@@ -307,7 +307,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
         tool.parentWindow= parent;
 
         if ( template!=null ) {
-            if ( template.endsWith(".pngwalk") ) {
+            URISplit split= URISplit.parse(template);
+            if ( split.file.endsWith(".pngwalk") ) {
                 Map<String,String> map= readPngwalkFile(template);
                 tool.product= map.get("product");
                 tool.baseurl= map.get("baseurl");
