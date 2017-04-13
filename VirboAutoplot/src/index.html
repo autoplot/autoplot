@@ -24,8 +24,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-04-12 r20643):</p>
+        <p>Bugfixes (2017-04-13 r20667):</p>
         <ul> 
+            <li>PDS-PPI node now gets data from http://pds-ppi.igpp.ucla.edu. 
+            <li>correctly handle pngwalk URIs with "?timerange=Apr+2017"
             <li>pitch angle distribution renderer finally uses curved pieces to draw, instead of trapezoids.  Thanks, Ed!
             <li>reduce verbosity of "uh-oh, span used on ordinal like month, day" warning.  I don't see that there's a problem with this.
             <li>1809: kludge in proper handling of signature for addMouseModule
@@ -85,9 +87,9 @@
         </ul>
         <p>Features:</p>
         <ul> 
-            <li>1787: add text field so that orbit number can be entered directly.
             <li>Jython editor now allows tabs to be used instead of spaces, when "tabIsCompletion" is false.
             <li>Jython editor now shows tabs, which are syntactically different than spaces.
+            <li>1787: add text field so that orbit number can be entered directly.
             <li>Introduce "gridIrregularY" to replace old LGrid.rebin codes.
             <li>TimeRangeEditor keeps track of last spacecraft used for orbits.
             <li>JUNO Perijove intervals added.
