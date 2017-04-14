@@ -38,6 +38,7 @@ import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.fsm.FileStorageModel;
+import org.das2.util.AboutUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
@@ -106,6 +107,14 @@ public class CDAWebDB {
                 DataSetURI.getFile( CDAWeb + "pub/software/cdawlib/AAREADME.txt", false, new NullProgressMonitor() );        
                 online= true;
             } catch ( IOException ex ) {
+                try {
+                    if ( !AboutUtil.isJreVersionAtLeast("1.8.0_102") ) {
+                        logger.warning("Java version is probably too old to connect to CDAWeb");
+                    }
+                } catch (ParseException ex1) {
+                    logger.warning("Java version may be too old to connect to CDAWeb");
+                }
+                
                 online= false;
             }
         }
