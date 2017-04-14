@@ -26,6 +26,9 @@
         
         <p>Bugfixes (2017-04-13 r20667):</p>
         <ul> 
+            <li>.html extension claimed for use for HTML tables.  As OpenDap is not used often and it was reserved to avoid confusion with it.
+            <li>Html export format restored after it was accidentally removed from available options.
+            <li>Digital renderer properly handles formats like "%d mph" and rank 0 rendering (where location is not known) works more like rank 1, using format and align.
             <li>PDS-PPI node now gets data from http://pds-ppi.igpp.ucla.edu. 
             <li>correctly handle pngwalk URIs with "?timerange=Apr+2017"
             <li>pitch angle distribution renderer finally uses curved pieces to draw, instead of trapezoids.  Thanks, Ed!
@@ -87,7 +90,8 @@
         </ul>
         <p>Features:</p>
         <ul> 
-            <li>Jython editor now allows tabs to be used instead of spaces, when "tabIsCompletion" is false.
+            <li>subtract filter added to remove confusion with diff, which is finite differences.  (Bill)
+            <li>Jython editor now allows tabs to be used instead of spaces, when "tabIsCompletion" is false. 
             <li>Jython editor now shows tabs, which are syntactically different than spaces.
             <li>1787: add text field so that orbit number can be entered directly.
             <li>Introduce "gridIrregularY" to replace old LGrid.rebin codes.
