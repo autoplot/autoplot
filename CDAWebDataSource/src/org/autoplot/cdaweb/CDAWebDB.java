@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -42,14 +41,13 @@ import org.das2.util.AboutUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
-import org.das2.util.filesystem.HtmlUtil;
-import org.das2.util.filesystem.HttpUtil;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -807,7 +805,7 @@ public class CDAWebDB {
                             }
                         }
                     }
-                } catch ( Exception ex2 ) {
+                } catch ( DOMException ex2 ) {
                     logger.log( Level.WARNING, "exception", ex2 );
                 }
             }
