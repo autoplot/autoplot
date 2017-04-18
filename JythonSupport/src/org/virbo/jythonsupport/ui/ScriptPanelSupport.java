@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.jythonsupport.ui;
 
 import java.beans.PropertyChangeEvent;
@@ -30,7 +27,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 import org.das2.DasApplication;
-import org.das2.util.DasExceptionHandler;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.python.core.PyException;
@@ -125,13 +121,10 @@ public class ScriptPanelSupport {
             saveAs();
             return;
         }
-        OutputStream out = new FileOutputStream(file);
-        try {
+        try (OutputStream out = new FileOutputStream(file)) {
             String text = editor.getText();
             out.write(text.getBytes());
             setDirty(false);
-        } finally {
-            out.close();
         }
     }
 
