@@ -8,8 +8,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.autoplot.bufferdataset.FloatDataSet;
 import org.autoplot.bufferdataset.LongDataSet;
+import org.das2.datum.LoggerManager;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -31,6 +34,8 @@ import org.virbo.dataset.SemanticOps;
  */
 public abstract class QDataSetBridge {
 
+    private static final Logger logger= LoggerManager.getLogger("qdataset.bridge");
+    
     QDataSet ds;
     Exception exception;
     
@@ -194,11 +199,9 @@ public abstract class QDataSetBridge {
                 sliceDep.put( nameFor( ads,true ), "PLANE_"+i );
                 i++;
             }
-            i=0;
         } catch ( Exception ex ) {
             this.exception= ex;
-            ex.printStackTrace(); // print the exception, because Exception handling is inconsistent with Matlab and IDL.
-            return;
+            logger.log(Level.WARNING, null, ex );
         }
     }
     
@@ -218,6 +221,7 @@ public abstract class QDataSetBridge {
         this.exception= null;
         Runnable run = new Runnable() {
 
+            @Override
             public void run() {
                 datasets.clear();
                 name= "";
@@ -232,7 +236,7 @@ public abstract class QDataSetBridge {
                     
                 } catch (Exception ex) {
                     exception= ex;
-                    ex.printStackTrace();
+                    logger.log( Level.WARNING, null, ex );
                     mon.setProgressMessage("EXCEPTION");
                     mon.finished();
                     return;
@@ -699,64 +703,91 @@ public abstract class QDataSetBridge {
         UnitsConverter uc= maybeGetConverter(ds1);
         
         if ( ds1 instanceof FDataSet || ds1 instanceof FloatDataSet ) {
-            if (ds1.rank() == 1) {
-                float[] result = new float[ds1.length()];
-                copyValues(ds1, result);
-                return result;
-            } else if (ds1.rank() == 2) {
-                float[][] result = new float[ds1.length()][ds1.length(0)];
-                copyValues(ds1, result);
-                return result;
-            } else if (ds1.rank() == 3) {
-                float[][][] result = new float[ds1.length()][ds1.length(0)][ds1.length(0, 0)];
-                copyValues(ds1, result);
-                return result;
-            } else if (ds1.rank() == 4) {
-                float[][][][] result = new float[ds1.length()][ds1.length(0)][ds1.length(0, 0)][ds1.length(0,0,0)];
-                copyValues(ds1, result);
-                return result;
-            } else {
-                throw new IllegalArgumentException("rank limit");
-            }  
+            switch (ds1.rank()) {
+                case 1:
+                {
+                    float[] result = new float[ds1.length()];
+                    copyValues(ds1, result);
+                    return result;
+                }
+                case 2:
+                {
+                    float[][] result = new float[ds1.length()][ds1.length(0)];
+                    copyValues(ds1, result);
+                    return result;
+                }
+                case 3:
+                {
+                    float[][][] result = new float[ds1.length()][ds1.length(0)][ds1.length(0, 0)];
+                    copyValues(ds1, result);
+                    return result;
+                }  
+                case 4:
+                {
+                    float[][][][] result = new float[ds1.length()][ds1.length(0)][ds1.length(0, 0)][ds1.length(0,0,0)];
+                    copyValues(ds1, result);
+                    return result;
+                }
+                default:
+                    throw new IllegalArgumentException("rank limit");
+            }
         } else if ( ds1 instanceof LongDataSet && uc==UnitsConverter.IDENTITY ) { // Special support for CDF TT2000
-             if (ds1.rank() == 1) {
-                long[] result = new long[ds1.length()];
-                copyValues(ds1, result);
-                return result;
-            } else if (ds1.rank() == 2) {
-                long[][] result = new long[ds1.length()][ds1.length(0)];
-                copyValues(ds1, result);
-                return result;
-            } else if (ds1.rank() == 3) {
-                long[][][] result = new long[ds1.length()][ds1.length(0)][ds1.length(0, 0)];
-                copyValues(ds1, result);
-                return result;
-            } else if (ds1.rank() == 4) {
-                long[][][][] result = new long[ds1.length()][ds1.length(0)][ds1.length(0, 0)][ds1.length(0,0,0)];
-                copyValues(ds1, result);
-                return result;
-            } else {
-                throw new IllegalArgumentException("rank limit");
-            }             
+            switch (ds1.rank()) {
+                case 1:
+                {
+                    long[] result = new long[ds1.length()];
+                    copyValues(ds1, result);
+                    return result;
+                }
+                case 2:
+                {
+                    long[][] result = new long[ds1.length()][ds1.length(0)];
+                    copyValues(ds1, result);
+                    return result;
+                }
+                case 3:
+                {
+                    long[][][] result = new long[ds1.length()][ds1.length(0)][ds1.length(0, 0)];
+                    copyValues(ds1, result);
+                    return result;
+                }             
+                case 4:
+                {
+                    long[][][][] result = new long[ds1.length()][ds1.length(0)][ds1.length(0, 0)][ds1.length(0,0,0)];
+                    copyValues(ds1, result);
+                    return result;
+                }
+                default:
+                    throw new IllegalArgumentException("rank limit");
+            }
         } else {
-            if (ds1.rank() == 1) {
-                double[] result = new double[ds1.length()];
-                values(name, result);
-                return result;
-            } else if (ds1.rank() == 2) {
-                double[][] result = new double[ds1.length()][ds1.length(0)];
-                values(name, result);
-                return result;
-            } else if (ds1.rank() == 3) {
-                double[][][] result = new double[ds1.length()][ds1.length(0)][ds1.length(0, 0)];
-                values(name, result);
-                return result;
-            } else if (ds1.rank() == 4) {
-                double[][][][] result = new double[ds1.length()][ds1.length(0)][ds1.length(0, 0)][ds1.length(0,0,0)];
-                values(name, result);
-                return result;
-            } else {
-                throw new IllegalArgumentException("rank limit");
+            switch (ds1.rank()) {
+                case 1:
+                {
+                    double[] result = new double[ds1.length()];
+                    values(name, result);
+                    return result;
+                }
+                case 2:
+                {
+                    double[][] result = new double[ds1.length()][ds1.length(0)];
+                    values(name, result);
+                    return result;
+                }
+                case 3:
+                {
+                    double[][][] result = new double[ds1.length()][ds1.length(0)][ds1.length(0, 0)];
+                    values(name, result);
+                    return result;
+                }
+                case 4:
+                {
+                    double[][][][] result = new double[ds1.length()][ds1.length(0)][ds1.length(0, 0)][ds1.length(0,0,0)];
+                    values(name, result);
+                    return result;
+                }
+                default:
+                    throw new IllegalArgumentException("rank limit");
             }
         }
     }
@@ -779,22 +810,29 @@ public abstract class QDataSetBridge {
         if ( ds1==null ) {
             throw new IllegalArgumentException("No such dataset: "+name );
         }
-        if (ds1.rank() == 1 ) {
-            throw new IllegalArgumentException("dataset is rank 1, slice not allowed");
-        } else if (ds1.rank() == 2) {
-            double[] result = new double[ds1.length(i)];
-            slice(name, i, result);
-            return result;
-        } else if (ds1.rank() == 3) {
-            double[][] result = new double[ds1.length(i)][ds1.length(i,0)];
-            slice(name, i,result);
-            return result;
-        } else if (ds1.rank() == 4) {
-            double[][][] result = new double[ds1.length(i)][ds1.length(i,0)][ds1.length(i,0,0)];
-            slice(name, i,result);
-            return result;
-        } else {
-            throw new IllegalArgumentException("rank limit");
+        switch (ds1.rank()) {
+            case 1:
+                throw new IllegalArgumentException("dataset is rank 1, slice not allowed");
+            case 2:
+            {
+                double[] result = new double[ds1.length(i)];
+                slice(name, i, result);
+                return result;
+            }
+            case 3:
+            {
+                double[][] result = new double[ds1.length(i)][ds1.length(i,0)];
+                slice(name, i,result);
+                return result;
+            }
+            case 4:
+            {
+                double[][][] result = new double[ds1.length(i)][ds1.length(i,0)][ds1.length(i,0,0)];
+                slice(name, i,result);
+                return result;
+            }
+            default:
+                throw new IllegalArgumentException("rank limit");
         }
     }
 
@@ -809,57 +847,80 @@ public abstract class QDataSetBridge {
         UnitsConverter uc= maybeGetConverter(ds1);
         if ( ds1 instanceof FDataSet || ds1 instanceof FloatDataSet) { 
             //TODO: don't forget about BufferDataSet FloatDataSet
-            if (ds1.rank() == 1 ) {
-                float[] result = new float[ds1.length()];
-                copyValues( ds1, result );
-                return result;
-            } else if (ds1.rank() == 2) {
-                float[][] result = new float[ds1.length()][ds1.length(0)];
-                copyValues( ds1, result );
-                return result;
-            } else if (ds1.rank() == 3) {
-                float[][][] result = new float[ds1.length()][ds1.length(0)][ds1.length(0,0)];
-                copyValues( ds1, result );
-                return result;
-            } else {
-                throw new IllegalArgumentException("rank limit");
+            switch (ds1.rank()) {
+                case 1:
+                {
+                    float[] result = new float[ds1.length()];
+                    copyValues( ds1, result );
+                    return result;
+                }
+                case 2:
+                {
+                    float[][] result = new float[ds1.length()][ds1.length(0)];
+                    copyValues( ds1, result );
+                    return result;
+                }
+                case 3:
+                {
+                    float[][][] result = new float[ds1.length()][ds1.length(0)][ds1.length(0,0)];
+                    copyValues( ds1, result );
+                    return result;
+                }
+                default:
+                    throw new IllegalArgumentException("rank limit");
             }
         } else if ( ds1 instanceof LongDataSet && uc==UnitsConverter.IDENTITY ) { // Special support for CDF TT2000
-             if (ds1.rank() == 1) {
-                long[] result = new long[ds1.length()];
-                copyValues(ds1, result);
-                return result;
-            } else if (ds1.rank() == 2) {
-                long[][] result = new long[ds1.length()][ds1.length(0)];
-                copyValues(ds1, result);
-                return result;
-            } else if (ds1.rank() == 3) {
-                long[][][] result = new long[ds1.length()][ds1.length(0)][ds1.length(0, 0)];
-                copyValues(ds1, result);
-                return result;
-            } else if (ds1.rank() == 4) {
-                long[][][][] result = new long[ds1.length()][ds1.length(0)][ds1.length(0, 0)][ds1.length(0,0,0)];
-                copyValues(ds1, result);
-                return result;
-            } else {
-                throw new IllegalArgumentException("rank limit");
-            }                         
+            switch (ds1.rank()) {
+                case 1:
+                {
+                    long[] result = new long[ds1.length()];
+                    copyValues(ds1, result);
+                    return result;
+                }
+                case 2:
+                {
+                    long[][] result = new long[ds1.length()][ds1.length(0)];
+                    copyValues(ds1, result);
+                    return result;
+                }
+                case 3:
+                {
+                    long[][][] result = new long[ds1.length()][ds1.length(0)][ds1.length(0, 0)];
+                    copyValues(ds1, result);
+                    return result;
+                }                         
+                case 4:
+                {
+                    long[][][][] result = new long[ds1.length()][ds1.length(0)][ds1.length(0, 0)][ds1.length(0,0,0)];
+                    copyValues(ds1, result);
+                    return result;
+                }
+                default:
+                    throw new IllegalArgumentException("rank limit");
+            }
         } else {
-            if (ds1.rank() == 1 ) {
-                double[] result = new double[ds1.length()];
-                copyValues( ds1, result );
-                return result;
-            } else if (ds1.rank() == 2) {
-                double[][] result = new double[ds1.length()][ds1.length(0)];
-                copyValues( ds1, result );
-                return result;
-            } else if (ds1.rank() == 3) {
-                double[][][] result = new double[ds1.length()][ds1.length(0)][ds1.length(0,0)];
-                copyValues( ds1, result );
-                return result;
-            } else {
-                throw new IllegalArgumentException("rank limit");
-            }            
+            switch (ds1.rank()) {
+                case 1:
+                {
+                    double[] result = new double[ds1.length()];
+                    copyValues( ds1, result );
+                    return result;
+                }
+                case 2:
+                {
+                    double[][] result = new double[ds1.length()][ds1.length(0)];
+                    copyValues( ds1, result );
+                    return result;
+                }
+                case 3:
+                {            
+                    double[][][] result = new double[ds1.length()][ds1.length(0)][ds1.length(0,0)];
+                    copyValues( ds1, result );
+                    return result;
+                }
+                default:
+                    throw new IllegalArgumentException("rank limit");
+            }
         }
     }
 
@@ -986,9 +1047,11 @@ public abstract class QDataSetBridge {
     }
 
     /**
-     * return the length of the dimensions of the dataset, once sliced at index i.
+     * return the lengths of the dimensions of the named dataset, once sliced at index i.
      * @param name
+     * @param i the index to slice
      * @return
+     * @see #length() length which returns the length of the zeroth index.
      */
     public int[] lengths(String name, int i) {
         QDataSet ds1= datasets.get(name);
@@ -1004,9 +1067,9 @@ public abstract class QDataSetBridge {
     }
 
     /**
-     * return the length of the zeroth dimension of the main dataset.
-     * @param name
-     * @return
+     * return the lengths of the dimensions of the main dataset, once sliced at index i.
+     * @param i the index to slice
+     * @return the lengths of each dimension.
      */
     public int[] lengths(int i) {
         return lengths(name,i);
@@ -1015,7 +1078,7 @@ public abstract class QDataSetBridge {
     /**
      * return the length of the zeroth dimension of the dataset
      * @param name
-     * @return
+     * @return the length of the zeroth dimension 
      */
     public int length(String name) {
         QDataSet ds1= datasets.get(name);
@@ -1028,8 +1091,7 @@ public abstract class QDataSetBridge {
 
     /**
      * return the length of the zeroth dimension of the main dataset.
-     * @param name
-     * @return
+     * @return the length of the zeroth dimension 
      */
     public int length() {
         return length(name);
@@ -1061,7 +1123,8 @@ public abstract class QDataSetBridge {
      * returns one of String, int, double, float, int[], double, float[]
      * @param name
      * @param propname
-     * @return
+     * @param i
+     * @return the property
      */
     public Object property(String name, String propname, int i ) {
         Object prop = datasets.get(name).property(propname,i);
@@ -1069,7 +1132,7 @@ public abstract class QDataSetBridge {
             return nameFor((QDataSet) prop);
         } else if (prop instanceof Units) {
             for ( Units u: prefUnits ) {
-                if ( u.isConvertableTo( SemanticOps.getUnits( datasets.get(this.name) )) ) {
+                if ( u.isConvertibleTo( SemanticOps.getUnits( datasets.get(this.name) )) ) {
                     return u.toString();
                 }
             }
@@ -1113,7 +1176,7 @@ public abstract class QDataSetBridge {
         } else if (prop instanceof Units) {
             Units dsu=  SemanticOps.getUnits( datasets.get(name) );
             for ( Units u: prefUnits ) {
-                if ( u.isConvertableTo( dsu ) ) {
+                if ( u.isConvertibleTo( dsu ) ) {
                     return u.toString();
                 }
             }
@@ -1135,7 +1198,7 @@ public abstract class QDataSetBridge {
      * @return
      */
     public Map<String, Object> properties(String name) {
-        LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>(DataSetUtil.getProperties(datasets.get(name)));
+        LinkedHashMap<String, Object> result = new LinkedHashMap<>(DataSetUtil.getProperties(datasets.get(name)));
         for (String s : result.keySet()) {
             result.put(s, property(name, s));
         }
@@ -1144,7 +1207,6 @@ public abstract class QDataSetBridge {
 
     /**
      * returns one of String, int, double, float, int[], double, float[]
-     * @param name
      * @param propname
      * @return
      */
@@ -1164,7 +1226,7 @@ public abstract class QDataSetBridge {
     }
 
     public Map<String, Object> properties() {
-        LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>(DataSetUtil.getProperties(datasets.get(name)));
+        LinkedHashMap<String, Object> result = new LinkedHashMap<>(DataSetUtil.getProperties(datasets.get(name)));
         for (String s : result.keySet()) {
             result.put(s, property(name, s));
         }
