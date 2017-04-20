@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Tabs are shown in Jython editor now, and can be used as Jython indentation character.  This was a bit painful to figure out, and the upper screenshot shows where the wrong method was used, before a GitHub version of the editor (JSyntaxPane) was modified instead.
+        <p><small>Wedges in the PitchAngleDistribution mode are finally rounded.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,7 @@
         
         <p>Bugfixes (2017-04-13 r20667):</p>
         <ul> 
+            <li>orbitRenderer setTickVDescriptor is respected now.
             <li>.html extension claimed for use for HTML tables.  As OpenDap is not used often and it was reserved to avoid confusion with it.
             <li>Html export format restored after it was accidentally removed from available options.
             <li>Digital renderer properly handles formats like "%d mph" and rank 0 rendering (where location is not known) works more like rank 1, using format and align.
@@ -90,6 +91,8 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>DDataSet family of QDataSet implementations implement trim(0,n) by returning self, avoiding copy.
+            <li>add reduceBins which removes a bins dimension with the linear or geometric average.
             <li>subtract filter added to remove confusion with diff, which is finite differences.  (Bill)
             <li>Jython editor now allows tabs to be used instead of spaces, when "tabIsCompletion" is false. 
             <li>Jython editor now shows tabs, which are syntactically different than spaces.
