@@ -95,12 +95,16 @@ public class LabelConverter extends Converter {
                         }
                         String contextStr= DataSetUtil.contextAsString(dataSet);
                         title= insertString( title, "CONTEXT", contextStr );
+                    } else {
+                        title= insertString( title, "CONTEXT", "" ); 
                     }
+                } else {
+                    title= insertString( title, "CONTEXT", "" );// the problem here is that something needs to be inserted, otherwise DasPlot will use it.
                 }
             }
             if ( title.contains("PLOT_CONTEXT") ) {
                 title= insertString( title, "PLOT_CONTEXT", "%{CONTEXT}");
-            }
+            }            
             if ( title.contains("USER_PROPERTIES" ) ) {
                 if ( pe!=null ) {
                     QDataSet dataSet= pe.getController().getDataSet();
