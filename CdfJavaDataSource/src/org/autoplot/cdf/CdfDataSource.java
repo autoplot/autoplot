@@ -1025,7 +1025,7 @@ public class CdfDataSource extends AbstractDataSource {
         DatumRange vrange= IstpMetadataModel.getValidRange( thisAttributes, units );
         if ( vrange!=null ) {
             if ( vrange.width().value()<=0 ) {
-                logger.warning("ignoring VALID_MIN and VALID_MAX because they are equal or out of order.");
+                logger.fine("ignoring VALID_MIN and VALID_MAX because they are equal or out of order.");
             } else {
                 QDataSet extentds= Ops.extentSimple( result,null );
                 if ( isFinite( extentds.value(0) ) ) {
@@ -1035,7 +1035,7 @@ public class CdfDataSource extends AbstractDataSource {
                         result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
                         result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );                    
                     } else {
-                        logger.warning("ignoring VALID_MIN and VALID_MAX because no timetags would be considered valid.");
+                        logger.fine("ignoring VALID_MIN and VALID_MAX because no timetags would be considered valid.");
                     }
                 } else {
                     logger.fine("using VALID_MIN and VALID_MAX to indictate that all data is invalid.");
@@ -1078,22 +1078,22 @@ public class CdfDataSource extends AbstractDataSource {
                         result.putProperty( QDataSet.BIN_MINUS, delta );
                     } else {
                         result.putProperty( QDataSet.BIN_PLUS, null );
-                        logger.log(Level.WARNING, "DELTA_MINUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
+                        logger.log(Level.FINE, "DELTA_MINUS_VAR units are not convertible: {0}", SemanticOps.getUnits(delta));
                     }
                 } else {
                     if ( !UnitsUtil.isRatioMeasurement(deltaUnits) ) {
-                        logger.log(Level.WARNING, "DELTA_PLUS_VAR units are not ratio measurements having a meaningful zero: {0}", new Object[] { deltaUnits } );
+                        logger.log(Level.FINE, "DELTA_PLUS_VAR units are not ratio measurements having a meaningful zero: {0}", new Object[] { deltaUnits } );
                     } else if ( result.length()!=delta.length() ) {
-                        logger.log(Level.WARNING, "DELTA_PLUS_VAR length ({0,number,#})!= data length ({1,number,#})", new Object[] { delta.length(), result.length() } );
+                        logger.log(Level.FINE, "DELTA_PLUS_VAR length ({0,number,#})!= data length ({1,number,#})", new Object[] { delta.length(), result.length() } );
                     } else {
-                        logger.log(Level.WARNING, "DELTA_PLUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
+                        logger.log(Level.FINE, "DELTA_PLUS_VAR units are not convertible: {0}", SemanticOps.getUnits(delta));
                     }
                 }
             } else {
                 if ( UnitsUtil.isTimeLocation(units) ) {
                     logger.log(Level.FINE, "DELTA_PLUS_VAR variable is not found for {0}: {1}", new Object[] { svariable, deltaPlus } );                    
                 } else {
-                    logger.log(Level.WARNING, "DELTA_PLUS_VAR variable is not found for {0}: {1}", new Object[] { svariable, deltaPlus } );
+                    logger.log(Level.FINE, "DELTA_PLUS_VAR variable is not found for {0}: {1}", new Object[] { svariable, deltaPlus } );
                 }
             }
         }
@@ -1125,7 +1125,7 @@ public class CdfDataSource extends AbstractDataSource {
                         lablDs= wrapDataSet(cdf, labl, constraints, idep > 0, false, null);
                         if ( idep==1 && attributes!=null ) attributes.put( "LABL_PTR_1", lablDs );
                     } catch ( Exception ex ) {
-                        logger.log( Level.WARNING, "unable to load LABL_PTR_"+sidep+" for "+svariable, ex );
+                        logger.log( Level.FINE, "unable to load LABL_PTR_"+sidep+" for "+svariable, ex );
                         thisAttributes.remove("LABL_PTR_" + sidep);
                     }
                     if ( lablDs!=null && lablDs.length()<4 && displayType==null ) {
