@@ -1128,7 +1128,11 @@ public class PlotController extends DomNodeController {
                 System.err.println("whoops, getting there");
                 return;
             }
-            dasPlot.setTitle( (String)titleConverter.convertForward( plot.getTitle() ) );
+            String t= (String)titleConverter.convertForward( plot.getTitle() );
+            if ( t.contains("0.0 to 100.0" ) ) {
+                new Exception("temporary for test002_022").printStackTrace(); // TODO: temporary
+            }
+            dasPlot.setTitle( t );
             dasPlot.getYAxis().setLabel( (String)plot.getYaxis().getController().labelConverter.convertForward( plot.getYaxis().getLabel() ) );
             dasPlot.getXAxis().setLabel( (String)plot.getXaxis().getController().labelConverter.convertForward( plot.getXaxis().getLabel() ) );
             QDataSet pds= plotElement.getController().getDataSet();
