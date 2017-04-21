@@ -99,7 +99,7 @@ public class LabelConverter extends Converter {
                         title= insertString( title, "CONTEXT", "" ); 
                     }
                 } else {
-                    title= insertString( title, "CONTEXT", "" );// the problem here is that something needs to be inserted, otherwise DasPlot will use it.
+                    title= insertString( title, "CONTEXT", "" );// https://sourceforge.net/p/autoplot/bugs/1814/
                 }
             }
             if ( title.contains("PLOT_CONTEXT") ) {
