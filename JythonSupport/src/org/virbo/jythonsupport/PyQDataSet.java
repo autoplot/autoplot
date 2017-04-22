@@ -1,14 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.jythonsupport;
 
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumUtil;
@@ -217,7 +213,7 @@ public class PyQDataSet extends PyJavaInstance {
     
     private final static Map<String,PyReflectedFunction> binaryInfixMethods;
     static {
-        binaryInfixMethods= new HashMap<String, PyReflectedFunction>(); //TODO: what is this?
+        binaryInfixMethods= new HashMap<>(); //TODO: what is this?
         binaryInfixMethods.put( "gt", new PyReflectedFunction("gt") );
         
         for ( Method m: BinaryInfixOps.class.getMethods() ) {
