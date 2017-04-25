@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Wedges in the PitchAngleDistribution mode are finally rounded.
+        <p><small>This shows a bug where the orbit plot broke the line but still drew ticks, which is fixed now.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-04-21 r20667):</p>
+        <p>Bugfixes (2017-04-25 r20695):</p>
         <ul> 
+            <li>1815: breaks in orbitPlot were not drawn properly.
             <li>Quiet noisy CDF warnings, which endusers don't see and CDF developers can adjust log levels to see.
             <li>1814: test002_022 shows mismanagement of %{CONTEXT} property in one branch.
             <li>orbitRenderer setTickVDescriptor is respected now.
