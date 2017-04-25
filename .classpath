@@ -54,11 +54,11 @@
 	<classpathentry kind="lib" path="APLibs/lib/javacsv.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/javaws.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/opendap-2.1.jar"/>
-	<classpathentry kind="lib" path="APLibs/lib/cdfj_20141113.jar"/>
-	<classpathentry kind="lib" path="APLibs/lib/jsamp-1.1.jar"/>
-	<classpathentry kind="lib" path="APLibs/lib/jsyntaxpane-0.9.6.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/metadata-extractor-2.6.4.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/mailapi.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/itextpdf-5.4.3.jar"/>
+	<classpathentry kind="lib" path="APLibs/lib/jsamp-1.3.5.jar"/>
+	<classpathentry kind="lib" path="APLibs/lib/cdfj-20170223.jar"/>
+	<classpathentry kind="lib" path="APLibs/lib/jsyntaxpane-1.1.4.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
