@@ -10,6 +10,7 @@ import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -169,9 +170,7 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
                         length+=ds.length();
                         return true;
                         
-                    } catch (IllegalArgumentException ex) {
-                        return false;
-                    } catch (IOException ex) {
+                    } catch (IllegalArgumentException | IOException ex) {
                         return false;
                     }
 
@@ -179,6 +178,7 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
 
                 @Override
                 public QDataSet next() {
+                    if ( result==null ) throw new NoSuchElementException();
                     QDataSet r= result;
                     result= null;
                     return r;
