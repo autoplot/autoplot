@@ -1032,8 +1032,15 @@ public class CdfDataSource extends AbstractDataSource {
                     DatumRange extent= DataSetUtil.asDatumRange( extentds );
                     if ( dependantVariable || extent.intersects(vrange) ) { // if this data depends on other independent data, or intersects the valid range.
                         // typical route
-                        result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
-                        result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );                    
+                        if ( UnitsUtil.isTimeLocation( vrange.getUnits() ) ) {
+                            if ( extent.intersects(vrange) ) {
+                                result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
+                                result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );
+                            }
+                        } else {
+                            result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
+                            result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );                    
+                        }
                     } else {
                         logger.fine("ignoring VALID_MIN and VALID_MAX because no timetags would be considered valid.");
                     }
