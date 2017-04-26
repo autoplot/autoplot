@@ -174,18 +174,6 @@ public class HapiDataSource extends AbstractDataSource {
         
         return result;
     }
-
-    public static class HapiParameter {
-        String name="";
-        String type="";
-        
-        
-    }
-    
-    public static class HapiDoc {
-        String description="";
-        
-    }
     
     public static final double FILL_VALUE= -1e38;
     
