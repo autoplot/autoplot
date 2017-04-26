@@ -58,7 +58,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -66,7 +65,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -719,6 +717,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 org.das2.util.LoggerManager.logGuiEvent(ev);                
                 final String value= dataSetSelector.getValue();
                 Runnable run= new Runnable() {
+                    @Override
                     public void run() {
                         dataSetSelector.setValue("vap+hapi:"+value);
                         dataSetSelector.maybePlot( ev.getModifiers() );
@@ -1955,18 +1954,19 @@ APSplash.checkTime("init 52.9");
                 if ( AppManager.getInstance().getApplicationCount()==1 ) {
                     int opt= JOptionPane.showConfirmDialog( AutoplotUI.this,
                             "Quit application?", "Quit Autoplot", JOptionPane.YES_NO_CANCEL_OPTION );
-                    if ( opt==JOptionPane.YES_OPTION ) {
-                        //normal route
-                        if ( AppManager.getInstance().requestQuit() ) {
-                            
-                        } else {
+                    switch (opt) {
+                        case JOptionPane.YES_OPTION:
+                            //normal route
+                            if ( AppManager.getInstance().requestQuit() ) {
+                                
+                            } else {
+                                return;
+                            }   break;
+                        case JOptionPane.NO_OPTION:
+                            AutoplotUI.this.dom.getController().reset();
                             return;
-                        }
-                    } else if ( opt==JOptionPane.NO_OPTION ) {
-                        AutoplotUI.this.dom.getController().reset();
-                        return;
-                    } else {
-                        return;
+                        default:
+                            return;
                     }
                 }
                 AutoplotUI.this.dispose();
@@ -4159,7 +4159,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
                     try {
                         return DataSetURI.getDataSource(uri).getDataSet( new NullProgressMonitor() );
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        logger.log(Level.INFO,null,ex);
                         return null;
                     }
                 }
@@ -5891,6 +5891,7 @@ APSplash.checkTime("init 240");
                             sel.maybePlot( KeyEvent.ALT_MASK ); // this should enter the editor as before
                         } else {
                             Runnable run= new Runnable() {
+                                @Override
                                 public void run() {
                                     support.addPlotElementFromBookmark( "Add Bookmarked URI", furi ); 
                                 }
