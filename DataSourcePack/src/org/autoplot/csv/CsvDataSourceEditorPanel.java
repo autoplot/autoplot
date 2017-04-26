@@ -90,12 +90,16 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
     Tool currentTool = Tool.NONE;
     JToggleButton currentToolButton;
 
+    /**
+     * initializer 
+     */
     public CsvDataSourceEditorPanel() {
         initComponents();
         jTable1.setCellSelectionEnabled(true);
 
         jTable1.getColumnModel().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting()) {
                     return;
@@ -409,7 +413,7 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 for ( int i=0; i<iskip; i++ ) {
                     breader.readLine();
                 }
-            } catch ( Exception ex ) {
+            } catch ( IOException | NumberFormatException ex ) {
                 logger.log( Level.WARNING,  ex.getMessage(), ex );
             } }
 
@@ -423,7 +427,7 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 for ( int i=0; i<iskip; i++ ) {
                     breader.readLine();
                 }
-            } catch ( Exception ex ) {
+            } catch ( IOException | NumberFormatException ex ) {
                 logger.log( Level.WARNING, ex.getMessage(), ex );
             } }
             CsvReader reader= new CsvReader( breader );
@@ -439,7 +443,7 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             reader.readHeaders();
             int ncol= reader.getHeaderCount();
 
-            headers= new ArrayList<String>();
+            headers= new ArrayList<>();
             
             headers.addAll( Arrays.asList(reader.getHeaders()) );
 
@@ -447,7 +451,7 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 headers.set( i, "field"+i );
             }
 
-            columns= new HashMap<Integer, String>();
+            columns= new HashMap<>();
             for ( int i=0; i<ncol; i++ ) {
                 columns.put( i, headers.get(i) );
                 jTable1.getColumnModel().getColumn(i).setHeaderValue( headers.get(i) );
@@ -524,13 +528,30 @@ private void skipTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:
         resetTable();
     }
 }//GEN-LAST:event_skipTextFieldFocusLost
-    protected File file = null;
+
+/**
+ * the current file
+ */
+protected File file = null;
+
+/**
+ * the current file
+ */
     public static final String PROP_FILE = "file";
 
+    /**
+     * return the current file
+     * @return  the current file
+     */
     public File getFile() {
         return file;
     }
 
+    /**
+     * set the current file
+     * @param file the current file
+     * @throws IOException 
+     */
     public void setFile(File file) throws IOException {
         this.file = file;
 
@@ -557,18 +578,20 @@ private void skipTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:
     public static final String PROP_DEP0 = "depend0";
     public static final String PROP_DELIM = "delim";
 
+    @Override
     public JPanel getPanel() {
         return this;
     }
 
-    private int getIntValue(String name, int def) {
-        if (params.get(name) == null) {
-            return def;
-        } else {
-            return Integer.parseInt(params.get(name));
-        }
-    }
+//    private int getIntValue(String name, int def) {
+//        if (params.get(name) == null) {
+//            return def;
+//        } else {
+//            return Integer.parseInt(params.get(name));
+//        }
+//    }
 
+    @Override
     public void setURI(String url) {
         try {
             split = URISplit.parse(url);
@@ -610,6 +633,7 @@ private void skipTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:
 
     }
 
+    @Override
     public String getURI() {
 
         String delim= String.valueOf( delimComboBox.getSelectedItem() );

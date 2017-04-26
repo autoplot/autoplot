@@ -36,6 +36,11 @@ import org.virbo.dsutil.DataSetBuilder;
  */
 public class CsvDataSource extends AbstractDataSource {
     private static final Logger logger= LoggerManager.getLogger("apdss.csv");
+    
+    /**
+     * initializer
+     * @param uri the URI
+     */
     public CsvDataSource(URI uri) {
         super(uri);
     }

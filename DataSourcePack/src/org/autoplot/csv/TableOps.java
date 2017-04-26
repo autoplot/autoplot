@@ -13,17 +13,19 @@ import java.util.regex.Pattern;
 
 /**
  * I'd still like to refactor all the table-type sources to get the common codes.
- * These include:
- *   * html tables
- *   * xls, csv
- *   * dat
- *
+ * These include:<ul>
+ *   <li> html tables
+ *   <li> xls, csv
+ *   <li> dat
+ * </ul>
  * @author jbf
  */
 public class TableOps {
 
     /**
      * returns the index of the field.  Supports the name, or field0, or 0, etc.
+     * @param string the field for which we want to identify the index
+     * @param fieldNames the field names for each column.
      * @return the field index, or -1 if the column doesn't exist.
      */
     public static int getFieldIndex(String string, String[] fieldNames) {
@@ -46,13 +48,14 @@ public class TableOps {
     }
 
    /**
-     * returns the field index of the name, which can be:
-     *   a column name
-     *   an implicit column name "field1"
-     *   a column index (0 is the first column)
-     *   a negative column index (-1 is the last column)
+     * returns the field index of the name, which can be:<ul>
+     *   <li>a column name
+     *   <li>an implicit column name "field1"
+     *   <li>a column index (0 is the first column)
+     *   <li>a negative column index (-1 is the last column)
+     * </ul>
      * @param name
-     * @param count
+     * @param fieldNames the field names for each column.
      * @return the index of the field, or -1 if the column doesn't exist.
      */
     public static int columnIndex( String name, String[] fieldNames ) {
@@ -71,10 +74,13 @@ public class TableOps {
     /**
      * parse range strings like "3:6", "3:-5", and "Bx_gsm-Bz_gsm"
      * if the delimiter is colon, then the end is exclusive.  If it is "-",
-     * then it is inclusive.
-     * @param o
-     * @param columnCount
-     * @return
+     * then it is inclusive.  For example,<ul>
+     * <li>3:6 -> [3,6]
+     * <li>3-5 -> [3,6]
+     * </ul>
+     * @param o the range string or field names, etc.
+     * @param fieldNames the field names for each column.
+     * @return the two-element range, where first index is inclusive, second is exclusive.
      * @throws java.lang.NumberFormatException
      */
     public static int[] parseRangeStr(String o, String[] fieldNames ) throws NumberFormatException {
