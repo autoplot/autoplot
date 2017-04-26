@@ -20,6 +20,7 @@ import java.net.URI;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
+import java.util.logging.Logger;
 import org.virbo.dataset.QDataSet;
 import org.das2.dataset.DataSetAdapter;
 import org.das2.dataset.NoDataInIntervalException;
@@ -37,8 +38,14 @@ import org.virbo.qstream.QDataSetStreamHandler;
  * @author jbf
  */
 public class Das2StreamDataSource extends AbstractDataSource {
+    
+    private static final Logger logger= Logger.getLogger("apdss.d2s");
 
-    /** Creates a new instance of Das2StreamDataSource */
+    /** 
+     * Creates a new instance of Das2StreamDataSource
+     * @param uri the URI.
+     * @throws java.io.IOException 
+     */
     public Das2StreamDataSource(URI uri) throws IOException {
         super(uri);
     }
@@ -92,7 +99,7 @@ public class Das2StreamDataSource extends AbstractDataSource {
 
         } else {
             try {
-                HashMap<String,String> props = new HashMap<String,String>();
+                HashMap<String,String> props = new HashMap<>();
                 props.put("file", DataSetURI.fromUri(uri) );
 
                 DataSetStreamHandler handler = new DataSetStreamHandler(props, mon);
