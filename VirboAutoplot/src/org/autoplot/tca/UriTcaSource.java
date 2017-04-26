@@ -44,7 +44,7 @@ public class UriTcaSource extends AbstractQFunction {
     QDataSet error;
     QDataSet errorNoDs;
     QDataSet nonValueDs;
-    QDataSet nonMonoDs;
+    //QDataSet nonMonoDs;
     QDataSet initialError;
 
     static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.tca.uritcasource" );
@@ -59,7 +59,7 @@ public class UriTcaSource extends AbstractQFunction {
         error= DataSetUtil.asDataSet( eu.createDatum("Error") );
         errorNoDs= DataSetUtil.asDataSet( eu.createDatum("No Data") );
         nonValueDs= DataSetUtil.asDataSet( eu.createDatum(" ") );
-        nonMonoDs= DataSetUtil.asDataSet( eu.createDatum("Non Mono") );
+        //nonMonoDs= DataSetUtil.asDataSet( eu.createDatum("Non Mono") );
 
         DataSource dss1;
         try {
