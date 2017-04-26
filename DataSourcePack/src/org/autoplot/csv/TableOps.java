@@ -127,9 +127,13 @@ public class TableOps {
         char delimiter=',';
         BufferedReader read= new BufferedReader(new InputStreamReader(thein));
         String l= read.readLine();
-        if ( l.split(";",-2).length > l.split(",",-2).length ) delimiter=';';
-        thein.unread( 10 );
-        thein.unread(l.getBytes());
-        return delimiter;
+        if ( l!=null ) {
+            if ( l.split(";",-2).length > l.split(",",-2).length ) delimiter=';';
+            thein.unread( 10 );
+            thein.unread(l.getBytes());
+            return delimiter;
+        } else {
+            return ',';
+        }
     }
 }
