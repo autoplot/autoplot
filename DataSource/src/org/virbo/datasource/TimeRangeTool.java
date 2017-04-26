@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -235,7 +236,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
      * @param scs 
      */
     public static void setAdditionalSpacecraftForOrbit( String[] scs ) {
-        extraSpacecraft= scs;
+        extraSpacecraft= Arrays.copyOf(scs,scs.length);
     }
     
     private void resetSpacecraft( final String sc  ) {
