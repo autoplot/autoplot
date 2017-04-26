@@ -19,7 +19,6 @@ import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import org.das2.datum.Datum;
@@ -50,10 +49,10 @@ public class TimeRangeTool extends javax.swing.JPanel {
      */
     private DatumRange pendingTimeRange;
 
-    private Preferences prefs;
+    private final Preferences prefs;
     private static final String PREF_SPACECRAFT = "spacecraft";
 
-    private InputVerifier verifier=null;
+    private final InputVerifier verifier=null; //TODO: review where this was used, since now it is not used.
         
     /** Creates new form TimeRangeTool */
     public TimeRangeTool() {
