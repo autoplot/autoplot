@@ -94,11 +94,14 @@ public class LabelConverter extends Converter {
                             }
                         }
                         String contextStr= DataSetUtil.contextAsString(dataSet);
+                        System.err.println("bug1814: context substitution success");
                         title= insertString( title, "CONTEXT", contextStr );
                     } else {
+                        System.err.println("bug1814: ds is null");
                         title= insertString( title, "CONTEXT", "" ); 
                     }
                 } else {
+                    System.err.println("bug1814: pe is null");
                     title= insertString( title, "CONTEXT", "" );// https://sourceforge.net/p/autoplot/bugs/1814/
                 }
             }
