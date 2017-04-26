@@ -4121,7 +4121,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
         if ( uri.trim().length()>0 ) {
             URISplit split= URISplit.parse(uri);
             if ( split.vapScheme==null || !split.vapScheme.equals("vap+inline") ) {
-                if ( split.vapScheme.equals("vap+internal") ) {
+                if ( "vap+internal".equals(split.vapScheme) ) {
                     String[] ss= split.path.split(",",-2);
                     StringBuilder urib= new StringBuilder( "vap+inline:" );
                     for (String s : ss) {
