@@ -63,11 +63,13 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         
         List<QDataSet> dss= new ArrayList<>();
         
-        String groupTitle= null;
+        String groupTitle;
         
         QDataSet dep0= (QDataSet) data.property( QDataSet.DEPEND_0 );
         if ( dep0!=null ) {
             dss.add(dep0);
+        } else {
+            throw new IllegalArgumentException("data must have a DEPEND_0");
         }
         
         boolean dep1IsOrdinal= false;
@@ -138,8 +140,12 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         jo.put( "sampleStopDate", dr.max().toString() );
         jo.put( "parameters", parameters );
         
-        if ( !infoFile.getParentFile().exists() ) {
-            infoFile.getParentFile().mkdirs();
+        File parentFile= infoFile.getParentFile();
+        if ( parentFile==null ) throw new IllegalArgumentException("info has no parent");
+        if ( !parentFile.exists() ) {
+            if ( !parentFile.mkdirs() ) {
+                throw new IllegalArgumentException("unable to make folder for info file.");
+            }
         }
         
         try ( FileWriter fw = new FileWriter(infoFile) ) {
