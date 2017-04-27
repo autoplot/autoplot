@@ -272,23 +272,6 @@ public class InlineDataSource extends AbstractDataSource {
                         
         List<String> script= new ArrayList<>();
         String timerange= InlineDataSourceFactory.getScript( s, script );
-
-        s= s.replaceAll("%20"," ");
-        //s= s.replaceAll("\\+"," ");
-
-        String noFile= null;
-        if ( s.startsWith("vap+inline:file:///") ) {
-            noFile= s.substring(19);
-        } else if ( s.startsWith("vap+inline:file:/") ) { // this is an old bug where file was inserted.
-            noFile= s.substring(17);
-        } else if ( s.startsWith("vap+inline:") ) {
-            noFile= s.substring(11);
-        } else { // do what we did before    
-            // this is because URISplit treats it like a file.
-            URISplit split= URISplit.parse(s);
-            noFile= split.params==null ? split.file : split.params; //kludge...
-            
-        }
         
         String[] ss= script.toArray(new String[script.size()]);
         
