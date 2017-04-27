@@ -85,13 +85,13 @@ public class LabelConverter extends Converter {
             if ( title.contains("CONTEXT" ) ) {
                 if ( pe!=null ) {
                     int loopCount=0;
-                    while ( pe.getController().isPendingChanges() ) {
+                    if ( pe.getController().isPendingChanges() ) {
                         loopCount++;
                         if ( loopCount>1000 ) {
                             break;
                         }
                         try {
-                            Thread.sleep(100);
+                            Thread.sleep(200);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(LabelConverter.class.getName()).log(Level.SEVERE, null, ex);
                         }
