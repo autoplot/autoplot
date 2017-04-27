@@ -84,6 +84,21 @@ public class LabelConverter extends Converter {
             
             if ( title.contains("CONTEXT" ) ) {
                 if ( pe!=null ) {
+                    int loopCount=0;
+                    while ( pe.getController().isPendingChanges() ) {
+                        loopCount++;
+                        if ( loopCount>1000 ) {
+                            break;
+                        }
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(LabelConverter.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    if ( loopCount>1000 ) {
+                        logger.warning("wait for isPendingChanges reached limit");
+                    }
                     QDataSet dataSet= pe.getController().getDataSet();
                     if ( dataSet!=null ) {
                         if ( plot!=null && plot.getXaxis()==axis ) {  // crazy kludge, sure to cause problems.  This assumes that DEPEND_0 is the dataset causing the variation in X.
