@@ -109,14 +109,14 @@ public class LabelConverter extends Converter {
                             }
                         }
                         String contextStr= DataSetUtil.contextAsString(dataSet);
-                        System.err.println("bug1814: context substitution success. "+Thread.currentThread().getName() );
+                        logger.log(Level.FINEST, "bug1814: context substitution success. {0}", Thread.currentThread().getName());
                         title= insertString( title, "CONTEXT", contextStr );
                     } else {
-                        System.err.println("bug1814: ds is null. "+Thread.currentThread().getName() );
+                        logger.log(Level.FINEST, "bug1814: ds is null. {0}", Thread.currentThread().getName());
                         title= insertString( title, "CONTEXT", "" ); 
                     }
                 } else {
-                    System.err.println("bug1814: pe is null." + Thread.currentThread().getName() );
+                    logger.log(Level.FINEST, "bug1814: pe is null.{0}", Thread.currentThread().getName());
                     title= insertString( title, "CONTEXT", "" );// https://sourceforge.net/p/autoplot/bugs/1814/
                 }
             }
