@@ -46,6 +46,7 @@ import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
+import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.HtmlResponseIOException;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.Caching;
@@ -738,37 +739,6 @@ public class DataSourceController extends DomNodeController {
                 }
             }
             haveCheckedInternalTsb = true;
-        }
-    }
-
-    /**
-     * We've loaded the data, but it needs to be trimmed to exactly what the TSB requests, because a time axis
-     * is not visible.
-     * @param tsbData
-     * @param timeRange the range where the data was requested.
-     * @return the trimmed data
-     * @see https://sourceforge.net/p/autoplot/bugs/1559/
-     */
-    private QDataSet trimToTsbRange(QDataSet tsbData, DatumRange timeRange) {
-        if ( tsbData==null ) return null;
-        // find the timetags
-        QDataSet time= null;
-        //TODO: rank 3 joins 
-        QDataSet dep0= (QDataSet) tsbData.property(QDataSet.DEPEND_0);
-        if ( dep0!=null ) {
-            time= (QDataSet) dep0.property(QDataSet.DEPEND_0);
-        } else {
-            if ( SemanticOps.isBundle(tsbData) ) {
-                time= Ops.unbundle( tsbData, 0 );
-            }
-        }
-        if ( time!=null && UnitsUtil.isTimeLocation( SemanticOps.getUnits(time) ) && time.rank()==1 ) {
-            QDataSet w= Ops.where( Ops.within( time, timeRange ) );
-            tsbData= DataSetOps.applyIndex( tsbData, w );
-            return tsbData;
-            
-        } else {
-            return tsbData;
         }
     }
 
@@ -1799,7 +1769,7 @@ public class DataSourceController extends DomNodeController {
                         }
                     }
                     //https://sourceforge.net/p/autoplot/bugs/1559/ Let's trim it...
-                    result= trimToTsbRange( result, ltsb.getTimeRange() );
+                    result= DataSourceUtil.trimScatterToTimeRange( result, ltsb.getTimeRange() );
                 }
 
                 setDataSetInternal(result, props, dom.controller.isValueAdjusting());

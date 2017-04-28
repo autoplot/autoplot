@@ -48,6 +48,7 @@ import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.WritableDataSet;
+import org.virbo.dataset.examples.Schemes;
 import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
@@ -187,8 +188,12 @@ public class Util {
         if (monitor == null) {
             monitor = new NullProgressMonitor();
         }
-
+        
         TimeSeriesBrowse tsb= result.getCapability( TimeSeriesBrowse.class );
+        if ( tsb==null ) {
+            tsb= factory.getCapability( TimeSeriesBrowse.class );
+        }
+        
         if ( tsb!=null ) {
             tsb.setTimeRange( timeRange );
         } else {
@@ -223,6 +228,13 @@ public class Util {
             monitor = new NullProgressMonitor();
             monitor.setLabel("strange condition where occasional null...");
             rds= result.getDataSet(monitor);  //TODO nasty kludge, just try reading again...
+        }
+        
+        if ( tsb!=null ) {
+            if ( !Schemes.isTimeSeries(rds) ) {
+                logger.fine("trim data to timerange");
+                rds= DataSourceUtil.trimScatterToTimeRange( rds, timeRange );
+            }
         }
         
         if ( rds==null ) return null;
@@ -272,7 +284,15 @@ public class Util {
                 }
             }
         }
-        
+
+        TimeSeriesBrowse tsb= result.getCapability(TimeSeriesBrowse.class);
+        if ( tsb!=null ) {
+            if ( !Schemes.isTimeSeries(rds) ) {
+                logger.fine("trim data to timerange");
+                rds= DataSourceUtil.trimScatterToTimeRange( rds, tsb.getTimeRange() );
+            }
+        }
+
         if ( rds==null ) return null;
         
         rds= ensureWritable(rds);

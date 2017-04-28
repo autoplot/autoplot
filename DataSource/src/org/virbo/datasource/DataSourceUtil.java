@@ -46,6 +46,7 @@ import org.das2.datum.Units;
 import org.das2.datum.TimeParser;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
@@ -942,6 +943,38 @@ public class DataSourceUtil {
     public static TimeSeriesBrowse getTimeSeriesBrowse( DataSource dss ) {
         return dss.getCapability( TimeSeriesBrowse.class );
     }
+    
+    /**
+     * We've loaded the data, but it needs to be trimmed to exactly what the TSB requests, because a time axis
+     * is not visible.  This was introduced to support where TSB returns data that needs to be trimmed.
+     * @param tsbData
+     * @param timeRange the range where the data was requested.
+     * @return the trimmed data
+     * @see https://sourceforge.net/p/autoplot/bugs/1559/
+     */
+    public static QDataSet trimScatterToTimeRange(QDataSet tsbData, DatumRange timeRange) {
+        if ( tsbData==null ) return null;
+        // find the timetags
+        QDataSet time= null;
+        //TODO: rank 3 joins 
+        QDataSet dep0= (QDataSet) tsbData.property(QDataSet.DEPEND_0);
+        if ( dep0!=null ) {
+            time= (QDataSet) dep0.property(QDataSet.DEPEND_0);
+        } else {
+            if ( SemanticOps.isBundle(tsbData) ) {
+                time= Ops.unbundle( tsbData, 0 );
+            }
+        }
+        if ( time!=null && UnitsUtil.isTimeLocation( SemanticOps.getUnits(time) ) && time.rank()==1 ) {
+            QDataSet w= Ops.where( Ops.within( time, timeRange ) );
+            tsbData= DataSetOps.applyIndex( tsbData, w );
+            return tsbData;
+            
+        } else {
+            return tsbData;
+        }
+    }
+    
 
     /**
      * With the URI, establish if it has time series browse and set the timerange
