@@ -26,6 +26,11 @@
         
         <p>Bugfixes (2017-04-27 r20712):</p>
         <ul> 
+            <li>1559: trim getDataSet calls to the time range requested, when the time axis is not visible.
+            <li>debug printing for 1814 accidentally left in production release.
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>1814: test002_022 shows how loading %{CONTEXT} is unreliable.  Various experiments appear to improve results.
             <li>trivial findbugs cleanup.
             <li>rte_0066894792: code to enter mash-up dialog didn't consider all cases resulting in NullPointerException.  Thanks, me!
@@ -54,50 +59,11 @@
             <li>1804: trim off-by-one error corrected.
             <li>1802: checkIsotropic could trigger before axes were sized with AutoplotServer.                
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>Java 8 Javadocs supported in Jython completions.
-            <li>new CDF Jar file fixes problem where unused ThreadGroups were made.
-            <li>1801: dataset iterator is inordinately slow, put in optimal loops for rank 1 data.  
-            <li>interpolate and interpolateNN now have single-dataset interface as well as arrays.  Thanks, Kristoff!
-            <li>BufferDataSet remove redundant check of reclen which was also miscoded, using remaining() instead of limit(), producing incorrect warnings.
-            <li>tca can be reset before entering the editor panel.  Thanks, Kris!
-            <li>when bins are specified with ranges, use render type hint to request Nearest Neighbor Spectrograms.
-            <li>bugfix: in the case where the HAPI dataset is just one day, the discovery range would be the day before the data range, making it a poor choice.
-            <li>PDS/PPI uses https now.  Editor properly sets the parameter when returning to the editor GUI.
-            <li>downloadResourceAsTempFile now includes http or https (or ftp) in generated filename.
-            <li>getConvertibleUnits replaces getConvertableUnits (spelling error), and getConvertibleUnits now sorts the units.
-            <li>trimStrideWrapper dropped metadata.
-            <li>Units.getAllUnits would return a list of strings when it's declaration indicated that it would return a list of Units.  Thanks, Jon!
-            <li>RTE reports (and provide feedback) must now submit to jfaden.net:80, not jfaden.net:8080, because of firewall issues.
-            <li>1794: correction to branch when github is accessed.
-            <li>some spectrogram and color scatter assumed data and colorbar zunits were the same.
-            <li>https://bugs-pw.physics.uiowa.edu/mantis/view.php?id=478: ascii time transfer types could not have differing units.
-            <li>test100 showed where an immutable dataset was modified with the "hanning" filter. 
-            <li>&y=bgsm[:,1] was unnecessarily URL-encoded, reducing readability.</li>
-            <li>where parameters list was incorrect when the HDF5 file contained structures
-            <li>link(x,y,z) dropped z, when x y or z is an object (not dataset).
-            <li>issue a warning when das2stream units change, which can cause problems.
-            <li>where with HDF5 files containing parameters with dots in the name was never tested.
-            <li>where with HDF5 files containing structures was never tested.
-            <li>csv editor panel has selection for delimiter.
-            <li>corrections to HAPI reader, which was broken after rank 2 DEPEND_1 support was added.
-            <li>addDataPoint.jy script updated to use DataPointRecorder (not DataPointRecorderNew), and supports keystroke mode.
-            <li>log "ImageIO used to create" at less than info, to avoid clutter in server logs.
-            <li>rte_1490216564: don't throw runtime error when taskSize is zero, just ignore it.
-            <li>1785: unable to format bundle to CDF.  (Append is now handled properly.)  Thanks, Kristoff!
-            <li>1789: PngWalkTool correct feedback about writing to writable fs.  The code didn't distinguish between Read-Only and Read-Write, and assumed that local filesystems were read-write.  Thanks, Sebastian!
-            <li>rte_0147649225: fall back after failing to find "field6" in bundleDescriptor, because HAPI metadata was mistaken for Rich ASCII.
-            <li>rte 0857617456: Null pointer when selecting time field type but time format column has never been set.  Thanks, Shiva!
-            <li>corrections to format to .wav gui, which wasn't initialized properly to indicate automatic scaling.
-            <li>digitizer DataPointRecorder "new" operation fires dataset update event.  Thanks, Kris!
-            <li>bugfix: vap+cdaweb:ds=IM_K0_SIE&amp;id=SI_PIXELS had image&gt;THUMBSIZE&gt;50 for the RENDER_TYPE, which Autoplot doesn't support as "image"
-            <li>Experimental support for rank 2 DEPEND_1 datasets with HAPI.  HAPI uses sampleStartDate for discovery.
-            <li>check for vap+internal:data_1,data_2 when switching to mash-up
-            <li>1754: Correctly support http://autoplot.org/data/AMSR_E_L3_SeaIce6km_B06_20070307.hdf.gz
-        </ul>
         <p>Features:</p>
         <ul> 
+       </ul>
+       <p>Less recent features:</p>
+       <ul>
             <li>DDataSet family of QDataSet implementations implement trim(0,n) by returning self, avoiding copy.
             <li>add reduceBins which removes a bins dimension with the linear or geometric average.
             <li>subtract filter added to remove confusion with diff, which is finite differences.  (Bill)
@@ -107,23 +73,6 @@
             <li>Introduce "gridIrregularY" to replace old LGrid.rebin codes.
             <li>TimeRangeEditor keeps track of last spacecraft used for orbits.
             <li>JUNO Perijove intervals added.
-       </ul>
-       <p>Less recent features:</p>
-       <ul>
-            <li>Data Mash Up GUI has bundle operator so that events lists can be constructed.
-            <li>Introduce high-rank trim, so you can trim on any index now.
-            <li>HAPI Server bins can have either centers or ranges specified.
-            <li>HAPI Server support for enumerated data (Strings) supported.
-            <li>1779: refactor to create action "Edit Plot"->"Replace plot with clipboard plot"
-            <li>metadata now has "copy value" popup menu item.
-            <li>support ds[:,1] as well as ds&slice1=1, so that X and Y can be components of vectors.
-            <li>563: HDF and CDF support X and Y datasets.  Thanks Kris and others who have requested this.
-            <li>bugfix:negative DELTA_PLUS, which is invalid, is handled.
-            <li>layout tab indicates selected plot.
-            <li>export-to-hapi formats catalog and info responses.
-            <li>export-to-wav has timeScale parameter for scaling time tags, useful for auralizing B-Field data.
-            <li>AutoplotServlet simpleServlet has symbolSize to support sparklines.
-            <li>HAPI server allows external configuration (but it must be in /home/jbf/hapi/ for now!)
        </ul>
 
         <p>Known issues:</p>
