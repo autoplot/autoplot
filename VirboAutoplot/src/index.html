@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Pitch angle distribution plots now use curved plates.  Thanks, Ed!
+        <p><small>Blooper trying to draw multiple Juno orbits.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -31,6 +31,7 @@
         </ul>
         <p>Older Bugfixes:</p>
         <ul>
+            <li>1723: Wind waves data then dsAboveBackground shows where VALID_MIN was incorrectly copied over to result.</li>
             <li>1814: test002_022 shows how loading %{CONTEXT} is unreliable.  Various experiments appear to improve results.
             <li>trivial findbugs cleanup.
             <li>rte_0066894792: code to enter mash-up dialog didn't consider all cases resulting in NullPointerException.  Thanks, me!
