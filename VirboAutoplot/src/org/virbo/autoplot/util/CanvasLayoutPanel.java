@@ -481,9 +481,7 @@ public class CanvasLayoutPanel extends JLabel {
             }
         }
         this.target = c;
-        if ( c instanceof DasCanvas ) {
-            ((DasCanvas)c).addPropertyChangeListener( DasCanvas.PROP_PAINTCOUNT, repaintListener );
-        }
+        c.addPropertyChangeListener( DasCanvas.PROP_PAINTCOUNT, repaintListener );
         
         c.addContainerListener(new ContainerListener() {
             @Override
