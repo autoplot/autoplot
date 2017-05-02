@@ -41,6 +41,7 @@ import org.das2.datum.EnumerationUnits;
 import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.ByteBufferInputStream;
+import org.das2.util.LoggerManager;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -67,7 +68,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
     String column = null;
     String depend0 = null;
 
-    private final static Logger logger= Logger.getLogger("apdss.ascii");
+    private final static Logger logger= LoggerManager.getLogger("apdss.ascii");
 
     public final static String PARAM_INTERVAL_TAG="intervalTag";
 
@@ -163,7 +164,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
 //        
 //        try {
 
+        logger.fine("read file");
+        
         ds = doReadFile(mon);
+        
+        logger.fine("done read file");
         
         if ( mon.isCancelled() ) {
             throw new CancelledOperationException("cancelled data read");
@@ -432,7 +437,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 Units u0= parser.getUnits(0);
                 Units u1= parser.getUnits(1);
                 if ( u0!=u1 ) {
-                    if ( u1.isConvertableTo(u0.getOffsetUnits()) ) { // allow "s" to go with UTC
+                    if ( u1.isConvertibleTo(u0.getOffsetUnits()) ) { // allow "s" to go with UTC
                         UnitsConverter uc= u1.getConverter(u0.getOffsetUnits());
                         for ( int i=0;i<dep0.length(); i++ ) {
                             dep0.putValue(i,1,dep0.value(i,0)+uc.convert(dep0.value(i,1)) );
@@ -463,7 +468,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
 //            mon.finished();
 //        }
         
-
+        
     }
 
     /**
@@ -476,9 +481,13 @@ public class AsciiTableDataSource extends AbstractDataSource {
      */
     private DDataSet doReadFile(final ProgressMonitor mon) throws NumberFormatException, IOException, FileNotFoundException {
 
+        logger.finer("maybe download file");
+        
         String o;
         file = getFile(mon.getSubtaskMonitor("getFile"));
 
+        logger.finer("got file");
+        
         if ( file.isDirectory() ) {
             throw new IOException("expected file but got directory");
         }
@@ -932,15 +941,16 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 Matcher m= p.matcher(w);
                 int ieq;
                 if ( !m.find() ) {
-                    Pattern p2= Pattern.compile("\\.(within)\\(");
+                    Pattern p2= Pattern.compile("\\.(within|matches)\\(");
                     Matcher m2= p2.matcher(w);
                     if ( !m2.find() ) {
-                        throw new IllegalArgumentException("where can only contain .eq,.ne,.ge,.gt,.le,.lt, or .within");
+                        throw new IllegalArgumentException("where can only contain .eq,.ne,.ge,.gt,.le,.lt, .within, or .matches");
                     } else {
                         ieq= m2.start();
-                        String sval= w.substring(ieq+8,w.length()-1);
+                        String sop= m2.group(1);
+                        String sval= w.substring(ieq+sop.length()+2,w.length()-1);
                         String sparm= w.substring(0,ieq);
-                        parser.setWhereConstraint( sparm, "within", DataSourceUtil.unescape(sval) );
+                        parser.setWhereConstraint( sparm, sop, DataSourceUtil.unescape(sval) );
                     }
                 } else {
                     ieq= m.start();
@@ -952,6 +962,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
             }
         }
                 
+        logger.fine("done process parameters and peeking at file");
         
         // --- done configuration, now read ---
         DDataSet ds1;
@@ -986,7 +997,9 @@ public class AsciiTableDataSource extends AbstractDataSource {
             mon.setProgressMessage("reading "+file);
             ds1 = (DDataSet) parser.readFile(file.toString(), mon.getSubtaskMonitor("read file")); //DANGER
         }
-
+        
+        logger.fine("done parsing file");
+        
         return ds1;
     }
 
