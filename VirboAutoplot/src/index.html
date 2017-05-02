@@ -26,6 +26,10 @@
         
         <p>Bugfixes (2017-04-27 r20712):</p>
         <ul> 
+            <li>small round of findbugs cleanup.
+            <li>select time by orbit would pick previous orbit if it overlapped slightly.
+            <li>1820: occasional failures of test033, double checking for valid ticks.
+            <li>1723: Wind waves data then dbAboveBackground showed where VALID_MIN was improperly propogated.
             <li>1559: trim getDataSet calls to the time range requested, when the time axis is not visible.
             <li>debug printing for 1814 accidentally left in production release.
         </ul>
@@ -62,7 +66,9 @@
         </ul>
         <p>Features:</p>
         <ul> 
-       </ul>
+            <li>Editor panel has switch to turn off arrow annotations for tab, and to allow tab-is-4-spaces instead of completions popup.
+            <li>extent filter (which returns min,max of a dataset) added to filters.
+        </ul>
        <p>Less recent features:</p>
        <ul>
             <li>DDataSet family of QDataSet implementations implement trim(0,n) by returning self, avoiding copy.
