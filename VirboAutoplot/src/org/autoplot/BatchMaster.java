@@ -118,7 +118,7 @@ public class BatchMaster extends javax.swing.JPanel {
 
                     pwd= split.path;
 
-                    Map<String,String> params= URISplit.parseParams(split.params);  //TODO: support these.
+                    //Map<String,String> params= URISplit.parseParams(split.params);  //TODO: support these.
                     Map<String,Object> env= new HashMap<>();
 
                     DasProgressPanel monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(BatchMaster.this), "download script");
@@ -533,7 +533,7 @@ public class BatchMaster extends javax.swing.JPanel {
         Map<String,String> params= URISplit.parseParams(split.params);  //TODO: support these.
         Map<String,Object> env= new HashMap<>();
 
-        DasProgressPanel monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(BatchMaster.this), "download script");
+        //DasProgressPanel monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(BatchMaster.this), "download script");
         File scriptFile= DataSetURI.getFile( split.file, new NullProgressMonitor() );
         String script= readScript( scriptFile );
         
