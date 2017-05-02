@@ -185,7 +185,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
         // old code that handled timeFormats removed.  It was no longer in use.
         
-        ArrayDataSet vds = null;
+        MutablePropertyDataSet vds = null;
         ArrayDataSet dep0 = null;
 
         if ((column == null) && (timeColumn != -1)) {
@@ -315,6 +315,32 @@ public class AsciiTableDataSource extends AbstractDataSource {
             }
         }
 
+        String x= getParam( "X", null );
+        String y= getParam( "Y", null );
+        String z= getParam( "Z", null );
+        
+        if ( z!=null ) {
+            QDataSet zds= ArrayDataSet.copy( DataSetOps.unbundle( ds, parser.getFieldIndex(z) ) );
+            QDataSet yds;
+            QDataSet xds;
+            if ( y!=null ) {
+                yds= ArrayDataSet.copy( DataSetOps.unbundle( ds, parser.getFieldIndex(y) ) );
+            } else {
+                throw new IllegalArgumentException("expected param Y");
+            }
+            if ( x!=null ) {
+                xds= ArrayDataSet.copy( DataSetOps.unbundle( ds, parser.getFieldIndex(x) ) );
+            } else {
+                if ( dep0!=null ) {
+                    xds= dep0;
+                } else {
+                    throw new IllegalArgumentException("expected param X"); 
+                }
+            }
+            vds= (MutablePropertyDataSet)Ops.bundle( xds, yds, zds );
+        }
+        
+        
         if ( bundle!=null ) {
             rank2= bundle;
         }
