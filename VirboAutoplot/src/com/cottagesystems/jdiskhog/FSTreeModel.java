@@ -139,7 +139,7 @@ public class FSTreeModel implements TreeModel {
     }
     
     public void setComparator( Comparator c ) {
-        System.err.println("set comparator to "+c );
+        logger.log(Level.FINE, "set comparator to {0}", c);
         Comparator old= this.comparator;
         this.comparator= c;
         if ( old!=c ) {
@@ -276,7 +276,7 @@ public class FSTreeModel implements TreeModel {
     };
 
     @Override
-    public synchronized int getChildCount(Object parent) {
+    public int getChildCount(Object parent) {
         final File f = ((TreeNode) parent).getFile();
         if (!f.exists()) {
             return 0;
