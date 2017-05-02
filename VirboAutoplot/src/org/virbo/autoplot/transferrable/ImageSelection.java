@@ -7,6 +7,8 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
@@ -14,6 +16,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.TransferHandler;
+import org.das2.util.LoggerManager;
 
 /**
  * Transferable for Images.
@@ -29,6 +32,8 @@ import javax.swing.TransferHandler;
  */
 public class ImageSelection implements Transferable {
     
+    private static final Logger logger= LoggerManager.getLogger("autoplot.gui.transfer");
+    
     private static final DataFlavor defaultFlavor = DataFlavor.imageFlavor;
     
     private Image image;
@@ -40,21 +45,10 @@ public class ImageSelection implements Transferable {
     public void setImage( Image i ) {
         this.image= i;
     }
-    
-    public boolean canImport(JComponent comp, DataFlavor flavors[]) {
-        if (!(comp instanceof JLabel) || (comp instanceof AbstractButton)) {
-            return false;
-        }
-        for (int i=0, n=flavors.length; i<n; i++) {
-            if (flavors[i].equals(defaultFlavor)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     public static ClipboardOwner getNullClipboardOwner() {
         return new ClipboardOwner() {
+            @Override
             public void lostOwnership(Clipboard clipboard, Transferable contents) {
                 // do nothing
             }
@@ -62,7 +56,6 @@ public class ImageSelection implements Transferable {
     }
 
     public Transferable createTransferable(JComponent  comp) {
-// Clear
         image = null;
         Icon icon = null;
         
@@ -97,15 +90,13 @@ public class ImageSelection implements Transferable {
                 return true;
             }
             
-        } catch (UnsupportedFlavorException ignored) {
-            ignored.printStackTrace();
-        } catch (IOException ignored) {
-            ignored.printStackTrace();;
+        } catch (UnsupportedFlavorException | IOException ignored) {
+            logger.log( Level.SEVERE, null, ignored );
         }
         return false;
     }
-    
-// Transferable
+
+    @Override
     public Object getTransferData(DataFlavor flavor) {
         if (isDataFlavorSupported(flavor)) {
             return image;
@@ -113,10 +104,12 @@ public class ImageSelection implements Transferable {
         return null;
     }
     
+    @Override
     public DataFlavor[] getTransferDataFlavors() {
         return new DataFlavor[] { defaultFlavor };
     }
     
+    @Override
     public boolean isDataFlavorSupported( DataFlavor flavor ) {
         return flavor.equals(defaultFlavor);
     }
