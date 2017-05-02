@@ -126,9 +126,7 @@ public class WalkUtil {
         
         List<URI> result= new ArrayList(ss.length);
         timeRanges.clear();
-
-        String dirsuri= DataSetURI.fromUri(surls);
-
+        
         for ( i = 0; i < ss.length; i++) {
             DatumRange dr2=null;
             if ( fsm!=null ) dr2= fsm.getRangeFor(ss[i]);
