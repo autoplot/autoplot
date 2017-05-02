@@ -27,6 +27,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Element;
+import jsyntaxpane.SyntaxStyle;
+import jsyntaxpane.SyntaxStyles;
 import jsyntaxpane.actions.ActionUtils;
 import jsyntaxpane.actions.IndentAction;
 import org.das2.jythoncompletion.CompletionSettings;
@@ -60,16 +62,38 @@ public class EditorContextMenu {
         JythonCompletionProvider.getInstance().settings().addPropertyChangeListener( new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                if ( evt.getPropertyName().equals( CompletionSettings.PROP_EDITORFONT ) ) {
-                    editor.setFont( Font.decode((String)evt.getNewValue() ) );
-                } else if ( evt.getPropertyName().equals( CompletionSettings.PROP_TAB_IS_COMPLETION ) ) {
-                    boolean tabIsCompletion= (Boolean)evt.getNewValue();
-                    Action get = ActionUtils.getAction( editor, IndentAction.class );
-                    if ( get==null ) {
-                        logger.warning("Expected to find IndentAction");
-                    } else {
-                        ((IndentAction)get).setInsertTab(!tabIsCompletion);
-                    }
+                switch (evt.getPropertyName()) {
+                    case CompletionSettings.PROP_EDITORFONT:
+                        editor.setFont( Font.decode((String)evt.getNewValue() ) );
+                        break;
+                    case CompletionSettings.PROP_TABISSPACES:
+                        {
+                            boolean tabIsSpaces= (Boolean)evt.getNewValue();
+                            Action get = ActionUtils.getAction( editor, IndentAction.class );
+                            if ( get==null ) {
+                                logger.warning("Expected to find IndentAction");
+                            } else {
+                                ((IndentAction)get).setInsertTab(!tabIsSpaces);
+                            }       break;
+                        }
+                    case CompletionSettings.PROP_TAB_IS_COMPLETION:
+                        {
+                            boolean tabIsCompletion= (Boolean)evt.getNewValue();
+                            Action get = ActionUtils.getAction( editor, IndentAction.class );
+                            if ( get==null ) {
+                                logger.warning("Expected to find IndentAction");
+                            } else {
+                                ((IndentAction)get).setInsertTab(!tabIsCompletion);
+                            }       break;
+                        }
+                    case CompletionSettings.PROP_SHOWTABS:
+                        SyntaxStyle deflt= SyntaxStyles.getInstance().getStyle(null);
+                        boolean value= (Boolean)evt.getNewValue();
+                        deflt.setDrawTabs(value);
+                        editor.repaint();
+                        break;
+                    default:
+                        break;
                 }
             } 
         });

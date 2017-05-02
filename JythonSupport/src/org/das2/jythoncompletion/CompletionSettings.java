@@ -123,6 +123,42 @@ public class CompletionSettings {
         }
     }
 
+    private boolean showTabs = true;
+
+    public static final String PROP_SHOWTABS = "showTabs";
+
+    public boolean isShowTabs() {
+        return showTabs;
+    }
+
+    public void setShowTabs(boolean showTabs) {
+        boolean oldShowTabs = this.showTabs;
+        this.showTabs = showTabs;
+        propertyChangeSupport.firePropertyChange(PROP_SHOWTABS, oldShowTabs, showTabs);
+        prefs.putBoolean(PROP_SHOWTABS, showTabs );
+        try {
+            prefs.flush();
+        } catch ( BackingStoreException ex ) {
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
+        }
+    }
+
+    private boolean tabIsSpaces;
+
+    /**
+     * If true, then the tab keystroke inserts four spaces.
+     */
+    public static final String PROP_TABISSPACES = "tabIsSpaces";
+
+    public boolean isTabIsSpaces() {
+        return tabIsSpaces;
+    }
+
+    public void setTabIsSpaces(boolean tabIsSpaces) {
+        boolean oldTabIsSpaces = this.tabIsSpaces;
+        this.tabIsSpaces = tabIsSpaces;
+        propertyChangeSupport.firePropertyChange(PROP_TABISSPACES, oldTabIsSpaces, tabIsSpaces);
+    }
 
 
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
@@ -138,6 +174,8 @@ public class CompletionSettings {
     public void loadPreferences() {
         docHome= prefs.get( PROP_DOCHOME, "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/ws/doc/" ) ;
         tabIsCompletion= prefs.getBoolean( PROP_TAB_IS_COMPLETION, true );
+        tabIsSpaces= prefs.getBoolean( PROP_TABISSPACES, false );
+        showTabs= prefs.getBoolean( PROP_SHOWTABS, true );
         editorFont= prefs.get( PROP_EDITORFONT, "sans-12" );
         documentationPaneSize= prefs.get( PROP_DOCUMENTATIONPANESIZE, "640x480" );
     }
