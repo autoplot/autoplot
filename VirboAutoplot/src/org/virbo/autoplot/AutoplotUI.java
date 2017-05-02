@@ -3908,9 +3908,7 @@ public void switchToEditorCard( String selector ) {
     //    return;
     //}
     logger.log(Level.FINE, "switch to selector: {0}", selector);
-    if ( (CardLayout)timeRangePanel.getLayout() instanceof CardLayout ) {
-        ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, selector );
-    }
+    ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, selector );
     if ( CARD_TIME_RANGE_SELECTOR.equals(selector) ) {
         uriTimeRangeToggleButton1.setPosition( 0 );
         dataSetSelector.setCardSelectedNoEventKludge(false);
