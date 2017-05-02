@@ -264,8 +264,12 @@ public class TimeRangeTool extends javax.swing.JPanel {
                     String str = String.valueOf(o.getDatumRange(orb));
                     ss.add(orb+": "+str);
                     if ( !gotFocus && o.getDatumRange(orb).intersects(focusRange) ) {
-                        gotFocus=true;
-                        focusItem= orb+": "+str;
+                        if ( DatumRangeUtil.normalize( focusRange, o.getDatumRange(orb).max() ) < 0.5 ) { // check for round-off errors or overlaps.
+                            logger.fine("trivial overlap ignored");
+                        } else {
+                            gotFocus=true;
+                            focusItem= orb+": "+str;
+                        }
                     }
                 } catch (ParseException ex) { // this won't happen
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
@@ -839,13 +843,8 @@ public class TimeRangeTool extends javax.swing.JPanel {
     private void orbitNumberTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_orbitNumberTFActionPerformed
         String orbit1= orbitNumberTF.getText();
         String s= showOrbit(orbit1);
-        Orbits o= Orbits.getOrbitsFor((String)scComboBox.getSelectedItem());
-        try {
-            DatumRange dr = o.getDatumRange(s);
-            setSelectedRange("orbit:"+(String)scComboBox.getSelectedItem()+":"+s);
-        } catch (ParseException ex) {
-            Logger.getLogger(TimeRangeTool.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        //Orbits o= Orbits.getOrbitsFor((String)scComboBox.getSelectedItem());
+        setSelectedRange("orbit:"+(String)scComboBox.getSelectedItem()+":"+s);
     }//GEN-LAST:event_orbitNumberTFActionPerformed
 
     /**
