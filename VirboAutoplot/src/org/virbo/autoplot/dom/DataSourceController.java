@@ -1327,9 +1327,7 @@ public class DataSourceController extends DomNodeController {
                 this.fillDataSet = null;
             }
                         
-            if ( fillDs instanceof MutablePropertyDataSet ) { // https://sourceforge.net/p/autoplot/bugs/1743/
-                ((MutablePropertyDataSet)fillDs).makeImmutable();
-            }
+            fillDs.makeImmutable();
             
             setFillDataSet(fillDs);
         } finally {
