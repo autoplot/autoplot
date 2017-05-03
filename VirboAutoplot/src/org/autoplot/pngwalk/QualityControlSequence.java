@@ -65,6 +65,11 @@ public class QualityControlSequence {
         return r;
     }
 
+    /**
+     * return the QC record 
+     * @param forIndex
+     * @return 
+     */
     public QualityControlRecord getQualityControlRecord(int forIndex) {
         if (!PngWalkTool.isQualityControlEnabled()) {
             throw new IllegalStateException();
@@ -87,5 +92,33 @@ public class QualityControlSequence {
         return rec;
 
     }
+    
+    /**
+     * return the QC record where index is for all images.
+     * @param forIndex
+     * @return 
+     */
+    public QualityControlRecord getQualityControlRecordNoSubRange(int forIndex) {
+        if (!PngWalkTool.isQualityControlEnabled()) {
+            throw new IllegalStateException();
+        }
+        QualityControlRecord rec;
+        try {
+            
+            URI imageURI= walkImageSequence.imageAtNoSubRange(forIndex).getUri();
+            if ( imageURI.toString().length()==0 ) { // bug 3055130 okay
+                rec=null;
+            } else {
+                rec = QualityControlRecord.getRecord( imageURI, qcFolder);
+            }
+        } catch (UnknownHostException ex) {
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            rec = null;
+        } catch(IOException ex) {
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            rec = null;
+        }
+        return rec;
 
+    }
 }

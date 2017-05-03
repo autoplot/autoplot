@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,6 +48,8 @@ public class WalkImageSequence implements PropertyChangeListener  {
     private int index;
 
     private DatumRange timeSpan = null;
+    
+    // list of ranges for each existing image file.
     private List<DatumRange> datumRanges = null;
     
     // list of ranges, including gaps between files.
@@ -72,11 +75,13 @@ public class WalkImageSequence implements PropertyChangeListener  {
 
     private URI qcFolder = null;                 //Location for quality control files, if used
     private QualityControlSequence qualitySeq;
+    private String qcFilter=""; // limits what is shown.
 
     private boolean haveThumbs400=true;
     
     private boolean limitWarning= false;
-
+    
+    
     /** Create an image sequence based on a URI template.
      *
      * @param template a template, or null will produce an empty walk sequence.
@@ -289,7 +294,8 @@ public class WalkImageSequence implements PropertyChangeListener  {
         // remember current image so we can update the index appropriately
         WalkImage currentImage = null;
         if(displayImages.size() >  0) currentImage = currentImage();
-        if (timeSpan != null) {
+
+        if ( timeSpan != null || qcFilter.length()>0 ) {
             List<DatumRange> displayRange;
             if (isUseSubRange() && subRange.size() > 0) {
                 displayRange = subRange;
@@ -299,12 +305,53 @@ public class WalkImageSequence implements PropertyChangeListener  {
             
             limitWarning = possibleRanges.size()==20000;
             
+            List<QualityControlRecord.Status> statuses=null;
+            if ( qualitySeq!=null ) {
+                statuses = new ArrayList<>(this.datumRanges.size());
+                for ( int i=0; i<datumRanges.size(); i++ ) {
+                    statuses.add(i,qualitySeq.getQualityControlRecordNoSubRange(i).getStatus() );
+                }
+            }
+                    
+            HashSet<QualityControlRecord.Status> allowedStatuses= new HashSet<>();
+            if ( qcFilter.length()>0 ) {
+                for ( int i=0; i<qcFilter.length(); i++ ) {
+                    char ch= qcFilter.charAt(i);
+                    switch (ch) {
+                        case 'o':
+                            allowedStatuses.add( QualityControlRecord.Status.OK );
+                            break;
+                        case 'p':
+                            allowedStatuses.add( QualityControlRecord.Status.PROBLEM );
+                            break;
+                        case 'i':
+                            allowedStatuses.add( QualityControlRecord.Status.IGNORE );
+                            break;
+                        case 'u':
+                            allowedStatuses.add( QualityControlRecord.Status.UNKNOWN );
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            
             displayImages.clear();
-
+            
             for (DatumRange dr : displayRange) {
-                if (datumRanges.contains(dr)) {
-                    displayImages.add(existingImages.get(datumRanges.indexOf(dr)));
+                int ind= datumRanges.indexOf(dr);
+                if ( ind>-1 ) {
+                    if ( qualitySeq!=null && qcFilter.length()>0 ) {
+                        assert statuses!=null;
+                        if ( !allowedStatuses.contains( statuses.get(ind) ) ) {
+                            continue;
+                        }
+                    }
+                    displayImages.add(existingImages.get(ind));//TODO: suspect this is very inefficient.
                 } else if (showMissing && timeSpan != null) {
+                    if ( qualitySeq!=null && qcFilter.length()>0 ) {
+                        continue;
+                    }
                     // add missing image placeholder
                     WalkImage ph = new WalkImage(null,haveThumbs400);
                     ph.setCaption(dr.toString());
@@ -379,6 +426,11 @@ public class WalkImageSequence implements PropertyChangeListener  {
         throw new IllegalStateException("didn't find image for "+image);
     }
 
+    /**
+     * return the image of the subrange.
+     * @param n
+     * @return 
+     */
     public WalkImage imageAt(int n) {
         if (n<0 || n>displayImages.size()-1) {
             throw new IndexOutOfBoundsException("index must be within 0-"+(displayImages.size()-1)+": "+n);
@@ -387,6 +439,19 @@ public class WalkImageSequence implements PropertyChangeListener  {
         }
     }
 
+    /**
+     * get the image in the sequence, regardless of the subrange.
+     * @param n
+     * @return 
+     */
+    public WalkImage imageAtNoSubRange(int n) {
+        if (n<0 || n>existingImages.size()-1) {
+            throw new IndexOutOfBoundsException("index must be within 0-"+(displayImages.size()-1)+": "+n);
+        } else {
+            return existingImages.get(n);
+        }
+    }
+    
     public URI getQCFolder() {
         return qcFolder;
     }
@@ -452,6 +517,17 @@ public class WalkImageSequence implements PropertyChangeListener  {
         if ( first!=-1 ) {
             setActiveSubrange( first, last );
         }
+    }
+    
+    /**
+     * string containing combination of "opi" meaning that each should be shown.
+     * "" will show everything.
+     * @param s 
+     */
+    public void setQCFilter( String s ) {
+        if ( s==null ) throw new NullPointerException("qcfilter cannot be null, set to empty string to clear");
+        this.qcFilter= s;
+        rebuildSequence();
     }
 
     /**

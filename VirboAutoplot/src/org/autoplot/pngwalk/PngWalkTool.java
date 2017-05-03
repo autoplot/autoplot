@@ -56,6 +56,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -860,6 +861,19 @@ public final class PngWalkTool extends javax.swing.JPanel {
             }
         } ).setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_END, 0 ));
 
+        final JCheckBoxMenuItem qcmi= new JCheckBoxMenuItem("Show Only Quality Control Records",false);
+        qcmi.addActionListener( new AbstractAction(  ) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if ( qcmi.isSelected() ) {
+                    tool.seq.setQCFilter("opi");
+                } else {
+                    tool.seq.setQCFilter("");
+                }
+            }
+        } );
+        navMenu.add(qcmi);
+        
         result.add( navMenu );
         tool.navMenu= navMenu;
         
