@@ -294,7 +294,6 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
                 Color color0= g2.getColor();
                 switch (rec.getStatus()) {
                     case OK:
-                        System.err.println("imgX="+imgX);
                         g2.setColor( Color.GREEN );
                         break;
                     case PROBLEM:
