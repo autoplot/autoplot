@@ -370,6 +370,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 }
             } else {
                 logger.fine("removing bundleDescriptor because of rank2");
+                ds.putProperty(QDataSet.BUNDLE_1,null);
             }
 
             MutablePropertyDataSet mds;
