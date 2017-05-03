@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.graph.GraphUtil;
 import org.virbo.dataset.QDataSet;
 
 /**
@@ -170,7 +171,8 @@ public class SinglePngWalkView extends PngWalkView {
 
                         int imageX= (int)( ( ix * factor + lrect.x ) );
                         int imageY= (int)( ( iy * factor + lrect.y ) );
-                        if ( clickDigitizer.viewer.annoTypeChar=='+' ) {                            
+                        if ( clickDigitizer.viewer.annoTypeChar=='+' ) { 
+                            g2.setColor( Color.LIGHT_GRAY );
                             g2.drawLine( 0,imageY,getWidth(),imageY );
                             g2.drawLine( imageX,0,imageX,getHeight() );
                             Color c0= g2.getColor();
@@ -179,6 +181,9 @@ public class SinglePngWalkView extends PngWalkView {
                             g2.setStroke( new BasicStroke( 1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 1.0f, new float[] { 1.f,3.f }, 0.f ) );
                             g2.drawLine( 0,imageY,getWidth(),imageY );
                             g2.drawLine( imageX,0,imageX,getHeight() );
+                            g2.setColor( Color.BLACK );
+                            g2.drawLine( imageX-20,imageY,imageX+20,imageY );
+                            g2.drawLine( imageX,imageY-20,imageX,imageY+20 );
                             g2.setStroke( stroke0 );
                             g2.setColor( c0 );
                         } else if ( clickDigitizer.viewer.annoTypeChar=='|' ) { 
