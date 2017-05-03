@@ -785,6 +785,21 @@ public class AsciiTableDataSource extends AbstractDataSource {
             depend0 = o;
         }
 
+        o = params.get("Z");
+        if ( o!=null ) {
+            column= o;
+        } else {
+            o = params.get("Y");
+            if ( o!=null ) {
+                column= o;
+            }
+        }
+        
+        o = params.get("X");
+        if ( o!=null ) {
+            depend0= o;
+        }
+
         o = params.get("rank2");
         if (o != null) {
             rank2 = parseRangeStr(o, columnCount);
@@ -936,11 +951,20 @@ public class AsciiTableDataSource extends AbstractDataSource {
         o = params.get("units");
         if (o != null) {
             String sunits = o;
-            Units u = Units.lookupUnits(sunits);
+            Units u;
+            if ( sunits.equals("enum") ) {
+                u = EnumerationUnits.create("default");
+            } else {
+                u= Units.lookupUnits(sunits);
+            }
             if (column != null) {
                 int icol = parser.getFieldIndex(column);
                 parser.setUnits(icol, u);
-                parser.setFieldParser(icol, parser.UNITS_PARSER);
+                if ( sunits.equals("enum") ) {
+                    parser.setFieldParser(icol, parser.ENUMERATION_PARSER);
+                } else {
+                    parser.setFieldParser(icol, parser.UNITS_PARSER);
+                }
             }
         }
         
@@ -1022,6 +1046,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         } else {
             mon.setProgressMessage("reading "+file);
             ds1 = (DDataSet) parser.readFile(file.toString(), mon.getSubtaskMonitor("read file")); //DANGER
+            
         }
         
         logger.fine("done parsing file");
