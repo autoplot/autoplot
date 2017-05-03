@@ -153,7 +153,11 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
     public MouseWheelListener getMouseWheelListener() {
         return new MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
-                if ( seq!=null && seq.size()!=0 ) seq.skipBy(e.getWheelRotation());
+                if ( e.getModifiersEx()!=0 ) {
+                    //disable ctrl+wheel because we'll use it for zoom soon.
+                } else {
+                    if ( seq!=null && seq.size()!=0 ) seq.skipBy(e.getWheelRotation());
+                }
             }
         };
     }
