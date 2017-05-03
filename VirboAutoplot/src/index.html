@@ -26,6 +26,7 @@
         
         <p>Bugfixes (2017-04-27 r20712):</p>
         <ul> 
+            <li>1823: PNGWalkTool QC needs, including show just QC records.  Thanks, Kris and Craig!
             <li>small round of findbugs cleanup.
             <li>select time by orbit would pick previous orbit if it overlapped slightly.
             <li>1820: occasional failures of test033, double checking for valid ticks.
@@ -66,6 +67,8 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>ASCII table reader is able to read in (X,Y)->Z where Z can be ordinal data.
+            <li>ASCII table reader where now has matches clause, for example where=sc.matches('.*A')
             <li>Editor panel has switch to turn off arrow annotations for tab, and to allow tab-is-4-spaces instead of completions popup.
             <li>extent filter (which returns min,max of a dataset) added to filters.
         </ul>
