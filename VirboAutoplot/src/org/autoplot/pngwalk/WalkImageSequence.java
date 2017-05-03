@@ -303,7 +303,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
                 displayRange = possibleRanges;
             }
             
-            limitWarning = possibleRanges.size()==20000;
+            limitWarning = possibleRanges!=null && possibleRanges.size()==20000;
             
             List<QualityControlRecord.Status> statuses=null;
             if ( qualitySeq!=null ) {
@@ -336,28 +336,41 @@ public class WalkImageSequence implements PropertyChangeListener  {
                 }
             }
             
-            displayImages.clear();
-            
-            for (DatumRange dr : displayRange) {
-                int ind= datumRanges.indexOf(dr);
-                if ( ind>-1 ) {
+            if ( displayRange!=null ) {
+                displayImages.clear();
+
+                for (DatumRange dr : displayRange) {
+                    int ind= datumRanges.indexOf(dr);
+                    if ( ind>-1 ) {
+                        if ( qualitySeq!=null && qcFilter.length()>0 ) {
+                            assert statuses!=null;
+                            if ( !allowedStatuses.contains( statuses.get(ind) ) ) {
+                                continue;
+                            }
+                        }
+                        displayImages.add(existingImages.get(ind));//TODO: suspect this is very inefficient.
+                    } else if (showMissing && timeSpan != null) {
+                        if ( qualitySeq!=null && qcFilter.length()>0 ) {
+                            continue;
+                        }
+                        // add missing image placeholder
+                        WalkImage ph = new WalkImage(null,haveThumbs400);
+                        ph.setCaption(dr.toString());
+                        displayImages.add(ph);
+                    } else {
+                        logger.fine("I don't think we should get here (but we do, harmless).");
+                    }
+                }
+            } else {
+                displayImages.clear();
+                for ( int ind=0; ind<existingImages.size(); ind++ ) {
                     if ( qualitySeq!=null && qcFilter.length()>0 ) {
                         assert statuses!=null;
                         if ( !allowedStatuses.contains( statuses.get(ind) ) ) {
                             continue;
                         }
                     }
-                    displayImages.add(existingImages.get(ind));//TODO: suspect this is very inefficient.
-                } else if (showMissing && timeSpan != null) {
-                    if ( qualitySeq!=null && qcFilter.length()>0 ) {
-                        continue;
-                    }
-                    // add missing image placeholder
-                    WalkImage ph = new WalkImage(null,haveThumbs400);
-                    ph.setCaption(dr.toString());
-                    displayImages.add(ph);
-                } else {
-                    logger.fine("I don't think we should get here (but we do, harmless).");
+                    displayImages.add(existingImages.get(ind));
                 }
             }
         } else {
