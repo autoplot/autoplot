@@ -39,7 +39,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -686,6 +685,7 @@ public class AutoplotUtil {
                                     Logger.getLogger(AutoplotUtil.class.getName()).log(Level.SEVERE, null, ex);
                                 }
                                 Runnable run2= new Runnable() {
+                                    @Override
                                     public void run() {
                                         SwingUtilities.getWindowAncestor(p).setVisible(false);
                                         doManageFilesystems( parent );        
