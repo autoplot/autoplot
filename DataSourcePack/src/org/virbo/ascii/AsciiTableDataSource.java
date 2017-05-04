@@ -282,7 +282,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 dep0 = ArrayDataSet.copy(DataSetOps.slice1(ds, icol));
             }
             dep0.putProperty(QDataSet.UNITS, parser.getUnits(icol));
-            String tf= params.get("timeFormat");
+            //String tf= params.get("timeFormat");
             if ( UnitsUtil.isTimeLocation( parser.getUnits(icol) ) ) {
                 dep0.putProperty(QDataSet.LABEL,null);
                 dep0.putProperty(QDataSet.NAME,"time");
