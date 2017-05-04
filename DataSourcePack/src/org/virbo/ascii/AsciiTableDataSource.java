@@ -283,7 +283,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
             }
             dep0.putProperty(QDataSet.UNITS, parser.getUnits(icol));
             String tf= params.get("timeFormat");
-            if ( UnitsUtil.isTimeLocation( parser.getUnits(icol) ) && tf!=null && !tf.equals("ISO8601") ) {
+            if ( UnitsUtil.isTimeLocation( parser.getUnits(icol) ) ) {
                 dep0.putProperty(QDataSet.LABEL,null);
                 dep0.putProperty(QDataSet.NAME,"time");
             }
@@ -431,7 +431,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 }
             }
             
-            if ( mds.property(QDataSet.DEPEND_1)==null ) {
+            if ( !parser.isRichHeader() ) {
                 //http://autoplot.org/data/autoplot.xml, test005_demo6
                 mds.putProperty( QDataSet.BUNDLE_1, null );
             }
