@@ -425,6 +425,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 }
             }
             
+            if ( mds.property(QDataSet.DEPEND_1)==null ) {
+                //http://autoplot.org/data/autoplot.xml, test005_demo6
+                mds.putProperty( QDataSet.BUNDLE_1, null );
+            }
+            
             String label= getParam( "label", null );
             if ( label!=null ) {
                 mds.putProperty( QDataSet.LABEL, label );
