@@ -352,25 +352,21 @@ public class AsciiTableDataSource extends AbstractDataSource {
             if ( rank2[0]==-1 ) {
                 throw new IllegalArgumentException("bad parameter: rank2");
             }
-            if ( bundleDescriptor==null ) {
-                Units u = parser.getUnits(rank2[0]);
-                for (int i = rank2[0]; i < rank2[1]; i++) {
-                    if (u != parser.getUnits(i)) {
-                        u = null;
-                    }
+            
+            Units u = parser.getUnits(rank2[0]);
+            for (int i = rank2[0]; i < rank2[1]; i++) {
+                if (u != parser.getUnits(i)) {
+                    u = null;
                 }
-                if (u != null) {
-                    ds.putProperty(QDataSet.UNITS, u);
-                }
-                if (validMax != Double.POSITIVE_INFINITY) {
-                    ds.putProperty(QDataSet.VALID_MAX, validMax);
-                }
-                if (validMin != Double.NEGATIVE_INFINITY) {
-                    ds.putProperty(QDataSet.VALID_MIN, validMin);
-                }
-            } else {
-                logger.fine("removing bundleDescriptor because of rank2");
-                ds.putProperty(QDataSet.BUNDLE_1,null);
+            }
+            if (u != null) {
+                ds.putProperty(QDataSet.UNITS, u);
+            }
+            if (validMax != Double.POSITIVE_INFINITY) {
+                ds.putProperty(QDataSet.VALID_MAX, validMax);
+            }
+            if (validMin != Double.NEGATIVE_INFINITY) {
+                ds.putProperty(QDataSet.VALID_MIN, validMin);
             }
 
             MutablePropertyDataSet mds;
