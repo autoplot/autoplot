@@ -1978,7 +1978,12 @@ public class AutoplotUtil {
                         if ( Schemes.isEventsList(fillds) ) {
                             spec= RenderType.eventsBar;
                         } else {
-                            spec= RenderType.digital;
+                            Units u3= (Units) bundle1.property(QDataSet.UNITS,bundle1.length()-1);
+                            if ( UnitsUtil.isOrdinalMeasurement(u3) ) {
+                                spec= RenderType.digital;
+                            } else {
+                                spec = RenderType.series;
+                            }
                         }
                     } else {
                         Units u3= (Units) bundle1.property(QDataSet.UNITS,bundle1.length()-1);
