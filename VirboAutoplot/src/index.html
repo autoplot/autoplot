@@ -24,8 +24,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-04-27 r20712):</p>
+        <p>Bugfixes (2017-05-05 r20759):</p>
         <ul> 
+            <li>TimeParser ISO8601-deriving code would fail because it dropped the Z.
+            <li>DataPointRecorder support for old digitizing files is improved.
             <li>1823: PNGWalkTool QC needs, including show just QC records.  Thanks, Kris and Craig!
             <li>small round of findbugs cleanup.
             <li>select time by orbit would pick previous orbit if it overlapped slightly.
@@ -67,6 +69,8 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>1823: pngwalk tool now supports zoom on image.
+            <li>isEventsList now requires that each endTime be greater than or equal to startTime, and is used in guessRenderType, to support (X,Y)->Z where Z can be ordinal data.
             <li>ASCII table reader is able to read in (X,Y)->Z where Z can be ordinal data.
             <li>ASCII table reader where now has matches clause, for example where=sc.matches('.*A')
             <li>Editor panel has switch to turn off arrow annotations for tab, and to allow tab-is-4-spaces instead of completions popup.
