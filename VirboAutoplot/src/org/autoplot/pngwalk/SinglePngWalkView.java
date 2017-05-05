@@ -184,8 +184,6 @@ public class SinglePngWalkView extends PngWalkView {
         at.concatenate(affineTransform);
         g2.setTransform(at);
         
-        System.err.println(affineTransform);
-
         g2.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON );
         g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
 
