@@ -319,6 +319,18 @@ public class AsciiTableDataSource extends AbstractDataSource {
                     dep0.putProperty( QDataSet.UNITS, newDep0Units );
                 }
             }
+        } else {
+            if ( ds.rank()==2 ) {
+                MutablePropertyDataSet bds= (MutablePropertyDataSet) ds.property(QDataSet.BUNDLE_1);
+                if ( bds!=null ) {
+                    for ( int i=0; i<bds.length(); i++ ) {
+                        Units u= (Units)bds.property(QDataSet.UNITS,i);
+                        if ( u!=null && UnitsUtil.isTimeLocation(u) ) {
+                            bds.putProperty( QDataSet.LABEL, i, null );
+                        }
+                    }
+                }
+            }
         }
 
         String x= getParam( "X", null );
