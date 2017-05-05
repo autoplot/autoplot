@@ -8,13 +8,21 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.AbstractAction;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import org.das2.graph.GraphUtil;
 import org.virbo.dataset.QDataSet;
 
@@ -29,6 +37,10 @@ public class SinglePngWalkView extends PngWalkView {
 
     Rectangle imageLocation= null;
     
+    AffineTransform affineTransform= new AffineTransform();
+    MouseWheelListener delegate= getMouseWheelListener();
+    Point mousePressPoint= null;
+    
     transient ClickDigitizer clickDigitizer;
     int clickDigitizerSelect= -1;
     
@@ -37,12 +49,32 @@ public class SinglePngWalkView extends PngWalkView {
         clickDigitizer= new ClickDigitizer( this );
         
         setShowCaptions(true);
-        addMouseWheelListener( getMouseWheelListener() );
+        
+        addMouseWheelListener( new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                if ( ( e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK )==KeyEvent.CTRL_DOWN_MASK ) {
+                    affineTransform.scale( 1+(.04*e.getWheelRotation()), 1+(.04*e.getWheelRotation()) );
+                    repaint();
+                } else {
+                    delegate.mouseWheelMoved(e);
+                }
+            }
+        });
+        
         MouseAdapter ma= new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 if ( e.isPopupTrigger() ) {
-                    getPopup().show(e.getComponent(),e.getX(), e.getY());
+                    JPopupMenu m= getPopup();
+                    m.add( new JMenuItem( new AbstractAction( "Reset Zoom (Ctrl+MouseWheel to set)" ) {
+                        public void actionPerformed(ActionEvent e) {
+                            affineTransform= new AffineTransform();
+                            repaint();
+                        }
+                    } ) );
+                    m.show(e.getComponent(),e.getX(), e.getY());
                 }
+                mousePressPoint= e.getPoint();
                 Point p= getImagePosition( e.getX(), e.getY() );
                 if ( p!=null ) try {
                     clickDigitizerSelect= clickDigitizer.maybeSelect(p);
@@ -73,7 +105,14 @@ public class SinglePngWalkView extends PngWalkView {
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
                 if ( e.isPopupTrigger() ) {
-                    getPopup().show(e.getComponent(),e.getX(), e.getY());
+                    JPopupMenu m= getPopup();
+                    m.add( new JMenuItem( new AbstractAction( "Reset Zoom (Ctrl+MouseWheel to set)" ) {
+                        public void actionPerformed(ActionEvent e) {
+                            affineTransform= new AffineTransform();
+                            repaint();
+                        }
+                    } ) );
+                    m.show(e.getComponent(),e.getX(), e.getY());
                 }
                 if ( clickDigitizerSelect==-1 ) {
                     Rectangle lrect= imageLocation;
@@ -99,7 +138,15 @@ public class SinglePngWalkView extends PngWalkView {
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                
+                if ( mousePressPoint!=null ) {
+                    if ( ( e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK ) == KeyEvent.CTRL_DOWN_MASK ) {
+                        Point p= e.getPoint();
+                        affineTransform.translate( (p.x-mousePressPoint.x) / affineTransform.getScaleX(),
+                            ( p.y-mousePressPoint.y ) / affineTransform.getScaleY() );
+                        mousePressPoint= p;
+                        repaint();
+                    }
+                }
             }
             
             
@@ -132,6 +179,12 @@ public class SinglePngWalkView extends PngWalkView {
     protected synchronized void paintComponent(Graphics g1) {
         super.paintComponent(g1);
         Graphics2D g2 = (Graphics2D) g1;
+        
+        AffineTransform at= g2.getTransform();
+        at.concatenate(affineTransform);
+        g2.setTransform(at);
+        
+        System.err.println(affineTransform);
 
         g2.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON );
         g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
