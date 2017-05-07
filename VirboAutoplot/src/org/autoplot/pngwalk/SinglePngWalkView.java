@@ -23,7 +23,6 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import org.das2.graph.GraphUtil;
 import org.virbo.dataset.QDataSet;
 
 /**
@@ -75,6 +74,9 @@ public class SinglePngWalkView extends PngWalkView {
                     m.show(e.getComponent(),e.getX(), e.getY());
                 }
                 mousePressPoint= e.getPoint();
+                if ( ( e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK ) == KeyEvent.CTRL_DOWN_MASK ) {
+                    return;
+                }
                 Point p= getImagePosition( e.getX(), e.getY() );
                 if ( p!=null ) try {
                     clickDigitizerSelect= clickDigitizer.maybeSelect(p);
@@ -171,7 +173,7 @@ public class SinglePngWalkView extends PngWalkView {
         double factor = (double) lrect.getWidth() / (double) i.getWidth(null);
 
         int imageX= (int)( ( x - lrect.x ) / factor );
-        int imageY= (int)( ( y - lrect.y ) / factor );        
+        int imageY= (int)( ( y - lrect.y ) / factor );     
         return new Point(imageX,imageY);
     }
     
