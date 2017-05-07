@@ -914,7 +914,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         }
         optionsMenu.add( thumbsizeMenu );
 
-        final JMenuItem qc= new JMenuItem( new AbstractAction( "Start QC" ) {
+        final JMenuItem qc= new JMenuItem( new AbstractAction( "Start Quality Control Annotations Tool (QC)" ) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);        

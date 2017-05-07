@@ -53,7 +53,7 @@ public class SinglePngWalkView extends PngWalkView {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
                 if ( ( e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK )==KeyEvent.CTRL_DOWN_MASK ) {
-                    affineTransform.scale( 1+(.04*e.getWheelRotation()), 1+(.04*e.getWheelRotation()) );
+                    affineTransform.scale( 1-(.04*e.getWheelRotation()), 1-(.04*e.getWheelRotation()) );
                     repaint();
                 } else {
                     delegate.mouseWheelMoved(e);
@@ -72,9 +72,13 @@ public class SinglePngWalkView extends PngWalkView {
                         }
                     } ) );
                     m.show(e.getComponent(),e.getX(), e.getY());
+                    return;
                 }
                 mousePressPoint= e.getPoint();
                 if ( ( e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK ) == KeyEvent.CTRL_DOWN_MASK ) {
+                    return;
+                }
+                if ( e.getButton()!=MouseEvent.BUTTON1 ) {
                     return;
                 }
                 Point p= getImagePosition( e.getX(), e.getY() );
@@ -115,7 +119,11 @@ public class SinglePngWalkView extends PngWalkView {
                         }
                     } ) );
                     m.show(e.getComponent(),e.getX(), e.getY());
+                    return;
                 }
+                if ( e.getButton()!=MouseEvent.BUTTON1 ) {
+                    return;
+                }                
                 if ( clickDigitizerSelect==-1 ) {
                     Rectangle lrect= imageLocation;
                     if ( imageLocation==null ) return;

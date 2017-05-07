@@ -202,6 +202,14 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
         return paintImageCentered(i, g2, null);
     }
 
+    /**
+     * paint the image centered within the this component.  The image may be
+     * scaled to fit within the View's (component's) boundardies.
+     * @param i the image to paint.
+     * @param g2 the graphics context.
+     * @param caption the caption to paint below the image.
+     * @return the rectangle containing the coordinates where the image was drawn.
+     */
     protected Rectangle paintImageCentered(BufferedImage i, Graphics2D g2, String caption) {
         FontMetrics fm = this.getFontMetrics(this.getFont());
         double captionHeight=  ( showCaptions && caption!=null ) ? ( fm.getHeight() + fm.getDescent() ) : 0 ;
