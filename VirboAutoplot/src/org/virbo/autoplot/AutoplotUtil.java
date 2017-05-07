@@ -775,7 +775,7 @@ public class AutoplotUtil {
                 w.println("# don't show icon in legend when there is only one renderer.");
                 w.println("#reluctantLegendIcons=true");
                 w.println("");
-                w.println("# monitor the event thread for hangs.");
+                w.println("# monitor the event thread for hangs.  See autoplot_data/log/, if the app hangs.");
                 w.println("#enableResponseMonitor=true");
                 w.println("");
                 w.println("# turn off certificate checks.");
