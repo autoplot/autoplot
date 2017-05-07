@@ -4666,8 +4666,8 @@ private void updateFrameTitle() {
         alm.addOptionalSwitchArgument("autoLayout",null,"autoLayout",alm.TRUE,"turn on/off initial autolayout setting");
         alm.addOptionalSwitchArgument("mode","m","mode","expert","start in basic (browse,reduced) mode or expert mode" );
         //alm.addOptionalSwitchArgument("exit", null, "exit", "0", "exit after running script" );
-        alm.addBooleanSwitchArgument( "eventThreadMonitor", null, "eventThreadMonitor", "monitor the event thread for long unresponsive pauses");
-
+        alm.addBooleanSwitchArgument( "eventThreadMonitor", null, "eventThreadMonitor", "monitor the event thread for long unresponsive pauses (deprecated, use enableResponseMonitor)");
+        alm.addBooleanSwitchArgument( "enableResponseMonitor", null, "enableResponseMonitor", "monitor the event thread for long unresponsive pauses");
         alm.addBooleanSwitchArgument( "samp", null, "samp", "enable SAMP connection for use with European Space Agency applications and websites");
         alm.addOptionalSwitchArgument( "server", null, "server", "-1", "start server at the given port listening to commands. (Replaces port)");
         alm.addBooleanSwitchArgument( "nop", null, "nop", "no operation, to be a place holder for jnlp script.");
@@ -4944,7 +4944,8 @@ APSplash.checkTime("init 220");
                     repaintRunnable.run();
                     //SwingUtilities.invokeLater(repaintRunnable);
 
-                    if ( System.getProperty("enableResponseMonitor","false").equals("true") ) {
+                    if ( System.getProperty("enableResponseMonitor","false").equals("true")
+                            || alm.getBooleanValue("eventThreadMonitor") || alm.getBooleanValue("enableResponseMonitor") ) {
                         EventThreadResponseMonitor emon= new EventThreadResponseMonitor();
                         if ( app!=null ) {
                             emon.addToMap( GuiExceptionHandler.UNDO_REDO_SUPPORT, app.undoRedoSupport );
