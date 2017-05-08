@@ -332,7 +332,7 @@ public class DataMashUp extends javax.swing.JPanel {
             if ( vv instanceof Name ) {
                 parent.insert( new DefaultMutableTreeNode( ((Name)vv).id + "." + ((Attribute)et).attr), i );
             } else {
-                logger.fine("expected Name at "+(et).toString() );
+                logger.log(Level.FINE, "expected Name at {0}", (et).toString());
                 parent.insert( new DefaultMutableTreeNode( "." + ((Attribute)et).attr), i );
             }
         } else if ( et instanceof UnaryOp ) { // a negative number appears as a unary minus op and positive number.
@@ -769,17 +769,17 @@ public class DataMashUp extends javax.swing.JPanel {
 
             MutableTreeNode n= getTreeNode(data);
 
-            if ( false ) { // my attempt to replace the first argument with the expression.
-                if ( n.getChildCount()>0 ) {
-                    if ( !isChildOf( mtn, n ) ) {
-                        String s= n.getChildAt(0).toString();
-                        if ( s.length()>0 && Character.isJavaIdentifierStart(s.charAt(0)) ) {
-                            n.remove( 0 );
-                            n.insert( mtn, 0 );                    
-                        }
-                    }
-                }
-            }
+//            if ( false ) { // my attempt to replace the first argument with the expression.
+//                if ( n.getChildCount()>0 ) {
+//                    if ( !isChildOf( mtn, n ) ) {
+//                        String s= n.getChildAt(0).toString();
+//                        if ( s.length()>0 && Character.isJavaIdentifierStart(s.charAt(0)) ) {
+//                            n.remove( 0 );
+//                            n.insert( mtn, 0 );                    
+//                        }
+//                    }
+//                }
+//            }
             
             if ( parent==null ) {
                 model.setRoot(n);
