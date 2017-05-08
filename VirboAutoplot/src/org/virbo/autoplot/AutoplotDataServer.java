@@ -325,6 +325,7 @@ public class AutoplotDataServer {
         alm.addBooleanSwitchArgument( "nostream", "", "nostream","disable streaming, as with Bill's dataset which is X and Y table");
         alm.addBooleanSwitchArgument( "ascii", "a", "ascii", "request that ascii streams be sent instead of binary.");
         alm.addBooleanSwitchArgument( "noexit", "z", "noexit", "don't exit after running, for use with scripts." );
+        alm.addBooleanSwitchArgument( "enableResponseMonitor", null, "enableResponseMonitor", "monitor the event thread for long unresponsive pauses");        
 
         alm.requireOneOf(new String[]{"uri"});
         alm.process(args);
@@ -341,6 +342,14 @@ public class AutoplotDataServer {
 
         boolean stream= ! alm.getBooleanValue("nostream");
 
+        
+        //AutoplotUtil.maybeLoadSystemProperties();
+        //if ( System.getProperty("enableResponseMonitor","false").equals("true")
+        //                    || alm.getBooleanValue("enableResponseMonitor") ) {
+        if ( alm.getBooleanValue("enableResponseMonitor") ) {
+            EventThreadResponseMonitor emon= new EventThreadResponseMonitor();
+            emon.start();
+        }
         //initialize the application.  We don't use the object, but this
         //will allow us to reset the cache position.
         getDocumentModel();
