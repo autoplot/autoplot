@@ -2,7 +2,6 @@ package org.autoplot.pngwalk;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -16,13 +15,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.management.RuntimeErrorException;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -65,10 +62,12 @@ public class SinglePngWalkView extends PngWalkView {
         });
         
         MouseAdapter ma= new MouseAdapter() {
+            @Override
             public void mousePressed(MouseEvent e) {
                 if ( e.isPopupTrigger() ) {
                     JPopupMenu m= getPopup();
                     m.add( new JMenuItem( new AbstractAction( "Reset Zoom (Ctrl+MouseWheel to set)" ) {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             affineTransform= new AffineTransform();
                             repaint();
@@ -87,9 +86,7 @@ public class SinglePngWalkView extends PngWalkView {
                 Point p= getImagePosition( e.getX(), e.getY() );
                 if ( p!=null ) try {
                     clickDigitizerSelect= clickDigitizer.maybeSelect(p);
-                } catch (IOException ex) {
-                    Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ParseException ex) {
+                } catch (IOException | ParseException ex) {
                     Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 if ( clickDigitizerSelect==-1 ) {
@@ -106,20 +103,20 @@ public class SinglePngWalkView extends PngWalkView {
                     int imageY= (int)( ( e.getY() - lrect.y ) / factor );                    
                     try {
                         clickDigitizer.doLookupMetadata( imageX, imageY, false );
-                    } catch (IOException ex) {
-                        Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (ParseException ex) {
+                    } catch (IOException | ParseException ex) {
                         Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
                 
             }
 
+            @Override
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
                 if ( e.isPopupTrigger() ) {
                     JPopupMenu m= getPopup();
                     m.add( new JMenuItem( new AbstractAction( "Reset Zoom (Ctrl+MouseWheel to set)" ) {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             affineTransform= new AffineTransform();
                             repaint();
@@ -196,13 +193,13 @@ public class SinglePngWalkView extends PngWalkView {
         return new Point(imageX,imageY);
     }
     
-    /**
-     * this was introduced to support digitizing points while zoomed into an
-     * image, but I am missing a transform somewhere and the feature will be
-     * disabled so I can make a release. 
-     * @param image
-     * @return 
-     */
+//    /**
+//     * this was introduced to support digitizing points while zoomed into an
+//     * image, but I am missing a transform somewhere and the feature will be
+//     * disabled so I can make a release. 
+//     * @param image
+//     * @return 
+//     */
 //    private Rectangle transformRect( Rectangle image ) {
 //        Rectangle result= new Rectangle();        
 //        try {
@@ -267,36 +264,48 @@ public class SinglePngWalkView extends PngWalkView {
 
                         int imageX= (int)( ( ix * factor + lrect.x ) );
                         int imageY= (int)( ( iy * factor + lrect.y ) );
-                        if ( clickDigitizer.viewer.annoTypeChar=='+' ) { 
-                            g2.setColor( Color.LIGHT_GRAY );
-                            g2.drawLine( 0,imageY,getWidth(),imageY );
-                            g2.drawLine( imageX,0,imageX,getHeight() );
-                            Color c0= g2.getColor();
-                            Stroke stroke0= g2.getStroke();
-                            g2.setColor( g2.getBackground() );
-                            g2.setStroke( new BasicStroke( 1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 1.0f, new float[] { 1.f,3.f }, 0.f ) );
-                            g2.drawLine( 0,imageY,getWidth(),imageY );
-                            g2.drawLine( imageX,0,imageX,getHeight() );
-                            g2.setColor( Color.BLACK );
-                            g2.drawLine( imageX-20,imageY,imageX+20,imageY );
-                            g2.drawLine( imageX,imageY-20,imageX,imageY+20 );
-                            g2.setStroke( stroke0 );
-                            g2.setColor( c0 );
-                        } else if ( clickDigitizer.viewer.annoTypeChar=='|' ) { 
-                            g2.drawLine( imageX,0,imageX,getHeight() );                            
-                            Color c0= g2.getColor();
-                            Stroke stroke0= g2.getStroke();
-                            g2.setColor( g2.getBackground() );
-                            g2.setStroke( new BasicStroke( 1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 1.0f, new float[] { 1.f,3.f }, 0.f ) );
-                            g2.drawLine( imageX,0,imageX,getHeight() );
-                            g2.setStroke( stroke0 );
-                            g2.setColor( c0 );
-                        } else if ( clickDigitizer.viewer.annoTypeChar=='.' ) {
-                            g2.drawOval( imageX-2, imageY-2, 5, 5 );
-                            Color c0= g2.getColor();
-                            g2.setColor( g2.getBackground() );
-                            g2.fillOval( imageX-1, imageY-1, 3, 3 );
-                            g2.setColor( c0 );
+                        switch (clickDigitizer.viewer.annoTypeChar) {
+                            case '+':
+                                {
+                                    g2.setColor( Color.LIGHT_GRAY );
+                                    g2.drawLine( 0,imageY,getWidth(),imageY );
+                                    g2.drawLine( imageX,0,imageX,getHeight() );
+                                    Color c0= g2.getColor();
+                                    Stroke stroke0= g2.getStroke();
+                                    g2.setColor( g2.getBackground() );
+                                    g2.setStroke( new BasicStroke( 1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 1.0f, new float[] { 1.f,3.f }, 0.f ) );
+                                    g2.drawLine( 0,imageY,getWidth(),imageY );
+                                    g2.drawLine( imageX,0,imageX,getHeight() );
+                                    g2.setColor( Color.BLACK );
+                                    g2.drawLine( imageX-20,imageY,imageX+20,imageY );
+                                    g2.drawLine( imageX,imageY-20,imageX,imageY+20 );
+                                    g2.setStroke( stroke0 );
+                                    g2.setColor( c0 );
+                                    break;
+                                }
+                            case '|':
+                                {
+                                    g2.drawLine( imageX,0,imageX,getHeight() );
+                                    Color c0= g2.getColor();
+                                    Stroke stroke0= g2.getStroke();
+                                    g2.setColor( g2.getBackground() );
+                                    g2.setStroke( new BasicStroke( 1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 1.0f, new float[] { 1.f,3.f }, 0.f ) );
+                                    g2.drawLine( imageX,0,imageX,getHeight() );
+                                    g2.setStroke( stroke0 );
+                                    g2.setColor( c0 );
+                                    break;
+                                }
+                            case '.':
+                                {
+                                    g2.drawOval( imageX-2, imageY-2, 5, 5 );
+                                    Color c0= g2.getColor();
+                                    g2.setColor( g2.getBackground() );
+                                    g2.fillOval( imageX-1, imageY-1, 3, 3 );
+                                    g2.setColor( c0 );
+                                    break;
+                                }
+                            default:
+                                break;
                         }
                         
                     }
