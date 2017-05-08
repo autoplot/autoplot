@@ -142,9 +142,7 @@ public class SinglePngWalkView extends PngWalkView {
                     int imageY= (int)( ( e.getY() - lrect.y ) / factor );                    
                     try {
                         clickDigitizer.doLookupMetadata( imageX, imageY, true );
-                    } catch (IOException ex) {
-                        Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (ParseException ex) {
+                    } catch (IOException | ParseException ex) {
                         Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
