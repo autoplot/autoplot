@@ -2,6 +2,7 @@ package org.autoplot.pngwalk;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -15,11 +16,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.management.RuntimeErrorException;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -92,6 +95,10 @@ public class SinglePngWalkView extends PngWalkView {
                 if ( clickDigitizerSelect==-1 ) {
                     Rectangle lrect= imageLocation;
                     if ( imageLocation==null ) return;
+                    if ( !affineTransform.isIdentity() ) {
+                        seq.setStatus(  "digitizing is not supported with image zoom and pan, Reset Zoom with right-click." );
+                        return;
+                    }
                     BufferedImage i = seq.currentImage().getImage();
                     if ( i==null ) return;
                     double factor = (double) lrect.getWidth() / (double) i.getWidth(null);
@@ -127,6 +134,10 @@ public class SinglePngWalkView extends PngWalkView {
                 if ( clickDigitizerSelect==-1 ) {
                     Rectangle lrect= imageLocation;
                     if ( imageLocation==null ) return;
+                    if ( !affineTransform.isIdentity() ) {
+                        seq.setStatus(  "digitizing is not supported with image zoom and pan, Reset Zoom with right-click." );
+                        return;
+                    }
                     BufferedImage i = seq.currentImage().getImage();
                     if ( i==null ) return;
                     double factor = (double) lrect.getWidth() / (double) i.getWidth(null);
@@ -185,6 +196,30 @@ public class SinglePngWalkView extends PngWalkView {
         return new Point(imageX,imageY);
     }
     
+    /**
+     * this was introduced to support digitizing points while zoomed into an
+     * image, but I am missing a transform somewhere and the feature will be
+     * disabled so I can make a release. 
+     * @param image
+     * @return 
+     */
+//    private Rectangle transformRect( Rectangle image ) {
+//        Rectangle result= new Rectangle();        
+//        try {
+//            Point p1= new Point(image.getLocation());
+//            Point p2= new Point(image.getLocation().x+image.width,image.getLocation().y+image.height);
+//            Point p3= new Point(image.getLocation());
+//            Point p4= new Point(image.getLocation());
+//            affineTransform.inverseTransform( p1, p3 );
+//            affineTransform.inverseTransform( p2, p4 );
+//            result= new Rectangle( p3, new Dimension( p4.x-p3.x, p4.y-p3.y ) );
+//            return result;
+//        } catch (NoninvertibleTransformException ex) {
+//            throw new RuntimeException(ex);
+//        }
+//        
+//    }
+    
     @Override
     protected synchronized void paintComponent(Graphics g1) {
         super.paintComponent(g1);
@@ -210,7 +245,7 @@ public class SinglePngWalkView extends PngWalkView {
             }
             paintImageCentered(loadingImage, g2);
         }
-
+        
         if ( i!=null && clickDigitizer.viewer!=null && clickDigitizer.viewer.digitizer!=null ) {
             int h= i.getHeight();
             int w= i.getWidth();
@@ -270,5 +305,11 @@ public class SinglePngWalkView extends PngWalkView {
                 Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+
+        //if ( imageLocation!=null ) {
+        //    imageLocation= transformRect(imageLocation);
+        //    System.err.println("234: " + imageLocation);
+        //}
+        
     }
 }
