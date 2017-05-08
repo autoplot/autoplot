@@ -9,6 +9,7 @@ import static org.virbo.autoplot.ScriptContext.*;
 
 import org.das2.util.ArgumentList;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.datasource.URISplit;
 
 /**
@@ -36,6 +37,7 @@ public class AutoplotServer {
         alm.addOptionalSwitchArgument("canvas.aspect", "a", "canvas.aspect", "", "aspect ratio" );
         alm.addOptionalSwitchArgument("format", "f", "format", "png", "output format png or pdf (default=png)");
         alm.addOptionalSwitchArgument("outfile", "o", "outfile", "-", "output filename or -");
+        alm.addBooleanSwitchArgument( "enableResponseMonitor", null, "enableResponseMonitor", "monitor the event thread for long unresponsive pauses");
         alm.addBooleanSwitchArgument( "noexit", "z", "noexit", "don't exit after running, for use with scripts." );
         alm.requireOneOf( new String[] { "uri", "vap" } );
         alm.process(args);
@@ -65,6 +67,14 @@ public class AutoplotServer {
 
         if ( outfile.endsWith(".pdf") ) format= "pdf";
 
+        //AutoplotUtil.maybeLoadSystemProperties();
+        //if ( System.getProperty("enableResponseMonitor","false").equals("true")
+        //                    || alm.getBooleanValue("enableResponseMonitor") ) {
+        if ( alm.getBooleanValue("enableResponseMonitor") ) {
+            EventThreadResponseMonitor emon= new EventThreadResponseMonitor();
+            emon.start();
+        }
+        
         Application dom= getDocumentModel();
         
         // do dimensions
