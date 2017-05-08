@@ -91,7 +91,12 @@ public class BinaryDataFormatter implements DataFormatter {
                 }
                 int nfields;
                 if ( parameter.has("size") ) {
-                    nfields= DataSetUtil.product( (int[])parameter.get("size") );
+                    JSONArray ja= (JSONArray)parameter.get("size");
+                    int prod= 1;
+                    for ( int j=0; j<ja.length(); j++ ) {
+                        prod*= ja.getInt(j);
+                    }
+                    nfields= prod;
                 } else {
                     nfields= 1;
                 }
