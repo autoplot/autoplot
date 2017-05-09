@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Comparing adjacent images in the PNG Walk Tool, using its new ability to zoom in on images.
+        <p><small>Script demonstrates event thread mis-management.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,8 @@
         
         <p>Bugfixes (2017-05-08 r20759):</p>
         <ul> 
-            <li>--enableResponseMonitor command line switch function restored.
+            <li>'$Y$m$(d,span=4)/P4D' counts off days consistently.  Thanks, Masafumi!
+            <li>--enableResponseMonitor command line switch function restored, added to AutoplotServlet.  Thanks, Seth!
             <li>jnlp needed Codebase attribute to run without complaint.
             <li>TimeParser ISO8601-deriving code would fail because it dropped the Z.
             <li>DataPointRecorder support for old digitizing files is improved.
@@ -34,7 +35,7 @@
             <li>small round of findbugs cleanup.
             <li>select time by orbit would pick previous orbit if it overlapped slightly.
             <li>1820: occasional failures of test033, double checking for valid ticks.
-            <li>1723: Wind waves data then dbAboveBackground showed where VALID_MIN was improperly propogated.
+            <li>1723: Wind waves data then dbAboveBackground showed where VALID_MIN was improperly propogated.  Thanks, Masafumi!
             <li>1559: trim getDataSet calls to the time range requested, when the time axis is not visible.
             <li>debug printing for 1814 accidentally left in production release.
         </ul>
