@@ -65,6 +65,10 @@ public class CapabilitiesServlet extends HttpServlet {
             outputFormats.put( 1, "binary" );
             jo.put( "outputFormats", outputFormats );
             out.write( jo.toString(4) );
+            JSONObject status= new JSONObject();
+            status.put( "code", 1200 );
+            status.put( "message", "OK request successful");
+            jo.put( "status", status );
             
         } catch ( JSONException ex ) {
             throw new ServletException(ex);

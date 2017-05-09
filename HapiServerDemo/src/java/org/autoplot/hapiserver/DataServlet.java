@@ -143,7 +143,7 @@ public class DataServlet extends HttpServlet {
         }
         
         if ( format.equals("binary") ) {
-            if ( include.equals("header") ) throw new IllegalArgumentException("header cannot be sent with binary");
+            if ( include.equals("header") ) throw new IllegalArgumentException("header cannot be sent with binary");  //TODO: check this
         }
         
         JSONObject jo;
@@ -222,6 +222,17 @@ public class DataServlet extends HttpServlet {
                 if ( dsiter!=null ) dsiter.resortFields( indexMap );
                 jsonParameters= newParameters;
                 jo.put( "parameters", jsonParameters );
+                
+                JSONObject status= new JSONObject();
+                if ( ( dsiter!=null && !dsiter.hasNext() ) || ( dataFiles!=null && dataFiles.length==0 ) ) {
+                    status.put( "code", 1201 );
+                    status.put( "message", "no data in interval");
+                } else {
+                    status.put( "code", 1200 );
+                    status.put( "message", "OK request successful");
+                }
+                
+                jo.put( "status", status );
             }
 
             if ( include.equals("header") ) {
@@ -252,7 +263,7 @@ public class DataServlet extends HttpServlet {
 
         
         try {
-
+            assert dsiter!=null;
             if ( dsiter.hasNext() ) {
                             
                 QDataSet first= dsiter.next();

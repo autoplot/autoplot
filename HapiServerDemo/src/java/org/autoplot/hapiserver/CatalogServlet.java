@@ -37,6 +37,12 @@ public class CatalogServlet extends HttpServlet {
         jo.put("x-deployedAt", deployedAt );
         JSONArray catalog= HapiServerSupport.getCatalog();
         jo.put("catalog",catalog);
+                
+        JSONObject status= new JSONObject();
+        status.put( "code", 1200 );
+        status.put( "message", "OK request successful");
+        jo.put( "status", status );
+        
         return jo;
     }
     

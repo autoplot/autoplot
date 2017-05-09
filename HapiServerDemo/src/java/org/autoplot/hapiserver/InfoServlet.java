@@ -100,6 +100,12 @@ public class InfoServlet extends HttpServlet {
         }
         
         jo.put("parameters",parameters);
+        
+        JSONObject status= new JSONObject();
+        status.put( "code", 1200 );
+        status.put( "message", "OK request successful");
+                
+        jo.put( "status", status );
         return jo;
 
     }
