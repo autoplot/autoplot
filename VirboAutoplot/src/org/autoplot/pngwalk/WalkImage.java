@@ -230,17 +230,21 @@ public class WalkImage  {
      * @return
      */
     public BufferedImage readImage( File f ) throws IllegalArgumentException, IOException  {
-        BufferedImage lim= ImageIO.read( f );
-        if ( lim==null ) { // Bob had pngs on his site that returned an html document decorating.
-            System.err.println("fail to read image: "+f );
+        try {
+            BufferedImage lim= ImageIO.read( f );
+            if ( lim==null ) { // Bob had pngs on his site that returned an html document decorating.
+                logger.info("fail to read image: "+f );
+                return missingImage;
+            }
+            if ( lim.getType()==0 ) {
+                BufferedImage imNew= new BufferedImage( lim.getWidth(), lim.getHeight(), BufferedImage.TYPE_INT_ARGB );
+                imNew.getGraphics().drawImage( lim, 0, 0, null );
+                lim= imNew;
+            }
+            return lim;
+        } catch ( IOException ex ) {
             return missingImage;
         }
-        if ( lim.getType()==0 ) {
-            BufferedImage imNew= new BufferedImage( lim.getWidth(), lim.getHeight(), BufferedImage.TYPE_INT_ARGB );
-            imNew.getGraphics().drawImage( lim, 0, 0, null );
-            lim= imNew;
-        }
-        return lim;
     }
 
     /**
@@ -514,7 +518,7 @@ public class WalkImage  {
         } catch (RuntimeException ex) {
             throw ex;
         } catch (Exception ex) {
-            System.err.println("Error loading image file from " + DataSetURI.fromUri(imgURI) );
+            //System.err.println("Error loading image file from " + DataSetURI.fromUri(imgURI) );
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             setStatus(Status.MISSING);
             throw new RuntimeException(ex);
