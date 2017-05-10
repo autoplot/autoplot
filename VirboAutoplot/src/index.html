@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-05-08 r20759):</p>
+        <p>Bugfixes (2017-05-10 r20777):</p>
         <ul> 
+            <li>DataPointRecorder treats -1e31 as fill, to support legacy applications.
             <li>'$Y$m$(d,span=4)/P4D' counts off days consistently.  Thanks, Masafumi!
             <li>--enableResponseMonitor command line switch function restored, added to AutoplotServlet.  Thanks, Seth!
             <li>jnlp needed Codebase attribute to run without complaint.
@@ -72,6 +73,7 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>Add handling for yscans without yTags at all, and those that use yTagInterval as well.  Thanks, Chris!
             <li>573: pngwalk tool now supports zoom on image.
             <li>isEventsList now requires that each endTime be greater than or equal to startTime, and is used in guessRenderType, to support (X,Y)->Z where Z can be ordinal data.
             <li>ASCII table reader is able to read in (X,Y)->Z where Z can be ordinal data.
