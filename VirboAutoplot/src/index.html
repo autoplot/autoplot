@@ -26,6 +26,7 @@
         
         <p>Bugfixes (2017-05-10 r20777):</p>
         <ul> 
+            <li>in das2stream reader, buffer capacity now grows on data packet reads as well as header packets.  Thanks, Chris!
             <li>DataPointRecorder treats -1e31 as fill, to support legacy applications.
             <li>'$Y$m$(d,span=4)/P4D' counts off days consistently.  Thanks, Masafumi!
             <li>--enableResponseMonitor command line switch function restored, added to AutoplotServlet.  Thanks, Seth!
