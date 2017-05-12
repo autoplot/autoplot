@@ -594,8 +594,9 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
 
     /**
      * allow clients to tell this to load a file.  
-     * @param file
-     * @return
+     * @param file the .jy or .jyds file.
+     * @return false if the editor is dirty, true if the file is loaded.
+     * @throws java.io.IOException
      */
     public boolean loadFile( File file ) throws IOException {
         if ( isDirty() ) {
