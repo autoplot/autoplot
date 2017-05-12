@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Script demonstrates event thread mis-management.
+        <p><small>Silly plot demonstrating interpolate routine.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,10 +24,14 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-05-10 r20777):</p>
+        <p>Bugfixes (2017-05-12 r20785):</p>
         <ul> 
+            <li>1818: pngwalk of Omni DST vs KP skips each December.
+            <li>1825: Data Point Recorder drops points when x-axis is not a time axis.
+            <li>1821,0656: load example script dialog cancel didn't work.  
+            <li>1697: A second path resulting in waiting threads when FileSystem simultaneously created by multiple threads.  Thanks, Seth!
+            <li>1824: -1e30 is treated as fill in DataPointRecorder, to support files from old Das2 applications.  Thanks, Darrelle!
             <li>in das2stream reader, buffer capacity now grows on data packet reads as well as header packets.  Thanks, Chris!
-            <li>DataPointRecorder treats -1e31 as fill, to support legacy applications.
             <li>'$Y$m$(d,span=4)/P4D' counts off days consistently.  Thanks, Masafumi!
             <li>--enableResponseMonitor command line switch function restored, added to AutoplotServlet.  Thanks, Seth!
             <li>jnlp needed Codebase attribute to run without complaint.
