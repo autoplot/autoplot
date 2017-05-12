@@ -289,8 +289,8 @@ public class ScriptPanelSupport {
     }
 
     /**
-     * save the editor contents to a file.
-     * @return JOptionPane.OK_OPTION if successful, or JOptionPane.CANCEL_OPTION if the operator cancelled the saveAs operation.
+     * save the editor contents to a file.  Note this used to return JOptionPane.OK_OPTION, but this is also 0.
+     * @return JFileChooser.APPROVE_OPTION or JFileChooser.CANCEL_OPTION if the operator cancelled the saveAs operation.
      * @throws FileNotFoundException
      * @throws IOException 
      */
@@ -300,7 +300,7 @@ public class ScriptPanelSupport {
             if ( panel.isDirty() ) {
                 return saveAs();
             }
-            return JOptionPane.OK_OPTION;
+            return JFileChooser.APPROVE_OPTION;
         }
         OutputStream out = null;
         try {
@@ -342,7 +342,7 @@ public class ScriptPanelSupport {
         } finally {
             if ( out!=null ) out.close();
         }
-        return JOptionPane.OK_OPTION;
+        return JFileChooser.APPROVE_OPTION;
     }
     
     WatchService watcher;

@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
@@ -313,7 +314,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         try {
             URL url = EditorContextMenu.class.getResource(resourceFile);
             if (this.isDirty()) {
-                if ( this.support.saveAs()==JOptionPane.CANCEL_OPTION ) {
+                if ( this.support.saveAs()==JFileChooser.CANCEL_OPTION ) {
                     return;
                 }
             }
