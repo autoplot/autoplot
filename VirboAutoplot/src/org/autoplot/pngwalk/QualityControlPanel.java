@@ -115,7 +115,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
     public void setStatus(int numOK, int numProblem, int numIgnore, int numUnknown) {
 
         String statustxt;
-        if ( walkImageSequence.getQCFolder()==null ) {
+        if ( walkImageSequence==null || walkImageSequence.getQCFolder()==null ) {
             statustxt= " ";
         } else {
             statustxt= String.format("%d OK | %d Prob | %d Ign | %d Unknown", numOK, numProblem, numIgnore, numUnknown);
