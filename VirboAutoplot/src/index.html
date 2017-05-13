@@ -26,7 +26,11 @@
         
         <p>Bugfixes (2017-05-12 r20785):</p>
         <ul> 
+            <li>file:///.../*.png used in PNG Walk tool would clip off the first two characters of each filename's label.
+            <li>rte_0424767770: new code didn't account for path where walkImageSequence would be null.  Thanks, Ivar!
             <li>1818: pngwalk of Omni DST vs KP skips each December.
+            <li>0595: sftp is now recognized, fixing Jython listDirectory command.
+            <li>Data Point Recorder sorting is disabled while data is loaded from a file, for speed.
             <li>1825: Data Point Recorder drops points when x-axis is not a time axis.
             <li>1821,0656: load example script dialog cancel didn't work.  
             <li>1697: A second path resulting in waiting threads when FileSystem simultaneously created by multiple threads.  Thanks, Seth!
