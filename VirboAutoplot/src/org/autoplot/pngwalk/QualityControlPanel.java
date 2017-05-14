@@ -180,7 +180,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
                         for ( Enumeration<AbstractButton> e= statusButtonGroup.getElements(); e.hasMoreElements(); ) {
                             e.nextElement().setEnabled(true);
                         }
-                        okButton.setEnabled(true);
+                        okButton.setEnabled(false);
                         loginButton.setEnabled(false);        
                     } else {
                         //JOptionPane.showMessageDialog( QualityControlPanel.this,"<html>Unable to write to File System<br>"+fs.getRootURI() );
