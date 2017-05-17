@@ -21,6 +21,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
 import java.util.logging.Logger;
+import org.das2.dataset.DataSet;
 import org.virbo.dataset.QDataSet;
 import org.das2.dataset.DataSetAdapter;
 import org.das2.dataset.NoDataInIntervalException;
@@ -118,7 +119,12 @@ public class Das2StreamDataSource extends AbstractDataSource {
 
                 in.close();
 
-                return DataSetAdapter.create(handler.getDataSet());
+                DataSet r= handler.getDataSet();
+                if ( r!=null ) {
+                    return DataSetAdapter.create(handler.getDataSet());
+                } else {
+                    return null;
+                }
             } catch ( StreamException se ) {
                  if ( se.toString().contains( "Expecting stream descriptor header" ) ) {
                     int i= se.toString().indexOf("beginning \n'");
