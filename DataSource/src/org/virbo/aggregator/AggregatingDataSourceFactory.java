@@ -145,11 +145,11 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
                 logger.finer("unable to parse timerange, just use default delegate");
             }
             if ( tdr!=null ) {
-                String[] names= fsm.getBestNamesFor( tdr, mon );
+                String[] names= fsm.getBestNamesFor( tdr, mon.getSubtaskMonitor("get best names") );
                 if ( names.length>0 ) {
                     delegateFile= names[0];
                 } else {
-                    delegateFile= fsm.getRepresentativeFile( mon );
+                    delegateFile= fsm.getRepresentativeFile( mon.getSubtaskMonitor("get delegate") );
                 }
             } else {
                 delegateFile= fsm.getRepresentativeFile( mon );
