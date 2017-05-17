@@ -860,19 +860,6 @@ public final class PngWalkTool extends javax.swing.JPanel {
                tool.seq.setIndex( tool.seq.size()-1 );
             }
         } ).setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_END, 0 ));
-
-        final JCheckBoxMenuItem qcmi= new JCheckBoxMenuItem("Show Only Quality Control Records",false);
-        qcmi.addActionListener( new AbstractAction(  ) {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if ( qcmi.isSelected() ) {
-                    tool.seq.setQCFilter("opi");
-                } else {
-                    tool.seq.setQCFilter("");
-                }
-            }
-        } );
-        navMenu.add(qcmi);
         
         result.add( navMenu );
         tool.navMenu= navMenu;
@@ -914,7 +901,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         }
         optionsMenu.add( thumbsizeMenu );
 
-        final JMenuItem qc= new JMenuItem( new AbstractAction( "Start Quality Control Annotations Tool (QC)" ) {
+        final JMenuItem qc= new JMenuItem( new AbstractAction( "Start Quality Control Tool (QC)" ) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);        
@@ -925,6 +912,19 @@ public final class PngWalkTool extends javax.swing.JPanel {
         });
         qc.setToolTipText("Start up the Quality Control tool that adds documentation to images.");
         optionsMenu.add( qc );
+        
+        final JCheckBoxMenuItem qcmi= new JCheckBoxMenuItem("Show Only Quality Control Records",false);
+        qcmi.addActionListener( new AbstractAction(  ) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if ( qcmi.isSelected() ) {
+                    tool.seq.setQCFilter("op");
+                } else {
+                    tool.seq.setQCFilter("");
+                }
+            }
+        } );
+        optionsMenu.add(qcmi);
         
         final JMenuItem dg= new JMenuItem( new AbstractAction( "Start Digitizer" ) {
             @Override

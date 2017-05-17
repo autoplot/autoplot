@@ -535,7 +535,11 @@ public class WalkImageSequence implements PropertyChangeListener  {
     
     /**
      * string containing combination of "opi" meaning that each should be shown.
-     * "" will show everything.
+     * "" will show everything.  The list can include:<ul>
+     * <li>o okay are shown
+     * <li>p problem are shown
+     * <li>i ignore are shown
+     * </ul>
      * @param s 
      */
     public void setQCFilter( String s ) {
