@@ -11,6 +11,13 @@
 
 package org.autoplot.pngwalk;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfWriter;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -31,9 +38,11 @@ import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -56,7 +65,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -71,11 +79,11 @@ import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UnsupportedLookAndFeelException;
+import org.das2.components.DasProgressPanel;
 import org.das2.components.DataPointRecorder;
 import org.das2.components.TearoffTabbedPane;
 import org.das2.dataset.DataSetUpdateEvent;
 import org.das2.dataset.DataSetUpdateListener;
-import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeParser;
@@ -91,6 +99,7 @@ import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.AlertNullProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
@@ -940,6 +949,18 @@ public final class PngWalkTool extends javax.swing.JPanel {
         
         result.add( optionsMenu );
 
+        final JMenu toolsMenu= new JMenu("Tools");
+        final JMenuItem writePdf= new JMenuItem( new AbstractAction( "Write to PDF" ) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);        
+                tool.writePdf();
+            }
+        });
+        writePdf.setToolTipText("Write the visible images to a PDF file with last QC annotation.");
+        toolsMenu.add( writePdf );
+        result.add( toolsMenu );
+        
         final JMenu bookmarksMenu= new JMenu("Bookmarks");
         final BookmarksManager man= new BookmarksManager(frame,true,"PNG Bookmarks");
 
@@ -2075,6 +2096,91 @@ public final class PngWalkTool extends javax.swing.JPanel {
      */
     public WalkImageSequence getSequence() {
         return this.seq;
+    }
+    
+    private void writeToPdfImmediately( ProgressMonitor monitor, File f ) throws FileNotFoundException {
+        try {
+            monitor.setTaskSize(this.seq.size());
+            monitor.started();
+            
+            FileOutputStream out= new FileOutputStream( f );
+                        
+            Rectangle rect = new Rectangle( (int)(8.5*72), (int)11*72 );
+            Document doc = new Document(rect, 0, 0, 0, 0 );
+            doc.addCreator("autoplotPngwalkTool");
+            doc.addCreationDate();
+            
+            PdfWriter writer = PdfWriter.getInstance(doc, out);
+            doc.open();
+                      
+            QualityControlSequence qcseq= this.seq.getQualityControlSequence();
+            
+            for ( int i= 0; i<this.seq.size(); i++ ) {
+                monitor.setTaskProgress(i);
+                PdfContentByte cb = writer.getDirectContent();
+
+                cb.saveState();
+
+                BufferedImage im= this.seq.imageAt(i).getImage();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                try {
+                    ImageIO.write(im, "png", baos);
+                    Image pdfImage= com.itextpdf.text.Image.getInstance(baos.toByteArray() );
+                    int w= (int)(7.5*72);
+                    int h= w * im.getHeight() / im.getWidth();
+                    pdfImage.setAbsolutePosition(36,11*72-36-h);
+                    pdfImage.scaleToFit(w,h);
+                    
+                    cb.addImage( pdfImage );
+                    doc.add( pdfImage.rectangle(36,11*72-36-h) );
+                    if ( qcseq!=null ) {
+                        QualityControlRecord r= qcseq.getQualityControlRecord(i);
+                        if ( r!=null ) {
+                            Paragraph p= new Paragraph();
+                            p.add(r.getLastComment());
+                            doc.add(p);
+                        }
+                    }
+                    
+                } catch (IOException ex) {
+                    Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                cb.restoreState();
+                
+                doc.newPage();
+            }
+                        
+            doc.close();
+            monitor.finished();
+            
+        } catch (DocumentException ex) {
+            Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            monitor.finished();
+            
+        }
+    }
+    
+    public void writePdf() {
+        JFileChooser choose= new JFileChooser();
+        choose.setSelectedFile( new File("/tmp/pngwalk.pdf") );
+        if ( choose.showSaveDialog(navMenu)==JFileChooser.APPROVE_OPTION ) {
+            final File f= choose.getSelectedFile();
+            final ProgressMonitor mon= DasProgressPanel.createFramed("write pdf");
+            Runnable run= new Runnable() {
+                public void run() {
+                    try {
+                        writeToPdfImmediately( mon , f );
+                        JOptionPane.showMessageDialog(parentWindow,"wrote file "+f);
+                    } catch (FileNotFoundException ex) {
+                        Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
+                    }                    
+                }
+            };
+            new Thread(run).start();
+
+        }
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -70,7 +70,7 @@ public class QualityControlRecord {
 
     private boolean initialized = false;    //to support lazy initialization
 
-    private TreeSet comments;               //list of comments, use treeset to sort by date
+    private TreeSet<ReviewComment> comments;               //list of comments, use treeset to sort by date
     private Status currentStatus;           //current review status
     private Date changeDate;                //time of last modification
     private ReviewComment newComment;       //new commentText to be appended to list on write
@@ -107,12 +107,12 @@ public class QualityControlRecord {
     }
 
     static {
-        cache= new HashMap<URI,QualityControlRecord>();
+        cache= new HashMap<>();
         cacheURI= null;
     }
 
     private QualityControlRecord() {
-        comments = new TreeSet<ReviewComment>();
+        comments = new TreeSet<>();
         currentStatus = Status.UNKNOWN;
         utcDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); // findbugs STCAL_INVOKE_ON_STATIC_DATE_FORMAT_INSTANCE
         utcDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -426,6 +426,18 @@ public class QualityControlRecord {
         base.appendChild(e);
     }
 
+    /**
+     * return the last comment.
+     * @return the last comment, or "" if no comments have been added.
+     */
+    public String getLastComment() { 
+        if ( comments.size()>0 ) {
+            return comments.last().commentText;
+        } else {
+            return "";
+        }
+    }
+    
     public String getCommentsHTML() {
         if (!initialized) initialize();
         StringBuilder sb = new StringBuilder();
