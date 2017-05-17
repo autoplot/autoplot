@@ -473,7 +473,7 @@ public class Das2ServerDataSource extends AbstractDataSource {
             DataSet ds = handler.getDataSet();
 
             if ( ds==null ) {
-                throw new RuntimeException("failed to get dataset, without explanation!  (Possibly no records)");
+                return null;
             }
 
             if ( ds.getXLength()==0 ) {
