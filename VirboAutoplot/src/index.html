@@ -24,8 +24,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-05-12 r20785):</p>
+        <p>Bugfixes (2017-05-12 r20797):</p>
         <ul> 
+            <li>1831: hint that something is wrong when URI is rejected in add plot dialog.
+            <li>1829: check for null when adapting das2streams.
             <li>file:///.../*.png used in PNG Walk tool would clip off the first two characters of each filename's label.
             <li>rte_0424767770: new code didn't account for path where walkImageSequence would be null.  Thanks, Ivar!
             <li>1818: pngwalk of Omni DST vs KP skips each December.
@@ -82,6 +84,7 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>Add tools menu to PNGWalkTool, and action to write PNGWalk to PDF file.
             <li>Add handling for yscans without yTags at all, and those that use yTagInterval as well.  Thanks, Chris!
             <li>573: pngwalk tool now supports zoom on image.
             <li>isEventsList now requires that each endTime be greater than or equal to startTime, and is used in guessRenderType, to support (X,Y)->Z where Z can be ordinal data.
