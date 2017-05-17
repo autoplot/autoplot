@@ -72,6 +72,7 @@
                       </Group>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
+                  <Component id="messagesLabel" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -80,6 +81,7 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
+              <Component id="messagesLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -269,6 +271,11 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Show &quot;Additional Operations&quot; fields, where filters can be applied immediately after loading."/>
         <Property name="name" type="java.lang.String" value="showAdditionalOperations" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="messagesLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="messages"/>
       </Properties>
     </Component>
   </SubComponents>

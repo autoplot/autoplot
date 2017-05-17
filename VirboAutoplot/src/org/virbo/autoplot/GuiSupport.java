@@ -13,6 +13,7 @@ import org.autoplot.renderer.SpectrogramStylePanel;
 import org.autoplot.renderer.SeriesStylePanel;
 import org.autoplot.renderer.HugeScatterStylePanel;
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Frame;
@@ -1265,7 +1266,9 @@ public class GuiSupport {
                                     List<String> problems= new ArrayList<>();
                                     while ( factory.reject( uri, problems, new NullProgressMonitor() ) ) {
                                         dia.setTitle("Add Plot, URI was rejected...");
-
+                                        
+                                        dia.setMessagesLabelText("The URI was rejected.  Verify that it is correct using the inspect button (right).");
+                                        
                                         WindowManager.getInstance().showModalDialog(dia);
 
                                         if ( dia.isCancelled() ) {

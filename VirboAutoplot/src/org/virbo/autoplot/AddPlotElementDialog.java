@@ -38,6 +38,8 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
     public AddPlotElementDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        messagesLabel.setVisible(false);
+        invalidate();
         setLocationRelativeTo(parent);
         secondaryDataSetSelector.setVisible(secondaryCheckBox.isSelected());
         tertiaryCheckBox.setVisible(secondaryCheckBox.isSelected());
@@ -79,6 +81,20 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
                 doBookmarks(tertiaryDataSetSelector);
             }
         });
+    }
+    
+    /**
+     * add additional text to the dialog.
+     * @param text 
+     */
+    public void setMessagesLabelText( String text ) {
+        if ( text==null || text.trim().length()==0 ) {
+            messagesLabel.setVisible(false);
+        } else {
+            messagesLabel.setText(text);
+            messagesLabel.setVisible(true);
+        }
+        revalidate();
     }
     
     /**
@@ -151,6 +167,7 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
         tertiaryFiltersComboBox = new javax.swing.JComboBox<>();
         tertiaryFiltersCB = new javax.swing.JCheckBox();
         doShowAdditionalFiltersCB = new javax.swing.JCheckBox();
+        messagesLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("addPlotElementDialog"); // NOI18N
@@ -246,6 +263,8 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
         doShowAdditionalFiltersCB.setText("Show \"Additional Operations\" fields, where filters can be applied immediately after loading.");
         doShowAdditionalFiltersCB.setName("showAdditionalOperations"); // NOI18N
 
+        messagesLabel.setText("messages");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -288,13 +307,15 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
                             .add(secondaryCheckBox)
                             .add(tertiaryCheckBox)
                             .add(doShowAdditionalFiltersCB))
-                        .add(0, 0, Short.MAX_VALUE)))
+                        .add(0, 0, Short.MAX_VALUE))
+                    .add(messagesLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
+                .add(messagesLabel)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(primaryDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -483,6 +504,7 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
     private javax.swing.JButton cancelButton;
     private javax.swing.JCheckBox doShowAdditionalFiltersCB;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel messagesLabel;
     private javax.swing.JButton overplotButton;
     private javax.swing.JButton plotBelowButton;
     private javax.swing.JButton plotButton;
