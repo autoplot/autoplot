@@ -61,11 +61,9 @@ public class AnimatedGifDemo {
                 = new IIOMetadataNode("ApplicationExtension");
             ae.setAttribute("applicationID", "NETSCAPE");
             ae.setAttribute("authenticationCode", "2.0");
+            int loop= 1;
             byte[] uo = new byte[]{
-                //last two bytes is an unsigned short (little endian) that
-                //indicates the the number of times to loop.
-                //0 means loop forever.
-                0x1, 0x1, 0x0
+                0x01, (byte)( loop & 0xFF ), (byte)( (loop>>8) & 0xFF )
             };
             ae.setUserObject(uo);
             aes.appendChild(ae);
