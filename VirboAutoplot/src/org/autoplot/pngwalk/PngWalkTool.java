@@ -2103,6 +2103,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
             monitor.setTaskSize(this.seq.size());
             monitor.started();
             
+            int imageNumber= 1;
             FileOutputStream out= new FileOutputStream( f );
                         
             Rectangle rect = new Rectangle( (int)(8.5*72), (int)11*72 );
@@ -2124,6 +2125,14 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 BufferedImage im= this.seq.imageAt(i).getImage();
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 try {
+                    while ( im==null ) {
+                        try {
+                            Thread.sleep(100);
+                        } catch ( InterruptedException ex ) {
+                            throw new RuntimeException(ex);
+                        }
+                        im= this.seq.imageAt(i).getImage();
+                    }
                     ImageIO.write(im, "png", baos);
                     Image pdfImage= com.itextpdf.text.Image.getInstance(baos.toByteArray() );
                     int w= (int)(7.5*72);
@@ -2133,14 +2142,20 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     
                     cb.addImage( pdfImage );
                     doc.add( pdfImage.rectangle(36,11*72-36-h) );
+                    String caption;
                     if ( qcseq!=null ) {
                         QualityControlRecord r= qcseq.getQualityControlRecord(i);
                         if ( r!=null ) {
-                            Paragraph p= new Paragraph();
-                            p.add(r.getLastComment());
-                            doc.add(p);
+                            caption= String.format("%d. %s", imageNumber, r.getLastComment());
+                        } else {
+                            caption= String.format("%d.", imageNumber ); 
                         }
+                    } else {
+                        caption= String.format("%d.", imageNumber ); 
                     }
+                    Paragraph p= new Paragraph();
+                    p.add(caption);
+                    doc.add(p);
                     
                 } catch (IOException ex) {
                     Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
@@ -2149,10 +2164,10 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 cb.restoreState();
                 
                 doc.newPage();
+                imageNumber++;
             }
                         
             doc.close();
-            monitor.finished();
             
         } catch (DocumentException ex) {
             Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
