@@ -2,11 +2,14 @@ package external;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
 import org.w3c.dom.Node;
 
 import javax.imageio.*;
 import javax.imageio.metadata.*;
 import javax.imageio.stream.ImageOutputStream;
+import org.das2.util.monitor.ProgressMonitor;
 
 /**
  * Creates an animated GIF from GIF frames. A thin wrapper to code written by
@@ -16,7 +19,7 @@ import javax.imageio.stream.ImageOutputStream;
  *
  * @author Andrew Thompson
  */
-class WriteAnimatedGif {
+public class AnimatedGifDemo {
 
     /**
      * See http://forums.sun.com/thread.jspa?messageID=10755673#10755673
@@ -62,7 +65,7 @@ class WriteAnimatedGif {
                 //last two bytes is an unsigned short (little endian) that
                 //indicates the the number of times to loop.
                 //0 means loop forever.
-                0x1, 0x0, 0x0
+                0x1, 0x1, 0x0
             };
             ae.setUserObject(uo);
             aes.appendChild(ae);
@@ -86,39 +89,85 @@ class WriteAnimatedGif {
      * animation.
      * @param delayTimes String[] Array of Strings, representing the frame delay
      * times.
+     * @throws java.io.IOException
      */
     public static void saveAnimate(
         File file,
         BufferedImage[] frames,
-        String[] delayTimes) throws Exception {
+        String[] delayTimes) throws IOException {
 
         ImageWriter iw = ImageIO.getImageWritersByFormatName("gif").next();
 
-        ImageOutputStream ios = ImageIO.createImageOutputStream(file);
-        iw.setOutput(ios);
-        iw.prepareWriteSequence(null);
-
-        for (int i = 0; i < frames.length; i++) {
-            BufferedImage src = frames[i];
-
-            ImageWriteParam iwp = iw.getDefaultWriteParam();
-
-            IIOMetadata metadata = iw.getDefaultImageMetadata(
-                new ImageTypeSpecifier(src), iwp);
-
-            configure(metadata, delayTimes[i], i);
-
-            IIOImage ii = new IIOImage(src, null, metadata);
-
-            iw.writeToSequence(ii, null);
-
+        try (ImageOutputStream ios = ImageIO.createImageOutputStream(file)) {
+            iw.setOutput(ios);
+            iw.prepareWriteSequence(null);
+            
+            for (int i = 0; i < frames.length; i++) {
+                BufferedImage src = frames[i];
+                
+                ImageWriteParam iwp = iw.getDefaultWriteParam();
+                
+                IIOMetadata metadata = iw.getDefaultImageMetadata(
+                        new ImageTypeSpecifier(src), iwp);
+                
+                configure(metadata, delayTimes[i], i);
+                
+                IIOImage ii = new IIOImage(src, null, metadata);
+                
+                iw.writeToSequence(ii, null);
+                
+            }
+            
+            iw.endWriteSequence();
         }
 
-        iw.endWriteSequence();
-
-        ios.close();
-
     }
+    
+    /**
+     * Write of the saveAnimate that takes an iterator so that all images
+     * need not be in memory at once.  UNTESTED!
+     *
+     * @author GeoffTitmus
+     * @param file File A File in which to store the animation.
+     * @param frames Iterator of BufferedImages, the frames of the animation.
+     * @param delayTimes Iterator of Strings, representing the frame delay times in formatted milliseconds.
+     * @throws java.io.IOException
+     */
+    public static void saveAnimate(
+        File file,
+        Iterator<BufferedImage> frames,
+        Iterator<String> delayTimes ) throws IOException {
+
+        try (ImageOutputStream ios = ImageIO.createImageOutputStream(file)) {
+            ImageWriter iw = ImageIO.getImageWritersByFormatName("gif").next();
+
+            iw.setOutput(ios);
+            iw.prepareWriteSequence(null);
+
+            Iterator<String> delayTimesIterator= delayTimes;
+
+
+            int i=0;
+            while ( frames.hasNext() ) {
+                BufferedImage src= frames.next();
+                
+                ImageWriteParam iwp = iw.getDefaultWriteParam();
+
+                IIOMetadata metadata = iw.getDefaultImageMetadata(
+                        new ImageTypeSpecifier(src), iwp);
+
+                configure(metadata, delayTimesIterator.next(), i);
+
+                IIOImage ii = new IIOImage(src, null, metadata);
+
+                iw.writeToSequence(ii, null);
+                i=i+1;
+            }
+            iw.endWriteSequence();
+
+        } 
+        
+    }    
 
     /**
      * Dump the usage to the System.err stream.
