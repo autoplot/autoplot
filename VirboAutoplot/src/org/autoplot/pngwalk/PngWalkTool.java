@@ -18,6 +18,7 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
+import external.AnimatedGifDemo;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -51,6 +52,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -61,6 +63,8 @@ import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -70,10 +74,12 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
@@ -84,6 +90,7 @@ import org.das2.components.DataPointRecorder;
 import org.das2.components.TearoffTabbedPane;
 import org.das2.dataset.DataSetUpdateEvent;
 import org.das2.dataset.DataSetUpdateListener;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeParser;
@@ -910,19 +917,21 @@ public final class PngWalkTool extends javax.swing.JPanel {
         }
         optionsMenu.add( thumbsizeMenu );
 
+        final JCheckBoxMenuItem qcmi= new JCheckBoxMenuItem("Show Only Quality Control Records",false);
+        
         final JMenuItem qc= new JMenuItem( new AbstractAction( "Start Quality Control Tool (QC)" ) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);        
                 if ( !PngWalkTool.isQualityControlEnabled() ) {
                     tool.startQC();
+                    qcmi.setEnabled(true);
                 }
             }
         });
         qc.setToolTipText("Start up the Quality Control tool that adds documentation to images.");
         optionsMenu.add( qc );
         
-        final JCheckBoxMenuItem qcmi= new JCheckBoxMenuItem("Show Only Quality Control Records",false);
         qcmi.addActionListener( new AbstractAction(  ) {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -933,6 +942,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 }
             }
         } );
+        qcmi.setToolTipText("show only QC records with Okay or Bad setting.");
+        qcmi.setEnabled(false);
+        
         optionsMenu.add(qcmi);
         
         final JMenuItem dg= new JMenuItem( new AbstractAction( "Start Digitizer" ) {
@@ -959,6 +971,18 @@ public final class PngWalkTool extends javax.swing.JPanel {
         });
         writePdf.setToolTipText("Write the visible images to a PDF file with last QC annotation.");
         toolsMenu.add( writePdf );
+        result.add( toolsMenu );
+
+        final JMenuItem writeGif= new JMenuItem( new AbstractAction( "Write to Animated GIF" ) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);        
+                tool.writeAnimatedGif();
+            }
+        });
+        writeGif.setToolTipText("Write the visible images to an animated GIF file.");
+        toolsMenu.add( writeGif );
+        
         result.add( toolsMenu );
         
         final JMenu bookmarksMenu= new JMenu("Bookmarks");
@@ -2158,7 +2182,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     doc.add(p);
                     
                 } catch (IOException ex) {
-                    Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
                 
                 cb.restoreState();
@@ -2170,13 +2194,18 @@ public final class PngWalkTool extends javax.swing.JPanel {
             doc.close();
             
         } catch (DocumentException ex) {
-            Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } finally {
             monitor.finished();
             
         }
     }
     
+    /**
+     * write the sequence to a PDF file, so that this can be used to produce
+     * worksheets.
+     * 
+     */
     public void writePdf() {
         JFileChooser choose= new JFileChooser();
         choose.setSelectedFile( new File("/tmp/pngwalk.pdf") );
@@ -2187,6 +2216,140 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 public void run() {
                     try {
                         writeToPdfImmediately( mon , f );
+                        JOptionPane.showMessageDialog(parentWindow,"wrote file "+f);
+                    } catch (FileNotFoundException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }                    
+                }
+            };
+            new Thread(run).start();
+
+        }
+    }
+    
+    /**
+     * 
+     * @param monitor
+     * @param f
+     * @param overrideDelays if null, then just use 100ms between frames, otherwise use this delay. "realTime", "10ms", "secondPerDay"
+     * @throws FileNotFoundException 
+     */
+    private void writeToAnimatedGifImmediately( final ProgressMonitor monitor, File f, final String overrideDelays ) throws FileNotFoundException {
+        try {
+            monitor.setTaskSize(this.seq.size());
+            monitor.started();
+            
+            final DatumRange baseRange= this.seq.imageAt(0).getDatumRange();
+            final Datum baset;
+            if ( baseRange!=null ) {
+                baset= this.seq.imageAt(0).getDatumRange().min();
+            } else {
+                if ( overrideDelays!=null && !overrideDelays.endsWith("ms")) {
+                    throw new IllegalArgumentException("template does not imply timeranges");
+                }
+                baset= null;
+            }
+            
+            Iterator<BufferedImage> images= new Iterator() {
+                int i=0;
+                @Override
+                public boolean hasNext() {
+                    return i<PngWalkTool.this.seq.size();
+                }
+
+                @Override
+                public Object next() {
+                    BufferedImage im= seq.imageAt(i).getImage();
+                    monitor.setTaskProgress(i);
+                    while ( im==null ) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        im= seq.imageAt(i).getImage();
+                    }
+                    i=i+1;
+                    return im;
+                }
+            };
+            
+            Iterator<String> delays= new Iterator() {
+                int i=0;
+                Datum lastTime;
+                
+                @Override
+                public boolean hasNext() {
+                    return true;
+                }
+
+                @Override
+                public String next() {
+                    if ( i==0 ) {
+                        lastTime= baset;
+                    }
+                    i=i+1;
+                    if ( i==seq.size() ) i--;
+                    String result;
+                    if ( overrideDelays!=null ) {
+                        if ( overrideDelays.equals("realTime") ) {
+                            result= String.valueOf((int)( seq.imageAt(i).getDatumRange().min().subtract(lastTime).convertTo(Units.milliseconds).value()) );
+                            lastTime= seq.imageAt(i).getDatumRange().min();
+                        } else if ( overrideDelays.equals("secondPerDay") ) {
+                            result= String.valueOf((int) (seq.imageAt(i).getDatumRange().min().subtract(lastTime).convertTo(Units.milliseconds).value()/86400000) );
+                            lastTime= seq.imageAt(i).getDatumRange().min();
+                        } else if ( overrideDelays.endsWith("ms") ) {
+                            try {
+                                result= String.valueOf((int) Units.milliseconds.parse(overrideDelays).value() );
+                            } catch (ParseException ex) {
+                                throw new IllegalArgumentException( ex );
+                            }
+                        } else {
+                            throw new IllegalArgumentException("100ms, realTime, or secondPerDay, etc.");
+                        }
+                    } else {
+                        result= "100";
+                    }
+                    if ( Integer.parseInt(result)>500 ) {
+                        result= "500";
+                    }
+                    return result;
+                }
+                
+            };
+            
+            AnimatedGifDemo.saveAnimate( f, images, delays );
+            
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        } finally {
+            monitor.finished();
+        }
+    }
+        
+    public void writeAnimatedGif() {
+        JFileChooser choose= new JFileChooser();
+        choose.setSelectedFile( new File("/tmp/pngwalk.gif") );
+        final String[] opts= new String[] { "10ms", "100ms", "1000sec", "realTime", "secondPerDay" };
+        JPanel p= new JPanel();
+        p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
+        
+        JComboBox jo= new JComboBox(opts);
+        jo.setSelectedIndex(1);
+        jo.setMaximumSize( new Dimension( 1000, 30 ) );
+        p.add(new JLabel("Interslide-Delay:"));
+        p.add(jo);
+        p.add(Box.createGlue());
+        
+        choose.setAccessory(p);
+        if ( choose.showSaveDialog(navMenu)==JFileChooser.APPROVE_OPTION ) {
+            final File f= choose.getSelectedFile();
+            final ProgressMonitor mon= DasProgressPanel.createFramed("write animated gif");
+            final String fdelay= (String)jo.getSelectedItem();
+            Runnable run= new Runnable() {
+                public void run() {
+                    try {
+                        writeToAnimatedGifImmediately( mon , f, fdelay );
                         JOptionPane.showMessageDialog(parentWindow,"wrote file "+f);
                     } catch (FileNotFoundException ex) {
                         Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
