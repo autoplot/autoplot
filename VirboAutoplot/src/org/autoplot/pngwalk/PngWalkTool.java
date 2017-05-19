@@ -2272,6 +2272,12 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     i=i+1;
                     return im;
                 }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException("remove is not supported");
+                }
+                
             };
             
             Iterator<String> delays= new Iterator() {
@@ -2314,6 +2320,12 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     }
                     return result;
                 }
+                
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException("remove is not supported");
+                }
+                
                 
             };
             
