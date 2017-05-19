@@ -628,6 +628,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         }
     }
     private Window parentWindow;
+    private JCheckBoxMenuItem qcFilterMenuItem;
 
     /**
      * return the interval size (up/down)
@@ -918,6 +919,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         optionsMenu.add( thumbsizeMenu );
 
         final JCheckBoxMenuItem qcmi= new JCheckBoxMenuItem("Show Only Quality Control Records",false);
+        tool.qcFilterMenuItem= qcmi;
         
         final JMenuItem qc= new JMenuItem( new AbstractAction( "Start Quality Control Tool (QC)" ) {
             @Override
@@ -925,7 +927,6 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 LoggerManager.logGuiEvent(e);        
                 if ( !PngWalkTool.isQualityControlEnabled() ) {
                     tool.startQC();
-                    qcmi.setEnabled(true);
                 }
             }
         });
@@ -1553,6 +1554,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
             }
             ENABLE_QUALITY_CONTROL= true;
         }
+        qcFilterMenuItem.setEnabled(true);
     }
 
     protected DataPointRecorder digitizer= null;
@@ -2320,12 +2322,6 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     }
                     return result;
                 }
-                
-                @Override
-                public void remove() {
-                    throw new UnsupportedOperationException("remove is not supported");
-                }
-                
                 
             };
             
