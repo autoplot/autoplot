@@ -26,6 +26,7 @@
         
         <p>Bugfixes (2017-05-19 r20815):</p>
         <ul> 
+            <li>allow different credentials to be used on different paths on the same server.
             <li>1818: getTimeRange( 1990/12/01, 1month ) would fail the pngwalktool because 1990/13/01 was not normalized (via carry).
             <li>1833: catch bad path when "orbit:file:///" used where "file:///" should have been used.  There was code to trap this exception, but the wrong exception type was thrown.  Thanks, Ivar!
             <li>1698: proper support for bundles in qstreams.
@@ -36,6 +37,7 @@
             <li>rte_0424767770: new code didn't account for path where walkImageSequence would be null.  Thanks, Ivar!
             <li>DataPoint comparison of non-time values made no sense, causing some points to disappear.
             <li>1818: pngwalk of Omni DST vs KP skips each December.
+            <li>0656: cancel press in load example script dialog is correctly handled.
             <li>0595: sftp is now recognized, fixing Jython listDirectory command.
             <li>Data Point Recorder sorting is disabled while data is loaded from a file, for speed.
             <li>1825: Data Point Recorder drops points when x-axis is not a time axis.
