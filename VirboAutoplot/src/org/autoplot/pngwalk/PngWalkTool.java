@@ -2211,7 +2211,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         choose.setSelectedFile( new File("/tmp/pngwalk.pdf") );
         if ( choose.showSaveDialog(navMenu)==JFileChooser.APPROVE_OPTION ) {
             final File f= choose.getSelectedFile();
-            final ProgressMonitor mon= DasProgressPanel.createFramed("write pdf");
+            final ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(this),"write pdf");
             Runnable run= new Runnable() {
                 public void run() {
                     try {
@@ -2292,26 +2292,25 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     if ( i==seq.size() ) i--;
                     String result;
                     if ( overrideDelays!=null ) {
-                        if ( overrideDelays.equals("realTime") ) {
-                            result= String.valueOf((int)( seq.imageAt(i).getDatumRange().min().subtract(lastTime).convertTo(Units.milliseconds).value()) );
-                            lastTime= seq.imageAt(i).getDatumRange().min();
-                        } else if ( overrideDelays.equals("secondPerDay") ) {
-                            result= String.valueOf((int) (seq.imageAt(i).getDatumRange().min().subtract(lastTime).convertTo(Units.milliseconds).value()/86400000) );
-                            lastTime= seq.imageAt(i).getDatumRange().min();
-                        } else if ( overrideDelays.endsWith("ms") ) {
-                            try {
-                                result= String.valueOf((int) Units.milliseconds.parse(overrideDelays).value() );
-                            } catch (ParseException ex) {
-                                throw new IllegalArgumentException( ex );
-                            }
-                        } else {
-                            throw new IllegalArgumentException("100ms, realTime, or secondPerDay, etc.");
+                        switch (overrideDelays) {
+                            case "realTime":
+                                result= String.valueOf((int)( seq.imageAt(i).getDatumRange().min().subtract(lastTime).convertTo(Units.milliseconds).value()) );
+                                lastTime= seq.imageAt(i).getDatumRange().min();
+                                break;
+                            case "secondPerDay":
+                                result= String.valueOf((int) (seq.imageAt(i).getDatumRange().min().subtract(lastTime).convertTo(Units.milliseconds).value()/86400000) );
+                                lastTime= seq.imageAt(i).getDatumRange().min();
+                                break;
+                            default:
+                                try {
+                                    result= String.valueOf((int) Units.milliseconds.parse(overrideDelays).value() );
+                                } catch (ParseException ex) {
+                                    throw new IllegalArgumentException( ex );
+                                }   
+                                break;
                         }
                     } else {
                         result= "100";
-                    }
-                    if ( Integer.parseInt(result)>500 ) {
-                        result= "500";
                     }
                     return result;
                 }
@@ -2330,7 +2329,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
     public void writeAnimatedGif() {
         JFileChooser choose= new JFileChooser();
         choose.setSelectedFile( new File("/tmp/pngwalk.gif") );
-        final String[] opts= new String[] { "10ms", "100ms", "1000sec", "realTime", "secondPerDay" };
+        final String[] opts= new String[] { "10ms", "100ms", "1000ms", "realTime", "secondPerDay" };
         JPanel p= new JPanel();
         p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
         
@@ -2344,7 +2343,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         choose.setAccessory(p);
         if ( choose.showSaveDialog(navMenu)==JFileChooser.APPROVE_OPTION ) {
             final File f= choose.getSelectedFile();
-            final ProgressMonitor mon= DasProgressPanel.createFramed("write animated gif");
+            final ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(this),"write animated gif");
             final String fdelay= (String)jo.getSelectedItem();
             Runnable run= new Runnable() {
                 public void run() {
