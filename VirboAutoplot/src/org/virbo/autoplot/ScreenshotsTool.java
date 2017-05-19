@@ -62,6 +62,7 @@ import org.das2.components.DasProgressPanel;
 import org.das2.datum.LoggerManager;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
+import org.das2.datum.Units;
 import org.das2.util.FileUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -88,7 +89,11 @@ public class ScreenshotsTool extends EventQueue {
     private boolean receivedEvents= false;  // so this can be used without automatic screenshots.
 
     long t0 = 0;
-    long tb = System.currentTimeMillis();
+    
+    /**
+     * intialization time
+     */
+    long timeBase = System.currentTimeMillis();
 
     private final ConcurrentLinkedQueue<ImageRecord> imageQueue= new ConcurrentLinkedQueue<>();
     
@@ -107,7 +112,7 @@ public class ScreenshotsTool extends EventQueue {
     
     File outLocationFolder;
     BufferedWriter logFile;
-    TimeParser tp = TimeParser.create("$Y$m$d_$H$M$S");
+    TimeParser tp = TimeParser.create("$Y$m$d_$H$M$S_$(subsec,places=3)");
     TickleTimer tickleTimer;
     
     private static void checkFolderContents( String text, JCheckBox deleteFilesCheckBox ) {
@@ -275,13 +280,13 @@ public class ScreenshotsTool extends EventQueue {
                 AWTEvent update= peekEvent(1200);
                 if ( update==null ) {
                     long t1= System.currentTimeMillis();
-                    Rectangle r= doTakePicture(filenameFor(t1-tb, 99999), t1);
+                    Rectangle r= doTakePicture(filenameFor(t1, 99999), t1);
                     if ( bounds==null ) bounds= r; else bounds= bounds.union(r);
 
                 } else {
                     if ( canReject(update) ) {
                         long t1= System.currentTimeMillis();
-                        Rectangle r= doTakePicture(filenameFor(t1-tb, 99999), t1);
+                        Rectangle r= doTakePicture(filenameFor(t1, 99999), t1);
                         if ( bounds==null ) bounds= r; else bounds= bounds.union(r);
                     }
                     //System.err.println("update coming anyway");
@@ -750,8 +755,15 @@ public class ScreenshotsTool extends EventQueue {
      */
     Rectangle bounds= null;
 
-    private String filenameFor( long dt, int id ) {
-        return tp.format(TimeUtil.now(), null) + "_" + String.format("%06d", dt/100 ) + "_" + String.format("%05d", id ) + ".png";
+    /**
+     * create a filename for the given time offset and event id.
+     * @param dt milliseconds since initial time.
+     * @param id event id
+     * @return the filename to use, currently $Y$m$d_$H$M$S_$(subsec,places=3)_id.png
+     */
+    private String filenameFor( long t1, int id ) {
+        double us2000= (t1 - 946684800e3 ) * 1000;
+        return tp.format(Units.us2000.createDatum(us2000)) + "_" + String.format("%05d", id ) + ".png";
     }
     
     /**
@@ -760,7 +772,7 @@ public class ScreenshotsTool extends EventQueue {
      */
     public void takePicture( int id ) {
         long t1= System.currentTimeMillis();
-        doTakePicture(filenameFor(t1-tb, id), t1);
+        doTakePicture(filenameFor(t1, id), t1);
     }
     
     /**
@@ -771,8 +783,7 @@ public class ScreenshotsTool extends EventQueue {
      */
     public void takePicture( int id, String caption ) {
         long t1= System.currentTimeMillis();
-        long dt= t1-tb;
-        String file= filenameFor(dt, id);
+        String file= filenameFor(t1, id);
         doTakePicture(file, t1,false);
         String reviewer= System.getProperty("user.name");
         String time= TimeParser.create("$Y-$m-$dT$H:$M:$SZ").format(TimeUtil.now());
@@ -805,8 +816,7 @@ public class ScreenshotsTool extends EventQueue {
     public void takePicture( int id, String caption, Component c, Point p, int buttons ) {
 
         long t1= System.currentTimeMillis();
-        long dt= t1-tb;
-        String filename= filenameFor(dt, id);
+        String filename= filenameFor(t1, id);
 
         if ( p==null ) {
             p= c.getLocation();
@@ -979,7 +989,7 @@ public class ScreenshotsTool extends EventQueue {
         super.dispatchEvent(theEvent);
 
         long t1 = System.currentTimeMillis();
-        long dt= t1 - tb;
+        long dt= t1 - timeBase;
         
         boolean reject= false;
 
@@ -1035,7 +1045,7 @@ public class ScreenshotsTool extends EventQueue {
         } 
 
         if (  !reject ) {
-            Rectangle r= doTakePicture(filenameFor(dt, theEvent.getID()), t1);   // Take a picture here
+            Rectangle r= doTakePicture(filenameFor(t1, theEvent.getID()), t1);   // Take a picture here
             if ( bounds==null ) bounds= r; else bounds= bounds.union(r);
         }
 
