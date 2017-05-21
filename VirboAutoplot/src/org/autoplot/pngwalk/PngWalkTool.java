@@ -2322,6 +2322,12 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     }
                     return result;
                 }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException("remove is not supported");
+                }
+                
                 
             };
             
