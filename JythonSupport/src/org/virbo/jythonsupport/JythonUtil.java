@@ -1192,7 +1192,11 @@ public class JythonUtil {
                 if ( ent.getKey()==null ) {
                     logger.log( Level.WARNING, "parameter name was null" );
                 } else if ( ent.getValue()==null ) {
-                    logger.log( Level.WARNING, "parameter value was null" );
+                    if ( ent.getKey().equals("dom") ) {
+                        logger.log( Level.FINE, "parameter \"dom\" value was set to null" );  // Some scripts don't use dom.
+                    } else {
+                        logger.log( Level.WARNING, "parameter value was null" );
+                    }
                 } else {
                     interp.set( ent.getKey(), ent.getValue() );
                 }
