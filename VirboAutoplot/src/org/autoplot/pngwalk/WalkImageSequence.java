@@ -544,8 +544,11 @@ public class WalkImageSequence implements PropertyChangeListener  {
      */
     public void setQCFilter( String s ) {
         if ( s==null ) throw new NullPointerException("qcfilter cannot be null, set to empty string to clear");
+        String oldQcFilter= this.qcFilter;
         this.qcFilter= s;
-        rebuildSequence();
+        if ( !qcFilter.equals(oldQcFilter ) ) {
+            rebuildSequence();
+        }
     }
 
     /**
