@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,6 +83,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -101,6 +103,7 @@ import org.das2.datum.format.TimeDatumFormatter;
 import org.das2.event.DataPointSelectionEvent;
 import org.das2.event.DataPointSelectionListener;
 import org.das2.util.ArgumentList;
+import org.das2.util.FileUtil;
 import org.das2.util.ImageUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
@@ -116,6 +119,7 @@ import org.virbo.autoplot.AppManager;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.GuiSupport;
+import org.virbo.autoplot.JythonUtil;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksException;
@@ -983,6 +987,16 @@ public final class PngWalkTool extends javax.swing.JPanel {
         });
         writeGif.setToolTipText("Write the visible images to an animated GIF file.");
         toolsMenu.add( writeGif );
+
+        final JMenuItem writeHtml= new JMenuItem( new AbstractAction( "Write to HTML" ) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);        
+                tool.writeHtml();
+            }
+        });
+        writeHtml.setToolTipText("Write the visible images to an animated GIF file.");
+        toolsMenu.add( writeHtml );
         
         result.add( toolsMenu );
         
@@ -1272,6 +1286,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 
             setNavButtonsEnabled(true);
             if ( navMenu!=null ) navMenu.setEnabled(true);
+            seq.setQCFilter("");
+            qcFilterMenuItem.setSelected(false);
+            
         } catch ( Exception ex ) {
             seq= null;
             setNavButtonsEnabled(false);
@@ -2122,6 +2139,88 @@ public final class PngWalkTool extends javax.swing.JPanel {
      */
     public WalkImageSequence getSequence() {
         return this.seq;
+    }
+    
+    
+    private void writeToHtmlImmediately( ProgressMonitor monitor, File f, String summary ) throws FileNotFoundException {
+            
+        for ( int i= 0; i<this.seq.size(); i++ ) {
+                
+            BufferedImage im= this.seq.imageAt(i).getImage();
+            while ( im==null ) {
+                try {
+                    Thread.sleep(100);
+                } catch ( InterruptedException ex ) {
+                    throw new RuntimeException(ex);
+                }
+                im = this.seq.imageAt(i).getImage();
+            }
+            try {
+                String n= this.seq.getQCFolder().relativize(this.seq.imageAt(i).getUri()).getPath();
+                ImageIO.write( im, "png", new File( f, n ) );
+                File qcFile= new File( this.seq.imageAt(i).getUri().getPath() + ".ok" );
+                if ( qcFile.exists() ) {
+                    FileUtil.fileCopy( qcFile, new File( f, n+".ok" ) );
+                }
+                qcFile= new File( this.seq.imageAt(i).getUri().getPath() + ".problem" );
+                if ( qcFile.exists() ) {
+                    FileUtil.fileCopy( qcFile, new File( f, n+".problem" ) );
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        URL url= PngWalkTool.class.getResource("makeTutorialHtml.jy");
+        final ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(this),"write HTML");
+        Map<String,String> params= new HashMap<>();
+        params.put("dir",f.toString());
+        params.put("name",""); //TODO: what should this be?
+        params.put("summary",summary);
+        try {
+            JythonUtil.invokeScriptSoon(url,null,params,false,false,mon);
+        } catch (IOException ex) {
+            Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+    
+    /**
+     * write the sequence to a PDF file, so that this can be used to produce
+     * worksheets.
+     * 
+     */
+    public void writeHtml() {
+        JFileChooser choose= new JFileChooser();
+        choose.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        choose.setSelectedFile( new File("/tmp/pngwalk/") );
+        
+        JPanel p= new JPanel();
+        p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
+        
+        final JTextField ta= new JTextField();
+        ta.setMaximumSize( new Dimension( 1000, 30 ) );
+        ta.setMinimumSize( new Dimension( 100, 30 ) );
+        p.add(new JLabel("Title:"));
+        p.add(ta);
+        p.add(Box.createGlue());
+        
+        choose.setAccessory(p);
+        
+        if ( choose.showSaveDialog(navMenu)==JFileChooser.APPROVE_OPTION ) {
+            final File f= choose.getSelectedFile();
+            final ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(this),"write pdf");
+            Runnable run= new Runnable() {
+                public void run() {
+                    try {
+                        writeToHtmlImmediately( mon , f, ta.getText() );
+                    } catch (FileNotFoundException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }                    
+                }
+            };
+            new Thread(run).start();
+        }
     }
     
     private void writeToPdfImmediately( ProgressMonitor monitor, File f ) throws FileNotFoundException {
