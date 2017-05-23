@@ -199,6 +199,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     }
     
     private boolean checkOutOfMemoryError( Throwable t ) {
+        if ( t==null ) return false;
         if ( t instanceof OutOfMemoryError ) {
             return true;
         } else if ( t instanceof PyException ) {
