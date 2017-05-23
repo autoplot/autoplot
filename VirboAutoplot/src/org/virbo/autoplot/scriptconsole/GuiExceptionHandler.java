@@ -198,6 +198,20 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         }
     }
     
+    private boolean checkOutOfMemoryError( Throwable t ) {
+        if ( t instanceof OutOfMemoryError ) {
+            return true;
+        } else if ( t instanceof PyException ) {
+            if ( ((PyException)t).toString().contains("java.lang.OutOfMemory") ) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    
     private final Map<Integer,DiaDescriptor> dialogs= Collections.synchronizedMap( new HashMap<Integer, DiaDescriptor>() );
 
     private DiaDescriptor createDialog( final Throwable throwable, final boolean uncaught ) {
@@ -366,6 +380,10 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                 System.err.println("== Error hit "+dia1.hits +" times");
                 t.printStackTrace( System.err );
             }
+        }
+        
+        if ( checkOutOfMemoryError(t) ) {
+            errorMessage= errorMessage + "\n\nThe wiki page at \"http://autoplot.org/outOfMemory\" might be helpful in resolving this issue.";
         }
 
         if ( dia1==null ) {
