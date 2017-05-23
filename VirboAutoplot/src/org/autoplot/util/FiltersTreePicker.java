@@ -1,0 +1,43 @@
+
+package org.autoplot.util;
+
+import org.netbeans.jemmy.operators.DialogOperator;
+import org.netbeans.jemmy.operators.JButtonOperator;
+import org.netbeans.jemmy.operators.JFrameOperator;
+import org.netbeans.jemmy.operators.JMenuBarOperator;
+import org.netbeans.jemmy.operators.JTreeOperator;
+import org.virbo.filters.AddFilterDialog;
+
+/**
+ *
+ * @author faden@cottagesystems.com
+ */
+public class FiltersTreePicker {
+    
+    /**
+     * find the filter and select it from the Tools->Filters gui.
+     * @param mainFrame
+     * @param path
+     */
+    public static void pickFilter(JFrameOperator mainFrame, String[] path  ) {
+        try {
+            // Implement reducex() filter
+            new JMenuBarOperator( mainFrame ).pushMenuNoBlock("Tools|Additional Operations...");
+
+            DialogOperator addFilterFrame = new DialogOperator( new RegexComponentChooser("Add Operation" ) );
+            
+            // NOTE this hangs when the tree view "By Category" is not set.
+            
+            JTreeOperator tree= new JTreeOperator( addFilterFrame );
+            tree.clickMouse();
+            tree.selectPath(tree.findPath( path ) );
+            Thread.sleep(500);
+            new JButtonOperator( addFilterFrame, "OK" ).clickMouse();
+
+            Thread.sleep(500);
+
+        } catch ( InterruptedException ex ) {
+            throw new RuntimeException(ex);
+        }
+    }
+}
