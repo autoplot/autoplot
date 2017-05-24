@@ -229,6 +229,7 @@ if ! $JAVAC $JAVAARGS org/das2/datum/SIUnits.java; then echo "****"; hasErrors=1
 if ! $JAVAC $JAVAARGS org/virbo/dataset/RepeatIndexDataSet.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/virbo/jythonsupport/ui/DataMashUp.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/das2/util/*Formatter.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/util/jemmy/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/virbo/filters/*.java; then echo "****"; hasErrors=1; fi
 
 cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
