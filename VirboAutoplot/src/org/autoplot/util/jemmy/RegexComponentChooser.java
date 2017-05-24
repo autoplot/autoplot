@@ -1,5 +1,5 @@
 
-package org.autoplot.util;
+package org.autoplot.util.jemmy;
 
 import java.awt.Component;
 import java.awt.Dialog;

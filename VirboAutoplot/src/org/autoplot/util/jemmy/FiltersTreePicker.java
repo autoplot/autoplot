@@ -1,5 +1,5 @@
 
-package org.autoplot.util;
+package org.autoplot.util.jemmy;
 
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;

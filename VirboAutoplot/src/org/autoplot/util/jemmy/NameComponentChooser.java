@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.autoplot.util;
+package org.autoplot.util.jemmy;
 
 import java.awt.Component;
 import org.netbeans.jemmy.ComponentChooser;
