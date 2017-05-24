@@ -14,6 +14,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -97,6 +98,15 @@ public class InfoServlet extends HttpServlet {
             DatumRange tr= DatumRangeUtil.parseTimeRangeValid( startDate+"/"+stopDate );
             jo.put( "sampleStartDate", tr.min().toString() );
             jo.put( "sampleStopDate", tr.max().toString() );
+        }
+        
+        Iterator iter= o.keys();
+        while ( iter.hasNext() ) {
+            Object k= iter.next();
+            String s= String.valueOf(k);
+            if ( s.startsWith("x_") || s.equals("resourceURL") ) {
+                jo.put( s, o.get(s) );
+            }
         }
         
         jo.put("parameters",parameters);
