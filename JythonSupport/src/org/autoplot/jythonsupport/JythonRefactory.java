@@ -75,6 +75,7 @@ public class JythonRefactory {
         m.put("zipfs", "org.das2.util.filesystem");
         forwardMap = reverseMap(m);   
         //forwardMap = m;   
+        //TODO: more entries, or logic that matches "org.virbo" with "org.virbo.datasource.capability"
     }
     
     private static final Map<String,String> fullNameMap= new HashMap<>();    
@@ -177,7 +178,8 @@ public class JythonRefactory {
     }
     
     public static void main( String[] args ) throws IOException {
-        File f= fixImports( new File( "/home/jbf/ct/autoplot/rfe/528/examples/rfe528.okay.jy") );
+        //File f= fixImports( new File( "/home/jbf/ct/autoplot/rfe/528/examples/rfe528.okay.jy") );
+        File f= fixImports( new File( "/home/jbf/ct/autoplot/rfe/528/examples/rfe528.20160909.okay.jy") );
         System.err.println(f);
     }
 }
