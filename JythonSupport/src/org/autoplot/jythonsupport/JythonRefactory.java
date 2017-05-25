@@ -20,6 +20,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.virbo.datasource.DataSourceUtil;
@@ -45,13 +46,30 @@ public class JythonRefactory {
         return fileout;
     }
     
-    private static final Map<String,String> forwardMap= new HashMap<>();
-    static {
-        forwardMap.put( "org.das2.qds.examples", "org.virbo.dataset.examples" );
-        forwardMap.put( "org.das2.qds.array", "org.virbo.dataset" );
+    /**
+     * return the reverse of the map.
+     * @param map 
+     * @return 
+     */
+    private static Map<String,String> reverseMap( Map<String,String> map ) {
+        HashMap<String,String> result= new HashMap<>(map.size());
+        for ( Entry<String,String> e: map.entrySet() ) {
+            result.put( e.getValue(), e.getKey() );
+        }
+        return result;
     }
     
+    private static final Map<String,String> forwardMap;
     
+    static {
+        HashMap<String,String> m= new HashMap<>();
+        m.put( "org.virbo.dataset.examples", "org.das2.qds.examples" );
+        m.put( "org.virbo.dataset", "org.das2.qds" );
+        
+        forwardMap= reverseMap(m);
+        
+    }
+    private static final Map<String,String> fullNameMap= new HashMap<>();    
     
     private static final Pattern IMPORT_REGEX= Pattern.compile("(\\s*)from(\\s+)([a-zA-Z0-9.]+)(\\s+)import(\\s+)([a-zA-Z0-9 ,]+)(\\s*)");
     private static final Pattern IMPORT_AS_REGEX= Pattern.compile("(\\s*)import(\\s+)([a-zA-Z0-9.]+)(\\s+)(as(\\s+)([a-zA-Z0-9]+)(\\s*))?");
@@ -126,12 +144,22 @@ public class JythonRefactory {
                     if ( m.group(5)!=null ) { // as clause
                         writer.print( m.group(5) ); 
                     } else {
-                        writer.print( " as " );
-                        writer.print( m.group(3) );
+                        if ( clas.length()>0 ) {
+                            fullNameMap.put( p, path+"."+clas );
+                        } else {
+                            fullNameMap.put( p, path );
+                        }
                     }
                     writer.println();
 
                 } else {
+                    if ( fullNameMap.size()>0 ) {
+                        for ( Entry<String,String> e: fullNameMap.entrySet() ) {
+                            if ( line.contains(e.getKey() ) ) {
+                                line= line.replace( e.getKey(), e.getValue() );
+                            }
+                        }
+                    }
                     writer.println(line);
                 }
             }
@@ -141,7 +169,7 @@ public class JythonRefactory {
     }
     
     public static void main( String[] args ) throws IOException {
-        File f= fixImports( new File( "/home/jbf/ct/autoplot/rfe/528/examples/rfe528.jy") );
+        File f= fixImports( new File( "/home/jbf/ct/autoplot/rfe/528/examples/rfe528.okay.jy") );
         System.err.println(f);
     }
 }
