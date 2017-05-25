@@ -1,13 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.jythonsupport;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -16,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,12 +56,27 @@ public class JythonRefactory {
     
     static {
         HashMap<String,String> m= new HashMap<>();
-        m.put( "org.virbo.dataset.examples", "org.das2.qds.examples" );
-        m.put( "org.virbo.dataset", "org.das2.qds" );
-        
-        forwardMap= reverseMap(m);
-        
+        m.put("org.virbo.dataset.examples", "org.das2.qds.examples" );
+        m.put("org.virbo.dataset", "org.das2.qds" );
+        m.put("org.virbo.autoplot", "org.autoplot");
+        m.put("org.virbo.autoplot.state", "org.autoplot.state");
+        m.put("org.virbo.datasource", "org.autoplot.datasource");
+        m.put("org.virbo.dataset", "org.das2.qds");
+        m.put("org.autoplot.bufferdataset", "org.das2.qds.bufferdataset");
+        m.put("org.qdataset", "org.das2.qds");
+        m.put("org.virbo.dsutil", "org.das2.qdsutil");
+        m.put("org.virbo.filters", "org.das2.qdsfilters");
+        m.put("org.virbo.qstream", "org.das2.qstream");
+        m.put("org.qstream.filter", "org.das2.qstream.filter");
+        m.put("org.virbo.ascii", "org.autoplot.ascii");
+        m.put("org.virbo.das2Stream", "org.autoplot.das2stream");
+        m.put("org.virbo.spase", "org.autoplot.spase");
+        m.put("org.virbo","org.autoplot");
+        m.put("zipfs", "org.das2.util.filesystem");
+        forwardMap = reverseMap(m);   
+        //forwardMap = m;   
     }
+    
     private static final Map<String,String> fullNameMap= new HashMap<>();    
     
     private static final Pattern IMPORT_REGEX= Pattern.compile("(\\s*)from(\\s+)([a-zA-Z0-9.]+)(\\s+)import(\\s+)([a-zA-Z0-9 ,]+)(\\s*)");
