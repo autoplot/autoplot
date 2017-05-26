@@ -36,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import org.autoplot.jythonsupport.JythonRefactory;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -574,21 +575,21 @@ public class BatchMaster extends javax.swing.JPanel {
                 } catch ( URISyntaxException ex ) {
                     throw new IOException(ex);
                 }   interp.set("_apuri", uri );
-                interp.exec("autoplot.params[\'"+paramName+"\']=_apuri");
+                interp.exec("autoplot.params[\'"+paramName+"\']=_apuri"); // JythonRefactory okay
                 break;
             case 'A':
-                interp.exec("autoplot.params[\'"+paramName+"\']=\'"+f1+"\'");
+                interp.exec("autoplot.params[\'"+paramName+"\']=\'"+f1+"\'");// JythonRefactory okay
                 break;
             case 'T':
                 try {
                     DatumRange timeRange= DatumRangeUtil.parseTimeRange(f1);
                     interp.set("_apdr", timeRange );
-                    interp.exec("autoplot.params[\'"+paramName+"\']=_apdr");
+                    interp.exec("autoplot.params[\'"+paramName+"\']=_apdr");// JythonRefactory okay
                 } catch (ParseException ex) {
                     Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
                 }   break;
             default:
-                interp.exec("autoplot.params[\'"+paramName+"\']="+f1);
+                interp.exec("autoplot.params[\'"+paramName+"\']="+f1);// JythonRefactory okay
                 break;
         }
         
@@ -647,7 +648,7 @@ public class BatchMaster extends javax.swing.JPanel {
             Map<String,org.virbo.jythonsupport.JythonUtil.Param> parms= Util.getParams( env, script, params, new NullProgressMonitor() );
 
             InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false );
-            interp.exec("import autoplot");
+            interp.exec("import autoplot");  // JythonRefactory okay
             
             ParametersFormPanel pfp= new org.virbo.jythonsupport.ui.ParametersFormPanel();
             pfp.doVariables( env, scriptFile, params, null );
@@ -678,7 +679,7 @@ public class BatchMaster extends javax.swing.JPanel {
                     setParam( interp, parms.get(paramName), paramName, f1 );
                     
                     if ( param2NameCB.getSelectedItem().toString().trim().length()==0 ) {
-                        interp.execfile( new FileInputStream(scriptFile), scriptFile.getName() );
+                        interp.execfile( JythonRefactory.fixImports(new FileInputStream(scriptFile)), scriptFile.getName() );
                     } else {
                         String[] ff2= param2Values.getText().split("\n");
                         int i2=0;
@@ -686,7 +687,7 @@ public class BatchMaster extends javax.swing.JPanel {
                             if ( f2.trim().length()==0 ) continue;
                             paramName= param2NameCB.getSelectedItem().toString();
                             setParam( interp, parms.get(paramName), paramName, f2 );
-                            interp.execfile( new FileInputStream(scriptFile), scriptFile.getName() );
+                            interp.execfile(  JythonRefactory.fixImports(new FileInputStream(scriptFile)), scriptFile.getName() );
                             i2=i2+f2.length()+1;
                         }
                     }

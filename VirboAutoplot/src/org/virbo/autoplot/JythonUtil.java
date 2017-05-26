@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.text.BadLocationException;
+import org.autoplot.jythonsupport.JythonRefactory;
 import org.das2.system.RequestProcessor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -75,7 +76,7 @@ public class JythonUtil {
         if ( org.virbo.jythonsupport.Util.isLegacyImports() ) {
             if ( appContext ) {
                 try ( InputStream in = JythonUtil.class.getResource("/appContextImports.py").openStream() ) {
-                    interp.execfile( in, "/appContextImports.py" );
+                    interp.execfile( in, "/appContextImports.py" ); // JythonRefactory okay
                 }
             }
         }
@@ -126,10 +127,10 @@ public class JythonUtil {
         PythonInterpreter interp = JythonUtil.createInterpreter(true, false, model.getDocumentModel(), new NullProgressMonitor() );
         if ( pwd!=null ) {
             pwd= URISplit.format( URISplit.parse(pwd) ); // sanity check against injections
-            interp.exec("PWD='"+pwd+"'");
+            interp.exec("PWD='"+pwd+"'");// JythonRefactory okay
         }
 
-        interp.exec("import autoplot");
+        interp.exec("import autoplot");// JythonRefactory okay
         int iargv=0;  // skip the zeroth one, it is the name of the script
         for (String s : argv ) {
             int ieq= s.indexOf("=");
@@ -143,7 +144,7 @@ public class JythonUtil {
 //                            sval= pwd + sval;
 //                        }
 //                    }
-                    interp.exec("autoplot.params['" + snam + "']='" + sval+"'");
+                    interp.exec("autoplot.params['" + snam + "']='" + sval+"'");// JythonRefactory okay
                 } else {
                     if ( snam.startsWith("-") ) {
                         System.err.println("\n!!! Script arguments should not start with -, they should be name=value");
@@ -152,7 +153,7 @@ public class JythonUtil {
                 }
             } else {
                 if ( iargv>=0 ) {
-                    interp.exec("autoplot.params['arg_" + iargv + "']='" + s +"'" );
+                    interp.exec("autoplot.params['arg_" + iargv + "']='" + s +"'" );// JythonRefactory okay
                     iargv++;
                 } else {
                     //System.err.println("skipping parameter" + s );
@@ -162,9 +163,9 @@ public class JythonUtil {
         }
         
         if ( name==null ) {
-            interp.execfile(in);
+            interp.execfile(JythonRefactory.fixImports(in));
         } else {
-            interp.execfile(in,name);
+            interp.execfile(JythonRefactory.fixImports(in),name);
         }
 
     }
@@ -403,7 +404,7 @@ public class JythonUtil {
                         }
                         try ( FileInputStream in = new FileInputStream(file) ) {
                             
-                            interp.execfile( in, url.toString());
+                            interp.execfile( JythonRefactory.fixImports(in), url.toString());
                             
                         } catch ( PyException ex ) {
                             if ( scriptPanel!=null ) {

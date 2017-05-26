@@ -60,6 +60,7 @@ import javax.swing.text.Element;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
+import org.autoplot.jythonsupport.JythonRefactory;
 import org.das2.components.DasProgressPanel;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -730,7 +731,7 @@ public class ScriptPanelSupport {
                                         try {
                                             annotationsSupport.clearAnnotations();
                                             annotationsSupport.annotateChars( i0, i1, "programCounter", "pc", interp );
-                                            interp.exec(s);
+                                            interp.exec(JythonRefactory.fixImports(s));
                                         } catch (PyException ex) {
                                             throw ex;
                                         }
@@ -763,12 +764,12 @@ public class ScriptPanelSupport {
                                             if ( parseExcept!=null ) {
                                                 JOptionPane.showMessageDialog( panel, "ParseException in parameter "+parseExcept );
                                             } else {
-                                                interp.exec(panel.getEditorPanel().getText());
+                                                interp.exec(JythonRefactory.fixImports(panel.getEditorPanel().getText()));
                                             }
                                         }
                                     } else {
                                         // no parameters
-                                        interp.exec(panel.getEditorPanel().getText());
+                                        interp.exec(JythonRefactory.fixImports(panel.getEditorPanel().getText()));
                                     }
                                 } else {
                                     boolean experiment= System.getProperty("jythonDebugger","false").equals("true");
@@ -794,11 +795,11 @@ public class ScriptPanelSupport {
                                         if ( warning ) {
                                             System.err.println("code contains data that will not be represented properly!");
                                         }
-                                        InputStream in= new ByteArrayInputStream( code.getBytes() );
-                                        interp.execfile(in,file.getName());
-                                        in.close();
+                                        try (InputStream in = new ByteArrayInputStream( code.getBytes() )) {
+                                            interp.execfile(JythonRefactory.fixImports(in),file.getName());
+                                        }
                                     } else {
-                                        interp.exec(code);
+                                        interp.exec(JythonRefactory.fixImports(code));
                                     }
                                 }
                                 setInterruptible( null );

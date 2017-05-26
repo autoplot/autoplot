@@ -23,6 +23,7 @@ import javax.swing.JCheckBox;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import org.autoplot.jythonsupport.JythonRefactory;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.util.InteractiveInterpreter;
 import org.virbo.datasource.AutoplotSettings;
@@ -66,7 +67,7 @@ public class RunScriptPanel extends javax.swing.JPanel {
                 InteractiveInterpreter interp = JythonUtil.createInterpreter(true, false);
                 interp.set("dom", model.getDocumentModel());
                 interp.set("monitor", mon);
-                interp.exec( buf.toString() );
+                interp.exec( JythonRefactory.fixImports(buf.toString()) );
             } else {
                 throw new IllegalArgumentException("file was empty: "+ff );
             }

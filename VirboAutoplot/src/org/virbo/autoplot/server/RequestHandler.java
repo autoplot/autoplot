@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.autoplot.jythonsupport.JythonRefactory;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.util.PythonInterpreter;
@@ -56,7 +57,7 @@ public class RequestHandler {
             PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
 
             if ( org.virbo.jythonsupport.Util.isLegacyImports() ) {
-                interp.execfile(AutoplotUI.class.getResource("/appContextImports.py").openStream(), "/appContextImports.py");
+                interp.execfile(AutoplotUI.class.getResource("/appContextImports.py").openStream(), "/appContextImports.py"); // JythonRefactory okay
             }
             interp.setOut( out );
             interp.set("dom", model.getDocumentModel() );
@@ -73,7 +74,7 @@ public class RequestHandler {
             while ( s!=null ) {
                 try {
                     echo = !s.trim().endsWith(";");
-                    interp.exec(s);
+                    interp.exec(JythonRefactory.fixImports(s));
                 } catch ( RuntimeException ex ) {
                     ex.printStackTrace( new PrintStream( out ) );
                     ex.printStackTrace();

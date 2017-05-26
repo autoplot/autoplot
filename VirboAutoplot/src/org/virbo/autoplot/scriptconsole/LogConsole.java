@@ -54,6 +54,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import javax.xml.parsers.ParserConfigurationException;
+import org.autoplot.jythonsupport.JythonRefactory;
 import org.das2.jythoncompletion.JythonCompletionTask;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
 import org.das2.jythoncompletion.ui.CompletionImpl;
@@ -107,13 +108,14 @@ public class LogConsole extends javax.swing.JPanel {
                     @Override
                     public void run() {
                         try {
-                            System.out.println("AP> " + s);
+                            String s1= JythonRefactory.fixImports(s);
+                            System.out.println("AP> " + s1);
                             maybeInitializeInterpreter();
                             try {
-                                PyObject po= interp.eval(s);
-                                if ( !( po instanceof PyNone ) ) interp.exec("print '" + po.__str__() +"'" ); 
+                                PyObject po= interp.eval(s1);
+                                if ( !( po instanceof PyNone ) ) interp.exec("print '" + po.__str__() +"'" ); // JythonRefactory okay
                             } catch (PyException ex ) {
-                                interp.exec(s);
+                                interp.exec(s1);// JythonRefactory okay
                             }
                             commandLineTextPane1.setText("");
                         } catch (IOException ex) {
