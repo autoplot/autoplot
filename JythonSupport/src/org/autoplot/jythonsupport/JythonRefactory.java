@@ -61,6 +61,8 @@ public class JythonRefactory {
     private static final Map<String,String> forwardMap;
     
     static {
+        // map of old name to new name.  Note org.virbo will match anything 
+        // underneath it, but more specific maps are added for efficiency.
         HashMap<String,String> m= new HashMap<>();
         m.put("org.virbo.dataset", "org.das2.qds");
         m.put("org.qdataset", "org.das2.qds");
@@ -79,19 +81,18 @@ public class JythonRefactory {
         m.put("org.virbo.ascii", "org.autoplot.ascii");
         m.put("org.virbo.das2Stream", "org.autoplot.das2stream");
         m.put("org.virbo.spase", "org.autoplot.spase");
-        m.put("org.virbo.imagedatasource", "org.virbo.imagedatasource" );
+        m.put("org.virbo.imagedatasource", "org.autoplot.imagedatasource" );
         m.put("org.virbo.idlsupport", "org.autoplot.idlsupport" );
         m.put("org.virbo.jythonsupport", "org.autoplot.jythonsupport");
         m.put("zipfs", "org.das2.util.filesystem");
-        //forwardMap = reverseMap(m);   
-        forwardMap = m;   
-        //TODO: more entries, or logic that matches "org.virbo" with "org.virbo.datasource.capability"
+        forwardMap = reverseMap(m);   
+        //forwardMap = m;   
     }
     
     private static final Map<String,String> fullNameMap= new HashMap<>();    
     
-    private static final Pattern IMPORT_REGEX= Pattern.compile("(\\s*)from(\\s+)([a-zA-Z0-9.]+)(\\s+)import(\\s+)([a-zA-Z0-9 ,]+)(\\s*)");
-    private static final Pattern IMPORT_AS_REGEX= Pattern.compile("(\\s*)import(\\s+)([a-zA-Z0-9.]+)(\\s+)(as(\\s+)([a-zA-Z0-9]+)(\\s*))?");
+    private static final Pattern IMPORT_REGEX= Pattern.compile("(\\s*)from(\\s+)([a-zA-Z0-9_.]+)(\\s+)import(\\s+)([a-zA-Z0-9_ ,]+)(\\s*)");
+    private static final Pattern IMPORT_AS_REGEX= Pattern.compile("(\\s*)import(\\s+)([a-zA-Z0-9_.]+)(\\s*)((\\s+)as(\\s+)([a-zA-Z0-9_]+)(\\s*))?");
     
     /**
      * read in the stream, replacing import statements with new packages.
@@ -110,6 +111,9 @@ public class JythonRefactory {
         PrintStream writer= new PrintStream( baos );
         while ( line!=null ) {
             Matcher m;
+            //if ( line.contains( "org.virbo.jythonsupport.ui.Util.FormData" ) ) {
+            //    System.err.println("here114");
+            //}
             m= IMPORT_REGEX.matcher(line);
             if ( m.matches() ) {
                 String p= m.group(3);
@@ -149,45 +153,37 @@ public class JythonRefactory {
             } else {
                 m= IMPORT_AS_REGEX.matcher(line);
                 if ( m.matches() ) {
-                    // identify the path and class file by using the convention that path must start with lower case.
-                    String p = m.group(3);
-                    String[] pp= p.split("\\.",-2);
-                    StringBuilder pathBuilder= new StringBuilder();
-                    StringBuilder clasBuilder= new StringBuilder();
-                    int iclass=-1;
-                    for ( int i=0; i<pp.length; i++ ) { 
-                        if ( iclass==-1 && pp[i].length()>0 && Character.isUpperCase(pp[i].charAt(0)) ) {
-                            iclass=i;
-                            clasBuilder.append(pp[i]);
-                        } else if ( iclass>-1 ) {
-                            clasBuilder.append(".");
-                            clasBuilder.append(pp[i]);
+                    String p= m.group(3);
+                    String cl= null;
+                    String n=null;
+                    String[] ss= p.split("\\.",-2);
+                    int i= p.length();
+                    for ( int k=ss.length; k>0; k-- ) {
+                        String path= p.substring(0,i);
+                        n= forwardMap.get(path);
+                        if ( n==null ) {
+                            i= i-ss[k-1].length()-1;
                         } else {
-                            if ( i>0 ) pathBuilder.append(".");
-                            pathBuilder.append(pp[i]);
+                            cl= p.substring(i);
+                            p= path;
+                            break;
                         }
                     }
-                    String path= pathBuilder.toString();
-                    String srcPath= path;
-                    String n= forwardMap.get(path);
-                    if ( n!=null ) path= n;
-                    String clas= clasBuilder.toString();
                     writer.print( m.group(1) );
                     writer.print( "import" );
                     writer.print( m.group(2) );
-                    writer.print( path );
-                    if ( clas.length()>0 ) {
-                        writer.print( "." );
-                        writer.print( clas );
+                    writer.print( n );
+                    if ( cl!=null ) {
+                        writer.print( cl );
                     }
                     writer.print( m.group(4) );
                     if ( m.group(5)!=null ) { // as clause
                         writer.print( m.group(5) ); 
                     } else {
-                        if ( clas.length()>0 ) {
-                            fullNameMap.put( p, path+"."+clas );
+                        if ( n!=null ) {
+                            fullNameMap.put( p+cl, n+cl );
                         } else {
-                            fullNameMap.put( p, path );
+                            fullNameMap.put( p, n );
                         }
                     }
                     writer.println();
