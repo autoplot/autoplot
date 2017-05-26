@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +48,15 @@ public class JythonRefactory {
         FileOutputStream fout= new FileOutputStream(fileout);
         DataSourceUtil.transfer( out, fout );
         return fileout;
+    }
+    
+    public static String fixImports( String s ) throws IOException {
+        InputStream fin= new ByteArrayInputStream( s.getBytes(Charset.forName("US-ASCII")) );
+        InputStream out= fixImports( fin );
+        ByteArrayOutputStream baos= new ByteArrayOutputStream(s.length()*110/100);
+        DataSourceUtil.transfer( out, baos );
+        String result= baos.toString("US-ASCII");
+        return result;
     }
     
     /**
@@ -208,14 +218,19 @@ public class JythonRefactory {
             }
             line= reader.readLine(); 
         }
-        logger.log(Level.WARNING, "fixImports in {0}ms, affected={1}", new Object[] { System.currentTimeMillis()-t0, affected } );
+        if (affected) {
+            logger.log(Level.WARNING, "fixImports in {0}ms, affected={1}.  Code contains imports with old (\"virbo\") names.", new Object[] { System.currentTimeMillis()-t0, affected } );
+        } else {
+            logger.log(Level.FINE, "fixImports in {0}ms, affected={1}", new Object[] { System.currentTimeMillis()-t0, affected } );
+        }
         return new ByteArrayInputStream( baos.toByteArray() );
     }
     
     public static void main( String[] args ) throws IOException {
         //File f= fixImports( new File( "/home/jbf/ct/autoplot/rfe/528/examples/rfe528.okay.jy") );
-        
-        InputStream in= fixImports( new URL("http://jfaden.net/~jbf/autoplot/rfe/528/rfe528.20160909.okay.jy").openStream() );
+        URL url = new URL( "file:///home/jbf/project/juno/svn/studies/jbf/trajPlot/finalPlotSouth.jy" );
+        //URL url = new URL("http://jfaden.net/~jbf/autoplot/rfe/528/rfe528.20160909.okay.jy");
+        InputStream in= fixImports( url.openStream() );
         BufferedReader r= new BufferedReader(new InputStreamReader(in));
         String line;
         while ( (line= r.readLine())!=null ) {
