@@ -194,11 +194,7 @@ public class JythonRefactory {
                         if ( m.group(5)!=null ) { // as clause
                             writer.print( m.group(5) ); 
                         } else {
-                            if ( n!=null ) {
-                                fullNameMap.put( p+cl, n+cl );
-                            } else {
-                                fullNameMap.put( p, n );
-                            }
+                            fullNameMap.put( p+cl, n+cl );
                         }
                         writer.println();
                         affected= true;
@@ -228,8 +224,9 @@ public class JythonRefactory {
     
     public static void main( String[] args ) throws IOException {
         //File f= fixImports( new File( "/home/jbf/ct/autoplot/rfe/528/examples/rfe528.okay.jy") );
-        URL url = new URL( "file:///home/jbf/project/juno/svn/studies/jbf/trajPlot/finalPlotSouth.jy" );
-        //URL url = new URL("http://jfaden.net/~jbf/autoplot/rfe/528/rfe528.20160909.okay.jy");
+        //URL url = new URL( "file:///home/jbf/project/juno/svn/studies/jbf/trajPlot/finalPlotSouth.jy" );
+        //URL url = new URL( "file:///home/jbf/project/juno/svn/studies/jbf/u/george/20170207/junoPolarPlot.jy");
+        URL url = new URL("http://jfaden.net/~jbf/autoplot/rfe/528/rfe528.20160909.okay.jy");
         InputStream in= fixImports( url.openStream() );
         BufferedReader r= new BufferedReader(new InputStreamReader(in));
         String line;
