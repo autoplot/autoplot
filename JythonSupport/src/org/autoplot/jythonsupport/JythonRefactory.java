@@ -36,20 +36,20 @@ public class JythonRefactory {
     
     private static final Logger logger= LoggerManager.getLogger("jython.refactory");
             
-    /**
-     * map imports within file to the new names.
-     * @param f jython script
-     * @return new script.
-     */
-    public static File fixImports( File f ) throws IOException {
-        FileInputStream fin= new FileInputStream(f);
-        InputStream out= fixImports( fin );
-        File fileout= File.createTempFile( "autoplot.jythonrefactory", ".jy" );
-        fileout.deleteOnExit();
-        FileOutputStream fout= new FileOutputStream(fileout);
-        DataSourceUtil.transfer( out, fout );
-        return fileout;
-    }
+//    /**
+//     * map imports within file to the new names.
+//     * @param f jython script
+//     * @return new script.
+//     */
+//    public static File fixImports( File f ) throws IOException {
+//        FileInputStream fin= new FileInputStream(f);
+//        InputStream out= fixImports( fin );
+//        File fileout= File.createTempFile( "autoplot.jythonrefactory", ".jy" );
+//        fileout.deleteOnExit();
+//        FileOutputStream fout= new FileOutputStream(fileout);
+//        DataSourceUtil.transfer( out, fout );
+//        return fileout;
+//    }
     
     public static String fixImports( String s ) throws IOException {
         InputStream fin= new ByteArrayInputStream( s.getBytes(Charset.forName("US-ASCII")) );
