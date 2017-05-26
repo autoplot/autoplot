@@ -11,11 +11,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.util.LoggerManager;
 import org.virbo.datasource.DataSourceUtil;
 
 /**
@@ -25,6 +29,8 @@ import org.virbo.datasource.DataSourceUtil;
  */
 public class JythonRefactory {
     
+    private static final Logger logger= LoggerManager.getLogger("jython.refactory");
+            
     /**
      * map imports within file to the new names.
      * @param f jython script
@@ -56,14 +62,16 @@ public class JythonRefactory {
     
     static {
         HashMap<String,String> m= new HashMap<>();
+        m.put("org.virbo.dataset", "org.das2.qds");
+        m.put("org.qdataset", "org.das2.qds");
         m.put("org.virbo.dataset.examples", "org.das2.qds.examples" );
-        m.put("org.virbo.dataset", "org.das2.qds" );
+        m.put("org.virbo","org.autoplot");
         m.put("org.virbo.autoplot", "org.autoplot");
+        m.put("org.virbo.autoplot.dom", "org.autoplot.dom");
+        m.put("org.virbo.autoplot.bookmarks", "org.autoplot.bookmarks");
         m.put("org.virbo.autoplot.state", "org.autoplot.state");
         m.put("org.virbo.datasource", "org.autoplot.datasource");
-        m.put("org.virbo.dataset", "org.das2.qds");
         m.put("org.autoplot.bufferdataset", "org.das2.qds.bufferdataset");
-        m.put("org.qdataset", "org.das2.qds");
         m.put("org.virbo.dsutil", "org.das2.qdsutil");
         m.put("org.virbo.filters", "org.das2.qdsfilters");
         m.put("org.virbo.qstream", "org.das2.qstream");
@@ -71,10 +79,12 @@ public class JythonRefactory {
         m.put("org.virbo.ascii", "org.autoplot.ascii");
         m.put("org.virbo.das2Stream", "org.autoplot.das2stream");
         m.put("org.virbo.spase", "org.autoplot.spase");
-        m.put("org.virbo","org.autoplot");
+        m.put("org.virbo.imagedatasource", "org.virbo.imagedatasource" );
+        m.put("org.virbo.idlsupport", "org.autoplot.idlsupport" );
+        m.put("org.virbo.jythonsupport", "org.autoplot.jythonsupport");
         m.put("zipfs", "org.das2.util.filesystem");
-        forwardMap = reverseMap(m);   
-        //forwardMap = m;   
+        //forwardMap = reverseMap(m);   
+        forwardMap = m;   
         //TODO: more entries, or logic that matches "org.virbo" with "org.virbo.datasource.capability"
     }
     
@@ -90,6 +100,9 @@ public class JythonRefactory {
      * @throws IOException 
      */
     public static InputStream fixImports( InputStream in ) throws IOException {
+        long t0= System.currentTimeMillis();
+        
+        boolean affected= false;
         
         BufferedReader reader= new BufferedReader( new InputStreamReader(in) );
         String line= reader.readLine(); 
@@ -112,6 +125,7 @@ public class JythonRefactory {
                     writer.print( m.group(6) );
                     writer.print( m.group(7) );
                     writer.println();
+                    affected= true;
                 } else {
                     writer.println(line);
                 }
@@ -160,7 +174,7 @@ public class JythonRefactory {
                         }
                     }
                     writer.println();
-
+                    affected= true;
                 } else {
                     if ( fullNameMap.size()>0 ) {
                         for ( Entry<String,String> e: fullNameMap.entrySet() ) {
@@ -174,12 +188,17 @@ public class JythonRefactory {
             }
             line= reader.readLine(); 
         }
+        logger.log(Level.WARNING, "fixImports in {0}ms, affected={1}", new Object[] { System.currentTimeMillis()-t0, affected } );
         return new ByteArrayInputStream( baos.toByteArray() );
     }
     
     public static void main( String[] args ) throws IOException {
         //File f= fixImports( new File( "/home/jbf/ct/autoplot/rfe/528/examples/rfe528.okay.jy") );
+        
         File f= fixImports( new File( "/home/jbf/ct/autoplot/rfe/528/examples/rfe528.20160909.okay.jy") );
+        for ( String line : Files.readAllLines( f.toPath() ) ) {
+            System.err.println(line);
+        }
         System.err.println(f);
     }
 }
