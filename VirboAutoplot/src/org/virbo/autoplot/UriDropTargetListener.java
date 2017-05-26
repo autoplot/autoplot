@@ -114,6 +114,10 @@ public class UriDropTargetListener implements DropTargetListener {
                     } else {
                         DataFlavor nixFileDataFlavor = new DataFlavor("text/uri-list;class=java.lang.String");
                         if ( dtde.isDataFlavorSupported(nixFileDataFlavor) ) {
+                            if ( !haveAcceptedDrop ) {
+                               dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                                haveAcceptedDrop= true;
+                            }
                             String data = (String)dtde.getTransferable().getTransferData(nixFileDataFlavor);
                             if ( data!=null ) {
                                 item= new Bookmark.Item( data );
