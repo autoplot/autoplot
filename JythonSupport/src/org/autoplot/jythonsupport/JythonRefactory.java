@@ -113,12 +113,29 @@ public class JythonRefactory {
             m= IMPORT_REGEX.matcher(line);
             if ( m.matches() ) {
                 String p= m.group(3);
-                String n= forwardMap.get(p);
+                String cl= null;
+                String n=null;
+                String[] ss= p.split("\\.",-2);
+                int i= p.length();
+                for ( int k=ss.length; k>0; k-- ) {
+                    String path= p.substring(0,i);
+                    n= forwardMap.get(path);
+                    if ( n==null ) {
+                        i= i-ss[k-1].length()-1;
+                    } else {
+                        cl= p.substring(i);
+                        p= path;
+                        break;
+                    }
+                }
                 if ( n!=null ) {
                     writer.print( m.group(1) );
                     writer.print( "from" );
                     writer.print( m.group(2) );
                     writer.print( n );
+                    if ( cl!=null ) {
+                        writer.print( cl );
+                    }
                     writer.print( m.group(4) );
                     writer.print( "import" );
                     writer.print( m.group(5) );
