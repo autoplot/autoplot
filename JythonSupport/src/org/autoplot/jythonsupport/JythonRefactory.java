@@ -44,7 +44,8 @@ public class JythonRefactory {
     public static File fixImports( File f ) throws IOException {
         FileInputStream fin= new FileInputStream(f);
         InputStream out= fixImports( fin );
-        File fileout= File.createTempFile("fixImports", ".jy");
+        File fileout= File.createTempFile( "autoplot.jythonrefactory", ".jy" );
+        fileout.deleteOnExit();
         FileOutputStream fout= new FileOutputStream(fileout);
         DataSourceUtil.transfer( out, fout );
         return fileout;
