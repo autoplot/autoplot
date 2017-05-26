@@ -89,8 +89,8 @@ public class JythonRefactory {
         m.put("org.virbo.idlsupport", "org.autoplot.idlsupport" );
         m.put("org.virbo.jythonsupport", "org.autoplot.jythonsupport");
         m.put("zipfs", "org.das2.util.filesystem");
-        //forwardMap = reverseMap(m);   
-        forwardMap = m;   
+        forwardMap = reverseMap(m);   
+        //forwardMap = m;   
     }
     
     private static final Map<String,String> fullNameMap= new HashMap<>();    
