@@ -190,7 +190,7 @@ public final class EventThreadResponseMonitor {
                     boolean hungProcess= System.currentTimeMillis()-lastPost > ERROR_LEVEL_MILLIS;
                     if ( hungProcess && ! eventId.equals(reportedEventId) ) {
 
-                        logger.log(Level.INFO, "PATHOLOGICAL EVENT QUEUE CLEAR TIME, WRITING REPORT TO autoplot_data/logs/...\n" );
+                        logger.log(Level.INFO, "PATHOLOGICAL EVENT QUEUE CLEAR TIME, WRITING REPORT TO autoplot_data/log/...\n" );
 
                         Date now= new Date();
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
