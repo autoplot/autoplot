@@ -89,8 +89,8 @@ public class JythonRefactory {
         m.put("org.virbo.idlsupport", "org.autoplot.idlsupport" );
         m.put("org.virbo.jythonsupport", "org.autoplot.jythonsupport");
         m.put("zipfs", "org.das2.util.filesystem");
-        forwardMap = reverseMap(m);   
-        //forwardMap = m;   
+        //forwardMap = reverseMap(m);   
+        forwardMap = m;   
     }
     
     private static final Map<String,String> fullNameMap= new HashMap<>();    
@@ -132,7 +132,6 @@ public class JythonRefactory {
                         i= i-ss[k-1].length()-1;
                     } else {
                         cl= p.substring(i);
-                        p= path;
                         break;
                     }
                 }
@@ -173,25 +172,29 @@ public class JythonRefactory {
                             break;
                         }
                     }
-                    writer.print( m.group(1) );
-                    writer.print( "import" );
-                    writer.print( m.group(2) );
-                    writer.print( n );
-                    if ( cl!=null ) {
-                        writer.print( cl );
-                    }
-                    writer.print( m.group(4) );
-                    if ( m.group(5)!=null ) { // as clause
-                        writer.print( m.group(5) ); 
-                    } else {
-                        if ( n!=null ) {
-                            fullNameMap.put( p+cl, n+cl );
-                        } else {
-                            fullNameMap.put( p, n );
+                    if ( n!=null ) {
+                        writer.print( m.group(1) );
+                        writer.print( "import" );
+                        writer.print( m.group(2) );
+                        writer.print( n );
+                        if ( cl!=null ) {
+                            writer.print( cl );
                         }
+                        writer.print( m.group(4) );
+                        if ( m.group(5)!=null ) { // as clause
+                            writer.print( m.group(5) ); 
+                        } else {
+                            if ( n!=null ) {
+                                fullNameMap.put( p+cl, n+cl );
+                            } else {
+                                fullNameMap.put( p, n );
+                            }
+                        }
+                        writer.println();
+                        affected= true;
+                    } else {
+                        writer.println(line);
                     }
-                    writer.println();
-                    affected= true;
                 } else {
                     if ( fullNameMap.size()>0 ) {
                         for ( Entry<String,String> e: fullNameMap.entrySet() ) {
