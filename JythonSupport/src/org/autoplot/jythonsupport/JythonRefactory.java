@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +26,9 @@ import org.virbo.datasource.DataSourceUtil;
 /**
  * Provide one class that manages backwards compatibility as package names
  * are changed.  See https://sourceforge.net/p/autoplot/feature-requests/528/
+ * This also implements future compatibility, where for the last release of
+ * the v2016a branch, future .jy files will be reverse mapped back to its
+ * names.
  * @author jbf
  */
 public class JythonRefactory {
@@ -208,10 +212,12 @@ public class JythonRefactory {
     public static void main( String[] args ) throws IOException {
         //File f= fixImports( new File( "/home/jbf/ct/autoplot/rfe/528/examples/rfe528.okay.jy") );
         
-        File f= fixImports( new File( "/home/jbf/ct/autoplot/rfe/528/examples/rfe528.20160909.okay.jy") );
-        for ( String line : Files.readAllLines( f.toPath() ) ) {
+        InputStream in= fixImports( new URL("http://jfaden.net/~jbf/autoplot/rfe/528/rfe528.20160909.okay.jy").openStream() );
+        BufferedReader r= new BufferedReader(new InputStreamReader(in));
+        String line;
+        while ( (line= r.readLine())!=null ) {
             System.err.println(line);
         }
-        System.err.println(f);
+
     }
 }
