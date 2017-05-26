@@ -65,7 +65,7 @@ public class Test029 {
         System.err.printf("glob.py is approx %d lines long.\n",count);
 
         InteractiveInterpreter interp = JythonUtil.createInterpreter(false);
-        interp.exec("import glob\n");
+        interp.exec("import glob\n");// JythonRefactory okay
         PyObject res= interp.eval("glob.glob('*')\n");
         System.err.println(res);
 
