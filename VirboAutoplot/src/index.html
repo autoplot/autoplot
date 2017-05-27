@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Autoplot is used to create images for a May-The-Forth-Be-With-You You Tube video.  <a href="https://www.youtube.com/watch?v=1KxXf5x5rHc">Have a listen!</a>
+        <p><small>Autoplot is used to create images and audio for a May-The-Forth-Be-With-You You Tube video.  <a href="https://www.youtube.com/watch?v=1KxXf5x5rHc">Have a listen!</a>
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-05-19 r20815):</p>
+        <p>Bugfixes (2017-05-27 r20857):</p>
         <ul> 
+            <li>drag-n-drop from Thunderbird email "save attachment as" dialog fixed.
+            <li>rte_2119934227: put a link in the runtime error popup for OutOfMemory errors.
+            <li>rte_1890761962: index out of bounds in "near real time" Time range editor.
             <li>allow different credentials to be used on different paths on the same server.
             <li>1818: getTimeRange( 1990/12/01, 1month ) would fail the pngwalktool because 1990/13/01 was not normalized (via carry).
             <li>1833: catch bad path when "orbit:file:///" used where "file:///" should have been used.  There was code to trap this exception, but the wrong exception type was thrown.  Thanks, Ivar!
@@ -91,6 +94,10 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>das2Server credentials manager has add method for scripts to insert credentials.
+            <li>rfe528: Jemmy codes are moved into Autoplot app from VATesting, so that it's easier for any one to create tests.
+            <li>Introduce JythonRefactory which will support old names after path names move around in v2017a.
+            <li>add FileSystemUtil.unzipFile.
             <li>DataPointRecorder turn off the sorted property as data is loaded, since it is too slow and presumably sorted already.
             <li>display data mouse module keeps track of which renderer was selected, to facilitate comparisons.
             <li>Add action to write PNGWalk as an animated gif.
