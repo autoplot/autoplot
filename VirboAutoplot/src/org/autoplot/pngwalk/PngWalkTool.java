@@ -1287,7 +1287,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
             setNavButtonsEnabled(true);
             if ( navMenu!=null ) navMenu.setEnabled(true);
             seq.setQCFilter("");
-            qcFilterMenuItem.setSelected(false);
+            if ( qcFilterMenuItem!=null ) {
+                qcFilterMenuItem.setSelected(false);
+            }
             
         } catch ( Exception ex ) {
             seq= null;
