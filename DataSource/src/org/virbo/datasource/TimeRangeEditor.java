@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -425,7 +426,9 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         org.das2.util.LoggerManager.logGuiEvent(evt);
         TimeRangeTool t=new TimeRangeTool();
         t.setSelectedRange(getRange().toString());//TODO: goofy
-        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, t, "Select time range", JOptionPane.OK_CANCEL_OPTION ) ) {
+        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, t, "Select time range",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, 
+                new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/calendar.png"))) ) {
             String str= t.getSelectedRange();
             try {
                 setRange( DatumRangeUtil.parseTimeRangeValid(str) );
