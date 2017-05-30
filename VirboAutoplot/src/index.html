@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Autoplot is used to create images and audio for a May-The-Forth-Be-With-You You Tube video.  <a href="https://www.youtube.com/watch?v=1KxXf5x5rHc">Have a listen!</a>
+        <p><small>The PNG Walk Tool can now be used to create workflow documents.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,11 @@
         
         <p>Bugfixes (2017-05-27 r20857):</p>
         <ul> 
+            <li>strange RTE with colorbar drawing with x2go on Linux.  Thanks, Kris!
+            <li>rte_0153443069: CSV parser editor GUI would fail with NullPointerException because handling was delegated a sloppy code.  Thanks, Mimai!
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>drag-n-drop from Thunderbird email "save attachment as" dialog fixed.
             <li>rte_2119934227: put a link in the runtime error popup for OutOfMemory errors.
             <li>rte_1890761962: index out of bounds in "near real time" Time range editor.
@@ -61,39 +66,11 @@
             <li>1559: trim getDataSet calls to the time range requested, when the time axis is not visible.
             <li>debug printing for 1814 accidentally left in production release.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>1723: Wind waves data then dsAboveBackground shows where VALID_MIN was incorrectly copied over to result.</li>
-            <li>1814: test002_022 shows how loading %{CONTEXT} is unreliable.  Various experiments appear to improve results.
-            <li>trivial findbugs cleanup.
-            <li>rte_0066894792: code to enter mash-up dialog didn't consider all cases resulting in NullPointerException.  Thanks, me!
-            <li>rte_0110509840: exception where tweaked code didn't consider all cases for CDF X,Y,Z plot.  Thanks, jjm390!
-            <li>1815: breaks in orbitPlot were not drawn properly.
-            <li>Quiet noisy CDF warnings, which endusers don't see and CDF developers can adjust log levels to see.
-            <li>1814: test002_022 shows mismanagement of %{CONTEXT} property in one branch.
-            <li>orbitRenderer setTickVDescriptor is respected now.
-            <li>.html extension claimed for use for HTML tables.  As OpenDap is not used often and it was reserved to avoid confusion with it.
-            <li>Html export format restored after it was accidentally removed from available options.
-            <li>Digital renderer properly handles formats like "%d mph" and rank 0 rendering (where location is not known) works more like rank 1, using format and align.
-            <li>PDS-PPI node now gets data from http://pds-ppi.igpp.ucla.edu. 
-            <li>correctly handle pngwalk URIs with "?timerange=Apr+2017"
-            <li>pitch angle distribution renderer finally uses curved pieces to draw, instead of trapezoids.  Thanks, Ed!
-            <li>reduce verbosity of "uh-oh, span used on ordinal like month, day" warning.  I don't see that there's a problem with this.
-            <li>1809: kludge in proper handling of signature for addMouseModule
-            <li>special handling of parseDecimal("NaN").
-            <li>improve handling of space and umlaut (&uml;) in pngwalk file names.
-            <li>rte_0746124665: George saw path that was resulted in NullPointerException.
-            <li>one-arg join(ds) was deleted at some point, and is now replaced.  Thanks, George!
-            <li>HAPI export supports rank 3.
-            <li>bundle(ds1,ds2) correctly handles DEPEND_1 and DEPEND_2 when bundled datasets have equivalent values.
-            <li>correction to ascii formatting when microsecond resolution is used.  Thanks, Kristoff!
-            <li>slice2 and slice3 preserve NAME property.
-            <li>bugfix: LocalFileObject write capability didn't check to see if it could create a file, with the QC stuff in PNGWalk.
-            <li>1804: trim off-by-one error corrected.
-            <li>1802: checkIsotropic could trigger before axes were sized with AutoplotServer.                
-        </ul>
         <p>Features:</p>
         <ul> 
+        </ul>
+       <p>Less recent features:</p>
+       <ul>
             <li>formatting events dataset with colors to qstream uses hex format for RGB color.
             <li>das2Server credentials manager has add method for scripts to insert credentials.
             <li>rfe528: Jemmy codes are moved into Autoplot app from VATesting, so that it's easier for any one to create tests.
@@ -110,18 +87,6 @@
             <li>ASCII table reader where now has matches clause, for example where=sc.matches('.*A')
             <li>Editor panel has switch to turn off arrow annotations for tab, and to allow tab-is-4-spaces instead of completions popup.
             <li>extent filter (which returns min,max of a dataset) added to filters.
-        </ul>
-       <p>Less recent features:</p>
-       <ul>
-            <li>DDataSet family of QDataSet implementations implement trim(0,n) by returning self, avoiding copy.
-            <li>add reduceBins which removes a bins dimension with the linear or geometric average.
-            <li>subtract filter added to remove confusion with diff, which is finite differences.  (Bill)
-            <li>Jython editor now allows tabs to be used instead of spaces, when "tabIsCompletion" is false. 
-            <li>Jython editor now shows tabs, which are syntactically different than spaces.
-            <li>1787: add text field so that orbit number can be entered directly.
-            <li>Introduce "gridIrregularY" to replace old LGrid.rebin codes.
-            <li>TimeRangeEditor keeps track of last spacecraft used for orbits.
-            <li>JUNO Perijove intervals added.
        </ul>
 
         <p>Known issues:</p>
