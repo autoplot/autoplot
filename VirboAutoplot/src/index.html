@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The PNG Walk Tool can now be used to create workflow documents, like this: http://autoplot.org/data/tutorials/20170516_filters/20170516_1152.html
+        <p><small>The PNG Walk Tool can now be used to create workflow documents, <a href='http://autoplot.org/data/tutorials/20170516_filters/20170516_1152.html'>like this</a>. 
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,13 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-05-27 r20857):</p>
-        <ul> 
+        <p>Bugfixes (2017-05-31 r20857):</p>
+        <ul>  
+            <li>rte_1917581137: bug which shows with x2go and Ubuntu Mate.
+            <li>resize control points would appear on the colorbar, but you couldn't resize it. 
+            <li>Jython putProperty correctly uses the mutable dataset.
+            <li>digital renderer allows %E for exponential notation.
+            <li>colorbar resize control points allow resize of the horizonal direction.  Thanks, Ivar!
             <li>strange RTE with colorbar drawing with x2go on Linux.  Thanks, Kris!
             <li>rte_0153443069: CSV parser editor GUI would fail with NullPointerException because handling was delegated a sloppy code.  Thanks, Mimai!
         </ul>
