@@ -99,7 +99,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
             }
             return result;
         } finally {
-            mon.finished();
+            if ( !mon.isFinished() ) mon.finished();
         }
 
 
