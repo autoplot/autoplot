@@ -110,8 +110,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
         File src = DataSetURI.getFile(furi, mon );
 
-        FileReader reader= new FileReader(src);
-        try {
+        try (FileReader reader = new FileReader(src)) {
             String script= JythonUtil.readScript( new BufferedReader( reader ) );
             List<JythonUtil.Param> r2= JythonUtil.getGetParams( script, current );
 
@@ -122,8 +121,6 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
             }
 
             return result;
-        } finally {
-            reader.close();
         }
     }
 
@@ -137,7 +134,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
-        List<CompletionContext> result = new ArrayList<CompletionContext>();
+        List<CompletionContext> result = new ArrayList<>();
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
             String ext= DataSetURI.fromUri(cc.resourceURI);
             int i= ext.lastIndexOf(".");
@@ -199,20 +196,13 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
                 problems.add(TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED);
                 return true;
             }
-        } catch ( IOException ex ) {
+        } catch ( IOException | PyException ex ) {
             problems.add(ex.toString());
             return true;
-        } catch ( PyException ex ) {
-            problems.add(ex.toString());
-            return true;            
         }
         
         if (surl.contains("?")) {
-            if ( split.params.length()>0 ) {
-                return false;
-            } else {
-                return true;
-            }
+            return split.params.length() <= 0;
         } else {
             try {
                 if ( split.scheme!=null && split.scheme.equals("inline") ) {
@@ -224,21 +214,22 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
                 }
 
                 File src = DataSetURI.getFile( url, new NullProgressMonitor() );
-                BufferedReader reader = new BufferedReader(new FileReader(src));
-                String s = reader.readLine();
-                boolean haveResult = false;
-                while (s != null) {
-                    if (s.trim().startsWith("result")) {
-                        haveResult = true;
-                        break;
+                boolean haveResult;
+                try (BufferedReader reader = new BufferedReader(new FileReader(src))) {
+                    String s = reader.readLine();
+                    haveResult = false;
+                    while (s != null) {
+                        if (s.trim().startsWith("result")) {
+                            haveResult = true;
+                            break;
+                        }
+                        if (s.trim().startsWith("data")) {
+                            haveResult = true;
+                            break;
+                        }
+                        s = reader.readLine();
                     }
-                    if (s.trim().startsWith("data")) {
-                        haveResult = true;
-                        break;
-                    }
-                    s = reader.readLine();
                 }
-                reader.close();
                 if ( !haveResult ) problems.add("there must be a line that starts with \"data\" or \"result\"");
                 return !haveResult;
             } catch (IOException ex) {
@@ -259,71 +250,66 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
      */
     protected static Map<String,String> getResultParameters( String surl, ProgressMonitor mon ) throws IOException {
         File src = DataSetURI.getFile(DataSetURI.getURL(surl),mon);
-        BufferedReader reader = new BufferedReader(new FileReader(src));
-        String s = reader.readLine();
-
-        Pattern assignPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=(.*)(#(.*))?");
-        
-        Pattern tuplePattern=  Pattern.compile("\\s*\\(?\\s*([_a-zA-Z][_a-zA-Z0-9\\s*,\\s*]*)\\s*\\)?\\s*=(.*)(#(.*))?");
-        
-        Pattern defPattern= Pattern.compile("def .*");
-
-        boolean inDef= false;
-
-        Map<String,String> result= new LinkedHashMap<String, String>(); // from ID to description
-
-        while (s != null) {
-
-            if ( inDef==false ) {
-                Matcher defm= defPattern.matcher(s);
-                if ( defm.matches() ) {
-                    inDef= true;
-                }
-            } else {
-                if ( s.length()>0 && !Character.isWhitespace(s.charAt(0)) ) {
+        Map<String,String> result;
+        try (BufferedReader reader = new BufferedReader(new FileReader(src))) {
+            String s = reader.readLine();
+            Pattern assignPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=(.*)(#(.*))?");
+            Pattern tuplePattern=  Pattern.compile("\\s*\\(?\\s*([_a-zA-Z][_a-zA-Z0-9\\s*,\\s*]*)\\s*\\)?\\s*=(.*)(#(.*))?");
+            Pattern defPattern= Pattern.compile("def .*");
+            boolean inDef= false;
+            result = new LinkedHashMap<>(); // from ID to description
+            while (s != null) {
+                
+                if ( inDef==false ) {
                     Matcher defm= defPattern.matcher(s);
-                    inDef=  defm.matches();
-                }
-            }
-
-            if ( !inDef ) {
-                Matcher m= assignPattern.matcher(s);
-                if ( m.matches() ) {
-                    String rhs= m.group(2);
-                    if ( rhs.contains("getParam(") ) {
-                        // reject
-                    } else {
-                        if ( m.group(4)!=null ) {
-                            result.put(m.group(1), m.group(4) );
-                        } else {
-                            result.put(m.group(1), s );
-                        }
+                    if ( defm.matches() ) {
+                        inDef= true;
                     }
                 } else {
-                    m= tuplePattern.matcher(s);
+                    if ( s.length()>0 && !Character.isWhitespace(s.charAt(0)) ) {
+                        Matcher defm= defPattern.matcher(s);
+                        inDef=  defm.matches();
+                    }
+                }
+                
+                if ( !inDef ) {
+                    Matcher m= assignPattern.matcher(s);
                     if ( m.matches() ) {
-                        String tuple= m.group(1);
                         String rhs= m.group(2);
                         if ( rhs.contains("getParam(") ) {
                             // reject
                         } else {
-                            String[] ss= tuple.split(",");
-                            for ( String s1 : ss ) {
-                                if (m.group(4)!=null) {
-                                    result.put( s1, m.group(4));
-                                } else {
-                                    result.put( s1, s );
+                            if ( m.group(4)!=null ) {
+                                result.put(m.group(1), m.group(4) );
+                            } else {
+                                result.put(m.group(1), s );
+                            }
+                        }
+                    } else {
+                        m= tuplePattern.matcher(s);
+                        if ( m.matches() ) {
+                            String tuple= m.group(1);
+                            String rhs= m.group(2);
+                            if ( rhs.contains("getParam(") ) {
+                                // reject
+                            } else {
+                                String[] ss= tuple.split(",");
+                                for ( String s1 : ss ) {
+                                    if (m.group(4)!=null) {
+                                        result.put( s1, m.group(4));
+                                    } else {
+                                        result.put( s1, s );
+                                    }
                                 }
                             }
                         }
                     }
-                }
                     
+                }
+                
+                s = reader.readLine();
             }
-
-            s = reader.readLine();
         }
-        reader.close();
         return result;
     }
     
