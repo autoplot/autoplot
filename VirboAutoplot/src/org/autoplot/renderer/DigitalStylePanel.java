@@ -195,7 +195,7 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
         });
 
         formatCB.setEditable(true);
-        formatCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "", "%.2f", "%d", "%c", "%x" }));
+        formatCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "%.2f", "%.1E", "%d", "%c", "%x", "%o" }));
         formatCB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 formatCBActionPerformed(evt);
