@@ -357,7 +357,16 @@ public class PyQDataSet extends PyJavaInstance {
         if ( func!=null ) {
             return func.__call__(this,arg1,arg2);
         } else {
-            return super.invoke(name,arg1,arg2);
+            if ( name.equals("putProperty") ) {
+                if ( ds==null || this.ds.isImmutable() ) {
+                    throw new RuntimeException("putProperty on dataset that is read-only, use copy(ds) to make a mutable copy.");
+                } else {
+                    this.putProperty( (PyString)arg1, arg2 );
+                    return Py.None;
+                }
+            } else {
+                return super.invoke(name,arg1,arg2);
+            }
         }
     }
 
@@ -868,15 +877,28 @@ public class PyQDataSet extends PyJavaInstance {
     }
 
     /* we need to wrap put methods as well... */
-    public void putProperty( String prop, Object value ) {
-        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
+    public void putProperty( PyString prop, Object value ) {
+        if ( ds==null || ds.isImmutable() ) throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
         if ( prop.equals(QDataSet.UNITS) ) this.units= (Units)value;
-        ds.putProperty(prop,value);
+        Class clas= DataSetUtil.getPropertyClass(prop.toString() );
+        if ( value instanceof PyObject ) {
+            PyObject po= (PyObject)value;
+            ds.putProperty(prop.toString(),po.__tojava__(clas));
+        } else {
+            ds.putProperty(prop.toString(),value);
+        }
     }
-    public void putProperty( String prop, int index, Object value ) {
-        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
-        ds.putProperty(prop,index,value);
+    public void putProperty( PyString prop, int index, Object value ) {
+        if ( ds==null || ds.isImmutable() ) throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
+        Class clas= DataSetUtil.getPropertyClass(prop.toString() );
+        if ( value instanceof PyObject ) {
+            PyObject po= (PyObject)value;
+            ds.putProperty(prop.toString(),index,po.__tojava__(clas));
+        } else {
+            ds.putProperty(prop.toString(),index,value);
+        }
     }
+    
     public void putValue( double value ) {
         if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
         ds.putValue(value);
