@@ -42,12 +42,22 @@ public class ImageDataSet extends AbstractDataSet {
         return Math.log(d)/Math.log(2);
     }
     
+    
+    /**
+     * create a dataset from the image,
+     * returning a rank 3 dataset ds[w,h,3].
+     * @param image the image
+     */
+    public ImageDataSet( BufferedImage image ) {
+        this( image, null, null );
+    }
+    
     /**
      * create a dataset from the image.  When mask and op are null,
      * then a rank 3 dataset ds[w,h,3] is returned.
      * @param image the image
-     * @param mask the image is ANDed with this color, and shifted by the lowest one bit location.
-     * @param op an operation, such as grayscale, to convert the data to rank 2.
+     * @param mask null or the mask, where the image is ANDed with this color, and shifted by the lowest one bit location.
+     * @param op null or an operation, such as grayscale, to convert the data to rank 2.
      */
     public ImageDataSet( BufferedImage image, Color mask, ColorOp op ) {
         this.image= image;
