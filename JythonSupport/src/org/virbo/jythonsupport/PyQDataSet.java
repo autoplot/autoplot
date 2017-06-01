@@ -32,6 +32,7 @@ import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.TrimStrideWrapper;
@@ -52,6 +53,7 @@ public class PyQDataSet extends PyJavaInstance {
     private static final Logger logger= Logger.getLogger("jython");
 
     WritableDataSet ds;
+    MutablePropertyDataSet mpds;
     QDataSet rods; // read-only dataset
     Units units; // indicates if the units have been set.
 
@@ -63,6 +65,11 @@ public class PyQDataSet extends PyJavaInstance {
         super(ds);
         if (ds instanceof WritableDataSet && !((WritableDataSet)ds).isImmutable() ) {
             this.ds = (WritableDataSet) ds;
+            this.mpds= (MutablePropertyDataSet) ds;
+            this.rods= this.ds;
+        } else if ( ds instanceof MutablePropertyDataSet && !((MutablePropertyDataSet)ds).isImmutable() ) {
+            this.ds = null;
+            this.mpds= (MutablePropertyDataSet) ds;
             this.rods= this.ds;
         } else if (ds.rank() == 0) {
             this.ds = null;
@@ -358,7 +365,7 @@ public class PyQDataSet extends PyJavaInstance {
             return func.__call__(this,arg1,arg2);
         } else {
             if ( name.equals("putProperty") ) {
-                if ( ds==null || this.ds.isImmutable() ) {
+                if ( mpds==null || this.mpds.isImmutable() ) {
                     throw new RuntimeException("putProperty on dataset that is read-only, use copy(ds) to make a mutable copy.");
                 } else {
                     this.putProperty( (PyString)arg1, arg2 );
@@ -878,24 +885,26 @@ public class PyQDataSet extends PyJavaInstance {
 
     /* we need to wrap put methods as well... */
     public void putProperty( PyString prop, Object value ) {
-        if ( ds==null || ds.isImmutable() ) throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
-        if ( prop.equals(QDataSet.UNITS) ) this.units= (Units)value;
+        if ( mpds==null || mpds.isImmutable() ) {
+            throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
+        }
+        if ( prop.toString().equals(QDataSet.UNITS) ) this.units= (Units)value;
         Class clas= DataSetUtil.getPropertyClass(prop.toString() );
         if ( value instanceof PyObject ) {
             PyObject po= (PyObject)value;
-            ds.putProperty(prop.toString(),po.__tojava__(clas));
+            mpds.putProperty(prop.toString(),po.__tojava__(clas));
         } else {
-            ds.putProperty(prop.toString(),value);
+            mpds.putProperty(prop.toString(),value);
         }
     }
     public void putProperty( PyString prop, int index, Object value ) {
-        if ( ds==null || ds.isImmutable() ) throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
+        if ( mpds==null || mpds.isImmutable() ) throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
         Class clas= DataSetUtil.getPropertyClass(prop.toString() );
         if ( value instanceof PyObject ) {
             PyObject po= (PyObject)value;
-            ds.putProperty(prop.toString(),index,po.__tojava__(clas));
+            mpds.putProperty(prop.toString(),index,po.__tojava__(clas));
         } else {
-            ds.putProperty(prop.toString(),index,value);
+            mpds.putProperty(prop.toString(),index,value);
         }
     }
     
