@@ -66,11 +66,11 @@ public class PyQDataSet extends PyJavaInstance {
         if (ds instanceof WritableDataSet && !((WritableDataSet)ds).isImmutable() ) {
             this.ds = (WritableDataSet) ds;
             this.mpds= (MutablePropertyDataSet) ds;
-            this.rods= this.ds;
+            this.rods= ds;
         } else if ( ds instanceof MutablePropertyDataSet && !((MutablePropertyDataSet)ds).isImmutable() ) {
             this.ds = null;
             this.mpds= (MutablePropertyDataSet) ds;
-            this.rods= this.ds;
+            this.rods= ds;
         } else if (ds.rank() == 0) {
             this.ds = null;
             this.rods = ds;
@@ -888,7 +888,13 @@ public class PyQDataSet extends PyJavaInstance {
         if ( mpds==null || mpds.isImmutable() ) {
             throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
         }
-        if ( prop.toString().equals(QDataSet.UNITS) ) this.units= (Units)value;
+        if ( prop.toString().equals(QDataSet.UNITS) ) {
+            if ( value instanceof PyJavaInstance ) {
+                this.units= (Units) ((PyJavaInstance)value).__tojava__(Units.class);
+            } else {
+                this.units= (Units)value;
+            }
+        }
         Class clas= DataSetUtil.getPropertyClass(prop.toString() );
         if ( value instanceof PyObject ) {
             PyObject po= (PyObject)value;
