@@ -44,16 +44,21 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
         String type= params.get("type");
         if ( type==null ) type= "double";
         
+        String dep0Type= params.get("depend0Type" );
+        if ( dep0Type==null ) dep0Type= "double";
+        
         int dep0Len= ( dep0==null ? 0 : 1 );
         int typeSize= BufferDataSet.byteCount(type);
         
-        int recSize=  typeSize * ( dep0Len + data.length(0) );
+        int dep0TypeSize= BufferDataSet.byteCount(dep0Type);
+        int recSize=  dep0Len*dep0TypeSize + data.length(0) * typeSize;
+        
         int size= data.length() * recSize;
         
         ByteBuffer result= ByteBuffer.allocate(size);
         result.order( "big".equals( params.get("byteOrder") ) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN );
         
-        BufferDataSet ddata= BufferDataSet.makeDataSet( 2, recSize, dep0Len * typeSize, 
+        BufferDataSet ddata= BufferDataSet.makeDataSet( 2, recSize, dep0Len * dep0TypeSize, 
                 data.length(), data.length(0), 1, 1,
                 result, type );
         /*Double ddata= new Double( 2, 
@@ -70,13 +75,10 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
 
         if ( dep0!=null ) {
             BufferDataSet ddep0= BufferDataSet.makeDataSet( 1,
-                recSize, 0 * typeSize, 
+                recSize, 0, 
                 data.length(), data.length(0), 1, 1,
-                result, type );
-          /*  Double ddep0= new Double( 1,
-                recSize, 0 * typeSize, 
-                data.length(), data.length(0), 1,
-                result ); */
+                result, dep0Type );
+
             it= new QubeDataSetIterator(dep0);
         
             while ( it.hasNext() ) {
@@ -96,16 +98,20 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
         String type= params.get("type");
         if ( type==null ) type= "double";
                 
+        String dep0Type= params.get("depend0Type" );
+        if ( dep0Type==null ) dep0Type= "double";
+        
         int dep0Len= ( dep0==null ? 0 : 1 );
         int typeSize= BufferDataSet.byteCount(type);
-        int recSize=  typeSize * ( dep0Len + 1 );
+        int dep0TypeSize= BufferDataSet.byteCount(dep0Type);
+        int recSize=  dep0Len*dep0TypeSize + typeSize;
         int size= data.length() * recSize ;
         
         ByteBuffer result= ByteBuffer.allocate(size);
         result.order( "big".equals( params.get("byteOrder") ) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN );
         
         BufferDataSet ddata= BufferDataSet.makeDataSet( 1, 
-                recSize, dep0Len*typeSize, 
+                recSize, dep0Len*dep0TypeSize, 
                 data.length(), 1, 1, 1,
                 result, type );
         
@@ -118,9 +124,9 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
 
         if ( dep0!=null ) {
             BufferDataSet ddep0= BufferDataSet.makeDataSet( 1,
-                recSize, 0*typeSize, 
+                recSize, 0, 
                 data.length(), 1, 1, 1, 
-                result, type );
+                result, dep0Type );
             it= new QubeDataSetIterator(dep0);
         
             while ( it.hasNext() ) {
