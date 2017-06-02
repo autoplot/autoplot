@@ -27,6 +27,11 @@ public class RegexComponentChooser implements ComponentChooser {
     String regex;
     Pattern pattern;
 
+    /**
+     * create a component chooser for the regex.  It will look at the
+     * title of Dialogs, the text of JTextComponents and JLabels, etc.
+     * @param regex regular expression
+     */
     public RegexComponentChooser( String regex ) {
         this.regex= regex;
         this.pattern= Pattern.compile(regex);
@@ -46,7 +51,7 @@ public class RegexComponentChooser implements ComponentChooser {
         } else if ( text==null && comp instanceof JButton ) {
             text= ((JButton)comp).getText();
         } else if ( text==null && comp instanceof JToggleButton ) {
-            text= ((JButton)comp).getText();
+            text= ((JToggleButton)comp).getText();
         } else if ( text==null && comp instanceof JMenu ) {
             text= ((JMenu)comp).getText();
         } else if ( text==null && comp instanceof JMenuItem ) {
