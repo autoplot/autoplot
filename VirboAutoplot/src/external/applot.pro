@@ -1,3 +1,27 @@
+pro aboutAutoplot
+    ;AboutUtil= OBJ_NEW('IDLJavaObject$Static$AboutUtil', 'org.das2.util.AboutUtil')
+    ;print, "= Build Information ="
+    ;print, "release tag: ", AboutUtil.getReleaseTag()
+    ;print, "build url: ", AboutUtil.getJenkinsURL()
+  
+    print, "= Runtime Information ="
+    System= OBJ_NEW('IDLJavaObject$Static$System', 'java.lang.System')
+    javaVersion = System.getProperty("java.version"); // applet okay
+    javaVersionWarning= '' ; The java about checks for 1.8.102
+    arch = System.getProperty("os.arch"); // applet okay
+    Runtime= OBJ_NEW('IDLJavaObject$Static$System', 'java.lang.Runtime')
+    nf= OBJ_NEW( 'IDLJavaObject$System', 'java.text.DecimalFormat' )
+    
+    mem = nf.format( (Runtime.getRuntime()).maxMemory()   / 1000000 )
+    tmem= nf.format( (Runtime.getRuntime()).totalMemory() / 1000000 )
+    fmem= nf.format( (Runtime.getRuntime()).freeMemory()  / 1000000 )
+    print, "Java version: " + javaVersion + " " + javaVersionWarning 
+    print, "max memory (MB): " + mem + " (memory available to process)" 
+    print, "total memory (MB): " + tmem + " (amount allocated to the process)" 
+    print, "free memory (MB): " + fmem + " (amount available before more must be allocated)" 
+
+end
+
 ;; for rank 2, ytags must be specified
 ; ascii, boolean, use ascii transfer types
 pro das2stream, dataStruct, filename, ytags=ytags, ascii=ascii, xunits=xunits
