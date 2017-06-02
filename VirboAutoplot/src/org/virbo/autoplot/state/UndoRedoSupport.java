@@ -306,7 +306,7 @@ public class UndoRedoSupport {
                 continue;
             }
             String thisDiffFocus=null;
-            int i= s.propertyName().indexOf(".");
+            int i= s.propertyName().indexOf('.');
             if ( i>-1 ) thisDiffFocus= s.propertyName().substring(0,i);
             if ( focus==null ) {
                 focus= thisDiffFocus;
@@ -473,10 +473,8 @@ public class UndoRedoSupport {
                 }
             }
             File f3= new File( f2, TimeParser.create( "state_$Y$m$d_$H$M$S.vap.gz" ).format( TimeUtil.now(), null ) );
-            try {
-                OutputStream out= new GZIPOutputStream( new FileOutputStream(f3) );
+            try ( OutputStream out= new GZIPOutputStream( new FileOutputStream(f3) ) ) {
                 StatePersistence.saveState( out, state, "");
-                out.close();
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }

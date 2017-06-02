@@ -1119,7 +1119,7 @@ public class GuiSupport {
         try {
             ImportVapDialog d = new ImportVapDialog();
             if ( vap.contains("?") ) {
-                int i= vap.indexOf("?");
+                int i= vap.indexOf('?');
                 vap= vap.substring(0,i);
             }
             d.setVap(vap);

@@ -798,15 +798,15 @@ public class DomUtil {
             int i= template.indexOf("%{"+root+".");
             int n= root.length()+3;
             while ( i>-1 ) {
-                int i2= template.indexOf("}",i);
+                int i2= template.indexOf('}',i);
                 String propName= template.substring(i+n,i2);
-                int i3= propName.indexOf(".");
+                int i3= propName.indexOf('.');
                 Map<String,Object> props1= props;
                 while ( i3>-1 ) {
                     String propName1= propName.substring(0,i3);
                     props1= (Map<String, Object>) props.get(propName1);
                     propName= propName.substring(i3+1);
-                    i3= propName.indexOf(".");
+                    i3= propName.indexOf('.');
                 }
                 String prop= String.valueOf( props1.get(propName) );
                 template= template.substring(0,i) + prop + template.substring(i2+1);

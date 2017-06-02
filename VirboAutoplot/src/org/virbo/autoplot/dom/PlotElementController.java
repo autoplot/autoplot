@@ -517,7 +517,7 @@ public class PlotElementController extends DomNodeController {
             if (!plotElement.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2) {
                 String[] labels = SemanticOps.getComponentNames(fillDs);
                 String comp= plotElement.getComponent();
-                int ip= comp.indexOf("|");
+                int ip= comp.indexOf('|');
                 if ( ip!=-1 ) {
                     comp= comp.substring(0,ip);
                 }
@@ -544,7 +544,7 @@ public class PlotElementController extends DomNodeController {
                     throw ex;
                 }
             }
-            int idx= c.indexOf("|");
+            int idx= c.indexOf('|');
             if ( idx==-1 ) {
                 c="";
             } else {
@@ -868,7 +868,7 @@ public class PlotElementController extends DomNodeController {
         RenderType renderType;
         String renderControl="";
         if ( srenderType!=null && srenderType.trim().length()>0 ) {
-            int i= srenderType.indexOf(">");
+            int i= srenderType.indexOf('>');
             if ( i==-1 ) {
                 renderControl= "";
             } else {
@@ -936,7 +936,7 @@ public class PlotElementController extends DomNodeController {
                 if (resetPlotElement) {
                     if (comp.equals("")) {
                         String s= resolveRenderType( fillDs );
-                        int i= s.indexOf(">");
+                        int i= s.indexOf('>');
                         RenderType renderType= RenderType.valueOf(s.substring(0,i));
                         if ( !renderType.equals(plotElement.renderType) &&  getRenderer()!=null ) getRenderer().setDataSet(null); //bug1065
                         plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
@@ -947,7 +947,7 @@ public class PlotElementController extends DomNodeController {
                             QDataSet fillDs2 = fillDs;
                             if ( comp.length()>0 ) fillDs2= processDataSet( comp, fillDs2 );
                             String s= resolveRenderType( fillDs2 );
-                            int i= s.indexOf(">");
+                            int i= s.indexOf('>');
                             RenderType renderType= RenderType.valueOf(s.substring(0,i));
                             if ( !renderType.equals(plotElement.renderType) &&  getRenderer()!=null ) getRenderer().setDataSet(null); //bug1065
                             plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.

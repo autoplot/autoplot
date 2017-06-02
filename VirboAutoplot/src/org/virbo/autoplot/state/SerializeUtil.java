@@ -323,7 +323,7 @@ public class SerializeUtil {
                         PropertyDescriptor pd= pp.get( e.getAttribute("name") );
                         if ( pd==null ) throw new NullPointerException("expected to find attribute \"name\"");
                         String slen= e.getAttribute("length");
-                        if ( slen!=null && slen.length()>0 ) {
+                        if ( slen.length()>0 ) {
                             clasName= e.getAttribute("class");
                             Class c= scheme.getClass(clasName);
                             int n= Integer.parseInt(e.getAttribute("length"));

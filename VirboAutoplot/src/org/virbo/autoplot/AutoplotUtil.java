@@ -621,7 +621,7 @@ public class AutoplotUtil {
                     for ( Entry e: result.entrySet() ) {
                         String l= e.getKey().getClass().toString().replaceAll("class ", "" );
                         String tooltip= e.getValue().toString();
-                        int j= l.lastIndexOf(".");
+                        int j= l.lastIndexOf('.');
                         l= l.substring(j+1);
                         m.setValueAt( l, i, 0 );
                         m.setValueAt( tooltip, i, 1 );
@@ -1850,7 +1850,7 @@ public class AutoplotUtil {
      * @throws java.text.ParseException
      */
     public static void setDevicePosition(DasDevicePosition row, String spec) throws ParseException {
-        int i = spec.indexOf(",");
+        int i = spec.indexOf(',');
         if (i == -1)
             throw new IllegalArgumentException("spec must contain one comma");
         double[] ddmin = DasDevicePosition.parseLayoutStr(spec.substring(0, i));
@@ -1919,7 +1919,7 @@ public class AutoplotUtil {
                 }
                 return spec;
             } catch (IllegalArgumentException e) {
-                int i= srenderType.indexOf(">");
+                int i= srenderType.indexOf('>');
                 if ( i>-1 ) {
                     try {
                         srenderType= srenderType.substring(0,i);

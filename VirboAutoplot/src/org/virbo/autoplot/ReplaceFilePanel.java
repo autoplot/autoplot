@@ -106,7 +106,7 @@ public class ReplaceFilePanel extends javax.swing.JPanel {
         } else if ( sfile.startsWith("file:") ) {
             sfile= sfile.substring(5);
         }
-        int iext= sfile.lastIndexOf(".");
+        int iext= sfile.lastIndexOf('.');
         final String ext;
         if ( iext!=-1 ) {
             ext= sfile.substring(iext).toLowerCase();

@@ -270,7 +270,7 @@ public class Test140 {
         try (BufferedReader read = new BufferedReader( new FileReader(f) )) {
             String s= read.readLine();
             while ( s!=null ) {
-                int i= s.indexOf("#");
+                int i= s.indexOf('#');
                 if ( i>-1 ) {
                     s= s.substring(0,i);
                 }

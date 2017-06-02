@@ -499,12 +499,12 @@ public class ScriptPanelSupport {
     }
 
     private boolean uriFilesEqual(String surl1, String surl2) throws URISyntaxException {
-        int i1 = surl1.indexOf("?");
+        int i1 = surl1.indexOf('?');
         if (i1 == -1) {
             i1 = surl1.length();
         }
         URI uri1 = DataSetURI.getURI(surl1.substring(0, i1));
-        int i2 = surl2.indexOf("?");
+        int i2 = surl2.indexOf('?');
         if (i2 == -1) {
             i2 = surl2.length();
         }
@@ -1204,7 +1204,7 @@ public class ScriptPanelSupport {
                     if ( s.startsWith("file:") ) {
                         if ( s.startsWith("file://") ) s= s.substring(7);
                         if ( s.startsWith("file:") ) s= s.substring(5);
-                        int iq= s.indexOf("?");
+                        int iq= s.indexOf('?');
                         if ( iq>-1 ) {
                             s= s.substring(0,iq);
                         }

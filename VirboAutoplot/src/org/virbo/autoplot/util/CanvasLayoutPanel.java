@@ -475,10 +475,8 @@ public class CanvasLayoutPanel extends JLabel {
      * @param c 
      */
     public void setContainer( DasCanvas c) {
-        if ( this.target!=null ) {
-            if ( this.target instanceof DasCanvas ) { // this once allowed any JComponent.
-                this.target.removePropertyChangeListener( DasCanvas.PROP_PAINTCOUNT, repaintListener );
-            }
+        if ( this.target!=null ) {            
+            this.target.removePropertyChangeListener( DasCanvas.PROP_PAINTCOUNT, repaintListener );
         }
         this.target = c;
         c.addPropertyChangeListener( DasCanvas.PROP_PAINTCOUNT, repaintListener );

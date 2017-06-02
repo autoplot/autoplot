@@ -43,7 +43,7 @@ public class OptionsDialog extends javax.swing.JPanel {
      */
     private static Object undowow( String val, Class clas ) {
         if ( clas.equals( Level.class ) ) {
-            int i= val.indexOf(":");
+            int i= val.indexOf(':');
             return Level.parse(val.substring(0,i));
         } else {
             Object[] objs= clas.getEnumConstants();

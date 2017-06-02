@@ -2345,8 +2345,8 @@ public class ApplicationController extends DomNodeController implements RunLater
     
     private static String propname( Property p ) {
         String srcProp= p.toString();
-        int i1= srcProp.indexOf("[");
-        int i2= srcProp.indexOf("]",i1);
+        int i1= srcProp.indexOf('[');
+        int i2= srcProp.indexOf(']',i1);
         if ( i1>-1 && i2>i1 ) {
             srcProp= srcProp.substring(i1+1,i2);
         }

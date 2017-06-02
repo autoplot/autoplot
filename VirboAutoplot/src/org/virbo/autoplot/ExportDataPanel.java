@@ -444,9 +444,9 @@ public class ExportDataPanel extends javax.swing.JPanel {
 
         String ff= filenameTF.getText();
         if ( ! ff.endsWith( (String)formatDL.getSelectedItem() ) ) {
-            int ii2= ff.lastIndexOf("/");
+            int ii2= ff.lastIndexOf('/');
             if ( ii2==-1 ) ii2= 0;
-            int ii= ff.lastIndexOf(".");
+            int ii= ff.lastIndexOf('.');
             if ( ii>-1 && ii>ii2 ) {
                 filenameTF.setText(ff.substring(0,ii) + formatDL.getSelectedItem() );
             }

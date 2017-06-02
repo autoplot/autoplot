@@ -146,7 +146,7 @@ public class LabelConverter extends Converter {
                 if ( pe!=null ) {
                     QDataSet dataSet= pe.getController().getDataSet();
                     int i1= title.indexOf("{PROPERTIES")+12; // 12 includes the dot following
-                    int i2= title.indexOf("}",i1);
+                    int i2= title.indexOf('}',i1);
                     String prop= title.substring(i1,i2);
                     String[] ss= prop.split("\\.",-2);
                     Object o=null;

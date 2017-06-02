@@ -1,14 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.autoplot.state;
 
 import java.text.ParseException;
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
-import org.virbo.dataset.SemanticOps;
 import org.virbo.qstream.SerializeDelegate;
 
 /**
@@ -17,6 +12,7 @@ import org.virbo.qstream.SerializeDelegate;
  */
 public class DatumSerializeDelegate implements SerializeDelegate {
 
+    @Override
     public String format(Object o) {
         Datum d= (Datum)o;
         Units u= (Units) d.getUnits();
@@ -32,18 +28,20 @@ public class DatumSerializeDelegate implements SerializeDelegate {
         }
     }
 
+    @Override
     public Object parse(String typeId, String s) throws ParseException {
         s = s.trim();
         if ( s.endsWith(" (dimensionless)") ) {
             int i= s.indexOf(" (dimensionless)");
             return Units.dimensionless.parse(s.substring(0,i) );
         } else {
-            int i = s.indexOf(":");
-            Units u= SemanticOps.lookupUnits(s.substring(0,i) );
+            int i = s.indexOf(':');
+            Units u= Units.lookupUnits(s.substring(0,i) );
             return u.parse( s.substring(i+1) );
         }
     }
 
+    @Override
     public String typeId(Class clas) {
         return "datum";
     }

@@ -582,7 +582,7 @@ public class MetadataPanel extends javax.swing.JPanel {
         LoggerManager.logGuiEvent(evt);
         TreePath tp= metaDataTree.getSelectionPath();
         String s= tp.getLastPathComponent().toString();
-        int i= s.indexOf("=");
+        int i= s.indexOf('=');
         if ( i>-1 ) {
             s= s.substring(i+1);
         }

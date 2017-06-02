@@ -206,14 +206,16 @@ public class Test011 {
 
                 System.err.println("test011_002: " + DataSetUtil.format(bds));
                 ff = new SimpleStreamFormatter();
-                ff.format(bds, new FileOutputStream("test011_002.qds"), true);
+                try (FileOutputStream fo = new FileOutputStream("test011_002.qds")) {
+                    ff.format(bds, fo, true);
+                }
 
             }
 
             timer("test bundle of rank 1");
 
-            Units u= SemanticOps.lookupUnits("[foos]");
-            Units u2= SemanticOps.lookupUnits("foos");
+            Units u= Units.lookupUnits("[foos]");
+            Units u2= Units.lookupUnits("foos");
             if ( !u.isConvertibleTo(u2) ) {
                 throw new IllegalArgumentException("[foos] is not convertable to foos");
             }

@@ -1188,7 +1188,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                      String line= reader.readLine();
                      while ( line!=null ) {
                          try {
-                             int i= line.indexOf("#");
+                             int i= line.indexOf('#');
                              if ( i>-1 ) line= line.substring(0,i);
                              String[] ss= line.trim().split("\\s+");
                              if ( ss.length==1 && ss[0].length()==0 ) {
@@ -1774,7 +1774,7 @@ APSplash.checkTime("init 270");
                                 }
                             case "vap+":
                                 {
-                                    int i= s.indexOf(":",29);
+                                    int i= s.indexOf(':',29);
                                     String ex1= "."+s.substring(29,i);
                                     if ( exts.contains(ex1) ) {
                                         exts.remove(ex1);
@@ -4757,7 +4757,7 @@ private void updateFrameTitle() {
         }
         
         if ( initialURL!=null && initialURL.length()>1 ) { // check for relative filenames 
-            int i= initialURL.indexOf(":");
+            int i= initialURL.indexOf(':');
             logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", initialURL);
             if ( i==-1 ) { // it's a file.
                 boolean isAbsolute= initialURL.startsWith("/");
@@ -5087,8 +5087,8 @@ APSplash.checkTime("init 240");
                         String chstr = "";
                         for (Entry<Object, Object> e : changes.entrySet()) {
                             String client = String.valueOf(e.getValue());
-                            int ist = client.indexOf("(");
-                            int ien = client.lastIndexOf(")");
+                            int ist = client.indexOf('(');
+                            int ien = client.lastIndexOf(')');
                             if (ist != -1) {
                                 client = client.substring(0, ist) + client.substring(ien + 1);
                             }

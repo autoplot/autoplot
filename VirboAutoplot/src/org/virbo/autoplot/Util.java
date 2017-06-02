@@ -44,11 +44,11 @@ public class Util {
     private static String tagName(String svnURL, Map<String, String> abbrevs) {
         if ( svnURL==null ) return "untagged";
         String root= svnURL;
-        int i = root.lastIndexOf("/");
+        int i = root.lastIndexOf('/');
         if (i == -1) {
             return root;
         }
-        int i2= root.lastIndexOf("/",i-1);
+        int i2= root.lastIndexOf('/',i-1);
         String dir = root.substring(i2+1,i);
         root = root.substring(0, i2+1);
         String abbrev = abbrevs.get(root);
@@ -61,12 +61,12 @@ public class Util {
     }
 
     private static String popDollarValue(String propval) {
-        int i = propval.indexOf("$");
+        int i = propval.indexOf('$');
         if (i == -1) {
             return "";
         }
-        i = propval.indexOf(":", i + 1);
-        int i2 = propval.indexOf("$", i + 1);
+        i = propval.indexOf(':', i + 1);
+        int i2 = propval.indexOf('$', i + 1);
         if (i2 == -1) {
             return "";
         }
@@ -128,7 +128,7 @@ public class Util {
             String jar = url.toString();
 
             int i = jar.indexOf(".jar");
-            int i0 = jar.lastIndexOf("/", i - 1);
+            int i0 = jar.lastIndexOf('/', i - 1);
 
             String name;
             String jarname;

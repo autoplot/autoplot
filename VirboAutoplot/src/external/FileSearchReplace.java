@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package external;
 
@@ -31,18 +27,17 @@ public class FileSearchReplace {
 
         File fin= new File(file);
         File fout= new File(file+".1");
-        BufferedReader in= new BufferedReader( new FileReader(fin) );
-        PrintWriter out= new PrintWriter( new FileWriter( fout ) );
-        String s= in.readLine();
-        while ( s!=null ) {
-            for ( int i=1; i<args.length; i+=2 ) {
-                s= s.replaceAll( args[i], args[i+1] );
+        try ( BufferedReader in = new BufferedReader( new FileReader(fin) );
+            PrintWriter out= new PrintWriter( new FileWriter( fout ) ) ) {
+            String s= in.readLine();
+            while ( s!=null ) {
+                for ( int i=1; i<args.length; i+=2 ) {
+                    s= s.replaceAll( args[i], args[i+1] );
+                }
+                out.println(s);
+                s= in.readLine();
             }
-            out.println(s);
-            s= in.readLine();
         }
-        out.close();
-        in.close();
         if ( !fout.renameTo( fin ) ) {
             System.err.println("unable to rename file " +fout + " to " + fin );
         }

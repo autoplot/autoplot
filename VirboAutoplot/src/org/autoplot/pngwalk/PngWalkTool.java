@@ -301,8 +301,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
             String f= split.path;
             int i= f.indexOf( "/"+product+".pngwalk" );
             if ( i==-1 ) {
-                i= f.indexOf("*");
-                if ( i>-1 ) i= f.lastIndexOf("/",i);
+                i= f.indexOf('*');
+                if ( i>-1 ) i= f.lastIndexOf('/',i);
             }
             if ( i==-1 ) {
                 if ( f.endsWith("/") ) {
@@ -420,7 +420,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                         File file = DataSetURI.getFile( filename, new AlertNullProgressMonitor("get image file") ); // assume it's local.
                         String json= ImageUtil.getJSONMetadata( file );
                         if ( json!=null ) {
-                            if ( i0==-1 ) i0= template.indexOf("*"); 
+                            if ( i0==-1 ) i0= template.indexOf('*'); 
                             if ( i0==-1 ) i0= template.indexOf("$x");
                         }
                         productFile= tool.baseurl + tool.product + ".vap";
@@ -473,7 +473,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                         logger.log( Level.WARNING, null, ex );
                     }
                     
-                    int i= template.indexOf("$");
+                    int i= template.indexOf('$');
                     if ( i!=-1 ) { // do a little testing
                         int i2= i+1;
                         if ( i2==template.length() ) {

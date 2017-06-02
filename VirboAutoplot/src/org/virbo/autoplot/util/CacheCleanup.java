@@ -69,7 +69,7 @@ public class CacheCleanup {
                 hasAgg = data[i].contains("$Y");
                 if (hasAgg == true) {
 
-                    int iq= data[i].indexOf("?"); 
+                    int iq= data[i].indexOf('?'); 
                     int iy= data[i].indexOf("$Y"); 
                     if ( iq==-1 || iq>iy ) {
                         parts = data[i].split("\\s+"); 

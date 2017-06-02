@@ -190,7 +190,7 @@ public class Test501 {
             // iid index within the test
 
             for ( String id: ids ) {
-                int ipipe= id.indexOf("|");
+                int ipipe= id.indexOf('|');
                 if ( ipipe>-1 ) {
                     id= id.substring(0,ipipe).trim();
                 }
@@ -246,7 +246,7 @@ public class Test501 {
                         System.err.println( "test that should have had exampleRange did not: " + id );
                         continue;
                     }
-                    int ic= exampleRange.indexOf("|");
+                    int ic= exampleRange.indexOf('|');
                     if ( ic>-1 ) {
                         exampleRange= exampleRange.substring(0,ic);
                     }
@@ -265,7 +265,7 @@ public class Test501 {
                     String testRange= (String) dsdf.getProperty("testRange"); // this is a more thorough test, and should not change
                     if ( testRange!=null ) {
                         System.err.println("testRange parameter found: "+testRange);
-                        ic= testRange.indexOf("|");
+                        ic= testRange.indexOf('|');
                         if ( ic>-1 ) {
                             testRange= testRange.substring(0,ic);
                         }

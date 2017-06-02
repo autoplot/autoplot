@@ -60,7 +60,7 @@ public class ImportVapDialog extends javax.swing.JPanel {
 
             } else {
                 String s=  dsf.getUri();
-                int i= s.lastIndexOf("/");
+                int i= s.lastIndexOf('/');
                 JCheckBox mi;
                 if ( i==-1 ) {
                     mi= new JCheckBox( "<html>"+s+"</html>");
