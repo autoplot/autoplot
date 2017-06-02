@@ -45,7 +45,7 @@ public class PlotCommand extends PyObject {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
     
-    public static PyString __doc__ =
+    public static final PyString __doc__ =
         new PyString("<html><H2>plot([index],x,y,z,[named parameters])</H2>"
             + "plot (or plotx) plots the data or URI for data on the canvas.\n"
             + "<br><b>named parameters:</b>\n"
@@ -316,7 +316,7 @@ public class PlotCommand extends PyObject {
                     String srenderType= sval;
                     String renderControl;
                     if ( srenderType!=null && srenderType.trim().length()>0 ) {
-                        int ii= srenderType.indexOf(">");
+                        int ii= srenderType.indexOf('>');
                         if ( ii==-1 ) {
                             renderControl= "";
                         } else {
