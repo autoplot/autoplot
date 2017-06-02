@@ -26,18 +26,19 @@
         
         <p>Bugfixes (2017-05-31 r20857):</p>
         <ul>  
-            <li>rte_1917581137: bug which shows with x2go and Ubuntu Mate.
-            <li>resize control points would appear on the colorbar, but you couldn't resize it. 
+            <li>rte_2052946987: index-out-of-bounds caused by failure to update firstIndex, lastIndex when data is reduced and all data is outside of the visible region.  Thanks, Kris!
+            <li>1839: append of two rank zero datasets should be a rank 1 dataset.  Thanks, Kristoff!
+            <li>1836: revisit mutability of datasets in Jython scripts.
+            <li>rte_1917581137: bug which shows with x2go and Ubuntu Mate.  Thanks, Kris!
             <li>Jython putProperty correctly uses the mutable dataset.
             <li>digital renderer allows %E for exponential notation.
-            <li>colorbar resize control points allow resize of the horizonal direction.  Thanks, Ivar!
-            <li>strange RTE with colorbar drawing with x2go on Linux.  Thanks, Kris!
+            <li>colorbar resize control points allow resize of the vertical direction.  Thanks, Ivar!
             <li>rte_0153443069: CSV parser editor GUI would fail with NullPointerException because handling was delegated a sloppy code.  Thanks, Mimai!
         </ul>
         <p>Older Bugfixes:</p>
         <ul>
             <li>drag-n-drop from Thunderbird email "save attachment as" dialog fixed.
-            <li>rte_2119934227: put a link in the runtime error popup for OutOfMemory errors.
+            <li>rte_2119934227: put a link in the runtime error popup for OutOfMemory errors.  
             <li>rte_1890761962: index out of bounds in "near real time" Time range editor.
             <li>allow different credentials to be used on different paths on the same server.
             <li>1818: getTimeRange( 1990/12/01, 1month ) would fail the pngwalktool because 1990/13/01 was not normalized (via carry).
