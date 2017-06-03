@@ -40,7 +40,7 @@ public class RegexComponentChooser implements ComponentChooser {
     @Override
     public boolean checkComponent(Component comp) {
         String text= null;
-        if ( text==null && comp instanceof Dialog ) {
+        if ( comp instanceof Dialog ) {
             text= ((Dialog)comp).getTitle();
         } else if ( text==null && comp instanceof Frame ) {
             text= ((Frame)comp).getTitle();
