@@ -86,7 +86,7 @@ public class HapiServerSupport {
             DatumRange landing;
             if ( info.has("sampleStartDate") && info.has("sampleStopDate") ) {
                 try {
-                    landing = new DatumRange( Units.us2000.parse(info.getString("sampleStartDate")), Units.us2000.parse(info.getString("sampleStopDate")) );
+                    landing = DatumRangeUtil.parseTimeRange( info.getString("sampleStartDate")+"/"+info.getString("sampleStopDate") );
                 } catch (JSONException | ParseException ex) {
                     logger.log(Level.SEVERE, null, ex);
                     return null;
