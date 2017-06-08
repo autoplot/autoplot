@@ -6,7 +6,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -177,6 +179,25 @@ public class Util {
         } catch ( IOException | JSONException ex ) {
             throw new RuntimeException(ex);
         }
+    }
+    
+    /**
+     * transfers the data from one channel to another.  src and dest are
+     * closed after the operation is complete.
+     * @param src
+     * @param dest
+     * @throws java.io.IOException
+     */
+    public static void transfer( InputStream src, OutputStream dest ) throws IOException {
+        final byte[] buffer = new byte[ 16 * 1024 ];
+
+        int i= src.read(buffer);
+        while ( i != -1) {
+            dest.write(buffer,0,i);
+            i= src.read(buffer);
+        }
+        dest.close();
+        src.close();
     }
     
 }
