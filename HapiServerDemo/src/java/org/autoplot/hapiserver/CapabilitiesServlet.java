@@ -1,8 +1,12 @@
 
 package org.autoplot.hapiserver;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +20,9 @@ import org.json.JSONObject;
  * @author jbf
  */
 public class CapabilitiesServlet extends HttpServlet {
+    
+    private static final Logger logger= Logger.getLogger("hapi");    
+    
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -57,6 +64,12 @@ public class CapabilitiesServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json;charset=UTF-8");
+        File capFile= new File( Util.getHapiHome(), "capabilities.json" );
+        if ( capFile.exists() ) {
+            logger.log(Level.FINE, "using cached capabilities file {0}", capFile);
+            Util.transfer( new FileInputStream(capFile), response.getOutputStream() );
+            return;
+        }
         try (PrintWriter out = response.getWriter()) {
             JSONObject jo= new JSONObject();
             jo.put("HAPI",Util.hapiVersion());
