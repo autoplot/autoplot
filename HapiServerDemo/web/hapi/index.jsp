@@ -125,6 +125,7 @@
             <li>2017-05-08: bugfix with binary, where the size used internally is now an array of ints, was probably not expected.</li>
             <li>2017-05-24: copy x_meta and resourceURI from templates.</li>
             <li>2017-06-07: support now-P1D/now for example time range.</li>
+            <li>2017-06-08: catalog and capabilities responses can be cached.</li>
         </ul>
         </small>
     </body>
