@@ -6,9 +6,13 @@ package org.autoplot.hapiserver;
  * and open the template in the editor.
  */
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +29,8 @@ import org.json.JSONObject;
  */
 public class CatalogServlet extends HttpServlet {
 
+    private static final Logger logger= Logger.getLogger("hapi");    
+    
     private static final String deployedAt= TimeParser.create( TimeParser.TIMEFORMAT_Z ).format( TimeUtil.now() );
     /**
      * return the JSONObject for the catalog.
@@ -58,6 +64,12 @@ public class CatalogServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json;charset=UTF-8");
+        File catalogFile= new File( Util.getHapiHome(), "catalog.json" );
+        if ( catalogFile.exists() ) {
+            logger.log(Level.FINE, "using cached catalog file {0}", catalogFile);
+            Util.transfer( new FileInputStream(catalogFile), response.getOutputStream() );
+            return;
+        }
         try (PrintWriter out = response.getWriter()) {
             JSONObject jo= getCatalog();
             out.write( jo.toString(4) );
