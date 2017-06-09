@@ -46,12 +46,6 @@ public class InfoServlet extends HttpServlet {
         }
         
         JSONArray parameters= new JSONArray();
-        JSONObject parameter;
-        parameter= new JSONObject();
-        parameter.put( "name", "Time" );
-        parameter.put( "type", "isotime" );
-        parameter.put( "length", 24 );
-        parameters.put( 0, parameter );
 
         File infoFileHome= new File( Util.getHapiHome(), "info" );
         File infoFile= new File( infoFileHome, id+".json" );
@@ -65,10 +59,10 @@ public class InfoServlet extends HttpServlet {
         }
         JSONObject o= new JSONObject(builder.toString());
         JSONArray parametersRead= o.getJSONArray("parameters");
-        for ( int i=1; i<parametersRead.length(); i++ ) {
+        for ( int i=0; i<parametersRead.length(); i++ ) {
             JSONObject jo1= parametersRead.getJSONObject(i);
             parameters.put( i,jo1  );
-            if ( jo1.has("fill") ) {
+            if ( !jo1.has("fill") ) {
                 logger.log(Level.WARNING, "required parameter fill is missing from parameter {0}", i);
             }
         }
