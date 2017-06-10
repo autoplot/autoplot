@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The PNG Walk Tool can now be used to create workflow documents, <a href='http://autoplot.org/data/tutorials/20170516_filters/20170516_1152.html'>like this</a>. 
+        <p><small>New decimate filter used to get every tenth row and tenth column of image.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-05-31 r20857):</p>
+        <p>Bugfixes (2017-06-10 r20907):</p>
         <ul>  
+            <li>1840: display data made a little less confusing.
+            <li>correction of templates in das2streams.  Thanks, Chris!
+            <li>das2stream reader allows yunits to be missing, just print a warning.
             <li>rte_2052946987: index-out-of-bounds caused by failure to update firstIndex, lastIndex when data is reduced and all data is outside of the visible region.  Thanks, Kris!
             <li>1839: append of two rank zero datasets should be a rank 1 dataset.  Thanks, Kristoff!
             <li>1836: revisit mutability of datasets in Jython scripts.
@@ -74,6 +77,8 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>1840: display data dialog allows copy points to clipboard.
+            <li>decimate function added, which keeps every Nth point.
         </ul>
        <p>Less recent features:</p>
        <ul>
