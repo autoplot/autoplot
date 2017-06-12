@@ -74,6 +74,8 @@ public class Test014 {
         }
 
         plot( hist );
+        hist=Ops.copy(hist);
+                
         setCanvasSize( 600, 600 );
 
         final DasCanvas cc= getDocumentModel().getCanvases(0).getController().getDasCanvas();
