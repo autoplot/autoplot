@@ -1,11 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package test.endtoend;
 
-import javax.swing.SwingUtilities;
 import java.io.File;
 import java.util.logging.Level;
 import org.das2.datum.DatumRangeUtil;
@@ -16,7 +11,8 @@ import static org.virbo.autoplot.ScriptContext.*;
 
 /**
  * Test tool to simulate more sophistocated GUI operations
- * See https://sourceforge.net/tracker/index.php?func=detail&aid=3405480&group_id=199733&atid=970682
+ * See https://sourceforge.net/p/autoplot/bugs/748/
+ * 
  * @author jbf
  */
 public class Test034 {
