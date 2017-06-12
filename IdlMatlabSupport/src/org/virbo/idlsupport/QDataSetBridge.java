@@ -60,7 +60,6 @@ public abstract class QDataSetBridge {
         names = new LinkedHashMap<>();
         sliceDep= new LinkedHashMap<>();
         prefUnits= new ArrayList();
-        System.err.println("QDataSetBridge v2.1.0");
     }
 
     /**
