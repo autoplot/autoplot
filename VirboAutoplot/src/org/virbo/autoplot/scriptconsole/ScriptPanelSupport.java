@@ -520,7 +520,6 @@ public class ScriptPanelSupport {
     public void annotateError( Throwable ex ) {
         int line; // the line number                    
         StackTraceElement[] ses= ex.getStackTrace();
-        if ( ses==null ) return;
         if ( file!=null ) {
             for ( StackTraceElement se: ses ) {
                 if ( se!=null && se.getFileName()!=null && se.getFileName().endsWith(file.getName()) && se.getLineNumber()>-1 ) {
@@ -1086,7 +1085,7 @@ public class ScriptPanelSupport {
 
             @Override
             public boolean accept(File f) {
-                if ( f.toString()==null ) return false;
+                if ( f.toString()==null ) return false; //file.toString sometimes returns null on Windows.
                 return (f.isDirectory() || f.toString().endsWith(".jy") || f.toString().endsWith(".py") || f.toString().endsWith(".jyds"));
             }
 
