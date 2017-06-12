@@ -1600,11 +1600,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 @Override
                 public void dataPointSelected(DataPointSelectionEvent e) {
                     String image= (e.getPlane("image").toString());
-                    if ( image!=null ) {
-                        int i= seq.findIndex(image);
-                        if ( i>-1 ) {
-                            seq.setIndex(i);
-                        }
+                    int i= seq.findIndex(image);
+                    if ( i>-1 ) {
+                        seq.setIndex(i);
                     }
                 }
             });
