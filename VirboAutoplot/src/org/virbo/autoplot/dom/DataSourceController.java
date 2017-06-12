@@ -452,7 +452,7 @@ public class DataSourceController extends DomNodeController {
 
                     if (!UnitsUtil.isTimeLocation(this.dom.getTimeRange().getUnits())) {
                         List<BindingModel> bms = this.dom.getController().findBindings(this.dom, Application.PROP_TIMERANGE, null, null);
-                        if (bms == null || bms.isEmpty()) {
+                        if ( bms.isEmpty() ) {
                             logger.log(Level.FINE, "claiming dom timerange for TSB: {0}", this.dsf.getUri());
                             if (p != null) {
                                 p.setContext(getTsb().getTimeRange());
@@ -879,7 +879,7 @@ public class DataSourceController extends DomNodeController {
         
         // https://sourceforge.net/p/autoplot/feature-requests/425/ mashing data.  This area needs to be
         // cleaned up.
-        if (lparentSources == null || lparentSources.length == 0) {
+        if (lparentSources.length == 0) {
             return "no parent sources";
         }
         if (lparentSources[0] == null) {

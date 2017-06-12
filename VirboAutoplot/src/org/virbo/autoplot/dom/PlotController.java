@@ -525,7 +525,7 @@ public class PlotController extends DomNodeController {
                 LoggerManager.logGuiEvent(e);
                 List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
                 DatumRange dr= xaxis.getDatumRange();
-                if ( pele==null || pele.isEmpty() || scanNextRange==null ) {    
+                if ( pele.isEmpty() || scanNextRange==null ) {    
                     xaxis.setDatumRange(dr.next());
                 } else {
                     dr= scanNextRange;
@@ -545,7 +545,7 @@ public class PlotController extends DomNodeController {
                 LoggerManager.logGuiEvent(e);                
                 List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
                 DatumRange dr= xaxis.getDatumRange();
-                if ( pele==null || pele.isEmpty() || scanPrevRange==null ) {    
+                if ( pele.isEmpty() || scanPrevRange==null ) {    
                     xaxis.setDatumRange(dr.previous());
                 } else {
                     dr= scanPrevRange;
