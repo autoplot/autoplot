@@ -975,7 +975,7 @@ public class GuiSupport {
             @Override
             public boolean accept(File f) {
                 String s= f.toString();
-                if ( s==null ) return false;
+                if ( s==null ) return false; // Findbugs OK: There was a Windows bug where file.toString could return null.
                 return f.isDirectory() || s.endsWith(".xml");
             }
             @Override
@@ -1004,7 +1004,7 @@ public class GuiSupport {
             @Override
             public boolean accept(File f) {
                 String s= f.toString();
-                if ( s==null ) return false;
+                if ( s==null ) return false;// Findbugs OK: There was a Windows bug where file.toString could return null.
                 return f.isDirectory() || s.endsWith(ext);
             }
             @Override

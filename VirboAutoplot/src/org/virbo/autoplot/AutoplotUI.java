@@ -4512,14 +4512,12 @@ private void updateFrameTitle() {
             }
         }
         if ( raise ) {
-            if ( app!=null ) {
-                EventQueue.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        raiseApplicationWindow(app);
-                    }
-                });
-            }
+            EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    raiseApplicationWindow(app);
+                }
+            });
         }
 
     }
