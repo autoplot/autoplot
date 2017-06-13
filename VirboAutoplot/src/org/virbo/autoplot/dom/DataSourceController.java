@@ -1301,7 +1301,7 @@ public class DataSourceController extends DomNodeController {
                             //guessCadence( (MutablePropertyDataSet) dep.slice(0),null);
                         }
                     }
-                    fillDs.putProperty("DEPEND_" + i, dep);
+                    fillDs= Ops.putProperty( fillDs, "DEPEND_" + i, dep);
                 }
             }
 
