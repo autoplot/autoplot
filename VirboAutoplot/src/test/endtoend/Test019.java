@@ -213,6 +213,11 @@ public class Test019 {
             tp.parse(test).getTimeRange();
         }
         System.err.printf( "%d parses of %s: %d ms\n", nt, test, System.currentTimeMillis()-t0 );
+        
+        testTimeParser1( "access.autoplot.log.$Y$m$(d,end=T)",   "access.autoplot.log.20170614",      "2017-06-13/2017-06-14");
+        testTimeParser1( "access.autoplot.log.$(Y,end=T)$m$d",   "access.autoplot.log.20170614",      "2017-06-13/2017-06-14");
+        testTimeParser1( "access.autoplot.log.$(Y,end=T)$m$(d,delta=10)",   "access.autoplot.log.20170614",      "2017-06-04/2017-06-14");
+        testTimeParser1( "$Y$m$d/$(Y,end)$m$d",   "20160101/20170101",      "2016");
     }
     
     public static void testParse8601_1( String test, String ref ) throws ParseException {
