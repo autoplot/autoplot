@@ -105,7 +105,11 @@ public abstract class QDataSetBridge {
     }
 
     /**
-     * set the value to return when the data is invalid.
+     * set the value to return when the data is invalid.  Note in IDL, where I echoed which was being called:
+     * IDL> apds.setFillValue, 89.
+     * % setFillValue(float)
+     * IDL> apds.setFillValue, 89.d
+     * % setFillValue(double)
      * @param d
      */
     public void setFillValue( double d ) {
