@@ -113,12 +113,14 @@ public abstract class QDataSetBridge {
      * @param d
      */
     public void setFillValue( double d ) {
+        logger.fine("setFillValue(double)");
         this.fill= d;
         this.ffill= (float)d; // danger
         this.useFill= true;
     }
     
     public void setFillValue( float f ) {
+        logger.fine("setFillValue(float)");
         this.ffill= f;
         this.fill= (double)f; // danger
         this.useFill= true;
