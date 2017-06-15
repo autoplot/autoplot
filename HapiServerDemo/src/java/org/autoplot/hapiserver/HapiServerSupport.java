@@ -158,9 +158,17 @@ public class HapiServerSupport {
         return array;
     }
     
-    public static JSONObject readJSON( File jasonFile ) throws FileNotFoundException, IOException, JSONException {
+    /**
+     * read the JSONObject from the file.
+     * @param jsonFile file containing JSONObject.
+     * @return the JSONObject
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws JSONException 
+     */
+    public static JSONObject readJSON( File jsonFile ) throws FileNotFoundException, IOException, JSONException {
         StringBuilder builder= new StringBuilder();
-        try ( BufferedReader in= new BufferedReader( new FileReader( jasonFile ) ) ) {
+        try ( BufferedReader in= new BufferedReader( new FileReader( jsonFile ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
                 builder.append(line);
@@ -168,7 +176,7 @@ public class HapiServerSupport {
             }
         }
         if ( builder.length()==0 ) {
-            throw new IOException("file is empty: "+jasonFile);
+            throw new IOException("file is empty: "+jsonFile);
         }
         JSONObject catalog= new JSONObject(builder.toString());
         return catalog;

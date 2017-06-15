@@ -49,15 +49,7 @@ public class InfoServlet extends HttpServlet {
 
         File infoFileHome= new File( Util.getHapiHome(), "info" );
         File infoFile= new File( infoFileHome, id+".json" );
-        StringBuilder builder= new StringBuilder();
-        try ( BufferedReader in= new BufferedReader( new FileReader( infoFile ) ) ) {
-            String line= in.readLine();
-            while ( line!=null ) {
-                builder.append(line);
-                line= in.readLine();
-            }
-        }
-        JSONObject o= new JSONObject(builder.toString());
+        JSONObject o= HapiServerSupport.readJSON(infoFile);
         JSONArray parametersRead= o.getJSONArray("parameters");
         for ( int i=0; i<parametersRead.length(); i++ ) {
             JSONObject jo1= parametersRead.getJSONObject(i);

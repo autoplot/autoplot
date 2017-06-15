@@ -363,15 +363,7 @@ public class DataServlet extends HttpServlet {
         if ( !configFile.exists() ) {
             return null;
         }
-        StringBuilder builder= new StringBuilder();
-        try ( BufferedReader in= new BufferedReader( new FileReader( configFile ) ) ) {
-            String line= in.readLine();
-            while ( line!=null ) {
-                builder.append(line);
-                line= in.readLine();
-            }
-        }
-        JSONObject o= new JSONObject(builder.toString());
+        JSONObject o= HapiServerSupport.readJSON(configFile);
         if ( o.has("uri") ) {
             String suri= o.getString("uri");
             RecordIterator dsiter= new RecordIterator( suri, dr, allowStream ); 

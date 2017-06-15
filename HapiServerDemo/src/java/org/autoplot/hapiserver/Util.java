@@ -81,19 +81,6 @@ public class Util {
     public static final String hapiVersion() {
         return "1.1";
     }
-
-    private static JSONObject readJSON( File f ) throws IOException, JSONException {
-        StringBuilder builder= new StringBuilder();
-        try ( BufferedReader in= new BufferedReader( new FileReader( f ) ) ) {
-            String line= in.readLine();
-            while ( line!=null ) {
-                builder.append(line);
-                line= in.readLine();
-            }
-        }
-        JSONObject o= new JSONObject(builder.toString());
-        return o;
-    }
     
     static boolean isKey(String key) {
         Pattern p= Pattern.compile("\\d{8}+");
@@ -115,7 +102,7 @@ public class Util {
         keyFile= new File( keyFile, id + ".json" );
         if ( !keyFile.exists() ) return false;
         try {
-            JSONObject jo= readJSON(keyFile);
+            JSONObject jo= HapiServerSupport.readJSON(keyFile);
             if ( jo.has(key) ) {
                 jo= jo.getJSONObject(key);
                 return jo.getBoolean("create");
@@ -142,7 +129,7 @@ public class Util {
         keyFile= new File( keyFile, id + ".json" );
         if ( !keyFile.exists() ) return false;
         try {
-            JSONObject jo= readJSON(keyFile);
+            JSONObject jo= HapiServerSupport.readJSON(keyFile);
             if ( jo.has(key) ) {
                 jo= jo.getJSONObject(key);
                 return jo.getBoolean("modify") || jo.getBoolean("create");
@@ -169,7 +156,7 @@ public class Util {
         keyFile= new File( keyFile, id + ".json" );
         if ( !keyFile.exists() ) return false;
         try {
-            JSONObject jo= readJSON(keyFile);
+            JSONObject jo= HapiServerSupport.readJSON(keyFile);
             if ( jo.has(key) ) {
                 jo= jo.getJSONObject(key);
                 return jo.getBoolean("delete") || jo.getBoolean("create");
