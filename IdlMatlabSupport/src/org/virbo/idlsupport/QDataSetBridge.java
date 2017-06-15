@@ -109,19 +109,26 @@ public abstract class QDataSetBridge {
      * @param d
      */
     public void setFillValue( double d ) {
-         System.err.println("setFillValue(double)");
+        setFillDouble( d );
+    }
+    
+    public void setFillValue( float f ) {
+        this.ffill= f;
+        this.fill= (double)f; // danger
+        this.useFill= true;
+    }
+    
+    /**
+     * set the value to return when the data is invalid, when the data is known to be stored as doubles
+     * (8-byte numbers).  Python JPype doesn't allow for operator overloading, so this should be used.
+     * @param d 
+     */
+    public void setFillDouble( double d ) {
         this.fill= d;
         this.ffill= (float)d; // danger
         this.useFill= true;
     }
     
-    public void setFillValue( float f ) {
-        System.err.println("setFillValue(float)");
-        this.ffill= f;
-        this.fill= (double)f; // danger
-        this.useFill= true;
-    }
-
     protected String filter = "";
 
     public static final String PROP_FILTER = "filter";
