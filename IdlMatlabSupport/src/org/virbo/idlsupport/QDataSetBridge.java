@@ -25,11 +25,7 @@ import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.SemanticOps;
 
 /**
- * It's impossible to pass the QDataSet directly back to IDL, in fact structures
- * can't be passed.  To provide a QDataSet to IDL, extend this class to implement
- * getDataSet, then use QDataSetBridge.pro to read in a dataset and create a 
- * structure.
- * 
+ * See http://autoplot.org/IDL and http://autoplot.org/Matlab which show how this is used in the environments.
  * @author jbf
  */
 public abstract class QDataSetBridge {
@@ -113,14 +109,14 @@ public abstract class QDataSetBridge {
      * @param d
      */
     public void setFillValue( double d ) {
-        logger.fine("setFillValue(double)");
+         System.err.println("setFillValue(double)");
         this.fill= d;
         this.ffill= (float)d; // danger
         this.useFill= true;
     }
     
     public void setFillValue( float f ) {
-        logger.fine("setFillValue(float)");
+        System.err.println("setFillValue(float)");
         this.ffill= f;
         this.fill= (double)f; // danger
         this.useFill= true;
