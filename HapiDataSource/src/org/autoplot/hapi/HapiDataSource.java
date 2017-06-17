@@ -15,6 +15,7 @@ import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -420,13 +421,16 @@ public class HapiDataSource extends AbstractDataSource {
             for ( int i=0; i<nparam; i++ ) {
                 map.put( parametersArray.getJSONObject(i).getString("name"), i ); // really--should name/id are two names for the same thing...
             }
+            if ( !pps[0].equals(parametersArray.getJSONObject(0).getString("name")) ) { // add Time if it wasn't specified.
+                throw new IllegalArgumentException("first parameter must be \"" + parametersArray.getJSONObject(0).getString("name") + "\"" );
+            }
             nparam= pps.length;
             ParamDescription[] subsetPds= new ParamDescription[pps.length];
             for ( int ip=0; ip<pps.length; ip++ ) {
                 int i= map.get(pps[ip]);
                 subsetPds[ip]= pds[i];
             }
-            pds= subsetPds;
+            pds= subsetPds;   
         }
         
         URL url= HapiServer.getDataURL( server.toURL(), id, tr, pp );
