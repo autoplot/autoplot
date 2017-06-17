@@ -43,6 +43,7 @@ public class WavDataSourceFormatEditorPanel extends javax.swing.JPanel implement
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         timeScaleTF = new javax.swing.JTextField();
+        timetagsCheckbox = new javax.swing.JCheckBox();
 
         scaleCB.setText("Scale data to utilize full dynamic range");
 
@@ -59,22 +60,27 @@ public class WavDataSourceFormatEditorPanel extends javax.swing.JPanel implement
             }
         });
 
+        timetagsCheckbox.setText("Writing timing metadata as well.");
+        timetagsCheckbox.setToolTipText("<html>Write another file next to the file, which shows the DEPEND_0 (Time) offset at indeces.  The file (...ttag.txt) will contain one line per contiguous data chunk.");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(scaleCB)
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 264, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel2)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(timeScaleTF)))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                        .add(scaleCB)
+                        .add(layout.createSequentialGroup()
+                            .add(jLabel1)
+                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                            .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 264, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(layout.createSequentialGroup()
+                            .add(jLabel2)
+                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                            .add(timeScaleTF)))
+                    .add(timetagsCheckbox))
                 .addContainerGap(21, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -90,7 +96,9 @@ public class WavDataSourceFormatEditorPanel extends javax.swing.JPanel implement
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel2)
                     .add(timeScaleTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(204, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(timetagsCheckbox)
+                .addContainerGap(180, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -105,6 +113,7 @@ public class WavDataSourceFormatEditorPanel extends javax.swing.JPanel implement
     private javax.swing.JLabel jLabel2;
     private javax.swing.JCheckBox scaleCB;
     private javax.swing.JTextField timeScaleTF;
+    private javax.swing.JCheckBox timetagsCheckbox;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -149,6 +158,9 @@ public class WavDataSourceFormatEditorPanel extends javax.swing.JPanel implement
             default:
                 break;
         }
+        
+        s= getParam( args, "timetags", "F" );
+        timetagsCheckbox.setSelected( s.equals("T") );
 
         file= split.file;
     }
