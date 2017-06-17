@@ -13,10 +13,12 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -294,7 +296,8 @@ public class WavDataSourceFormat implements DataSourceFormat {
 
         float samplesPerSecond= 8000.0f;
 
-
+        final String SCHEME_ERROR= "data must be rank 1, rank 2 bundle, rank 2 waveform, or rank 3 join of waveforms.";
+        
         if ( SemanticOps.isRank2Waveform(data) ) {
             QDataSet dep1= (QDataSet) data.property(QDataSet.DEPEND_1);
             if ( dep1==null || dep1.length()<2 ) {
@@ -309,7 +312,21 @@ public class WavDataSourceFormat implements DataSourceFormat {
 
             samplesPerSecond= (float) Math.round( 1/periodSeconds );
 
-        } else {
+        } else if ( SemanticOps.isRank3JoinOfRank2Waveform(data) ) {
+            QDataSet dep1= (QDataSet) data.slice(0).property(QDataSet.DEPEND_1);
+            if ( dep1==null || dep1.length()<2 ) {
+                throw new IllegalArgumentException("dep1 length must be at least 2");
+            }
+            Units u= (Units) dep1.property( QDataSet.UNITS ) ;
+            if ( u==null ) {
+                u= Units.dimensionless;
+            }
+            UnitsConverter uc= u.getConverter( Units.seconds );
+            double periodSeconds= uc.convert( dep1.value(1) - dep1.value(0) );
+
+            samplesPerSecond= (float) Math.round( 1/periodSeconds );
+            
+        } else if ( data.rank()==1 || ( data.rank()==2 && SemanticOps.isBundle(data) ) ) {
             if ( dep0!=null && dep0.length()>1 ) {
                 Units u= (Units) dep0.property( QDataSet.UNITS ) ;
                 if ( u==null ) {
@@ -325,6 +342,8 @@ public class WavDataSourceFormat implements DataSourceFormat {
             } else {
                 throw new IllegalArgumentException("dep0 length must be at least 2");
             }
+        } else {
+            throw new IllegalArgumentException(SCHEME_ERROR);
         }
         
         int channels= 1;
@@ -338,8 +357,11 @@ public class WavDataSourceFormat implements DataSourceFormat {
                 } else {
                     channels= (int) data.length(0);
                 }   break;
+            case 3:
+                // rank 3 waveforms cannot be used to produce stereo.
+                break;
             default:
-                throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
+                throw new IllegalArgumentException(SCHEME_ERROR);
         }
 
         Map<String, String> params2 = new HashMap<>();
@@ -390,9 +412,26 @@ public class WavDataSourceFormat implements DataSourceFormat {
                     buf= formatRank2Waveform( data, new NullProgressMonitor(), params2 );
                 } else {
                     buf= formatRank2(data, new NullProgressMonitor(), params2);
-                }   break;
+                }   
+                break;
+            case 3:
+                int nbuf= data.length();
+                List<ByteBuffer> bufs= new ArrayList<>(nbuf);
+                int cap=0;
+                
+                for ( int j=0; j<data.length(); j++ ) {
+                    ByteBuffer buf1= formatRank2Waveform( data.slice(j), new NullProgressMonitor(), params2 );
+                    bufs.add(j,buf1);
+                    cap+=buf1.limit();
+                }
+                buf= ByteBuffer.allocate(cap);
+                for ( int j=0; j<nbuf; j++ ) {
+                    buf.put(bufs.get(j));
+                }
+                buf.flip();
+                break;
             default:
-                throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
+                throw new IllegalArgumentException(SCHEME_ERROR);
         }
         
         String timetags= params2.get("timetags");
@@ -401,7 +440,12 @@ public class WavDataSourceFormat implements DataSourceFormat {
             timetagFilename= timetagFilename.substring(0,timetagFilename.length()-4)+".ttag.txt";
             File timetagFile= new File( timetagFilename );
             try (PrintWriter out = new PrintWriter( new FileWriter(timetagFile) )) {
-                QDataSet ttag= SemanticOps.xtagsDataSet(data);
+                QDataSet ttag;
+                if ( data.rank()<3 ) {
+                    ttag= SemanticOps.xtagsDataSet(data);
+                } else {
+                    ttag= SemanticOps.xtagsDataSet(data.slice(0));
+                }
                 if ( ttag==null ) {
                     throw new IllegalArgumentException("timetags requested, but data does not have timetags.");
                 } else {
@@ -451,8 +495,30 @@ public class WavDataSourceFormat implements DataSourceFormat {
                                 
                             }
                             break;
+                        case 3:
+                            if ( SemanticOps.isRank3JoinOfRank2Waveform(data) ) {
+                                int iwaveRec=1;
+                                for ( int k=0; k<data.length(); k++ ) {
+                                    QDataSet r2data= data.slice(k);
+                                    ttag= SemanticOps.xtagsDataSet(r2data);
+                                    expect= Ops.multiply( expect, r2data.length(0) );
+                                    int recSize= r2data.length(0);
+                                    for ( int i=(k==0?1:0); i<r2data.length(); i++ ) {
+                                        QDataSet t1= ttag.slice(i);
+                                        if ( aboutEqual( Ops.subtract( t1,t0 ), expect ) ) {
+                                        } else {
+                                            out.println( String.format( "%s,%d", df.format( tu.createDatum(t1.value()),tu ), iwaveRec*recSize ) );
+                                        }
+                                        t0= t1;
+                                        iwaveRec+= 1;
+                                    }
+                                }
+                            } else {
+                                throw new IllegalArgumentException("cannot get here, something has gone horribly wrong.");
+                            }
+                            break;                            
                         default:
-                            throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
+                            throw new IllegalArgumentException(SCHEME_ERROR);
                     }
                 }
             }
