@@ -18,6 +18,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.virbo.dsops.Ops;
 
 /**
  * Tests of the IDL/Matlab interface.
@@ -287,6 +288,23 @@ public class Test024 {
         System.err.println( checkAPDS( uri, null ) );
 
     }
+    
+    
+    /**
+     * test use with HAPI server
+     * 
+     */
+    public static void test10() throws Exception {
+        System.err.println( "\n= test10 =\n");        
+        String uri= "vap+hapi:http://jfaden.net/HapiServerDemo/hapi?id=Iowa+City+Conditions&parameters=Time,Temperature,Humidity,Pressure&timerange=2017-May";
+        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        apds.loadDataSet(uri);
+        apds.setFillDouble(0);
+        System.err.println( apds.toString() );
+        System.err.println( Ops.mean( apds.values("Temperature") ) );
+        System.err.println( Ops.mean( apds.values("Humidity") ) );
+        System.err.println( Ops.mean( apds.values("Pressure") ) );
+    }
 
     public static void testGuessNameFor() {
         System.err.println( "\n= testGuessNameFor =\n");
@@ -341,6 +359,7 @@ public class Test024 {
             LoggerManager.readConfiguration();
             
             //testAuth();
+            test10();
             
             testFilters();
             
