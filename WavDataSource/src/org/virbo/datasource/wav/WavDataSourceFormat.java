@@ -57,7 +57,6 @@ public class WavDataSourceFormat implements DataSourceFormat {
 
         String type = params.get("type");
         boolean doscale= !"F".equals( params.get("scale") );
-        boolean timetags= "T".equals("timetags");
                     
         QDataSet extent= Ops.extent(data);
         int dep0Len = 0; //(dep0 == null ? 0 : 1);
@@ -401,47 +400,24 @@ public class WavDataSourceFormat implements DataSourceFormat {
             String timetagFilename= split.resourceUri.getPath();
             timetagFilename= timetagFilename.substring(0,timetagFilename.length()-4)+".ttag.txt";
             File timetagFile= new File( timetagFilename );
-            PrintWriter out= new PrintWriter( new FileWriter(timetagFile) );
-            QDataSet ttag= SemanticOps.xtagsDataSet(data);
-            if ( ttag==null ) {
-                throw new IllegalArgumentException("timetags requested, but data does not have timetags.");
-            } else {
-                QDataSet t0= ttag.slice(0);
-                Units tu= SemanticOps.getUnits(t0);
-                int i0= 0;
-                QDataSet expect= DataSetUtil.asDataSet( Units.seconds.createDatum(1).divide(samplesPerSecond) );
-                if ( UnitsUtil.isTimeLocation( tu ) ) {
-                    out.println( "UTC,index" );
+            try (PrintWriter out = new PrintWriter( new FileWriter(timetagFile) )) {
+                QDataSet ttag= SemanticOps.xtagsDataSet(data);
+                if ( ttag==null ) {
+                    throw new IllegalArgumentException("timetags requested, but data does not have timetags.");
                 } else {
-                    out.println( String.format( "time(%s),index", SemanticOps.getUnits(t0) ) );
-                }
-                DatumFormatter df= tu.getDatumFormatterFactory().defaultFormatter();
-                out.println( String.format( "%s,%d", df.format( tu.createDatum(t0.value()),tu ), i0 ) );
-                switch (data.rank()) {
-                    case 1:
-                        for ( int i=1; i<data.length(); i++ ) {
-                            QDataSet t1= ttag.slice(i);
-                            if ( aboutEqual( Ops.subtract( t1,t0 ), expect ) ) {
-                            } else {
-                                out.println( String.format( "%s,%d", df.format( tu.createDatum(t1.value()),tu ), i ) );
-                            }
-                            t0= t1;
-                        }
-                        break;
-                    case 2:
-                        if ( SemanticOps.isRank2Waveform(data) ) {
-                            expect= Ops.multiply( expect, data.length(0) );
-                            int iwavRec=0;
-                            for ( int i=1; i<data.length(); i++ ) {
-                                QDataSet t1= ttag.slice(i);
-                                if ( aboutEqual( Ops.subtract( t1,t0 ), expect ) ) {
-                                } else {
-                                    out.println( String.format( "%s,%d", df.format( tu.createDatum(t1.value()),tu ), iwavRec ) );
-                                }
-                                t0= t1;
-                                iwavRec= i+data.length(0);
-                            }
-                        } else {
+                    QDataSet t0= ttag.slice(0);
+                    Units tu= SemanticOps.getUnits(t0);
+                    int i0= 0;
+                    QDataSet expect= DataSetUtil.asDataSet( Units.seconds.createDatum(1).divide(samplesPerSecond) );
+                    if ( UnitsUtil.isTimeLocation( tu ) ) {
+                        out.println( "UTC,index" );
+                    } else {
+                        out.println( String.format( "time(%s),index", SemanticOps.getUnits(t0) ) );
+                    }
+                    DatumFormatter df= tu.getDatumFormatterFactory().defaultFormatter();
+                    out.println( String.format( "%s,%d", df.format( tu.createDatum(t0.value()),tu ), i0 ) );
+                    switch (data.rank()) {
+                        case 1:
                             for ( int i=1; i<data.length(); i++ ) {
                                 QDataSet t1= ttag.slice(i);
                                 if ( aboutEqual( Ops.subtract( t1,t0 ), expect ) ) {
@@ -450,14 +426,36 @@ public class WavDataSourceFormat implements DataSourceFormat {
                                 }
                                 t0= t1;
                             }
-
-                        }
-                        break;
-                    default:
-                        throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
+                            break;
+                        case 2:
+                            if ( SemanticOps.isRank2Waveform(data) ) {
+                                expect= Ops.multiply( expect, data.length(0) );
+                                int recSize= data.length(0);
+                                for ( int i=1; i<data.length(); i++ ) {
+                                    QDataSet t1= ttag.slice(i);
+                                    if ( aboutEqual( Ops.subtract( t1,t0 ), expect ) ) {
+                                    } else {
+                                        out.println( String.format( "%s,%d", df.format( tu.createDatum(t1.value()),tu ), i*recSize ) );
+                                    }
+                                    t0= t1;
+                                }
+                            } else {
+                                for ( int i=1; i<data.length(); i++ ) {
+                                    QDataSet t1= ttag.slice(i);
+                                    if ( aboutEqual( Ops.subtract( t1,t0 ), expect ) ) {
+                                    } else {
+                                        out.println( String.format( "%s,%d", df.format( tu.createDatum(t1.value()),tu ), i ) );
+                                    }
+                                    t0= t1;
+                                }
+                                
+                            }
+                            break;
+                        default:
+                            throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
+                    }
                 }
             }
-            out.close();
         }
 
         AudioInputStream inFileAIS = new AudioInputStream( newInputStream(buf), outDataFormat, buf.capacity()/(bytesPerField*channels) );
