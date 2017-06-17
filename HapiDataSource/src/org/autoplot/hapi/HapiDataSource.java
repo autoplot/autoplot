@@ -430,6 +430,7 @@ public class HapiDataSource extends AbstractDataSource {
                 int i= map.get(pps[ip]);
                 subsetPds[ip]= pds[i];
             }
+            //TODO: the parameters must also be sorted by position in stream.
             pds= subsetPds;   
         }
         
