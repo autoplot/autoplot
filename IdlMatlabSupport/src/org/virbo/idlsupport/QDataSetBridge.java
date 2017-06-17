@@ -186,6 +186,12 @@ public abstract class QDataSetBridge {
             name = nameFor(ds);
 
             datasets.put(name, ds);
+            if ( SemanticOps.isBundle(ds) ) {
+                String[] ss= DataSetOps.bundleNames(ds);
+                for ( String s: ss ) {
+                    datasets.put( s, DataSetOps.unbundle(ds,s) );
+                }
+            }
 
             for (int i = 0; i < ds.rank(); i++) {
                 QDataSet dep = (QDataSet) ds.property("DEPEND_" + i);
