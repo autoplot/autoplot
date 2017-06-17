@@ -173,6 +173,10 @@ public class WavDataSourceFormatEditorPanel extends javax.swing.JPanel implement
         if ( !scaleCB.isSelected() ) {
             args.put( "scale", "F" );
         } 
+        
+        if ( timetagsCheckbox.isSelected() ) {
+            args.put( "timetags", "T" );
+        }
 
         double ts;
         try {
