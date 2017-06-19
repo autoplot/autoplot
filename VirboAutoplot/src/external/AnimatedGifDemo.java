@@ -9,7 +9,6 @@ import org.w3c.dom.Node;
 import javax.imageio.*;
 import javax.imageio.metadata.*;
 import javax.imageio.stream.ImageOutputStream;
-import org.das2.util.monitor.ProgressMonitor;
 
 /**
  * Creates an animated GIF from GIF frames. A thin wrapper to code written by
@@ -122,10 +121,9 @@ public class AnimatedGifDemo {
     }
     
     /**
-     * Write of the saveAnimate that takes an iterator so that all images
-     * need not be in memory at once.  UNTESTED!
+     * Rewrite of the saveAnimate that takes an iterator so that all images
+     * need not be in memory at once.  
      *
-     * @author GeoffTitmus
      * @param file File A File in which to store the animation.
      * @param frames Iterator of BufferedImages, the frames of the animation.
      * @param delayTimes Iterator of Strings, representing the frame delay times in formatted milliseconds.
