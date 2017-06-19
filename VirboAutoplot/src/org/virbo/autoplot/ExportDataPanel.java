@@ -556,7 +556,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
             editorPanel.setURI(currentFileString);
         }
         try {
-            updateEditorPanel( currentFileString, true );
+            updateEditorPanel( split.ext, true );
         } catch ( RuntimeException ex ) {
             
         }
