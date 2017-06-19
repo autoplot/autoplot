@@ -49,29 +49,18 @@ public class BinaryDataFormatter implements DataFormatter {
                 Units u= SemanticOps.getUnits(record.slice(i));
                 if ( stype.equals("isotime") ) {
                     if ( !parameter.has("length") ) throw new RuntimeException("required tag length is missing");
-                    int len= parameter.getInt("length");
-                    tt= AsciiTimeTransferType.getForName( "time"+len, Collections.singletonMap(QDataSet.UNITS,(Object)u) );
-                } else if ( stype.equals("string") ) {
-                    if ( !parameter.has("length") ) throw new RuntimeException("required tag length is missing");
                     final int len= parameter.getInt("length");
-                    final Units units= u;
-                    final byte[] zeros= new byte[len];
-                    for ( int i2=0; i2<zeros.length; i2++ ) zeros[i2]= 0;
+                    final TransferType delegate= AsciiTimeTransferType.getForName( "time"+(len-1), Collections.singletonMap(QDataSet.UNITS,(Object)u) );
+                    final byte NULL= 0;
                     tt= new TransferType() {
                         @Override
                         public void write(double d, ByteBuffer buffer) {
-                            String s= units.createDatum(d).toString();
-                            byte[] bytes= s.getBytes( Charset.forName("UTF-8" ) );  
-                            if ( bytes.length<len ) {
-                                buffer.put( bytes, 0, Math.min(bytes.length,len) );  //TODO: we could be in the middle of a letter.
-                                buffer.put( zeros, bytes.length, len-bytes.length );
-                            } else {
-                                buffer.put( bytes, 0, len );  //TODO: we could be in the middle of a UTF-8 letter.
-                            }
+                            delegate.write(d, buffer);
+                            buffer.put(NULL);
                         }
                         @Override
                         public double read(ByteBuffer buffer) {
-                            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                            throw new UnsupportedOperationException("Not supported."); 
                         }
                         @Override
                         public int sizeBytes() {
@@ -86,8 +75,48 @@ public class BinaryDataFormatter implements DataFormatter {
                             return "string"+len;
                         }   
                     };
-                } else {
+                } else if ( stype.equals("string") ) {
+                    if ( !parameter.has("length") ) throw new RuntimeException("required tag length is missing");
+                    final int len= parameter.getInt("length");
+                    final Units units= u;
+                    final byte[] zeros= new byte[len];
+                    for ( int i2=0; i2<zeros.length; i2++ ) zeros[i2]= 0;
+                    tt= new TransferType() {
+                        @Override
+                        public void write(double d, ByteBuffer buffer) {
+                            String s= units.createDatum(d).toString();
+                            byte[] bytes= s.getBytes( Charset.forName("UTF-8") );  
+                            if ( bytes.length<len ) {
+                                buffer.put( bytes, 0, Math.min(bytes.length,len) );  //TODO: we could be in the middle of a letter.
+                                buffer.put( zeros, bytes.length, len-bytes.length );
+                            } else {
+                                // find last full character
+                                int ipos= len-1;
+                                while ( ipos>0 && bytes[ipos]<0 ) ipos--;  // unicode characters > 127 are multi-byte.
+                                buffer.put( bytes, 0, ipos );  //TODO: we could be in the middle of a UTF-8 letter.
+                            }
+                        }
+                        @Override
+                        public double read(ByteBuffer buffer) {
+                            throw new UnsupportedOperationException("Not supported."); 
+                        }
+                        @Override
+                        public int sizeBytes() {
+                            return len;
+                        }
+                        @Override
+                        public boolean isAscii() {
+                            return false;
+                        }
+                        @Override
+                        public String name() {
+                            return "string"+len;
+                        }   
+                    };
+                } else if ( stype.equals("double") || stype.equals("integer")) {
                     tt= TransferType.getForName(stype, Collections.singletonMap(QDataSet.UNITS,(Object)u) );
+                } else {
+                    throw new IllegalArgumentException("server is misconfigured, using unsupported type: "+stype );
                 }
                 int nfields;
                 if ( parameter.has("size") ) {
