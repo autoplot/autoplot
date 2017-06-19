@@ -127,6 +127,7 @@
             <li>2017-06-07: support now-P1D/now for example time range.</li>
             <li>2017-06-08: catalog and capabilities responses can be cached.</li>
             <li>2017-06-09: bug in info response, where time was hard-coded and not getting changes in static file.</li>
+            <li>2017-06-19: Bob's verifier caught that time lengths assumed that the string need not be null terminated.</li>
         </ul>
         </small>
     </body>
