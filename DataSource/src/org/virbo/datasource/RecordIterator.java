@@ -28,10 +28,11 @@ public class RecordIterator implements Iterator<QDataSet>  {
     QDataSet src=null;
     
     Iterator<QDataSet> streamingIterator=null;
+    private DatumRange depend0Constraint=null;    
+    QDataSet nextRecord=null; // when depend0Constraint is set, we need to read to the next record in the hasNext method.
+            
     QDataSet sortDataSet=null;
-    
-    int recordCount=0;
-    
+
     private static final Logger logger= Logger.getLogger("apdss.recordIterator");
     
     /**
@@ -176,7 +177,24 @@ public class RecordIterator implements Iterator<QDataSet>  {
      * @throws IllegalArgumentException if the data has a depend0 which is not monotonic.
      */
     public final void constrainDepend0( DatumRange dr ) {
-        if ( this.src==null ) {
+        if ( this.src==null ) {      
+            this.depend0Constraint= dr;
+            if ( streamingIterator.hasNext() ) {
+                nextRecord= streamingIterator.next();
+                nextRecord= normalize(nextRecord);
+                QDataSet dep0= nextRecord.slice(0);
+                while ( DataSetUtil.asDatum(dep0).lt( dr.min() ) && streamingIterator.hasNext() ) {
+                    nextRecord= streamingIterator.next();
+                    nextRecord= normalize(nextRecord);
+                    dep0= nextRecord.slice(0);
+                }
+                if ( depend0Constraint==null || DataSetUtil.asDatum(dep0).ge( depend0Constraint.max() ) ) {
+                    nextRecord= null;
+                }
+                index= -1;
+            } else {
+                nextRecord= null;
+            }
             return;
         }
         if ( this.src.length()==0 ) {
@@ -211,52 +229,58 @@ public class RecordIterator implements Iterator<QDataSet>  {
     @Override
     public boolean hasNext() {
         if ( this.streamingIterator!=null ) {
-            if ( this.index>0 ) {
-                logger.log(Level.FINER, "skipping {0} records", this.index);
-                for ( int i=0; i<this.index && this.streamingIterator.hasNext() ; i++ ) {
-                    streamingIterator.next();
-                }
-                this.lastIndex -= this.index;
-                this.index= 0;
-            }
-            return ( ( this.lastIndex<0 || recordCount<this.lastIndex ) && this.streamingIterator.hasNext() );
-            
+            return nextRecord != null;            
         } else {
             return this.index < this.lastIndex;
         }
     }
 
+    /**
+     * look for CONTEXT_0 and make this the first element of the bundle.
+     * @param result
+     * @return 
+     */
+    private static QDataSet normalize( QDataSet result ) {
+        QDataSet dep0= (QDataSet) result.property(QDataSet.CONTEXT_0);
+        if ( dep0!=null ) {
+            switch (result.rank()) {
+                case 0:
+                    result= Ops.bundle( dep0, result );
+                    break;
+                case 1:
+                    QDataSet d= Ops.bundle( dep0, result.slice(0) );
+                    for ( int j=1; j<result.length(); j++ ) {
+                        d= Ops.bundle( d, result.slice(j));
+                    }   
+                    result= d;
+                    break;
+                default:
+                    throw new IllegalArgumentException("rank>2 streaming not supported");
+            }
+        }
+        return result;
+    }
+    
     @Override
     public QDataSet next() {
         if ( this.streamingIterator!=null ) {
-            if ( this.index>0 ) {
-                for ( int i=0; i<this.index && this.streamingIterator.hasNext() ; i++ ) {
-                    streamingIterator.next();
-                }
-            }
-            QDataSet nextRecord= streamingIterator.next();
-            QDataSet dep0= (QDataSet) nextRecord.property(QDataSet.CONTEXT_0);
-            if ( dep0!=null ) {
-                switch (nextRecord.rank()) {
-                    case 0:
-                        nextRecord= Ops.bundle( dep0, nextRecord );
-                        break;
-                    case 1:
-                        QDataSet d= Ops.bundle( dep0, nextRecord.slice(0) );
-                        for ( int j=1; j<nextRecord.length(); j++ ) {
-                            d= Ops.bundle( d, nextRecord.slice(j));
-                        }   
-                        nextRecord= d;
-                        break;
-                    default:
-                        throw new IllegalArgumentException("rank>2 streaming not supported");
-                }
-            }
+            QDataSet result= nextRecord;
             if ( this.sortDataSet!=null ) {
-                nextRecord= DataSetOps.applyIndex( nextRecord, 0, sortDataSet, true );
+                result= DataSetOps.applyIndex( result, 0, sortDataSet, true );
             }
-            recordCount++;
-            return nextRecord;
+            if ( streamingIterator.hasNext() ) {
+                QDataSet nextRecord1= streamingIterator.next();
+                nextRecord1= normalize(nextRecord1);
+                QDataSet dep0= (QDataSet) result.slice(0);
+                if ( depend0Constraint==null || DataSetUtil.asDatum(dep0).lt( depend0Constraint.max() ) ) {
+                    nextRecord= nextRecord1;
+                } else {
+                    nextRecord= null;
+                }
+            } else {
+                nextRecord= null;
+            }
+            return result;
         } else {
             return src.slice(index++);
         }
