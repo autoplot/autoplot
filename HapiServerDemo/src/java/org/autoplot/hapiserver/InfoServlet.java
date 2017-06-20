@@ -6,13 +6,11 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.TimeZone;
@@ -118,6 +116,9 @@ public class InfoServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        String HAPI_SERVER_HOME= getServletContext().getInitParameter("HAPI_SERVER_HOME");
+        Util.setHapiHome( new File( HAPI_SERVER_HOME ) );
+            
         String id= request.getParameter("id");
         
         if ( id==null ) throw new ServletException("required parameter 'id' is missing from request");

@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -73,6 +72,9 @@ public class DataServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        String HAPI_SERVER_HOME= getServletContext().getInitParameter("HAPI_SERVER_HOME");
+        Util.setHapiHome( new File( HAPI_SERVER_HOME ) );
+            
         Map<String,String[]> params= new HashMap<>( request.getParameterMap() );
         String id= getParam( params,"id",null,"The identifier for the resource.", null );
         String timeMin= getParam( params, "time.min", null, "The earliest value of time to include in the response.", null );
