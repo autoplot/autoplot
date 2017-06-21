@@ -129,6 +129,7 @@
             <li>2017-06-09: bug in info response, where time was hard-coded and not getting changes in static file.</li>
             <li>2017-06-19: Bob's verifier caught that time lengths assumed that the string need not be null terminated.  doubles used for return types.</li>
             <li>2017-06-20: Bob's verifier caught that streaming data sources were not trimmed to request time.</li>
+            <li>2017-06-21: support for P1D/lastday added to DasCoreDatum, so that sample times are not always changing.</li>
         </ul>
         </small>
     </body>
