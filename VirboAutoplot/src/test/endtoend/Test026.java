@@ -224,6 +224,22 @@ public class Test026 {
             doTest(43, "orbit:rbspa-pp:403-406", "2013-01-27T18:58:17.392Z to 2013-01-29T06:53:13.619Z", micros);
             doTest(44, "1972/now-P1D", "1972-01-01T00:00/" + now.subtract(1, Units.days), micros);
             doTest(45, "now-P10D/now-P1D", new DatumRange(now.subtract(10, Units.days), now.subtract(1, Units.days)).toString(), micros);
+            
+            int[] tt= TimeUtil.fromDatum(now);
+            tt[2]=1;
+            tt[3]=0;
+            tt[4]=0;
+            tt[5]=0;
+            tt[6]=0;
+            Datum t2= TimeUtil.toDatum(tt);
+            tt[1]--;
+            if ( tt[1]==0 ) {
+                tt[0]--;
+                tt[1]=12;
+            }
+            Datum t1= TimeUtil.toDatum(tt);
+                    
+            doTest(46, "P1M/lastmonth", t1.toString()+"/"+t2.toString(), micros); // these things
 
             closeHTML(); //closes body and html
             System.exit(0);  // TODO: something is firing up the event thread
