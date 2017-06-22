@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Pattern;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.MetadataModel;
 import org.w3c.dom.Node;
 
@@ -95,7 +95,7 @@ public class MetadataUtil {
      * @return
      */
     public static Map<String,Object> sliceProperties(Map<String,Object> properties, int sliceDimension) {
-        return org.virbo.dataset.DataSetOps.sliceProperties(properties, sliceDimension);
+        return org.das2.qds.DataSetOps.sliceProperties(properties, sliceDimension);
     }
 
     /**

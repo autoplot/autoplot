@@ -31,7 +31,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.DataSourceFilter;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
 import org.virbo.qstream.SimpleStreamFormatter;

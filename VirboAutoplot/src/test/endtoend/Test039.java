@@ -23,8 +23,8 @@ import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.util.AboutUtil;
 import org.das2.util.LoggerManager;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dsops.Ops;
+import org.das2.qds.QDataSet;
+import org.das2.qds.ops.Ops;
 import test.graph.QFunctionLarry;
 
 /**

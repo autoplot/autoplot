@@ -24,8 +24,8 @@ import org.autoplot.dom.DataSourceController;
 import org.autoplot.dom.DataSourceFilter;
 import org.autoplot.dom.PlotElement;
 import org.autoplot.dom.PlotElementController;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
 
 /**
  * GUI tab for controlling how data is handled, provides feedback for what is

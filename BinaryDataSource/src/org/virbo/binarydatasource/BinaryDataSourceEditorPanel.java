@@ -18,11 +18,11 @@ import javax.swing.JPanel;
 import javax.swing.table.TableModel;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceEditorPanel;
-import org.virbo.dsutil.QDataSetTableModel;
+import org.das2.qds.util.QDataSetTableModel;
 import java.lang.Short; // because of Short object in this package.
 import java.net.URISyntaxException;
 import java.net.URL;

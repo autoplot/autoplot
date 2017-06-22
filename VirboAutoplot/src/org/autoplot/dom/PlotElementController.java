@@ -78,17 +78,17 @@ import org.autoplot.RenderTypeUtil;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.layout.LayoutConstants;
 import org.autoplot.util.RunLaterListener;
-import org.virbo.dataset.ArrayDataSet;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.JoinDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
-import org.virbo.dataset.examples.Schemes;
+import org.das2.qds.ArrayDataSet;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.JoinDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
+import org.das2.qds.examples.Schemes;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 import org.autoplot.metatree.MetadataUtil;
 
 /**

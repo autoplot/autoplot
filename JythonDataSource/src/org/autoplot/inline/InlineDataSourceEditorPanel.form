@@ -224,7 +224,7 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
-                <Component class="org.virbo.jythonsupport.ui.EditorTextPane" name="editorTextPane1">
+                <Component class="org.autoplot.jythonsupport.ui.EditorTextPane" name="editorTextPane1">
                   <Events>
                     <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="editorTextPane1FocusGained"/>
                   </Events>
@@ -255,7 +255,7 @@
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Component class="org.virbo.jythonsupport.ui.DataMashUp" name="dataMashUp1">
+            <Component class="org.autoplot.jythonsupport.ui.DataMashUp" name="dataMashUp1">
             </Component>
           </SubComponents>
         </Container>

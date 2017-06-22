@@ -13,8 +13,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 import org.python.util.PythonInterpreter;
-import org.virbo.jythonsupport.JythonUtil;
-import org.virbo.jythonsupport.JythonUtil.Param;
+import org.autoplot.jythonsupport.JythonUtil;
+import org.autoplot.jythonsupport.JythonUtil.Param;
 
 /**
  * Test of Jython features.
@@ -37,7 +37,7 @@ public class Test038 {
         
         try {
             String script= JythonUtil.readScript( new FileReader(file) );
-            String scrip= org.virbo.jythonsupport.JythonUtil.simplifyScriptToGetParams(script,true);
+            String scrip= org.autoplot.jythonsupport.JythonUtil.simplifyScriptToGetParams(script,true);
             File f= new File(file);
             String fout= "./test038_"+f.getName();
             FileWriter fw= new FileWriter(fout);
@@ -46,7 +46,7 @@ public class Test038 {
             } finally {
                 fw.close();
             }
-            List<Param> parms= org.virbo.jythonsupport.JythonUtil.getGetParams( script );
+            List<Param> parms= org.autoplot.jythonsupport.JythonUtil.getGetParams( script );
             for ( Param p: parms ) {
                 System.err.println(p);
             }

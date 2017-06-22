@@ -37,13 +37,13 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUtil;
 import org.autoplot.util.RunLaterListener;
-import org.virbo.dataset.ArrayDataSet;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.RankZeroDataSet;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.ArrayDataSet;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.RankZeroDataSet;
+import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceUtil;
@@ -52,8 +52,8 @@ import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.Caching;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.autoplot.datasource.capability.Updating;
-import org.virbo.dsops.Ops;
-import org.virbo.dsutil.AutoHistogram;
+import org.das2.qds.ops.Ops;
+import org.das2.qds.util.AutoHistogram;
 
 /**
  * Controller node manages a DataSourceFilter node.

@@ -22,7 +22,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
 import java.util.logging.Logger;
 import org.das2.dataset.DataSet;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.das2.dataset.DataSetAdapter;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.util.FileUtil;

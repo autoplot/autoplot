@@ -15,8 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 import org.das2.util.LoggerManager;
-import org.virbo.dsutil.AsciiParser;
-import org.virbo.dsutil.AsciiParser.RecordParser;
+import org.das2.qds.util.AsciiParser;
+import org.das2.qds.util.AsciiParser.RecordParser;
 
 /**
  * You will need to:

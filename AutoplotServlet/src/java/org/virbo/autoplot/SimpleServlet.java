@@ -56,7 +56,7 @@ import org.autoplot.dom.DataSourceFilter;
 import org.autoplot.dom.Plot;
 import org.autoplot.dom.PlotElement;
 import org.autoplot.state.StatePersistence;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetSelectorSupport;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
@@ -66,7 +66,7 @@ import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.jython.JythonDataSourceFactory;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 
 /**
  * SimpleServlet produces PNG,PDF, and SVG products for

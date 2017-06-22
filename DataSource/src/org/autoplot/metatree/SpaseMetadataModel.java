@@ -11,7 +11,7 @@ package org.autoplot.metatree;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.MetadataModel;
 
 /**

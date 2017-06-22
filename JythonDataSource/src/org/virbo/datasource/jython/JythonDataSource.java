@@ -39,9 +39,9 @@ import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.util.PythonInterpreter;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.LogNames;
@@ -49,10 +49,10 @@ import org.autoplot.datasource.ReferenceCache;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.Caching;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
-import org.virbo.dsops.Ops;
-import org.virbo.jythonsupport.JythonOps;
-import org.virbo.jythonsupport.JythonUtil;
-import org.virbo.jythonsupport.PyQDataSet;
+import org.das2.qds.ops.Ops;
+import org.autoplot.jythonsupport.JythonOps;
+import org.autoplot.jythonsupport.JythonUtil;
+import org.autoplot.jythonsupport.PyQDataSet;
 
 /**
  * Use a jython script to read and process data from a number of sources.

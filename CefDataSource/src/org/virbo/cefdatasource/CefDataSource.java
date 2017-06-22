@@ -22,21 +22,21 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.das2.datum.EnumerationUnits;
 import org.virbo.cefdatasource.CefReaderHeader.ParamStruct;
-import org.virbo.dataset.ArrayDataSet;
-import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
-import org.virbo.dataset.SortDataSet;
-import org.virbo.dataset.WritableDataSet;
+import org.das2.qds.ArrayDataSet;
+import org.das2.qds.DDataSet;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
+import org.das2.qds.SortDataSet;
+import org.das2.qds.WritableDataSet;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.MetadataModel;
 import org.autoplot.datasource.URISplit;
-import org.virbo.dsops.Ops;
-import org.virbo.dsutil.DataSetBuilder;
+import org.das2.qds.ops.Ops;
+import org.das2.qds.util.DataSetBuilder;
 
 /**
  *
@@ -194,7 +194,7 @@ public class CefDataSource extends AbstractDataSource {
                     DataSetBuilder result = new DataSetBuilder( 2, 0, param.cefFieldPos[1] - param.cefFieldPos[0] + 1 );
                     ds = result.getDataSet();
                 } else {
-                    ds = org.virbo.dataset.DataSetOps.leafTrim(tds, param.cefFieldPos[0], param.cefFieldPos[1] + 1);
+                    ds = org.das2.qds.DataSetOps.leafTrim(tds, param.cefFieldPos[0], param.cefFieldPos[1] + 1);
                 }
 
                 ArrayDataSet dds = ArrayDataSet.copy(ds);
@@ -228,7 +228,7 @@ public class CefDataSource extends AbstractDataSource {
                 if (tds == null) {
                     ds = DDataSet.createRank1(0);
                 } else {
-                    ds = org.virbo.dataset.DataSetOps.slice1(tds, param.cefFieldPos[0]);
+                    ds = org.das2.qds.DataSetOps.slice1(tds, param.cefFieldPos[0]);
                 }
 
                 rank0 = ds.rank();
@@ -268,10 +268,10 @@ public class CefDataSource extends AbstractDataSource {
                         QDataSet dp01 = (QDataSet) dep0ds.property(QDataSet.DEPEND_0);
                         QDataSet dp02 = (QDataSet) ds.property(QDataSet.DEPEND_0);
                         if (dp01 != null && dp02 != null && dp01.length() == dp02.length()) {
-                            dep0ds = org.virbo.dataset.DataSetOps.slice0(dep0ds, 0); // kludge for CLUSTER/PEACE //TODO: probably isn't necessary now.
+                            dep0ds = org.das2.qds.DataSetOps.slice0(dep0ds, 0); // kludge for CLUSTER/PEACE //TODO: probably isn't necessary now.
                             dep0ds.putProperty( QDataSet.CONTEXT_0, null );
                             if (dep0ds.length() > qube[newDim]) { // second kludge for CLUSTER/PEACE
-                                dep0ds = org.virbo.dataset.DataSetOps.trim(dep0ds, 0, qube[newDim]);
+                                dep0ds = org.das2.qds.DataSetOps.trim(dep0ds, 0, qube[newDim]);
                             }
 
                         }
@@ -319,7 +319,7 @@ public class CefDataSource extends AbstractDataSource {
      * @param idim the dimension being sorted.
      * @param sort rank 1 dataset of new indeces.
      * @return new dataset that is a copy of the first, resorted.
-     * @see  org.virbo.dataset.SortDataSet for similar functionality
+     * @see  org.das2.qds.SortDataSet for similar functionality
      */
     private MutablePropertyDataSet makeMonotonic(MutablePropertyDataSet ds, int idim, QDataSet sort) {
 
@@ -334,7 +334,7 @@ public class CefDataSource extends AbstractDataSource {
         qube[idim] = sort.length();
 
         DDataSet cds = DDataSet.create(qube);
-        org.virbo.dataset.DataSetUtil.putProperties(org.virbo.dataset.DataSetUtil.getProperties(ds), cds);
+        org.das2.qds.DataSetUtil.putProperties(org.das2.qds.DataSetUtil.getProperties(ds), cds);
 
         if (idim == 0) {
             for (int i = 0; i < qube[0]; i++) {
@@ -431,13 +431,13 @@ public class CefDataSource extends AbstractDataSource {
             logger.finest("handling DELTA_PLUS DELTA_MINUS for time series"); // STA_L2_SWEA_PAD_20070117_V04.cef?energy_table
             CefReaderHeader.ParamStruct p1 = cef.parameters.get(sdeltaPlus);
             if ( p1.cefFieldPos[0]>-1 && p1.cefFieldPos[1]>-1 ) {
-                MutablePropertyDataSet mds= org.virbo.dataset.DataSetOps.leafTrim( tds, p1.cefFieldPos[0], p1.cefFieldPos[1] + 1);
+                MutablePropertyDataSet mds= org.das2.qds.DataSetOps.leafTrim( tds, p1.cefFieldPos[0], p1.cefFieldPos[1] + 1);
                 if ( p1.entries.containsKey("UNITS") ) {
                     mds.putProperty( QDataSet.UNITS, Units.lookupUnits((String)p1.entries.get("UNITS")) );
                 }
                 ds.putProperty( QDataSet.DELTA_PLUS, mds );
                 p1 = cef.parameters.get(sdeltaMinus);
-                mds= org.virbo.dataset.DataSetOps.leafTrim( tds, p1.cefFieldPos[0], p1.cefFieldPos[1] + 1);
+                mds= org.das2.qds.DataSetOps.leafTrim( tds, p1.cefFieldPos[0], p1.cefFieldPos[1] + 1);
                 if ( p1.entries.containsKey("UNITS") ) {
                     mds.putProperty( QDataSet.UNITS, Units.lookupUnits((String)p1.entries.get("UNITS")) );
                 }

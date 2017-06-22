@@ -18,9 +18,9 @@ import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.ScriptContext;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.examples.Schemes;
-import org.virbo.dsops.Ops;
+import org.das2.qds.QDataSet;
+import org.das2.qds.examples.Schemes;
+import org.das2.qds.ops.Ops;
 
 /**
  *

@@ -10,13 +10,13 @@ import org.das2.graph.DasAxis;
 import org.das2.graph.DasCanvas;
 import org.autoplot.AutoplotUtil;
 import org.autoplot.AutoplotUtil.AutoRangeDescriptor;
-import org.virbo.dataset.DataSetUtil;
+import org.das2.qds.DataSetUtil;
 import static org.autoplot.ScriptContext.*;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.MetadataModel;
-import org.virbo.dsops.Ops;
-import org.virbo.jythonsupport.Util;
+import org.das2.qds.ops.Ops;
+import org.autoplot.jythonsupport.Util;
 import org.autoplot.metatree.MetadataUtil;
 
 

@@ -10,7 +10,7 @@
 package org.virbo.ascii;
 
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 

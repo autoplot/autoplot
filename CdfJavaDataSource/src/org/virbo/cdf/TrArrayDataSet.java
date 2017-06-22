@@ -7,8 +7,8 @@ package org.virbo.cdf;
 
 import java.lang.reflect.Array;
 import java.util.logging.Logger;
-import org.virbo.dataset.AbstractDataSet;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.AbstractDataSet;
+import org.das2.qds.QDataSet;
 
 /**
  * echo ArrayDataSet, but [0,3,2,1] transpose

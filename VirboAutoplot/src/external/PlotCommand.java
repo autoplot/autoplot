@@ -28,8 +28,8 @@ import org.autoplot.dom.DataSourceFilter;
 import org.autoplot.dom.Plot;
 import org.autoplot.dom.PlotElement;
 import org.autoplot.dom.Row;
-import org.virbo.dataset.QDataSet;
-import org.virbo.jythonsupport.JythonOps;
+import org.das2.qds.QDataSet;
+import org.autoplot.jythonsupport.JythonOps;
 
 /**
  * new implementation of the plot command allows for keywords in the

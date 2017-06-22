@@ -19,9 +19,9 @@ import org.autoplot.dom.ApplicationController;
 import org.autoplot.dom.Axis;
 import org.autoplot.dom.BindingModel;
 import org.autoplot.layout.LayoutConstants;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
 
 /**
  * build up a dom programmatically to test dom operators.

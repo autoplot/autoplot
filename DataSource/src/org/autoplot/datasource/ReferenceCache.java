@@ -19,10 +19,10 @@ import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.WritableDataSet;
-import org.virbo.dsops.Ops;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.WritableDataSet;
+import org.das2.qds.ops.Ops;
 
 /**
  * Provide a cache of datasets that are in memory, so that the same data is not 

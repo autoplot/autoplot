@@ -74,7 +74,7 @@ import org.autoplot.dom.PlotElement;
 import org.autoplot.dom.Plot;
 import org.autoplot.layout.LayoutUtil;
 import org.autoplot.state.StatePersistence;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.URISplit;

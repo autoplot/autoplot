@@ -20,9 +20,9 @@ import org.das2.client.DasServer;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.stream.StreamDescriptor;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dsops.Ops;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.ops.Ops;
 
 import static org.autoplot.ScriptContext.*;
 
@@ -61,7 +61,7 @@ public class Test501 {
         System.err.printf( "uri: %s\n", uri );
 
         long t0= System.currentTimeMillis();
-        QDataSet ds= org.virbo.jythonsupport.Util.getDataSet( uri );
+        QDataSet ds= org.autoplot.jythonsupport.Util.getDataSet( uri );
 
         double t= (System.currentTimeMillis()-t0)/1000.;
         MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);

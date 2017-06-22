@@ -5,8 +5,8 @@
 package test;
 
 import org.virbo.cefdatasource.ReformDataSet;
-import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.DDataSet;
+import org.das2.qds.QDataSet;
 
 /**
  *

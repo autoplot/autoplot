@@ -10,12 +10,12 @@ import org.das2.datum.DatumRange;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.aggregator.AggregatingDataSourceFactory;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.capability.Streaming;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 
 /**
  * Introduce class to hold code for iterating through any dataset.

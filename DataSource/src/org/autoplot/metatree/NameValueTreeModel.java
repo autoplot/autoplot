@@ -18,8 +18,8 @@ import java.util.Map.Entry;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dsutil.PropertiesTreeModel;
+import org.das2.qds.QDataSet;
+import org.das2.qds.util.PropertiesTreeModel;
 
 /**
  *

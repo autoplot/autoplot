@@ -22,13 +22,13 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.CompletionContext;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.URISplit;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 
 /**
  *

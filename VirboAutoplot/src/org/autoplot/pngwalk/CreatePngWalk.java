@@ -37,12 +37,12 @@ import org.autoplot.ScriptContext;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.Plot;
 import org.autoplot.state.StatePersistence;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.URISplit;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -85,7 +85,7 @@ public class CreatePngWalk {
         if ( params.useBatchUri ) {
             try {
                 String uri= params.batchUri;
-                QDataSet timesds= org.virbo.jythonsupport.Util.getDataSet( uri );
+                QDataSet timesds= org.autoplot.jythonsupport.Util.getDataSet( uri );
                 times= new String[timesds.length()];
                 
                 if ( params.batchUriName.equals("") ) {

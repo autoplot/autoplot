@@ -7,8 +7,8 @@ package test.endtoend;
 
 import org.autoplot.AutoplotUtil;
 import org.autoplot.RenderType;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
 
 /**
  * Test for autoranging for various QDataSets.  This now uses AutoplotUtil.bounds, which was extracted from here to

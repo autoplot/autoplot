@@ -47,11 +47,11 @@ import org.autoplot.MouseModuleType;
 import org.autoplot.RenderType;
 import org.autoplot.RenderTypeUtil;
 import org.autoplot.dom.ChangesSupport.DomLock;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.URISplit;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 
 /**
  * Manages a Plot node, for example listening for autoRange updates 

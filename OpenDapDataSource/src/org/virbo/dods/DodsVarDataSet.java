@@ -17,11 +17,11 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 import org.das2.datum.EnumerationUnits;
 import org.das2.util.LoggerManager;
-import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.Slice0DataSet;
-import org.virbo.dataset.TrimDataSet;
-import org.virbo.dataset.WritableDataSet;
+import org.das2.qds.DDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.Slice0DataSet;
+import org.das2.qds.TrimDataSet;
+import org.das2.qds.WritableDataSet;
 
 /**
  * Adapter from Dods DArray to look like QDataSet.

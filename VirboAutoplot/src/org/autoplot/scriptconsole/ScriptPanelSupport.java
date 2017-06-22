@@ -84,8 +84,8 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.URISplit;
 import org.virbo.datasource.jython.JythonDataSourceFactory;
-import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
-import org.virbo.jythonsupport.ui.ParametersFormPanel;
+import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
+import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 
 /**
  * Error annotations, saveAs, etc.
@@ -742,7 +742,7 @@ public class ScriptPanelSupport {
                                 } else if ( ( ( mode & Event.SHIFT_MASK ) == Event.SHIFT_MASK ) || ( ( mode & Event.ALT_MASK ) == Event.ALT_MASK ) ) {
                                     JPanel p= new JPanel();
                                     Map<String,String> vars= new HashMap();
-                                    ParametersFormPanel pfp= new org.virbo.jythonsupport.ui.ParametersFormPanel();
+                                    ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
                                     Map<String,Object> env= new HashMap();
                                     env.put("dom",interp.get("dom") );
                                     env.put("PWD",interp.get("PWD") );

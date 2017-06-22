@@ -5,7 +5,7 @@ import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import gov.nasa.gsfc.spdf.cdfj.ReaderFactory;
 import java.nio.ByteBuffer;
 import java.util.Locale;
-import org.autoplot.bufferdataset.BufferDataSet;
+import org.das2.qds.buffer.BufferDataSet;
 
 /**
  * Demo where the old library fails on 32bit machines, and that 

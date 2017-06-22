@@ -9,13 +9,13 @@ import java.util.logging.Logger;
 import org.das2.datum.Units;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.ArrayDataSet;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.WritableDataSet;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ArrayDataSet;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.WritableDataSet;
+import org.das2.qds.ops.Ops;
 
 /**
  * Implementations of the CDF virtual variables seen in CDAWeb, but implemented in QDataSet.

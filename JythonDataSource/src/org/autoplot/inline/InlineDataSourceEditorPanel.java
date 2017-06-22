@@ -32,8 +32,8 @@ import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.DataSourceUtil;
-import org.virbo.jythonsupport.Util;
-import org.virbo.jythonsupport.ui.DataMashUp;
+import org.autoplot.jythonsupport.Util;
+import org.autoplot.jythonsupport.ui.DataMashUp;
 
 /**
  * Editor panel for inline URIs.  This supports events lists and short 
@@ -81,9 +81,9 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         jLabel1 = new javax.swing.JLabel();
         examplesButton = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
-        editorTextPane1 = new org.virbo.jythonsupport.ui.EditorTextPane();
+        editorTextPane1 = new org.autoplot.jythonsupport.ui.EditorTextPane();
         jPanel3 = new javax.swing.JPanel();
-        dataMashUp1 = new org.virbo.jythonsupport.ui.DataMashUp();
+        dataMashUp1 = new org.autoplot.jythonsupport.ui.DataMashUp();
 
         setName("inlineDataSourceEditorPanel"); // NOI18N
 
@@ -479,10 +479,10 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
-    private org.virbo.jythonsupport.ui.DataMashUp dataMashUp1;
+    private org.autoplot.jythonsupport.ui.DataMashUp dataMashUp1;
     private javax.swing.JButton deleteSelectedButton;
     private javax.swing.JLabel directionsLabel;
-    private org.virbo.jythonsupport.ui.EditorTextPane editorTextPane1;
+    private org.autoplot.jythonsupport.ui.EditorTextPane editorTextPane1;
     private javax.swing.JButton examplesButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

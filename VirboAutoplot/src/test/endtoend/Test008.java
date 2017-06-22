@@ -6,10 +6,10 @@ package test.endtoend;
 
 import java.io.PrintWriter;
 import static org.autoplot.ScriptContext.*;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dsops.Ops;
-import org.virbo.jythonsupport.Util;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.ops.Ops;
+import org.autoplot.jythonsupport.Util;
 
 /**
  * Andrew's server

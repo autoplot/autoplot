@@ -13,10 +13,10 @@ import org.python.core.PyException;
 import org.python.core.PyObject;
 import org.python.core.PyReflectedFunction;
 import org.python.util.InteractiveInterpreter;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dsops.Ops;
-import org.virbo.jythonsupport.JythonUtil;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
+import org.das2.qds.ops.Ops;
+import org.autoplot.jythonsupport.JythonUtil;
 
 /**
  * Test that built-in functions of python aren't accidentally stepped on.

@@ -27,8 +27,8 @@ import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.MetadataModel;
 import org.autoplot.datasource.URISplit;
-import org.virbo.dsutil.AsciiParser;
-import org.virbo.dsutil.AsciiParser.DelimParser;
+import org.das2.qds.util.AsciiParser;
+import org.das2.qds.util.AsciiParser.DelimParser;
 
 /**
  * Factory for AsciiTableDataSource readers for the ascii table reader.

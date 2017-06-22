@@ -50,7 +50,7 @@ import org.python.core.PyJavaInstance;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.DataSourceFilter;
 import org.autoplot.scriptconsole.ExitExceptionHandler;
-import org.virbo.dataset.ArrayDataSet;
+import org.das2.qds.ArrayDataSet;
 import org.das2.dataset.DataSetAdapter;
 import org.das2.datum.InconvertibleUnitsException;
 import org.das2.event.BoxRenderer;
@@ -70,7 +70,7 @@ import org.autoplot.dom.DomUtil;
 import org.autoplot.dom.Plot;
 import org.autoplot.dom.PlotElement;
 import org.autoplot.state.StatePersistence;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.URISplit;
@@ -1178,7 +1178,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      * @throws java.text.ParseException if the timerange cannot be parsed.
      */
     public static String[] getTimeRangesFor(String surl, String timeRange, String format) throws IOException, ParseException {
-        return org.virbo.jythonsupport.Util.getTimeRangesFor( surl, timeRange, format );
+        return org.autoplot.jythonsupport.Util.getTimeRangesFor( surl, timeRange, format );
     }
 
     /**
@@ -1192,7 +1192,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      * @throws java.text.ParseException of the outer range cannot be parsed.
      */
     public static String[] generateTimeRanges( String spec, String srange ) throws ParseException {
-        return org.virbo.jythonsupport.Util.generateTimeRanges( spec, srange );
+        return org.autoplot.jythonsupport.Util.generateTimeRanges( spec, srange );
     }
     
     /**
@@ -1207,7 +1207,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      * @throws java.lang.Exception any exception thrown by the data source.
      */
     public static String[] getCompletions( String file ) throws Exception {
-        return org.virbo.jythonsupport.Util.getAllCompletions(file);
+        return org.autoplot.jythonsupport.Util.getAllCompletions(file);
     }
     
     /**
@@ -1216,7 +1216,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      * @param millis number of milliseconds to pause execution
      */
     public static void sleep( int millis ) {
-        org.virbo.jythonsupport.Util.sleep( millis );
+        org.autoplot.jythonsupport.Util.sleep( millis );
     }
     
     /**

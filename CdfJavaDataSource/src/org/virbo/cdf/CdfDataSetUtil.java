@@ -5,10 +5,10 @@
 
 package org.virbo.cdf;
 
-import org.virbo.dataset.DataSetIterator;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.QubeDataSetIterator;
+import org.das2.qds.DataSetIterator;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
+import org.das2.qds.QubeDataSetIterator;
 
 /**
  *

@@ -33,9 +33,9 @@ import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
-import org.virbo.jythonsupport.JythonOps;
-import org.virbo.jythonsupport.JythonUtil;
-import org.virbo.jythonsupport.Util;
+import org.autoplot.jythonsupport.JythonOps;
+import org.autoplot.jythonsupport.JythonUtil;
+import org.autoplot.jythonsupport.Util;
 
 /**
  * Creates inline data sources.

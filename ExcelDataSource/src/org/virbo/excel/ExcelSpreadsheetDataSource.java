@@ -19,8 +19,8 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.virbo.dataset.AbstractDataSet;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.AbstractDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
 

@@ -5,10 +5,10 @@
 
 package org.virbo.cdf;
 
-import org.virbo.dataset.AbstractDataSet;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.AbstractDataSet;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
 
 /**
  * QDataSet implementation that appends datasets together to make them

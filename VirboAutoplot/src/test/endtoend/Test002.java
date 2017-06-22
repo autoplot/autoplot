@@ -10,9 +10,9 @@ import java.io.PrintWriter;
 import org.autoplot.RenderType;
 import org.autoplot.ScriptContext;
 import org.autoplot.dom.Application;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dsops.Ops;
-import org.virbo.jythonsupport.Util;
+import org.das2.qds.QDataSet;
+import org.das2.qds.ops.Ops;
+import org.autoplot.jythonsupport.Util;
 
 /**
  * Test Autoplot including:

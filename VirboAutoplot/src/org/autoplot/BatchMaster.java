@@ -48,9 +48,9 @@ import org.python.util.InteractiveInterpreter;
 import org.autoplot.dom.Application;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
-import org.virbo.jythonsupport.JythonUtil.Param;
-import org.virbo.jythonsupport.ui.ParametersFormPanel;
-import org.virbo.jythonsupport.ui.Util;
+import org.autoplot.jythonsupport.JythonUtil.Param;
+import org.autoplot.jythonsupport.ui.ParametersFormPanel;
+import org.autoplot.jythonsupport.ui.Util;
 
 /**
  * Tool for running batches, generating inputs for jython scripts.
@@ -124,12 +124,12 @@ public class BatchMaster extends javax.swing.JPanel {
                     File scriptFile= DataSetURI.getFile( split.file, monitor );
                     String script= readScript( scriptFile );
 
-                    Map<String,org.virbo.jythonsupport.JythonUtil.Param> parms= Util.getParams( env, script, URISplit.parseParams(split.params), new NullProgressMonitor() );
+                    Map<String,org.autoplot.jythonsupport.JythonUtil.Param> parms= Util.getParams( env, script, URISplit.parseParams(split.params), new NullProgressMonitor() );
 
                     String[] items= new String[parms.size()+1];
                     int i=0;
                     items[0]="";
-                    for ( Entry<String,org.virbo.jythonsupport.JythonUtil.Param> p: parms.entrySet() ) {
+                    for ( Entry<String,org.autoplot.jythonsupport.JythonUtil.Param> p: parms.entrySet() ) {
                         items[i+1]= p.getKey();
                         i=i+1;
                     }
@@ -406,7 +406,7 @@ public class BatchMaster extends javax.swing.JPanel {
         p= p.trim();
         if ( p.length()>0 ) {
             try {
-                org.virbo.jythonsupport.JythonUtil.Param pd= getParamDescription( p );
+                org.autoplot.jythonsupport.JythonUtil.Param pd= getParamDescription( p );
                 if ( pd==null ) return; // shouldn't happen
                 String[] ss=null; // will be generated values
                 if ( pd.type=='T' ) {
@@ -518,7 +518,7 @@ public class BatchMaster extends javax.swing.JPanel {
      * @return the Param or null.
      * @throws IOException 
      */
-    private org.virbo.jythonsupport.JythonUtil.Param getParamDescription( String name ) throws IOException {
+    private org.autoplot.jythonsupport.JythonUtil.Param getParamDescription( String name ) throws IOException {
         
         String scriptName= dataSetSelector1.getValue();
         URISplit split= URISplit.parse(scriptName);
@@ -554,7 +554,7 @@ public class BatchMaster extends javax.swing.JPanel {
      * @param f1
      * @throws IOException 
      */
-    private void setParam( InteractiveInterpreter interp, org.virbo.jythonsupport.JythonUtil.Param paramDescription, 
+    private void setParam( InteractiveInterpreter interp, org.autoplot.jythonsupport.JythonUtil.Param paramDescription, 
             String paramName, String f1 ) throws IOException {
         if ( paramDescription==null ) {
             throw new IllegalArgumentException("expected to see parameter description!");
@@ -643,12 +643,12 @@ public class BatchMaster extends javax.swing.JPanel {
             File scriptFile= DataSetURI.getFile( split.file, monitor.getSubtaskMonitor("download script") );
             String script= readScript( scriptFile );
             
-            Map<String,org.virbo.jythonsupport.JythonUtil.Param> parms= Util.getParams( env, script, params, new NullProgressMonitor() );
+            Map<String,org.autoplot.jythonsupport.JythonUtil.Param> parms= Util.getParams( env, script, params, new NullProgressMonitor() );
 
             InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false );
             interp.exec("import autoplot");  // JythonRefactory okay
             
-            ParametersFormPanel pfp= new org.virbo.jythonsupport.ui.ParametersFormPanel();
+            ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
             pfp.doVariables( env, scriptFile, params, null );
             for ( Entry<String,String> ent: params.entrySet() ) {
                 try {

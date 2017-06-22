@@ -12,7 +12,7 @@ import org.das2.datum.Units;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.MetadataModel;
 
 /**

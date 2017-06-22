@@ -30,15 +30,15 @@ import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
-import org.autoplot.bufferdataset.BufferDataSet;
-import org.virbo.dataset.ArrayDataSet;
-import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.Slice0DataSet;
+import org.das2.qds.buffer.BufferDataSet;
+import org.das2.qds.ArrayDataSet;
+import org.das2.qds.DDataSet;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.Slice0DataSet;
 import org.autoplot.datasource.DataSourceUtil;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 
 /**
  * static methods supporting CdfFileDataSource

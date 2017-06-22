@@ -21,11 +21,11 @@ import java.nio.channels.FileChannel.MapMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.DataSetOps;
+import org.das2.qds.DDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.DataSetOps;
 import org.autoplot.datasource.AbstractDataSource;
-import org.virbo.dsutil.AsciiParser;
+import org.das2.qds.util.AsciiParser;
 import org.das2.datum.TimeParser;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -42,15 +42,15 @@ import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.ByteBufferInputStream;
 import org.das2.util.LoggerManager;
-import org.virbo.dataset.ArrayDataSet;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.ArrayDataSet;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.DataSourceUtil;
 //import org.virbo.datasource.ReferenceCache;
-import org.virbo.dsops.Ops;
-import org.virbo.dsutil.AsciiHeadersParser;
-import org.virbo.dsutil.AsciiParser.FieldParser;
+import org.das2.qds.ops.Ops;
+import org.das2.qds.util.AsciiHeadersParser;
+import org.das2.qds.util.AsciiParser.FieldParser;
 
 /**
  * DataSource for reading data in ASCII files, where each record is 

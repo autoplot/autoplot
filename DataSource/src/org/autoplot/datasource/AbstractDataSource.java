@@ -24,19 +24,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.autoplot.bufferdataset.BufferDataSet;
+import org.das2.qds.buffer.BufferDataSet;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.capability.Updating;
-import org.virbo.dsops.CoerceUtil;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.CoerceUtil;
+import org.das2.qds.ops.Ops;
 
 /**
  * Base class for file-based DataSources that keeps track of the uri, makes

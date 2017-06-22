@@ -13,12 +13,12 @@ import org.das2.datum.Units;
 import org.das2.graph.DefaultPlotSymbol;
 import org.autoplot.ScriptContext;
 import org.autoplot.dom.Application;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.WritableDataSet;
-import org.virbo.dsops.Ops;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.WritableDataSet;
+import org.das2.qds.ops.Ops;
 
 /**
  * das2 end-to-end tests of renderers and tick labelling.  Introduced as part

@@ -12,8 +12,8 @@ import java.io.InputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.text.ParseException;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.QDataSet;
 
 /**
  *

@@ -27,7 +27,7 @@ import javax.swing.filechooser.FileFilter;
 import org.das2.util.LoggerManager;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.DataSourceController;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.DataSourceFormatEditorPanel;

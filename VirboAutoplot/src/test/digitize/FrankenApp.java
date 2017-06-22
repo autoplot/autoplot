@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.virbo.dataset.QDataSet;
-import static org.virbo.dsops.Ops.*;
+import org.das2.qds.QDataSet;
+import static org.das2.qds.ops.Ops.*;
 
 /**
  * I need to port some of Sebastian's routines into Java so I can debug them.

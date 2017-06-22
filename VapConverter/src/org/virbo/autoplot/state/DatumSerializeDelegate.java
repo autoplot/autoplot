@@ -8,7 +8,7 @@ package org.virbo.autoplot.state;
 import java.text.ParseException;
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.SemanticOps;
 import org.virbo.qstream.SerializeDelegate;
 
 /**

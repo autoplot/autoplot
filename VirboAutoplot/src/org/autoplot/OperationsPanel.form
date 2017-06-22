@@ -50,7 +50,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Container class="org.virbo.filters.FiltersChainPanel" name="filtersChainPanel">
+    <Container class="org.das2.qds.filters.FiltersChainPanel" name="filtersChainPanel">
       <Properties>
         <Property name="name" type="java.lang.String" value="filtersChainPanel" noResource="true"/>
       </Properties>

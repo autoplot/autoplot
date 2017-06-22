@@ -9,8 +9,8 @@ import java.util.Arrays;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import org.autoplot.datasource.DataSetSelector;
-import org.virbo.jythonsupport.ui.DataMashUp;
-import org.virbo.jythonsupport.ui.NamedURIListTool;
+import org.autoplot.jythonsupport.ui.DataMashUp;
+import org.autoplot.jythonsupport.ui.NamedURIListTool;
 
 /**
  *

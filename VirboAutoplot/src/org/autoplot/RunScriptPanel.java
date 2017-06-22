@@ -28,7 +28,7 @@ import org.autoplot.jythonsupport.JythonRefactory;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.util.InteractiveInterpreter;
 import org.autoplot.datasource.AutoplotSettings;
-import org.virbo.jythonsupport.ui.EditorTextPane;
+import org.autoplot.jythonsupport.ui.EditorTextPane;
 
 /**
  *
@@ -38,13 +38,13 @@ public class RunScriptPanel extends javax.swing.JPanel {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.jython");
 
-    org.virbo.jythonsupport.ui.EditorTextPane textArea;
+    org.autoplot.jythonsupport.ui.EditorTextPane textArea;
 
     /** Creates new form RunScriptPanel */
     public RunScriptPanel() {
         initComponents();
         this.jScrollPane1.getVerticalScrollBar().setUnitIncrement(12);
-        textArea = new org.virbo.jythonsupport.ui.EditorTextPane();
+        textArea = new org.autoplot.jythonsupport.ui.EditorTextPane();
         scriptPanel.add( textArea );
         textArea.setEditable(false);
     }

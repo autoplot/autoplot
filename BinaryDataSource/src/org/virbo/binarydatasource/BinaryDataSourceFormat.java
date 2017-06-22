@@ -13,11 +13,11 @@ import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.util.Map;
-import org.autoplot.bufferdataset.BufferDataSet;
+import org.das2.qds.buffer.BufferDataSet;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.QubeDataSetIterator;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.QDataSet;
+import org.das2.qds.QubeDataSetIterator;
+import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.DataSourceFormat;
 

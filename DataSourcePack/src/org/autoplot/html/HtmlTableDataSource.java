@@ -16,8 +16,8 @@ import javax.swing.text.html.parser.ParserDelegator;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.capability.Streaming;
 

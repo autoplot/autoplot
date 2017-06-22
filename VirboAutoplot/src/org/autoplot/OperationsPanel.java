@@ -30,10 +30,10 @@ import javax.swing.event.DocumentListener;
 import org.das2.datum.LoggerManager;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.autoplot.util.TickleTimer;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.examples.Schemes;
+import org.das2.qds.QDataSet;
+import org.das2.qds.examples.Schemes;
 import org.autoplot.datasource.InputVerifier;
-import org.virbo.filters.FiltersChainPanel;
+import org.das2.qds.filters.FiltersChainPanel;
 
 /**
  * Make a special component for managing filters.  This extracts the functionality
@@ -358,7 +358,7 @@ public class OperationsPanel extends javax.swing.JPanel {
     private void initComponents() {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
-        filtersChainPanel = new org.virbo.filters.FiltersChainPanel();
+        filtersChainPanel = new org.das2.qds.filters.FiltersChainPanel();
         operatorsComboBox = new org.autoplot.datasource.RecentComboBox();
         editComponentPanel = new javax.swing.JButton();
         operationsLabel = new javax.swing.JLabel();
@@ -587,7 +587,7 @@ public class OperationsPanel extends javax.swing.JPanel {
         OperationsPanel p= new OperationsPanel();
         QDataSet ds= Schemes.simpleSpectrogramTimeSeries();
         try {
-            org.virbo.jythonsupport.Util.getDataSet("http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2000-01-09");
+            org.autoplot.jythonsupport.Util.getDataSet("http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2000-01-09");
         } catch ( Exception ex ) {
             throw ex;
         }
@@ -653,7 +653,7 @@ public class OperationsPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel dataSetLabel;
     private javax.swing.JButton editComponentPanel;
-    private org.virbo.filters.FiltersChainPanel filtersChainPanel;
+    private org.das2.qds.filters.FiltersChainPanel filtersChainPanel;
     private javax.swing.JLabel operationsLabel;
     private org.autoplot.datasource.RecentComboBox operatorsComboBox;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;

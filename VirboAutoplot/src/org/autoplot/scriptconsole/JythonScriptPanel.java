@@ -7,7 +7,7 @@ package org.autoplot.scriptconsole;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import org.virbo.jythonsupport.ui.EditorContextMenu;
+import org.autoplot.jythonsupport.ui.EditorContextMenu;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -51,8 +51,8 @@ import org.autoplot.dom.ApplicationController;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
-import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
-import org.virbo.jythonsupport.ui.EditorTextPane;
+import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
+import org.autoplot.jythonsupport.ui.EditorTextPane;
 
 /**
  * GUI for editing and running Jython scripts.
@@ -386,7 +386,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         contextSelector = new javax.swing.JComboBox();
         caretPositionLabel = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        textArea = new org.virbo.jythonsupport.ui.EditorTextPane();
+        textArea = new org.autoplot.jythonsupport.ui.EditorTextPane();
         newScriptButton = new javax.swing.JButton();
         interruptButton = new javax.swing.JButton();
         fileNameTextField = new javax.swing.JTextField();
@@ -554,7 +554,7 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
     private javax.swing.JButton newScriptButton;
     private javax.swing.JButton openButton;
     private javax.swing.JButton saveAsButton;
-    private org.virbo.jythonsupport.ui.EditorTextPane textArea;
+    private org.autoplot.jythonsupport.ui.EditorTextPane textArea;
     // End of variables declaration//GEN-END:variables
 
     public EditorTextPane getEditorPanel() {

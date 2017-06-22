@@ -37,15 +37,15 @@ import org.autoplot.dom.DataSourceController;
 import org.autoplot.dom.DataSourceFilter;
 import org.autoplot.dom.PlotElement;
 import org.autoplot.dom.PlotElementController;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.JoinDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.RankZeroDataSet;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.JoinDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.RankZeroDataSet;
+import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.MetadataModel;
-import org.virbo.dsutil.AutoHistogram;
-import org.virbo.dsutil.PropertiesTreeModel;
+import org.das2.qds.util.AutoHistogram;
+import org.das2.qds.util.PropertiesTreeModel;
 import org.autoplot.metatree.NameValueTreeModel;
 
 /**

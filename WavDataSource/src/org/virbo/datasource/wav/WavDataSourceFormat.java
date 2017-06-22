@@ -32,18 +32,18 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.autoplot.bufferdataset.BufferDataSet;
+import org.das2.qds.buffer.BufferDataSet;
 import org.das2.datum.UnitsUtil;
 import org.das2.datum.format.DatumFormatter;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.QubeDataSetIterator;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
+import org.das2.qds.QubeDataSetIterator;
+import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.DataSourceFormat;
-import org.virbo.dsops.Ops;
-import org.virbo.dsutil.DataSetBuilder;
+import org.das2.qds.ops.Ops;
+import org.das2.qds.util.DataSetBuilder;
 
 /**
  * Format data to binary wav file.  The wav file format contains metadata in the first bytes, 

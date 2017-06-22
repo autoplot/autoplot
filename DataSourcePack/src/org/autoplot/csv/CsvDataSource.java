@@ -20,15 +20,15 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
-import org.virbo.dataset.SparseDataSet;
+import org.das2.qds.DDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
+import org.das2.qds.SparseDataSet;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
-import org.virbo.dsops.Ops;
-import org.virbo.dsutil.AsciiParser;
-import org.virbo.dsutil.DataSetBuilder;
+import org.das2.qds.ops.Ops;
+import org.das2.qds.util.AsciiParser;
+import org.das2.qds.util.DataSetBuilder;
 
 /**
  * Specialized reader only reads csv files.  These csv files must be simple tables with the same number of fields in each record.

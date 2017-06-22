@@ -6,13 +6,13 @@
 package test.endtoend;
 
 import org.das2.datum.Datum;
-import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.IndexListDataSetIterator;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.QubeDataSetIterator;
-import org.virbo.dataset.WritableDataSet;
-import org.virbo.dsops.Ops;
+import org.das2.qds.DDataSet;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.IndexListDataSetIterator;
+import org.das2.qds.QDataSet;
+import org.das2.qds.QubeDataSetIterator;
+import org.das2.qds.WritableDataSet;
+import org.das2.qds.ops.Ops;
 
 /**
  * tests of qdataset operations performance, correctness.

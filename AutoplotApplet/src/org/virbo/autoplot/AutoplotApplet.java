@@ -61,14 +61,14 @@ import org.autoplot.dom.Canvas;
 import org.autoplot.dom.Diff;
 import org.autoplot.dom.DomUtil;
 import org.autoplot.dom.Plot;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
-import org.virbo.dsutil.AsciiParser;
+import org.das2.qds.util.AsciiParser;
 import org.virbo.qstream.SerializeDelegate;
 import org.virbo.qstream.SerializeRegistry;
 

@@ -17,7 +17,7 @@ import java.beans.PersistenceDelegate;
 import org.das2.datum.DatumUtil;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.TimeLocationUnits;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.SemanticOps;
 
 /**
  *

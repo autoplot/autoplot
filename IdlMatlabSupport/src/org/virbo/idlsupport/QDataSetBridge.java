@@ -10,19 +10,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.autoplot.bufferdataset.FloatDataSet;
-import org.autoplot.bufferdataset.LongDataSet;
+import org.das2.qds.buffer.FloatDataSet;
+import org.das2.qds.buffer.LongDataSet;
 import org.das2.datum.LoggerManager;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.FDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.QubeDataSetIterator;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.FDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.QubeDataSetIterator;
+import org.das2.qds.SemanticOps;
 
 /**
  * See http://autoplot.org/IDL and http://autoplot.org/Matlab which show how this is used in the environments.

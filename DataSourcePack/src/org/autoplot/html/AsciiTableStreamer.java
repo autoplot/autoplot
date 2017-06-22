@@ -13,10 +13,10 @@ import org.das2.datum.EnumerationUnits;
 import org.das2.datum.TimeParser;
 import org.das2.datum.Units;
 import org.das2.util.LoggerManager;
-import org.virbo.dataset.AbstractDataSet;
-import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dsops.Ops;
+import org.das2.qds.AbstractDataSet;
+import org.das2.qds.DDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.ops.Ops;
 
 /**
  * Generic class for converting a table of ASCII strings to QDataSet stream.

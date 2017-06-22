@@ -33,7 +33,7 @@ import javax.xml.xpath.XPathFactory;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
 import org.virbo.spase.VOTableReader;

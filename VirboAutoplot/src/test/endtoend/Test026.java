@@ -4,7 +4,7 @@
  */
 package test.endtoend;
 
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.SemanticOps;
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.datum.DatumRangeUtil;

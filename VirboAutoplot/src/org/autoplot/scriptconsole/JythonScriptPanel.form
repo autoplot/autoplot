@@ -114,7 +114,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
-        <Component class="org.virbo.jythonsupport.ui.EditorTextPane" name="textArea">
+        <Component class="org.autoplot.jythonsupport.ui.EditorTextPane" name="textArea">
           <Events>
             <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="textAreaFocusGained"/>
           </Events>

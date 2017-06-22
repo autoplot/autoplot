@@ -21,16 +21,16 @@ import org.eso.fits.FitsHDUnit;
 import org.eso.fits.FitsKeyword;
 import org.eso.fits.FitsMatrix;
 import org.eso.fits.FitsTable;
-import org.virbo.dataset.AbstractDataSet;
-import org.virbo.dataset.ArrayDataSet;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.FDataSet;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.AbstractDataSet;
+import org.das2.qds.ArrayDataSet;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.FDataSet;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.MetadataModel;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 
 /**
  *

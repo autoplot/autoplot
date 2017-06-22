@@ -18,16 +18,16 @@ import java.util.HashMap;
 import java.util.Map;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.QubeDataSetIterator;
+import org.das2.qds.QDataSet;
+import org.das2.qds.QubeDataSetIterator;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.DataSourceFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.SemanticOps;
-import org.virbo.dataset.examples.Schemes;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.SemanticOps;
+import org.das2.qds.examples.Schemes;
 
 /**
  * Format the QDataSet into CDF tables, using Nand Lal's library.

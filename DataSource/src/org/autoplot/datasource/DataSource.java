@@ -11,7 +11,7 @@ package org.autoplot.datasource;
 
 import org.das2.util.monitor.ProgressMonitor;
 import java.util.Map;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 
 /**
  * Like the DataLoader of das2, but provides minimal dataset discovery metadata

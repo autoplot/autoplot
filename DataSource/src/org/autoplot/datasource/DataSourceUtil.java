@@ -46,11 +46,11 @@ import org.das2.datum.Units;
 import org.das2.datum.TimeParser;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 //import org.virbo.qstream.SimpleStreamFormatter;
 //import org.virbo.qstream.StreamException;
 

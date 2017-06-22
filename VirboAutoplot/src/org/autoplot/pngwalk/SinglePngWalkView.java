@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 
 /**
  * An implementation of PngWalkView to display a single image.

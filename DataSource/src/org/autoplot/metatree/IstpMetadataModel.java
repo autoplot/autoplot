@@ -19,15 +19,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LatexToGranny;
-import org.virbo.dataset.ArrayDataSet;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.ArrayDataSet;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.MetadataModel;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.LogNames;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 
 /**
  * Metadata model for ISTP conventions.  For example, FIELDNAM is mapped to QDataSet.NAME, SCALEMIN is 

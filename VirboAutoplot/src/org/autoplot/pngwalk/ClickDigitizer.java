@@ -27,13 +27,13 @@ import org.das2.util.monitor.AlertNullProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 
 /**
  * Quick-n-dirty class for picking off points from images.  The ClickDigitizer knows how to 

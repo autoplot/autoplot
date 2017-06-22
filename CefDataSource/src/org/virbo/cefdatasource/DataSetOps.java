@@ -5,10 +5,10 @@
 package org.virbo.cefdatasource;
 
 import org.das2.datum.Units;
-import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.RankNDataSet;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.DDataSet;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.RankNDataSet;
+import org.das2.qds.QDataSet;
 
 /**
  *
@@ -24,7 +24,7 @@ public class DataSetOps {
      */
     public static DDataSet collapse(QDataSet ds) {
         DDataSet result;
-        int[] qube = org.virbo.dataset.DataSetUtil.qubeDims( ds );
+        int[] qube = org.das2.qds.DataSetUtil.qubeDims( ds );
         Units u = (Units) ds.property(QDataSet.UNITS);
         double fill = u == null ? Double.NaN : u.getFillDouble();
 
@@ -83,7 +83,7 @@ public class DataSetOps {
                     result.putValue(i, k, ssum);
                 }
             }
-            org.virbo.dataset.DataSetUtil.putProperties(org.virbo.dataset.DataSetUtil.getProperties(ds), result);
+            org.das2.qds.DataSetUtil.putProperties(org.das2.qds.DataSetUtil.getProperties(ds), result);
             result.putProperty(QDataSet.DEPEND_1, result.property("DEPEND_2"));
 
         } else {
@@ -122,7 +122,7 @@ public class DataSetOps {
                     }
                 }
             }
-            org.virbo.dataset.DataSetUtil.putProperties(org.virbo.dataset.DataSetUtil.getProperties(ds), result);
+            org.das2.qds.DataSetUtil.putProperties(org.das2.qds.DataSetUtil.getProperties(ds), result);
             result.putProperty(QDataSet.DEPEND_2, result.property("DEPEND_3"));
 
         } else {

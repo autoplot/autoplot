@@ -12,10 +12,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static org.autoplot.ScriptContext.*;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dsops.Ops;
-import org.virbo.jythonsupport.Util;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.ops.Ops;
+import org.autoplot.jythonsupport.Util;
 
 /**
  * giant list of ASCII URIs for testing.
@@ -118,7 +118,7 @@ public class Test021 {
             try {
                 
                 if (s.startsWith("CC ")) {
-                    String[] list = org.virbo.jythonsupport.Util.listDirectory(s.substring(3));
+                    String[] list = org.autoplot.jythonsupport.Util.listDirectory(s.substring(3));
                     PrintWriter out = new PrintWriter( label+".txt" );
                     for (String l : list) {
                         out.println(l);

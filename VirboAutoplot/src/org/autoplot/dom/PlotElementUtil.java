@@ -11,7 +11,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 
 /**
  * static utilities the plot element controller uses.

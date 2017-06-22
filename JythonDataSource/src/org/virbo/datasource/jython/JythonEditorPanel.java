@@ -61,10 +61,10 @@ import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.LogNames;
 import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.URISplit;
-import org.virbo.jythonsupport.JythonUtil;
-import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
-import org.virbo.jythonsupport.ui.ScriptPanelSupport;
-import org.virbo.jythonsupport.ui.Util;
+import org.autoplot.jythonsupport.JythonUtil;
+import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
+import org.autoplot.jythonsupport.ui.ScriptPanelSupport;
+import org.autoplot.jythonsupport.ui.Util;
 
 /**
  * Editor for vap+jyds uris.  These URIs offer a couple of challenges,
@@ -151,7 +151,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         fileNameLabel = new javax.swing.JLabel();
         scriptScrollPane = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
-        textArea = new org.virbo.jythonsupport.ui.EditorTextPane();
+        textArea = new org.autoplot.jythonsupport.ui.EditorTextPane();
         paramsScrollPane = new javax.swing.JScrollPane();
         paramsPanel = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -237,7 +237,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     private javax.swing.JPanel scriptPanel;
     private javax.swing.JScrollPane scriptScrollPane;
     private org.das2.components.TearoffTabbedPane tearoffTabbedPane1;
-    private org.virbo.jythonsupport.ui.EditorTextPane textArea;
+    private org.autoplot.jythonsupport.ui.EditorTextPane textArea;
     private javax.swing.JComboBox variableComboBox;
     // End of variables declaration//GEN-END:variables
 

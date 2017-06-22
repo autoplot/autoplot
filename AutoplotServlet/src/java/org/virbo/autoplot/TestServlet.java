@@ -18,8 +18,8 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import javax.imageio.ImageIO;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dsutil.DataSetBuilder;
+import org.das2.qds.QDataSet;
+import org.das2.qds.util.DataSetBuilder;
 
 /**
  * This is a stress test for the servlet. Repeatly hitting the it to see if we can mess it up.

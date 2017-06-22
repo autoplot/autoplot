@@ -49,8 +49,8 @@ import org.python.core.PyString;
 import org.python.core.PyStringMap;
 import org.python.core.PyTableCode;
 import org.python.util.PythonInterpreter;
-import org.virbo.jythonsupport.JythonOps;
-import org.virbo.jythonsupport.JythonUtil;
+import org.autoplot.jythonsupport.JythonOps;
+import org.autoplot.jythonsupport.JythonUtil;
 
 /**
  * Completions for Jython code.
@@ -909,7 +909,7 @@ public class JythonCompletionTask implements CompletionTask {
             } else {
                 interp = new PythonInterpreter();
             }
-            if ( org.virbo.jythonsupport.Util.isLegacyImports() ) {
+            if ( org.autoplot.jythonsupport.Util.isLegacyImports() ) {
                 URL imports = JythonOps.class.getResource("/imports.py");
                 try (InputStream in = imports.openStream()) {
                     interp.execfile(in,"/imports.py");

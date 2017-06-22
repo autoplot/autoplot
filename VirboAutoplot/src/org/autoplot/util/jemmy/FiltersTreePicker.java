@@ -6,7 +6,7 @@ import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
 import org.netbeans.jemmy.operators.JTreeOperator;
-import org.virbo.filters.AddFilterDialog;
+import org.das2.qds.filters.AddFilterDialog;
 
 /**
  *

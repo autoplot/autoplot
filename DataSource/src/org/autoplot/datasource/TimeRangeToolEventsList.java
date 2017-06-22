@@ -31,10 +31,10 @@ import org.das2.datum.UnitsUtil;
 import org.das2.event.DataRangeSelectionEvent;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 
 /**
  * The EventsList tool makes it easy to browse around a list of events.  It

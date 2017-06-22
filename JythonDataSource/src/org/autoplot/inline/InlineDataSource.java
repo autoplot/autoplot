@@ -22,20 +22,20 @@ import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.util.PythonInterpreter;
-import org.virbo.dataset.BundleDataSet;
-import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.BundleDataSet;
+import org.das2.qds.DDataSet;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
-import org.virbo.dsops.Ops;
-import org.virbo.dsutil.DataSetBuilder;
-import org.virbo.jythonsupport.JythonOps;
-import org.virbo.jythonsupport.JythonUtil;
-import org.virbo.jythonsupport.Util;
+import org.das2.qds.ops.Ops;
+import org.das2.qds.util.DataSetBuilder;
+import org.autoplot.jythonsupport.JythonOps;
+import org.autoplot.jythonsupport.JythonUtil;
+import org.autoplot.jythonsupport.Util;
 
 /**
  * Data source used mostly for demonstrations and quick modifications
@@ -263,9 +263,9 @@ public class InlineDataSource extends AbstractDataSource {
 
         logger.log( Level.FINER, "create interpreter");
         interp= JythonUtil.createInterpreter(true);
-        if ( ! org.virbo.jythonsupport.Util.isLegacyImports() ) { // we need to always bring this in to support legacy URIs.
+        if ( ! org.autoplot.jythonsupport.Util.isLegacyImports() ) { // we need to always bring this in to support legacy URIs.
             logger.log( Level.FINER, "import the stuff we don't import automatically anymore");
-            try (InputStream in = org.virbo.jythonsupport.Util.class.getResource("imports.py").openStream()) {
+            try (InputStream in = org.autoplot.jythonsupport.Util.class.getResource("imports.py").openStream()) {
                 interp.execfile( in, "imports.py");
             }
         }

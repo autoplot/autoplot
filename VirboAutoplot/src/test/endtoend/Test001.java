@@ -8,12 +8,12 @@ package test.endtoend;
 import java.io.IOException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
-import static org.virbo.dsops.Ops.*;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
+import static org.das2.qds.ops.Ops.*;
 import static org.autoplot.ScriptContext.*;
-import org.virbo.dsops.Ops;
-import org.virbo.jythonsupport.Util;
+import org.das2.qds.ops.Ops;
+import org.autoplot.jythonsupport.Util;
 
 /**
  * Test Autoplot

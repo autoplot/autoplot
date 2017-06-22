@@ -127,7 +127,7 @@ import org.autoplot.bookmarks.BookmarksManager;
 import org.autoplot.bookmarks.BookmarksManagerModel;
 import org.autoplot.bookmarks.Util;
 import org.autoplot.transferrable.ImageSelection;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.FileSystemUtil;

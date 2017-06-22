@@ -6,11 +6,11 @@ package org.virbo.cefdatasource;
 
 import java.util.Arrays;
 import java.util.Map;
-import org.virbo.dataset.AbstractDataSet;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.RankNDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.DataSetOps;
+import org.das2.qds.AbstractDataSet;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.RankNDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.DataSetOps;
 
 /**
  *

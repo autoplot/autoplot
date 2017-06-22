@@ -35,7 +35,7 @@ public class DataSetDescriptorAdapter extends DataSetDescriptor {
     protected DataSet getDataSetImpl(Datum start, Datum end, Datum resolution, ProgressMonitor monitor) throws DasException {
         source.setViewRange( new DatumRange( start, end ) );
         try {
-            org.virbo.dataset.QDataSet ds= source.getDataSet( monitor );
+            org.das2.qds.QDataSet ds= source.getDataSet( monitor );
             if ( ds.rank()==1 ) {
                 return VectorDataSetAdapter.create(ds);
             } else {

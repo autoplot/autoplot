@@ -4,7 +4,7 @@ package org.virbo.ascii;
 import java.text.ParseException;
 import org.das2.datum.Units;
 import org.das2.datum.TimeParser;
-import org.virbo.dsutil.AsciiParser;
+import org.das2.qds.util.AsciiParser;
 
 /**
  * Parse the record by recombining the separated fields, then parsing

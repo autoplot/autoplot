@@ -15,9 +15,9 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
 
 /**
  * Class for containing the logic of how macros are implemented.

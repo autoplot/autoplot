@@ -5,10 +5,10 @@
 
 package test.endtoend;
 
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSourceRegistry;
 import static org.autoplot.ScriptContext.*;
-import org.virbo.jythonsupport.Util;
+import org.autoplot.jythonsupport.Util;
 
 /**
  * tests of the Java-based cdf reader

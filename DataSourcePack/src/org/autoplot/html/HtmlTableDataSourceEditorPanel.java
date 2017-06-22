@@ -29,12 +29,12 @@ import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.ui.TableRowHeader;
-import org.virbo.dsutil.QDataSetTableModel;
+import org.das2.qds.util.QDataSetTableModel;
 
 /**
  *

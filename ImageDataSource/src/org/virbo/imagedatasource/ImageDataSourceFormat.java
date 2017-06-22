@@ -7,10 +7,10 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.DataSetIterator;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.QubeDataSetIterator;
+import org.das2.qds.DataSetIterator;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.QDataSet;
+import org.das2.qds.QubeDataSetIterator;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.DataSourceFormat;
 

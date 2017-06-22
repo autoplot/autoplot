@@ -10,12 +10,12 @@ package org.virbo.cdf;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.virbo.dataset.AbstractDataSet;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.RankZeroDataSet;
-import org.virbo.dataset.Slice0DataSet;
-import org.virbo.dataset.WritableDataSet;
+import org.das2.qds.AbstractDataSet;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
+import org.das2.qds.RankZeroDataSet;
+import org.das2.qds.Slice0DataSet;
+import org.das2.qds.WritableDataSet;
 
 /**
  * hacked DDataSet implementation does transpose for column major files.

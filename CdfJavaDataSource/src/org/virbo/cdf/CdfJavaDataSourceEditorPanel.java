@@ -41,7 +41,7 @@ import org.das2.util.DasExceptionHandler;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceEditorPanel;

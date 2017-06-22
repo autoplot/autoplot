@@ -19,7 +19,7 @@ import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.python.core.PyStringMap;
 import org.python.util.PythonInterpreter;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 
 /**
  * little GUI for printing the PDB output and sending commands to it.

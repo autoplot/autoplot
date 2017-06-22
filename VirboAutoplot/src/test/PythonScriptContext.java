@@ -14,8 +14,8 @@ import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUI;
 import org.autoplot.dom.Application;
 import org.autoplot.scriptconsole.ExitExceptionHandler;
-import org.virbo.dataset.ArrayDataSet;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.ArrayDataSet;
+import org.das2.qds.QDataSet;
 
 /**
  * This new class is meant to replace ScriptContext, and fixing a number of

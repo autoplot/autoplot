@@ -8,10 +8,10 @@ import org.das2.dataset.VectorUtil;
 import java.io.File;
 import java.io.FileOutputStream;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.das2.dataset.TableDataSetAdapter;
 import org.das2.dataset.VectorDataSetAdapter;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.DataSourceFormat;
 

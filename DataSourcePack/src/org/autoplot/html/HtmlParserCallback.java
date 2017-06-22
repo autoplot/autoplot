@@ -11,8 +11,8 @@ import java.util.logging.Logger;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLEditorKit;
-import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.DDataSet;
+import org.das2.qds.QDataSet;
 
 /**
  *

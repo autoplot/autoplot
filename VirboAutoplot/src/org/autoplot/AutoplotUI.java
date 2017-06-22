@@ -179,8 +179,8 @@ import org.autoplot.dom.PlotController;
 import org.autoplot.scriptconsole.GuiExceptionHandler;
 import org.autoplot.state.UndoRedoSupport;
 import org.autoplot.util.TickleTimer;
-import org.virbo.dataset.DataSetAnnotations;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.DataSetAnnotations;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
@@ -191,9 +191,9 @@ import org.autoplot.datasource.SourceTypesBrowser;
 import org.autoplot.datasource.TimeRangeEditor;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
-import org.virbo.filters.AddFilterDialog;
-import org.virbo.filters.FiltersChainPanel;
-import org.virbo.jythonsupport.ui.DataMashUp;
+import org.das2.qds.filters.AddFilterDialog;
+import org.das2.qds.filters.FiltersChainPanel;
+import org.autoplot.jythonsupport.ui.DataMashUp;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -5747,7 +5747,7 @@ APSplash.checkTime("init 240");
                 @Override
                 public void run() {
                     try ( BufferedReader reader= new BufferedReader( new FileReader(ff) ) ) {
-                        Map<String,String> doc= org.virbo.jythonsupport.JythonUtil.getDocumentation( reader );
+                        Map<String,String> doc= org.autoplot.jythonsupport.JythonUtil.getDocumentation( reader );
                         String title= doc.get( "TITLE" );
                         if ( title!=null ) b.setDescription(title); //TODO: bookmarks use inconsistent names... 
                         String label= doc.get( "LABEL" );

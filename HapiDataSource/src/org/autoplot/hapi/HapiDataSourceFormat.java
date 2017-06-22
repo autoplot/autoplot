@@ -20,13 +20,13 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.QubeDataSetIterator;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
+import org.das2.qds.QubeDataSetIterator;
+import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.URISplit;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 
 /**
  * Format the QDataSet into HAPI server info and data responses.

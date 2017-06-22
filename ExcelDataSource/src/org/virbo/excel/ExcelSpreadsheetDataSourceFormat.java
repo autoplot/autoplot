@@ -22,9 +22,9 @@ import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.DataSetWrapper;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.DataSetWrapper;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.URISplit;
 

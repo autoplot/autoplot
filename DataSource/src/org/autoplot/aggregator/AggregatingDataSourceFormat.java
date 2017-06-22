@@ -15,12 +15,12 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.fsm.FileStorageModel;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.URISplit;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 
 /**
  * Format the data by breaking it up into an aggregated pile of files.

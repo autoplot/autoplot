@@ -3,10 +3,10 @@ package org.autoplot;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.RGBImageRenderer;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
-import org.virbo.dataset.examples.Schemes;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
+import org.das2.qds.examples.Schemes;
 
 public enum RenderType {
     spectrogram,

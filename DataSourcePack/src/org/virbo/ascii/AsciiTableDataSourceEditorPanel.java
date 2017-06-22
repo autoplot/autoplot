@@ -47,16 +47,16 @@ import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.ui.Util;
-import org.virbo.dsutil.AsciiHeadersParser;
-import org.virbo.dsutil.AsciiParser;
-import org.virbo.dsutil.AutoHistogram;
-import org.virbo.dsutil.DataSetBuilder;
+import org.das2.qds.util.AsciiHeadersParser;
+import org.das2.qds.util.AsciiParser;
+import org.das2.qds.util.AutoHistogram;
+import org.das2.qds.util.DataSetBuilder;
 
 /**
  * editor panel for managing ASCII table URIs.

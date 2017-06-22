@@ -22,9 +22,9 @@ import org.das2.util.filesystem.HtmlUtil;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.autoplot.ScriptContext;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dsops.Ops;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.ops.Ops;
 
 import static org.autoplot.ScriptContext.*;
 import org.autoplot.bookmarks.Bookmark;
@@ -115,7 +115,7 @@ public class Test140 {
         } else if ( uri.startsWith("pngwalk:") ) {
             System.err.println("skipping pngwalk");
         } else {
-            ds= org.virbo.jythonsupport.Util.getDataSet( uri );
+            ds= org.autoplot.jythonsupport.Util.getDataSet( uri );
             tsec= (System.currentTimeMillis()-t0)/1000.;
             if ( ds!=null ) {
                 MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);

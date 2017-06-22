@@ -6,7 +6,7 @@
 package org.autoplot.datasource;
 
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 
 /**
  * @author jbf

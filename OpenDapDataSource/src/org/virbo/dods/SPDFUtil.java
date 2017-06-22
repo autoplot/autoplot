@@ -16,7 +16,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 
 /**
  * static methods for helping to use the SPDF dods server.

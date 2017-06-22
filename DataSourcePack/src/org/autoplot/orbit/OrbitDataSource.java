@@ -10,13 +10,13 @@ import java.util.logging.Level;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Orbits;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DefaultTimeSeriesBrowse;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 
 /**
  * Read in orbits as events file.  This expects URIs like

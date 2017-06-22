@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.AbstractDataSource;
 import opendap.dap.Attribute;
 import java.net.URI;
@@ -40,13 +40,13 @@ import opendap.dap.DAP2Exception;
 import opendap.dap.NoSuchAttributeException;
 import opendap.dap.Server.InvalidParameterException;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.dataset.AbstractDataSet;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.MutablePropertyDataSet;
+import org.das2.qds.AbstractDataSet;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.MutablePropertyDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
-import org.virbo.dsutil.TransposeRankNDataSet;
+import org.das2.qds.util.TransposeRankNDataSet;
 
 /**
  * Read data via OpenDAP.

@@ -11,13 +11,13 @@ import java.text.ParseException;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.JoinDataSet;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.WritableDataSet;
-import org.virbo.dsops.Ops;
+import org.das2.qds.DDataSet;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.JoinDataSet;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.WritableDataSet;
+import org.das2.qds.ops.Ops;
 
 /**
  *

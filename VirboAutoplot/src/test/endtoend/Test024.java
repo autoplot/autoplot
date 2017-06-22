@@ -14,11 +14,11 @@ import org.das2.util.monitor.ConsoleTextProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.ScriptContext;
-import org.virbo.dataset.DataSetUtil;
+import org.das2.qds.DataSetUtil;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 
 /**
  * Tests of the IDL/Matlab interface.

@@ -19,7 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRangeUtil;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.SemanticOps;
 
 /**
  *

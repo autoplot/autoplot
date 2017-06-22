@@ -35,17 +35,17 @@ import org.das2.util.monitor.AbstractProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
-import org.virbo.dataset.ArrayDataSet;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.ArrayDataSet;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 import org.virbo.qstream.SimpleStreamFormatter;
 
 /**
@@ -121,7 +121,7 @@ public class AutoplotDataServer {
                 QDataSet ds1= null;
                 try {
                     
-                    ds1= org.virbo.jythonsupport.Util.getDataSet(suri, dr.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
+                    ds1= org.autoplot.jythonsupport.Util.getDataSet(suri, dr.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
                     
                 } catch ( NoDataInIntervalException ex ) {
                     logger.log( Level.INFO, "no data trying to read "+dr, ex ); 
@@ -133,7 +133,7 @@ public class AutoplotDataServer {
                 if ( ds1!=null ) {
                     if ( !SemanticOps.isTimeSeries(ds1) ) { //automatically fall back to -nostream
                         logger.fine( String.format( "dataset doesn't appear to be a timeseries, reloading everything" ) );
-                        ds1 = org.virbo.jythonsupport.Util.getDataSet(suri, outer.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
+                        ds1 = org.autoplot.jythonsupport.Util.getDataSet(suri, outer.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
                         logger.log( Level.FINE, "  --> {0} )", ds1 );
                         writeData(format, out, ds1, ascii, stream );
                         someValid= true;
@@ -166,7 +166,7 @@ public class AutoplotDataServer {
             logger.fine("org.virbo.jythonsupport.Util.getDataSet( suri ):");
             logger.log( Level.FINE, "   suri={0}\n", suri );
 
-            ds = org.virbo.jythonsupport.Util.getDataSet(suri,mon);
+            ds = org.autoplot.jythonsupport.Util.getDataSet(suri,mon);
             logger.log(Level.FINE, "loaded ds={0}", ds);
             
             if ( ds!=null ) {

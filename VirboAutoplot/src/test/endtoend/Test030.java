@@ -4,9 +4,9 @@
  */
 package test.endtoend;
 
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.QDataSet;
-import org.virbo.jythonsupport.Util;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.QDataSet;
+import org.autoplot.jythonsupport.Util;
 import static org.autoplot.ScriptContext.*;
 
 /**

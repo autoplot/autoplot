@@ -6,7 +6,7 @@
 package org.virbo.dods;
 
 import java.lang.reflect.Array;
-import org.virbo.dataset.WritableDataSet;
+import org.das2.qds.WritableDataSet;
 
 /**
  * Copy java arrays into a dataset.

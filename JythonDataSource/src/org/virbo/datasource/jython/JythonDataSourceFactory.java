@@ -33,8 +33,8 @@ import org.autoplot.datasource.LogNames;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import static org.virbo.datasource.jython.JythonDataSource.PARAM_SCRIPT;
-import org.virbo.jythonsupport.JythonUtil;
-import org.virbo.jythonsupport.PyQDataSet;
+import org.autoplot.jythonsupport.JythonUtil;
+import org.autoplot.jythonsupport.PyQDataSet;
 
 /**
  *

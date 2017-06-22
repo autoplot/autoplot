@@ -44,17 +44,17 @@ import org.autoplot.scriptconsole.MakeToolPanel;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
-import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
-import org.virbo.jythonsupport.ui.EditorTextPane;
-import org.virbo.jythonsupport.ui.ParametersFormPanel;
-import org.virbo.jythonsupport.ui.ScriptPanelSupport;
+import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
+import org.autoplot.jythonsupport.ui.EditorTextPane;
+import org.autoplot.jythonsupport.ui.ParametersFormPanel;
+import org.autoplot.jythonsupport.ui.ScriptPanelSupport;
 
 /**
  * Utilities for Jython functions, such as a standard way to initialize
  * an interpreter and invoke a script asynchronously.  See also 1310.
  * TODO: this needs review, since the autoplot.py was added to the imports.
  * 
- * @see org.virbo.jythonsupport.JythonUtil
+ * @see org.autoplot.jythonsupport.JythonUtil
  * @author jbf
  */
 public class JythonUtil {
@@ -74,8 +74,8 @@ public class JythonUtil {
      * @throws java.io.IOException
      */
     public static InteractiveInterpreter createInterpreter( boolean appContext, boolean sandbox ) throws IOException {
-        InteractiveInterpreter interp= org.virbo.jythonsupport.JythonUtil.createInterpreter(sandbox);
-        if ( org.virbo.jythonsupport.Util.isLegacyImports() ) {
+        InteractiveInterpreter interp= org.autoplot.jythonsupport.JythonUtil.createInterpreter(sandbox);
+        if ( org.autoplot.jythonsupport.Util.isLegacyImports() ) {
             if ( appContext ) {
                 try ( InputStream in = JythonUtil.class.getResource("/appContextImports.py").openStream() ) {
                     interp.execfile( in, "/appContextImports.py" ); // JythonRefactory okay
@@ -218,7 +218,7 @@ public class JythonUtil {
         JPanel p= new JPanel();
         p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
         
-        ParametersFormPanel fpf= new org.virbo.jythonsupport.ui.ParametersFormPanel();
+        ParametersFormPanel fpf= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
         ParametersFormPanel.FormData fd=  fpf.doVariables( env, file, fvars, p );
 
         if ( fd.count==0 && !makeTool ) {
@@ -227,7 +227,7 @@ public class JythonUtil {
         
         JPanel scriptPanel= new JPanel( new BorderLayout() );
         JTabbedPane tp= new JTabbedPane();
-        org.virbo.jythonsupport.ui.EditorTextPane textArea= new EditorTextPane();
+        org.autoplot.jythonsupport.ui.EditorTextPane textArea= new EditorTextPane();
         
         String theScript= EditorTextPane.loadFileToString( file ) ;
         try {
@@ -275,7 +275,7 @@ public class JythonUtil {
         int result= AutoplotUtil.showConfirmDialog2( parent, tp, "Run Script "+file.getName(), JOptionPane.OK_CANCEL_OPTION );
         if ( result==JOptionPane.OK_OPTION ) {
             fd=  fpf.getFormData();
-            org.virbo.jythonsupport.ui.ParametersFormPanel.resetVariables( fd, fvars );
+            org.autoplot.jythonsupport.ui.ParametersFormPanel.resetVariables( fd, fvars );
             if ( makeTool ) {
                 if ( makeToolPanel.isInstall() ) { // the user has requested that the script be installed.
                     Window w= ScriptContext.getViewWindow();
@@ -349,7 +349,7 @@ public class JythonUtil {
             fvars= vars;
         }
         
-        ParametersFormPanel pfp= new org.virbo.jythonsupport.ui.ParametersFormPanel();
+        ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
         Map<String,Object> env= new HashMap();
         env.put("dom",dom );
         URISplit split= URISplit.parse(url.toString());

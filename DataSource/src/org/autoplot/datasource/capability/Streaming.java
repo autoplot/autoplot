@@ -3,7 +3,7 @@ package org.autoplot.datasource.capability;
 
 import java.util.Iterator;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 
 /**
  * allows the records to be read in as they are available.  Note

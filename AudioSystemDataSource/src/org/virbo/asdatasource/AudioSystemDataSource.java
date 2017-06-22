@@ -18,15 +18,15 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.TargetDataLine;
 import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
-import org.autoplot.bufferdataset.BufferDataSet;
+import org.das2.qds.buffer.BufferDataSet;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.TagGenDataSet;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.TagGenDataSet;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.capability.Streaming;
 import org.autoplot.datasource.capability.Updating;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 
 /**
  * provide a dataset by grabbing data from the desktop's audio system.

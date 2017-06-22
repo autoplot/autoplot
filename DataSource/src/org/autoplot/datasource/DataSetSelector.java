@@ -97,7 +97,7 @@ import org.autoplot.datasource.DataSetURI.CompletionResult;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.autoplot.datasource.ui.PromptComboBoxEditor;
 import org.autoplot.datasource.ui.PromptTextField;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 
 /**
  * Swing component for selecting dataset URIs.  This provides hooks for completions.

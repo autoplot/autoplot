@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.das2.util.AboutUtil;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetSelectorSupport;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.DataSourceEditorPanelUtil;

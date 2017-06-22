@@ -12,8 +12,8 @@ import java.nio.charset.CharacterCodingException;
 import java.text.ParseException;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dsutil.DataSetBuilder;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.util.DataSetBuilder;
 
 /**
  * CEF reader based on Chris Perry's IDL CEF Reader code.

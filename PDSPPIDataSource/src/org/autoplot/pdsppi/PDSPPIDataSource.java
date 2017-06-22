@@ -16,15 +16,15 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
-import org.virbo.dsops.Ops;
+import org.das2.qds.ops.Ops;
 import org.virbo.spase.VOTableReader;
 import org.xml.sax.SAXException;
 
@@ -49,7 +49,7 @@ public class PDSPPIDataSource extends AbstractDataSource {
     }
     
     @Override
-    public org.virbo.dataset.QDataSet getDataSet(ProgressMonitor mon) throws Exception {
+    public org.das2.qds.QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         
         try {
             TimeSeriesBrowse tsb= getCapability( TimeSeriesBrowse.class );
