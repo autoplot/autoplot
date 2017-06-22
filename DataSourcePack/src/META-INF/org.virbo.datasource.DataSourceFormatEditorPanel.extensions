@@ -1,2 +1,2 @@
-org.virbo.ascii.AsciiTableDataSourceFormatEditorPanel dat txt tab
-org.virbo.das2Stream.Das2StreamDataSourceFormatEditorPanel qds d2s
+org.autoplot.ascii.AsciiTableDataSourceFormatEditorPanel dat txt tab
+org.autoplot.das2Stream.Das2StreamDataSourceFormatEditorPanel qds d2s

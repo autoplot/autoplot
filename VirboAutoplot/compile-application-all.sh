@@ -77,7 +77,7 @@ for i in \
   NetCdfDataSource CefDataSource \
   WavDataSource ImageDataSource ExcelDataSource \
   FitsDataSource OpenDapDataSource \
-  CdfDataSource CdfJavaDataSource CDAWebDataSource PDSPPIDataSource HapiDataSource \
+  CdfJavaDataSource CDAWebDataSource PDSPPIDataSource HapiDataSource \
   VirboAutoplot; do
     echo $RSYNC -a --exclude .svn ../${i}/src/ temp-src/
     $RSYNC -a --exclude .svn ../${i}/src/ temp-src/
@@ -216,8 +216,8 @@ if ! $JAVAC $JAVAARGS org/das2/math/filter/*.java; then echo "*****"; hasErrors=
 if ! $JAVAC $JAVAARGS org/das2/components/DataPointRecorderNew.java; then echo "*****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/das2/components/AngleSpectrogramSlicer.java; then echo "*****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/das2/graph/Auralizor.java; then echo "*****"; hasErrors=1; fi  
-if ! $JAVAC $JAVAARGS org/virbo/qstream/*.java; then echo "*****"; hasErrors=1; fi  
-if ! $JAVAC $JAVAARGS org/qstream/filter/*.java; then echo "*****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/das2/qstream/*.java; then echo "*****"; hasErrors=1; fi  
+if ! $JAVAC $JAVAARGS org/das2/qstream/filter/*.java; then echo "*****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/das2/datum/SIUnits.java; then echo "****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/das2/qds/RepeatIndexDataSet.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/autoplot/jythonsupport/ui/DataMashUp.java; then echo "****"; hasErrors=1; fi  

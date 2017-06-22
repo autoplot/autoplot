@@ -83,7 +83,7 @@ import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.URISplit;
-import org.virbo.datasource.jython.JythonDataSourceFactory;
+import org.autoplot.datasource.jython.JythonDataSourceFactory;
 import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 

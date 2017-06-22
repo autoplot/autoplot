@@ -54,7 +54,7 @@ import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
-import org.virbo.qstream.QDataSetStreamHandler;
+import org.das2.qstream.QDataSetStreamHandler;
 
 /**
  * DataSource for communicating with Das2servers.
@@ -403,8 +403,8 @@ public class Das2ServerDataSource extends AbstractDataSource {
         if ( qds ) {
 
             try {
-                org.virbo.qstream.QDataSetStreamHandler eh= new org.virbo.qstream.QDataSetStreamHandler();
-                org.virbo.qstream.StreamTool.readStream( channel,eh );
+                org.das2.qstream.QDataSetStreamHandler eh= new org.das2.qstream.QDataSetStreamHandler();
+                org.das2.qstream.StreamTool.readStream( channel,eh );
 
                 result1= eh.getDataSet();
 
@@ -413,7 +413,7 @@ public class Das2ServerDataSource extends AbstractDataSource {
                     result1= eh.flattenJoin(result1);
                 }
                 
-            } catch ( org.virbo.qstream.StreamException ex ) {
+            } catch ( org.das2.qstream.StreamException ex ) {
                 Throwable cause= ex.getCause();
                 if ( !mon.isFinished() ) mon.finished(); // the stream reader probably called it already.
                 if ( cause!=null && ( cause instanceof java.io.InterruptedIOException ) ) { 

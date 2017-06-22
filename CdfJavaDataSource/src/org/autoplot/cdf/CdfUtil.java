@@ -10,7 +10,6 @@ package org.autoplot.cdf;
 
 import gov.nasa.gsfc.spdf.cdfj.CDFException;
 import gov.nasa.gsfc.spdf.cdfj.CDFReader;
-import org.virbo.cdf.*;
 import java.util.logging.Level;
 import org.das2.datum.DatumRange;
 import org.das2.datum.EnumerationUnits;

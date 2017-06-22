@@ -1,1 +1,1 @@
-org.virbo.dods.DodsDataSourceFactory dds dods
+org.autoplot.dods.DodsDataSourceFactory dds dods

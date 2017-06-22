@@ -74,8 +74,8 @@ import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.URISplit;
-import org.virbo.qstream.SimpleStreamFormatter;
-import org.virbo.qstream.StreamException;
+import org.das2.qstream.SimpleStreamFormatter;
+import org.das2.qstream.StreamException;
 
 /**
  * ScriptContext provides the API to perform abstract functions with 

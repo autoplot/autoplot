@@ -36,7 +36,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
-import org.virbo.spase.VOTableReader;
+import org.autoplot.spase.VOTableReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

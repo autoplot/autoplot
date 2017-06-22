@@ -69,8 +69,8 @@ import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.util.AsciiParser;
-import org.virbo.qstream.SerializeDelegate;
-import org.virbo.qstream.SerializeRegistry;
+import org.das2.qstream.SerializeDelegate;
+import org.das2.qstream.SerializeRegistry;
 
 /**
  *

@@ -6,7 +6,6 @@
 package org.autoplot.cdf;
 
 import gov.nasa.gsfc.spdf.cdfj.CDFException;
-import org.virbo.cdf.*;
 import java.beans.PropertyChangeEvent;
 import java.util.logging.Level;
 import org.das2.datum.Units;

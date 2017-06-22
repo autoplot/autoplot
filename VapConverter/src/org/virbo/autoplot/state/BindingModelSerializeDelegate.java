@@ -9,7 +9,7 @@ import org.virbo.autoplot.dom.*;
 import java.text.ParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.virbo.qstream.SerializeDelegate;
+import org.das2.qstream.SerializeDelegate;
 
 /**
  *

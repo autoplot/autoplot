@@ -6,7 +6,7 @@ package org.autoplot.state;
 
 import java.text.ParseException;
 import java.util.logging.Level;
-import org.virbo.qstream.SerializeDelegate;
+import org.das2.qstream.SerializeDelegate;
 
 /**
  *

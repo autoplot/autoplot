@@ -9,7 +9,7 @@ import java.beans.PropertyEditor;
 import java.text.ParseException;
 import org.das2.beans.BeansUtil;
 import org.das2.components.propertyeditor.Displayable;
-import org.virbo.qstream.SerializeDelegate;
+import org.das2.qstream.SerializeDelegate;
 
 /**
  *

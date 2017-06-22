@@ -26,7 +26,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
 //import org.virbo.cdf.CdfJavaDataSource;
-import org.virbo.cdf.CdfVirtualVars;
+import org.autoplot.cdf.CdfVirtualVars;
 import org.das2.qds.ArrayDataSet;
 import org.das2.qds.DDataSet;
 import org.das2.qds.DataSetUtil;

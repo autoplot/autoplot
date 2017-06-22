@@ -46,7 +46,7 @@ import org.das2.system.RequestProcessor;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.cdf.CdfJavaDataSourceEditorPanel;
+import org.autoplot.cdf.CdfJavaDataSourceEditorPanel;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.TimeRangeTool;

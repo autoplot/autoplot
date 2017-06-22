@@ -60,7 +60,7 @@ import org.autoplot.datasource.DataSourceEditorPanelUtil;
 import org.autoplot.datasource.WindowManager;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.PyQDataSet;
-import org.virbo.qstream.StreamException;
+import org.das2.qstream.StreamException;
 
 /**
  * Special editor for Jython scripts, adding undo and redo actions, bigger/smaller
@@ -319,7 +319,7 @@ public class EditorTextPane extends JEditorPane {
                     mpds.putProperty(QDataSet.TITLE, oldTitle==null ? doThis : ( doThis+": "+oldTitle ) );
                     FileOutputStream fout= new FileOutputStream(tmpfile);
                     try {
-                        new org.virbo.qstream.SimpleStreamFormatter().format(mpds, fout, true );
+                        new org.das2.qstream.SimpleStreamFormatter().format(mpds, fout, true );
                     } finally {
                         fout.close();
                     }

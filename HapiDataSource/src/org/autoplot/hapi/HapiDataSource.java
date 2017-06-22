@@ -54,7 +54,7 @@ import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
-import org.virbo.qstream.TransferType;
+import org.das2.qstream.TransferType;
 
 /**
  * HAPI data source uses transactions with HAPI servers to collect data.

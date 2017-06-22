@@ -24,7 +24,7 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.URISplit;
-import org.virbo.spase.VOTableReader;
+import org.autoplot.spase.VOTableReader;
 
 /**
  * PDS/PPI node factory.  Examples include:

@@ -25,7 +25,7 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
-import org.virbo.spase.VOTableReader;
+import org.autoplot.spase.VOTableReader;
 import org.xml.sax.SAXException;
 
 /**

@@ -46,7 +46,7 @@ import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
-import org.virbo.qstream.SimpleStreamFormatter;
+import org.das2.qstream.SimpleStreamFormatter;
 
 /**
  * Data server for U. Iowa P.W. Group converts URIs into streams of data.  These would typically

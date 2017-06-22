@@ -68,8 +68,8 @@ import org.autoplot.dom.Canvas;
 import org.autoplot.dom.DomUtil;
 import org.autoplot.dom.Plot;
 import org.autoplot.dom.Row;
-import org.virbo.qstream.SerializeDelegate;
-import org.virbo.qstream.SerializeRegistry;
+import org.das2.qstream.SerializeDelegate;
+import org.das2.qstream.SerializeRegistry;
 
 /**
  *

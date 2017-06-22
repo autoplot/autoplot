@@ -34,9 +34,9 @@ import org.autoplot.dom.DataSourceFilter;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
-import org.virbo.qstream.SimpleStreamFormatter;
-import org.virbo.qstream.StreamException;
-import org.virbo.qstream.StreamTool;
+import org.das2.qstream.SimpleStreamFormatter;
+import org.das2.qstream.StreamException;
+import org.das2.qstream.StreamTool;
 
 /**
  * Embed data and vap in a zip file.  Now that we have PWD, this will

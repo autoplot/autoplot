@@ -1,2 +1,2 @@
-org.virbo.datasource.jython.JythonEditorPanel jyds
+org.autoplot.datasource.jython.JythonEditorPanel jyds
 org.autoplot.inline.InlineDataSourceEditorPanel inline

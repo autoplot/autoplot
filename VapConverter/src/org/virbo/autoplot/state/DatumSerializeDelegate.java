@@ -9,7 +9,7 @@ import java.text.ParseException;
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.qds.SemanticOps;
-import org.virbo.qstream.SerializeDelegate;
+import org.das2.qstream.SerializeDelegate;
 
 /**
  *

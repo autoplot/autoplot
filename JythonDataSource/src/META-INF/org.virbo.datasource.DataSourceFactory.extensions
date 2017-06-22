@@ -1,2 +1,2 @@
-org.virbo.datasource.jython.JythonDataSourceFactory jyds
+org.autoplot.datasource.jython.JythonDataSourceFactory jyds
 org.autoplot.inline.InlineDataSourceFactory inline

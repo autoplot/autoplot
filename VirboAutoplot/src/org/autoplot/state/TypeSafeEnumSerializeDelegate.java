@@ -10,7 +10,7 @@ import java.lang.reflect.Modifier;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.virbo.qstream.SerializeDelegate;
+import org.das2.qstream.SerializeDelegate;
 
 /**
  *

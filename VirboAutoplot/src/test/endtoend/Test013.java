@@ -38,10 +38,10 @@ import org.das2.qds.WritableDataSet;
 import org.das2.qds.ops.Ops;
 import static org.das2.qds.ops.Ops.*;
 import org.autoplot.jythonsupport.Util;
-import org.virbo.qstream.QDataSetStreamHandler;
-import org.virbo.qstream.SimpleStreamFormatter;
-import org.virbo.qstream.StreamException;
-import org.virbo.qstream.StreamTool;
+import org.das2.qstream.QDataSetStreamHandler;
+import org.das2.qstream.SimpleStreamFormatter;
+import org.das2.qstream.StreamException;
+import org.das2.qstream.StreamTool;
 import test.BundleBinsDemo;
 
 /**

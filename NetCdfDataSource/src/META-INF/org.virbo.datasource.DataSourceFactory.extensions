@@ -1,1 +1,1 @@
-org.virbo.netCDF.NetCDFDataSourceFactory nc ncml nc4 h5 hdf5 hdf
+org.autoplot.netCDF.NetCDFDataSourceFactory nc ncml nc4 h5 hdf5 hdf

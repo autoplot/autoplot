@@ -7,7 +7,7 @@ package org.autoplot.state;
 
 import java.awt.Color;
 import java.text.ParseException;
-import org.virbo.qstream.SerializeDelegate;
+import org.das2.qstream.SerializeDelegate;
 
 /**
  *
