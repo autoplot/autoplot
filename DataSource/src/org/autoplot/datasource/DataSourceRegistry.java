@@ -122,7 +122,7 @@ public class DataSourceRegistry {
     }
 
     /**
-     * look for META-INF/org.virbo.datasource.DataSourceFactory, create the
+     * look for META-INF/org.autoplot.datasource.DataSourceFactory, create the
      * factory, then query for its extensions.  This is the orginal method
      * and is not used.
      */
@@ -135,9 +135,9 @@ public class DataSourceRegistry {
             ClassLoader loader = DataSetURI.class.getClassLoader();
             Enumeration<URL> urls;
             if (loader == null) {
-                urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFactory");
+                urls = ClassLoader.getSystemResources("META-INF/org.autoplot.datasource.DataSourceFactory");
             } else {
-                urls = loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory");
+                urls = loader.getResources("META-INF/org.autoplot.datasource.DataSourceFactory");
             }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
@@ -223,7 +223,7 @@ public class DataSourceRegistry {
 
     }
     /**
-     * look for META-INF/org.virbo.datasource.DataSourceFactory.extensions
+     * look for META-INF/org.autoplot.datasource.DataSourceFactory.extensions
      */
     protected void discoverRegistryEntries() {
         DataSourceRegistry registry= this;
@@ -231,9 +231,9 @@ public class DataSourceRegistry {
             ClassLoader loader = DataSetURI.class.getClassLoader();
             Enumeration<URL> urls;
             if (loader == null) {
-                urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFactory.extensions");
+                urls = ClassLoader.getSystemResources("META-INF/org.autoplot.datasource.DataSourceFactory.extensions");
             } else {
-                urls = loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory.extensions");
+                urls = loader.getResources("META-INF/org.autoplot.datasource.DataSourceFactory.extensions");
             }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
@@ -245,7 +245,7 @@ public class DataSourceRegistry {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
                             if ( ss[i].contains(".") ) {
-                                logger.warning("META-INF/org.virbo.datasource.DataSourceFactory.extensions contains extension that contains period: ");
+                                logger.warning("META-INF/org.autoplot.datasource.DataSourceFactory.extensions contains extension that contains period: ");
                                 logger.warning( ss[0] + " " + ss[i] + " in " + url);
                                 logger.warning("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
                                 logger.warning("");
@@ -261,9 +261,9 @@ public class DataSourceRegistry {
 
 
             if (loader == null) {
-                urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFactory.mimeTypes");
+                urls = ClassLoader.getSystemResources("META-INF/org.autoplot.datasource.DataSourceFactory.mimeTypes");
             } else {
-                urls = loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory.mimeTypes");
+                urls = loader.getResources("META-INF/org.autoplot.datasource.DataSourceFactory.mimeTypes");
             }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
@@ -284,9 +284,9 @@ public class DataSourceRegistry {
 
 
             if (loader == null) {
-                urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFormat.extensions");
+                urls = ClassLoader.getSystemResources("META-INF/org.autoplot.datasource.DataSourceFormat.extensions");
             } else {
-                urls = loader.getResources("META-INF/org.virbo.datasource.DataSourceFormat.extensions");
+                urls = loader.getResources("META-INF/org.autoplot.datasource.DataSourceFormat.extensions");
             }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
@@ -298,7 +298,7 @@ public class DataSourceRegistry {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
                             if ( ss[i].contains(".") ) {
-                                logger.warning("META-INF/org.virbo.datasource.DataSourceFormat.extensions contains extension that contains period: ");
+                                logger.warning("META-INF/org.autoplot.datasource.DataSourceFormat.extensions contains extension that contains period: ");
                                 logger.warning( ss[0] + " " + ss[i] + " in " + url);
                                 logger.warning("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
                                 logger.warning("");
@@ -314,9 +314,9 @@ public class DataSourceRegistry {
 
 
             if (loader == null) {
-                urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions");
+                urls = ClassLoader.getSystemResources("META-INF/org.autoplot.datasource.DataSourceEditorPanel.extensions");
             } else {
-                urls = loader.getResources("META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions");
+                urls = loader.getResources("META-INF/org.autoplot.datasource.DataSourceEditorPanel.extensions");
             }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
@@ -328,7 +328,7 @@ public class DataSourceRegistry {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
                             if ( ss[i].contains(".") ) {
-                                logger.warning("META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions contains extension that contains period: ");
+                                logger.warning("META-INF/org.autoplot.datasource.DataSourceEditorPanel.extensions contains extension that contains period: ");
                                 logger.log(Level.WARNING, "{0} {1} in {2}", new Object[]{ss[0], ss[i], url});
                                 logger.warning("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
                                 logger.warning("");
@@ -343,9 +343,9 @@ public class DataSourceRegistry {
             }
 
             if (loader == null) {
-                urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFormatEditorPanel.extensions");
+                urls = ClassLoader.getSystemResources("META-INF/org.autoplot.datasource.DataSourceFormatEditorPanel.extensions");
             } else {
-                urls = loader.getResources("META-INF/org.virbo.datasource.DataSourceFormatEditorPanel.extensions");
+                urls = loader.getResources("META-INF/org.autoplot.datasource.DataSourceFormatEditorPanel.extensions");
             }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
@@ -357,7 +357,7 @@ public class DataSourceRegistry {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
                             if ( ss[i].contains(".") ) {
-                                logger.warning("META-INF/org.virbo.datasource.DataSourceFormatEditorPanel.extensions contains extension that contains period: ");
+                                logger.warning("META-INF/org.autoplot.datasource.DataSourceFormatEditorPanel.extensions contains extension that contains period: ");
                                 logger.log(Level.WARNING, "{0} {1} in {2}", new Object[]{ss[0], ss[i], url});
                                 logger.warning("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
                                 logger.warning("");
@@ -381,7 +381,7 @@ public class DataSourceRegistry {
      * override the internal extentions.  This allows, for example, a new version
      * of a data source to be compared to the production.
      * @param ext if non-null, use this extension instead.
-     * @param jarFile the jar file, which must contain META-INF/org.virbo.datasource.DataSourceFactory.extensions.
+     * @param jarFile the jar file, which must contain META-INF/org.autoplot.datasource.DataSourceFactory.extensions.
      * @throws IOException 
      */
     public void registerDataSourceJar( String ext, final URL jarFile ) throws IOException {
@@ -393,7 +393,7 @@ public class DataSourceRegistry {
             }
         });
 
-        Enumeration<URL> re= loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory.extensions");
+        Enumeration<URL> re= loader.getResources("META-INF/org.autoplot.datasource.DataSourceFactory.extensions");
         List<URL> rre= new ArrayList();
         while ( re.hasMoreElements() ) {
             URL u= re.nextElement();

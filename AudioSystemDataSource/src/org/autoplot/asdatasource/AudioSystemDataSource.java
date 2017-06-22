@@ -1,5 +1,5 @@
 
-package org.virbo.asdatasource;
+package org.autoplot.asdatasource;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

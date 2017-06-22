@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.virbo.asdatasource;
+package org.autoplot.asdatasource;
 
 import java.awt.Window;
 import java.util.List;

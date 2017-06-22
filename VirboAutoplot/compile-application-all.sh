@@ -90,22 +90,22 @@ echo "special handling of META-INF stuff..."
 
 #TODO: check for end-of-lines on each entry.
 
-file=org.virbo.datasource.DataSourceFactory.extensions
+file=org.autoplot.datasource.DataSourceFactory.extensions
 sed -n p ../*/src/META-INF/$file > temp-classes/META-INF/$file
 
-file=org.virbo.datasource.DataSourceFactory.mimeTypes
+file=org.autoplot.datasource.DataSourceFactory.mimeTypes
 sed -n p ../*/src/META-INF/$file > temp-classes/META-INF/$file
 
-file=org.virbo.datasource.DataSourceFormat.extensions
+file=org.autoplot.datasource.DataSourceFormat.extensions
 sed -n p ../*/src/META-INF/$file > temp-classes/META-INF/$file
 
-file=org.virbo.datasource.DataSourceEditorPanel.extensions
+file=org.autoplot.datasource.DataSourceEditorPanel.extensions
 sed -n p ../*/src/META-INF/$file > temp-classes/META-INF/$file
 
 file=helpsets.txt
 sed -n p ../*/src/META-INF/$file > temp-classes/META-INF/$file
 
-echo "Main-Class: org.virbo.autoplot.AutoplotUI" > temp-src/MANIFEST.MF
+echo "Main-Class: org.autoplot.AutoplotUI" > temp-src/MANIFEST.MF
 
 # remove signatures
 rm temp-classes/META-INF/*.RSA
@@ -205,6 +205,7 @@ if ! $JAVAC $JAVAARGS org/autoplot/pngwalk/QualityControlPanel.java; then echo "
 if ! $JAVAC $JAVAARGS org/das2/beans/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/das2/util/awt/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS test/endtoend/*.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/idlsupport/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/virbo/idlsupport/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/das2/system/NullPreferencesFactory.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/autoplot/tca/UriTcaSource.java; then echo "****"; hasErrors=1; fi
@@ -225,18 +226,18 @@ if ! $JAVAC $JAVAARGS org/das2/util/*Formatter.java; then echo "****"; hasErrors
 if ! $JAVAC $JAVAARGS org/autoplot/util/jemmy/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/das2/qds/filters/*.java; then echo "****"; hasErrors=1; fi
 
-cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
-for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
+cat ../temp-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1
+for i in `cat ../temp-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    echo $JAVAC $JAVAARGS $i.java
    if ! $JAVAC $JAVAARGS $i.java; then echo "****"; hasErrors=1; fi
 done
-cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFormat.extensions | cut -d' ' -f1
-for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFormat.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
+cat ../temp-classes/META-INF/org.autoplot.datasource.DataSourceFormat.extensions | cut -d' ' -f1
+for i in `cat ../temp-classes/META-INF/org.autoplot.datasource.DataSourceFormat.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    echo $JAVAC $JAVAARGS $i.java
    if ! $JAVAC $JAVAARGS $i.java; then echo "****"; hasErrors=1; fi
 done
-cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1
-for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
+cat ../temp-classes/META-INF/org.autoplot.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1
+for i in `cat ../temp-classes/META-INF/org.autoplot.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    echo $JAVAC $JAVAARGS $i.java
    if ! $JAVAC $JAVAARGS $i.java; then echo "****"; hasErrors=1; fi
 done

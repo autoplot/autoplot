@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.virbo.asdatasource;
+package org.autoplot.asdatasource;
 
 import java.net.URI;
 import java.util.ArrayList;
