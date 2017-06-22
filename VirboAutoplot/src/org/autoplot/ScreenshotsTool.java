@@ -146,7 +146,7 @@ public class ScreenshotsTool extends EventQueue {
         tf.setText(s);
         folderPanel.add( tf );
 
-        folderPanel.add( new JButton( new AbstractAction( "Pick", new ImageIcon( ScreenshotsTool.class.getResource("/org/virbo/autoplot/file.png") ) ) {
+        folderPanel.add( new JButton( new AbstractAction( "Pick", new ImageIcon( ScreenshotsTool.class.getResource("/org/autoplot/file.png") ) ) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser ch= new JFileChooser();

@@ -387,7 +387,7 @@ public class OperationsPanel extends javax.swing.JPanel {
             }
         });
 
-        editComponentPanel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/resources/pipeMag2.png"))); // NOI18N
+        editComponentPanel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/resources/pipeMag2.png"))); // NOI18N
         editComponentPanel.setToolTipText("Open filters editor");
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), editComponentPanel, org.jdesktop.beansbinding.BeanProperty.create("enabled"));

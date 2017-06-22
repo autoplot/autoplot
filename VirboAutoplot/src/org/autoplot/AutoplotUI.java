@@ -273,7 +273,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
     private AutoplotHelpSystem helpSystem;
     private transient UriDropTargetListener dropListener;
 
-    private static final String RESOURCES= "/org/virbo/autoplot/resources/";
+    private static final String RESOURCES= "/org/autoplot/resources/";
     
     /**
      * yellow triangle with exclamation point, used to indicate warning condition.
@@ -3217,7 +3217,7 @@ APSplash.checkTime("init 52.9");
         });
         toolsMenu.add(mashDataMenuItem);
 
-        filtersMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/resources/pipeMag2.png"))); // NOI18N
+        filtersMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/resources/pipeMag2.png"))); // NOI18N
         filtersMenuItem.setText("Additional Operations...");
         filtersMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -3237,7 +3237,7 @@ APSplash.checkTime("init 52.9");
         toolsMenu.add(decodeURLItem);
 
         reloadAllMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_L, java.awt.event.InputEvent.CTRL_MASK));
-        reloadAllMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/resources/reload.png"))); // NOI18N
+        reloadAllMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/resources/reload.png"))); // NOI18N
         reloadAllMenuItem.setText("Reload All Data");
         reloadAllMenuItem.setToolTipText("Reload all data, updating to get any changes.  Axis settings and labels should remain the same.");
         reloadAllMenuItem.addActionListener(new java.awt.event.ActionListener() {

@@ -52,7 +52,7 @@ public class GettingStartedPanel extends javax.swing.JPanel {
 
         jLabel3.setText("Open a data file on your desktop:");
 
-        browseLocalButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/file.png"))); // NOI18N
+        browseLocalButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/file.png"))); // NOI18N
         browseLocalButton.setToolTipText("Browse local filesystem");
         browseLocalButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

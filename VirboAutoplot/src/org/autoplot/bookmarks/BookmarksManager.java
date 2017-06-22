@@ -553,7 +553,7 @@ public class BookmarksManager extends javax.swing.JDialog {
             }
         });
 
-        plotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/go.png"))); // NOI18N
+        plotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/go.png"))); // NOI18N
         plotButton.setText("Plot");
         plotButton.setToolTipText("Plot the URI in the current focus position");
         plotButton.addActionListener(new java.awt.event.ActionListener() {

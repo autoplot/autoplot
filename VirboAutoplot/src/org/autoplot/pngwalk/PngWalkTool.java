@@ -164,7 +164,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
     String actionCommand=null;
 
     static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.pngwalk");
-    private static final String RESOURCES= "/org/virbo/autoplot/resources/";
+    private static final String RESOURCES= "/org/autoplot/resources/";
     private static final Icon WARNING_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"warning-icon.png") );
     private static final Icon ERROR_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"error-icon.png") );
     private static final Icon BUSY_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"spinner.gif") );

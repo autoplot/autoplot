@@ -284,14 +284,14 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                     //interruptButton.setIcon(
                     //        new javax.swing.ImageIcon(
                     //        getClass().getResource(
-                    //        "/org/virbo/autoplot/resources/stop-icon-disabled.png")) );
+                    //        "/org/autoplot/resources/stop-icon-disabled.png")) );
                     interruptButton.setEnabled(false);
                     executeButton.setEnabled(true);
                 } else {
                     //interruptButton.setIcon(
                     //        new javax.swing.ImageIcon(
                     //        getClass().getResource(
-                    //        "/org/virbo/autoplot/resources/stop-icon.png")) );
+                    //        "/org/autoplot/resources/stop-icon.png")) );
                     interruptButton.setEnabled(true);
                     executeButton.setEnabled(false);
                 }
@@ -391,7 +391,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         interruptButton = new javax.swing.JButton();
         fileNameTextField = new javax.swing.JTextField();
 
-        executeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/go.png"))); // NOI18N
+        executeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/go.png"))); // NOI18N
         executeButton.setText("Execute");
         executeButton.setToolTipText("<html>Execute script.  <br>Alt modifier enters editor GUI.  <br>Ctrl modifier attempts to trace program location.  <br>Shift modifier will being up parameters gui.");
         executeButton.addActionListener(new java.awt.event.ActionListener() {
