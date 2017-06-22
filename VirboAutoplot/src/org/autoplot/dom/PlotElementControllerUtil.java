@@ -3,7 +3,7 @@ package org.autoplot.dom;
 
 import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsUtil;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 
 /**
  *

@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.virbo.autoplot.util.TickleTimer;
+import org.autoplot.util.TickleTimer;
 import org.das2.datum.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -32,7 +32,7 @@ import org.das2.datum.format.DateTimeDatumFormatter;
 import org.das2.util.LoggerManager;
 import org.virbo.dataset.QDataSet;
 import org.autoplot.datasource.DataSetURI;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 
 /**
  * When the data source supports loading additional data when the time axis (or plot context) changes, then

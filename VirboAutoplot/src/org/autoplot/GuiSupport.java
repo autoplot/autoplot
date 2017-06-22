@@ -151,7 +151,7 @@ import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.xml.sax.SAXException;
 
 /**

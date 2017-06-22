@@ -29,7 +29,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.das2.datum.LoggerManager;
 import org.jdesktop.beansbinding.BindingGroup;
-import org.virbo.autoplot.util.TickleTimer;
+import org.autoplot.util.TickleTimer;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.examples.Schemes;
 import org.autoplot.datasource.InputVerifier;

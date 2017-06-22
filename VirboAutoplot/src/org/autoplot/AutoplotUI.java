@@ -178,7 +178,7 @@ import org.autoplot.dom.Plot;
 import org.autoplot.dom.PlotController;
 import org.autoplot.scriptconsole.GuiExceptionHandler;
 import org.autoplot.state.UndoRedoSupport;
-import org.virbo.autoplot.util.TickleTimer;
+import org.autoplot.util.TickleTimer;
 import org.virbo.dataset.DataSetAnnotations;
 import org.virbo.dataset.QDataSet;
 import org.autoplot.datasource.AutoplotSettings;

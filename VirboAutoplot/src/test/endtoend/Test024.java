@@ -17,7 +17,7 @@ import org.autoplot.ScriptContext;
 import org.virbo.dataset.DataSetUtil;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceUtil;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 
 /**

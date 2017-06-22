@@ -44,7 +44,7 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 import org.virbo.qstream.SimpleStreamFormatter;
 

@@ -14,7 +14,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import org.das2.util.LoggerManager;
 import org.autoplot.MouseModuleType;
-import org.virbo.autoplot.util.TickleTimer;
+import org.autoplot.util.TickleTimer;
 
 /**
  * listen to an Options class and keep prefs up to date.

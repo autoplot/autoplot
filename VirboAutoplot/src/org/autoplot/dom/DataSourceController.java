@@ -49,9 +49,9 @@ import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.HtmlResponseIOException;
 import org.autoplot.datasource.URISplit;
-import org.virbo.datasource.capability.Caching;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
-import org.virbo.datasource.capability.Updating;
+import org.autoplot.datasource.capability.Caching;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.Updating;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.AutoHistogram;
 

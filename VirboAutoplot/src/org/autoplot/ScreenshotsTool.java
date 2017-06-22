@@ -66,7 +66,7 @@ import org.das2.datum.Units;
 import org.das2.util.FileUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.autoplot.util.TickleTimer;
+import org.autoplot.util.TickleTimer;
 
 /**
  * Jeremy's experiment that will create automatic documentation.

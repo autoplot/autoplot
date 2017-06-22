@@ -78,7 +78,7 @@ import org.virbo.dataset.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.URISplit;
-import org.virbo.datasource.capability.Caching;
+import org.autoplot.datasource.capability.Caching;
 import org.xml.sax.SAXException;
 import org.autoplot.bookmarks.BookmarksException;
 import org.autoplot.dom.CanvasController;

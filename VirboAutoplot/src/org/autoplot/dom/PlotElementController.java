@@ -87,9 +87,9 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.examples.Schemes;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.DataSourceRegistry;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
-import org.virbo.metatree.MetadataUtil;
+import org.autoplot.metatree.MetadataUtil;
 
 /**
  * PlotElementController manages the PlotElement, for example resolving the datasource and loading the dataset.

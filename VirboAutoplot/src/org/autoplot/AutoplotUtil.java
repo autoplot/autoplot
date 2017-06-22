@@ -136,7 +136,7 @@ import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.ReferenceCache;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
-import org.virbo.datasource.capability.Caching;
+import org.autoplot.datasource.capability.Caching;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.AutoHistogram;
 import org.w3c.dom.Document;

@@ -16,7 +16,6 @@ import org.autoplot.bookmarks.Bookmark.Folder;
 import org.autoplot.datasource.AutoplotSettings;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
-import org.virbo.autoplot.*;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DropTarget;

@@ -46,7 +46,7 @@ import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.MetadataModel;
 import org.virbo.dsutil.AutoHistogram;
 import org.virbo.dsutil.PropertiesTreeModel;
-import org.virbo.metatree.NameValueTreeModel;
+import org.autoplot.metatree.NameValueTreeModel;
 
 /**
  *

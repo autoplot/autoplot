@@ -17,7 +17,7 @@ import org.virbo.dataset.QDataSet;
 import org.autoplot.datasource.MetadataModel;
 import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.Util;
-import org.virbo.metatree.MetadataUtil;
+import org.autoplot.metatree.MetadataUtil;
 
 
 /**

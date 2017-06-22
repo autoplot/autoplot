@@ -72,7 +72,7 @@ import org.autoplot.LayoutListener;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.layout.LayoutConstants;
 import org.autoplot.util.RunLaterListener;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 
 /**
  * The ApplicationController, one per dom, is in charge of managing the 
