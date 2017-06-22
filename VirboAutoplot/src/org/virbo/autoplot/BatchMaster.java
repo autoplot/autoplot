@@ -1,5 +1,5 @@
 
-package org.autoplot;
+package org.virbo.autoplot;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;

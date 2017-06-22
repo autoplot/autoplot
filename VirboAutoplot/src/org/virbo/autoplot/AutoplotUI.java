@@ -120,7 +120,6 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.DefaultEditorKit;
 import javax.xml.parsers.ParserConfigurationException;
-import org.autoplot.BatchMaster;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.autoplot.pngwalk.CreatePngWalk;
 import org.autoplot.pngwalk.PngWalkTool;
@@ -4866,7 +4865,7 @@ APSplash.checkTime("init 200");
                         addSingleInstanceListener( alm, app );
                     }
                     if ( alm.getBooleanValue("samp") ) {
-                        org.autoplot.AddSampListener.addSampListener( app.dataSetSelector );
+                        org.virbo.autoplot.AddSampListener.addSampListener( app.dataSetSelector );
                     }
 
                 }

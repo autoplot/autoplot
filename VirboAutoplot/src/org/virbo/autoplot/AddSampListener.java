@@ -1,5 +1,5 @@
 
-package org.autoplot;
+package org.virbo.autoplot;
 
 import java.util.HashMap;
 import java.util.Map;
