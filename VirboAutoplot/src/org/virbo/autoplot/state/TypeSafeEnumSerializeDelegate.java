@@ -30,6 +30,9 @@ public class TypeSafeEnumSerializeDelegate implements SerializeDelegate {
     public Object parse(String typeId, String description) throws ParseException {
         try {
             String sclass = typeId.substring(5);
+            if ( sclass.startsWith("org.virbo.autoplot") ) {
+                sclass= "org.autoplot"+sclass.substring(18);
+            }
             Class type = Class.forName(sclass);
 
             if (!Modifier.isPublic(type.getModifiers()))
@@ -54,7 +57,13 @@ public class TypeSafeEnumSerializeDelegate implements SerializeDelegate {
     }
 
     public String typeId(Class clas) {
-        return "enum:"+clas.getName();
+        String id= clas.getName();
+        if ( id.equals("org.autoplot.MouseModuleType") ) {
+            id= "org.virbo.autoplot.MouseModuleType";
+        } else if ( id.equals("org.autoplot.RenderType")  ) {
+            id= "org.virbo.autoplot.RenderType";
+        }
+        return "enum:"+id;
     }
 
 }
