@@ -20,7 +20,7 @@ import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.LocalFileSystem;
-import org.virbo.datasource.capability.Updating;
+import org.autoplot.datasource.capability.Updating;
 
 /**
  *

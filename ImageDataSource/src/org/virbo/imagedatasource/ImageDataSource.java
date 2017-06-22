@@ -49,7 +49,7 @@ import org.virbo.dataset.SemanticOps;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
 import org.virbo.dsops.Ops;
-import org.virbo.metatree.MetadataUtil;
+import org.autoplot.metatree.MetadataUtil;
 import org.w3c.dom.Node;
 
 /**

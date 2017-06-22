@@ -17,7 +17,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.autoplot.datasource.LogNames;
 import org.autoplot.datasource.URISplit;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.virbo.jythonsupport.Util;
 import org.virbo.jythonsupport.ui.DataMashUp;
 

@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.virbo.datasource.ui;
+package org.autoplot.datasource.ui;
 
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 

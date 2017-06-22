@@ -15,7 +15,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
-import org.virbo.datasource.capability.Streaming;
+import org.autoplot.datasource.capability.Streaming;
 
 /**
  *

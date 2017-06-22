@@ -192,12 +192,12 @@ if [ $hasErrors -eq 1 ]; then
   echo "Error somewhere in compile, see above"
   exit 1 
 fi
-if ! $JAVAC $JAVAARGS org/virbo/autoplot/state/*.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/virbo/autoplot/scriptconsole/DumpRteExceptionHandler.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/virbo/autoplot/JythonMain.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/state/*.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/scriptconsole/DumpRteExceptionHandler.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/JythonMain.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/autoplot/help/AutoplotHelpViewer.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/virbo/autoplot/AutoplotServer.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/virbo/autoplot/AutoplotDataServer.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/AutoplotServer.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/AutoplotDataServer.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/virbo/dsutil/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/autoplot/pngwalk/PngWalkTool1.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/autoplot/pngwalk/ImageResize.java; then echo "****"; hasErrors=1; fi

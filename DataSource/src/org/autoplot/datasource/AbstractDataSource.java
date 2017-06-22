@@ -34,7 +34,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.capability.Updating;
+import org.autoplot.datasource.capability.Updating;
 import org.virbo.dsops.CoerceUtil;
 import org.virbo.dsops.Ops;
 

@@ -47,7 +47,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.dsops.Ops;
-import org.virbo.metatree.MetadataUtil;
+import org.autoplot.metatree.MetadataUtil;
 
 /**
  *

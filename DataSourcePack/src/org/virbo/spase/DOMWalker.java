@@ -21,7 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.virbo.metatree.NameValueTreeModel;
+import org.autoplot.metatree.NameValueTreeModel;
 
 /**
  *

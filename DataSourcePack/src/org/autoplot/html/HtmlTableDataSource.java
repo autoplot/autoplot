@@ -19,7 +19,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.autoplot.datasource.AbstractDataSource;
-import org.virbo.datasource.capability.Streaming;
+import org.autoplot.datasource.capability.Streaming;
 
 /**
  * Data source for extracting data from HTML tables.  This has been used

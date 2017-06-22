@@ -10,7 +10,7 @@ import org.virbo.cdf.*;
 import java.beans.PropertyChangeEvent;
 import java.util.logging.Level;
 import org.das2.datum.Units;
-import org.virbo.metatree.IstpMetadataModel;
+import org.autoplot.metatree.IstpMetadataModel;
 import org.das2.util.monitor.ProgressMonitor;
 import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import gov.nasa.gsfc.spdf.cdfj.ReaderFactory;
@@ -39,7 +39,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.autoplot.util.TickleTimer;
+import org.autoplot.util.TickleTimer;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
@@ -55,7 +55,7 @@ import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.MetadataModel;
 import org.autoplot.datasource.ReferenceCache;
 import org.virbo.dsops.Ops;
-import org.virbo.metatree.MetadataUtil;
+import org.autoplot.metatree.MetadataUtil;
 
 /**
  * CDF data source based on Nand Lal's pure-Java
@@ -1212,7 +1212,7 @@ public class CdfDataSource extends AbstractDataSource {
 
                 if ( lablDs!=null && ( depDs==null || depDs.rank()==2 || depDs.rank()==1 && depDs.length()<100 ) ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
                     if ( depDs!=null && lablDs.rank()==1 && depDs.rank()==2 && DataSetUtil.asDatum(lablDs.slice(0)).toString().equals("channel00") ) {
-                        MutablePropertyDataSet b= org.virbo.metatree.IstpMetadataModel.maybeReduceRank2( depDs );
+                        MutablePropertyDataSet b= org.autoplot.metatree.IstpMetadataModel.maybeReduceRank2( depDs );
                         if ( b!=null ) {
                             lablDs= b;
                         }

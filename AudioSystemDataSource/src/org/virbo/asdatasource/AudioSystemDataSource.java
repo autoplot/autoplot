@@ -24,8 +24,8 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.TagGenDataSet;
 import org.autoplot.datasource.AbstractDataSource;
-import org.virbo.datasource.capability.Streaming;
-import org.virbo.datasource.capability.Updating;
+import org.autoplot.datasource.capability.Streaming;
+import org.autoplot.datasource.capability.Updating;
 import org.virbo.dsops.Ops;
 
 /**

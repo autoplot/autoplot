@@ -31,7 +31,7 @@ import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.MetadataModel;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.TransposeRankNDataSet;
-import org.virbo.metatree.IstpMetadataModel;
+import org.autoplot.metatree.IstpMetadataModel;
 import ucar.nc2.Attribute;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Structure;

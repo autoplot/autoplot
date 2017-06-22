@@ -40,7 +40,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.LoggerManager;
 import org.das2.datum.UnitsUtil;
-import org.virbo.datasource.ui.PromptComboBoxEditor;
+import org.autoplot.datasource.ui.PromptComboBoxEditor;
 
 /**
  * Standard control for controlling a DatumRange containing times, with

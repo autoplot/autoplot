@@ -42,7 +42,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.URISplit;
-import org.virbo.datasource.ui.TableRowHeader;
+import org.autoplot.datasource.ui.TableRowHeader;
 
 /**
  * Read data from Excel spreadsheets.  This supports .xls, but not .xlsx.

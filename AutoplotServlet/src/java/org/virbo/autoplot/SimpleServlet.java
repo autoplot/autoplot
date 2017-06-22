@@ -64,7 +64,7 @@ import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.URISplit;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.jython.JythonDataSourceFactory;
 import org.virbo.dsops.Ops;
 

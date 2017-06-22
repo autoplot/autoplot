@@ -13,7 +13,7 @@ import org.autoplot.datasource.CompletionContext;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DefaultTimeSeriesBrowse;
 import org.autoplot.datasource.URISplit;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 
 /**
  * Constructor for HAPI data sources.

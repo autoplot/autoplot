@@ -23,7 +23,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.filesystem.LocalFileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.datasource.capability.Updating;
+import org.autoplot.datasource.capability.Updating;
 
 /**
  * Aggregation polling checks for updates of the set, for a given timerange. 

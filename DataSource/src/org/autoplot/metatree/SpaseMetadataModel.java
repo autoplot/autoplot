@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 
-package org.virbo.metatree;
+package org.autoplot.metatree;
 
 import java.util.HashMap;
 import java.util.Map;

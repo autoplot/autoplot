@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.virbo.metatree;
+package org.autoplot.metatree;
 
 import java.text.ParseException;
 import java.util.ArrayList;

@@ -9,7 +9,7 @@
 
 package org.virbo.spase;
 
-import org.virbo.metatree.SpaseMetadataModel;
+import org.autoplot.metatree.SpaseMetadataModel;
 import java.net.URI;
 import org.das2.util.monitor.NullProgressMonitor;
 import java.util.Map;

@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.virbo.datasource.capability;
+package org.autoplot.datasource.capability;
 
 /**
  * Caching allows datasets to cache other URIs along with the one requested.

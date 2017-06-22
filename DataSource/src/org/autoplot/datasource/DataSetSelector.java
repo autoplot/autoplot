@@ -94,9 +94,9 @@ import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.autoplot.datasource.DataSetURI.CompletionResult;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
-import org.virbo.datasource.ui.PromptComboBoxEditor;
-import org.virbo.datasource.ui.PromptTextField;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.ui.PromptComboBoxEditor;
+import org.autoplot.datasource.ui.PromptTextField;
 import org.virbo.dsops.Ops;
 
 /**

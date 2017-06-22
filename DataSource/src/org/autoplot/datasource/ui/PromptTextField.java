@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.virbo.datasource.ui;
+package org.autoplot.datasource.ui;
 
 import java.awt.Color;
 import java.awt.Graphics;

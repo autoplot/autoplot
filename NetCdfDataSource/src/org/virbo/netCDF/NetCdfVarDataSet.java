@@ -23,7 +23,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.autoplot.datasource.MetadataModel;
 import org.virbo.dsops.Ops;
-import org.virbo.metatree.IstpMetadataModel;
+import org.autoplot.metatree.IstpMetadataModel;
 import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;
 import ucar.ma2.Range;

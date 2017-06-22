@@ -4,7 +4,7 @@
  */
 
 
-package org.virbo.datasource.ui;
+package org.autoplot.datasource.ui;
         
 /*
  * User: mkovalenko * Date: Oct 22, 2001 * Time: 5:17:14 PM * Describe file

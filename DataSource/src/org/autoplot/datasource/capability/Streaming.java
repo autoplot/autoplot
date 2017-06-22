@@ -1,5 +1,5 @@
 
-package org.virbo.datasource.capability;
+package org.autoplot.datasource.capability;
 
 import java.util.Iterator;
 import org.das2.util.monitor.ProgressMonitor;

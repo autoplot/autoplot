@@ -9,7 +9,7 @@
 package org.virbo.dods;
 
 import org.autoplot.datasource.MetadataModel;
-import org.virbo.metatree.IstpMetadataModel;
+import org.autoplot.metatree.IstpMetadataModel;
 import opendap.dap.AttributeTable;
 import opendap.dap.DAS;
 import opendap.dap.DASException;

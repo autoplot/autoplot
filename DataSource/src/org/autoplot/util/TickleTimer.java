@@ -5,7 +5,7 @@
  *
  */
 
-package org.virbo.autoplot.util;
+package org.autoplot.util;
 
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;

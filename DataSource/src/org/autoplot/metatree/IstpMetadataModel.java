@@ -5,7 +5,7 @@
  *
  *
  */
-package org.virbo.metatree;
+package org.autoplot.metatree;
 
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;

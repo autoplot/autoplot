@@ -11,7 +11,7 @@ package org.virbo.spase;
 
 import java.io.File;
 import java.io.FileInputStream;
-import org.virbo.metatree.SpaseMetadataModel;
+import org.autoplot.metatree.SpaseMetadataModel;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;

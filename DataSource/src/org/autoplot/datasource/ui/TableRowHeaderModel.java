@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.virbo.datasource.ui;
+package org.autoplot.datasource.ui;
 
 /* * User: mkovalenko * Date: Oct 22, 2001 * Time: 6:33:56 PM * Describe file */ 
 import javax.swing.*;

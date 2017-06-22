@@ -15,7 +15,7 @@ import org.virbo.dataset.QDataSet;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DefaultTimeSeriesBrowse;
 import org.autoplot.datasource.URISplit;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 
 /**

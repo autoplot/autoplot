@@ -31,7 +31,7 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.LogNames;
 import org.autoplot.datasource.URISplit;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import static org.virbo.datasource.jython.JythonDataSource.PARAM_SCRIPT;
 import org.virbo.jythonsupport.JythonUtil;
 import org.virbo.jythonsupport.PyQDataSet;

@@ -24,7 +24,7 @@ import org.autoplot.datasource.CompletionContext;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.URISplit;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 
 /**
  * DataSourceFactory for communicating with Das2servers.

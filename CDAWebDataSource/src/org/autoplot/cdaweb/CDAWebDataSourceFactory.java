@@ -26,7 +26,7 @@ import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.DefaultTimeSeriesBrowse;
 import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.URISplit;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 
 /**
  * Create a CDAWebDataSource.  The source contains knowledge of the CDAWeb database, knowing

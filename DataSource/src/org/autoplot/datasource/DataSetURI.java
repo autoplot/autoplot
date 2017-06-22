@@ -61,7 +61,7 @@ import org.das2.util.filesystem.VFSFileSystemFactory;
 import org.das2.util.filesystem.WebFileSystem;
 import org.autoplot.aggregator.AggregatingDataSourceFactory;
 import org.autoplot.aggregator.AggregatingDataSourceFormat;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 
 /**

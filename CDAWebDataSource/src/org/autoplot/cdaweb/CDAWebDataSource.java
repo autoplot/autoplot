@@ -40,10 +40,10 @@ import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.datasource.MetadataModel;
 import org.autoplot.datasource.URISplit;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.DataSetBuilder;
-import org.virbo.metatree.IstpMetadataModel;
+import org.autoplot.metatree.IstpMetadataModel;
 
 /**
  * Special data source for reading time series from NASA Goddard's CDAWeb

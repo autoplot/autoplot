@@ -16,7 +16,7 @@ import org.autoplot.datasource.CompletionContext;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DefaultTimeSeriesBrowse;
 import org.autoplot.datasource.URISplit;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 
 /**
  * Orbit data sources added for demonstration purposes, but it will also be useful for showing

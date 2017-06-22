@@ -45,7 +45,7 @@ import org.autoplot.datasource.DataSourceEditorPanelUtil;
 import org.autoplot.datasource.SourceTypesBrowser;
 import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.URISplit;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 
 /**
  *

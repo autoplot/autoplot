@@ -46,7 +46,7 @@ import org.virbo.ascii.ColSpanTableCellRenderer;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.URISplit;
-import org.virbo.datasource.ui.TableRowHeader;
+import org.autoplot.datasource.ui.TableRowHeader;
 import org.virbo.dsutil.AsciiParser;
 
 /**

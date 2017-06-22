@@ -82,7 +82,7 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
         jTable1 = new javax.swing.JTable();
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        paramsTextArea1 = new org.virbo.datasource.ui.ParamsTextArea();
+        paramsTextArea1 = new org.autoplot.datasource.ui.ParamsTextArea();
         jLabel1 = new javax.swing.JLabel();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
@@ -195,7 +195,7 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
     public javax.swing.JScrollPane jScrollPane1;
     public javax.swing.JScrollPane jScrollPane2;
     public javax.swing.JTable jTable1;
-    public org.virbo.datasource.ui.ParamsTextArea paramsTextArea1;
+    public org.autoplot.datasource.ui.ParamsTextArea paramsTextArea1;
     // End of variables declaration//GEN-END:variables
 
 	@Override
