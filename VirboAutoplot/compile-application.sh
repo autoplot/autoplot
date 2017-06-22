@@ -110,9 +110,9 @@ fi
 
 echo "done copy jar file classes."
 
-echo "=== look for plugins, META-INF/org.virbo.datasource.DataSourceFactory.extensions etc =="
+echo "=== look for plugins, META-INF/org.autoplot.datasource.DataSourceFactory.extensions etc =="
 #echo 'ls -1 ../*/src/META-INF/org.virbo.datasource.DataSourceFactory.extensions | awk  \'BEGIN { FS = "/" } ; { print $2 }\' | sort | uniq | xargs'
-plugins=`ls -1 ../*/src/META-INF/org.virbo.datasource.DataSourceFactory.extensions | $AWK  'BEGIN { FS = "/" } ; { print $2 }' | sort | uniq | xargs`
+plugins=`ls -1 ../*/src/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | $AWK  'BEGIN { FS = "/" } ; { print $2 }' | sort | uniq | xargs`
 echo $plugins
 
 echo "copy sources..."
@@ -134,19 +134,19 @@ echo "done copy sources"
 echo "=== special handling of META-INF stuff..."
 mkdir temp-volatile-classes/META-INF
 
-file=org.virbo.datasource.DataSourceFactory.extensions
+file=org.autoplot.datasource.DataSourceFactory.extensions
 sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 
-file=org.virbo.datasource.DataSourceFactory.mimeTypes
+file=org.autoplot.datasource.DataSourceFactory.mimeTypes
 sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 
-file=org.virbo.datasource.DataSourceFormat.extensions
+file=org.autoplot.datasource.DataSourceFormat.extensions
 sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 
-file=org.virbo.datasource.DataSourceEditorPanel.extensions
+file=org.autoplot.datasource.DataSourceEditorPanel.extensions
 sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 
-file=org.virbo.datasource.DataSourceFormatEditorPanel.extensions
+file=org.autoplot.datasource.DataSourceFormatEditorPanel.extensions
 sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 
 file=helpsets.txt
@@ -166,6 +166,7 @@ rm -f temp-volatile-classes/META-INF/*.RSA
 rm -f temp-volatile-classes/META-INF/*.DSA
 rm -f temp-volatile-classes/META-INF/*.SF
 
+export TIMESTAMP=`date +%Y%m%d_%H%M%S`
 cat src/META-INF/build.txt | sed "s/build.tag\:/build.tag\: $TAG/" > temp-volatile-classes/META-INF/build.txt
 echo "build.jenkinsURL: $BUILD_URL" >> temp-volatile-classes/META-INF/build.txt
 
@@ -248,20 +249,20 @@ JAVAARGS="-g -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotSta
 echo "=== compile sources..."
 cd temp-volatile-src
 echo "pwd=" `pwd`
-echo $JAVAC $JAVAARGS org/virbo/autoplot/AutoplotUI.java
-if ! $JAVAC $JAVAARGS org/virbo/autoplot/AutoplotUI.java; then echo "****"; hasErrors=1; fi
+echo $JAVAC $JAVAARGS org/autoplot/AutoplotUI.java
+if ! $JAVAC $JAVAARGS org/autoplot/AutoplotUI.java; then echo "****"; hasErrors=1; fi
 if [ $hasErrors -eq 1 ]; then
   echo "Error somewhere in compile, see above"
   exit 1 
 fi
 echo "only the first compile is echoed."
-if ! $JAVAC $JAVAARGS org/virbo/autoplot/state/*.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/virbo/autoplot/scriptconsole/DumpRteExceptionHandler.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/virbo/autoplot/JythonMain.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/state/*.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/scriptconsole/DumpRteExceptionHandler.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/JythonMain.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/autoplot/help/AutoplotHelpViewer.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/virbo/autoplot/AutoplotServer.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/virbo/autoplot/AutoplotDataServer.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/virbo/dsutil/*.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/AutoplotServer.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/AutoplotDataServer.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/das2/qds/util/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/autoplot/pngwalk/PngWalkTool1.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/autoplot/pngwalk/ImageResize.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/autoplot/pngwalk/QualityControlPanel.java; then echo "****"; hasErrors=1; fi
@@ -269,15 +270,16 @@ if ! $JAVAC $JAVAARGS org/das2/beans/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/das2/util/awt/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/das2/util/ExceptionHandler.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS test/endtoend/*.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/idlsupport/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/virbo/idlsupport/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/das2/system/NullPreferencesFactory.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/autoplot/tca/UriTcaSource.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/virbo/dataset/NearestNeighborTcaFunction.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/das2/qds/NearestNeighborTcaFunction.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/qstream/filter/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/das2/event/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/das2/dataset/NoDataInIntervalException.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/qstream/filter/*.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/virbo/autoplot/ScreenshotsTool.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/ScreenshotsTool.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/autoplot/wgetfs/WGetFileSystemFactory.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/das2/fsm/FileStorageModelNew.java; then echo "****"; hasErrors=1; fi  # some scripts use this old name.
 if ! $JAVAC $JAVAARGS org/das2/math/filter/*.java; then echo "****"; hasErrors=1; fi  
@@ -287,38 +289,37 @@ if ! $JAVAC $JAVAARGS org/das2/graph/Auralizor.java; then echo "****"; hasErrors
 if ! $JAVAC $JAVAARGS org/das2/datum/Ratio.java; then echo "****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/das2/datum/RationalNumber.java; then echo "****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/das2/datum/SIUnits.java; then echo "****"; hasErrors=1; fi  
-if ! $JAVAC $JAVAARGS org/virbo/dataset/RepeatIndexDataSet.java; then echo "****"; hasErrors=1; fi
-# this can be removed soon:
-if ! $JAVAC $JAVAARGS org/virbo/dataset/SparseDataSetBuilder.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/virbo/dataset/SparseDataSet.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/virbo/jythonsupport/ui/DataMashUp.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/das2/qds/RepeatIndexDataSet.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/jythonsupport/ui/DataMashUp.java; then echo "****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/das2/util/*Formatter.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/autoplot/util/jemmy/*.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/virbo/filters/*.java; then echo "****"; hasErrors=1; fi
-cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
-for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
+if ! $JAVAC $JAVAARGS org/das2/qds/filters/*.java; then echo "****"; hasErrors=1; fi
+
+cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1
+for i in `cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    echo $JAVAC $JAVAARGS $i.java
    if ! $JAVAC $JAVAARGS $i.java; then hasErrors=1; fi
 done
-cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFormat.extensions | cut -d' ' -f1
-for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFormat.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
+cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFormat.extensions | cut -d' ' -f1
+for i in `cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFormat.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    echo $JAVAC $JAVAARGS $i.java
    if ! $JAVAC $JAVAARGS $i.java; then hasErrors=1; fi
 done
-cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1
-for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
+cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1
+for i in `cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    echo $JAVAC $JAVAARGS $i.java
    if ! $JAVAC $JAVAARGS $i.java; then hasErrors=1; fi
 done
-cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFormatEditorPanel.extensions | cut -d' ' -f1
-for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFormatEditorPanel.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
+cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFormatEditorPanel.extensions | cut -d' ' -f1
+for i in `cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFormatEditorPanel.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    echo $JAVAC $JAVAARGS $i.java
    if ! $JAVAC $JAVAARGS $i.java; then hasErrors=1; fi
 done
 
 # NetCDF IOServiceProvider allows Autoplot URIs to be used in ncml files.
-if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:.. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/netCDF/AbstractIOSP.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:.. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/netCDF/APIOServiceProvider.java; then hasErrors=1; fi
+echo "compile AbstractIOSP and APIOServiceProvider"
+if ! $JAVAC $JAVAARGS org/autoplot/netCDF/AbstractIOSP.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/netCDF/APIOServiceProvider.java; then echo "****"; hasErrors=1; fi
 
 cd ..
 echo "done compile sources."

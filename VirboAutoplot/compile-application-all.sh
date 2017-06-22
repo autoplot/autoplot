@@ -167,9 +167,10 @@ for i in \
   AudioSystemDataSource \
   BinaryDataSource DataSourcePack JythonDataSource \
   Das2ServerDataSource TsdsDataSource  \
-  NetCdfDataSource CdfDataSource CefDataSource \
+  NetCdfDataSource CefDataSource \
   WavDataSource ImageDataSource ExcelDataSource \
   FitsDataSource OpenDapDataSource \
+  CdfJavaDataSource \
   VirboAutoplot; do
     if [ -d ../${i}/javahelp/ ]; then
         echo ${RSYNC} -av --exclude .svn ../${i}/javahelp/ temp-classes/
