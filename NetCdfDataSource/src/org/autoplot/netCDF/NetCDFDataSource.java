@@ -71,7 +71,7 @@ public class NetCDFDataSource extends AbstractDataSource {
 
 /*    static {
         try {
-            NetcdfFile.registerIOProvider("org.virbo.netCDF.APIOServiceProvider");
+            NetcdfFile.registerIOProvider("org.autoplot.netCDF.APIOServiceProvider");
         } catch (IllegalAccessException ex) {
             logger.log(Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
@@ -131,7 +131,7 @@ public class NetCDFDataSource extends AbstractDataSource {
     
     @Override
     public QDataSet getDataSet( ProgressMonitor mon) throws IOException, NoDataInIntervalException, ParseException {
-        logger.entering("org.virbo.netCDF.NetCDFDataSource", "getDataSet");
+        logger.entering("org.autoplot.netCDF.NetCDFDataSource", "getDataSet");
         mon.started();
         mon.setTaskSize(20);
         try { 
@@ -190,7 +190,7 @@ public class NetCDFDataSource extends AbstractDataSource {
             
         } finally {
             mon.finished();
-            logger.exiting("org.virbo.netCDF.NetCDFDataSource", "getDataSet");
+            logger.exiting("org.autoplot.netCDF.NetCDFDataSource", "getDataSet");
         }
         
     }
@@ -352,7 +352,7 @@ public class NetCDFDataSource extends AbstractDataSource {
     
     @Override
     public Map<String,Object> getMetadata( ProgressMonitor mon ) throws Exception {
-        logger.entering("org.virbo.netCDF.NetCDFDataSource", "getMetadata");
+        logger.entering("org.autoplot.netCDF.NetCDFDataSource", "getMetadata");
         mon.started();
         try {
             mon.setProgressMessage("reading metadata");
@@ -385,7 +385,7 @@ public class NetCDFDataSource extends AbstractDataSource {
             return result;
         } finally {
             mon.finished();
-            logger.exiting("org.virbo.netCDF.NetCDFDataSource", "getMetadata");
+            logger.exiting("org.autoplot.netCDF.NetCDFDataSource", "getMetadata");
         }
         
         
