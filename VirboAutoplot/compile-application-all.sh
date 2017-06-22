@@ -228,23 +228,23 @@ if ! $JAVAC $JAVAARGS org/das2/qds/filters/*.java; then echo "****"; hasErrors=1
 cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    echo $JAVAC $JAVAARGS $i.java
-   if ! $JAVAC $JAVAARGS $i.java; then hasErrors=1; fi
+   if ! $JAVAC $JAVAARGS $i.java; then echo "****"; hasErrors=1; fi
 done
 cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFormat.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFormat.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    echo $JAVAC $JAVAARGS $i.java
-   if ! $JAVAC $JAVAARGS $i.java; then hasErrors=1; fi
+   if ! $JAVAC $JAVAARGS $i.java; then echo "****"; hasErrors=1; fi
 done
 cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    echo $JAVAC $JAVAARGS $i.java
-   if ! $JAVAC $JAVAARGS $i.java; then hasErrors=1; fi
+   if ! $JAVAC $JAVAARGS $i.java; then echo "****"; hasErrors=1; fi
 done
 
 # NetCDF IOServiceProvider allows Autoplot URIs to be used in ncml files.
 echo "compile AbstractIOSP and APIOServiceProvider"
-if ! $JAVAC $JAVAARGS org/virbo/netCDF/AbstractIOSP.java; then hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/virbo/netCDF/APIOServiceProvider.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/netCDF/AbstractIOSP.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/netCDF/APIOServiceProvider.java; then echo "****"; hasErrors=1; fi
 
 cd ..
 echo "done compile sources."
