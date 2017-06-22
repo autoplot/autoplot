@@ -148,7 +148,7 @@ public class RecentUrisDialog extends javax.swing.JDialog {
             }
         });
 
-        plotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/go.png"))); // NOI18N
+        plotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/go.png"))); // NOI18N
         plotButton.setText("Plot");
         plotButton.setToolTipText("Replace the current plot with this");
         plotButton.addActionListener(new java.awt.event.ActionListener() {
@@ -157,7 +157,7 @@ public class RecentUrisDialog extends javax.swing.JDialog {
             }
         });
 
-        editUriButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/fileMag.png"))); // NOI18N
+        editUriButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/fileMag.png"))); // NOI18N
         editUriButton.setText("Edit");
         editUriButton.setToolTipText("Inspect this resource.  If an editor panel is available, this will enter the editor panel before plotting.  Otherwise the\nURI is copied to the address bar for editing with completions.");
         editUriButton.addActionListener(new java.awt.event.ActionListener() {

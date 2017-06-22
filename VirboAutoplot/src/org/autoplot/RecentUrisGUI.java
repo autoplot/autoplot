@@ -47,7 +47,7 @@ import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.util.filesystem.Glob;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.AutoplotSettings;
+import org.autoplot.datasource.AutoplotSettings;
 
 /**
  * This presents the URI history in a useful dialog where URIs are

@@ -5,7 +5,7 @@
 
 package test;
 
-import org.virbo.datasource.DataSourceUtil;
+import org.autoplot.datasource.DataSourceUtil;
 
 /**
  *

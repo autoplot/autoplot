@@ -16,7 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.MetadataModel;
+import org.autoplot.datasource.MetadataModel;
 
 /**
  *

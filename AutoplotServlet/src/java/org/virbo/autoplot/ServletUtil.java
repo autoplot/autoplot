@@ -20,8 +20,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
-import org.virbo.datasource.AutoplotSettings;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.AutoplotSettings;
+import org.autoplot.datasource.URISplit;
 
 /**
  * Utilities for the servlets

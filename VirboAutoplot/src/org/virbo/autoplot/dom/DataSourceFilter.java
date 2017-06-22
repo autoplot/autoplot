@@ -6,7 +6,7 @@
 package org.virbo.autoplot.dom;
 
 import java.util.List;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.URISplit;
 
 /**
  * Model for a source of data plus additional processing.

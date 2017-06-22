@@ -28,13 +28,13 @@ import org.das2.util.LoggerManager;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSourceFormat;
-import org.virbo.datasource.DataSourceFormatEditorPanel;
-import org.virbo.datasource.DataSourceRegistry;
-import org.virbo.datasource.DataSourceUtil;
-import org.virbo.datasource.FileSystemUtil;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSourceFormat;
+import org.autoplot.datasource.DataSourceFormatEditorPanel;
+import org.autoplot.datasource.DataSourceRegistry;
+import org.autoplot.datasource.DataSourceUtil;
+import org.autoplot.datasource.FileSystemUtil;
+import org.autoplot.datasource.URISplit;
 
 /**
  * GUI for specifying how data should be output to a file.

@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.format.TimeDatumFormatter;
 import org.python.util.PythonInterpreter;
-import org.virbo.autoplot.scriptconsole.LoggingOutputStream;
+import org.autoplot.scriptconsole.LoggingOutputStream;
 
 /**
  * Allow the clients to run scripts on the server.

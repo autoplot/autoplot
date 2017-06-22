@@ -5,9 +5,9 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSource;
-import org.virbo.datasource.DataSourceFactory;
+import org.autoplot.datasource.CompletionContext;
+import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.DataSourceFactory;
 
 /**
  * Factory for ImageDataSource, which read in images into datasets.

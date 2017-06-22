@@ -70,7 +70,7 @@ import org.autoplot.ColumnColumnConnectorMouseModule;
 import org.autoplot.GuiSupport;
 import org.autoplot.LayoutListener;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
-import org.virbo.autoplot.layout.LayoutConstants;
+import org.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.util.RunLaterListener;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 

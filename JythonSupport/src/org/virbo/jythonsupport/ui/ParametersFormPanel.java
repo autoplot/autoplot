@@ -40,10 +40,10 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.util.PythonInterpreter;
-import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.TimeRangeTool;
-import org.virbo.datasource.URISplit;
-import org.virbo.datasource.WindowManager;
+import org.autoplot.datasource.DataSetSelector;
+import org.autoplot.datasource.TimeRangeTool;
+import org.autoplot.datasource.URISplit;
+import org.autoplot.datasource.WindowManager;
 import org.virbo.jythonsupport.JythonUtil;
 import org.virbo.jythonsupport.JythonUtil.Param;
 import static org.virbo.jythonsupport.ui.Util.getParams;
@@ -360,7 +360,7 @@ public class ParametersFormPanel {
                             x.width= Integer.MAX_VALUE;
                             tf.setMaximumSize(x);
                             tf.setUI( tf.getUI() ); // kludge to maybe avoid deadlock.
-                            Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/virbo/datasource/jython/file2.png"));
+                            Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/autoplot/datasource/jython/file2.png"));
                             JButton filesButton= new JButton( fileIcon );
                             filesButton.addActionListener( new ActionListener() {
                                 @Override
@@ -442,7 +442,7 @@ public class ParametersFormPanel {
                             tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
                             tf.setText( val );
                             ctf= tf;
-                            Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/virbo/datasource/calendar.png"));
+                            Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/autoplot/datasource/calendar.png"));
                             JButton button= new JButton( fileIcon );
                             button.addActionListener( new ActionListener() {
                                 @Override

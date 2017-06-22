@@ -13,7 +13,7 @@ import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.AbstractDataSourceFormat;
+import org.autoplot.datasource.AbstractDataSourceFormat;
 import org.virbo.dsops.Ops;
 
 /**

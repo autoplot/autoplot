@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
 import org.das2.datum.LoggerManager;
-import org.virbo.datasource.URISplit;
-import org.virbo.datasource.DataSourceFormatEditorPanel;
+import org.autoplot.datasource.URISplit;
+import org.autoplot.datasource.DataSourceFormatEditorPanel;
 
 /**
  *

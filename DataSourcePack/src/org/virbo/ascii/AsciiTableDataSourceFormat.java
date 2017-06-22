@@ -29,7 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.AbstractDataSourceFormat;
+import org.autoplot.datasource.AbstractDataSourceFormat;
 import org.das2.datum.format.FormatStringFormatter;
 import org.virbo.dataset.BundleDataSet;
 import org.virbo.dataset.DDataSet;

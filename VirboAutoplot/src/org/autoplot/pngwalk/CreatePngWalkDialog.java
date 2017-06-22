@@ -23,8 +23,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import org.autoplot.AutoplotUtil;
 import org.autoplot.EventsListToolUtil;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.TimeRangeTool;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.TimeRangeTool;
 
 /**
  * Provide dialog to control make pngwalk code.
@@ -222,7 +222,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         timeRangeToolButton = new javax.swing.JButton();
         timeRangeRadioButton = new javax.swing.JRadioButton();
         eventsFileRadioButton = new javax.swing.JRadioButton();
-        eventsFileSelector = new org.virbo.datasource.DataSetSelector();
+        eventsFileSelector = new org.autoplot.datasource.DataSetSelector();
         pngFormatCB = new javax.swing.JRadioButton();
         pdfFormatCB = new javax.swing.JRadioButton();
         jLabel4 = new javax.swing.JLabel();
@@ -288,7 +288,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         timeFormatCB.setEditable(true);
         timeFormatCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "$Y$m$d", "$Y", "$Y$(m,span=3)", "$Y$m", "$Y_$j", "$Y$m$d_$H", "$Y$m$d_$H$M", "$Y$m$d_$H$M$S", "$(o,id=rbspa-pp)", "$(o,id=http://das2.org/wiki/index.php/Orbits/crres)" }));
 
-        timeRangeToolButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/calendar.png"))); // NOI18N
+        timeRangeToolButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/calendar.png"))); // NOI18N
         timeRangeToolButton.setToolTipText("Use time range tool");
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, timeRangeRadioButton, org.jdesktop.beansbinding.ELProperty.create("${selected}"), timeRangeToolButton, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
@@ -525,7 +525,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JCheckBox createThumbsCb;
     private javax.swing.JRadioButton eventsFileRadioButton;
-    private org.virbo.datasource.DataSetSelector eventsFileSelector;
+    private org.autoplot.datasource.DataSetSelector eventsFileSelector;
     private javax.swing.JTextField flnRootTf;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

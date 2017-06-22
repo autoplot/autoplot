@@ -119,8 +119,8 @@ import org.das2.util.Entities;
 import org.das2.util.awt.PdfGraphicsOutput;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.autoplot.bookmarks.Bookmark;
-import org.virbo.autoplot.bookmarks.BookmarksException;
+import org.autoplot.bookmarks.Bookmark;
+import org.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.dom.Annotation;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
@@ -134,23 +134,23 @@ import org.virbo.autoplot.dom.OptionsPrefsController;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotController;
 import org.virbo.autoplot.dom.PlotElement;
-import org.virbo.autoplot.layout.LayoutConstants;
-import org.virbo.autoplot.state.StatePersistence;
+import org.autoplot.layout.LayoutConstants;
+import org.autoplot.state.StatePersistence;
 import org.virbo.autoplot.transferrable.ImageSelection;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.AutoplotSettings;
-import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSource;
-import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.DataSourceFormat;
-import org.virbo.datasource.DataSourceFormatEditorPanel;
-import org.virbo.datasource.DataSourceRegistry;
-import org.virbo.datasource.DataSourceUtil;
-import org.virbo.datasource.URISplit;
-import org.virbo.datasource.WindowManager;
+import org.autoplot.datasource.AutoplotSettings;
+import org.autoplot.datasource.DataSetSelector;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.DataSourceFactory;
+import org.autoplot.datasource.DataSourceFormat;
+import org.autoplot.datasource.DataSourceFormatEditorPanel;
+import org.autoplot.datasource.DataSourceRegistry;
+import org.autoplot.datasource.DataSourceUtil;
+import org.autoplot.datasource.URISplit;
+import org.autoplot.datasource.WindowManager;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.xml.sax.SAXException;
 
@@ -543,7 +543,7 @@ public class GuiSupport {
                         break;
                     }
             }
-            parent.setStatus("Wrote " + org.virbo.datasource.DataSourceUtil.unescape(uriOut) );
+            parent.setStatus("Wrote " + org.autoplot.datasource.DataSourceUtil.unescape(uriOut) );
         } catch ( IllegalArgumentException ex ) {
             parent.applicationModel.getExceptionHandler().handle(ex);
             logger.log(Level.FINE, " ..caused exception: {0} using format {1}", new Object[]{uriOut, format});

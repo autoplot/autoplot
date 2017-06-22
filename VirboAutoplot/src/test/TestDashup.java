@@ -8,7 +8,7 @@ package test;
 import java.util.Arrays;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import org.virbo.datasource.DataSetSelector;
+import org.autoplot.datasource.DataSetSelector;
 import org.virbo.jythonsupport.ui.DataMashUp;
 import org.virbo.jythonsupport.ui.NamedURIListTool;
 

@@ -13,7 +13,7 @@ package org.autoplot;
 
 import java.io.File;
 import javax.swing.JFileChooser;
-import org.virbo.datasource.AutoplotSettings;
+import org.autoplot.datasource.AutoplotSettings;
 
 /**
  *

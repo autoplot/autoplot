@@ -54,13 +54,13 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.PyException;
-import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSourceEditorPanel;
-import org.virbo.datasource.FileSystemUtil;
-import org.virbo.datasource.LogNames;
-import org.virbo.datasource.TimeRangeTool;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSetSelector;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSourceEditorPanel;
+import org.autoplot.datasource.FileSystemUtil;
+import org.autoplot.datasource.LogNames;
+import org.autoplot.datasource.TimeRangeTool;
+import org.autoplot.datasource.URISplit;
 import org.virbo.jythonsupport.JythonUtil;
 import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
 import org.virbo.jythonsupport.ui.ScriptPanelSupport;
@@ -465,7 +465,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     tf.setText( val );
                     ctf= tf;
                     
-                    Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/virbo/datasource/calendar.png"));
+                    Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/autoplot/datasource/calendar.png"));
                     JButton button= new JButton( fileIcon );
                     button.addActionListener( new ActionListener() {
                         @Override

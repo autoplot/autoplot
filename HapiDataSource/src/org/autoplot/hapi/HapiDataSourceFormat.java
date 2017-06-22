@@ -24,8 +24,8 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.DataSourceFormat;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSourceFormat;
+import org.autoplot.datasource.URISplit;
 import org.virbo.dsops.Ops;
 
 /**

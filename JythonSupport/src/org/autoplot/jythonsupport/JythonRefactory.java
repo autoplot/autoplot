@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.util.LoggerManager;
-import org.virbo.datasource.DataSourceUtil;
+import org.autoplot.datasource.DataSourceUtil;
 
 /**
  * Provide one class that manages backwards compatibility as package names

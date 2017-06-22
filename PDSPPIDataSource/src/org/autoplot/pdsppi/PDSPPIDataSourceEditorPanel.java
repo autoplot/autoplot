@@ -31,8 +31,8 @@ import org.das2.util.filesystem.FSTreeModel;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.DataSourceEditorPanel;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSourceEditorPanel;
+import org.autoplot.datasource.URISplit;
 
 /**
  * Editor panel for getting data from PDS/PPI node.

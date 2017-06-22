@@ -15,8 +15,8 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSourceUtil;
+import org.autoplot.datasource.CompletionContext;
+import org.autoplot.datasource.DataSourceUtil;
 
 /**
  * Utilties.

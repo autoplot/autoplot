@@ -5,7 +5,7 @@
  */
 package test.endtoend;
 
-import org.virbo.datasource.DataSourceUtil;
+import org.autoplot.datasource.DataSourceUtil;
 
 /**
  * Unit tests added as new codes are introduced.  This will serve mostly

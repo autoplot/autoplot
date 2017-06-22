@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.MetadataModel;
+import org.autoplot.datasource.MetadataModel;
 
 /**
  * This was once used to implement scale_factor and add_offset, but is no longer used.

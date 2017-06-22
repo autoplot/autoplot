@@ -27,11 +27,11 @@ import org.das2.dataset.DataSetAdapter;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.util.FileUtil;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSourceUtil;
-import org.virbo.datasource.HtmlResponseIOException;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.AbstractDataSource;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSourceUtil;
+import org.autoplot.datasource.HtmlResponseIOException;
+import org.autoplot.datasource.URISplit;
 import org.virbo.qstream.QDataSetStreamHandler;
 
 /**

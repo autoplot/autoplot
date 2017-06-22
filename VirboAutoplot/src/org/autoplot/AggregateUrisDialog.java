@@ -24,8 +24,8 @@ import javax.swing.SwingUtilities;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomOps;
-import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.ThreadManager;
+import org.autoplot.datasource.DataSetSelector;
+import org.autoplot.datasource.ThreadManager;
 
 /**
  * Dialog assisting the scientists in creating aggregations for file
@@ -52,7 +52,7 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
 
         previewDataSetSelector.setHidePlayButton(true);
         String s = dataSetSelector.getValue();
-        String agg = org.virbo.datasource.DataSourceUtil.makeAggregation(s);
+        String agg = org.autoplot.datasource.DataSourceUtil.makeAggregation(s);
         if (agg != null) {
             previewDataSetSelector.setValue(agg);
         } else {
@@ -70,8 +70,8 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
         }
         allUrisTA.setEditable(false);
 
-        addressBarUriButton.setIcon( new ImageIcon( this.getClass().getResource("/org/virbo/datasource/go.png") ) );
-        allUrisButton.setIcon( new ImageIcon( this.getClass().getResource("/org/virbo/datasource/go.png") ) );
+        addressBarUriButton.setIcon( new ImageIcon( this.getClass().getResource("/org/autoplot/datasource/go.png") ) );
+        allUrisButton.setIcon( new ImageIcon( this.getClass().getResource("/org/autoplot/datasource/go.png") ) );
     }
 
     /**
@@ -136,7 +136,7 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
         jLabel5 = new javax.swing.JLabel();
         allUrisButton = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
-        previewDataSetSelector = new org.virbo.datasource.DataSetSelector();
+        previewDataSetSelector = new org.autoplot.datasource.DataSetSelector();
         jScrollPane1 = new javax.swing.JScrollPane();
         allUrisTA = new javax.swing.JTextArea();
         showWildcardsButton = new javax.swing.JButton();
@@ -347,7 +347,7 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private org.virbo.datasource.DataSetSelector previewDataSetSelector;
+    private org.autoplot.datasource.DataSetSelector previewDataSetSelector;
     private javax.swing.JButton showWildcardsButton;
     // End of variables declaration//GEN-END:variables
 

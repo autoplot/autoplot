@@ -30,8 +30,8 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.jythoncompletion.ui.CompletionImpl;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.DataSourceEditorPanel;
-import org.virbo.datasource.DataSourceUtil;
+import org.autoplot.datasource.DataSourceEditorPanel;
+import org.autoplot.datasource.DataSourceUtil;
 import org.virbo.jythonsupport.Util;
 import org.virbo.jythonsupport.ui.DataMashUp;
 

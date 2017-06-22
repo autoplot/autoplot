@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
 import java.util.List;
-import org.virbo.autoplot.bookmarks.Bookmark;
+import org.autoplot.bookmarks.Bookmark;
 
 
 /**

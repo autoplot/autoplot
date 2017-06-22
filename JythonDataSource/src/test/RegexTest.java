@@ -7,7 +7,7 @@ package test;
 
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import org.virbo.datasource.LogNames;
+import org.autoplot.datasource.LogNames;
 
 /**
  *

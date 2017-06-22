@@ -44,11 +44,11 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSource;
-import org.virbo.datasource.DataSourceUtil;
-import org.virbo.datasource.HtmlResponseIOException;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.DataSourceUtil;
+import org.autoplot.datasource.HtmlResponseIOException;
+import org.autoplot.datasource.URISplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.capability.Updating;
@@ -1863,7 +1863,7 @@ public class DataSourceController extends DomNodeController {
                     if (title.contains("\n")) {
                         title = title.substring(0, title.indexOf("\n"));
                     }
-                    if (message.contains(org.virbo.aggregator.AggregatingDataSource.MSG_NO_FILES_FOUND)) {
+                    if (message.contains(org.autoplot.aggregator.AggregatingDataSource.MSG_NO_FILES_FOUND)) {
                         // this implies that there are files in other intervals, so don't have popup
                     } else {
                         model.showMessage(addHtmlBreaks(message), title, JOptionPane.WARNING_MESSAGE);

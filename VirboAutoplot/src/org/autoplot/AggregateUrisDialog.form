@@ -163,7 +163,7 @@
                 <Property name="verticalAlignment" type="int" value="1"/>
               </Properties>
             </Component>
-            <Component class="org.virbo.datasource.DataSetSelector" name="previewDataSetSelector">
+            <Component class="org.autoplot.datasource.DataSetSelector" name="previewDataSetSelector">
             </Component>
             <Container class="javax.swing.JScrollPane" name="jScrollPane1">
               <AuxValues>

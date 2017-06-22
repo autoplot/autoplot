@@ -4,9 +4,9 @@ package org.autoplot;
 import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Dimension;
-import org.virbo.datasource.AutoplotSettings;
+import org.autoplot.datasource.AutoplotSettings;
 import java.lang.reflect.InvocationTargetException;
-import org.virbo.autoplot.bookmarks.Bookmark;
+import org.autoplot.bookmarks.Bookmark;
 import java.util.logging.Level;
 import org.das2.DasApplication;
 import org.das2.graph.DasCanvas;
@@ -72,18 +72,18 @@ import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Plot;
-import org.virbo.autoplot.layout.LayoutUtil;
-import org.virbo.autoplot.state.StatePersistence;
+import org.autoplot.layout.LayoutUtil;
+import org.autoplot.state.StatePersistence;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSource;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.URISplit;
 import org.virbo.datasource.capability.Caching;
 import org.xml.sax.SAXException;
-import org.virbo.autoplot.bookmarks.BookmarksException;
+import org.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.dom.CanvasController;
-import org.virbo.datasource.HtmlResponseIOException;
-import org.virbo.datasource.Version;
+import org.autoplot.datasource.HtmlResponseIOException;
+import org.autoplot.datasource.Version;
 /**
  * Internal model of the application to separate model from view.
  * Note this is the legacy model that still remains from the first implementation

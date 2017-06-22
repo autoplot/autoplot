@@ -19,7 +19,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.dom.DebugPropertyChangeSupport;
-import org.virbo.datasource.DataSetURI;
+import org.autoplot.datasource.DataSetURI;
 
 /**
  * <p>This class maintains a list of <code>WalkImage</code>s and provides functionality

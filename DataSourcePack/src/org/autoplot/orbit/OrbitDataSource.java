@@ -12,9 +12,9 @@ import org.das2.datum.Orbits;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DefaultTimeSeriesBrowse;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.AbstractDataSource;
+import org.autoplot.datasource.DefaultTimeSeriesBrowse;
+import org.autoplot.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 

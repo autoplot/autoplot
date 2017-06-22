@@ -15,8 +15,8 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.ScriptContext;
 import org.virbo.dataset.DataSetUtil;
-import org.virbo.datasource.DataSource;
-import org.virbo.datasource.DataSourceUtil;
+import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.DataSourceUtil;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 
@@ -182,13 +182,13 @@ public class Test024 {
     public static void test6() throws Exception {
         System.err.println( "\n= test6 =\n");
         {
-            DataSource dss= org.virbo.datasource.DataSetURI.getDataSource( "http://acdisc.gsfc.nasa.gov/opendap/HDF-EOS5/Aura_OMI_Level3/OMAEROe.003/2005/OMI-Aura_L3-OMAEROe_2005m0101_v003-2011m1109t081947.he5.dds?lat" );
-            TimeSeriesBrowse tsb= org.virbo.datasource.DataSourceUtil.getTimeSeriesBrowse(dss);
+            DataSource dss= org.autoplot.datasource.DataSetURI.getDataSource( "http://acdisc.gsfc.nasa.gov/opendap/HDF-EOS5/Aura_OMI_Level3/OMAEROe.003/2005/OMI-Aura_L3-OMAEROe_2005m0101_v003-2011m1109t081947.he5.dds?lat" );
+            TimeSeriesBrowse tsb= org.autoplot.datasource.DataSourceUtil.getTimeSeriesBrowse(dss);
             System.err.println(tsb);
         }
         {
-            DataSource dss= org.virbo.datasource.DataSetURI.getDataSource( "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109" );
-            TimeSeriesBrowse tsb= org.virbo.datasource.DataSourceUtil.getTimeSeriesBrowse(dss);
+            DataSource dss= org.autoplot.datasource.DataSetURI.getDataSource( "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109" );
+            TimeSeriesBrowse tsb= org.autoplot.datasource.DataSourceUtil.getTimeSeriesBrowse(dss);
             System.err.println(tsb);
         }
     }
@@ -267,8 +267,8 @@ public class Test024 {
     private static String checkAPDS( String uri, String tr ) throws Exception {
         if ( tr!=null ) {
             // mimic code in papco that is failing
-            DataSource dss= org.virbo.datasource.DataSetURI.getDataSource( uri );
-            TimeSeriesBrowse tsb= org.virbo.datasource.DataSourceUtil.getTimeSeriesBrowse( dss );
+            DataSource dss= org.autoplot.datasource.DataSetURI.getDataSource( uri );
+            TimeSeriesBrowse tsb= org.autoplot.datasource.DataSourceUtil.getTimeSeriesBrowse( dss );
             DatumRange dr= DatumRangeUtil.parseTimeRange( tr ) ;
             tsb.setTimeRange(dr);
             uri= tsb.getURI();

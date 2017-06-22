@@ -46,8 +46,8 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.util.InteractiveInterpreter;
 import org.virbo.autoplot.dom.Application;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.URISplit;
 import org.virbo.jythonsupport.JythonUtil.Param;
 import org.virbo.jythonsupport.ui.ParametersFormPanel;
 import org.virbo.jythonsupport.ui.Util;
@@ -181,7 +181,7 @@ public class BatchMaster extends javax.swing.JPanel {
         param1Values = new javax.swing.JTextArea();
         jScrollPane1 = new javax.swing.JScrollPane();
         param2Values = new javax.swing.JTextArea();
-        dataSetSelector1 = new org.virbo.datasource.DataSetSelector();
+        dataSetSelector1 = new org.autoplot.datasource.DataSetSelector();
         messageLabel = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         param1NameCB = new javax.swing.JComboBox<>();
@@ -714,7 +714,7 @@ public class BatchMaster extends javax.swing.JPanel {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.virbo.datasource.DataSetSelector dataSetSelector1;
+    private org.autoplot.datasource.DataSetSelector dataSetSelector1;
     private javax.swing.JButton goButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

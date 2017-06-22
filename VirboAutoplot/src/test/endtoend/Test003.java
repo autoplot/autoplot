@@ -15,7 +15,7 @@ import org.das2.util.filesystem.KeyChain;
 import org.das2.util.filesystem.WebFileSystem;
 import org.das2.util.monitor.CancelledOperationException;
 import org.autoplot.ScriptContext;
-import org.virbo.datasource.DataSetURI;
+import org.autoplot.datasource.DataSetURI;
 
 /**
  * Reiner's stuff, other vap files.

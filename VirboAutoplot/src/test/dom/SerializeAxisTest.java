@@ -12,7 +12,7 @@ import java.io.FileOutputStream;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.virbo.autoplot.dom.Axis;
-import org.virbo.autoplot.state.DatumRangePersistenceDelegate;
+import org.autoplot.state.DatumRangePersistenceDelegate;
 
 /**
  *

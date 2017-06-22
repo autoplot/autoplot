@@ -30,11 +30,11 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.SortDataSet;
 import org.virbo.dataset.WritableDataSet;
-import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSourceUtil;
-import org.virbo.datasource.MetadataModel;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.AbstractDataSource;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSourceUtil;
+import org.autoplot.datasource.MetadataModel;
+import org.autoplot.datasource.URISplit;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.DataSetBuilder;
 

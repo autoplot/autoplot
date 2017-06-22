@@ -13,7 +13,7 @@ import org.python.core.PyJavaInstance;
 import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUI;
 import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.scriptconsole.ExitExceptionHandler;
+import org.autoplot.scriptconsole.ExitExceptionHandler;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.QDataSet;
 

@@ -11,8 +11,8 @@ import org.das2.util.monitor.NullProgressMonitor;
 import static org.autoplot.ScriptContext.*;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.Column;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSetURI.CompletionResult;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSetURI.CompletionResult;
 
 /**
  * Test Autoplot's demo bookmarks

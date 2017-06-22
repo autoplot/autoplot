@@ -1,1 +1,1 @@
-from org.virbo.autoplot.ScriptContext import *
+from org.autoplot.ScriptContext import *

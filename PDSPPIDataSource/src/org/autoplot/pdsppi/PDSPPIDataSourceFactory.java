@@ -18,12 +18,12 @@ import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.AbstractDataSourceFactory;
-import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSource;
-import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.AbstractDataSourceFactory;
+import org.autoplot.datasource.CompletionContext;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.DataSourceFactory;
+import org.autoplot.datasource.URISplit;
 import org.virbo.spase.VOTableReader;
 
 /**

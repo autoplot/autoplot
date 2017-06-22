@@ -47,11 +47,11 @@ import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.cdf.CdfJavaDataSourceEditorPanel;
-import org.virbo.datasource.AutoplotSettings;
-import org.virbo.datasource.DataSourceEditorPanel;
-import org.virbo.datasource.TimeRangeTool;
-import org.virbo.datasource.URISplit;
-import org.virbo.datasource.WindowManager;
+import org.autoplot.datasource.AutoplotSettings;
+import org.autoplot.datasource.DataSourceEditorPanel;
+import org.autoplot.datasource.TimeRangeTool;
+import org.autoplot.datasource.URISplit;
+import org.autoplot.datasource.WindowManager;
 
 /**
  *

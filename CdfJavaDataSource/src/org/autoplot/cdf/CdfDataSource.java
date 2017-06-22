@@ -50,10 +50,10 @@ import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.ReplicateDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSourceUtil;
-import org.virbo.datasource.MetadataModel;
-import org.virbo.datasource.ReferenceCache;
+import org.autoplot.datasource.AbstractDataSource;
+import org.autoplot.datasource.DataSourceUtil;
+import org.autoplot.datasource.MetadataModel;
+import org.autoplot.datasource.ReferenceCache;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
 

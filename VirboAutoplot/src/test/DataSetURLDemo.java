@@ -13,7 +13,7 @@ import java.net.URI;
 import java.net.URL;
 import org.das2.components.DasProgressPanel;
 import java.util.List;
-import org.virbo.datasource.DataSetURI;
+import org.autoplot.datasource.DataSetURI;
 
 /**
  *

@@ -25,11 +25,11 @@ import org.das2.datum.TimeParser;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.autoplot.ScriptContext;
-import org.virbo.autoplot.bookmarks.Bookmark;
-import org.virbo.autoplot.bookmarks.BookmarksException;
-import org.virbo.autoplot.bookmarks.BookmarksManager;
-import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
-import org.virbo.datasource.DataSetURI;
+import org.autoplot.bookmarks.Bookmark;
+import org.autoplot.bookmarks.BookmarksException;
+import org.autoplot.bookmarks.BookmarksManager;
+import org.autoplot.bookmarks.BookmarksManagerModel;
+import org.autoplot.datasource.DataSetURI;
 import org.xml.sax.SAXException;
 
 /**

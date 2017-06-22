@@ -32,7 +32,7 @@ import org.jdesktop.beansbinding.BindingGroup;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.examples.Schemes;
-import org.virbo.datasource.InputVerifier;
+import org.autoplot.datasource.InputVerifier;
 import org.virbo.filters.FiltersChainPanel;
 
 /**
@@ -359,7 +359,7 @@ public class OperationsPanel extends javax.swing.JPanel {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         filtersChainPanel = new org.virbo.filters.FiltersChainPanel();
-        operatorsComboBox = new org.virbo.datasource.RecentComboBox();
+        operatorsComboBox = new org.autoplot.datasource.RecentComboBox();
         editComponentPanel = new javax.swing.JButton();
         operationsLabel = new javax.swing.JLabel();
         dataSetLabel = new javax.swing.JLabel();
@@ -655,7 +655,7 @@ public class OperationsPanel extends javax.swing.JPanel {
     private javax.swing.JButton editComponentPanel;
     private org.virbo.filters.FiltersChainPanel filtersChainPanel;
     private javax.swing.JLabel operationsLabel;
-    private org.virbo.datasource.RecentComboBox operatorsComboBox;
+    private org.autoplot.datasource.RecentComboBox operatorsComboBox;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 }

@@ -60,7 +60,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout"/>
     </Container>
-    <Component class="org.virbo.datasource.RecentComboBox" name="operatorsComboBox">
+    <Component class="org.autoplot.datasource.RecentComboBox" name="operatorsComboBox">
       <Properties>
         <Property name="name" type="java.lang.String" value="operatorsComboBox" noResource="true"/>
       </Properties>

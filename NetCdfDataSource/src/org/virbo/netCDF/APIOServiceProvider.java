@@ -9,7 +9,7 @@ import org.das2.datum.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetURI;
+import org.autoplot.datasource.DataSetURI;
 import ucar.ma2.Array;
 import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;

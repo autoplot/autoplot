@@ -121,17 +121,17 @@ import org.autoplot.AutoplotUtil;
 import org.autoplot.GuiSupport;
 import org.autoplot.JythonUtil;
 import org.autoplot.ScriptContext;
-import org.virbo.autoplot.bookmarks.Bookmark;
-import org.virbo.autoplot.bookmarks.BookmarksException;
-import org.virbo.autoplot.bookmarks.BookmarksManager;
-import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
-import org.virbo.autoplot.bookmarks.Util;
+import org.autoplot.bookmarks.Bookmark;
+import org.autoplot.bookmarks.BookmarksException;
+import org.autoplot.bookmarks.BookmarksManager;
+import org.autoplot.bookmarks.BookmarksManagerModel;
+import org.autoplot.bookmarks.Util;
 import org.virbo.autoplot.transferrable.ImageSelection;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.FileSystemUtil;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSetSelector;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.FileSystemUtil;
+import org.autoplot.datasource.URISplit;
 import org.xml.sax.SAXException;
 
 /**
@@ -1804,7 +1804,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         nextSetButton = new javax.swing.JButton();
         jumpToFirstButton = new javax.swing.JButton();
         jumpToLastButton = new javax.swing.JButton();
-        dataSetSelector1 = new org.virbo.datasource.DataSetSelector();
+        dataSetSelector1 = new org.autoplot.datasource.DataSetSelector();
         statusLabel = new javax.swing.JLabel();
         showMissingCheckBox = new javax.swing.JCheckBox();
         useRangeCheckBox = new javax.swing.JCheckBox();
@@ -2475,7 +2475,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel actionButtonsPanel;
-    private org.virbo.datasource.DataSetSelector dataSetSelector1;
+    private org.autoplot.datasource.DataSetSelector dataSetSelector1;
     private javax.swing.JButton editRangeButton;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JButton jumpToFirstButton;

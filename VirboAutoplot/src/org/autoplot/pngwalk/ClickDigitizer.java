@@ -31,8 +31,8 @@ import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSourceUtil;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSourceUtil;
 import org.virbo.dsops.Ops;
 
 /**

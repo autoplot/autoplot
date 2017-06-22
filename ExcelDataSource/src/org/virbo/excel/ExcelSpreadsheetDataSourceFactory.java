@@ -17,12 +17,12 @@ import java.util.Map;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSource;
-import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.MetadataModel;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.CompletionContext;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.DataSourceFactory;
+import org.autoplot.datasource.MetadataModel;
+import org.autoplot.datasource.URISplit;
 
 /**
  *

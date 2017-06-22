@@ -277,7 +277,7 @@ public class DataPanel extends javax.swing.JPanel {
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        dataSetSelector = new org.virbo.datasource.DataSetSelector();
+        dataSetSelector = new org.autoplot.datasource.DataSetSelector();
         dataSourceFiltersPanel = new org.autoplot.OperationsPanel();
         additionalOperationsCheckBox = new javax.swing.JCheckBox();
         doSuppressReset = new javax.swing.JCheckBox();
@@ -449,7 +449,7 @@ public class DataPanel extends javax.swing.JPanel {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox additionalOperationsCheckBox;
-    private org.virbo.datasource.DataSetSelector dataSetSelector;
+    private org.autoplot.datasource.DataSetSelector dataSetSelector;
     private org.autoplot.OperationsPanel dataSourceFiltersPanel;
     private javax.swing.JCheckBox doSuppressReset;
     private javax.swing.JLabel jLabel1;

@@ -21,8 +21,8 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSource;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSource;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 

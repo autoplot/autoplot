@@ -31,7 +31,7 @@ import org.das2.graph.DasPlot;
 import org.das2.datum.format.DateTimeDatumFormatter;
 import org.das2.util.LoggerManager;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetURI;
+import org.autoplot.datasource.DataSetURI;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**

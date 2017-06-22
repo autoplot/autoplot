@@ -7,7 +7,7 @@ package test;
 import java.awt.Dialog;
 import javax.swing.JDialog;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.datasource.CompletionsDataSourceEditor;
+import org.autoplot.datasource.CompletionsDataSourceEditor;
 
 /**
  * demonstrate the Completions-based GUI.  The gui queries completions and produces droplists and buttons based

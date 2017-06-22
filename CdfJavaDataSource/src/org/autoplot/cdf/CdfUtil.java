@@ -37,7 +37,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.Slice0DataSet;
-import org.virbo.datasource.DataSourceUtil;
+import org.autoplot.datasource.DataSourceUtil;
 import org.virbo.dsops.Ops;
 
 /**

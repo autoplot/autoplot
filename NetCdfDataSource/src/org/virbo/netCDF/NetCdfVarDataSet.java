@@ -21,7 +21,7 @@ import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.MetadataModel;
+import org.autoplot.datasource.MetadataModel;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.IstpMetadataModel;
 import ucar.ma2.DataType;

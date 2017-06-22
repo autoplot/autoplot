@@ -23,11 +23,11 @@ import javax.swing.SwingUtilities;
 import org.das2.datum.LoggerManager;
 import org.das2.event.DataRangeSelectionEvent;
 import org.das2.event.DataRangeSelectionListener;
-import org.virbo.autoplot.bookmarks.Bookmark;
-import org.virbo.autoplot.bookmarks.BookmarksException;
-import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.TimeRangeToolEventsList;
-import org.virbo.datasource.WindowManager;
+import org.autoplot.bookmarks.Bookmark;
+import org.autoplot.bookmarks.BookmarksException;
+import org.autoplot.datasource.DataSetSelector;
+import org.autoplot.datasource.TimeRangeToolEventsList;
+import org.autoplot.datasource.WindowManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -65,7 +65,7 @@ public class EventsListToolUtil {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
-        org.virbo.autoplot.bookmarks.Util.loadRecent( "eventsRecent", sel, deft );
+        org.autoplot.bookmarks.Util.loadRecent( "eventsRecent", sel, deft );
         
     }
     

@@ -6,7 +6,7 @@
 package test.endtoend;
 
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSourceRegistry;
+import org.autoplot.datasource.DataSourceRegistry;
 import static org.autoplot.ScriptContext.*;
 import org.virbo.jythonsupport.Util;
 

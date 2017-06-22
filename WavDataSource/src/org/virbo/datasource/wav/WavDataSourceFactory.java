@@ -16,10 +16,10 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.AbstractDataSourceFactory;
-import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSource;
+import org.autoplot.datasource.AbstractDataSourceFactory;
+import org.autoplot.datasource.CompletionContext;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSource;
 
 /**
  *

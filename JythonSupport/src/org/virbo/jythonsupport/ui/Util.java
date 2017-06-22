@@ -16,8 +16,8 @@ import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.util.PythonInterpreter;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.URISplit;
 import org.virbo.jythonsupport.JythonUtil;
 
 /**

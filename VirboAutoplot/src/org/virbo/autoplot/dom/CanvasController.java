@@ -39,7 +39,7 @@ import org.das2.graph.SelectionUtil;
 import org.das2.util.LoggerManager;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import static org.virbo.autoplot.dom.DomNodeController.logger;
-import org.virbo.autoplot.layout.LayoutConstants;
+import org.autoplot.layout.LayoutConstants;
 
 /**
  * Controller for canvases.

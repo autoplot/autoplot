@@ -19,7 +19,7 @@ import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import org.virbo.datasource.DataSetURI;
+import org.autoplot.datasource.DataSetURI;
 
 /**
  * This is the abstract superclass for views in the PNGWalk tool.  Concrete

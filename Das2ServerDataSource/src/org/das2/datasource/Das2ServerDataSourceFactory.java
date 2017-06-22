@@ -20,10 +20,10 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSource;
-import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.CompletionContext;
+import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.DataSourceFactory;
+import org.autoplot.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**

@@ -7,7 +7,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
-import org.virbo.datasource.DataSourceUtil;
+import org.autoplot.datasource.DataSourceUtil;
 
 /**
  * Represents a state of the application as a whole, with its one canvas and

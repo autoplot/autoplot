@@ -124,7 +124,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="org.virbo.datasource.DataSetSelector" name="primaryDataSetSelector">
+    <Component class="org.autoplot.datasource.DataSetSelector" name="primaryDataSetSelector">
     </Component>
     <Component class="javax.swing.JCheckBox" name="secondaryCheckBox">
       <Properties>
@@ -134,7 +134,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="secondaryCheckBoxActionPerformed"/>
       </Events>
     </Component>
-    <Component class="org.virbo.datasource.DataSetSelector" name="secondaryDataSetSelector">
+    <Component class="org.autoplot.datasource.DataSetSelector" name="secondaryDataSetSelector">
       <BindingProperties>
         <BindingProperty name="enabled" source="secondaryCheckBox" sourcePath="${selected}" target="secondaryDataSetSelector" targetPath="enabled" updateStrategy="0" immediately="false"/>
       </BindingProperties>
@@ -150,7 +150,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tertiaryCheckBoxActionPerformed"/>
       </Events>
     </Component>
-    <Component class="org.virbo.datasource.DataSetSelector" name="tertiaryDataSetSelector">
+    <Component class="org.autoplot.datasource.DataSetSelector" name="tertiaryDataSetSelector">
       <BindingProperties>
         <BindingProperty name="enabled" source="tertiaryCheckBox" sourcePath="${selected}" target="tertiaryDataSetSelector" targetPath="enabled" updateStrategy="0" immediately="false"/>
       </BindingProperties>
@@ -176,7 +176,7 @@
     <Component class="javax.swing.JButton" name="plotButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/org/virbo/datasource/go.png"/>
+          <Image iconType="3" name="/org/autoplot/datasource/go.png"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Plot"/>
         <Property name="toolTipText" type="java.lang.String" value="Replace the current plot with this"/>

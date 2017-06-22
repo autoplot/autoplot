@@ -21,7 +21,7 @@ import org.das2.graph.DasCanvas;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Canvas;
 import org.virbo.autoplot.dom.CanvasController;
-import org.virbo.autoplot.layout.LayoutUtil;
+import org.autoplot.layout.LayoutUtil;
 
 /**
  * Listens to changes in axis labels and colorbar visible to trigger relayout.

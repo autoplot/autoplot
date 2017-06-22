@@ -27,7 +27,7 @@ import javax.swing.text.Document;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.util.InteractiveInterpreter;
-import org.virbo.datasource.AutoplotSettings;
+import org.autoplot.datasource.AutoplotSettings;
 import org.virbo.jythonsupport.ui.EditorTextPane;
 
 /**

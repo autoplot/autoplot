@@ -75,11 +75,11 @@ import org.das2.datum.TimeUtil;
 import org.das2.system.RequestProcessor;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.AutoplotSettings;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSourceEditorPanel;
-import org.virbo.datasource.TimeRangeTool;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.AutoplotSettings;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSourceEditorPanel;
+import org.autoplot.datasource.TimeRangeTool;
+import org.autoplot.datasource.URISplit;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -577,7 +577,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     private static final Map<String,ImageIcon> icons= Collections.synchronizedMap( new HashMap() );
     
     private static Icon iconFor( Object o, boolean wait ) {
-        //return new javax.swing.ImageIcon(Das2ServerDataSourceEditorPanel.class.getResource("/org/virbo/datasource/fileMag.png"));
+        //return new javax.swing.ImageIcon(Das2ServerDataSourceEditorPanel.class.getResource("/org/autoplot/datasource/fileMag.png"));
         //icons.clear(); // for debugging
         ImageIcon result= icons.get(o.toString());
         if (result==null && wait ) {

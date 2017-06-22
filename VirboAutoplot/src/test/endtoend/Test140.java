@@ -27,13 +27,13 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 
 import static org.autoplot.ScriptContext.*;
-import org.virbo.autoplot.bookmarks.Bookmark;
-import org.virbo.autoplot.bookmarks.BookmarksException;
+import org.autoplot.bookmarks.Bookmark;
+import org.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceFilter;
-import org.virbo.autoplot.state.StatePersistence;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.URISplit;
+import org.autoplot.state.StatePersistence;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.URISplit;
 import org.xml.sax.SAXException;
 
 /**

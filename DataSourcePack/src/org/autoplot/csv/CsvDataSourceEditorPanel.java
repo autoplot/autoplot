@@ -43,9 +43,9 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.ascii.AsciiTableTableModel;
 import org.virbo.ascii.ColSpanTableCellRenderer;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSourceEditorPanel;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSourceEditorPanel;
+import org.autoplot.datasource.URISplit;
 import org.virbo.datasource.ui.TableRowHeader;
 import org.virbo.dsutil.AsciiParser;
 

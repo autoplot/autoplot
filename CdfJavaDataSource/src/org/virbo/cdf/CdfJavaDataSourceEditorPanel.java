@@ -42,10 +42,10 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSourceEditorPanel;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSetSelector;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSourceEditorPanel;
+import org.autoplot.datasource.URISplit;
 
 /**
  * Editor panel for CDF files.  The "Java" part of the name comes from this is a

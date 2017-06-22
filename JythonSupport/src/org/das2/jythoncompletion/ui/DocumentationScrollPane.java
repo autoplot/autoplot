@@ -70,7 +70,7 @@ import javax.swing.text.Utilities;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 import org.das2.jythoncompletion.support.CompletionDocumentation;
-import org.virbo.datasource.DataSourceUtil;
+import org.autoplot.datasource.DataSourceUtil;
 
 /**
  *

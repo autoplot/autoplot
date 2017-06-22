@@ -24,7 +24,7 @@ import javax.swing.JFrame;
 import org.das2.DasApplication;
 import org.das2.util.filesystem.FileSystemSettings;
 import org.virbo.autoplot.AutoplotApplet;
-import org.virbo.autoplot.state.StatePersistence;
+import org.autoplot.state.StatePersistence;
 
 /**
  * Andrew's server

@@ -28,8 +28,8 @@ import javax.swing.SwingUtilities;
 import org.das2.DasApplication;
 import org.das2.datum.LoggerManager;
 import org.das2.util.AboutUtil;
-import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
-import org.virbo.datasource.AutoplotSettings;
+import org.autoplot.scriptconsole.GuiExceptionHandler;
+import org.autoplot.datasource.AutoplotSettings;
 
 /**
  * This utility regularly posts events on the event thread, and measures processing time.

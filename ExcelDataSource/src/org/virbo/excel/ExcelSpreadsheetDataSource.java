@@ -21,8 +21,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSetURI;
+import org.autoplot.datasource.AbstractDataSource;
+import org.autoplot.datasource.DataSetURI;
 
 /**
  * Creates QDataSets from an Excel spreadsheet using Apache POI library.<ul>

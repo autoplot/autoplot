@@ -19,9 +19,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.prefs.Preferences;
-import org.virbo.autoplot.bookmarks.Bookmark;
-import org.virbo.autoplot.bookmarks.BookmarksException;
-import org.virbo.datasource.DataSetSelector;
+import org.autoplot.bookmarks.Bookmark;
+import org.autoplot.bookmarks.BookmarksException;
+import org.autoplot.datasource.DataSetSelector;
 import org.xml.sax.SAXException;
 
 /**
@@ -98,7 +98,7 @@ public class AddDataSourcePanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        dataSetSelector1 = new org.virbo.datasource.DataSetSelector();
+        dataSetSelector1 = new org.autoplot.datasource.DataSetSelector();
 
         jLabel1.setText("Add Data Sources Found in Jar File:");
 
@@ -137,7 +137,7 @@ public class AddDataSourcePanel extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    public org.virbo.datasource.DataSetSelector dataSetSelector1;
+    public org.autoplot.datasource.DataSetSelector dataSetSelector1;
     public javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 

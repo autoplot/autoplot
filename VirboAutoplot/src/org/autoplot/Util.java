@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 import org.das2.util.AboutUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.DataSourceUtil;
+import org.autoplot.datasource.DataSourceUtil;
 
 /**
  *

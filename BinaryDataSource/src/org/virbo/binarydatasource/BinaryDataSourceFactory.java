@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.AbstractDataSourceFactory;
-import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSource;
+import org.autoplot.datasource.AbstractDataSourceFactory;
+import org.autoplot.datasource.CompletionContext;
+import org.autoplot.datasource.DataSource;
 
 /**
  * Factory for BinaryDataSource, which reads data from binary files.

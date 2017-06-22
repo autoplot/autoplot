@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetURI;
+import org.autoplot.datasource.DataSetURI;
 import org.virbo.dsops.Ops;
 
 import static org.autoplot.ScriptContext.*;

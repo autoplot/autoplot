@@ -19,7 +19,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.AbstractDataSource;
+import org.autoplot.datasource.AbstractDataSource;
 
 /**
  * BinaryDataSource returns data backed by binary data files.  Data

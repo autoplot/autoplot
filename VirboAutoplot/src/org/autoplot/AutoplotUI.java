@@ -24,8 +24,8 @@ import org.autoplot.APSplash;
 import java.awt.event.MouseEvent;
 import java.net.URISyntaxException;
 import javax.swing.Icon;
-import org.virbo.autoplot.bookmarks.Bookmark;
-import org.virbo.autoplot.bookmarks.BookmarksManager;
+import org.autoplot.bookmarks.Bookmark;
+import org.autoplot.bookmarks.BookmarksManager;
 import com.cottagesystems.jdiskhog.JDiskHogPanel;
 import java.awt.AWTEvent;
 import org.das2.components.DasProgressPanel;
@@ -159,38 +159,38 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
-import org.virbo.autoplot.bookmarks.BookmarksException;
-import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
-import org.virbo.autoplot.bookmarks.DelayMenu;
+import org.autoplot.bookmarks.BookmarksException;
+import org.autoplot.bookmarks.BookmarksManagerModel;
+import org.autoplot.bookmarks.DelayMenu;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.dom.PlotElement;
-import org.virbo.autoplot.scriptconsole.JythonScriptPanel;
-import org.virbo.autoplot.scriptconsole.LogConsole;
-import org.virbo.autoplot.server.RequestHandler;
-import org.virbo.autoplot.server.RequestListener;
+import org.autoplot.scriptconsole.JythonScriptPanel;
+import org.autoplot.scriptconsole.LogConsole;
+import org.autoplot.server.RequestHandler;
+import org.autoplot.server.RequestListener;
 import org.virbo.autoplot.dom.Options;
 import org.virbo.autoplot.dom.OptionsPrefsController;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotController;
-import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
-import org.virbo.autoplot.state.UndoRedoSupport;
+import org.autoplot.scriptconsole.GuiExceptionHandler;
+import org.autoplot.state.UndoRedoSupport;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.dataset.DataSetAnnotations;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.AutoplotSettings;
-import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.HtmlResponseIOException;
-import org.virbo.datasource.ReferenceCache;
-import org.virbo.datasource.SourceTypesBrowser;
-import org.virbo.datasource.TimeRangeEditor;
-import org.virbo.datasource.URISplit;
-import org.virbo.datasource.WindowManager;
+import org.autoplot.datasource.AutoplotSettings;
+import org.autoplot.datasource.DataSetSelector;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSourceFactory;
+import org.autoplot.datasource.HtmlResponseIOException;
+import org.autoplot.datasource.ReferenceCache;
+import org.autoplot.datasource.SourceTypesBrowser;
+import org.autoplot.datasource.TimeRangeEditor;
+import org.autoplot.datasource.URISplit;
+import org.autoplot.datasource.WindowManager;
 import org.virbo.filters.AddFilterDialog;
 import org.virbo.filters.FiltersChainPanel;
 import org.virbo.jythonsupport.ui.DataMashUp;
@@ -967,11 +967,10 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 switch (evt.getPropertyName()) {
                     case ApplicationModel.PROPERTY_RECENT:
                         final List<Bookmark> recent = applicationModel.getRecent();
-                        SwingUtilities.invokeLater(
-                            new Runnable() {
+                        SwingUtilities.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
-                                    org.virbo.autoplot.bookmarks.Util.setRecent( dataSetSelector, recent );
+                                    org.autoplot.bookmarks.Util.setRecent( dataSetSelector, recent );
                                     //dataSetSelector.setRecent(urls);
                                 }
                             } );
@@ -2571,7 +2570,7 @@ APSplash.checkTime("init 52.9");
         tabbedPanelContainer = new javax.swing.JPanel();
         statusTextField = new javax.swing.JTextField();
         timeRangePanel = new javax.swing.JPanel();
-        dataSetSelector = new org.virbo.datasource.DataSetSelector();
+        dataSetSelector = new org.autoplot.datasource.DataSetSelector();
         uriTimeRangeToggleButton1 = new org.autoplot.UriTimeRangeToggleButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
@@ -3829,7 +3828,7 @@ private void aggregateMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
 private void decodeURLItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_decodeURLItemActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
     String s = dataSetSelector.getValue();
-    s = org.virbo.datasource.DataSourceUtil.unescape(s);
+    s = org.autoplot.datasource.DataSourceUtil.unescape(s);
     dataSetSelector.setValue(s);
 }//GEN-LAST:event_decodeURLItemActionPerformed
 
@@ -5316,7 +5315,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenuItem createPngWalkMenuItem;
     private javax.swing.JSeparator createPngWalkSeparator;
     private javax.swing.JCheckBoxMenuItem dataPanelCheckBoxMenuItem;
-    protected org.virbo.datasource.DataSetSelector dataSetSelector;
+    protected org.autoplot.datasource.DataSetSelector dataSetSelector;
     private javax.swing.JRadioButtonMenuItem dataSetSelectorMenuItem;
     private javax.swing.JMenuItem decodeURLItem;
     private javax.swing.JCheckBoxMenuItem doyCB;

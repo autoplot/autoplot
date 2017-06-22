@@ -425,7 +425,7 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="titleCBActionPerformed"/>
           </Events>
         </Component>
-        <Component class="org.virbo.datasource.TimeRangeEditor" name="timeRangeEditor1">
+        <Component class="org.autoplot.datasource.TimeRangeEditor" name="timeRangeEditor1">
         </Component>
       </SubComponents>
     </Container>

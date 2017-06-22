@@ -22,12 +22,12 @@ import javax.swing.JOptionPane;
 import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasPlot;
 import org.das2.util.LoggerManager;
-import org.virbo.autoplot.bookmarks.Bookmark;
-import org.virbo.autoplot.bookmarks.BookmarksException;
+import org.autoplot.bookmarks.Bookmark;
+import org.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElement;
-import org.virbo.autoplot.layout.LayoutConstants;
-import org.virbo.datasource.DataSetSelector;
+import org.autoplot.layout.LayoutConstants;
+import org.autoplot.datasource.DataSetSelector;
 import org.xml.sax.SAXException;
 
 /**

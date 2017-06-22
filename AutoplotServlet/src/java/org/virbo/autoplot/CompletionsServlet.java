@@ -17,7 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.URISplit;
 
 /**
  * Servlet to provide completions and will be used to bridge the thin client launcher with

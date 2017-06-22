@@ -24,9 +24,9 @@ import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.MetadataModel;
-import org.virbo.datasource.DataSourceUtil;
-import org.virbo.datasource.LogNames;
+import org.autoplot.datasource.MetadataModel;
+import org.autoplot.datasource.DataSourceUtil;
+import org.autoplot.datasource.LogNames;
 import org.virbo.dsops.Ops;
 
 /**

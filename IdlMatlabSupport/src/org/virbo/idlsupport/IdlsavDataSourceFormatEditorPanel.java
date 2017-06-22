@@ -13,9 +13,9 @@ package org.virbo.idlsupport;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JPanel;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.URISplit;
 import java.lang.Short; // because of Short object in this package.
-import org.virbo.datasource.DataSourceFormatEditorPanel;
+import org.autoplot.datasource.DataSourceFormatEditorPanel;
 
 /**
  *

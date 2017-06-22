@@ -28,7 +28,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.KeyChain;
 import org.das2.util.filesystem.WriteCapability;
 import org.das2.util.monitor.CancelledOperationException;
-import org.virbo.datasource.DataSetURI;
+import org.autoplot.datasource.DataSetURI;
 
 /**
  *

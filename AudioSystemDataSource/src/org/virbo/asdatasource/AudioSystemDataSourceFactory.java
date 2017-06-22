@@ -11,10 +11,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.AbstractDataSourceFactory;
-import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSource;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.AbstractDataSourceFactory;
+import org.autoplot.datasource.CompletionContext;
+import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.URISplit;
 
 /**
  * Read data directly from the desktop audio system, to create a useful source

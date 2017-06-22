@@ -60,8 +60,8 @@ import org.python.parser.ast.exprType;
 import org.python.parser.ast.stmtType;
 import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
-import org.virbo.datasource.AutoplotSettings;
-import org.virbo.datasource.DataSetURI;
+import org.autoplot.datasource.AutoplotSettings;
+import org.autoplot.datasource.DataSetURI;
 
 /**
  * Utilities to support Jython scripting.
@@ -367,7 +367,7 @@ public class JythonUtil {
         String vers= "";
         
         // This is the version that Autoplot would like to find, and should be found within the Java class path.
-        double currentVersion= 1.51;  //rfe320 improved getParam support.
+        double currentVersion= 1.60;  //rfe320 improved getParam support.
                 
         if ( ff4.exists() ) {
             try ( BufferedReader r= new BufferedReader( new FileReader( ff4 ) ) ) {

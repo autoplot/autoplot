@@ -25,8 +25,8 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.DataSetWrapper;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSourceFormat;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSourceFormat;
+import org.autoplot.datasource.URISplit;
 
 /**
  * Format the QDataSet into Excel spreadsheets (1990s format).  

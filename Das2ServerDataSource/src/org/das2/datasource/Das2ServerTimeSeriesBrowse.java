@@ -13,7 +13,7 @@ import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.util.LoggerManager;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**

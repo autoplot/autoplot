@@ -12,7 +12,7 @@ package org.virbo.metatree;
 import java.util.HashMap;
 import java.util.Map;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.MetadataModel;
+import org.autoplot.datasource.MetadataModel;
 
 /**
  *

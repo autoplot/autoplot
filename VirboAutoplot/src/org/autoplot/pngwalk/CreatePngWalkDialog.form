@@ -309,7 +309,7 @@
     <Component class="javax.swing.JButton" name="timeRangeToolButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/org/virbo/datasource/calendar.png"/>
+          <Image iconType="3" name="/org/autoplot/datasource/calendar.png"/>
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="Use time range tool"/>
       </Properties>
@@ -341,7 +341,7 @@
         <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="eventsFileRadioButtonItemStateChanged"/>
       </Events>
     </Component>
-    <Component class="org.virbo.datasource.DataSetSelector" name="eventsFileSelector">
+    <Component class="org.autoplot.datasource.DataSetSelector" name="eventsFileSelector">
       <BindingProperties>
         <BindingProperty name="enabled" source="eventsFileRadioButton" sourcePath="${selected}" target="eventsFileSelector" targetPath="enabled" updateStrategy="0" immediately="false"/>
       </BindingProperties>

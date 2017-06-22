@@ -23,7 +23,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.TagGenDataSet;
-import org.virbo.datasource.AbstractDataSource;
+import org.autoplot.datasource.AbstractDataSource;
 import org.virbo.datasource.capability.Streaming;
 import org.virbo.datasource.capability.Updating;
 import org.virbo.dsops.Ops;

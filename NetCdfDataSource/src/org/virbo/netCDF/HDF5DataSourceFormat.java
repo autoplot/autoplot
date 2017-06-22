@@ -25,7 +25,7 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.AbstractDataSourceFormat;
+import org.autoplot.datasource.AbstractDataSourceFormat;
 import ucar.ma2.Array;
 import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;

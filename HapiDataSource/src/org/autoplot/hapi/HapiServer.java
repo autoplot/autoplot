@@ -26,7 +26,7 @@ import org.das2.datum.TimeParser;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.virbo.datasource.AutoplotSettings;
+import org.autoplot.datasource.AutoplotSettings;
 
 /**
  * Utility methods for interacting with HAPI servers.  

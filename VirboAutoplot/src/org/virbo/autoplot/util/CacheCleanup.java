@@ -13,8 +13,8 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.LoggerManager;
 import org.das2.fsm.FileStorageModel;
 import org.das2.util.filesystem.FileSystem;
-import org.virbo.datasource.AutoplotSettings;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.AutoplotSettings;
+import org.autoplot.datasource.URISplit;
 
 
 

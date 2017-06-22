@@ -7,9 +7,9 @@ package test.endtoend;
 import java.io.PrintWriter;
 import java.util.List;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSetURI.CompletionResult;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSetURI.CompletionResult;
+import org.autoplot.datasource.URISplit;
 
 /**
  * Tests of URI parsing. This should have been done ages ago, but better late than never. This is

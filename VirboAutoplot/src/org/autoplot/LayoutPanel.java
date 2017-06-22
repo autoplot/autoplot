@@ -72,8 +72,8 @@ import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElementController;
 import org.virbo.autoplot.dom.Row;
 import org.virbo.autoplot.util.CanvasLayoutPanel;
-import org.virbo.datasource.DataSourceEditorPanel;
-import org.virbo.datasource.DataSourceEditorPanelUtil;
+import org.autoplot.datasource.DataSourceEditorPanel;
+import org.autoplot.datasource.DataSourceEditorPanelUtil;
 
 /**
  * LayoutPanel shows all the plots and plot elements on the canvas.  

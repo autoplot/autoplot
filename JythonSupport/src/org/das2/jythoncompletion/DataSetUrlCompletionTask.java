@@ -13,8 +13,8 @@ import javax.swing.text.JTextComponent;
 import org.das2.jythoncompletion.support.CompletionResultSet;
 import org.das2.jythoncompletion.support.CompletionTask;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSetURI.CompletionResult;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSetURI.CompletionResult;
 
 /**
  *

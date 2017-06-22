@@ -6,7 +6,7 @@
 package org.virbo.imagedatasource;
 
 import javax.swing.JPanel;
-import org.virbo.datasource.DataSourceFormatEditorPanel;
+import org.autoplot.datasource.DataSourceFormatEditorPanel;
 
 /**
  *

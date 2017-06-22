@@ -9,8 +9,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JPanel;
-import org.virbo.datasource.DataSourceFormatEditorPanel;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSourceFormatEditorPanel;
+import org.autoplot.datasource.URISplit;
 
 /**
  *

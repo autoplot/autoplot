@@ -42,11 +42,11 @@ import org.python.util.PythonInterpreter;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.LogNames;
-import org.virbo.datasource.ReferenceCache;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.AbstractDataSource;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.LogNames;
+import org.autoplot.datasource.ReferenceCache;
+import org.autoplot.datasource.URISplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
@@ -178,7 +178,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             return getInlineDataSet(new URI(uri.getRawSchemeSpecificPart()));
         }
         
-        boolean useReferenceCache= "true".equals( System.getProperty( org.virbo.datasource.ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
+        boolean useReferenceCache= "true".equals(System.getProperty(org.autoplot.datasource.ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
 
         suri= URISplit.makeCanonical(suri);
         

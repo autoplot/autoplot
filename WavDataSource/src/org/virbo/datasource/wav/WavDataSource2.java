@@ -22,9 +22,9 @@ import org.autoplot.bufferdataset.BufferDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.TagGenDataSet;
-import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.AbstractDataSource;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.URISplit;
 
 /**
  * This version of the DataSource works by wrapping BinaryDataSource.  It

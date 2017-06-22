@@ -30,7 +30,7 @@ import org.das2.DasApplication;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.python.core.PyException;
-import org.virbo.datasource.FileSystemUtil;
+import org.autoplot.datasource.FileSystemUtil;
 
 /**
  * @see ScriptPanelSupport in VirboAutoplot project.  TODO: clean this up.

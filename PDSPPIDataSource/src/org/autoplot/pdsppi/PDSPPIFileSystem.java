@@ -36,7 +36,7 @@ import org.das2.util.filesystem.FSTreeModel;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.WebFileSystem;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.DataSourceUtil;
+import org.autoplot.datasource.DataSourceUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

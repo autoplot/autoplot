@@ -21,8 +21,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
 import org.das2.datum.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSourceFactory;
+import org.autoplot.datasource.CompletionContext;
+import org.autoplot.datasource.DataSourceFactory;
 
 /**
  * Attempt to make a general-purpose way to make a GUI for a data

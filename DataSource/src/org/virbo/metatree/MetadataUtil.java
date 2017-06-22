@@ -18,7 +18,7 @@ import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.MetadataModel;
+import org.autoplot.datasource.MetadataModel;
 import org.w3c.dom.Node;
 
 /**

@@ -13,7 +13,7 @@ package org.autoplot;
 
 import java.awt.event.ItemEvent;
 import javax.swing.JSpinner;
-import org.virbo.autoplot.layout.LayoutConstants;
+import org.autoplot.layout.LayoutConstants;
 
 /**
  *

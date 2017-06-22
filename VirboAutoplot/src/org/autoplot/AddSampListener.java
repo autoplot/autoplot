@@ -12,7 +12,7 @@ import org.astrogrid.samp.gui.GuiHubConnector;
 import org.astrogrid.samp.client.AbstractMessageHandler;
 import org.astrogrid.samp.client.HubConnection;
 import org.das2.util.LoggerManager;
-import org.virbo.datasource.DataSetSelector;
+import org.autoplot.datasource.DataSetSelector;
 
 /**
  * Listener for the Cluster Final Archive SAMP protocol.  Other clients

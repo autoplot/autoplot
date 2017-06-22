@@ -8,7 +8,7 @@
  */
 package org.virbo.dods;
 
-import org.virbo.datasource.MetadataModel;
+import org.autoplot.datasource.MetadataModel;
 import org.virbo.metatree.IstpMetadataModel;
 import opendap.dap.AttributeTable;
 import opendap.dap.DAS;
@@ -23,7 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.AbstractDataSource;
+import org.autoplot.datasource.AbstractDataSource;
 import opendap.dap.Attribute;
 import java.net.URI;
 import java.util.Collections;
@@ -43,9 +43,9 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSourceUtil;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSourceUtil;
+import org.autoplot.datasource.URISplit;
 import org.virbo.dsutil.TransposeRankNDataSet;
 
 /**

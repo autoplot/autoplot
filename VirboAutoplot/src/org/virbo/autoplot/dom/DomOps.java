@@ -20,7 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.graph.DasRow;
 import org.das2.util.LoggerManager;
-import org.virbo.datasource.DataSourceUtil;
+import org.autoplot.datasource.DataSourceUtil;
 
 /**
  * Many operations are defined within the DOM object controllers that needn't

@@ -10,8 +10,8 @@ import java.io.IOException;
 import java.util.Map;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceFilter;
-import org.virbo.autoplot.state.StatePersistence;
-import org.virbo.datasource.URISplit;
+import org.autoplot.state.StatePersistence;
+import org.autoplot.datasource.URISplit;
 
 /**
  * At the RPW Group, we need to rewrite the vap so that the username is known to the Das2ServerDataSource.

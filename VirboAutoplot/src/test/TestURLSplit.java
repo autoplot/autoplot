@@ -8,8 +8,8 @@ package test;
 import java.io.File;
 import java.util.List;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.URISplit;
 
 /**
  *

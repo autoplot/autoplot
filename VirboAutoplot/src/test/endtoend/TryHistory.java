@@ -22,7 +22,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.TimeUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.AutoplotSettings;
+import org.autoplot.datasource.AutoplotSettings;
 
 /**
  *

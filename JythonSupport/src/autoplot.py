@@ -10,7 +10,7 @@ from org.virbo.dataset import QDataSet
 from org.virbo.dsutil.BinAverage import *
 from org.virbo.dsutil import DataSetBuilder
 
-_autoplot_jython_version= 1.53
+_autoplot_jython_version= 1.60
 #_autoplot_jython_version= float(getAutoplotScriptingVersion()[1:])
 
 from org.das2.datum import DatumRange, Units, DatumRangeUtil, TimeUtil
@@ -21,8 +21,8 @@ from org.das2.datum import TimeParser
 #from java.io import File
 #from org.das2.util.filesystem import FileSystem
 #from org.das2.fsm import FileStorageModel
-from org.virbo.datasource.DataSetURI import getFile
-from org.virbo.datasource.DataSetURI import downloadResourceAsTempFile
+from org.autoplot.datasource.DataSetURI import getFile
+from org.autoplot.datasource.DataSetURI import downloadResourceAsTempFile
 #import java
 #import org
 # end, security concerns.

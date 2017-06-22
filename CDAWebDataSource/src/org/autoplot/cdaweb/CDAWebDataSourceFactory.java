@@ -20,12 +20,12 @@ import org.das2.fsm.FileStorageModel;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSource;
-import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.DefaultTimeSeriesBrowse;
-import org.virbo.datasource.FileSystemUtil;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.CompletionContext;
+import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.DataSourceFactory;
+import org.autoplot.datasource.DefaultTimeSeriesBrowse;
+import org.autoplot.datasource.FileSystemUtil;
+import org.autoplot.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**

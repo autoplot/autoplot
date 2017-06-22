@@ -20,9 +20,9 @@ import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.SwingUtilities;
-import org.virbo.autoplot.bookmarks.Bookmark;
-import org.virbo.autoplot.bookmarks.BookmarksManager;
-import org.virbo.datasource.DataSetSelector;
+import org.autoplot.bookmarks.Bookmark;
+import org.autoplot.bookmarks.BookmarksManager;
+import org.autoplot.datasource.DataSetSelector;
 
 /**
  * Allow additional plots to be added, and plot one URI against another.
@@ -150,11 +150,11 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
     private void initComponents() {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
-        primaryDataSetSelector = new org.virbo.datasource.DataSetSelector();
+        primaryDataSetSelector = new org.autoplot.datasource.DataSetSelector();
         secondaryCheckBox = new javax.swing.JCheckBox();
-        secondaryDataSetSelector = new org.virbo.datasource.DataSetSelector();
+        secondaryDataSetSelector = new org.autoplot.datasource.DataSetSelector();
         tertiaryCheckBox = new javax.swing.JCheckBox();
-        tertiaryDataSetSelector = new org.virbo.datasource.DataSetSelector();
+        tertiaryDataSetSelector = new org.autoplot.datasource.DataSetSelector();
         overplotButton = new javax.swing.JButton();
         plotBelowButton = new javax.swing.JButton();
         plotButton = new javax.swing.JButton();
@@ -212,7 +212,7 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
             }
         });
 
-        plotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/go.png"))); // NOI18N
+        plotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/go.png"))); // NOI18N
         plotButton.setText("Plot");
         plotButton.setToolTipText("Replace the current plot with this");
         plotButton.addActionListener(new java.awt.event.ActionListener() {
@@ -470,21 +470,21 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
     /**
      * @return the primaryDataSetSelector
      */
-    public org.virbo.datasource.DataSetSelector getPrimaryDataSetSelector() {
+    public org.autoplot.datasource.DataSetSelector getPrimaryDataSetSelector() {
         return primaryDataSetSelector;
     }
 
     /**
      * @return the secondaryDataSetSelector
      */
-    public org.virbo.datasource.DataSetSelector getSecondaryDataSetSelector() {
+    public org.autoplot.datasource.DataSetSelector getSecondaryDataSetSelector() {
         return secondaryDataSetSelector;
     }
 
     /**
      * @return the tertiaryDataSetSelector
      */
-    public org.virbo.datasource.DataSetSelector getTertiaryDataSetSelector() {
+    public org.autoplot.datasource.DataSetSelector getTertiaryDataSetSelector() {
         return tertiaryDataSetSelector;
     }
 
@@ -508,15 +508,15 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
     private javax.swing.JButton overplotButton;
     private javax.swing.JButton plotBelowButton;
     private javax.swing.JButton plotButton;
-    private org.virbo.datasource.DataSetSelector primaryDataSetSelector;
+    private org.autoplot.datasource.DataSetSelector primaryDataSetSelector;
     private javax.swing.JCheckBox primaryFiltersCB;
     private javax.swing.JComboBox<String> primaryFiltersComboBox;
     private javax.swing.JCheckBox secondaryCheckBox;
-    private org.virbo.datasource.DataSetSelector secondaryDataSetSelector;
+    private org.autoplot.datasource.DataSetSelector secondaryDataSetSelector;
     private javax.swing.JCheckBox secondaryFiltersCB;
     private javax.swing.JComboBox<String> secondaryFiltersComboBox;
     private javax.swing.JCheckBox tertiaryCheckBox;
-    private org.virbo.datasource.DataSetSelector tertiaryDataSetSelector;
+    private org.autoplot.datasource.DataSetSelector tertiaryDataSetSelector;
     private javax.swing.JCheckBox tertiaryFiltersCB;
     private javax.swing.JComboBox<String> tertiaryFiltersComboBox;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;

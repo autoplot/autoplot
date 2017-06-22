@@ -39,7 +39,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.URISplit;
 import org.virbo.dsops.Ops;
 
 /**

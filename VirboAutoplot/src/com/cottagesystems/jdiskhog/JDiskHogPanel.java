@@ -40,7 +40,7 @@ import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.AutoplotUI;
-import org.virbo.datasource.AutoplotSettings;
+import org.autoplot.datasource.AutoplotSettings;
 
 /**
  * Tool for cleaning up files in a local filesystem.  This has minor customizations 

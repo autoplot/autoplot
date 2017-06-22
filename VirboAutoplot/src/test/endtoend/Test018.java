@@ -18,7 +18,7 @@ import static org.autoplot.ScriptContext.*;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.BindingModel;
-import org.virbo.autoplot.layout.LayoutConstants;
+import org.autoplot.layout.LayoutConstants;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;

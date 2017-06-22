@@ -50,7 +50,7 @@ import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.URISplit;
 import org.virbo.dsops.Ops;
 
 /**

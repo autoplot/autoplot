@@ -19,8 +19,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
 import org.das2.util.LoggerManager;
-import org.virbo.datasource.DataSourceFormatEditorPanel;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSourceFormatEditorPanel;
+import org.autoplot.datasource.URISplit;
 
 /**
  * Editor Panel for formatting data.

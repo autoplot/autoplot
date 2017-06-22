@@ -15,10 +15,10 @@ import javax.swing.JOptionPane;
 import org.das2.util.AboutUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetSelectorSupport;
-import org.virbo.datasource.DataSourceEditorPanel;
-import org.virbo.datasource.DataSourceEditorPanelUtil;
-import org.virbo.datasource.DataSourceRegistry;
+import org.autoplot.datasource.DataSetSelectorSupport;
+import org.autoplot.datasource.DataSourceEditorPanel;
+import org.autoplot.datasource.DataSourceEditorPanelUtil;
+import org.autoplot.datasource.DataSourceRegistry;
 
 /**
  *

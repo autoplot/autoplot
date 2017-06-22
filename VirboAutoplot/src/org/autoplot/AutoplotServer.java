@@ -9,8 +9,8 @@ import static org.autoplot.ScriptContext.*;
 
 import org.das2.util.ArgumentList;
 import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
-import org.virbo.datasource.URISplit;
+import org.autoplot.scriptconsole.GuiExceptionHandler;
+import org.autoplot.datasource.URISplit;
 
 /**
  * Server for producing images from Autoplot URIs, first requested by U. Michigan.

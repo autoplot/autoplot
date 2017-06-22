@@ -70,10 +70,10 @@ import org.python.parser.ast.UnaryOp;
 import org.python.parser.ast.exprType;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.AutoplotSettings;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSource;
-import org.virbo.datasource.DataSourceFactory;
+import org.autoplot.datasource.AutoplotSettings;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.DataSourceFactory;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**

@@ -22,11 +22,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.autoplot.cdf.CdfDataSource;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSource;
-import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.CompletionContext;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.DataSourceFactory;
+import org.autoplot.datasource.URISplit;
 
 /**
  * Read data from CDF files using the Java reader provided by NASA/Goddard.

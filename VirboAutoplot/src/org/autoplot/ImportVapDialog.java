@@ -21,8 +21,8 @@ import org.das2.components.DasProgressPanel;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceFilter;
-import org.virbo.autoplot.state.StatePersistence;
-import org.virbo.datasource.DataSetURI;
+import org.autoplot.state.StatePersistence;
+import org.autoplot.datasource.DataSetURI;
 
 
 /**

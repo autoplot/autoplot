@@ -11,7 +11,7 @@
 
 package org.autoplot;
 
-import org.virbo.datasource.DataSetSelectorSupport;
+import org.autoplot.datasource.DataSetSelectorSupport;
 
 /**
  *

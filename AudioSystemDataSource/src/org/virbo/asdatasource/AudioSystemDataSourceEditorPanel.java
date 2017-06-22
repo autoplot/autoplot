@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JPanel;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.DataSourceEditorPanel;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSourceEditorPanel;
+import org.autoplot.datasource.URISplit;
 
 /**
  *

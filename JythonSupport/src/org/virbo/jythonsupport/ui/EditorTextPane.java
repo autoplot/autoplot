@@ -55,9 +55,9 @@ import org.python.parser.SimpleNode;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSourceEditorPanel;
-import org.virbo.datasource.DataSourceEditorPanelUtil;
-import org.virbo.datasource.WindowManager;
+import org.autoplot.datasource.DataSourceEditorPanel;
+import org.autoplot.datasource.DataSourceEditorPanelUtil;
+import org.autoplot.datasource.WindowManager;
 import org.virbo.jythonsupport.JythonUtil;
 import org.virbo.jythonsupport.PyQDataSet;
 import org.virbo.qstream.StreamException;
@@ -284,7 +284,7 @@ public class EditorTextPane extends JEditorPane {
                 return;
             }
             
-            Icon icon= new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/fileMag.png") );
+            Icon icon= new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/fileMag.png") );
             if ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( this, parent, "Editing URI", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon ) ) {
                 String newUri= p.getURI();
                 this.setSelectionStart(lineStart+uri0);

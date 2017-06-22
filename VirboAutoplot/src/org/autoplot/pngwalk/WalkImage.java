@@ -20,8 +20,8 @@ import org.das2.datum.DatumRange;
 import org.das2.system.RequestProcessor;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.URISplit;
 
 /**
  * A class to manage an image for the PNGWalk tool. Handles downloading and

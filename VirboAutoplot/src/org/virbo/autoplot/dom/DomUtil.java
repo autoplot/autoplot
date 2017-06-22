@@ -30,7 +30,7 @@ import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
-import org.virbo.autoplot.state.StatePersistence;
+import org.autoplot.state.StatePersistence;
 
 /**
  * operations for the DOM, such as search-for-node and child properties

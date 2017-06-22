@@ -11,8 +11,8 @@ import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
-import org.virbo.datasource.URISplit;
-import org.virbo.datasource.DataSourceFormat;
+import org.autoplot.datasource.URISplit;
+import org.autoplot.datasource.DataSourceFormat;
 
 /**
  * Format data to RGB images, or ARGB images.

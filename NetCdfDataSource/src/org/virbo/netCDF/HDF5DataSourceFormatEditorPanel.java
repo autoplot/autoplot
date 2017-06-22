@@ -7,8 +7,8 @@ package org.virbo.netCDF;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JPanel;
-import org.virbo.datasource.AbstractDataSourceFormatEditorPanel;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.AbstractDataSourceFormatEditorPanel;
+import org.autoplot.datasource.URISplit;
 
 /**
  * Options for formatting to HDF5.

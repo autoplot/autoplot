@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.AbstractDataSourceFactory;
-import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSource;
-import org.virbo.datasource.DefaultTimeSeriesBrowse;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.AbstractDataSourceFactory;
+import org.autoplot.datasource.CompletionContext;
+import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.DefaultTimeSeriesBrowse;
+import org.autoplot.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**

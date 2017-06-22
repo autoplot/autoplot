@@ -39,7 +39,7 @@ import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.TimeSeriesBrowseController;
-import org.virbo.datasource.TimeRangeEditor;
+import org.autoplot.datasource.TimeRangeEditor;
 
 /**
  * Panel for controlling the axes of the current focus plot.
@@ -394,7 +394,7 @@ public class AxisPanel extends javax.swing.JPanel {
         legendEnableCheckbox = new javax.swing.JCheckBox();
         legendTextField = new javax.swing.JTextField();
         titleCB = new javax.swing.JCheckBox();
-        timeRangeEditor1 = new org.virbo.datasource.TimeRangeEditor();
+        timeRangeEditor1 = new org.autoplot.datasource.TimeRangeEditor();
 
         xAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("X Axis [?]"));
         xAxisPanel.setToolTipText("click title for help");
@@ -769,7 +769,7 @@ public class AxisPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox legendEnableCheckbox;
     private javax.swing.JTextField legendTextField;
     private javax.swing.JCheckBox showXAxisLabelsCB;
-    private org.virbo.datasource.TimeRangeEditor timeRangeEditor1;
+    private org.autoplot.datasource.TimeRangeEditor timeRangeEditor1;
     private javax.swing.JCheckBox titleCB;
     private javax.swing.JTextField titleTextField;
     private javax.swing.JPanel xAxisPanel;

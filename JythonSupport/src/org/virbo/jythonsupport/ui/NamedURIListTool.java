@@ -37,12 +37,12 @@ import org.jdesktop.beansbinding.AutoBinding;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Bindings;
-import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSourceEditorPanel;
-import org.virbo.datasource.DataSourceEditorPanelUtil;
-import org.virbo.datasource.URISplit;
-import org.virbo.datasource.WindowManager;
+import org.autoplot.datasource.DataSetSelector;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSourceEditorPanel;
+import org.autoplot.datasource.DataSourceEditorPanelUtil;
+import org.autoplot.datasource.URISplit;
+import org.autoplot.datasource.WindowManager;
 import org.virbo.filters.FiltersChainPanel;
 
 /**

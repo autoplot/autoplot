@@ -32,8 +32,8 @@ import org.das2.fsm.FileStorageModel;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSourceUtil;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSourceUtil;
 
 /**
  *

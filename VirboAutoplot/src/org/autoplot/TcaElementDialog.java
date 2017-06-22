@@ -18,10 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingUtilities;
-import org.virbo.autoplot.bookmarks.Bookmark;
-import org.virbo.autoplot.bookmarks.BookmarksManager;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSourceRegistry;
+import org.autoplot.bookmarks.Bookmark;
+import org.autoplot.bookmarks.BookmarksManager;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSourceRegistry;
 
 /**
  *
@@ -56,7 +56,7 @@ public class TcaElementDialog extends javax.swing.JDialog {
                 }
             }
         });
-        org.virbo.autoplot.bookmarks.Util.loadRecent( "tcaRecent", primaryDataSetSelector, getDefault() );
+        org.autoplot.bookmarks.Util.loadRecent( "tcaRecent", primaryDataSetSelector, getDefault() );
 
 
     }
@@ -77,7 +77,7 @@ public class TcaElementDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        primaryDataSetSelector = new org.virbo.datasource.DataSetSelector();
+        primaryDataSetSelector = new org.autoplot.datasource.DataSetSelector();
         plotButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
@@ -215,7 +215,7 @@ public class TcaElementDialog extends javax.swing.JDialog {
     /**
      * @return the primaryDataSetSelector
      */
-    public org.virbo.datasource.DataSetSelector getPrimaryDataSetSelector() {
+    public org.autoplot.datasource.DataSetSelector getPrimaryDataSetSelector() {
         return primaryDataSetSelector;
     }
 
@@ -227,7 +227,7 @@ public class TcaElementDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton plotButton;
-    private org.virbo.datasource.DataSetSelector primaryDataSetSelector;
+    private org.autoplot.datasource.DataSetSelector primaryDataSetSelector;
     // End of variables declaration//GEN-END:variables
 
 }

@@ -35,8 +35,8 @@ import org.das2.jythoncompletion.CompletionSettings;
 import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.util.LoggerManager;
 import org.python.parser.SimpleNode;
-import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSourceUtil;
+import org.autoplot.datasource.DataSetSelector;
+import org.autoplot.datasource.DataSourceUtil;
 import org.virbo.jythonsupport.JythonUtil;
 
 /**
@@ -485,7 +485,7 @@ public class EditorContextMenu {
                     editor.inspectURI();
                 }
             } );
-            mi.setIcon( new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/fileMag.png") ) );
+            mi.setIcon( new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/fileMag.png") ) );
             mi.setToolTipText("Use the data source editor panel to modify URI");
             actionsMenu.add( mi );
             

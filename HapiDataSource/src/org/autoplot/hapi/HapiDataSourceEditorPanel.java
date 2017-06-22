@@ -50,10 +50,10 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSourceEditorPanel;
-import org.virbo.datasource.TimeRangeTool;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.DataSetSelector;
+import org.autoplot.datasource.DataSourceEditorPanel;
+import org.autoplot.datasource.TimeRangeTool;
+import org.autoplot.datasource.URISplit;
 
 /**
  * Swing editor for HAPI URIs
@@ -249,7 +249,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         jScrollPane2 = new javax.swing.JScrollPane();
         idsList2 = new javax.swing.JList<>();
         clearButton = new javax.swing.JButton();
-        filtersComboBox = new org.virbo.datasource.RecentComboBox();
+        filtersComboBox = new org.autoplot.datasource.RecentComboBox();
         jLabel3 = new javax.swing.JLabel();
         binaryCB = new javax.swing.JCheckBox();
 
@@ -553,7 +553,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private javax.swing.JButton clearAllB;
     private javax.swing.JButton clearButton;
     private javax.swing.JButton extraInfoButton;
-    private org.virbo.datasource.RecentComboBox filtersComboBox;
+    private org.autoplot.datasource.RecentComboBox filtersComboBox;
     private javax.swing.JList<String> idsList2;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;

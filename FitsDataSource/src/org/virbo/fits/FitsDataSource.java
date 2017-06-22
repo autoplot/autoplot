@@ -28,8 +28,8 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.FDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.MetadataModel;
+import org.autoplot.datasource.AbstractDataSource;
+import org.autoplot.datasource.MetadataModel;
 import org.virbo.dsops.Ops;
 
 /**

@@ -19,9 +19,9 @@ import javax.swing.table.TableModel;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSource;
-import org.virbo.datasource.DataSourceEditorPanel;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.DataSourceEditorPanel;
 import org.virbo.dsutil.QDataSetTableModel;
 import java.lang.Short; // because of Short object in this package.
 import java.net.URISyntaxException;
@@ -33,7 +33,7 @@ import javax.swing.InputMap;
 import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 import org.das2.util.filesystem.FileSystem;
-import org.virbo.datasource.URISplit;
+import org.autoplot.datasource.URISplit;
 
 /**
  *

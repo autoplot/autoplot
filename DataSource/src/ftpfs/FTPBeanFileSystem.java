@@ -51,7 +51,7 @@ import org.das2.util.monitor.CancelledOperationException;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.util.OsUtil;
-import org.virbo.datasource.DataSourceUtil;
+import org.autoplot.datasource.DataSourceUtil;
 
 /**
  * Alternate implementation of FTP that was originally introduced when the

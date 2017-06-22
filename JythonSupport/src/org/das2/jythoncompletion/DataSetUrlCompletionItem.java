@@ -12,7 +12,7 @@ import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import org.das2.jythoncompletion.support.CompletionItem;
 import org.das2.jythoncompletion.support.CompletionTask;
-import org.virbo.datasource.DataSetURI.CompletionResult;
+import org.autoplot.datasource.DataSetURI.CompletionResult;
 
 /**
  * Completions for the URI when (for example) getDataSet('http:&lt;C&gt;') is entered.
