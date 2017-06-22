@@ -6,7 +6,7 @@
 package test;
 
 import java.io.IOException;
-import org.virbo.autoplot.ScriptContext;
+import org.autoplot.ScriptContext;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;

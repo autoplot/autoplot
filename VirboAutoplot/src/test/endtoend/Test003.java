@@ -14,7 +14,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.KeyChain;
 import org.das2.util.filesystem.WebFileSystem;
 import org.das2.util.monitor.CancelledOperationException;
-import org.virbo.autoplot.ScriptContext;
+import org.autoplot.ScriptContext;
 import org.virbo.datasource.DataSetURI;
 
 /**

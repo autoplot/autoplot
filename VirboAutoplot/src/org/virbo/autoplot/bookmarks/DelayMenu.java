@@ -15,8 +15,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
-import org.virbo.autoplot.AutoplotUI;
-import org.virbo.autoplot.AutoplotUtil;
+import org.autoplot.AutoplotUI;
+import org.autoplot.AutoplotUtil;
 import org.virbo.datasource.DataSetSelector;
 
 /**

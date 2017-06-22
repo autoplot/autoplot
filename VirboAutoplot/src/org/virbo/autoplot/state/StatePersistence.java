@@ -34,7 +34,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerConfigurationException;
 import org.das2.util.AboutUtil;
-import org.virbo.autoplot.RenderType;
+import org.autoplot.RenderType;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.dom.PlotElement;

@@ -5,6 +5,7 @@
 
 package org.virbo.autoplot;
 
+import org.autoplot.JythonUtil;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;

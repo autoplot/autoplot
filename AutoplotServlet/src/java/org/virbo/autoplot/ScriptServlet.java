@@ -1,6 +1,9 @@
 
 package org.virbo.autoplot;
 
+import org.autoplot.JythonUtil;
+import org.autoplot.ScriptContext;
+import org.autoplot.ApplicationModel;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;

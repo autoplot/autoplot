@@ -5,7 +5,7 @@
 package test.endtoend;
 
 import java.io.PrintWriter;
-import static org.virbo.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext.*;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;

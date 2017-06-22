@@ -8,7 +8,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import org.virbo.autoplot.MouseModuleType;
+import org.autoplot.MouseModuleType;
 
 /**
  * Bean for holding AP configuration options.  Note there are a few AutoplotUI prefs here that shouldn't be.

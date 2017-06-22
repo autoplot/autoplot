@@ -16,10 +16,10 @@ import org.autoplot.jythonsupport.JythonRefactory;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.util.PythonInterpreter;
-import org.virbo.autoplot.ApplicationModel;
-import org.virbo.autoplot.AutoplotUI;
-import org.virbo.autoplot.JythonUtil;
-import org.virbo.autoplot.ScriptContext;
+import org.autoplot.ApplicationModel;
+import org.autoplot.AutoplotUI;
+import org.autoplot.JythonUtil;
+import org.autoplot.ScriptContext;
 
 /**
  * Handles requests coming in from the server.

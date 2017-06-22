@@ -39,7 +39,7 @@ import org.das2.util.FileUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.autoplot.AutoplotUI;
+import org.autoplot.AutoplotUI;
 import org.virbo.datasource.AutoplotSettings;
 
 /**
@@ -196,7 +196,7 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
                 mon1.started();
         
                 List<String> problems= new ArrayList();
-                boolean y= org.virbo.autoplot.Util.pruneFileTree( local, problems );
+                boolean y= org.autoplot.Util.pruneFileTree( local, problems );
                 mon1.finished();
                 if ( y ) {
                     JOptionPane.showMessageDialog( jtree, "<html>Successful", "Prune fscache", JOptionPane.PLAIN_MESSAGE );

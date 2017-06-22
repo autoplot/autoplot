@@ -21,12 +21,12 @@ import java.util.Map.Entry;
 import org.das2.util.filesystem.HtmlUtil;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.autoplot.ScriptContext;
+import org.autoplot.ScriptContext;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 
-import static org.virbo.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext.*;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.dom.Application;

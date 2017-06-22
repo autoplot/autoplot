@@ -14,7 +14,7 @@ import org.das2.system.DasLogger;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Plot;
-import static org.virbo.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext.*;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.BindingModel;

@@ -7,7 +7,7 @@ package test.endtoend;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.jythonsupport.Util;
-import static org.virbo.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext.*;
 
 /**
  * tests of metadata representation in the ascii file parser, that provides a means

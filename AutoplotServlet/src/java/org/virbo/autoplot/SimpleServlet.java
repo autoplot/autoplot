@@ -4,6 +4,8 @@
  */
 package org.virbo.autoplot;
 
+import org.autoplot.RenderType;
+import org.autoplot.ApplicationModel;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;

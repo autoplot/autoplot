@@ -5,6 +5,10 @@
  */
 package org.virbo.autoplot.bookmarks;
 
+import org.autoplot.AutoplotUI;
+import org.autoplot.AutoplotUtil;
+import org.autoplot.ImportBookmarksGui;
+import org.autoplot.ApplicationModel;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.HeadlessException;

@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import org.das2.util.LoggerManager;
-import org.virbo.autoplot.MouseModuleType;
+import org.autoplot.MouseModuleType;
 import org.virbo.autoplot.util.TickleTimer;
 
 /**

@@ -6,7 +6,7 @@
 package test.endtoend;
 
 import java.io.IOException;
-import org.virbo.autoplot.ScriptContext;
+import org.autoplot.ScriptContext;
 
 /**
  * Test Jan's products

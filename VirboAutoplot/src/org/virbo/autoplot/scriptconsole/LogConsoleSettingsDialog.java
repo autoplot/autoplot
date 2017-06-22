@@ -29,7 +29,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.das2.datum.LoggerManager;
-import org.virbo.autoplot.AutoplotUtil;
+import org.autoplot.AutoplotUtil;
 
 /**
  * Settings GUI for the Log Console dialog. The log console is more complex than

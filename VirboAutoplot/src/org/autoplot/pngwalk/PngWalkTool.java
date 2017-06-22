@@ -115,12 +115,12 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
-import org.virbo.autoplot.AppManager;
-import org.virbo.autoplot.AutoplotUI;
-import org.virbo.autoplot.AutoplotUtil;
-import org.virbo.autoplot.GuiSupport;
-import org.virbo.autoplot.JythonUtil;
-import org.virbo.autoplot.ScriptContext;
+import org.autoplot.AppManager;
+import org.autoplot.AutoplotUI;
+import org.autoplot.AutoplotUtil;
+import org.autoplot.GuiSupport;
+import org.autoplot.JythonUtil;
+import org.autoplot.ScriptContext;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
@@ -623,7 +623,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         if ( r==JFileChooser.APPROVE_OPTION ) {
             prefs.put( PngWalkTool.PREF_RECENT, chooser.getSelectedFile().getParent() );
             try {
-                if ( ! org.virbo.autoplot.Util.copyFile( src, chooser.getSelectedFile()) ) {
+                if ( ! org.autoplot.Util.copyFile( src, chooser.getSelectedFile()) ) {
                     JOptionPane.showMessageDialog( parent, "<html>Unable to save image to: <br>" + chooser.getSelectedFile() );
                 }
             } catch (IOException ex) {

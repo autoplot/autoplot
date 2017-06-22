@@ -64,8 +64,8 @@ import org.python.core.PyException;
 import org.python.core.PyNone;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
-import org.virbo.autoplot.GuiSupport;
-import org.virbo.autoplot.JythonUtil;
+import org.autoplot.GuiSupport;
+import org.autoplot.JythonUtil;
 import org.xml.sax.SAXException;
 
 /**

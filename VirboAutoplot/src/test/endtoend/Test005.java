@@ -8,7 +8,7 @@ import java.io.PrintWriter;
 import java.util.List;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.monitor.NullProgressMonitor;
-import static org.virbo.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext.*;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.Column;
 import org.virbo.datasource.DataSetURI;

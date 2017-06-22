@@ -1,6 +1,7 @@
 
 package org.virbo.autoplot.bookmarks;
 
+import org.autoplot.AutoplotUtil;
 import org.virbo.autoplot.*;
 import java.awt.Component;
 import java.beans.PropertyChangeListener;

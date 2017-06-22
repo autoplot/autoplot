@@ -7,7 +7,7 @@ package test.endtoend;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.dataset.QDataSet;
 import org.virbo.jythonsupport.Util;
-import static org.virbo.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext.*;
 
 /**
  * tests of tick labels, using the new DomainDivider.  This was a system written

@@ -5,6 +5,7 @@
  */
 package org.virbo.autoplot;
 
+import org.autoplot.ScriptContext;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;

@@ -7,7 +7,7 @@ package org.virbo.autoplot.dom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.virbo.autoplot.RenderType;
+import org.autoplot.RenderType;
 
 /**
  * Represents the method for painting data on to a plot, and filters that

@@ -27,7 +27,7 @@ import org.das2.graph.DasDevicePosition;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.autoplot.ScriptContext;
+import org.autoplot.ScriptContext;
 
 /**
  * tests of das2 internals.  These are tests of non-graphic parts (see test009 for this), and does not include

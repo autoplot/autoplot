@@ -4,7 +4,7 @@ package test;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import org.virbo.autoplot.AutoplotUI;
+import org.autoplot.AutoplotUI;
 
 /**
  * demonstrate the difference between wait and sleep

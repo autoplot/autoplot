@@ -4,6 +4,8 @@
  */
 package org.virbo.autoplot;
 
+import org.autoplot.ScriptContext;
+import org.autoplot.AutoplotUI;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;

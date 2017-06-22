@@ -13,7 +13,7 @@ import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ConsoleTextProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.autoplot.ScriptContext;
+import org.autoplot.ScriptContext;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceUtil;

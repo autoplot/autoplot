@@ -10,7 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.LineNumberInputStream;
 import java.util.Scanner;
 import java.util.regex.Pattern;
-import org.virbo.autoplot.ScriptContext;
+import org.autoplot.ScriptContext;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;

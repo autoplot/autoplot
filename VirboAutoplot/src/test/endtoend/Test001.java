@@ -11,7 +11,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import static org.virbo.dsops.Ops.*;
-import static org.virbo.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext.*;
 import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.Util;
 

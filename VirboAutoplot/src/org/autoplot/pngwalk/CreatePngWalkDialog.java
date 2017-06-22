@@ -21,8 +21,8 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import org.virbo.autoplot.AutoplotUtil;
-import org.virbo.autoplot.EventsListToolUtil;
+import org.autoplot.AutoplotUtil;
+import org.autoplot.EventsListToolUtil;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.TimeRangeTool;
 

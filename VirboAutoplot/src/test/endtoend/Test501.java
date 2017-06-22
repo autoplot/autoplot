@@ -24,7 +24,7 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 
-import static org.virbo.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext.*;
 
 /**
  * Plasma Wave Group at Iowa, test Das2Server entries with "exampleRange".

@@ -5,8 +5,8 @@
 
 package test.endtoend;
 
-import org.virbo.autoplot.AutoplotUtil;
-import org.virbo.autoplot.RenderType;
+import org.autoplot.AutoplotUtil;
+import org.autoplot.RenderType;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 

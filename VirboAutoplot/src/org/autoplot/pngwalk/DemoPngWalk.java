@@ -24,7 +24,7 @@ import org.das2.util.ArgumentList;
 import org.das2.datum.TimeParser;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
-import org.virbo.autoplot.ScriptContext;
+import org.autoplot.ScriptContext;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.bookmarks.BookmarksManager;

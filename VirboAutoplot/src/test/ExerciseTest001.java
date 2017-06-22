@@ -12,7 +12,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.dsops.Ops;
 
-import static org.virbo.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext.*;
 
 /**
  * code to work out https://sourceforge.net/tracker/?func=detail&aid=3015945&group_id=199733&atid=970682

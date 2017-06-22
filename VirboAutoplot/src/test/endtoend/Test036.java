@@ -4,7 +4,7 @@
  */
 package test.endtoend;
 
-import org.virbo.autoplot.AutoplotDataServer;
+import org.autoplot.AutoplotDataServer;
 
 /**
  * Tests of the AutoplotDataServer.  Note that this is only a simulation, for

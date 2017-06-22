@@ -6,12 +6,12 @@ package test.endtoend;
 
 import java.io.PrintWriter;
 import java.util.logging.Level;
-import org.virbo.autoplot.ScriptContext;
+import org.autoplot.ScriptContext;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.Util;
-import static org.virbo.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext.*;
 
 /**
  * Tests of inline data source.

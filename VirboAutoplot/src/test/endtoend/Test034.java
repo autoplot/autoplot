@@ -7,7 +7,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.DatumRange;
 import org.virbo.autoplot.dom.Application;
 
-import static org.virbo.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext.*;
 
 /**
  * Test tool to simulate more sophistocated GUI operations
