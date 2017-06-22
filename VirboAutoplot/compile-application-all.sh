@@ -186,8 +186,8 @@ JAVAARGS="-g -target 1.7 -source 1.7 -cp ../temp-classes:. -d ../temp-classes -X
 # compile key java classes.
 echo "compile sources..."
 cd temp-src
-echo $JAVAC $JAVAARGS org/virbo/autoplot/AutoplotUI.java
-if ! $JAVAC $JAVAARGS org/virbo/autoplot/AutoplotUI.java; then echo "****"; hasErrors=1; fi
+echo $JAVAC $JAVAARGS org/autoplot/AutoplotUI.java
+if ! $JAVAC $JAVAARGS org/autoplot/AutoplotUI.java; then echo "****"; hasErrors=1; fi
 if [ $hasErrors -eq 1 ]; then
   echo "Error somewhere in compile, see above"
   exit 1 
@@ -209,7 +209,7 @@ if ! $JAVAC $JAVAARGS org/virbo/idlsupport/*.java; then echo "****"; hasErrors=1
 if ! $JAVAC $JAVAARGS org/das2/system/NullPreferencesFactory.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/autoplot/tca/UriTcaSource.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/virbo/dataset/NearestNeighborTcaFunction.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/virbo/autoplot/ScreenshotsTool.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/ScreenshotsTool.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/autoplot/wgetfs/WGetFileSystemFactory.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/das2/fsm/FileStorageModelNew.java; then echo "*****"; hasErrors=1; fi  # some scripts use this old name.
 if ! $JAVAC $JAVAARGS org/das2/math/filter/*.java; then echo "*****"; hasErrors=1; fi  
@@ -262,7 +262,7 @@ echo "make jumbo jar file..."
 cd temp-classes
 mkdir -p ../dist/
 rm -f ../temp-src/MANIFEST.MF   # remove leftover signatures.
-echo "Main-Class: org.virbo.autoplot.AutoplotUI" > ../temp-src/MANIFEST.MF
+echo "Main-Class: org.autoplot.AutoplotUI" > ../temp-src/MANIFEST.MF
 $JAR cmf ../temp-src/MANIFEST.MF ../dist/AutoplotAll.jar *
 cd ..
 
