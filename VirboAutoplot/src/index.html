@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Looking at waveform data from old Explorer wave file.
+        <p><small>Autoplot's digitizer is used to digitize Autoplot's lightning bolt.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -79,6 +79,7 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>680: time parser supports "P1D/lastday" to refer to yesterday, where lastday refers to last day boundary; also lasthour and last month.
             <li>597: export to wav can now write files containing timetag mapping, to support Larry's animations.
             <li>IDL/Matlab bridge supports bundles of data (coming from HAPI servers, for example).
             <li>IDL/Matlab bridge can now be used with native Python (SciPy), using Python JPype package.
