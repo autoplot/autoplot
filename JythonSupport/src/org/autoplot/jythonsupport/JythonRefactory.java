@@ -88,9 +88,9 @@ public class JythonRefactory {
         m.put("org.virbo.autoplot.bookmarks", "org.autoplot.bookmarks");
         m.put("org.virbo.autoplot.state", "org.autoplot.state");
         m.put("org.virbo.datasource", "org.autoplot.datasource");
-        m.put("org.autoplot.bufferdataset", "org.das2.qds.bufferdataset");
-        m.put("org.virbo.dsutil", "org.das2.qdsutil");
-        m.put("org.virbo.filters", "org.das2.qdsfilters");
+        m.put("org.autoplot.bufferdataset", "org.das2.qds.buffer");
+        m.put("org.virbo.dsutil", "org.das2.qds.util");
+        m.put("org.virbo.filters", "org.das2.qds.filters");
         m.put("org.virbo.qstream", "org.das2.qstream");
         m.put("org.qstream.filter", "org.das2.qstream.filter");
         m.put("org.virbo.ascii", "org.autoplot.ascii");
@@ -99,10 +99,10 @@ public class JythonRefactory {
         m.put("org.virbo.imagedatasource", "org.autoplot.imagedatasource" );
         m.put("org.virbo.idlsupport", "org.autoplot.idlsupport" );
         m.put("org.virbo.jythonsupport", "org.autoplot.jythonsupport");
-        m.put("zipfs", "org.das2.util.filesystem.zipfs");
-        forwardMap = new HashMap<>();
+        //m.put("zipfs", "org.das2.util.filesystem.zipfs");
+        //forwardMap = new HashMap<>();
         //forwardMap = reverseMap(m);   
-        //forwardMap = m;   
+        forwardMap = m;   
     }
     
     private static final Map<String,String> fullNameMap= new HashMap<>();    
