@@ -15,7 +15,6 @@ import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.AbstractDataSourceFormat;
 import org.das2.qds.ops.Ops;
-import org.virbo.idlsupport.WriteIDLSav;
 
 /**
  * Export to idlsav support.  rank 1 datasets, and rank 2 bundles are supported.
