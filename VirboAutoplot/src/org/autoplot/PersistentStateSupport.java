@@ -36,7 +36,7 @@ import javax.xml.parsers.ParserConfigurationException;
 //import org.apache.xml.serialize.OutputFormat;
 //import org.apache.xml.serialize.XMLSerializer;
 import org.das2.util.filesystem.FileSystem;
-import org.virbo.autoplot.dom.Application;
+import org.autoplot.dom.Application;
 import org.autoplot.state.EmbedDataExperiment;
 import org.autoplot.datasource.AutoplotSettings;
 import org.w3c.dom.Document;

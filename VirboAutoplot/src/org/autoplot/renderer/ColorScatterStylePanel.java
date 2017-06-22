@@ -25,10 +25,10 @@ import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
 import org.autoplot.PlotStylePanel;
-import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.dom.ApplicationController;
-import org.virbo.autoplot.dom.PlotElement;
-import org.virbo.autoplot.dom.PlotElementStyle;
+import org.autoplot.dom.Application;
+import org.autoplot.dom.ApplicationController;
+import org.autoplot.dom.PlotElement;
+import org.autoplot.dom.PlotElementStyle;
 
 /**
  *

@@ -30,7 +30,7 @@ import javax.xml.validation.Validator;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.WriteCapability;
-import org.virbo.autoplot.dom.DebugPropertyChangeSupport;
+import org.autoplot.dom.DebugPropertyChangeSupport;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

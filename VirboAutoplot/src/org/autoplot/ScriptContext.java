@@ -47,8 +47,8 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.Bindings;
 import org.python.core.PyJavaInstance;
-import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.dom.DataSourceFilter;
+import org.autoplot.dom.Application;
+import org.autoplot.dom.DataSourceFilter;
 import org.autoplot.scriptconsole.ExitExceptionHandler;
 import org.virbo.dataset.ArrayDataSet;
 import org.das2.dataset.DataSetAdapter;
@@ -65,10 +65,10 @@ import org.jdesktop.beansbinding.Converter;
 import org.python.core.Py;
 import org.python.core.PyFunction;
 import org.autoplot.ApplicationModel.ResizeRequestListener;
-import org.virbo.autoplot.dom.DomNode;
-import org.virbo.autoplot.dom.DomUtil;
-import org.virbo.autoplot.dom.Plot;
-import org.virbo.autoplot.dom.PlotElement;
+import org.autoplot.dom.DomNode;
+import org.autoplot.dom.DomUtil;
+import org.autoplot.dom.Plot;
+import org.autoplot.dom.PlotElement;
 import org.autoplot.state.StatePersistence;
 import org.virbo.dataset.QDataSet;
 import org.autoplot.datasource.DataSetURI;
@@ -1654,7 +1654,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      * plots.
      */
     public static void fixLayout() {
-        org.virbo.autoplot.dom.DomOps.newCanvasLayout(dom);
+        org.autoplot.dom.DomOps.newCanvasLayout(dom);
     }
     
     /**

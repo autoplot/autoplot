@@ -9,7 +9,7 @@ import java.beans.XMLDecoder;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import org.virbo.autoplot.dom.Application;
+import org.autoplot.dom.Application;
 
 /**
  *

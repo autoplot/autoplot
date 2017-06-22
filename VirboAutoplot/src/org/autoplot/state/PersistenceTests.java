@@ -15,8 +15,8 @@ import org.das2.datum.Units;
 import org.das2.graph.DasColorBar.Type;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.PlotSymbol;
-import org.virbo.autoplot.dom.PlotElementStyle;
-import org.virbo.autoplot.dom.Plot;
+import org.autoplot.dom.PlotElementStyle;
+import org.autoplot.dom.Plot;
 
 /**
  *

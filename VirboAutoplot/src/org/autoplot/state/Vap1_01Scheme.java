@@ -5,9 +5,9 @@
 
 package org.autoplot.state;
 
-import org.virbo.autoplot.dom.DomNode;
-import org.virbo.autoplot.dom.PlotElement;
-import org.virbo.autoplot.dom.PlotElementStyle;
+import org.autoplot.dom.DomNode;
+import org.autoplot.dom.PlotElement;
+import org.autoplot.dom.PlotElementStyle;
 import org.w3c.dom.Element;
 
 /**

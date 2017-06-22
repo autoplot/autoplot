@@ -47,7 +47,7 @@ import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUI;
 import org.autoplot.JythonUtil;
 import org.autoplot.ScriptContext;
-import org.virbo.autoplot.dom.ApplicationController;
+import org.autoplot.dom.ApplicationController;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;

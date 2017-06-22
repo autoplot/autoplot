@@ -9,7 +9,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import org.autoplot.RenderType;
 import org.autoplot.ScriptContext;
-import org.virbo.autoplot.dom.Application;
+import org.autoplot.dom.Application;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.Util;

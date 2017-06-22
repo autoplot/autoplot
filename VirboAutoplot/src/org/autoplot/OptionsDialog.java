@@ -6,7 +6,7 @@ package org.autoplot;
 
 import java.util.logging.Level;
 import javax.swing.JComboBox;
-import org.virbo.autoplot.dom.Options;
+import org.autoplot.dom.Options;
 
 /**
  * Custom GUI for editing options.  This should be

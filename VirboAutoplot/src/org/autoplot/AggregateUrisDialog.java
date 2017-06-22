@@ -21,9 +21,9 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.dom.DataSourceFilter;
-import org.virbo.autoplot.dom.DomOps;
+import org.autoplot.dom.Application;
+import org.autoplot.dom.DataSourceFilter;
+import org.autoplot.dom.DomOps;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.ThreadManager;
 

@@ -6,10 +6,10 @@
 package test.dom;
 
 import java.util.List;
-import org.virbo.autoplot.dom.Canvas;
-import org.virbo.autoplot.dom.Column;
-import org.virbo.autoplot.dom.Diff;
-import org.virbo.autoplot.dom.DomUtil;
+import org.autoplot.dom.Canvas;
+import org.autoplot.dom.Column;
+import org.autoplot.dom.Diff;
+import org.autoplot.dom.DomUtil;
 
 /**
  *

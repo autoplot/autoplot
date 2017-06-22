@@ -8,8 +8,8 @@ package org.autoplot.servletutil;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.dom.DataSourceFilter;
+import org.autoplot.dom.Application;
+import org.autoplot.dom.DataSourceFilter;
 import org.autoplot.state.StatePersistence;
 import org.autoplot.datasource.URISplit;
 

@@ -10,8 +10,8 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
 import org.autoplot.PlotStylePanel;
-import org.virbo.autoplot.dom.PlotElement;
-import org.virbo.autoplot.dom.PlotElementStyle;
+import org.autoplot.dom.PlotElement;
+import org.autoplot.dom.PlotElementStyle;
 
 /**
  *

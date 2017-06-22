@@ -18,7 +18,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.util.filesystem.FileSystem;
-import org.virbo.autoplot.dom.DebugPropertyChangeSupport;
+import org.autoplot.dom.DebugPropertyChangeSupport;
 import org.autoplot.datasource.DataSetURI;
 
 /**

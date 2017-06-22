@@ -78,7 +78,7 @@ import org.python.util.PythonInterpreter;
 import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUtil;
 import org.autoplot.JythonUtil;
-import org.virbo.autoplot.dom.ApplicationController;
+import org.autoplot.dom.ApplicationController;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.FileSystemUtil;

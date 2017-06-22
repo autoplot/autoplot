@@ -18,8 +18,8 @@ import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
 import org.jdesktop.beansbinding.Converter;
-import org.virbo.autoplot.dom.DomNode;
-import org.virbo.autoplot.dom.PlotElement;
+import org.autoplot.dom.DomNode;
+import org.autoplot.dom.PlotElement;
 
 /**
  * Attempt to measure performance problems with Bindings.  By binding many

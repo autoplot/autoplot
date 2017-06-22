@@ -7,7 +7,7 @@ package org.autoplot.state;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.virbo.autoplot.dom.DomNode;
+import org.autoplot.dom.DomNode;
 import org.w3c.dom.Element;
 
 /**
@@ -20,7 +20,7 @@ public abstract class AbstractVapScheme implements VapScheme {
     String packg;
 
     AbstractVapScheme() {
-        this.packg= "org.virbo.autoplot.dom";
+        this.packg= "org.autoplot.dom";
     }
     
     @Override

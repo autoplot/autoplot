@@ -13,7 +13,7 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
 import org.autoplot.PlotStylePanel.StylePanel;
-import org.virbo.autoplot.dom.PlotElement;
+import org.autoplot.dom.PlotElement;
 
 /**
  * specialized GUI for controlling the renderer.

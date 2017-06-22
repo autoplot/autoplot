@@ -36,11 +36,11 @@ import org.das2.datum.TimeUtil;
 import org.das2.system.RequestProcessor;
 import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUtil;
-import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.dom.BindingModel;
-import org.virbo.autoplot.dom.Diff;
-import org.virbo.autoplot.dom.DomUtil;
-import org.virbo.autoplot.dom.Plot;
+import org.autoplot.dom.Application;
+import org.autoplot.dom.BindingModel;
+import org.autoplot.dom.Diff;
+import org.autoplot.dom.DomUtil;
+import org.autoplot.dom.Plot;
 import org.autoplot.datasource.AutoplotSettings;
 
 /**

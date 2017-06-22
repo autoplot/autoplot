@@ -45,7 +45,7 @@ import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.util.InteractiveInterpreter;
-import org.virbo.autoplot.dom.Application;
+import org.autoplot.dom.Application;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
 import org.virbo.jythonsupport.JythonUtil.Param;

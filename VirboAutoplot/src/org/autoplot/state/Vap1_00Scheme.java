@@ -7,9 +7,9 @@ package org.autoplot.state;
 
 import java.text.ParseException;
 import java.util.logging.Level;
-import org.virbo.autoplot.dom.Axis;
-import org.virbo.autoplot.dom.DomNode;
-import org.virbo.autoplot.dom.PlotElementStyle;
+import org.autoplot.dom.Axis;
+import org.autoplot.dom.DomNode;
+import org.autoplot.dom.PlotElementStyle;
 import org.w3c.dom.Element;
 
 /**

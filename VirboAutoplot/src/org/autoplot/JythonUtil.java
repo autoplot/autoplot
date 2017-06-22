@@ -38,7 +38,7 @@ import org.python.core.PyException;
 import org.python.core.PySystemState;
 import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
-import org.virbo.autoplot.dom.Application;
+import org.autoplot.dom.Application;
 import org.autoplot.scriptconsole.JythonScriptPanel;
 import org.autoplot.scriptconsole.MakeToolPanel;
 import org.autoplot.datasource.DataSetURI;

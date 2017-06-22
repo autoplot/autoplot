@@ -5,7 +5,7 @@ import java.io.File;
 import java.util.logging.Level;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.DatumRange;
-import org.virbo.autoplot.dom.Application;
+import org.autoplot.dom.Application;
 
 import static org.autoplot.ScriptContext.*;
 

@@ -18,9 +18,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 import javax.swing.Timer;
 import org.das2.graph.DasCanvas;
-import org.virbo.autoplot.dom.ApplicationController;
-import org.virbo.autoplot.dom.Canvas;
-import org.virbo.autoplot.dom.CanvasController;
+import org.autoplot.dom.ApplicationController;
+import org.autoplot.dom.Canvas;
+import org.autoplot.dom.CanvasController;
 import org.autoplot.layout.LayoutUtil;
 
 /**

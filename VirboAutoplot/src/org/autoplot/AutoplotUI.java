@@ -162,20 +162,20 @@ import org.jdesktop.beansbinding.Bindings;
 import org.autoplot.bookmarks.BookmarksException;
 import org.autoplot.bookmarks.BookmarksManagerModel;
 import org.autoplot.bookmarks.DelayMenu;
-import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.dom.ApplicationController;
-import org.virbo.autoplot.dom.BindingModel;
-import org.virbo.autoplot.dom.DataSourceFilter;
-import org.virbo.autoplot.dom.DomNode;
-import org.virbo.autoplot.dom.PlotElement;
+import org.autoplot.dom.Application;
+import org.autoplot.dom.ApplicationController;
+import org.autoplot.dom.BindingModel;
+import org.autoplot.dom.DataSourceFilter;
+import org.autoplot.dom.DomNode;
+import org.autoplot.dom.PlotElement;
 import org.autoplot.scriptconsole.JythonScriptPanel;
 import org.autoplot.scriptconsole.LogConsole;
 import org.autoplot.server.RequestHandler;
 import org.autoplot.server.RequestListener;
-import org.virbo.autoplot.dom.Options;
-import org.virbo.autoplot.dom.OptionsPrefsController;
-import org.virbo.autoplot.dom.Plot;
-import org.virbo.autoplot.dom.PlotController;
+import org.autoplot.dom.Options;
+import org.autoplot.dom.OptionsPrefsController;
+import org.autoplot.dom.Plot;
+import org.autoplot.dom.PlotController;
 import org.autoplot.scriptconsole.GuiExceptionHandler;
 import org.autoplot.state.UndoRedoSupport;
 import org.virbo.autoplot.util.TickleTimer;
@@ -3969,7 +3969,7 @@ private void fixLayoutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
     Runnable run= new Runnable() {
         @Override
         public void run() {
-            org.virbo.autoplot.dom.DomOps.newCanvasLayout(dom);
+                org.autoplot.dom.DomOps.newCanvasLayout(dom);
         }
     };
     new Thread(run,"canvas layout").start();

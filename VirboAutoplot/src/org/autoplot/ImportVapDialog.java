@@ -19,8 +19,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import org.das2.components.DasProgressPanel;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.dom.DataSourceFilter;
+import org.autoplot.dom.Application;
+import org.autoplot.dom.DataSourceFilter;
 import org.autoplot.state.StatePersistence;
 import org.autoplot.datasource.DataSetURI;
 

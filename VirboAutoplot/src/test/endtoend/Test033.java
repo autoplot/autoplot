@@ -7,7 +7,7 @@ package test.endtoend;
 
 import org.autoplot.pngwalk.CreatePngWalk;
 import org.autoplot.ScriptContext;
-import org.virbo.autoplot.dom.Application;
+import org.autoplot.dom.Application;
 import java.io.File;
 import org.das2.datum.DatumRangeUtil;
 

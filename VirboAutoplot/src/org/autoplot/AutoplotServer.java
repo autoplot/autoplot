@@ -8,7 +8,7 @@ import org.das2.graph.DasCanvas;
 import static org.autoplot.ScriptContext.*;
 
 import org.das2.util.ArgumentList;
-import org.virbo.autoplot.dom.Application;
+import org.autoplot.dom.Application;
 import org.autoplot.scriptconsole.GuiExceptionHandler;
 import org.autoplot.datasource.URISplit;
 

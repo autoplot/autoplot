@@ -14,8 +14,8 @@ import java.beans.Expression;
 import java.beans.PersistenceDelegate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.virbo.autoplot.dom.BindingModel;
-import org.virbo.autoplot.dom.Connector;
+import org.autoplot.dom.BindingModel;
+import org.autoplot.dom.Connector;
 
 /**
  *

@@ -4,10 +4,13 @@
  */
 package org.autoplot.state;
 
+import org.autoplot.dom.DomUtil;
+import org.autoplot.dom.BindingModel;
+import org.autoplot.dom.DomNode;
+import org.autoplot.dom.Connector;
 import java.awt.Color;
 import java.beans.IntrospectionException;
 import java.text.ParseException;
-import org.virbo.autoplot.dom.*;
 import java.beans.BeanInfo;
 import java.beans.IndexedPropertyDescriptor;
 import java.beans.PropertyDescriptor;

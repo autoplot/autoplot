@@ -5,7 +5,7 @@
 
 package org.autoplot.state;
 
-import org.virbo.autoplot.dom.*;
+import org.autoplot.dom.BindingModel;
 import java.text.ParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

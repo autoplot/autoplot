@@ -56,21 +56,21 @@ import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasPlot;
 import org.das2.graph.Renderer;
 import static org.autoplot.GuiSupport.getStylePanel;
-import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.dom.ApplicationController;
-import org.virbo.autoplot.dom.Axis;
-import org.virbo.autoplot.dom.BindingModel;
-import org.virbo.autoplot.dom.Column;
-import org.virbo.autoplot.dom.DataSourceController;
-import org.virbo.autoplot.dom.DataSourceFilter;
-import org.virbo.autoplot.dom.DomOps;
-import org.virbo.autoplot.dom.DomUtil;
-import org.virbo.autoplot.dom.Options;
-import org.virbo.autoplot.dom.PlotElement;
-import org.virbo.autoplot.dom.PlotElementStyle;
-import org.virbo.autoplot.dom.Plot;
-import org.virbo.autoplot.dom.PlotElementController;
-import org.virbo.autoplot.dom.Row;
+import org.autoplot.dom.Application;
+import org.autoplot.dom.ApplicationController;
+import org.autoplot.dom.Axis;
+import org.autoplot.dom.BindingModel;
+import org.autoplot.dom.Column;
+import org.autoplot.dom.DataSourceController;
+import org.autoplot.dom.DataSourceFilter;
+import org.autoplot.dom.DomOps;
+import org.autoplot.dom.DomUtil;
+import org.autoplot.dom.Options;
+import org.autoplot.dom.PlotElement;
+import org.autoplot.dom.PlotElementStyle;
+import org.autoplot.dom.Plot;
+import org.autoplot.dom.PlotElementController;
+import org.autoplot.dom.Row;
 import org.virbo.autoplot.util.CanvasLayoutPanel;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.DataSourceEditorPanelUtil;
@@ -1309,7 +1309,7 @@ public class LayoutPanel extends javax.swing.JPanel {
 
     private void fixLayout( java.awt.event.ActionEvent evt) {                                         
         org.das2.util.LoggerManager.logGuiEvent(evt);       
-        org.virbo.autoplot.dom.DomOps.newCanvasLayout(dom);
+        org.autoplot.dom.DomOps.newCanvasLayout(dom);
     }
     
     private void biggerMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_biggerMIActionPerformed
@@ -1331,7 +1331,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             } catch ( ParseException ex ) {}
         }
 
-        if ( dom.getOptions().isAutolayout() ) org.virbo.autoplot.dom.DomOps.newCanvasLayout(dom);
+        if ( dom.getOptions().isAutolayout() ) org.autoplot.dom.DomOps.newCanvasLayout(dom);
         
     }//GEN-LAST:event_biggerMIActionPerformed
 
@@ -1376,7 +1376,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             } catch ( ParseException ex ) {}
         }
 
-        if ( dom.getOptions().isAutolayout() ) org.virbo.autoplot.dom.DomOps.newCanvasLayout(dom);
+        if ( dom.getOptions().isAutolayout() ) org.autoplot.dom.DomOps.newCanvasLayout(dom);
         
     }//GEN-LAST:event_sameSizeMIActionPerformed
 
@@ -1399,7 +1399,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             } catch ( ParseException ex ) {}
         }
 
-        if ( dom.getOptions().isAutolayout() ) org.virbo.autoplot.dom.DomOps.newCanvasLayout(dom);
+        if ( dom.getOptions().isAutolayout() ) org.autoplot.dom.DomOps.newCanvasLayout(dom);
 
     }//GEN-LAST:event_smallerMIActionPerformed
 

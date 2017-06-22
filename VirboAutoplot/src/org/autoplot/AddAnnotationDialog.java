@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.graph.AnchorType;
-import org.virbo.autoplot.dom.Annotation;
+import org.autoplot.dom.Annotation;
 
 /**
  *

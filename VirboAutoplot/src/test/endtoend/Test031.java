@@ -4,7 +4,7 @@
  */
 package test.endtoend;
 
-import org.virbo.autoplot.dom.Application;
+import org.autoplot.dom.Application;
 import org.virbo.dataset.QDataSet;
 import org.virbo.jythonsupport.Util;
 import static org.autoplot.ScriptContext.*;

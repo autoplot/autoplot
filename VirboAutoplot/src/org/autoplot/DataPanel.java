@@ -18,12 +18,12 @@ import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
-import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.dom.ApplicationController;
-import org.virbo.autoplot.dom.DataSourceController;
-import org.virbo.autoplot.dom.DataSourceFilter;
-import org.virbo.autoplot.dom.PlotElement;
-import org.virbo.autoplot.dom.PlotElementController;
+import org.autoplot.dom.Application;
+import org.autoplot.dom.ApplicationController;
+import org.autoplot.dom.DataSourceController;
+import org.autoplot.dom.DataSourceFilter;
+import org.autoplot.dom.PlotElement;
+import org.autoplot.dom.PlotElementController;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 

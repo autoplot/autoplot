@@ -16,8 +16,8 @@ import javax.swing.JColorChooser;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import org.das2.graph.GraphUtil;
-import org.virbo.autoplot.dom.DomUtil;
-import org.virbo.autoplot.dom.PlotElement;
+import org.autoplot.dom.DomUtil;
+import org.autoplot.dom.PlotElement;
 
 /**
  *

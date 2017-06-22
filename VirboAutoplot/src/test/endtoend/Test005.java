@@ -9,8 +9,8 @@ import java.util.List;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import static org.autoplot.ScriptContext.*;
-import org.virbo.autoplot.dom.Axis;
-import org.virbo.autoplot.dom.Column;
+import org.autoplot.dom.Axis;
+import org.autoplot.dom.Column;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSetURI.CompletionResult;
 

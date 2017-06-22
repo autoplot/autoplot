@@ -5,7 +5,8 @@
 
 package test.dom;
 
-import org.virbo.autoplot.dom.*;
+import org.autoplot.dom.PlotElementStyle;
+import org.autoplot.dom.PlotElement;
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.graph.DasColorBar;

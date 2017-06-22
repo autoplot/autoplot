@@ -12,7 +12,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.graph.DefaultPlotSymbol;
 import org.autoplot.ScriptContext;
-import org.virbo.autoplot.dom.Application;
+import org.autoplot.dom.Application;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
