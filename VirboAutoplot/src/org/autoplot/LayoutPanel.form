@@ -415,7 +415,7 @@
                 </DimensionLayout>
               </Layout>
               <SubComponents>
-                <Component class="org.virbo.autoplot.util.CanvasLayoutPanel" name="canvasLayoutPanel1">
+                <Component class="org.autoplot.util.CanvasLayoutPanel" name="canvasLayoutPanel1">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="canvasLayoutPanel1"/>
                   </Properties>

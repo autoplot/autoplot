@@ -126,7 +126,7 @@ import org.autoplot.bookmarks.BookmarksException;
 import org.autoplot.bookmarks.BookmarksManager;
 import org.autoplot.bookmarks.BookmarksManagerModel;
 import org.autoplot.bookmarks.Util;
-import org.virbo.autoplot.transferrable.ImageSelection;
+import org.autoplot.transferrable.ImageSelection;
 import org.virbo.dataset.QDataSet;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;

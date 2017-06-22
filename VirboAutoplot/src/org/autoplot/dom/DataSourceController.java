@@ -36,7 +36,7 @@ import org.das2.util.monitor.AlertNullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUtil;
-import org.virbo.autoplot.util.RunLaterListener;
+import org.autoplot.util.RunLaterListener;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;

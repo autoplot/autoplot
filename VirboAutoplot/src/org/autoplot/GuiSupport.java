@@ -136,7 +136,7 @@ import org.autoplot.dom.PlotController;
 import org.autoplot.dom.PlotElement;
 import org.autoplot.layout.LayoutConstants;
 import org.autoplot.state.StatePersistence;
-import org.virbo.autoplot.transferrable.ImageSelection;
+import org.autoplot.transferrable.ImageSelection;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;

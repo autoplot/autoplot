@@ -71,7 +71,7 @@ import org.autoplot.dom.PlotElementStyle;
 import org.autoplot.dom.Plot;
 import org.autoplot.dom.PlotElementController;
 import org.autoplot.dom.Row;
-import org.virbo.autoplot.util.CanvasLayoutPanel;
+import org.autoplot.util.CanvasLayoutPanel;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.DataSourceEditorPanelUtil;
 
@@ -807,7 +807,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         dataSourceList = new javax.swing.JList<>();
         jSplitPane2 = new javax.swing.JSplitPane();
         jPanel1 = new javax.swing.JPanel();
-        canvasLayoutPanel1 = new org.virbo.autoplot.util.CanvasLayoutPanel();
+        canvasLayoutPanel1 = new org.autoplot.util.CanvasLayoutPanel();
         tallerButton = new javax.swing.JButton();
         shorterButton = new javax.swing.JButton();
         sameHeightButton = new javax.swing.JButton();
@@ -1469,7 +1469,7 @@ public class LayoutPanel extends javax.swing.JPanel {
     private javax.swing.JMenuItem biggerMI;
     private javax.swing.JPopupMenu bindingActionsMenu;
     private javax.swing.JList bindingListComponent;
-    private org.virbo.autoplot.util.CanvasLayoutPanel canvasLayoutPanel1;
+    private org.autoplot.util.CanvasLayoutPanel canvasLayoutPanel1;
     private javax.swing.JPopupMenu dataSourceActionsMenu;
     private javax.swing.JList<String> dataSourceList;
     private javax.swing.JMenuItem deleteBindingsMenuItem;

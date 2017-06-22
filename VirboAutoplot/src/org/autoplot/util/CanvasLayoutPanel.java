@@ -1,5 +1,5 @@
 
-package org.virbo.autoplot.util;
+package org.autoplot.util;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

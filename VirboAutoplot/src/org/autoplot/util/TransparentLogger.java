@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.virbo.autoplot.util;
+package org.autoplot.util;
 
 import java.util.ResourceBundle;
 import java.util.logging.Filter;

@@ -1,5 +1,5 @@
 
-package org.virbo.autoplot.util;
+package org.autoplot.util;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

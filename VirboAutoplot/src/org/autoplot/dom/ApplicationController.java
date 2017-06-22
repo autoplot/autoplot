@@ -71,7 +71,7 @@ import org.autoplot.GuiSupport;
 import org.autoplot.LayoutListener;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.layout.LayoutConstants;
-import org.virbo.autoplot.util.RunLaterListener;
+import org.autoplot.util.RunLaterListener;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**

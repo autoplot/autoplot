@@ -1,4 +1,4 @@
-package org.virbo.autoplot.transferrable;
+package org.autoplot.transferrable;
         
 import java.awt.Image;
 import java.awt.datatransfer.Clipboard;
