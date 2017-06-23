@@ -188,31 +188,31 @@ JAVAARGS="-g -target 1.7 -source 1.7 -cp ../temp-classes:. -d ../temp-classes -X
 echo "compile sources..."
 cd temp-src
 echo $JAVAC $JAVAARGS org/autoplot/AutoplotUI.java
-if ! $JAVAC $JAVAARGS org/autoplot/AutoplotUI.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/AutoplotUI.java; then echo "\n\n****\n\n"; hasErrors=1; fi
 if [ $hasErrors -eq 1 ]; then
   echo "Error somewhere in compile, see above"
   exit 1 
 fi
-if ! $JAVAC $JAVAARGS org/autoplot/state/*.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/scriptconsole/DumpRteExceptionHandler.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/JythonMain.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/help/AutoplotHelpViewer.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/AutoplotServer.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/AutoplotDataServer.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/das2/qds/util/*.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/pngwalk/PngWalkTool1.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/pngwalk/ImageResize.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/pngwalk/QualityControlPanel.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/das2/beans/*.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/das2/util/awt/*.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS test/endtoend/*.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/idlsupport/*.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/virbo/idlsupport/*.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/das2/system/NullPreferencesFactory.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/tca/UriTcaSource.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/das2/qds/NearestNeighborTcaFunction.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/ScreenshotsTool.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/wgetfs/WGetFileSystemFactory.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/state/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/scriptconsole/DumpRteExceptionHandler.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/JythonMain.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/help/AutoplotHelpViewer.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/AutoplotServer.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/AutoplotDataServer.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/das2/qds/util/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/pngwalk/PngWalkTool1.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/pngwalk/ImageResize.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/pngwalk/QualityControlPanel.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/das2/beans/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/das2/util/awt/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS test/endtoend/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/idlsupport/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/virbo/idlsupport/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/das2/system/NullPreferencesFactory.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/tca/UriTcaSource.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/das2/qds/NearestNeighborTcaFunction.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/ScreenshotsTool.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/wgetfs/WGetFileSystemFactory.java; then echo "\n\n****\n\n"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/das2/fsm/FileStorageModelNew.java; then echo "*****"; hasErrors=1; fi  # some scripts use this old name.
 if ! $JAVAC $JAVAARGS org/das2/math/filter/*.java; then echo "*****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/das2/components/DataPointRecorderNew.java; then echo "*****"; hasErrors=1; fi  
@@ -220,34 +220,34 @@ if ! $JAVAC $JAVAARGS org/das2/components/AngleSpectrogramSlicer.java; then echo
 if ! $JAVAC $JAVAARGS org/das2/graph/Auralizor.java; then echo "*****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/das2/qstream/*.java; then echo "*****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/das2/qstream/filter/*.java; then echo "*****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/das2/datum/SIUnits.java; then echo "****"; hasErrors=1; fi  
-if ! $JAVAC $JAVAARGS org/das2/qds/RepeatIndexDataSet.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/jythonsupport/ui/DataMashUp.java; then echo "****"; hasErrors=1; fi  
-if ! $JAVAC $JAVAARGS org/das2/util/*Formatter.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/util/jemmy/*.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/das2/qds/filters/*.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/das2/datum/SIUnits.java; then echo "\n\n****\n\n"; hasErrors=1; fi  
+if ! $JAVAC $JAVAARGS org/das2/qds/RepeatIndexDataSet.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/jythonsupport/ui/DataMashUp.java; then echo "\n\n****\n\n"; hasErrors=1; fi  
+if ! $JAVAC $JAVAARGS org/das2/util/*Formatter.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/util/jemmy/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/das2/qds/filters/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/virbo/autoplot/*.java; then echo "****"; hasErrors=1; fi
 
 cat ../temp-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    echo $JAVAC $JAVAARGS $i.java
-   if ! $JAVAC $JAVAARGS $i.java; then echo "****"; hasErrors=1; fi
+   if ! $JAVAC $JAVAARGS $i.java; then echo "\n\n****\n\n"; hasErrors=1; fi
 done
 cat ../temp-classes/META-INF/org.autoplot.datasource.DataSourceFormat.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.autoplot.datasource.DataSourceFormat.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    echo $JAVAC $JAVAARGS $i.java
-   if ! $JAVAC $JAVAARGS $i.java; then echo "****"; hasErrors=1; fi
+   if ! $JAVAC $JAVAARGS $i.java; then echo "\n\n****\n\n"; hasErrors=1; fi
 done
 cat ../temp-classes/META-INF/org.autoplot.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.autoplot.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    echo $JAVAC $JAVAARGS $i.java
-   if ! $JAVAC $JAVAARGS $i.java; then echo "****"; hasErrors=1; fi
+   if ! $JAVAC $JAVAARGS $i.java; then echo "\n\n****\n\n"; hasErrors=1; fi
 done
 
 # NetCDF IOServiceProvider allows Autoplot URIs to be used in ncml files.
 echo "compile AbstractIOSP and APIOServiceProvider"
-if ! $JAVAC $JAVAARGS org/autoplot/netCDF/AbstractIOSP.java; then echo "****"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/netCDF/APIOServiceProvider.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/netCDF/AbstractIOSP.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/netCDF/APIOServiceProvider.java; then echo "\n\n****\n\n"; hasErrors=1; fi
 
 cd ..
 echo "done compile sources."
