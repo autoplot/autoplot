@@ -92,7 +92,7 @@ public class JythonUtil {
         ///  http://www.gossamer-threads.com/lists/python/python/697524
         org.python.core.PySystemState pySys = new org.python.core.PySystemState();
         
-        String[] loadClasses= new String[] { "glob.py", "autoplot.py", "autoplotapp.py" }; // these must be in the root of the interpretter search path.
+        String[] loadClasses= new String[] { "glob.py", "autoplot2017.py", "autoplotapp.py" }; // these must be in the root of the interpretter search path.
         for ( String pysrc: loadClasses ) {
             if ( pysrc.equals("glob.py") ) {
                 URL jarUrl= InteractiveInterpreter.class.getResource("/"+pysrc);
@@ -128,7 +128,7 @@ public class JythonUtil {
         if ( loadAutoplotStuff ) {
             maybeLoadAdapters();
             if ( Util.isLegacyImports() ) {
-                URL imports= JythonOps.class.getResource("/imports.py");
+                URL imports= JythonOps.class.getResource("/imports2017.py");
                 if ( imports==null ) {
                     throw new RuntimeException("unable to locate imports.py on classpath");
                 } else {
@@ -140,7 +140,7 @@ public class JythonUtil {
                 logger.log( Level.FINE, simports );
                 //InputStream in = imports.openStream();
                 try {
-                    interp.execfile( new ByteArrayInputStream(bimports), "/imports.py");
+                    interp.execfile( new ByteArrayInputStream(bimports), "/imports2017.py");
                 } finally {
                     in.close();
                 }
@@ -167,7 +167,7 @@ public class JythonUtil {
      */
     public static void setupInterp( PythonInterpreter interp, String pwd, String resourceUri, Map<String,String> paramsl, ProgressMonitor mon ) {
         interp.set("PWD", pwd);
-        interp.exec("import autoplot");
+        interp.exec("import autoplot2017 as autoplot");
         interp.exec("autoplot.params=dict()");
         for ( Entry<String,String> e : paramsl.entrySet()) {
             String s= e.getKey();
@@ -186,8 +186,8 @@ public class JythonUtil {
         
         interp.set("monitor", mon);
         
-        try ( InputStream in= JythonOps.class.getResource("/autoplot.py").openStream() ) {
-            interp.execfile( in, "/autoplot.py"); // import everything into default namespace.
+        try ( InputStream in= JythonOps.class.getResource("/autoplot2017.py").openStream() ) {
+            interp.execfile( in, "/autoplot2017.py"); // import everything into default namespace.
         } catch ( IOException ex ) {
             logger.log( Level.SEVERE, ex.getMessage(), ex );
         }
@@ -356,14 +356,14 @@ public class JythonUtil {
     
     /**
      * copy the two python files specific to Autoplot into the user's autoplot_data/jython folder.
-     * This reads the version from the first line of the autoplot.py.
+     * This reads the version from the first line of the autoplot2017.py.
      * @return the item to add to the python search path.
      * @throws IOException 
      */
     private static String getLocalJythonAutoplotLib() throws IOException {
         File ff2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA ) );
         File ff3= new File( ff2.toString() + "/jython" );
-        File ff4= new File( ff3, "autoplot.py" );
+        File ff4= new File( ff3, "autoplot2017.py" );
         String vers= "";
         
         // This is the version that Autoplot would like to find, and should be found within the Java class path.
@@ -373,7 +373,7 @@ public class JythonUtil {
             try ( BufferedReader r= new BufferedReader( new FileReader( ff4 ) ) ) {
                 String line= r.readLine();
                 if ( line!=null ) {
-                    Pattern versPattern= Pattern.compile("# autoplot.py v([\\d\\.]+) .*");  // must be parsable as a double.
+                    Pattern versPattern= Pattern.compile("# autoplot2017.py v([\\d\\.]+) .*");  // must be parsable as a double.
                     Matcher m= versPattern.matcher(line);
                     if ( m.matches() ) {
                         vers= m.group(1);
@@ -399,7 +399,7 @@ public class JythonUtil {
                     }
                 }
             }
-            String[] ss= new String[] { "autoplot.py", "autoplotapp.py" };
+            String[] ss= new String[] { "autoplot2017.py", "autoplotapp.py" };
             for ( String s: ss ) {
                 InputStream in= JythonUtil.class.getResourceAsStream("/"+s);
                 FileOutputStream out= new FileOutputStream( new File( ff3, s ) );
@@ -743,7 +743,7 @@ public class JythonUtil {
      * @param paramsl 
      */ 
     public static void setParams( PythonInterpreter interp, Map<String,String> paramsl ) {
-        interp.exec("import autoplot");
+        interp.exec("import autoplot2017 as autoplot");
         interp.exec("autoplot.params=dict()");
         for ( Entry<String,String> e : paramsl.entrySet()) {
             String s= e.getKey();
@@ -1205,7 +1205,7 @@ public class JythonUtil {
         
         setParams( interp, params );
         interp.exec(prog);
-        interp.exec("import autoplot\n");
+        interp.exec("import autoplot2017 as autoplot\n");
         PyList sort= (PyList) interp.eval( "autoplot._paramSort" );
         
         boolean altWhy= false; // I don't know why things are suddenly showing up in this other space.
