@@ -130,9 +130,9 @@ public class JythonUtil {
             if ( Util.isLegacyImports() ) {
                 URL imports= JythonOps.class.getResource("/imports2017.py");
                 if ( imports==null ) {
-                    throw new RuntimeException("unable to locate imports.py on classpath");
+                    throw new RuntimeException("unable to locate imports2017.py on classpath");
                 } else {
-                    logger.log(Level.FINE, "loading imports.py from {0}", imports);
+                    logger.log(Level.FINE, "loading imports2017.py from {0}", imports);
                 }
                 InputStream in= imports.openStream(); // note this stream will load in another stream.
                 byte[] bimports= FileUtil.readBytes(in);
@@ -297,7 +297,7 @@ public class JythonUtil {
     private static String getLocalJythonAutoplotAppLib() throws IOException {
         File ff2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA ) );
         File ff3= new File( ff2.toString() + "/jython" );
-        File ff4= new File( ff3.toString(), "pylistingapp.txt" );
+        File ff4= new File( ff3.toString(), "pylistingapp2017.txt" );
         if ( ff4.exists() ) {
             return ff3.toString();
         }
@@ -309,42 +309,47 @@ public class JythonUtil {
             }
         }
         
-        if ( JythonUtil.class.getResource("/pylistingapp.txt")==null ) {
-            logger.log( Level.FINE, "unable to find pylistingapp.txt in application, assuming this is not the Autoplot client application.");
+        if ( JythonUtil.class.getResource("/pylistingapp2017.txt")==null ) {
+            logger.log( Level.FINE, "unable to find pylistingapp2017.txt in application, assuming this is not the Autoplot client application.");
         } else {
-            logger.log(Level.FINE, "unpacking jython codes in {0}", JythonUtil.class.getResourceAsStream("/pylistingapp.txt"));
+            logger.log(Level.FINE, "unpacking jython codes in {0}", JythonUtil.class.getResourceAsStream("/pylistingapp2017.txt"));
             
-            try ( BufferedReader r= new BufferedReader( new InputStreamReader( JythonUtil.class.getResourceAsStream("/pylistingapp.txt") ) ) ) {
+            try ( BufferedReader r= new BufferedReader( new InputStreamReader( JythonUtil.class.getResourceAsStream("/pylistingapp2017.txt") ) ) ) {
                 String s= r.readLine();
                 while ( s!=null ) {
-                    File ff5= new File( ff3, s );
-                    logger.log(Level.FINER, "copy to local folder python code: {0}", s);
-                    if ( s.contains("/") ) {
-                        if ( !makeHomeFor( ff5 ) ) {
-                            throw new IOException("Unable to makeHomeFor "+ff5);
+                    int i= s.indexOf("#");
+                    if ( i>-1 ) s= s.substring(0,i);
+                    s= s.trim();
+                    if ( s.length()>0 ) {
+                        File ff5= new File( ff3, s );
+                        logger.log(Level.FINER, "copy to local folder python code: {0}", s);
+                        if ( s.contains("/") ) {
+                            if ( !makeHomeFor( ff5 ) ) {
+                                throw new IOException("Unable to makeHomeFor "+ff5);
+                            }
                         }
-                    }
-                    if ( ff5.exists() ) {
-                        logger.fine("already have file, skip...");
-                        s= r.readLine();
-                        continue;
-                    }
-                    InputStream in= JythonUtil.class.getResourceAsStream("/"+s);
-                    if ( in==null ) {
-                        throw new IllegalArgumentException("unable to find jython code which should be embedded in application: "+s);
-                    }                                        
-                    //Re https://sourceforge.net/p/autoplot/bugs/1724/:
-                    //Really each file should be copied and then renamed.
-                    
-                    try (FileOutputStream out = new FileOutputStream( ff5 ) ) {
-                        transferStream(in,out);
-                    } finally {
-                        in.close();
-                        if ( new File( ff3, s ).setReadOnly()==false ) {
-                            logger.log( Level.FINER, "set read-only on file {0} failed", s );
+                        if ( ff5.exists() ) {
+                            logger.fine("already have file, skip...");
+                            s= r.readLine();
+                            continue;
                         }
-                        if ( new File( ff3, s ).setWritable( true, true )==false ) {
-                            logger.log( Level.FINER, "set write for user only on file {0} failed", s );
+                        InputStream in= JythonUtil.class.getResourceAsStream("/"+s);
+                        if ( in==null ) {
+                            throw new IllegalArgumentException("unable to find jython code which should be embedded in application: "+s);
+                        }                                        
+                        //Re https://sourceforge.net/p/autoplot/bugs/1724/:
+                        //Really each file should be copied and then renamed.
+
+                        try (FileOutputStream out = new FileOutputStream( ff5 ) ) {
+                            transferStream(in,out);
+                        } finally {
+                            in.close();
+                            if ( new File( ff3, s ).setReadOnly()==false ) {
+                                logger.log( Level.FINER, "set read-only on file {0} failed", s );
+                            }
+                            if ( new File( ff3, s ).setWritable( true, true )==false ) {
+                                logger.log( Level.FINER, "set write for user only on file {0} failed", s );
+                            }
                         }
                     }
                     s= r.readLine();
