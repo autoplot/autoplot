@@ -77,8 +77,8 @@ public class JythonUtil {
         InteractiveInterpreter interp= org.autoplot.jythonsupport.JythonUtil.createInterpreter(sandbox);
         if ( org.autoplot.jythonsupport.Util.isLegacyImports() ) {
             if ( appContext ) {
-                try ( InputStream in = JythonUtil.class.getResource("/appContextImports.py").openStream() ) {
-                    interp.execfile( in, "/appContextImports.py" ); // JythonRefactory okay
+                try ( InputStream in = JythonUtil.class.getResource("/appContextImports2017.py").openStream() ) {
+                    interp.execfile( in, "/appContextImports2017.py" ); // JythonRefactory okay
                 }
             }
         }
