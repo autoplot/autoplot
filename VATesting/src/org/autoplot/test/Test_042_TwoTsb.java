@@ -18,12 +18,12 @@ import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JPopupMenuOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
-import org.virbo.autoplot.AutoplotUI;
-import org.virbo.autoplot.ScreenshotsTool;
-import org.virbo.autoplot.ScriptContext;
-import static org.virbo.autoplot.ScriptContext.save;
-import static org.virbo.autoplot.ScriptContext.writeToPng;
-import org.virbo.autoplot.dom.Application;
+import org.autoplot.AutoplotUI;
+import org.autoplot.ScreenshotsTool;
+import org.autoplot.ScriptContext;
+import static org.autoplot.ScriptContext.save;
+import static org.autoplot.ScriptContext.writeToPng;
+import org.autoplot.dom.Application;
 import util.RegexComponentChooser;
 
 /**

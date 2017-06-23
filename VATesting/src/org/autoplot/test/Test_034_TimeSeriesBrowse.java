@@ -21,10 +21,10 @@ import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
-import org.virbo.autoplot.AutoplotUI;
-import org.virbo.autoplot.ScriptContext;
-import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.dom.BindingModel;
+import org.autoplot.AutoplotUI;
+import org.autoplot.ScriptContext;
+import org.autoplot.dom.Application;
+import org.autoplot.dom.BindingModel;
 import util.NameComponentChooser;
 import util.RegexComponentChooser;
 

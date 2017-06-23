@@ -5,7 +5,7 @@
 
 package org.autoplot.test;
 
-import org.virbo.autoplot.dom.Application;
+import org.autoplot.dom.Application;
 import java.text.ParseException;
 import org.das2.datum.DatumRangeUtil;
 import java.io.IOException;
@@ -23,10 +23,10 @@ import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JListOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
-import org.virbo.autoplot.AutoplotUI;
+import org.autoplot.AutoplotUI;
 import util.NameComponentChooser;
 import util.RegexComponentChooser;
-import static org.virbo.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext.*;
 /**
  *
  * @author jbf

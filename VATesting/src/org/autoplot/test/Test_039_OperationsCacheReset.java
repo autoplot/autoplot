@@ -20,10 +20,10 @@ import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JTabbedPaneOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.netbeans.jemmy.operators.JTreeOperator;
-import org.virbo.autoplot.AutoplotUI;
-import org.virbo.autoplot.ScriptContext;
-import static org.virbo.autoplot.ScriptContext.save;
-import static org.virbo.autoplot.ScriptContext.writeToPng;
+import org.autoplot.AutoplotUI;
+import org.autoplot.ScriptContext;
+import static org.autoplot.ScriptContext.save;
+import static org.autoplot.ScriptContext.writeToPng;
 import util.FiltersTreePicker;
 import util.RegexComponentChooser;
 

@@ -16,7 +16,7 @@ import org.das2.graph.DasPlot;
 import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.operators.JPopupMenuOperator;
 import org.netbeans.jemmy.operators.JTabbedPaneOperator;
-import org.virbo.autoplot.AutoplotUI;
+import org.autoplot.AutoplotUI;
 import util.RegexComponentChooser;
 
 /**

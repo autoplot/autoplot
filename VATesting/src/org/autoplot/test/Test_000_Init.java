@@ -12,11 +12,11 @@ import java.util.logging.Logger;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.TestOut;
-import org.virbo.autoplot.AutoplotUI;
-import static org.virbo.autoplot.ScriptContext.createGui;
-import static org.virbo.autoplot.ScriptContext.getApplicationModel;
-import static org.virbo.autoplot.ScriptContext.getViewWindow;
-import org.virbo.autoplot.scriptconsole.DumpRteExceptionHandler;
+import org.autoplot.AutoplotUI;
+import static org.autoplot.ScriptContext.createGui;
+import static org.autoplot.ScriptContext.getApplicationModel;
+import static org.autoplot.ScriptContext.getViewWindow;
+import org.autoplot.scriptconsole.DumpRteExceptionHandler;
 
 /**
  * Verify that Jemmy will work, set the mouse position for tests.

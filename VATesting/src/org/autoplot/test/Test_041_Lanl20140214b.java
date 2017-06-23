@@ -15,9 +15,9 @@ import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
-import org.virbo.autoplot.AutoplotUI;
-import static org.virbo.autoplot.ScriptContext.*;
-import org.virbo.autoplot.dom.Application;
+import org.autoplot.AutoplotUI;
+import static org.autoplot.ScriptContext.*;
+import org.autoplot.dom.Application;
 
 /**
  * Demos new failure for ect-rept-sci-L3_20130915.

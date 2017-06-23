@@ -4,7 +4,7 @@
  */
 package org.autoplot.test;
 
-import org.virbo.autoplot.AutoplotUI;
+import org.autoplot.AutoplotUI;
 
 /**
  * Introduced because the VirboAutoplot project no longer supported profiling in

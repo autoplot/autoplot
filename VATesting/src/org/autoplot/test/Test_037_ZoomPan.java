@@ -15,11 +15,11 @@ import org.das2.datum.LoggerManager;
 import org.das2.graph.DasPlot;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.TestOut;
-import org.virbo.autoplot.dom.Application;
+import org.autoplot.dom.Application;
 import org.netbeans.jemmy.operators.JFrameOperator;
-import org.virbo.autoplot.AutoplotUI;
-import static org.virbo.autoplot.ScriptContext.*;
-import org.virbo.autoplot.scriptconsole.DumpRteExceptionHandler;
+import org.autoplot.AutoplotUI;
+import static org.autoplot.ScriptContext.*;
+import org.autoplot.scriptconsole.DumpRteExceptionHandler;
 
 /**
  * verify the zoom pan functions of the mousewheel.

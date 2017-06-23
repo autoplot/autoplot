@@ -10,8 +10,8 @@ import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
-import org.virbo.autoplot.AutoplotUI;
-import org.virbo.autoplot.ScriptContext;
+import org.autoplot.AutoplotUI;
+import org.autoplot.ScriptContext;
 
 /**
  * first testing of Jemmy API.

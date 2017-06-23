@@ -24,13 +24,13 @@ import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
 import org.netbeans.jemmy.operators.JTextComponentOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
-import org.virbo.autoplot.AddPlotElementDialog;
-import org.virbo.autoplot.AutoplotUI;
-import org.virbo.autoplot.ScreenshotsTool;
-import org.virbo.autoplot.ScriptContext;
-import static org.virbo.autoplot.ScriptContext.save;
-import static org.virbo.autoplot.ScriptContext.writeToPng;
-import org.virbo.datasource.DataSetSelector;
+import org.autoplot.AddPlotElementDialog;
+import org.autoplot.AutoplotUI;
+import org.autoplot.ScreenshotsTool;
+import org.autoplot.ScriptContext;
+import static org.autoplot.ScriptContext.save;
+import static org.autoplot.ScriptContext.writeToPng;
+import org.autoplot.datasource.DataSetSelector;
 import util.RegexComponentChooser;
 
 /**

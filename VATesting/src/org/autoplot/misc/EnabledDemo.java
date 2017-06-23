@@ -36,7 +36,7 @@ public class EnabledDemo extends javax.swing.JPanel {
         jCheckBox1 = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
-        dataSetSelector1 = new org.virbo.datasource.DataSetSelector();
+        dataSetSelector1 = new org.autoplot.datasource.DataSetSelector();
         jButton1 = new javax.swing.JButton();
 
         jCheckBox1.setText("jCheckBox1");
@@ -114,7 +114,7 @@ public class EnabledDemo extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.virbo.datasource.DataSetSelector dataSetSelector1;
+    private org.autoplot.datasource.DataSetSelector dataSetSelector1;
     private javax.swing.JButton jButton1;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;

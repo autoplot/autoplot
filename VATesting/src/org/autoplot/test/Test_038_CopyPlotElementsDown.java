@@ -10,16 +10,16 @@ import util.RegexComponentChooser;
 import org.netbeans.jemmy.ComponentChooser;
 import javax.swing.JMenuItem;
 import org.netbeans.jemmy.operators.JPopupMenuOperator;
-import org.virbo.autoplot.dom.Application;
+import org.autoplot.dom.Application;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.LoggerManager;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.operators.JFrameOperator;
-import org.virbo.autoplot.AutoplotUI;
+import org.autoplot.AutoplotUI;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.TestOut;
-import static org.virbo.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext.*;
 
 /**
  *

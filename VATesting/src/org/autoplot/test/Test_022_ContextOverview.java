@@ -18,10 +18,10 @@ import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.*;
-import org.virbo.autoplot.AutoplotUI;
-import static org.virbo.autoplot.ScriptContext.*;
-import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.dom.BindingModel;
+import org.autoplot.AutoplotUI;
+import static org.autoplot.ScriptContext.*;
+import org.autoplot.dom.Application;
+import org.autoplot.dom.BindingModel;
 import util.RegexComponentChooser;
 
 /**

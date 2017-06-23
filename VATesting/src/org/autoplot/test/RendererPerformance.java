@@ -13,11 +13,12 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.SpectrogramRenderer;
-import org.virbo.autoplot.RenderType;
-import org.virbo.autoplot.ScriptContext;
-import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.dom.PlotElementController;
-import vatest.endtoend.Test009;
+import org.autoplot.RenderType;
+import org.autoplot.ScriptContext;
+import org.autoplot.dom.Application;
+import org.autoplot.dom.PlotElementController;
+import org.das2.util.LoggerManager;
+//import vatest.endtoend.Test009;
 
 /**
  * Introduce test to keep track of rendering performance.
@@ -25,6 +26,7 @@ import vatest.endtoend.Test009;
  */
 public class RendererPerformance {
     
+    private static final Logger logger= LoggerManager.getLogger("RendererPerformance");
     private static void waitForPaint( final DasCanvas c ) throws InterruptedException, InvocationTargetException {
         SwingUtilities.invokeAndWait( new Runnable() {
             @Override
@@ -65,11 +67,11 @@ public class RendererPerformance {
                 waitForPaint(c);
             }      
         } catch (InterruptedException ex) {
-            Logger.getLogger(Test009.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (ParseException ex) {
-            Logger.getLogger(Test009.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (InvocationTargetException ex) {
-            Logger.getLogger(RendererPerformance.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         System.err.println( "update: " + pec.getRenderer().getUpdateCount() );
         System.err.println( "render: "+pec.getRenderer().getRenderCount() );

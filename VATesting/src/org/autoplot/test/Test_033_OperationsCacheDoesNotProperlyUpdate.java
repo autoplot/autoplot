@@ -6,17 +6,17 @@
 package org.autoplot.test;
 
 import java.io.IOException;
-import org.virbo.autoplot.dom.Application;
+import org.autoplot.dom.Application;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.LoggerManager;
 import org.netbeans.jemmy.JemmyProperties;
-import org.virbo.autoplot.AutoplotUI;
+import org.autoplot.AutoplotUI;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
-import static org.virbo.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext.*;
 
 /**
  * Test_033

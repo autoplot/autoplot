@@ -12,8 +12,8 @@ import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JTabbedPaneOperator;
 import org.netbeans.jemmy.operators.JTextAreaOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
-import org.virbo.autoplot.AutoplotUI;
-import org.virbo.autoplot.ScriptContext;
+import org.autoplot.AutoplotUI;
+import org.autoplot.ScriptContext;
 
 /**
  *

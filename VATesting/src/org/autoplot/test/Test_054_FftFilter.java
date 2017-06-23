@@ -16,8 +16,8 @@ import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JTabbedPaneOperator;
 import org.netbeans.jemmy.operators.JTextComponentOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
-import org.virbo.autoplot.AutoplotUI;
-import org.virbo.autoplot.ScriptContext;
+import org.autoplot.AutoplotUI;
+import org.autoplot.ScriptContext;
 import util.FiltersTreePicker;
 import util.RegexComponentChooser;
 

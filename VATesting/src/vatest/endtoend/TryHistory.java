@@ -21,8 +21,8 @@ import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.TimeUtil;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.AutoplotSettings;
+import org.das2.qds.QDataSet;
+import org.autoplot.datasource.AutoplotSettings;
 
 /**
  *
@@ -83,7 +83,7 @@ public class TryHistory {
                 long t0= System.currentTimeMillis();
 
                 try {
-                    QDataSet ds = org.virbo.jythonsupport.Util.getDataSet(suri, new NullProgressMonitor() );
+                    QDataSet ds = org.autoplot.jythonsupport.Util.getDataSet(suri, new NullProgressMonitor() );
                     out.println( "result: " + ds);
                 } catch ( Exception ex ) {
                     String exs= ex.getMessage();
