@@ -14,7 +14,7 @@
 # On OS 10.5.8, this worked:
 #  JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
 #
-# Used by: autoplot-jar-all on http://papco.org:8080/hudson.  This is used for testing.
+# Used by: autoplot-jar-all on http://jfaden.net:8080/hudson.  This is used for testing.
 #
 
 if [ "" = "$JAVA_HOME" ]; then
@@ -135,15 +135,15 @@ for i in $( find * -name 'CDFLeapSeconds.txt' ); do   # support for CDF TT2000
    mkdir -p $(dirname ../temp-classes/$i)
    cp $i ../temp-classes/$i
 done
-for i in $( find * -name 'pylisting.txt' ); do   # support for python on LANL where listing of autoplot.org cannot be done.
+for i in $( find * -name 'pylisting*.txt' ); do   # support for python on LANL where listing of autoplot.org cannot be done.
    mkdir -p $(dirname ../temp-classes/$i)
    cp $i ../temp-classes/$i
 done
-for i in $( find * -name 'pylistingapp.txt' ); do   # support for python on LANL where listing of autoplot.org cannot be done.
+for i in $( find * -name 'pylistingapp*.txt' ); do   # support for python on LANL where listing of autoplot.org cannot be done.
    mkdir -p $(dirname ../temp-classes/$i)
    cp $i ../temp-classes/$i
 done
-for i in $( find * -name 'packagelist.txt' ); do  
+for i in $( find * -name 'packagelist*.txt' ); do  
    mkdir -p $(dirname ../temp-classes/$i)
    cp $i ../temp-classes/$i
 done
