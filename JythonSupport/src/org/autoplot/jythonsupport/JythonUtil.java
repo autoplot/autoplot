@@ -404,7 +404,7 @@ public class JythonUtil {
                     }
                 }
             }
-            String[] ss= new String[] { "autoplot2017.py", "autoplotapp.py" };
+            String[] ss= new String[] { "autoplot2017.py", "autoplotapp2017.py" };
             for ( String s: ss ) {
                 InputStream in= JythonUtil.class.getResourceAsStream("/"+s);
                 FileOutputStream out= new FileOutputStream( new File( ff3, s ) );
