@@ -209,6 +209,13 @@ public class JythonRefactory {
                         if ( m.group(5)!=null ) { // as clause
                             writer.print( m.group(5) ); 
                         } else {
+                            for ( int k=ss.length; k>0; k-- ) {
+                                String path= p.substring(0,i);
+                                n= forwardMap.get(path);
+                                if ( n!=null && n.equals(p) ) {
+                                    fullNameMap.put( p, n );
+                                }
+                            }
                             fullNameMap.put( p+cl, n+cl );
                         }
                         writer.println();
