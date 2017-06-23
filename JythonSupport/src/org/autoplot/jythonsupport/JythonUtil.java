@@ -92,7 +92,7 @@ public class JythonUtil {
         ///  http://www.gossamer-threads.com/lists/python/python/697524
         org.python.core.PySystemState pySys = new org.python.core.PySystemState();
         
-        String[] loadClasses= new String[] { "glob.py", "autoplot2017.py", "autoplotapp.py" }; // these must be in the root of the interpretter search path.
+        String[] loadClasses= new String[] { "glob.py", "autoplot2017.py", "autoplotapp2017.py" }; // these must be in the root of the interpretter search path.
         for ( String pysrc: loadClasses ) {
             if ( pysrc.equals("glob.py") ) {
                 URL jarUrl= InteractiveInterpreter.class.getResource("/"+pysrc);
@@ -103,9 +103,9 @@ public class JythonUtil {
                 } else {
                     logger.log(Level.WARNING, "Couldn''t find jar containing {0}.  See https://sourceforge.net/p/autoplot/bugs/576/", pysrc);
                 }
-            } else if ( pysrc.equals("autoplotapp.py" ) ) {
+            } else if ( pysrc.equals("autoplotapp2017.py" ) ) {
                 String f= getLocalJythonAutoplotAppLib();
-                if ( !pySys.path.contains( new PyString(f) ) ) {
+                if ( !pySys.path.contains( new PyString(f) ) ) { // TODO possible bug here: PyString/String means local path is in there 4 times.
                     pySys.path.insert(0,new PyString(f) );
                 }    
             } else {
