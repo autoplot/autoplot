@@ -4,16 +4,12 @@ package org.autoplot.jythonsupport;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,9 +23,6 @@ import org.autoplot.datasource.DataSourceUtil;
 /**
  * Provide one class that manages backwards compatibility as package names
  * are changed.  See https://sourceforge.net/p/autoplot/feature-requests/528/
- * This also implements future compatibility, where for the last release of
- * the v2016a branch, future .jy files will be reverse mapped back to its
- * names.
  * @author jbf
  */
 public class JythonRefactory {
@@ -99,6 +92,7 @@ public class JythonRefactory {
         m.put("org.virbo.imagedatasource", "org.autoplot.imagedatasource" );
         m.put("org.virbo.idlsupport", "org.autoplot.idlsupport" );
         m.put("org.virbo.jythonsupport", "org.autoplot.jythonsupport");
+        m.put("org","org");  //mark that some things under org will change.
         //m.put("zipfs", "org.das2.util.filesystem.zipfs");
         //forwardMap = new HashMap<>();
         //forwardMap = reverseMap(m);   
@@ -109,6 +103,25 @@ public class JythonRefactory {
     
     private static final Pattern IMPORT_REGEX= Pattern.compile("(\\s*)from(\\s+)([a-zA-Z0-9_.]+)(\\s+)import(\\s+)([a-zA-Z0-9_ ,]+)(\\s*)");
     private static final Pattern IMPORT_AS_REGEX= Pattern.compile("(\\s*)import(\\s+)([a-zA-Z0-9_.]+)(\\s*)((\\s+)as(\\s+)([a-zA-Z0-9_]+)(\\s*))?");
+    
+    private static String magicMatch( String p ) {
+        String n="";
+        String cl="";
+        String[] ss= p.split("\\.",-2);
+        int i= p.length();
+        for ( int k=ss.length; k>0; k-- ) {
+            String path= p.substring(0,i);
+            n= forwardMap.get(path);
+            if ( n==null ) {
+                i= i-ss[k-1].length()-1;
+            } else {
+                cl= p.substring(i);
+                p= path;
+                break;
+            }
+        }
+        return n+cl;
+    }
     
     /**
      * read in the stream, replacing import statements with new packages.
@@ -206,9 +219,22 @@ public class JythonRefactory {
                 } else {
                     if ( fullNameMap.size()>0 ) {
                         for ( Entry<String,String> e: fullNameMap.entrySet() ) {
-                            if ( line.contains(e.getKey() ) ) {
-                                line= line.replace( e.getKey(), e.getValue() );
+                            Pattern identifierP= Pattern.compile("([a-zA-Z0-9\\.\\_]+)");
+                            String skey= e.getKey(); //BUG need to prefix with space or chindex=0.
+                            int i= line.indexOf(skey);
+                            while ( i>-1 ) {
+                                Matcher matcher= identifierP.matcher(line.substring(i));
+                                if ( matcher.find() ) { // should be true
+                                    String mehave= matcher.group(1);
+                                    String mewant= magicMatch(mehave);
+                                    line= line.replace( mehave, mewant );
+                                    i= line.indexOf( skey, i+mewant.length() );
+                                } else {
+                                    logger.warning("something has gone terribly wrong at JythonRefactory line 233");
+                                    i= -1; //
+                                }
                             }
+                            
                         }
                     }
                     writer.println(line);
@@ -229,7 +255,11 @@ public class JythonRefactory {
         //URL url = new URL( "file:///home/jbf/project/juno/svn/studies/jbf/trajPlot/finalPlotSouth.jy" );
         //URL url = new URL( "file:///home/jbf/project/juno/svn/studies/jbf/u/george/20170207/junoPolarPlot.jy");
         //URL url = new URL("http://jfaden.net/~jbf/autoplot/rfe/528/rfe528.20160909.okay.jy");
-        URL url= new URL("file:/home/jbf/ct/hudson/script/test037/3577243.jy");
+        
+        System.err.println( magicMatch("org.virbo.autoplot.RenderType") );
+        
+        URL url = new URL("http://jfaden.net/~jbf/autoplot/rfe/528/orgImport.jy");
+        //URL url= new URL("file:/home/jbf/ct/hudson/script/test037/3577243.jy");
         InputStream in= fixImports( url.openStream() );
         BufferedReader r= new BufferedReader(new InputStreamReader(in));
         String line;
