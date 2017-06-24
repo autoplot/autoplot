@@ -70,7 +70,7 @@
 
     </resources> 
 
-    <application-desc  main-class="org.virbo.autoplot.AutoplotUI">
+    <application-desc  main-class="org.autoplot.AutoplotUI">
         <!-- see http://autoplot.org//developer#Command-Line_Arguments -->
         <argument>--nop</argument>   <!-- this is to support the jnlp-server, which can insert a starting value -->
     </application-desc>
