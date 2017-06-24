@@ -64,6 +64,20 @@ if [ "" = "$STOREPASS" ]; then
     set -x
 fi
 
+hasErrors=0
+
+function raiseerror {
+   echo '*****'
+   echo '*****'
+   echo '*****'
+   hasErrors=1
+}
+
+function compilef {
+   echo $JAVAC $JAVAARGS $1
+   if ! $JAVAC $JAVAARGS $1; then raiseerror; fi
+}
+
 if [ "" = "$CODEBASE" ]; then
     CODEBASE=NEED_CODEBASE_TO_BE_DEFINED_IN_COMPILE_SCRIPT
 fi
@@ -256,44 +270,44 @@ if [ $hasErrors -eq 1 ]; then
   exit 1 
 fi
 echo "only the first compile is echoed."
-if ! $JAVAC $JAVAARGS org/autoplot/state/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/scriptconsole/DumpRteExceptionHandler.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/JythonMain.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/help/AutoplotHelpViewer.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/AutoplotServer.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/AutoplotDataServer.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/das2/qds/util/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/pngwalk/PngWalkTool1.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/pngwalk/ImageResize.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/pngwalk/QualityControlPanel.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/das2/beans/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/das2/util/awt/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/das2/util/ExceptionHandler.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS test/endtoend/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/idlsupport/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/virbo/idlsupport/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/das2/system/NullPreferencesFactory.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/tca/UriTcaSource.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/das2/qds/NearestNeighborTcaFunction.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/qstream/filter/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/das2/event/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/das2/dataset/NoDataInIntervalException.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/qstream/filter/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/ScreenshotsTool.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/wgetfs/WGetFileSystemFactory.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/das2/fsm/FileStorageModelNew.java; then echo "\n\n****\n\n"; hasErrors=1; fi  # some scripts use this old name.
-if ! $JAVAC $JAVAARGS org/das2/math/filter/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi  
-if ! $JAVAC $JAVAARGS org/das2/components/DataPointRecorderNew.java; then echo "\n\n****\n\n"; hasErrors=1; fi  
-if ! $JAVAC $JAVAARGS org/das2/components/AngleSpectrogramSlicer.java; then echo "*****"; hasErrors=1; fi  
-if ! $JAVAC $JAVAARGS org/das2/graph/Auralizor.java; then echo "\n\n****\n\n"; hasErrors=1; fi  
-if ! $JAVAC $JAVAARGS org/das2/datum/Ratio.java; then echo "\n\n****\n\n"; hasErrors=1; fi  
-if ! $JAVAC $JAVAARGS org/das2/datum/RationalNumber.java; then echo "\n\n****\n\n"; hasErrors=1; fi  
-if ! $JAVAC $JAVAARGS org/das2/datum/SIUnits.java; then echo "\n\n****\n\n"; hasErrors=1; fi  
-if ! $JAVAC $JAVAARGS org/das2/qds/RepeatIndexDataSet.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/jythonsupport/ui/DataMashUp.java; then echo "\n\n****\n\n"; hasErrors=1; fi  
-if ! $JAVAC $JAVAARGS org/das2/util/*Formatter.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/util/jemmy/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/das2/qds/filters/*.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+compilef 'org/autoplot/state/*.java'
+compilef 'org/autoplot/scriptconsole/DumpRteExceptionHandler.java'
+compilef 'org/autoplot/JythonMain.java'
+compilef 'org/autoplot/help/AutoplotHelpViewer.java'
+compilef 'org/autoplot/AutoplotServer.java'
+compilef 'org/autoplot/AutoplotDataServer.java'
+compilef 'org/das2/qds/util/*.java'
+compilef 'org/autoplot/pngwalk/PngWalkTool1.java'
+compilef 'org/autoplot/pngwalk/ImageResize.java'
+compilef 'org/autoplot/pngwalk/QualityControlPanel.java'
+compilef 'org/das2/beans/*.java'
+compilef 'org/das2/util/awt/*.java'
+compilef 'org/das2/util/ExceptionHandler.java'
+compilef 'test/endtoend/*.java'
+compilef 'org/autoplot/idlsupport/*.java'
+compilef 'org/virbo/idlsupport/*.java'
+compilef 'org/das2/system/NullPreferencesFactory.java'
+compilef 'org/autoplot/tca/UriTcaSource.java'
+compilef 'org/das2/qds/NearestNeighborTcaFunction.java'
+compilef 'org/qstream/filter/*.java'
+compilef 'org/das2/event/*.java'
+compilef 'org/das2/dataset/NoDataInIntervalException.java'
+compilef 'org/qstream/filter/*.java'
+compilef 'org/autoplot/ScreenshotsTool.java'
+compilef 'org/autoplot/wgetfs/WGetFileSystemFactory.java'
+compilef 'org/das2/fsm/FileStorageModelNew.java'  # some scripts use this old name.
+compilef 'org/das2/math/filter/*.java'  
+compilef 'org/das2/components/DataPointRecorderNew.java'  
+compilef 'org/das2/components/AngleSpectrogramSlicer.java'
+compilef 'org/das2/graph/Auralizor.java'  
+compilef 'org/das2/datum/Ratio.java'  
+compilef 'org/das2/datum/RationalNumber.java'  
+compilef 'org/das2/datum/SIUnits.java'  
+compilef 'org/das2/qds/RepeatIndexDataSet.java'
+compilef 'org/autoplot/jythonsupport/ui/DataMashUp.java'  
+compilef 'org/das2/util/*Formatter.java'
+compilef 'org/autoplot/util/jemmy/*.java'
+compilef 'org/das2/qds/filters/*.java'
 
 cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
