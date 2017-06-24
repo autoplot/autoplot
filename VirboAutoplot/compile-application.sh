@@ -284,17 +284,98 @@ if [ $hasErrors -eq 1 ]; then
   exit 1 
 fi
 
-echo "setting version to \${AP_VERSION}=${AP_VERSION} in build.tag"
-cat temp-classes/META-INF/build.txt | sed "s/build.tag:/build.tag: ${AP_VERSION}/g" > temp-classes/META-INF/build.txt.1
-mv temp-classes/META-INF/build.txt.1 temp-classes/META-INF/build.txt
 
-echo "make jumbo jar file..."
-cd temp-classes
-mkdir -p ../dist/
-rm -f ../temp-src/MANIFEST.MF   # remove leftover signatures.
-echo "Main-Class: org.autoplot.AutoplotUI" > ../temp-src/MANIFEST.MF
-$JAR cmf ../temp-src/MANIFEST.MF ../dist/AutoplotAll.jar *
+if [ "$justCompile" = "1" ]; then
+  echo "justCompile set to 1, stopping"
+  exit 0
+else
+  echo "justCompile not set to 1, continue on"
+fi
+
+
+#Don't do this, since we modify the jnlp file to make a release.
+#echo "=== make signed jnlp file..."  # http://www.coderanch.com/t/554729/JNLP-Web-Start/java/Signing-JNLP-JNLP-INF-directory
+#mkdir temp-volatile-classes/JNLP-INF
+#cp dist/autoplot.jnlp temp-volatile-classes/JNLP-INF/APPLICATION.JNLP
+
+
+echo "=== make jumbo jar files..."
+mkdir -p dist/
+cd temp-volatile-classes
+echo " ==manifest=="
+cat ../temp-volatile-src/MANIFEST.MF
+echo " ==manifest=="
+${JAVA_HOME}/bin/jar cmf ../temp-volatile-src/MANIFEST.MF ../dist/AutoplotVolatile.jar *
 cd ..
 
-echo "done make jumbo jar file..."
+echo "done make jumbo jar files..."
+
+# See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5078608 "Digital signatures are invalid after unpacking"
+# See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6575373 "Error verifying signatures of pack200 files in some cases"
+# See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6351684 "pack200 doesn't work on/corrupts obfuscated files"
+echo "=== normalize jar file before signing..."
+${JAVA_HOME}/bin/pack200 --repack dist/AutoplotVolatile1.jar dist/AutoplotVolatile.jar
+${JAVA_HOME}/bin/pack200 --repack dist/AutoplotVolatile2.jar dist/AutoplotVolatile1.jar # http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6575373  Note this doesn't appear to have an effect.
+mv dist/AutoplotVolatile2.jar dist/AutoplotVolatile.jar
+rm dist/AutoplotVolatile1.jar
+
+echo "=== sign and pack the jar file..."
+echo "  use set +x to hide private info"
+#echo  ${JAVA_HOME}/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"
+set +x
+if ! ${JAVA_HOME}/bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"; then
+   echo "Fail to sign resources!"
+   exit 1
+fi
+set -x
+
+echo "=== verify the jar file..."
+${JAVA_HOME}/bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10
+
+echo "=== sign and pack the jar file..."
+${JAVA_HOME}/bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
+${JAVA_HOME}/bin/unpack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile_pack_gz.jar
+
+if ! ${JAVA_HOME}/bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10; then
+   echo "jarsigner verify failed on file dist/AutoplotVolatile.jar!"
+   exit 1
+fi
+
+echo "=== verify signed and unpacked jar file..."
+if ! ${JAVA_HOME}/bin/jarsigner -verify -verbose dist/AutoplotVolatile_pack_gz.jar | head -10; then
+   echo "jarsigner verify  failed on pack_gz file dist/AutoplotVolatile_pack_gz.jar!"
+   exit 1
+fi
+rm dist/AutoplotVolatile_pack_gz.jar
+
+echo "=== create jnlp file for build..."
+cp src/autoplot.jnlp dist
+
+echo "=== copy branding for release, such as png icon images"
+cp src/*.png dist
+cp src/*.gif dist  # mac Java7 has a bug where it can't use pngs for icons, use .gif instead.
+cp src/index.html dist  #TODO: why?
+
+echo "=== modify jar files for this particular release"
+cd temp-volatile-src
+compilef ../temp-volatile-classes external/FileSearchReplace.java
+cd ..
+${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
+${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/index.html '#{tag}' $TAG '#{codebase}' $CODEBASE
+
+# if these are needed.
+# These are needed for the single-jar build.
+#if [ $AP_KEEP_STABLE = 'T' ]; then
+mv AutoplotStable.jar.pack.gz dist/
+mv AutoplotStable.jar dist/
+#else
+#  rm AutoplotStable.jar.pack.gz
+#  rm AutoplotStable.jar
+#fi
+
+echo "copy htaccess.  htaccess must be moved to .htaccess to provide support for .pack.gz."
+cp src/htaccess.txt dist/
+
+# remove this proprietary font so that it isn't accidentally released.
+rm -f temp-volatile-classes/resources/scheme_bk.otf
 
