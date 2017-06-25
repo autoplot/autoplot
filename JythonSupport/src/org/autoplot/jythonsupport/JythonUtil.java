@@ -1209,6 +1209,13 @@ public class JythonUtil {
         }
         
         setParams( interp, params );
+        
+        try {
+            prog= JythonRefactory.fixImports(prog);
+        } catch (IOException ex) {
+            Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         interp.exec(prog);
         interp.exec("import autoplot2017 as autoplot\n");
         PyList sort= (PyList) interp.eval( "autoplot._paramSort" );
