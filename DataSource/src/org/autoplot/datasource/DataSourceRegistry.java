@@ -478,11 +478,14 @@ public class DataSourceRegistry {
      * register the data source factory by extension.  The name of the
      * factory class is given, so that the class is not accessed until first
      * use.
-     * @param className the class name of the factory. (e.g. "org.virbo.cdf.CdfJavaDataSourceFactory")
+     * @param className the class name of the factory. (e.g. "org.autoplot.cdf.CdfJavaDataSourceFactory")
      * @param extension the  extension (e.g. "cdf")
      * @param description a description of the format (e.g. "CDF files using java based reader")
      */
     public void registerExtension(String className, String extension, String description ) {
+        if ( className.contains("virbo") ) {
+            System.err.println("**** virbo found in "+className );
+        }
         extension= getExtension(extension);
         Object old= dataSourcesByExt.get(extension);
         if ( old!=null ) {
@@ -574,6 +577,9 @@ public class DataSourceRegistry {
 
         DataSourceFactory result;
         if (o instanceof String) {
+            System.err.println("*** getSource");
+            System.err.println("*** "+extension);
+            System.err.println("*** "+o);
             try {
                 if ( ((String)o).endsWith("DataSource") ) {
                     throw new IllegalArgumentException("DataSourceFactory names cannot end in DataSource: "+o);
