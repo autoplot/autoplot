@@ -83,6 +83,7 @@ public class JythonRefactory {
         m.put("org.virbo.datasource", "org.autoplot.datasource");
         m.put("org.autoplot.bufferdataset", "org.das2.qds.buffer");
         m.put("org.virbo.dsutil", "org.das2.qds.util");
+        m.put("org.virbo.dsops", "org.das2.qds.ops");
         m.put("org.virbo.filters", "org.das2.qds.filters");
         m.put("org.virbo.qstream", "org.das2.qstream");
         m.put("org.qstream.filter", "org.das2.qstream.filter");
@@ -265,7 +266,8 @@ public class JythonRefactory {
         
         System.err.println( magicMatch("org.virbo.autoplot.RenderType") );
         
-        URL url = new URL("http://jfaden.net/~jbf/autoplot/rfe/528/orgImport.jy");
+        //URL url = new URL("http://jfaden.net/~jbf/autoplot/rfe/528/orgImport.jy");
+        URL url = new URL("http://emfisis.physics.uiowa.edu/team/jyds/filterParm.jyds");
         //URL url= new URL("file:/home/jbf/ct/hudson/script/test037/3577243.jy");
         InputStream in= fixImports( url.openStream() );
         BufferedReader r= new BufferedReader(new InputStreamReader(in));
