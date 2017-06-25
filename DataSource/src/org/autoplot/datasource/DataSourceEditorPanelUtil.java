@@ -26,7 +26,7 @@ public class DataSourceEditorPanelUtil {
      * @throws IllegalArgumentException when the editor panel throws an exception.
      */
     public static DataSourceEditorPanel getDataSourceEditorPanel( JPanel parent, String uri ) {
-        logger.entering("org.virbo.datasource.DataSourceEditorPanelUtil", "getDataSourceEditorPanel");
+        logger.entering("org.autoplot.datasource.DataSourceEditorPanelUtil", "getDataSourceEditorPanel");
         DataSourceEditorPanel edit;
         edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel( uri );
         if ( edit==null ) {
@@ -44,7 +44,7 @@ public class DataSourceEditorPanelUtil {
                 throw new IllegalArgumentException(ex);
             }
         }
-        logger.exiting("org.virbo.datasource.DataSourceEditorPanelUtil", "getDataSourceEditorPanel");
+        logger.exiting("org.autoplot.datasource.DataSourceEditorPanelUtil", "getDataSourceEditorPanel");
         return edit;
     }
     

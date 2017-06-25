@@ -77,7 +77,7 @@ public interface DataSource {
     Map<String,Object> getProperties();
    
     /**
-     * cookie jar of capabilities, see org.virbo.datasource.capability.  Each capability can be 
+     * cookie jar of capabilities, see org.autoplot.datasource.capability.  Each capability can be 
      * queried, and either an object implementing the capability or null is returned.  Example
      * capabilities include:<table>
      * <tr><td>TimeSeriesBrowse</td><td>which allows the user to request data from a different interval. </td></tr>

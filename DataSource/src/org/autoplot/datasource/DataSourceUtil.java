@@ -51,8 +51,8 @@ import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
-//import org.virbo.qstream.SimpleStreamFormatter;
-//import org.virbo.qstream.StreamException;
+//import org.autoplot.qstream.SimpleStreamFormatter;
+//import org.autoplot.qstream.StreamException;
 
 /**
  *
@@ -790,7 +790,7 @@ public class DataSourceUtil {
     }
 
     /**
-     * See VirboAutoplot org.virbo.autoplot.AutoplotUtil.guessRenderType.
+     * See VirboAutoplot org.autoplot.AutoplotUtil.guessRenderType.
      * @param fillds
      * @return
      */

@@ -70,7 +70,7 @@ public class DataSourceRegistry {
 
     /**
      * get an instance of a class given the class name.
-     * @param o the class name, e.g. org.virbo.netCDF.HDF5DataSourceFormatEditorPanel
+     * @param o the class name, e.g. org.autoplot.netCDF.HDF5DataSourceFormatEditorPanel
      * @return an instance of the class.
      */
     public static Object getInstanceFromClassName( String o ) {
@@ -537,7 +537,7 @@ public class DataSourceRegistry {
 
     /**
      * register the data source factory by extension and mime
-     * @param className the class name of the factory. (e.g. "org.virbo.cdf.CdfJavaDataSourceFactory")
+     * @param className the class name of the factory. (e.g. "org.autoplot.cdf.CdfJavaDataSourceFactory")
      * @param extension the  extension (e.g. "cdf")
      * @param mime for example "application/x-das2stream"
      */

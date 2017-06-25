@@ -41,8 +41,8 @@ public interface DataSourceFactory {
      * return additional tools for creating valid URIs, such as TimeSeriesBrowse.  This may soon include
      * a file selector, and an automatic GUI created from the completions model.
      * @param <T>
-     * @param clazz the class, such as org.virbo.datasource.capability.TimeSeriesBrowse
-     * @return the capability, such as an instance of org.virbo.datasource.capability.TimeSeriesBrowse
+     * @param clazz the class, such as org.autoplot.datasource.capability.TimeSeriesBrowse
+     * @return the capability, such as an instance of org.autoplot.datasource.capability.TimeSeriesBrowse
      */
     public <T> T getCapability( Class<T> clazz );
     

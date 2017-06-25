@@ -903,7 +903,7 @@ public class URISplit {
      * @param resourceUri null or the resource uri, such as "http://www-pw.physics.uiowa.edu/das/das2Server"
      * @param args null or a map of arguments, including "arg_0" for a positional argument.  
      * @return the URI.  If vapScheme is null, then the URI will be implicit.
-     * @see org.virbo.jythonsupport#uri
+     * @see org.autoplot.jythonsupport#uri
      */
     public static String format( String vapScheme, String resourceUri, Map<String,Object> args ) {
         Map<String,String> largs;
