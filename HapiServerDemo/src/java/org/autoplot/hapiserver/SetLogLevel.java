@@ -1,5 +1,5 @@
 
-package org.virbo.autoplot;
+package org.autoplot.hapiserver;
 
 import java.io.IOException;
 import java.io.PrintWriter;
