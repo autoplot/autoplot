@@ -263,7 +263,7 @@ public class ApplicationModel {
      * allow inspection of dataset.
      * @param ds
      */
-    void setDataSet(QDataSet ds) {
+    public void setDataSet(QDataSet ds) {
         dom.getController().getPlotElement().getController().setResetRanges(true);
         dom.getController().getDataSourceFilter().getController().setDataSource(null);
         dom.getController().getDataSourceFilter().setUri("vap+internal:");
