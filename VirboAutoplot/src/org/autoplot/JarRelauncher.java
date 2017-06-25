@@ -26,7 +26,7 @@ public class JarRelauncher {
         if ( System.getProperty("os.family").equals("Windows") ) {
             String javaPath = System.getProperty("java.home") + "\\bin\\java.exe";
             try {
-                Runtime.getRuntime().exec("\\" + javaPath + " -Xmx1000M -jar " + myPath + "autoplot.jar org.virbo.autoplot.AutoplotUI");
+                Runtime.getRuntime().exec("\\" + javaPath + " -Xmx1000M -jar " + myPath + "autoplot.jar org.autoplot.AutoplotUI");
             } catch (IOException ex) {
                 Logger.getLogger(JarRelauncher.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
             }
