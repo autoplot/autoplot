@@ -4,7 +4,7 @@ package org.autoplot.hapiserver;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.json.JSONObject;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 
 /**
  *

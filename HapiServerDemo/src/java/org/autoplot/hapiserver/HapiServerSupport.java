@@ -20,7 +20,7 @@ import org.das2.datum.Units;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.QDataSet;
 
 /**
  *

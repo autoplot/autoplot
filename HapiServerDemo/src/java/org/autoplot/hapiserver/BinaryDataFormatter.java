@@ -13,11 +13,11 @@ import org.das2.datum.Units;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
-import org.virbo.qstream.AsciiTimeTransferType;
-import org.virbo.qstream.TransferType;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
+import org.das2.qstream.AsciiTimeTransferType;
+import org.das2.qstream.TransferType;
 
 /**
  * Format to doubles.

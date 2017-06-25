@@ -24,16 +24,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.das2.datum.Datum;
-import org.virbo.datasource.RecordIterator;
+import org.autoplot.datasource.RecordIterator;
 import org.das2.datum.DatumRange;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dsops.Ops;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
+import org.das2.qds.ops.Ops;
 
 /**
  *

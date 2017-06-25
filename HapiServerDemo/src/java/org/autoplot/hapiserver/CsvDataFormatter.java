@@ -8,13 +8,12 @@ import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.datum.format.DatumFormatter;
-import org.das2.datum.format.DefaultDatumFormatter;
 import org.das2.datum.format.EnumerationDatumFormatter;
 import org.das2.datum.format.TimeDatumFormatter;
 import org.das2.util.NumberFormatUtil;
 import org.json.JSONObject;
-import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.QDataSet;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
 
 /**
  * Comma Separated Value (CSV) formatter
