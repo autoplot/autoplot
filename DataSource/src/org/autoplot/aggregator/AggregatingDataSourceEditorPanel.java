@@ -175,7 +175,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
         jButton2.setText("jButton2");
 
-        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/help.png"))); // NOI18N
+        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/help.png"))); // NOI18N
         jButton3.setToolTipText("Help for this component\n");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -188,7 +188,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         delegateTextField.setText("example file used for editing goes here.");
         delegateTextField.setToolTipText("this only indicates the delegate file used to edit the rest of the URI above");
 
-        timeRangeToolButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/calendar.png"))); // NOI18N
+        timeRangeToolButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/calendar.png"))); // NOI18N
         timeRangeToolButton.setToolTipText("Time Range Tool");
         timeRangeToolButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
