@@ -260,7 +260,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 }
 
                 interp.set("PWD",split.path);
-                interp.exec("import autoplot");
+                interp.exec("import autoplot2017 as autoplot");
                 interp.exec("autoplot.params=dict()");
                 for ( Entry<String,String> e : paramsl.entrySet()) {
                     String s= e.getKey();
