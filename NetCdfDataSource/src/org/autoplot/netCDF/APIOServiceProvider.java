@@ -36,7 +36,7 @@ public class APIOServiceProvider extends AbstractIOSP implements IOServiceProvid
     
     @Override
     public boolean isValidFile(RandomAccessFile arg0) throws IOException {
-        return false; // must refer via iosp="org.virbo.netcdf.APIOServiceProvider"
+        return false; // must refer via iosp="org.autoplot.netcdf.APIOServiceProvider"
     }
 
     QDataSet result;
