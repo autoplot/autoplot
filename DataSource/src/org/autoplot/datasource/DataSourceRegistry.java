@@ -483,9 +483,6 @@ public class DataSourceRegistry {
      * @param description a description of the format (e.g. "CDF files using java based reader")
      */
     public void registerExtension(String className, String extension, String description ) {
-        if ( className.contains("virbo") ) {
-            System.err.println("**** virbo found in "+className );
-        }
         extension= getExtension(extension);
         Object old= dataSourcesByExt.get(extension);
         if ( old!=null ) {
@@ -577,9 +574,6 @@ public class DataSourceRegistry {
 
         DataSourceFactory result;
         if (o instanceof String) {
-            System.err.println("*** getSource");
-            System.err.println("*** "+extension);
-            System.err.println("*** "+o);
             try {
                 if ( ((String)o).endsWith("DataSource") ) {
                     throw new IllegalArgumentException("DataSourceFactory names cannot end in DataSource: "+o);
