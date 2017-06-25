@@ -84,7 +84,7 @@ public class AutoplotDataServer {
         boolean someValid= false;
 
         if (!timeRange.equals("")) {
-            logger.fine("org.virbo.jythonsupport.Util.getDataSet( suri,timeRange ):");
+            logger.fine("org.autoplot.jythonsupport.Util.getDataSet( suri,timeRange ):");
             logger.log(Level.FINE, "   suri={0}", suri);
             logger.log(Level.FINE, "   timeRange={0}", timeRange);
 
@@ -163,7 +163,7 @@ public class AutoplotDataServer {
 
         } else {
             // TODO: consider the virtue of allowing this, where a timerange is not specified.
-            logger.fine("org.virbo.jythonsupport.Util.getDataSet( suri ):");
+            logger.fine("org.autoplot.jythonsupport.Util.getDataSet( suri ):");
             logger.log( Level.FINE, "   suri={0}\n", suri );
 
             ds = org.autoplot.jythonsupport.Util.getDataSet(suri,mon);
@@ -314,7 +314,7 @@ public class AutoplotDataServer {
 
     public static void main(String[] args) throws Exception {
 
-        System.err.println("org.virbo.autoplot.AutoplotDataServer 20160309 (Autoplot version " + APSplash.getVersion() + ")" );
+        System.err.println("org.autoplot.AutoplotDataServer 20160309 (Autoplot version " + APSplash.getVersion() + ")" );
 
         ArgumentList alm = new ArgumentList("AutoplotDataServer");
         alm.addOptionalSwitchArgument("uri", "u", "uri", "", "URI to plot");
