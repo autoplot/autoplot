@@ -217,7 +217,7 @@ public class Test032 {
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
-            DataSourceRegistry.getInstance().registerExtension( "org.virbo.cdf.CdfJavaDataSourceFactory", "cdf", "CDF files using java based reader" );
+            DataSourceRegistry.getInstance().registerExtension( "org.autoplot.cdf.CdfJavaDataSourceFactory", "cdf", "CDF files using java based reader" );
 
             Test012.main( new String[] { "032" } );
 
