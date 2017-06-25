@@ -17,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.autoplot.jythonsupport.JythonRefactory;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.format.TimeDatumFormatter;
 import org.python.util.PythonInterpreter;
@@ -143,6 +144,7 @@ public class ScriptServlet extends HttpServlet {
             LoggingOutputStream los2= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO ); 
             ScriptContext._setOutputStream( los2 ); 
             
+            script= JythonRefactory.fixImports(script);
             interp.exec(script);
             
             try { los1.close(); } catch ( IOException ex ) {}

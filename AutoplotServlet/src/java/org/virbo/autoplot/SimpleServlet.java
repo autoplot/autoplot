@@ -161,11 +161,6 @@ public class SimpleServlet extends HttpServlet {
 
         logger.fine("=======================");
 
-        //register java cdf as .cdf handler
-        if ( DataSourceRegistry.getInstance().getSource("cdf")==null ) {
-            DataSourceRegistry.getInstance().registerExtension( "org.virbo.cdf.CdfJavaDataSourceFactory", "cdf", "cdf files read by the Java CDF reader" );
-        }
-
         long t0 = System.currentTimeMillis();
         String suniq = request.getParameter("requestId");
         long uniq;
@@ -429,8 +424,8 @@ public class SimpleServlet extends HttpServlet {
                     appmodel.doOpenVap(openable, params);
                 }
                 logit("opened vap", t0, uniq, debug);
-                width = appmodel.dom.getCanvases(0).getWidth();
-                height = appmodel.dom.getCanvases(0).getHeight();
+                width = appmodel.getDocumentModel().getCanvases(0).getWidth();
+                height = appmodel.getDocumentModel().getCanvases(0).getHeight();
                 DasCanvas c = dom.getController().getCanvas().getController().getDasCanvas();
                 c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
             }
@@ -705,7 +700,7 @@ public class SimpleServlet extends HttpServlet {
                     case "image/png":
                         logger.log(Level.FINE, "time to create image: {0} ms", ( System.currentTimeMillis()-t0 ));
                         try {
-                            appmodel.canvas.writeToPng( out, width, height );
+                            appmodel.getCanvas().writeToPng( out, width, height );
                             
                         } catch (IOException ioe) {
                             logger.log( Level.SEVERE, ioe.toString(), ioe );
@@ -725,19 +720,19 @@ public class SimpleServlet extends HttpServlet {
                         
                     case "application/pdf":  
                         logit("do prepareForOutput", t0, uniq, debug);
-                        appmodel.canvas.prepareForOutput(width, height);
+                        appmodel.getCanvas().prepareForOutput(width, height);
                         logit("done with prepareForOutput", t0, uniq, debug);
                         GraphicsOutput go = new org.das2.util.awt.PdfGraphicsOutput();
-                        appmodel.canvas.writeToGraphicsOutput(out, go);
+                        appmodel.getCanvas().writeToGraphicsOutput(out, go);
                         logit("done with write to output", t0, uniq, debug);
                         break;
                         
                     case "image/svg+xml":
                         logit("do prepareForOutput...", t0, uniq, debug);
-                        appmodel.canvas.prepareForOutput(width, height);
+                        appmodel.getCanvas().prepareForOutput(width, height);
                         logit("done with prepareForOutput", t0, uniq, debug);
                         GraphicsOutput gos = new org.das2.util.awt.SvgGraphicsOutput();
-                        appmodel.canvas.writeToGraphicsOutput(out, gos);
+                        appmodel.getCanvas().writeToGraphicsOutput(out, gos);
                         logit("done with write to output", t0, uniq, debug);
                         break;
                         
