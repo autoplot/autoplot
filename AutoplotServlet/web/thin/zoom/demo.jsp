@@ -6,8 +6,8 @@
 
 <%@page import="java.io.FilenameFilter"%>
 <%@page import="java.io.File"%>
-<%@page import="org.virbo.autoplot.ServletUtil"%>
-<%@page import="org.virbo.autoplot.SimpleServlet"%>
+<%@page import="org.autoplot.servlet.ServletUtil"%>
+<%@page import="org.autoplot.servlet.SimpleServlet"%>
 <%@page import="java.net.URLEncoder"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">

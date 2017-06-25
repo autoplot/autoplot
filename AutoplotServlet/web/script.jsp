@@ -25,7 +25,7 @@
     WARNING: This allows arbitrary code to be executed on the server, so this
     should not be left on and should not be advertised.  We try to guard against attacks with
     taint-checking (for example, imports are not allowed nor formatDataSet,
-    <a target="_blank" href="https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/AutoplotServlet/src/java/org/virbo/autoplot/ScriptServlet.java">etc</a>)
+    <a target="_blank" href="https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/AutoplotServlet/src/java/org/autoplot/servlet/ScriptServlet.java">etc</a>)
     but this is not thorough.
     Scripts are logged in /tmp/autoplotservlet or the location indicated in the environment variable AUTOPLOT_SERVLET_HOME.
     The file AUTOPLOT_SERVLET_HOME/allowhosts can be used
@@ -36,8 +36,8 @@
     <p>Note there are issues with the design right now, and this lacks abusive testing!</p>
 
     Documentation:
-    <a href="http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/ws/doc/org/virbo/autoplot/ScriptContext.html">Script Context</a>
-    <a href="https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/JythonSupport/src/org/virbo/jythonsupport/imports.py">Imported Codes</a>
+    <a href="http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/ws/doc/org/autoplot/ScriptContext.html">Script Context</a>
+    <a href="https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/JythonSupport/src/imports2017.py">Imported Codes</a>
     <br><br>
     
     <form action="ScriptServlet" method="POST">

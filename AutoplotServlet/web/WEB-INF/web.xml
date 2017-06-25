@@ -4,43 +4,43 @@
     <display-name>Autoplot Servlet</display-name>
     <listener>
         <description>Shuts down RequestProcessor threads</description>
-        <listener-class>org.virbo.autoplot.ShutdownListener</listener-class>
+        <listener-class>org.autoplot.servlet.ShutdownListener</listener-class>
     </listener>
     <servlet>
         <servlet-name>SimpleServlet</servlet-name>
-        <servlet-class>org.virbo.autoplot.SimpleServlet</servlet-class>
+        <servlet-class>org.autoplot.servlet.SimpleServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ScriptServlet</servlet-name>
-        <servlet-class>org.virbo.autoplot.ScriptServlet</servlet-class>
+        <servlet-class>org.autoplot.servlet.ScriptServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>SetLogLevel</servlet-name>
-        <servlet-class>org.virbo.autoplot.SetLogLevel</servlet-class>
+        <servlet-class>org.autoplot.servlet.SetLogLevel</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>SecureScriptServlet</servlet-name>
-        <servlet-class>org.virbo.autoplot.SecureScriptServlet</servlet-class>
+        <servlet-class>org.autoplot.servlet.SecureScriptServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>CdawebVapServlet</servlet-name>
-        <servlet-class>org.virbo.autoplot.CdawebVapServlet</servlet-class>
+        <servlet-class>org.autoplot.servlet.CdawebVapServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>JnlpServlet</servlet-name>
-        <servlet-class>org.virbo.autoplot.JnlpServlet</servlet-class>
+        <servlet-class>org.autoplot.servlet.JnlpServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>CompletionsServlet</servlet-name>
-        <servlet-class>org.virbo.autoplot.CompletionsServlet</servlet-class>
+        <servlet-class>org.autoplot.servlet.CompletionsServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ServletInfo</servlet-name>
-        <servlet-class>org.virbo.autoplot.ServletInfo</servlet-class>
+        <servlet-class>org.autoplot.servlet.ServletInfo</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>URITemplatesServlet</servlet-name>
-        <servlet-class>org.virbo.autoplot.URITemplatesServlet</servlet-class>
+        <servlet-class>org.autoplot.servlet.URITemplatesServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>SimpleServlet</servlet-name>
