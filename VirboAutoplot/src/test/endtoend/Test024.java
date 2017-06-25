@@ -11,7 +11,6 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ConsoleTextProgressMonitor;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.ScriptContext;
 import org.das2.qds.DataSetUtil;
@@ -28,7 +27,7 @@ public class Test024 {
 
     public static void example1() throws Exception {
         System.err.println( "\n= example1 =\n");
-        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        org.autoplot.idlsupport.APDataSet apds  = new org.autoplot.idlsupport.APDataSet();
         apds.setDataSetURI("http://www.autoplot.org/data/swe-np.xls?column=data&depend0=dep0");
         apds.doGetDataSet();
         System.err.println( apds.toString() );
@@ -42,7 +41,7 @@ public class Test024 {
 
     public static void example2() throws Exception {
         System.err.println( "\n= example2 =\n");
-        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        org.autoplot.idlsupport.APDataSet apds  = new org.autoplot.idlsupport.APDataSet();
         apds.setDataSetURI("vap+inline:ripples(20)");
         apds.doGetDataSet();
         System.err.println( apds.toString() );
@@ -62,12 +61,12 @@ public class Test024 {
 
     public static void example3() throws Exception {
         System.err.println( "\n= example3 =\n");
-        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        org.autoplot.idlsupport.APDataSet apds  = new org.autoplot.idlsupport.APDataSet();
         apds.setDataSetURI("vap:file:///home/jbf/ct/hudson/data.backup/xls/hourlyForecast.xls?column=Temperature_F&depend0=Rel_Humidity_");
         apds.doGetDataSet();
         System.err.println( apds.toString() );
 
-        apds  = new org.virbo.idlsupport.APDataSet();
+        apds  = new org.autoplot.idlsupport.APDataSet();
         apds.setDataSetURI("vap+das2server:http://www-pw.physics.uiowa.edu/das/das2Server?dataset=das2_1/cassini/cassiniLrfc&key=33696757&start_time=2010-01-11T11:15:00.000Z&end_time=2010-01-11T21:45:00.000Z&-lfdr+ExEw+-mfdr+ExEw+-mfr+13ExEw+-hfr+ABC12EuEvEx+-n+hfr_snd+-n+lp_rswp+-n+bad_data+-n+dpf_zero+-n+mfdr_mfr2+-n+mfr3_hfra+-n+hf1_hfrc+-a+-b+30+-bgday=" );
 
         apds.doGetDataSet();
@@ -94,7 +93,7 @@ public class Test024 {
 
     public static void example4() throws Exception {
         System.err.println( "\n= example4 =\n");
-        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        org.autoplot.idlsupport.APDataSet apds  = new org.autoplot.idlsupport.APDataSet();
         apds.setDataSetURI("vap+inline:ripples(20)");
         apds.doGetDataSet();
 
@@ -123,7 +122,7 @@ public class Test024 {
     public static void example5() throws InterruptedException, IOException {
         
         System.err.println( "\n= example5 =\n");
-        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        org.autoplot.idlsupport.APDataSet apds  = new org.autoplot.idlsupport.APDataSet();
         apds.setDataSetURI("http://acdisc.gsfc.nasa.gov/opendap/HDF-EOS5/Aura_OMI_Level3/OMAEROe.003/2005/OMI-Aura_L3-OMAEROe_2005m0101_v003-2011m1109t081947.he5.dds?lat");
         apds.doGetDataSet();
         if ( apds.getStatus()!=0 ) {
@@ -151,7 +150,7 @@ public class Test024 {
      */
     public static void example6() throws Exception {
         System.err.println( "\n= example6 =\n");
-        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        org.autoplot.idlsupport.APDataSet apds  = new org.autoplot.idlsupport.APDataSet();
         apds.setDataSetURI("vap+h5:file:///home/jbf/data.backup/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?Flux");
         apds.doGetDataSet();
         if ( apds.getStatus()!=0 ) {
@@ -208,7 +207,7 @@ public class Test024 {
         
         long t0= System.currentTimeMillis();
 
-        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        org.autoplot.idlsupport.APDataSet apds  = new org.autoplot.idlsupport.APDataSet();
         apds.setDataSetURI( TestSupport.TEST_HOME+"data.backup/cdf/rbsp-a_magnetometer_hires-sm_emfisis-L3_$Y$m$d_v$(v,sep).cdf?coordinates&timerange="+range );
 
         System.err.println( "t05: "+ (System.currentTimeMillis()-t0)/1000. + " seconds" );
@@ -234,7 +233,7 @@ public class Test024 {
      */
     public static void test9() throws Exception {
         System.err.println( "\n= test9 =\n");
-        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        org.autoplot.idlsupport.APDataSet apds  = new org.autoplot.idlsupport.APDataSet();
         apds.setDataSetURI( TestSupport.TEST_HOME+"data.backup/cdf/rbsp-a_WFR-waveform-continuous-burst-magnitude_emfisis-L4_20140117T00_v1.3.2.cdf?Epoch" );
         //apds.setDataSetURI( "/home/jbf/tmp/rbsp-a_WFR-waveform-continuous-burst-magnitude_emfisis-L4_20140117T00_v1.3.2.cdf?Epoch" );
         
@@ -273,7 +272,7 @@ public class Test024 {
             tsb.setTimeRange(dr);
             uri= tsb.getURI();
         }
-        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        org.autoplot.idlsupport.APDataSet apds  = new org.autoplot.idlsupport.APDataSet();
         apds.setDataSetURI(uri);
         apds.doGetDataSet();
         if ( apds.getStatus()!=0 ) {
@@ -293,11 +292,12 @@ public class Test024 {
     /**
      * test use with HAPI server
      * 
+     * @throws java.lang.Exception
      */
     public static void test10() throws Exception {
         System.err.println( "\n= test10 =\n");        
         String uri= "vap+hapi:http://jfaden.net/HapiServerDemo/hapi?id=Iowa+City+Conditions&parameters=Time,Temperature,Humidity,Pressure&timerange=2017-May";
-        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        org.autoplot.idlsupport.APDataSet apds  = new org.autoplot.idlsupport.APDataSet();
         apds.loadDataSet(uri);
         apds.setFillDouble(0);
         System.err.println( apds.toString() );
@@ -325,7 +325,7 @@ public class Test024 {
      */    
     public static void testFilters() throws Exception {
         System.err.println( "\n= testFilters =\n");
-        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        org.autoplot.idlsupport.APDataSet apds  = new org.autoplot.idlsupport.APDataSet();
         apds.setDataSetURI("http://emfisis.physics.uiowa.edu/Flight/RBSP-B/Quick-Look/2015/04/04/rbsp-b_WFR-waveform-continuous-burst_emfisis-Quick-Look_20150404T16_v1.4.1.cdf?BuSpec");
         apds.setFilter("|histogram()");
         ProgressMonitor mon= new ConsoleTextProgressMonitor();
@@ -346,7 +346,7 @@ public class Test024 {
      */
     public static void testAuth() throws InterruptedException {
         System.err.println( "\n= testAuth =\n");
-        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        org.autoplot.idlsupport.APDataSet apds  = new org.autoplot.idlsupport.APDataSet();
         apds.loadDataSet("vap+das2Server:http://jupiter.physics.uiowa.edu/das/server?end_time=2015-05-22T00:00:00.000Z&start_time=2015-05-21T00:00:00.000Z&dataset=Juno/WAV/Survey");
         if ( apds.getStatus()==0 ) {
             System.err.println( apds.toString() );
