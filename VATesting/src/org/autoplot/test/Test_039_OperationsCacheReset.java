@@ -8,6 +8,7 @@ package org.autoplot.test;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.TestOut;
@@ -24,6 +25,7 @@ import org.autoplot.AutoplotUI;
 import org.autoplot.ScriptContext;
 import static org.autoplot.ScriptContext.save;
 import static org.autoplot.ScriptContext.writeToPng;
+import org.das2.qds.filters.ReducexFilterEditorPanel;
 import util.FiltersTreePicker;
 import util.RegexComponentChooser;
 
@@ -38,6 +40,9 @@ public class Test_039_OperationsCacheReset implements Scenario {
 
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
 
+        ReducexFilterEditorPanel x= new ReducexFilterEditorPanel();
+        System.err.println( "*** " + x.getPanel() );
+        
         try {
             
             ScriptContext.createGui();
