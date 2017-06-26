@@ -257,8 +257,9 @@ echo "done copy help files."
 
 hasErrors=0
 
-JAVAARGS="-g -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10"
-
+#JAVAARGS="-g -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10"
+#JAVAARGS="-g -target 1.7 -source 1.7 -Xlint:unchecked -bootclasspath $JAVA_HOME/jre/lib/rt.jar -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10"
+JAVAARGS="-g -target 1.7 -source 1.7 -bootclasspath $JAVA_HOME/jre/lib/rt.jar -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10"
 # compile key java classes.  These contain references that cause all needed Java classes to be compiled in.
 echo "=== compile sources..."
 cd temp-volatile-src
