@@ -6,7 +6,7 @@
    
     <information> 
         <title>*</title>
-        <vendor>http://virbo.org/</vendor>
+        <vendor>http://autoplot.org/</vendor>
 	<homepage href="http://autoplot.org/" />
         <description>plots data from various sources, such as opendap, cdf, and netcdf using das2</description> 
         <description kind="short">data plotter</description> 
@@ -50,7 +50,7 @@
         
     </resources> 
 
-    <application-desc  main-class="org.virbo.autoplot.AutoplotUI">
+    <application-desc  main-class="org.autoplot.AutoplotUI">
         <!-- see http://autoplot.org//developer#Command-Line_Arguments -->
         <argument>*</argument>  <!-- this is to support the jnlp-server, which can insert a starting value -->
     </application-desc>
