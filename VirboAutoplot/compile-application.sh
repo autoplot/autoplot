@@ -98,6 +98,9 @@ if [ "" = "$AWK" ]; then
     AWK=awk
 fi
 
+echo "CODEBASE="
+echo $CODEBASE
+
 rm -r -f temp-volatile-src/
 mkdir temp-volatile-src/
 rm -r -f temp-volatile-classes/
