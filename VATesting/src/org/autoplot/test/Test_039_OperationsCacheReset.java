@@ -52,6 +52,10 @@ public class Test_039_OperationsCacheReset implements Scenario {
             Thread.sleep(500);
             new JMenuBarOperator(mainFrame).pushMenu("Options|Enable Feature|Data Panel", "|");
             
+            Thread.sleep(300);
+            
+            new JMenuBarOperator(mainFrame).pushMenu("Options|Enable Feature|Log Console", "|");
+            
             Thread.sleep(500);
             
             // plot first test dataset
