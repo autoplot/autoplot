@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ import org.autoplot.datasource.LogNames;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import static org.autoplot.datasource.jython.JythonDataSource.PARAM_SCRIPT;
+import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.PyQDataSet;
 
@@ -83,7 +85,9 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         try {
 
             mon.setLabel("Executing script to get names."); // warn of this slow, inefficient, and risky behavior.    
-            interp.execfile(new FileInputStream(src),src.getName());
+            InputStream in = new FileInputStream(src);
+            in= JythonRefactory.fixImports(in);
+            interp.execfile(in,src.getName());
 
             PyStringMap map = ((PyStringMap) interp.getLocals());
             PyList list = map.keys();

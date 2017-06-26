@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.LineNumberReader;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -51,6 +52,7 @@ import org.autoplot.datasource.capability.Caching;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
 import org.autoplot.jythonsupport.JythonOps;
+import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.PyQDataSet;
 
@@ -302,8 +304,9 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                         fr.close();
 
                     } else {
-                        FileInputStream in = new FileInputStream( jythonScript );
+                        InputStream in = new FileInputStream( jythonScript );
                         try {
+                            in= JythonRefactory.fixImports(in);
                             interp.execfile(in,jythonScript.getName());
                         } catch ( PyException ex ) {
                             if ( ex.toString().contains("checkForComodification") ) {
@@ -311,6 +314,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                                 in = new FileInputStream( jythonScript );
                                 logger.warning("avoiding second strange concurrent modification bug that occurs within Jython on the server.  Run the whole thing again.");
                                 Thread.sleep(200);
+                                in= JythonRefactory.fixImports(in);
                                 interp.execfile(in,jythonScript.getName());
                             } else {
                                 throw ex; // This exception is caught again 6 lines down
