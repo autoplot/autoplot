@@ -173,7 +173,7 @@ else
    rm -rf temp-volatile-classes/JNLP-INF/
 fi
 
-printf "Main-Class: org.virbo.autoplot.AutoplotUI\nPermissions: all-permissions\nCodebase: autoplot.org apps-pw.physics.uiowa.edu\nApplication-Name: Autoplot\n" > temp-volatile-src/MANIFEST.MF
+printf "Main-Class: org.autoplot.AutoplotUI\nPermissions: all-permissions\nCodebase: autoplot.org apps-pw.physics.uiowa.edu\nApplication-Name: Autoplot\n" > temp-volatile-src/MANIFEST.MF
 
 # remove signatures
 rm -f temp-volatile-classes/META-INF/*.RSA
