@@ -49,16 +49,20 @@ public class QualityControlPanel extends javax.swing.JPanel {
         // 1.5 and earlier don't allow you to clear a button group, so we hack it with an invisible button
         nullRadioButton = new JRadioButton();
         statusButtonGroup.add(nullRadioButton);  //add to button group, but not to UI
-        nullRadioButton.addItemListener(new ItemListener() {
+        ItemListener l= new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if ( qcRecord==null || e.getStateChange() == ItemEvent.SELECTED ) {
-                    okButton.setEnabled(false);
+                if ( okRadioButton.isSelected() || problemRadioButton.isSelected() || ignoreRadioButton.isSelected() ) {
+                    saveButton.setEnabled(true);
                 } else {
-                    okButton.setEnabled(true);
+                    saveButton.setEnabled(false);
                 }
             }
-        });
+        };
+        nullRadioButton.addItemListener(l);
+        okRadioButton.addItemListener(l);
+        problemRadioButton.addItemListener(l);
+        ignoreRadioButton.addItemListener(l);
         statusButtonGroup.setSelected(nullRadioButton.getModel(), true);
         
     }
@@ -147,10 +151,17 @@ public class QualityControlPanel extends javax.swing.JPanel {
                 }
                 walkImageSequence.setQCFolder( DataSetURI.getResourceURI(sequenceProperties.getProperty(KEY_QUALITY_CONTROL_URI, path)) );
 
-                for ( Enumeration<AbstractButton> e= statusButtonGroup.getElements(); e.hasMoreElements(); ) {
-                    e.nextElement().setEnabled(false);
+                QualityControlSequence qseq= walkImageSequence.getQualityControlSequence();
+                int index= walkImageSequence.getIndex(); // DANGER: see repeat code
+                if ( qseq==null || qseq.getQualityControlRecord(index)!=null ) {
+                    saveButton.setEnabled(true);
+                    setStateButtonedEnabled(true);
+                } else {
+                    saveButton.setEnabled(false);
+                    setStateButtonedEnabled(false);
                 }
-                okButton.setEnabled(false);
+                          
+                setStateButtonedEnabled(false);      
                 loginButton.setEnabled(true);
                 
             } catch (FileNotFoundException ex) {
@@ -177,16 +188,14 @@ public class QualityControlPanel extends javax.swing.JPanel {
                     FileSystem fs= FileSystem.create(uri);
                     WriteCapability w= fs.getFileObject("testwrite.txt").getCapability(WriteCapability.class);
                     if ( w!=null && w.canWrite() ) {
-                        for ( Enumeration<AbstractButton> e= statusButtonGroup.getElements(); e.hasMoreElements(); ) {
-                            e.nextElement().setEnabled(true);
-                        }
-                        okButton.setEnabled(false);
+                        setStateButtonedEnabled(true);
+                        saveButton.setEnabled(true);
                         loginButton.setEnabled(false);        
                     } else {
                         //JOptionPane.showMessageDialog( QualityControlPanel.this,"<html>Unable to write to File System<br>"+fs.getRootURI() );
                         loginButton.setEnabled(false);    
                         loginButton.setToolTipText("<html>Unable to write to File System<br>"+fs.getRootURI());
-                        okButton.setEnabled(false);
+                        saveButton.setEnabled(false);
                         sequencePropertiesHost.setText( uri.toString() + " -- " + "Unable to write to file system" );
                     }
                 } catch ( FileSystem.FileSystemOfflineException | UnknownHostException | FileNotFoundException ex) {
@@ -254,7 +263,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
         okRadioButton = new javax.swing.JRadioButton();
         problemRadioButton = new javax.swing.JRadioButton();
         ignoreRadioButton = new javax.swing.JRadioButton();
-        okButton = new javax.swing.JButton();
+        saveButton = new javax.swing.JButton();
         loginButton = new javax.swing.JButton();
         sequencePropertiesHost = new javax.swing.JTextField();
         commentSplitPane = new javax.swing.JSplitPane();
@@ -302,12 +311,12 @@ public class QualityControlPanel extends javax.swing.JPanel {
             }
         });
 
-        okButton.setText("Save");
-        okButton.setToolTipText("Save the record to disk");
-        okButton.setEnabled(false);
-        okButton.addActionListener(new java.awt.event.ActionListener() {
+        saveButton.setText("Save");
+        saveButton.setToolTipText("Save the record to disk");
+        saveButton.setEnabled(false);
+        saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                okButtonActionPerformed(evt);
+                saveButtonActionPerformed(evt);
             }
         });
 
@@ -333,12 +342,12 @@ public class QualityControlPanel extends javax.swing.JPanel {
                     .add(okRadioButton)
                     .add(problemRadioButton)
                     .add(ignoreRadioButton))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 150, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(okButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 69, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(saveButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 69, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(loginButton))
                 .addContainerGap())
-            .add(sequencePropertiesHost, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
+            .add(sequencePropertiesHost)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -346,7 +355,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
                 .add(sequencePropertiesHost, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(okButton)
+                    .add(saveButton)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                             .add(okRadioButton)
@@ -360,9 +369,8 @@ public class QualityControlPanel extends javax.swing.JPanel {
 
         commentSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         commentSplitPane.setResizeWeight(1.0);
-        commentSplitPane.setContinuousLayout(true);
 
-        previousCommentEditorPane.setContentType("text/html");
+        previousCommentEditorPane.setContentType("text/html"); // NOI18N
         previousCommentEditorPane.setEditable(false);
         // Set HTML renderer to use java system default font instead of Times New Roman
         java.awt.Font font = javax.swing.UIManager.getFont("Label.font");
@@ -410,7 +418,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
+            .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -421,7 +429,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(commentSplitPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)
+            .add(commentSplitPane)
             .add(jPanel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -484,6 +492,14 @@ public class QualityControlPanel extends javax.swing.JPanel {
                     sequencePropertiesHost.setText(uri.toString());
                     sequencePropertiesHost.setToolTipText(uri.toString());
                     loginButton.setEnabled(true);
+                    int index= walkImageSequence.getIndex();
+                    if ( index>=0 ) {
+                        QualityControlSequence qseq= walkImageSequence.getQualityControlSequence();
+                        if ( qseq==null || qseq.getQualityControlRecord(index)!=null ) {
+                            saveButton.setEnabled(true);
+                            setStateButtonedEnabled(true);
+                        }                    
+                    }
                     if ( uri.getScheme().equals("file") ) {  // log in automatically if it's not restricted
                        login();
                     }
@@ -509,7 +525,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
         displayRecord(qcRecord);
     }
 
-    private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
+    private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         String text=  newCommentTextArea.getText();
         QualityControlRecord.Status status;
         if ( ignoreRadioButton.isSelected() ) {
@@ -522,7 +538,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
             status= QualityControlRecord.Status.PROBLEM;
         }
         setStatus( text, status );
-    }//GEN-LAST:event_okButtonActionPerformed
+    }//GEN-LAST:event_saveButtonActionPerformed
 
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
         login();
@@ -541,10 +557,10 @@ public class QualityControlPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton loginButton;
     private javax.swing.JTextArea newCommentTextArea;
-    private javax.swing.JButton okButton;
     private javax.swing.JRadioButton okRadioButton;
     private javax.swing.JEditorPane previousCommentEditorPane;
     private javax.swing.JRadioButton problemRadioButton;
+    private javax.swing.JButton saveButton;
     private javax.swing.JTextField sequencePropertiesHost;
     private javax.swing.ButtonGroup statusButtonGroup;
     private javax.swing.JLabel statusLabel;
@@ -556,5 +572,11 @@ public class QualityControlPanel extends javax.swing.JPanel {
         f.pack();
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setVisible(true);
+    }
+
+    private void setStateButtonedEnabled(boolean b) {
+        for ( Enumeration<AbstractButton> e= statusButtonGroup.getElements(); e.hasMoreElements(); ) {
+            e.nextElement().setEnabled(b);
+        }
     }
 }
