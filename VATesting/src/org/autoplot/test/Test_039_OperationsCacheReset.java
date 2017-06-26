@@ -50,6 +50,9 @@ public class Test_039_OperationsCacheReset implements Scenario {
             new JLabelOperator(mainFrame).waitText( AutoplotUI.READY_MESSAGE );
             
             Thread.sleep(500);
+            new JMenuBarOperator(mainFrame).pushMenu("Options|Enable Feature|Data Panel", "|");
+            
+            Thread.sleep(500);
             
             // plot first test dataset
             new JTextFieldOperator(app.getDataSetSelector().getEditor()).setText("vap+inline:ripplesTimeSeries(2000)");
