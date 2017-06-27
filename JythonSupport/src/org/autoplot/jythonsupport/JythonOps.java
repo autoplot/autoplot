@@ -118,7 +118,7 @@ public class JythonOps {
      * coerce a python array or list into a QDataSet.
      * @param arg0 Python object or Datum
      * @return QDataSet
-     * @see org.virbo.dsops.Ops#dataset(java.lang.Object) 
+     * @see org.das2.qds.ops.Ops#dataset(java.lang.Object) 
      */
     public static QDataSet dataset( PyObject arg0 ) {
         if ( arg0 instanceof PyQDataSet ) {
@@ -202,7 +202,7 @@ public class JythonOps {
      * coerce python objects to Datum
      * @param arg0 Python object, one of rank 0 dataset, int, float, or String.
      * @return Datum 
-     * @see org.virbo.dsops.Ops#datum(java.lang.Object) 
+     * @see org.das2.qds.ops.Ops#datum(java.lang.Object) 
      */
     public static Datum datum( PyObject arg0 ) {
         if ( arg0 instanceof PyQDataSet ) {

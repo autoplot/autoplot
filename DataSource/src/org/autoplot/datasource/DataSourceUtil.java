@@ -790,7 +790,7 @@ public class DataSourceUtil {
     }
 
     /**
-     * See VirboAutoplot org.autoplot.AutoplotUtil.guessRenderType.
+     * @see Autoplot org.autoplot.AutoplotUtil.guessRenderType.
      * @param fillds
      * @return
      */
@@ -868,7 +868,8 @@ public class DataSourceUtil {
     }
 
     /**
-     * open the URL in a browser.   Borrowed from http://www.centerkey.com/java/browser/.  See also openBrowser in VirboAutoplot,
+     * open the URL in a browser.   Borrowed from http://www.centerkey.com/java/browser/.  
+     * See also openBrowser in Autoplot,
      * which this replaces.
      * 
      * Java 6 introduced standard code for doing this.  The old code is still 

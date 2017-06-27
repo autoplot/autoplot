@@ -896,7 +896,7 @@ public class AutoplotUtil {
      * @param ds
      * @param properties
      * @return 
-     * @see #autoRange(org.virbo.dataset.QDataSet, java.util.Map, boolean) 
+     * @see #autoRange(org.das2.qds.QDataSet, java.util.Map, boolean) 
      */
     public static AutoRangeDescriptor autoRange(QDataSet hist, QDataSet ds, Map properties) {
 
@@ -1192,7 +1192,7 @@ public class AutoplotUtil {
      * @param ds the dataset, a non-bundle, to be autoranged.
      * @param properties Additional constraints for properties, such as SCALE_TYPE
      * @return  the range.
-     * @see #autoRange(org.virbo.dataset.QDataSet, java.util.Map, boolean) 
+     * @see #autoRange(org.das2.qds.QDataSet, java.util.Map, boolean) 
      */
     public static AutoRangeDescriptor autoRange( QDataSet ds, Map properties ) {
         return autoRange( ds, properties, false );
@@ -1882,8 +1882,8 @@ public class AutoplotUtil {
     }
 
     /**
-     * See DataSource org.virbo.datasource.DataSourceUtil.guessRenderType, which will become the official version.
-     * See http://autoplot.org/developer.guessRenderType
+     * @see org.autoplot.datasource.DataSourceUtil#guessRenderType(org.das2.qds.QDataSet), which will become the official version.
+     * @see http://autoplot.org/developer.guessRenderType
      * @param fillds
      * @return
      */

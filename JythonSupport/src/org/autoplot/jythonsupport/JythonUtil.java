@@ -65,7 +65,7 @@ import org.autoplot.datasource.DataSetURI;
 
 /**
  * Utilities to support Jython scripting.
- * @see org.virbo.autoplot.JythonUtil
+ * @see org.autoplot.JythonUtil
  * @author jbf
  */
 public class JythonUtil {

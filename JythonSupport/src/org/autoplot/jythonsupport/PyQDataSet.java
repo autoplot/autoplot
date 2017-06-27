@@ -844,7 +844,7 @@ public class PyQDataSet extends PyJavaInstance {
             uc= UnitsConverter.IDENTITY;
         }
                 
-        // see org.virbo.dsops.CoerceUtil, make version that makes iterators.
+        // see org.das2.qds.ops.CoerceUtil, make version that makes iterators.
         if ( val.rank()==0 ) {
             double d = uc.convert(val.value());
             while (iter.hasNext()) {

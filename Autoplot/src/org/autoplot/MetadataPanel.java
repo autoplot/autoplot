@@ -295,7 +295,8 @@ public class MetadataPanel extends javax.swing.JPanel {
     boolean statisticsDirty;
 
     /**
-     * create a string showing a histogram.  See org.virbo.dataset.DataSetUtil.toSparkline
+     * create a string showing a histogram.  
+     * @see org.das2.qds.DataSetUtil.toSparkline
      */
 //    private String histStr(QDataSet ds) {
 //        QDataSet hist = Ops.histogram(ds, 20);

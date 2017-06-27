@@ -192,7 +192,7 @@ public class ParametersFormPanel {
     }
             
     /**
-     * Populates the JPanel with options.  See org.virbo.jythonsupport.ui.Util.createForm.
+     * Populates the JPanel with options.  See org.autoplot.jythonsupport.ui.Util.createForm.
      * @param env environment variables such as PWD and dom.
      * @param f the file containing the script.
      * @param params map containing any settings for the variables.
@@ -250,7 +250,7 @@ public class ParametersFormPanel {
     }
     
     /**
-     * Populates the JPanel with options.  See org.virbo.jythonsupport.ui.Util.createForm, this is only used 
+     * Populates the JPanel with options.  See org.autoplot.jythonsupport.ui.Util.createForm, this is only used 
      * with the .jyds.  TODO: Fix this!!!
      * 
      * @param env null or an map containing variables like "dom" and "PWD"

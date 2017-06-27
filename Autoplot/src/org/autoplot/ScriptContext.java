@@ -144,7 +144,7 @@ public class ScriptContext extends PyJavaInstance {
      * plot([3,2,1])
      * </pre>
      * @param app the application
-     * @see #setWindow(org.virbo.autoplot.ApplicationModel) 
+     * @see #setWindow(org.autoplot.ApplicationModel) 
      * @see #newApplication(java.lang.String) 
      */
     public static synchronized void setApplication( AutoplotUI app ) {
@@ -165,7 +165,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param appm 
      * @see #newWindow(java.lang.String) 
      * @see #getWindow() which returns the current window.
-     * @see #setApplication(org.virbo.autoplot.AutoplotUI) which creates another application.
+     * @see #setApplication(org.autoplot.AutoplotUI) which creates another application.
      */
     public static synchronized void setWindow( ApplicationModel appm ) {
         AutoplotUI app= appLookup.get(appm);
@@ -236,7 +236,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param x the window upper-left location, if possible
      * @param y the window upper-left location, if possible
      * @return a handle (do not use this object, code will break) for the window.
-     * @see #setWindow(org.virbo.autoplot.ApplicationModel) 
+     * @see #setWindow(org.autoplot.ApplicationModel) 
      */
     public static synchronized ApplicationModel newWindow( final String id, int width, int height, int x, int y ) {
         ApplicationModel result= newWindow(id);
@@ -306,7 +306,7 @@ public class ScriptContext extends PyJavaInstance {
      * create a new window.
      * @param id identifier for the window
      * @return a handle (do not use this object, code will break) for the window.
-     * @see #setWindow(org.virbo.autoplot.ApplicationModel) 
+     * @see #setWindow(org.autoplot.ApplicationModel) 
      */
     public static synchronized ApplicationModel newWindow( final String id ) {
         ApplicationModel result= applets.get(id);
@@ -684,7 +684,7 @@ public class ScriptContext extends PyJavaInstance {
      * fillToZero digital image  pitchAngleDistribution eventsBar vectorPlot orbitPlot contour
      *<blockquote><pre><small>{@code
      *plot( 0, 'label', findgen(20), ripples(20), ripples(20), 'digital' )
-     *from org.virbo.autoplot import RenderType
+     *from org.autoplot import RenderType
      *plot( 0, 'label', findgen(20), ripples(20), ripples(20), RenderType.digital.toString() )
      *}</small></pre></blockquote>
      *
