@@ -106,12 +106,12 @@ public class JythonUtil {
     }
 
     protected static void runScript( ApplicationModel model, String script, String[] argv, String pwd ) throws IOException {
-        logger.entering( "org.virbo.autoplot.JythonUtil", "runScript {0}", script );
+        logger.entering( "org.autoplot.JythonUtil", "runScript {0}", script );
         URL url= DataSetURI.getURL(script);
         try (InputStream in = url.openStream()) {
             runScript(model, in, script, argv, pwd );
         }
-        logger.exiting( "org.virbo.autoplot.JythonUtil", "runScript {0}", script );
+        logger.exiting( "org.autoplot.JythonUtil", "runScript {0}", script );
     }
 
     /**

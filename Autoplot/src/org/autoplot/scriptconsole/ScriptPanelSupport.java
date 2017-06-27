@@ -413,7 +413,7 @@ public class ScriptPanelSupport {
     }
     
     private void restartWatcher( File file ) throws IOException {
-        logger.entering( "org.virbo.autoplot.scriptconsole", "restartWatcher {0}", file );
+        logger.entering( "org.autoplot.scriptconsole", "restartWatcher {0}", file );
         if ( watcher!=null ) {
             watcher.close();
         } 
@@ -430,7 +430,7 @@ public class ScriptPanelSupport {
             logger.fine("watch service was closed");
         }
 
-        logger.exiting("org.virbo.autoplot.scriptconsole", "restartWatcher {0}", file );
+        logger.exiting("org.autoplot.scriptconsole", "restartWatcher {0}", file );
     }
     
     protected void loadFile(File file) throws IOException, FileNotFoundException {

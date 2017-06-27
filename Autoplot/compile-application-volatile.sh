@@ -10,7 +10,7 @@
 #
 # CDF Support will be awkward because of the binaries.  Support this for the hudson platform.
 #
-# This should be run from the folder "VirboAutoplot"
+# This should be run from the folder "Autoplot"
 #
 # Used by: ???
 #

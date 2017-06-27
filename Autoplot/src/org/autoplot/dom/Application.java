@@ -440,7 +440,7 @@ public class Application extends DomNode {
      * @param id an id, such as "plot_2"
      * @return the node
      * @throws IllegalArgumentException if the id is not found.
-     * @see DomUtil#getElementById(org.virbo.autoplot.dom.DomNode, java.lang.String) 
+     * @see DomUtil#getElementById(org.autoplot.dom.DomNode, java.lang.String) 
      */
     public DomNode getElementById( String id ) {
         DomNode result= DomUtil.getElementById( this, id );

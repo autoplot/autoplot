@@ -111,7 +111,7 @@ if ($FORM{"main-class"}) {
     $application_desc .= $FORM{"main-class"} . "\">";
 } else {
     $application_desc = "<application-desc main-class=\"";
-    $application_desc .= "org.virbo.autoplot.AutoplotUI" . "\">";
+    $application_desc .= "org.autoplot.AutoplotUI" . "\">";
 }
 
 if ($url | $uri) {

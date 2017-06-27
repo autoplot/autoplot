@@ -25,7 +25,7 @@ public class AutoplotServer {
         
     public static void main(String[] args) throws Exception {
           
-        System.err.println("org.virbo.autoplot.AutoplotServer 20160202");
+        System.err.println("org.autoplot.AutoplotServer 20160202");
 
         Util.addFonts();
         

@@ -29,7 +29,7 @@ import org.autoplot.datasource.ThreadManager;
 
 /**
  * Dialog assisting the scientists in creating aggregations for file
- * URIS.  This uses org.virbo.datasource.DataSourceUtil.makeAggregation
+ * URIS.  This uses org.autoplot.datasource.DataSourceUtil.makeAggregation
  * to look for parts of filenames that look like dates, for example 20150516
  * would be replaced with $Y$m$d.
  * 

@@ -126,7 +126,7 @@ public class ApplicationModel {
         DasApplication.getDefaultApplication().setExceptionHandler(exceptionHandler);
         FileSystem.setExceptionHandler(exceptionHandler);
         String cl= eh.getClass().getName();
-        if ( cl.equals("org.virbo.autoplot.scriptconsole.GuiExceptionHandler") ) { // support applet, which doesn't know about Gui...
+        if ( cl.equals("org.autoplot.scriptconsole.GuiExceptionHandler") ) { // support applet, which doesn't know about Gui...
             try {
                 Method m= eh.getClass().getMethod("setApplicationModel", ApplicationModel.class);
                 m.invoke(eh, this);
@@ -388,7 +388,7 @@ public class ApplicationModel {
      *
      * @param suri the new data source URI.
      * @param mon progress monitor which is just used to convey messages.
-     * @see org.virbo.autoplot.dom.DataSourceController#resetSuri(java.lang.String, org.das2.util.monitor.ProgressMonitor) 
+     * @see org.autoplot.dom.DataSourceController#resetSuri(java.lang.String, org.das2.util.monitor.ProgressMonitor) 
      */
     protected void resetDataSetSourceURL(String suri, ProgressMonitor mon) {
 

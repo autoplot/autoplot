@@ -303,8 +303,8 @@ public class LogConsole extends javax.swing.JPanel {
      * For example:
      * <blockquote><pre><small>{@code
      *    Handler h = lc.getHandler();
-     *    Logger.getLogger("virbo").setLevel(Level.ALL);
-     *    Logger.getLogger("virbo").addHandler(h);
+     *    Logger.getLogger("autoplot").setLevel(Level.ALL);
+     *    Logger.getLogger("autoplot").addHandler(h);
      *}</small></pre></blockquote>
      * @return handler for receiving messages.
      */

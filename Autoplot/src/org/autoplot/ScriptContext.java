@@ -1336,7 +1336,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      * bind( model.getPlotDefaults(), "title", model.getPlotDefaults().getXAxis(), "label" )
      *}</small></pre></blockquote>
      * 
-     * @see org.virbo.autoplot.dom.ApplicationController#bind(org.virbo.autoplot.dom.DomNode, java.lang.String, java.lang.Object, java.lang.String) which will save the binding to a vap.
+     * @see org.autoplot.dom.ApplicationController#bind(org.autoplot.dom.DomNode, java.lang.String, java.lang.Object, java.lang.String) which will save the binding to a vap.
      * @param src java bean such as model.getPlotDefaults()
      * @param srcProp a property name such as "title"
      * @param dst java bean such as model.getPlotDefaults().getXAxis()
@@ -1361,7 +1361,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      * bind( model.getPlotDefaults(), "title", model.getPlotDefaults().getXAxis(), "label" )
      *}</small></pre></blockquote>
      * 
-     * @see org.virbo.autoplot.dom.ApplicationController#bind(org.virbo.autoplot.dom.DomNode, java.lang.String, java.lang.Object, java.lang.String, org.jdesktop.beansbinding.Converter) which will save the binding to a vap.
+     * @see org.autoplot.dom.ApplicationController#bind(org.autoplot.dom.DomNode, java.lang.String, java.lang.Object, java.lang.String, org.jdesktop.beansbinding.Converter) which will save the binding to a vap.
      * @param src java bean such as model.getPlotDefaults()
      * @param srcProp a property name such as "title"
      * @param dst java bean such as model.getPlotDefaults().getXAxis()
@@ -1426,7 +1426,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      * bind( model.getPlotDefaults(), "title", model.getPlotDefaults().getXAxis(), "label" )
      *}</small></pre></blockquote>
      * 
-     * @see org.virbo.autoplot.dom.ApplicationController#bind(org.virbo.autoplot.dom.DomNode, java.lang.String, java.lang.Object, java.lang.String, org.jdesktop.beansbinding.Converter) which will save the binding to a vap.
+     * @see org.autoplot.dom.ApplicationController#bind(org.autoplot.dom.DomNode, java.lang.String, java.lang.Object, java.lang.String, org.jdesktop.beansbinding.Converter) which will save the binding to a vap.
      * @param src java bean such as model.getPlotDefaults()
      * @param srcProp a property name such as "title"
      * @param dst java bean such as model.getPlotDefaults().getXAxis()

@@ -5,7 +5,7 @@
 ; tplot, 'protonvel'
 ;-
 pro tdas_store_data, name, uri
-   qds= OBJ_NEW('IDLjavaObject$APDataSet', 'org.virbo.idlsupport.APDataSet')
+   qds= OBJ_NEW('IDLjavaObject$APDataSet', 'org.idlsupport.APDataSet')
    qds->setDataSetUri, uri
    qds->doGetDataSet
    qds->setPreferredUnits, 'seconds since 1970-001T00:00'

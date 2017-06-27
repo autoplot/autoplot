@@ -736,7 +736,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * add a canvas to the application.  Currently, only one canvas is supported, so this
      * will have unanticipated effects if called more than once.
      *
-     * This must be public to provide access to org.virbo.autoplot.ApplicationModel
+     * This must be public to provide access to org.autoplot.ApplicationModel
      * @return
      */
     public synchronized DasCanvas addCanvas() {
@@ -2309,7 +2309,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param srcProp a property name such as "title"
      * @param dst java bean such as model.getPlotDefaults().getXAxis()
      * @param dstProp a property name such as "label"
-     * @see org.virbo.autoplot.ScriptContext#bind(java.lang.Object, java.lang.String, java.lang.Object, java.lang.String) which can bind any two objects together.
+     * @see org.autoplot.ScriptContext#bind(java.lang.Object, java.lang.String, java.lang.Object, java.lang.String) which can bind any two objects together.
      */
     public void bind( DomNode src, String srcProp, Object dst, String dstProp) {
         bind(src, srcProp, dst, dstProp, null );
@@ -2690,7 +2690,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * return the DataSourceFilter for the plotElement, or null if none exists.
      * @param element
      * @return the DataSourceFilter to which the plot element refers, or null.
-     * @see #getFirstPlotFor(org.virbo.autoplot.dom.DataSourceFilter) 
+     * @see #getFirstPlotFor(org.autoplot.dom.DataSourceFilter) 
      */
     public DataSourceFilter getDataSourceFilterFor(PlotElement element) {
         String id = element.getDataSourceFilterId();

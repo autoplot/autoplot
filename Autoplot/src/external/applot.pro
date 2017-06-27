@@ -455,7 +455,7 @@ pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, tmpfile=tmpfile, noplot=nopl
       if javahome eq '' then javahome= 'c:/"program files"/java/jre1.6.0_03/'
 
       print, 'spawn autoplot java process'
-      cmd= javahome+'/bin/java -cp '+classpath+ ' org.virbo.autoplot.AutoplotUI --port='+strtrim(port,2)
+      cmd= javahome+'/bin/java -cp '+classpath+ ' org.autoplot.AutoplotUI --port='+strtrim(port,2)
       print, cmd
       if !version.os_family eq 'Windows' then begin
         spawn, cmd, pid=appid, /nowait
