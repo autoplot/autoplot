@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Autoplot's digitizer is used to digitize Autoplot's lightning bolt.  Happy Summer!
+        <p><small>Our local grocery store celebrates PI day back in March, and unintentionally supports TAU (2*PI) as well.  Happy <a href="https://tauday.com/tau-manifesto">TAU</a> day!
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,9 +26,10 @@
         
         <p>Bugfixes (2017-06-17 r20939):</p>
         <ul>  
+            <li>1849: QC save button cannot be enabled if all records have been QC-marked.  Thanks, Kris!
             <li>1766: $(Y,end)$m$(d,delta=10) now works.
             <li>1836: ArrayDataSet.copy used getBack to get the backing array to determine the class, causing runtime error with new mutability checks.
-            <li>1840: display data made a little less confusing.
+            <li>1840: display data made a little less confusing.  Thanks, Ivar!
             <li>correction of templates in das2streams.  Thanks, Chris!
             <li>das2stream reader allows yunits to be missing, just print a warning.
             <li>rte_2052946987: index-out-of-bounds caused by failure to update firstIndex, lastIndex when data is reduced and all data is outside of the visible region.  Thanks, Kris!
@@ -79,6 +80,7 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>528: giant refactoring where org.virbo.autoplot is moved to org.autoplot, org.virbo.dataset moved to org.das2.qds, etc.  More about this <a href="http://autoplot.org//autoplot2017">here</a>.
             <li>680: time parser supports "P1D/lastday" to refer to yesterday, where lastday refers to last day boundary; also lasthour and lastmonth.
             <li>597: export to wav can now write files containing timetag mapping, to support Larry's animations.
             <li>IDL/Matlab bridge supports bundles of data (coming from HAPI servers, for example).
