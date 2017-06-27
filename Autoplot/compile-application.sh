@@ -426,7 +426,7 @@ cp src/index.html dist  #TODO: why?
 
 echo "=== modify jar files for this particular release"
 cd temp-volatile-src
-compilef ../temp-volatile-classes external/FileSearchReplace.java
+$JAVAC  -target 1.7 -source 1.7 -d ../temp-volatile-classes external/FileSearchReplace.java
 cd ..
 ${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
 ${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/index.html '#{tag}' $TAG '#{codebase}' $CODEBASE
