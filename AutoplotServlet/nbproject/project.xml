@@ -7,7 +7,7 @@
             <minimum-ant-version>1.6</minimum-ant-version>
             <web-module-libraries>
                 <library dirs="200">
-                    <file>${reference.VirboAutoplot.jar}</file>
+                    <file>${reference.Autoplot.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
@@ -256,7 +256,7 @@
                 <id>jar</id>
             </reference>
             <reference>
-                <foreign-project>VirboAutoplot</foreign-project>
+                <foreign-project>Autoplot</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
                 <target>jar</target>
