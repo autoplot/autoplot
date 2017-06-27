@@ -14,6 +14,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import org.das2.util.LoggerManager;
 import org.autoplot.MouseModuleType;
+import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.util.TickleTimer;
 
 /**
@@ -83,7 +84,7 @@ public class OptionsPrefsController {
      * @param options
      */
     public OptionsPrefsController( Options options ) {
-        prefs = Preferences.userNodeForPackage( options.getClass() );
+        prefs = AutoplotSettings.settings().getPreferences(options.getClass());
         this.options= options;
         options.addPropertyChangeListener( listener );
     }

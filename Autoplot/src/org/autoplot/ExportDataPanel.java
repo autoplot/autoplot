@@ -24,6 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
+import org.autoplot.datasource.AutoplotSettings;
 import org.das2.util.LoggerManager;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.DataSourceController;
@@ -107,7 +108,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
             }
         });
         
-        Preferences prefs= Preferences.userNodeForPackage(AutoplotUI.class);
+        Preferences prefs= AutoplotSettings.settings().getPreferences(AutoplotUI.class);
         String currentFileString = prefs.get("ExportDataCurrentFile", "");
         String currentExtString = prefs.get("ExportDataCurrentExt", ".txt");
         if ( !currentExtString.equals("") ) {
@@ -185,7 +186,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
             s1= s1.substring(5);
         }
 
-        Preferences prefs= Preferences.userNodeForPackage(AutoplotUI.class);
+        Preferences prefs= AutoplotSettings.settings().getPreferences(AutoplotUI.class);
         prefs.put("ExportDataCurrentFile", s1 );
         prefs.put("ExportDataCurrentExt", ext );
         

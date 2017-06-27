@@ -21,6 +21,7 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import org.autoplot.datasource.AutoplotSettings;
 
 /**
  *
@@ -122,7 +123,7 @@ public class FSTreeModel implements TreeModel {
 //        });
 //        
         this.root = root;
-        Preferences prefs= Preferences.userNodeForPackage( FSTreeModel.class );
+        Preferences prefs= AutoplotSettings.settings().getPreferences( FSTreeModel.class );
         String sort= prefs.get( "fsTreeSort", "size" );
         switch (sort) {
             case "size":
@@ -143,7 +144,7 @@ public class FSTreeModel implements TreeModel {
         Comparator old= this.comparator;
         this.comparator= c;
         if ( old!=c ) {
-            Preferences prefs= Preferences.userNodeForPackage( FSTreeModel.class );
+            Preferences prefs= AutoplotSettings.settings().getPreferences( FSTreeModel.class );
             prefs.put( "fsTreeSort", c==fileSizeComparator ? "size" : "alpha" );
             try {
                 prefs.flush();

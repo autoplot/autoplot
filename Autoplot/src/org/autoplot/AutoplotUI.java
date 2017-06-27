@@ -944,7 +944,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 if ( AutoplotUI.this==ScriptContext.getViewWindow()  ) {
                     ScriptContext.close();
                 }
-                final Preferences prefs= Preferences.userNodeForPackage(ApplicationModel.class);
+                final Preferences prefs= AutoplotSettings.settings().getPreferences(ApplicationModel.class);
                 long x= AutoplotUI.this.getLocation().x;
                 long y= AutoplotUI.this.getLocation().y;
                 logger.log( Level.FINE, "saving last location {0} {1}", new Object[]{x, y});
@@ -4865,7 +4865,7 @@ APSplash.checkTime("init -70");
 
                     app.createDropTargetListener( app.dataSetSelector );
 
-                    Preferences prefs= Preferences.userNodeForPackage( AutoplotUI.class );
+                    Preferences prefs= AutoplotSettings.settings().getPreferences( AutoplotUI.class );
                     int posx= prefs.getInt( "locationx", app.getLocation().x );
                     int posy= prefs.getInt( "locationy", app.getLocation().y );
                     if ( posx!= app.getLocation().x || posy!=app.getLocation().y ) {

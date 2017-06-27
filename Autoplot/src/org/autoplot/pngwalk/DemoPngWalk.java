@@ -29,6 +29,7 @@ import org.autoplot.bookmarks.Bookmark;
 import org.autoplot.bookmarks.BookmarksException;
 import org.autoplot.bookmarks.BookmarksManager;
 import org.autoplot.bookmarks.BookmarksManagerModel;
+import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
 import org.xml.sax.SAXException;
 
@@ -78,7 +79,7 @@ public class DemoPngWalk {
         if ( template!=null ) {
             tool.setTemplate(template);
         } else {
-            Preferences prefs = Preferences.userNodeForPackage(PngWalkTool.class);
+            Preferences prefs = AutoplotSettings.settings().getPreferences(PngWalkTool.class);
             String srecent = prefs.get( PngWalkTool.PREF_RECENT,"");
             if ( srecent.equals("") ) {
                 tool.setTemplate("file:/tmp/pngwalk/product_$Y$m$d.png");

@@ -52,7 +52,7 @@ public class DataSetSelectorSupport {
      * @return the URI for the vap file, or null if cancel was pressed.
      */
     public static String browseLocalVap( java.awt.Component parent, String initialSelection) {
-        Preferences prefs = Preferences.userNodeForPackage( AutoplotSettings.class);
+        Preferences prefs = AutoplotSettings.settings().getPreferences( AutoplotSettings.class);
 
         String currentDirectory = prefs.get( AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, prefs.get(AutoplotSettings.PREF_LAST_OPEN_FOLDER, userHome().toString() ) );
         String currentFile=  prefs.get( AutoplotSettings.PREF_LAST_OPEN_VAP_FILE, "" );
@@ -162,7 +162,7 @@ public class DataSetSelectorSupport {
      * @return the URI for the vap file.
      */
     public static String browseLocal( java.awt.Component parent ) {
-        Preferences prefs = Preferences.userNodeForPackage(DataSetSelectorSupport.class);
+        Preferences prefs = AutoplotSettings.settings().getPreferences(DataSetSelectorSupport.class);
 
         String currentDirectory = prefs.get(AutoplotSettings.PREF_LAST_OPEN_FOLDER, userHome().toString());
         final HashMap exts = DataSourceRegistry.getInstance().dataSourcesByExt;

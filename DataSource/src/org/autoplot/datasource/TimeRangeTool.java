@@ -60,7 +60,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
         initComponents();
         scComboBox.setModel( new DefaultComboBoxModel(getSpacecraft()) );
 
-        prefs = Preferences.userNodeForPackage( TimeRangeTool.class );
+        prefs = AutoplotSettings.settings().getPreferences( TimeRangeTool.class );
         final String sc= prefs.get(PREF_SPACECRAFT, "rbspa-pp" );
         
         scComboBox.setSelectedItem( sc );

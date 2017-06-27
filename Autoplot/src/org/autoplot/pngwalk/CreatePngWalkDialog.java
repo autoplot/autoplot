@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import org.autoplot.AutoplotUtil;
 import org.autoplot.EventsListToolUtil;
+import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.TimeRangeTool;
 
@@ -50,7 +51,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
     }
 
     private void setDefaults() {
-        Preferences prefs= Preferences.userNodeForPackage( CreatePngWalkDialog.class );
+        Preferences prefs= AutoplotSettings.settings().getPreferences( CreatePngWalkDialog.class );
 
         String file= prefs.get( "filenameRoot", flnRootTf.getText() );
         flnRootTf.setText(file);
@@ -85,7 +86,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
     }
 
     public void writeDefaults() {
-        Preferences prefs= Preferences.userNodeForPackage( CreatePngWalkDialog.class );
+        Preferences prefs= AutoplotSettings.settings().getPreferences( CreatePngWalkDialog.class );
         prefs.put( "filenameRoot", flnRootTf.getText().trim() );
         File ff= getOutputFolder( getOutputFolderTf().getText().trim() );
         prefs.put( "outputFolder", DataSetURI.fromFile(ff).substring(7) );

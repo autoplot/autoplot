@@ -1882,7 +1882,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         newValue.add(item);
 
         if ( prefNode==null ) { //TODO: I suspect this is old code that can be removed.
-            Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
+            Preferences prefs = AutoplotSettings.settings().getPreferences(ApplicationModel.class);
             prefs.put("bookmarks", Bookmark.formatBooks(newValue));
             try {
                 prefs.flush();

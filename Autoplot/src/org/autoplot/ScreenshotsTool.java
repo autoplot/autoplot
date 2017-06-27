@@ -57,6 +57,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.pngwalk.PngWalkTool;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.LoggerManager;
@@ -131,7 +132,7 @@ public class ScreenshotsTool extends EventQueue {
      */
     public static void start( Window parent ) {
 
-        Preferences prefs= Preferences.userNodeForPackage( ScreenshotsTool.class );
+        Preferences prefs= AutoplotSettings.settings().getPreferences( ScreenshotsTool.class );
         String s= prefs.get( "outputFolder", System.getProperty("user.home") );
 
         JPanel p= new JPanel();

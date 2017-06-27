@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import org.autoplot.datasource.AutoplotSettings;
 import org.das2.jythoncompletion.ui.CompletionImpl;
 import org.das2.util.LoggerManager;
 
@@ -21,7 +22,7 @@ import org.das2.util.LoggerManager;
 public class CompletionSettings {
 
     private static final Logger logger= LoggerManager.getLogger( "jython.editor" );
-    Preferences prefs= Preferences.userNodeForPackage( CompletionSettings.class );
+    Preferences prefs= AutoplotSettings.settings().getPreferences( CompletionSettings.class );
 
     private String docHome = "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/ws/doc/"; // // see repeat code in loadPreferences
     

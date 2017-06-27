@@ -506,7 +506,7 @@ public class ApplicationModel {
 
         } else {
 
-            Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
+            Preferences prefs = AutoplotSettings.settings().getPreferences(ApplicationModel.class);
             String srecent = prefs.get(PREF_RECENT,"");
 
             if (srecent.equals("") || !srecent.startsWith("<")) {
@@ -554,7 +554,7 @@ public class ApplicationModel {
      * @return the bookmarks of the legacy user.
      */
     public List<Bookmark> getLegacyBookmarks() {
-        Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
+        Preferences prefs = AutoplotSettings.settings().getPreferences(ApplicationModel.class);
         String sbookmark = prefs.get("bookmarks", "");
 
         if (sbookmark.equals("") || !sbookmark.startsWith("<")) {
@@ -1029,7 +1029,7 @@ public class ApplicationModel {
         if ( !f.exists() ) throw new IllegalArgumentException("no such file: "+f);
         if ( f.length()==0 ) throw new IllegalArgumentException("zero-length file: "+f);
 
-        Preferences prefs= Preferences.userNodeForPackage( AutoplotSettings.class);
+        Preferences prefs= AutoplotSettings.settings().getPreferences( AutoplotSettings.class);
         prefs.put( AutoplotSettings.PREF_LAST_OPEN_VAP_FILE, f.getAbsolutePath() );
         prefs.put( AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, f.getParent() );        
         

@@ -19,6 +19,7 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import org.autoplot.datasource.AutoplotSettings;
 import org.das2.util.TickleTimer;
 
 /**
@@ -35,7 +36,7 @@ public class CommandLineTextPane extends JTextPane {
     TickleTimer flushTimer= new TickleTimer(500, new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            Preferences prefs= Preferences.userNodeForPackage( CommandLineTextPane.class );
+            Preferences prefs= AutoplotSettings.settings().getPreferences( CommandLineTextPane.class );
             try {
                 prefs.flush();
             } catch (BackingStoreException ex) {
@@ -71,7 +72,7 @@ public class CommandLineTextPane extends JTextPane {
                 }
                 historyIndex= history.size();
                 pendingEntry= "";
-                Preferences prefs= Preferences.userNodeForPackage( CommandLineTextPane.class );
+                Preferences prefs= AutoplotSettings.settings().getPreferences( CommandLineTextPane.class );
                 prefs.put( "lastCommands", packHistoryCommands( history.subList(0,historyIndex) ) );
                 flushTimer.tickle();
                 fireActionPerformed( e );
@@ -126,7 +127,7 @@ public class CommandLineTextPane extends JTextPane {
     }
 
     private void loadFromPrefs() {
-        Preferences prefs= Preferences.userNodeForPackage( CommandLineTextPane.class );
+        Preferences prefs= AutoplotSettings.settings().getPreferences( CommandLineTextPane.class );
         String last= prefs.get( "lastCommands", "" );
         if ( last.trim().length()>0 ) {
             history.addAll( unpackHistoryCommands(last) );

@@ -599,7 +599,7 @@ public class GuiSupport {
                         return parent;
                     }
                 });
-                Preferences prefs= Preferences.userNodeForPackage(AutoplotUI.class);
+                Preferences prefs= AutoplotSettings.settings().getPreferences(AutoplotUI.class);
                 String currentFileString = prefs.get("ExportDataCurrentFile", "");
                 String currentExtString = prefs.get("ExportDataCurrentExt", ".txt");
                 if ( !currentExtString.equals("") ) {
@@ -1036,7 +1036,7 @@ public class GuiSupport {
                 final JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setDialogTitle("Print to "+ext.toUpperCase());
                 fileChooser.setFileFilter(getFileNameExtensionFilter( ext + " files", ext ));
-                Preferences prefs = Preferences.userNodeForPackage(DasCanvas.class);
+                Preferences prefs = AutoplotSettings.settings().getPreferences(DasCanvas.class);
                 String savedir = prefs.get("savedir", null);
                 if (savedir != null) fileChooser.setCurrentDirectory(new File(savedir));
                 if (currentFile != null) {
@@ -2067,7 +2067,7 @@ public class GuiSupport {
     }
 
     protected void doInspectVap() {
-        Preferences prefs = Preferences.userNodeForPackage( AutoplotSettings.class);
+        Preferences prefs = AutoplotSettings.settings().getPreferences( AutoplotSettings.class);
 
         String currentDirectory = prefs.get( AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, prefs.get(AutoplotSettings.PREF_LAST_OPEN_FOLDER, new File(System.getProperty("user.home")).toString() ) );
         String lcurrentFile=  prefs.get( AutoplotSettings.PREF_LAST_OPEN_VAP_FILE, "" );

@@ -166,7 +166,7 @@ public class PersistentStateSupport {
         this.strategy= strategy;
         this.ext= "."+extension;
         this.component= parent;
-        Preferences prefs= Preferences.userNodeForPackage(PersistentStateSupport.class);
+        Preferences prefs= AutoplotSettings.settings().getPreferences(PersistentStateSupport.class);
         setDirectory( "" );
         String recentFileString= prefs.get( PREF_FILE+ext+"_recent", "" );
         setRecentFiles( recentFileString );
@@ -325,7 +325,7 @@ public class PersistentStateSupport {
                         saveImpl(f,scheme);
                     }
                     
-                    Preferences prefs= Preferences.userNodeForPackage( AutoplotSettings.class);
+                    Preferences prefs= AutoplotSettings.settings().getPreferences( AutoplotSettings.class);
                     prefs.put( AutoplotSettings.PREF_LAST_OPEN_VAP_FILE, new File( getCurrentFile() ).getAbsolutePath() );
                     prefs.put( AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, new File( getCurrentFile() ).getParent() );
                     setSaving( false );

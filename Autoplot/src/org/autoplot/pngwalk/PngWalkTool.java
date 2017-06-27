@@ -126,6 +126,7 @@ import org.autoplot.bookmarks.BookmarksException;
 import org.autoplot.bookmarks.BookmarksManager;
 import org.autoplot.bookmarks.BookmarksManagerModel;
 import org.autoplot.bookmarks.Util;
+import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.transferrable.ImageSelection;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetSelector;
@@ -602,7 +603,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
      * @param ssrc the file
      */
     protected static void saveLocalCopy( Component parent, String ssrc ) {
-        Preferences prefs = Preferences.userNodeForPackage(PngWalkTool.class);
+        Preferences prefs = AutoplotSettings.settings().getPreferences(PngWalkTool.class);
         String srecent = prefs.get( PngWalkTool.PREF_RECENT, System.getProperty("user.home") );
         if ( ssrc==null ) {
             JOptionPane.showMessageDialog( parent, "No image is selected." );

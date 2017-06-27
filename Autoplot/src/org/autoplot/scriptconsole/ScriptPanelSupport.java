@@ -78,6 +78,7 @@ import org.python.util.PythonInterpreter;
 import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUtil;
 import org.autoplot.JythonUtil;
+import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.dom.ApplicationController;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
@@ -253,7 +254,7 @@ public class ScriptPanelSupport {
             } else {
                 chooser.setSelectedFile(file);
             }
-            Preferences prefs = Preferences.userNodeForPackage(ScriptPanelSupport.class);
+            Preferences prefs = AutoplotSettings.settings().getPreferences(ScriptPanelSupport.class);
             String openFile= prefs.get(PREFERENCE_OPEN_FILE, "");
             if ( !openFile.equals("") && !FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), new File(openFile) )  ) {
                 File dir= new File(openFile).getParentFile();
@@ -261,7 +262,7 @@ public class ScriptPanelSupport {
             }
         }
         if ( file==null ) {
-            Preferences prefs = Preferences.userNodeForPackage(ScriptPanelSupport.class);
+            Preferences prefs = AutoplotSettings.settings().getPreferences(ScriptPanelSupport.class);
             String openFile = prefs.get(PREFERENCE_OPEN_FILE, "");
             if ( !openFile.equals("") ) {
                 chooser.setCurrentDirectory( new File(openFile).getParentFile() );
@@ -1120,7 +1121,7 @@ public class ScriptPanelSupport {
                 panel.setFilename(file.toString());
                 restartWatcher(file);
                 
-                Preferences prefs = Preferences.userNodeForPackage(ScriptPanelSupport.class);
+                Preferences prefs = AutoplotSettings.settings().getPreferences(ScriptPanelSupport.class);
                 prefs.put(PREFERENCE_OPEN_FILE, file.toString() );
                 
                 if ( file.toString().endsWith(".jyds") ) {
@@ -1269,7 +1270,7 @@ public class ScriptPanelSupport {
                 }
             }
 
-            Preferences prefs = Preferences.userNodeForPackage(ScriptPanelSupport.class);
+            Preferences prefs = AutoplotSettings.settings().getPreferences(ScriptPanelSupport.class);
             String openFile = prefs.get(PREFERENCE_OPEN_FILE, "");
 
             JFileChooser chooser = new JFileChooser();

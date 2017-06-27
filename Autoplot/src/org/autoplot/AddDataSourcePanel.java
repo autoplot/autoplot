@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.prefs.Preferences;
 import org.autoplot.bookmarks.Bookmark;
 import org.autoplot.bookmarks.BookmarksException;
+import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetSelector;
 import org.xml.sax.SAXException;
 
@@ -41,7 +42,7 @@ public class AddDataSourcePanel extends javax.swing.JPanel {
         dataSetSelector1.setEnableDataSource(false);
         dataSetSelector1.setHidePlayButton(true);
 
-        Preferences prefs = Preferences.userNodeForPackage(AddDataSourcePanel.class);
+        Preferences prefs = AutoplotSettings.settings().getPreferences(AddDataSourcePanel.class);
         String srecent = prefs.get(PREF_RECENT,"");
 
         if ( !srecent.equals("") ) {
@@ -71,7 +72,7 @@ public class AddDataSourcePanel extends javax.swing.JPanel {
 
         dataSetSelector1.addPropertyChangeListener( DataSetSelector.PROP_RECENT, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                Preferences prefs = Preferences.userNodeForPackage(AddDataSourcePanel.class);
+                Preferences prefs = AutoplotSettings.settings().getPreferences(AddDataSourcePanel.class);
                 List<String> srecent= dataSetSelector1.getRecent();
                 List<Bookmark> recent = new ArrayList<Bookmark>();
                 for ( String s : srecent ) {

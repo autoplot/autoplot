@@ -32,7 +32,7 @@ public final class AutoplotSettings {
 
     private AutoplotSettings() {
         try {
-            prefs = Preferences.userNodeForPackage( AutoplotSettings.class );
+            prefs = getPreferences( AutoplotSettings.class );
             addPropertyChangeListener(listener);
             loadPreferences();
         } catch ( Exception ex ) {
@@ -58,7 +58,7 @@ public final class AutoplotSettings {
     static Preferences prefs;
 
     /**
-     * load the preferences from Preferences.userNodeForPackage( AutoplotSettings.class ),
+     * load the preferences from getPreferences( AutoplotSettings.class ),
      * which include the location of the autoplot_data directory and fscache.
      * The system property AUTOPLOT_DATA will override the user preference 
      * /opt/virbo/datasource/autoplotData which is by default "${HOME}/autoplot_data", and
@@ -75,6 +75,33 @@ public final class AutoplotSettings {
         this.fscache= prefs.get( PROP_FSCACHE, this.autoplotData+"/fscache" );
         p= System.getProperty("AUTOPLOT_FSCACHE");
         if ( p!=null ) this.fscache= p;
+    }
+    
+    /**
+     * wrapper that will handle legacy (v2016a) prefs, and will allow migration
+     * to ~/autoplot_data/config area.
+     * @param c the class requesting preferences.
+     * @return the preferences object this class should use.
+     */
+    public Preferences getPreferences( Class c ) {
+        String s= c.getPackage().getName();
+        switch (s) {
+            case "org.autoplot.dom":
+                s= "org.virbo.autoplot.dom";
+                break;
+            case "org.autoplot":
+                s= "org.virbo.autoplot";
+                break;
+            case "org.autoplot.scriptconsole":
+                s= "org.virbo.autoplot.scriptconsole";
+                break;
+            case "org.autoplot.datasource":
+                s= "org.virbo.datasource";
+                break;
+            default:
+                break;
+        }
+        return Preferences.userRoot().node("/"+s.replace('.','/'));
     }
     
     /**

@@ -1892,7 +1892,7 @@ public class AutoplotUtil {
 
         RenderType specPref= RenderType.spectrogram;
         Options o= new Options();
-        Preferences prefs= Preferences.userNodeForPackage( o.getClass() );  //TODO: because this is static?
+        Preferences prefs= AutoplotSettings.settings().getPreferences( o.getClass() );  //TODO: because this is static?
         boolean nn= prefs.getBoolean(Options.PROP_NEARESTNEIGHBOR,o.isNearestNeighbor());
         if ( nn ) {
             specPref = RenderType.nnSpectrogram;

@@ -70,7 +70,7 @@ public class WindowManager {
         String name= window.getName(); 
         logger.log(Level.FINE, "looking up position for {0}", name);
         if ( name==null ) return;
-        final Preferences prefs= Preferences.userNodeForPackage(WindowManager.class);
+        final Preferences prefs= AutoplotSettings.settings().getPreferences(WindowManager.class);
         int grab= 4 * window.getFont().getSize(); // pixels so mouse operator has something to grab
         Dimension screenSize= java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         if ( prefs.getInt( "window."+name+".screenwidth", 0 )==screenSize.width ) {
@@ -124,7 +124,7 @@ public class WindowManager {
         logger.log(Level.FINE, "storing position for {0}", name);
         if ( name==null ) return;
         
-        final Preferences prefs= Preferences.userNodeForPackage(WindowManager.class);
+        final Preferences prefs= AutoplotSettings.settings().getPreferences(WindowManager.class);
         logger.log( Level.FINE, "saving last location {0} {1} {2} {3}", new Object[]{x, y, h, w});
         // so that we know these settings are still valid.
         prefs.putInt( "window."+name+".screenwidth", java.awt.Toolkit.getDefaultToolkit().getScreenSize().width ); 
