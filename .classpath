@@ -23,10 +23,10 @@
 	<classpathentry kind="src" path="QStream/src"/>
 	<classpathentry kind="src" path="TsdsDataSource/src"/>
 	<classpathentry kind="src" path="WavDataSource/src"/>
-	<classpathentry kind="src" path="VirboAutoplot/src"/>
+	<classpathentry kind="src" path="Autoplot/src"/>
 	<classpathentry kind="src" path="dasCore/src"/>
 	<classpathentry kind="src" path="AutoplotApplet/src"/>
-	<classpathentry kind="src" path="VirboAutoplot/javahelp"/>
+	<classpathentry kind="src" path="Autoplot/javahelp"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="APLibs/lib/netCDF/commons-codec-1.3.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/netCDF/commons-httpclient-3.0.jar"/>
