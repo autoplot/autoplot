@@ -109,12 +109,12 @@ mkdir temp-volatile-classes
 echo "pwd=" `pwd`
 if [ "" = "$AUTOPLOT_STABLE_DIR" ]; then 
    echo "copy jar file classes using wget -q..."
-   echo ${WGET} -q -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar 
-   ${WGET} -q -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar # 2>&1 | head -100
-   echo ${WGET} -q -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar.pack.gz 
-   ${WGET} -q -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar.pack.gz # 2>&1 | head -100
+   echo ${WGET} -q -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/AutoplotStable.jar 
+   ${WGET} -q -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/AutoplotStable.jar # 2>&1 | head -100
+   echo ${WGET} -q -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/AutoplotStable.jar.pack.gz 
+   ${WGET} -q -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/AutoplotStable.jar.pack.gz # 2>&1 | head -100
    if [ $? -ne 0 ]; then
-      echo "wget fails: $WGET -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar"
+      echo "wget fails: $WGET -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/AutoplotStable.jar"
       exit -1
    fi
 else
@@ -128,7 +128,7 @@ fi
 echo "done copy jar file classes."
 
 echo "=== look for plugins, META-INF/org.autoplot.datasource.DataSourceFactory.extensions etc =="
-#echo 'ls -1 ../*/src/META-INF/org.virbo.datasource.DataSourceFactory.extensions | awk  \'BEGIN { FS = "/" } ; { print $2 }\' | sort | uniq | xargs'
+#echo 'ls -1 ../*/src/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | awk  \'BEGIN { FS = "/" } ; { print $2 }\' | sort | uniq | xargs'
 plugins=`ls -1 ../*/src/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | $AWK  'BEGIN { FS = "/" } ; { print $2 }' | sort | uniq | xargs`
 echo $plugins
 
@@ -140,7 +140,7 @@ for i in \
   AutoplotHelp \
   IdlMatlabSupport \
   $plugins \
-  VirboAutoplot; do
+  Autoplot; do
     echo ${RSYNC} -a --exclude .svn ../${i}/src/ temp-volatile-src/
     ${RSYNC} -a --exclude .svn ../${i}/src/ temp-volatile-src/
 done
@@ -249,7 +249,7 @@ for i in \
   IdlMatlabSupport \
   AudioSystemDataSource \
   $plugins \
-  VirboAutoplot; do
+  Autoplot; do
     if [ -d ../${i}/javahelp/ ]; then
         echo ${RSYNC} --exclude .svn ../${i}/javahelp/ temp-volatile-classes/
         ${RSYNC} --exclude .svn ../${i}/javahelp/ temp-volatile-classes/

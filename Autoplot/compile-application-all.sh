@@ -103,7 +103,7 @@ for i in \
   WavDataSource ImageDataSource ExcelDataSource \
   FitsDataSource OpenDapDataSource \
   CdfJavaDataSource CDAWebDataSource PDSPPIDataSource HapiDataSource \
-  VirboAutoplot; do
+  Autoplot; do
     echo $RSYNC -a --exclude .svn ../${i}/src/ temp-src/
     $RSYNC -a --exclude .svn ../${i}/src/ temp-src/
 done
@@ -201,7 +201,7 @@ for i in \
   WavDataSource ImageDataSource ExcelDataSource \
   FitsDataSource OpenDapDataSource \
   CdfJavaDataSource \
-  VirboAutoplot; do
+  Autoplot; do
     if [ -d ../${i}/javahelp/ ]; then
         echo ${RSYNC} -av --exclude .svn ../${i}/javahelp/ temp-classes/
         ${RSYNC} -av --exclude .svn ../${i}/javahelp/ temp-classes/

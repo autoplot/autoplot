@@ -87,8 +87,8 @@ rm -r -f temp-volatile-classes/
 mkdir temp-volatile-classes
 
 echo "copy jar file classes..."
-wget -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar
-wget -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar.pack.gz
+wget -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/AutoplotStable.jar
+wget -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/AutoplotStable.jar.pack.gz
 echo "done copy jar file classes."
 
 echo "copy sources..."
@@ -105,7 +105,7 @@ for i in \
   WavDataSource ImageDataSource ExcelDataSource \
   FitsDataSource OpenDapDataSource \
   CdfJavaDataSource CDAWebDataSource PDSPPIDataSource HapiDataSource \
-  VirboAutoplot; do
+  Autoplot; do
     echo ${RSYNC} -a --exclude .svn ../${i}/src/ temp-volatile-src/
     ${RSYNC} -a --exclude .svn ../${i}/src/ temp-volatile-src/
 done
@@ -203,7 +203,7 @@ for i in \
   WavDataSource ImageDataSource ExcelDataSource \
   FitsDataSource OpenDapDataSource \
   CdfJavaDataSource \
-  VirboAutoplot; do
+  Autoplot; do
     if [ -d ../${i}/javahelp/ ]; then
         echo rsync -av --exclude .svn ../${i}/javahelp/ temp-volatile-classes/
         rsync -av --exclude .svn ../${i}/javahelp/ temp-volatile-classes/
