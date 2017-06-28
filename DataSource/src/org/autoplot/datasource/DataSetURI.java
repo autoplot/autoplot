@@ -948,6 +948,9 @@ public class DataSetURI {
             } else if ( ex.getMessage().contains("unable to delete") ) {
                 IOException ex2= new IOException(ex);
                 throw ex2;
+            } else if ( ex.getMessage().contains("root must contain user name") ) {
+                IOException ex2= new IOException(ex);
+                throw ex2;
             } else {
                 IOException ex2= new IOException("Unsupported protocol: "+suri,ex);
                 throw ex2;//TODO: we should probably never hide the original message.
