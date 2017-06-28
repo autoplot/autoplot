@@ -498,7 +498,7 @@ public class JythonCompletionTask implements CompletionTask {
             while ( ss!=null ) {
                 if ( !ss.startsWith("#") && ss.length()>0 ) {
                     if ( ss.startsWith(search) && !results.contains(ss.substring(plen)) ) {
-                        String link= "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/lastSuccessfulBuild/artifact/doc/" + ss.replaceAll("\\.","/") + "/package-summary.html";
+                        String link= "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc2017/lastSuccessfulBuild/artifact/doc/" + ss.replaceAll("\\.","/") + "/package-summary.html";
                         rs.addItem(new DefaultCompletionItem(ss, search.length(), ss, ss, link ));
                         count++;
                     }
@@ -910,9 +910,9 @@ public class JythonCompletionTask implements CompletionTask {
                 interp = new PythonInterpreter();
             }
             if ( org.autoplot.jythonsupport.Util.isLegacyImports() ) {
-                URL imports = JythonOps.class.getResource("/imports.py");
+                URL imports = JythonOps.class.getResource("/imports2017.py");
                 try (InputStream in = imports.openStream()) {
-                    interp.execfile(in,"/imports.py");
+                    interp.execfile(in,"/imports2017.py");
                 }
             }
             return interp;
