@@ -201,7 +201,11 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
                 return true;
             }
         } catch ( IOException | PyException ex ) {
-            problems.add(ex.toString());
+            String s= ex.toString();
+            if ( s.startsWith("Traceback (innermost last):\n  File \"<string>\", ") ) {
+                s= s.substring(47);
+            }
+            problems.add(s);
             return true;
         }
         
