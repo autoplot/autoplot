@@ -135,6 +135,10 @@ public class InfoServlet extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
            try {
                JSONObject jo= getInfo( id );
+               String parameters= request.getParameter("parameters");
+               if ( parameters!=null) {
+                   jo= Util.subsetParams(jo,parameters);
+               }
                String s= jo.toString(4);
                out.write(s);
            } catch ( IllegalArgumentException ex ) {

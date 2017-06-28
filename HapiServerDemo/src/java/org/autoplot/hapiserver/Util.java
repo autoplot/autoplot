@@ -11,12 +11,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletResponse;
+import org.das2.qds.DataSetUtil;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -215,5 +219,86 @@ public class Util {
         }
     }
     
+    /**
+     * return a new JSONObject for the info request, with the subset of parameters.
+     * @param jo
+     * @param parameters comma-delimited list of parameters.
+     * @return
+     * @throws JSONException 
+     */
+    public static JSONObject subsetParams( JSONObject jo, String parameters ) throws JSONException {
+        jo= new JSONObject( jo.toString() );
+        String[] pps= parameters.split(",");
+        Map<String,Integer> map= new HashMap();
+        JSONArray jsonParameters= jo.getJSONArray("parameters");
+        for ( int i=0; i<jsonParameters.length(); i++ ) {
+            map.put( jsonParameters.getJSONObject(i).getString("name"), i ); // really--should name/id are two names for the same thing...
+        }
+        JSONArray newParameters= new JSONArray();
+        int[] indexMap= new int[pps.length];
+        int[] lengths= new int[pps.length];
+        boolean hasTime= false;
+        for ( int ip=0; ip<pps.length; ip++ ) {
+            Integer i= map.get(pps[ip]);
+            if ( i==null ) {
+                throw new IllegalArgumentException("bad parameter: "+pps[ip]);
+            }
+            indexMap[ip]= i;
+            if ( i==0 ) {
+                hasTime= true;
+            }
+            newParameters.put( ip, jsonParameters.get(i) );
+            lengths[ip]= 1;
+            if ( jsonParameters.getJSONObject(i).has("size") ) {
+                JSONArray jarray1= jsonParameters.getJSONObject(i).getJSONArray("size");
+                for ( int k=0; k<jarray1.length(); k++ ) {
+                    lengths[ip]*= jarray1.getInt(k);
+                }
+            }
+        }
+
+        // add time if it was missing.  This demonstrates a feature that is burdensome to implementors, I believe.
+        if ( !hasTime ) {
+            int[] indexMap1= new int[1+indexMap.length];
+            int[] lengths1= new int[1+lengths.length];
+            indexMap1[0]= 0;
+            System.arraycopy( indexMap, 0, indexMap1, 1, indexMap.length );
+            lengths1[0]= 1;
+            System.arraycopy( lengths, 0, lengths1, 1, indexMap.length );
+            indexMap= indexMap1;
+            lengths= lengths1;
+            for ( int k=newParameters.length()-1; k>=0; k-- ) {
+                newParameters.put( k+1, newParameters.get(k) );
+            }
+            newParameters.put(0,jsonParameters.get(0));
+        }
+
+        // unpack the resort where the lengths are greater than 1.
+        int[] indexMap1= new int[ DataSetUtil.sum(lengths) ];
+        int c= 0;
+        if ( indexMap1.length>indexMap.length ) {
+            for ( int k=0; k<lengths.length; k++ ) {
+                if ( lengths[k]==1 ) {
+                    indexMap1[c]= indexMap[k];
+                    c++;
+                } else {
+                    for ( int l=0; l<lengths[k]; l++ ) { //TODO: there's a bug here if there is anything after the spectrogram, but I'm hungry for turkey...
+                        indexMap1[c]= indexMap[k]+l;
+                        c++;
+                    }
+                    if ( k<lengths.length-1 ) {
+                        throw new IllegalArgumentException("not properly implemented");
+                    }
+                }
+            }
+            indexMap= indexMap1;
+        }
+
+        jsonParameters= newParameters;
+        jo.put( "parameters", jsonParameters );        
+
+        jo.put( "__indexmap__", indexMap );
+        return jo;
+    }
     
 }
