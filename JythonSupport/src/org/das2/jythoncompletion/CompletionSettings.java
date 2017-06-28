@@ -24,7 +24,7 @@ public class CompletionSettings {
     private static final Logger logger= LoggerManager.getLogger( "jython.editor" );
     Preferences prefs= AutoplotSettings.settings().getPreferences( CompletionSettings.class );
 
-    private String docHome = "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/ws/doc/"; // // see repeat code in loadPreferences
+    private String docHome = "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc2017/ws/doc/"; // // see repeat code in loadPreferences
     
     public static final String PROP_DOCHOME = "docHome";
 
@@ -173,7 +173,7 @@ public class CompletionSettings {
     }
 
     public void loadPreferences() {
-        docHome= prefs.get( PROP_DOCHOME, "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/ws/doc/" ) ;
+        docHome= prefs.get( PROP_DOCHOME, "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc2017/ws/doc/" ) ;
         tabIsCompletion= prefs.getBoolean( PROP_TAB_IS_COMPLETION, true );
         tabIsSpaces= prefs.getBoolean( PROP_TABISSPACES, false );
         showTabs= prefs.getBoolean( PROP_SHOWTABS, true );
