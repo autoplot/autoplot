@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-06-17 r20939):</p>
+        <p>Bugfixes (2017-06-28 r21064):</p>
         <ul>  
+            <li>1850: when .jyds scripts reject because of error, the red squiggle was placed on the incorrect line.
             <li>1849: QC save button cannot be enabled if all records have been QC-marked.  Thanks, Kris!
             <li>1766: $(Y,end)$m$(d,delta=10) now works.
             <li>1836: ArrayDataSet.copy used getBack to get the backing array to determine the class, causing runtime error with new mutability checks.
@@ -80,6 +81,7 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>savToHdf.pro included to encourage use of HDF5 and discourage use of IDLSav files.
             <li>528: giant refactoring where org.virbo.autoplot is moved to org.autoplot, org.virbo.dataset moved to org.das2.qds, etc.  More about this <a href="http://autoplot.org//autoplot2017">here</a>.
             <li>680: time parser supports "P1D/lastday" to refer to yesterday, where lastday refers to last day boundary; also lasthour and lastmonth.
             <li>597: export to wav can now write files containing timetag mapping, to support Larry's animations.
