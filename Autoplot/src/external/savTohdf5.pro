@@ -1,4 +1,6 @@
-PRO sav_to_hdf5,savefile,filename=filename
+; from https://d3denergetic.github.io/FIDASIM/master/sourcefile/sav_to_hdf5.pro.html
+
+PRO sav_to_hdf5,savefile,filename=filename,clobber=clobber
 ;+#save_to_hdf5
 ;+Converts an IDL save file to a HDF5 file
 ;+***
@@ -18,11 +20,11 @@ if not keyword_set(filename) then begin
   filename = strjoin(p[0:n_elements(p)-c],'.')+'.h5'
 endif
 
-restore, savefile
+restore, savefile, /verbose
 
 sObj = OBJ_NEW('IDL_Savefile',savefile)
 vars = strlowcase(sObj->Names())
-write_hdf5,vars,filename=filename
+write_hdf5,vars,filename=filename,clobber=clobber
 END
 
 FUNCTION vars_to_struct,vars=vars,level=level
