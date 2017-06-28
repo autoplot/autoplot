@@ -1,8 +1,6 @@
 
 package org.autoplot;
 
-import org.autoplot.AutoplotUtil;
-import org.autoplot.ApplicationModel;
 import external.PlotCommand;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -44,7 +42,6 @@ import org.autoplot.scriptconsole.MakeToolPanel;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
-import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
 import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.autoplot.jythonsupport.ui.ScriptPanelSupport;
@@ -209,6 +206,7 @@ public class JythonUtil {
      * @param makeTool the dialog is always shown and the user can have the script installed as a tool.
      * @param resourceUri when the user decides to make a tool, we need the source location.
      * @return JOptionPane.OK_OPTION or JOptionPane.CANCEL_OPTION if the user cancels.
+     * @throws java.io.IOException
      */
     public static int showScriptDialog( Component parent, Map<String,Object> env, File file, Map<String,String> fvars, boolean makeTool, final URI resourceUri ) throws IOException {
         
