@@ -80,7 +80,7 @@
         %>
         <br><br>
         <%
-            long l= org.virbo.dataset.RecordIterator.TIME_STAMP; // load RecordIterator class first, or we'll get a negative time.
+            long l= org.das2.qds.RecordIterator.TIME_STAMP; // load RecordIterator class first, or we'll get a negative time.
         %>
         <br><small>deployed <%= Util.getDurationForHumans( System.currentTimeMillis() - l ) %> ago</small>
         
