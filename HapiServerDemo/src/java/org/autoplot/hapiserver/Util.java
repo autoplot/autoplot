@@ -9,10 +9,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.Calendar;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -186,5 +190,30 @@ public class Util {
         dest.close();
         src.close();
     }
+    
+    /**
+     * send a "bad id" response to the client.
+     * @param id the id.
+     * @param response the response object
+     * @param out the print writer for the response object.
+     */
+    public static void raiseBadId(String id, HttpServletResponse response, final PrintWriter out) {
+        try {
+            JSONObject jo= new JSONObject();
+            jo.put("HAPI",Util.hapiVersion());
+            jo.put("createdAt",String.format("%tFT%<tRZ",Calendar.getInstance(TimeZone.getTimeZone("Z"))));
+            JSONObject status= new JSONObject();
+            status.put( "code", 1406 );
+            String msg= "unrecognized id: "+id;
+            status.put( "message", msg );
+            jo.put("status",status);
+            String s= jo.toString(4);
+            response.setStatus(404);
+            out.write(s);
+        } catch (JSONException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
     
 }

@@ -109,7 +109,8 @@ public class DataServlet extends HttpServlet {
         RecordIterator dsiter;
         
         if ( !( HapiServerSupport.getCatalogIds().contains(id) ) ) {
-            throw new IllegalArgumentException("id not recognized");
+            Util.raiseBadId(id, response, response.getWriter() );
+            return;
         }
         
         boolean allowStream= !stream.equals("false");

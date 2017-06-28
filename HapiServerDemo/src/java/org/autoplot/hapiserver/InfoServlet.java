@@ -34,6 +34,14 @@ public class InfoServlet extends HttpServlet {
     
     private static final Logger logger= Logger.getLogger("hapi");    
     
+    /**
+     * 
+     * @param id the identifier
+     * @return the JSON object
+     * @throws JSONException
+     * @throws IllegalArgumentException if the id is not defined.
+     * @throws IOException 
+     */
     protected static JSONObject getInfo( String id ) throws JSONException, IllegalArgumentException, IOException {
         JSONObject jo= new JSONObject();
         jo.put("HAPI",Util.hapiVersion());
@@ -125,12 +133,14 @@ public class InfoServlet extends HttpServlet {
         
         response.setContentType("application/json;charset=UTF-8");        
         try (PrintWriter out = response.getWriter()) {
-           
-           JSONObject jo= getInfo( id );
-           String s= jo.toString(4);
-           out.write(s);
-            
-        } catch ( JSONException | IllegalArgumentException ex ) {
+           try {
+               JSONObject jo= getInfo( id );
+               String s= jo.toString(4);
+               out.write(s);
+           } catch ( IllegalArgumentException ex ) {
+                Util.raiseBadId(id, response, out);
+           }
+        } catch ( JSONException ex ) {
             throw new ServletException(ex);
         }
     }
