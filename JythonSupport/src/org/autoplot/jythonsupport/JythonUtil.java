@@ -856,6 +856,7 @@ public class JythonUtil {
       */
      public static String simplifyScriptToGetParams( String[] ss, stmtType[] stmts, HashSet variableNames, int beginLine, int lastLine, int depth  ) {
          int acceptLine= -1;  // first line to accept
+         int currentLine= 0; // current line we are writing (0 is first line).
          StringBuilder result= new StringBuilder();
          for ( int istatement=0; istatement<stmts.length; istatement++ ) {
              stmtType o= stmts[istatement];
@@ -944,7 +945,13 @@ public class JythonUtil {
                  acceptLine= -1;
              } else {
                  if ( simplifyScriptToGetParamsOkay( o, variableNames ) ) {
-                     if ( acceptLine<0 ) acceptLine= (o).beginLine;
+                     if ( acceptLine<0 ) {
+                         acceptLine= (o).beginLine;
+                         for ( int i=currentLine+1; i<acceptLine; i++ ) {
+                             result.append("\n");
+                             currentLine= acceptLine;
+                         }
+                     }
                  } else {
                      if ( acceptLine>-1 ) {
                          int thisLine= (o).beginLine;
@@ -952,6 +959,7 @@ public class JythonUtil {
                              appendToResult(result,ss[i-1]).append("\n");
                          }
                          appendToResult(result,"\n");
+                         currentLine= thisLine;
                          acceptLine= -1;
                      }
                 }
