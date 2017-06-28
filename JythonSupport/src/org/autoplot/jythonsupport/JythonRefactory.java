@@ -220,7 +220,9 @@ public class JythonRefactory {
                             fullNameMap.put( p+cl, n+cl );
                         }
                         writer.println();
-                        affected= true;
+                        if ( !p.equals(n) ) {
+                            affected= true;
+                        }
                     } else {
                         writer.println(line);
                     }
@@ -237,6 +239,9 @@ public class JythonRefactory {
                                     String mewant= magicMatch(mehave);
                                     line= line.replace( mehave, mewant );
                                     i= line.indexOf( skey, i+mewant.length() );
+                                    if ( !mehave.equals(mewant ) ) {
+                                        affected= true;
+                                    }
                                 } else {
                                     logger.warning("something has gone terribly wrong at JythonRefactory line 233");
                                     i= -1; //
