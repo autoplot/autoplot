@@ -271,7 +271,7 @@ public class RecordIterator implements Iterator<QDataSet>  {
             if ( streamingIterator.hasNext() ) {
                 QDataSet nextRecord1= streamingIterator.next();
                 nextRecord1= normalize(nextRecord1);
-                QDataSet dep0= (QDataSet) result.slice(0);
+                QDataSet dep0= (QDataSet) nextRecord1.slice(0);
                 if ( depend0Constraint==null || DataSetUtil.asDatum(dep0).lt( depend0Constraint.max() ) ) {
                     nextRecord= nextRecord1;
                 } else {
