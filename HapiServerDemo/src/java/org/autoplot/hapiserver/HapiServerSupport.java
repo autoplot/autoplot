@@ -178,8 +178,13 @@ public class HapiServerSupport {
         if ( builder.length()==0 ) {
             throw new IOException("file is empty: "+jsonFile);
         }
-        JSONObject catalog= new JSONObject(builder.toString());
-        return catalog;
+        try {
+            JSONObject catalog= new JSONObject(builder.toString());
+            return catalog;
+        } catch ( JSONException ex ) {
+            logger.log( Level.WARNING, "Exception encountered when reading "+jsonFile, ex );
+            throw ex;
+        }
     }
     
     private static JSONObject getCatalogNew() throws IOException, JSONException {
