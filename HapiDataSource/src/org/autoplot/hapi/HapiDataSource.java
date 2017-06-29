@@ -52,8 +52,10 @@ import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DefaultTimeSeriesBrowse;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.das2.datum.TimeUtil;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
+import org.das2.qstream.DatumRangeSerializeDelegate;
 import org.das2.qstream.TransferType;
 
 /**
@@ -412,6 +414,16 @@ public class HapiDataSource extends AbstractDataSource {
         
         DatumRange tr; // TSB = DatumRangeUtil.parseTimeRange(timeRange);
         tr= tsb.getTimeRange();
+        
+        if ( info.has("cadence") ) {
+            try {
+                int[] ii= DatumRangeUtil.parseISO8601Duration(info.getString("cadence"));
+                Datum t= TimeUtil.toDatumDuration(ii);
+                tr= new DatumRange( tr.min().subtract(t), tr.max().add(t) );
+            } catch ( ParseException ex ) {
+                logger.warning("unable to parse cadence as ISO8601 duration: "+ info.getString("cadence") );
+            }
+        }
         
         JSONArray parametersArray= info.getJSONArray("parameters");
         int nparam= parametersArray.length(); // this is the actual number sent.
