@@ -96,6 +96,7 @@ public class InfoServlet extends HttpServlet {
         status.put( "message", "OK request successful");
                 
         o.put( "status", status );
+        o.put("__infoVersion__", "1.0" );
         return o;
 
     }
