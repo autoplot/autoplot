@@ -43,9 +43,6 @@ public class InfoServlet extends HttpServlet {
      * @throws IOException 
      */
     protected static JSONObject getInfo( String id ) throws JSONException, IllegalArgumentException, IOException {
-        JSONObject jo= new JSONObject();
-        jo.put("HAPI",Util.hapiVersion());
-        jo.put("createdAt",String.format("%tFT%<tRZ",Calendar.getInstance(TimeZone.getTimeZone("Z"))));
         
         if ( !HapiServerSupport.getCatalogIds().contains(id) ){
             throw new IllegalArgumentException("invalid parameter id: \""+id+"\" is not known.");
@@ -55,7 +52,12 @@ public class InfoServlet extends HttpServlet {
 
         File infoFileHome= new File( Util.getHapiHome(), "info" );
         File infoFile= new File( infoFileHome, id+".json" );
+        
         JSONObject o= HapiServerSupport.readJSON(infoFile);
+        
+        o.put("HAPI",Util.hapiVersion());
+        o.put("createdAt",String.format("%tFT%<tRZ",Calendar.getInstance(TimeZone.getTimeZone("Z"))));
+        
         JSONArray parametersRead= o.getJSONArray("parameters");
         for ( int i=0; i<parametersRead.length(); i++ ) {
             JSONObject jo1= parametersRead.getJSONObject(i);
@@ -64,22 +66,19 @@ public class InfoServlet extends HttpServlet {
                 logger.log(Level.WARNING, "required parameter fill is missing from parameter {0}", i);
             }
         }
+        
         // support local features like "now-P3D", which are not hapi features.
         if ( o.has("startDate") && o.has("stopDate") ) { 
             String startDate= o.getString("startDate");
             String stopDate= o.getString("stopDate");
             DatumRange tr= DatumRangeUtil.parseTimeRangeValid( startDate+"/"+stopDate );
-            jo.put( "startDate", tr.min().toString() );
-            jo.put( "stopDate", tr.max().toString() );
+            o.put( "startDate", tr.min().toString() );
+            o.put( "stopDate", tr.max().toString() );
         } else {
-            if ( o.has("startDate") ) {
-                jo.put( "startDate", o.get("startDate") );
-            } else {
+            if ( !o.has("startDate") ) {
                 logger.warning("non-conformant server needs to have startDate");
             }
-            if ( o.has("stopDate") ) {
-                jo.put( "stopDate", o.get("stopDate") );
-            } else {
+            if ( !o.has("stopDate") ) {
                 logger.warning("non-conformant server needs to have stopDate");
             }
         }
@@ -88,27 +87,16 @@ public class InfoServlet extends HttpServlet {
             String startDate= o.getString("sampleStartDate");
             String stopDate= o.getString("sampleStopDate");
             DatumRange tr= DatumRangeUtil.parseTimeRangeValid( startDate+"/"+stopDate );
-            jo.put( "sampleStartDate", tr.min().toString() );
-            jo.put( "sampleStopDate", tr.max().toString() );
+            o.put( "sampleStartDate", tr.min().toString() );
+            o.put( "sampleStopDate", tr.max().toString() );
         }
-        
-        Iterator iter= o.keys();
-        while ( iter.hasNext() ) {
-            Object k= iter.next();
-            String s= String.valueOf(k);
-            if ( s.startsWith("x_") || s.equals("resourceURL") ) {
-                jo.put( s, o.get(s) );
-            }
-        }
-        
-        jo.put("parameters",parameters);
         
         JSONObject status= new JSONObject();
         status.put( "code", 1200 );
         status.put( "message", "OK request successful");
                 
-        jo.put( "status", status );
-        return jo;
+        o.put( "status", status );
+        return o;
 
     }
 
