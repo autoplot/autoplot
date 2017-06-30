@@ -175,7 +175,15 @@ public class JythonRefactory {
                     writer.print( m.group(6) );
                     writer.print( m.group(7) );
                     writer.println();
-                    affected= true;
+                    if ( cl!=null ) {
+                        if ( !p.equals( n+cl ) ) {
+                            affected= true;
+                        }
+                    } else {
+                        if ( !p.equals( n ) ) {
+                            affected= true;
+                        }
+                    }
                 } else {
                     writer.println(line);
                 }
