@@ -438,13 +438,13 @@ public class CreatePngWalk {
             }
         });
         
-        LoggerManager.setEnableTimers(true);
-        LoggerManager.setTimerLogfile("/tmp/foo.autoplot.txt");
+        //LoggerManager.setEnableTimers(true);
+        //LoggerManager.setTimerLogfile("/tmp/foo.autoplot.txt");
         
         String currentTimeLabel;
         for ( String atime : times ) {
             
-            LoggerManager.resetTimer();
+            //LoggerManager.resetTimer();
             
             returnCode1= 0;
             
@@ -455,7 +455,7 @@ public class CreatePngWalk {
                 atime= atime.substring(0,ic);
             }
             
-            LoggerManager.markTime("455");
+            //LoggerManager.markTime("455");
             
             String filename= getFilename( params, "", atime );
             String filenameThumb = getRelativeFilename( params, "thumbs400", atime );
@@ -469,7 +469,7 @@ public class CreatePngWalk {
             pngFilenameArrayThumbs.add(filenameThumb);
             pngFilenameArrayBig.add(filenameBig);
             
-            LoggerManager.markTime("469");
+            //LoggerManager.markTime("469");
             
             count = count + 1;
             if (mon.isCancelled()) {
@@ -486,7 +486,7 @@ public class CreatePngWalk {
                 }
             }
 
-            LoggerManager.markTime("486");
+            //LoggerManager.markTime("486");
             
             try {
                 DatumRange dr;
@@ -514,9 +514,9 @@ public class CreatePngWalk {
             mon.setProgressMessage( String.format("write %s", filename ) );
             logger.log( Level.FINE, String.format("write %s", filename ) );
 
-            LoggerManager.markTime("514");
+            //LoggerManager.markTime("514");
             appmodel.waitUntilIdle();
-            LoggerManager.markTime("516");
+            //LoggerManager.markTime("516");
             
             if ( params.autorange ) {
                 for ( Plot p: dom2.getPlots() ) {
@@ -526,10 +526,10 @@ public class CreatePngWalk {
                 }
 
             }
-            LoggerManager.markTime("526");
+            //LoggerManager.markTime("526");
             appmodel.waitUntilIdle();
 
-            LoggerManager.markTime("529");
+            //LoggerManager.markTime("529");
             
             if ( atime.equals(times[0]) ) { // resetting zoomY and zoomZ can cause the labels and bounds to change.  Turn off autoranging.
                 dom2.getOptions().setAutolayout(false);
@@ -538,7 +538,7 @@ public class CreatePngWalk {
             
             BufferedImage image = null;
             
-            LoggerManager.markTime("538");
+            //LoggerManager.markTime("538");
             
             if ( params.outputFormat.equals("png") ) {
                 image= myWriteToPng(filename, dom2, w0, h0);
@@ -548,7 +548,7 @@ public class CreatePngWalk {
             } else {
                 dom2.getCanvases(0).getController().getDasCanvas().writeToPDF(filename);
             }
-            LoggerManager.markTime("548");
+            //LoggerManager.markTime("548");
             
             if ( returnCode1==0 ) {
                 returnCodeAll= 0;
@@ -581,7 +581,7 @@ public class CreatePngWalk {
                 }
             }
             
-            LoggerManager.markTime("581");
+            //LoggerManager.markTime("581");
             
             double imagesPerSec = count * 1000. / (java.lang.System.currentTimeMillis() - t0);
             double etaSec= (n-count) / imagesPerSec;
@@ -597,10 +597,10 @@ public class CreatePngWalk {
             } else {
                 mon.setAdditionalInfo(String.format( Locale.US, "(%.1f/sec%s)", imagesPerSec, etaStr ) );
             }
-            LoggerManager.markTime("597");
+            //LoggerManager.markTime("597");
         }
         
-        LoggerManager.setEnableTimers(false);
+        //LoggerManager.setEnableTimers(false);
         
         if ( !mon.isCancelled() ) {
             writeHTMLFile( params, pngFilenameArrayThumbs, pngFilenameArrayBig, timeLabels );
