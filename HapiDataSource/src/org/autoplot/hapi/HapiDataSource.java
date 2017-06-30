@@ -15,7 +15,6 @@ import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +54,6 @@ import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.datum.TimeUtil;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
-import org.das2.qstream.DatumRangeSerializeDelegate;
 import org.das2.qstream.TransferType;
 
 /**
@@ -421,7 +419,7 @@ public class HapiDataSource extends AbstractDataSource {
                 Datum t= TimeUtil.toDatumDuration(ii);
                 tr= new DatumRange( tr.min().subtract(t), tr.max().add(t) );
             } catch ( ParseException ex ) {
-                logger.warning("unable to parse cadence as ISO8601 duration: "+ info.getString("cadence") );
+                logger.log(Level.WARNING, "unable to parse cadence as ISO8601 duration: {0}", info.getString("cadence"));
             }
         }
         
@@ -1085,11 +1083,11 @@ public class HapiDataSource extends AbstractDataSource {
             
             for ( int i=1; i<pds.length; i++ ) { // only works for rank2!!!
                 if ( pds[i].dependName!=null ) {
-                    for ( int j=0; j<pds[i].dependName.length; j++ ) {
-                        if ( pds[i].dependName[j]!=null ) {
+                    for (String dependName : pds[i].dependName) {
+                        if (dependName != null) {
                             int k;
-                            for ( k=1; k<pds.length; k++ ) {
-                                if ( pds[k].name.equals(pds[i].dependName[j]) ) {
+                            for (k=1; k<pds.length; k++) {
+                                if (pds[k].name.equals(dependName)) {
                                     break;
                                 }
                             }
