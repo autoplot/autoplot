@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Our local grocery store celebrates PI day back in March, and unintentionally supports TAU (2*PI) as well.  Happy <a href="https://tauday.com/tau-manifesto">TAU</a> day!
+        <p><small>HAPI client considers data cadence, drawing connections to points beyond the x-axis range.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-06-28 r21064):</p>
+        <p>Bugfixes (2017-06-30 r21085):</p>
         <ul>  
+            <li>improvements to events renderer to better support nominal data.
+            <li>HAPI client considers data cadence when requesting data.
+            <li>rfe528: correct warning message import being corrected when correction wasn't necessary.
             <li>1850: when .jyds scripts reject because of error, the red squiggle was placed on the incorrect line.
             <li>1849: QC save button cannot be enabled if all records have been QC-marked.  Thanks, Kris!
             <li>1766: $(Y,end)$m$(d,delta=10) now works.
