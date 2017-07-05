@@ -553,6 +553,8 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         formatSysProp( doc, p, "os.name" );
         formatSysProp( doc, p, "os.arch" );
         formatSysProp( doc, p, "os.version" );
+        formatSysProp( doc, p, "javawebstart.version" );
+        
         DecimalFormat nf = new DecimalFormat("0.0");
         String mem = nf.format(Runtime.getRuntime().maxMemory() / (1024 * 1024));
         String tmem= nf.format(Runtime.getRuntime().totalMemory() / (1024 * 1024));
