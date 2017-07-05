@@ -537,7 +537,12 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     private static void formatSysProp( Document doc, Element parent,String prop ) {
         Element ele= doc.createElement("property");
         ele.setAttribute( "name", prop );
-        ele.setAttribute( "value",System.getProperty(prop) );
+        String v= System.getProperty(prop);
+        if ( v!=null ) {
+            ele.setAttribute( "value",v );
+        } else {
+            ele.setAttribute( "value","(null)" );
+        }
         parent.appendChild(ele);
     }
 
