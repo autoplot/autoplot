@@ -235,7 +235,7 @@ public class NetCDFDataSource extends AbstractDataSource {
         boolean makeLocal= true;
         if ( makeLocal ) {
             File file= getFile(mon.getSubtaskMonitor("getFile"));
-            location= "file://"+file.toString();
+            location= file.toURI().toURL().toString();
         } else {
             location= DataSetURI.fromUri(resourceURI);
         }
