@@ -15,6 +15,9 @@
 # Used by: ???
 #
 
+echo "Is this used anywhere?  Contact autoplot@groups.google.com."
+exit(1)
+
 # set JAVA_HOME 
 if [ "" = "$JAVA_HOME" ]; then
     JAVA_HOME=/usr/local/jdk1.7.0_80/

@@ -275,6 +275,7 @@ if [ $hasErrors -eq 1 ]; then
   exit 1 
 fi
 echo "only the first compile is echoed."
+compilef 'org/virbo/autoplot/*.java'  # support old launchers.
 compilef 'org/autoplot/state/*.java'
 compilef 'org/autoplot/scriptconsole/DumpRteExceptionHandler.java'
 compilef 'org/autoplot/JythonMain.java'
