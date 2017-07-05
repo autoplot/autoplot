@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>HAPI client considers data cadence, drawing connections to points beyond the x-axis range.
+        <p><small>Fun with the mash up tool, plotting the left and right channels of a stereo wav file.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,10 @@
         
         <p>Bugfixes (2017-06-30 r21085):</p>
         <ul>  
+            <li>1854: clean up code which relied on file.toString to construct URLs for the NetCDF library, which would break on Windows.
+            <li>rte020756902: old bug where getAllUnits() once returned array of strings now returns array of units showed with recent refactoring.  Thanks George!
+            <li>rfe528: old references to org.virbo.autoplot.AutoplotUI were not supported in jumbojar, because there were no direct references to the routine.
+            <li>unintentionally committed testing code prevented PNGWalk creation on Windows machines, since May 03, 2017.
             <li>improvements to events renderer to better support nominal data.
             <li>HAPI client considers data cadence when requesting data.
             <li>rfe528: correct warning message import being corrected when correction wasn't necessary.
@@ -84,6 +88,7 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>runtime error reporting includes a flag for JavaWebstart use.
             <li>savToHdf.pro included to encourage use of HDF5 and discourage use of IDLSav files.
             <li>528: giant refactoring where org.virbo.autoplot is moved to org.autoplot, org.virbo.dataset moved to org.das2.qds, etc.  More about this <a href="http://autoplot.org//autoplot2017">here</a>.
             <li>680: time parser supports "P1D/lastday" to refer to yesterday, where lastday refers to last day boundary; also lasthour and lastmonth.
