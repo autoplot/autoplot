@@ -22,10 +22,12 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p><a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac DMG Release</a> is available.
+        <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
         <p>Bugfixes (2017-07-05 r21092):</p>
         <ul>  
+            <li>1836: ds.putProperty( QDataSet.UNITS, None ) would cause RTE.  Thanks, Kristoff!
+            <li>1853: copy over code from other makeCanonical branch to handle case where NullPointerException occurred.
             <li>1854: clean up code which relied on file.toString to construct URLs for the NetCDF library, which would break on Windows.  Thanks, Kristoff!
             <li>rte020756902: old bug where getAllUnits() once returned array of strings now returns array of units showed with recent refactoring.  Thanks George!
             <li>rfe528: old references to org.virbo.autoplot.AutoplotUI were not supported in jumbojar, because there were no direct references to the routine.
@@ -122,7 +124,9 @@
 
         <p>Known issues:</p>
         <ul>
-            <li> <a href="https://sourceforge.net/p/autoplot/bugs/?limit=1000">see Source Forge</a>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/?limit=1000">see Source Forge</a>
+            <li>Bugs often have a four-digit ID and can be reviewed with https://sourceforge.net/p/autoplot/bugs/&lt;ID&gt;/.  
+            <li>Features typically have a three-digit ID and can be reviewed with https://sourceforge.net/p/autoplot/feature-requests/&lt;ID&gt;/.
         </ul>
         <p>This completes the feature set for the new production branch. No major features will be added before branching this version.
             A production branch will be started in a couple of weeks, and the "Start Autoplot" link at the top of
