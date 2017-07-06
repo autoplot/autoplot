@@ -891,6 +891,8 @@ public class PyQDataSet extends PyJavaInstance {
         if ( prop.toString().equals(QDataSet.UNITS) ) {
             if ( value instanceof PyJavaInstance ) {
                 this.units= (Units) ((PyJavaInstance)value).__tojava__(Units.class);
+            } else if ( value.equals(Py.None) ) {
+                this.units= null;
             } else {
                 this.units= (Units)value;
             }
