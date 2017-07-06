@@ -893,8 +893,14 @@ public class PyQDataSet extends PyJavaInstance {
                 this.units= (Units) ((PyJavaInstance)value).__tojava__(Units.class);
             } else if ( value.equals(Py.None) ) {
                 this.units= null;
-            } else {
+            } else if ( value instanceof Units ) {
                 this.units= (Units)value;
+            } else if ( value instanceof String ) {
+                value= Units.lookupUnits((String)value);
+            } else if ( value instanceof PyString ) {
+                value= Units.lookupUnits(((PyString)value).toString());
+            } else {
+                logger.warning("Expected Unit object for units.");
             }
         }
         Class clas= DataSetUtil.getPropertyClass(prop.toString() );
@@ -908,6 +914,13 @@ public class PyQDataSet extends PyJavaInstance {
     public void putProperty( PyString prop, int index, Object value ) {
         if ( mpds==null || mpds.isImmutable() ) throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
         Class clas= DataSetUtil.getPropertyClass(prop.toString() );
+        if ( prop.toString().equals(QDataSet.UNITS) ) {
+            if ( value instanceof String ) {
+                value= Units.lookupUnits((String)value);
+            } else if ( value instanceof PyString ) {
+                value= Units.lookupUnits(((PyString)value).toString());
+            }
+        }
         if ( value instanceof PyObject ) {
             PyObject po= (PyObject)value;
             mpds.putProperty(prop.toString(),index,po.__tojava__(clas));
