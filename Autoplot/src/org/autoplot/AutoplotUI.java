@@ -4880,7 +4880,8 @@ APSplash.checkTime("init 200");
                         addSingleInstanceListener( alm, app );
                     }
                     if ( alm.getBooleanValue("samp") ) {
-                        org.autoplot.AddSampListener.addSampListener( app.dataSetSelector );
+                        org.autoplot.AddSampListener.addSampListener( app );
+                        app.setMessage("SAMP listener started");
                     }
 
                 }

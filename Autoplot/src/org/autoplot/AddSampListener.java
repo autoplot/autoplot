@@ -1,10 +1,13 @@
 
 package org.autoplot;
 
+import java.awt.Dimension;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JComponent;
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.Metadata;
 import org.astrogrid.samp.xmlrpc.StandardClientProfile;
@@ -33,9 +36,11 @@ public class AddSampListener {
 
     /**
      * Add the SAMP listener to Autoplot.
-     * @param sel the Autoplot URI address bar
+     * @param app the Autoplot application root.
      */
-    public synchronized static void addSampListener( final DataSetSelector sel ) {
+    public synchronized static void addSampListener( AutoplotUI app ) {
+        
+        final DataSetSelector sel= app.getDataSetSelector();
         
         AbstractMessageHandler l= listeners.get(sel.hashCode()); //why is my HashMap not working???
         if ( listeners.size()>0 ) {
@@ -46,9 +51,30 @@ public class AddSampListener {
         logger.info( "starting up SAMP listener" );
 
         StandardClientProfile profile = StandardClientProfile.getInstance();
+        
+        if ( !profile.isHubRunning() ) {
+            try {
+                logger.info("starting SAMP hub...");
+                org.astrogrid.samp.hub.Hub.runMain(new String[0]);
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, null, "error when starting hub");
+                logger.log(Level.SEVERE, null, ex);
+            }
+        } else {
+            logger.info("Client is already running.");
+        }
+        
         GuiHubConnector hubConnector = new GuiHubConnector(profile);
         hubConnector.setAutoconnect(3);
 
+        if ( ! "true".equals( System.getProperty("java.awt.headless") ) ) {
+            //hubConnector.createMonitorPanel();
+            JComponent cc= hubConnector.createMonitorPanel();
+            cc.setMinimumSize( new Dimension(32,32*4));
+            cc.setPreferredSize( new Dimension(32,32*4));
+            ScriptContext.addTab( "samp", cc );
+        }
+        
         Metadata meta = new Metadata();
         meta.setName("Autoplot");
         meta.setDescriptionText("Autoplot");
