@@ -39,9 +39,16 @@ public class AddSampListener {
      * @param app the Autoplot application root.
      */
     public synchronized static void addSampListener( AutoplotUI app ) {
-        
         final DataSetSelector sel= app.getDataSetSelector();
-        
+        addSampListener( sel );
+    }
+    
+    /**
+     * Add the SAMP listener to Autoplot.
+     * @param sel the selector.
+     */
+    public synchronized static void addSampListener( final DataSetSelector sel ) {
+
         AbstractMessageHandler l= listeners.get(sel.hashCode()); //why is my HashMap not working???
         if ( listeners.size()>0 ) {
             logger.info("handler is already running.");
