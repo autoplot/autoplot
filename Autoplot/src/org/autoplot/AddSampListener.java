@@ -70,8 +70,8 @@ public class AddSampListener {
         if ( ! "true".equals( System.getProperty("java.awt.headless") ) ) {
             //hubConnector.createMonitorPanel();
             JComponent cc= hubConnector.createMonitorPanel();
-            cc.setMinimumSize( new Dimension(32,32*4));
-            cc.setPreferredSize( new Dimension(32,32*4));
+            //cc.setMinimumSize( new Dimension(400,400));
+            //cc.setPreferredSize( new Dimension(400,400));
             ScriptContext.addTab( "samp", cc );
         }
         
