@@ -10,6 +10,7 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -670,7 +671,32 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     
     private void write( String name ) throws IOException {
         logger.log(Level.FINE, "call cdf.write({0})", new Object[] { logName(name) } );
-        cdf.write( name );
+        try {
+            synchronized (CdfDataSource.lock) {
+                CdfDataSource.openFiles.clear();
+                CdfDataSource.openFilesRev.clear();
+                CdfDataSource.openFilesFresh.clear();
+            }
+            System.gc();
+            cdf.write( name );
+        } catch ( FileNotFoundException ex ){
+            logger.log(Level.WARNING, "first attempt to write \"{0}\" fails, try again for good measure", name);
+            synchronized (CdfDataSource.lock) {
+                CdfDataSource.openFiles.clear();
+                CdfDataSource.openFilesRev.clear();
+                CdfDataSource.openFilesFresh.clear();
+            }
+            System.gc();
+            try {
+                Thread.sleep(1000);
+                System.gc();
+                Thread.sleep(1000);
+                System.gc();
+            } catch (InterruptedException ex1) {
+                logger.log(Level.SEVERE, null, ex1);
+            }
+            cdf.write( name );
+        }
     }
     
     private void defineCompressedVariable( String name, CDFDataType type, int[] dims )  throws Exception{
