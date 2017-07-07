@@ -77,7 +77,12 @@ function raiseerror {
 #JAVAARGS="-g -target 1.7 -source 1.7 -Xlint:unchecked -bootclasspath $JAVA_HOME/jre/lib/rt.jar -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10"
 JAVAARGS="-g -target 1.7 -source 1.7 -bootclasspath $JAVA_HOME/jre/lib/rt.jar -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10"
 
+export timer=`date +%s`
+
 function compilef {
+   timer1=`date +%s`
+   dt=`expr $(( timer1 - timer ))`
+   echo "ELAPSED TIME (SEC): $dt"
    echo $JAVAC $JAVAARGS $1
    if ! $JAVAC $JAVAARGS $1; then raiseerror; fi
 }
@@ -268,6 +273,8 @@ hasErrors=0
 echo "=== compile sources..."
 cd temp-volatile-src
 echo "pwd=" `pwd`
+t0=`date +%s`
+
 echo $JAVAC $JAVAARGS org/autoplot/AutoplotUI.java
 if ! $JAVAC $JAVAARGS org/autoplot/AutoplotUI.java; then echo "\n\n****\n\n"; hasErrors=1; fi
 if [ $hasErrors -eq 1 ]; then
