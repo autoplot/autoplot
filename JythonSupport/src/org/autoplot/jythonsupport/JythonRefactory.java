@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.io.PrintStream;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -102,7 +103,7 @@ public class JythonRefactory {
     
     private static final Map<String,String> fullNameMap= new HashMap<>();    
     
-    private static final Pattern IMPORT_REGEX= Pattern.compile("(\\s*)from(\\s+)([a-zA-Z0-9_.]+)(\\s+)import(\\s+)([a-zA-Z0-9_ ,]+)(\\s*)");
+    private static final Pattern IMPORT_REGEX= Pattern.compile("(\\s*)from(\\s+)([a-zA-Z0-9_.]+)(\\s+)import(\\s+)([a-zA-Z0-9_ ,\\*(]+)(\\s*)");
     private static final Pattern IMPORT_AS_REGEX= Pattern.compile("(\\s*)import(\\s+)([a-zA-Z0-9_.]+)(\\s*)((\\s+)as(\\s+)([a-zA-Z0-9_]+)(\\s*))?");
     
     private static String magicMatch( String p ) {
@@ -135,7 +136,7 @@ public class JythonRefactory {
         
         boolean affected= false;
         
-        BufferedReader reader= new BufferedReader( new InputStreamReader(in) );
+        LineNumberReader reader= new LineNumberReader( new InputStreamReader(in) );
         String line= reader.readLine(); 
         ByteArrayOutputStream baos= new ByteArrayOutputStream(10000);
         PrintStream writer= new PrintStream( baos );
