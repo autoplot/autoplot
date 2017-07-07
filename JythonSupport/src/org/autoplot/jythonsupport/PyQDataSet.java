@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumUtil;
@@ -357,7 +358,29 @@ public class PyQDataSet extends PyJavaInstance {
             return super.invoke(name,arg1);
         }
     }
+    
+    /**
+     * experiment with making the dataset mutable, even after it has been 
+     * made immutable.
+     */
+    private void makeMutable() {
+        logger.log(Level.FINE, "makeMutable called using: {0}", rods);
+        if ( mpds==null ) {
+            mpds= DataSetOps.makePropertiesMutable(rods);
+        } else {
+            mpds= DataSetOps.makePropertiesMutable(mpds);
+        }
+        
+        if ( ds==null ) {
+            this.ds= Ops.copy(rods);
+            this.rods= ds;
+        } else {
+            this.ds= Ops.copy(ds);
+            this.rods= ds;            
+        }
 
+    }
+    
     @Override
     public PyObject invoke(String name, PyObject arg1, PyObject arg2) {
         PyReflectedFunction func= binaryInfixMethods.get(name);
@@ -366,11 +389,12 @@ public class PyQDataSet extends PyJavaInstance {
         } else {
             if ( name.equals("putProperty") ) {
                 if ( mpds==null || this.mpds.isImmutable() ) {
-                    throw new RuntimeException("putProperty on dataset that is read-only, use copy(ds) to make a mutable copy.");
-                } else {
-                    this.putProperty( (PyString)arg1, arg2 );
-                    return Py.None;
+                    makeMutable();
                 }
+                
+                this.putProperty( (PyString)arg1, arg2 );
+                return Py.None;
+                
             } else {
                 return super.invoke(name,arg1,arg2);
             }
@@ -652,8 +676,8 @@ public class PyQDataSet extends PyJavaInstance {
      */
     @Override
     public void __setitem__(PyObject arg0, PyObject arg1) {
-        if ( ds==null ) {
-            throw new RuntimeException("__setitem__ on dataset that is read-only, use copy(ds) to make a mutable copy.");
+        if ( ds==null || ds.isImmutable() ) {
+            makeMutable();
         }
         DataSetIterator iter = new QubeDataSetIterator(ds);
         if ( arg0 instanceof PyList ) {
