@@ -81,8 +81,9 @@ export timer=`date +%s`
 
 function compilef {
    timer1=`date +%s`
-   dt=`expr $(( timer1 - timer ))`
-   echo "ELAPSED TIME (SEC): $dt"
+   #dt=`expr $(( timer1 - timer ))`
+   echo "DATE: $timer1 $1
+   #echo "ELAPSED TIME (SEC): $dt"
    echo $JAVAC $JAVAARGS $1
    if ! $JAVAC $JAVAARGS $1; then raiseerror; fi
 }
