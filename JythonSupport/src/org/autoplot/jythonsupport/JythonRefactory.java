@@ -145,6 +145,14 @@ public class JythonRefactory {
             //if ( line.contains( "org.virbo.jythonsupport.ui.Util.FormData" ) ) {
             //    System.err.println("here114");
             //}
+            
+            int ibs= line.indexOf(".BoxSelected");
+            if ( ibs>-1 ) {
+                line= line.substring(0,ibs) + ".boxSelected" + line.substring(ibs+12);
+                affected= true;
+                logger.log(Level.WARNING, "fixImports found use of old .BoxSelected method" );
+            }
+            
             m= IMPORT_REGEX.matcher(line);
             if ( m.matches() ) {
                 String p= m.group(3);
