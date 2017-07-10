@@ -773,7 +773,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
         BoxSelectorMouseModule mm= new BoxSelectorMouseModule( p, p.getXAxis(), p.getYAxis(), null, new BoxRenderer(p), label );
         BoxSelectionListener bsl= new BoxSelectionListener() {
             @Override
-            public void BoxSelected(BoxSelectionEvent e) {
+            public void boxSelected(BoxSelectionEvent e) {
                 listener.__call__(Py.java2py(e));
             }
         };
