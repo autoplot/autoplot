@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Fun with the mash up tool, plotting the left and right channels of a stereo wav file.
+        <p><small>Quick study of automated testing read times shows where the time it takes to read a file is bimodal.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-07-07 r21108):</p>
+        <p>Bugfixes (2017-07-12 r21120):</p>
         <ul>  
+            <li>method "BoxSelected" renamed to "boxSelected" to conform to Java and Java Beans conventions, and Jython refactoring supports old scripts.
             <li>1661: format to CDF corrected on Windows by doing extra garbage collections.  Thanks, Kristoff!
             <li>1836: copy dataset internally when the mutable dataset is no longer mutable.  Thanks, Kristoff!
             <li>rfe528: star imports are supported.  Thanks, Kristoff!
