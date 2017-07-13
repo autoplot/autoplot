@@ -2354,7 +2354,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         JRadioButton b2= new JRadioButton( s2 );
         p.add(b2);
         bg.add(b2);
-        JOptionPane.showMessageDialog( parent, p, "Which range", JOptionPane.QUESTION_MESSAGE );
+        JOptionPane.showMessageDialog( parent, p, "Which Range?", JOptionPane.QUESTION_MESSAGE );
         if ( b1.isSelected() ) {
             LoggerManager.getLogger("gui").log(Level.FINE, "user picked first timerange {0}", s1);
             return timeRange1;
@@ -2394,7 +2394,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
             if ( i==0 ) bg.setSelected(b1.getModel(),true);
             buttons.add(b1);
         }
-        JOptionPane.showMessageDialog( parent, p, "Which Range", JOptionPane.QUESTION_MESSAGE );
+        JOptionPane.showMessageDialog( parent, p, "Which Range?", JOptionPane.QUESTION_MESSAGE );
         for ( int i=0; i<timeRange.size(); i++ ) {
             if ( buttons.get(i).isSelected() ) {
                 LoggerManager.getLogger("gui").log(Level.FINE, "user picked {0} timerange {1}", new Object[] { i, timeRange.get(i) } );
