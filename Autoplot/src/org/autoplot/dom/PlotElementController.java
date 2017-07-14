@@ -91,6 +91,7 @@ import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
 import org.autoplot.metatree.MetadataUtil;
+import org.das2.datum.InconvertibleUnitsException;
 
 /**
  * PlotElementController manages the PlotElement, for example resolving the datasource and loading the dataset.
@@ -2357,12 +2358,16 @@ public class PlotElementController extends DomNodeController {
                     ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 1 ), props, ignoreDsProps );
                 } else {
                     ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, fillDs.length(0)-1 ), props, ignoreDsProps ); 
+                    Units u= ydesc.range.getUnits();
                     for ( int i=fillDs.length(0)-2; i>=0; i-- ) {
-                       AutoplotUtil.AutoRangeDescriptor ydesc1= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs,i ), props, ignoreDsProps );
-                       if ( ydesc1.range.getUnits().isConvertibleTo(ydesc.range.getUnits()) ) {
-                           ydesc.range= DatumRangeUtil.union( ydesc.range, ydesc1.range );
-                       } else {
-                           break;
+                        AutoplotUtil.AutoRangeDescriptor ydesc1= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs,i ), props, ignoreDsProps );
+                        if ( ydesc1.range.getUnits().isConvertibleTo(u) ) {
+                            ydesc.range= DatumRangeUtil.union( ydesc.range, ydesc1.range );
+                        } else {
+                            Units u1;
+                            u1= ydesc1.range.getUnits();
+                            DatumRange r1= new DatumRange( ydesc1.range.min().doubleValue(u1), ydesc1.range.max().doubleValue(u1), u );
+                            ydesc.range= DatumRangeUtil.union( ydesc.range, r1 );
                        }
                     }
                 }
