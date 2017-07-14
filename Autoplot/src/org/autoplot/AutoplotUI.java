@@ -3744,15 +3744,11 @@ private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     org.das2.util.LoggerManager.logGuiEvent(evt);
     try {
         String release = AboutUtil.getReleaseTag();
-        if (release != null) {
-            if ( release.equals("(dev)") ) {
-                release= "devel";
-            }
-            String surl = "http://autoplot.org/jnlp/" + release;
-            AutoplotUtil.openBrowser(surl);
-        } else {
-            JOptionPane.showMessageDialog(this, "This is an untagged release.");
+        if ( release.equals("(dev)") ) {
+            release= "devel";
         }
+        String surl = "http://autoplot.org/jnlp/" + release;
+        AutoplotUtil.openBrowser(surl);
     } catch (IOException ex) {
         throw new RuntimeException(ex);
     }
@@ -4734,12 +4730,8 @@ private void updateFrameTitle() {
         String tag;
         try {
             tag = AboutUtil.getReleaseTag(APSplash.class);
-            if ( tag!=null ) {
-                welcome+=" ("+tag+")";
-                System.setProperty("http.agent", "Autoplot-"+tag );
-            } else {
-                System.setProperty("http.agent", "Autoplot-dev" );
-            }
+            welcome+=" ("+tag+")";
+            System.setProperty("http.agent", "Autoplot-"+tag );
             
         } catch (IOException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);

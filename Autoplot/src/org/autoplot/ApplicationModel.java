@@ -980,7 +980,6 @@ public class ApplicationModel {
         }
 
         BufferedImage im= (BufferedImage) getCanvas().getImageNonPrint( getCanvas().getWidth(), getCanvas().getHeight() );
-        if ( im==null ) return null;
 
         if ( im.getHeight() / height > 3 ) {
             thickenLines(im);
