@@ -1537,47 +1537,47 @@ public class JythonUtil {
         return result.toString();
     }
     
-    public static void main( String[] args ) throws IOException {
-        main_test1(args);
-    }
-    
-        /**
-     * test the getGetParams for a script, seeing if we can reduce 
-     * and run the script within interactive time.
-     * 
-     * @param file
-     * @throws Exception 
-     */
-    private static void doTestGetParams( String testId, String file ) {
-        long t0= System.currentTimeMillis();
-        System.err.println("== test "+testId+": "+ file + " ==" );
-        
-        try {
-            String script= JythonUtil.readScript( new FileReader(file) );
-            String scrip= org.autoplot.jythonsupport.JythonUtil.simplifyScriptToGetParams(script,true);
-            File f= new File(file);
-            String fout= "./test038_"+f.getName();
-            try ( FileWriter fw= new FileWriter(fout) ) {
-                fw.append(scrip);
-            }
-            List<Param> parms= org.autoplot.jythonsupport.JythonUtil.getGetParams( script );
-            for ( Param p: parms ) {
-                System.err.println(p);
-            }
-            System.err.println( String.format( "read params in %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
-        } catch ( Exception ex ) {
-            logger.log(Level.WARNING,null,ex);
-            System.err.println( String.format( "failed within %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
-        }
-
-    }
-    
-    public static void main_test1(String[] args ) throws FileNotFoundException {
-        doTestGetParams("006","/home/jbf/ct/hudson/script/test038/yab_20131003.jy"); //TODO: needs fixing
-        doTestGetParams("000","/home/jbf/ct/hudson/script/test038/trivial.jy");
-        doTestGetParams("001","/home/jbf/ct/hudson/script/test038/demoParms0.jy");
-        doTestGetParams("002","/home/jbf/ct/hudson/script/test038/demoParms1.jy");
-        doTestGetParams("003","/home/jbf/ct/hudson/script/test038/demoParms.jy");
-        doTestGetParams("004","/home/jbf/ct/hudson/script/test038/rbsp/emfisis/background_removal_wfr.jyds");
-    }
+//    public static void main( String[] args ) throws IOException {
+//        main_test1(args);
+//    }
+//    
+//        /**
+//     * test the getGetParams for a script, seeing if we can reduce 
+//     * and run the script within interactive time.
+//     * 
+//     * @param file
+//     * @throws Exception 
+//     */
+//    private static void doTestGetParams( String testId, String file ) {
+//        long t0= System.currentTimeMillis();
+//        System.err.println("== test "+testId+": "+ file + " ==" );
+//        
+//        try {
+//            String script= JythonUtil.readScript( new FileReader(file) );
+//            String scrip= org.autoplot.jythonsupport.JythonUtil.simplifyScriptToGetParams(script,true);
+//            File f= new File(file);
+//            String fout= "./test038_"+f.getName();
+//            try ( FileWriter fw= new FileWriter(fout) ) {
+//                fw.append(scrip);
+//            }
+//            List<Param> parms= org.autoplot.jythonsupport.JythonUtil.getGetParams( script );
+//            for ( Param p: parms ) {
+//                System.err.println(p);
+//            }
+//            System.err.println( String.format( "read params in %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
+//        } catch ( Exception ex ) {
+//            logger.log(Level.WARNING,null,ex);
+//            System.err.println( String.format( "failed within %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
+//        }
+//
+//    }
+//    
+//    public static void main_test1(String[] args ) throws FileNotFoundException {
+//        doTestGetParams("006","/home/jbf/ct/hudson/script/test038/yab_20131003.jy"); //TODO: needs fixing
+//        doTestGetParams("000","/home/jbf/ct/hudson/script/test038/trivial.jy");
+//        doTestGetParams("001","/home/jbf/ct/hudson/script/test038/demoParms0.jy");
+//        doTestGetParams("002","/home/jbf/ct/hudson/script/test038/demoParms1.jy");
+//        doTestGetParams("003","/home/jbf/ct/hudson/script/test038/demoParms.jy");
+//        doTestGetParams("004","/home/jbf/ct/hudson/script/test038/rbsp/emfisis/background_removal_wfr.jyds");
+//    }
 }
