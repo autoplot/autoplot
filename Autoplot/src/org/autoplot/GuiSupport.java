@@ -2082,7 +2082,7 @@ public class GuiSupport {
             @Override
             public boolean accept(File f) {
                 String s= f.toString();
-                if ( s==null ) return false; // Old Windows bug.
+                if ( s==null ) return false; // Old Windows bug.  FINDBUGS OKAY
                 return s.endsWith(".vap") || f.isDirectory();
             }
 
