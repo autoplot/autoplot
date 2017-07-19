@@ -37,9 +37,7 @@ public class HapiServer {
     protected final static Logger logger= Logger.getLogger("apdss.hapi");
     
     /**
-     * get known servers.  This scrapes through the user's history 
-     * to find servers as well, but we might have a more transparent method
-     * for doing this.
+     * get known servers.  
      * @return known servers
      */
     public static List<String> getKnownServers() {
