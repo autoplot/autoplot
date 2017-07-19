@@ -1308,7 +1308,7 @@ public abstract class QDataSetBridge {
     /**
      * return the total memory and free memory available to the Java process,
      * in megabytes (1e6 bytes). 
-     * @return an integer array [ total, used ]
+     * @return an integer array [ used, total ]
      */
     public int[] freeMemory() {
     
@@ -1316,10 +1316,10 @@ public abstract class QDataSetBridge {
         int tmem= (int)( (Runtime.getRuntime()).totalMemory() / 1000000 );
         int fmem= (int)( (Runtime.getRuntime()).freeMemory()  / 1000000 );
 
-        return new int[] { mem-tmem, tmem-fmem };
+        return new int[] { tmem-fmem, mem };
 
     }
-    
+
     
     /**
      * clear existing data from memory, in case the bridge object is not cleared
