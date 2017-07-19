@@ -38,6 +38,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import javax.swing.JDialog;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
@@ -733,6 +735,11 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
         String result= "vap+cdaweb:ds="+dsidComboBox.getSelectedItem()+"&id="+lid;
         if ( filter.length()>0 ) {
+            filter= filter.trim();
+            int i= filter.indexOf(" ");
+            if ( i>-1 ) {
+                filter= filter.substring(0,i);
+            }
             result+= "&filter="+filter;
         }
         if ( slice1!=null && slice1.length()>0 ) {
