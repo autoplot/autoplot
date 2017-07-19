@@ -4,6 +4,7 @@
  */
 package org.virbo.idlsupport;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -1279,5 +1280,37 @@ public abstract class QDataSetBridge {
 
     public String name() {
         return name;
+    }
+    
+    /**
+     * print the Java memory stats to stderr.
+     * @see #clearMemory() 
+     */
+    public void reportMemory() {
+        System.err.println( "= Java Runtime Information =" );
+        String javaVersion= System.getProperty("java.version"); 
+        String javaVersionWarning= ""; // The java about checks for 1.8.102
+        String arch = System.getProperty("os.arch");// applet okay
+        NumberFormat nf= new java.text.DecimalFormat();
+    
+        String mem = nf.format( (Runtime.getRuntime()).maxMemory()   / 1000000 );
+        String tmem= nf.format( (Runtime.getRuntime()).totalMemory() / 1000000 );
+        String fmem= nf.format( (Runtime.getRuntime()).freeMemory()  / 1000000 );
+        
+        System.err.println( "Java version: " + javaVersion + " " + javaVersionWarning );
+        System.err.println( "Arch: " + arch );
+        System.err.println( "Max memory (MB): " + mem + " (memory available to process)" );
+        System.err.println( "total memory (MB): " + tmem + " (amount allocated to the process)" );
+        System.err.println( "free memory (MB): " + fmem + " (amount available before more must be allocated)" );
+
+    }
+    
+    /**
+     * clear existing data from memory, in case the bridge object is not cleared
+     * from in IDL or Matlab memory.
+     * @see #reportMemory() 
+     */
+    public void clearMemory() {
+        datasets.clear();
     }
 }

@@ -35,7 +35,7 @@ public class APDataSet extends QDataSetBridge {
      */
     public APDataSet() {
         super();
-        System.err.println("APDataSet v1.5.0");
+        System.err.println("APDataSet v1.5.1");
         String j= System.getProperty("java.version");
         System.err.println("Java Version "+j);
     }
