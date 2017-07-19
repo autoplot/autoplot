@@ -1306,6 +1306,22 @@ public abstract class QDataSetBridge {
     }
     
     /**
+     * return the total memory and free memory available to the Java process,
+     * in megabytes (1e6 bytes). 
+     * @return an integer array [ total, used ]
+     */
+    public int[] freeMemory() {
+    
+        int mem = (int)( (Runtime.getRuntime()).maxMemory()   / 1000000 );
+        int tmem= (int)( (Runtime.getRuntime()).totalMemory() / 1000000 );
+        int fmem= (int)( (Runtime.getRuntime()).freeMemory()  / 1000000 );
+
+        return new int[] { mem-tmem, tmem-fmem };
+
+    }
+    
+    
+    /**
      * clear existing data from memory, in case the bridge object is not cleared
      * from in IDL or Matlab memory.
      * @see #reportMemory() 
