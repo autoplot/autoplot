@@ -565,6 +565,13 @@ public class DataMashUp extends javax.swing.JPanel {
             root= new DefaultMutableTreeNode( expr );
         } else if ( assign.value instanceof Attribute ) {
             root= new DefaultMutableTreeNode( expr );
+        } else if ( assign.value instanceof UnaryOp ) {  // negation, eg: -1.0
+            UnaryOp op= (UnaryOp)assign.value;
+            if ( op.operand instanceof Num ) {
+                root= new DefaultMutableTreeNode( "-" + String.valueOf(((Num)op.operand).n).trim() );
+            } else {
+                root= new DefaultMutableTreeNode( "0.0" );
+            }
         } else {
             root= new DefaultMutableTreeNode( funcCallName( (Call)assign.value ) );
             if ( assign.value instanceof Call ) {
