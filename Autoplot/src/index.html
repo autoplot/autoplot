@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-07-19 r21135):</p>
+        <p>Bugfixes (2017-07-21 r21143):</p>
         <ul>  
+            <li>1865: add a little hysteresis to the LanlNNRebinner, so it doesn't flop back and forth with axis changes.</li>
             <li>small round of findbugs, including one real bug in DigitalRenderer with xaxis units.
             <li>rte_1708171669: space in CDAWeb filter would cause RTE.
             <li>1860: fill data within bundles of data is marked as fill in the metadata tab.
@@ -97,6 +98,7 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>support new scheme, rank2WaveformRank2Offsets in hugeScatter and series renderers, for analysis with Ivar's new CDF files.
             <li>rfe528: after years of being stuck with the "BoxSelected" mistake, this is finally corrected to "boxSelected"
             <li>IDL/Matlab interface includes method for clearing used memory.  Thanks, Masafumi!
             <li>start SAMP now adds a tab to show SAMP hub status.  Thanks, Pedro!
