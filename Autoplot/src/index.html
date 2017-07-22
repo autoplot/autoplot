@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-07-21 r21143):</p>
+        <p>Bugfixes (2017-07-22 r21152):</p>
         <ul>  
+            <li>1801: dataset iterator is inordinately slow, put in optimal loops for collapse of rank 4 data.
             <li>rte_0164874230: index out of bounds on Slice operation editor panel.  Thanks, Kris!
             <li>bug where rank 2 DEPEND_3 wasn't sliced properly is corrected.  Thanks, Arya!
             <li>1865: add a little hysteresis to the LanlNNRebinner, so it doesn't flop back and forth with axis changes.</li>
