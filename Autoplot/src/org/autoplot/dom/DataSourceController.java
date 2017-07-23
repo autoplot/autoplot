@@ -1193,6 +1193,8 @@ public class DataSourceController extends DomNodeController {
      * into the property QDataSet.CADENCE of the tags ds. fillDs is used to
      * identify missing values, which are skipped for the cadence guess.
      *
+     * Note this may override the cadence setting found within the dataset.
+     * 
      * @param xds the tags for which the cadence is determined.
      * @param fillDs a dependent dataset possibly with fill values, or null.
      */
