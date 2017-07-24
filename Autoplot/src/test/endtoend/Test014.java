@@ -149,6 +149,7 @@ public class Test014 {
             doTest( 7, "file:/home/jbf/ct/hudson/data.backup/cdf/rbsp-b_WFR-spectral-matrix_emfisis-L1_20121015120844_v1.2.2.cdf?BuBu[0]", null );
             doTest( 8, "file:/home/jbf/ct/hudson/data.backup/dat/apl/jon/electron_events_safings_and_peaks.csv?column=peak_rate&depend0=begin_UTC", null );
 
+            doTest( 9, "file:/home/jbf/ct/hudson/data.backup/cdf/mms1_fpi_brst_l2_dis-dist_20160111063934_v3.1.0.cdf?mms1_dis_dist_brst", null );
             System.exit(0);  // TODO: something is firing up the event thread
             
         } catch ( Exception ex) {
