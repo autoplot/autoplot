@@ -455,7 +455,7 @@ public class CdfUtil {
      * @param cdf the value of CDF
      * @param svariable name of the variable
      * @param recStart the first record to retrieve (0 is the first record in the file).
-     * @param recCount the number of records to retrieve
+     * @param recCount the number of records to retrieve, -1 means the record is flag for slice
      * @param recInterval the number of records to increment, typically 1 (e.g. 2= every other record).
      * @param slice1 if non-negative, return the slice at this point.
      * @param depend if false, don't do the non-varying expansion.
@@ -467,6 +467,11 @@ public class CdfUtil {
             CDFReader cdf, String svariable, long recStart, long recCount, long recInterval, 
             int slice1, boolean depend, ProgressMonitor mon) throws Exception {
 
+        if ( recCount==0 ) {
+            throw new IllegalArgumentException("recCount must be greater than 0 or -1");
+        }
+        if ( recCount<-1 ) throw new IllegalArgumentException("recCount must be greater than 0 or -1");
+        
         logger.log( Level.FINE, "wrapCdfData {0}[{1}:{2}:{3}]", new Object[] { svariable, String.valueOf(recStart), // no commas in {1}
                  ""+(recCount+recStart), recInterval } );
         
