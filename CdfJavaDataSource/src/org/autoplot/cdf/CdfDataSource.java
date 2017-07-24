@@ -934,10 +934,11 @@ public class CdfDataSource extends AbstractDataSource {
         long[] recs = mc.get(0);
         
         if ( numRec==1 ) {//mms1_fpi_brst_l2_dis-dist_20160111063934_v3.1.0.cdf?mms1_dis_dist_brst[100:200]
-            if ( cdf.getEffectiveRank(svariable)==cdf.getNumberOfElements(svariable) ) {
+            boolean [] varies= cdf.getVarys(svariable);
+            if ( CdfUtil.getEffectiveRank(varies)==cdf.getNumberOfElements(svariable) ) {
                 recs[0]= 0;                
             }
-            if ( cdf.getEffectiveRank(svariable)==0  ) {
+            if ( CdfUtil.getEffectiveRank(varies)==0  ) {
                 recs[0]= 0;
             }
         }

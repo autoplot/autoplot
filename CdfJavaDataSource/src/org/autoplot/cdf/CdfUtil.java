@@ -393,7 +393,7 @@ public class CdfUtil {
      * <li>vap+cdfj:file:///home/jbf/ct/autoplot/data.backup/examples/cdf/seth/rbspb_pre_ect-mageisHIGH-sp-L1_20130709_v1.0.0.cdf?Histogram_prot
      * </ul>
      */
-    private static int getEffectiveRank( boolean[] varies ) {
+    protected static int getEffectiveRank( boolean[] varies ) {
         int rank = 0;
         for (int i = 0; i < varies.length; i++) {
             if (!varies[i]) continue;
@@ -493,7 +493,7 @@ public class CdfUtil {
             dims = dimSizes.length;
         }
 
-        if ( getEffectiveRank(dimVaries) != dimSizes.length ) { // vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/lep/2011/ge_k0_lep_20111016_v01.cdf?V0
+          if ( getEffectiveRank(dimVaries) != dimSizes.length ) { // vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/lep/2011/ge_k0_lep_20111016_v01.cdf?V0
             int[] dimSizes1= new int[ cdf.getEffectiveRank(svariable) ];
             boolean[] varies= cdf.getVarys(svariable);
             int[] dimensions= cdf.getDimensions(svariable);
@@ -515,10 +515,10 @@ public class CdfUtil {
             }
         }
 
-        int varRecCount= cdf.getNumberOfValues(svariable);
-        if ( recCount==-1 && recStart>0 && varRecCount==1 ) { // another kludge for Rockets, where depend was assigned variance
-            recStart= 0;
-        }
+         int varRecCount= cdf.getNumberOfValues(svariable);
+         if ( recCount==-1 && recStart>0 && varRecCount==1 ) { // another kludge for Rockets, where depend was assigned variance
+             recStart= 0;
+         }
     
         if ( recCount>1 ) {    // check for length limit
             int bytesPerRecord= DataSetUtil.product(dimSizes) * sizeOf(varType);
