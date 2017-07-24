@@ -828,7 +828,7 @@ public class CdfDataSource extends AbstractDataSource {
      * @throws Exception 
      */
     private QDataSet getDeltaPlusMinus( final CDFReader cdf, QDataSet ds, final String deltaPlus, final String constraints ) throws Exception {
-        QDataSet delta= wrapDataSet( cdf, (String)deltaPlus, constraints, !!cdf.recordVariance((String)deltaPlus), false, null ); //TODO: slice1
+        QDataSet delta= wrapDataSet( cdf, (String)deltaPlus, constraints, cdf.recordVariance((String)deltaPlus), false, null ); //TODO: slice1
         if ( delta.rank()>0 && delta.length()==1 && delta.length()!=ds.length() ) {
             delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
         }
@@ -872,7 +872,7 @@ public class CdfDataSource extends AbstractDataSource {
             Map<String,Object> thisAttributes, 
             int slice1, 
             ProgressMonitor mon) throws Exception, ParseException {
-
+        
         if ( !hasVariable(cdf, svariable) ) {
             throw new IllegalArgumentException( "No such variable: "+svariable );
         }
@@ -932,6 +932,16 @@ public class CdfDataSource extends AbstractDataSource {
         }        
         
         long[] recs = mc.get(0);
+        
+        if ( numRec==1 ) {//mms1_fpi_brst_l2_dis-dist_20160111063934_v3.1.0.cdf?mms1_dis_dist_brst[100:200]
+            if ( cdf.getEffectiveRank(svariable)==cdf.getNumberOfElements(svariable) ) {
+                recs[0]= 0;                
+            }
+            if ( cdf.getEffectiveRank(svariable)==0  ) {
+                recs[0]= 0;
+            }
+        }
+        
         boolean slice= recs[1]==-1;
         MutablePropertyDataSet result;
 
