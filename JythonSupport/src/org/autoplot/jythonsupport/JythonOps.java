@@ -6,12 +6,16 @@
 package org.autoplot.jythonsupport;
 
 import java.awt.Color;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.autoplot.datasource.FileSystemUtil;
 import org.das2.datum.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -41,6 +45,8 @@ import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.URISplit;
 import org.das2.qds.ops.Ops;
+import org.das2.util.filesystem.FileSystem;
+import org.das2.util.monitor.ProgressMonitor;
 
 /**
  * Contains operations that are only available to Jython code, and is dependent
@@ -322,6 +328,34 @@ public class JythonOps {
             }
         }
         return c;
+    }
+    
+    /**
+     * download the resource, unpack it, and add it to the search path.
+     * @param syspath the list of folders to search, should be sys.path.
+     * @param path the path to add, which should be a jar file, possibly contained within a zip on an http site.
+     * @param mon monitor for the download.
+     * addToSearchPath( sys.path, 'http://www.trieuvan.com/apache//commons/math/binaries/commons-math3-3.6.1-bin.zip/commons-math3-3.6.1/commons-math3-3.6.1.jar', monitor )
+     * @return 
+     * @see https://sourceforge.net/p/autoplot/feature-requests/584/, which shows 
+     * @throws IOException
+     * @throws URISyntaxException 
+     */
+    public static String addToSearchPath( PyList syspath, String path, ProgressMonitor mon ) throws IOException, URISyntaxException {
+        if ( path.endsWith(".jar") ) {
+            File jarFile= FileSystemUtil.doDownload( path, mon );
+            syspath.append( new PyString(jarFile.toString()));
+            return jarFile.toString();
+            //THE CODE BELOW DOESN'T NEED TO BE EXECUTED
+            //File destDir= FileSystem.settings().getLocalCacheDir();
+            //destDir= new File( destDir, "jar" );
+            //destDir= new File( destDir, jarFile.getName().substring(0,jarFile.getName().length()-4) );
+            //org.das2.util.filesystem.FileSystemUtil.unzipFile( jarFile, destDir);
+            //syspath.append( new PyString(destDir.toString()) );
+            
+        } else {
+            throw new IllegalArgumentException("only jar files can be added.");
+        }
     }
     
     /**
