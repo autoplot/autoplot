@@ -26,7 +26,8 @@
         
         <p>Bugfixes (2017-07-25 r21162):</p>
         <ul>  
-            <li>1868: where with append triggered a branch where an immutable dataset's internal buffer was accessed with write code.
+            <li>convertUnitsTo now checks that a BUNDLE_0 is not present, which might have old UNITS within.  Thanks, Ivar!
+            <li>1868: where with append triggered a branch where an immutable dataset's internal buffer was accessed with write code.  Thanks, Kristoff!
             <li>1867: AverageTableRebinner interpolate Y before interpolating X, to support MMS FPI interleaved sample modes.
             <li>rank 4 support was never implemented for ListIndexDataSetIterator, so inline with where would not work.
             <li>1866: catch CDF recCount=0, which causes reader to enter infinite loop, triggered when [200:300] was used and a non-time-varying DELTA_PLUS was found.
