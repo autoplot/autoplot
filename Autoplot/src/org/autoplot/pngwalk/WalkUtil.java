@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.pngwalk;
 
@@ -15,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -26,14 +23,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
-import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeParser;
 import org.das2.fsm.FileStorageModel;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.datasource.DataSetURI;
-import org.autoplot.datasource.DataSourceUtil;
 
 /**
  *
@@ -83,6 +78,20 @@ public class WalkUtil {
     }
 
 
+    /**
+     * encode strange characters like umlauts, but not slashes.
+     */
+    private static String makeSafe( String s ) {
+        try {
+            String result= URLEncoder.encode( s, "UTF-8" );
+            result= result.replaceAll("\\%2F","/");
+            result= result.replaceAll("\\%7E","~");
+            return result;
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
     /**
      * return an array of URLs that match the spec for the timerange 
      * (if provided), limiting the search to this range.
@@ -136,9 +145,9 @@ public class WalkUtil {
                     result.add( f.toURI() );
                 } else {
                     if ( ss[i].startsWith("/") ) {
-                        result.add( fs.getRootURI().resolve( URLEncoder.encode( ss[i].substring(1),"UTF-8") ) );
+                        result.add( fs.getRootURI().resolve( makeSafe( ss[i].substring(1) ) ) );
                     } else {
-                        result.add( fs.getRootURI().resolve( URLEncoder.encode( ss[i],"UTF-8") ) );
+                        result.add( fs.getRootURI().resolve( makeSafe( ss[i] ) ) );
                     }
                 }
                 timeRanges.add(dr2);
