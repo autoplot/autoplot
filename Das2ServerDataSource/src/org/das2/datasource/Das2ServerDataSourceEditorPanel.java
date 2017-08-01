@@ -383,7 +383,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     descriptionLabel.setText( description==null ? "" : description.getNodeValue() );
 
                     NodeList exs=  (NodeList) xpath.evaluate( "/stream/properties/@*", document, XPathConstants.NODESET );
-                    List<String> examples= new ArrayList<String>();
+                    List<String> examples= new ArrayList<>();
                     String example= null;
                     for ( int i=0; i<exs.getLength(); i++ ) {
                         Node ex= exs.item(i);
@@ -475,13 +475,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         } catch (SAXException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
             logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (ParserConfigurationException ex) {
-            JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (MalformedURLException ex) {
-            JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (IOException ex) {
+        } catch (ParserConfigurationException | IOException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         } finally {
@@ -641,13 +635,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             
         } catch (MalformedURLException ex) {
             logger.log(Level.SEVERE, "listPeers("+uri+")\n"+ex.getMessage(), ex);
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, "listPeers("+uri+")\nresults in:\n"+ex.getMessage(), ex);
-        } catch (ParserConfigurationException ex) {
-            logger.log(Level.SEVERE, "listPeers("+uri+")\nresults in:\n"+ex.getMessage(), ex);
-        } catch (SAXException ex) {
-            logger.log(Level.SEVERE, "listPeers("+uri+")\nresults in:\n"+ex.getMessage(), ex);
-        } catch (XPathExpressionException ex) {
+        } catch (IOException | ParserConfigurationException | SAXException | XPathExpressionException ex) {
             logger.log(Level.SEVERE, "listPeers("+uri+")\nresults in:\n"+ex.getMessage(), ex);
         } finally {
             try {
@@ -798,16 +786,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             SwingUtilities.invokeLater(run);
 
 
-        } catch (XPathExpressionException ex) {
-            JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (SAXException ex) {
-            JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (ParserConfigurationException ex) {
-            JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (IOException ex) {
+        } catch (XPathExpressionException | SAXException | ParserConfigurationException | IOException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         } finally {
@@ -1240,8 +1219,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( folder ) ldataSetId.append("/");
 
         StringBuilder params= new StringBuilder();
-        String readerParams= readerParamsTextArea.getText();
-        String[] ss= readerParams.split("\n");
+        String lreaderParams= readerParamsTextArea.getText();
+        String[] ss= lreaderParams.split("\n");
         for ( int i=0; i<ss.length; i++ ) {
             String ss1= ss[i].trim();
             if ( ss1.length()==0 ) continue;
