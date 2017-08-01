@@ -56,9 +56,9 @@
                                   </Group>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="-2" max="-2" attributes="0"/>
-                                      <Component id="timeRangeTextField" max="32767" attributes="0"/>
-                                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="recentComboBox1" max="32767" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
                                       <Component id="timeRangeTool" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
@@ -114,7 +114,7 @@
                   <Component id="timeRangeTool" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="timeRangeTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="recentComboBox1" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -182,13 +182,6 @@
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>
         <Property name="text" type="java.lang.String" value="Data Set Id:"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="timeRangeTextField">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="DEFAULT_TIMERANGE" type="code"/>
-        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel3">
@@ -309,6 +302,8 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="intrinsicCbActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="org.autoplot.datasource.RecentComboBox" name="recentComboBox1">
     </Component>
   </SubComponents>
 </Form>
