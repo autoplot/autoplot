@@ -50,7 +50,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="timeRangeTextField" min="-2" pref="247" max="-2" attributes="0"/>
+                  <Component id="timeRangeComboBox" min="-2" pref="264" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="timeRangeToolButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
@@ -89,9 +89,9 @@
               <Group type="102" alignment="0" attributes="0">
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="timeRangeTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jButton3" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="timeRangeToolButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="timeRangeComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
@@ -120,11 +120,6 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Time Range for Aggregation:"/>
             <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Enter the time range to over which to aggregate data. &lt;br&gt;&#xa;Data from files within this range will be combined by concatenating over the first dimension.&lt;/br&gt;&#xa;&lt;/html&gt;&#xa;&#xa;"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JTextField" name="timeRangeTextField">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="jTextField1"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="outerRangeTextField">
@@ -199,7 +194,7 @@
         <Component class="javax.swing.JButton" name="jButton3">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/org/virbo/datasource/help.png"/>
+              <Image iconType="3" name="/org/autoplot/datasource/help.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value="Help for this component&#xa;"/>
           </Properties>
@@ -222,7 +217,7 @@
         <Component class="javax.swing.JButton" name="timeRangeToolButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/org/virbo/datasource/calendar.png"/>
+              <Image iconType="3" name="/org/autoplot/datasource/calendar.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value="Time Range Tool"/>
           </Properties>
@@ -244,6 +239,8 @@
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="availabilityCBActionPerformed"/>
           </Events>
+        </Component>
+        <Component class="org.autoplot.datasource.RecentComboBox" name="timeRangeComboBox">
         </Component>
       </SubComponents>
     </Container>

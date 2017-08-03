@@ -12,6 +12,7 @@ package org.autoplot.aggregator;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -29,6 +30,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -46,6 +48,7 @@ import org.autoplot.datasource.SourceTypesBrowser;
 import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.datasource.ui.PromptComboBoxEditor;
 
 /**
  *
@@ -58,6 +61,13 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     /** Creates new form AggregatingDataSourceEditorPanel */
     public AggregatingDataSourceEditorPanel() {
         initComponents();
+        timeRangeComboBox.setName("timeRangeEditor");
+        timeRangeComboBox.setMinimumSize( new Dimension( 200,30) ); // long items in history cause problems.
+        
+        timeRangeComboBox.setPreferenceNode("timerange");
+        timeRangeComboBox.setEditor( new PromptComboBoxEditor("Time range to view (e.g. 2010-01-01)") );
+        timeRangeComboBox.setToolTipText("Recently entered time ranges");
+        ((JComponent)timeRangeComboBox.getEditor().getEditorComponent()).setToolTipText("Time Range, right-click for examples");
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "aggregator_main");
     }
     String uri;
@@ -81,14 +91,14 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             DatumRange dr1 = DatumRangeUtil.parseTimeRangeValid(range);
             DatumRange dr2;
             try {
-                dr2 = DatumRangeUtil.parseTimeRange(timeRangeTextField.getText());
+                dr2 = DatumRangeUtil.parseTimeRange(timeRangeComboBox.getSelectedItem().toString());
                 dr2 = DatumRangeUtil.union(dr1, dr2);
-                timeRangeTextField.setText(dr2.toString());
+                timeRangeComboBox.setSelectedItem(dr2.toString());
             } catch (ParseException ex) {
-                timeRangeTextField.setText(range);
+                timeRangeComboBox.setSelectedItem(range);
             }
         } else {
-            timeRangeTextField.setText(range);
+            timeRangeComboBox.setSelectedItem(range);
         }        
     }
     
@@ -104,7 +114,6 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         delegatePanel = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        timeRangeTextField = new javax.swing.JTextField();
         outerRangeTextField = new javax.swing.JLabel();
         yearsComboBox = new javax.swing.JComboBox();
         monthsComboBox = new javax.swing.JComboBox();
@@ -116,6 +125,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         timeRangeToolButton = new javax.swing.JButton();
         reduceCB = new javax.swing.JCheckBox();
         availabilityCB = new javax.swing.JCheckBox();
+        timeRangeComboBox = new org.autoplot.datasource.RecentComboBox();
 
         delegatePanel.setLayout(new java.awt.BorderLayout());
 
@@ -123,8 +133,6 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
         jLabel1.setText("Time Range for Aggregation:");
         jLabel1.setToolTipText("<html>Enter the time range to over which to aggregate data. <br>\nData from files within this range will be combined by concatenating over the first dimension.</br>\n</html>\n\n");
-
-        timeRangeTextField.setText("jTextField1");
 
         outerRangeTextField.setFont(new java.awt.Font("SansSerif", 0, 10)); // NOI18N
         outerRangeTextField.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/aggregator/spinner_16.gif"))); // NOI18N
@@ -214,7 +222,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             .add(jPanel1Layout.createSequentialGroup()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 247, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(timeRangeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 264, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(timeRangeToolButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -249,9 +257,9 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             .add(jPanel1Layout.createSequentialGroup()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
-                    .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jButton3)
-                    .add(timeRangeToolButton))
+                    .add(timeRangeToolButton)
+                    .add(timeRangeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(reduceCB)
@@ -311,14 +319,14 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     private void timeRangeToolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeToolButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         TimeRangeTool t=new TimeRangeTool();
-        String tr= timeRangeTextField.getText();
+        String tr= timeRangeComboBox.getSelectedItem().toString();
         if ( tr.trim().length()==0 ) {
             tr= "2010-01-01"; // default
         }
         t.setSelectedRange( tr );
         if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, t, "Select time range", JOptionPane.OK_CANCEL_OPTION ) ) {
             String str= t.getSelectedRange();
-            timeRangeTextField.setText( DatumRangeUtil.parseTimeRangeValid(str).toString() );
+            timeRangeComboBox.setSelectedItem( DatumRangeUtil.parseTimeRangeValid(str).toString() );
         }
     }//GEN-LAST:event_timeRangeToolButtonActionPerformed
 
@@ -358,7 +366,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     private javax.swing.JComboBox monthsComboBox;
     private javax.swing.JLabel outerRangeTextField;
     private javax.swing.JCheckBox reduceCB;
-    private javax.swing.JTextField timeRangeTextField;
+    private org.autoplot.datasource.RecentComboBox timeRangeComboBox;
     private javax.swing.JButton timeRangeToolButton;
     private javax.swing.JComboBox yearsComboBox;
     // End of variables declaration//GEN-END:variables
@@ -418,7 +426,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
         DatumRange selectedRange = null;
         try {
-            selectedRange = DatumRangeUtil.parseTimeRange(timeRangeTextField.getText());
+            selectedRange = DatumRangeUtil.parseTimeRange(timeRangeComboBox.getSelectedItem().toString());
         } catch (ParseException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
@@ -585,8 +593,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
                     }
                 }
-                timeRangeTextField.setText(timeRange);
-
+                timeRangeComboBox.setSelectedItem(timeRange);
+                
                 String reduce= params.get("reduce");
                 reduceCB.setSelected( "T".equals(reduce) );
 
@@ -595,8 +603,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
             } else {
                 jPanel1.setEnabled( false );
-                timeRangeTextField.setText("");
-                timeRangeTextField.setEnabled(false);
+                timeRangeComboBox.setSelectedItem("");
+                timeRangeComboBox.setEnabled(false);
                 reduceCB.setEnabled(false);
                 availabilityCB.setEnabled(false);
                 yearsComboBox.setEnabled(false);
@@ -635,15 +643,15 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     }
 
     public void setTimeRange( DatumRange timerange ) {
-        timeRangeTextField.setText( timerange.toString() );
+        timeRangeComboBox.setSelectedItem( timerange.toString() );
     }
 
     public DatumRange getTimeRange( ) {
-        if ( timeRangeTextField.getText().trim().equals("") ) {
+        if ( timeRangeComboBox.getSelectedItem().toString().trim().equals("") ) {
             return null;
         } else {
             try {
-                return DatumRangeUtil.parseTimeRange(timeRangeTextField.getText().trim());
+                return DatumRangeUtil.parseTimeRange( timeRangeComboBox.getSelectedItem().toString().trim() );
             } catch (ParseException ex) {
                 return null;
             }
@@ -671,7 +679,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         allParams.putAll(URISplit.parseParams(dsplit.params));
         
         if ( hasTimeFields ) {
-            String tr = timeRangeTextField.getText();
+            String tr = timeRangeComboBox.getSelectedItem().toString().trim();
             tr= tr.replaceAll(" ","+");
             String tr0= allParams.get("timerange"); // check that the delegate didn't insert a timerange
             if ( tr0!=null && tr0.length()>0 ) {
@@ -703,13 +711,14 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     @Override
     public void markProblems(List<String> problems) {
         List<String> p= new ArrayList(problems);
+        JTextField timeRangeTextField= (JTextField)timeRangeComboBox.getEditor().getEditorComponent();
         if ( p.contains( TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED ) ) {
             p.remove( TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED );
             timeRangeTextField.setBackground( Color.YELLOW );
             jLabel1.setBackground( Color.YELLOW );
             jLabel1.setForeground( Color.RED );
             jLabel1.setToolTipText( jLabel1.getToolTipText() + "<br><b>"+TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED  );
-            timeRangeTextField.setToolTipText( TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED );
+            timeRangeComboBox.setToolTipText( TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED );
         } else if ( p.contains(TimeSeriesBrowse.PROB_PARSE_ERROR_IN_TIMERANGE ) ) {
             p.remove(TimeSeriesBrowse.PROB_PARSE_ERROR_IN_TIMERANGE );
             timeRangeTextField.setBackground( Color.YELLOW );
