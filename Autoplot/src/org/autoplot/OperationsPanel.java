@@ -219,8 +219,7 @@ public class OperationsPanel extends javax.swing.JPanel {
                         if ( filtersChainPanel.validateFilter(news) ) {
                             filtersChainPanel.setFilter(news);
                             if ( dataSet!=null ) {
-                                filtersChainPanel.setInput(null);
-                                filtersChainPanel.setInput(dataSet);
+                                filtersChainPanel.resetInput(dataSet);
                                 filtersChainPanel.setFilter(news);
                             }
                             operatorsTextField.setText(news);
@@ -257,8 +256,7 @@ public class OperationsPanel extends javax.swing.JPanel {
                 if ( !fcpf.equals(newf) ) {
                     filtersChainPanel.setFilter(newf);
                     if ( dataSet!=null ) {
-                        filtersChainPanel.setInput(null);
-                        filtersChainPanel.setInput(dataSet);
+                        filtersChainPanel.resetInput(dataSet);
                         filtersChainPanel.setFilter(newf);
                     } else {
                         filtersChainPanel.setInput(null);
@@ -279,8 +277,7 @@ public class OperationsPanel extends javax.swing.JPanel {
             public void run() {
                 String filter= filtersChainPanel.getFilter();
                 filtersChainPanel.setFilter("");
-                filtersChainPanel.setInput(null);
-                filtersChainPanel.setInput(ds);  
+                filtersChainPanel.resetInput(ds);  
                 filtersChainPanel.setFilter(filter);
             }
         };
@@ -458,8 +455,7 @@ public class OperationsPanel extends javax.swing.JPanel {
         if ( filtersChainPanel.validateFilter(news) ) {
             filtersChainPanel.setFilter(news);
             if ( dataSet!=null ) {
-                filtersChainPanel.setInput(null);
-                filtersChainPanel.setInput(dataSet);
+                filtersChainPanel.resetInput(dataSet);
                 filtersChainPanel.setFilter(news);
             }
             operatorsTextField.setText(news);
@@ -521,7 +517,7 @@ public class OperationsPanel extends javax.swing.JPanel {
             @Override
             public void run() {
                 filtersChainPanel.setFilter(filter);
-                filtersChainPanel.setInput(dataSet);
+                filtersChainPanel.resetInput(dataSet);
                 if ( !oldFilter.equals(filter) || !filter.equals(operatorsTextField.getText()) ) {           
                     try {
                         int carot= operatorsTextField.getCaretPosition();
