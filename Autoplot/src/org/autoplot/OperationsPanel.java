@@ -516,6 +516,21 @@ public class OperationsPanel extends javax.swing.JPanel {
         Runnable run= new Runnable() {
             @Override
             public void run() {
+                QDataSet oldDataSet= filtersChainPanel.getInput();
+                String oldFilter= filtersChainPanel.getFilter();
+                if ( oldFilter!=null && oldFilter.equals(filter) && oldDataSet!=null && oldDataSet.equals(dataSet) ) {
+                    //return;
+                    if ( !filter.equals(operatorsTextField.getText()) ) {
+                        try {
+                            int carot= operatorsTextField.getCaretPosition();
+                            operatorsTextField.setText(filter);
+                            operatorsTextField.setCaretPosition(Math.min(filter.length(),carot));
+                        } catch ( IllegalStateException ex ) {
+                            logger.fine("looks like someone else is editing the operators text field already, returning.");
+                        }
+                    }
+                    return;
+                }
                 filtersChainPanel.setFilter(filter);
                 filtersChainPanel.resetInput(dataSet);
                 if ( !oldFilter.equals(filter) || !filter.equals(operatorsTextField.getText()) ) {           
