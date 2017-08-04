@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>RBSP-B Magnetic Field Data.
+        <p><small>MMS FPI data causes problems with the default spectrogram interpolation.  This has been improved by first interpolating in Y then X.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-07-29 r21174):</p>
+        <p>Bugfixes (2017-08-04 r21182):</p>
         <ul>  
+            <li>Don't draw lines at tick locations when "opposite axis" is used.
+            <li>1871: many timerange text fields don't use history.  Thanks, Dan!
+            <li>flattenRank2 always returns a rank 2 dataset, generating 0,1,2,... when DEPEND_0 or DEPEND_1 is missing.
+            <li>1873: incorrect reset of slices filter.  Thanks, Joe!
             <li>1869: restore function of pngwalk:http://jfaden.net/hudson/job/autoplot-test070/*/artifact/test070_008.png.
             <li>Ivar's script caught where new code didn't handle fill properly because BUNDLE_1 hid it. 
             <li>convertUnitsTo now checks that a BUNDLE_0 is not present, which might have old UNITS within.  Thanks, Ivar!
@@ -108,7 +112,9 @@
         </ul>
         <p>Features:</p>
         <ul> 
-            <li>experimental TriScatRebinner added, so draw spectrograms from scatter data using Delauney triangulation.
+            <li>Update RBSP orbits to Feb 2017.
+            <li>DasAxis foreground color is exposed in the property editor, under the controller node.
+            <li>experimental TriScatRebinner added, to draw spectrograms from scatter data using Delauney triangulation.
             <li>support new scheme, rank2WaveformRank2Offsets in hugeScatter and series renderers, for analysis with Ivar's new CDF files.
             <li>rfe528: after years of being stuck with the "BoxSelected" mistake, this is finally corrected to "boxSelected"
             <li>IDL/Matlab interface includes method for clearing used memory.  Thanks, Masafumi!
