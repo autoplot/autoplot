@@ -770,6 +770,11 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 if ( ScriptContext.getViewWindow()==AutoplotUI.this ) {
                     org.das2.util.LoggerManager.logGuiEvent(ev);                    
                     String s= dataSetSelector.getValue();
+                    int i= dataSetSelector.getEditor().getCaretPosition();
+                    if ( i==0 || s.substring(i-1).contains("/") ) {
+                            dataSetSelector.showCompletions();
+                        return;
+                    }
                     Map<String,String> args;
                     try {
                         URISplit split= URISplit.parse(s);        //bug 1408--note runScript doesn't account for changes made to the GUI.
