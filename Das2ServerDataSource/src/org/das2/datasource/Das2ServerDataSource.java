@@ -480,7 +480,7 @@ public class Das2ServerDataSource extends AbstractDataSource {
                 throw new RuntimeException("empty dataset returned");
             }
             
-            AbstractDataSet result;
+            MutablePropertyDataSet result;
             if ( item==null || item.equals("") ) {
                 result= DataSetAdapter.create(ds); //TODO: danger if it has TCA planes, it will return bundle.  Probably not what we want.
             } else {
@@ -512,6 +512,10 @@ public class Das2ServerDataSource extends AbstractDataSource {
                                 das2ds= ds.getPlanarView( "" );
                             } else {
                                 das2ds= ds.getPlanarView( "plane_"+iitem );
+                            }
+                            if ( das2ds==null ) {
+                                String[] ss= ds.getPlaneIds();
+                                das2ds= ds.getPlanarView( ss[iitem] );
                             }
                             if ( das2ds==null ) throw new IllegalArgumentException("no such plane, looking for " + item  );
                             result= DataSetAdapter.create( das2ds ); // fragile                
