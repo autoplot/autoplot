@@ -341,6 +341,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     
     Map<String,String> readerParams= new HashMap(); // from dataset url to params.
             
+    String userTimeRange= null;
+    
     /**
      * this is called off the event thread for the web transaction, then hop back on it to populate the GUI.
      * @param url
@@ -1011,6 +1013,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         String endTime= params.remove("end_time");
         String str= params.remove("timerange");
         if ( str!=null ) {
+            userTimeRange= str;
             DatumRange tr;
             try {
                 tr = DatumRangeUtil.parseTimeRange( str );
@@ -1025,6 +1028,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 Datum t1= TimeUtil.create( startTime );
                 Datum t2= TimeUtil.create( endTime );
                 DatumRange dr = new DatumRange( t1, t2 );
+                if ( userTimeRange==null ) userTimeRange= dr.toString();
                 recentComboBox1.setSelectedItem(dr.toString());
             } catch ( ParseException ex ) {
                 recentComboBox1.setSelectedItem( DEFAULT_TIMERANGE );
