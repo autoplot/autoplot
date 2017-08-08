@@ -93,15 +93,15 @@ public class WalkUtil {
     }
     
     /**
-     * return an array of URLs that match the spec for the timerange 
+     * return an array of URIs that match the spec for the timerange 
      * (if provided), limiting the search to this range.
      *
-     * @param surl an autoplot url with an aggregation specifier.
+     * @param surl an Autoplot URI with an aggregation specifier.
      * @param timeRange a string that is parsed to a time range, such as 2001, or null. 
      * @param timeRanges list which is populated
      * @param download (is not used)
      * @param mon progress monitor
-     * @return a list of URLs without the aggregation specifier.
+     * @return a list of URIs without the aggregation specifier.
      * @throws java.io.IOException if the remote folder cannot be listed.
      * @throws java.text.ParseException if the timerange cannot be parsed.
      * @throws java.net.URISyntaxException when the surl cannot be resolved to a web address.
@@ -140,7 +140,7 @@ public class WalkUtil {
             DatumRange dr2=null;
             if ( fsm!=null ) dr2= fsm.getRangeFor(ss[i]);
             if ( dr==null || dr2==null || dr.contains(dr2) ) {
-                if ( fs.getFileObject(ss[i]).isLocal() ) {
+                if ( false && fs.getFileObject(ss[i]).isLocal() ) {
                     File f= fs.getFileObject(ss[i]).getFile();
                     result.add( f.toURI() );
                 } else {
