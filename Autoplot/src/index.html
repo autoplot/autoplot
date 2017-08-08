@@ -24,8 +24,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-08-04 r21182):</p>
+        <p>Bugfixes (2017-08-08 r21199):</p>
         <ul>  
+            <li>in PNGWalkTool, show unique part of filenames in .../*/foo/bar.png.  Before bar.png was shown for each image.
+            <li>item parameter works properly for das2server dialog for all streams now.
             <li>Don't draw lines at tick locations when "opposite axis" is used.
             <li>1871: many timerange text fields don't use history.  Thanks, Dan!
             <li>flattenRank2 always returns a rank 2 dataset, generating 0,1,2,... when DEPEND_0 or DEPEND_1 is missing.
@@ -112,6 +114,7 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>das2server dialog shows a droplist of items when they are identified by the server.
             <li>Update RBSP orbits to Feb 2017.
             <li>DasAxis foreground color is exposed in the property editor, under the controller node.
             <li>585: experimental TriScatRebinner added, to draw spectrograms from scatter data using Delauney triangulation.
