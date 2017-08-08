@@ -187,7 +187,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
                 captionString = datumRanges.get(i).toString();//TODO: consider not formatting these until visible.
             } else {
                 captionString = uris.get(i).toString();
-                if ( splitIndex==-1 ) splitIndex= WalkUtil.splitIndex( captionString );
+                if ( splitIndex==-1 ) splitIndex= WalkUtil.splitIndex( template );
                 captionString = captionString.substring(splitIndex+1);
             }
 
