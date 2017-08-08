@@ -39,6 +39,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.Icon;
@@ -49,7 +51,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
@@ -135,7 +136,6 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         jLabel5 = new javax.swing.JLabel();
         tcaTextField = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
-        tcaItem = new javax.swing.JTextField();
         viewDsdfButton = new javax.swing.JButton();
         validRangeLabel = new javax.swing.JLabel();
         discoveryCb = new javax.swing.JCheckBox();
@@ -145,6 +145,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         timeRangeTool = new javax.swing.JButton();
         intrinsicCb = new javax.swing.JCheckBox();
         recentComboBox1 = new org.autoplot.datasource.RecentComboBox();
+        itemsComboBox = new javax.swing.JComboBox<>();
 
         setName("das2serverDataSourceEditorPanel"); // NOI18N
 
@@ -186,8 +187,6 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         jLabel6.setText("TCA Item:");
         jLabel6.setToolTipText("The optional item number for TCAs.");
-
-        tcaItem.setToolTipText("The optional item number for TCAs.");
 
         viewDsdfButton.setText("View DSDF");
         viewDsdfButton.setToolTipText("View the DSDF configuration file on the server");
@@ -236,6 +235,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         });
 
+        itemsComboBox.setEditable(true);
+        itemsComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " ", " " }));
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -245,7 +247,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(das2ServerComboBox, 0, 630, Short.MAX_VALUE)
+                            .add(das2ServerComboBox, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .add(jLabel1)
                             .add(layout.createSequentialGroup()
                                 .add(jLabel2)
@@ -268,7 +270,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                                         .add(21, 21, 21)
                                         .add(validRangeLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 267, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(examplesComboBox, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .add(examplesComboBox, 0, 322, Short.MAX_VALUE))
                                     .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                                         .add(jLabel3)
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -287,10 +289,10 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .add(jLabel5)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(tcaTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 70, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(44, 44, 44)
+                        .add(26, 26, 26)
                         .add(jLabel6)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(tcaItem, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 42, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(itemsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .add(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -331,8 +333,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     .add(jLabel5)
                     .add(tcaTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jLabel6)
-                    .add(tcaItem, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(intrinsicCb))
+                    .add(intrinsicCb)
+                    .add(itemsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -342,6 +344,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     Map<String,String> readerParams= new HashMap(); // from dataset url to params.
             
     String userTimeRange= null;
+    
+    Map<String,String> tcaItem= new HashMap(); // from ID to selected TCA item.
     
     /**
      * this is called off the event thread for the web transaction, then hop back on it to populate the GUI.
@@ -387,21 +391,54 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     NodeList exs=  (NodeList) xpath.evaluate( "/stream/properties/@*", document, XPathConstants.NODESET );
                     List<String> examples= new ArrayList<>();
                     String example= null;
+                    Map<String,String> items= new HashMap<>();
+                    Pattern itemPattern= Pattern.compile("item_(\\d\\d)");
                     for ( int i=0; i<exs.getLength(); i++ ) {
                         Node ex= exs.item(i);
-                        if ( ex.getNodeName().startsWith("exampleRange") ) {
+                        String name= ex.getNodeName();
+                        if ( name.startsWith("exampleRange") ) {
                             examples.add(ex.getNodeValue());
-                        }
-                        if (ex.getNodeName().equals("exampleRange") ) {
+                        } else if ( name.equals("exampleRange") ) {
                             example= ex.getNodeValue();
-                        }
-                        if ( ex.getNodeName().equals("items") ) {
+                        } else if ( name.equals("items") ) {
                             isTca= true;
-                        }
-                        if ( ex.getNodeName().equals("requiresInterval") ) {
+                        } else if ( name.equals("requiresInterval") ) {
                             isTca= !ex.getNodeValue().equals("0");
+                        } else if ( name.startsWith("item_") ) {
+                            Matcher m= itemPattern.matcher(name);
+                            if ( m.matches() ) {
+                                String s= ex.getNodeValue();
+                                int ipipe= s.indexOf("|");
+                                if ( ipipe>-1 ) {
+                                    s= s.substring(0,ipipe);
+                                }
+                                s= s.trim();
+                                items.put( name, s );
+                            }
                         }
                     }
+                    
+                    String selectedItem= tcaItem.get( url.toString() ); 
+                    if ( items.size()>0 && isTca ) {
+                        DefaultComboBoxModel aModel= new DefaultComboBoxModel();
+                        aModel.addElement(""); // all items
+                        String e;
+                        int index=0;
+                        do {
+                            e= items.get( String.format("item_%02d", index ) );
+                            if ( e!=null ) aModel.addElement(e);
+                            index++;
+                        } while ( e!=null );
+                        itemsComboBox.setModel(aModel);
+                    } else {
+                        DefaultComboBoxModel aModel= new DefaultComboBoxModel();
+                        aModel.addElement(""); // all items
+                        itemsComboBox.setModel(aModel);
+                    }
+                    if ( selectedItem!=null ) {
+                        itemsComboBox.setSelectedItem(selectedItem);
+                    }
+                    
                     if ( example!=null && curr.equals(DEFAULT_TIMERANGE) ) { // DANGER: what if they are the same?
                         Das2ServerDataSourceEditorPanel.this.recentComboBox1.setSelectedItem( example );
                     }
@@ -900,6 +937,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     public javax.swing.JCheckBox discoveryCb;
     public javax.swing.JComboBox examplesComboBox;
     public javax.swing.JCheckBox intrinsicCb;
+    public javax.swing.JComboBox<String> itemsComboBox;
     public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel2;
     public javax.swing.JLabel jLabel3;
@@ -912,7 +950,6 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     public javax.swing.JTree jTree1;
     public javax.swing.JTextArea readerParamsTextArea;
     public org.autoplot.datasource.RecentComboBox recentComboBox1;
-    public javax.swing.JTextField tcaItem;
     public javax.swing.JTextField tcaTextField;
     public javax.swing.JButton timeRangeTool;
     public javax.swing.JLabel validRangeLabel;
@@ -1046,7 +1083,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         String item= params.remove("item");
         if ( item!=null ) {
-            tcaItem.setText(item);
+            itemsComboBox.setSelectedItem(item);
+            tcaItem.put( "" + serverURL + "?server=dsdf&dataset=" + dataSetId, item );
         }
         StringBuilder paramsStr= new StringBuilder();
         for ( Entry<String,String> e: params.entrySet() ) {
@@ -1255,8 +1293,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( !tcaInterval.equals("") ) {
             result.append("&interval=").append(tcaInterval);
         }
-        if ( !tcaItem.getText().trim().equals("") ) {
-            result.append("&item=").append(tcaItem.getText().trim());
+        if ( !itemsComboBox.getSelectedItem().toString().trim().equals("") ) {
+            result.append("&item=").append(itemsComboBox.getSelectedItem().toString().trim());
         }
         
         if ( params.length()>0 ) result.append("&").append(params.toString());

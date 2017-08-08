@@ -24,7 +24,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="das2ServerComboBox" alignment="0" pref="630" max="32767" attributes="0"/>
+                          <Component id="das2ServerComboBox" alignment="0" max="32767" attributes="0"/>
                           <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
@@ -52,7 +52,7 @@
                                       <EmptySpace min="-2" pref="21" max="-2" attributes="0"/>
                                       <Component id="validRangeLabel" min="-2" pref="267" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="examplesComboBox" max="32767" attributes="0"/>
+                                      <Component id="examplesComboBox" pref="322" max="32767" attributes="0"/>
                                   </Group>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
@@ -78,10 +78,10 @@
                       <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="tcaTextField" min="-2" pref="70" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="44" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
                       <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="tcaItem" min="-2" pref="42" max="-2" attributes="0"/>
+                      <Component id="itemsComboBox" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
@@ -131,8 +131,8 @@
                   <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="tcaTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="tcaItem" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="intrinsicCb" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="itemsComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
@@ -228,11 +228,6 @@
         <Property name="toolTipText" type="java.lang.String" value="The optional item number for TCAs."/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="tcaItem">
-      <Properties>
-        <Property name="toolTipText" type="java.lang.String" value="The optional item number for TCAs."/>
-      </Properties>
-    </Component>
     <Component class="javax.swing.JButton" name="viewDsdfButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="View DSDF"/>
@@ -304,6 +299,20 @@
       </Events>
     </Component>
     <Component class="org.autoplot.datasource.RecentComboBox" name="recentComboBox1">
+    </Component>
+    <Component class="javax.swing.JComboBox" name="itemsComboBox">
+      <Properties>
+        <Property name="editable" type="boolean" value="true"/>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="2">
+            <StringItem index="0" value=" "/>
+            <StringItem index="1" value=" "/>
+          </StringArray>
+        </Property>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>
