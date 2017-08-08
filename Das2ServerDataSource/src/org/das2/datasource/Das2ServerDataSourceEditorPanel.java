@@ -235,6 +235,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         });
 
+        recentComboBox1.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                recentComboBox1ItemStateChanged(evt);
+            }
+        });
+
         itemsComboBox.setEditable(true);
         itemsComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " ", " " }));
 
@@ -461,6 +467,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                                 anExample= s;
                             }
                             examples.set(i, s );
+                            if ( Das2ServerDataSourceEditorPanel.this.userTimeRange!=null ) {
+                                anExample=  Das2ServerDataSourceEditorPanel.this.userTimeRange;
+                            }
                             if ( example==null && i==examples.size()-1 ) {
                                 Das2ServerDataSourceEditorPanel.this.recentComboBox1.setSelectedItem( anExample );
                             }
@@ -929,6 +938,10 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
    private void intrinsicCbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_intrinsicCbActionPerformed
       // TODO add your handling code here:
    }//GEN-LAST:event_intrinsicCbActionPerformed
+
+    private void recentComboBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_recentComboBox1ItemStateChanged
+        logger.log(Level.FINEST, "changed {0}", evt.getItem());
+    }//GEN-LAST:event_recentComboBox1ItemStateChanged
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
