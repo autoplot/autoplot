@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>MMS FPI data causes problems with the default spectrogram interpolation, due to interleaved sweeps.  This has been corrected by first interpolating in Y then X.
+        <p><small>Experiment with new metadata that would allow time offsets for each step of a sweep.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -48,6 +48,9 @@
             <li>1860: fill data within bundles of data is marked as fill in the metadata tab.
             <li>fix the setUnits filter, where it was using an old method.  Thanks, Kristoff!
             <li>1858: extend autorange to include all data when bundled data has different units.
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>method "BoxSelected" renamed to "boxSelected" to conform to Java and Java Beans conventions, and Jython refactoring supports old scripts.
             <li>1661: format to CDF corrected on Windows by doing extra garbage collections.  Thanks, Kristoff!
             <li>1836: copy dataset internally when the mutable dataset is no longer mutable.  Thanks, Kristoff!
@@ -75,45 +78,9 @@
             <li>colorbar resize control points allow resize of the vertical direction.  Thanks, Ivar!
             <li>rte_0153443069: CSV parser editor GUI would fail with NullPointerException because handling was delegated a sloppy code.  Thanks, Mimai!
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>drag-n-drop from Thunderbird email "save attachment as" dialog fixed.
-            <li>rte_2119934227: put a link in the runtime error popup for OutOfMemory errors.  
-            <li>rte_1890761962: index out of bounds in "near real time" Time range editor.
-            <li>allow different credentials to be used on different paths on the same server.
-            <li>1818: getTimeRange( 1990/12/01, 1month ) would fail the pngwalktool because 1990/13/01 was not normalized (via carry).
-            <li>1833: catch bad path when "orbit:file:///" used where "file:///" should have been used.  There was code to trap this exception, but the wrong exception type was thrown.  Thanks, Ivar!
-            <li>1698: proper support for bundles in qstreams.
-            <li>rte_0110509841: old events scheme check (time,deltaTime,color,str) was broken since last production release v2016a_15.  Thanks, Chris!
-            <li>1831: hint that something is wrong when URI is rejected in add plot dialog.  Thanks, Ivar!
-            <li>1829: check for null when adapting das2streams.
-            <li>file:///.../*.png used in PNG Walk tool would clip off the first two characters of each filename's label.
-            <li>rte_0424767770: new code didn't account for path where walkImageSequence would be null.  Thanks, Ivar!
-            <li>DataPoint comparison of non-time values made no sense, causing some points to disappear.
-            <li>1818: pngwalk of Omni DST vs KP skips each December.
-            <li>0656: cancel press in load example script dialog is correctly handled.
-            <li>0595: sftp is now recognized, fixing Jython listDirectory command.
-            <li>Data Point Recorder sorting is disabled while data is loaded from a file, for speed.
-            <li>1825: Data Point Recorder drops points when x-axis is not a time axis.
-            <li>1821,0656: load example script dialog cancel didn't work.  
-            <li>1697: A second path resulting in waiting threads when FileSystem simultaneously created by multiple threads.  Thanks, Seth!
-            <li>1824: -1e30 is treated as fill in DataPointRecorder, to support files from old Das2 applications.  Thanks, Darrelle!
-            <li>in das2stream reader, buffer capacity now grows on data packet reads as well as header packets.  Thanks, Chris!
-            <li>'$Y$m$(d,span=4)/P4D' counts off days consistently.  Thanks, Masafumi!
-            <li>--enableResponseMonitor command line switch function restored, added to AutoplotServlet.  Thanks, Seth!
-            <li>jnlp needed Codebase attribute to run without complaint.
-            <li>TimeParser ISO8601-deriving code would fail because it dropped the Z.
-            <li>DataPointRecorder support for old digitizing files is improved.
-            <li>1823: PNGWalkTool QC needs, including show just QC records.  Thanks, Kris and Craig!
-            <li>small round of findbugs cleanup.
-            <li>select time by orbit would pick previous orbit if it overlapped slightly.
-            <li>1820: occasional failures of test033, double checking for valid ticks.
-            <li>1723: Wind waves data then dbAboveBackground showed where VALID_MIN was improperly propagated.  Thanks, Masafumi!
-            <li>1559: trim getDataSet calls to the time range requested, when the time axis is not visible.
-            <li>debug printing for 1814 accidentally left in production release.
-        </ul>
         <p>Features:</p>
         <ul> 
+            <li>time range dialogs properly show recent timeranges.
             <li>das2server dialog shows a droplist of items when they are identified by the server.
             <li>Update RBSP orbits to Feb 2017.
             <li>DasAxis foreground color is exposed in the property editor, under the controller node.
@@ -121,6 +88,9 @@
             <li>support new scheme, rank2WaveformRank2Offsets in hugeScatter and series renderers, for analysis with Ivar's new CDF files.
             <li>rfe528: after years of being stuck with the "BoxSelected" mistake, this is finally corrected to "boxSelected"
             <li>IDL/Matlab interface includes method for clearing used memory.  Thanks, Masafumi!
+        </ul>
+       <p>Less recent features:</p>
+       <ul>
             <li>start SAMP now adds a tab to show SAMP hub status.  Thanks, Pedro!
             <li>runtime error reporting includes a flag for JavaWebstart use.
             <li>savToHdf.pro included to encourage use of HDF5 and discourage use of IDLSav files.
@@ -133,25 +103,6 @@
             <li>reducex supports rank 3 join.
             <li>1840: display data dialog allows copy points to clipboard.
             <li>decimate function added, which keeps every Nth point.  Thanks, Ivar!
-        </ul>
-       <p>Less recent features:</p>
-       <ul>
-            <li>formatting events dataset with colors to qstream uses hex format for RGB color.
-            <li>das2Server credentials manager has add method for scripts to insert credentials.
-            <li>rfe528: Jemmy codes are moved into Autoplot app from VATesting, so that it's easier for any one to create tests.
-            <li>Introduce JythonRefactory which will support old names after path names move around in v2017a.
-            <li>add FileSystemUtil.unzipFile.
-            <li>DataPointRecorder turn off the sorted property as data is loaded, since it is too slow and presumably sorted already.
-            <li>display data mouse module keeps track of which renderer was selected, to facilitate comparisons.
-            <li>Add action to write PNGWalk as an animated gif.
-            <li>Add tools menu to PNGWalkTool, and action to write PNGWalk to PDF file.
-            <li>Add handling for yscans without yTags at all, and those that use yTagInterval as well.  Thanks, Chris!
-            <li>573: pngwalk tool now supports zoom on image.
-            <li>isEventsList now requires that each endTime be greater than or equal to startTime, and is used in guessRenderType, to support (X,Y)->Z where Z can be ordinal data.
-            <li>ASCII table reader is able to read in (X,Y)->Z where Z can be ordinal data.
-            <li>ASCII table reader where now has matches clause, for example where=sc.matches('.*A')
-            <li>Editor panel has switch to turn off arrow annotations for tab, and to allow tab-is-4-spaces instead of completions popup.
-            <li>extent filter (which returns min,max of a dataset) added to filters.
        </ul>
 
         <p>Known issues:</p>
