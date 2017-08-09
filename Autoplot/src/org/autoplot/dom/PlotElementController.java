@@ -2856,7 +2856,7 @@ public class PlotElementController extends DomNodeController {
                                                 });
                                             }
                                         });
-                                        hmm.getSlicer().addAction( new AbstractAction("Export Data") {
+                                        hmm.getSlicer().addAction( new AbstractAction("Export Data...") {
                                             @Override
                                             public void actionPerformed(ActionEvent e) {
                                                 org.das2.util.LoggerManager.logGuiEvent(e);
@@ -2899,7 +2899,7 @@ public class PlotElementController extends DomNodeController {
                                     mm= plot.getDasMouseInputAdapter().getModuleByLabel("Vertical Slice");
                                     final VerticalSlicerMouseModule vmm= ((VerticalSlicerMouseModule)mm);
                                     if ( vmm!=null ) { // for example in headless mode
-                                        vmm.getSlicer().addAction( new AbstractAction("Export Data") {
+                                        vmm.getSlicer().addAction( new AbstractAction("Export Data...") {
                                             @Override
                                             public void actionPerformed(ActionEvent e) {
                                                 org.das2.util.LoggerManager.logGuiEvent(e);
