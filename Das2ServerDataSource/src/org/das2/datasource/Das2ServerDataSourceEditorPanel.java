@@ -432,7 +432,13 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         int index=0;
                         do {
                             e= items.get( String.format("item_%02d", index ) );
-                            if ( e!=null ) aModel.addElement(e);
+                            if ( e!=null ) {
+                                if ( index==0 ) {
+                                    aModel.addElement("0 ("+e+")");
+                                } else {
+                                    aModel.addElement(e);
+                                }
+                            }
                             index++;
                         } while ( e!=null );
                         itemsComboBox.setModel(aModel);
@@ -1306,8 +1312,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( !tcaInterval.equals("") ) {
             result.append("&interval=").append(tcaInterval);
         }
-        if ( !itemsComboBox.getSelectedItem().toString().trim().equals("") ) {
-            result.append("&item=").append(itemsComboBox.getSelectedItem().toString().trim());
+        String s= itemsComboBox.getSelectedItem().toString().trim();
+        if ( !s.equals("") ) {
+            if ( s.startsWith("0 (") ) {
+                s= "0";
+            }
+            result.append("&item=").append(s);
         }
         
         if ( params.length()>0 ) result.append("&").append(params.toString());
