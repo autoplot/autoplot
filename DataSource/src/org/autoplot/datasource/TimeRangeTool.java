@@ -649,8 +649,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
         jLabel1.setText("Near Real Time timeranges");
 
         nrtComboBox.setEditable(true);
-        nrtComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "PT2H (last two hours)", "P1D  (last 24 hours)", "P5D  (last 5 days)", "P30D  (last thirty days)", "now/now+P1D (next 24 hours)", "now/now+P5D (next 5 days)", "now/now+P30D (next 30 days)", " " }));
-        nrtComboBox.setSelectedIndex(1);
+        nrtComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "PT2H (last two hours)", "P1D  (last 24 hours)", "P5D  (last 5 days)", "P30D  (last thirty days)", "now/now+P1D (next 24 hours)", "now/now+P5D (next 5 days)", "now/now+P30D (next 30 days)", "P1D/lastday (24 hours leading up the the last day boundary)", "lastday/P1D (24 hours following up the the last day boundary)", "P2M/lastmonth (two months leading up to the last month boundary)", "lastyear/P1Y (the last five years leading up to the year boundary)" }));
 
         org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
