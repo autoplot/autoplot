@@ -1450,13 +1450,9 @@ public class LayoutPanel extends javax.swing.JPanel {
                 JPanel parent= new JPanel();
                 parent.setLayout( new BorderLayout() );
                 DataSourceEditorPanel p= DataSourceEditorPanelUtil.getDataSourceEditorPanel( parent, uri );
-                if ( p==null ) {
-                    JOptionPane.showMessageDialog( this, "Unable to create editor" );
-                } else {
-                    if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, parent, "Edit "+((DataSourceFilter)s).getId(), JOptionPane.OK_CANCEL_OPTION ) ) {
-                        uri= p.getURI();
-                        ((DataSourceFilter)s).setUri(uri);
-                    }
+                if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, parent, "Edit "+((DataSourceFilter)s).getId(), JOptionPane.OK_CANCEL_OPTION ) ) {
+                    uri= p.getURI();
+                    ((DataSourceFilter)s).setUri(uri);
                 }
             }
         }
