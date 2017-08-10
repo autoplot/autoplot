@@ -58,7 +58,7 @@ public class APSplash extends JFrame {
     public static String getVersion() {
         try {
             String tag= AboutUtil.getReleaseTag( APSplash.class );
-            if ( tag==null ) return "untagged_version"; else return tag;
+            return tag;
         } catch (IOException ex) {
             return "untagged_version";
         }
