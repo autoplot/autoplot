@@ -54,53 +54,70 @@ public class CdfUtil {
      * @return String like double, float or string
      */
     private static String getTargetType(int type) {
-        if ( type==CDFConstants.CDF_DOUBLE || type==CDFConstants.CDF_REAL8 || type==CDFConstants.CDF_EPOCH ) {
-            return "double";
-        } else if ( type==CDFConstants.CDF_EPOCH16 ) {
-            return "double";
-        } else if ( type==CDFConstants.CDF_FLOAT || type==CDFConstants.CDF_REAL4 ) {
-            return "float";
-        } else if ( type==CDFConstants.CDF_UINT4 ) {
-            return "double";
-        } else if ( type==CDFConstants.CDF_INT8 || type==CDFConstants.CDF_TT2000 ) {
-            return "long";
-        } else if ( type==CDFConstants.CDF_INT4 || type==CDFConstants.CDF_UINT2 ) {
-            return "int";
-        } else if ( type==CDFConstants.CDF_INT2 || type==CDFConstants.CDF_UINT1 ) {
-            return "short";
-        } else if ( type==CDFConstants.CDF_INT1 || type==CDFConstants.CDF_BYTE ) {
-            return "byte";
-        } else if ( type==CDFConstants.CDF_CHAR || type==CDFConstants.CDF_UCHAR ) {
-            return "string";
-        } else {
-            throw new IllegalArgumentException("unsupported type: "+type);
+        switch (type) {
+            case (int)CDFConstants.CDF_DOUBLE:
+            case (int)CDFConstants.CDF_REAL8:
+            case (int)CDFConstants.CDF_EPOCH:
+                return "double";
+            case (int)CDFConstants.CDF_EPOCH16:
+                return "double";
+            case (int)CDFConstants.CDF_FLOAT:
+            case (int)CDFConstants.CDF_REAL4:
+                return "float";
+            case (int)CDFConstants.CDF_UINT4:
+                return "double";
+            case (int)CDFConstants.CDF_INT8:
+            case (int)CDFConstants.CDF_TT2000:
+                return "long";
+            case (int)CDFConstants.CDF_INT4:
+            case (int)CDFConstants.CDF_UINT2:
+                return "int";
+            case (int)CDFConstants.CDF_INT2:
+            case (int)CDFConstants.CDF_UINT1:
+                return "short";
+            case (int)CDFConstants.CDF_INT1:
+            case (int)CDFConstants.CDF_BYTE:
+                return "byte";
+            case (int)CDFConstants.CDF_CHAR:
+            case (int)CDFConstants.CDF_UCHAR:
+                return "string";
+            default:
+                throw new IllegalArgumentException("unsupported type: "+type);
         }
     }
     
     private static Object byteBufferType( int type ) {
-        if ( type==CDFConstants.CDF_DOUBLE || type==CDFConstants.CDF_REAL8 || type==CDFConstants.CDF_EPOCH ) {
-            return BufferDataSet.DOUBLE;
-        } else if ( type==CDFConstants.CDF_FLOAT || type==CDFConstants.CDF_REAL4 ) {
-            return BufferDataSet.FLOAT;
-        } else if ( type==CDFConstants.CDF_UINT4) {
-            return BufferDataSet.DOUBLE;
-        } else if ( type==CDFConstants.CDF_INT8 || type==CDFConstants.CDF_TT2000 ) {
-            return BufferDataSet.LONG;
-        } else if ( type==CDFConstants.CDF_INT4 || type==CDFConstants.CDF_UINT2 ) {
-            return BufferDataSet.INT;
-        } else if ( type==CDFConstants.CDF_INT2 || type==CDFConstants.CDF_UINT1 ) {
-            return BufferDataSet.SHORT;
-        } else if ( type==CDFConstants.CDF_INT1 || type==CDFConstants.CDF_BYTE ) {
-            return BufferDataSet.BYTE;
-        } else if ( type==CDFConstants.CDF_CHAR ) {
-            return BufferDataSet.BYTE; // determined experimentally: vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/ac_k0_mfi_20080602_v01.cdf?BGSEc
-        } else if (type==CDFConstants.CDF_UCHAR ) {
-            return BufferDataSet.BYTE; // TODO: I think...
-        } else if (type==CDFConstants.CDF_EPOCH16 ) {
-            return BufferDataSet.DOUBLE;
-        } else {
-            throw new IllegalArgumentException("unsupported type: "+type);
-        }        
+        switch (type) {
+            case (int)CDFConstants.CDF_DOUBLE:
+            case (int)CDFConstants.CDF_REAL8:
+            case (int)CDFConstants.CDF_EPOCH:
+                return BufferDataSet.DOUBLE;
+            case (int)CDFConstants.CDF_FLOAT:
+            case (int)CDFConstants.CDF_REAL4:
+                return BufferDataSet.FLOAT;
+            case (int)CDFConstants.CDF_UINT4:
+                return BufferDataSet.DOUBLE;
+            case (int)CDFConstants.CDF_INT8:
+            case (int)CDFConstants.CDF_TT2000:
+                return BufferDataSet.LONG;
+            case (int)CDFConstants.CDF_INT4:
+            case (int)CDFConstants.CDF_UINT2:
+                return BufferDataSet.INT;
+            case (int)CDFConstants.CDF_INT2:
+            case (int)CDFConstants.CDF_UINT1:
+                return BufferDataSet.SHORT;
+            case (int)CDFConstants.CDF_INT1:
+            case (int)CDFConstants.CDF_BYTE:
+                return BufferDataSet.BYTE;
+            case (int)CDFConstants.CDF_CHAR:        
+                return BufferDataSet.BYTE; // determined experimentally: vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/ac_k0_mfi_20080602_v01.cdf?BGSEc
+            case (int)CDFConstants.CDF_UCHAR:
+                return BufferDataSet.BYTE; // TODO: I think...
+            case (int)CDFConstants.CDF_EPOCH16:
+                return BufferDataSet.DOUBLE;
+            default:
+                throw new IllegalArgumentException("unsupported type: "+type);
+        }
     }
     
     /**
@@ -122,43 +139,48 @@ public class CdfUtil {
         result.order(byteBuffer.order());
                 
         int fieldBytes= BufferDataSet.byteCount(bbType);
-        if ( qube.length==3 ) {
-            int len1= qube[1];
-            int len2= qube[2];
-            for ( int i0=0; i0<qube[0]; i0++ ) {
-                for ( int i1=0; i1<qube[1]; i1++ ) {
-                    for ( int i2=0; i2<qube[2]; i2++ ) {
-                        int iin= fieldBytes * ( i1 * len2 + i2  );
-                        int iout= fieldBytes * ( i0 * len1 * len2 + i2 * len1 + i1 );
-                        for ( int j=0; j<fieldBytes; j++ ) {
-                            temp.put( iin + j, byteBuffer.get(iout+j) );
-                        }
-                    }
-                }
-                result.put(temp);
-                temp.flip();
-            }
-        } else if ( qube.length==4 ) {
-            int len1= qube[1];
-            int len2= qube[2];
-            int len3= qube[3];            
-            for ( int i0=0; i0<qube[0]; i0++ ) {
-                for ( int i1=0; i1<qube[1]; i1++ ) {
-                    for ( int i2=0; i2<qube[2]; i2++ ) {
-                        for ( int i3=0; i3<qube[3]; i3++ ) {
-                            int iin= fieldBytes * ( i1*len2*len3 + i2*len3 +i3 );
-                            int iout= fieldBytes * ( i0*len1*len2*len3 + i3*len2*len1 + i2*len1 +i1 );
-                            for ( int j=0; j<fieldBytes; j++ ) {
-                                temp.put( iin + j, byteBuffer.get( iout + j ) );
+        switch (qube.length) {
+            case 3:
+                {
+                    int len1= qube[1];
+                    int len2= qube[2];
+                    for ( int i0=0; i0<qube[0]; i0++ ) {
+                        for ( int i1=0; i1<qube[1]; i1++ ) {
+                            for ( int i2=0; i2<qube[2]; i2++ ) {
+                                int iin= fieldBytes * ( i1 * len2 + i2  );
+                                int iout= fieldBytes * ( i0 * len1 * len2 + i2 * len1 + i1 );
+                                for ( int j=0; j<fieldBytes; j++ ) {
+                                    temp.put( iin + j, byteBuffer.get(iout+j) );
+                                }
                             }
                         }
-                    }
-                }            
-                result.put(temp);
-                temp.flip();
-            }
-        } else {
-            throw new IllegalArgumentException("number of dimensions must be less than 5: "+qube.length );
+                        result.put(temp);
+                        temp.flip();
+                    }       break;
+                }
+            case 4:
+                {
+                    int len1= qube[1];
+                    int len2= qube[2];
+                    int len3= qube[3];
+                    for ( int i0=0; i0<qube[0]; i0++ ) {
+                        for ( int i1=0; i1<qube[1]; i1++ ) {
+                            for ( int i2=0; i2<qube[2]; i2++ ) {
+                                for ( int i3=0; i3<qube[3]; i3++ ) {
+                                    int iin= fieldBytes * ( i1*len2*len3 + i2*len3 +i3 );
+                                    int iout= fieldBytes * ( i0*len1*len2*len3 + i3*len2*len1 + i2*len1 +i1 );
+                                    for ( int j=0; j<fieldBytes; j++ ) {
+                                        temp.put( iin + j, byteBuffer.get( iout + j ) );
+                                    }
+                                }
+                            }
+                        }
+                        result.put(temp);
+                        temp.flip();
+                    }       break;
+                }
+            default:
+                throw new IllegalArgumentException("number of dimensions must be less than 5: "+qube.length );
         }
         result.flip();
         
@@ -861,26 +883,18 @@ public class CdfUtil {
                 if ( att!=null && rank>1 ) {
                     logger.log(Level.FINE, "get attribute DEPEND_"+dim+" entry for {0}", svar );
                     result.dep = String.valueOf(att);
-                    if ( result.dep==null ) {
-                        if ( !hasAttribute( cdf, svar, "LABL_PTR_"+dim ) ) {
-                            throw new Exception("No such variable: "+String.valueOf(att));
-                        } else {
-
-                        }
+                    if ( cdf.getDimensions( result.dep ).length>0 && cdf.getNumberOfValues( result.dep )>1 && cdf.recordVariance( result.dep ) ) {
+                        result.rank2= true;
+                        result.nrec = cdf.getDimensions( result.dep )[0];
+                        warn.add( "NOTE: " + result.dep + " is record varying" );
                     } else {
-                        if ( cdf.getDimensions( result.dep ).length>0 && cdf.getNumberOfValues( result.dep )>1 && cdf.recordVariance( result.dep ) ) {
-                            result.rank2= true;
+                        result.nrec = cdf.getNumberOfValues( result.dep );
+                        if (result.nrec == 1) {
                             result.nrec = cdf.getDimensions( result.dep )[0];
-                            warn.add( "NOTE: " + result.dep + " is record varying" );
-                        } else {
-                            result.nrec = cdf.getNumberOfValues( result.dep );
-                            if (result.nrec == 1) {
-                                result.nrec = cdf.getDimensions( result.dep )[0];
-                            }
                         }
-                        if ( dims.length>(dim-2) && (result.nrec)!=dims[dim-1] ) {
-                            warn.add("DEPEND_"+dim+" length ("+result.nrec+") is inconsistent with length ("+dims[dim-1]+")" );
-                        }
+                    }
+                    if ( dims.length>(dim-2) && (result.nrec)!=dims[dim-1] ) {
+                        warn.add("DEPEND_"+dim+" length ("+result.nrec+") is inconsistent with length ("+dims[dim-1]+")" );
                     }
                 }
             }
@@ -910,16 +924,12 @@ public class CdfUtil {
                 if ( att!=null && rank>1  ) {
                     logger.log(Level.FINE, "get attribute LABL_PTR_"+dim+" entry for {0}", svar );
                     result.labl= String.valueOf(att);
-                    if ( result.labl==null ) {
-                        warn.add("LABL_PTR_"+dim+" refers to "+String.valueOf(att)+" but this is not found" );
-                    } else {
-                        int nrec = cdf.getNumberOfValues(result.labl);
-                        if ( nrec == 1) {
-                            nrec = cdf.getDimensions(result.labl)[0];
-                        }
-                        if ( dims.length>(dim-2) && (nrec)!=dims[dim-1] ) {
-                            warn.add("LABL_PTR_"+dim+" length is inconsistent with length ("+dims[dim-1]+")" );
-                        }
+                    int nrec = cdf.getNumberOfValues(result.labl);
+                    if ( nrec == 1) {
+                        nrec = cdf.getDimensions(result.labl)[0];
+                    }
+                    if ( dims.length>(dim-2) && (nrec)!=dims[dim-1] ) {
+                        warn.add("LABL_PTR_"+dim+" length is inconsistent with length ("+dims[dim-1]+")" );
                     }
                 }
             }
