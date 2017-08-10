@@ -463,7 +463,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     public boolean reject( String url ) throws IOException, URISyntaxException {
         URISplit split = URISplit.parse(url); 
 
-        if ( split.resourceUri.toURL()==null ) {
+        if ( split.resourceUri==null ) {
             return true;
         }
         
@@ -478,7 +478,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     public boolean prepare( String url,  java.awt.Window parent, ProgressMonitor mon) throws Exception {
         URISplit split= URISplit.parse(url);
 
-        cdfFile= DataSetURI.getFile( split.resourceUri.toURL(), mon );
+        cdfFile= DataSetURI.getFile( split.resourceUri, mon );
         DataSetURI.checkLength(cdfFile);
 
         logger.log(Level.FINE, "opening cdf file {0}", cdfFile.toString());
@@ -715,7 +715,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             } else {
                 String p= String.valueOf( treePath.getPathComponent(1) );
                 p= p.replaceAll("=", "%3D");
-                lparams.put( "arg_0", p + ( subset==null ? "" : subset ) );
+                lparams.put( "arg_0", p + subset );
             }
             
             if ( xCheckBox.isSelected() ) {
