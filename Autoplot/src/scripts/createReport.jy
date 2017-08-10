@@ -55,3 +55,5 @@ cb.restoreState()
 
 document.close()
 out.close()
+
+showMessageDialog('report created at /tmp/autoplot.report.pdf')
