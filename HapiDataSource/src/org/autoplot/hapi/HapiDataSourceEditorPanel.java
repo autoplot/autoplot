@@ -67,7 +67,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     
     private URL defaultServer;
 	
-	private Datum myValidTime;
+    private Datum myValidTime;
 	
     /**
      * return the range of available data. For example, Polar/Hydra data is available
@@ -136,6 +136,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         initComponents();
         filtersComboBox.setPreferenceNode("hapi.filters");
+        timeRangeComboBox.setPreferenceNode("timerange");
         jScrollPane4.getVerticalScrollBar().setUnitIncrement( parametersPanel.getFont().getSize() );
 
         parametersPanel.setLayout( new BoxLayout( parametersPanel, BoxLayout.Y_AXIS ) );
@@ -235,7 +236,6 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         jLabel1 = new javax.swing.JLabel();
         serversComboBox = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
-        timeRangeTextField = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel3 = new javax.swing.JPanel();
@@ -252,6 +252,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         filtersComboBox = new org.autoplot.datasource.RecentComboBox();
         jLabel3 = new javax.swing.JLabel();
         binaryCB = new javax.swing.JCheckBox();
+        timeRangeComboBox = new org.autoplot.datasource.RecentComboBox();
 
         jLabel1.setText("HAPI Server:");
 
@@ -264,12 +265,6 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         });
 
         jLabel2.setText("Time Range: ");
-
-        timeRangeTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                timeRangeTextFieldActionPerformed(evt);
-            }
-        });
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/hapi/calendar.png"))); // NOI18N
         jButton1.setToolTipText("Time Range Tool");
@@ -337,7 +332,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(titleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE)
+                .addComponent(jScrollPane4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(clearAllB)
@@ -383,11 +378,11 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(clearButton)
                     .addComponent(filtersComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 226, Short.MAX_VALUE))
+                .addGap(0, 229, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                     .addGap(30, 30, 30)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)))
         );
 
         jSplitPane1.setLeftComponent(jPanel1);
@@ -402,7 +397,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 595, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -413,7 +408,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(timeRangeTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE)
+                        .addComponent(timeRangeComboBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
@@ -438,24 +433,19 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(timeRangeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel2))
+                        .addComponent(jLabel2)
+                        .addComponent(timeRangeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jButton1)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void timeRangeTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeTextFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_timeRangeTextFieldActionPerformed
-
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         TimeRangeTool tt= new TimeRangeTool();
-        JTextField tf= timeRangeTextField;
-        tt.setSelectedRange(tf.getText());
+        tt.setSelectedRange(timeRangeComboBox.getSelectedItem().toString());
         int r= JOptionPane.showConfirmDialog( this, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
         if ( r==JOptionPane.OK_OPTION) {
-            tf.setText(tt.getSelectedRange());
+            timeRangeComboBox.setSelectedItem(tt.getSelectedRange());
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -567,7 +557,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private javax.swing.JPanel parametersPanel;
     private javax.swing.JComboBox<String> serversComboBox;
     private javax.swing.JButton setAllB;
-    private javax.swing.JTextField timeRangeTextField;
+    private org.autoplot.datasource.RecentComboBox timeRangeComboBox;
     private javax.swing.JLabel titleLabel;
     // End of variables declaration//GEN-END:variables
 
@@ -668,7 +658,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         String timerange= params.get("timerange");
         if ( timerange!=null ) {
-            timeRangeTextField.setText(timerange);
+            //timeRangeTextField.setText(timerange);
+            timeRangeComboBox.setSelectedItem(timerange);
         }
         String parameters= params.get("parameters");
         if ( parameters!=null ) {
@@ -705,7 +696,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 throw new RuntimeException(ex);
             }
         }
-        String uri= "vap+hapi:" + serversComboBox.getSelectedItem().toString() + "?id=" + id + "&timerange="+timeRangeTextField.getText().replaceAll(" ","+");
+        String uri= "vap+hapi:" + serversComboBox.getSelectedItem().toString() + "?id=" + id + "&timerange="+timeRangeComboBox.getSelectedItem().toString().replaceAll(" ","+");
         if ( binaryCB.isSelected() && binaryCB.isEnabled() ) {
             uri+= "&format=binary";
         }
@@ -1014,14 +1005,14 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                         }
                     }
                 }
-                String currentTimeRange = timeRangeTextField.getText().trim();
+                String currentTimeRange = timeRangeComboBox.getSelectedItem().toString().trim();
                 if (currentTimeRange.length() == 0) {
-                    timeRangeTextField.setText( sampleRange.toString() );
+                    timeRangeComboBox.setSelectedItem( sampleRange.toString() );
                 } else {
                     try {
                         DatumRange current = DatumRangeUtil.parseTimeRange(currentTimeRange);
                         if ( !current.intersects(range) ) {
-                            timeRangeTextField.setText( sampleRange.toString() );
+                            timeRangeComboBox.setSelectedItem( sampleRange.toString() );
                         }
                     } catch (ParseException ex) {
                         // do nothing.
