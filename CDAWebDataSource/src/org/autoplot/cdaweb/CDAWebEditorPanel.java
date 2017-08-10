@@ -129,7 +129,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             String timeDflt= CDAWebDB.getInstance().getSampleTime(ds);
             DatumRange tr= DatumRangeUtil.parseTimeRange( timeDflt );
             String str= timeRangeComboBox.getSelectedItem().toString();
-            if ( str!=null ) str= str.trim(); else str="";
+            str= str.trim();
             if ( !str.equals("") ) {
                 try {
                     DatumRange tr1 = DatumRangeUtil.parseTimeRange(str);
@@ -716,10 +716,6 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         if ( lid==null ) lid="";
         
         String timeRange= timeRangeComboBox.getSelectedItem().toString();
-        if ( timeRange==null ) { // TODO: I don't think this should ever be null.  Null observed 2017-03-06.
-            logger.warning("here the timeRange is null");
-            timeRange= "";
-        }
         
         timeRange= timeRange.replaceAll(" ", "+");
 
