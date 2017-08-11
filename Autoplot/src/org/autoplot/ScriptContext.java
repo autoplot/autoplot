@@ -387,7 +387,7 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * keep track of the default application.
      */
-    protected static AutoplotUI defaultApp= null; // kludge to get the first.
+    private static AutoplotUI defaultApp= null; // kludge to get the first.
 
     /**
      * set the default application.  Jython codes should not call this.
