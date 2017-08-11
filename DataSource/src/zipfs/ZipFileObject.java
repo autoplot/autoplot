@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package zipfs;
 
@@ -56,7 +52,7 @@ public class ZipFileObject extends FileObject {
         this.zipEntry = zipEntry;
         this.parent = par;
         this.name = name;       // used by getNameExt only when zipEntry is null
-        children = new ArrayList<ZipFileObject>();
+        children = new ArrayList<>();
     }
 
     protected void addChildObject(ZipFileObject child) {
@@ -114,12 +110,8 @@ public class ZipFileObject extends FileObject {
             throw new IllegalArgumentException("unable to create file "+tmpFile );
         }
 
-        InputStream zStream = null;
-        try {
-            zStream= zfs.getZipFile().getInputStream(zipEntry);
+        try (InputStream zStream = zfs.getZipFile().getInputStream(zipEntry)) {
             FileSystemUtil.dumpToFile(zStream, tmpFile);
-        } finally {
-            zStream.close();
         }
 
         return tmpFile;
