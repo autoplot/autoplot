@@ -24,8 +24,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-08-08 r21199):</p>
+        <p>Bugfixes (2017-08-11 r21231):</p>
         <ul>  
+            <li>1876: first line of CSV was always handled as a header, dropping the first record.
+            <li>1876: Excel CSVs start with 0xFEFF, to assert UTF-8, which also caused problems.
+            <li>error message for dataset length mismatch was mis-reported in validate.
             <li>in PNGWalkTool, show unique part of filenames in .../*/foo/bar.png.  Before bar.png was shown for each image.
             <li>item parameter works properly for das2server dialog for all streams now.
             <li>Don't draw lines at tick locations when "opposite axis" is used.
@@ -80,7 +83,8 @@
         </ul>
         <p>Features:</p>
         <ul> 
-            <li>DataPointRecorder (used with digitizing) allows the units to be reset.
+            <li>DataPointRecorder (used with digitizing) allows the units to be reset.  Thanks, Bill!
+            <li>matlab_jet_black0 color table added.  Thanks, Seth!
             <li>"lastyear" keyword supported in timeranges, to indicate the last year boundary.
             <li>time range dialogs properly show recent timeranges.
             <li>das2server dialog shows a droplist of items when they are identified by the server.
