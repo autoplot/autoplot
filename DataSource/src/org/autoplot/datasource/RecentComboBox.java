@@ -39,6 +39,8 @@ public class RecentComboBox extends JComboBox {
     File recentFile;
     String preferenceNode= "";
 
+    public static final String PREF_NODE_TIMERANGE="timerange";
+    
     private final static Logger logger= LoggerManager.getLogger("apdss.uri");
     
     public RecentComboBox() {
@@ -94,6 +96,25 @@ public class RecentComboBox extends JComboBox {
         this.verifier= v;
     }
 
+    /**
+     * to make it easier to convert GUIs with JTextFields to RecentComboBoxes, setText is available.
+     * @param text 
+     */
+    public void setText( String text ) {
+        setSelectedItem(text);
+    }
+    
+    /**
+     * get the string value, which is also the getSelectedItem.
+     * @return 
+     */
+    public String getText() {
+        if ( getSelectedItem()==null ) {
+            return "";
+        } else {
+            return getSelectedItem().toString();
+        }
+    }
     
     /**
      * this loads the recent entries file (e.g. autoplot_data/bookmarks/recent.timerange.txt)
