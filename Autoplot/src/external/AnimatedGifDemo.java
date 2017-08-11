@@ -48,9 +48,11 @@ public class AnimatedGifDemo {
             child = child.getNextSibling();
         }
 
-        IIOMetadataNode gce = (IIOMetadataNode) child;
-        gce.setAttribute("userDelay", "FALSE");
-        gce.setAttribute("delayTime", delayTime);
+        if ( child!=null ) {
+            IIOMetadataNode gce = (IIOMetadataNode) child;
+            gce.setAttribute("userDelay", "FALSE");
+            gce.setAttribute("delayTime", delayTime);
+        }
 
         //only the first node needs the ApplicationExtensions node
         if (imageIndex == 0) {
