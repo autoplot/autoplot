@@ -154,13 +154,13 @@ public class RecentComboBox extends JComboBox {
      * @param items
      */
     private void saveRecent( List<String> items ) {
-        if ( recentFile==null || !recentFile.getParentFile().exists() ) {
+        if ( recentFile==null || !bookmarksFolder.exists() ) {
             return; //not yet, we're initializing for the first time.
         }
         
         File recentFileTemp;
         try {
-            recentFileTemp= File.createTempFile( "recent."+ this.preferenceNode, ".txt", recentFile.getParentFile() );
+            recentFileTemp= File.createTempFile( "recent."+ this.preferenceNode, ".txt", bookmarksFolder );
         } catch (IOException ex) {
             logger.warning(ex.getMessage());
             return;
@@ -206,7 +206,7 @@ public class RecentComboBox extends JComboBox {
             public void run() {
                 File recentFileTemp;
                 try {
-                    recentFileTemp= File.createTempFile( "recent."+ preferenceNode, ".txt", recentFile.getParentFile() );
+                    recentFileTemp= File.createTempFile( "recent."+ preferenceNode, ".txt", bookmarksFolder );
                 } catch (IOException ex) {
                     logger.warning(ex.getMessage());
                     return;
