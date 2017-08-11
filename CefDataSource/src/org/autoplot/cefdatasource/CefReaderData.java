@@ -198,11 +198,6 @@ public class CefReaderData {
          */
         int work_size = 0;
 
-        Cef cef1 = new Cef();
-
-        cef1.nparam = 1;        //*** set nparam to 1 when it is added to the parameter data
-
-
         // *** Set the processing state flag (1=first record, 2=subsequent records, 0 = end of file )
         int trflag = 1;     //*** set to 0 if no more data required in requested time range
         int n_fields;     //*** number of fields per record

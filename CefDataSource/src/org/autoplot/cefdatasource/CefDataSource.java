@@ -104,18 +104,18 @@ public class CefDataSource extends AbstractDataSource {
 
         entries.putAll(param.entries);
 
-        Map<String, Object> restEntries = new HashMap();
-        for (Iterator<String> i = cef.parameters.keySet().iterator(); i.hasNext();) {
-            String key = i.next();
-            CefReaderHeader.ParamStruct parm = cef.parameters.get(key);
-            if (parm.sizes.length == 1 && parm.sizes[0] == 1) {
-                restEntries.put(key, "[*] " + parm.entries.get("CATDESC"));
-            } else {
-                String s = Arrays.toString(parm.sizes);
-                s = s.substring(1, s.length() - 1);
-                restEntries.put(key, "[*," + s + "] " + parm.entries.get("CATDESC"));
-            }
-        }
+        //Map<String, Object> restEntries = new HashMap();  //findbugs showed that none of this is used.
+        //for (Iterator<String> i = cef.parameters.keySet().iterator(); i.hasNext();) {
+           // String key = i.next();
+            //CefReaderHeader.ParamStruct parm = cef.parameters.get(key);
+           // if (parm.sizes.length == 1 && parm.sizes[0] == 1) {
+                //restEntries.put(key, "[*] " + parm.entries.get("CATDESC"));
+           // } else {
+                //String s = Arrays.toString(parm.sizes);
+                //s = s.substring(1, s.length() - 1);
+                //restEntries.put(key, "[*," + s + "] " + parm.entries.get("CATDESC"));
+            //}
+        //}
         return entries;
     }
 

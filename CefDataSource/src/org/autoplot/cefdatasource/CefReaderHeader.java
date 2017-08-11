@@ -167,7 +167,7 @@ public class CefReaderHeader {
         int pdata = 0; // data index
 
         int eCount = 0;
-        List<String> elements = null;
+        //List<String> elements = null; // for debugging
         int[] data_idx;
 
         GlobalStruct gStru = null;
@@ -277,9 +277,9 @@ public class CefReaderHeader {
                             } else if (key.equals("ENTRY")) {
                                 //*** if this is the second entry then must be multi entry global ***
                                 if (eCount == 0) {
-                                    elements = new ArrayList();
+                                    //elements = new ArrayList();
                                 }
-                                elements.add(value[0]);
+                                //elements.add(value[0]);
 
                                 eCount = eCount + 1;
 
