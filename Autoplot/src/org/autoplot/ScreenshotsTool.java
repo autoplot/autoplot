@@ -98,6 +98,8 @@ public class ScreenshotsTool extends EventQueue {
 
     private final ConcurrentLinkedQueue<ImageRecord> imageQueue= new ConcurrentLinkedQueue<>();
     
+    private final Object imageQueueLock= new Object();
+    
     /**
      * thread responsible for converting BufferedImages into files.
      */
@@ -306,8 +308,8 @@ public class ScreenshotsTool extends EventQueue {
                         logger.log(Level.FINE, "imageRecorderThread..." );
 
                         while ( pngWriterThreadRunning && imageQueue.isEmpty() ) { 
-                            synchronized ( imageQueue ) {
-                                imageQueue.wait();
+                            synchronized ( imageQueueLock ) {
+                                imageQueueLock.wait();
                             }
                         }
                         while ( !imageQueue.isEmpty() ) {
@@ -922,9 +924,9 @@ public class ScreenshotsTool extends EventQueue {
         Rectangle myBounds= getMyBounds(b);
 
         ImageRecord imr= new ImageRecord( im, file );
-        synchronized ( imageQueue ) {
+        synchronized ( imageQueueLock ) {
             imageQueue.add( imr );
-            imageQueue.notifyAll();
+            imageQueueLock.notifyAll();
         }
         t0= System.currentTimeMillis();
 
@@ -966,8 +968,8 @@ public class ScreenshotsTool extends EventQueue {
         pngWriterThreadRunning= false;
         try {
             while ( pngWriterThreadNotDone ) {
-                synchronized ( imageQueue ) {
-                    imageQueue.wait();
+                synchronized ( imageQueueLock ) {
+                    imageQueueLock.wait();
                 }
             }
         } catch ( InterruptedException ex ) {
@@ -1091,8 +1093,8 @@ public class ScreenshotsTool extends EventQueue {
         pngWriterThreadRunning= false;
         try {
             while ( pngWriterThreadNotDone ) {
-                synchronized ( imageQueue ) {
-                    imageQueue.wait();
+                synchronized ( imageQueueLock ) {
+                    imageQueueLock.wait();
                 }
             }
         } catch ( InterruptedException ex ) {
