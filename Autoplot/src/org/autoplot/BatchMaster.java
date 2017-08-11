@@ -11,7 +11,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +39,6 @@ import org.autoplot.jythonsupport.JythonRefactory;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.datum.format.NumberFormatUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -343,11 +341,14 @@ public class BatchMaster extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goButtonActionPerformed
+        if ( !goButton.isEnabled() ) {
+            return;
+        }
+        goButton.setEnabled(false);
         Runnable run= new Runnable() {
             @Override
             public void run() {
                 try {
-                    goButton.setEnabled(false);
                     doIt();
                 } catch (IOException ex) {
                     messageLabel.setText(ex.getMessage());
@@ -618,7 +619,7 @@ public class BatchMaster extends javax.swing.JPanel {
         return build.toString();
     }
     
-    public synchronized void doIt() throws IOException {
+    public void doIt() throws IOException {
         ProgressMonitor monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(this), "Run Batch");
         try {
             String scriptName= dataSetSelector1.getValue();
