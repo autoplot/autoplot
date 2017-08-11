@@ -1,12 +1,9 @@
 
 package org.autoplot.datasource;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -18,12 +15,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.das2.datum.LoggerManager;
@@ -105,7 +99,7 @@ public class RecentComboBox extends JComboBox {
      * this loads the recent entries file (e.g. autoplot_data/bookmarks/recent.timerange.txt)
      * and should not be called on the event thread.
      */
-    private synchronized void loadRecent() {
+    private void loadRecent() {
         List<String> items= new ArrayList( RECENT_SIZE+2 );
         try {
             if ( recentFile!=null && recentFile.exists() ) {
@@ -159,13 +153,21 @@ public class RecentComboBox extends JComboBox {
      * save the recent items to the disk.  items.get(0) is the most recent item, and will be saved last on the disk.
      * @param items
      */
-    private synchronized void saveRecent( List<String> items ) {
+    private void saveRecent( List<String> items ) {
         if ( recentFile==null || !recentFile.getParentFile().exists() ) {
             return; //not yet, we're initializing for the first time.
         }
+        
+        File recentFileTemp;
+        try {
+            recentFileTemp= File.createTempFile( "recent."+ this.preferenceNode, ".txt", recentFile.getParentFile() );
+        } catch (IOException ex) {
+            logger.warning(ex.getMessage());
+            return;
+        }
         BufferedWriter w = null;
         try {
-            w = new BufferedWriter(new FileWriter(recentFile));
+            w = new BufferedWriter(new FileWriter(recentFileTemp));
             items= new ArrayList(items);
             Collections.reverse(items);
             for ( String s:items ) {
@@ -181,6 +183,10 @@ public class RecentComboBox extends JComboBox {
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
+        }
+        
+        if ( !recentFileTemp.renameTo(recentFile) ) {
+            logger.log(Level.WARNING, "unable to overwrite file {0}", recentFile);
         }
     }
 
@@ -198,19 +204,20 @@ public class RecentComboBox extends JComboBox {
         Runnable run= new Runnable() {
             @Override
             public void run() {
+                File recentFileTemp;
+                try {
+                    recentFileTemp= File.createTempFile( "recent."+ preferenceNode, ".txt", recentFile.getParentFile() );
+                } catch (IOException ex) {
+                    logger.warning(ex.getMessage());
+                    return;
+                }
                 BufferedWriter w = null;
                 try {
-                    synchronized (this) {
-                        if ( recentFile!=null ) {
-                            if ( recentFile.exists() ) {
-                                w = new BufferedWriter(new FileWriter(recentFile,true));
-                            } else {
-                                w = new BufferedWriter(new FileWriter(recentFile));
-                            }
-                            w.append(s, 0, s.length());
-                            w.append("\n");
-                            w.close();
-                        }
+                    if ( recentFile!=null ) {
+                        w = new BufferedWriter(new FileWriter(recentFileTemp));
+                        w.append(s, 0, s.length());
+                        w.append("\n");
+                        w.close();
                     }
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
@@ -220,6 +227,9 @@ public class RecentComboBox extends JComboBox {
                     } catch (IOException ex) {
                         logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
+                }
+                if ( !recentFileTemp.renameTo(recentFile) ) {
+                   logger.log(Level.WARNING, "unable to overwrite file {0}", recentFile);
                 }
                 loadRecent();        
             }
