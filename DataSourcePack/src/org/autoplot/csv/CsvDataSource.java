@@ -92,7 +92,6 @@ public class CsvDataSource extends AbstractDataSource {
 
         InputStream in = DataSetURI.getInputStream(uri, mon);
         
-        PushbackInputStream thein= new PushbackInputStream(in,1024);        
         //char delimiter= TableOps.getDelim(thein);
         
         String sdelimiter= getParam("delim", ",");
@@ -101,7 +100,7 @@ public class CsvDataSource extends AbstractDataSource {
         
         char delimiter= sdelimiter.charAt(0);
         
-        BufferedReader breader= new BufferedReader( new InputStreamReader(thein) );        
+        BufferedReader breader= new BufferedReader( new InputStreamReader(in) );        
         
         String skip= getParam( "skipLines", "" );
         if ( skip.length()==0 ) skip= getParam( "skip", "" );
@@ -190,6 +189,8 @@ public class CsvDataSource extends AbstractDataSource {
         int line=0;
         double fill= 0;
 
+        boolean needToCheckHeader= true; // check to see if the first line of data was mistaken for a header
+        
         while ( reader.readRecord() ) {
             line++;
             mon.setProgressMessage("read line "+line);
@@ -275,6 +276,48 @@ public class CsvDataSource extends AbstractDataSource {
                 continue;
             }
 
+            if ( needToCheckHeader ) {
+                boolean yepItsData= true;
+                double[] cbs= new double[columnUnits.length];
+                for ( int icol= 0; icol<columnUnits.length; icol++ ) {
+                    try {
+                        if ( icol==0 ) { 
+                            if ( headers[icol].length()>1 && ((int)headers[icol].charAt(0))==0xFEFF ) { //Excel UTF non-space
+                                headers[icol]= headers[icol].substring(1);
+                            }
+                        }
+                        u= columnUnits[icol];
+                        if ( u instanceof EnumerationUnits ) {
+                            cbs[icol]= ((EnumerationUnits)u).createDatum( headers[icol] ).doubleValue(u);
+                        } else {
+                            cbs[icol]= u.parse(headers[icol]).doubleValue(u);
+                        }
+                    } catch ( ParseException ex ) {
+                        yepItsData= false;
+                    }
+                }
+                if ( yepItsData ) {
+                    if ( idep0column>=0 ) {
+                        tbuilder.putValue( -1, cbs[idep0column] );
+                        tbuilder.nextRecord();
+                    }
+                    if ( bundleb!=null ) {
+                        for ( int j=0; j<bundleb.length; j++ ) {
+                            builder.putValue(-1,j,cbs[icolumn+j] );
+                        }
+                        builder.nextRecord();
+                    } else {
+                        builder.putValue(-1,cbs[icolumn] );
+                        builder.nextRecord();
+                    }
+                    for ( int icol=0; icol<columnUnits.length; icol++ ) { 
+                        headers[icol]= "field"+icol;
+                    }
+                }
+                needToCheckHeader= false;
+            }
+                
+                
             if ( idep0column>=0 ) {
                 tbuilder.putValue( -1, tb );
                 tbuilder.nextRecord();
