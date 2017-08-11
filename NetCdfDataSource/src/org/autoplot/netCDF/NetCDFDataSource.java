@@ -229,7 +229,7 @@ public class NetCDFDataSource extends AbstractDataSource {
      * @param mon
      * @throws IOException
      */
-    private synchronized void readData( ProgressMonitor mon ) throws IOException {
+    private void readData( ProgressMonitor mon ) throws IOException {
 
         String location;
         boolean makeLocal= true;
