@@ -74,6 +74,7 @@ import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
+import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 
 /**
@@ -156,11 +157,12 @@ public class DataMashUp extends javax.swing.JPanel {
      */
     public DataMashUp() {
         initComponents();
+        timeRangeRecentComboBox.setPreferenceNode( "timerange" );
         namedURIListTool1.setDataMashUp(this);
         namedURIListTool1.addPropertyChangeListener( NamedURIListTool.PROP_TIMERANGE, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                timeRangeTextField.setText( namedURIListTool1.getTimeRange().toString() );
+                timeRangeRecentComboBox.setText( namedURIListTool1.getTimeRange().toString() );
             }
         });
 
@@ -268,8 +270,8 @@ public class DataMashUp extends javax.swing.JPanel {
         DefaultTreeModel m= (DefaultTreeModel) expressionTree.getModel();
         
         b.append( getJython( m, m.getRoot() ) );
-        String timerange= timeRangeTextField.getText();
-        if ( timeRangeTextField.isEnabled() ) {
+        String timerange= timeRangeRecentComboBox.getText();
+        if ( timeRangeRecentComboBox.isEnabled() ) {
             b.append("&timerange=").append(timerange.trim().replaceAll(" ","+") );
         }
         
@@ -312,8 +314,8 @@ public class DataMashUp extends javax.swing.JPanel {
         b.append( getJython( m, tn ) );
         b.append( getJythonSynchronize("&") );
         
-        String timerange= timeRangeTextField.getText();
-        if ( timeRangeTextField.isEnabled() ) {
+        String timerange= timeRangeRecentComboBox.getText();
+        if ( timeRangeRecentComboBox.isEnabled() ) {
             b.append("&timerange=\'").append(timerange.trim().replaceAll(" ","+")).append("\'");
         }
         
@@ -732,13 +734,13 @@ public class DataMashUp extends javax.swing.JPanel {
             setUris(uris);            
         }
         if ( timerange==null ) {
-            timeRangeTextField.setText( "" );
-            timeRangeTextField.setEnabled(false);
+            timeRangeRecentComboBox.setText( "" );
+            timeRangeRecentComboBox.setEnabled(false);
             timeRangeLabel.setEnabled(false);
             timeRangeLabel.setToolTipText("In-line code does not support Time Series Browse");
         } else {
-            timeRangeTextField.setText( timerange.replaceAll("\\+", " " ) );
-            timeRangeTextField.setEnabled(true);
+            timeRangeRecentComboBox.setText( timerange.replaceAll("\\+", " " ) );
+            timeRangeRecentComboBox.setEnabled(true);
             timeRangeLabel.setEnabled(true);
             timeRangeLabel.setToolTipText("Current time range for data requests");
         }
@@ -746,7 +748,7 @@ public class DataMashUp extends javax.swing.JPanel {
     
     public void enableTimeRange() {
         timeRangeLabel.setEnabled(true);
-        timeRangeTextField.setEnabled(true);
+        timeRangeRecentComboBox.setEnabled(true);
     }
     
     private static boolean isChildOf( TreeNode parent, TreeNode child ) {
@@ -879,7 +881,7 @@ public class DataMashUp extends javax.swing.JPanel {
         namedURIListTool1 = new org.autoplot.jythonsupport.ui.NamedURIListTool();
         jLabel1 = new javax.swing.JLabel();
         timeRangeLabel = new javax.swing.JLabel();
-        timeRangeTextField = new javax.swing.JTextField();
+        timeRangeRecentComboBox = new org.autoplot.datasource.RecentComboBox();
 
         addItemMenuItem.setText("Add function...");
         addItemMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -938,7 +940,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(directionsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(directionsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
             .addComponent(jScrollPane6)
         );
         jPanel4Layout.setVerticalGroup(
@@ -946,7 +948,7 @@ public class DataMashUp extends javax.swing.JPanel {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addComponent(directionsLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE))
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE))
         );
 
         jSplitPane2.setRightComponent(jPanel4);
@@ -965,7 +967,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -986,7 +988,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1007,7 +1009,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1034,7 +1036,7 @@ public class DataMashUp extends javax.swing.JPanel {
         myFunctionsPanel.setLayout(myFunctionsPanelLayout);
         myFunctionsPanelLayout.setHorizontalGroup(
             myFunctionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
         );
         myFunctionsPanelLayout.setVerticalGroup(
             myFunctionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1048,8 +1050,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
+                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addComponent(jTabbedPane1))
@@ -1058,7 +1059,7 @@ public class DataMashUp extends javax.swing.JPanel {
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addComponent(jLabel2)
-                .addGap(0, 272, Short.MAX_VALUE))
+                .addGap(0, 278, Short.MAX_VALUE))
             .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
                     .addGap(32, 32, 32)
@@ -1087,18 +1088,16 @@ public class DataMashUp extends javax.swing.JPanel {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jScrollPane7)
-                        .addContainerGap())
+                    .addComponent(jScrollPane7)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(synchronizeCB)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addGap(0, 306, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(synchronizeCB))
         );
@@ -1115,15 +1114,15 @@ public class DataMashUp extends javax.swing.JPanel {
             }
         });
 
-        timeRangeTextField.setEnabled(false);
-        timeRangeTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+        timeRangeRecentComboBox.setEnabled(false);
+        timeRangeRecentComboBox.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
-                timeRangeTextFieldFocusLost(evt);
+                timeRangeRecentComboBoxFocusLost(evt);
             }
         });
-        timeRangeTextField.addActionListener(new java.awt.event.ActionListener() {
+        timeRangeRecentComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                timeRangeTextFieldActionPerformed(evt);
+                timeRangeRecentComboBoxActionPerformed(evt);
             }
         });
 
@@ -1134,11 +1133,10 @@ public class DataMashUp extends javax.swing.JPanel {
             .addComponent(jSplitPane1)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 498, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(timeRangeLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(timeRangeTextField)
-                .addContainerGap())
+                .addComponent(timeRangeRecentComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 265, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1146,27 +1144,15 @@ public class DataMashUp extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(timeRangeLabel)
-                    .addComponent(timeRangeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(timeRangeRecentComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSplitPane1))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void timeRangeTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_timeRangeTextFieldFocusLost
-        try {
-            namedURIListTool1.setTimeRange( DatumRangeUtil.parseTimeRange(timeRangeTextField.getText()));
-        } catch (ParseException ex) {
-            Logger.getLogger(DataMashUp.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_timeRangeTextFieldFocusLost
 
-    private void timeRangeTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeTextFieldActionPerformed
-        try {
-            namedURIListTool1.setTimeRange( DatumRangeUtil.parseTimeRange(timeRangeTextField.getText()));
-        } catch (ParseException ex) {
-            Logger.getLogger(DataMashUp.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_timeRangeTextFieldActionPerformed
+    }//GEN-LAST:event_timeRangeTextFieldFocusLost
 
     /**
      * use the resolver to get the QDataSet, then plot it.
@@ -1283,6 +1269,22 @@ public class DataMashUp extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_scratchListMousePressed
 
+    private void timeRangeRecentComboBoxFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_timeRangeRecentComboBoxFocusLost
+        try {
+            namedURIListTool1.setTimeRange( DatumRangeUtil.parseTimeRange(timeRangeRecentComboBox.getText()));
+        } catch (ParseException ex) {
+            Logger.getLogger(DataMashUp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_timeRangeRecentComboBoxFocusLost
+
+    private void timeRangeRecentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeRecentComboBoxActionPerformed
+        try {
+            namedURIListTool1.setTimeRange( DatumRangeUtil.parseTimeRange(timeRangeRecentComboBox.getText()));
+        } catch (ParseException ex) {
+            Logger.getLogger(DataMashUp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_timeRangeRecentComboBoxActionPerformed
+
     private void checkForTSB() {
         String[] suris= namedURIListTool1.getUris();
         String timerange= null;
@@ -1313,11 +1315,11 @@ public class DataMashUp extends javax.swing.JPanel {
             }
         }
         if ( timerange!=null ) {
-            timeRangeTextField.setEnabled(true);
+            timeRangeRecentComboBox.setEnabled(true);
             timeRangeLabel.setEnabled(true);
-            timeRangeTextField.setText( timerange );
+            timeRangeRecentComboBox.setText( timerange );
         } else {
-            timeRangeTextField.setEnabled(false);
+            timeRangeRecentComboBox.setEnabled(false);
             timeRangeLabel.setEnabled(false);
         }
     }
@@ -1594,6 +1596,6 @@ public class DataMashUp extends javax.swing.JPanel {
     private javax.swing.JList scratchList;
     private javax.swing.JCheckBox synchronizeCB;
     private javax.swing.JLabel timeRangeLabel;
-    private javax.swing.JTextField timeRangeTextField;
+    private org.autoplot.datasource.RecentComboBox timeRangeRecentComboBox;
     // End of variables declaration//GEN-END:variables
 }
