@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -23,17 +24,19 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.output.TeeOutputStream;
 import org.das2.datum.Datum;
 import org.autoplot.datasource.RecordIterator;
 import org.das2.datum.DatumRange;
+import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
-import org.json.JSONArray;
+import org.das2.fsm.FileStorageModel;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
+import org.das2.util.filesystem.FileSystem;
 
 /**
  *
@@ -41,6 +44,8 @@ import org.das2.qds.ops.Ops;
  */
 @WebServlet(urlPatterns = {"/DataServlet"})
 public class DataServlet extends HttpServlet {
+
+    private static final Logger logger= Logger.getLogger("hapi");
 
     private String getParam( Map<String,String[]> request, String name, String deft, String doc, Pattern constraints ) {
         String[] vs= request.remove(name);
@@ -78,7 +83,7 @@ public class DataServlet extends HttpServlet {
         Map<String,String[]> params= new HashMap<>( request.getParameterMap() );
         String id= getParam( params,"id",null,"The identifier for the resource.", null );
         String timeMin= getParam( params, "time.min", null, "The earliest value of time to include in the response.", null );
-        String timeMax= getParam( params, "time.max", null, "The latest value of time to include in the response.", null );
+        String timeMax= getParam( params, "time.max", null, "The include values of time up to but not including this time in the response.", null );
         String parameters= getParam( params, "parameters", "", "The comma separated list of parameters to include in the response ", null );
         String include= getParam( params, "include", "", "include header at the top", Pattern.compile("(|header)") );
         String format= getParam( params, "format", "", "The desired format for the data stream.", Pattern.compile("(|csv|binary)") );
@@ -118,25 +123,52 @@ public class DataServlet extends HttpServlet {
         OutputStream out = response.getOutputStream();
                 
         File[] dataFiles= null;
+        dsiter= null;
         
-        try {
-            dsiter= checkAutoplotSource( id, dr, allowStream );
-            if ( dsiter==null ) {
-                File dataFileHome= new File( Util.getHapiHome(), "data" );
-                File dataFile= new File( dataFileHome, id+".csv" );
-                if ( dataFile.exists() ) {
-                    dataFiles= new File[] { dataFile };
-                } else {
-                    if ( id.equals("0B000800408DD710.noStream") ) {
-                        dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/0B000800408DD710.$Y$m$d.d2s", dr, false ); // allow Autoplot to select
-                    } else {
-                        throw new IllegalArgumentException("bad id: "+id+", does not exist: "+dataFile );
+        // Look to see if we can cover the time range using cached files.  These files
+        // must: be csv, contain all data, cover all data within $Y$m$d
+        boolean allowCache= true;
+        if ( allowCache ) {
+            File dataFileHome= new File( Util.getHapiHome(), "cache" );
+            dataFileHome= new File( dataFileHome, id );
+            if ( dataFileHome.exists() ) {
+                FileStorageModel fsm= FileStorageModel.create( FileSystem.create(dataFileHome.toURI()), "$Y/$m/$Y$m$d.csv" );
+                File[] files= fsm.getFilesFor(dr); 
+                // make sure we have all files.
+                if ( files.length>0 ) {
+                    DatumRange dr1= fsm.getRangeFor(fsm.getNameFor(files[0]));
+                    while ( dr1.min().gt(dr.min()) ) dr1= dr1.previous();
+                    int nfiles= 0;
+                    while ( dr1.min().lt(dr.max()) ) {
+                        nfiles++;
+                        dr1= dr1.next();
+                    }
+                    if ( nfiles==files.length ) { // we have all files.
+                        dataFiles= files;
                     }
                 }
             }
-        } catch ( Exception ex ) {
-            ex.printStackTrace();
-            throw new IllegalArgumentException("Exception thrown by data read", ex);
+        }
+        
+        if ( dataFiles==null ) {
+            try {
+                dsiter= checkAutoplotSource( id, dr, allowStream );
+                if ( dsiter==null ) {
+                    File dataFileHome= new File( Util.getHapiHome(), "data" );
+                    File dataFile= new File( dataFileHome, id+".csv" );
+                    if ( dataFile.exists() ) {
+                        dataFiles= new File[] { dataFile };
+                    } else {
+                        if ( id.equals("0B000800408DD710.noStream") ) {
+                            dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/0B000800408DD710.$Y$m$d.d2s", dr, false ); // allow Autoplot to select
+                        } else {
+                            throw new IllegalArgumentException("bad id: "+id+", does not exist: "+dataFile );
+                        }
+                    }
+                }
+            } catch ( Exception ex ) {
+                throw new IllegalArgumentException("Exception thrown by data read", ex);
+            }
         }
         
         try {
@@ -189,6 +221,32 @@ public class DataServlet extends HttpServlet {
             throw new ServletException(ex);
         }
 
+        // To cache days, post a single-day request for CSV of all parameters.
+        boolean createCache= true;
+        if ( createCache && 
+                dataFormatter instanceof CsvDataFormatter &&
+                parameters.equals("") &&
+                TimeUtil.getSecondsSinceMidnight(dr.min())==0 && 
+                TimeUtil.getSecondsSinceMidnight(dr.max())==0 && 
+                dr.width().doubleValue(Units.seconds)==86400 || 
+                dr.width().doubleValue(Units.seconds)==86401 ) {
+            File dataFileHome= new File( Util.getHapiHome(), "cache" );
+            dataFileHome= new File( dataFileHome, id );
+            if ( !dataFileHome.exists() ) {
+                if ( !dataFileHome.mkdirs() ) logger.log(Level.FINE, "unable to mkdir {0}", dataFileHome);
+            }
+            if ( dataFileHome.exists() ) {
+                TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d.csv");
+                String s= tp.format(dr);
+                File ff= new File( dataFileHome, s );
+                if ( !ff.getParentFile().exists() ) {
+                    if ( !ff.getParentFile().mkdirs() ) logger.log(Level.FINE, "unable to mkdir {0}", ff.getParentFile());
+                }
+                FileOutputStream fout= new FileOutputStream(ff);
+                org.apache.commons.io.output.TeeOutputStream tout= new TeeOutputStream( out, fout );
+                out= tout;
+            }
+        }
         
         try {
             assert dsiter!=null;

@@ -131,6 +131,7 @@
             <li>2017-06-20: Bob's verifier caught that streaming data sources were not trimmed to request time.</li>
             <li>2017-06-21: support for P1D/lastday added to DasCoreDatum, so that sample times are not always changing.</li>
             <li>2017-06-28: return 404 when ID is bad, instead of empty response.  Bugfix, where streaming datasources would output an extra record.  Bugfix, subset parameters in info request.  Thanks, Bob!</li>
+            <li>2017-08-14: add experimental caching mechanism, where ~/hapi/cache can contain daily cache files.</li>
         </ul>
         </small>
     </body>
