@@ -1,13 +1,9 @@
 
 package org.autoplot.hapiserver;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Calendar;
@@ -15,8 +11,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletResponse;
 import org.das2.qds.DataSetUtil;
@@ -69,7 +63,7 @@ public class Util {
             synchronized ( Util.class ) {
                 HAPI_HOME_ = Util.HAPI_HOME;
                 if ( HAPI_HOME_==null ) {
-                    Util.HAPI_HOME= HAPI_HOME_ = f;
+                    Util.HAPI_HOME= f;
                 }
             }
         } else {
