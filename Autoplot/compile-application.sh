@@ -81,9 +81,9 @@ export timer=`date +%s`
 
 allcodes='org/autoplot/AutoplotUI.java'
 function compilef {
-   timer1=`date +%s`
+   #timer1=`date +%s`
    #dt=`expr $(( timer1 - timer ))`
-   echo "DATE: $timer1 $1"
+   #echo "DATE: $timer1 $1"
    #echo "ELAPSED TIME (SEC): $dt"
    #echo $JAVAC $JAVAARGS $1
    #if ! $JAVAC $JAVAARGS $1; then raiseerror; fi
@@ -406,12 +406,12 @@ rm dist/AutoplotVolatile1.jar
 echo "=== sign and pack the jar file..."
 echo "  use set +x to hide private info"
 #echo  ${JAVA_HOME}/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"
-set +x
+#set +x
 if ! ${JAVA_HOME}/bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"; then
    echo "Fail to sign resources!"
    exit 1
 fi
-set -x
+#set -x
 
 echo "=== verify the jar file..."
 ${JAVA_HOME}/bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10
