@@ -79,13 +79,20 @@ JAVAARGS="-g -target 1.7 -source 1.7 -bootclasspath $JAVA_HOME/jre/lib/rt.jar -c
 
 export timer=`date +%s`
 
+allcodes='org/autoplot/AutoplotUI.java'
 function compilef {
    timer1=`date +%s`
    #dt=`expr $(( timer1 - timer ))`
    echo "DATE: $timer1 $1"
    #echo "ELAPSED TIME (SEC): $dt"
-   echo $JAVAC $JAVAARGS $1
-   if ! $JAVAC $JAVAARGS $1; then raiseerror; fi
+   #echo $JAVAC $JAVAARGS $1
+   #if ! $JAVAC $JAVAARGS $1; then raiseerror; fi
+   allcodes="$allcodes $1"
+}
+
+function compilef-go {
+   echo $JAVAC $JAVAARGS $allcodes
+   if ! $JAVAC $JAVAARGS $allcodes; then raiseerror; fi
 }
 
 if [ "" = "$CODEBASE" ]; then
@@ -323,31 +330,31 @@ compilef 'org/das2/util/*Formatter.java'
 compilef 'org/autoplot/util/jemmy/*.java'
 compilef 'org/das2/qds/filters/*.java'
 
+compilef-go
+
 cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
-   echo $JAVAC $JAVAARGS $i.java
-   if ! $JAVAC $JAVAARGS $i.java; then hasErrors=1; fi
+   compilef $i.java
 done
 cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFormat.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFormat.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
-   echo $JAVAC $JAVAARGS $i.java
-   if ! $JAVAC $JAVAARGS $i.java; then hasErrors=1; fi
+   compilef $i.java
 done
 cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
-   echo $JAVAC $JAVAARGS $i.java
-   if ! $JAVAC $JAVAARGS $i.java; then hasErrors=1; fi
+   compilef $i.java
 done
 cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFormatEditorPanel.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFormatEditorPanel.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
-   echo $JAVAC $JAVAARGS $i.java
-   if ! $JAVAC $JAVAARGS $i.java; then hasErrors=1; fi
+   compilef $i.java
 done
 
 # NetCDF IOServiceProvider allows Autoplot URIs to be used in ncml files.
 echo "compile AbstractIOSP and APIOServiceProvider"
-if ! $JAVAC $JAVAARGS org/autoplot/netCDF/AbstractIOSP.java; then echo "\n\n****\n\n"; hasErrors=1; fi
-if ! $JAVAC $JAVAARGS org/autoplot/netCDF/APIOServiceProvider.java; then echo "\n\n****\n\n"; hasErrors=1; fi
+compilef org/autoplot/netCDF/AbstractIOSP.java
+compilef org/autoplot/netCDF/APIOServiceProvider.java
+
+compilef-go
 
 cd ..
 echo "done compile sources."
