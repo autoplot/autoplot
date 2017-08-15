@@ -330,8 +330,6 @@ compilef 'org/das2/util/*Formatter.java'
 compilef 'org/autoplot/util/jemmy/*.java'
 compilef 'org/das2/qds/filters/*.java'
 
-compilef-go
-
 cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    compilef $i.java
