@@ -128,7 +128,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         try {
             String timeDflt= CDAWebDB.getInstance().getSampleTime(ds);
             DatumRange tr= DatumRangeUtil.parseTimeRange( timeDflt );
-            String str= timeRangeComboBox.getSelectedItem().toString();
+            String str= timeRangeComboBox.getText();
             str= str.trim();
             if ( !str.equals("") ) {
                 try {
@@ -149,7 +149,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                 new Runnable() { 
                     @Override
                     public void run() { 
-                        timeRangeComboBox.setSelectedItem(ftr);
+                        timeRangeComboBox.setText(ftr);
                     }
                 }
             );
@@ -171,7 +171,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             if ( ! CDAWebDB.getInstance().getServiceProviderIds().containsKey(ds) ) {
                 messageComponent= new JLabel("<html>Service provider \""+ ds +"\" not found in ftp/cdaweb.gsfc.nasa.gov/pub/cdaweb/all.xml");
                 descriptionLabel.setText("");
-                timeRangeComboBox.setSelectedItem("");
+                timeRangeComboBox.setText("");
                 paramEditor= null;
                 return;
             }
@@ -604,11 +604,11 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         TimeRangeTool tt= new TimeRangeTool();
-        String s= timeRangeComboBox.getSelectedItem().toString();
+        String s= timeRangeComboBox.getText();
         if ( s!=null ) tt.setSelectedRange(s);
         int r= JOptionPane.showConfirmDialog( this, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
         if ( r==JOptionPane.OK_OPTION) {
-            timeRangeComboBox.setSelectedItem(tt.getSelectedRange());
+            timeRangeComboBox.setText(tt.getSelectedRange());
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -643,7 +643,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         this.dsidComboBox.setSelectedItem( args.get( CDAWebDataSource.PARAM_DS ) );
         String timeRange= args.get( CDAWebDataSource.PARAM_TIMERANGE );
         if ( timeRange!=null ) {
-            this.timeRangeComboBox.setSelectedItem( timeRange.replaceAll("\\+", " " ) );
+            this.timeRangeComboBox.setText( timeRange.replaceAll("\\+", " " ) );
         }
         timeRangeComboBox.setPreferenceNode("timerange");
 
@@ -715,7 +715,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         if ( lid==null && this.id!=null ) lid=this.id;
         if ( lid==null ) lid="";
         
-        String timeRange= timeRangeComboBox.getSelectedItem().toString();
+        String timeRange= timeRangeComboBox.getText();
         
         timeRange= timeRange.replaceAll(" ", "+");
 
