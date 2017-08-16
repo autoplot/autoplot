@@ -442,10 +442,10 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         TimeRangeTool tt= new TimeRangeTool();
-        tt.setSelectedRange(timeRangeComboBox.getSelectedItem().toString());
+        tt.setSelectedRange(timeRangeComboBox.getText());
         int r= JOptionPane.showConfirmDialog( this, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
         if ( r==JOptionPane.OK_OPTION) {
-            timeRangeComboBox.setSelectedItem(tt.getSelectedRange());
+            timeRangeComboBox.setText(tt.getSelectedRange());
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -659,7 +659,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         String timerange= params.get("timerange");
         if ( timerange!=null ) {
             //timeRangeTextField.setText(timerange);
-            timeRangeComboBox.setSelectedItem(timerange);
+            timeRangeComboBox.setText(timerange);
         }
         String parameters= params.get("parameters");
         if ( parameters!=null ) {
@@ -696,7 +696,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 throw new RuntimeException(ex);
             }
         }
-        String uri= "vap+hapi:" + serversComboBox.getSelectedItem().toString() + "?id=" + id + "&timerange="+timeRangeComboBox.getSelectedItem().toString().replaceAll(" ","+");
+        String uri= "vap+hapi:" + serversComboBox.getSelectedItem().toString() + "?id=" + id + "&timerange="+timeRangeComboBox.getText().replaceAll(" ","+");
         if ( binaryCB.isSelected() && binaryCB.isEnabled() ) {
             uri+= "&format=binary";
         }
@@ -1005,14 +1005,14 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                         }
                     }
                 }
-                String currentTimeRange = timeRangeComboBox.getSelectedItem().toString().trim();
+                String currentTimeRange = timeRangeComboBox.getText().trim();
                 if (currentTimeRange.length() == 0) {
-                    timeRangeComboBox.setSelectedItem( sampleRange.toString() );
+                    timeRangeComboBox.setText( sampleRange.toString() );
                 } else {
                     try {
                         DatumRange current = DatumRangeUtil.parseTimeRange(currentTimeRange);
                         if ( !current.intersects(range) ) {
-                            timeRangeComboBox.setSelectedItem( sampleRange.toString() );
+                            timeRangeComboBox.setText( sampleRange.toString() );
                         }
                     } catch (ParseException ex) {
                         // do nothing.
