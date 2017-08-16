@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -13,12 +14,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -132,7 +136,7 @@ public class DataServlet extends HttpServlet {
             File dataFileHome= new File( Util.getHapiHome(), "cache" );
             dataFileHome= new File( dataFileHome, id );
             if ( dataFileHome.exists() ) {
-                FileStorageModel fsm= FileStorageModel.create( FileSystem.create(dataFileHome.toURI()), "$Y/$m/$Y$m$d.csv" );
+                FileStorageModel fsm= FileStorageModel.create( FileSystem.create(dataFileHome.toURI()), "$Y/$m/$Y$m$d.csv.gz" );
                 File[] files= fsm.getFilesFor(dr); 
                 // make sure we have all files.
                 if ( files.length>0 ) {
@@ -236,14 +240,15 @@ public class DataServlet extends HttpServlet {
                 if ( !dataFileHome.mkdirs() ) logger.log(Level.FINE, "unable to mkdir {0}", dataFileHome);
             }
             if ( dataFileHome.exists() ) {
-                TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d.csv");
+                TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d.csv.gz");
                 String s= tp.format(dr);
                 File ff= new File( dataFileHome, s );
                 if ( !ff.getParentFile().exists() ) {
                     if ( !ff.getParentFile().mkdirs() ) logger.log(Level.FINE, "unable to mkdir {0}", ff.getParentFile());
                 }
                 FileOutputStream fout= new FileOutputStream(ff);
-                org.apache.commons.io.output.TeeOutputStream tout= new TeeOutputStream( out, fout );
+                GZIPOutputStream gzout= new GZIPOutputStream(fout);
+                org.apache.commons.io.output.TeeOutputStream tout= new TeeOutputStream( out, gzout );
                 out= tout;
             }
         }
@@ -363,7 +368,7 @@ public class DataServlet extends HttpServlet {
      * we have the csv pre-calculated, so just read from it.
      * Note the output stream is closed here!
      * @param out
-     * @param dataFile
+     * @param dataFile file to send, which if ends in .gz, uncompress it, 
      * @param dr
      * @param parameters
      * @throws FileNotFoundException
@@ -371,22 +376,32 @@ public class DataServlet extends HttpServlet {
      * 
      */
     private void cachedDataCsv(OutputStream out, File dataFile, DatumRange dr, String parameters) throws FileNotFoundException, IOException {
-        try ( BufferedReader reader= new BufferedReader( new FileReader(dataFile) ); 
-              BufferedWriter writer= new BufferedWriter( new OutputStreamWriter(out) ) ) {
-            String line= reader.readLine();
-            while ( line!=null ) {
-                int i= line.indexOf(",");
-                try {
-                    Datum t= TimeUtil.create(line.substring(0,i));
-                    if ( dr.contains(t) ) {
-                        writer.write(line);
-                        writer.newLine();
+        Reader freader;
+        if ( dataFile.getName().endsWith(".gz") ) {
+            freader= new InputStreamReader( new GZIPInputStream( new FileInputStream(dataFile) ) );
+        } else {
+            freader= new FileReader(dataFile);
+        }
+        try {
+            try ( BufferedReader reader= new BufferedReader( freader ); 
+                  BufferedWriter writer= new BufferedWriter( new OutputStreamWriter(out) ) ) {
+                String line= reader.readLine();
+                while ( line!=null ) {
+                    int i= line.indexOf(",");
+                    try {
+                        Datum t= TimeUtil.create(line.substring(0,i));
+                        if ( dr.contains(t) ) {
+                            writer.write(line);
+                            writer.newLine();
+                        }
+                    } catch (ParseException ex) {
+                        Logger.getLogger(DataServlet.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                } catch (ParseException ex) {
-                    Logger.getLogger(DataServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    line= reader.readLine();
                 }
-                line= reader.readLine();
             }
+        } finally {
+            freader.close();
         }
     }
 
