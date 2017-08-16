@@ -389,7 +389,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     XPathFactory factory = XPathFactory.newInstance();
                     XPath xpath = (XPath) factory.newXPath();
 
-                    String curr= Das2ServerDataSourceEditorPanel.this.recentComboBox1.getSelectedItem().toString();
+                    String curr= Das2ServerDataSourceEditorPanel.this.recentComboBox1.getText();
 
                     Node description= (Node) xpath.evaluate( "/stream/properties/@description", document, XPathConstants.NODE );
                     descriptionLabel.setText( description==null ? "" : description.getNodeValue() );
@@ -452,7 +452,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     }
                     
                     if ( example!=null && curr.equals(DEFAULT_TIMERANGE) ) { // DANGER: what if they are the same?
-                        Das2ServerDataSourceEditorPanel.this.recentComboBox1.setSelectedItem( example );
+                        Das2ServerDataSourceEditorPanel.this.recentComboBox1.setText( example );
                     }
                     if ( example!=null ) {
                         try {
@@ -477,7 +477,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                                 anExample=  Das2ServerDataSourceEditorPanel.this.userTimeRange;
                             }
                             if ( example==null && i==examples.size()-1 ) {
-                                Das2ServerDataSourceEditorPanel.this.recentComboBox1.setSelectedItem( anExample );
+                                Das2ServerDataSourceEditorPanel.this.recentComboBox1.setText( anExample );
                             }
                             
                         }
@@ -494,7 +494,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     if ( example==null ) { // legacy
                         Node exampleRange= (Node) xpath.evaluate( "/stream/properties/@x_range", document, XPathConstants.NODE );
                         if ( exampleRange!=null && curr.equals(DEFAULT_TIMERANGE) ) {
-                            Das2ServerDataSourceEditorPanel.this.recentComboBox1.setSelectedItem( exampleRange.getNodeValue() );
+                            Das2ServerDataSourceEditorPanel.this.recentComboBox1.setText( exampleRange.getNodeValue() );
                         }
                         if ( exampleRange!=null ) {
                             try {
@@ -917,12 +917,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( !item.equals(EXAMPLE_TIME_RANGES) ) {
             int i= item.indexOf(EXAMPLE_TIME_RANGE_HTML_DELIM);
             if ( i>-1 && item.startsWith("<html>") ) {
-                recentComboBox1.setSelectedItem(item.substring(6,i).trim());
+                recentComboBox1.setText(item.substring(6,i).trim());
             } else {
                 if ( i>-1 ) {
-                    recentComboBox1.setSelectedItem(item.substring(0,i).trim()); // ??? where did the <html> go???
+                    recentComboBox1.setText(item.substring(0,i).trim()); // ??? where did the <html> go???
                 } else {
-                    recentComboBox1.setSelectedItem(item.trim()); 
+                    recentComboBox1.setText(item.trim()); 
                 }
             }
         }
@@ -934,10 +934,10 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         TimeRangeTool tt= new TimeRangeTool();
         //JTextField tf= timeRangeTextField;
         RecentComboBox tf= recentComboBox1;
-        tt.setSelectedRange(tf.getSelectedItem().toString());
+        tt.setSelectedRange(tf.getText());
         int r= JOptionPane.showConfirmDialog( this, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
         if ( r==JOptionPane.OK_OPTION) {
-            tf.setSelectedItem(tt.getSelectedRange());
+            tf.setText(tt.getSelectedRange());
         }
     }//GEN-LAST:event_timeRangeToolActionPerformed
 
@@ -1085,12 +1085,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 Datum t2= TimeUtil.create( endTime );
                 DatumRange dr = new DatumRange( t1, t2 );
                 if ( userTimeRange==null ) userTimeRange= dr.toString();
-                recentComboBox1.setSelectedItem(dr.toString());
+                recentComboBox1.setText(dr.toString());
             } catch ( ParseException ex ) {
-                recentComboBox1.setSelectedItem( DEFAULT_TIMERANGE );
+                recentComboBox1.setText( DEFAULT_TIMERANGE );
             }
         } else {
-            recentComboBox1.setSelectedItem( DEFAULT_TIMERANGE );
+            recentComboBox1.setText( DEFAULT_TIMERANGE );
         }
 		  
         String intrinsic = params.remove("intrinsic");
@@ -1258,7 +1258,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         DatumRange timeRange;
         try {
-            timeRange = DatumRangeUtil.parseTimeRange(recentComboBox1.getSelectedItem().toString());
+            timeRange = DatumRangeUtil.parseTimeRange(recentComboBox1.getText());
         } catch (ParseException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             timeRange= this.validTimeRange;
@@ -1306,7 +1306,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             result.append("&start_time=").append(timeRange.min()).append("&end_time=").append(timeRange.max());
         }
 		  
-		  if(intrinsicCb.isSelected()) result.append("&intrinsic=true");
+        if(intrinsicCb.isSelected()) result.append("&intrinsic=true");
 		  
         String tcaInterval= tcaTextField.getText().trim();
         if ( !tcaInterval.equals("") ) {
