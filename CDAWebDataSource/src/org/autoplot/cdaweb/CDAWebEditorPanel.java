@@ -48,6 +48,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.cdf.CdfJavaDataSourceEditorPanel;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSourceEditorPanel;
+import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
@@ -643,7 +644,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         if ( timeRange!=null ) {
             this.timeRangeComboBox.setText( timeRange.replaceAll("\\+", " " ) );
         }
-        timeRangeComboBox.setPreferenceNode("timerange");
+        timeRangeComboBox.setPreferenceNode( RecentComboBox.PREF_NODE_TIMERANGE );
 
     }
 

@@ -61,7 +61,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         recentComboBox.setName("timeRangeEditor");
         recentComboBox.setMinimumSize( new Dimension( 200,30) ); // long items in history cause problems.
         
-        recentComboBox.setPreferenceNode("timerange");
+        recentComboBox.setPreferenceNode(RecentComboBox.PREF_NODE_TIMERANGE);
         recentComboBox.setEditor( new PromptComboBoxEditor("Time range to view (e.g. 2010-01-01)") );
         recentComboBox.setToolTipText("Recently entered time ranges");
         ((JComponent)recentComboBox.getEditor().getEditorComponent()).setToolTipText("Time Range, right-click for examples");

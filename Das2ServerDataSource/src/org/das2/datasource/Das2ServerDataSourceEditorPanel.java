@@ -107,7 +107,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     /** Creates new form Das2ServerDataSourceEditorPanel */
     public Das2ServerDataSourceEditorPanel() {
         initComponents();
-        recentComboBox1.setPreferenceNode("timerange");
+        recentComboBox1.setPreferenceNode(RecentComboBox.PREF_NODE_TIMERANGE);
     }
 
     /**

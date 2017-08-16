@@ -52,6 +52,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSourceEditorPanel;
+import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.URISplit;
 
@@ -136,7 +137,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         initComponents();
         filtersComboBox.setPreferenceNode("hapi.filters");
-        timeRangeComboBox.setPreferenceNode("timerange");
+        timeRangeComboBox.setPreferenceNode(RecentComboBox.PREF_NODE_TIMERANGE);
         jScrollPane4.getVerticalScrollBar().setUnitIncrement( parametersPanel.getFont().getSize() );
 
         parametersPanel.setLayout( new BoxLayout( parametersPanel, BoxLayout.Y_AXIS ) );
