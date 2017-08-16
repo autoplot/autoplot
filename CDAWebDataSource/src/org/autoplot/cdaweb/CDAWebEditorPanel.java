@@ -33,13 +33,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import javax.swing.JDialog;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
@@ -56,7 +53,7 @@ import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
 
 /**
- *
+ * Editor Panel for data with CDAWeb at NASA/Goddard.
  * @author jbf
  */
 public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
@@ -116,6 +113,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         dsidComboBox.setSelectedItem(t.getSelectedItem());
         final String uri = getURI();
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 refresh(uri);
             }
