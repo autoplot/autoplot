@@ -380,20 +380,28 @@ public class CreatePngWalk {
             build.append("--product=").append(params.product).append( " ");
             ff.println( "timeFormat=" + params.timeFormat );
             build.append("--timeFormat='").append(params.timeFormat).append( "' ");
-            ff.println( "timeRange=" + params.timeRangeStr );
-            build.append("--timeRange='").append(params.timeRangeStr).append( "' ");
+            
+            if ( params.useBatchUri==false ) {
+                ff.println( "timeRange=" + params.timeRangeStr );
+                build.append("--timeRange='").append(params.timeRangeStr).append( "' ");
+            }
+            
             if ( params.batchUriName.equals("$o") ) {
                 ff.println( "# the filePattern may need editing, depending on extension and subdirectories.");
                 ff.println( "filePattern=*.png");
             }
-            if ( params.batchUri!=null && !params.batchUri.equals("") ) {
-                ff.println( "batchUri=" + params.batchUri );
-                build.append("--batchUri=").append(params.batchUri).append( " ");
+            
+            if ( params.useBatchUri ) {
+                if ( params.batchUri!=null && !params.batchUri.equals("") ) {
+                    ff.println( "batchUri=" + params.batchUri );
+                    build.append("--batchUri=").append(params.batchUri).append( " ");
+                }
+                if ( !params.batchUriName.equals("") ) {
+                    ff.println( "batchUriName=" + params.batchUri );
+                    build.append("--batchUriName=").append(params.batchUri).append( " ");
+                }
             }
-            if ( !params.batchUriName.equals("") ) {
-                ff.println( "batchUriName=" + params.batchUri );
-                build.append("--batchUriName=").append(params.batchUri).append( " ");
-            }
+            
             if ( params.rescalex!=null && !params.rescalex.equals("0%,100%") ) {
                 ff.println( "rescalex="+ params.rescalex );
                 build.append("--rescalex=").append(params.rescalex).append( " ");
