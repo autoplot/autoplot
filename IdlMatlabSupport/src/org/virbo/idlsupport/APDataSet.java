@@ -132,7 +132,7 @@ public class APDataSet extends QDataSetBridge {
 
         StringBuilder s= new StringBuilder();
         
-        if ( this.surl!=null ) s.append(this.surl);
+        s.append(this.surl);
         if ( this.filter.length()>0 ) s.append(this.filter);
         for ( String name1: datasets.keySet() ) {
             QDataSet qds= datasets.get(name1);
