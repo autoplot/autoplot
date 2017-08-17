@@ -306,9 +306,6 @@ public class DataSetSelectorSupport {
     protected void refreshRecentFilesMenu() {
         if (recentMenu != null) {
             recentMenu.removeAll();
-            if (ui.getRecent() == null) {
-                return;
-            }
             ArrayList<String> recent = new ArrayList<>(ui.getRecent());
             Collections.reverse(recent);
             for (String s : recent) {
