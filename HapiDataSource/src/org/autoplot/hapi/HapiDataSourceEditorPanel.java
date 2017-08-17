@@ -154,6 +154,9 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     }
                     if ( idsList2.getSelectedValue()!=null ) {
                         currentId= idsList2.getSelectedValue();
+                        if ( currentId.startsWith("Error:" ) ) {
+                            return;
+                        }
                     }
                     if ( currentId!=null ) {
                         titleLabel.setText("Retrieving info for "+currentId+"...");
@@ -459,6 +462,15 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                         resetServer( url );
                     } catch (IOException | JSONException ex) {
                         logger.log(Level.SEVERE, null, ex);
+                        DefaultListModel m= new DefaultListModel() ;
+                        m.add(0,"Error: unable to connect");
+                        idsList2.setModel( m );
+                        Runnable run= new Runnable() {
+                            public void run() {
+                                serversComboBox.setSelectedItem("http://datashop.elasticbeanstalk.com/hapi");
+                            }
+                        };
+                        //SwingUtilities.invokeLater(run);
                     }
                 }
             };
@@ -795,12 +807,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
      * @throws JSONException 
      */
     private void resetServer( URL server ) throws IOException, JSONException {
-        try {
-            idsJSON= HapiServer.getCatalog(server);
-            resetServerCatalog(server,"");
-        } catch ( IOException ex ) {
-            DataSetSelector.showUserExceptionDialog( this, "<html>Error when connecting to server<br>"+server, "I/O Exception", ex, JOptionPane.WARNING_MESSAGE );
-        }
+        idsJSON= HapiServer.getCatalog(server);
+        resetServerCatalog(server,"");
     }
     
     private String getHtmlFor( Object o ) throws JSONException {
