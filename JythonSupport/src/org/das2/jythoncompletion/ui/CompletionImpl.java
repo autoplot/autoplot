@@ -583,64 +583,62 @@ CaretListener, KeyListener, FocusListener, ListSelectionListener, PropertyChange
                 return;
             }
         }
-        if (localCompletionResult != null) {
-            CharSequence commonText = null;
-            int anchorOffset = -1;
-outer:      for (Iterator it = localCompletionResult.getResultSets().iterator(); it.hasNext();) {
-                CompletionResultSetImpl resultSet = (CompletionResultSetImpl)it.next();
-                List<? extends CompletionItem> resultItems = resultSet.getItems();
-                if (resultItems.size() > 0) {
-                    if (anchorOffset >= -1) {
-                        if (anchorOffset > -1 && anchorOffset != resultSet.getAnchorOffset())
-                            anchorOffset = -2;
-                        else
-                            anchorOffset = resultSet.getAnchorOffset();
+        CharSequence commonText = null;
+        int anchorOffset = -1;
+outer:  for (Iterator it = localCompletionResult.getResultSets().iterator(); it.hasNext();) {
+            CompletionResultSetImpl resultSet = (CompletionResultSetImpl)it.next();
+            List<? extends CompletionItem> resultItems = resultSet.getItems();
+            if (resultItems.size() > 0) {
+                if (anchorOffset >= -1) {
+                    if (anchorOffset > -1 && anchorOffset != resultSet.getAnchorOffset())
+                        anchorOffset = -2;
+                    else
+                        anchorOffset = resultSet.getAnchorOffset();
+                }
+                for (Iterator itt = resultItems.iterator(); itt.hasNext();) {
+                    CharSequence text = ((CompletionItem)itt.next()).getInsertPrefix();
+                    if (text == null) {
+                        commonText = null;
+                        break outer;
                     }
-                    for (Iterator itt = resultItems.iterator(); itt.hasNext();) {
-                        CharSequence text = ((CompletionItem)itt.next()).getInsertPrefix();
-                        if (text == null) {
-                            commonText = null;
-                            break outer;
-                        }
-                        if (commonText == null) {
-                            commonText = text;
-                        } else {
-                            // Get the largest common part
-                            int minLen = Math.min(text.length(), commonText.length());
-                            for (int commonInd = 0; commonInd < minLen; commonInd++) {
-                                if (text.charAt(commonInd) != commonText.charAt(commonInd)) {
-                                    if (commonInd == 0) {
-                                        commonText = null;
-                                        break outer; // no common text
-                                    }
-                                    commonText = commonText.subSequence(0, commonInd);
-                                    break;
+                    if (commonText == null) {
+                        commonText = text;
+                    } else {
+                        // Get the largest common part
+                        int minLen = Math.min(text.length(), commonText.length());
+                        for (int commonInd = 0; commonInd < minLen; commonInd++) {
+                            if (text.charAt(commonInd) != commonText.charAt(commonInd)) {
+                                if (commonInd == 0) {
+                                    commonText = null;
+                                    break outer; // no common text
                                 }
+                                commonText = commonText.subSequence(0, commonInd);
+                                break;
                             }
                         }
                     }
                 }
             }
-            if (commonText != null && anchorOffset >= 0) {
-                int caretOffset = c.getSelectionStart();
-                if (caretOffset - anchorOffset < commonText.length()) {
+        }
+        if (commonText != null && anchorOffset >= 0) {
+            int caretOffset = c.getSelectionStart();
+            if (caretOffset - anchorOffset < commonText.length()) {
 
-                    Document doc = getActiveDocument();
-                    BaseDocument baseDoc = null;
-                    if(doc instanceof BaseDocument)
-                        baseDoc = (BaseDocument)doc;
-                        
-                    // Insert the missing end part of the prefix
+                Document doc = getActiveDocument();
+                BaseDocument baseDoc = null;
+                if(doc instanceof BaseDocument)
+                    baseDoc = (BaseDocument)doc;
+
+                // Insert the missing end part of the prefix
+                if(baseDoc != null)
+                    baseDoc.atomicLock();
+                try {
+                    doc.remove(anchorOffset, caretOffset - anchorOffset);
+                    doc.insertString(anchorOffset, commonText.toString(), null);
+                } catch (BadLocationException e) {
+                } finally {
                     if(baseDoc != null)
-                        baseDoc.atomicLock();
-                    try {
-                        doc.remove(anchorOffset, caretOffset - anchorOffset);
-                        doc.insertString(anchorOffset, commonText.toString(), null);
-                    } catch (BadLocationException e) {
-                    } finally {
-                        if(baseDoc != null)
-                            baseDoc.atomicUnlock();
-                    }
+                        baseDoc.atomicUnlock();
                 }
             }
         }
