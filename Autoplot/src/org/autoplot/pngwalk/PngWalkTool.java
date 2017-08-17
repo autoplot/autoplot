@@ -2106,11 +2106,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
         List<DatumRange> current = seq.getActiveSubrange();
         DatumRange range= DatumRangeUtil.union(current.get(0), current.get(current.size()-1));
-        if ( range==null ) {
-            timeFilterTextField.setText("error"); // shouldn't get here
-        } else {
-            timeFilterTextField.setText( range.toString() );
-        }
+        timeFilterTextField.setText( range.toString() );
     }//GEN-LAST:event_useRangeCheckBoxItemStateChanged
 
     private void showMissingCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showMissingCheckBoxActionPerformed
