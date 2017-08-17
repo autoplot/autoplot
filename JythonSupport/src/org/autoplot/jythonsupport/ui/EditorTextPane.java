@@ -279,10 +279,6 @@ public class EditorTextPane extends JEditorPane {
             JPanel parent= new JPanel();
             parent.setLayout( new BorderLayout() );
             DataSourceEditorPanel p= DataSourceEditorPanelUtil.getDataSourceEditorPanel(parent,oldUri);
-            if ( p==null ) {
-                JOptionPane.showMessageDialog( this, "<html>Unable to find editor for URI<br>"+oldUri, "URI needed", JOptionPane.INFORMATION_MESSAGE );
-                return;
-            }
             
             Icon icon= new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/fileMag.png") );
             if ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( this, parent, "Editing URI", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon ) ) {
