@@ -910,7 +910,7 @@ public class CdfUtil {
                 if ( att!=null && rank>1  ) {
                     logger.log(Level.FINE, "get attribute LABL_PTR_"+dim+" entry for {0}", svar );
                     result.labl = String.valueOf(att);
-                    if ( result.labl==null ) throw new Exception("No such variable: "+String.valueOf(att));
+                    if ( !cdf.existsVariable(result.labl) ) throw new Exception("No such variable: "+String.valueOf(att));
                     result.nrec = cdf.getNumberOfValues( result.labl );
                     if (result.nrec == 1) {
                         result.nrec = cdf.getDimensions(svar)[0];
@@ -925,7 +925,7 @@ public class CdfUtil {
                     logger.log(Level.FINE, "get attribute LABL_PTR_"+dim+" entry for {0}", svar );
                     result.labl= String.valueOf(att);
                     int nrec = cdf.getNumberOfValues(result.labl);
-                    if ( nrec == 1) {
+                    if ( nrec == 1 ) {
                         nrec = cdf.getDimensions(result.labl)[0];
                     }
                     if ( dims.length>(dim-2) && (nrec)!=dims[dim-1] ) {

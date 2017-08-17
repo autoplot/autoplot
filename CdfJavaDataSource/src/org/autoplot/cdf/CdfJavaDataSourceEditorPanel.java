@@ -708,7 +708,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             } else if ( treePath.getPathCount()==3 ) {
                 String p= String.valueOf( treePath.getPathComponent(1) );
                 p= p.replaceAll("=", "%3D");
-                lparams.put( "arg_0", p + ( subset==null ? "" : subset ) );
+                lparams.put( "arg_0", p + subset );
                 String val=  String.valueOf( treePath.getPathComponent(2) );
                 int idx= val.indexOf(":");
                 lparams.put( "slice1", val.substring(0,idx).trim() );
