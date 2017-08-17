@@ -671,7 +671,6 @@ public class DataSetSelector extends javax.swing.JPanel {
         String msg= ex.getMessage();
         if ( msg==null ) msg= ex.toString();
         msg= msg.trim();
-        if ( msg==null ) msg="";
         if ( ex instanceof FileNotFoundException && msg.length()==0 ) {
             msg= FILE_NOT_FOUND; // this may never happen, but to be sure...
         }
@@ -1704,7 +1703,6 @@ public class DataSetSelector extends javax.swing.JPanel {
     private void inspectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inspectButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);            
         String context = ((String) dataSetSelector.getEditor().getItem()).trim();
-        if ( context==null ) context= "";
         if ( context.startsWith("vap ") ) context= "vap+"+context.substring(4);
         String ext = DataSetURI.getExt(context);
         final String fcontext= context;
