@@ -90,10 +90,6 @@ public class CefReaderHeader {
             }
             String tempRecord = sbuf.toString();
 
-            if (tempRecord == null) {
-                eofReached = true;
-                break;
-            }
             tempRecord = tempRecord.trim();
 
             //*** skip comment lines ***
