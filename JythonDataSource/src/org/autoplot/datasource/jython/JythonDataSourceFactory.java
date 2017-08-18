@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -149,8 +150,9 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, n, this, "arg_0", null, null));
                 }
                 Map<String,JythonUtil.Param> po2= getParams( cc.resourceURI, new NullProgressMonitor() );
-                for ( String n: po2.keySet() ) {
-                    JythonUtil.Param parm= po2.get(n);
+                for ( Entry<String,JythonUtil.Param> e: po2.entrySet() ) {
+                    String n= e.getKey();
+                    JythonUtil.Param parm= e.getValue();
                     if ( parm.doc==null ) parm.doc="";
                     if ( !parm.name.equals(parm.label) ) {
                         parm.doc+= " (named "+parm.label+" in the script)";
