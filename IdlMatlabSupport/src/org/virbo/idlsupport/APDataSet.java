@@ -7,6 +7,7 @@ package org.virbo.idlsupport;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.qds.QDataSet;
@@ -134,8 +135,9 @@ public class APDataSet extends QDataSetBridge {
         
         s.append(this.surl);
         if ( this.filter.length()>0 ) s.append(this.filter);
-        for ( String name1: datasets.keySet() ) {
-            QDataSet qds= datasets.get(name1);
+        for ( Entry<String,QDataSet> e: datasets.entrySet() ) {
+            String name1= e.getKey();
+            QDataSet qds= e.getValue();
             s.append( "\n" ).append( name1 ).append( ": " ).append( qds.toString() );
             for ( int i=0; i<QDataSet.MAX_RANK; i++ ) {
                 if ( d.property("DEPEND_"+i) ==qds ) {
@@ -146,8 +148,9 @@ public class APDataSet extends QDataSetBridge {
                 }
             }
         }
-        for ( String n: sliceDep.keySet() ) {
-            QDataSet ds1= (QDataSet)datasets.get(name).slice(0).property(sliceDep.get(n));
+        for ( Entry<String,String> e: sliceDep.entrySet() ) {
+            String n= e.getKey();
+            QDataSet ds1= (QDataSet)datasets.get(name).slice(0).property(e.getValue());
             s.append( "\nvia slice(0): " ).append(n).append( ": " ).append( ds1 ) .append( " (" ). append( sliceDep.get(n) ).append( ")" );
         }
         return s.toString();
