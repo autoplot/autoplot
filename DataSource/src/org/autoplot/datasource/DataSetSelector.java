@@ -47,6 +47,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -64,7 +65,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -314,10 +314,11 @@ public class DataSetSelector extends javax.swing.JPanel {
      * @return  true if the URI was handled.
      */
     private boolean checkActionTriggers( String suri ) {
-        for (String actionTriggerRegex : actionTriggers.keySet()) {
+        for ( Entry<String,Action> e: actionTriggers.entrySet()) {
+            String actionTriggerRegex= e.getKey();
             if (Pattern.matches(actionTriggerRegex, suri)) {
                 logger.finest("matches action trigger");
-                Action action = actionTriggers.get(actionTriggerRegex);
+                Action action = e.getValue();
                 action.actionPerformed(new ActionEvent(this, 123, "dataSetSelect"));
                 return true;
             }
@@ -332,6 +333,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      */
     private void setTextInternal( final String text ) {
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 editor.setText( text );
             }
@@ -759,10 +761,11 @@ public class DataSetSelector extends javax.swing.JPanel {
         logger.log(Level.FINE, "browseSourceType {0}", surl);
         
         // hooks for browsing, such as "vap+internal"
-        for (String browseTriggerRegex : browseTriggers.keySet()) {
+        for ( Entry<String,Action> e : browseTriggers.entrySet()) {
+            String browseTriggerRegex = e.getKey();
             if (Pattern.matches(browseTriggerRegex, surl )) {
                 logger.finest("matches browse trigger");
-                Action action = browseTriggers.get(browseTriggerRegex);
+                Action action = e.getValue();
                 action.actionPerformed( new ActionEvent(this, 123, "dataSetSelect") );
                 return;
             }
@@ -1708,10 +1711,11 @@ public class DataSetSelector extends javax.swing.JPanel {
         final String fcontext= context;
 
         // hooks for browsing, such as "vap+internal"
-        for (String browseTriggerRegex : browseTriggers.keySet()) {
+        for ( Entry<String,Action> e: browseTriggers.entrySet()) {
+            String browseTriggerRegex= e.getKey();
             if (Pattern.matches(browseTriggerRegex, context)) {
                 logger.finest("matches browse trigger");
-                Action action = browseTriggers.get(browseTriggerRegex);
+                Action action = e.getValue();
                 action.actionPerformed( new ActionEvent(this, 123, "dataSetSelect") );
                 return;
             }
