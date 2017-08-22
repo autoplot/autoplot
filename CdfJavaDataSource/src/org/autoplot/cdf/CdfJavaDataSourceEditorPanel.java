@@ -699,8 +699,14 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         if ( subset.length()>0 && subset.charAt(0)!='[' ) {
             subset= "["+subset+"]";
         }
-
-        Map<String,String> lparams= new HashMap(this.params);
+        
+        Map<String,String> lparams= this.params;
+        if ( lparams!=null ) {
+            lparams= new HashMap(lparams);
+        } else {
+            lparams= new HashMap();
+        }
+        
         if ( isValidCDF ) {
             TreePath treePath= parameterTree.getSelectionPath();
             if ( treePath==null ) {
