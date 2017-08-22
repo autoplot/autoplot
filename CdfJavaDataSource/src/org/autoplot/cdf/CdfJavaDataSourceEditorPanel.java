@@ -11,6 +11,7 @@
 
 package org.autoplot.cdf;
 
+import gov.nasa.gsfc.spdf.cdfj.CDFException;
 import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +36,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import org.autoplot.cdf.CdfDataSource;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.util.DasExceptionHandler;
 import org.das2.util.filesystem.FileSystem;
@@ -468,10 +468,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         }
         
         FileSystem fs = FileSystem.create( DataSetURI.getWebURL( DataSetURI.toUri(split.path) ).toURI() );
-        if ( fs.isDirectory( split.file.substring(split.path.length()) ) ) {
-            return true;
-        }
-        return false;
+        return fs.isDirectory( split.file.substring(split.path.length()) );
     }
 
     @Override
@@ -838,7 +835,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                             expand.add( new TreePath( new Object[] { root, node } ) );
                         }
                         
-                    } catch (Exception ex ) {
+                    } catch (CDFException.ReaderError | ArrayIndexOutOfBoundsException | IllegalArgumentException ex ) {
                         logger.log(Level.WARNING,"parameter name found: "+s+" referred to by " +e.getKey(),ex);
                         root.add( node );
                     }
@@ -850,7 +847,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                         selection= new TreePath( new Object[] { root, node } );
                     }
                 }
-            } catch ( Exception t ) {
+            } catch ( CDFException.ReaderError t ) {
                 logger.log(Level.WARNING,t.getMessage(),t);
 
             }
