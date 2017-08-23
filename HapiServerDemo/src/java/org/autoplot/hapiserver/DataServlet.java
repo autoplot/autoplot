@@ -186,19 +186,21 @@ public class DataServlet extends HttpServlet {
             if ( include.equals("header") ) throw new IllegalArgumentException("header cannot be sent with binary");  //TODO: check this
         }
         
-        JSONObject jo;
+        JSONObject jo0, jo;
         
         try {
 
-            jo= InfoServlet.getInfo( id );
+            jo0= InfoServlet.getInfo( id );
             int[] indexMap=null;
             
             if ( !parameters.equals("") ) {
-                jo= Util.subsetParams( jo, parameters );
+                jo= Util.subsetParams( jo0, parameters );
                 indexMap= (int[])jo.get("__indexmap__");
                 if ( dsiter!=null ) {
                     dsiter.resortFields( indexMap );
                 }
+            } else {
+                jo= jo0;
             }
             
             if ( include.equals("header") ) {
@@ -218,7 +220,7 @@ public class DataServlet extends HttpServlet {
             
             if ( dataFiles!=null ) {
                 for ( File dataFile : dataFiles ) {
-                    cachedDataCsv( out, dataFile, dr, parameters, indexMap );
+                    cachedDataCsv( dataFormatter, out, dataFile, dr, parameters, indexMap );
                 }
                 return;
             }
@@ -366,44 +368,6 @@ public class DataServlet extends HttpServlet {
         }
     }
     
-    /**
-     * split, but not when comma is within quotes.
-     * @param line for example 'a,b,"c,d"'
-     * @param nf number of fields, or -1 for no constaint
-     * @return ['a','b','c,d']
-     */
-    private static String[] csvSplit( String line, int nf ) {
-        String[] result= line.split(",",-2);
-        if ( result.length==nf ) {
-            return result;
-        } else {
-            int j0= 0;
-            StringBuilder b= new StringBuilder();
-            for ( String result1 : result ) {
-                String[] f1 = result1.split("\"", -2);
-                b.append(f1[0]);
-                boolean withinQuote= false;
-                for ( int k=1; k<f1.length; k++ ) {
-                    b.append("\"");
-                    b.append(f1[k]);
-                    withinQuote= !withinQuote;
-                }
-                if ( !withinQuote ) {
-                    result[j0]= b.toString();
-                    b= new StringBuilder();
-                    j0++;
-                }
-            }
-            if ( nf>-1 ) {
-                if ( j0<nf ){
-                    throw new IllegalArgumentException("expected "+nf+" fields");
-                } else if ( j0!=nf ) {
-                    logger.log(Level.WARNING, "expected {0} fields, got {1}", new Object[]{nf, j0});
-                }
-            }
-            return Arrays.copyOfRange(result,0,j0);
-        }
-    }
 
     /**
      * we have the csv pre-calculated, so just read from it.
@@ -416,7 +380,7 @@ public class DataServlet extends HttpServlet {
      * @throws IOException 
      * 
      */
-    private void cachedDataCsv( OutputStream out, File dataFile, DatumRange dr, String parameters, int[] indexMap ) throws FileNotFoundException, IOException {
+    private void cachedDataCsv( DataFormatter dataFormatter, OutputStream out, File dataFile, DatumRange dr, String parameters, int[] indexMap ) throws FileNotFoundException, IOException {
         Reader freader;
         if ( dataFile.getName().endsWith(".gz") ) {
             freader= new InputStreamReader( new GZIPInputStream( new FileInputStream(dataFile) ) );
@@ -443,7 +407,7 @@ public class DataServlet extends HttpServlet {
                             if ( pmap==null ) {
                                 writer.write(line);
                             } else {
-                                String[] ss= csvSplit(line,nf);
+                                String[] ss= Util.csvSplit(line,nf);
                                 if ( nf==-1 ) nf= ss.length;
                                 for ( int j=0; j<pmap.length; j++ ) {
                                     if ( j>0 ) writer.write(',');
@@ -462,6 +426,6 @@ public class DataServlet extends HttpServlet {
             freader.close();
         }
     }
-
+    
     
 }
