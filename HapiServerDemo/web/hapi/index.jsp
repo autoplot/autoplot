@@ -133,7 +133,7 @@
             <li>2017-06-21: support for P1D/lastday added to DasCoreDatum, so that sample times are not always changing.</li>
             <li>2017-06-28: return 404 when ID is bad, instead of empty response.  Bugfix, where streaming datasources would output an extra record.  Bugfix, subset parameters in info request.  Thanks, Bob!</li>
             <li>2017-08-14: add experimental caching mechanism, where HOME/hapi/cache can contain daily cache files.  Cache is stored in .gzip form.</li>
-            <li>2017-08-23: failed release was using old version, where format=binary would return ascii files from the cache.</li>
+            <li>2017-08-23: failed release was using old version, where format=binary would return ascii files from the cache.  ascii would not properly subset.</li>
         </ul>
         </small>
     </body>
