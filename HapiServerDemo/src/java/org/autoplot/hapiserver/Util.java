@@ -6,11 +6,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletResponse;
 import org.das2.qds.DataSetUtil;
@@ -23,6 +26,8 @@ import org.json.JSONObject;
  * @author jbf
  */
 public class Util {
+    
+    private static final Logger LOGGER= Logger.getLogger("hapi");
     
     /**
      * return the duration in a easily-human-consumable form.
@@ -294,5 +299,53 @@ public class Util {
         jo.put( "__indexmap__", indexMap );
         return jo;
     }
+
+    /**
+     * split, but not when comma is within quotes.
+     * @param line for example 'a,b,"c,d"'
+     * @param nf number of fields, or -1 for no constraint
+     * @return ['a','b','c,d']
+     */
+    public static String[] csvSplit(String line, int nf) {
+        String[] result = line.split(",", -2);
+        if (result.length == nf) {
+            return result;
+        } else {
+            int j0 = 0;
+            StringBuilder b = new StringBuilder();
+            boolean withinQuote = false;
+            for (String result1 : result) {
+                String[] f1 = result1.split("\"", -2);
+                b.append(f1[0]);
+                for (int k = 1; k < f1.length; k++) {
+                    b.append(f1[k]);
+                    withinQuote = !withinQuote;
+                }
+                if (!withinQuote) {
+                    result[j0] = b.toString();
+                    b = new StringBuilder();
+                    j0++;
+                } else {
+                    b.append(",");
+                }
+            }
+            if (nf > -1) {
+                if (j0 < nf) {
+                    throw new IllegalArgumentException("expected " + nf + " fields");
+                } else if (j0 != nf) {
+                    LOGGER.log(Level.WARNING, "expected {0} fields, got {1}", new Object[]{nf, j0});
+                }
+            }
+            return Arrays.copyOfRange(result, 0, j0);
+        }
+    }
     
+    public static void main( String[] args ) {
+        String line= "a,b,\"c,d\"";
+        String[] ss;
+        ss= csvSplit( line, -1 );
+        for ( String s: ss ) {
+            System.err.println( s );
+        }
+    }
 }
