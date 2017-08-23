@@ -16,6 +16,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -131,7 +132,7 @@ public class DataServlet extends HttpServlet {
         
         // Look to see if we can cover the time range using cached files.  These files
         // must: be csv, contain all data, cover all data within $Y$m$d
-        boolean allowCache= true;
+        boolean allowCache= dataFormatter instanceof CsvDataFormatter;
         if ( allowCache ) {
             File dataFileHome= new File( Util.getHapiHome(), "cache" );
             dataFileHome= new File( dataFileHome, id );
@@ -190,11 +191,12 @@ public class DataServlet extends HttpServlet {
         try {
 
             jo= InfoServlet.getInfo( id );
-
+            int[] indexMap=null;
+            
             if ( !parameters.equals("") ) {
                 jo= Util.subsetParams( jo, parameters );
+                indexMap= (int[])jo.get("__indexmap__");
                 if ( dsiter!=null ) {
-                    int[] indexMap= (int[])jo.get("__indexmap__");
                     dsiter.resortFields( indexMap );
                 }
             }
@@ -216,7 +218,7 @@ public class DataServlet extends HttpServlet {
             
             if ( dataFiles!=null ) {
                 for ( File dataFile : dataFiles ) {
-                    cachedDataCsv( out, dataFile, dr, parameters );
+                    cachedDataCsv( out, dataFile, dr, parameters, indexMap );
                 }
                 return;
             }
@@ -363,6 +365,45 @@ public class DataServlet extends HttpServlet {
             return null;
         }
     }
+    
+    /**
+     * split, but not when comma is within quotes.
+     * @param line for example 'a,b,"c,d"'
+     * @param nf number of fields, or -1 for no constaint
+     * @return ['a','b','c,d']
+     */
+    private static String[] csvSplit( String line, int nf ) {
+        String[] result= line.split(",",-2);
+        if ( result.length==nf ) {
+            return result;
+        } else {
+            int j0= 0;
+            StringBuilder b= new StringBuilder();
+            for ( String result1 : result ) {
+                String[] f1 = result1.split("\"", -2);
+                b.append(f1[0]);
+                boolean withinQuote= false;
+                for ( int k=1; k<f1.length; k++ ) {
+                    b.append("\"");
+                    b.append(f1[k]);
+                    withinQuote= !withinQuote;
+                }
+                if ( !withinQuote ) {
+                    result[j0]= b.toString();
+                    b= new StringBuilder();
+                    j0++;
+                }
+            }
+            if ( nf>-1 ) {
+                if ( j0<nf ){
+                    throw new IllegalArgumentException("expected "+nf+" fields");
+                } else if ( j0!=nf ) {
+                    logger.log(Level.WARNING, "expected {0} fields, got {1}", new Object[]{nf, j0});
+                }
+            }
+            return Arrays.copyOfRange(result,0,j0);
+        }
+    }
 
     /**
      * we have the csv pre-calculated, so just read from it.
@@ -375,13 +416,21 @@ public class DataServlet extends HttpServlet {
      * @throws IOException 
      * 
      */
-    private void cachedDataCsv(OutputStream out, File dataFile, DatumRange dr, String parameters) throws FileNotFoundException, IOException {
+    private void cachedDataCsv( OutputStream out, File dataFile, DatumRange dr, String parameters, int[] indexMap ) throws FileNotFoundException, IOException {
         Reader freader;
         if ( dataFile.getName().endsWith(".gz") ) {
             freader= new InputStreamReader( new GZIPInputStream( new FileInputStream(dataFile) ) );
         } else {
             freader= new FileReader(dataFile);
         }
+        
+        //TODO: handle parameters and format=binary, think about JSON
+        int[] pmap=null;
+        if ( parameters.length()>0 ) {
+            pmap= indexMap;
+        }
+        
+        int nf= -1;
         try {
             try ( BufferedReader reader= new BufferedReader( freader ); 
                   BufferedWriter writer= new BufferedWriter( new OutputStreamWriter(out) ) ) {
@@ -391,7 +440,16 @@ public class DataServlet extends HttpServlet {
                     try {
                         Datum t= TimeUtil.create(line.substring(0,i));
                         if ( dr.contains(t) ) {
-                            writer.write(line);
+                            if ( pmap==null ) {
+                                writer.write(line);
+                            } else {
+                                String[] ss= csvSplit(line,nf);
+                                if ( nf==-1 ) nf= ss.length;
+                                for ( int j=0; j<pmap.length; j++ ) {
+                                    if ( j>0 ) writer.write(',');
+                                    writer.write( ss[pmap[j]] );
+                                }
+                            }
                             writer.newLine();
                         }
                     } catch (ParseException ex) {
