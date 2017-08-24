@@ -84,6 +84,8 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     private String filter="";
     private String id="";
 
+    private String providedTimeRange= "";
+    
     private boolean pickDs() {
         Window win = SwingUtilities.getWindowAncestor(this);
         JFrame frame = null;
@@ -125,9 +127,9 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
     private void refreshDefaultTime( String ds, DatumRange dr ) {
         try {
-            String timeDflt= CDAWebDB.getInstance().getSampleTime(ds);
+            final String timeDflt= CDAWebDB.getInstance().getSampleTime(ds);
             DatumRange tr= DatumRangeUtil.parseTimeRange( timeDflt );
-            String str= timeRangeComboBox.getText();
+            String str= providedTimeRange;
             str= str.trim();
             if ( !str.equals("") ) {
                 try {
@@ -149,6 +151,8 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                     @Override
                     public void run() { 
                         timeRangeComboBox.setText(ftr);
+                        DefaultComboBoxModel m= new DefaultComboBoxModel(new String[] { "Example Time Ranges",timeDflt } );
+                        exampleTimeRangesCB.setModel(m);
                     }
                 }
             );
@@ -459,6 +463,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         jButton1 = new javax.swing.JButton();
         availabilityCB = new javax.swing.JCheckBox();
         timeRangeComboBox = new org.autoplot.datasource.RecentComboBox();
+        exampleTimeRangesCB = new javax.swing.JComboBox<>();
         descriptionLabel = new javax.swing.JLabel();
 
         setName("cdawebEditorPanel"); // NOI18N
@@ -502,6 +507,13 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             }
         });
 
+        exampleTimeRangesCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Example Time Ranges" }));
+        exampleTimeRangesCB.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                exampleTimeRangesCBItemStateChanged(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout timeRangePanelLayout = new org.jdesktop.layout.GroupLayout(timeRangePanel);
         timeRangePanel.setLayout(timeRangePanelLayout);
         timeRangePanelLayout.setHorizontalGroup(
@@ -512,9 +524,11 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                     .add(timeRangePanelLayout.createSequentialGroup()
                         .add(jLabel3)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(timeRangeComboBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .add(timeRangeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 192, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(jButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(exampleTimeRangesCB, 0, 164, Short.MAX_VALUE))
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, timeRangePanelLayout.createSequentialGroup()
                         .add(0, 18, Short.MAX_VALUE)
                         .add(availableTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 370, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -532,7 +546,10 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                             .add(jLabel3)
                             .add(timeRangeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                         .add(0, 0, Short.MAX_VALUE))
-                    .add(jButton1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(jButton1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(timeRangePanelLayout.createSequentialGroup()
+                        .add(0, 0, Short.MAX_VALUE)
+                        .add(exampleTimeRangesCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(timeRangePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(availableTextField)
@@ -616,12 +633,22 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         // TODO add your handling code here:
     }//GEN-LAST:event_availabilityCBActionPerformed
 
+    private void exampleTimeRangesCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_exampleTimeRangesCBItemStateChanged
+        String s= (String)exampleTimeRangesCB.getSelectedItem();
+        if ( s.startsWith("Example") ) {
+            //do nothing
+        } else {
+            timeRangeComboBox.setSelectedItem(s);
+        }
+    }//GEN-LAST:event_exampleTimeRangesCBItemStateChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox availabilityCB;
     private javax.swing.JLabel availableTextField;
     private javax.swing.JLabel descriptionLabel;
     private javax.swing.JComboBox dsidComboBox;
+    private javax.swing.JComboBox<String> exampleTimeRangesCB;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
@@ -643,9 +670,10 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         String timeRange= args.get( CDAWebDataSource.PARAM_TIMERANGE );
         if ( timeRange!=null ) {
             this.timeRangeComboBox.setText( timeRange.replaceAll("\\+", " " ) );
+            providedTimeRange= timeRange.replaceAll("\\+", " " );
         }
         timeRangeComboBox.setPreferenceNode( RecentComboBox.PREF_NODE_TIMERANGE );
-
+        
     }
 
     @Override
