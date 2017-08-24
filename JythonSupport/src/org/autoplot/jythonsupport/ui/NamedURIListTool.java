@@ -72,7 +72,7 @@ public class NamedURIListTool extends JPanel {
      * list of Java identifiers, one for each URI.
      */
     List<String> ids=null;
-    
+
     DataMashUp dataMashUp;
     
     public NamedURIListTool( ) {
@@ -190,6 +190,21 @@ public class NamedURIListTool extends JPanel {
         this.timeRange = timeRange;
         firePropertyChange(PROP_TIMERANGE, oldTimeRange, timeRange);
     }
+    
+    private boolean showIds = true;
+
+    public static final String PROP_SHOWIDS = "showIds";
+
+    public boolean isShowIds() {
+        return showIds;
+    }
+
+    public void setShowIds(boolean showIds) {
+        boolean oldShowIds = this.showIds;
+        this.showIds = showIds;
+        firePropertyChange(PROP_SHOWIDS, oldShowIds, showIds);
+    }
+    
 
     /**
      * return the panel with the add and remove icons.
@@ -201,24 +216,51 @@ public class NamedURIListTool extends JPanel {
         final JPanel sub= new JPanel( new BorderLayout() );
         
         Dimension limit= new Dimension(100,24);
+        if ( !showIds ) {
+            limit= new Dimension(24,24);
+        }
         Dimension dim= new Dimension(24,24);
         
         if ( fi>=0 ) {
-            JButton name= new JButton( ids.get(fi) + "=" );
-            name.setMaximumSize( limit );
-            name.setPreferredSize( limit );
-            name.setToolTipText( "press to rename " );
-            name.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    org.das2.util.LoggerManager.logGuiEvent(e);                    
-                    String oldName= ids.get(fi);
-                    rename(fi);
-                    String newName= ids.get(fi);
-                    firePropertyChange( PROP_ID + "Name_"+fi, oldName, newName );
-                }
-            } );
-            sub.add( name, BorderLayout.WEST );
+            if ( showIds ) {
+                JButton name= new JButton( ids.get(fi) + "=" );
+                name.setMaximumSize( limit );
+                name.setPreferredSize( limit );
+                name.setToolTipText( "press to rename " );
+                name.addActionListener(new ActionListener() {
+                 @Override
+                    public void actionPerformed(ActionEvent e) {
+                        org.das2.util.LoggerManager.logGuiEvent(e);                    
+                        String oldName= ids.get(fi);
+                        rename(fi);
+                        String newName= ids.get(fi);
+                        firePropertyChange( PROP_ID + "Name_"+fi, oldName, newName );
+                    }
+                } );
+                sub.add( name, BorderLayout.WEST );
+            } else {
+                JButton subAdd= new JButton("");
+                subAdd.setIcon( new ImageIcon( FiltersChainPanel.class.getResource("/resources/add.png") ) );
+                subAdd.setMaximumSize( limit );
+                subAdd.setPreferredSize( limit );            
+                subAdd.setToolTipText( "add new URI" );        
+                subAdd.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        org.das2.util.LoggerManager.logGuiEvent(e);
+                        List<String> ids= new ArrayList<>(NamedURIListTool.this.ids);
+                        List<String> uris= new ArrayList<>(NamedURIListTool.this.uris);
+                        String newName= makeupName( ids );
+                        ids.add(fi,newName);
+                        uris.add(fi,"");
+                        setIds(ids);
+                        setUris(uris);
+                    }
+                } );
+           
+                sub.add( subAdd, BorderLayout.WEST );
+                
+            }
         } else {
         
            JButton subAdd= new JButton("");
@@ -391,6 +433,8 @@ public class NamedURIListTool extends JPanel {
         this.uris= new ArrayList<>(uris);
         if ( uris.size()==ids.size() ) refresh();
     }
+    
+    
     
     /**
      * return the Jython code that gets these.
