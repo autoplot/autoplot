@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
@@ -73,9 +74,11 @@ import org.autoplot.state.StatePersistence;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceFormat;
+import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.URISplit;
 import org.das2.qstream.SimpleStreamFormatter;
 import org.das2.qstream.StreamException;
+import org.das2.util.filesystem.FileSystem;
 
 /**
  * ScriptContext provides the API to perform abstract functions with 
@@ -1646,7 +1649,14 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      * @throws java.io.IOException
      */
     public static Application loadVap( String filename ) throws IOException {
-        return (Application) StatePersistence.restoreState( new File( filename ) );
+        try {
+            File f= FileSystemUtil.doDownload( filename, new NullProgressMonitor() );
+            return (Application) StatePersistence.restoreState( f );
+        } catch (FileSystem.FileSystemOfflineException ex) {
+            throw new IOException(ex);
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
     
     /**
