@@ -310,17 +310,23 @@ public class Util {
      * @throws Exception if any of the loads reports an exception
      */
     public static List<QDataSet> getDataSets( List<String> uris, ProgressMonitor mon ) throws Exception {
+        if ( mon==null ) mon= new NullProgressMonitor();
         final ArrayList result= new ArrayList( uris.size() );
+        final ProgressMonitor[] monitors= new ProgressMonitor[uris.size()];
+        mon.setTaskSize(10*uris.size());
+        mon.started();
         for ( int i=0; i<uris.size(); i++ ) {
             final String uri= uris.get(i);
             final int fi= i;
             result.add(fi,null);
+            monitors[i]= new NullProgressMonitor();
+            final ProgressMonitor thisProgressMonitor= monitors[i];
             Runnable run= new Runnable() {
                 @Override
                 public void run() {
                     QDataSet ds;
                     try {
-                        ds = getDataSet(uri);
+                        ds = getDataSet(uri,thisProgressMonitor);
                         if ( ds==null ) {
                             throw new NoDataInIntervalException("data returned was null");
                         } else {
@@ -338,18 +344,35 @@ public class Util {
         while ( blocking ) {
             Thread.sleep(250);
             blocking= false;
+            int taskProgress= 0;
+            //System.err.println("===");
             for ( int i=0; i<uris.size(); i++ ) {
+                //System.err.println( "" + monitors[i].getTaskProgress() +" / " + monitors[i].getTaskSize() );
+                if ( monitors[i].getTaskSize()>0 ) {
+                    taskProgress+= ( 10 * monitors[i].getTaskProgress() ) / monitors[i].getTaskSize();
+                } else {
+                    taskProgress+= 2;
+                }
                 if ( result.get(i)==null ) {
                     blocking= true;
                 }
             }
+            //System.err.println( "" + taskProgress +" / " + mon.getTaskSize() + " sum" );
+            mon.setTaskProgress(taskProgress);
         }
+        
+        Exception e=null;
         for ( int i=0; i<uris.size(); i++ ) {
-            if ( result.get(i) instanceof Exception ) {
-                throw ((Exception)result.get(i));
+            if ( e==null && result.get(i) instanceof Exception ) {
+                e= ((Exception)result.get(i));
             }
         }
-        return result;
+        mon.finished();
+        if ( e!=null ) {
+            throw e;
+        } else {
+            return result;
+        }
     }
             
     /**
