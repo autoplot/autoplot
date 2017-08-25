@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>PNGWalk Digitizer used to digitize the path of bug on pool surface.
+        <p><small>A colander is used to look at the 2017 eclipse in Kearney, Nebraska.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-08-19 r21275):</p>
+        <p>Bugfixes (2017-08-25 r21299):</p>
         <ul>  
+            <li>rte 0579778410: some path resulted with NullPointerException in CDF editor panel
+            <li>1869: listings of Hudson http showed where subdirectories show up in listings (ls /a/->/a/b/c/), causing strange problems.
+            <li>1875: preserve the scientist's timerange 
             <li>1129: unnecessary 1-second delay in waitUntilIdle when producing pngwalks corrected.
             <li>round of FindBugs cleanup.
             <li>Corrections to waveform dataset plotting with Series renderer mode.
@@ -88,6 +91,7 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>064: ExportDataBundle is experimental system from aggregating a set of URIs for export into ascii tables, CDF files, and IDL savesets.
             <li>New compile script for Autoplot which compiles within minutes instead of 20+ minutes, should have no effect
             <li>588: allow 64-point rank 2 waveforms.  Bugfix were waveform scheme test didn't check rank of offsets, which can now be rank 2.
             <li>DataPointRecorder (used with digitizing) allows the units to be reset.  Thanks, Bill!
