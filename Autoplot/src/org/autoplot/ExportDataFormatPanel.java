@@ -106,7 +106,12 @@ public class ExportDataFormatPanel extends javax.swing.JPanel {
     }
     
     public String getURI() {
-        URISplit split= URISplit.parse(editorPanel.getURI());
+        URISplit split;
+        if ( editorPanel!=null ) {
+            split= URISplit.parse(editorPanel.getURI());
+        } else {
+            split= URISplit.parse(filenameTF.getText());
+        }
         split.file= filenameTF.getText();
         String ext= formatDL.getSelectedItem().toString();
         if ( !split.file.endsWith(ext) ) {
