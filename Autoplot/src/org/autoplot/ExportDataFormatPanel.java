@@ -6,6 +6,7 @@ import java.awt.event.ItemEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -55,6 +56,18 @@ public class ExportDataFormatPanel extends javax.swing.JPanel {
         
         List<String> exts = DataSourceRegistry.getInstance().getFormatterExtensions();
         Collections.sort(exts);
+        
+        List<String> newExts= new ArrayList<>(exts.size());
+        
+        for ( String s: exts ) {
+            DataSourceFormat dsf= DataSourceRegistry.getInstance().getFormatByExt(s);
+            if ( dsf.canFormat(dataset) ) {
+                newExts.add(s);
+            }
+        }
+        
+        exts= newExts;
+        
         formatDL.setModel( new DefaultComboBoxModel(exts.toArray()) );
         formatDL.setRenderer( new DefaultListCellRenderer() {
             @Override
@@ -95,6 +108,10 @@ public class ExportDataFormatPanel extends javax.swing.JPanel {
     public String getURI() {
         URISplit split= URISplit.parse(editorPanel.getURI());
         split.file= filenameTF.getText();
+        String ext= formatDL.getSelectedItem().toString();
+        if ( !split.file.endsWith(ext) ) {
+            split.file+= ext;
+        };
         return URISplit.format(split);
     }
     
