@@ -29,6 +29,7 @@ import org.das2.util.LoggerManager;
 import org.das2.qds.DataSetOps;
 import org.das2.qds.SemanticOps;
 import org.das2.qds.examples.Schemes;
+import org.das2.qds.ops.Ops;
 
 /**
  * Format the QDataSet into CDF tables, using Nand Lal's library.
@@ -160,9 +161,13 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
         QDataSet bds= (QDataSet) data.property(QDataSet.BUNDLE_1);
         if ( bds != null) {
-            if ( !append ) {
-                String name= nameFor(bds);
-                addVariableRank1NoVary(bds, name, true, new HashMap<String,String>(), new NullProgressMonitor() );
+            if ( !append && data.rank()==2 ) {
+                if ( dep1==null ) {
+                    logger.fine("writing bundled datasets to CDF separately.");
+                } else {
+                    String name= nameFor(bds);
+                    addVariableRank1NoVary(bds, name, true, new HashMap<String,String>(), new NullProgressMonitor() );
+                }
             } else {
                 String name= nameFor(bds);
                 Map<String,String> params1= new HashMap<>();
@@ -174,17 +179,25 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             }
         }
         
-        addVariableRankN(data, nameFor(data), false, params, mon );
-        
-        try {
-            if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_0", CDFDataType.CHAR, nameFor(dep0) );
-            if ( dep1!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_1", CDFDataType.CHAR, nameFor(dep1) );
-            if ( dep2!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_2", CDFDataType.CHAR, nameFor(dep2) );
-            if ( bds!=null )  cdf.addVariableAttributeEntry( nameFor(data), "LABL_PTR_1", CDFDataType.CHAR, nameFor(bds) );
-        } catch ( CDFException.WriterError ex ) {
-            logger.log( Level.WARNING, ex.getMessage() , ex );
+        if ( bds!=null && dep1==null ) {
+            for ( int i=0; i<bds.length(); i++ ) {
+                QDataSet data1= Ops.unbundle( data, i ) ;
+                addVariableRankN( data1, nameFor(data1), false, params, mon );
+                if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data1), "DEPEND_0", CDFDataType.CHAR, nameFor(dep0) );
+            }
+        } else {
+            addVariableRankN(data, nameFor(data), false, params, mon );
+
+            try {
+                if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_0", CDFDataType.CHAR, nameFor(dep0) );
+                if ( dep1!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_1", CDFDataType.CHAR, nameFor(dep1) );
+                if ( dep2!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_2", CDFDataType.CHAR, nameFor(dep2) );
+                if ( bds!=null )  cdf.addVariableAttributeEntry( nameFor(data), "LABL_PTR_1", CDFDataType.CHAR, nameFor(bds) );
+            } catch ( CDFException.WriterError ex ) {
+                logger.log( Level.WARNING, ex.getMessage() , ex );
+            }
         }
-        
+                
         write( ffile.toString() );
         
     }
