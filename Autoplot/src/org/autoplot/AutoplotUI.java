@@ -1954,6 +1954,11 @@ APSplash.checkTime("init 52.8");
         item.setToolTipText("Export the data that has the focus");
         expertItems.add(item);
         fileMenu.add( item );
+
+        item = new JMenuItem( support.getDumpAllDataAction( dom ) );
+        item.setToolTipText("Export the all data on the canvas");
+        expertItems.add(item);
+        fileMenu.add( item );
 APSplash.checkTime("init 52.9");
         JSeparator dumpSep= new JSeparator();
         expertItems.add( dumpSep );

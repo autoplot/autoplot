@@ -705,6 +705,42 @@ public class GuiSupport {
         };
     }
 
+    /**
+     * provide action to allow users to export a dataset to formats that support this.
+     * @param dom
+     * @return 
+     */
+    Action getDumpAllDataAction( final Application dom ) {
+        return new AbstractAction("Export All Data...") {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
+                final ExportDataBundle edw= new ExportDataBundle();
+
+                ArrayList<String> uris= new ArrayList<>();
+                ArrayList<String> ids= new ArrayList<>();
+                int i=0;
+                for ( DataSourceFilter dsf: dom.getDataSourceFilters() ) {
+                    uris.add(dsf.getUri());
+                    ids.add("data"+i);
+                    i=i+1;
+                }
+                
+                edw.setUris( uris.toArray(new String[uris.size()]) );
+                
+                if ( JOptionPane.showConfirmDialog( parent, edw, "export all", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_CANCEL_OPTION ) {
+                    try {
+                        ScriptContext.formatDataSet( edw.getDataSet(), edw.getUri() );
+                        parent.setStatus("Wrote " + org.autoplot.datasource.DataSourceUtil.unescape(edw.getUri()) );
+                    } catch (Exception ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        };
+    }
+    
+    
     public Action createNewDOMAction() {
         return new AbstractAction("Reset Window...") {
             @Override
