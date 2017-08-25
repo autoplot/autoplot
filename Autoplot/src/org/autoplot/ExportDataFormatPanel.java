@@ -93,7 +93,9 @@ public class ExportDataFormatPanel extends javax.swing.JPanel {
     }
     
     public String getURI() {
-        return editorPanel.getURI();
+        URISplit split= URISplit.parse(editorPanel.getURI());
+        split.file= filenameTF.getText();
+        return URISplit.format(split);
     }
     
     DataSourceFormatEditorPanel editorPanel=null;
@@ -301,6 +303,12 @@ public class ExportDataFormatPanel extends javax.swing.JPanel {
 
     private void formatDLItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_formatDLItemStateChanged
         String ss=  (String) evt.getItem();
+        if ( evt.getStateChange()==ItemEvent.DESELECTED ) {
+            String s= filenameTF.getText();
+            if ( s.endsWith(ss) ) {
+                filenameTF.setText(s.substring(0,s.length()-ss.length()));
+            }
+        }
         updateEditorPanel(ss,evt.getStateChange()==ItemEvent.SELECTED);
     }//GEN-LAST:event_formatDLItemStateChanged
 
