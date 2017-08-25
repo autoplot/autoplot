@@ -1,6 +1,9 @@
 
 package org.autoplot;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -12,6 +15,7 @@ import org.das2.qds.ops.Ops;
 import org.das2.qds.util.QDataSetTableModel;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 
 /**
  *
@@ -127,22 +131,51 @@ public class ExportDataBundle extends javax.swing.JPanel {
         
     }//GEN-LAST:event_namedURIListTool1PropertyChange
 
+    boolean updating= false;
+    
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        refresh();
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                refresh();
+                updating= false;
+                jButton1.setEnabled(true);
+            }
+        };
+        if ( updating ) {
+            logger.fine("already updating");
+        } else {
+            jButton1.setEnabled(false);
+            updating= true;
+            new Thread(run).start();
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    
+    private ProgressMonitor createProgressMonitor() {
+        final ProgressMonitor result= new NullProgressMonitor();
+        final javax.swing.Timer t= new javax.swing.Timer( 100, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jButton1.setText(result.getTaskProgress()+"/"+result.getTaskSize());
+                if ( result.isFinished() || result.isCancelled() ) {
+                    ((javax.swing.Timer)e.getSource()).stop();
+                    jButton1.setText("Load");
+                }
+            }
+        });
+        t.setRepeats(true);
+        t.start();
+        return result;
+    }
   
-    /**
-     * return the dataset, which is a bundle of URIs, or null.
-     * @return 
-     */
-    public QDataSet getDataSet() {
+    private void updateDataSet() {
         String[] ids= namedURIListTool1.getIds();
         String[] uris= namedURIListTool1.getUris();
         QDataSet[] dss= new QDataSet[ids.length];
         QDataSet bundle= null;
         try {
-            List<QDataSet> dssa= org.autoplot.jythonsupport.Util.getDataSets( Arrays.asList(uris), new NullProgressMonitor() );
+            List<QDataSet> dssa= org.autoplot.jythonsupport.Util.getDataSets( Arrays.asList(uris), createProgressMonitor() );
             dss= dssa.toArray( dss );
             dssa= Ops.synchronizeNN( dssa.get(0), dss );
             bundle= Ops.bundle( (QDataSet)dssa.get(0).property(QDataSet.DEPEND_0) );
@@ -164,11 +197,29 @@ public class ExportDataBundle extends javax.swing.JPanel {
         } catch (Exception ex) {
             logger.log(Level.SEVERE, null, ex);
         }
+        this.bundle= bundle;
+    }
+        
+    QDataSet bundle= null;
+    
+    /**
+     * return the dataset, which is a bundle of URIs, or null.
+     * @return 
+     */
+    public QDataSet getDataSet() {
+        if ( bundle==null ) {
+            updateDataSet();
+        }
         return bundle;
     }
     
     public void setUris( String[] uris ) {
         namedURIListTool1.setUris( Arrays.asList(uris) );
+        String[] ids= new String[uris.length];
+        for ( int i=0; i<ids.length; i++ ) {
+            ids[i]= "ds"+i;
+        }
+        namedURIListTool1.setIds( Arrays.asList(ids) );
     }
     
     /**
@@ -180,6 +231,7 @@ public class ExportDataBundle extends javax.swing.JPanel {
     }
     
     public void refresh() {
+        updateDataSet();
         QDataSet bundle= getDataSet();
         if ( bundle==null ) {
             DefaultTableModel n= new DefaultTableModel(1,1);
