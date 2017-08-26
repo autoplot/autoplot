@@ -718,17 +718,13 @@ public class GuiSupport {
                 final ExportDataBundle edw= new ExportDataBundle();
 
                 ArrayList<String> uris= new ArrayList<>();
-                ArrayList<String> ids= new ArrayList<>();
-                int i=0;
                 for ( DataSourceFilter dsf: dom.getDataSourceFilters() ) {
                     uris.add(dsf.getUri());
-                    ids.add("data"+i);
-                    i=i+1;
                 }
                 
                 edw.setUris( uris.toArray(new String[uris.size()]) );
                 
-                if ( JOptionPane.showConfirmDialog( parent, edw, "export all", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_CANCEL_OPTION ) {
+                if ( JOptionPane.showConfirmDialog( parent, edw, "export all", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                     try {
                         ScriptContext.formatDataSet( edw.getDataSet(), edw.getUri() );
                         parent.setStatus("Wrote " + org.autoplot.datasource.DataSourceUtil.unescape(edw.getUri()) );
