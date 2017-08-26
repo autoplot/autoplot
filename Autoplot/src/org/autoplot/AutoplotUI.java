@@ -4553,6 +4553,8 @@ private void updateFrameTitle() {
 
             if ( testPngFilename!=null && testPngFilename.length()>0 ) {
                 logger.log(Level.FINE, "Writing to {0}", testPngFilename);
+                Logger.getLogger("autoplot.scriptcontext.writeToPng").setLevel(Level.FINER);
+                Logger.getLogger("autoplot.scriptcontext.writeToPng").fine("Logging at FINE");
                 ScriptContext.writeToPng(testPngFilename);
             }
 
