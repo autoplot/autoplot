@@ -30,6 +30,8 @@ import org.das2.util.LoggerManager;
 
 /**
  * Extract just the GUI that is used to specify how a dataset will be exported.
+ * This will surely be confused with the ExportDataPanel, which also specifies
+ * which dataset should be used.
  * @author jbf
  */
 public class ExportDataFormatPanel extends javax.swing.JPanel {
@@ -87,7 +89,7 @@ public class ExportDataFormatPanel extends javax.swing.JPanel {
         Preferences prefs= AutoplotSettings.settings().getPreferences(AutoplotUI.class);
         String currentFileString = prefs.get("ExportDataCurrentFile", "");
         String currentExtString = prefs.get("ExportDataCurrentExt", ".txt");
-        if ( !currentExtString.equals("") ) {
+        if ( !currentExtString.equals("") && exts.contains(currentExtString) ) {
             formatDL.setSelectedItem(currentExtString);
         }        
         if ( !currentFileString.equals("") ) {
@@ -116,8 +118,12 @@ public class ExportDataFormatPanel extends javax.swing.JPanel {
         String ext= formatDL.getSelectedItem().toString();
         if ( !split.file.endsWith(ext) ) {
             split.file+= ext;
-        };
-        return URISplit.format(split);
+        }
+        String result= URISplit.format(split);
+        Preferences prefs= AutoplotSettings.settings().getPreferences(AutoplotUI.class);
+        prefs.put("ExportDataCurrentFile", result );
+        prefs.put("ExportDataCurrentExt", ext );
+        return result;
     }
     
     DataSourceFormatEditorPanel editorPanel=null;
