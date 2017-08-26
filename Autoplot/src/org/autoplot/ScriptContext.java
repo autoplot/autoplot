@@ -969,8 +969,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
         BufferedImage image = model.canvas.getImage( width, height );
         
         Logger llogger= Logger.getLogger("autoplot.scriptcontext.writeToPng");
-        llogger.log(Level.FINE, "writeToPng({0},{1},{2})->{3},{4} image.", new Object[]{filename, width, height, image.getWidth(), image.getHeight()});
-        
+        llogger.log(Level.WARNING, "writeToPng({0},{1},{2})->{3},{4} image.", new Object[]{filename, width, height, image.getWidth(), image.getHeight()});
         Map<String,String> meta= new LinkedHashMap<>();
         meta.put( DasPNGConstants.KEYWORD_SOFTWARE, "Autoplot" );
         meta.put( DasPNGConstants.KEYWORD_PLOT_INFO, model.canvas.getImageMetadata() );
