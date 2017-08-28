@@ -276,7 +276,7 @@ public class Axis extends DomNode {
             Axis that = (Axis) n;
             if ( !exclude.contains( PROP_LOG ) ) this.setLog(that.isLog());
             if ( !exclude.contains( PROP_FLIPPED ) ) this.setFlipped(that.isFlipped());
-            if ( !exclude.contains( PROP_OPPOSITE ) ) this.setFlipped(that.isOpposite());
+            if ( !exclude.contains( PROP_OPPOSITE ) ) this.setOpposite(that.isOpposite());
             if ( !exclude.contains( PROP_RANGE ) ) this.setRange(that.getRange());
             if ( !exclude.contains( PROP_LABEL ) ) this.setLabel(that.getLabel());
             if ( !exclude.contains( PROP_FONTSIZE ) ) this.setFontSize(that.getFontSize());
