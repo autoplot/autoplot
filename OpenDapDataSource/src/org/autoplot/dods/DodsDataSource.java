@@ -239,7 +239,10 @@ public class DodsDataSource extends AbstractDataSource {
                 String var = depVars[i];
                 //int[] ii2 = parser.getRecDims(var);
                 constraint1.append(",").append(var);
-                if ( dimsStr!=null) constraint1.append(dimsStr);
+                if ( dimsStr!=null && i==0 ) {
+                    int i2= dimsStr.indexOf("]");
+                    constraint1.append(dimsStr.substring(0,i2+1));
+                }
                 da.setDependName(i, var);
 
                 //Map<String, Object> depMeta = getMetadata(var);
