@@ -222,6 +222,9 @@ public class DodsAdapter {
             public void incrementByteCount(int bytes) {
                 byteCount += bytes;
                 mon.setTaskProgress(byteCount);
+                if ( mon.getTaskSize()==-1 ) {
+                    mon.setProgressMessage( String.format("%d KBytes loaded",byteCount/1024 ) );
+                }
             }
             @Override
             public boolean userCancelled() {
