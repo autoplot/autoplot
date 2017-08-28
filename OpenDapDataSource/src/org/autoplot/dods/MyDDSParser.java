@@ -23,6 +23,7 @@ import opendap.dap.parser.ParseException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import opendap.dap.DGrid;
 
 /**
@@ -110,7 +111,22 @@ public class MyDDSParser {
                 return result.toArray( new String[result.size()] );
             }
         } else if ( bt instanceof DGrid ) {
-            return null;
+            DGrid g= ((DGrid) bt);
+            Enumeration e= g.getVariables();
+            while ( e.hasMoreElements() ) {
+                Object o= e.nextElement();
+                if ( o instanceof DArray ) {
+                    DArray a= (DArray)o;
+                    result.add( a.getName() );
+                } else {
+                    result.add( null );
+                }
+            }
+            if ( result.size()>0 && result.get(0).equals(var) ) {
+                return result.subList(1,result.size()).toArray( new String[result.size()-1] );
+            } else {
+                return result.toArray( new String[result.size()] );
+            }
         } else {
             return null;
         }
