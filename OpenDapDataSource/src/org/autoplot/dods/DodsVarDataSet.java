@@ -124,7 +124,7 @@ public abstract class DodsVarDataSet implements WritableDataSet {
 
     @Override
     public int length(int i0, int i1, int i2 ) {
-        throw new IllegalArgumentException("rank limit");
+        return dimSizes[3];
     }
 
 
