@@ -274,6 +274,7 @@ public class DodsAdapter {
             if ( dds==null ) {
                 System.err.println( "Webstart/Opendap interaction results in dconnect.getData -> null");
                 System.err.println( "opendap.Version.getVersionString()="+opendap.Version.getVersionString() );
+                throw new IllegalArgumentException("unable to load data, for unknown reason.");
             }
             
         } catch (DDSException ex) {
