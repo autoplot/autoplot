@@ -3028,6 +3028,14 @@ public class ApplicationController extends DomNodeController implements RunLater
         for (DataSourceFilter dsf: application.getDataSourceFilters() ) {
             dsf.controller.setResetDimensions(false);
         }
+        System.err.println( "bindings size: " + this.application.bindings.size() + "  should be: " + that.bindings.size() );
+        if ( this.application.bindings.size()!=that.bindings.size() ) {
+            for ( int i=0; i<Math.max(this.application.bindings.size(),that.bindings.size()); i++ ) {
+                String s1= i<this.application.bindings.size() ? this.application.bindings.get(i).toString() : "";
+                String s2= i<that.bindings.size() ? that.bindings.get(i).toString() : "";
+                System.err.println( String.format( "%60s %60s\n", s1, s2 ) );
+            }
+        }
     }
 
     /**
