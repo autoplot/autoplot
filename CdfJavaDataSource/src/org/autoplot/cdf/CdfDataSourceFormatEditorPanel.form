@@ -29,6 +29,7 @@
                   </Group>
                   <Component id="insertCB" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="epochTimeTagsCB" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="bundleCB" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -46,7 +47,9 @@
               <Component id="insertCB" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="epochTimeTagsCB" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="205" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="bundleCB" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="181" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -78,6 +81,11 @@
     <Component class="javax.swing.JCheckBox" name="epochTimeTagsCB">
       <Properties>
         <Property name="text" type="java.lang.String" value="Use legacy Epoch timetags instead of TT2000"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="bundleCB">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Unpack bundled data into separate variables"/>
       </Properties>
     </Component>
   </SubComponents>

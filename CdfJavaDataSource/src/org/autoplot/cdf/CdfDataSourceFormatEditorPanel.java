@@ -42,6 +42,7 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
         typeComboBox = new javax.swing.JComboBox();
         insertCB = new javax.swing.JCheckBox();
         epochTimeTagsCB = new javax.swing.JCheckBox();
+        bundleCB = new javax.swing.JCheckBox();
 
         setName("dataSourceFormatEditorPanel"); // NOI18N
 
@@ -52,6 +53,8 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
         insertCB.setText("Insert instead of overwriting existing cdf file");
 
         epochTimeTagsCB.setText("Use legacy Epoch timetags instead of TT2000");
+
+        bundleCB.setText("Unpack bundled data into separate variables");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -65,7 +68,8 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(typeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 123, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(insertCB)
-                    .add(epochTimeTagsCB))
+                    .add(epochTimeTagsCB)
+                    .add(bundleCB))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -79,12 +83,15 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
                 .add(insertCB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(epochTimeTagsCB)
-                .addContainerGap(205, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(bundleCB)
+                .addContainerGap(181, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox bundleCB;
     private javax.swing.JCheckBox epochTimeTagsCB;
     private javax.swing.JCheckBox insertCB;
     private javax.swing.JLabel jLabel1;
@@ -117,6 +124,9 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
         s= getParam( args, "timeType", "tt2000" );
         epochTimeTagsCB.setSelected(s.equals("epoch"));
         
+        s= getParam( args, "bundle", "F" );
+        bundleCB.setSelected(s.equals("T"));
+        
         file= split.file;
     }
 
@@ -138,6 +148,12 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
             args.put("timeType", "epoch");
         } else {
             args.remove("timeType");            
+        }
+        
+        if ( bundleCB.isSelected() ) {
+            args.put("bundle", "T");
+        } else {
+            args.remove("bundle");
         }
         
         String params= URISplit.formatParams(args);
