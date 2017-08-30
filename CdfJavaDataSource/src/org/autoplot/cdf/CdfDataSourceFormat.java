@@ -35,6 +35,7 @@ import org.das2.qds.ops.Ops;
  * Format the QDataSet into CDF tables, using Nand Lal's library.
  * Datasets will be assigned names if they don't have a NAME property.
  * If the append=T parameter is set, then variables should have names.
+ * if the bundle=T parameter is set, then bundles should be unbundled into separate variables.
  *
  * @author jbf
  */
@@ -179,7 +180,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             }
         }
         
-        if ( bds!=null && dep1==null ) {
+        if ( bds!=null && dep1==null && "T".equals(params.get("bundle")) ) {
             for ( int i=0; i<bds.length(); i++ ) {
                 QDataSet data1= Ops.unbundle( data, i ) ;
                 addVariableRankN( data1, nameFor(data1), false, params, mon );
