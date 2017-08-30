@@ -6,6 +6,8 @@ package test.endtoend;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.SynchronousQueue;
@@ -313,11 +315,15 @@ public class Test017 {
         }
     }
     
-
+    private static Set<String> usedIds= new HashSet<>();
+    
     private static void doTest( final String uri, final String id, ThreadPoolExecutor exec ) throws IOException, InterruptedException, Exception {
 
         System.err.printf( "== %s ==\n", id );
         System.err.printf( "uri: %s\n", uri );
+        
+        if ( usedIds.contains(id) ) throw new IllegalArgumentException("id "+id+" used twice, test code needs attention");
+        usedIds.add(id);
         
         ResultRunnable run= new ResultRunnable( uri, id );
         int timeoutSeconds= 180;
