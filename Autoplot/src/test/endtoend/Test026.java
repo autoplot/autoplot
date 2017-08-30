@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.BufferedWriter;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Tests of time parsing. A little testing appears in Test019, but this provides
@@ -80,6 +82,8 @@ public class Test026 {
         doTest(id, test, ref, 0.);
     }
 
+    private static Set<Integer> usedIds= new HashSet<>();
+    
     /**
      * 
      * @param id the test identifier
@@ -90,6 +94,9 @@ public class Test026 {
      */
     public static void doTest(int id, String test, String ref, double diffMicros) throws Exception {
 
+        if ( usedIds.contains(id) ) throw new IllegalArgumentException("id "+id+" used twice, test code needs attention");
+        usedIds.add(id);
+        
         DatumRange dr = parseTimeRange(test);
         DatumRange drref = parseTimeRange(ref);
         if (drref.equals(dr)) {
