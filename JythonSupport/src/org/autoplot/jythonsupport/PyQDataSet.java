@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Datum;
@@ -57,6 +58,9 @@ public class PyQDataSet extends PyJavaInstance {
     MutablePropertyDataSet mpds;
     QDataSet rods; // read-only dataset
     Units units; // indicates if the units have been set.
+    int serialNumber;
+    
+    private static AtomicInteger _seq= new AtomicInteger(1000);
 
     /**
      * Note getDataSet will always provide a writable dataset.
@@ -64,6 +68,8 @@ public class PyQDataSet extends PyJavaInstance {
      */
     PyQDataSet(QDataSet ds) {
         super(ds);
+        this.serialNumber= _seq.incrementAndGet();
+        
         if (ds instanceof WritableDataSet && !((WritableDataSet)ds).isImmutable() ) {
             this.ds = (WritableDataSet) ds;
             this.mpds= (MutablePropertyDataSet) ds;
@@ -85,6 +91,14 @@ public class PyQDataSet extends PyJavaInstance {
 
     public QDataSet getQDataSet() {
         return this.rods;
+    }
+    
+    /**
+     * return the serial number.
+     * @return 
+     */
+    public int getSerialNumber() {
+        return serialNumber;
     }
     
     /* plus, minus, multiply, divide */
@@ -354,6 +368,12 @@ public class PyQDataSet extends PyJavaInstance {
         PyReflectedFunction func= binaryInfixMethods.get(name);
         if ( func!=null ) {
             return func.__call__(this,arg1);
+        } else if ( name.equals("property") ) {
+            if ( arg1 instanceof PyString ) {
+                return Py.java2py(this.rods.property(arg1.toString()));
+            } else {
+                return super.invoke(name,arg1);
+            }
         } else {
             return super.invoke(name,arg1);
         }
@@ -365,38 +385,39 @@ public class PyQDataSet extends PyJavaInstance {
      */
     private void makeMutable() {
         logger.log(Level.FINE, "makeMutable called using: {0}", rods);
-        if ( mpds==null ) {
-            mpds= DataSetOps.makePropertiesMutable(rods);
-        } else {
-            mpds= DataSetOps.makePropertiesMutable(mpds);
-        }
-        
         if ( ds==null ) {
             this.ds= Ops.copy(rods);
+            this.mpds= ds;
             this.rods= ds;
         } else {
             this.ds= Ops.copy(ds);
+            this.mpds= ds;
             this.rods= ds;            
         }
 
     }
-    
+
     @Override
     public PyObject invoke(String name, PyObject arg1, PyObject arg2) {
         PyReflectedFunction func= binaryInfixMethods.get(name);
         if ( func!=null ) {
             return func.__call__(this,arg1,arg2);
         } else {
-            if ( name.equals("putProperty") ) {
-                if ( mpds==null || this.mpds.isImmutable() ) {
-                    makeMutable();
-                }
-                
-                this.putProperty( (PyString)arg1, arg2 );
-                return Py.None;
-                
-            } else {
-                return super.invoke(name,arg1,arg2);
+            switch (name) {
+                case "putProperty":
+                    if ( mpds==null || this.mpds.isImmutable() ) {
+                        makeMutable();
+                    }
+                    this.putProperty( (PyString)arg1, arg2 );
+                    return Py.None;
+                case "property":
+                    if ( arg1 instanceof PyString && arg2 instanceof PyInteger ) {
+                        return Py.java2py(this.rods.property(arg1.toString(),((PyInteger)arg2).getValue()));
+                    } else {
+                        return super.invoke(name,arg1,arg2);
+                    }
+                default:
+                    return super.invoke(name,arg1,arg2);
             }
         }
     }
@@ -934,7 +955,10 @@ public class PyQDataSet extends PyJavaInstance {
             }
         }
         Class clas= DataSetUtil.getPropertyClass(prop.toString() );
-        if ( value instanceof PyObject ) {
+        if ( value instanceof PyString ) {
+            PyString po= (PyString)value;
+            mpds.putProperty(prop.toString(),po.toString());
+        } else if ( value instanceof PyObject ) {
             PyObject po= (PyObject)value;
             mpds.putProperty(prop.toString(),po.__tojava__(clas));
         } else {
@@ -943,7 +967,6 @@ public class PyQDataSet extends PyJavaInstance {
     }
     public void putProperty( PyString prop, int index, Object value ) {
         if ( mpds==null || mpds.isImmutable() ) throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
-        Class clas= DataSetUtil.getPropertyClass(prop.toString() );
         if ( prop.toString().equals(QDataSet.UNITS) ) {
             if ( value instanceof String ) {
                 value= Units.lookupUnits((String)value);
@@ -951,7 +974,11 @@ public class PyQDataSet extends PyJavaInstance {
                 value= Units.lookupUnits(((PyString)value).toString());
             }
         }
-        if ( value instanceof PyObject ) {
+        Class clas= DataSetUtil.getPropertyClass(prop.toString() );
+        if ( value instanceof PyString ) {
+            PyString po= (PyString)value;
+            mpds.putProperty(prop.toString(),index,po.toString());
+        } else if ( value instanceof PyObject ) {
             PyObject po= (PyObject)value;
             mpds.putProperty(prop.toString(),index,po.__tojava__(clas));
         } else {
