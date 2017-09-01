@@ -234,6 +234,9 @@ public class PlotElementController extends DomNodeController {
         public void propertyChange(PropertyChangeEvent evt) {
             LoggerManager.logPropertyChangeEvent(evt,"dsfListener");
             if ( evt.getPropertyName().equals(DataSourceFilter.PROP_FILTERS) ) {
+                if ( evt.getOldValue().toString().trim().equals( evt.getNewValue().toString().trim() ) ) {
+                    return;
+                }
                 logger.log(Level.FINE, "property change in DSF means I need to autorange: {0}", evt.getPropertyName());
                 setResetRanges(true);
                 maybeSetPlotAutorange();
