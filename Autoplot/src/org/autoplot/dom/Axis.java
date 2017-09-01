@@ -38,6 +38,7 @@ public class Axis extends DomNode {
     public void setRange(DatumRange range) {
         if ( range==null ) {
             logger.log( Level.WARNING, "range set to null!");
+            return;
         }
 //        System.err.println("range="+range);
 //        if ( this.controller!=null 
