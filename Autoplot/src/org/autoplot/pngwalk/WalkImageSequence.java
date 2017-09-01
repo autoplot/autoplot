@@ -188,6 +188,9 @@ public class WalkImageSequence implements PropertyChangeListener  {
             } else {
                 captionString = uris.get(i).toString();
                 if ( splitIndex==-1 ) splitIndex= WalkUtil.splitIndex( template );
+                if ( template.startsWith("file:///") && captionString.length()>6 && captionString.charAt(6)!='/' ) {
+                    splitIndex= splitIndex-2;
+                }
                 captionString = captionString.substring(splitIndex+1);
             }
 
