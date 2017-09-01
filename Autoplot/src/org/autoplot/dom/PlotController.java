@@ -1654,7 +1654,7 @@ public class PlotController extends DomNodeController {
                 logger.finer("remove timerange binding that would cause inconvertable units");
             }
             if (!shouldBindX) shouldBindX= shouldBindX(newSettings.getXaxis());
-            needToAutorangeAfterAll= !shouldBindX;
+            needToAutorangeAfterAll= UnitsUtil.isTimeLocation( plot.getXaxis().getRange().getUnits() ) && !shouldBindX;
         }
 
         if ( newSettings.getXaxis().isLog()==false && ( needToAutorangeAfterAll || plot.getXaxis().isAutoRange() ) ) {
