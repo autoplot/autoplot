@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A colander is used to look at the 2017 eclipse in Kearney, Nebraska.
+        <p><small>Colorscatter mode is used to make silly plot of Bx, By, and Bz on a rotating spacecraft.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,10 @@
         
         <p>Bugfixes (2017-08-25 r21299):</p>
         <ul>  
+            <li>jython PyQDataSet corrects handling of "property calls", to correct bug mutability.
+            <li>cdf export writes DEPEND_1 and DEPEND_2 as non-time-varying when they are rank 1.
+            <li>1882: jython indexing bug, where SPE[i,j,r] is used with scalars i and j, and array r. 
+            <li>1881: weightsDataSet always returns a BundleWeightsDataSet, even for simple bundles, because fill was not properly handled.
             <li>rte 0579778410: some path resulted with NullPointerException in CDF editor panel
             <li>1852: metadata tab for join dataset doesn't show properties of each joined data set.
             <li>1869: listings of Hudson http showed where subdirectories show up in listings (ls /a/->/a/b/c/), causing strange problems.
@@ -92,6 +96,8 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>add magnitude (of vectors) to the tree of filter operations.
+            <li>591: Image URIs can be flipped horizontally or vertically, with ?xaxis=[360.,0,0.,2047].
             <li>064: ExportDataBundle is experimental system from aggregating a set of URIs for export into ascii tables, CDF files, and IDL savesets.
             <li>New compile script for Autoplot which compiles within minutes instead of 20+ minutes, should have no effect
             <li>588: allow 64-point rank 2 waveforms.  Bugfix were waveform scheme test didn't check rank of offsets, which can now be rank 2.
