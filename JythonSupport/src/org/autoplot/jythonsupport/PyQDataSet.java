@@ -1126,6 +1126,12 @@ public class PyQDataSet extends PyJavaInstance {
                 result[i]= rods.value(i);
             }
             return result;
+        } else if ( c.isAssignableFrom(QDataSet.class) ) {
+            return rods;
+        } else if ( c.isAssignableFrom(MutablePropertyDataSet.class) ) {
+            return mpds;
+        } else if ( c.isAssignableFrom(WritableDataSet.class) ) {
+            return ds;
         }
         return super.__tojava__(c);
     }
