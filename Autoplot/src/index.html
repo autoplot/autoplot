@@ -24,9 +24,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-08-25 r21299):</p>
+        <p>Bugfixes (2017-09-02 r21299):</p>
         <ul>  
-            <li>jython PyQDataSet corrects handling of "property calls", to correct bug mutability.
+            <li>1884: "import autoplot as ap" was broken since the org.virbo refactoring.
+            <li>1511: tighten up code which could reset the y axis autorange property because " " was in the .vap for a filter.
+            <li>bugfix: when pngwalk template is file:///home/jbf/ct/hudson/artifacts/test070*.png, the filename was clipped improperly.
+            <li>1883: jython PyQDataSet corrects handling of "property" calls, and __tojava__, to correct mutability bugs.
             <li>cdf export writes DEPEND_1 and DEPEND_2 as non-time-varying when they are rank 1.
             <li>1882: jython indexing bug, where SPE[i,j,r] is used with scalars i and j, and array r. 
             <li>1881: weightsDataSet always returns a BundleWeightsDataSet, even for simple bundles, because fill was not properly handled.
@@ -96,6 +99,9 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>064: CDF formatting "bundle" named parameter allows bundle dataset to be written to CDF in separate variables.
+            <li>515: improve support for new colorbars created in scripts.
+            <li>592: allow remote scripts to be accessed over SFTP.
             <li>add magnitude (of vectors) to the tree of filter operations.
             <li>591: Image URIs can be flipped horizontally or vertically, with ?xaxis=[360.,0,0.,2047].
             <li>064: ExportDataBundle is experimental system from aggregating a set of URIs for export into ascii tables, CDF files, and IDL savesets.
