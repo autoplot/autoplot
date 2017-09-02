@@ -224,13 +224,13 @@ public class JythonUtil {
      * @param parent parent GUI to follow 
      * @param env 
      * @param file file containing the script.
-     * @param fvars parameters for the script.
+     * @param fparams parameters for the script.
      * @param makeTool the dialog is always shown and the user can have the script installed as a tool.
      * @param resourceUri when the user decides to make a tool, we need the source location.
      * @return JOptionPane.OK_OPTION or JOptionPane.CANCEL_OPTION if the user cancels.
      * @throws java.io.IOException
      */
-    public static int showScriptDialog( Component parent, Map<String,Object> env, File file, Map<String,String> fvars, boolean makeTool, final URI resourceUri ) throws IOException {
+    public static int showScriptDialog( Component parent, Map<String,Object> env, File file, Map<String,String> fparams, boolean makeTool, final URI resourceUri ) throws IOException {
         
         if ( !EventQueue.isDispatchThread() ) {
             System.err.println("*** called from off of event thread!!!");
@@ -239,7 +239,7 @@ public class JythonUtil {
         p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
         
         ParametersFormPanel fpf= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
-        ParametersFormPanel.FormData fd=  fpf.doVariables( env, file, fvars, p );
+        ParametersFormPanel.FormData fd=  fpf.doVariables( env, file, fparams, p );
 
         if ( fd.count==0 && !makeTool ) {
             return JOptionPane.OK_OPTION;
@@ -295,7 +295,7 @@ public class JythonUtil {
         int result= AutoplotUtil.showConfirmDialog2( parent, tp, "Run Script "+file.getName(), JOptionPane.OK_CANCEL_OPTION );
         if ( result==JOptionPane.OK_OPTION ) {
             fd=  fpf.getFormData();
-            org.autoplot.jythonsupport.ui.ParametersFormPanel.resetVariables( fd, fvars );
+            org.autoplot.jythonsupport.ui.ParametersFormPanel.resetVariables( fd, fparams );
             if ( makeTool ) {
                 if ( makeToolPanel.isInstall() ) { // the user has requested that the script be installed.
                     Window w= ScriptContext.getViewWindow();
@@ -319,7 +319,7 @@ public class JythonUtil {
      * executed, and monitor should be used to detect that the script is finished.
      * @param url the address of the script.
      * @param dom if null, then null is passed into the script and the script must not use dom.
-     * @param vars values for parameters, or null.
+     * @param params values for parameters, or null.
      * @param askParams if true, query the user for parameter settings.
      * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
      * @param mon1 monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
@@ -328,10 +328,10 @@ public class JythonUtil {
      * @deprecated use invokeScriptSoon with URI.
      */
     public static int invokeScriptSoon( final URL url, final Application dom, 
-            Map<String,String> vars, 
+            Map<String,String> params, 
             boolean askParams, boolean makeTool, 
             ProgressMonitor mon1) throws IOException {
-        return invokeScriptSoon( url, dom, vars, askParams, makeTool, null, mon1 );
+        return invokeScriptSoon( url, dom, params, askParams, makeTool, null, mon1 );
     }            
     
     /**
@@ -360,7 +360,7 @@ public class JythonUtil {
      * executed, and monitor should be used to detect that the script is finished.
      * @param url the address of the script.
      * @param dom if null, then null is passed into the script and the script must not use dom.
-     * @param vars values for parameters, or null.
+     * @param params values for parameters, or null.
      * @param askParams if true, query the user for parameter settings.
      * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
      * @param scriptPanel null or place to mark error messages and to mark as running a script.
@@ -370,14 +370,14 @@ public class JythonUtil {
      * @deprecated use invokeScriptSoon with URI.
      */    
     public static int invokeScriptSoon( final URL url, final Application dom, 
-            Map<String,String> vars, 
+            Map<String,String> params, 
             boolean askParams, 
             final boolean makeTool, 
             final JythonScriptPanel scriptPanel,
             ProgressMonitor mon1) throws IOException {
         try {
             URI uri= url.toURI();
-            return invokeScriptSoon( uri, dom, vars, askParams, makeTool, scriptPanel, mon1 );
+            return invokeScriptSoon( uri, dom, params, askParams, makeTool, scriptPanel, mon1 );
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -389,7 +389,7 @@ public class JythonUtil {
      * executed, and monitor should be used to detect that the script is finished.
      * @param uri the resource URI of the script (without parameters).
      * @param dom if null, then null is passed into the script and the script must not use dom.
-     * @param vars values for parameters, or null.
+     * @param params values for parameters, or null.
      * @param askParams if true, query the user for parameter settings.
      * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
      * @param scriptPanel null or place to mark error messages and to mark as running a script.
@@ -398,7 +398,7 @@ public class JythonUtil {
      * @throws java.io.IOException
      */
     public static int invokeScriptSoon( final URI uri, final Application dom, 
-            Map<String,String> vars, 
+            Map<String,String> params, 
             boolean askParams, 
             final boolean makeTool, 
             final JythonScriptPanel scriptPanel,
@@ -412,11 +412,11 @@ public class JythonUtil {
         }
         final File file;
         
-        final Map<String,String> fvars;
-        if ( vars==null ) {
-            fvars= new HashMap();
+        final Map<String,String> fparams;
+        if ( params==null ) {
+            fparams= new HashMap();
         } else {
-            fvars= vars;
+            fparams= params;
         }
         
         ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
@@ -434,14 +434,14 @@ public class JythonUtil {
             args.put( "dom", dom );
             args.put( "PWD", split.path ); 
     
-            JPanel params= new JPanel();
-            fd=  pfp.doVariables( env, file, vars, params );
+            JPanel paramPanel= new JPanel();
+            fd=  pfp.doVariables( env, file, params, paramPanel );
             
-            response= showScriptDialog( dom.getController().getDasCanvas(), args, file, fvars, makeTool, uri );
+            response= showScriptDialog( dom.getController().getDasCanvas(), args, file, fparams, makeTool, uri );
             
         } else {
             file = DataSetURI.getFile( uri, new NullProgressMonitor() );
-            fd=  pfp.doVariables( env, file, vars, null );
+            fd=  pfp.doVariables( env, file, params, null );
         }
         
         if ( response==JOptionPane.OK_OPTION ) {
@@ -451,9 +451,9 @@ public class JythonUtil {
                     try {
                         PythonInterpreter interp = JythonUtil.createInterpreter(true, false, dom, mon );
                         logger.log(Level.FINE, "invokeScriptSoon({0})", uri);
-                        for ( Map.Entry<String,String> v: fvars.entrySet() ) {
+                        for ( Map.Entry<String,String> p: fparams.entrySet() ) {
                             try {
-                                fd.implement( interp, v.getKey(), v.getValue() );
+                                fd.implement( interp, p.getKey(), p.getValue() );
                             } catch ( ParseException ex ) {
                                 logger.log( Level.WARNING, null, ex );
                             }
