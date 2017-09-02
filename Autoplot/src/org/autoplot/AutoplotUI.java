@@ -779,7 +779,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     try {
                         URISplit split= URISplit.parse(s);        //bug 1408--note runScript doesn't account for changes made to the GUI.
                         args= URISplit.parseParams(split.params);
-                        if ( JOptionPane.OK_OPTION==JythonUtil.invokeScriptSoon( split.resourceUri.toURL(), dom, 
+                        if ( JOptionPane.OK_OPTION==JythonUtil.invokeScriptSoon( split.resourceUri, dom, 
                                 args, true, true, scriptPanel, new NullProgressMonitor() ) ) {
                             split.params= URISplit.formatParams(args);
                             String history= URISplit.format(split);
@@ -824,7 +824,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 String s= source.getValue();
                 if ( s.endsWith(".jy") ) {
                     try {
-                        JythonUtil.invokeScriptSoon( DataSetURI.getURL(s), dom, 
+                        JythonUtil.invokeScriptSoon( DataSetURI.getResourceURI(s), dom, 
                                 new HashMap(), true, true, scriptPanel, new NullProgressMonitor() );
                     } catch ( IOException ex ) {
                         throw new RuntimeException(ex);
@@ -5837,7 +5837,7 @@ APSplash.checkTime("init 240");
                 @Override
                 public void run() {
                     try {
-                        int res= JythonUtil.invokeScriptSoon( split.resourceUri.toURL(), dom, 
+                        int res= JythonUtil.invokeScriptSoon( split.resourceUri, dom, 
                                 params, true, !fisTool, scriptPanel, mon );
                         if ( res==JOptionPane.OK_OPTION ) {
                             split.params= URISplit.formatParams(params);
