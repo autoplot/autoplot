@@ -14,8 +14,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -26,6 +28,8 @@ import org.das2.util.FileUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
+import org.das2.util.filesystem.HtmlUtil;
+import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.ProgressMonitor;
 
 /**
@@ -182,6 +186,39 @@ public class FileSystemUtil {
         } else {
             return false;
         }
+    }
+
+    /**
+     * return true if the file has a parent which is resolvable.
+     * @param url
+     * @return 
+     * <pre>
+     * {@code
+     * from org.autoplot.datasource import FileSystemUtil
+     * print FileSystemUtil.hasParent(URL('http://autoplot.org/data/2016/ace_mag_2016_001.cdf'))  # True
+     * print FileSystemUtil.hasParent(URL('http://autoplot.org/Image:tabs.png'))  # False
+     * }
+     * </pre>
+     */
+    public static boolean hasParent(URL url) {
+        String p= url.toExternalForm();
+        if ( p.endsWith("/") ) {
+            p= p.substring(0,p.length()-1);
+        }
+        int is= p.lastIndexOf("/");
+        p= p.substring(0,is+1);
+        try {
+            URL purl= new URL(p);
+            URL[] kids= HtmlUtil.getDirectoryListing(purl);
+            for ( URL k: kids ) {
+                if ( k.equals(url) ) return true;
+            }
+        } catch (MalformedURLException ex) {
+            logger.log(Level.FINE, null, ex);
+        } catch (IOException | CancelledOperationException ex) {
+            logger.log(Level.FINE, null, ex);
+        }
+        return false;
     }
 
     /**
