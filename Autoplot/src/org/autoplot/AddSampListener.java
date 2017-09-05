@@ -120,14 +120,12 @@ public class AddSampListener {
                         if ( !FileSystemUtil.hasParent( new URL(s) ) ) {
                             try {
                                 File file= DataSetURI.downloadResourceAsTempFile( new URL(s), new NullProgressMonitor() );
+                                // remove the @ part.
                                 String s1= file.getAbsolutePath();
                                 int i1= s1.lastIndexOf("@");
                                 File nnfile= new File( s1.substring(0,i1) );
                                 file.renameTo( nnfile );
-                                s= nnfile.toURI().toASCIIString();
-                                
-                                // remove the @ part.
-                                
+                                s= nnfile.toURI().toASCIIString();                                
                             } catch (MalformedURLException ex) {
                                 logger.log(Level.SEVERE, null, ex);
                             } catch (IOException ex) {
