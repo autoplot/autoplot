@@ -2,7 +2,10 @@
 package org.autoplot;
 
 import java.awt.Dimension;
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -16,6 +19,12 @@ import org.astrogrid.samp.client.AbstractMessageHandler;
 import org.astrogrid.samp.client.HubConnection;
 import org.das2.util.LoggerManager;
 import org.autoplot.datasource.DataSetSelector;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.FileSystemUtil;
+import org.autoplot.datasource.URISplit;
+import org.das2.util.FileUtil;
+import org.das2.util.filesystem.FileSystem;
+import org.das2.util.monitor.NullProgressMonitor;
 
 /**
  * Listener for the Cluster Final Archive SAMP protocol.  Other clients
@@ -103,9 +112,35 @@ public class AddSampListener {
                 logger.log(Level.FINE, "got message: {0}", message.toString());
                 String s= (String) message.getParam("url");
 
-                if ( s.startsWith( "file://localhost" ) ) s= s.substring(16);
-                if ( s.startsWith( "file://" ) ) s= s.substring(7);
+                if ( s.startsWith( "file://" ) ) {
+                    if ( s.startsWith( "file://localhost" ) ) s= s.substring(16);
+                    if ( s.startsWith( "file://" ) ) s= s.substring(7);
+                } else {
+                    try {
+                        if ( !FileSystemUtil.hasParent( new URL(s) ) ) {
+                            try {
+                                File file= DataSetURI.downloadResourceAsTempFile( new URL(s), new NullProgressMonitor() );
+                                String s1= file.getAbsolutePath();
+                                int i1= s1.lastIndexOf("@");
+                                File nnfile= new File( s1.substring(0,i1) );
+                                file.renameTo( nnfile );
+                                s= nnfile.toURI().toASCIIString();
+                                
+                                // remove the @ part.
+                                
+                            } catch (MalformedURLException ex) {
+                                logger.log(Level.SEVERE, null, ex);
+                            } catch (IOException ex) {
+                                logger.log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    } catch (MalformedURLException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                        //do what we did before.
+                    }
+                }
                 String ext= s.endsWith(".cdf") ? ext="cdf" : null;
+                
                 if ( "cdf".equals(ext) || mType.equals("table.load.cdf") ) {
                     maybePlot( sel, "vap+cdf:" + s );
                 } else if ( mType.equals("image.load.fits") )  {
