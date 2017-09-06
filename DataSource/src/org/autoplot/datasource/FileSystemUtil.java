@@ -201,7 +201,8 @@ public class FileSystemUtil {
      * </pre>
      */
     public static boolean hasParent(URL url) {
-        String p= url.toExternalForm();
+        String surl= url.toExternalForm();
+        String p= surl;
         if ( p.endsWith("/") ) {
             p= p.substring(0,p.length()-1);
         }
@@ -211,7 +212,7 @@ public class FileSystemUtil {
             URL purl= new URL(p);
             URL[] kids= HtmlUtil.getDirectoryListing(purl);
             for ( URL k: kids ) {
-                if ( k.equals(url) ) return true;
+                if ( k.toExternalForm().equals(surl) ) return true;
             }
         } catch (MalformedURLException ex) {
             logger.log(Level.FINE, null, ex);
