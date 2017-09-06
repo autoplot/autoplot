@@ -169,16 +169,23 @@ public class InlineDataSource extends AbstractDataSource {
             
         boolean isCommand= s.length()>0 && s.charAt(0)>='a' && s.charAt(0)<='z';
 
-        String linkCommand= "link( "+s + ")";
-
-        try {
-            PyObject result= interp.eval( linkCommand ); //wha?
+        String linkCommand=null;
+        
+        try {    
+            PyObject result;
+            if ( Ops.isSafeName(s) ) {
+                result= interp.eval( s ); 
+            } else {
+                linkCommand= "link( "+s + ")";        
+                result= interp.eval( linkCommand ); //wha?
+            }
+            
             QDataSet res = (QDataSet) result.__tojava__(QDataSet.class);
             return DataSetOps.makePropertiesMutable(res);
         } catch ( RuntimeException ex ) {
             // since we couldn't run the command, we know that wasn't it.
             // TODO: it would be nicer to try to parse the string a little instead.
-            logger.log(Level.FINE, "failed to execute: {0}", linkCommand);
+            logger.log(Level.FINE, "failed to execute: {0}", (linkCommand!=null ? linkCommand : s ) );
             logger.log( Level.FINE, ex.getMessage(), ex );
         }
 
