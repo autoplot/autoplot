@@ -1,24 +1,20 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.metatree;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.das2.datum.Units;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import org.autoplot.datasource.LogNames;
 import org.das2.qds.DataSetOps;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
-import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.MetadataModel;
+import org.das2.datum.LoggerManager;
 import org.w3c.dom.Node;
 
 /**
@@ -27,6 +23,7 @@ import org.w3c.dom.Node;
  */
 public class MetadataUtil {
 
+    private static final Logger logger= LoggerManager.getLogger(LogNames.APDSS);
     /**
      * converts tree model node into canonical Map<String,Object>.  Branch nodes
      * are HashMap<String,Object> as well.
@@ -34,7 +31,7 @@ public class MetadataUtil {
      * @return
      */
     public static Map<String,Object> toMetaTree( Node node ) {
-        Map<String,Object> result= new LinkedHashMap<String,Object>();
+        Map<String,Object> result= new LinkedHashMap<>();
         Node child= node.getFirstChild();
         while ( child!=null ) {
             Object value;
@@ -127,7 +124,7 @@ public class MetadataUtil {
      */
     public static Map<String,Object> sprocess( String c, Map<String,Object> properties ) {
 
-        int i= c.indexOf("|");
+        int i= c.indexOf('|');
         if ( i>0 ) {
             c= c.substring(i); // TODO: look at the slice component.
         }
@@ -163,6 +160,7 @@ public class MetadataUtil {
                 if ( s.hasNextInt() ) {
                      int st= s.nextInt();
                      int en= s.nextInt();
+                     logger.fine("not using st and en: "+st+","+en);
                 }
             } else if ( cmd.startsWith("|total") && cmd.length()==7 ) {
                 int dim= cmd.charAt(6)-'0';

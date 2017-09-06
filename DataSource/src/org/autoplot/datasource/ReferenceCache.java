@@ -381,7 +381,7 @@ public class ReferenceCache {
         System.err.println("== uris ==");
         i=0;
         for ( Entry<String,ReferenceCacheEntry> ent : instance.uris.entrySet() ) {
-            System.err.printf( "%3d %s\n", ++i, String.valueOf(ent.getValue()) );
+            System.err.printf( "%3d %s%n", ++i, String.valueOf(ent.getValue()) );
             ReferenceCacheEntry ent1= ent.getValue();
             QDataSet ds= ent1.qds==null ? null : ent1.qds.get();
             if ( ds!=null ) {
@@ -410,7 +410,7 @@ public class ReferenceCache {
         System.err.println("== locks ==");
         i=0;
         for ( Entry<String,ProgressMonitor> ent : instance.locks.entrySet() ) {
-            System.err.printf( "%3d %s\n", ++i, String.valueOf(ent.getValue()) );
+            System.err.printf( "%3d %s%n", ++i, String.valueOf(ent.getValue()) );
         }
     }
 

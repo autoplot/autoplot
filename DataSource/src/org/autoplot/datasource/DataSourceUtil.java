@@ -381,7 +381,7 @@ public class DataSourceUtil {
         int best= -1;
         int n= search.size();
 
-        int limit= s.indexOf("?");
+        int limit= s.indexOf('?');
         if ( limit==-1 ) limit=s.length();
         
         DatumRange dr= null;

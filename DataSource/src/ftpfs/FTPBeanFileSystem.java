@@ -129,7 +129,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
         }
 
         // pop off the password
-        int icolon= userInfoNoPassword==null ? -1 : userInfoNoPassword.indexOf(":");
+        int icolon= userInfoNoPassword==null ? -1 : userInfoNoPassword.indexOf(':');
         if ( icolon>-1 ) {
             userInfoNoPassword= userInfoNoPassword.substring(0,icolon);
         }
@@ -298,89 +298,81 @@ public class FTPBeanFileSystem extends WebFileSystem {
     public DirectoryEntry[] parseLsl(String dir, File listing) throws IOException {
         InputStream in = new FileInputStream(listing);
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in,"US-ASCII"));
-
-        String aline = reader.readLine();
-
-        boolean done = aline == null;
-
-        String types = "d-";
-
-        long bytesRead = 0;
-        //long totalSize;
-        //long sumSize=0;
-
-        List<DirectoryEntry> result = new ArrayList<DirectoryEntry>(20);
-        int lineNum = 1;
-
-        int sizePos= 31;
-        int modifiedPos= 42;
-
-        while (!done) {
-            //logger.log(Level.FINEST, "{0}: {1}", new Object[]{lineNum, aline});
-            bytesRead = bytesRead + aline.length() + 1;
-
-            aline = aline.trim();
-
-            if (aline.length() == 0) {
-                done = true;
-            } else {
-
-                char type = aline.charAt(0);
-                if (type == 't') {
-                    if (aline.indexOf("total") == 0) {
-                        //totalSize= Long.parseLong( aline.substring( 5 ).trim() );
-                    }
-                }
-
-                if (types.indexOf(type) != -1) {
-                    int i = aline.lastIndexOf(' ');
-                    //String name = aline.substring(i + 1);
-                    //long size = 0;
-                    //try {
-                    //size= Long.parseLong( aline.substring( 31, 31+11 ) ); // tested on: linux server
-                    //} catch ( NumberFormatException e ) {
-                    //}
-
-                    //boolean isFolder = type == 'd';
-
-                    DirectoryEntry item = new DirectoryEntry();
-                    item.name = aline.substring(i + 1);
-                    try {
-                        item.size = Long.parseLong(aline.substring(sizePos, sizePos + 11).trim());
-                    } catch ( NumberFormatException ex ) {
-                        try {
-                            item.size = Long.parseLong(aline.substring(sizePos, sizePos + 10).trim());
-                        } catch ( NumberFormatException ex2 ) {
-                            logger.log( Level.WARNING, "unable to parse size in "+aline+" at "+sizePos,ex2 );
-                            item.size = 1; // don't RTE
-                        }
-                    }
-                    item.type = type == 'd' ? 'd' : 'f';
-                    if ( aline.length()>=modifiedPos+12 ) {
-                        item.modified = parseTime1970(aline.substring(modifiedPos, modifiedPos+12), Calendar.getInstance());
-                    } else {
-                        item.modified = 0;
+        List<DirectoryEntry> result;
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in,"US-ASCII"))) {
+            String aline = reader.readLine();
+            boolean done = aline == null;
+            String types = "d-";
+            long bytesRead = 0;
+            //long totalSize;
+            //long sumSize=0;
+            result = new ArrayList<>(20);
+            int lineNum = 1;
+            int sizePos= 31;
+            int modifiedPos= 42;
+            while (!done) {
+                //logger.log(Level.FINEST, "{0}: {1}", new Object[]{lineNum, aline});
+                bytesRead = bytesRead + aline.length() + 1;
+                
+                aline = aline.trim();
+                
+                if (aline.length() == 0) {
+                    done = true;
+                } else {
+                    
+                    char type = aline.charAt(0);
+                    if (type == 't') {
+                        //if (aline.indexOf("total") == 0) {
+                            //totalSize= Long.parseLong( aline.substring( 5 ).trim() );
+                        //}
                     }
                     
-
-                    result.add(item);
-
-                    //sumSize= sumSize + size;
-
-                }
-
-                aline = reader.readLine();
-                lineNum++;
-
-                done = aline == null;
-
-            } // if (aline.length)
-
-        } // while
-
-        reader.close();
-        //TODO: finally clause
+                    if (types.indexOf(type) != -1) {
+                        int i = aline.lastIndexOf(' ');
+                        //String name = aline.substring(i + 1);
+                        //long size = 0;
+                        //try {
+                        //size= Long.parseLong( aline.substring( 31, 31+11 ) ); // tested on: linux server
+                        //} catch ( NumberFormatException e ) {
+                        //}
+                        
+                        //boolean isFolder = type == 'd';
+                        
+                        DirectoryEntry item = new DirectoryEntry();
+                        item.name = aline.substring(i + 1);
+                        try {
+                            item.size = Long.parseLong(aline.substring(sizePos, sizePos + 11).trim());
+                        } catch ( NumberFormatException ex ) {
+                            try {
+                                item.size = Long.parseLong(aline.substring(sizePos, sizePos + 10).trim());
+                            } catch ( NumberFormatException ex2 ) {
+                                logger.log( Level.WARNING, "unable to parse size in "+aline+" at "+sizePos,ex2 );
+                                item.size = 1; // don't RTE
+                            }
+                        }
+                        item.type = type == 'd' ? 'd' : 'f';
+                        if ( aline.length()>=modifiedPos+12 ) {
+                            item.modified = parseTime1970(aline.substring(modifiedPos, modifiedPos+12), Calendar.getInstance());
+                        } else {
+                            item.modified = 0;
+                        }
+                        
+                        
+                        result.add(item);
+                        
+                        //sumSize= sumSize + size;
+                        
+                    }
+                    
+                    aline = reader.readLine();
+                    lineNum++;
+                    
+                    done = aline == null;
+                    
+                } // if (aline.length)
+            } // while
+            //TODO: finally clause
+        }
 
         return (DirectoryEntry[]) result.toArray(new DirectoryEntry[result.size()]);
     }
@@ -440,20 +432,14 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     
                 } catch (NullPointerException ex) {
                     logger.log( Level.SEVERE, "Unable to make connection to " + getRootURL().getHost(), ex );
-                    IOException ex2= new IOException("Unable to make connection to " + getRootURL().getHost()); // TODO: Java 1.6 will fix this
-                    ex2.initCause(ex);
-                    throw ex2;
+                    throw new IOException("Unable to make connection to " + getRootURL().getHost(), ex);
                 } catch (CancelledOperationException ex ) {
                     throw new FileSystemOfflineException("user cancelled credentials");
                 }
 
                 String ss = bean.getDirectoryContentAsString();
-                FileWriter fw=null;
-                try {
-                    fw= new FileWriter(listingt);
+                try (FileWriter fw = new FileWriter(listingt)) {
                     fw.write(ss);
-                } finally {
-                    if ( fw!=null ) fw.close();
                 }
 
                 //Windows7 cannot clobber the old filename.  Delete it manually.  TODO: locks...
@@ -482,7 +468,6 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     KeyChain.getDefault().clearUserPassword(url);
                     // loop for them to try again.
                 } else if ( e.getMessage().startsWith("550") ) {
-                    
                     new File(localRoot, directory);
                     throw new IOException( e.getMessage()+": "+directory);
                 } else {
@@ -529,6 +514,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
                 int totalBytes = 0;
 
+                @Override                
                 public boolean byteRead(int bytes) {
                     totalBytes += bytes;
                     if (mon.isCancelled()) {
@@ -540,6 +526,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     return true;
                 }
 
+                @Override
                 public boolean byteWrite(int bytes) {
                     totalBytes += bytes;
                     mon.setTaskProgress(totalBytes);
@@ -569,11 +556,9 @@ public class FTPBeanFileSystem extends WebFileSystem {
             } else {
                 throw new IOException(ex.toString());
             }
-        } catch (FtpException ex) {
+        } catch (FtpException | CancelledOperationException ex) {
             throw new IOException(ex.getMessage());
 
-        } catch ( CancelledOperationException ex ) {
-            throw new IOException(ex.getMessage());
         } finally {
             mon.finished();
         }
@@ -581,6 +566,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
     }
 
+    @Override
     protected void downloadFile( String filename, File targetFile, final File partFile, final ProgressMonitor mon) throws java.io.IOException {
 
         Lock lock= getDownloadLock( filename, targetFile, mon );
@@ -623,9 +609,9 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     File listingFile = new File(targetFile.getParentFile(), ".listing");
                     if (!listingFile.exists()) {
                         String listing = bean.getDirectoryContentAsString();
-                        FileOutputStream out2 = new FileOutputStream(listingFile);
-                        out2.write(listing.getBytes());
-                        out2.close();
+                        try (FileOutputStream out2 = new FileOutputStream(listingFile)) {
+                            out2.write(listing.getBytes("US-ASCII"));
+                        }
                     }
 
                     long size = this.getFileObject(filename).getSize();
@@ -637,6 +623,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
                         int totalBytes = 0;
 
+                        @Override
                         public boolean byteRead(int bytes) {
                             totalBytes += bytes;
                             if (mon.isCancelled()) {
@@ -648,6 +635,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                             return true;
                         }
 
+                        @Override
                         public boolean byteWrite(int bytes) {
                             totalBytes += bytes;
                             mon.setTaskProgress(totalBytes);
@@ -660,8 +648,9 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     
                 } catch (RuntimeException ex) {
                     logger.log( Level.SEVERE, ex.getMessage(), ex );
-                    if (ex.getCause() instanceof IOException) {
-                        throw (IOException) ex.getCause();
+                    Throwable cause= ex.getCause();
+                    if (cause instanceof IOException) {
+                        throw (IOException) cause;
                     } else {
                         IOException tex= new IOException(ex);
                         throw tex;

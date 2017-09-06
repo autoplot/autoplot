@@ -158,7 +158,7 @@ public class SourceTypesBrowser extends javax.swing.JPanel {
             return dataSetSelector1.getValue();
         } else {
             String s= types.get( sourceTypesComboBox.getSelectedIndex() );
-            int i= s.indexOf(":");
+            int i= s.indexOf(':');
             if ( i>-1 ) s= s.substring(0,i);
             return "vap+"+ s + ":" + dataSetSelector1.getValue();
         }

@@ -57,7 +57,7 @@ public class AggregatingDataSourceFormat implements DataSourceFormat {
             if ( data1.length()>0 ) {
                 logger.log(Level.FINE, "formatting {0}", s);
                 StringBuilder uri1= new StringBuilder(base).append(s);
-                if ( delegateParams!=null && delegateParams.length()>0 ) uri1.append( "?").append( delegateParams );
+                if ( delegateParams.length()>0 ) uri1.append( "?").append( delegateParams );
                 String uri2= uri1.toString();
                 DataSourceFormat df= DataSetURI.getDataSourceFormat(new URI(uri2) );
                 df.formatData( uri2, data1, mon.getSubtaskMonitor( i, i+1, base ) );

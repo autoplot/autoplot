@@ -45,7 +45,7 @@ public class FtpFileObject extends WebFileObject {
         if ( listing.exists() ) {
             try {
                 DirectoryEntry[] list = ftpfs.parseLslNew(null, listing);
-                int ii= this.getNameExt().lastIndexOf("/");
+                int ii= this.getNameExt().lastIndexOf('/');
                 String lookFor= this.getNameExt().substring(ii+1);
                 String lookForGz= this.getNameExt().substring(ii+1) + ".gz";
                 for (int i = 0; i < list.length; i++) {
@@ -85,7 +85,7 @@ public class FtpFileObject extends WebFileObject {
         if ( listing.exists() ) {
             try {
                 DirectoryEntry[] list = ftpfs.parseLslNew(null, listing);
-                int ii= this.getNameExt().lastIndexOf("/");
+                int ii= this.getNameExt().lastIndexOf('/');
                 String lookFor= this.getNameExt().substring(ii+1);
                 for (int i = 0; i < list.length; i++) {
                     if (list[i].name.equals(lookFor)) {

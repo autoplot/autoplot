@@ -627,11 +627,11 @@ public class DataSourceRegistry {
             int i= name.lastIndexOf('.');
             name= name.substring(i);
         }
-        int i=name.indexOf("?");
+        int i=name.indexOf('?');
         if ( i!=-1 ) {
             name = name.substring(0,i );
         }
-        i=name.indexOf("&"); // this is a whoops, they meant ?
+        i=name.indexOf('&'); // this is a whoops, they meant ?
         if ( i!=-1 ) {
             name = name.substring(0,i );
         }
@@ -794,7 +794,7 @@ public class DataSourceRegistry {
      * @return true if the vapScheme needs a URL.
      */
     public boolean hasResourceUri(String vapScheme) {
-        int i= vapScheme.indexOf(":");
+        int i= vapScheme.indexOf(':');
         if ( i>0 ) vapScheme= vapScheme.substring(0,i);
         boolean noUri= vapScheme.endsWith("cdaweb") || vapScheme.endsWith("inline" ) || vapScheme.endsWith("pdsppi");
         return !noUri;

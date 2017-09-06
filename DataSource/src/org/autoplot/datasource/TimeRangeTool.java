@@ -116,7 +116,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 || ss[1].startsWith("sftp://")
                 || ss[1].startsWith("ftp://")
                 || ss[1].startsWith("file:/") ) {
-                int i= ss[1].indexOf(":",6);
+                int i= ss[1].indexOf(':',6);
                 if ( i==-1 ) {
                     scComboBox.setSelectedItem(ss[1]);
                 } else {
@@ -124,7 +124,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                     orbit= ss[1].substring(i+1);
                 }
             } else {
-                int i= ss[1].indexOf(":");
+                int i= ss[1].indexOf(':');
                 if ( i==-1 ) {
                     scComboBox.setSelectedItem(ss[1]);
                     orbitList.setSelectedValue( ss[1], true );
@@ -185,11 +185,11 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 List indexes= orbitList.getSelectedValuesList();
                 if ( indexes.size()>1 ) {
                     StringBuilder orbits= new StringBuilder();
-                    int i= orb.indexOf(":");
+                    int i= orb.indexOf(':');
                     if ( i>-1 ) orbits.append(orb.substring(0,i)); else orbits.append(orb);
                     orbits.append("-");
                     orb= String.valueOf( indexes.get(indexes.size()-1) );
-                    i= orb.indexOf(":");
+                    i= orb.indexOf(':');
                     if ( i>-1 ) orbits.append(orb.substring(0,i)); else orbits.append(orb);
                     orb= orbits.toString();
                 } else {
@@ -197,13 +197,13 @@ public class TimeRangeTool extends javax.swing.JPanel {
                         orbitList.setSelectedIndex(0);
                         orb= orbitList.getSelectedValue().toString();
                     }
-                    int i= orb.indexOf(":");
+                    int i= orb.indexOf(':');
                     if ( i>-1 ) orb= orb.substring(0,i);
                 }
                 return "orbit:"+sc+":"+orb;
             case 2: {
                 String s= (String)nrtComboBox.getSelectedItem();
-                int i= s.indexOf(" ");
+                int i= s.indexOf(' ');
                 if ( i==-1 ) {
                     return s;
                 } else {
@@ -860,7 +860,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
     private String showOrbit( String sorbit ) {
         try {
             Orbits o= Orbits.getOrbitsFor((String)scComboBox.getSelectedItem());
-            int i= sorbit.indexOf(":");
+            int i= sorbit.indexOf(':');
             if ( i>-1 ) sorbit= sorbit.substring(0,i);
             DatumRange dr;
             try {

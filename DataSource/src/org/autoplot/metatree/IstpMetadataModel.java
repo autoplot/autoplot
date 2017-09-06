@@ -237,15 +237,15 @@ public class IstpMetadataModel extends MetadataModel {
 
         String name= String.valueOf(attrs.get("FIELDNAM"));
         
-        Map<String,Object> user= new LinkedHashMap<String,Object>();
+        Map<String,Object> user= new LinkedHashMap<>();
 
-        Map<String, Object> properties = new LinkedHashMap<String, Object>();
+        Map<String, Object> properties = new LinkedHashMap<>();
 
         String title= "";
         String s;
         s= (String)attrs.get("Source_name");
         if (  s!=null ) {
-            int i= s.indexOf(">");
+            int i= s.indexOf('>');
             if ( i>-1 ) {
                 title= title + s.substring(0,i).trim();
             }
@@ -253,7 +253,7 @@ public class IstpMetadataModel extends MetadataModel {
         
         s= (String)attrs.get("Descriptor");
         if (  s!=null ) {
-            int i= s.indexOf(">");
+            int i= s.indexOf('>');
             if ( i>-1 ) {
                 if ( title.length()>0 ) title= title+"/";
                 title= title + s.substring(0,i).trim();
@@ -273,7 +273,7 @@ public class IstpMetadataModel extends MetadataModel {
         
         if (attrs.containsKey("DISPLAY_TYPE")) {
             String type = (String) attrs.get("DISPLAY_TYPE");
-            int i= type.indexOf(">");
+            int i= type.indexOf('>');
             String stype= i==-1 ? type : type.substring(0,i);
             if ( !stype.equals(stype.toLowerCase() ) ) {
                 logger.log(Level.FINE, "DISPLAY_TYPE should be lower case ({0})", type);

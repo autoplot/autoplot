@@ -395,7 +395,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         StringBuilder base= new StringBuilder( this.suri );
         int j= base.indexOf("?");
         if ( j==-1 || suriNoFile ) {
-            int icolon= suri.indexOf(":");
+            int icolon= suri.indexOf(':');
             if ( suriNoFile && icolon>-1 && icolon<MAX_VAP_PREFIX ) {
                 base= new StringBuilder( base.substring(0,icolon+1) );
             }
@@ -431,7 +431,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
                 } else {
                     paramValue= "????";
                 }
-                int icolon= paramValue.indexOf(":");
+                int icolon= paramValue.indexOf(':');
                 if ( icolon!=-1 && !paramValue.substring(0,icolon).equals("orbit")) {
                     paramValue= paramValue.substring(0,icolon);
                 }

@@ -52,7 +52,7 @@ public class ZipFileSystem extends FileSystem {
 
     private void addZipEntry(String name, ZipEntry entry) {
         logger.log(Level.FINE, "addZipEntry: {0}", name);
-        String parentName = name.substring(0, name.lastIndexOf("/", name.length()-2)+1);
+        String parentName = name.substring(0, name.lastIndexOf('/', name.length()-2)+1);
         // recursively back up until we find a path we've already added.
         if (!filemap.containsKey(parentName)) addZipEntry(parentName, null);
 
@@ -60,7 +60,7 @@ public class ZipFileSystem extends FileSystem {
         if (entry == null) {
             n = name;
             if (n.endsWith("/")) n = n.substring(0, n.length()-1);
-            n = n.substring(n.lastIndexOf("/"));
+            n = n.substring(n.lastIndexOf('/'));
         }
         ZipFileObject zfo = new ZipFileObject(this, entry, filemap.get(parentName),n);
         filemap.put(name, zfo);
@@ -109,7 +109,7 @@ public class ZipFileSystem extends FileSystem {
         
         for(int i=0; i<contents.length; ++i) {
             String s = contents[i].getNameExt();
-            results[i] = s.substring(s.lastIndexOf("/",s.length()-2)+1);
+            results[i] = s.substring(s.lastIndexOf('/',s.length()-2)+1);
         }
         return results;
     }

@@ -397,7 +397,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             } else if (file.endsWith("/..")) { // pop up one directory
                 logger.fine("jump to parent directory");
                 int carotpos = surl.lastIndexOf("/..");
-                carotpos = surl.lastIndexOf("/", carotpos - 1);
+                carotpos = surl.lastIndexOf('/', carotpos - 1);
                 if (carotpos != -1) {
                     String sval= surl.substring(0, carotpos + 1);
                     dataSetSelector.getEditor().setItem(sval);
@@ -909,7 +909,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 setValue(surl);
             }
             
-            int carotpos = surl.indexOf("?");
+            int carotpos = surl.indexOf('?');
             if (carotpos == -1) {
                 carotpos = surl.length();
             } else {
@@ -1270,7 +1270,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     clearBusyIcon();
                 }
 
-                int i2= labelPrefix.lastIndexOf("/");
+                int i2= labelPrefix.lastIndexOf('/');
                 if ( i2!=-1 ) {
                     labelPrefix= labelPrefix.substring(0,i2+1);
                 }
@@ -1374,7 +1374,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     clearBusyIcon();
                 }
 
-                int i2= labelPrefix.lastIndexOf("/");
+                int i2= labelPrefix.lastIndexOf('/');
                 if ( i2!=-1 ) {
                     labelPrefix= labelPrefix.substring(0,i2+1);
                 }
@@ -1583,7 +1583,11 @@ public class DataSetSelector extends javax.swing.JPanel {
                             JOptionPane.showMessageDialog(DataSetSelector.this, pane );
                         } catch (IOException ex) {
                             Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
-                        }   break;
+                        }  
+                        break;
+                    default:
+                        JOptionPane.showMessageDialog(DataSetSelector.this, "about:plugins or about:classpath" );
+                        break;
                 }
             }
         });
@@ -1597,7 +1601,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     private String checkActionTrigger(String surl) {
         for ( String s: actionTriggers.keySet() ) {
             if ( surl.matches(s) ) {
-                int i= s.indexOf(":");
+                int i= s.indexOf(':');
                 if ( i>-1 ) {
                     String tr= s.substring(0,i);
                     if ( Ops.safeName(tr).equals(tr) ) {

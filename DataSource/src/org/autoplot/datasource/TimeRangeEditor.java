@@ -183,7 +183,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             isUri= true;
         }
         if ( !isUri  ) {
-            int icolon= text.indexOf(":");
+            int icolon= text.indexOf(':');
             if ( icolon>-1 ) {
                 String pref= text.substring(0,icolon);
                 if ( Character.isLetter(pref.charAt(0)) && Pattern.matches( "[a-zA-Z_\\+0-9]*", pref ) ) {

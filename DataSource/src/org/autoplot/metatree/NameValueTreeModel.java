@@ -50,15 +50,15 @@ public class NameValueTreeModel implements TreeModel {
             value= value.trim();
             this.value = value;
             if ( value.length()>LINE_LEN || value.contains("\n") ) {
-                splits= new ArrayList<Integer>();
+                splits= new ArrayList<>();
                 int ii=0;
                 while ( ii<value.length() ) {
-                    int i= value.indexOf("\n",ii);
+                    int i= value.indexOf('\n',ii);
                     if ( (i-ii)>LINE_LEN || i==-1 ) {
                         if ( value.length()-ii < LINE_LEN ) {
                             ii= value.length();
                         } else {
-                            i= value.lastIndexOf(" ",ii+LINE_LEN);
+                            i= value.lastIndexOf(' ',ii+LINE_LEN);
                             if ( i==-1 ) {
                                 ii= ii+LINE_LEN; 
                             } else if ( i>ii ) {

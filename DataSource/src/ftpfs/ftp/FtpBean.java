@@ -1057,8 +1057,8 @@ public class FtpBean
             release();    // Release the object
         }
 
-        int first = reply.indexOf("\"");
-        int last = reply.lastIndexOf("\"");
+        int first = reply.indexOf('\"');
+        int last = reply.lastIndexOf('\"');
         return reply.substring(first + 1, last);
     }
 

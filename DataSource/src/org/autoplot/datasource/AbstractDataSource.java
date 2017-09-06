@@ -106,7 +106,7 @@ public abstract class AbstractDataSource implements DataSource {
 
     protected String getExt(URI uri) {
         String s = uri.getPath();
-        int i = s.lastIndexOf(".");
+        int i = s.lastIndexOf('.');
         if (i == -1) {
             return "";
         } else {

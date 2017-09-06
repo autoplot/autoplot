@@ -185,7 +185,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         int i = surl.lastIndexOf("timerange=", cc.surlpos);
 
         if (i != -1) {
-            int i1 = surl.indexOf("&", i);
+            int i1 = surl.indexOf('&', i);
             carotPos -= (i1 - i);
         }
 

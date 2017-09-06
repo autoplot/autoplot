@@ -97,7 +97,7 @@ public class WGetFileSystem extends WebFileSystem {
         } else {
             if ( !monitor.isStarted() ) {
                 if ( line.startsWith("Length:" ) ) {
-                    int term= line.indexOf(" ",8);
+                    int term= line.indexOf(' ',8);
                     monitor.setTaskSize( interpretLong( line.substring(8,term) ) );
                     monitor.setProgressMessage("wget "+filename);
                     monitor.started();

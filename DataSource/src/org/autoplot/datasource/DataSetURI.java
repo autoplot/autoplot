@@ -32,6 +32,7 @@ import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.nio.channels.Channels;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -145,7 +146,7 @@ public class DataSetURI {
     public static String getExplicitExt(String surl) {
         URISplit split = URISplit.parse(surl);
         if ( split.vapScheme==null ) return null;
-        int i = split.vapScheme.indexOf("+");
+        int i = split.vapScheme.indexOf('+');
         if (i != -1) {
             return split.vapScheme.substring(i + 1);
         } else {
@@ -232,7 +233,7 @@ public class DataSetURI {
         if ( !DataSourceRegistry.getInstance().hasResourceUri(surl) ) {
             return false;
         }
-        int iquest = surl.indexOf("?");
+        int iquest = surl.indexOf('?');
         if ( iquest>0 ) surl= surl.substring(0,iquest);
         surl= surl.replaceAll("%25", "%");
         int ipercy = surl.lastIndexOf("%Y");
@@ -246,7 +247,7 @@ public class DataSetURI {
         if (ipercy == -1) ipercy = surl.lastIndexOf("$v");
         if (ipercy == -1) ipercy = surl.lastIndexOf("$(v");
         if (ipercy == -1) ipercy = surl.lastIndexOf("$x");
-        if (ipercy == -1) ipercy = surl.lastIndexOf("*");
+        if (ipercy == -1) ipercy = surl.lastIndexOf('*');
         
         return ipercy != -1;
     }
@@ -442,7 +443,7 @@ public class DataSetURI {
      * @return the DataSourceFormat that formats a dataset to the format.
      */
     public static DataSourceFormat getDataSourceFormat(URI uri) {
-        int i = uri.getScheme().indexOf(".");
+        int i = uri.getScheme().indexOf('.');
         String ext;
 
         if ( isAggregating(uri.toString()) ) {
@@ -454,7 +455,7 @@ public class DataSetURI {
             ext = uri.getScheme().substring(0, i);
 
         } else {
-            int i2 = uri.getScheme().indexOf("+");
+            int i2 = uri.getScheme().indexOf('+');
             if ( i2!=-1 ) {
                 ext= uri.getScheme().substring(i2+1);
             } else {
@@ -462,7 +463,7 @@ public class DataSetURI {
                 URL url = getWebURL(uri);
 
                 String file = url.getPath();
-                i = file.lastIndexOf(".");
+                i = file.lastIndexOf('.');
                 ext = i == -1 ? "" : file.substring(i);
             }
         }
@@ -540,7 +541,7 @@ public class DataSetURI {
                     Matcher m= p.matcher(cd);
                     if ( m.matches() ) {
                         String filename = m.group(1);
-                        int i0 = filename.lastIndexOf(".");
+                        int i0 = filename.lastIndexOf('.');
                         ext = filename.substring(i0);
                         factory = DataSourceRegistry.getInstance().getSource(ext);
                     }
@@ -667,7 +668,7 @@ public class DataSetURI {
     public static String fromUri( URI uri ) {
         //String surl= uri.getScheme() + ":" + uri.getSchemeSpecificPart();  // This is how we should do this!
         String surl= uri.toString();
-        int i= surl.indexOf("?");
+        int i= surl.indexOf('?');
         String query= i==-1 ? "" : surl.substring(i);
         if ( i!=-1 ) {
             //if ( query.contains("+") && !query.contains("%20") ) {
@@ -741,7 +742,7 @@ public class DataSetURI {
             byte[] magic = new byte[5];
             int bytes = fi.read(magic);
             if ( bytes==5 ) {
-                String ss= new String(magic);
+                String ss= new String(magic,"UTF-8");
                 if ( DataSourceUtil.isHtmlStream(ss) ) {
                     ex2= new HtmlResponseIOException( "file appears to be html: "+tfile, source );
                 }

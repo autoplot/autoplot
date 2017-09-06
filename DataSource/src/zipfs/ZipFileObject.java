@@ -67,7 +67,7 @@ public class ZipFileObject extends FileObject {
 
     @Override
     public FileObject[] getChildren() throws IOException {
-        return children.toArray(new ZipFileObject[0]);
+        return children.toArray(new ZipFileObject[children.size()]);
     }
 
     @Override

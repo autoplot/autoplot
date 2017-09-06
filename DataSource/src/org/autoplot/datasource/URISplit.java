@@ -160,7 +160,7 @@ public class URISplit {
      * @return the absolute path
      */
     public static String makeAbsolute( String path, String suri ) {
-        int i= suri.indexOf(":");
+        int i= suri.indexOf(':');
         if ( i==-1 ) { // it's a file.
             boolean isAbsolute= suri.startsWith("/");
             if ( !isAbsolute ) {
@@ -264,7 +264,7 @@ public class URISplit {
         }
 
         String scheme;  // identify a scheme, if any.  This might be vap+foo:, or http:
-        int i0 = surl.indexOf(":");
+        int i0 = surl.indexOf(':');
         if (i0 == -1) {
             scheme = "";
         } else if (i0 == 1) { // one letter scheme is assumed to be windows drive letter.
@@ -304,9 +304,9 @@ public class URISplit {
 
         if (scheme.equals("")) {
             boolean isFile= true;
-            int iquery= surl.indexOf("?");
+            int iquery= surl.indexOf('?');
             if ( iquery==-1 ) {
-                int ieq= surl.indexOf("=");
+                int ieq= surl.indexOf('=');
                 //kludge in support for "ripples(30,30")
                 int ch0= surl.length()>0 ? surl.charAt(0) : (char)0;
                 int ch1= surl.length()>1 ? surl.charAt(1) : (char)0;
@@ -333,7 +333,7 @@ public class URISplit {
                     result.surl += ('/' + surl); // Windows c:
                     result.resourceUriCarotPos += 1;
                 }
-                int iq= result.surl.indexOf("?");
+                int iq= result.surl.indexOf('?');
                 if ( iq==-1 ) iq= result.surl.length();
 
                 result.surl = result.surl.replaceAll("\\\\", "/"); //TODO: what if \ in query part?
@@ -533,7 +533,7 @@ public class URISplit {
      */
     private static void parseScheme(URISplit result, boolean normalize) throws URISyntaxException {
         String surl = result.surl;
-        int h = surl.indexOf(":"); // "c:" should be "file:///c:"
+        int h = surl.indexOf(':'); // "c:" should be "file:///c:"
 
         String scheme = surl.substring(0, h);
         
@@ -543,7 +543,7 @@ public class URISplit {
             result.formatCarotPos = result.resourceUriCarotPos + scheme.length() + 1;
             result.surl = surl.substring(h + 1);
             result.scheme = magikPop(result.surl, "([a-zA-Z\\+]+)\\:.*");
-            int iq= result.surl.indexOf("?");
+            int iq= result.surl.indexOf('?');
             if ( iq==-1 ) iq= result.surl.length();
             try {
                 result.resourceUri = new URI(uriEncode(result.surl.substring(0,iq)));
@@ -554,13 +554,13 @@ public class URISplit {
         } else {
             if ( scheme.length()<20 && scheme.matches("[a-z.]+") && scheme.contains(".")) { // handle legacy schemes like cdf.http://...
                 logger.log( Level.WARNING, "URI scheme contains .: {0} converting from vap.xxx to vap+xxx", surl);
-                int j = scheme.indexOf(".");
+                int j = scheme.indexOf('.');
                 result.vapScheme = "vap+" + scheme.substring(0, j);
                 result.surl = result.surl.substring(j + 1);
                 if (result.resourceUriCarotPos > j) result.resourceUriCarotPos -= (j + 1);
                 result.formatCarotPos = result.resourceUriCarotPos + result.vapScheme.length() + 1;
                 result.scheme = magikPop(result.surl, "([a-zA-Z\\+]+)\\:.*");
-                int iq= result.surl.indexOf("?");
+                int iq= result.surl.indexOf('?');
                 if ( iq==-1 ) iq= result.surl.length();
                 try {
                     result.resourceUri = new URI(uriEncode(result.surl.substring(0,iq)));
@@ -574,7 +574,7 @@ public class URISplit {
                 }
                 result.surl = surl;
                 result.scheme = magikPop(result.surl, "([a-zA-Z\\+]+)\\:.*");
-                int iq= result.surl.indexOf("?");
+                int iq= result.surl.indexOf('?');
                 if ( iq==-1 ) iq= surl.length();
                 try {
                     result.resourceUri = new URI(uriEncode(result.surl.substring(0,iq)));
@@ -661,8 +661,8 @@ public class URISplit {
 
         int iquery;
         // check for just one ?
-        iquery = rsurl.indexOf("?");
-        int ieq= rsurl.indexOf("=");
+        iquery = rsurl.indexOf('?');
+        int ieq= rsurl.indexOf('=');
 
         String file;
 
@@ -681,9 +681,9 @@ public class URISplit {
 
         String ext = null;
         if (file != null) {
-            i = file.lastIndexOf(".");
+            i = file.lastIndexOf('.');
             if (i>-1 ) {
-                int i2= file.indexOf("/",i);
+                int i2= file.indexOf('/',i);
                 if ( i2==-1 ) {
                     ext= file.substring(i);
                 } else {
@@ -710,9 +710,9 @@ public class URISplit {
         
         int ihash;
         if ( iquery==-1 ) {
-            ihash= rsurl.indexOf("#");
+            ihash= rsurl.indexOf('#');
         } else {
-            ihash= rsurl.indexOf("#",iquery);
+            ihash= rsurl.indexOf('#',iquery);
         }
         if ( ihash==-1 ) ihash= rsurl.length();
         
@@ -759,7 +759,7 @@ public class URISplit {
         if ( ext!=null && ext.length()==0 ) ext=null;
         
         if (file != null) {
-            i = rsurl.lastIndexOf("/", iquery);
+            i = rsurl.lastIndexOf('/', iquery);
             if (i == -1) {
                 result.path = rsurl.substring(0, iquery);
                 result.file = rsurl.substring(0, iquery);
