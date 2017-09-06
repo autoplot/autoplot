@@ -206,7 +206,7 @@ public class FileSystemUtil {
         if ( p.endsWith("/") ) {
             p= p.substring(0,p.length()-1);
         }
-        int is= p.lastIndexOf("/");
+        int is= p.lastIndexOf('/');
         p= p.substring(0,is+1);
         try {
             URL purl= new URL(p);
