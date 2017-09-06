@@ -221,7 +221,7 @@ public class CsvDataSource extends AbstractDataSource {
                     dep0ds= parseHeader( idep0column, reader.getHeader(idep0column),reader.get(idep0column) );
                     dep0u= SemanticOps.getUnits(dep0ds);
                 }
-                if ( !( u instanceof TimeLocationUnits ) ) {
+                if ( !( u instanceof TimeLocationUnits ) && bundleb==null ) {
                     icolumnDs= parseHeader( icolumn, reader.getHeader(icolumn),reader.get(icolumn) );
                     u= SemanticOps.getUnits(icolumnDs);
                 }
