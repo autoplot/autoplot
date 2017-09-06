@@ -83,12 +83,12 @@ public class AggregationPollUpdating implements Updating {
     private long dirHash( DatumRange datumRange ) throws IOException {
         String[] ss= fsm.getBestNamesFor( datumRange, new NullProgressMonitor() );
 
-        long hash= 1;
-        for ( int i=0; i<ss.length; i++ ) {
-            FileObject fo= fsm.getFileSystem().getFileObject(ss[i]);
+        long hash= 1L;
+        for (String s : ss) {
+            FileObject fo = fsm.getFileSystem().getFileObject(s);
             Date lm= fo.lastModified(); //HTML FS doesn't give good dates.
             long sz= fo.getSize();
-            hash= hash + 17 * lm.hashCode() + 31 * sz + 31 * ss[i].hashCode();
+            hash = hash + 17L * lm.hashCode() + 31L * sz + 31L * s.hashCode();
             //hash= hash + 31 * sz + 31 * ss[i].hashCode();
         }
 
