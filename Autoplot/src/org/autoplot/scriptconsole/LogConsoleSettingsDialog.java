@@ -75,18 +75,18 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         public void setSelectedItem(Object anItem) {
             Level level = (Level) anItem;
             logger.setLevel(level);
-            boolean invisible = true;
+            //boolean invisible = true;
             StringBuilder err = new StringBuilder();
             for (Handler h : logger.getHandlers()) {
                 if (level != null && h.getLevel().intValue() > level.intValue()) {
                     err.append("handler filters data: ").append(h).append("\n");
-                } else {
-                    invisible = false;
-                }
+                }// else {
+                 //   invisible = false;
+                //}
             }
-            if (invisible) {//TODO: check parents
+            //if (invisible) {//TODO: check parents
                 //err.append( String.format( "No handlers (of %d) will show this log level: %s", logger.getHandlers().length, level ) );
-            }
+            //}
             if (err.length() > 0) {
                 AutoplotUtil.showMessageDialog(LogConsoleSettingsDialog.this,
                         err.toString(), "Misconfigured Logger", JOptionPane.OK_OPTION);

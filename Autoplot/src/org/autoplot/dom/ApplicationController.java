@@ -332,10 +332,10 @@ public class ApplicationController extends DomNodeController implements RunLater
             LoggerManager.logGuiEvent(e);
             super.focusGained(e);
 
-            if ( e.getComponent() instanceof ColumnColumnConnector ) {
+            //if ( e.getComponent() instanceof ColumnColumnConnector ) {
                 //logger.fine( "focus on column column connector");
-
-            }
+            //}
+            
             Plot domPlot = getPlotFor(e.getComponent());
             if (domPlot == null) {
                 return;

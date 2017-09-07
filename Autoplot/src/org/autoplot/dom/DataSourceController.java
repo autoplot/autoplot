@@ -1299,8 +1299,6 @@ public class DataSourceController extends DomNodeController {
                     } else {
                         if (dep.rank() == 1) {
                             guessCadence((MutablePropertyDataSet) dep, null);
-                        } else if (dep.rank() == 2 && dep.length(0) > 2) {
-                            //guessCadence( (MutablePropertyDataSet) dep.slice(0),null);
                         }
                     }
                     fillDs= Ops.putProperty( fillDs, "DEPEND_" + i, dep);

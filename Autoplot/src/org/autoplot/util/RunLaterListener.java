@@ -49,9 +49,9 @@ public abstract class RunLaterListener implements PropertyChangeListener, Runnab
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         invocationCount++;
-        if ( invocationCount>1 ) {
+        //if ( invocationCount>1 ) {
             //throw new IllegalArgumentException("this doesn't work");
-        }
+        //}
         if ( propertyName!=null ) {
             node.removePropertyChangeListener(propertyName,this);
         } else {

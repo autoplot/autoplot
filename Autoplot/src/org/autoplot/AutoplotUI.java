@@ -2281,8 +2281,6 @@ APSplash.checkTime("init 52.9");
             if ( w > screenSize.getWidth() - maximizedPixelGain && 
                     w < screenSize.getWidth() ) {
                 maximize= true;
-            } else if ( desiredAppSize.width > screenSize.getWidth() ) { 
-                
             }
             
         } else {

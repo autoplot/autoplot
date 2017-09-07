@@ -1528,9 +1528,9 @@ public class PlotController extends DomNodeController {
             }
         }
 
-        if ( dom.getController().getPlotElementsFor(plot).isEmpty() ) {
+        //if ( dom.getController().getPlotElementsFor(plot).isEmpty() ) {
             //System.err.println("should this happen?  see bug 2992903");
-        }
+        //}
 
         if ( dom.getOptions().isAutoranging() ) {
             resetZoom( plot.getXaxis().isAutoRange() && pele!=null && pele.getPlotDefaults().getXaxis().isAutoRange(), plot.getYaxis().isAutoRange(), plot.getZaxis().isAutoRange() );

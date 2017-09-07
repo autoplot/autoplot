@@ -28,11 +28,11 @@ public class PropertyChangeDiff implements Diff {
 
     private static void doSet(DomNode node, String propertyName, Object oldVal1, Object newVal) {
         try {
-            Object oldVal =  DomUtil.getPropertyValue(node, propertyName);
-            if (!(oldVal == oldVal1 || oldVal.equals(oldVal1))) {
+            //Object oldVal =  DomUtil.getPropertyValue(node, propertyName);
+            //if (!(oldVal == oldVal1 || oldVal.equals(oldVal1))) {
                 //throw new IllegalArgumentException("old value");
                 //let's be loosey goosey on this because sometimes setting one property resets another
-            }
+            //}
             DomUtil.setPropertyValue( node, propertyName, newVal );
         } catch (IllegalAccessException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);

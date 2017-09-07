@@ -291,9 +291,9 @@ public class PlotElementController extends DomNodeController {
             LoggerManager.logPropertyChangeEvent(evt,"plotElementListener");            
             logger.log(Level.FINE, "plotElementListener: {0} {1}->{2}", new Object[]{evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()});
             if ( evt.getPropertyName().equals(PlotElement.PROP_RENDERTYPE) && !PlotElementController.this.isValueAdjusting() ) {
-                if ( dom.getController().isValueAdjusting() ) {
+                //if ( dom.getController().isValueAdjusting() ) {
                     //return; // occasional NullPointerException, bug 2988979
-                }
+                //}
                 final RenderType newRenderType = (RenderType) evt.getNewValue();
                 final RenderType oldRenderType = (RenderType) evt.getOldValue();
                 changesSupport.registerPendingChange( PlotElementController.this, PENDING_RESET_RENDER_TYPE );
@@ -934,9 +934,9 @@ public class PlotElementController extends DomNodeController {
                 logger.log(Level.FINE, "  dataSet: {0}", String.valueOf(fillDs) );
                 
                 //This was to support the CdawebVapServlet, where partial vaps are handled.  See https://sourceforge.net/p/autoplot/bugs/1304/
-                if ( plotElement.isAutoRenderType() ) {
+                //if ( plotElement.isAutoRenderType() ) {
                     //resetPlotElement= true;
-                }
+                //}
                 
                 if (resetPlotElement) {
                     if (comp.equals("")) {
@@ -2824,9 +2824,9 @@ public class PlotElementController extends DomNodeController {
                         if ( plot==null ) {
                             System.err.println("pec2326: brace yourself for crash, plot is null!");
                             plot = getDasPlot(); // for debugging  Spectrogram->Series
-                            if ( oldRenderer==null && dom.controller.isValueAdjusting() ) { // I think this is an undo, and the plot has already been deleted.
+                            //if ( oldRenderer==null && dom.controller.isValueAdjusting() ) { // I think this is an undo, and the plot has already been deleted.
 
-                            }
+                            //}
                             if ( plot==null ) {
                                 throw new IllegalStateException("getDasPlot() result was null.");
                             }
@@ -3015,13 +3015,13 @@ public class PlotElementController extends DomNodeController {
         }
         Renderer oldRenderer= getRenderer();
         maybeCreateDasPeer();
-        if ( getRenderer()!=null && getRenderer()!=oldRenderer ) {
-            QDataSet oldDs= getDataSet(); // TODO: this needs review.  There was a comment about slices, but this works fine.  Old code 
-            if ( oldDs!=null ) {
+        //if ( getRenderer()!=null && getRenderer()!=oldRenderer ) {
+            //QDataSet oldDs= getDataSet(); // TODO: this needs review.  There was a comment about slices, but this works fine.  Old code 
+            //if ( oldDs!=null ) {
                 //bug1355: This should not be done, I think.
                 //getRenderer().setDataSet(oldDs);
-            }
-        }        
+            //}
+        //}        
     }
     
     /**
