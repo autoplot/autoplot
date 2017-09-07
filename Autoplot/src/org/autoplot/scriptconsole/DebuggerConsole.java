@@ -23,6 +23,7 @@ import org.das2.qds.ops.Ops;
 
 /**
  * little GUI for printing the PDB output and sending commands to it.
+ * See http://autoplot.org/developer.jython.pdb
  * @author jbf
  */
 public class DebuggerConsole extends javax.swing.JPanel {
@@ -115,7 +116,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
      * set the interpreter we to control.
      * @param out 
      */
-    public void setInterp( PythonInterpreter out ) {
+    public synchronized void setInterp( PythonInterpreter out ) {
         this.out= out;
         Py.getSystemState().stdin= new PyFile( pin );
     }
@@ -369,7 +370,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
      * @param expr 
      * @return the evaluation, if possible.
      */
-    synchronized PyObject setEval( String expr ) {
+    private synchronized PyObject setEval( String expr ) {
         expr= expr.trim();
         PyObject lo= out.getLocals();
         if ( lo instanceof PyStringMap ) {
@@ -393,7 +394,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
      * get the evaluation
      * @param expr 
      */
-    PyObject getEval() {
+    private synchronized PyObject getEval() {
         return printObj;
     }
 

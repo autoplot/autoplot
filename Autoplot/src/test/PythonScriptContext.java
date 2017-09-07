@@ -71,7 +71,7 @@ public class PythonScriptContext extends PyJavaInstance {
     /**
      * initialize the model and view.
      */
-    private synchronized void maybeInitModel() {
+    private void maybeInitModel() {
         if (model == null) {
             model = new ApplicationModel();
             model.setExceptionHandler( new ExitExceptionHandler() );

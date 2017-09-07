@@ -555,7 +555,7 @@ public class UndoRedoSupport {
      * Getter for property ignoringUpdates.
      * @return Value of property ignoringUpdates.
      */
-    public boolean isIgnoringUpdates() {
+    public synchronized boolean isIgnoringUpdates() {
         return this.ignoringUpdates;
     }
 
