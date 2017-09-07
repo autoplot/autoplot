@@ -220,7 +220,9 @@ public class ScreenshotsTool extends EventQueue {
                 prefs.put( "outputFolder", tf.getText() );
                 try{
                     prefs.flush();
-                } catch ( BackingStoreException e ) {}
+                } catch ( BackingStoreException e ) {
+                    logger.log( Level.WARNING, e.getMessage(), e );
+                }
                 Toolkit.getDefaultToolkit().getSystemEventQueue().push(
                     new ScreenshotsTool( parent, tf.getText() ));
             } catch ( IOException ex ) {
@@ -309,7 +311,9 @@ public class ScreenshotsTool extends EventQueue {
 
                         while ( pngWriterThreadRunning && imageQueue.isEmpty() ) { 
                             synchronized ( imageQueueLock ) {
-                                imageQueueLock.wait();
+                                if ( pngWriterThreadRunning && imageQueue.isEmpty() ) {
+                                    imageQueueLock.wait();
+                                }
                             }
                         }
                         while ( !imageQueue.isEmpty() ) {
@@ -334,7 +338,9 @@ public class ScreenshotsTool extends EventQueue {
                     }
                     logger.fine("sleep for a second to make sure the last image is done writing."); // test.Test_042_TwoTsb would show issue
                     Thread.sleep(1000);
-                    pngWriterThreadNotDone= false;
+                    synchronized (imageQueueLock) {
+                        pngWriterThreadNotDone= false;
+                    }
                 } catch ( InterruptedException ex ) {
                     logger.log( Level.WARNING, null, ex );
                 }
@@ -969,7 +975,9 @@ public class ScreenshotsTool extends EventQueue {
         try {
             while ( pngWriterThreadNotDone ) {
                 synchronized ( imageQueueLock ) {
-                    imageQueueLock.wait();
+                    if ( pngWriterThreadNotDone  ) {
+                        imageQueueLock.wait();
+                    }
                 }
             }
         } catch ( InterruptedException ex ) {
@@ -1058,8 +1066,8 @@ public class ScreenshotsTool extends EventQueue {
             tickleTimer.tickle( String.valueOf(theEvent.getID()) );
         }
 
-        if ( theEvent.getID()==401 ) {
-            if ( ( (KeyEvent)theEvent).getKeyCode()==KeyEvent.VK_CONTROL ) {
+        if ( theEvent.getID()==401 && theEvent instanceof KeyEvent) {
+            if ( ((KeyEvent)theEvent).getKeyCode()==KeyEvent.VK_CONTROL ) {
                 keyEscape=2;
             } else if ( ((KeyEvent)theEvent).getKeyCode()==KeyEvent.VK_SHIFT ) {
                 keyEscape--;
@@ -1075,7 +1083,7 @@ public class ScreenshotsTool extends EventQueue {
                     new Thread(run).start();
                 }
             }
-        } else if ( theEvent.getID()==402 ) {
+        } else if ( theEvent.getID()==402 && theEvent instanceof KeyEvent ) {
             if ( ((KeyEvent)theEvent).getKeyCode()==KeyEvent.VK_SHIFT ) {
                 // do nothing
             } else {
@@ -1094,7 +1102,9 @@ public class ScreenshotsTool extends EventQueue {
         try {
             while ( pngWriterThreadNotDone ) {
                 synchronized ( imageQueueLock ) {
-                    imageQueueLock.wait();
+                    if ( pngWriterThreadNotDone ) {
+                        imageQueueLock.wait();
+                    }
                 }
             }
         } catch ( InterruptedException ex ) {
