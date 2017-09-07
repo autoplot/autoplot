@@ -180,7 +180,7 @@ public class SinglePngWalkView extends PngWalkView {
      * @param y the y location in the component.
      * @return null or the Point location.
      */
-    Point getImagePosition( int x, int y ) {
+    private Point getImagePosition( int x, int y ) {
         Rectangle lrect= imageLocation;
         if ( imageLocation==null ) return null;
         BufferedImage i = seq.currentImage().getImage();
@@ -217,7 +217,7 @@ public class SinglePngWalkView extends PngWalkView {
 //    }
     
     @Override
-    protected synchronized void paintComponent(Graphics g1) {
+    protected void paintComponent(Graphics g1) {
         super.paintComponent(g1);
         Graphics2D g2 = (Graphics2D) g1;
         
