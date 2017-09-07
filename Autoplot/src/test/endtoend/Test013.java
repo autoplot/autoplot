@@ -183,7 +183,7 @@ public class Test013 {
      * @throws javax.xml.parsers.ParserConfigurationException
      */
     private static QDataSet test6() throws StreamException, IOException {
-        QDataSet result= null;
+        QDataSet result= null; // FINDBUGS okay
         result= Ops.join( result, Ops.dindgen( 5 ) );
         result= Ops.join( result, Ops.dindgen( 5 ) );
         result= Ops.join( result, Ops.dindgen( 5 ) );

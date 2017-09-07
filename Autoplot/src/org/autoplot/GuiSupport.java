@@ -1104,8 +1104,8 @@ public class GuiSupport {
                                         try ( FileOutputStream out = new FileOutputStream(ffname) ){
                                             
                                             PdfGraphicsOutput go = new PdfGraphicsOutput();
-                                            
-                                            PdfOptionsPanel pdecor= (PdfOptionsPanel)decor;
+
+                                            PdfOptionsPanel pdecor= (PdfOptionsPanel)decor; // findbugs OKAY
                                             go.setGraphicsShapes( pdecor.fontsAsShapesCB.isSelected() );
                                             go.setOutputStream(out);
                                             if ( pdecor.manualWidthCB.isSelected() ) {

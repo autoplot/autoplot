@@ -111,7 +111,7 @@ public class DomUtil {
         int iprop=0;
         Pattern indexedPattern= Pattern.compile("([a-zA-Z_]+)\\[(\\d+)\\]");
         Object thisNode= node;
-        PropertyDescriptor result=null;
+        
         while ( iprop< props.length ) {
             String prop1= props[iprop];
             Matcher m= indexedPattern.matcher(prop1);
@@ -157,8 +157,8 @@ public class DomUtil {
             iprop++;
         }
 
-        if ( !setit && result==null ) throw new IllegalArgumentException( "unable to find property \""+propertyName+"\" in "+node );
-        return result;
+        if ( !setit ) throw new IllegalArgumentException( "unable to find property \""+propertyName+"\" in "+node );
+        return null;
     }
 
     /**

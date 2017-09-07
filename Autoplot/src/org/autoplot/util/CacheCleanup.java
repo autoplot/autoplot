@@ -104,11 +104,10 @@ public class CacheCleanup {
             //System.out.println(constantPart);
             //System.out.println(templatePart);
             FileSystem fs= FileSystem.create( constantPart );
-            DatumRange dr= null;    //for testing, just do one month.  None means everything but it's much slower.
-            //DatumRange dr = DatumRangeUtil.parseTimeRangeValid("2010-mar");
             FileStorageModel fsm = FileStorageModel.create( fs, templatePart );
             String localRoot= fsm.getFileSystem().getLocalRoot().toString();
-            File[] ff= fsm.getFilesFor(dr);
+            File[] ff= fsm.getFilesFor(null); // null means load everything.
+            //File[] ff= fsm.getFilesFor(DatumRangeUtil.parseTimeRangeValid("2010-mar")); // ffor testing, just do one month.  None means everything but it's much slower.
             for (File ff1 : ff) {
                 DatumRange tr = fsm.getRangeFor(ff1.toString().substring(localRoot.length() + 1));
                 File[] fbest= fsm.getBestFilesFor(tr);

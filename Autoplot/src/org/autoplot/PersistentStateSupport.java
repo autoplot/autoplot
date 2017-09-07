@@ -399,10 +399,9 @@ public class PersistentStateSupport {
         InputSource source = new InputSource();
         source.setCharacterStream(new InputStreamReader(in));
         DocumentBuilder builder;
-        ErrorHandler eh= null;
         DocumentBuilderFactory domFactory= DocumentBuilderFactory.newInstance();
         builder = domFactory.newDocumentBuilder();
-        builder.setErrorHandler(eh);
+        builder.setErrorHandler(null);
         Document document= builder.parse(source);
         return document;
     }

@@ -108,8 +108,6 @@ public class DomOps {
      */
     public static List<PlotElement> copyPlotElements( Plot srcPlot, Plot dstPlot ) {
 
-        DataSourceFilter dsf= null;
-
         ApplicationController ac=  srcPlot.getController().getApplication().getController();
         List<PlotElement> srcElements = ac.getPlotElementsFor(srcPlot);
 
@@ -117,11 +115,11 @@ public class DomOps {
         for (PlotElement srcElement : srcElements) {
             if (!srcElement.getComponent().equals("")) {
                 if ( srcElement.getController().getParentPlotElement()==null ) {
-                    PlotElement newp = ac.copyPlotElement(srcElement, dstPlot, dsf);
+                    PlotElement newp = ac.copyPlotElement(srcElement, dstPlot, null);
                     newElements.add(newp);
                 }
             } else {
-                PlotElement newp = ac.copyPlotElement(srcElement, dstPlot, dsf);
+                PlotElement newp = ac.copyPlotElement(srcElement, dstPlot, null);
                 newElements.add(newp);
                 List<PlotElement> srcKids = srcElement.controller.getChildPlotElements();
                 DataSourceFilter dsf1 = ac.getDataSourceFilterFor(newp);

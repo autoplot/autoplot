@@ -52,7 +52,7 @@ public class Test006 {
     public static void main(String[] args)  {
         try {
 
-            Exception e=null;
+            Exception e=null; // FINDBUGS okay
             e= doTest( 0, "ftp://spdf.gsfc.nasa.gov/pub/data/omni/low_res_omni/omni2_$Y.dat?column=field17&timerange=1963&timeFormat=$Y+$j+$H&time=field0&validMax=999", e );
             //e= doTest( 0, "ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/omni2_$Y.dat?column=field17&timerange=1963&timeFormat=$Y+$j+$H&time=field0&validMax=999", e );
             e= doTest( 1, "vap+dat:file:///home/jbf/ct/hudson/data.backup/dat/A1050412.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD", e );

@@ -42,19 +42,26 @@ public class RegexComponentChooser implements ComponentChooser {
         String text= null;
         if ( comp instanceof Dialog ) {
             text= ((Dialog)comp).getTitle();
-        } else if ( text==null && comp instanceof Frame ) {
+        }
+        if ( text==null && comp instanceof Frame ) {
             text= ((Frame)comp).getTitle();
-        } else if ( text==null && comp instanceof JTextComponent ) {
+        }
+        if ( text==null && comp instanceof JTextComponent ) {
             text= ((JTextComponent)comp).getText();
-        } else if ( text==null && comp instanceof JLabel ) {
+        }
+        if ( text==null && comp instanceof JLabel ) {
             text= ((JLabel)comp).getText();
-        } else if ( text==null && comp instanceof JButton ) {
+        }
+        if ( text==null && comp instanceof JButton ) {
             text= ((JButton)comp).getText();
-        } else if ( text==null && comp instanceof JToggleButton ) {
+        }
+        if ( text==null && comp instanceof JToggleButton ) {
             text= ((JToggleButton)comp).getText();
-        } else if ( text==null && comp instanceof JMenu ) {
+        }
+        if ( text==null && comp instanceof JMenu ) {
             text= ((JMenu)comp).getText();
-        } else if ( text==null && comp instanceof JMenuItem ) {
+        }
+        if ( text==null && comp instanceof JMenuItem ) {
             text= ((JMenuItem)comp).getText();
         }
         String name = comp.getName();
