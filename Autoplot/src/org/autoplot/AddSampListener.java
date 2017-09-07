@@ -124,7 +124,9 @@ public class AddSampListener {
                                 String s1= file.getAbsolutePath();
                                 int i1= s1.lastIndexOf("@");
                                 File nnfile= new File( s1.substring(0,i1) );
-                                file.renameTo( nnfile );
+                                if ( !file.renameTo( nnfile ) ) {
+                                    logger.log(Level.WARNING, "unable to rename resource: {0}", file);
+                                }
                                 s= nnfile.toURI().toASCIIString();                                
                             } catch (MalformedURLException ex) {
                                 logger.log(Level.SEVERE, null, ex);
