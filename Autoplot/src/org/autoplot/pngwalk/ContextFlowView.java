@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.pngwalk;
 
@@ -14,10 +10,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,7 +111,7 @@ public class ContextFlowView extends PngWalkView {
         return new Rectangle(x, y, w, h);
     }
 
-    synchronized BufferedImage getRightImage( Image image, int width, int height, Rectangle bounds ) {
+    private BufferedImage getRightImage( Image image, int width, int height, Rectangle bounds ) {
 
         double magp= useSquashedThumbs ? 0.5 : 0.05;
         
@@ -147,7 +140,7 @@ public class ContextFlowView extends PngWalkView {
 //        }
     }
 
-    synchronized BufferedImage getLeftImage( Image image, int width, int height, Rectangle bounds ) {
+    private BufferedImage getLeftImage( Image image, int width, int height, Rectangle bounds ) {
         double magp=  useSquashedThumbs ? 0.5 : 0.05;
         //Image cacheImage = leftThumbsCache.get(image);
         Image cacheImage = null;
@@ -174,7 +167,7 @@ public class ContextFlowView extends PngWalkView {
 //        }
     }
 
-    private synchronized void maybeTimeStamp(Graphics2D g, Rectangle bounds, String s ) {
+    private void maybeTimeStamp(Graphics2D g, Rectangle bounds, String s ) {
         int fmh = 14; // font metrics height
         if (s != null) {
             g.drawString(s, bounds.x, bounds.y + bounds.height + fmh);
@@ -182,7 +175,7 @@ public class ContextFlowView extends PngWalkView {
     }
     
     @Override
-    protected synchronized void paintComponent(Graphics g1) {
+    protected void paintComponent(Graphics g1) {
 
         if (seq == null)
             return;
