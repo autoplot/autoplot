@@ -3,6 +3,7 @@ package org.autoplot.cdf;
 
 import gov.nasa.gsfc.spdf.cdfj.CDFDataType;
 import gov.nasa.gsfc.spdf.cdfj.CDFException;
+import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import gov.nasa.gsfc.spdf.cdfj.CDFWriter;
 import java.lang.reflect.Array;
 import org.autoplot.datasource.DataSourceUtil;
@@ -66,7 +67,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             if ( units!=null && UnitsUtil.isTimeLocation(units)) {
                 name = "Epoch";
             } else {
-                name = "Variable_" + names.size();
+                name = "Variable_" + seman.size();
             }
         }
         
@@ -90,8 +91,11 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             logger.log(Level.FINE, "create CDF file {0}", ffile);
             logger.log(Level.FINE, "call cdf= new CDFWriter( false )");
             cdf = new CDFWriter( false );
-
         } else {
+            CDFReader read= new CDFReader( ffile.toString() );
+            for ( String n : read.getVariableNames() ) {
+                seman.put( n,null );
+            }
             logger.log(Level.FINE, "call cdf= new CDFWriter( {0}, false )", ffile.toString() );
             cdf = new CDFWriter( ffile.toString(), false ); // read in the old file first
             
@@ -232,7 +236,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         } else if ( Schemes.isBundleDescriptor(ds) ) {
             String[] array= new String[ ds.length() ];
             String[] ss= DataSetOps.bundleNames(ds);
-            int dim=0;
+            int dim=0; // max number of characters
             for ( int i=0; i<ds.length(); i++ ) {
                 String s= (String)ds.property( QDataSet.LABEL, i );
                 if ( s==null ) s= (String)ds.property( QDataSet.NAME, i );
