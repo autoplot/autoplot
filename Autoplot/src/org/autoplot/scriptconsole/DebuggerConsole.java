@@ -116,7 +116,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
      * set the interpreter we to control.
      * @param out 
      */
-    public synchronized void setInterp( PythonInterpreter out ) {
+    public void setInterp( PythonInterpreter out ) {
         this.out= out;
         Py.getSystemState().stdin= new PyFile( pin );
     }
@@ -370,7 +370,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
      * @param expr 
      * @return the evaluation, if possible.
      */
-    private synchronized PyObject setEval( String expr ) {
+    public PyObject setEval( String expr ) {
         expr= expr.trim();
         PyObject lo= out.getLocals();
         if ( lo instanceof PyStringMap ) {
@@ -394,7 +394,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
      * get the evaluation
      * @param expr 
      */
-    private synchronized PyObject getEval() {
+    public PyObject getEval() {
         return printObj;
     }
 
