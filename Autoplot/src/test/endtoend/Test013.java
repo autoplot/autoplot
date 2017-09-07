@@ -432,7 +432,9 @@ public class Test013 {
             SimpleStreamFormatter ssf= new SimpleStreamFormatter();
             QDataSet ds= Util.getDataSet("vap+inline:ripples(5,4)&DEPEND_1=pow(10,linspace(1,3,4))&DEPEND_0=timegen('2013-04-04T00:00','60 sec',5)");
             File f= new File("test013_spectrogram.qds");
-            ssf.format( ds, new FileOutputStream(f),true);
+            try ( OutputStream out= new FileOutputStream(f) ) {
+                ssf.format( ds, out, true );
+            }
             readStream(f);
         } catch (Exception ex) {
             Logger.getLogger(Test013.class.getName()).log(Level.SEVERE, null, ex);
