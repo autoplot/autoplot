@@ -399,7 +399,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
      * initialize the quality control sequence.
      * @param qcFolder URI with the password resolved.
      */
-    protected void initQualitySequence( URI qcFolder ) {
+    protected synchronized void initQualitySequence( URI qcFolder ) {
         try {
             this.qcFolder= qcFolder;
             qualitySeq = new QualityControlSequence(WalkImageSequence.this, qcFolder);
@@ -482,7 +482,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
      * hasn't logged in yet.
      * @return
      */
-    public QualityControlSequence getQualityControlSequence() {
+    public synchronized QualityControlSequence getQualityControlSequence() {
         return this.qualitySeq;
     }
     
@@ -545,7 +545,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
      * </ul>
      * @param s 
      */
-    public void setQCFilter( String s ) {
+    public synchronized void setQCFilter( String s ) {
         if ( s==null ) throw new NullPointerException("qcfilter cannot be null, set to empty string to clear");
         String oldQcFilter= this.qcFilter;
         this.qcFilter= s;
