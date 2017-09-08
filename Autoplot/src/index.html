@@ -24,12 +24,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-09-02 r21299):</p>
+        <p>Bugfixes (2017-09-08 r21372):</p>
         <ul>  
-            <li>RGB Image Renderer allows sloppiness in the units, to avoid runtime error during paint.
             <li>rte 1931288470: matlab_jet_black0 was not properly initialized, causing RTE in some cases.  Thanks, Masafumi!
-            <li>format-to-CDF's append would fail to automatically generate a new name, because it assumed all the CDF file names were in memory.  Thanks, Kristoff!
+            <li>format-to-CDF's append would fail to automatically generate a new name, because it assumed all the CDF variable names were in memory.  Thanks, Kristoff!
             <li>branch of CSV reader would drop the first record.  Thanks, Masafumi!
+            <li>RGB Image Renderer allows sloppiness in the units, to avoid runtime error during paint.
             <li>in-line Jython scripts would show expression as enumerated data, instead of resolving it, because of link(name) failure.
             <li>another round of Findbugs, focusing on unneccessary Thread synchronization and find-single-character in String.
             <li>1884: "import autoplot as ap" was broken since the org.virbo refactoring.
