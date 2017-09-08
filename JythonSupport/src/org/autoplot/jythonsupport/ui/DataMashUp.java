@@ -82,6 +82,7 @@ import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.graph.Renderer;
+import org.das2.qds.ops.Ops;
 
 /**
  * GUI for specifying mashups, where a number of 
@@ -822,13 +823,24 @@ public class DataMashUp extends javax.swing.JPanel {
         
         if ( !data.startsWith("vap+") ) { //TODO: cheesy vap+ to detect URIs.
             int index= -1;
+            String arg0= null;
             if ( parent!=null ) {
                 index= parent.getIndex(mtn);
+                String vv= mtn.toString();
+                if ( Ops.isSafeName(vv) ) {
+                    arg0=vv;
+                }
                 parent.remove(mtn);
+                
             } 
 
             MutableTreeNode n= getTreeNode(data);
 
+            if ( n.getChildCount()>0 ) {
+                if ( Ops.isSafeName(n.getChildAt(0).toString()) && arg0!=null ) {
+                    ((DefaultMutableTreeNode)n.getChildAt(0)).setUserObject(arg0);
+                }
+            }
 //            if ( false ) { // my attempt to replace the first argument with the expression.
 //                if ( n.getChildCount()>0 ) {
 //                    if ( !isChildOf( mtn, n ) ) {
@@ -1025,7 +1037,7 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("mathematics", jPanel1);
@@ -1046,13 +1058,13 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("dataset", jPanel3);
 
         filtersList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "putValues(ds,w,v): replace the values at w with v", "removeValues(ds,w): remove the values at w", "removeValuesGreaterThan(ds,v)", "removeValuesLessThan(ds,v)", "where(c): return the list of indices where the condition is true", "lt(ds1,ds2): return true where ds1 is less than ds2", "le(ds1,ds2): return true where ds1 is less than or equal to ds2", "gt(ds1,ds2): return true where ds1 is greater than ds2", "ge(ds1,ds2): return true where ds1 is greater than or equal to ds2", "eq(ds1,ds2): return true where ds1 is equal to ds2", "ne(ds1,ds2): return true where ds1 is not equal to ds2", "or(ds1,ds2): return true where ds1 or ds2 is true", "and(ds1,ds2): return true where ds1 and ds2 is true" };
+            String[] strings = { "putValues(ds,w,v)", "removeValues(ds,w)", "removeValuesGreaterThan(ds,v)", "removeValuesLessThan(ds,v)", "where(c)", "lt(ds1,ds2)", "le(ds1,ds2)", "gt(ds1,ds2)", "ge(ds1,ds2)", "eq(ds1,ds2)", "ne(ds1,ds2)", "or(ds1,ds2)", "and(ds1,ds2)" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
@@ -1067,7 +1079,7 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("filters", jPanel5);
@@ -1094,7 +1106,7 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         myFunctionsPanelLayout.setVerticalGroup(
             myFunctionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("my functions", myFunctionsPanel);
@@ -1119,7 +1131,7 @@ public class DataMashUp extends javax.swing.JPanel {
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addGap(3, 3, 3)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
                 .addGap(3, 3, 3))
         );
 
@@ -1130,7 +1142,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
-                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE)
+                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 413, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addComponent(jTabbedPane1))
@@ -1142,7 +1154,7 @@ public class DataMashUp extends javax.swing.JPanel {
                 .addGap(0, 294, Short.MAX_VALUE))
             .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
-                    .addGap(32, 32, 32)
+                    .addGap(23, 23, 23)
                     .addComponent(jTabbedPane1)))
         );
 
@@ -1326,6 +1338,22 @@ public class DataMashUp extends javax.swing.JPanel {
         plotExpr();
     }//GEN-LAST:event_plotMenuItemActionPerformed
 
+    private void timeRangeRecentComboBoxFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_timeRangeRecentComboBoxFocusLost
+        try {
+            namedURIListTool1.setTimeRange( DatumRangeUtil.parseTimeRange(timeRangeRecentComboBox.getText()));
+        } catch (ParseException ex) {
+            Logger.getLogger(DataMashUp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_timeRangeRecentComboBoxFocusLost
+
+    private void timeRangeRecentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeRecentComboBoxActionPerformed
+        try {
+            namedURIListTool1.setTimeRange( DatumRangeUtil.parseTimeRange(timeRangeRecentComboBox.getText()));
+        } catch (ParseException ex) {
+            Logger.getLogger(DataMashUp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_timeRangeRecentComboBoxActionPerformed
+
     private void scratchListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_scratchListMouseClicked
         if ( jTabbedPane1.getSelectedComponent()==myFunctionsPanel ) {
             if ( evt.isPopupTrigger() ) {
@@ -1349,22 +1377,6 @@ public class DataMashUp extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_scratchListMousePressed
-
-    private void timeRangeRecentComboBoxFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_timeRangeRecentComboBoxFocusLost
-        try {
-            namedURIListTool1.setTimeRange( DatumRangeUtil.parseTimeRange(timeRangeRecentComboBox.getText()));
-        } catch (ParseException ex) {
-            Logger.getLogger(DataMashUp.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_timeRangeRecentComboBoxFocusLost
-
-    private void timeRangeRecentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeRecentComboBoxActionPerformed
-        try {
-            namedURIListTool1.setTimeRange( DatumRangeUtil.parseTimeRange(timeRangeRecentComboBox.getText()));
-        } catch (ParseException ex) {
-            Logger.getLogger(DataMashUp.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_timeRangeRecentComboBoxActionPerformed
 
     private void checkForTSB() {
         String[] suris= namedURIListTool1.getUris();
