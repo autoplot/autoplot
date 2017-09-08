@@ -242,7 +242,7 @@ public class DataMashUp extends javax.swing.JPanel {
         scratchList.setCellRenderer( myListCellRenderer );
         allList.setCellRenderer( myListCellRenderer );
         
-        String data = "ds";
+        String data = "ds1";
         TreePath tp= new TreePath( ( (DefaultMutableTreeNode) expressionTree.getModel().getRoot() ).getPath() );
         doDrop(data,tp);
         
@@ -718,6 +718,7 @@ public class DataMashUp extends javax.swing.JPanel {
         List<String> uris= new ArrayList<>();
         boolean haveAllIds= false;
         String timerange= null;
+        boolean synch= false;
         for ( String s: ss ) {
             if ( s.trim().length()==0 ) continue;
             int i= s.indexOf("=");
@@ -758,9 +759,9 @@ public class DataMashUp extends javax.swing.JPanel {
                         }
                     }
                 } else if ( s.contains("synchronize(") ) {
-                    synchronizeCB.setSelected(true);
+                    synch=true;
                 } else if ( s.contains("synchronizeOne(") ) {
-                    synchronizeCB.setSelected(true);                    
+                    synch=true;
                 } else {
                      if ( s.substring(0,i).trim().equals("timerange") ) {
                         timerange= s.substring(i+1).trim();
@@ -777,6 +778,8 @@ public class DataMashUp extends javax.swing.JPanel {
                 fillTree( s );
             }
         }
+        synchronizeCB.setSelected(synch);
+        
         if ( haveAllIds==false ) {
             setIds(ids);
             setUris(uris);            
