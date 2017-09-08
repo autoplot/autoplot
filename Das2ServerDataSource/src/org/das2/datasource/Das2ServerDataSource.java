@@ -58,45 +58,46 @@ import org.das2.qstream.QDataSetStreamHandler;
 
 /**
  * DataSource for communicating with Das2servers.
+ *
  * @author jbf
  */
 public class Das2ServerDataSource extends AbstractDataSource {
 
-    private static final Map<String,String> keys= new HashMap();
-    
+    private static final Map<String, String> keys = new HashMap();
+
     public Das2ServerDataSource(URI uri) throws ParseException {
         super(uri);
-        if ( !"no".equals( params.get("tsb") ) ) {
-            addCapability( TimeSeriesBrowse.class, getTimeSeriesBrowse() );
+        if (!"no".equals(params.get("tsb"))) {
+            addCapability(TimeSeriesBrowse.class, getTimeSeriesBrowse());
         }
-        HashMap<String,String> params2 = new HashMap(params);
+        HashMap<String, String> params2 = new HashMap(params);
         params2.put("server", "dataset");
-        
-        if ( params.get("dataset")==null ) {
-            String dataset= params.remove("arg_0");
-            if ( dataset!=null ) {
-                params.put( "dataset", dataset );
-                params2.put( "dataset", dataset );
+
+        if (params.get("dataset") == null) {
+            String dataset = params.remove("arg_0");
+            if (dataset != null) {
+                params.put("dataset", dataset);
+                params2.put("dataset", dataset);
                 params2.remove("arg_0");
             }
         }
-                
-        String str= params.get("timerange");
-        if ( str!=null ) {
-            str= str.replaceAll("\\+"," ");
+
+        String str = params.get("timerange");
+        if (str != null) {
+            str = str.replaceAll("\\+", " ");
             try {
-                DatumRange tr= DatumRangeUtil.parseTimeRange( str );
-                params2.put( "start_time", tr.min().toString() );
-                params2.put( "end_time", tr.max().toString() );  
+                DatumRange tr = DatumRangeUtil.parseTimeRange(str);
+                params2.put("start_time", tr.min().toString());
+                params2.put("end_time", tr.max().toString());
                 params2.remove("timerange");
             } catch (ParseException ex) {
                 logger.log(Level.WARNING, "unable to parse timerange {0}", str);
             }
         } else {
-            
+
         }
 
-        Map<String,String> otherParams= new LinkedHashMap( params );
+        Map<String, String> otherParams = new LinkedHashMap(params);
         otherParams.remove("start_time");
         otherParams.remove("end_time");
         otherParams.remove("resolution");
@@ -109,29 +110,29 @@ public class Das2ServerDataSource extends AbstractDataSource {
         otherParams.remove("interval");
         otherParams.remove("key");
 
-        dsParams= (String)  URISplit.formatParams(otherParams);
-        
-        if ( params2.get("start_time")!=null && params2.get("end_time")!=null ) {
-            timeRange= new DatumRange( Units.us2000.parse( params2.get("start_time") ), Units.us2000.parse( params2.get("end_time") ) );
+        dsParams = (String) URISplit.formatParams(otherParams);
+
+        if (params2.get("start_time") != null && params2.get("end_time") != null) {
+            timeRange = new DatumRange(Units.us2000.parse(params2.get("start_time")), Units.us2000.parse(params2.get("end_time")));
         }
 
-        resolution= null;
-        if ( params2.get("resolution")!=null ) {
-            resolution= Units.seconds.parse( params2.get("resolution") );
+        resolution = null;
+        if (params2.get("resolution") != null) {
+            resolution = Units.seconds.parse(params2.get("resolution"));
         }
 
     }
 
-    private static final Logger logger= LoggerManager.getLogger("apdss.das2server");
+    private static final Logger logger = LoggerManager.getLogger("apdss.das2server");
 
     DatumRange timeRange;
     Datum resolution;
     String dsParams;
     List<String> tcaDesc;
-    Map dsdfParams=null;
+    Map dsdfParams = null;
 
     @Override
-    public synchronized QDataSet getDataSet( final ProgressMonitor mon ) throws Exception {
+    public synchronized QDataSet getDataSet(final ProgressMonitor mon) throws Exception {
         //http://www-pw.physics.uiowa.edu/das/das2Server
         //?dataset=das2_1/voyager1/pws/sa-4s-pf.new
         //&start_time=2004-01-01&end_time=2004-01-06&server=dataset&ascii=1
@@ -144,11 +145,10 @@ public class Das2ServerDataSource extends AbstractDataSource {
         //&server=dataset
         //&interval=300.0    // interval in seconds
         //&ascii=1'
-
         mon.started();
-        
-        Map<String,String> params2 = new LinkedHashMap();
-        Map<String,String> otherParams= new LinkedHashMap( params );
+
+        Map<String, String> params2 = new LinkedHashMap();
+        Map<String, String> otherParams = new LinkedHashMap(params);
         otherParams.remove("start_time");
         otherParams.remove("end_time");
         otherParams.remove("resolution");
@@ -157,92 +157,93 @@ public class Das2ServerDataSource extends AbstractDataSource {
         otherParams.remove("timerange");
         otherParams.remove("_res");      // =0.0 means use native resolution
         otherParams.remove("intrinsic"); // =true means use native resolution
-                
 
-        String item= (String) otherParams.remove("item");
-        String interval= (String)otherParams.remove("interval");
-        String key1= (String) otherParams.remove("key");
+        String item = (String) otherParams.remove("item");
+        String interval = (String) otherParams.remove("interval");
+        String key1 = (String) otherParams.remove("key");
 
-        dsParams= (String)  URISplit.formatParams(otherParams);
+        dsParams = (String) URISplit.formatParams(otherParams);
 
         params2.put("server", "dataset");
-        if ( timeRange!=null ) {
-            params2.put("start_time", URLEncoder.encode(timeRange.min().toString(), "US-ASCII") );
-            params2.put("end_time", URLEncoder.encode(timeRange.max().toString(), "US-ASCII") );
+        if (timeRange != null) {
+            params2.put("start_time", URLEncoder.encode(timeRange.min().toString(), "US-ASCII"));
+            params2.put("end_time", URLEncoder.encode(timeRange.max().toString(), "US-ASCII"));
         } else {
             throw new IllegalArgumentException("timeRange is null");
         }
 
         // optional explicit resolution
-        String sresolution= params.get("_res");
-        if ( sresolution!=null ) {
+        String sresolution = params.get("_res");
+        if (sresolution != null) {
             params2.remove("_res");
         }
-        if ( "true".equals(params.get("intrinsic")) ) {
-            sresolution= "0";
+        if ("true".equals(params.get("intrinsic"))) {
+            sresolution = "0";
             params2.remove("intrinsic");
         }
 
-        if ( sresolution!=null ) {
-            if ( sresolution.trim().length()==0 || sresolution.equals("0") ) {
-                resolution= null;
+        if (sresolution != null) {
+            if (sresolution.trim().length() == 0 || sresolution.equals("0")) {
+                resolution = null;
             } else {
-                resolution= Units.seconds.parse(sresolution);
+                resolution = Units.seconds.parse(sresolution);
             }
         }
 
-        if ( resolution!=null ) {
-            params2.put("resolution", ""+resolution.doubleValue(Units.seconds) );
+        if (resolution != null) {
+            params2.put("resolution", "" + resolution.doubleValue(Units.seconds));
         } else {
             logger.fine("resolution is not available, loading at intrinsic resolution");
         }
-        String dataset= params.get("dataset");
-        if ( dataset==null ) {
-            dataset= params.get("arg_0");
+        String dataset = params.get("dataset");
+        if (dataset == null) {
+            dataset = params.get("arg_0");
         }
-        
-        if ( dataset==null ) {
+
+        if (dataset == null) {
             throw new IllegalArgumentException("dataset is not specified");
         }
-        
-        mon.setProgressMessage("request "+dataset );
 
-        if ( interval!=null ) { // TCAs use interval parameter
+        mon.setProgressMessage("request " + dataset);
+
+        if (interval != null) { // TCAs use interval parameter
             logger.finer("dataset is a TCA, so do not use resolution");
             // this is dicey.  interval is now replaced with a value based on the
             // resolution.
-            
+
             double dsec;
-            if ( resolution==null ) {
-                dsec= Double.parseDouble(interval);
+            if (resolution == null) {
+                dsec = Double.parseDouble(interval);
             } else {
-                dsec= resolution.doubleValue(Units.seconds);
+                dsec = resolution.doubleValue(Units.seconds);
             }
-            
-            int iinterval= (int)dsec;
-            if ( iinterval<1 ) iinterval= 1;
-            
-            params2.put("interval",URLEncoder.encode(String.valueOf( iinterval ), "US-ASCII"));
+
+            int iinterval = (int) dsec;
+            if (iinterval < 1) {
+                iinterval = 1;
+            }
+
+            params2.put("interval", URLEncoder.encode(String.valueOf(iinterval), "US-ASCII"));
             params2.remove("resolution");
         } else {
             logger.finer("dataset is not a TCA, interval parameter is null");
         }
-        
-        params2.put("dataset", URLEncoder.encode(dataset, "US-ASCII") );
-        if ( dsParams.length()>0 ) {
-            if ( dsParams.contains("+-") && !dsParams.startsWith("+") ) {
-                params2.put("params", dsParams ); // somebody already encoded it.
+
+        params2.put("dataset", URLEncoder.encode(dataset, "US-ASCII"));
+        if (dsParams.length() > 0) {
+            if (dsParams.contains("+-") && !dsParams.startsWith("+")) {
+                params2.put("params", dsParams); // somebody already encoded it.
             } else {
-                params2.put("params", URLEncoder.encode(dsParams,"US-ASCII") );
+                params2.put("params", URLEncoder.encode(dsParams, "US-ASCII"));
             }
         }
         URL url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
 
         //if ( interval!=null && tcaDesc==null ) {
-        if ( true ) {
-            if ( dsdfParams==null ) {
-                String dsdfURL= this.resourceURI + "?server=dsdf&dataset=" + dataset;
-                URL url3= new URL( dsdfURL );
+        if (true) {
+            if (dsdfParams == null) {
+                String dsdfURL = this.resourceURI + "?server=dsdf&dataset=" + dataset;
+                URL url3 = new URL(dsdfURL);
                 logger.log(Level.FINE, "opening {0}", url3);
                 //URLConnection c= url3.openConnection();
                 //c.setRequestProperty( "User-agent", "" );
@@ -250,9 +251,9 @@ public class Das2ServerDataSource extends AbstractDataSource {
 
                 ReadableByteChannel channel = Channels.newChannel(in);
 
-                final Map map= new LinkedHashMap();
+                final Map map = new LinkedHashMap();
 
-                DataSetStreamHandler handler = new DataSetStreamHandler( new HashMap(), mon ) {
+                DataSetStreamHandler handler = new DataSetStreamHandler(new HashMap(), mon) {
                     @Override
                     public void streamDescriptor(StreamDescriptor sd) throws StreamException {
                         super.streamDescriptor(sd);
@@ -261,326 +262,335 @@ public class Das2ServerDataSource extends AbstractDataSource {
                 };
                 try {
                     StreamTool.readStream(channel, handler);
-                } catch ( StreamException ex ) {
-                    if ( ex.getMessage().equals("noSuchDataSet") ) {
-                        throw new StreamException("noSuchDataSet: "+dataset );
+                } catch (StreamException ex) {
+                    if (ex.getMessage().equals("noSuchDataSet")) {
+                        throw new StreamException("noSuchDataSet: " + dataset);
                     } else {
-                        throw new StreamException(ex.getMessage()+"\ndsdf request was\n"+url3);
+                        throw new StreamException(ex.getMessage() + "\ndsdf request was\n" + url3);
                     }
                 } finally {
                     channel.close();
                 }
-                
-                dsdfParams= map;
+
+                dsdfParams = map;
             }
 
-            tcaDesc=new ArrayList<>();
+            tcaDesc = new ArrayList<>();
 
-            int iplane=0;
-            String label= (String)dsdfParams.get("label");
-            while ( label!=null ) {
+            int iplane = 0;
+            String label = (String) dsdfParams.get("label");
+            while (label != null) {
                 tcaDesc.add(label);
                 iplane++;
-                label= (String)dsdfParams.get("plane_"+iplane+".label");
+                label = (String) dsdfParams.get("plane_" + iplane + ".label");
             }
 
-            String groupAccess= (String)dsdfParams.get("groupAccess" );
-            if ( groupAccess!=null && groupAccess.trim().length()>0 ) {
-                if ( key1==null ) {
+            String groupAccess = (String) dsdfParams.get("groupAccess");
+            if (groupAccess != null && groupAccess.trim().length() > 0) {
+                if (key1 == null) {
                     //keys.clear();
-                    String k= this.resourceURI.toString()+"?"+ params.get("dataset");
-                    String t= keys.get( k );
+                    String k = this.resourceURI.toString() + "?" + params.get("dataset");
+                    String t = keys.get(k);
                     //String t= null; // TODO: See if we can keep track of keys for jython scripts.  See sftp://jbf@klunk/home/jbf/project/cassini/production/devel/autoplot/jyds/cassini.jyds?timerange=2014-12-10+21:18+to+23:29&bg=F
-                    if ( t==null ) {
+                    if (t == null) {
                         Authenticator authenticator;
-                        authenticator= new Authenticator( DasServer.create(this.resourceURI.toURL()),groupAccess);
-                        Key key2= authenticator.authenticate();
-                        if ( key2!=null ) {
-                            params2.put("key", key2.toString() );
-                            url2= new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
-                            keys.put( k, key2.toString() );
+                        authenticator = new Authenticator(DasServer.create(this.resourceURI.toURL()), groupAccess);
+                        Key key2 = authenticator.authenticate();
+                        if (key2 != null) {
+                            params2.put("key", key2.toString());
+                            url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
+                            keys.put(k, key2.toString());
                         }
                     } else {
-                        params2.put("key", t );
-                        url2= new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
+                        params2.put("key", t);
+                        url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
                     }
                 } else {
-                    params2.put("key", key1 );
-                    url2= new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
+                    params2.put("key", key1);
+                    url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
                 }
             }
-            
+
         }
 
-        boolean qds= "1".equals( dsdfParams.get("qstream") );
-        
-        logger.log( Level.FINE, "opening {0} {1}", new Object[]{ qds ? "as qstream" : "as das2stream", url2 });
-        
-		  // Allow response bodies that are Das2 streams or QStreams to be processed
-		  // normally even when the HTTP Status code indicates an error.  This is to handle
-		  // errors that are packaged properly.
-		  InputStream in = null;
-		  URLConnection conn = url2.openConnection();
-                  conn.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
-                  conn.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
-		  if(conn instanceof HttpURLConnection){
-		     HttpURLConnection httpConn = (HttpURLConnection) conn;
-			  int nStatus = httpConn.getResponseCode();
-                          while ( nStatus==401 ) {
-                                //URL keyChainUrl= new URL( url2.getProtocol() + "://user@" + url2.getHost() + url2.getPath() + "/" + params2.get("dataset" ) );
-                                //String userInfo= KeyChain.getDefault().getUserInfo(keyChainUrl);
+        boolean qds = "1".equals(dsdfParams.get("qstream"));
 
-                                org.das2.util.CredentialsManager cm= org.das2.util.CredentialsManager.getMannager();
-                                String sLocId;
+        logger.log(Level.FINE, "opening {0} {1}", new Object[]{qds ? "as qstream" : "as das2stream", url2});
 
-                                String readAccessGroup;
-                                String auth= httpConn.getHeaderField("WWW-Authenticate");
-                                Pattern p= Pattern.compile("Basic realm=\"(.*)\"");
-                                Matcher m= p.matcher(auth);
-                                if ( m.matches() ) {
-                                    readAccessGroup= m.group(1);
-                                } else {
-                                    readAccessGroup= "das2 server";
-                                }
-                                
-                                sLocId= this.resourceURI.toURL().toString() + "|" + readAccessGroup;
-                                //String sLocId = "planet.physics.uiowa.edu/das/das2Server|voyager1/pwi/SpecAnalyzer-4s-Efield";
-                                if(!cm.hasCredentials(sLocId)){
-                                    DasServer svr = DasServer.create(this.resourceURI.toURL());
-                                    String sDesc = String.format("<html><h3>%s</h3><hr>Server: <b>%s</b><br>"+ "Data Set: <b>%s</b>",
-                                         svr.getName(), svr.getHost(),
-                                         dataset );
-                                    cm.setDescription(sLocId, sDesc, svr.getLogo() );
-                                }
-                                String sHash = cm.getHttpBasicHash(sLocId);
-                                if ( sHash==null ) {
-                                    throw new java.io.IOException("User credentials are not available "+
-					  " for URL: " + url2);
-                                }
-                                //String sHashRaw=  cm.getHttpBasicHashRaw(sLocId);
-                                //KeyChain.getDefault().setUserInfo( keyChainUrl, sHashRaw );
-                                
-                                conn = url2.openConnection(); //TODO: stderr should be consumed.
-                                conn.setRequestProperty("Authorization", "Basic " + sHash );
-                                conn.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
-                                conn.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
-                                httpConn = (HttpURLConnection) conn;
-                                nStatus = httpConn.getResponseCode();
-                                if ( nStatus==401 ){
-                                    cm.invalidate(sLocId);
-                                }
-                          }
-                                
-                              
-			  if(nStatus >= 400){
-			     String sMime = httpConn.getContentType();
-				  
-				  // if this isn't a Das2 stream or QStream, go ahead and throw
-			     if( ! MIME.isDataStream(sMime)) 
-					  throw new java.io.IOException("Server returned HTTP response code: "+
-					  nStatus + " for URL: " + url2);
-				  else
-				     in = httpConn.getErrorStream();
-				}
-		   }
-		   if(in == null) in = conn.getInputStream();
-		  
+        // Allow response bodies that are Das2 streams or QStreams to be processed
+        // normally even when the HTTP Status code indicates an error.  This is to handle
+        // errors that are packaged properly.
+        InputStream in = null;
+        URLConnection conn = url2.openConnection();
+        conn.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
+        conn.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
+        if (conn instanceof HttpURLConnection) {
+            HttpURLConnection httpConn = (HttpURLConnection) conn;
+            int nStatus = httpConn.getResponseCode();
+            while (nStatus == 401) {
+                //URL keyChainUrl= new URL( url2.getProtocol() + "://user@" + url2.getHost() + url2.getPath() + "/" + params2.get("dataset" ) );
+                //String userInfo= KeyChain.getDefault().getUserInfo(keyChainUrl);
+
+                org.das2.util.CredentialsManager cm = org.das2.util.CredentialsManager.getMannager();
+                String sLocId;
+
+                String readAccessGroup;
+                String auth = httpConn.getHeaderField("WWW-Authenticate");
+                Pattern p = Pattern.compile("Basic realm=\"(.*)\"");
+                Matcher m = p.matcher(auth);
+                if (m.matches()) {
+                    readAccessGroup = m.group(1);
+                } else {
+                    readAccessGroup = "das2 server";
+                }
+
+                sLocId = this.resourceURI.toURL().toString() + "|" + readAccessGroup;
+                //String sLocId = "planet.physics.uiowa.edu/das/das2Server|voyager1/pwi/SpecAnalyzer-4s-Efield";
+                if (!cm.hasCredentials(sLocId)) {
+                    DasServer svr = DasServer.create(this.resourceURI.toURL());
+                    String sDesc = String.format("<html><h3>%s</h3><hr>Server: <b>%s</b><br>" + "Data Set: <b>%s</b>",
+                        svr.getName(), svr.getHost(),
+                        dataset);
+                    cm.setDescription(sLocId, sDesc, svr.getLogo());
+                }
+                String sHash = cm.getHttpBasicHash(sLocId);
+                if (sHash == null) {
+                    throw new java.io.IOException("User credentials are not available "
+                        + " for URL: " + url2);
+                }
+                //String sHashRaw=  cm.getHttpBasicHashRaw(sLocId);
+                //KeyChain.getDefault().setUserInfo( keyChainUrl, sHashRaw );
+
+                conn = url2.openConnection(); //TODO: stderr should be consumed.
+                conn.setRequestProperty("Authorization", "Basic " + sHash);
+                conn.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
+                conn.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
+                httpConn = (HttpURLConnection) conn;
+                nStatus = httpConn.getResponseCode();
+                if (nStatus == 401) {
+                    cm.invalidate(sLocId);
+                }
+            }
+
+            if (nStatus >= 400) {
+                String sMime = httpConn.getContentType();
+
+                // if this isn't a Das2 stream or QStream, go ahead and throw
+                if (!MIME.isDataStream(sMime)) {
+                    throw new java.io.IOException("Server returned HTTP response code: "
+                        + nStatus + " for URL: " + url2);
+                } else {
+                    in = httpConn.getErrorStream();
+                }
+            }
+        }
+        if (in == null) {
+            in = conn.getInputStream();
+        }
+
         final DasProgressMonitorInputStream mpin = new DasProgressMonitorInputStream(in, mon);
 
         ReadableByteChannel channel = Channels.newChannel(mpin);
 
         QDataSet result1;
 
-        mon.setProgressMessage("reading "+dataset);
-        
-        String techContact= (String)dsdfParams.get("techContact");
-        if (techContact==null ) {
-            techContact="";
+        mon.setProgressMessage("reading " + dataset);
+
+        String techContact = (String) dsdfParams.get("techContact");
+        if (techContact == null) {
+            techContact = "";
         } else {
-            techContact="\nTechnical Contact: "+techContact;
+            techContact = "\nTechnical Contact: " + techContact;
         }
-        
-        if ( qds ) {
+
+        if (qds) {
 
             try {
-                org.das2.qstream.QDataSetStreamHandler eh= new org.das2.qstream.QDataSetStreamHandler();
-                org.das2.qstream.StreamTool.readStream( channel,eh );
+                org.das2.qstream.QDataSetStreamHandler eh = new org.das2.qstream.QDataSetStreamHandler();
+                org.das2.qstream.StreamTool.readStream(channel, eh);
 
-                result1= eh.getDataSet();
+                result1 = eh.getDataSet();
 
                 // check if we can flatten rank 2 join that comes from aggregation
-                if ( QDataSetStreamHandler.isFlattenableJoin(result1) ) {
-                    result1= eh.flattenJoin(result1);
+                if (QDataSetStreamHandler.isFlattenableJoin(result1)) {
+                    result1 = eh.flattenJoin(result1);
                 }
-                
-            } catch ( org.das2.qstream.StreamException ex ) {
-                Throwable cause= ex.getCause();
-                if ( !mon.isFinished() ) mon.finished(); // the stream reader probably called it already.
-                if ( cause!=null && ( cause instanceof java.io.InterruptedIOException ) ) { 
-                    logger.log( Level.WARNING, ex.getMessage(), ex );
+
+            } catch (org.das2.qstream.StreamException ex) {
+                Throwable cause = ex.getCause();
+                if (!mon.isFinished()) {
+                    mon.finished(); // the stream reader probably called it already.
+                }
+                if (cause != null && (cause instanceof java.io.InterruptedIOException)) {
+                    logger.log(Level.WARNING, ex.getMessage(), ex);
                     //TODO CancelledOperationException
-                    throw (java.io.InterruptedIOException)ex.getCause();
-                } else if ( cause!=null && ( cause instanceof org.das2.dataset.NoDataInIntervalException )) {
-                    throw (org.das2.dataset.NoDataInIntervalException)ex.getCause();
-                } else if ( ex.getMessage().contains("Empty response from reader")  ) {
-                    throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage()+techContact );
-                } else if ( ex.getMessage().contains("No data found") ) {
+                    throw (java.io.InterruptedIOException) ex.getCause();
+                } else if (cause != null && (cause instanceof org.das2.dataset.NoDataInIntervalException)) {
+                    throw (org.das2.dataset.NoDataInIntervalException) ex.getCause();
+                } else if (ex.getMessage().contains("Empty response from reader")) {
+                    throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage() + techContact);
+                } else if (ex.getMessage().contains("No data found")) {
                     throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage());
                 } else {
-                    throw new StreamException( ex.getMessage()+ "\ndataset request was\n"+url2+techContact );
+                    throw new StreamException(ex.getMessage() + "\ndataset request was\n" + url2 + techContact);
                 }
             }
-            
+
         } else {
             DataSetStreamHandler handler = new DataSetStreamHandler(new HashMap(), mon) {
 
                 @Override
                 public void streamDescriptor(StreamDescriptor sd) throws StreamException {
                     super.streamDescriptor(sd);
-                    if ( mon.getTaskSize() != -1) { // progress messages are on the stream.
-                       mpin.setEnableProgressPosition(false);
+                    if (mon.getTaskSize() != -1) { // progress messages are on the stream.
+                        mpin.setEnableProgressPosition(false);
                     }
                 }
             };
 
             try {
                 StreamTool.readStream(channel, handler);
-            } catch ( StreamException ex ) {
+            } catch (StreamException ex) {
                 mon.finished();
-                Throwable cause= ex.getCause();
-                if ( ex.getCause()!=null && ( ex.getCause() instanceof java.io.InterruptedIOException ) ) {
-                    logger.log( Level.INFO, ex.getMessage(), ex );
-                    if ( ex.getMessage().contains("Operation cancelled") ) { // TODO: nasty getMessage...
+                Throwable cause = ex.getCause();
+                if (ex.getCause() != null && (ex.getCause() instanceof java.io.InterruptedIOException)) {
+                    logger.log(Level.INFO, ex.getMessage(), ex);
+                    if (ex.getMessage().contains("Operation cancelled")) { // TODO: nasty getMessage...
                         throw new CancelledOperationException(techContact);
                     } else {
-                        throw (java.io.InterruptedIOException)ex.getCause();
+                        throw (java.io.InterruptedIOException) ex.getCause();
                     }
-                 }else if ( cause!=null && ( cause instanceof org.das2.dataset.NoDataInIntervalException )) {
-                    throw (org.das2.dataset.NoDataInIntervalException)ex.getCause();
-                } else if ( ex.getMessage().contains("Empty response from reader")  ) {
-                    throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage()+" " +techContact );
-                } else if ( ex.getMessage().contains("No data found") ) {
+                } else if (cause != null && (cause instanceof org.das2.dataset.NoDataInIntervalException)) {
+                    throw (org.das2.dataset.NoDataInIntervalException) ex.getCause();
+                } else if (ex.getMessage().contains("Empty response from reader")) {
+                    throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage() + " " + techContact);
+                } else if (ex.getMessage().contains("No data found")) {
                     throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage());
                 } else {
-                    ex= new StreamException( ex.getMessage()+ "\ndataset request was \n"+url2+" " +techContact );
-                    logger.log( Level.INFO, ex.getMessage(), ex );
+                    ex = new StreamException(ex.getMessage() + "\ndataset request was \n" + url2 + " " + techContact);
+                    logger.log(Level.INFO, ex.getMessage(), ex);
                     throw ex;
                 }
             }
 
-            if ( !mon.isFinished() ) mon.finished(); // I don't believe the das2stream reader calls finished.
-
+            if (!mon.isFinished()) {
+                mon.finished(); // I don't believe the das2stream reader calls finished.
+            }
             DataSet ds = handler.getDataSet();
 
-            if ( ds==null ) {
+            if (ds == null) {
                 return null;
             }
 
-            if ( ds.getXLength()==0 ) {
+            if (ds.getXLength() == 0) {
                 throw new RuntimeException("empty dataset returned");
             }
-            
+
             MutablePropertyDataSet result;
-            if ( item==null || item.equals("") ) {
-                result= DataSetAdapter.create(ds); //TODO: danger if it has TCA planes, it will return bundle.  Probably not what we want.
+            if (item == null || item.equals("")) {
+                result = DataSetAdapter.create(ds); //TODO: danger if it has TCA planes, it will return bundle.  Probably not what we want.
             } else {
                 DataSet das2ds;
-                das2ds= ds.getPlanarView( item );
+                das2ds = ds.getPlanarView(item);
                 //TODO: there's a bug where item=x shows where the 0th item label is always used.
-                if ( das2ds==null ) {
-                    if ( item.contains(",") ) {
-                        BundleDataSet bds=null;
-                        String[] ss= item.split(",");
-                        for ( String s: ss ) {
-                            das2ds= ds.getPlanarView( s );
-                            if ( das2ds==null ) {
-                                int iitem= Integer.parseInt(s);
-                                if ( iitem==0 ) {
-                                    das2ds= ds.getPlanarView( "" );
+                if (das2ds == null) {
+                    if (item.contains(",")) {
+                        BundleDataSet bds = null;
+                        String[] ss = item.split(",");
+                        for (String s : ss) {
+                            das2ds = ds.getPlanarView(s);
+                            if (das2ds == null) {
+                                int iitem = Integer.parseInt(s);
+                                if (iitem == 0) {
+                                    das2ds = ds.getPlanarView("");
                                 } else {
-                                    das2ds= ds.getPlanarView( "plane_"+iitem );
+                                    das2ds = ds.getPlanarView("plane_" + iitem);
                                 }
                             }
-                            QDataSet bds1= DataSetAdapter.create( das2ds ); 
-                            bds= (BundleDataSet) Ops.bundle( bds, bds1 );
+                            QDataSet bds1 = DataSetAdapter.create(das2ds);
+                            bds = (BundleDataSet) Ops.bundle(bds, bds1);
                         }
-                        result= bds;
+                        result = bds;
                     } else {
                         try {
-                            int iitem= Integer.parseInt(item);
-                            if ( iitem==0 ) {
-                                das2ds= ds.getPlanarView( "" );
+                            int iitem = Integer.parseInt(item);
+                            if (iitem == 0) {
+                                das2ds = ds.getPlanarView("");
                             } else {
-                                das2ds= ds.getPlanarView( "plane_"+iitem );
+                                das2ds = ds.getPlanarView("plane_" + iitem);
                             }
-                            if ( das2ds==null ) {
-                                String[] ss= ds.getPlaneIds();
-                                das2ds= ds.getPlanarView( ss[iitem] );
+                            if (das2ds == null) {
+                                String[] ss = ds.getPlaneIds();
+                                das2ds = ds.getPlanarView(ss[iitem]);
                             }
-                            if ( das2ds==null ) throw new IllegalArgumentException("no such plane, looking for " + item  );
-                            result= DataSetAdapter.create( das2ds ); // fragile                
-                        } catch ( NumberFormatException ex ) {
-                            throw new IllegalArgumentException("unable to find component \""+item+"\"" );
+                            if (das2ds == null) {
+                                throw new IllegalArgumentException("no such plane, looking for " + item);
+                            }
+                            result = DataSetAdapter.create(das2ds); // fragile                
+                        } catch (NumberFormatException ex) {
+                            throw new IllegalArgumentException("unable to find component \"" + item + "\"");
                         }
                     }
                 } else {
-                    result= DataSetAdapter.create( das2ds ); // fragile
+                    result = DataSetAdapter.create(das2ds); // fragile
                 }
             }
 
-            if ( tcaDesc!=null && tcaDesc.size()>0 ) {
-                if ( item==null || item.equals("") || item.equals("0") ) {
-                    QDataSet bds= (QDataSet)result.property(QDataSet.BUNDLE_1);
-                    if ( bds!=null && bds instanceof BundleDescriptor ) {
-                        BundleDescriptor bds1= (BundleDescriptor)bds;
-                        for ( int i=0; i<bds1.length(); i++ ) {
-                            bds1.putProperty( QDataSet.LABEL, i, tcaDesc.get(i) );
+            if (tcaDesc != null && tcaDesc.size() > 0) {
+                if (item == null || item.equals("") || item.equals("0")) {
+                    QDataSet bds = (QDataSet) result.property(QDataSet.BUNDLE_1);
+                    if (bds != null && bds instanceof BundleDescriptor) {
+                        BundleDescriptor bds1 = (BundleDescriptor) bds;
+                        for (int i = 0; i < bds1.length(); i++) {
+                            bds1.putProperty(QDataSet.LABEL, i, tcaDesc.get(i));
                         }
                     } else {
-                        result.putProperty( QDataSet.LABEL, tcaDesc.get(0) );
+                        result.putProperty(QDataSet.LABEL, tcaDesc.get(0));
                     }
                 } else {
-                    if ( !item.contains(",") ) {
-                        result.putProperty( QDataSet.LABEL, tcaDesc.get( Integer.parseInt(item) ) );
+                    if (!item.contains(",")) {
+                        result.putProperty(QDataSet.LABEL, tcaDesc.get(Integer.parseInt(item)));
                     }
                 }
             }
-            result1= result;
+            result1 = result;
 
         }
 
         logger.fine("  done. ");
 
         try {
-            String prop= QDataSet.DEPEND_0;
-            QDataSet dep= (QDataSet) result1.property( prop );
-            if ( dep==null ) {
-                prop= QDataSet.JOIN_0;
-                Object o= result1.property( prop );
-                if ( o instanceof QDataSet ) {
-                    dep= (QDataSet) o;
+            String prop = QDataSet.DEPEND_0;
+            QDataSet dep = (QDataSet) result1.property(prop);
+            if (dep == null) {
+                prop = QDataSet.JOIN_0;
+                Object o = result1.property(prop);
+                if (o instanceof QDataSet) {
+                    dep = (QDataSet) o;
                 }
             }
-            if ( dep!=null && dep.property( QDataSet.CACHE_TAG )== null ) {
+            if (dep != null && dep.property(QDataSet.CACHE_TAG) == null) {
                 CacheTag ct;
-                if ( SemanticOps.isBundle(result1) ) {
-                    QDataSet bounds= SemanticOps.bounds(dep);
-                    ct= new CacheTag( DataSetUtil.asDatumRange( bounds.slice(1), true ), resolution );
+                if (SemanticOps.isBundle(result1)) {
+                    QDataSet bounds = SemanticOps.bounds(dep);
+                    ct = new CacheTag(DataSetUtil.asDatumRange(bounds.slice(1), true), resolution);
                 } else {
-                    QDataSet bounds= SemanticOps.bounds(result1);
-                    ct= new CacheTag( DataSetUtil.asDatumRange( bounds.slice(0), true ), resolution );
+                    QDataSet bounds = SemanticOps.bounds(result1);
+                    ct = new CacheTag(DataSetUtil.asDatumRange(bounds.slice(0), true), resolution);
                 }
-                MutablePropertyDataSet dep2= DataSetOps.makePropertiesMutable(dep);
-                dep2.putProperty( QDataSet.CACHE_TAG, ct );
-                MutablePropertyDataSet result2= DataSetOps.makePropertiesMutable(result1);
-                result2.putProperty( prop, dep2 );
+                MutablePropertyDataSet dep2 = DataSetOps.makePropertiesMutable(dep);
+                dep2.putProperty(QDataSet.CACHE_TAG, ct);
+                MutablePropertyDataSet result2 = DataSetOps.makePropertiesMutable(result1);
+                result2.putProperty(prop, dep2);
                 return result2;
             }
-        } catch ( IllegalArgumentException ex ) {
-            logger.log( Level.WARNING, ex.getMessage(), ex );
+        } catch (IllegalArgumentException ex) {
+            logger.log(Level.WARNING, ex.getMessage(), ex);
         }
-        
-        if ( !mon.isFinished() ) mon.finished();
+
+        if (!mon.isFinished()) {
+            mon.finished();
+        }
         return result1;
 
     }
@@ -589,47 +599,49 @@ public class Das2ServerDataSource extends AbstractDataSource {
         return new TimeSeriesBrowse() {
             @Override
             public void setTimeRange(DatumRange dr) {
-                timeRange= dr;
+                timeRange = dr;
             }
 
             @Override
             public void setTimeResolution(Datum d) {
-                resolution= d;
+                resolution = d;
             }
 
             @Override
             public String getURI() {
-                Map<String,String> c= new LinkedHashMap(params);
-                String stime= timeRange.min().toString().replace(" ", "+");
-                String etime= timeRange.max().toString().replace(" ", "+");
-                c.put("start_time",stime);
-                c.put("end_time",etime);
-                if ( resolution!=null ) {
-                    double resSec= resolution.doubleValue(Units.seconds);
-                    resSec= Math.round( resSec * 1000 ) / 1000.;
-                    c.put( "resolution", String.valueOf(resSec) );
+                Map<String, String> c = new LinkedHashMap(params);
+                String stime = timeRange.min().toString().replace(" ", "+");
+                String etime = timeRange.max().toString().replace(" ", "+");
+                c.put("start_time", stime);
+                c.put("end_time", etime);
+                if (resolution != null) {
+                    double resSec = resolution.doubleValue(Units.seconds);
+                    resSec = Math.round(resSec * 1000) / 1000.;
+                    c.put("resolution", String.valueOf(resSec));
                 } else {
                     logger.fine("no resolution specified");
                 }
-                if ( params.containsKey("interval") ) {
-                    c.put( "interval", params.get("interval") );
+                if (params.containsKey("interval")) {
+                    c.put("interval", params.get("interval"));
                 }
-                String sparams= URISplit.formatParams(c);
+                String sparams = URISplit.formatParams(c);
                 //if ( dsParams!=null && dsParams.trim().length()>0 )  sparams+= "&" + dsParams; //TODO: Double-load was caused by extra & at the end.  It's silly to have it so sensitive.
                 return "vap+das2Server:" + resourceURI + "?" + sparams;
             }
 
             @Override
             public String blurURI() {
-                String sparams= "dataset="+params.get( "dataset" );
-                if ( params.containsKey("interval") ) { // this is important, because TSB will not update this.
-                    sparams+= "&interval="+params.get("interval"); 
+                String sparams = "dataset=" + params.get("dataset");
+                if (params.containsKey("interval")) { // this is important, because TSB will not update this.
+                    sparams += "&interval=" + params.get("interval");
                 }
-                if ( dsParams!=null && dsParams.trim().length()>0 )  sparams+= "&" + dsParams;
-                
+                if (dsParams != null && dsParams.trim().length() > 0) {
+                    sparams += "&" + dsParams;
+                }
+
                 return "vap+das2Server:" + resourceURI + "?" + sparams;
             }
-            
+
             @Override
             public DatumRange getTimeRange() {
                 return timeRange;
@@ -642,16 +654,16 @@ public class Das2ServerDataSource extends AbstractDataSource {
 
             @Override
             public void setURI(String suri) throws ParseException {
-                URISplit split= URISplit.parse(uri);
-                Map<String,String> params= URISplit.parseParams(split.params);
-                String startTime= params.remove( "start_time" );
-                String endTime= params.get( "end_time" );
-                String sresolution= params.get("resolution");
-                if ( startTime!=null && endTime!=null ) {
-                    timeRange= new DatumRange( Units.us2000.parse(startTime), Units.us2000.parse(endTime) );
+                URISplit split = URISplit.parse(uri);
+                Map<String, String> params = URISplit.parseParams(split.params);
+                String startTime = params.remove("start_time");
+                String endTime = params.get("end_time");
+                String sresolution = params.get("resolution");
+                if (startTime != null && endTime != null) {
+                    timeRange = new DatumRange(Units.us2000.parse(startTime), Units.us2000.parse(endTime));
                 }
-                if ( sresolution!=null ) {
-                    resolution= Units.seconds.parse(sresolution);
+                if (sresolution != null) {
+                    resolution = Units.seconds.parse(sresolution);
                 }
             }
         };
@@ -664,8 +676,7 @@ public class Das2ServerDataSource extends AbstractDataSource {
 
     @Override
     public String toString() {
-        return this.resourceURI + "?" + params.get( "dataset" );
+        return this.resourceURI + "?" + params.get("dataset");
     }
-
 
 }
