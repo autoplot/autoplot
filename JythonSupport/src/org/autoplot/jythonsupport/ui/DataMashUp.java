@@ -40,12 +40,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javafx.scene.control.ListCell;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -79,9 +77,7 @@ import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
-import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
-import org.das2.graph.Renderer;
 import org.das2.qds.ops.Ops;
 
 /**
