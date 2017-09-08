@@ -948,12 +948,12 @@ public class JythonCompletionTask implements CompletionTask {
      */
     private static String hideJavaPaths( String label ) {
         StringBuffer build= new StringBuffer();
-        Pattern p= Pattern.compile("(org.virbo.dataset.QDataSet|java.lang.String|java.lang.Object|org.das2.util.monitor.ProgressMonitor|org.das2.datum.DatumRange|org.das2.datum.Datum)");
+        Pattern p= Pattern.compile("(org.das2.qds.QDataSet|java.lang.String|java.lang.Object|org.das2.util.monitor.ProgressMonitor|org.das2.datum.DatumRange|org.das2.datum.Datum)");
         Matcher m= p.matcher(label);
         while ( m.find() ) {
             String s= m.group(1);
             switch (s) {
-                case "org.virbo.dataset.QDataSet":
+                case "org.das2.qds.QDataSet":
                     m.appendReplacement(build,"QDataSet");
                     break;
                 case "java.lang.String":
