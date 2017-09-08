@@ -31,6 +31,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,9 +40,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javafx.scene.control.ListCell;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -51,6 +55,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeNode;
@@ -76,6 +81,7 @@ import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.das2.graph.Renderer;
 
 /**
  * GUI for specifying mashups, where a number of 
@@ -152,11 +158,47 @@ public class DataMashUp extends javax.swing.JPanel {
         checkForTSB();
     }
 
+    private ListCellRenderer myListCellRenderer=  new DefaultListCellRenderer() {
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            final javax.swing.JLabel label= (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            String v= value.toString();
+            if ( v.contains(": ") ) {
+                int i= v.lastIndexOf(": ");
+                String newv= "<html><b>"+v.substring(0,i)+"</b>: <i>"+v.substring(i+2)+"</i>";
+                label.setText(newv);
+            }
+            return label;
+        }
+    };
+    
     /**
      * Creates new form DataMashUp
      */
     public DataMashUp() {
         initComponents();
+        List<String> allItems= new ArrayList<>();
+        List<JList> lsms= new ArrayList<>();
+        lsms.add(mathematicsList);
+        lsms.add(datasetList);
+        lsms.add(filtersList);
+        lsms.add(scratchList);
+        for ( int i=0; i< lsms.size(); i++ ) {
+            JList jc= (JList)lsms.get(i);
+            for ( int j=0; j<jc.getModel().getSize(); j++ ) {
+                String s= (String)jc.getModel().getElementAt(j);
+                allItems.add(s);
+            }
+        }
+        Collections.sort(allItems);
+        DefaultListModel dlm= new DefaultListModel();
+        for ( String s: allItems ) {
+            if ( s.trim().length()>0 ) {
+                dlm.addElement(s);
+            }
+        }
+        allList.setModel( dlm );
+        
         timeRangeRecentComboBox.setPreferenceNode( "timerange" );
         namedURIListTool1.setDataMashUp(this);
         namedURIListTool1.addPropertyChangeListener( NamedURIListTool.PROP_TIMERANGE, new PropertyChangeListener() {
@@ -187,13 +229,19 @@ public class DataMashUp extends javax.swing.JPanel {
         dragSource.createDefaultDragGestureRecognizer(expressionTree, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
         
         // add all jLists
-        dragSource.createDefaultDragGestureRecognizer( jList1, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
-        dragSource.createDefaultDragGestureRecognizer( jList2, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
-        dragSource.createDefaultDragGestureRecognizer( jList3, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
+        dragSource.createDefaultDragGestureRecognizer(mathematicsList, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
+        dragSource.createDefaultDragGestureRecognizer(datasetList, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
+        dragSource.createDefaultDragGestureRecognizer(filtersList, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
         dragSource.createDefaultDragGestureRecognizer( scratchList, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
-        
+        dragSource.createDefaultDragGestureRecognizer( allList, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
         dragSource.createDefaultDragGestureRecognizer( namedURIListTool1, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
 
+        mathematicsList.setCellRenderer( myListCellRenderer );
+        datasetList.setCellRenderer( myListCellRenderer );
+        filtersList.setCellRenderer( myListCellRenderer );
+        scratchList.setCellRenderer( myListCellRenderer );
+        allList.setCellRenderer( myListCellRenderer );
+        
         String data = "ds";
         TreePath tp= new TreePath( ( (DefaultMutableTreeNode) expressionTree.getModel().getRoot() ).getPath() );
         doDrop(data,tp);
@@ -865,16 +913,19 @@ public class DataMashUp extends javax.swing.JPanel {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList();
+        mathematicsList = new javax.swing.JList();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
-        jList2 = new javax.swing.JList();
+        datasetList = new javax.swing.JList();
         jPanel5 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jList3 = new javax.swing.JList();
+        filtersList = new javax.swing.JList();
         myFunctionsPanel = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         scratchList = new javax.swing.JList();
+        jPanel6 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        allList = new javax.swing.JList<>();
         jPanel2 = new javax.swing.JPanel();
         synchronizeCB = new javax.swing.JCheckBox();
         jScrollPane7 = new javax.swing.JScrollPane();
@@ -948,20 +999,20 @@ public class DataMashUp extends javax.swing.JPanel {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addComponent(directionsLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE))
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE))
         );
 
         jSplitPane2.setRightComponent(jPanel4);
 
         jLabel2.setText("Drag functions onto the palette to the right.");
 
-        jList1.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "add(x,y)", "subtract(x,y)", "multiply(x,y)", "divide(x,y)", "pow(x,y)", "log10(x)", "sqrt(x)", "abs(x)", "magnitude(x)", "atan2(x,y)", "toRadians(x)", "toDegrees(x)", "sin(x)", "cos(x)", "tan(x)", "asin(x)", "acos(x)", "atan2(y,x)", "atan(x)", " " };
+        mathematicsList.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "add(x,y)", "subtract(x,y)", "multiply(x,y)", "divide(x,y)", "pow(x,y)", "log10(x)", "sqrt(x)", "abs(x): the absolute value of the data", "magnitude(x): the lengths of the vectors", "toRadians(x)", "toDegrees(x)", "sin(x)", "cos(x)", "tan(x)", "asin(x)", "acos(x)", "atan2(y,x)", "atan(x)", " " };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
-        jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jScrollPane3.setViewportView(jList1);
+        mathematicsList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane3.setViewportView(mathematicsList);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -971,18 +1022,18 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("mathematics", jPanel1);
 
-        jList2.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "link(x,y)", "link(x,y,z)", "slice1(ds,0)", "smooth(ds,5)", "putProperty(ds,QDataSet.UNITS,'s')", "getProperty(ds,QDataSet.DEPEND_0)", "unbundle(ds,0)", "bundle(t,ds1,ds2)" };
+        datasetList.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "link(x,y): create data set where y is a function of x", "link(x,y,z): create data set where z is a function of x and y", "slice1(ds,0): slice ds(x,y) to create a new ds(x)", "smooth(ds,5): run boxcar average over the dataset", "putProperty(ds,QDataSet.UNITS,'s'): attach properties to the data", "getProperty(ds,QDataSet.DEPEND_0): get properties, like timetags.", "unbundle(ds,0): remove the 0th dataset from the bundle", "bundle(t,ds1,ds2): bundle the three datasets together" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
-        jList2.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jScrollPane4.setViewportView(jList2);
+        datasetList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane4.setViewportView(datasetList);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -992,18 +1043,18 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("dataset", jPanel3);
 
-        jList3.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "putValues(ds,w,v)", "removeValues(ds,w)", "removeValuesGreaterThan(ds,v)", "removeValuesLessThan(ds,v)", "where(c)", "lt(ds1,ds2)", "le(ds1,ds2)", "gt(ds1,ds2)", "ge(ds1,ds2)", "eq(ds1,ds2)", "ne(ds1,ds2)", "or(ds1,ds2)", "and(ds1,ds2)" };
+        filtersList.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "putValues(ds,w,v): replace the values at w with v", "removeValues(ds,w): remove the values at w", "removeValuesGreaterThan(ds,v)", "removeValuesLessThan(ds,v)", "where(c): return the list of indices where the condition is true", "lt(ds1,ds2): return true where ds1 is less than ds2", "le(ds1,ds2): return true where ds1 is less than or equal to ds2", "gt(ds1,ds2): return true where ds1 is greater than ds2", "ge(ds1,ds2): return true where ds1 is greater than or equal to ds2", "eq(ds1,ds2): return true where ds1 is equal to ds2", "ne(ds1,ds2): return true where ds1 is not equal to ds2", "or(ds1,ds2): return true where ds1 or ds2 is true", "and(ds1,ds2): return true where ds1 and ds2 is true" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
-        jList3.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jScrollPane2.setViewportView(jList3);
+        filtersList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane2.setViewportView(filtersList);
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -1013,7 +1064,7 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("filters", jPanel5);
@@ -1036,14 +1087,40 @@ public class DataMashUp extends javax.swing.JPanel {
         myFunctionsPanel.setLayout(myFunctionsPanelLayout);
         myFunctionsPanelLayout.setHorizontalGroup(
             myFunctionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 419, Short.MAX_VALUE)
         );
         myFunctionsPanelLayout.setVerticalGroup(
             myFunctionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("my functions", myFunctionsPanel);
+
+        allList.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane1.setViewportView(allList);
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(3, 3, 3)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 413, Short.MAX_VALUE)
+                .addGap(3, 3, 3))
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(3, 3, 3)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
+                .addGap(3, 3, 3))
+        );
+
+        jTabbedPane1.addTab("all", jPanel6);
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
@@ -1059,7 +1136,7 @@ public class DataMashUp extends javax.swing.JPanel {
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addComponent(jLabel2)
-                .addGap(0, 278, Short.MAX_VALUE))
+                .addGap(0, 294, Short.MAX_VALUE))
             .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
                     .addGap(32, 32, 32)
@@ -1070,6 +1147,7 @@ public class DataMashUp extends javax.swing.JPanel {
 
         jSplitPane1.setBottomComponent(jSplitPane2);
 
+        synchronizeCB.setSelected(true);
         synchronizeCB.setText("synchronize data by time tags, interpolating data to the first dataset's time tags");
         synchronizeCB.setToolTipText("Nearest Neighbor synchronization is used to line up the data, so that they can be combined.");
 
@@ -1091,13 +1169,13 @@ public class DataMashUp extends javax.swing.JPanel {
                     .addComponent(jScrollPane7)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(synchronizeCB)
-                        .addGap(0, 306, Short.MAX_VALUE)))
+                        .addGap(0, 379, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(synchronizeCB))
         );
@@ -1523,10 +1601,13 @@ public class DataMashUp extends javax.swing.JPanel {
                         s= getJython( (DefaultTreeModel)expressionTree.getModel(), n );
                     }
                 } else if  ( dge.getComponent()==namedURIListTool1 ) {
-                    System.err.println("herehere");
-                    
+                    System.err.println("herehere");   
                 }
                 if ( s!=null ) {
+                    if ( s.contains(": ") ) {
+                        int i= s.lastIndexOf(": ");
+                        s= s.substring(0,i).trim();
+                    }
                     dge.startDrag(null, new StringSelection(s) ) ;
                 }
             }
@@ -1564,22 +1645,24 @@ public class DataMashUp extends javax.swing.JPanel {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem addItemMenuItem;
+    private javax.swing.JList<String> allList;
+    private javax.swing.JList datasetList;
     private javax.swing.JMenuItem deleteItemsMenuItem;
     private javax.swing.JLabel directionsLabel;
     private javax.swing.JMenuItem editMenuItem;
     private javax.swing.JPopupMenu expressionPopupMenu;
     private javax.swing.JTree expressionTree;
+    private javax.swing.JList filtersList;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JList jList1;
-    private javax.swing.JList jList2;
-    private javax.swing.JList jList3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
@@ -1589,6 +1672,7 @@ public class DataMashUp extends javax.swing.JPanel {
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JList mathematicsList;
     private javax.swing.JPanel myFunctionsPanel;
     private org.autoplot.jythonsupport.ui.NamedURIListTool namedURIListTool1;
     private javax.swing.JPopupMenu palettePopupMenu;
