@@ -32,6 +32,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -45,6 +46,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -352,6 +354,38 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     String userTimeRange= null;
     
     Map<String,String> tcaItem= new HashMap(); // from ID to selected TCA item.
+        
+    private static class Example {
+        String timeRange;
+        String label="";
+        String params="";
+        String name="";
+    }
+    
+    LinkedHashMap<String,Example> theExamples= new LinkedHashMap<>();
+    
+    /**
+     * populate the timeRange and label parts of the Example.
+     * @param s the string 
+     * @param e null or the existing Example
+     */
+    private static Example parseExample( String s, Example e ) {
+        if ( e==null ) e= new Example();
+        int j= s.indexOf( EXAMPLE_TIMERANGE_LABEL_DELIM );
+        if ( j>-1 ) {
+            e.timeRange= s.substring(0,j);
+            e.label= s.substring(j+1).trim();
+        } else {
+            e.timeRange= s;
+        }
+        return e;
+    }
+    
+    private static Example addParamsToExample( String s, Example e ) {
+        if ( e==null ) e= new Example();
+        e.params= s;
+        return e;
+    }
     
     /**
      * this is called off the event thread for the web transaction, then hop back on it to populate the GUI.
@@ -395,17 +429,23 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     descriptionLabel.setText( description==null ? "" : description.getNodeValue() );
 
                     NodeList exs=  (NodeList) xpath.evaluate( "/stream/properties/@*", document, XPathConstants.NODESET );
-                    List<String> examples= new ArrayList<>();
                     String example= null;
+                    String exampleParams= null;
                     Map<String,String> items= new HashMap<>();
                     Pattern itemPattern= Pattern.compile("item_(\\d\\d)");
                     for ( int i=0; i<exs.getLength(); i++ ) {
                         Node ex= exs.item(i);
                         String name= ex.getNodeName();
-                        if ( name.startsWith("exampleRange") ) {
-                            examples.add(ex.getNodeValue());
-                        } else if ( name.equals("exampleRange") ) {
-                            example= ex.getNodeValue();
+                        if ( name.startsWith("exampleRange")) {
+                            String s= ex.getNodeValue();
+                            name= name.replace("exampleRange","example");
+                            Example e = theExamples.get(name);
+                            theExamples.put( name, parseExample( s, e ) );
+                        } else if ( name.startsWith("exampleParams") ) {
+                            String s=ex.getNodeValue();
+                            name=name.replace("exampleParams","example");
+                            Example e = theExamples.get(name);
+                            theExamples.put( name, addParamsToExample( s, e ) );
                         } else if ( name.equals("items") ) {
                             isTca= true;
                         } else if ( name.equals("requiresInterval") ) {
@@ -461,35 +501,50 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                             logger.info("default timerange doesn't parse!");
                         }                        
                     }
-                    if ( examples.size()>0 ) {
-                        for ( int i=0; i<examples.size(); i++ ) {    // remove the human comments following the delimiter
-                            String s= examples.get(i);
-                            int j= s.indexOf( EXAMPLE_TIMERANGE_LABEL_DELIM );
+                    
+                    if ( theExamples.size()>0 ) {
+                        List<String> keys= new ArrayList<>(theExamples.size());
+                        keys.add("LABEL");
+                        
+                        if ( theExamples.containsKey("example") ) {
+                            keys.add( "example" );
+                        }
+                        for ( String k: theExamples.keySet() ) {
+                            if ( !k.equals("example") ) keys.add(k);
+                        }
+                        
+                        if ( theExamples.size()>0 ) {
                             String anExample;
-                            if ( j>-1 ) {
-                                anExample= s.substring(0,j);
-                                s= "<html>" + anExample + " <i><nbsp>"+s.substring(j+1).trim() + "</i>";
-                            } else {
-                                anExample= s;
-                            }
-                            examples.set(i, s );
+                            anExample= theExamples.entrySet().iterator().next().getValue().timeRange;
                             if ( Das2ServerDataSourceEditorPanel.this.userTimeRange!=null ) {
                                 anExample=  Das2ServerDataSourceEditorPanel.this.userTimeRange;
                             }
-                            if ( example==null && i==examples.size()-1 ) {
-                                Das2ServerDataSourceEditorPanel.this.recentComboBox1.setText( anExample );
-                            }
-                            
+                            Das2ServerDataSourceEditorPanel.this.recentComboBox1.setText( anExample );
                         }
-                        examples.add( 0, String.format( Locale.US, "<html><i>Example Time Ranges (%d)</i>", examples.size() ) );
-                        DefaultComboBoxModel model= new DefaultComboBoxModel( examples.toArray( new String[examples.size()] ) );
+                                                
+                        DefaultComboBoxModel model= new DefaultComboBoxModel( keys.toArray() );
                         Das2ServerDataSourceEditorPanel.this.examplesComboBox.setModel( model );
                         Das2ServerDataSourceEditorPanel.this.examplesComboBox.setEnabled(true);
                     } else {
-                        DefaultComboBoxModel model= new DefaultComboBoxModel( new String[] { "No example time ranges found..." } );
+                        DefaultComboBoxModel model= new DefaultComboBoxModel( new String[] { "NONEFOUND" } );
                         Das2ServerDataSourceEditorPanel.this.examplesComboBox.setModel( model );
                         Das2ServerDataSourceEditorPanel.this.examplesComboBox.setEnabled(false);
                     }
+                    Das2ServerDataSourceEditorPanel.this.examplesComboBox.setRenderer( new ListCellRenderer() {
+                        @Override
+                        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                            JLabel def= new JLabel();
+                            if ( value.equals("LABEL") ) {
+                                def.setText(String.format( Locale.US, "<html><i>Example Time Ranges (%d)</i>", theExamples.size() ));
+                            } else if ( value.equals("NONEFOUND") ) {
+                                def.setText(String.format( Locale.US, "No example time ranges found..." ) );
+                            } else {
+                                Example e= theExamples.get((String)value);
+                                def.setText( "<html>" + e.timeRange + " <i><nbsp>"+ e.label + "</i>" );
+                            }
+                            return def;
+                        }
+                    });
 
                     if ( example==null ) { // legacy
                         Node exampleRange= (Node) xpath.evaluate( "/stream/properties/@x_range", document, XPathConstants.NODE );
@@ -914,20 +969,16 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     private void examplesComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_examplesComboBoxActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         String item= (String) examplesComboBox.getSelectedItem();
-        if ( !item.equals(EXAMPLE_TIME_RANGES) ) {
-            int i= item.indexOf(EXAMPLE_TIME_RANGE_HTML_DELIM);
-            if ( i>-1 && item.startsWith("<html>") ) {
-                recentComboBox1.setText(item.substring(6,i).trim());
+        if ( item.startsWith("example") ) {
+            logger.log(Level.FINE, "example item: {0}", item);
+            Example e= theExamples.get(item);
+            if ( e==null ) {
+                logger.warning("whoops, where is the label");
             } else {
-                if ( i>-1 ) {
-                    recentComboBox1.setText(item.substring(0,i).trim()); // ??? where did the <html> go???
-                } else {
-                    recentComboBox1.setText(item.trim()); 
-                }
+                recentComboBox1.setText( e.timeRange );
             }
         }
     }//GEN-LAST:event_examplesComboBoxActionPerformed
-    private static final String EXAMPLE_TIME_RANGE_HTML_DELIM = "<i>";
 
     private void timeRangeToolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeToolActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
