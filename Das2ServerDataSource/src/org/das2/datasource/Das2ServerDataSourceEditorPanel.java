@@ -976,6 +976,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 logger.warning("whoops, where is the label");
             } else {
                 recentComboBox1.setText( e.timeRange );
+                readerParamsTextArea.setText( e.params );
             }
         }
     }//GEN-LAST:event_examplesComboBoxActionPerformed
