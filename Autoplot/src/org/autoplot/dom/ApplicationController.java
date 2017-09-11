@@ -15,6 +15,8 @@ import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -69,6 +71,8 @@ import org.autoplot.AutoplotUI;
 import org.autoplot.ColumnColumnConnectorMouseModule;
 import org.autoplot.GuiSupport;
 import org.autoplot.LayoutListener;
+import org.autoplot.ScriptContext;
+import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.layout.LayoutConstants;
 import org.autoplot.util.RunLaterListener;
@@ -2109,6 +2113,20 @@ public class ApplicationController extends DomNodeController implements RunLater
             for ( DasCanvasComponent cc : extraCC ) {
                 c.controller.getDasCanvas().remove(cc);
             }    
+            
+            try {
+                File f= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "config");
+                f= new File( f, "defaults.vap");
+                if ( f.exists() ) {
+                    Application app= ScriptContext.loadVap( f.toString() );
+                    this.application.options.syncTo( app.options );
+                } else {
+                    logger.info("saving initial vap to HOME/autoplot_data/config/defaults.vap");
+                    ScriptContext.save( f.toString() );
+                }
+            } catch ( IOException ex ) {
+                ex.printStackTrace();
+            }
             
             // reset das2 stuff which may be in a bad state.  This must be done on the event thread.
             Runnable run= new Runnable() {
