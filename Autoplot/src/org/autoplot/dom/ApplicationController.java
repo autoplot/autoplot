@@ -2114,18 +2114,21 @@ public class ApplicationController extends DomNodeController implements RunLater
                 c.controller.getDasCanvas().remove(cc);
             }    
             
-            try {
-                File f= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "config");
-                f= new File( f, "defaults.vap");
-                if ( f.exists() ) {
-                    Application app= ScriptContext.loadVap( f.toString() );
-                    this.application.options.syncTo( app.options );
-                } else {
-                    logger.info("saving initial vap to HOME/autoplot_data/config/defaults.vap");
-                    ScriptContext.save( f.toString() );
+            boolean resetFonts= false;
+            if ( resetFonts ) {
+                try {
+                    File f= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "config");
+                    f= new File( f, "defaults.vap");
+                    if ( f.exists() ) {
+                        Application app= ScriptContext.loadVap( f.toString() );
+                        this.application.options.syncTo( app.options );
+                    } else {
+                        logger.info("saving initial vap to HOME/autoplot_data/config/defaults.vap");
+                        ScriptContext.save( f.toString() );
+                    }
+                } catch ( IOException ex ) {
+                    ex.printStackTrace();
                 }
-            } catch ( IOException ex ) {
-                ex.printStackTrace();
             }
             
             // reset das2 stuff which may be in a bad state.  This must be done on the event thread.
