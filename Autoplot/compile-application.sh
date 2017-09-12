@@ -33,11 +33,11 @@ if [ "" = "$TAG" ]; then
 fi
 echo "TAG=${TAG}"
 
-if [ "" = "$DONT_HIDE" ]; then
-    DONT_HIDE="F"
+if [ "" = "$DO_HIDE" ]; then
+    DO_HIDE="true"
 fi
 
-echo "DONT_HIDE=${DONT_HIDE}  # if T then show passwords etc for debugging."
+echo "DO_HIDE=${DO_HIDE}  # if false then show passwords etc for debugging."
 
 JAVAC=${JAVA_HOME}/bin/javac
 JAR=${JAVA_HOME}/bin/jar
@@ -375,13 +375,6 @@ else
   echo "justCompile not set to 1, continue on"
 fi
 
-if [ "$justCompile" = "1" ]; then
-  echo "justCompile set to 1, stopping"
-  exit 0
-else
-  echo "justCompile not set to 1, continue on"
-fi
-
 
 #Don't do this, since we modify the jnlp file to make a release.
 #echo "=== make signed jnlp file..."  # http://www.coderanch.com/t/554729/JNLP-Web-Start/java/Signing-JNLP-JNLP-INF-directory
@@ -410,7 +403,8 @@ mv dist/AutoplotVolatile2.jar dist/AutoplotVolatile.jar
 rm dist/AutoplotVolatile1.jar
 
 echo "=== sign and pack the jar file..."
-if [ "$DONT_HIDE" != "1" ]; then 
+
+if [ "$DO_HIDE" = "true" ]; then 
    echo "  use set +x to hide private info"
    #echo  ${JAVA_HOME}/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"
    set +x
@@ -421,7 +415,7 @@ if ! ${JAVA_HOME}/bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" $JAR
    exit 1
 fi
 
-if [ "$DONT_HIDE" != "1" ]; then 
+if [ "$DO_HIDE" = "true" ]; then 
    set -x
 fi
 
