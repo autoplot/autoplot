@@ -33,6 +33,12 @@ if [ "" = "$TAG" ]; then
 fi
 echo "TAG=${TAG}"
 
+if [ "" = "$DONT_HIDE" ]; then
+    DONT_HIDE="F"
+fi
+
+echo "DONT_HIDE=${DONT_HIDE}  # if T then show passwords etc for debugging."
+
 JAVAC=${JAVA_HOME}/bin/javac
 JAR=${JAVA_HOME}/bin/jar
 
@@ -46,7 +52,7 @@ if [ "" = "$AP_KEEP_STABLE" ]; then
     AP_KEEP_STABLE=F
 fi
 
-echo "$AP_KEEP_STABLE=${AP_KEEP_STABLE}  # if T then keep the stable jars for release"
+echo "AP_KEEP_STABLE=${AP_KEEP_STABLE}  # if T then keep the stable jars for release"
 
 if [ "" = "$ALIAS" ]; then
     ALIAS=virbo
@@ -404,14 +410,20 @@ mv dist/AutoplotVolatile2.jar dist/AutoplotVolatile.jar
 rm dist/AutoplotVolatile1.jar
 
 echo "=== sign and pack the jar file..."
-echo "  use set +x to hide private info"
-#echo  ${JAVA_HOME}/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"
-set +x
+if [ "$DONT_HIDE" != "1" ]; then 
+   echo "  use set +x to hide private info"
+   #echo  ${JAVA_HOME}/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"
+   set +x
+fi
+
 if ! ${JAVA_HOME}/bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"; then
    echo "Fail to sign resources!"
    exit 1
 fi
-set -x
+
+if [ "$DONT_HIDE" != "1" ]; then 
+   set -x
+fi
 
 echo "=== verify the jar file..."
 ${JAVA_HOME}/bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10
