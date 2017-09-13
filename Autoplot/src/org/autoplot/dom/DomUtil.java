@@ -3,6 +3,7 @@ package org.autoplot.dom;
 
 import java.awt.Color;
 import java.beans.IndexedPropertyDescriptor;
+import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
 import java.io.ByteArrayOutputStream;
@@ -267,6 +268,34 @@ public class DomUtil {
 
     }
 
+    /**
+     * attempt to parse the diff formatted to the string.  Some example diffs:
+     * 'delete row_5 from Canvases[0].rows @ 2;'
+     * 'Canvases[0].marginColumn.left +8.0em \u2192 +7.0em'
+     * 'plots[0].xaxis.range 2017-09-07 23:00 to 2017-09-09 00:00 \u2192 0.0 to 100.0 ;'
+     * This is a bit of an exercise to see if all the needed information is available.
+     * @return appropriate diff object
+     */
+    public static Diff parseDiff( String s, Application dom ) {
+        Pattern p1= Pattern.compile("(insert|delete) (.+) (from|into) (.+) @ (\\d+)");
+        Matcher m1= p1.matcher(s);
+        if ( m1.matches() ) {
+            if ( m1.group(1).equals("delete") ) {
+                return new ArrayNodeDiff( m1.group(3), ArrayNodeDiff.Action.Delete, dom, Integer.parseInt(m1.group(4)) );
+            } else {
+                return new ArrayNodeDiff( m1.group(3), ArrayNodeDiff.Action.Insert, dom, Integer.parseInt(m1.group(4)) );
+            }
+        } else {
+            Pattern p2= Pattern.compile("(.+\\.(.+)) (.+) \u2192 (.+)");
+            Matcher m2= p2.matcher(s);
+            if ( m2.matches() ) {
+                //Object parent= 
+                //return new PropertyChangeDiff( m2.group(2), Object oldVal, Object newVal) 
+            }
+        }
+        return null;
+    }
+            
     public static Object parseObject(Object context, String s) {
         PropertyEditor edit = BeansUtil.findEditor(context.getClass());
         if (edit == null) {
@@ -295,6 +324,7 @@ public class DomUtil {
      * @param root the root, such as the dom or the canvas.
      * @param id the id of the node.
      * @return the node with this id, or null if the id is not found.
+     * @see #getElementByAddress(org.autoplot.dom.DomNode, java.lang.String) 
      */
     public static DomNode getElementById(DomNode root, String id) {
         if (id == null ) {
@@ -315,6 +345,53 @@ public class DomUtil {
         return null;
     }
 
+    /**
+     * return the node at the address, for example "plots[2].xaxis" of an application.
+     * @param domNode the initial dom node, like dom.
+     * @param address the address, like plots[2].xaxis
+     * @return the domNode at the address.
+     * @see #getElementById(org.autoplot.dom.DomNode, java.lang.String) y
+     */
+    public static DomNode getElementByAddress( DomNode domNode, String address ) {
+        String[] ss= address.split("\\.");
+        for ( String s: ss ) {
+            try {
+                int index;
+                Pattern p= Pattern.compile("([a-zA-Z]+)(\\[(\\d+)\\])?");
+                Matcher m= p.matcher(s);
+                if ( m.matches() ) {
+                    if ( m.group(2)!=null ) {
+                        index= Integer.parseInt(m.group(3));
+                    } else {
+                        index= -1;
+                    }
+                } else {
+                    throw new IllegalArgumentException("regex doesn't match");
+                }
+                String prop= m.group(1);
+                Class c = domNode.getClass();
+                Object o;
+                if ( index>-1 ) {
+                    IndexedPropertyDescriptor pd = new IndexedPropertyDescriptor(prop, c);
+                    Method getter = pd.getIndexedReadMethod();
+                    o= getter.invoke( domNode, index );
+                } else {
+                    PropertyDescriptor pd = new PropertyDescriptor(prop, c);
+                    Method getter = pd.getReadMethod();
+                    o= getter.invoke( domNode );
+                }
+                if ( !( o instanceof DomNode ) ) {
+                    throw new IllegalArgumentException("address is not that of a node (is it a property?)");
+                }
+                domNode= (DomNode)o;
+
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | IntrospectionException ex) {
+                throw new IllegalArgumentException(ex);
+            }
+        }
+        return domNode;
+    }
+    
     /**
      * find the nodes matching this regex.
      * @param root the node to start at.
