@@ -965,7 +965,13 @@ public class CdfDataSource extends AbstractDataSource {
             result = CdfUtil.wrapCdfData(cdf,svariable, recs[0], recCount, recs[2], slice1, dependantVariable, mon);
             //result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2]);
         }
-        result.putProperty(QDataSet.NAME, svariable);
+        
+        if ( slice1>-1 ) {
+            result.putProperty(QDataSet.NAME, svariable+"__"+slice1 );
+            // note this will be replaced in caller code.
+        } else {
+            result.putProperty(QDataSet.NAME, svariable);
+        }
 
         final boolean doUnits = true;
         Units units=null;
@@ -976,7 +982,7 @@ public class CdfDataSource extends AbstractDataSource {
                 if ( sunits.equalsIgnoreCase("row number") || sunits.equalsIgnoreCase("column number" ) ) { // kludge for POLAR/VIS
                     mu= Units.dimensionless;
                 } else {
-                    mu = SemanticOps.lookupUnits(sunits);
+                    mu = Units.lookupUnits(sunits);
                 }
                 Units u = (Units) result.property(QDataSet.UNITS);
                 if (u == null) {
