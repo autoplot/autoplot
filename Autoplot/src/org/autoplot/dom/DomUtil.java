@@ -268,33 +268,48 @@ public class DomUtil {
 
     }
 
-    /**
-     * attempt to parse the diff formatted to the string.  Some example diffs:
-     * 'delete row_5 from Canvases[0].rows @ 2;'
-     * 'Canvases[0].marginColumn.left +8.0em \u2192 +7.0em'
-     * 'plots[0].xaxis.range 2017-09-07 23:00 to 2017-09-09 00:00 \u2192 0.0 to 100.0 ;'
-     * This is a bit of an exercise to see if all the needed information is available.
-     * @return appropriate diff object
-     */
-    public static Diff parseDiff( String s, Application dom ) {
-        Pattern p1= Pattern.compile("(insert|delete) (.+) (from|into) (.+) @ (\\d+)");
-        Matcher m1= p1.matcher(s);
-        if ( m1.matches() ) {
-            if ( m1.group(1).equals("delete") ) {
-                return new ArrayNodeDiff( m1.group(3), ArrayNodeDiff.Action.Delete, dom, Integer.parseInt(m1.group(4)) );
-            } else {
-                return new ArrayNodeDiff( m1.group(3), ArrayNodeDiff.Action.Insert, dom, Integer.parseInt(m1.group(4)) );
-            }
-        } else {
-            Pattern p2= Pattern.compile("(.+\\.(.+)) (.+) \u2192 (.+)");
-            Matcher m2= p2.matcher(s);
-            if ( m2.matches() ) {
-                //Object parent= 
-                //return new PropertyChangeDiff( m2.group(2), Object oldVal, Object newVal) 
-            }
-        }
-        return null;
-    }
+//  This was abondoned because it's too difficult to do automatically.
+//    /**
+//     * attempt to parse the diff formatted to the string.  Some example diffs:
+//     * 'delete row_5 from Canvases[0].rows @ 2;'
+//     * 'Canvases[0].marginColumn.left +8.0em \u2192 +7.0em'
+//     * 'plots[0].xaxis.range 2017-09-07 23:00 to 2017-09-09 00:00 \u2192 0.0 to 100.0 ;'
+//     * This is a bit of an exercise to see if all the needed information is available.
+//     * @param s
+//     * @param dom
+//     * @return appropriate diff object
+//     */
+//    public static Diff parseDiff( String s, Application dom ) {
+//        Pattern p1= Pattern.compile("(insert|delete) (.+) (from|into) (.+) @ (\\d+)");
+//        Matcher m1= p1.matcher(s);
+//        if ( m1.matches() ) {
+//            if ( m1.group(1).equals("delete") ) {
+//                return new ArrayNodeDiff( m1.group(3), ArrayNodeDiff.Action.Delete, dom, Integer.parseInt(m1.group(4)) );
+//            } else {
+//                return new ArrayNodeDiff( m1.group(3), ArrayNodeDiff.Action.Insert, dom, Integer.parseInt(m1.group(4)) );
+//            }
+//        } else {
+//            Pattern p2= Pattern.compile("((.+)\\.([a-zA-Z]+)) (.+) \u2192 (.+)");
+//            Matcher m2= p2.matcher(s);
+//            if ( m2.matches() ) {
+//                String sparent= m2.group(2);
+//                DomNode parent= getElementByAddress( dom, sparent );
+//                try {
+//                    Class c= getPropertyType( parent, m2.group(3) );
+//                    Object old= c.
+//                    //Object parent=
+//                    //return new PropertyChangeDiff( m2.group(2), Object oldVal, Object newVal) 
+//                } catch (IllegalAccessException ex) {
+//                    Logger.getLogger(DomUtil.class.getName()).log(Level.SEVERE, null, ex);
+//                } catch (IllegalArgumentException ex) {
+//                    Logger.getLogger(DomUtil.class.getName()).log(Level.SEVERE, null, ex);
+//                } catch (InvocationTargetException ex) {
+//                    Logger.getLogger(DomUtil.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//            }
+//        }
+//        return null;
+//    }
             
     public static Object parseObject(Object context, String s) {
         PropertyEditor edit = BeansUtil.findEditor(context.getClass());
