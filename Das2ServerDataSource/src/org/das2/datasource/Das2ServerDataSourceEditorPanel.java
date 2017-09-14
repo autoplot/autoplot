@@ -98,7 +98,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
     private static final Logger logger= LoggerManager.getLogger("apdss.das2server");
 
-    private static final String EXAMPLE_TIMERANGE_LABEL_DELIM = "|";
+    private static final char EXAMPLE_TIMERANGE_LABEL_DELIM = '|';
 
     //DANGER: NB gui code doesn't use this...
     private static final String EXAMPLE_TIME_RANGES = "<html><i>Example Time Ranges</i>";
@@ -115,7 +115,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     /**
      * list of servers we know about
      */
-    List<String> d2ss;
+    private List<String> d2ss;
 	 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -347,22 +347,21 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    DatumRange validTimeRange= null; // some timerange believed to be valid.
+    private DatumRange validTimeRange= null; // some timerange believed to be valid.
     
-    Map<String,String> readerParams= new HashMap(); // from dataset url to params.
+    private final Map<String,String> readerParams= new HashMap(); // from dataset url to params.
             
-    String userTimeRange= null;
+    private String userTimeRange= null;
     
-    Map<String,String> tcaItem= new HashMap(); // from ID to selected TCA item.
+    private final Map<String,String> tcaItem= new HashMap(); // from ID to selected TCA item.
         
     private static class Example {
-        String timeRange;
-        String label="";
-        String params="";
-        String name="";
+        private String timeRange;
+        private String label="";
+        private String params="";
     }
     
-    LinkedHashMap<String,Example> theExamples= new LinkedHashMap<>();
+    private final LinkedHashMap<String,Example> theExamples= new LinkedHashMap<>();
     
     /**
      * populate the timeRange and label parts of the Example.
@@ -429,8 +428,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     descriptionLabel.setText( description==null ? "" : description.getNodeValue() );
 
                     NodeList exs=  (NodeList) xpath.evaluate( "/stream/properties/@*", document, XPathConstants.NODESET );
-                    String example= null;
-                    String exampleParams= null;
+                    Example example= null;
+                    //String exampleParams= null;
                     Map<String,String> items= new HashMap<>();
                     Pattern itemPattern= Pattern.compile("item_(\\d\\d)");
                     for ( int i=0; i<exs.getLength(); i++ ) {
@@ -441,11 +440,13 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                             name= name.replace("exampleRange","example");
                             Example e = theExamples.get(name);
                             theExamples.put( name, parseExample( s, e ) );
+                            example= parseExample( s, e );
                         } else if ( name.startsWith("exampleParams") ) {
                             String s=ex.getNodeValue();
                             name=name.replace("exampleParams","example");
                             Example e = theExamples.get(name);
                             theExamples.put( name, addParamsToExample( s, e ) );
+                            addParamsToExample( s, example );
                         } else if ( name.equals("items") ) {
                             isTca= true;
                         } else if ( name.equals("requiresInterval") ) {
@@ -454,7 +455,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                             Matcher m= itemPattern.matcher(name);
                             if ( m.matches() ) {
                                 String s= ex.getNodeValue();
-                                int ipipe= s.indexOf("|");
+                                int ipipe= s.indexOf('|');
                                 if ( ipipe>-1 ) {
                                     s= s.substring(0,ipipe);
                                 }
@@ -492,11 +493,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     }
                     
                     if ( example!=null && curr.equals(DEFAULT_TIMERANGE) ) { // DANGER: what if they are the same?
-                        Das2ServerDataSourceEditorPanel.this.recentComboBox1.setText( example );
+                        Das2ServerDataSourceEditorPanel.this.recentComboBox1.setText( example.timeRange );
                     }
                     if ( example!=null ) {
                         try {
-                            validTimeRange= DatumRangeUtil.parseTimeRange(example);
+                            validTimeRange= DatumRangeUtil.parseTimeRange(example.timeRange);
                         } catch (ParseException ex) {
                             logger.info("default timerange doesn't parse!");
                         }                        
@@ -786,7 +787,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
                 while (s != null) {
                     if ( s.length()>ttaglen+15 && s.substring(ttaglen+4,ttaglen+15).equalsIgnoreCase(seek)) {
-                        int i= s.indexOf("?");
+                        int i= s.indexOf('?');
                         if ( i==-1 ) i= s.length();
                         String key= s.substring(ttaglen+4+seek.length(),i);
                         if ( dss.contains(key) ) dss.remove( key ); // move to the end

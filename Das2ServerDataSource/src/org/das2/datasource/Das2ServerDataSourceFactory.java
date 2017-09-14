@@ -46,7 +46,7 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
         //?dataset=das2_1/voyager1/pws/sa-4s-pf.new
         //&start_time=2004-01-01&end_time=2004-01-06&server=dataset&ascii=1
 
-        List<CompletionContext> result = new ArrayList<CompletionContext>();
+        List<CompletionContext> result = new ArrayList<>();
 
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "dataset=", "dataset identifier"));
@@ -80,7 +80,7 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
 
     private synchronized List<String> getDatasetsList(String surl) {
         if (datasetsList == null) {
-            datasetsList = new HashMap<String, List<String>>();
+            datasetsList = new HashMap<>();
         }
         List<String> result = datasetsList.get(surl);
         
@@ -90,7 +90,7 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
                 URL url = new URL(surl + "?server=list");
                 reader = new BufferedReader(new InputStreamReader(url.openStream(),"US-ASCII"));
                 String s = reader.readLine();
-                ArrayList<String> list = new ArrayList<String>();
+                ArrayList<String> list = new ArrayList<>();
                 while (s != null) {
                     list.add(s);
                     s = reader.readLine();
