@@ -117,7 +117,11 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
     
     /**
      * Indicate if a URI is acceptable.
+     * <pre>
+     * {@code
      * vap+das2server:http://www-pw.physics.uiowa.edu/das/das2Server?galileo/pws/EDPosition.dsdf&timerange=2001-10-17
+     * }
+     * </pre>
      * @param surl
      * @param problems
      * @param mon
