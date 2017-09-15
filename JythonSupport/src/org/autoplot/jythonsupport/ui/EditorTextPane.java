@@ -179,7 +179,7 @@ public class EditorTextPane extends JEditorPane {
                 if ( v.startsWith("1.8") || v.startsWith("1.7") ) {
                     
                 } else {
-                    ((SyntaxDocument)EditorTextPane.this.getDocument()).setUndoManager( new CompoundUndoManager(EditorTextPane.this) );
+                    ((SyntaxDocument)EditorTextPane.this.getDocument()).setUndoManager( new UndoManager() );
                 }
                 
                 if ( JythonCompletionProvider.getInstance().settings().isTabIsCompletion()==false ) {
