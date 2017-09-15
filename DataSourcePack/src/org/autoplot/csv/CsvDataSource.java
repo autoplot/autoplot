@@ -238,7 +238,7 @@ public class CsvDataSource extends AbstractDataSource {
                 }
             }
 
-
+            String badTimeTag= null;
             try {
                 if ( idep0column>=0 ) {
                     if ( dep0u instanceof EnumerationUnits ) {
@@ -248,6 +248,7 @@ public class CsvDataSource extends AbstractDataSource {
                     }
                 }
                 if ( bundleb!=null ) {
+                    int validCount= 0;
                     for ( int j=0; j<bundleb.length; j++ ) {
                         Units u1= columnUnits[icolumn+j];
                         if ( u1 instanceof EnumerationUnits ) {
@@ -255,11 +256,26 @@ public class CsvDataSource extends AbstractDataSource {
                         } else {
                             try {
                                 bundleb[j]= u1.parse(reader.get(icolumn+j)).doubleValue(u1);
+                                validCount++;
                             } catch ( ParseException ex ) {
-                                fill= -1e38;
-                                bundleb[j]= fill;
+                                if ( UnitsUtil.isTimeLocation(u1) ) {
+                                    badTimeTag= reader.get(icolumn+j);
+                                    // we will drop the entire record or throw an exception.
+                                    fill= -1e38;
+                                    bundleb[j]= fill;
+                                } else {
+                                    fill= -1e38;
+                                    bundleb[j]= fill;
+                                }
                             }
                         }
+                    }
+                    if ( badTimeTag!=null ) {
+                        String msg= "failed to parse timetag at line "+line+": "+badTimeTag;
+                        if ( validCount==0 ) {
+                            badTimeTag=null;
+                        }
+                        throw new ParseException(msg,0);
                     }
                 } else {
                     if ( u instanceof EnumerationUnits ) {
@@ -271,8 +287,12 @@ public class CsvDataSource extends AbstractDataSource {
 
 
             } catch ( ParseException ex ) {
-                logger.log(Level.FINE, "skipping line: {0}", reader.getRawRecord());
-                continue;
+                if ( badTimeTag!=null ) {
+                    throw ex;
+                } else {
+                    logger.log(Level.FINE, "skipping line: {0}", reader.getRawRecord());
+                    continue;
+                }
             }
 
             if ( needToCheckHeader ) {
