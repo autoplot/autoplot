@@ -175,7 +175,12 @@ public class EditorTextPane extends JEditorPane {
                 JPopupMenu oldPopup= EditorTextPane.this.getComponentPopupMenu();
                 EditorTextPane.this.setContentType("text/python");
 
-                ((SyntaxDocument)EditorTextPane.this.getDocument()).setUndoManager( new CompoundUndoManager(EditorTextPane.this) );
+                String v= System.getProperty("java.version");
+                if ( v.startsWith("1.8") || v.startsWith("1.7") ) {
+                    
+                } else {
+                    ((SyntaxDocument)EditorTextPane.this.getDocument()).setUndoManager( new CompoundUndoManager(EditorTextPane.this) );
+                }
                 
                 if ( JythonCompletionProvider.getInstance().settings().isTabIsCompletion()==false ) {
                     // See EditorContextMenu line 62
