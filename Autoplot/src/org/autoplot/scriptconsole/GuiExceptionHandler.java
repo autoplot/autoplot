@@ -82,6 +82,7 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
+import org.autoplot.APSplash;
 import org.das2.datum.LoggerManager;
 import org.das2.util.ExceptionHandler;
 import org.das2.util.AboutUtil;
@@ -90,6 +91,7 @@ import org.python.core.PyException;
 import org.autoplot.AppManager;
 import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUI;
+import static org.autoplot.AutoplotUI.getProcessId;
 import org.autoplot.AutoplotUtil;
 import org.autoplot.ScriptContext;
 import org.autoplot.dom.Application;
@@ -678,6 +680,11 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
             e.appendChild(app);
 
+            Element v= doc.createElement("applicationVersion");
+            v.appendChild( doc.createTextNode( APSplash.getVersion()) );
+
+            e.appendChild(v);
+            
             Element user= doc.createElement("userComments");
             user.appendChild( doc.createTextNode(userComments) );
             e.appendChild(user);
