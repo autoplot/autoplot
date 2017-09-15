@@ -38,6 +38,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.undo.UndoManager;
 import jsyntaxpane.DefaultSyntaxKit;
+import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.SyntaxStyles;
 import jsyntaxpane.TokenType;
 import jsyntaxpane.actions.ActionUtils;
@@ -174,6 +175,8 @@ public class EditorTextPane extends JEditorPane {
                 JPopupMenu oldPopup= EditorTextPane.this.getComponentPopupMenu();
                 EditorTextPane.this.setContentType("text/python");
 
+                ((SyntaxDocument)EditorTextPane.this.getDocument()).setUndoManager( new CompoundUndoManager(EditorTextPane.this) );
+                
                 if ( JythonCompletionProvider.getInstance().settings().isTabIsCompletion()==false ) {
                     // See EditorContextMenu line 62
                     Action get = ActionUtils.getAction( EditorTextPane.this, IndentAction.class );
