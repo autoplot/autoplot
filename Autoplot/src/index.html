@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Compost Bin Temperatures for August, made with the Mashup tool and mod(T,'24hr').
+        <p><small>Color Scatter and Series modes interpreted data inconsistently.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,15 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-09-13 r21391):</p>
+        <p>Bugfixes (2017-09-16 r21407):</p>
         <ul>  
+            <li>clarify error where "file:///" is changed to "sftp:///jbf@nudnik" which leads to a confusing error because of the ///.
+            <li>1888: Java9 (beta) breaks the undo code of the Jython editor, causing RTE popups. 
+            <li>1889: csv with misformatted timetag would fail with mismarked fill value.  Now record is dropped or an error raised if only the timetag is misformatted.
+            <li>1876: Excel CSVs start with 0xFEFF, to assert UTF-8, support this in the general-purpose ascii table reader.
+            <li>rte_0003832449: indicate that the file starting with 0 (ascii null) does not appear to be ascii.
+            <li>avoid RTE with script editor in Java 9 (beta release) by doing type check.
+            <li>rte_1956645584: colorscatter and series modes interpreted data inconsistently.
             <li>With colorScatter and turning on the symbol connector, the data is misinterpreted.
             <li>rte_0164874230: catch runtime errors in validateFilter.  Catch any exception and trivially return false.
             <li>1886: das2server example parameters are now used.
