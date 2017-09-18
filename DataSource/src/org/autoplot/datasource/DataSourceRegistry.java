@@ -226,6 +226,7 @@ public class DataSourceRegistry {
      * look for META-INF/org.autoplot.datasource.DataSourceFactory.extensions
      */
     protected void discoverRegistryEntries() {
+        logger.fine("discoverRegistryEntries");
         DataSourceRegistry registry= this;
         try {
             ClassLoader loader = DataSetURI.class.getClassLoader();
@@ -237,6 +238,7 @@ public class DataSourceRegistry {
             }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
+                logger.log(Level.FINE, "loading {0}", url);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
                 String s = reader.readLine();
                 while (s != null) {
@@ -267,6 +269,7 @@ public class DataSourceRegistry {
             }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
+                logger.log(Level.FINE, "loading {0}", url);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
                 String s = reader.readLine();
                 while (s != null) {
@@ -290,6 +293,7 @@ public class DataSourceRegistry {
             }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
+                logger.log(Level.FINE, "loading {0}", url);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
                 String s = reader.readLine();
                 while (s != null) {
@@ -320,6 +324,7 @@ public class DataSourceRegistry {
             }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
+                logger.log(Level.FINE, "loading {0}", url);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
                 String s = reader.readLine();
                 while (s != null) {
@@ -349,6 +354,7 @@ public class DataSourceRegistry {
             }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
+                logger.log(Level.FINE, "loading {0}", url);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
                 String s = reader.readLine();
                 while (s != null) {

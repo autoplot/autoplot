@@ -82,6 +82,7 @@ public class DataSetURI {
 
 
     static {
+        logger.fine("load class DataSetURI");
         DataSourceRegistry registry = DataSourceRegistry.getInstance();
         registry.discoverFactories();
         registry.discoverRegistryEntries();
