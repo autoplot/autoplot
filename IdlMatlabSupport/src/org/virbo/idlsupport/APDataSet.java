@@ -69,6 +69,7 @@ public class APDataSet extends QDataSetBridge {
      * @see QDataSetBridge#getException()
      */
     public int loadDataSet( String uri ) {
+        System.err.println("URI: "+uri);
         setDataSetURI(uri);
         doGetDataSet();
         if ( exception!=null ) {
