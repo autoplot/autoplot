@@ -529,6 +529,12 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             Map<String,String> dataParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable( cdf, true, QDataSet.MAX_RANK, true, isMaster );
             Map<String,String> whereParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, 2, false, isMaster );
 
+            if ( dataParameterInfo.isEmpty() ) {
+                this.showAllVarTypeCB.setSelected(true);
+                parameterDescriptions= org.autoplot.cdf.CdfUtil.getPlottable( cdf, !this.showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, false, false );
+                this.showAllVarTypeCB.setEnabled(false);
+            }
+            
             String label;
             if ( this.showAllVarTypeCB.isSelected() ) {
                 parameterInfo= allParameterInfo;
