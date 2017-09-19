@@ -574,21 +574,21 @@ public class BatchMaster extends javax.swing.JPanel {
                 } catch ( URISyntaxException ex ) {
                     throw new IOException(ex);
                 }   interp.set("_apuri", uri );
-                interp.exec("autoplot.params[\'"+paramName+"\']=_apuri"); // JythonRefactory okay
+                interp.exec("autoplot2017.params[\'"+paramName+"\']=_apuri"); // JythonRefactory okay
                 break;
             case 'A':
-                interp.exec("autoplot.params[\'"+paramName+"\']=\'"+f1+"\'");// JythonRefactory okay
+                interp.exec("autoplot2017.params[\'"+paramName+"\']=\'"+f1+"\'");// JythonRefactory okay
                 break;
             case 'T':
                 try {
                     DatumRange timeRange= DatumRangeUtil.parseTimeRange(f1);
                     interp.set("_apdr", timeRange );
-                    interp.exec("autoplot.params[\'"+paramName+"\']=_apdr");// JythonRefactory okay
+                    interp.exec("autoplot2017.params[\'"+paramName+"\']=_apdr");// JythonRefactory okay
                 } catch (ParseException ex) {
                     Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
                 }   break;
             default:
-                interp.exec("autoplot.params[\'"+paramName+"\']="+f1);// JythonRefactory okay
+                interp.exec("autoplot2017.params[\'"+paramName+"\']="+f1);// JythonRefactory okay
                 break;
         }
         
@@ -647,7 +647,7 @@ public class BatchMaster extends javax.swing.JPanel {
             Map<String,org.autoplot.jythonsupport.JythonUtil.Param> parms= Util.getParams( env, script, params, new NullProgressMonitor() );
 
             InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false );
-            interp.exec("import autoplot");  // JythonRefactory okay
+            interp.exec(JythonRefactory.fixImports("import autoplot")); 
             
             ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
             pfp.doVariables( env, scriptFile, params, null );
