@@ -50,6 +50,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyTableCode;
 import org.python.util.PythonInterpreter;
 import org.autoplot.jythonsupport.JythonOps;
+import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.JythonUtil;
 
 /**
@@ -189,7 +190,7 @@ public class JythonCompletionTask implements CompletionTask {
         putInGetDataSetStub( interp );
         
         try {
-            interp.exec(eval);
+            interp.exec(JythonRefactory.fixImports(eval));
         } catch ( PyException ex ) {
             eval = editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
             eval = JythonUtil.removeSideEffects( eval );
@@ -203,6 +204,9 @@ public class JythonCompletionTask implements CompletionTask {
                 rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex2.toString()));
                 return 0;
             }
+        } catch (IOException ex) {
+            rs.addItem(new MessageCompletionItem("Exception occurred: " + ex.toString()));
+            return 0;
         }
 
         PyObject lcontext;
@@ -693,9 +697,12 @@ public class JythonCompletionTask implements CompletionTask {
         } 
         
         try {
-            interp.exec(eval);
+            interp.exec( JythonRefactory.fixImports(eval) );
         } catch ( PyException ex ) {
             rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
+            return 0;
+        } catch (IOException ex) {
+            rs.addItem(new MessageCompletionItem("Error with completions",ex.toString()));
             return 0;
         }
         
