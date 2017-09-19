@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Color Scatter and Series modes interpreted data inconsistently.
+        <p><small>The Events List tool is used to select time ranges from a list of time intervals.  Here is an example <a href="http://www-pw.physics.uiowa.edu/das2/Orbits/junoPJ.dat">file</a>.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,11 +24,13 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-09-16 r21407):</p>
+        <p>Bugfixes (2017-09-18 r21415):</p>
         <ul>  
+            <li>1884: refactory is used in completions.
+            <li>add logging to IDL/Matlab bridge.
             <li>clarify error where "file:///" is changed to "sftp:///jbf@nudnik" which leads to a confusing error because of the ///.
             <li>1888: Java9 (beta) breaks the undo code of the Jython editor, causing RTE popups. 
-            <li>1889: csv with misformatted timetag would fail with mismarked fill value.  Now record is dropped or an error raised if only the timetag is misformatted.
+            <li>1889: csv with misformatted timetag would fail with mis-marked fill value.  Now record is dropped or an error raised if only the timetag is misformatted.
             <li>1876: Excel CSVs start with 0xFEFF, to assert UTF-8, support this in the general-purpose ascii table reader.
             <li>rte_0003832449: indicate that the file starting with 0 (ascii null) does not appear to be ascii.
             <li>avoid RTE with script editor in Java 9 (beta release) by doing type check.
@@ -41,7 +43,7 @@
             <li>branch of CSV reader would drop the first record.  Thanks, Masafumi!
             <li>RGB Image Renderer allows sloppiness in the units, to avoid runtime error during paint.
             <li>in-line Jython scripts would show expression as enumerated data, instead of resolving it, because of link(name) failure.
-            <li>another round of Findbugs, focusing on unneccessary Thread synchronization and find-single-character in String.
+            <li>another round of Findbugs, focusing on unnecessary Thread synchronization and find-single-character in String.
             <li>1884: "import autoplot as ap" was broken since the org.virbo refactoring.
             <li>1511: tighten up code which could reset the y axis autorange property because " " was in the .vap for a filter.
             <li>bugfix: when pngwalk template is file:///home/jbf/ct/hudson/artifacts/test070*.png, the filename was clipped improperly.
