@@ -1,13 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.idlsupport;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.qds.QDataSet;
@@ -23,6 +22,7 @@ public class APDataSet extends QDataSetBridge {
 
     private String surl;
     
+    private static final Logger logger= Logger.getLogger("qdataset.bridge");
 
     static {
         /* DataSourceRegistry registry = DataSourceRegistry.getInstance();
@@ -36,7 +36,7 @@ public class APDataSet extends QDataSetBridge {
      */
     public APDataSet() {
         super();
-        System.err.println("APDataSet v1.5.1");
+        System.err.println("APDataSet v1.5.2");
         String j= System.getProperty("java.version");
         System.err.println("Java Version "+j);
     }
@@ -57,6 +57,7 @@ public class APDataSet extends QDataSetBridge {
      * @param suri the dataset URI, such as vap+dat:http://autoplot.org/data/autoplot.dat
      */
     public synchronized void setDataSetURI(String suri) {
+        logger.log(Level.FINE, "setDataSetURI({0})", suri);
         this.surl = suri;
         datasets.clear();
         names.clear();
@@ -69,7 +70,7 @@ public class APDataSet extends QDataSetBridge {
      * @see QDataSetBridge#getException()
      */
     public int loadDataSet( String uri ) {
-        System.err.println("URI: "+uri);
+        logger.log(Level.FINE, "loadDataSet({0})", uri);
         setDataSetURI(uri);
         doGetDataSet();
         if ( exception!=null ) {
@@ -87,6 +88,7 @@ public class APDataSet extends QDataSetBridge {
      * @see QDataSetBridge#getException()
      */
     public int loadDataSet( String uri, ProgressMonitor mon ) {
+        logger.log(Level.FINE, "loadDataSet({0},mon)", uri);
         setDataSetURI(uri);
         doGetDataSet(mon);
         if ( exception!=null ) {
@@ -103,6 +105,7 @@ public class APDataSet extends QDataSetBridge {
      * @throws Exception
      */
     protected QDataSet getDataSet( ProgressMonitor mon ) throws Exception {
+        logger.fine("getDataSet");
         if ( surl==null ) {
             throw new IllegalStateException("uri has not been set.");
         }
