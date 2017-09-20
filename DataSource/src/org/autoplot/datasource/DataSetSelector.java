@@ -462,7 +462,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                             tsbProblem= "<html>Unable to parse: "+surl+"<br>See http://autoplot.org/help#Time_Parsing_.2F_Formatting";
                         }
                     }
-                    logger.warning(tsbProblem);
+                    if ( tsbProblem.length()>0 ) logger.warning(tsbProblem);
                     
                     setMessage("busy: checking to see if uri looks acceptable");
                     ProgressMonitor mon= getMonitor();
