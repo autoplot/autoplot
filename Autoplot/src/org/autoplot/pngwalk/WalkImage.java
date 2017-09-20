@@ -81,6 +81,8 @@ public class WalkImage  {
 
     private String caption;
     private Status status;
+    private long initLoadBirthTime;
+    
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private final boolean haveThumbs400;
 
@@ -177,6 +179,14 @@ public class WalkImage  {
             freshness.addFirst(this);
         }
         return im;
+    }
+    
+    /**
+     * get the time that the image load was triggered.
+     * @return the time in millis, to be compared to System.currentTimeMillis.
+     */
+    public long getInitLoadBirthTime() {
+        return this.initLoadBirthTime;
     }
 
     /**
@@ -537,6 +547,7 @@ public class WalkImage  {
             }
         };
         setStatus(Status.IMAGE_LOADING);
+        initLoadBirthTime= System.currentTimeMillis();
         RequestProcessor.invokeLater(r);
     }
 

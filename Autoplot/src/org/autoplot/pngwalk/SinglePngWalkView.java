@@ -232,6 +232,8 @@ public class SinglePngWalkView extends PngWalkView {
 
         BufferedImage i = seq.currentImage().getImage();
         
+        long ageMillis= System.currentTimeMillis()-seq.currentImage().getInitLoadBirthTime();
+        
         if (i!=null && i.getWidth(this) >0 && i.getHeight(this) > 0) {
             imageLocation= paintImageCentered(i, g2, seq.currentImage().getCaption());
             cacheImage = i;
@@ -239,7 +241,11 @@ public class SinglePngWalkView extends PngWalkView {
             if (cacheImage != null) {
                 imageLocation= paintImageCentered(cacheImage, g2, seq.currentImage().getCaption());
             }
-            paintImageCentered(loadingImage, g2);
+            if ( ageMillis > 100 ) {
+                paintImageCentered(loadingImage, g2);
+            } else {
+                this.repaint(150);
+            }
         }
         
         if ( i!=null && clickDigitizer.viewer!=null && clickDigitizer.viewer.digitizer!=null ) {
