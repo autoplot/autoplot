@@ -426,7 +426,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         org.das2.util.LoggerManager.logGuiEvent(evt);
         TimeRangeTool t=new TimeRangeTool();
         t.setSelectedRange(getRange().toString());//TODO: goofy
-        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, t, "Select time range",
+        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( SwingUtilities.getWindowAncestor(this), t, "Select time range",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, 
                 new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/calendar.png"))) ) {
             String str= t.getSelectedRange();
