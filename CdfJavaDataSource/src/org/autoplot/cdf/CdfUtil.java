@@ -8,6 +8,7 @@
  */
 package org.autoplot.cdf;
 
+import gov.nasa.gsfc.spdf.cdfj.AttributeEntry;
 import gov.nasa.gsfc.spdf.cdfj.CDFException;
 import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import java.util.logging.Level;
@@ -984,12 +985,31 @@ public class CdfUtil {
 
         logger.fine("getting CDF attributes");
 
+        boolean[] isData= new boolean[v.length];
+        int i=-1;
+        
         int skipCount=0;
         for (String svar : v) {
+            i=i+1;
             if ( dataOnly ) {
-                Object attr= getAttribute( cdf, svar, "VAR_TYPE" );
+                Object attr= getAttribute(cdf, svar, "VAR_TYPE" );
+                if ( attr==null ) {
+                    attr= getAttribute(cdf,svar,"Var_Type");
+                    if ( attr!=null ) {
+                        logger.log(Level.INFO, "Var_type attribute found, should be \"VAR_TYPE\"");
+                    }
+                }
+                if ( attr!=null && "data".equalsIgnoreCase(attr.toString()) ) {
+                    if ( !attr.equals("data") ) {
+                        logger.log(Level.INFO, "var_type is case-sensitive, should be \"data\", not {0}", attr);
+                        attr= "data";
+                    }
+                }
                 if ( attr==null || !attr.equals("data") ) {
                     skipCount++;
+                    isData[i]= false;
+                } else {
+                    isData[i]= true;
                 }
             }
         }
@@ -998,7 +1018,9 @@ public class CdfUtil {
         //    dataOnly= false;
         //}
 
+        i=-1;
         for (String v1 : v) {
+            i=i+1;
             String svar=null;
             List<String> warn= new ArrayList();
             String xDependVariable=null;
@@ -1046,10 +1068,7 @@ public class CdfUtil {
                     continue;
                 }
                 if ( dataOnly ) {
-                    Object attr= getAttribute( cdf, svar, "VAR_TYPE" );
-                    if ( attr==null || !attr.equals("data") ) {
-                        continue;
-                    }
+                    if ( !isData[i] ) continue;
                 }
                 Object att= getAttribute( cdf, svar, "VIRTUAL" );
                 if ( att!=null ) {
