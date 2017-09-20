@@ -430,8 +430,11 @@ end
 ;   xunits=    units as a string, especially like "seconds since 2010-01-01T00:00"
 ;   delta_plus=  array of positive lengths showing the upper limit of the 1-sigma confidence interval.
 ;   delta_minus= array of positive lengths showing the lower limit of the 1-sigma confidence interval.
+;   index=       plot position [0,1,2,3..] 0 is default. (same as integer for first argument.)
 ;-
-pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, tmpfile=tmpfile, noplot=noplot, _extra=e, respawn=respawn, delta_plus=delta_plus, delta_minus=delta_minus
+pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, tmpfile=tmpfile, noplot=noplot, _extra=e, $ 
+    respawn=respawn, delta_plus=delta_plus, delta_minus=delta_minus, $
+    index=index
 
    x= x_in
    if ( n_elements(y_in) gt 0 ) then y= y_in
@@ -569,6 +572,20 @@ pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, tmpfile=tmpfile, noplot=nopl
       if ( n_elements(z) gt 0 ) then zz= z
    endelse
 
+   if ( n_elements( index ) eq 1 ) then begin
+      pos= index
+   endif
+   
+   if ( size(xx,/type) eq 6 ) then begin
+       message, 'complex numbers are not supported'
+   endif
+   if ( size(yy,/type) eq 6 ) then begin
+     message, 'complex numbers are not supported'
+   endif
+   if ( size(zz,/type) eq 6 ) then begin
+     message, 'complex numbers are not supported'
+   endif
+    
    if n_elements(xunits) eq 0 then xunits=''
    
    if ( keyword_set(delta_plus) and keyword_set(delta_minus) ) then begin
@@ -629,15 +646,15 @@ pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, tmpfile=tmpfile, noplot=nopl
 
        if ( pos gt -1 ) then begin
            if n_elements( e ) gt 0 then begin
-              cmd= 'plotx( '+strtrim(pos,2)+', ''file:'+tmpfile+''', '+ex+ ');'  ; semicolon means no echo
+              cmd= 'plot( '+strtrim(pos,2)+', ''file:'+tmpfile+''', '+ex+ ');'  ; semicolon means no echo
            endif else begin
-              cmd= 'plotx( '+strtrim(pos,2)+', ''file:'+tmpfile+''' );'  ; semicolon means no echo
+              cmd= 'plot( '+strtrim(pos,2)+', ''file:'+tmpfile+''' );'  ; semicolon means no echo
            endelse
        endif else begin
            if n_elements( e ) gt 0 then begin
-              cmd= 'plotx( ''file:'+tmpfile+''', '+ex+ ');'  ; semicolon means no echo
+              cmd= 'plot( ''file:'+tmpfile+''', '+ex+ ');'  ; semicolon means no echo
            endif else begin
-              cmd= 'plotx( ''file:'+tmpfile+''' );'  ; semicolon means no echo
+              cmd= 'plot( ''file:'+tmpfile+''' );'  ; semicolon means no echo
            endelse
        endelse
 
