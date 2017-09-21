@@ -994,9 +994,13 @@ public class CdfUtil {
             if ( dataOnly ) {
                 Object attr= getAttribute(cdf, svar, "VAR_TYPE" );
                 if ( attr==null ) {
-                    attr= getAttribute(cdf,svar,"Var_Type");
+                    for ( String s: cdf.variableAttributeNames(svar) ) {
+                        if ( s.equalsIgnoreCase("VAR_TYPE") ) {
+                            attr= getAttribute(cdf,svar,s);
+                        }
+                    }
                     if ( attr!=null ) {
-                        logger.log(Level.INFO, "Var_type attribute found, should be \"VAR_TYPE\"");
+                        logger.log(Level.INFO, "Wrong-case VAR_TYPE attribute found, should be \"VAR_TYPE\"");
                     }
                 }
                 if ( attr!=null && "data".equalsIgnoreCase(attr.toString()) ) {
