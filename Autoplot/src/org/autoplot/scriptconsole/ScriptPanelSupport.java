@@ -1201,6 +1201,10 @@ public class ScriptPanelSupport {
                     if ( s.startsWith("script:") ) s= s.substring(7);
                     if ( s.startsWith("vap+jyds:") ) s= s.substring(9);
                     if ( s.startsWith("vap+jy:") ) s= s.substring(7);
+                    int iscript= s.indexOf("script=");
+                    if ( iscript>-1 ) {
+                        s= s.substring(iscript+"script=".length());
+                    }
                     if ( s.startsWith("file:") ) {
                         if ( s.startsWith("file://") ) s= s.substring(7);
                         if ( s.startsWith("file:") ) s= s.substring(5);
