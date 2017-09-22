@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The Events List tool is used to select time ranges from a list of time intervals.  Here is an example <a href="http://www-pw.physics.uiowa.edu/das2/Orbits/junoPJ.dat">file</a>.
+        <p><small>Happy Fall!</a>.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-09-18 r21415):</p>
+        <p>Bugfixes (2017-09-22 r21431):</p>
         <ul>  
+            <li>if vap+jyds:/path/to/data/file.txt?script=/path/to/script.jyds was used, the data file would show in the recently used list.
+            <li>correct Pngwalk tool's flickering "..." icon which is too quick to indicate busy for trivial tasks.
+            <li>TimeRangeTool pops up over center of GUI, not the address bar.
+            <li>1884: "run batch" corrections.
             <li>1884: refactory is used in completions.
             <li>add logging to IDL/Matlab bridge.
             <li>clarify error where "file:///" is changed to "sftp:///jbf@nudnik" which leads to a confusing error because of the ///.
@@ -88,6 +92,8 @@
         </ul>
         <p>Older Bugfixes:</p>
         <ul>
+            <li>add complexConj and complexMultiply functions.
+            <li>loosen check for CDF VAR_TYPE to support ESA.
             <li>method "BoxSelected" renamed to "boxSelected" to conform to Java and Java Beans conventions, and Jython refactoring supports old scripts.
             <li>1661: format to CDF corrected on Windows by doing extra garbage collections.  Thanks, Kristoff!
             <li>1836: copy dataset internally when the mutable dataset is no longer mutable.  Thanks, Kristoff!
