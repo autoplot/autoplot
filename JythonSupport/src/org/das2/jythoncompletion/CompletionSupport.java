@@ -252,8 +252,6 @@ public class CompletionSupport {
                     if ( tokens.get(i).kind==PythonGrammarConstants.LPAREN && tokens.get(i-1).kind==PythonGrammarConstants.NAME ) {
                         String contextString= tokens.get(i-1).image;
                         return new CompletionContext( CompletionContext.COMMAND_ARGUMENT, contextString, tokens.get(myTokenIndex).image );
-                    } else if ( tokens.get(i-1).kind==PythonGrammarConstants.EQUAL ) {
-                        return new CompletionContext( CompletionContext.DEFAULT_NAME, null, tokens.get(myTokenIndex).image );
                     }
                 }
                 if ( tokens.get(0).kind==PythonGrammarConstants.NAME ) { // why this?
