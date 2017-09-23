@@ -874,7 +874,7 @@ public class JythonCompletionTask implements CompletionTask {
 
         PyObject po= interp.eval(method);
         PyObject doc= interp.eval(method+".__doc__");
-        if ( po instanceof PyFunction ) {
+         if ( po instanceof PyFunction ) {
             method= getPyFunctionSignature((PyFunction)po);
             String signature= makeInlineSignature( po, doc );
             result.addItem( new MessageCompletionItem( method, signature ) );
@@ -886,10 +886,8 @@ public class JythonCompletionTask implements CompletionTask {
             doPyReflectedFunction(eval, prf, labels, signatures, argss );    
             for ( int jj=0; jj<labels.size(); jj++ ) {
                 String signature= signatures.get(jj);
-                String link = null;
-                if (signature != null) {
-                    link= getLinkForJavaSignature(signature);
-                }
+                if ( signature==null ) continue; // I don't this this happens, but findbugs pointed out inconsistent code.
+                String link = getLinkForJavaSignature(signature);
                 DefaultCompletionItem item = new DefaultCompletionItem( method, 0, signature, labels.get(jj), link );
                 item.setReferenceOnly(true);
                 result.addItem( item );
