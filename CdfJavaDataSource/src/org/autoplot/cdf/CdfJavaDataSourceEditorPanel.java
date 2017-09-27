@@ -1,13 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * AggregatingDataSourceEditorPanel.java
- *
- * Created on Apr 22, 2009, 8:37:48 AM
- */
 
 package org.autoplot.cdf;
 
@@ -420,6 +410,8 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
      */
     Map<String,String> params;
     
+    String vapScheme;
+    
     /**
      * the location of the CDF file.
      */
@@ -495,6 +487,9 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     @Override
     public void setURI(String url) {
         URISplit split= URISplit.parse(url);
+        
+        vapScheme= split.vapScheme;
+        
         Map<String,String> lparams= URISplit.parseParams(split.params);
 
         try {
@@ -697,6 +692,8 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     public String getURI() {
         
         URISplit split= URISplit.parse(resourceUri);
+        
+        split.vapScheme= this.vapScheme;
                 
         String subset= subsetComboBox.getSelectedItem().toString().trim();
         if ( subset.length()>0 && subset.charAt(0)!='[' ) {
