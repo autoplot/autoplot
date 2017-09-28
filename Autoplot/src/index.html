@@ -24,8 +24,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-09-22 r21444):</p>
+        <p>Bugfixes (2017-09-27 r21457):</p>
         <ul>  
+            <li>CDF and HDF editor panels didn't preserve the vap+cdf or vap+hdf prefix, breaking servers which send data in files without extensions.
+            <li>fft function would assume that the cadence reported by the dataset was correct and precise, use code that looks at the timetags.
             <li>correct completions for "plot([1,2,3],title='t',&lt;C&gt;)" (tab at &lt;C&gt;)
             <li>if vap+jyds:/path/to/data/file.txt?script=/path/to/script.jyds was used, the data file would show in the recently used scripts list.
             <li>correct Pngwalk tool's flickering "..." icon which is too quick to indicate busy for trivial tasks.
@@ -96,6 +98,8 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>add "bounds" render type, which fills in the region between min and max channels.
+            <li>rfe521: aggregate rank 3 images by adding an index and joining them together.
             <li>add http://.../hapi/info trigger for future support of SPASE accessURLs.
             <li>string representation of complex data used (1.23+4.56j)
             <li>add complexConj and complexMultiply functions.
