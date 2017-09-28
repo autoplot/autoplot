@@ -40,6 +40,8 @@ import ucar.nc2.dataset.NetcdfDataset;
  */
 public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
+    private String vapScheme;
+
     /**
      * Creates new form HDF5DataSourceEditorPanel
      */
@@ -390,6 +392,9 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
     public void setURI(String uri) {
         
         split= URISplit.parse(uri);
+        
+        vapScheme= split.vapScheme;
+        
         params= URISplit.parseParams(split.params);
 
         try {
@@ -597,6 +602,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             params.remove("where");
         }
         
+        split.vapScheme= vapScheme;
         split.params= URISplit.formatParams(params);
         return URISplit.format(split);
     }
