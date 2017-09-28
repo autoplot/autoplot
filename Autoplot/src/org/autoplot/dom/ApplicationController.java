@@ -68,6 +68,7 @@ import org.jdesktop.beansbinding.Converter;
 import org.jdesktop.beansbinding.Property;
 import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUI;
+import org.autoplot.AutoplotUtil;
 import org.autoplot.ColumnColumnConnectorMouseModule;
 import org.autoplot.GuiSupport;
 import org.autoplot.LayoutListener;
@@ -577,6 +578,23 @@ public class ApplicationController extends DomNodeController implements RunLater
         item.setToolTipText("bind the plot's context property to the application timerange, for example when browsing histograms of data.");
         editPlotMenu.add(item);
 
+//        item = new JMenuItem(new AbstractAction("Move this plot below others") {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                LoggerManager.logGuiEvent(e);
+//                int i= application.plots.indexOf(domPlot);
+//                Application ap= (Application)getApplication().copy();
+//                List<Plot> pps= new ArrayList<>( Arrays.asList(ap.getPlots()) );
+//                Plot pp= pps.remove(i);
+//                pps.add(0, (Plot)pp.copy() );
+//                ap.setPlots(pps.toArray(new Plot[pps.size()]));
+//                application.controller.reset();
+//                application.syncTo(ap);
+//                AutoplotUtil.reloadAll(application);
+//            }
+//        });
+//        item.setToolTipText("Move this plot below others, so that it is drawn before.");
+//        editPlotMenu.add(item);
     }
 
     /**
