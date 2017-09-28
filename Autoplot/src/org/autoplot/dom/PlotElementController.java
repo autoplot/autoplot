@@ -92,6 +92,7 @@ import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
 import org.autoplot.metatree.MetadataUtil;
 import org.das2.datum.InconvertibleUnitsException;
+import org.das2.graph.BoundsRenderer;
 
 /**
  * PlotElementController manages the PlotElement, for example resolving the datasource and loading the dataset.
@@ -1810,6 +1811,8 @@ public class PlotElementController extends DomNodeController {
             bindToDigitalRenderer((DigitalRenderer)renderer);
         } else if (renderer instanceof TickCurveRenderer ) {
             bindToTickCurveRenderer((TickCurveRenderer)renderer);
+        } else if (renderer instanceof BoundsRenderer ) {
+            bindToBoundsRenderer((BoundsRenderer)renderer);
         } else if (renderer instanceof ContoursRenderer ) {
             bindToContoursRenderer((ContoursRenderer)renderer);
         }
@@ -3104,6 +3107,12 @@ public class PlotElementController extends DomNodeController {
         ac.bind(plotElement.style, "color", renderer, "color");
         ac.bind(plotElement.style, "lineWidth", renderer, "lineThick");
     }
+    
+    private void bindToBoundsRenderer(BoundsRenderer renderer) {
+        ApplicationController ac = this.dom.controller;
+        ac.bind(plotElement.style, "color", renderer, "color");
+    }
+    
     /**
      * special converter that fills in %{CONTEXT} macro, or inserts it when 
      * label is consistent with macro.  Also now does %{COMPONENT}.  Note

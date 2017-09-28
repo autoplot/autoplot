@@ -152,6 +152,7 @@ import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.renderer.BoundsStylePanel;
 import org.xml.sax.SAXException;
 
 /**
@@ -264,6 +265,9 @@ public class GuiSupport {
                 break;
             case contour:
                 editorPanel= new ContourStylePanel( );
+                break;
+            case bounds:
+                editorPanel= new BoundsStylePanel( );
                 break;
             case digital:
                 editorPanel= new DigitalStylePanel( );
@@ -1905,6 +1909,15 @@ public class GuiSupport {
         item.setToolTipText("Paste the plot in the system clipboard.");
         addPlotMenu.add(item);
             
+        item = new JMenuItem( new AbstractAction("Add Inset Plot") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.addPlot( "50%,100%-2em", "2em,50%" );
+            }
+        } );
+        item.setToolTipText("Add a plot at an arbitrary position.");
+        addPlotMenu.add(item);
+        
 //        item = new JMenuItem(new AbstractAction("Copy Plot Elements Right") {
 //
 //            public void actionPerformed(ActionEvent e) {

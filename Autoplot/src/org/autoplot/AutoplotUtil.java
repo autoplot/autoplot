@@ -137,6 +137,7 @@ import org.autoplot.datasource.ReferenceCache;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
 import org.autoplot.datasource.capability.Caching;
+import org.das2.graph.BoundsRenderer;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.AutoHistogram;
 import org.w3c.dom.Document;
@@ -2198,6 +2199,15 @@ public class AutoplotUtil {
                 result.setDataSetLoader(null);
                 return result;
             }
+        } else if ( renderType==RenderType.bounds ) {
+            if (recyclable != null && recyclable instanceof BoundsRenderer ) {
+                return recyclable;
+            } else {
+                BoundsRenderer result = new BoundsRenderer();
+                result.setDataSetLoader(null);
+                return result;
+            }
+            
 //        } else if ( renderType==RenderType.image ) {
 //            if (recyclable != null && recyclable instanceof ImageRenderer) {
 //                return recyclable;
