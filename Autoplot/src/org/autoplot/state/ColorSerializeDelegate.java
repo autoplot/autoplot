@@ -7,6 +7,7 @@ package org.autoplot.state;
 
 import java.awt.Color;
 import java.text.ParseException;
+import org.das2.graph.ColorUtil;
 import org.das2.qstream.SerializeDelegate;
 
 /**
@@ -19,12 +20,11 @@ public class ColorSerializeDelegate implements SerializeDelegate {
     }
 
     public String format(Object o) {
-        return String.format( "#%06x",((Color)o).getRGB() & 0xFFFFFF );
-        //return "#" + Integer.toHexString(((Color)o).getRGB() & 0xFFFFFF);
+        return ColorUtil.encodeColor((Color)o);
     }
 
     public Object parse(String typeId, String s) throws ParseException {
-        return java.awt.Color.decode((String)s);
+        return ColorUtil.decodeColor(s);
     }
 
     public String typeId(Class clas) {
