@@ -1,7 +1,3 @@
-/*
- * 
- * 
- */
 
 package org.autoplot.dom;
 
@@ -71,7 +67,7 @@ public class ApplicationControllerSyncSupport {
             application.plotElements.get(i).getController().setResetRanges(false);
             application.plotElements.get(i).getController().setDsfReset(false);
             application.plotElements.get(i).getStyle().syncTo(elements[i].getStyle());
-			application.plotElements.get(i).setRenderControl( elements[i].getRenderControl() ); // OrbitPlot relies completely on control.
+            application.plotElements.get(i).setRenderControl( elements[i].getRenderControl() ); // OrbitPlot relies completely on control.
             //application.plotElements.get(i).getController().resetRenderType( plotElements[i].getRenderType() );
             application.plotElements.get(i).setDataSourceFilterId(nameMap.get(elements[i].getDataSourceFilterId()));
             application.plotElements.get(i).getController().setResetPlotElement(false);
@@ -143,8 +139,8 @@ public class ApplicationControllerSyncSupport {
     }
 
     protected void syncConnectors( Connector[] connectors ) {
-        List<Connector> addConnectors= new ArrayList<Connector>();
-        List<Connector> deleteConnectors= new ArrayList<Connector>();
+        List<Connector> addConnectors= new ArrayList<>();
+        List<Connector> deleteConnectors= new ArrayList<>();
 
         List<Connector> thisConnectors= Arrays.asList(application.getConnectors());
         List<Connector> thatConnectors= Arrays.asList(connectors);
