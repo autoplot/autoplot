@@ -55,7 +55,7 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
         List<CompletionContext> result= new ArrayList();
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
             PythonInterpreter interp = JythonUtil.createInterpreter(false);
-            URL imports = JythonOps.class.getResource("imports2017.py");
+            URL imports = JythonOps.class.getResource("/imports2017.py");
             if ( imports!=null ) {
                 interp.execfile(imports.openStream(),"imports2017.py");
             } else {
@@ -77,7 +77,7 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
             }   
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             PythonInterpreter interp = JythonUtil.createInterpreter(false);
-            URL imports = JythonOps.class.getResource("imports2017.py");
+            URL imports = JythonOps.class.getResource("/imports2017.py");
             interp.execfile(imports.openStream(),"imports2017.py");
             String frag= cc.completable;
             org.das2.jythoncompletion.CompletionContext cc1= CompletionSupport.getCompletionContext( "x="+frag, cc.completablepos+2, 0, 0, 0 );        

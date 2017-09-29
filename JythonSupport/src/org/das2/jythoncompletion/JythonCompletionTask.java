@@ -917,7 +917,7 @@ public class JythonCompletionTask implements CompletionTask {
             if ( org.autoplot.jythonsupport.Util.isLegacyImports() ) {
                 URL imports = JythonOps.class.getResource("/imports2017.py");
                 try (InputStream in = imports.openStream()) {
-                    interp.execfile(in,"/imports2017.py");
+                    interp.execfile(in,"imports2017.py");
                 }
             }
             return interp;
