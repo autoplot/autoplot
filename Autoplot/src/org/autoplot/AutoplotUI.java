@@ -1272,6 +1272,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     write.append("# red green blue colorName\n");
                     write.append("# 255 255 255 white\n");
                     write.append("# 100% 100% 100% white\n");
+                    write.append("# 0x8B0000 DarkRed\n");
                     write.close();
                 }
             }
