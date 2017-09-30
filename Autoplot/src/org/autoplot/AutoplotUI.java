@@ -3525,105 +3525,12 @@ APSplash.checkTime("init 52.9");
     private void aboutAutoplotMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutAutoplotMenuItemActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         try {
-            StringBuilder buffy = new StringBuilder();
 
-            buffy.append("<html>\n");
-            URL aboutHtml = AutoplotUI.class.getResource("aboutAutoplot.html");
-
-            if ( aboutHtml!=null ) {
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(aboutHtml.openStream()))) {
-                    String s = reader.readLine();
-                    while (s != null) {
-                        buffy.append(s);
-                        s = reader.readLine();
-                    }
-                }
-            } 
-
-            buffy.append("<h2>Build Information:</h2>");
-            buffy.append("<ul>");
-            buffy.append("<li>release tag: ").append(AboutUtil.getReleaseTag()).append("</li>");
-            buffy.append("<li>build url: ").append(AboutUtil.getJenkinsURL()).append("</li>");
-            
-            List<String> bi = Util.getBuildInfos();
-            for (String ss : bi) {
-                buffy.append("    <li>").append(ss);
-            }
-            buffy.append("</ul>" );
-
-            buffy.append( "<h2>Open Source Components:</h2>");
-            buffy.append( "Autoplot uses many open-source components, such as: <br>");
-            buffy.append( "jsyntaxpane, Jython, Netbeans (Jython completion), OpenDAP, CDF, FITS, NetCDF, " 
-                    + "POI HSSF (Excel), Batik (SVG), iText (PDF), JSON, JavaCSV, JPG Metadata Extractor, das2, JDiskHog");        
-            
-            buffy.append("<h2>Runtime Information:</h2>");
-
-            String javaVersion = System.getProperty("java.version"); // applet okay
-            String arch = System.getProperty("os.arch"); // applet okay
-            java.text.DecimalFormat nf = new java.text.DecimalFormat("0.0");
-            String mem = nf.format(Runtime.getRuntime().maxMemory()   / 1000000 );
-            String tmem= nf.format(Runtime.getRuntime().totalMemory() / 1000000 );
-            String fmem= nf.format(Runtime.getRuntime().freeMemory()  / 1000000 );
-            String nmem= "???";
-            try {
-                // taken from https://svn.apache.org/repos/asf/flume/trunk/flume-ng-core/src/main/java/org/apache/flume/tools/DirectMemoryUtils.java
-                Class<?> VM = Class.forName("sun.misc.VM");
-                Method maxDirectMemory = VM.getDeclaredMethod("maxDirectMemory", new Class[0] );
-                Object result = maxDirectMemory.invoke(null, (Object[])null);
-                if (result != null && result instanceof Long) {
-                    nmem= nf.format( ((Long)result) / 1000000 );
-                }       
-            } catch ( ClassNotFoundException ex ) {
-                // do nothing, show ??? for native.
-            } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            String pwd= new File("foo.txt").getAbsoluteFile().getParent();
-            String pid= getProcessId("???");
-            String host= InetAddress.getLocalHost().getHostName();
-            String memWarning="";
-            if ( ( Runtime.getRuntime().maxMemory() / 1000000 )<700 ) {
-                memWarning= "<li> Available RAM is low, severely limiting capabilities (<a href=\"http://autoplot.org/lowMem\">info</a>)";
-            }
-            String bits= is32bit ? "32" : "64";
-            String bitsWarning;
-            bitsWarning= is32bit ? "(<a href=\"http://autoplot.org/32bit\">severely limiting capabilities</a>)" : "(recommended)";
-            
-            String javaVersionWarning= "";
-            Pattern p= Pattern.compile("(\\d+\\.\\d+)\\.\\d+\\_(\\d+)");
-            Matcher m= p.matcher(javaVersion);
-            if ( m.matches() ) {
-                double major= Double.parseDouble( m.group(1) );
-                int minor= Integer.parseInt( m.group(2) );
-                if ( major<1.8 || ( major==1.8 && minor<102 ) ) {
-                    javaVersionWarning= "(<a href=\"http://autoplot.org/javaVersion\">limiting access to CDAWeb</a>)";
-                } else {
-                    javaVersionWarning= "(recommended)";
-                }
-            }
-            
-                
-            String aboutContent = "<ul>" +
-                "<li>Java version: " + javaVersion + " " + javaVersionWarning + 
-                memWarning +    
-                "<li>max memory (MB): " + mem + " (memory available to process)" +
-                "<li>total memory (MB): " + tmem + " (amount allocated to the process)" +
-                "<li>free memory (MB): " + fmem + " (amount available before more must be allocated)" + 
-                "<li>native memory limit (MB): " + nmem + " (amount of native memory available to the process)" +
-                "<li>arch: " + arch +
-                "<li>" + bits + " bit Java " + bitsWarning  +
-                "<li>hostname: "+ host +
-                "<li>pid: " + pid +
-                "<li>pwd: " + pwd +
-                "</ul>";
-            buffy.append( aboutContent );
-            
-            buffy.append("</html>");
-
+            String bufStr= AutoplotUtil.getAboutAutoplotHtml();
 
             JTextPane jtp= new JTextPane();
             jtp.setContentType("text/html");
-            jtp.read(new StringReader(buffy.toString()), null);
+            jtp.read(new StringReader(bufStr), null);
             jtp.setEditable(false);
 
             jtp.addHyperlinkListener( new HyperlinkListener() {
@@ -4311,34 +4218,6 @@ public static String getProcessId(final String fallback) {
     return fallback;
 }
 
-private static final boolean is32bit;
-private static final String javaVersionWarning;
-
-static {
-    String s= System.getProperty("sun.arch.data.model");
-    if ( s==null ) { // GNU 1.5? 
-        s= System.getProperty("os.arch");
-        is32bit = !s.contains("64");
-    } else {
-        is32bit = s.equals("32");
-    }     
-    String javaVersion=  System.getProperty("java.version"); // applet okay
-    
-    Pattern p= Pattern.compile("(\\d+\\.\\d+)\\.\\d+\\_(\\d+)");
-    Matcher m= p.matcher(javaVersion);
-    if ( m.matches() ) {
-        double major= Double.parseDouble( m.group(1) );
-        int minor= Integer.parseInt( m.group(2) );
-        if ( major<1.8 || ( major==1.8 && minor<102 ) ) {
-            javaVersionWarning= " (oldJRE)";
-        } else {
-            javaVersionWarning= "";
-        }
-    } else {
-        javaVersionWarning= "";
-    }
-}
-
 private void updateFrameTitle() {
     final String suri= applicationModel.getVapFile();
 
@@ -4354,14 +4233,14 @@ private void updateFrameTitle() {
 
     final String server= rlistener==null ? "" : ( " (port="+rlistener.getPort()+")" );
     
-    final String s32bit= is32bit ? " (32bit)" : "";
+    final String s32bit= AutoplotUtil.is32bit ? " (32bit)" : "";
     
     final String theTitle;
     
     String apname= this.applicationName.length()==0 ? "" : this.applicationName + " - ";
     
     if ( suri==null ) {
-        theTitle= apname + title0 + isoffline + server + s32bit + javaVersionWarning;
+        theTitle= apname + title0 + isoffline + server + s32bit + AutoplotUtil.javaVersionWarning;
     } else {
         URISplit split= URISplit.parse(suri);
 

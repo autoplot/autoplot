@@ -50,15 +50,21 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Properties;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -79,6 +85,7 @@ import javax.swing.border.TitledBorder;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import static org.autoplot.AutoplotUI.getProcessId;
 import org.das2.datum.DomainDivider;
 import org.das2.datum.DomainDividerUtil;
 import org.das2.datum.EnumerationUnits;
@@ -140,6 +147,7 @@ import org.autoplot.datasource.capability.Caching;
 import org.das2.graph.BoundsRenderer;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.AutoHistogram;
+import org.das2.util.AboutUtil;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -2391,4 +2399,131 @@ public class AutoplotUtil {
         return WindowManager.showConfirmDialog( parent, omessage, title, optionType );
     }
 
+    public static final boolean is32bit;
+    
+    public static final String javaVersionWarning;
+
+    static {
+        String s= System.getProperty("sun.arch.data.model");
+        if ( s==null ) { // GNU 1.5? 
+            s= System.getProperty("os.arch");
+            is32bit = !s.contains("64");
+        } else {
+            is32bit = s.equals("32");
+        }     
+        String javaVersion=  System.getProperty("java.version"); // applet okay
+
+        Pattern p= Pattern.compile("(\\d+\\.\\d+)\\.\\d+\\_(\\d+)");
+        Matcher m= p.matcher(javaVersion);
+        if ( m.matches() ) {
+            double major= Double.parseDouble( m.group(1) );
+            int minor= Integer.parseInt( m.group(2) );
+            if ( major<1.8 || ( major==1.8 && minor<102 ) ) {
+                javaVersionWarning= " (oldJRE)";
+            } else {
+                javaVersionWarning= "";
+            }
+        } else {
+            javaVersionWarning= "";
+        }
+    }    
+    
+    public static String getAboutAutoplotHtml() throws IOException {
+        StringBuilder buffy = new StringBuilder();
+
+        buffy.append("<html>\n");
+        URL aboutHtml = AutoplotUI.class.getResource("aboutAutoplot.html");
+
+        if ( aboutHtml!=null ) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(aboutHtml.openStream()))) {
+                String s = reader.readLine();
+                while (s != null) {
+                    buffy.append(s);
+                    s = reader.readLine();
+                }
+            }
+        } 
+
+        buffy.append("<h2>Build Information:</h2>");
+        buffy.append("<ul>");
+        buffy.append("<li>release tag: ").append(AboutUtil.getReleaseTag()).append("</li>");
+        buffy.append("<li>build url: ").append(AboutUtil.getJenkinsURL()).append("</li>");
+
+        List<String> bi = Util.getBuildInfos();
+        for (String ss : bi) {
+            buffy.append("    <li>").append(ss);
+        }
+        buffy.append("</ul>" );
+
+        buffy.append( "<h2>Open Source Components:</h2>");
+        buffy.append( "Autoplot uses many open-source components, such as: <br>");
+        buffy.append( "jsyntaxpane, Jython, Netbeans (Jython completion), OpenDAP, CDF, FITS, NetCDF, " 
+                + "POI HSSF (Excel), Batik (SVG), iText (PDF), JSON, JavaCSV, JPG Metadata Extractor, das2, JDiskHog");        
+
+        buffy.append("<h2>Runtime Information:</h2>");
+
+        String javaVersion = System.getProperty("java.version"); // applet okay
+        String arch = System.getProperty("os.arch"); // applet okay
+        java.text.DecimalFormat nf = new java.text.DecimalFormat("0.0");
+        String mem = nf.format(Runtime.getRuntime().maxMemory()   / 1000000 );
+        String tmem= nf.format(Runtime.getRuntime().totalMemory() / 1000000 );
+        String fmem= nf.format(Runtime.getRuntime().freeMemory()  / 1000000 );
+        String nmem= "???";
+        try {
+            // taken from https://svn.apache.org/repos/asf/flume/trunk/flume-ng-core/src/main/java/org/apache/flume/tools/DirectMemoryUtils.java
+            Class<?> VM = Class.forName("sun.misc.VM");
+            Method maxDirectMemory = VM.getDeclaredMethod("maxDirectMemory", new Class[0] );
+            Object result = maxDirectMemory.invoke(null, (Object[])null);
+            if (result != null && result instanceof Long) {
+                nmem= nf.format( ((Long)result) / 1000000 );
+            }       
+        } catch ( ClassNotFoundException ex ) {
+            // do nothing, show ??? for native.
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        String pwd= new File("foo.txt").getAbsoluteFile().getParent();
+        String pid= getProcessId("???");
+        String host= InetAddress.getLocalHost().getHostName();
+        String memWarning="";
+        if ( ( Runtime.getRuntime().maxMemory() / 1000000 )<700 ) {
+            memWarning= "<li> Available RAM is low, severely limiting capabilities (<a href=\"http://autoplot.org/lowMem\">info</a>)";
+        }
+        String bits= is32bit ? "32" : "64";
+        String bitsWarning;
+        bitsWarning= is32bit ? "(<a href=\"http://autoplot.org/32bit\">severely limiting capabilities</a>)" : "(recommended)";
+
+        String javaVersionWarning= "";
+        Pattern p= Pattern.compile("(\\d+\\.\\d+)\\.\\d+\\_(\\d+)");
+        Matcher m= p.matcher(javaVersion);
+        if ( m.matches() ) {
+            double major= Double.parseDouble( m.group(1) );
+            int minor= Integer.parseInt( m.group(2) );
+            if ( major<1.8 || ( major==1.8 && minor<102 ) ) {
+                javaVersionWarning= "(<a href=\"http://autoplot.org/javaVersion\">limiting access to CDAWeb</a>)";
+            } else {
+                javaVersionWarning= "(recommended)";
+            }
+        }
+
+
+        String aboutContent = "<ul>" +
+            "<li>Java version: " + javaVersion + " " + javaVersionWarning + 
+            memWarning +    
+            "<li>max memory (MB): " + mem + " (memory available to process)" +
+            "<li>total memory (MB): " + tmem + " (amount allocated to the process)" +
+            "<li>free memory (MB): " + fmem + " (amount available before more must be allocated)" + 
+            "<li>native memory limit (MB): " + nmem + " (amount of native memory available to the process)" +
+            "<li>arch: " + arch +
+            "<li>" + bits + " bit Java " + bitsWarning  +
+            "<li>hostname: "+ host +
+            "<li>pid: " + pid +
+            "<li>pwd: " + pwd +
+            "</ul>";
+        buffy.append( aboutContent );
+
+        buffy.append("</html>");
+        return buffy.toString();
+
+    }
 }
