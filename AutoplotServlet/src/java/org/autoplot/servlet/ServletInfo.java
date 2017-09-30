@@ -49,28 +49,50 @@ public class ServletInfo extends HttpServlet {
             String s = AboutUtil.getAboutHtml();
             s = s.substring(0, s.length() - 7);
             out.println(s);
-                    
-            File sd= ServletUtil.getServletHome();
-            File ff= new File( sd, "whitelist.txt" );
-            out.println("<h2>Whitelist File</h2>\n");
-            out.println("Whitelist File: "+ff+"<br>");
-            out.println("<ul>");
-            List<String> ss= ServletUtil.getWhiteList();
-            for ( String s1: ss ) {
-                out.println("<li>"+s1+"\n");
+
+            boolean isHostPrivileged= false;
+            try {
+                SecurityUtil.checkAllowed(request);
+                isHostPrivileged= true;
+            } catch ( SecurityException ex ) {
             }
-            if ( ss.isEmpty() ) {
-                out.println("<li>(whitelist is empty)\n");
+            
+            if ( !isHostPrivileged ) {
+                out.println("<h2>You do not have access to see all information.\n</h2>");
             }
-            out.println("</ul>");
+            
+            if ( isHostPrivileged ) {
+                File sd= ServletUtil.getServletHome();
+                File ff= new File( sd, "whitelist.txt" );
+                out.println("<h2>Whitelist File</h2>\n");
+                out.println("Whitelist File: "+ff+"<br>");
+                out.println("<ul>");
+                List<String> ss= ServletUtil.getWhiteList();
+                for ( String s1: ss ) {
+                    out.println("<li>"+s1+"\n");
+                }
+                if ( ss.isEmpty() ) {
+                    out.println("<li>(whitelist is empty)\n");
+                }
+                out.println("</ul>");
+            } 
+            
             out.println("<h2>Other Info</h2>\n");
             InetAddress localhost = java.net.InetAddress.getLocalHost();
             String hostName = localhost.getHostName();
             out.println("hostname: "+hostName);
-            out.println("<br>user.name: "+ System.getProperty("user.name") + "\n"); // TODO: security concerns
-            out.println("<br>java.home: "+ System.getProperty("java.home") + "\n"); // TODO: security concerns
-            out.println("<p>PWD: "+ ( new File(".").getAbsolutePath() ) +"\n" );
-            out.println("<br>Servlet Home: "+ServletUtil.getServletHome() + "\n"); // TODO: security concerns
+            
+            if ( isHostPrivileged ) {
+                out.println("<br>user.name: "+ System.getProperty("user.name") + "\n"); // TODO: security concerns
+                out.println("<br>java.home: "+ System.getProperty("java.home") + "\n"); // TODO: security concerns
+                out.println("<br>user.home: "+ System.getProperty("user.home") + "\n"); // TODO: security concerns
+
+                out.println("<p>PWD: "+ ( new File(".").getAbsolutePath() ) +"\n" );
+                out.println("<br>Servlet Home: "+ServletUtil.getServletHome() + "\n"); // TODO: security concerns
+            } else {
+                
+            }
+            
             out.println("<br>servlet version="+version+"<br>");
             
             out.println("</p></body>");
