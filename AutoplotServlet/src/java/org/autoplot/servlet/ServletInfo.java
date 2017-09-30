@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.autoplot.AutoplotUtil;
 import org.das2.util.AboutUtil;
 import static org.autoplot.servlet.SimpleServlet.version;
 
@@ -46,10 +47,6 @@ public class ServletInfo extends HttpServlet {
             out.println("<body>");
             out.println("<h1>Servlet ServletInfo at " + request.getContextPath() + "</h1>");
             
-            String s = AboutUtil.getAboutHtml();
-            s = s.substring(0, s.length() - 7);
-            out.println(s);
-
             boolean isHostPrivileged= false;
             try {
                 SecurityUtil.checkAllowed(request);
@@ -77,12 +74,9 @@ public class ServletInfo extends HttpServlet {
                 out.println("</ul>");
             } 
             
-            out.println("<h2>Other Info</h2>\n");
-            InetAddress localhost = java.net.InetAddress.getLocalHost();
-            String hostName = localhost.getHostName();
-            out.println("hostname: "+hostName);
-            
             if ( isHostPrivileged ) {
+                String st= AutoplotUtil.getAboutAutoplotHtml();
+                out.println(st);
                 out.println("<br>user.name: "+ System.getProperty("user.name") + "\n"); // TODO: security concerns
                 out.println("<br>java.home: "+ System.getProperty("java.home") + "\n"); // TODO: security concerns
                 out.println("<br>user.home: "+ System.getProperty("user.home") + "\n"); // TODO: security concerns
