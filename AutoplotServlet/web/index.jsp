@@ -4,6 +4,7 @@
     Author     : jbf
 --%>
 
+<%@page import="org.autoplot.servlet.ServletInfo"%>
 <%@page import="org.das2.util.AboutUtil"%>
 <%@page import="org.autoplot.servlet.SimpleServlet"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -69,5 +70,6 @@
         <hr>
         <small><%= SimpleServlet.version %></small>
         <small><%= AboutUtil.getJenkinsURL() %></small>
+        <small>up: <%= ServletInfo.getDurationForHumans(ServletInfo.getAgeMillis()) %></small>
     </body>
 </html>
