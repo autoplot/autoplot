@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>HAPI server shows that an attic window was left open in the middle of January.  Happy Fall!
+        <p><small>Color GUI allows selection from 140 named colors.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-09-27 r21457):</p>
+        <p>Bugfixes (2017-09-27 r21469):</p>
         <ul>  
+            <li>vap+inline completions didn't import things properly, causing runtime error.
             <li>CDF and HDF editor panels didn't preserve the vap+cdf or vap+hdf prefix, breaking servers which send data in files without extensions.
             <li>fft function would assume that the cadence reported by the dataset was correct and precise, use code that looks at the timetags.
             <li>correct completions for "plot([1,2,3],title='t',&lt;C&gt;)" (tab at &lt;C&gt;)
@@ -98,6 +99,13 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>AutoplotServer has --nomessages which turns off message bubbles.
+            <li>ServletInfo reports memory consumed and other useful information.
+            <li>ServletInfo of Autoplot Servlet now checks whitelist before showing server-side information.
+            <li>three new plot symbols added (trianglesWest, trianglesEast, trianglesSouth).
+            <li>X11 color names like "DarkRed" can be used.
+            <li>.vap format supports transparent colors now.
+            <li>symbol size and line thickness spinners allow up to 20 pixels.
             <li>add "bounds" render type, which fills in the region between min and max channels.
             <li>rfe521: aggregate rank 3 images by adding an index and joining them together.
             <li>add http://.../hapi/info trigger for future support of SPASE accessURLs.
