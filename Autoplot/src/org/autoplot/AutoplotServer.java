@@ -9,7 +9,6 @@ import static org.autoplot.ScriptContext.*;
 
 import org.das2.util.ArgumentList;
 import org.autoplot.dom.Application;
-import org.autoplot.scriptconsole.GuiExceptionHandler;
 import org.autoplot.datasource.URISplit;
 
 /**
@@ -39,6 +38,7 @@ public class AutoplotServer {
         alm.addOptionalSwitchArgument("outfile", "o", "outfile", "-", "output filename or -");
         alm.addBooleanSwitchArgument( "enableResponseMonitor", null, "enableResponseMonitor", "monitor the event thread for long unresponsive pauses");
         alm.addBooleanSwitchArgument( "noexit", "z", "noexit", "don't exit after running, for use with scripts." );
+        alm.addBooleanSwitchArgument( "nomessages", "q", "nomessages", "don't show message bubbles.");
         alm.requireOneOf( new String[] { "uri", "vap" } );
         alm.process(args);
 
@@ -56,7 +56,7 @@ public class AutoplotServer {
         
         if ( width==-1 && vap.equals("") ) {
             URISplit split= URISplit.parse(suri);
-            if ( split.ext.equals(".vap") ) {
+            if ( ".vap".equals(split.ext) ) {
                 logger.warning("use --vap=file.vap to preserve width and height");
             } 
         }
@@ -123,6 +123,9 @@ public class AutoplotServer {
         logger.fine("get the model which provides the canvas");
         
         Application model= getDocumentModel();
+        if ( alm.getBooleanValue("nomessages" ) ) {
+            model.getOptions().setPrintingLogLevel(Level.OFF);
+        }
 
         switch (format) {
             case "png":
