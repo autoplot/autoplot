@@ -20,7 +20,13 @@ public class ColorSerializeDelegate implements SerializeDelegate {
     }
 
     public String format(Object o) {
-        return ColorUtil.encodeColor((Color)o);
+        Color color= (Color)o;
+        if ( color.getAlpha()<255 ) {
+            return "#" + Integer.toHexString(color.getRGB());
+        } else {
+            return "#" + Integer.toHexString(color.getRGB() & 0xFFFFFF);
+        }
+        //return ColorUtil.encodeColor((Color)o);
     }
 
     public Object parse(String typeId, String s) throws ParseException {
