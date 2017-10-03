@@ -478,8 +478,7 @@ public class StatePersistence {
                     }
                     Object val;
                     try {
-                        // pop off any single-quotes used to delimit strings in URLs.
-                        if ( c==String.class && sval.length()>1 && sval.startsWith("'") && sval.endsWith("'") ) {
+                        if ( sval.length()>1 && sval.startsWith("'") && sval.endsWith("'") ) {
                             sval= sval.substring(1,sval.length()-1);
                         }
                         val = sd.parse(sd.typeId(c), sval);
