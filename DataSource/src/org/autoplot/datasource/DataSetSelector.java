@@ -1068,6 +1068,10 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         } else {
             if ( split.scheme!=null && split.scheme.equals("file") ) {
+                if ( ".vap".equals(split.ext) && split.resourceUriCarotPos > split.file.length() ) {
+                    showVapCompletions(URISplit.format(split), split.formatCarotPos);
+                    return;
+                }
                 if ( !surl.startsWith("vap") ) maybeClearVap(split);
                 showFileSystemCompletions(URISplit.format(split), split.formatCarotPos);
                 return;
@@ -1300,11 +1304,26 @@ public class DataSetSelector extends javax.swing.JPanel {
                     sep= true;
                 }
                 remote.add(l);
-                logger.log(Level.FINEST, "appening {0}", l.completion);
+                logger.log(Level.FINEST, "appending {0}", l.completion);
             }
         }
     }
     
+    private void showVapCompletions( final String format, final int formatCarotPos) {
+        //URISplit split= URISplit.parse(format);
+        calcAndShowCompletions( new Runnable() {
+            @Override
+            public void run() {
+                List<CompletionResult> completions= new ArrayList<>();
+                completions.add( new CompletionResult( "timerange", "reset the timerange") );
+                completions.add( new CompletionResult( "plots[0].yaxis.range", "reset the yaxis range") );
+                showCompletionsGui( format.substring(0,formatCarotPos), completions );
+
+            }
+        } );
+   
+    }
+
     private void showFileSystemCompletions(final String surl, final int carotpos) {
 
         logger.log(Level.FINE, "entering showFileSystemCompletions({0},{1})", new Object[]{surl, carotpos});
