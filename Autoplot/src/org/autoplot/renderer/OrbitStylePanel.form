@@ -2,7 +2,7 @@
 
 <Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
-    <Component class="org.das2.components.propertyeditor.ColorEditor" name="colorEditor1">
+    <Component class="org.das2.components.propertyeditor.ColorEditor" name="colorEditor">
     </Component>
   </NonVisualComponents>
   <Properties>

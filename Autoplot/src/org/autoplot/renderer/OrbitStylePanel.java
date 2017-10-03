@@ -15,6 +15,8 @@ import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
 import org.autoplot.PlotStylePanel;
 import org.autoplot.dom.PlotElement;
+import org.autoplot.dom.PlotElementStyle;
+import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 
 /**
  * Style panel for orbit renderer
@@ -28,9 +30,9 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
     public OrbitStylePanel() {
         initComponents();
         //note the colorPanel must have its layout set to BorderLayout.
-        colorEditor1.setValue(Color.BLACK);
-        colorPanel.add( colorEditor1.getSmallEditor() );
-        colorEditor1.addPropertyChangeListener( new PropertyChangeListener() {
+        colorEditor.setValue(Color.BLACK);
+        colorPanel.add( colorEditor.getSmallEditor() );
+        colorEditor.addPropertyChangeListener( new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 update();
@@ -68,7 +70,7 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
         Map<String,String> controls= new LinkedHashMap();
         controls.put( Renderer.CONTROL_KEY_FONT_SIZE, fontSizeTF.getText() );
         //controls.put( "format", formatTF.getText() );
-        controls.put( Renderer.CONTROL_KEY_COLOR, Renderer.encodeColorControl( (Color)colorEditor1.getValue() ) );
+        controls.put( Renderer.CONTROL_KEY_COLOR, Renderer.encodeColorControl( (Color)colorEditor.getValue() ) );
         //controls.put( "fillLabel", fillLabelTF.getText() );
         controls.put( Renderer.CONTROL_KEY_LINE_THICK, thickTextField.getText() );
         controls.put( "tickLength", tickLengthTextField.getText() );
@@ -79,7 +81,7 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
     private void updateGUI( Renderer renderer ) {
         this.control= renderer.getControl();
         fontSizeTF.setText( renderer.getControl( Renderer.CONTROL_KEY_FONT_SIZE, fontSizeTF.getText() ) ); 
-        colorEditor1.setValue( renderer.getColorControl( Renderer.CONTROL_KEY_COLOR, (Color)colorEditor1.getValue() ) );
+        colorEditor.setValue( renderer.getColorControl( Renderer.CONTROL_KEY_COLOR, (Color)colorEditor.getValue() ) );
         thickTextField.setText( renderer.getControl( Renderer.CONTROL_KEY_LINE_THICK, thickTextField.getText() ) );
         tickLengthTextField.setText( renderer.getControl( "tickLength", tickLengthTextField.getText() ) );
     }
@@ -90,10 +92,14 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
         updateGUI( renderer );
         
         BindingGroup bc = new BindingGroup();
+        PlotElementStyle style= element.getStyle();
+        
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "color" ), colorEditor, BeanProperty.create("value")));
 
         bc.addBinding( Bindings.createAutoBinding( AutoBinding.UpdateStrategy.READ_WRITE, 
                 element, BeanProperty.create(  PlotElement.PROP_RENDERCONTROL ), 
                 this, BeanProperty.create( Renderer.PROP_CONTROL ) ) );
+        
         
         if ( elementBindingContext!=null ) {
             releaseElementBindings();
@@ -124,7 +130,7 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        colorEditor1 = new org.das2.components.propertyeditor.ColorEditor();
+        colorEditor = new org.das2.components.propertyeditor.ColorEditor();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         colorPanel = new javax.swing.JPanel();
@@ -259,7 +265,7 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.das2.components.propertyeditor.ColorEditor colorEditor1;
+    private org.das2.components.propertyeditor.ColorEditor colorEditor;
     private javax.swing.JPanel colorPanel;
     private javax.swing.JTextField fontSizeTF;
     private javax.swing.JLabel jLabel1;
