@@ -2,6 +2,7 @@
 package org.autoplot;
 
 import java.awt.Component;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
@@ -49,6 +51,10 @@ import org.autoplot.datasource.URISplit;
 import org.autoplot.jythonsupport.JythonUtil.Param;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.autoplot.jythonsupport.ui.Util;
+import org.das2.datum.Units;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
+import org.das2.qds.ops.Ops;
 
 /**
  * Tool for running batches, generating inputs for jython scripts.
@@ -167,6 +173,7 @@ public class BatchMaster extends javax.swing.JPanel {
         jList2 = new javax.swing.JList<>();
         jPopupMenu1 = new javax.swing.JPopupMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
+        loadUriMenuItem = new javax.swing.JMenuItem();
         timeRangesPanel = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         timeRangeComboBox = new javax.swing.JComboBox<>();
@@ -184,6 +191,7 @@ public class BatchMaster extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         param1NameCB = new javax.swing.JComboBox<>();
         param2NameCB = new javax.swing.JComboBox<>();
+        cancelButton = new javax.swing.JButton();
 
         jList2.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -200,6 +208,14 @@ public class BatchMaster extends javax.swing.JPanel {
             }
         });
         jPopupMenu1.add(jMenuItem1);
+
+        loadUriMenuItem.setText("load events file...");
+        loadUriMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadUriMenuItemActionPerformed(evt);
+            }
+        });
+        jPopupMenu1.add(loadUriMenuItem);
 
         jLabel2.setText("Time Range:");
 
@@ -286,12 +302,19 @@ public class BatchMaster extends javax.swing.JPanel {
 
         messageLabel.setText("Load up those parameters and hit Go!");
 
-        jLabel1.setText("<html>This tool generates inputs for scripts, running through a series of inputs.  Specify the parameter name and values to assign, and optionally a second parameter.  Each value of the second parameter is run for each value of the first.  Use the inspect button to set values for any other parameters. ");
+        jLabel1.setText("<html>This tool generates inputs for scripts, running through a series of inputs.  First load the script with the green \"play\" button, then specify the parameter name and values to assign, and optionally a second parameter.  Each value of the second parameter is run for each value of the first.  Use the inspect button to set values for any other parameters. Right-click within the values areas to generate values.");
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         param1NameCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
 
         param2NameCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
+
+        cancelButton.setText("Cancel");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -306,6 +329,8 @@ public class BatchMaster extends javax.swing.JPanel {
                             .addComponent(messageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(cancelButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(goButton, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addComponent(dataSetSelector1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 682, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
@@ -335,7 +360,9 @@ public class BatchMaster extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(messageLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(goButton)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(goButton)
+                    .addComponent(cancelButton))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -401,6 +428,34 @@ public class BatchMaster extends javax.swing.JPanel {
             jPopupMenu2.show( evt.getComponent(), evt.getX(), evt.getY() );
         }
     }//GEN-LAST:event_param2ValuesMouseReleased
+
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        Window w=SwingUtilities.getWindowAncestor(this);
+        if ( ! ( w instanceof JDialog ) ) {
+            logger.warning("untested code might leave hidden windows...");
+        }
+        w.setVisible(false);
+    }//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void loadUriMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadUriMenuItemActionPerformed
+        DataSetSelector dataSetSelector1= new DataSetSelector();
+        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog(this, dataSetSelector1, "load events", JOptionPane.OK_CANCEL_OPTION ) ) {
+            try {
+                QDataSet ds= org.autoplot.jythonsupport.Util.getDataSet(dataSetSelector1.getValue());
+                ds= Ops.createEvents(ds);
+                Units tu= ((Units)((QDataSet)ds.property(QDataSet.BUNDLE_1)).property(QDataSet.UNITS,0));
+                StringBuilder ss= new StringBuilder();
+                for ( int i=0; i<ds.length(); i++ ) {
+                    QDataSet tr= ds.slice(i).trim(0,2);
+                    tr= Ops.putProperty( tr, QDataSet.UNITS, tu );
+                    ss.append( DataSetUtil.asDatumRange( tr ).toString() ).append("\n");
+                }
+                param1Values.setText(ss.toString());
+            } catch (Exception ex) {
+                Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_loadUriMenuItemActionPerformed
 
     private void doGenerate( JComboBox cb, JTextArea ta ) {
         String p= cb.getSelectedItem().toString();
@@ -640,7 +695,7 @@ public class BatchMaster extends javax.swing.JPanel {
             Map<String,String> params= URISplit.parseParams(split.params);
             Map<String,Object> env= new HashMap<>();
             env.put("dom",this.dom);
-                    
+
             File scriptFile= DataSetURI.getFile( split.file, monitor.getSubtaskMonitor("download script") );
             String script= readScript( scriptFile );
             
@@ -658,7 +713,8 @@ public class BatchMaster extends javax.swing.JPanel {
                     logger.log(Level.SEVERE, null, ex);
                 }
             }
-            
+
+            monitor.setTaskSize( ff1.length );
             int i1=0;
             for ( String f1 : ff1 ) {
                 try {
@@ -666,7 +722,8 @@ public class BatchMaster extends javax.swing.JPanel {
                     if ( monitor.isCancelled() ) break;
                     monitor.setTaskProgress(monitor.getTaskProgress()+1);
                     if ( f1.trim().length()==0 ) continue;
-                    interp.set( "monitor", monitor.getSubtaskMonitor(f1) );
+                    //interp.set( "monitor", monitor.getSubtaskMonitor(f1) );
+                    interp.set( "monitor", new NullProgressMonitor() ); // subtask would reset indeterminate.
                     interp.set( "dom", this.dom );
                     interp.set( "PWD", split.path );
                     String paramName= param1NameCB.getSelectedItem().toString();
@@ -693,6 +750,8 @@ public class BatchMaster extends javax.swing.JPanel {
 
                 } catch (IOException ex) {
                     Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
+                } catch ( Exception ex ) {
+                    Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 i1=i1+f1.length()+1;
             }
@@ -715,6 +774,7 @@ public class BatchMaster extends javax.swing.JPanel {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton cancelButton;
     private org.autoplot.datasource.DataSetSelector dataSetSelector1;
     private javax.swing.JButton goButton;
     private javax.swing.JLabel jLabel1;
@@ -728,6 +788,7 @@ public class BatchMaster extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JMenuItem loadUriMenuItem;
     private javax.swing.JLabel messageLabel;
     private javax.swing.JComboBox<String> param1NameCB;
     private javax.swing.JTextArea param1Values;
