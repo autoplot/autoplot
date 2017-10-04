@@ -70,6 +70,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -616,16 +617,34 @@ public final class PngWalkTool extends javax.swing.JPanel {
             JOptionPane.showMessageDialog( parent, "<html>Unexpected error when downloading file<br>" + ssrc+"<br><br>"+ex.toString() );
             return;
         }
-
+        
         JFileChooser chooser= new JFileChooser( srecent );
+        
+        JPanel accessoryPanel= new JPanel();
+        accessoryPanel.setLayout( new BoxLayout(accessoryPanel,BoxLayout.Y_AXIS) );
+        JCheckBox r60= new JCheckBox( "Reduce to 60%" );
+        accessoryPanel.add(r60);
+        
         chooser.setMultiSelectionEnabled(false);
+        chooser.setAccessory(accessoryPanel);
         chooser.setSelectedFile( new File( chooser.getCurrentDirectory(), src.getName() ) );
         int r= chooser.showSaveDialog(parent);
         if ( r==JFileChooser.APPROVE_OPTION ) {
             prefs.put( PngWalkTool.PREF_RECENT, chooser.getSelectedFile().getParent() );
             try {
-                if ( ! org.autoplot.Util.copyFile( src, chooser.getSelectedFile()) ) {
-                    JOptionPane.showMessageDialog( parent, "<html>Unable to save image to: <br>" + chooser.getSelectedFile() );
+                if ( r60.isSelected() ) {
+                    BufferedImage im= ImageIO.read(src);
+                    int size= (int)Math.sqrt( im.getWidth()*im.getWidth() + im.getHeight()*im.getHeight() );
+                    im= ImageResize.getScaledInstance( im, size*60/100 );
+                    String ext= chooser.getSelectedFile().toString();
+                    int i= ext.lastIndexOf(".");
+                    ext= ext.substring(i+1);
+                    ImageIO.write( im, ext, chooser.getSelectedFile() );
+                            
+                } else {
+                    if ( ! org.autoplot.Util.copyFile( src, chooser.getSelectedFile()) ) {
+                        JOptionPane.showMessageDialog( parent, "<html>Unable to save image to: <br>" + chooser.getSelectedFile() );
+                    }
                 }
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog( parent, "<html>Unable to save image to: <br>" + chooser.getSelectedFile()+"<br><br>"+ex.toString() );
