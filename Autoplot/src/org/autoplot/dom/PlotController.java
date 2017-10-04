@@ -286,6 +286,13 @@ public class PlotController extends DomNodeController {
                 resetZoom( getPlot().getXaxis().isAutoRange(),
                         getPlot().getYaxis().isAutoRange(),
                         getPlot().getZaxis().isAutoRange() );
+            } else if ( evt.getPropertyName().equals("range") ) {
+                if ( !evt.getNewValue().equals(evt.getOldValue()) ) {
+                    System.err.println("line291 here range");
+                    resetZoom( getPlot().getXaxis().isAutoRange(),
+                        getPlot().getYaxis().isAutoRange(),
+                        getPlot().getZaxis().isAutoRange() );
+                }
             }
             
         }
