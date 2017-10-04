@@ -615,22 +615,27 @@ public class StatePersistence {
             }
 
             if ( domVersion.compareTo("1.00")<0 ) { // make all ranging automatic
-                Plot[] pp= state.getPlots();        // file:///home/jbf/ct/hudson/vap/Cluster1_HEEA_slices.vap motivated
-                for ( int i=0; i<pp.length; i++ ) {
-                    pp[i].getXaxis().setAutoRange(true);
-                    pp[i].getYaxis().setAutoRange(true);
-                    pp[i].getZaxis().setAutoRange(true);
+                // file:///home/jbf/ct/hudson/vap/Cluster1_HEEA_slices.vap motivated
+                for (Plot pp1 : state.getPlots() ) {
+                    pp1.getXaxis().setAutoRange(true);
+                    pp1.getYaxis().setAutoRange(true);
+                    pp1.getZaxis().setAutoRange(true);
                 }
             } else if ( domVersion.compareTo("1.07")<=0 ) {
                 // file:///home/jbf/ct/hudson/vap/ninePanels.vap shows that old vap files often didn't have the autorange cleared
                 // when changes were made.  Now the code properly handles these, so autorange needs to be turned off when loading vaps.
                 // This showed that 1.06 files would have this problem too: file:/home/jbf/ct/hudson/vap/cassini_kp.vap
-                logger.fine("clearing autorange property when loading vap file");
-                Plot[] pp= state.getPlots();        
-                for ( int i=0; i<pp.length; i++ ) {
-                    pp[i].getXaxis().setAutoRange(false);
-                    pp[i].getYaxis().setAutoRange(false);
-                    pp[i].getZaxis().setAutoRange(false);
+                logger.fine("clearing autorange property when loading vap file");   
+                for (Plot pp1 : state.getPlots() ) {
+                    if (!pp1.getXaxis().getAutoRangeHints().trim().isEmpty()) {
+                        pp1.getXaxis().setAutoRange(false);
+                    }
+                    if (!pp1.getYaxis().getAutoRangeHints().trim().isEmpty()) {
+                        pp1.getYaxis().setAutoRange(false);
+                    }
+                    if (!pp1.getZaxis().getAutoRangeHints().trim().isEmpty()) {
+                        pp1.getZaxis().setAutoRange(false);
+                    }
                 }
             }
             
