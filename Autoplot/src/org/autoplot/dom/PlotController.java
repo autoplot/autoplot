@@ -287,12 +287,13 @@ public class PlotController extends DomNodeController {
                         getPlot().getYaxis().isAutoRange(),
                         getPlot().getZaxis().isAutoRange() );
             } else if ( evt.getPropertyName().equals("range") ) {
-                if ( !evt.getNewValue().equals(evt.getOldValue()) ) {
-                    System.err.println("line291 here range");
-                    resetZoom( getPlot().getXaxis().isAutoRange(),
-                        getPlot().getYaxis().isAutoRange(),
-                        getPlot().getZaxis().isAutoRange() );
-                }
+                logger.fine("do consider autorange at some point");
+//                if ( !evt.getNewValue().equals(evt.getOldValue()) ) {
+//                    System.err.println("line291 here range");
+//                    resetZoom( getPlot().getXaxis().isAutoRange(),
+//                        getPlot().getYaxis().isAutoRange(),
+//                        getPlot().getZaxis().isAutoRange() );
+//                }
             }
             
         }
@@ -666,6 +667,7 @@ public class PlotController extends DomNodeController {
         ac.bind(application.getOptions(), Options.PROP_DRAWGRID, dasPlot1, "drawGrid");
         ac.bind(application.getOptions(), Options.PROP_DRAWMINORGRID, dasPlot1, "drawMinorGrid");
         ac.bind(application.getOptions(), Options.PROP_FLIPCOLORBARLABEL, this.plot.getZaxis().getController().dasAxis, "flipLabel");
+        ac.bind(application.getOptions(), Options.PROP_FLIPCOLORBARLABEL, this.plot.getYaxis().getController().dasAxis, "flipLabel");
         ac.bind(application.getOptions(), Options.PROP_TICKLEN, dasPlot1.getXAxis(), "tickLength");
         ac.bind(application.getOptions(), Options.PROP_TICKLEN, dasPlot1.getYAxis(), "tickLength");
         ac.bind(application.getOptions(), Options.PROP_TICKLEN, colorbar, "tickLength");
