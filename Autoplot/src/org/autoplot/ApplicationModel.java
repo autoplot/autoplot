@@ -521,13 +521,7 @@ public class ApplicationModel {
                         } catch (BackingStoreException ex) {
                             logger.log(Level.SEVERE,ex.getMessage(),ex);
                         }
-                    } catch (BookmarksException | SAXException | ParserConfigurationException e) {
-                        logger.log(Level.SEVERE,e.getMessage(),e);
-                        return new ArrayList<>();
-                    } catch (MalformedURLException e) {
-                        logger.log(Level.SEVERE,e.getMessage(),e);
-                        return new ArrayList<>();
-                    } catch (IOException e) {
+                    } catch (BookmarksException | SAXException | ParserConfigurationException | IOException e) {
                         logger.log(Level.SEVERE,e.getMessage(),e);
                         return new ArrayList<>();
                     }
@@ -1133,6 +1127,15 @@ public class ApplicationModel {
         
         //logger.fine("" + state.diffs(this.dom));
         restoreState(state);
+        
+        for ( Plot p: dom.getPlots() ) {
+            boolean resetx= p.getXaxis().isAutoRange() && ! p.getXaxis().getAutoRangeHints().trim().isEmpty();
+            boolean resety= p.getYaxis().isAutoRange() && ! p.getYaxis().getAutoRangeHints().trim().isEmpty();
+            boolean resetz= p.getZaxis().isAutoRange() && ! p.getZaxis().getAutoRangeHints().trim().isEmpty();
+            if ( resetx || resety|| resetz ) {
+                p.getController().resetZoom(resetx, resety, resetz);
+            }
+        }
 
     }
 
