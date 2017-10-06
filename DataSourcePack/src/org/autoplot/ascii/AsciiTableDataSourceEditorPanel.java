@@ -1351,8 +1351,10 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
         if (getColumn().contains(":") || getColumn().contains("-")) {
             if ( bundleCheckBox.isSelected() ) {
                 params.put("bundle", getColumn());
+                params.remove("rank2");
             } else {
                 params.put("rank2", getColumn());
+                params.remove("bundle");
             }
         } else {
             if ( isIso8601TimeField0() ) {
