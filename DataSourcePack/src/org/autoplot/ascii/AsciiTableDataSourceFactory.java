@@ -258,7 +258,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                             return false;
                         }
                     }
-                    if ( cc.size()>0 && cc.size()<6 ) {  // kludge where the last completion will be for eventListColumn when this could be done automatically.
+                    if ( cc.size()>0 && cc.size()<7 ) {  // kludge where the last completion will be for eventListColumn when this could be done automatically.
                         CompletionContext lastCC= cc.get(cc.size()-1);
                         if ( lastCC.context==CompletionContext.CONTEXT_PARAMETER_NAME 
                                 && lastCC.completable.equals("eventListColumn") ) {
