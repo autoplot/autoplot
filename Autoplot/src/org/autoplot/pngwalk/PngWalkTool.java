@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.Window;
@@ -987,7 +988,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         result.add( optionsMenu );
 
         final JMenu toolsMenu= new JMenu("Tools");
-        final JMenuItem writePdf= new JMenuItem( new AbstractAction( "Write to PDF" ) {
+        final JMenuItem writePdf= new JMenuItem( new AbstractAction( "Write to PDF..." ) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);        
@@ -998,7 +999,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         toolsMenu.add( writePdf );
         result.add( toolsMenu );
 
-        final JMenuItem writeGif= new JMenuItem( new AbstractAction( "Write to Animated GIF" ) {
+        final JMenuItem writeGif= new JMenuItem( new AbstractAction( "Write to Animated GIF..." ) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);        
@@ -1008,7 +1009,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         writeGif.setToolTipText("Write the visible images to an animated GIF file.");
         toolsMenu.add( writeGif );
 
-        final JMenuItem writeHtml= new JMenuItem( new AbstractAction( "Write to HTML" ) {
+        final JMenuItem writeHtml= new JMenuItem( new AbstractAction( "Write to HTML..." ) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);        
@@ -2163,31 +2164,39 @@ public final class PngWalkTool extends javax.swing.JPanel {
     
     private void writeToHtmlImmediately( ProgressMonitor monitor, File f, String summary ) throws FileNotFoundException {
             
-        for ( int i= 0; i<this.seq.size(); i++ ) {
-                
-            BufferedImage im= this.seq.imageAt(i).getImage();
-            while ( im==null ) {
+        monitor.setTaskSize( this.seq.size() );
+        monitor.started();
+        
+        try {
+            for ( int i= 0; i<this.seq.size(); i++ ) {
+                monitor.setTaskProgress(i);
+
+                BufferedImage im= this.seq.imageAt(i).getImage();
+                while ( im==null ) {
+                    try {
+                        Thread.sleep(100);
+                    } catch ( InterruptedException ex ) {
+                        throw new RuntimeException(ex);
+                    }
+                    im = this.seq.imageAt(i).getImage();
+                }
                 try {
-                    Thread.sleep(100);
-                } catch ( InterruptedException ex ) {
-                    throw new RuntimeException(ex);
+                    String n= this.seq.getQCFolder().relativize(this.seq.imageAt(i).getUri()).getPath();
+                    ImageIO.write( im, "png", new File( f, n ) );
+                    File qcFile= new File( this.seq.imageAt(i).getUri().getPath() + ".ok" );
+                    if ( qcFile.exists() ) {
+                        FileUtil.fileCopy( qcFile, new File( f, n+".ok" ) );
+                    }
+                    qcFile= new File( this.seq.imageAt(i).getUri().getPath() + ".problem" );
+                    if ( qcFile.exists() ) {
+                        FileUtil.fileCopy( qcFile, new File( f, n+".problem" ) );
+                    }
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, null, ex);
                 }
-                im = this.seq.imageAt(i).getImage();
             }
-            try {
-                String n= this.seq.getQCFolder().relativize(this.seq.imageAt(i).getUri()).getPath();
-                ImageIO.write( im, "png", new File( f, n ) );
-                File qcFile= new File( this.seq.imageAt(i).getUri().getPath() + ".ok" );
-                if ( qcFile.exists() ) {
-                    FileUtil.fileCopy( qcFile, new File( f, n+".ok" ) );
-                }
-                qcFile= new File( this.seq.imageAt(i).getUri().getPath() + ".problem" );
-                if ( qcFile.exists() ) {
-                    FileUtil.fileCopy( qcFile, new File( f, n+".problem" ) );
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        } finally {
+            monitor.finished();
         }
         
         URL url= PngWalkTool.class.getResource("makeTutorialHtml.jy");
@@ -2211,28 +2220,25 @@ public final class PngWalkTool extends javax.swing.JPanel {
      */
     public void writeHtml() {
         JFileChooser choose= new JFileChooser();
+        
+        Preferences prefs= Preferences.userNodeForPackage(PngWalkTool.class);
+        String fname= prefs.get( "writeToHtml", "/tmp/pngwalk/" );
+        
         choose.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        choose.setSelectedFile( new File("/tmp/pngwalk/") );
+        choose.setSelectedFile( new File(fname) );
         
-        JPanel p= new JPanel();
-        p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
-        
-        final JTextField ta= new JTextField();
-        ta.setMaximumSize( new Dimension( 1000, 30 ) );
-        ta.setMinimumSize( new Dimension( 100, 30 ) );
-        p.add(new JLabel("Title:"));
-        p.add(ta);
-        p.add(Box.createGlue());
-        
-        choose.setAccessory(p);
+        final HtmlOutputOptions hoo= new HtmlOutputOptions();
+
+        choose.setAccessory(hoo);
         
         if ( choose.showSaveDialog(navMenu)==JFileChooser.APPROVE_OPTION ) {
             final File f= choose.getSelectedFile();
-            final ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(this),"write pdf");
+            prefs.put( "writeToHtml", f.toString() );
+            final ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(this),"write html");
             Runnable run= new Runnable() {
                 public void run() {
                     try {
-                        writeToHtmlImmediately( mon , f, ta.getText() );
+                        writeToHtmlImmediately( mon , f, hoo.getTitle() );
                     } catch (FileNotFoundException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     }                    
