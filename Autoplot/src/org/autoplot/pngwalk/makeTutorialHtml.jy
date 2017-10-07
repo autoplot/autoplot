@@ -20,7 +20,12 @@ print '====='
 print params 
 print '====='
 
-d= getParam('dir','/home/jbf/ct/autoplot/tutorials/plotVap/', 'the pngwalk home' )
+d= getParam('dir','/tmp/pngwalk/', 'the pngwalk home' )
+outdir= getParam('outdir','', 'the output directory' )
+qconly= getParam('qconly','F', 'only qc records', ['T','F'] )
+
+
+if ( outdir=='' ): outdir= d
 
 ff= getParam('name', '', 'prefix for each file, e.g. product')
 
@@ -44,7 +49,7 @@ def getCaption( qcFile ):
         print 'caption: ', caption
         return caption
     except:
-        return ''
+        return 'No Caption'
 
 print 'ls '+d + '/' + ff + '*.png'
 ll= listDirectory( d + '/' + ff + '*.png' )
@@ -58,7 +63,7 @@ if ( ff=='' ): ff= thedate
 if ( len(summary)>0 ):
     summary= '<br>' + summary 
     
-html= open( d + '/' + ff + '.html', 'w' )
+html= open( outdir + '/' + ff + '.html', 'w' )
 html.write( '''
 	<head><title>%(dat)s</title></head>
 	<body style="background-color: #6B6B6B; margin=0;">
@@ -70,8 +75,13 @@ html.write( '''
 
 for l in ll:
     cap= getCaption( d + '/' + l + '.ok' ) 
-    if ( cap=='' ):
+    if ( cap=='No Caption' ):
         cap= getCaption( d + '/' + l + '.problem' ) 
+    if ( cap=='No Caption' ):
+        if ( qconly=='T' ): 
+           continue
+        else:
+           cap= ''
 
     img= l # remove the '.ok'
     
@@ -87,7 +97,7 @@ html.write( '''</div>
 
 html.close()
 
-url= d+'/' + ff + '.html'
+url= outdir+'/' + ff + '.html'
 print 'wrote '+url + '.'
 
 msg= 'Wrote '+ url +'.'
