@@ -2167,6 +2167,19 @@ public final class PngWalkTool extends javax.swing.JPanel {
         monitor.setTaskSize( this.seq.size() );
         monitor.started();
         
+        URI base;
+        if ( this.seq.getQCFolder()!=null ) {
+            base= this.seq.getQCFolder();
+        } else {
+            int splitIndex=-1;
+            if ( splitIndex==-1 ) splitIndex= WalkUtil.splitIndex( seq.getTemplate() );
+            try {
+                base= new URI( this.seq.getTemplate().substring(0,splitIndex) );
+            } catch (URISyntaxException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+        
         try {
             for ( int i= 0; i<this.seq.size(); i++ ) {
                 monitor.setTaskProgress(i);
@@ -2181,7 +2194,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     im = this.seq.imageAt(i).getImage();
                 }
                 try {
-                    String n= this.seq.getQCFolder().relativize(this.seq.imageAt(i).getUri()).getPath();
+                    String n;
+                    n= base.relativize( this.seq.imageAt(i).getUri() ).getPath();
                     ImageIO.write( im, "png", new File( f, n ) );
                     File qcFile= new File( this.seq.imageAt(i).getUri().getPath() + ".ok" );
                     if ( qcFile.exists() ) {
