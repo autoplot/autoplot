@@ -605,14 +605,18 @@ public class ApplicationController extends DomNodeController implements RunLater
     public Plot getPlotFor(Component c) {
         Plot plot1 = null;
         for (Plot p : application.getPlots()) {
-            DasPlot p1 = p.controller.getDasPlot();
-            if ( p1!=null && ( p1 == c || p1.getXAxis() == c || p1.getYAxis() == c ) ) {
-                plot1 = p;
-                break;
-            }
-            if (p.controller.getDasColorBar() == c) {
-                plot1 = p;
-                break;
+            if ( p.controller!=null ) {
+                DasPlot p1 = p.controller.getDasPlot();
+                if ( p1!=null && ( p1 == c || p1.getXAxis() == c || p1.getYAxis() == c ) ) {
+                    plot1 = p;
+                    break;
+                }
+                if (p.controller.getDasColorBar() == c) {
+                    plot1 = p;
+                    break;
+                }
+            } else {
+                logger.warning("application contains plot without controller (rte_0492573640)");
             }
         }
         return plot1;
