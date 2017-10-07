@@ -2217,7 +2217,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
         URL url= PngWalkTool.class.getResource("makeTutorialHtml.jy");
         final ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(this),"write HTML");
         Map<String,String> params= new HashMap<>();
-        params.put("dir",f.toString());
+        params.put("dir",base.toString());
+        params.put("qconly","true");
+        params.put("outdir",f.toString());
         params.put("name",""); //TODO: what should this be?
         params.put("summary",summary);
         try {
