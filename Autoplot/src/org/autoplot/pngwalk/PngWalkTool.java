@@ -1016,7 +1016,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 tool.writeHtml();
             }
         });
-        writeHtml.setToolTipText("Write the visible images to an animated GIF file.");
+        writeHtml.setToolTipText("Write the visible images to an HTML file.");
         toolsMenu.add( writeHtml );
         
         result.add( toolsMenu );
@@ -2183,6 +2183,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         try {
             for ( int i= 0; i<this.seq.size(); i++ ) {
                 monitor.setTaskProgress(i);
+                if ( monitor.isCancelled() ) break;
 
                 BufferedImage im= this.seq.imageAt(i).getImage();
                 while ( im==null ) {
@@ -2245,7 +2246,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
         choose.setAccessory(hoo);
         
-        if ( choose.showSaveDialog(navMenu)==JFileChooser.APPROVE_OPTION ) {
+        if ( choose.showSaveDialog(PngWalkTool.this)==JFileChooser.APPROVE_OPTION ) {
             final File f= choose.getSelectedFile();
             prefs.put( "writeToHtml", f.toString() );
             final ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(this),"write html");
@@ -2348,15 +2349,31 @@ public final class PngWalkTool extends javax.swing.JPanel {
      */
     public void writePdf() {
         JFileChooser choose= new JFileChooser();
-        choose.setSelectedFile( new File("/tmp/pngwalk.pdf") );
-        if ( choose.showSaveDialog(navMenu)==JFileChooser.APPROVE_OPTION ) {
+
+        Preferences prefs= Preferences.userNodeForPackage(PngWalkTool.class);
+        String fname= prefs.get( "writeToPdf", "/tmp/pngwalk.pdf" );
+        
+        choose.setSelectedFile( new File(fname) );
+        if ( choose.showSaveDialog(PngWalkTool.this)==JFileChooser.APPROVE_OPTION ) {
             final File f= choose.getSelectedFile();
+            prefs.put( "writeToPdf", f.toString() );
             final ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(this),"write pdf");
             Runnable run= new Runnable() {
                 public void run() {
                     try {
                         writeToPdfImmediately( mon , f );
-                        JOptionPane.showMessageDialog(parentWindow,"wrote file "+f);
+                        final JPanel panel= new javax.swing.JPanel();
+                        panel.setLayout( new BoxLayout(panel,BoxLayout.Y_AXIS ));
+                        panel.add( new javax.swing.JLabel("wrote file "+f) );
+                        JButton b= new JButton("Open in Browser");
+                        b.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                AutoplotUtil.openBrowser(f.toURI().toString());
+                            }
+                        });  
+                        panel.add( b );
+                        JOptionPane.showMessageDialog( PngWalkTool.this,panel );
                     } catch (FileNotFoundException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     }                    
@@ -2480,7 +2497,11 @@ public final class PngWalkTool extends javax.swing.JPanel {
         
     public void writeAnimatedGif() {
         JFileChooser choose= new JFileChooser();
-        choose.setSelectedFile( new File("/tmp/pngwalk.gif") );
+        
+        Preferences prefs= Preferences.userNodeForPackage(PngWalkTool.class);
+        String fname= prefs.get( "writeToGif", "/tmp/pngwalk.gif" );
+        
+        choose.setSelectedFile( new File(fname) );
         final String[] opts= new String[] { "10ms", "200ms", "400ms", "800ms", "realTime", "secondPerDay" };
         JPanel p= new JPanel();
         p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
@@ -2493,15 +2514,27 @@ public final class PngWalkTool extends javax.swing.JPanel {
         p.add(Box.createGlue());
         
         choose.setAccessory(p);
-        if ( choose.showSaveDialog(navMenu)==JFileChooser.APPROVE_OPTION ) {
+        if ( choose.showSaveDialog(PngWalkTool.this)==JFileChooser.APPROVE_OPTION ) {
             final File f= choose.getSelectedFile();
+            prefs.put( "writeToGif", f.toString() );
             final ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(this),"write animated gif");
             final String fdelay= (String)jo.getSelectedItem();
             Runnable run= new Runnable() {
                 public void run() {
                     try {
                         writeToAnimatedGifImmediately( mon , f, fdelay );
-                        JOptionPane.showMessageDialog(parentWindow,"wrote file "+f);
+                        JPanel panel= new javax.swing.JPanel();
+                        panel.setLayout( new BoxLayout(panel,BoxLayout.Y_AXIS ));
+                        panel.add( new javax.swing.JLabel("wrote file "+f) );
+                        JButton b= new JButton("Open in Browser");
+                        b.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                AutoplotUtil.openBrowser(f.toURI().toString());
+                            }
+                        });   
+                        panel.add( b );
+                        JOptionPane.showMessageDialog( PngWalkTool.this,panel );
                     } catch (FileNotFoundException ex) {
                         Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
                     }                    
