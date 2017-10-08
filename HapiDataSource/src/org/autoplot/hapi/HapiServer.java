@@ -283,6 +283,9 @@ public class HapiServer {
                 line= in.readLine();
             }
         }
+        if ( builder.length()==0 ) {
+            throw new IOException("empty response from "+url );
+        }
         JSONObject o= new JSONObject(builder.toString());
         
         return o;
