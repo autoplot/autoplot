@@ -19,6 +19,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -51,6 +53,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSourceEditorPanel;
+import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.URISplit;
@@ -1051,6 +1054,28 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         } catch (IOException | JSONException ex) {
             logger.log(Level.SEVERE, null, ex);
+            parametersPanel.removeAll();
+            parametersPanel.add(new javax.swing.JLabel("Error reported on server:"));
+            String s= ex.getMessage();
+            parametersPanel.add(new javax.swing.JLabel(s));
+            JLabel space= new javax.swing.JLabel(" ");
+            //space.setMinimumSize(new Dimension(30,30));
+            //space.setPreferredSize(new Dimension(30,30));
+            parametersPanel.add(space);
+            final URL url= HapiServer.createURL(server, HapiSpec.INFO_URL, Collections.singletonMap(HapiSpec.URL_PARAM_ID, id ) );
+            javax.swing.JButton l= new javax.swing.JButton("Load URL in Browser");
+            l.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        Desktop.getDesktop().browse( url.toURI() );
+                    } catch (URISyntaxException | IOException ex1) {
+                        logger.log(Level.SEVERE, null, ex1);
+                    }
+                }
+            });
+            parametersPanel.add(l);
+            titleLabel.setText("");
         }
                 
     }
