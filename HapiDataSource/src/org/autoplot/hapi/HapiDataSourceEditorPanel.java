@@ -35,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -197,7 +198,23 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             try {
-                resetVariable( new URL( (String)serversComboBox.getSelectedItem() ), idsList2.getSelectedValue() );  
+                String s= idsList2.getSelectedValue();
+                if ( s!=null ) {
+                    resetVariable( new URL( (String)serversComboBox.getSelectedItem() ), idsList2.getSelectedValue() );  
+                } else {
+                    parametersPanel.removeAll();
+                    parametersPanel.add(new JLabel(" "));
+//                    JEditorPane p= new JEditorPane();
+//                    try {
+//                        p.setPage( new URL( (String)serversComboBox.getSelectedItem() ));
+//                        parametersPanel.add( p );
+//                    } catch (IOException ex) {
+//                        Logger.getLogger(HapiDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+//                    }
+                    
+                    titleLabel.setText(" ");
+                    
+                }
             } catch (MalformedURLException ex) {
                 JOptionPane.showMessageDialog( parametersPanel, ex.toString() );
             }
