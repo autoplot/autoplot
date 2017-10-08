@@ -278,7 +278,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         idsList2 = new javax.swing.JList<>();
         clearButton = new javax.swing.JButton();
         filtersComboBox = new org.autoplot.datasource.RecentComboBox();
-        jLabel3 = new javax.swing.JLabel();
+        messagesLabel = new javax.swing.JLabel();
         binaryCB = new javax.swing.JCheckBox();
         timeRangeComboBox = new org.autoplot.datasource.RecentComboBox();
         exampleTimeRangesCB = new javax.swing.JComboBox<>();
@@ -416,7 +416,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         jSplitPane1.setLeftComponent(jPanel1);
 
-        jLabel3.setText("(messages here)");
+        messagesLabel.setText("(messages here)");
 
         binaryCB.setText("Use Binary");
         binaryCB.setToolTipText("Some servers support binary data transfers, and this will use binary to transfer data.");
@@ -433,7 +433,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)
+            .addComponent(jSplitPane1)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -450,7 +450,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(exampleTimeRangesCB, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(messagesLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(binaryCB)))
                 .addContainerGap())
@@ -466,7 +466,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .addComponent(jSplitPane1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
+                    .addComponent(messagesLabel)
                     .addComponent(binaryCB, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE))
                 .addGap(5, 5, 5)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -607,12 +607,12 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JLabel messagesLabel;
     private javax.swing.JPanel parametersPanel;
     private javax.swing.JComboBox<String> serversComboBox;
     private javax.swing.JButton setAllB;
@@ -634,7 +634,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         try {
             idsJSON= HapiServer.getCatalog(new URL(split.file));
         } catch ( IOException ex ) {
-            jLabel3.setText("Unable to connect to server");
+            messagesLabel.setText("Unable to connect to server");
         }
         return true;
     }
@@ -1008,7 +1008,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             DatumRange range= getRange(info);
             if ( range==null ) {
                 logger.warning("server is missing required startDate and stopDate parameters.");
-                jLabel3.setText( "range is not provided (non-compliant server)" );
+                messagesLabel.setText( "range is not provided (non-compliant server)" );
             } else {
                 DatumRange sampleRange=null;
                 if ( info.has("sampleStartDate") && info.has("sampleStopDate") ) {
@@ -1030,10 +1030,10 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     }    
                     if (range.max().ge(myValidTime)) { // Note stopDate is required since 2017-01-17.
                         logger.warning("server is missing required stopDate parameter.");
-                        jLabel3.setText(range.min().toString() + " to ?");
+                        messagesLabel.setText(range.min().toString() + " to ?");
                         sampleRange = new DatumRange(range.min(), range.min().add(1, Units.days));
                     } else {
-                        jLabel3.setText(range.toString());
+                        messagesLabel.setText(range.toString());
                         if ( cadence.ge(Units.days.createDatum(1)) ) {
                             Datum end = TimeUtil.nextMidnight(range.max());
                             end= end.subtract( 10,Units.days );
@@ -1061,6 +1061,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                             sampleRange= sampleRange.next();
                         }
                     }
+                } else {
+                    messagesLabel.setText( range.toString());
                 }
                 DefaultComboBoxModel m= new DefaultComboBoxModel(new String[] { "Example Time Ranges",sampleRange.toString() } );
                 exampleTimeRangesCB.setModel(m);
