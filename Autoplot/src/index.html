@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>PNGWalk tool used to browse images of DSCOVR mission data.
+        <p><small>At 8:00, the ones digit lower right segment is off, and the red and black values match.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-10-04 r21485):</p>
+        <p>Bugfixes (2017-10-09 r21502):</p>
         <ul>  
+            <li>1902: improvements to pngwalk tool's write to html.
+            <li>1905: ascii table data source depend1Values were dropped.
+            <li>deselecting "bundle" on the ascii editor would not remove bundle switch from URI.
             <li>1897: tests needed for autoRangeHints.
             <li>1899: add and subtract operators to allow sloppiness with units.
             <li>add a couple of completions for timerange and plots[0].yaxis.range to vap file completions after the question mark (?).
