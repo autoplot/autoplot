@@ -36,7 +36,9 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -48,6 +50,8 @@ import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.ui.TableRowHeader;
 import org.das2.qds.util.AsciiParser;
+import org.das2.qds.util.AsciiParser.RecordParser;
+import org.das2.qds.util.DataSetBuilder;
 
 /**
  *
@@ -390,8 +394,33 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             model.setFile(file);
             jTable1.setDefaultRenderer(Object.class, new ColSpanTableCellRenderer());
             AsciiParser.DelimParser p= parser.guessSkipAndDelimParser( file.getAbsolutePath() );
-            model.setRecParser(p);
-            
+            if ( p==null ) {
+                model.setRecParser( new RecordParser() {
+                    @Override
+                    public boolean tryParseRecord(String line, int irec, DataSetBuilder builder) {
+                        return false;
+                    }
+
+                    @Override
+                    public int fieldCount() {
+                        return 1;
+                    }
+
+                    @Override
+                    public int fieldCount(String line) {
+                        return 1;
+                    }
+
+                    @Override
+                    public boolean splitRecord(String line, String[] fields) {
+                        fields[0]= line;
+                        return true;
+                    }
+                });
+            } else {
+                model.setRecParser(p);
+            }
+                    
         } catch (IOException ex) {
             Logger.getLogger(CsvDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -442,6 +471,9 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             
             reader.readHeaders();
             int ncol= reader.getHeaderCount();
+            if ( ncol>jTable1.getModel().getColumnCount() ) {
+                ncol= jTable1.getModel().getColumnCount();
+            }
 
             headers= new ArrayList<>();
             
