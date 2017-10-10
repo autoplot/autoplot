@@ -191,7 +191,7 @@ public class CsvDataSource extends AbstractDataSource {
                     boolean foundColumnNumbers= false;
                     columnUnits= new Units[reader.getColumnCount()];
                     for ( int j=0; j<reader.getColumnCount(); j++ ) {
-                        columnUnits[j]= guessUnits(reader.get(j));
+                        columnUnits[j]= guessUnits(reader.get(j));reader.get(0);
                         if ( !( columnUnits[j] instanceof EnumerationUnits ) ) {
                             foundColumnNumbers= true;
                         }
@@ -239,7 +239,7 @@ public class CsvDataSource extends AbstractDataSource {
             }
 
             String badTimeTag= null;
-            try {
+            if ( columnUnits!=null ) try {
                 if ( idep0column>=0 ) {
                     if ( dep0u instanceof EnumerationUnits ) {
                         tb= ((EnumerationUnits)dep0u).createDatum( reader.get(idep0column) ).doubleValue(dep0u) ;
@@ -305,11 +305,11 @@ public class CsvDataSource extends AbstractDataSource {
                                 columnHeaders[icol]= columnHeaders[icol].substring(1);
                             }
                         }
-                        u= columnUnits[icol];
-                        if ( u instanceof EnumerationUnits ) {
-                            cbs[icol]= ((EnumerationUnits)u).createDatum( columnHeaders[icol] ).doubleValue(u);
+                        Units u1= columnUnits[icol];
+                        if ( u1 instanceof EnumerationUnits ) {
+                            cbs[icol]= ((EnumerationUnits)u1).createDatum( columnHeaders[icol] ).doubleValue(u1);
                         } else {
-                            cbs[icol]= u.parse(columnHeaders[icol]).doubleValue(u);
+                            cbs[icol]= u1.parse(columnHeaders[icol]).doubleValue(u);
                         }
                     } catch ( ParseException ex ) {
                         yepItsData= false;
