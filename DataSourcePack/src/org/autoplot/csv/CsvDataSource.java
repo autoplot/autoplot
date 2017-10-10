@@ -5,7 +5,6 @@ import com.csvreader.CsvReader;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PushbackReader;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.logging.Level;
@@ -45,7 +44,7 @@ public class CsvDataSource extends AbstractDataSource {
         super(uri);
     }
 
-    QDataSet parseHeader( int icol, String header, String sval ) {
+    private QDataSet parseHeader( int icol, String header, String sval ) {
         header= header.trim();
         DDataSet result= DDataSet.create( new int[0] ); // rank 0 dataset
 
@@ -77,12 +76,14 @@ public class CsvDataSource extends AbstractDataSource {
         try {
             Units.dimensionless.parse(sval);
             return Units.dimensionless;
-        } catch ( Exception ex ) {
+        } catch ( ParseException ex ) {
+            logger.log(Level.FINER, "fails to parse as number: {0}", sval);
         }
         try {
             AsciiParser.UNIT_UTC.parse(sval);
             return AsciiParser.UNIT_UTC;
-        } catch ( Exception ex ) {
+        } catch ( ParseException ex ) {
+            logger.log(Level.FINER, "fails to parse as time: {0}", sval);
         }
         return EnumerationUnits.create("enum");
     }
@@ -175,8 +176,6 @@ public class CsvDataSource extends AbstractDataSource {
         Units dep0u= Units.dimensionless;
         Units u= Units.dimensionless;
         Units[] columnUnits= null;
-
-        int hline=2; // allow top two lines to be header lines.
 
         double tb=0, cb=0;  // temporary holders for data
         double[] bundleb=null; // temporary holders for each column.
