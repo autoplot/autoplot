@@ -130,6 +130,14 @@ public class CsvDataSource extends AbstractDataSource {
             String peek= reader.getRawRecord();
             String[] newHeaders= peek.split(";",-2);
             if ( newHeaders.length>1 ) {
+                for ( int i=0; i<newHeaders.length; i++ ) {
+                    String s= newHeaders[i];
+                    s= s.trim();
+                    if ( s.startsWith("\"") && s.endsWith("\"") ) {
+                        s= s.substring(1,s.length()-1);
+                    }
+                    newHeaders[i]= s;
+                }
                 columnHeaders= newHeaders;
                 reader.setDelimiter(';');
             }
