@@ -19,7 +19,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,14 +30,11 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -469,19 +465,16 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             char delimiter= sdelimiter.charAt(0);
             if ( delimiter!=',' ) reader.setDelimiter(delimiter);
             
-            reader.readHeaders();
-            int ncol= reader.getHeaderCount();
+            String[] columnHeaders = CsvDataSourceFactory.getColumnHeaders(reader);
+            
+            int ncol= columnHeaders.length;
             if ( ncol>jTable1.getModel().getColumnCount() ) {
                 ncol= jTable1.getModel().getColumnCount();
             }
 
             headers= new ArrayList<>();
             
-            headers.addAll( Arrays.asList(reader.getHeaders()) );
-
-            for ( int i=0; i<headers.size(); i++ ) {
-                headers.set( i, "field"+i );
-            }
+            headers.addAll( Arrays.asList(columnHeaders) );
 
             columns= new HashMap<>();
             for ( int i=0; i<ncol; i++ ) {

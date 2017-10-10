@@ -90,19 +90,11 @@ public class CsvDataSourceFactory implements DataSourceFactory {
         try {
             reader= new CsvReader( fr );
 
-            String[] columns;
-            if ( reader.readHeaders() ) {
-                //int ncol= reader.getHeaderCount();
-                columns= reader.getHeaders();
-            } else {
-                columns= new String[reader.getColumnCount()];
-                for ( int i=0; i<columns.length; i++ ) {
-                    columns[i]= "field"+i;
-                }
-            }
-
-            for ( int i=0; i<columns.length; i++ ) {
-                String s= columns[i];
+            String[] columnHeaders;
+            columnHeaders = getColumnHeaders( reader);
+            
+            for ( int i=0; i<columnHeaders.length; i++ ) {
+                String s= columnHeaders[i];
                 String label= s;
                 //if ( ! label.equals(fields[i]) && label.startsWith("field") ) label += " ("+fields[i]+")";
 
@@ -118,6 +110,43 @@ public class CsvDataSourceFactory implements DataSourceFactory {
         
         return result;
 
+    }
+
+    /**
+     * get the column headers for each column, and possibly switch over
+     * to using a semicolon as a field delimiter.
+     * @param reader
+     * @return
+     * @throws IOException 
+     */
+    public static String[] getColumnHeaders( CsvReader reader) throws IOException {
+        String[] columnHeaders;
+        if ( reader.readHeaders() ) {
+            //int ncol= reader.getHeaderCount();
+            columnHeaders= reader.getHeaders();
+        } else {
+            columnHeaders= new String[reader.getColumnCount()];
+            for ( int i=0; i<columnHeaders.length; i++ ) {
+                columnHeaders[i]= "field"+i;
+            }
+        }
+        if ( columnHeaders.length==1 ) {
+            String peek= reader.getRawRecord();
+            String[] newHeaders= peek.split(";",-2);
+            if ( newHeaders.length>1 ) {
+                for ( int i=0; i<newHeaders.length; i++ ) {
+                    String s= newHeaders[i];
+                    s= s.trim();
+                    if ( s.startsWith("\"") && s.endsWith("\"") ) {
+                        s= s.substring(1,s.length()-1);
+                    }
+                    newHeaders[i]= s;
+                }
+                columnHeaders= newHeaders;
+                reader.setDelimiter(';');
+            }
+        }
+        return columnHeaders;
     }
 
     public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {

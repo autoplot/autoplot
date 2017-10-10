@@ -117,31 +117,7 @@ public class CsvDataSource extends AbstractDataSource {
         
         String[] columnHeaders;
 
-        if ( reader.readHeaders() ) {
-            columnHeaders= reader.getHeaders();
-        } else {
-            columnHeaders= new String[reader.getColumnCount()];
-            for ( int i=0; i<columnHeaders.length; i++ ) {
-                columnHeaders[i]= "field"+i;
-            }
-        }
-        
-        if ( columnHeaders.length==1 ) {
-            String peek= reader.getRawRecord();
-            String[] newHeaders= peek.split(";",-2);
-            if ( newHeaders.length>1 ) {
-                for ( int i=0; i<newHeaders.length; i++ ) {
-                    String s= newHeaders[i];
-                    s= s.trim();
-                    if ( s.startsWith("\"") && s.endsWith("\"") ) {
-                        s= s.substring(1,s.length()-1);
-                    }
-                    newHeaders[i]= s;
-                }
-                columnHeaders= newHeaders;
-                reader.setDelimiter(';');
-            }
-        }
+        columnHeaders= CsvDataSourceFactory.getColumnHeaders(reader);
 
         String column= getParam( "column", null );
         /**
