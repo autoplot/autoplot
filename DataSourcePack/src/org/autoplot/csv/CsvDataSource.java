@@ -309,7 +309,7 @@ public class CsvDataSource extends AbstractDataSource {
                         if ( u1 instanceof EnumerationUnits ) {
                             cbs[icol]= ((EnumerationUnits)u1).createDatum( columnHeaders[icol] ).doubleValue(u1);
                         } else {
-                            cbs[icol]= u1.parse(columnHeaders[icol]).doubleValue(u);
+                            cbs[icol]= u1.parse(columnHeaders[icol]).doubleValue(u1);
                         }
                     } catch ( ParseException ex ) {
                         yepItsData= false;
