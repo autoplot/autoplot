@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>At 8:00, the ones digit lower right segment is off, and the red and black values match.
+        <p><small>Fun with drop shadows.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-10-09 r21502):</p>
+        <p>Bugfixes (2017-10-10 r21514):</p>
         <ul>  
+            <li>DataPointRecorder had a time resolution limit that prevented use with waveform data.
+            <li>1793: automatically switch to semicolon, allow long headers.
             <li>1902: improvements to pngwalk tool's write to html.
             <li>1905: ascii table data source depend1Values were dropped.
             <li>deselecting "bundle" on the ascii editor would not remove bundle switch from URI.
