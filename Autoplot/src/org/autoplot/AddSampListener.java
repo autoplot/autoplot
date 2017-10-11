@@ -111,7 +111,11 @@ public class AddSampListener {
             public Map processCall( HubConnection connection, String senderId, Message message ) {
                 logger.log(Level.FINE, "got message: {0}", message.toString());
                 String s= (String) message.getParam("url");
-
+                String n= (String) message.getParam("name");
+                if ( n!=null && n.endsWith(" table") ) {
+                    n= n.substring(0,n.length()-6).trim();
+                }
+                    
                 if ( s.startsWith( "file://" ) ) {
                     if ( s.startsWith( "file://localhost" ) ) s= s.substring(16);
                     if ( s.startsWith( "file://" ) ) s= s.substring(7);
@@ -122,10 +126,19 @@ public class AddSampListener {
                                 File file= DataSetURI.downloadResourceAsTempFile( new URL(s), new NullProgressMonitor() );
                                 // remove the @ part.
                                 String s1= file.getAbsolutePath();
-                                int i1= s1.lastIndexOf("@");
-                                File nnfile= new File( s1.substring(0,i1) );
+                                File nnfile;
+                                if ( n!=null ) {
+                                    int i1= s1.lastIndexOf("/");
+                                    nnfile= new File( s1.substring(0,i1) +"/"+ n );
+                                } else {
+                                    int i1= s1.lastIndexOf("@");
+                                    nnfile= new File( s1.substring(0,i1) );
+                                }
                                 if ( !file.renameTo( nnfile ) ) {
                                     logger.log(Level.WARNING, "unable to rename resource: {0}", file);
+                                }
+                                if ( n!=null ) {
+                                    
                                 }
                                 s= nnfile.toURI().toASCIIString();                                
                             } catch (MalformedURLException ex) {
@@ -139,7 +152,7 @@ public class AddSampListener {
                         //do what we did before.
                     }
                 }
-                String ext= s.endsWith(".cdf") ? ext="cdf" : null;
+                String ext= s.endsWith(".cdf") ? "cdf" : null;
                 
                 if ( "cdf".equals(ext) || mType.equals("table.load.cdf") ) {
                     maybePlot( sel, "vap+cdf:" + s );
