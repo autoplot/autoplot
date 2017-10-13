@@ -188,7 +188,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         MutablePropertyDataSet vds = null;
         ArrayDataSet dep0 = null;
 
-        if ((column == null) && (timeColumn != -1)) {
+        if ((column == null) && (timeColumn != -1) ) {
             column = parser.getFieldNames()[timeColumn];
         }
 
@@ -843,6 +843,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
             }
         }
 
+        boolean haveColumn= column!=null;
+        
         if (column == null && depend0 == null && rank2 == null) {
             if (parser.getFieldNames().length == 2) {
                 depend0 = parser.getFieldNames()[0];
@@ -869,7 +871,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         eventListColumn= params.get("eventListColumn");
         
         // rfe https://sourceforge.net/p/autoplot/bugs/1425/: create events list automatically.
-        if ( parser.getFieldLabels().length>=2 && parser.getFieldLabels().length <= 5 && UnitsUtil.isTimeLocation(parser.getUnits(0)) && UnitsUtil.isTimeLocation(parser.getUnits(1)) ) {
+        if ( parser.getFieldLabels().length>=2 && parser.getFieldLabels().length <= 5 && UnitsUtil.isTimeLocation(parser.getUnits(0)) && UnitsUtil.isTimeLocation(parser.getUnits(1)) && !haveColumn ) {
             if ( parser.getFieldCount()>2 ) {
                 eventListColumn= "field"+(parser.getFieldLabels().length-1);
             } else {
