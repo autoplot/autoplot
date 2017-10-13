@@ -1,7 +1,9 @@
 
 package org.autoplot;
 
-import java.awt.Dimension;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Frame;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -10,7 +12,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.Metadata;
 import org.astrogrid.samp.xmlrpc.StandardClientProfile;
@@ -20,10 +25,11 @@ import org.astrogrid.samp.client.HubConnection;
 import org.das2.util.LoggerManager;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSourceEditorDialog;
+import org.autoplot.datasource.DataSourceEditorPanel;
+import org.autoplot.datasource.DataSourceEditorPanelUtil;
 import org.autoplot.datasource.FileSystemUtil;
-import org.autoplot.datasource.URISplit;
-import org.das2.util.FileUtil;
-import org.das2.util.filesystem.FileSystem;
+import org.autoplot.datasource.WindowManager;
 import org.das2.util.monitor.NullProgressMonitor;
 
 /**
@@ -38,9 +44,27 @@ public class AddSampListener {
     
     private static final Map<Integer,AbstractMessageHandler> listeners= new HashMap();
     
-    private static void maybePlot( DataSetSelector sel, String uri ) {
-        sel.setValue(uri);
-        sel.maybePlot(true);
+    private static synchronized void maybePlot( DataSetSelector sel, String uri ) {
+        
+        if ( false ) {
+            JPanel parent= new JPanel();
+            parent.setLayout( new BorderLayout() );
+            DataSourceEditorPanel p= DataSourceEditorPanelUtil.getDataSourceEditorPanel(parent,uri);
+
+            AutoplotUI dialogParent= ScriptContext.getApplication();
+
+            DataSourceEditorDialog dialog = new DataSourceEditorDialog( dialogParent, p.getPanel(), true);
+            dialog.revalidate();
+
+            Icon icon= new javax.swing.ImageIcon(AddSampListener.class.getResource("/org/autoplot/datasource/fileMag.png") );
+            if ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( dialogParent, parent, "Editing URI", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon ) ) {
+                String newUri= p.getURI();
+                ScriptContext.plot(newUri);        
+            }       
+        } else {
+            sel.setValue(uri);
+            sel.maybePlot(true);
+        }
     }
 
     /**
