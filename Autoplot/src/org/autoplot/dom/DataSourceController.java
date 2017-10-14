@@ -1340,7 +1340,7 @@ public class DataSourceController extends DomNodeController {
      * at a time. Note if a dataSource doesn't check mon.isCancelled(), then
      * processing will block until the old load is done.
      */
-    private void updateImmediately() {
+    private void updateImmediately(Exception parentException) {
 
         try {
             DataSource dss = getDataSource();
@@ -1354,7 +1354,7 @@ public class DataSourceController extends DomNodeController {
                 /**
                  * * here is the data load **
                  */
-                loadDataSet();
+                loadDataSet(parentException);
 
                 if (dataSet != null) {
                     setStatus("done loading dataset");
@@ -1446,12 +1446,14 @@ public class DataSourceController extends DomNodeController {
 
             setDataSet(null);
 
+            final RuntimeException fe = new RuntimeException("attempt to load "+ ( dss!=null ? dss.toString() : "(null)" ) );
+            
             Runnable run = new Runnable() {
                 @Override
                 public void run() {
                     try {
                         synchronized (dscLock) {
-                            updateImmediately();
+                            updateImmediately(fe);
                             if (dataSource != null) {
                                 if (updating != null) {
                                     updating.removePropertyChangeListener(updatesListener);
@@ -1732,7 +1734,7 @@ public class DataSourceController extends DomNodeController {
     /**
      * load the data set from the DataSource.
      */
-    private QDataSet loadDataSet() {
+    private QDataSet loadDataSet(Exception parentException) {
         synchronized (dscLock) {
             ProgressMonitor mymon;
 
@@ -1894,6 +1896,13 @@ public class DataSourceController extends DomNodeController {
                 setDataSet(null);
                 logger.log(Level.WARNING, ex.getMessage(), ex);
                 setStatus("error: " + ex.getMessage());
+                if ( ex.getCause()==null ) {
+                    try {
+                        ex.initCause(parentException);
+                    } catch ( RuntimeException ex2 ) {
+                        logger.fine("unable to preserve the initial stack trace");
+                    }
+                }
                 handleException(ex);
                 if (dsf.getUri().length() > 0) {
                     this.model.addException(dsf.getUri(), ex);
