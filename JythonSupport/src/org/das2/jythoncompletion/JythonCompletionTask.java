@@ -52,6 +52,7 @@ import org.python.util.PythonInterpreter;
 import org.autoplot.jythonsupport.JythonOps;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.JythonUtil;
+import org.autoplot.jythonsupport.SimplifyScriptSupport;
 
 /**
  * Completions for Jython code.
@@ -177,7 +178,9 @@ public class JythonCompletionTask implements CompletionTask {
         String eval;
         if ( JythonCompletionProvider.getInstance().settings().isSafeCompletions() ) {
             eval = editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
-            eval = JythonUtil.removeSideEffects( eval );
+            String eval1 = SimplifyScriptSupport.removeSideEffects( eval );
+            //String eval2 = JythonUtil.removeSideEffects( eval );
+            eval = eval1;
         } else {
             eval= editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
         }
@@ -193,7 +196,9 @@ public class JythonCompletionTask implements CompletionTask {
             interp.exec(JythonRefactory.fixImports(eval));
         } catch ( PyException ex ) {
             eval = editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
-            eval = JythonUtil.removeSideEffects( eval );
+            String eval1 = SimplifyScriptSupport.removeSideEffects( eval );
+            //String eval2 = JythonUtil.removeSideEffects( eval );
+            eval= eval1;
             if (eval.endsWith(":\n")) {
                eval = eval + "  pass\n";
             }
@@ -672,7 +677,7 @@ public class JythonCompletionTask implements CompletionTask {
      */
     private void putInGetDataSetStub( PythonInterpreter interp ) {
         String ss2= "def getDataSet( st, tr=None, mon=None ):\n   return findgen(100)\n\n";
-        logger.fine(ss2);
+        logger.finer(ss2);
         interp.exec( ss2  );
     }
     
@@ -1216,7 +1221,7 @@ public class JythonCompletionTask implements CompletionTask {
                 } else if ( po instanceof PyJavaClass ) {
                     
                 } else {
-                    logger.fine("");
+                    logger.log(Level.FINE, "skipping {0}", ss);
                 }
                     
                 keySort( signatures, signatures, labels, argss );
@@ -1233,7 +1238,7 @@ public class JythonCompletionTask implements CompletionTask {
                         if ( ss.equals("dom") ) {
                             link= "http://autoplot.org/developer.scripting#DOM";
                         }
-                        logger.log(Level.FINE, "DefaultCompletionItem({0},{1},\n{2}{3},\n{4},\n{5})", new Object[]{ss, cc.completable.length(), ss, argss.get(jj), label, link});
+                        logger.log(Level.FINER, "DefaultCompletionItem({0},{1},\n{2}{3},\n{4},\n{5})", new Object[]{ss, cc.completable.length(), ss, argss.get(jj), label, link});
                         result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + argss.get(jj), label, link) );
                     }
                 } else {
@@ -1250,6 +1255,7 @@ public class JythonCompletionTask implements CompletionTask {
             }
         }
         
+        logger.log( Level.FINE, "getLocalsCompletions found {0} completions", new Object[]{ result.size() } );
         return result;
     }
 
