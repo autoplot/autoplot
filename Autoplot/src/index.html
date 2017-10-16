@@ -24,8 +24,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-10-13 r21523):</p>
+        <p>Bugfixes (2017-10-16 r21523):</p>
         <ul>  
+            <li>George pointed out where rank 3 waveform data would drop records.
+            <li>column keyword was ignored when the first two columns were times.
             <li>ASCII files starting with two time columns could only be read as events, so column keyword didn't work.
             <li>UriTcaSource tweaked to provide useful method for sampling data from URI.
             <li>correction to TimeParser.normalizeTimes, which would improperly round resulting in .699999. Thanks, Masafumi!
