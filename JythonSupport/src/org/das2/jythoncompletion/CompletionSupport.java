@@ -153,7 +153,7 @@ public class CompletionSupport {
 
     public static CompletionContext getCompletionContext( String line, int pos, int i0, int i1, int i2 ) {
 
-        List<Token> tokens= new ArrayList<Token>(20);
+        List<Token> tokens= new ArrayList<>(20);
         Token t;
         int myTokenIndex=-1;
         int thisTokenIndex=-1;
@@ -195,6 +195,7 @@ public class CompletionSupport {
         
         CompletionContext result= null;
         
+        //HERE IS COMPLETIONS
         if ( tokens.isEmpty() ) {
             return new CompletionContext( CompletionContext.DEFAULT_NAME, null, "" );
         } else {
