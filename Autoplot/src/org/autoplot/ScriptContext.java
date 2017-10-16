@@ -615,7 +615,8 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void plot( int chNum, String label, QDataSet ds) {
         maybeInitModel();
-        model.setDataSet( chNum, label, ds );
+        ArrayDataSet yds= ds==null ? null : ArrayDataSet.copy(ds);
+        model.setDataSet( chNum, label, yds );
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
 
@@ -629,7 +630,8 @@ public class ScriptContext extends PyJavaInstance {
     public static void plot( int chNum, String label, QDataSet x, QDataSet y ) {
         maybeInitModel();
         ArrayDataSet yds= ArrayDataSet.copy(y);
-        if ( x!=null ) yds.putProperty( QDataSet.DEPEND_0, x );
+        ArrayDataSet xds= x==null ? null : ArrayDataSet.copy(x);
+        if ( xds!=null ) yds.putProperty( QDataSet.DEPEND_0, xds );
         model.setDataSet( chNum, label, yds);
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
@@ -648,9 +650,10 @@ public class ScriptContext extends PyJavaInstance {
         if ( x==null && renderType==null ) {
             model.setDataSet( chNum, label, y);
         } else {
+            ArrayDataSet xds= x==null ? null : ArrayDataSet.copy(x);
             ArrayDataSet yds= y==null ? null : ArrayDataSet.copy(y);
-            if ( x!=null && yds!=null ) yds.putProperty( QDataSet.DEPEND_0, x );
-            if ( ( yds!=null ) && ( x!=null || renderType!=null ) ) yds.putProperty( QDataSet.RENDER_TYPE, renderType ); // plot command calls this with all-null arguments, and we don't when RENDER_TYPE setting to be nulled.
+            if ( xds!=null && yds!=null ) yds.putProperty( QDataSet.DEPEND_0,xds );
+            if ( ( yds!=null ) && ( xds!=null || renderType!=null ) ) yds.putProperty( QDataSet.RENDER_TYPE, renderType ); // plot command calls this with all-null arguments, and we don't when RENDER_TYPE setting to be nulled.
             model.setDataSet( chNum, label, yds);
         }
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
@@ -666,15 +669,18 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z ) {
         maybeInitModel();
-        if ( z.rank()==1 ) {
-            ArrayDataSet yds= ArrayDataSet.copy(y);
-            yds.putProperty( QDataSet.DEPEND_0, x );
-            yds.putProperty( QDataSet.PLANE_0, z );
+        ArrayDataSet xds= x==null ? null : ArrayDataSet.copy(x);
+        ArrayDataSet yds= y==null ? null : ArrayDataSet.copy(y);
+        ArrayDataSet zds= z==null ? null : ArrayDataSet.copy(z);
+        if ( zds==null ) throw new IllegalArgumentException("z is null");
+        if ( zds.rank()==1 ) {
+            if ( yds==null ) throw new IllegalArgumentException("y is null");
+            yds.putProperty( QDataSet.DEPEND_0, xds );
+            yds.putProperty( QDataSet.PLANE_0, zds );
             model.setDataSet(chNum, label, yds);
         } else {
-            ArrayDataSet zds= ArrayDataSet.copy(z);
-            if ( x!=null ) zds.putProperty( QDataSet.DEPEND_0, x );
-            if ( y!=null ) zds.putProperty( QDataSet.DEPEND_1, y );
+            if ( xds!=null ) zds.putProperty( QDataSet.DEPEND_0, xds );
+            if ( yds!=null ) zds.putProperty( QDataSet.DEPEND_1, yds );
             model.setDataSet(chNum, label, zds);
         }
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
@@ -700,22 +706,24 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z, String renderType ) {
         maybeInitModel();
-        if ( z==null ) {
-            ArrayDataSet yds= ArrayDataSet.copy(y);
+        ArrayDataSet xds= x==null ? null : ArrayDataSet.copy(x);
+        ArrayDataSet yds= y==null ? null : ArrayDataSet.copy(y);
+        ArrayDataSet zds= z==null ? null : ArrayDataSet.copy(z);
+        if ( zds==null ) {
+            if ( yds==null ) throw new IllegalArgumentException("y cannot be null if z is null");
             yds.putProperty( QDataSet.RENDER_TYPE, renderType );
-            yds.putProperty( QDataSet.DEPEND_0, x );
+            yds.putProperty( QDataSet.DEPEND_0, xds );
             model.setDataSet(chNum, label, yds);
-        } else if ( z.rank()==1 ) {
-            ArrayDataSet yds= ArrayDataSet.copy(y);
+        } else if ( zds.rank()==1 ) {            
+            if ( yds==null ) throw new IllegalArgumentException("y cannot be null if z is null");
             yds.putProperty( QDataSet.RENDER_TYPE, renderType );
-            yds.putProperty( QDataSet.DEPEND_0, x );
-            yds.putProperty( QDataSet.PLANE_0, z );
+            yds.putProperty( QDataSet.DEPEND_0, xds );
+            yds.putProperty( QDataSet.PLANE_0, zds );
             model.setDataSet(chNum, label, yds);
         } else {
-            ArrayDataSet zds= ArrayDataSet.copy(z);
             zds.putProperty( QDataSet.RENDER_TYPE, renderType );
-            if ( x!=null ) zds.putProperty( QDataSet.DEPEND_0, x );
-            if ( y!=null ) zds.putProperty( QDataSet.DEPEND_1, y );
+            if ( x!=null ) zds.putProperty( QDataSet.DEPEND_0, xds );
+            if ( y!=null ) zds.putProperty( QDataSet.DEPEND_1, yds );
             model.setDataSet(chNum, label, zds);
         }
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
