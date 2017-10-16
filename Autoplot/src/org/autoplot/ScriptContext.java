@@ -76,6 +76,9 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.URISplit;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.ops.Ops;
 import org.das2.qstream.SimpleStreamFormatter;
 import org.das2.qstream.StreamException;
 import org.das2.util.filesystem.FileSystem;
@@ -607,6 +610,24 @@ public class ScriptContext extends PyJavaInstance {
         plot( chNum, (String)null, x, y, z );
     }
 
+    private static MutablePropertyDataSet mycopy( QDataSet ds ) {
+        if ( ds==null ) return null;
+        if ( DataSetUtil.isQube(ds) ) {
+            return Ops.copy(ds);
+        } else {
+            if ( ds instanceof MutablePropertyDataSet ) {
+                MutablePropertyDataSet mpds= (MutablePropertyDataSet)ds;
+                if ( mpds.isImmutable() ) {
+                    return mpds;
+                } else {
+                    return mpds; // TODO: make sure that plot doesn't mutate
+                }
+            } else {
+                return Ops.copy(ds);
+            }
+        }
+    }
+    
     /**
      * bring up the autoplot with the dataset
      * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
@@ -615,7 +636,7 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void plot( int chNum, String label, QDataSet ds) {
         maybeInitModel();
-        ArrayDataSet yds= ds==null ? null : ArrayDataSet.copy(ds);
+        MutablePropertyDataSet yds= mycopy(ds);
         model.setDataSet( chNum, label, yds );
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
@@ -629,8 +650,8 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void plot( int chNum, String label, QDataSet x, QDataSet y ) {
         maybeInitModel();
-        ArrayDataSet yds= ArrayDataSet.copy(y);
-        ArrayDataSet xds= x==null ? null : ArrayDataSet.copy(x);
+        MutablePropertyDataSet yds= mycopy(y);
+        MutablePropertyDataSet xds= mycopy(x);
         if ( xds!=null ) yds.putProperty( QDataSet.DEPEND_0, xds );
         model.setDataSet( chNum, label, yds);
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
@@ -650,8 +671,8 @@ public class ScriptContext extends PyJavaInstance {
         if ( x==null && renderType==null ) {
             model.setDataSet( chNum, label, y);
         } else {
-            ArrayDataSet xds= x==null ? null : ArrayDataSet.copy(x);
-            ArrayDataSet yds= y==null ? null : ArrayDataSet.copy(y);
+            MutablePropertyDataSet xds= mycopy(x);
+            MutablePropertyDataSet yds= mycopy(y);
             if ( xds!=null && yds!=null ) yds.putProperty( QDataSet.DEPEND_0,xds );
             if ( ( yds!=null ) && ( xds!=null || renderType!=null ) ) yds.putProperty( QDataSet.RENDER_TYPE, renderType ); // plot command calls this with all-null arguments, and we don't when RENDER_TYPE setting to be nulled.
             model.setDataSet( chNum, label, yds);
@@ -669,9 +690,9 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z ) {
         maybeInitModel();
-        ArrayDataSet xds= x==null ? null : ArrayDataSet.copy(x);
-        ArrayDataSet yds= y==null ? null : ArrayDataSet.copy(y);
-        ArrayDataSet zds= z==null ? null : ArrayDataSet.copy(z);
+        MutablePropertyDataSet xds= mycopy(x);
+        MutablePropertyDataSet yds= mycopy(y);
+        MutablePropertyDataSet zds= mycopy(z);
         if ( zds==null ) throw new IllegalArgumentException("z is null");
         if ( zds.rank()==1 ) {
             if ( yds==null ) throw new IllegalArgumentException("y is null");
@@ -706,9 +727,9 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z, String renderType ) {
         maybeInitModel();
-        ArrayDataSet xds= x==null ? null : ArrayDataSet.copy(x);
-        ArrayDataSet yds= y==null ? null : ArrayDataSet.copy(y);
-        ArrayDataSet zds= z==null ? null : ArrayDataSet.copy(z);
+        MutablePropertyDataSet xds= mycopy(x);
+        MutablePropertyDataSet yds= mycopy(y);
+        MutablePropertyDataSet zds= mycopy(z);
         if ( zds==null ) {
             if ( yds==null ) throw new IllegalArgumentException("y cannot be null if z is null");
             yds.putProperty( QDataSet.RENDER_TYPE, renderType );
