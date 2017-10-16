@@ -31,7 +31,7 @@ public class SimplifyScriptSupport {
          Module n= (Module)org.python.core.parser.parse( script, "exec" );
          String[] ss= script.split("\n");
          HashSet variableNames= new HashSet();
-         int lastLine= ss.length+1;
+         int lastLine= ss.length;
          return simplifyScriptToGetCompletions( ss, n.body, variableNames, 1, lastLine, 0 );
     }
     
@@ -273,7 +273,7 @@ public class SimplifyScriptSupport {
         try {
             o.traverse(vb);
             logger.finest( String.format( " %04d canResolve->%s: %s", o.beginLine,  vb.visitNameFail, o ) );
-            return !vb.visitNameFail;
+            return vb.looksOkay || !vb.visitNameFail;
             
         } catch (Exception ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
