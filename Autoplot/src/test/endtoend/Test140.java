@@ -82,7 +82,7 @@ public class Test140 {
 
         String label= String.format( "test%03d_%03d", testid, iid );
 
-        double tsec;
+        double tsec,psec;
         long t0= System.currentTimeMillis();
         tsec= t0; // for non-vap non-uri
         
@@ -156,6 +156,7 @@ public class Test140 {
                 throw new IllegalArgumentException("uri results in null dataset: "+uri );
                 
             }
+            psec= (System.currentTimeMillis()-t0)/1000.;
         }
 
         System.err.println( "dataset: "+ds );
@@ -189,6 +190,7 @@ public class Test140 {
         
         System.err.printf( "wrote to file: %s\n", name1 );
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", tsec, label, uri );
+        System.err.printf( "Plot in %9.3f seconds (%s): %s\n", tsec, label, uri );
 
         if ( uri.endsWith(".vap") || uri.contains(".vap?timerange=") ) {
             reset();
