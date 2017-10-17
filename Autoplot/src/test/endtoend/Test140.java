@@ -85,6 +85,7 @@ public class Test140 {
         double tsec,psec;
         long t0= System.currentTimeMillis();
         tsec= t0; // for non-vap non-uri
+        psec= t0;
         
         QDataSet ds=null;
         if ( uri.endsWith(".vap") || uri.contains(".vap?timerange=") ) {
@@ -190,7 +191,7 @@ public class Test140 {
         
         System.err.printf( "wrote to file: %s\n", name1 );
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", tsec, label, uri );
-        System.err.printf( "Plot in %9.3f seconds (%s): %s\n", tsec, label, uri );
+        System.err.printf( "Plot in %9.3f seconds (%s): %s\n", psec, label, uri );
 
         if ( uri.endsWith(".vap") || uri.contains(".vap?timerange=") ) {
             reset();
