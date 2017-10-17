@@ -76,6 +76,7 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.URISplit;
+import org.das2.qds.DataSetOps;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.ops.Ops;
@@ -610,20 +611,41 @@ public class ScriptContext extends PyJavaInstance {
         plot( chNum, (String)null, x, y, z );
     }
 
-    private static MutablePropertyDataSet mycopy( QDataSet ds ) {
+    private static MutablePropertyDataSet ensureMutable( QDataSet ds ) {
         if ( ds==null ) return null;
         if ( DataSetUtil.isQube(ds) ) {
-            return Ops.copy(ds);
-        } else {
             if ( ds instanceof MutablePropertyDataSet ) {
                 MutablePropertyDataSet mpds= (MutablePropertyDataSet)ds;
                 if ( mpds.isImmutable() ) {
-                    return mpds;
+                    return DataSetOps.makePropertiesMutable(mpds);
                 } else {
                     return mpds; // TODO: make sure that plot doesn't mutate
                 }
             } else {
-                return Ops.copy(ds);
+                return DataSetOps.makePropertiesMutable(ds);
+            }
+        } else {
+            if ( ds instanceof MutablePropertyDataSet ) {
+                MutablePropertyDataSet mpds= (MutablePropertyDataSet)ds;
+                if ( mpds.isImmutable() ) {
+                    return DataSetOps.makePropertiesMutable(mpds);
+                } else {
+                    return mpds; // TODO: make sure that plot doesn't mutate
+                }
+            } else {
+                return DataSetOps.makePropertiesMutable(ds);
+            }
+        }
+    }
+    
+    private static void ensureImmutable( QDataSet ... dss ) {
+        for ( QDataSet ds: dss ) {
+            if ( ds==null ) continue;
+            if ( ds instanceof MutablePropertyDataSet ) {
+                MutablePropertyDataSet mpds= (MutablePropertyDataSet)ds;
+                if ( !mpds.isImmutable() ) {
+                    mpds.makeImmutable();
+                }
             }
         }
     }
@@ -636,8 +658,9 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void plot( int chNum, String label, QDataSet ds) {
         maybeInitModel();
-        MutablePropertyDataSet yds= mycopy(ds);
+        MutablePropertyDataSet yds= ensureMutable(ds);
         model.setDataSet( chNum, label, yds );
+        ensureImmutable(ds);
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
 
@@ -650,10 +673,11 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void plot( int chNum, String label, QDataSet x, QDataSet y ) {
         maybeInitModel();
-        MutablePropertyDataSet yds= mycopy(y);
-        MutablePropertyDataSet xds= mycopy(x);
+        MutablePropertyDataSet yds= ensureMutable(y);
+        QDataSet xds= x;
         if ( xds!=null ) yds.putProperty( QDataSet.DEPEND_0, xds );
         model.setDataSet( chNum, label, yds);
+        ensureImmutable(x,y);
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
 
@@ -671,12 +695,13 @@ public class ScriptContext extends PyJavaInstance {
         if ( x==null && renderType==null ) {
             model.setDataSet( chNum, label, y);
         } else {
-            MutablePropertyDataSet xds= mycopy(x);
-            MutablePropertyDataSet yds= mycopy(y);
+            QDataSet xds= x;
+            MutablePropertyDataSet yds= ensureMutable(y);
             if ( xds!=null && yds!=null ) yds.putProperty( QDataSet.DEPEND_0,xds );
             if ( ( yds!=null ) && ( xds!=null || renderType!=null ) ) yds.putProperty( QDataSet.RENDER_TYPE, renderType ); // plot command calls this with all-null arguments, and we don't when RENDER_TYPE setting to be nulled.
             model.setDataSet( chNum, label, yds);
         }
+        ensureImmutable(x,y);
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
     
@@ -690,20 +715,24 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z ) {
         maybeInitModel();
-        MutablePropertyDataSet xds= mycopy(x);
-        MutablePropertyDataSet yds= mycopy(y);
-        MutablePropertyDataSet zds= mycopy(z);
-        if ( zds==null ) throw new IllegalArgumentException("z is null");
-        if ( zds.rank()==1 ) {
+        QDataSet xds= x;
+        
+        if ( z==null ) throw new IllegalArgumentException("z is null");
+        if ( z.rank()==1 ) {
+            QDataSet zds= z;
+            MutablePropertyDataSet yds= ensureMutable(y);
             if ( yds==null ) throw new IllegalArgumentException("y is null");
             yds.putProperty( QDataSet.DEPEND_0, xds );
             yds.putProperty( QDataSet.PLANE_0, zds );
             model.setDataSet(chNum, label, yds);
         } else {
+            QDataSet yds= y;
+            MutablePropertyDataSet zds= ensureMutable(z);
             if ( xds!=null ) zds.putProperty( QDataSet.DEPEND_0, xds );
             if ( yds!=null ) zds.putProperty( QDataSet.DEPEND_1, yds );
             model.setDataSet(chNum, label, zds);
         }
+        ensureImmutable(x,y,z);
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
 
@@ -727,26 +756,29 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z, String renderType ) {
         maybeInitModel();
-        MutablePropertyDataSet xds= mycopy(x);
-        MutablePropertyDataSet yds= mycopy(y);
-        MutablePropertyDataSet zds= mycopy(z);
+        QDataSet xds= x;
+        MutablePropertyDataSet zds= ensureMutable(z);
         if ( zds==null ) {
+            MutablePropertyDataSet yds= ensureMutable(y);
             if ( yds==null ) throw new IllegalArgumentException("y cannot be null if z is null");
             yds.putProperty( QDataSet.RENDER_TYPE, renderType );
             yds.putProperty( QDataSet.DEPEND_0, xds );
             model.setDataSet(chNum, label, yds);
-        } else if ( zds.rank()==1 ) {            
+        } else if ( zds.rank()==1 ) {           
+            MutablePropertyDataSet yds= ensureMutable(y);
             if ( yds==null ) throw new IllegalArgumentException("y cannot be null if z is null");
             yds.putProperty( QDataSet.RENDER_TYPE, renderType );
             yds.putProperty( QDataSet.DEPEND_0, xds );
             yds.putProperty( QDataSet.PLANE_0, zds );
             model.setDataSet(chNum, label, yds);
         } else {
+            QDataSet yds= y;
             zds.putProperty( QDataSet.RENDER_TYPE, renderType );
             if ( x!=null ) zds.putProperty( QDataSet.DEPEND_0, xds );
             if ( y!=null ) zds.putProperty( QDataSet.DEPEND_1, yds );
             model.setDataSet(chNum, label, zds);
         }
+        ensureImmutable(x,y,z);
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
 
