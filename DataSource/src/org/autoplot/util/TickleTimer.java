@@ -33,7 +33,7 @@ public class TickleTimer {
     /**
      * @param delay time in milliseconds to wait until firing off the change.  
      *   If delay is =<0, then events will be fired off immediately.
-     * @param PropertyChangeListener provides the callback when the timer 
+     * @param listener provides the callback when the timer 
      *    runs out.  The listener is added as one of the bean's property
      *    change listeners.
      */
@@ -100,7 +100,11 @@ public class TickleTimer {
         return this.running;
     }
 
-    public void setRunning(boolean running) {
+    /**
+     * turn off the timer.
+     * @param running 
+     */
+    private void setRunning(boolean running) {
         boolean oldRunning = this.running;
         this.running = running;
         propertyChangeSupport.firePropertyChange ("running", Boolean.valueOf(oldRunning), Boolean.valueOf(running));
