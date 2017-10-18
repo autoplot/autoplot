@@ -7,6 +7,7 @@ package org.autoplot.dom;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.graph.DasAxis;
@@ -177,8 +178,26 @@ public class AxisController extends DomNodeController {
         ac.bind(axis, "flipped", p, "flipped");
         ac.bind(axis, "visible", p, "visible" );
         ac.bind(axis, "opposite", p, "orientation", getOppositeConverter(axis,dasAxis) );
+        if ( p.isHorizontal() ) {
+            p.getColumn().addPropertyChangeListener(scaleListener);
+        } else {
+            p.getRow().addPropertyChangeListener(scaleListener);
+        }
+        axis.addPropertyChangeListener( Axis.PROP_RANGE, scaleListener );
+        axis.addPropertyChangeListener( Axis.PROP_LOG, scaleListener );
     }
 
+    
+    private final PropertyChangeListener scaleListener= new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            int npixels;
+            npixels= dasAxis.isHorizontal() ? dasAxis.getColumn().getWidth() : dasAxis.getRow().getHeight();                
+            Datum w= dasAxis.isLog() ? axis.getRange().max().divide(axis.getRange().min()) : axis.getRange().width();
+            axis.setScale( w.divide(npixels) );
+        }
+    };
+            
     public DasAxis getDasAxis() {
         return dasAxis;
     }

@@ -4,6 +4,7 @@ package org.autoplot.dom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 //import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
@@ -61,6 +62,20 @@ public class Axis extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_RANGE, oldRange, range);
     }
     
+    private Datum scale = null;
+
+    public static final String PROP_SCALE = "scale";
+
+    public Datum getScale() {
+        return scale;
+    }
+
+    public void setScale(Datum scale) {
+        Datum oldScale = this.scale;
+        this.scale = scale;
+        propertyChangeSupport.firePropertyChange(PROP_SCALE, oldScale, scale);
+    }
+
     protected boolean log = false;
     public static final String PROP_LOG = "log";
 
@@ -279,6 +294,7 @@ public class Axis extends DomNode {
             if ( !exclude.contains( PROP_FLIPPED ) ) this.setFlipped(that.isFlipped());
             if ( !exclude.contains( PROP_OPPOSITE ) ) this.setOpposite(that.isOpposite());
             if ( !exclude.contains( PROP_RANGE ) ) this.setRange(that.getRange());
+            if ( !exclude.contains( PROP_SCALE ) ) this.setScale(that.getScale());
             if ( !exclude.contains( PROP_LABEL ) ) this.setLabel(that.getLabel());
             if ( !exclude.contains( PROP_FONTSIZE ) ) this.setFontSize(that.getFontSize());
             if ( !exclude.contains( PROP_AUTORANGE ) ) this.setAutoRange(that.isAutoRange());
@@ -312,6 +328,8 @@ public class Axis extends DomNode {
         if ( !b ) result.add( new PropertyChangeDiff( PROP_OPPOSITE, that.opposite, this.opposite) );
         b=  that.range.equals(this.range) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_RANGE, that.range , this.range ) );
+        b=  that.scale.equals(this.scale) ;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_SCALE, that.scale , this.scale ) );
         b=  that.label.equals(this.label) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_LABEL, that.label , this.label ) );
         b=  that.fontSize.equals(this.fontSize) ;
