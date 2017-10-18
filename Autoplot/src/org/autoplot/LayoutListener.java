@@ -1,10 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot;
 
-import org.autoplot.ApplicationModel;
 import java.util.logging.Level;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
@@ -13,8 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 import javax.swing.Timer;
 import org.das2.graph.DasCanvas;
@@ -50,6 +44,7 @@ public class LayoutListener implements PropertyChangeListener {
         colorbar.addPropertyChangeListener(DasAxis.PROP_BOUNDS, this );
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         final Canvas canvas= model.dom.getController().getCanvas();
         final CanvasController cc= canvas.getController();
@@ -62,6 +57,7 @@ public class LayoutListener implements PropertyChangeListener {
                 if (t == null) {
                     logger.fine("create timer ");
                     t = new Timer(100, new ActionListener() {
+                        @Override
                         public synchronized void actionPerformed(ActionEvent e) {
                             if ( model.dom.getOptions().isAutolayout() ) { //bug 3034795 (now 411)
                                 logger.fine("do autolayout");
