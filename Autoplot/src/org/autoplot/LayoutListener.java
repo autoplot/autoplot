@@ -63,7 +63,7 @@ public class LayoutListener implements PropertyChangeListener {
                     logger.fine("create timer ");
                     t = new Timer(100, new ActionListener() {
                         public synchronized void actionPerformed(ActionEvent e) {
-                            if ( model.dom.getOptions().isAutolayout() ) { //bug 3034795
+                            if ( model.dom.getOptions().isAutolayout() ) { //bug 3034795 (now 411)
                                 logger.fine("do autolayout");
                                 ApplicationController applicationController= model.getDocumentModel().getController();
                                 cc.performingChange(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
@@ -73,24 +73,21 @@ public class LayoutListener implements PropertyChangeListener {
                                 dasCanvas.changePerformed(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
                                 cc.changePerformed(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
                             } else {
-                                //TODO: maybe we want a changeCancelled.
+                                // the timer was tickled, but in the meantime the autolayout was set to false.
                                 dasCanvas.performingChange(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
                                 dasCanvas.changePerformed(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
+                                cc.performingChange(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
+                                cc.changePerformed(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
                             }
                         }
                     });
                     t.setRepeats(false);
                 }
-                //Map<Object,Object> map= new HashMap();
-                //model.canvas.pendingChanges(map);
-                //boolean causedByAutolayout= map.containsKey( PENDING_CHANGE_AUTOLAYOUT );
-                if ( true ) { // !causedByAutolayout ) {
-                    cc.registerPendingChange(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
-                    dasCanvas.registerPendingChange(this, PENDING_CHANGE_AUTOLAYOUT);
-                    t.restart();
-                } else {
-                    logger.finest("reenter, no need to redo.");
-                }
+
+                cc.registerPendingChange(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
+                dasCanvas.registerPendingChange(this, PENDING_CHANGE_AUTOLAYOUT);
+                t.restart();
+
             }
         }
     }
