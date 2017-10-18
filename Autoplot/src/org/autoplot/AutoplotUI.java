@@ -5811,6 +5811,15 @@ APSplash.checkTime("init 240");
             new Thread( run ).start();
        }
     }
+    
+    /**
+     * add tickle timer, which triggers when things change.  This will go away!
+     * @return 
+     */
+    public TickleTimer getTickleTimer() {
+        return this.tickleTimer;
+    }
+    
 //
 //    /**
 //     * temporary to debug https://sourceforge.net/p/autoplot/bugs/1520/
