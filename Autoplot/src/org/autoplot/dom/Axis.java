@@ -62,7 +62,7 @@ public class Axis extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_RANGE, oldRange, range);
     }
     
-    private Datum scale = null;
+    private Datum scale = Units.dimensionless.createDatum(.1);
 
     public static final String PROP_SCALE = "scale";
 
