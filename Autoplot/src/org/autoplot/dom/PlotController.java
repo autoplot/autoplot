@@ -278,46 +278,47 @@ public class PlotController extends DomNodeController {
                 logger.fine("autorangeListener cannot work while isValueAdjusting");
                 return;
             }
-            if ( evt.getPropertyName().equals("autoRange") && evt.getNewValue().equals(Boolean.TRUE) ) {
-                resetZoom( getPlot().getXaxis().isAutoRange(),
-                        getPlot().getYaxis().isAutoRange(),
-                        getPlot().getZaxis().isAutoRange() );
-            } else if ( evt.getPropertyName().equals("autoRangeHints") ) {
-                resetZoom( getPlot().getXaxis().isAutoRange(),
-                        getPlot().getYaxis().isAutoRange(),
-                        getPlot().getZaxis().isAutoRange() );
-            } else if ( evt.getPropertyName().equals("range") ) {
-                boolean alwaysAutorange= false;
-                if ( alwaysAutorange ) {
-                    if ( !evt.getNewValue().equals(evt.getOldValue()) ) {
-                        System.err.println( String.format( "line291 %s %s %s", getPlot().getXaxis().isAutoRange(),
+            if ( dom.options.autoranging ) {
+                if ( evt.getPropertyName().equals("autoRange") && evt.getNewValue().equals(Boolean.TRUE) ) {
+                    resetZoom( getPlot().getXaxis().isAutoRange(),
                             getPlot().getYaxis().isAutoRange(),
-                            getPlot().getZaxis().isAutoRange() ) );
-                        boolean mustAutoRange= getPlot().getXaxis().isAutoRange() ||
-                            getPlot().getYaxis().isAutoRange();
-                        if ( mustAutoRange ) {
-                            List<PlotElement> pes= getApplication().getController().getPlotElementsFor(plot);
-                            for ( PlotElement pe: pes ) {
-                                try {
-                                    QDataSet b= AutoplotUtil.bounds( pe.getController().getDataSet(), pe.getRenderType() );
-                                    if ( getPlot().getYaxis().isAutoRange() ) {
-                                        pe.getPlotDefaults().getYaxis().setRange(DataSetUtil.asDatumRange(b.slice(1)));
-                                    }
-                                    if ( getPlot().getXaxis().isAutoRange() ) {
-                                        pe.getPlotDefaults().getXaxis().setRange(DataSetUtil.asDatumRange(b.slice(0)));
-                                    }
-                                } catch (Exception ex) {
-                                    logger.log(Level.SEVERE, null, ex);
-                                }
-                            }
-                            resetZoom( getPlot().getXaxis().isAutoRange(),
+                            getPlot().getZaxis().isAutoRange() );
+                } else if ( evt.getPropertyName().equals("autoRangeHints") ) {
+                    resetZoom( getPlot().getXaxis().isAutoRange(),
+                            getPlot().getYaxis().isAutoRange(),
+                            getPlot().getZaxis().isAutoRange() );
+                } else if ( evt.getPropertyName().equals("range") ) {
+                    boolean alwaysAutorange= false;
+                    if ( alwaysAutorange ) {
+                        if ( !evt.getNewValue().equals(evt.getOldValue()) ) {
+                            System.err.println( String.format( "line291 %s %s %s", getPlot().getXaxis().isAutoRange(),
                                 getPlot().getYaxis().isAutoRange(),
-                                getPlot().getZaxis().isAutoRange() );                       
+                                getPlot().getZaxis().isAutoRange() ) );
+                            boolean mustAutoRange= getPlot().getXaxis().isAutoRange() ||
+                                getPlot().getYaxis().isAutoRange();
+                            if ( mustAutoRange ) {
+                                List<PlotElement> pes= getApplication().getController().getPlotElementsFor(plot);
+                                for ( PlotElement pe: pes ) {
+                                    try {
+                                        QDataSet b= AutoplotUtil.bounds( pe.getController().getDataSet(), pe.getRenderType() );
+                                        if ( getPlot().getYaxis().isAutoRange() ) {
+                                            pe.getPlotDefaults().getYaxis().setRange(DataSetUtil.asDatumRange(b.slice(1)));
+                                        }
+                                        if ( getPlot().getXaxis().isAutoRange() ) {
+                                            pe.getPlotDefaults().getXaxis().setRange(DataSetUtil.asDatumRange(b.slice(0)));
+                                        }
+                                    } catch (Exception ex) {
+                                        logger.log(Level.SEVERE, null, ex);
+                                    }
+                                }
+                                resetZoom( getPlot().getXaxis().isAutoRange(),
+                                    getPlot().getYaxis().isAutoRange(),
+                                    getPlot().getZaxis().isAutoRange() );                       
+                            }
                         }
                     }
                 }
-            }
-            
+            }            
         }
     };
     
