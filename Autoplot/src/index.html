@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Fun with drop shadows.
+        <p><small>Autoplot can be made to layout out the plots precisely.  See <a href="demoFixedLayout.jy">the script</a>.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-10-16 r21523):</p>
-        <ul>  
+        <p>Bugfixes (2017-10-18 r21542):</p>
+        <ul>
+            <li>Huge scatter mode has branch which was dropping the last record of a rank 2 waveform.
+            <li>1911: respect options.autorange=False.  New autoranging code would always autorange.
+            <li>1910: make sure that the script plot command sets the immutable flag so that plot operates as expected and copying the data can be avoided.  Thanks, Masafumi!
             <li>George pointed out where rank 3 waveform data would drop records.
             <li>column keyword was ignored when the first two columns were times.
             <li>ASCII files starting with two time columns could only be read as events, so column keyword didn't work.
