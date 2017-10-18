@@ -7,8 +7,10 @@ package org.autoplot.dom;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
+import java.util.logging.Level;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasAxis.Lock;
@@ -93,6 +95,53 @@ public class AxisController extends DomNodeController {
                     changesSupport.performingChange(this, PENDING_RANGE_TWEAK);
                     axis.setRange(range);
                     changesSupport.changePerformed(this, PENDING_RANGE_TWEAK);
+                }
+            }
+            if ( evt.getPropertyName().equals( Axis.PROP_SCALE ) ) {
+                if ( dasAxis!=null ) { // the scale has changed, so let's see if we can reset the range to match the scale
+                    int npixels;
+                    npixels= dasAxis.isHorizontal() ? dasAxis.getColumn().getWidth() : dasAxis.getRow().getHeight();                
+                    Datum w;
+                    if ( dasAxis.isLog() ) {
+                        w= Units.log10Ratio.createDatum( Math.log10( axis.getRange().max().divide(axis.getRange().min() ).value() ) );
+                    } else {
+                        w= axis.getRange().width();
+                    }
+                    Datum oldScale= w.divide(npixels);
+                    Datum newScale= (Datum)evt.getNewValue();
+                    if ( !oldScale.getUnits().isConvertibleTo(newScale.getUnits()) ) {
+                        return;
+                    }
+                    if ( !oldScale.equals(newScale) ) {
+                        //System.err.println("105: need to reset scale");
+                        Datum scale = (Datum)evt.getNewValue();
+                        DatumRange otherRange = dasAxis.getDatumRange();
+                        Datum otherw;
+                        if ( dasAxis.isLog() ) {
+                            otherw= Units.log10Ratio.createDatum( Math.log10( otherRange.max().divide( otherRange.min() ).value() ) );
+                        } else {
+                            otherw= otherRange.width();
+                        }
+                        Datum otherScale = otherw.divide(npixels);
+                        
+                        double expand = (scale.divide(otherScale).value() - 1) / 2;
+                        if (Math.abs(expand) > 0.0001) {
+                            logger.log(Level.FINER, "expand={0} scale={1} otherScale={2}", new Object[]{expand, scale, otherScale});
+                            try {
+                                DatumRange newOtherRange;
+                                if ( dasAxis.isLog() ) {
+                                    newOtherRange= DatumRangeUtil.rescaleLog(otherRange, 0 - expand, 1 + expand);
+                                } else {
+                                    newOtherRange= DatumRangeUtil.rescale(otherRange, 0 - expand, 1 + expand);
+                                }
+                                axis.setRange(newOtherRange);
+                            } catch ( IllegalArgumentException ex ) {
+                                System.err.println("here129");
+                            }
+                        }
+                        
+                        //DatumRange nr= 
+                    }
                 }
             }
         }
@@ -193,8 +242,14 @@ public class AxisController extends DomNodeController {
         public void propertyChange(PropertyChangeEvent evt) {
             int npixels;
             npixels= dasAxis.isHorizontal() ? dasAxis.getColumn().getWidth() : dasAxis.getRow().getHeight();                
-            Datum w= dasAxis.isLog() ? axis.getRange().max().divide(axis.getRange().min()) : axis.getRange().width();
-            axis.setScale( w.divide(npixels) );
+            Datum w;
+            if ( dasAxis.isLog() ) {
+                w= Units.log10Ratio.createDatum( Math.log10( axis.getRange().max().divide(axis.getRange().min() ).value() ) );
+            } else {
+                w= axis.getRange().width();
+            }
+            Datum scale= w.divide(npixels);
+            axis.setScale( scale );
         }
     };
             
