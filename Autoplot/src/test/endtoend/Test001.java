@@ -5,9 +5,7 @@
 
 package test.endtoend;
 
-import java.io.IOException;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.monitor.ProgressMonitor;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import static org.das2.qds.ops.Ops.*;
