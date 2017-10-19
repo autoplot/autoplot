@@ -102,7 +102,10 @@ public class AxisController extends DomNodeController {
                     int npixels;
                     npixels= dasAxis.isHorizontal() ? dasAxis.getColumn().getWidth() : dasAxis.getRow().getHeight();                
                     Datum w;
-                    if ( dasAxis.isLog() ) {
+                    Units u= dasAxis.getUnits();
+                    if ( u!=u.getOffsetUnits() ) {
+                        w= axis.getRange().width();
+                    } else if ( dasAxis.isLog() ) {
                         w= Units.log10Ratio.createDatum( Math.log10( axis.getRange().max().divide(axis.getRange().min() ).value() ) );
                     } else {
                         w= axis.getRange().width();
@@ -116,8 +119,11 @@ public class AxisController extends DomNodeController {
                         //System.err.println("105: need to reset scale");
                         Datum scale = (Datum)evt.getNewValue();
                         DatumRange otherRange = dasAxis.getDatumRange();
+                        u= otherRange.getUnits();
                         Datum otherw;
-                        if ( dasAxis.isLog() ) {
+                        if ( u!=u.getOffsetUnits() ) {
+                            otherw= otherRange.width();
+                        } else if ( dasAxis.isLog() ) {
                             otherw= Units.log10Ratio.createDatum( Math.log10( otherRange.max().divide( otherRange.min() ).value() ) );
                         } else {
                             otherw= otherRange.width();
@@ -147,13 +153,18 @@ public class AxisController extends DomNodeController {
         }
     };
 
-    //TODO: this will confuse with isValueAdjusting
+    /**
+     * true if the Axis is adjusting, or the DasAxis which implements.
+     * @return true if the Axis is adjusting, or the DasAxis which implements.
+     */
     public boolean valueIsAdjusting() {
         return super.isValueAdjusting() || dasAxis.valueIsAdjusting();
     }
 
     /**
      * set the range without affecting the auto state.
+     * @param range the new range
+     * @param log true if the axis should be log.
      */
     public void setRangeAutomatically( DatumRange range, boolean log ) {
         axis.range= range; // don't fire off property change events.
@@ -243,7 +254,10 @@ public class AxisController extends DomNodeController {
             int npixels;
             npixels= dasAxis.isHorizontal() ? dasAxis.getColumn().getWidth() : dasAxis.getRow().getHeight();                
             Datum w;
-            if ( dasAxis.isLog() ) {
+            Units u= dasAxis.getUnits();
+            if ( u.getOffsetUnits()!=u ) {
+                w= axis.getRange().width(); // we have to do this, it doesn't matter if it is log.
+            } else if ( dasAxis.isLog() ) {
                 w= Units.log10Ratio.createDatum( Math.log10( axis.getRange().max().divide(axis.getRange().min() ).value() ) );
             } else {
                 w= axis.getRange().width();
