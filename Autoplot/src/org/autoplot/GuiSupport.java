@@ -1402,12 +1402,14 @@ public class GuiSupport {
 
     /**
      * support for binding two plot axes.
+     * Set log first since we might tweak range accordingly.
      * @param dstPlot
      * @param plot
      * @param axis
+     * @param props null is old range and log.  list of properties to bind
      * @throws java.lang.IllegalArgumentException
      */
-    private static void bindToPlotPeer( final ApplicationController controller, Plot dstPlot, Plot plot, Axis axis) throws IllegalArgumentException {
+    private static void bindToPlotPeer( final ApplicationController controller, Plot dstPlot, Plot plot, Axis axis, String[] props) throws IllegalArgumentException {
         Axis targetAxis;
         if (plot.getXaxis() == axis) {
             targetAxis = dstPlot.getXaxis();
@@ -1418,10 +1420,14 @@ public class GuiSupport {
         } else {
             throw new IllegalArgumentException("this axis and plot don't go together");
         }
-        axis.setLog( targetAxis.isLog() );
-        axis.setRange( targetAxis.getRange() );
-        controller.bind(targetAxis, Axis.PROP_LOG, axis, Axis.PROP_LOG); //set log first since we might tweak range accordingly.
-        controller.bind(targetAxis, Axis.PROP_RANGE, axis, Axis.PROP_RANGE);
+        if ( props==null ) {
+            axis.setLog( targetAxis.isLog() );
+            axis.setRange( targetAxis.getRange() );
+            props= new String[] { Axis.PROP_LOG, Axis.PROP_RANGE };
+        }
+        for ( String p : props ) {
+            controller.bind(targetAxis, p, axis, p ); 
+        }
     }
 
 
@@ -1486,7 +1492,7 @@ public class GuiSupport {
             bindingMenu.add(item);
         }
 
-        item = new JMenuItem(new AbstractAction("Add Binding to Plot Above") {
+        item = new JMenuItem(new AbstractAction("Bind Range to Plot Above") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
@@ -1494,12 +1500,12 @@ public class GuiSupport {
                 if (dstPlot == null) {
                     controller.setStatus("warning: no plot above");
                 } else {
-                    bindToPlotPeer(controller,dstPlot, plot, axis);
+                    bindToPlotPeer(controller,dstPlot, plot, axis, null );
                 }
             }
         });
         bindingMenu.add(item);
-        item = new JMenuItem(new AbstractAction("Add Binding to Plot Below") {
+        item = new JMenuItem(new AbstractAction("Bind Range to Plot Below") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
@@ -1507,12 +1513,12 @@ public class GuiSupport {
                 if (dstPlot == null) {
                     controller.setStatus("warning: no plot below");
                 } else {
-                    bindToPlotPeer(controller,dstPlot, plot, axis);
+                    bindToPlotPeer(controller,dstPlot, plot, axis, null );
                 }
             }
         });
         bindingMenu.add(item);
-        item = new JMenuItem(new AbstractAction("Add Binding to Plot to the Right") {
+        item = new JMenuItem(new AbstractAction("Bind Range to Plot to the Right") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
@@ -1520,12 +1526,12 @@ public class GuiSupport {
                 if (dstPlot == null) {
                     controller.setStatus("warning: no plot to the right");
                 } else {
-                    bindToPlotPeer(controller,dstPlot, plot, axis);
+                    bindToPlotPeer(controller,dstPlot, plot, axis, null );
                 }
             }
         });
         bindingMenu.add(item);
-        item = new JMenuItem(new AbstractAction("Add Binding to Plot to the Left") {
+        item = new JMenuItem(new AbstractAction("Bind Range to Plot to the Left") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
@@ -1533,12 +1539,39 @@ public class GuiSupport {
                 if (dstPlot == null) {
                     controller.setStatus("warning: no plot to the left");
                 } else {
-                    bindToPlotPeer(controller,dstPlot, plot, axis);
+                    bindToPlotPeer(controller,dstPlot, plot, axis, null );
                 }
             }
         });
         bindingMenu.add(item);
 
+        item = new JMenuItem(new AbstractAction("Bind Scale to Plot Above") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
+                Plot dstPlot = controller.getPlotAbove(plot);
+                if (dstPlot == null) {
+                    controller.setStatus("warning: no plot above");
+                } else {
+                    bindToPlotPeer(controller,dstPlot, plot, axis, new String[] { Axis.PROP_LOG, Axis.PROP_SCALE });
+                }
+            }
+        });
+        bindingMenu.add(item);
+        item = new JMenuItem(new AbstractAction("Bind Scale to Plot Below") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
+                Plot dstPlot = controller.getPlotBelow(plot);
+                if (dstPlot == null) {
+                    controller.setStatus("warning: no plot below");
+                } else {
+                    bindToPlotPeer(controller,dstPlot, plot, axis, new String[] { Axis.PROP_LOG, Axis.PROP_SCALE });
+                }
+            }
+        });
+        bindingMenu.add(item);
+        
         item = new JMenuItem(new AbstractAction("Remove Bindings") {
             @Override            
             public void actionPerformed(ActionEvent e) {
