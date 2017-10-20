@@ -17,7 +17,18 @@ public class PdfOptionsPanel extends javax.swing.JPanel {
         initComponents();
     }
 
-
+    /**
+     * return the pixels per point (a float or int), or "" if there is no
+     * preference.
+     * @return 
+     */
+    public String getPixelsPerInch() {
+        if ( pixelsPerPointCB.isSelected() ) {
+            return (String)pixelsPerInchComboBox.getSelectedItem();
+        } else {
+            return "";
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -32,7 +43,9 @@ public class PdfOptionsPanel extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         manualWidthCB = new javax.swing.JCheckBox();
         widthTF = new javax.swing.JTextField();
-        unitsCB = new javax.swing.JComboBox();
+        unitsComboBox = new javax.swing.JComboBox();
+        pixelsPerPointCB = new javax.swing.JCheckBox();
+        pixelsPerInchComboBox = new javax.swing.JComboBox<>();
 
         fontsAsShapesCB.setText("Fonts as shapes");
 
@@ -40,8 +53,7 @@ public class PdfOptionsPanel extends javax.swing.JPanel {
         jLabel1.setText("<html>Write the characters out as shapes.  This makes a portable PDF and all characters render, but the labels cannot be edited. ");
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
-        manualWidthCB.setText("Manually Set Page Width  (Coming Soon...)");
-        manualWidthCB.setEnabled(false);
+        manualWidthCB.setText("Set Canvas Width");
         manualWidthCB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 manualWidthCBActionPerformed(evt);
@@ -53,9 +65,21 @@ public class PdfOptionsPanel extends javax.swing.JPanel {
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, manualWidthCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), widthTF, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
-        unitsCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "inches", "centimeters", "points" }));
+        unitsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "inches", "centimeters", "points" }));
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, manualWidthCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), unitsCB, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, manualWidthCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), unitsComboBox, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        pixelsPerPointCB.setText("Set Pixels Per Inch");
+        pixelsPerPointCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pixelsPerPointCBActionPerformed(evt);
+            }
+        });
+
+        pixelsPerInchComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "72", "100", "144", "400" }));
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, pixelsPerPointCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), pixelsPerInchComboBox, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -80,9 +104,13 @@ public class PdfOptionsPanel extends javax.swing.JPanel {
                                 .addGap(29, 29, 29)
                                 .addComponent(widthTF, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(unitsCB, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(manualWidthCB))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                                .addComponent(unitsComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(manualWidthCB)
+                            .addComponent(pixelsPerPointCB)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(22, 22, 22)
+                                .addComponent(pixelsPerInchComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 24, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -96,8 +124,12 @@ public class PdfOptionsPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(widthTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(unitsCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(159, Short.MAX_VALUE))
+                    .addComponent(unitsComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pixelsPerPointCB)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pixelsPerInchComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(104, Short.MAX_VALUE))
         );
 
         layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {fontsAsShapesCB, manualWidthCB});
@@ -106,14 +138,20 @@ public class PdfOptionsPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void manualWidthCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualWidthCBActionPerformed
-        // TODO add your handling code here:
+        if ( manualWidthCB.isSelected() ) pixelsPerPointCB.setSelected(false);
     }//GEN-LAST:event_manualWidthCBActionPerformed
+
+    private void pixelsPerPointCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pixelsPerPointCBActionPerformed
+        if ( pixelsPerPointCB.isSelected() ) manualWidthCB.setSelected(false);
+    }//GEN-LAST:event_pixelsPerPointCBActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JCheckBox fontsAsShapesCB;
     private javax.swing.JLabel jLabel1;
     public javax.swing.JCheckBox manualWidthCB;
-    public javax.swing.JComboBox unitsCB;
+    private javax.swing.JComboBox<String> pixelsPerInchComboBox;
+    private javax.swing.JCheckBox pixelsPerPointCB;
+    public javax.swing.JComboBox unitsComboBox;
     public javax.swing.JTextField widthTF;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables

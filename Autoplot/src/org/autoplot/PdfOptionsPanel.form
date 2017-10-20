@@ -38,11 +38,16 @@
                               <EmptySpace min="29" pref="29" max="-2" attributes="0"/>
                               <Component id="widthTF" min="-2" pref="55" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="unitsCB" min="-2" pref="122" max="-2" attributes="0"/>
+                              <Component id="unitsComboBox" min="-2" pref="122" max="-2" attributes="0"/>
                           </Group>
                           <Component id="manualWidthCB" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="pixelsPerPointCB" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
+                              <Component id="pixelsPerInchComboBox" min="-2" pref="242" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="24" max="32767" attributes="0"/>
                   </Group>
               </Group>
           </Group>
@@ -60,9 +65,13 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="widthTF" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="unitsCB" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="unitsComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="159" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="pixelsPerPointCB" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="pixelsPerInchComboBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="104" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -89,8 +98,7 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="manualWidthCB">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Manually Set Page Width  (Coming Soon...)"/>
-        <Property name="enabled" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="Set Canvas Width"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="manualWidthCBActionPerformed"/>
@@ -110,7 +118,7 @@
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
       </AuxValues>
     </Component>
-    <Component class="javax.swing.JComboBox" name="unitsCB">
+    <Component class="javax.swing.JComboBox" name="unitsComboBox">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="3">
@@ -121,10 +129,36 @@
         </Property>
       </Properties>
       <BindingProperties>
-        <BindingProperty name="enabled" source="manualWidthCB" sourcePath="${selected}" target="unitsCB" targetPath="enabled" updateStrategy="0" immediately="false"/>
+        <BindingProperty name="enabled" source="manualWidthCB" sourcePath="${selected}" target="unitsComboBox" targetPath="enabled" updateStrategy="0" immediately="false"/>
       </BindingProperties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="pixelsPerPointCB">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Set Pixels Per Inch"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pixelsPerPointCBActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="pixelsPerInchComboBox">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="4">
+            <StringItem index="0" value="72"/>
+            <StringItem index="1" value="100"/>
+            <StringItem index="2" value="144"/>
+            <StringItem index="3" value="400"/>
+          </StringArray>
+        </Property>
+      </Properties>
+      <BindingProperties>
+        <BindingProperty name="enabled" source="pixelsPerPointCB" sourcePath="${selected}" target="pixelsPerInchComboBox" targetPath="enabled" updateStrategy="0" immediately="false"/>
+      </BindingProperties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>
     </Component>
   </SubComponents>

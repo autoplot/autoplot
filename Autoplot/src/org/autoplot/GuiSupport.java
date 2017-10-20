@@ -1114,7 +1114,7 @@ public class GuiSupport {
                                             go.setOutputStream(out);
                                             if ( pdecor.manualWidthCB.isSelected() ) {
                                                 double mant= Double.parseDouble(pdecor.widthTF.getText()); //TODO>: FormattedTextField
-                                                String units= (String)pdecor.unitsCB.getSelectedItem();
+                                                String units= (String)pdecor.unitsComboBox.getSelectedItem();
                                                 switch (units) {
                                                     case "inches":
                                                         mant= mant * 72;
@@ -1125,9 +1125,15 @@ public class GuiSupport {
                                                     default:
                                                         throw new IllegalArgumentException("implementation error: "+units);
                                                 }
-                                                double aspect= canvas.getHeight() / (double)canvas.getWidth();
+                                                // mant is the number of pixels width.
+                                                
+                                                int ppi= (int)( canvas.getWidth() * 72 / mant );
+                                                go.setPixelsPerInch( ppi );
                                                 go.setSize( canvas.getWidth(), canvas.getHeight() );
-                                                canvas.prepareForOutput( (int)mant, (int)(mant*aspect));
+                                            } else if ( pdecor.getPixelsPerInch().length()>0 ) {
+                                                int ppi= Integer.parseInt(pdecor.getPixelsPerInch());
+                                                go.setPixelsPerInch(ppi);
+                                                go.setSize( canvas.getWidth(), canvas.getHeight() );
                                             } else {
                                                 go.setSize( canvas.getWidth(), canvas.getHeight() );
                                             }
