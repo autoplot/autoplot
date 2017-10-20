@@ -101,8 +101,8 @@ public class Test026 {
         if (drref.equals(dr)) {
             System.err.println(id + ": " + test + "\t" + drref.min() + "\t" + DatumUtil.asOrderOneUnits(drref.width()));
         } else {
-            Datum d1 = dr.min().subtract(drref.min());
-            Datum d2 = dr.max().subtract(drref.max());
+            Datum d1 = dr.min().subtract(drref.min()).abs();
+            Datum d2 = dr.max().subtract(drref.max()).abs();
             if (d1.lt(Units.microseconds.createDatum(diffMicros))
                     && d2.lt(Units.microseconds.createDatum(diffMicros))) {
                 System.err.println(id + ": " + test + "\t" + drref + "\t within " + diffMicros + " micros (" + d1 + " " + d2 + ")");
@@ -235,6 +235,12 @@ public class Test026 {
             doTest(43, "orbit:rbspa-pp:403-406", "2013-01-27T18:58:17.392Z to 2013-01-29T06:53:13.619Z", micros, false);
             doTest(44, "1972/now-P1D", "1972-01-01T00:00/" + now.subtract(1, Units.days), micros, true);
             doTest(45, "now-P10D/now-P1D", new DatumRange(now.subtract(10, Units.days), now.subtract(1, Units.days)).toString(), micros, true);
+            
+            // time zone support and pluses for spaces
+            doTest(50, "2001-01-01T06:08-0600/P1D", "2001-01-01 12:08 to 2001-01-02 12:08" );
+            doTest(51, "2001-01-01T06:08+to+10:08", "2001-01-01 06:08 to 2001-01-01 10:08" );
+            doTest(52, "20010101T0608-0600/P1D", "2001-01-01 12:08 to 2001-01-02 12:08" );
+            doTest(53, "20010101T0608+0600/P1D", "2001-01-01 00:08 to 2001-01-02 00:08" );  // Note the plus here is interpretted as a space in some codes, so make sure this case is handled.
             
             int[] tt= TimeUtil.fromDatum(now);
             tt[2]=1;
