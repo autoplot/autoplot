@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Autoplot can be made to layout out the plots precisely.  See <a href="demoFixedLayout.jy">the script</a>.
+        <p><small>Autoplot can be made to lay out the plots precisely.  See <a href="demoFixedLayout.jy">the script</a>.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -44,6 +44,9 @@
             <li>add a couple of completions for timerange and plots[0].yaxis.range to vap file completions after the question mark (?).
             <li>support colorLoadOrder.vap?plots[0].yaxis.range='0+to+4'
             <li>1895: when rendererControl and color properties are inconsistent, let specific property override.
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>vap+inline completions didn't import things properly, causing runtime error.
             <li>CDF and HDF editor panels didn't preserve the vap+cdf or vap+hdf prefix, breaking servers which send data in files without extensions.
             <li>fft function would assume that the cadence reported by the dataset was correct and precise, use code that looks at the timetags.
@@ -53,68 +56,6 @@
             <li>TimeRangeTool pops up over center of GUI, not the address bar.
             <li>1884: "run batch" corrections.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>1884: refactory is used in completions.
-            <li>add logging to IDL/Matlab bridge.
-            <li>clarify error where "file:///" is changed to "sftp:///jbf@nudnik" which leads to a confusing error because of the ///.
-            <li>1888: Java9 (beta) breaks the undo code of the Jython editor, causing RTE popups. 
-            <li>1889: csv with misformatted timetag would fail with mis-marked fill value.  Now record is dropped or an error raised if only the timetag is misformatted.
-            <li>1876: Excel CSVs start with 0xFEFF, to assert UTF-8, support this in the general-purpose ascii table reader.
-            <li>rte_0003832449: indicate that the file starting with 0 (ascii null) does not appear to be ascii.
-            <li>avoid RTE with script editor in Java 9 (beta release) by doing type check.
-            <li>rte_1956645584: colorscatter and series modes interpreted data inconsistently.
-            <li>With colorScatter and turning on the symbol connector, the data is misinterpreted.
-            <li>rte_0164874230: catch runtime errors in validateFilter.  Catch any exception and trivially return false.
-            <li>1886: das2server example parameters are now used.
-            <li>rte 1931288470: matlab_jet_black0 was not properly initialized, causing RTE in some cases.  Thanks, Masafumi!
-            <li>format-to-CDF's append would fail to automatically generate a new name, because it assumed all the CDF variable names were in memory.  Thanks, Kristoff!
-            <li>branch of CSV reader would drop the first record.  Thanks, Masafumi!
-            <li>RGB Image Renderer allows sloppiness in the units, to avoid runtime error during paint.
-            <li>in-line Jython scripts would show expression as enumerated data, instead of resolving it, because of link(name) failure.
-            <li>another round of Findbugs, focusing on unnecessary Thread synchronization and find-single-character in String.
-            <li>1884: "import autoplot as ap" was broken since the org.virbo refactoring.
-            <li>1511: tighten up code which could reset the y axis autorange property because " " was in the .vap for a filter.
-            <li>bugfix: when pngwalk template is file:///home/jbf/ct/hudson/artifacts/test070*.png, the filename was clipped improperly.
-            <li>1883: jython PyQDataSet corrects handling of "property" calls, and __tojava__, to correct mutability bugs.
-            <li>cdf export writes DEPEND_1 and DEPEND_2 as non-time-varying when they are rank 1.
-            <li>1882: jython indexing bug, where SPE[i,j,r] is used with scalars i and j, and array r. 
-            <li>1881: weightsDataSet always returns a BundleWeightsDataSet, even for simple bundles, because fill was not properly handled.
-            <li>rte 0579778410: some path resulted with NullPointerException in CDF editor panel
-            <li>1852: metadata tab for join dataset doesn't show properties of each joined data set.
-            <li>1869: listings of Hudson http showed where subdirectories show up in listings (ls /a/->/a/b/c/), causing strange problems.
-            <li>1875: preserve the scientist's timerange 
-            <li>1129: unnecessary 1-second delay in waitUntilIdle when producing pngwalks corrected.
-            <li>round of FindBugs cleanup.
-            <li>Corrections to waveform dataset plotting with Series renderer mode.
-            <li>1878: FlattenWaveformDataSet can now detect that result is not monotonic.
-            <li>1878: FlattenWaveformDataSet would improperly propagate fill metadata for the DEPEND_0 values.
-            <li>1876: first line of CSV was always handled as a header, dropping the first record.
-            <li>1876: Excel CSVs start with 0xFEFF, to assert UTF-8, which also caused problems.
-            <li>error message for dataset length mismatch was mis-reported in validate.
-            <li>in PNGWalkTool, show unique part of filenames in .../*/foo/bar.png.  Before bar.png was shown for each image.
-            <li>item parameter works properly for das2server dialog for all streams now.
-            <li>Don't draw lines at tick locations when "opposite axis" is used.
-            <li>1871: many timerange text fields don't use history.  Thanks, Dan!
-            <li>flattenRank2 always returns a rank 2 dataset, generating 0,1,2,... when DEPEND_0 or DEPEND_1 is missing.
-            <li>1873: incorrect reset of slices filter.  Thanks, Joe!
-            <li>1869: restore function of pngwalk:http://jfaden.net/hudson/job/autoplot-test070/*/artifact/test070_008.png.
-            <li>Ivar's script caught where new code didn't handle fill properly because BUNDLE_1 hid it. 
-            <li>convertUnitsTo now checks that a BUNDLE_0 is not present, which might have old UNITS within.  Thanks, Ivar!
-            <li>1868: where with append triggered a branch where an immutable dataset's internal buffer was accessed with write code.  Thanks, Kristoff!
-            <li>1867: AverageTableRebinner interpolate Y before interpolating X, to support MMS FPI interleaved sample modes.
-            <li>rank 4 support was never implemented for ListIndexDataSetIterator, so inline with where would not work.
-            <li>1866: catch CDF recCount=0, which causes reader to enter infinite loop, triggered when [200:300] was used and a non-time-varying DELTA_PLUS was found.
-            <li>1801: dataset iterator is inordinately slow, put in optimal loops for collapse of rank 4 data.
-            <li>rte_0164874230: index out of bounds on Slice operation editor panel.  Thanks, Kris!
-            <li>bug where rank 2 DEPEND_3 wasn't sliced properly is corrected.  Thanks, Arya!
-            <li>1865: add a little hysteresis to the LanlNNRebinner, so it doesn't flop back and forth with axis changes.</li>
-            <li>small round of findbugs, including one real bug in DigitalRenderer with xaxis units.
-            <li>rte_1708171669: space in CDAWeb filter would cause RTE.
-            <li>1860: fill data within bundles of data is marked as fill in the metadata tab.
-            <li>fix the setUnits filter, where it was using an old method.  Thanks, Kristoff!
-            <li>1858: extend autorange to include all data when bundled data has different units.
-        </ul>
         <p>Features:</p>
         <ul> 
             <li>rfe601: new scale property allows axis scales to be bound.
@@ -123,6 +64,9 @@
             <li>DatumRangeUtil's time range parser properly throws parse exception with "0 to 4" (or any year&lt;1000.)
             <li>PNGWalk save as has checkbox to reduce the image by 60%, to save time in releases.
             <li>"Run Batch" allows times to be loaded from events file.
+        </ul>
+       <p>Less recent features:</p>
+       <ul>
             <li>AutoplotServer has --nomessages which turns off message bubbles.
             <li>ServletInfo reports memory consumed and other useful information.
             <li>ServletInfo of Autoplot Servlet now checks whitelist before showing server-side information.
@@ -136,32 +80,7 @@
             <li>string representation of complex data used (1.23+4.56j)
             <li>add complexConj and complexMultiply functions.
             <li>loosen check for CDF VAR_TYPE to support ESA.
-        </ul>
-       <p>Less recent features:</p>
-       <ul>
-            <li>SAMP file references are downloaded if necessary.  
-            <li>064: CDF formatting "bundle" named parameter allows bundle dataset to be written to CDF in separate variables.
-            <li>515: improve support for new colorbars created in scripts.
-            <li>592: allow remote scripts to be accessed over SFTP.
-            <li>add magnitude (of vectors) to the tree of filter operations.
-            <li>591: Image URIs can be flipped horizontally or vertically, with ?xaxis=[360.,0,0.,2047].
-            <li>064: ExportDataBundle is experimental system from aggregating a set of URIs for export into ascii tables, CDF files, and IDL savesets.
-            <li>New compile script for Autoplot which compiles within minutes instead of 20+ minutes, should have no effect
-            <li>588: allow 64-point rank 2 waveforms.  Bugfix were waveform scheme test didn't check rank of offsets, which can now be rank 2.
-            <li>synchronize functions allow rank2 data, where each channel is synchronized as a rank 1 dataset.
-            <li>DataPointRecorder (used with digitizing) allows the units to be reset.  Thanks, Bill!
-            <li>matlab_jet_black0 color table added.  Thanks, Seth!
-            <li>"lastyear" keyword supported in timeranges, to indicate the last year boundary.
-            <li>time range dialogs properly show recent timeranges.
-            <li>das2server dialog shows a droplist of items when they are identified by the server.
-            <li>Update RBSP orbits to Feb 2017.
-            <li>DasAxis foreground color is exposed in the property editor, under the controller node.
-            <li>585: experimental TriScatRebinner added, to draw spectrograms from scatter data using Delauney triangulation.
-            <li>support new scheme, rank2WaveformRank2Offsets in hugeScatter and series renderers, for analysis with Ivar's new CDF files.
-            <li>rfe528: after years of being stuck with the "BoxSelected" mistake, this is finally corrected to "boxSelected"
-            <li>IDL/Matlab interface includes method for clearing used memory.  Thanks, Masafumi!
        </ul>
-
         <p>Known issues:</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/?limit=1000">see Source Forge</a>
