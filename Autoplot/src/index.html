@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-10-19 r21550):</p>
+        <p>Bugfixes (2017-10-20 r21556):</p>
         <ul>
+            <li>Positive time zone offsets (+0600) where not parsed properly.
             <li>Huge scatter mode has branch which was dropping the last record of a rank 2 waveform.
             <li>1911: respect options.autorange=False.  New autoranging code would always autorange.
             <li>1910: make sure that the script plot command sets the immutable flag so that plot operates as expected and copying the data can be avoided.  Thanks, Masafumi!
@@ -58,6 +59,7 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>print to PDF now has pixels per inch and (finally) overall width controls.
             <li>rfe601: new scale property allows axis scales to be bound.
             <li>tweaks to property editor so it can be used to show the DOM with updates.
             <li>toDegrees and toRadians now set the units.
