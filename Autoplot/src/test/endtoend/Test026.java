@@ -4,7 +4,6 @@
  */
 package test.endtoend;
 
-import org.das2.qds.SemanticOps;
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.datum.DatumRangeUtil;
@@ -79,7 +78,7 @@ public class Test026 {
     }
 
     public static void doTest(int id, String test, String ref) throws Exception {
-        doTest(id, test, ref, 0.);
+        doTest(id, test, ref, 0., false);
     }
 
     private static Set<Integer> usedIds= new HashSet<>();
@@ -92,7 +91,7 @@ public class Test026 {
      * @param diffMicros allowable difference.
      * @throws Exception 
      */
-    public static void doTest(int id, String test, String ref, double diffMicros) throws Exception {
+    private static void doTest(int id, String test, String ref, double diffMicros, boolean secondChance) throws Exception {
 
         if ( usedIds.contains(id) ) throw new IllegalArgumentException("id "+id+" used twice, test code needs attention");
         usedIds.add(id);
@@ -111,7 +110,12 @@ public class Test026 {
                 System.err.println(id + ": " + test + " != " + ref + "\n    " + dr + " != " + drref + "\n    not within " + diffMicros + " micros (" + d1 + " " + d2 + ")"); 
                 //dr= parseTimeRange(test); // for debugging
                 //drref= parseTimeRange(ref);
-                throw new IllegalArgumentException("no parse exception, but parsed incorrectly.");
+                if ( secondChance ) {
+                    System.err.println("try again...");
+                    doTest( id, test, ref, diffMicros, false ); //NOW has the problem that occasionally they will fail.
+                } else {
+                    throw new IllegalArgumentException("no parse exception, but parsed incorrectly.");
+                }
             }
         }
         
@@ -166,16 +170,16 @@ public class Test026 {
             //doTests
             doTestDR(70, "0 to 35", DatumRange.newDatumRange(0, 35, Units.dimensionless));
             doTestDR(71, "0to35", DatumRange.newDatumRange(0, 35, Units.dimensionless));
-            doTestDR(72, "0 to 35 apples", DatumRange.newDatumRange(0, 35, SemanticOps.lookupUnits("apples")));
-            doTestDR(73, "0 to 35 sector", DatumRange.newDatumRange(0, 35, SemanticOps.lookupUnits("sector")));
-            doTestDR(74, "0to35 sector", DatumRange.newDatumRange(0, 35, SemanticOps.lookupUnits("sector")));
+            doTestDR(72, "0 to 35 apples", DatumRange.newDatumRange(0, 35, Units.lookupUnits("apples")));
+            doTestDR(73, "0 to 35 sector", DatumRange.newDatumRange(0, 35, Units.lookupUnits("sector")));
+            doTestDR(74, "0to35 sector", DatumRange.newDatumRange(0, 35, Units.lookupUnits("sector")));
             doTestDR(75, "-50to-35", DatumRange.newDatumRange(-50, -35, Units.dimensionless));
             doTestDR(76, "0 to 10 kHz", DatumRange.newDatumRange(0, 10000, Units.hertz));
             doTestDR(77, "0 to .01 MHz", DatumRange.newDatumRange(0, 10000, Units.hertz));
-            Units cm = SemanticOps.lookupUnits("cm");
+            Units cm = Units.lookupUnits("cm");
             cm.registerConverter(Units.meters, new UnitsConverter.ScaleOffset(1. / 100, 0));
             doTestDR(78, "0 to 10 cm", DatumRange.newDatumRange(0, .1, Units.meters));
-            Units mm = SemanticOps.lookupUnits("mm");
+            Units mm = Units.lookupUnits("mm");
             mm.registerConverter(Units.meters, new UnitsConverter.ScaleOffset(1. / 1000, 0));
             doTestDR(79, "0 to 100 mm", DatumRange.newDatumRange(0, 10, cm));
             doTestDR(80, "0 to 100 mm", DatumRange.newDatumRange(0, .1, Units.meters));
@@ -217,7 +221,7 @@ public class Test026 {
 
             //month boundaries crossing year boundary caused problems.
             doTest(35, "Aug 1969 through Sep 1970", "Aug 1 1969 to Oct 1 1970");
-            doTest(36, "2004-12-03T20:19:59.990/PT.02S", "2004-12-03 20:19:59.990 to 20:20:00.010", 30);
+            doTest(36, "2004-12-03T20:19:59.990/PT.02S", "2004-12-03 20:19:59.990 to 20:20:00.010", 30, false);
             doTest(37, "2004-12-03T20:19:56.2/PT.2S", "2004-12-03 20:19:56.200 to 20:19:56.400");
 
             testTimeRangeFormatParse(); // these are tests that used to be in test009.
@@ -225,12 +229,12 @@ public class Test026 {
             Datum now = TimeUtil.now();
             System.err.println("now= " + now);
             int micros = 60000000;
-            doTest(40, "P1D", new DatumRange(now.subtract(1, Units.days), now).toString(), micros);
-            doTest(41, "PT1H", new DatumRange(now.subtract(1, Units.hours), now).toString(), micros);
-            doTest(42, "orbit:rbspa-pp:403", "2013-01-27T18:58:17.392Z to 2013-01-28T03:57:01.358Z", micros);
-            doTest(43, "orbit:rbspa-pp:403-406", "2013-01-27T18:58:17.392Z to 2013-01-29T06:53:13.619Z", micros);
-            doTest(44, "1972/now-P1D", "1972-01-01T00:00/" + now.subtract(1, Units.days), micros);
-            doTest(45, "now-P10D/now-P1D", new DatumRange(now.subtract(10, Units.days), now.subtract(1, Units.days)).toString(), micros);
+            doTest(40, "P1D", new DatumRange(now.subtract(1, Units.days), now).toString(), micros, true);
+            doTest(41, "PT1H", new DatumRange(now.subtract(1, Units.hours), now).toString(), micros, true);
+            doTest(42, "orbit:rbspa-pp:403", "2013-01-27T18:58:17.392Z to 2013-01-28T03:57:01.358Z", micros, false);
+            doTest(43, "orbit:rbspa-pp:403-406", "2013-01-27T18:58:17.392Z to 2013-01-29T06:53:13.619Z", micros, false);
+            doTest(44, "1972/now-P1D", "1972-01-01T00:00/" + now.subtract(1, Units.days), micros, true);
+            doTest(45, "now-P10D/now-P1D", new DatumRange(now.subtract(10, Units.days), now.subtract(1, Units.days)).toString(), micros, true);
             
             int[] tt= TimeUtil.fromDatum(now);
             tt[2]=1;
@@ -246,7 +250,7 @@ public class Test026 {
             }
             Datum t1= TimeUtil.toDatum(tt);
                     
-            doTest(46, "P1M/lastmonth", t1.toString()+"/"+t2.toString(), micros); // these things
+            doTest(46, "P1M/lastmonth", t1.toString()+"/"+t2.toString(), micros, false); // these things
 
             closeHTML(); //closes body and html
             System.exit(0);  // TODO: something is firing up the event thread
