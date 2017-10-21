@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-10-20 r21556):</p>
+        <p>Bugfixes (2017-10-21 r21566):</p>
         <ul>
+            <li>rfe601: temporarily remove scale bindings to v1.08 vap files, so that they can be loaded with old Autoplot versions.
             <li>1911: set canvas size would trigger the thumbnail generation, which reset the canvas size to its old size.
             <li>Positive time zone offsets (+0600) where not parsed properly.
             <li>Huge scatter mode has branch which was dropping the last record of a rank 2 waveform.
