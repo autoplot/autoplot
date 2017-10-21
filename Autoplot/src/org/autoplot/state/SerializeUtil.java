@@ -87,14 +87,13 @@ public class SerializeUtil {
         try {
             String elementName = scheme.getName(node.getClass());
             DomNode defl = node.getClass().newInstance();
-            Element element = null;
+            Element element;
             
             element = document.createElement(elementName);
             
             BeanInfo info = BeansUtil.getBeanInfo(node.getClass());
             PropertyDescriptor[] properties = info.getPropertyDescriptors();
-            for (int i = 0; i < properties.length; i++) {
-                PropertyDescriptor pd = properties[i];
+            for (PropertyDescriptor pd : properties) {
                 String propertyName = pd.getName();
 
                 if ( propertyName.equals("class") ) continue;
@@ -125,16 +124,10 @@ public class SerializeUtil {
                     logger.log(Level.FINE, "skipping property \"{0}\" of {1}, failed to find read and write method.", new Object[]{propertyName, elementName});
                     continue;
                 }
-                Object value = null;
+                Object value;
                 try {
                     value = readMethod.invoke(node, new Object[0]);
-                } catch (IllegalAccessException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    continue;
-                } catch (IllegalArgumentException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    continue;
-                } catch (InvocationTargetException ex) {
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                     continue;
                 }
@@ -196,19 +189,7 @@ public class SerializeUtil {
                 }
             }
             return element;
-        } catch (IntrospectionException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new RuntimeException(ex);
-        } catch (IllegalArgumentException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new RuntimeException(ex);
-        } catch (InvocationTargetException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new RuntimeException(ex);
-        } catch (InstantiationException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new RuntimeException(ex);
-        } catch (IllegalAccessException ex) {
+        } catch (IntrospectionException | IllegalArgumentException | InvocationTargetException | InstantiationException | IllegalAccessException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         }
@@ -218,7 +199,9 @@ public class SerializeUtil {
     /**
      * return the Element, or null if we can't handle it
      * @param document
-     * @param node
+     * @param propClass 
+     * @param value
+     * @param defltValue 
      * @return
      */
     public static Element getElementForLeafNode( Document document, Class propClass, Object value, Object defltValue ) {
@@ -278,14 +261,14 @@ public class SerializeUtil {
 
     /**
      * decode the DomNode from the document element.
-     * @param element
-     * @param packg  the java package containing the default package for nodes.
+     * @param element the DOM element
+     * @param scheme the current version
      * @return
      * @throws ParseException
      */
     public static DomNode getDomNode( Element element, VapScheme scheme ) throws ParseException {
         try {
-            DomNode node = null;
+            DomNode node;
 
             String clasName= element.getNodeName();
 
@@ -302,8 +285,8 @@ public class SerializeUtil {
 
             PropertyDescriptor[] properties = info.getPropertyDescriptors();
             Map<String,PropertyDescriptor> pp= new HashMap();
-            for ( int i=0; i<properties.length; i++ ) {
-                pp.put( properties[i].getName(), properties[i] );
+            for (PropertyDescriptor property : properties) {
+                pp.put(property.getName(), property);
             }
 
             if ( element.hasAttribute("id") ) {
@@ -315,7 +298,7 @@ public class SerializeUtil {
             for ( int i=0; i<kids.getLength(); i++ ) {
                 Node k= kids.item(i);
                 if ( k instanceof Element ) {
-                    logger.log( Level.FINE, "reading node {0}", k.getNodeName() + k.getAttributes().getNamedItem("name") + " " + k.getAttributes().getNamedItem("value") );
+                    logger.log(Level.FINE, "reading node {0}{1} {2}", new Object[]{k.getNodeName(), k.getAttributes().getNamedItem("name"), k.getAttributes().getNamedItem("value")});
                     //Node nameNode= k.getAttributes().getNamedItem("name");
                     //if ( node instanceof Application && nameNode!=null && nameNode.getNodeValue().equals("connectors") ) {
                     //    System.err.println("here connectors");
@@ -397,16 +380,7 @@ public class SerializeUtil {
 
             return node;
 
-        } catch (IntrospectionException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new RuntimeException(ex);
-        } catch (IllegalArgumentException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new RuntimeException(ex);
-        } catch (InstantiationException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new RuntimeException(ex);
-        } catch (IllegalAccessException ex) {
+        } catch (IntrospectionException | IllegalArgumentException | InstantiationException | IllegalAccessException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         }
