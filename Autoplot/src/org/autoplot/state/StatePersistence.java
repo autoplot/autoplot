@@ -58,6 +58,10 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.jdesktop.beansbinding.AutoBinding;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
@@ -141,10 +145,14 @@ public class StatePersistence {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         }
+        
+        VapScheme currentScheme= new Vap1_09Scheme();
 
         VapScheme scheme;
         if ( sscheme.equals("") ) {
-            scheme= new Vap1_07Scheme();
+            scheme= new Vap1_08Scheme();
+        } else if ( sscheme.equals("1.09") ) {
+            scheme= new Vap1_09Scheme();
         } else if ( sscheme.equals("1.08") ) {
             scheme= new Vap1_08Scheme();
         } else if ( sscheme.equals("1.07") ) {
@@ -163,15 +171,19 @@ public class StatePersistence {
 
         document.appendChild(vap);
 
-        if ( sscheme.length()>0 ) {
+        if ( !scheme.getId().equals( currentScheme.getId() ) ) {
             try {
-                doConvert( document, scheme.getId(), sscheme );
+                //doConvert( document, scheme.getId(), currentScheme.getId() );
+                logger.log(Level.INFO, "converting from vap version {0} to {1}", new Object[]{currentScheme.getId(), scheme.getId()});
+                doConvert( document, currentScheme.getId(), scheme.getId() );
             } catch ( TransformerException ex ) {
                 logger.log( Level.WARNING, ex.getMessage(), ex );
                 IOException result= new IOException("Unable to export to version "+sscheme,ex );
                 throw result;
             }
         }
+        
+        
 
         writeDocument( out, document);
     }
@@ -395,16 +407,24 @@ public class StatePersistence {
         for ( BindingModel m: state.getBindings() ) {
             Object src= DomUtil.getElementById( state, m.getSrcId() );
             if ( src==null ) {
-                System.err.println("invalid binding:" + m + ", unable to find source node: "+ m.getSrcId() );
+                logger.log(Level.WARNING, "invalid binding:{0}, unable to find source node: {1}", new Object[]{m, m.getSrcId()});
                 continue;
             }
             Object dst= DomUtil.getElementById( state, m.getDstId() );
             if ( dst==null ) {
-                System.err.println("invalid binding:" + m + ", unable to find destination node: "+ m.getDstId() );
+                logger.log(Level.WARNING, "invalid binding:{0}, unable to find destination node: {1}", new Object[]{m, m.getDstId()});
                 continue;
             }
             BeanProperty srcProp= BeanProperty.create(m.getSrcProperty());
             BeanProperty dstProp= BeanProperty.create(m.getDstProperty());
+            if ( !srcProp.isReadable(src) ) {
+                logger.log(Level.WARNING, "invalid binding:{0}, unable to find source property: {1}", new Object[]{m, m.getSrcProperty() });
+                continue;
+            }
+            if ( !dstProp.isReadable(dst) ) {
+                logger.log(Level.WARNING, "invalid binding:{0}, unable to find destination property: {1}", new Object[]{m, m.getSrcProperty() });
+                continue;
+            }            
             Object srcVal= srcProp.getValue(src);
             Object dstVal= dstProp.getValue(dst);
             if ( srcVal==null && dstVal==null ) {
