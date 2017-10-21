@@ -26,6 +26,8 @@ import java.io.OutputStream;
 import java.io.PushbackInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -162,6 +164,20 @@ public class StatePersistence {
         } else {
             throw new IllegalArgumentException("output scheme not supported: "+sscheme);
         }
+        
+        if ( scheme.getId().equals( "1.08" ) && currentScheme.getId().equals("1.09") ) {
+            logger.warning("removing all bindings to scale to support old versions");
+            Application app= (Application)state;
+            List<BindingModel> bms= Arrays.asList( app.getBindings() );
+            List<BindingModel> newbms= new ArrayList( Arrays.asList( app.getBindings() ) );
+            for ( int i=app.getBindings().length-1; i>=0; i-- ) {
+                if ( app.getBindings(i).getSrcProperty().equals("scale") ||app.getBindings(i).getDstProperty().equals("scale") )  {
+                    newbms.remove(i);
+                }
+            }
+            app.setBindings(newbms.toArray( new BindingModel[newbms.size()] ) );
+        }
+        
         Element element = SerializeUtil.getDomElement( document, (DomNode)state, scheme );
 
         Element vap= document.createElement("vap");
