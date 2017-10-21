@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Autoplot can be made to lay out the plots precisely.  See <a href="demoFixedLayout.jy">the script</a>.
+        <p><small>New scale property is bound between plot and inset plot.  Zooming out in one zooms out in the other, or resizing.  Here's the <a href=screenshot601_2.vap">.vap</a>
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,7 @@
         
         <p>Bugfixes (2017-10-20 r21556):</p>
         <ul>
+            <li>1911: set canvas size would trigger the thumbnail generation, which reset the canvas size to its old size.
             <li>Positive time zone offsets (+0600) where not parsed properly.
             <li>Huge scatter mode has branch which was dropping the last record of a rank 2 waveform.
             <li>1911: respect options.autorange=False.  New autoranging code would always autorange.
