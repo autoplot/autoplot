@@ -198,9 +198,13 @@ public class ApplicationControllerSyncSupport {
                     DomNode src= DomUtil.getElementById(application,idMap.get(c.srcId));
                     DomNode dst= DomUtil.getElementById(application,idMap.get(c.dstId));
                     if ( src==null || dst==null ) {
-                        logger.finer("node was null");
+                        logger.info("src or dst was null");
                     } else {
-                        controller.bind( src, c.srcProperty, dst, c.dstProperty  );
+                        try {
+                            controller.bind( src, c.srcProperty, dst, c.dstProperty  );
+                        } catch ( IllegalArgumentException ex ) {
+                            logger.log(Level.INFO, "unable to bind property: {0}", ex);
+                        }
                     }
                 }
             } else {
