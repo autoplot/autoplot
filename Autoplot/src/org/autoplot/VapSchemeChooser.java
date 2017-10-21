@@ -34,6 +34,8 @@ public class VapSchemeChooser extends javax.swing.JPanel {
     public String getScheme() {
         if ( currentVersionCB.isSelected() ) {
             return "";
+        } else if ( v1_09CB.isSelected() ) {
+            return "1.09";            
         } else if ( v1_08CB.isSelected() ) {
             return "1.08";
         } else if ( v1_07CB.isSelected() ) {
@@ -70,6 +72,7 @@ public class VapSchemeChooser extends javax.swing.JPanel {
         embedDataCheckBox = new javax.swing.JCheckBox();
         v1_07CB = new javax.swing.JRadioButton();
         v1_08CB = new javax.swing.JRadioButton();
+        v1_09CB = new javax.swing.JRadioButton();
 
         buttonGroup1.add(v1_06CB);
         v1_06CB.setText("v1.06 (Autoplot 2010)");
@@ -86,8 +89,12 @@ public class VapSchemeChooser extends javax.swing.JPanel {
         v1_07CB.setText("v1.07 (Autoplot 2013)");
         v1_07CB.setToolTipText("Autoranging disabled");
 
+        buttonGroup1.add(v1_08CB);
         v1_08CB.setText("v1.08 (Autoplot 2014)");
         v1_08CB.setToolTipText("v1.08 restores autorange flag within the vap file, to support servers and timerange modifier.");
+
+        buttonGroup1.add(v1_09CB);
+        v1_09CB.setText("v1.09 (Autoplot 2017)");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -99,9 +106,10 @@ public class VapSchemeChooser extends javax.swing.JPanel {
                     .add(v1_06CB)
                     .add(currentVersionCB)
                     .add(embedDataCheckBox)
-                    .add(v1_07CB)
-                    .add(v1_08CB))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(v1_08CB)
+                    .add(v1_09CB)
+                    .add(v1_07CB))
+                .addContainerGap(140, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -109,14 +117,16 @@ public class VapSchemeChooser extends javax.swing.JPanel {
                 .add(13, 13, 13)
                 .add(currentVersionCB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(v1_08CB)
+                .add(v1_09CB)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(v1_08CB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(v1_07CB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(v1_06CB)
-                .add(18, 18, 18)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 36, Short.MAX_VALUE)
                 .add(embedDataCheckBox)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(18, 18, 18))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -128,6 +138,7 @@ public class VapSchemeChooser extends javax.swing.JPanel {
     private javax.swing.JRadioButton v1_06CB;
     private javax.swing.JRadioButton v1_07CB;
     private javax.swing.JRadioButton v1_08CB;
+    private javax.swing.JRadioButton v1_09CB;
     // End of variables declaration//GEN-END:variables
 
 }

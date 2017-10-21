@@ -26,10 +26,11 @@
                   <Component id="v1_06CB" min="-2" max="-2" attributes="0"/>
                   <Component id="currentVersionCB" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="embedDataCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="v1_07CB" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="v1_08CB" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="v1_09CB" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="v1_07CB" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace pref="140" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -39,14 +40,16 @@
               <EmptySpace min="-2" pref="13" max="-2" attributes="0"/>
               <Component id="currentVersionCB" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="v1_08CB" min="-2" max="-2" attributes="0"/>
+              <Component id="v1_09CB" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="v1_08CB" min="-2" pref="24" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="v1_07CB" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="v1_06CB" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <EmptySpace pref="36" max="32767" attributes="0"/>
               <Component id="embedDataCheckBox" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -87,8 +90,19 @@
     </Component>
     <Component class="javax.swing.JRadioButton" name="v1_08CB">
       <Properties>
+        <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+          <ComponentRef name="buttonGroup1"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="v1.08 (Autoplot 2014)"/>
         <Property name="toolTipText" type="java.lang.String" value="v1.08 restores autorange flag within the vap file, to support servers and timerange modifier."/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JRadioButton" name="v1_09CB">
+      <Properties>
+        <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+          <ComponentRef name="buttonGroup1"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="v1.09 (Autoplot 2017)"/>
       </Properties>
     </Component>
   </SubComponents>
