@@ -973,7 +973,9 @@ public class ApplicationModel {
             return null; // bug 3574147
         }
 
-        BufferedImage im= (BufferedImage) getCanvas().getImageNonPrint( getCanvas().getWidth(), getCanvas().getHeight() );
+        int w= getCanvas().getPreferredSize().width;
+        int h= getCanvas().getPreferredSize().height;
+        BufferedImage im= (BufferedImage) getCanvas().getImageNonPrint( w,h );
 
         if ( im.getHeight() / height > 3 ) {
             thickenLines(im);
