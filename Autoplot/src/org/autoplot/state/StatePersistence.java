@@ -594,7 +594,7 @@ public class StatePersistence {
                         // downgrade future versions.  This is experimental, but slightly
                         // better than not allowing use.  This is intended to smooth
                         // transitions to new autoplot versions.  Future vap files
-                        // that use future features will not load properly.
+                        // that use future features will not load properly, but may still be usable.
                         for ( double s=srcVersion; s>dstVersion; s=s-0.01 ) {
                             Source src = new DOMSource( root );
 
@@ -605,8 +605,9 @@ public class StatePersistence {
                             fname= fname.replaceAll("\\.","_") + ".xsl";
 
                             InputStream xsl = StatePersistence.class.getResourceAsStream(fname);
-                            if ( xsl==null ) {
-                                throw new RuntimeException("Unable to find "+fname+".");
+                            if ( xsl==null ) {                            
+                                // Unable to find the file 'fname'
+                                throw new RuntimeException("Unable to read .vap file version "+String.format("%.2f",srcVersion)+".  Upgrade to a newer version of Autoplot.");
                             }
                             TransformerFactory factory = TransformerFactory.newInstance();
                             Transformer tr = factory.newTransformer(new StreamSource(xsl));
