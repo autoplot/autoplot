@@ -171,6 +171,7 @@ public class HapiDataSource extends AbstractDataSource {
         
         if ( binsObject.has("description") ) {
             result.putProperty( QDataSet.TITLE, binsObject.getString("description") );
+            result.putProperty( QDataSet.LABEL, binsObject.getString("description") );
         }
         
         return result;
