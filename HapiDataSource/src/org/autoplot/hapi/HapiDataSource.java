@@ -414,7 +414,7 @@ public class HapiDataSource extends AbstractDataSource {
         DatumRange tr; // TSB = DatumRangeUtil.parseTimeRange(timeRange);
         tr= tsb.getTimeRange();
         
-        if ( info.has("cadence") ) {
+        if ( info.has("cadence") ) { // add one cadence length to beginning and end.
             try {
                 int[] ii= DatumRangeUtil.parseISO8601Duration(info.getString("cadence"));
                 Datum t= TimeUtil.toDatumDuration(ii);
@@ -974,9 +974,10 @@ public class HapiDataSource extends AbstractDataSource {
     }
 
     /**
-     * 
-     * @param ds
-     * @param pds
+     * Reform bundle into typical QDataSet schemes.  For example, a rank 2 bundle 
+     * ds[;T,N] would be reformed into rank 1 N[T].
+     * @param ds the bundle dataset
+     * @param pds metadata for each column.
      * @param sort if non-null, resort the data with these indeces.
      * @return 
      */
