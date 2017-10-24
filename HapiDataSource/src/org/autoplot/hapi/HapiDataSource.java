@@ -60,7 +60,7 @@ import org.das2.qstream.TransferType;
  * HAPI data source uses transactions with HAPI servers to collect data.
  * @author jbf
  */
-public class HapiDataSource extends AbstractDataSource {
+public final class HapiDataSource extends AbstractDataSource {
 
     protected final static Logger logger= LoggerManager.getLogger("apdss.hapi");
     
@@ -208,6 +208,7 @@ public class HapiDataSource extends AbstractDataSource {
         Units units= Units.dimensionless;
         String name= "";
         String description= "";
+        String label="";
         String type= "";
         int[] size= new int[0]; // array of scalars
         int length= 0; // length in bytes when transferring with binary.
@@ -889,6 +890,13 @@ public class HapiDataSource extends AbstractDataSource {
                     pds[i].description= ""; // when a value cannot be parsed, but it is not identified.
                 }
 
+                if ( jsonObjecti.has("label") ) {
+                    pds[i].label= jsonObjecti.getString("label");
+                    if ( pds[i].label==null ) pds[i].label= name;
+                } else {
+                    pds[i].label= name;
+                }
+                
                 if ( jsonObjecti.has("length") ) {
                     pds[i].length= jsonObjecti.getInt("length");
                 }
@@ -991,7 +999,7 @@ public class HapiDataSource extends AbstractDataSource {
             ds= Ops.copy( Ops.slice1( ds, 1 ) );
             ds= Ops.putProperty( ds, QDataSet.DEPEND_0, depend0 );
             ds= Ops.putProperty( ds, QDataSet.NAME, Ops.safeName(pds[1].name) );
-            ds= Ops.putProperty( ds, QDataSet.LABEL, pds[1].name );
+            ds= Ops.putProperty( ds, QDataSet.LABEL, pds[1].label );
             ds= Ops.putProperty( ds, QDataSet.TITLE, pds[1].description );
             ds= Ops.putProperty( ds, QDataSet.UNITS, pds[1].units );
             if ( pds[1].hasFill ) {
@@ -1004,7 +1012,7 @@ public class HapiDataSource extends AbstractDataSource {
             }
             ds= Ops.putProperty( ds, QDataSet.DEPEND_0, depend0 );
             ds= Ops.putProperty( ds, QDataSet.NAME, Ops.safeName(pds[1].name) );
-            ds= Ops.putProperty( ds, QDataSet.LABEL, pds[1].name );
+            ds= Ops.putProperty( ds, QDataSet.LABEL, pds[1].label );
             ds= Ops.putProperty( ds, QDataSet.TITLE, pds[1].description );
             ds= Ops.putProperty( ds, QDataSet.UNITS, pds[1].units );
             if ( pds[1].hasFill ) {
