@@ -643,10 +643,16 @@ public class Util {
     /**
      * return true if the file exists.  
      * This is introduced to avoid imports of java.io.File.
-     * @param file
-     * @return 
+     * @param file file or local file Autoplot URI
+     * @return true if the file exists.
+     * //TODO: this could support remote file systems
      */
     public static boolean fileExists( String file ) {
+        if ( file.startsWith("file:") ) {
+            file= file.substring(5);
+        } else {
+            
+        }
         return new File(file).exists();
     }
     
@@ -655,8 +661,14 @@ public class Util {
      * This is introduced to avoid imports of java.io.File.
      * @param file the file or directory.
      * @return true if the file can be read.
+     * //TODO: this could support remote file systems
      */
     public static boolean fileCanRead( String file ) {
+        if ( file.startsWith("file:") ) {
+            file= file.substring(5);
+        } else {
+            
+        }
         return new File(file).canRead();
     }
     
