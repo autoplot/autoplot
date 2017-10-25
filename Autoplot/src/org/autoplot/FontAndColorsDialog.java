@@ -5,7 +5,6 @@
  */
 package org.autoplot;
 
-import org.autoplot.ApplicationModel;
 import org.das2.graph.DasCanvas;
 import java.awt.Color;
 import java.awt.Font;
@@ -23,13 +22,12 @@ import org.autoplot.dom.PlotElement;
  *
  * @author  jbf
  */
-public class FontAndColorsDialog extends javax.swing.JDialog {
+public final class FontAndColorsDialog extends javax.swing.JDialog {
 
     ApplicationModel app;
     Color[] fores, backs;
     private final static int ICON_SIZE=16;
     
-    /** Creates new form FontAndColorsDialog */
     public FontAndColorsDialog( java.awt.Frame parent, boolean modal, ApplicationModel app) {
         super(parent, modal);
         setTitle("Font and Colors");
