@@ -1,0 +1,85 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package external;
+
+import com.idl.javaidl.*;
+
+
+/**
+ * Attempts at creating an IDL session within Java, so that SPEDAS could be called
+ * upon to load data.  This has not been successful.
+ * 
+ * @see https://www.harrisgeospatial.com/docs/datamanipulationwithajavaconnectorobject.html
+ * 
+ * @author jbf
+ */
+public class DemoJavaToIDLBridge {
+    
+    static java_IDL_connect ostock;
+    
+    public static void main( String[] args ) throws Exception {
+        
+        System.err.println( "== Environment==" );
+        System.err.println(  "null means the value is not set." );
+        System.err.println( String.format( "java.library.path=\"%s\"" , System.getProperty("java.library.path") ) ); //  /usr/local/itt/idl_8.4/bin/bin.linux.x86_64/
+
+        String IDL_DIR=System.getenv("IDL_DIR");
+        System.err.println( String.format( "IDL_DIR=\"%s\"" , IDL_DIR ) );
+        System.err.println( String.format( "LD_LIBRARY_PATH=\"%s\"", System.getenv("LD_LIBRARY_PATH") ) );
+        System.err.println( String.format( "IDL_DLM_PATH=\"%s\"" , System.getenv("IDL_DLM_PATH") ) );
+        
+        ostock = new java_IDL_connect( );
+        ostock.createObject( );
+        ostock.addIDLOutputListener( new JIDLOutputListener() {
+            @Override
+            public void IDLoutput(JIDLObjectI jidloi, String string) {
+                System.err.println( string );
+            }
+        } );
+
+        String a = "a";
+         String b = "b";
+         int[] aArray = {0, 1, 2, 3, 4, 5};
+         int[] bArray = {5, 4, 3, 2, 1, 0};
+
+         ostock.setIDLVariable(a, new JIDLArray(aArray));
+         ostock.setIDLVariable(b, new JIDLArray(bArray));
+
+         ostock.executeString("c = MATRIX_MULTIPLY(a,b)");
+         ostock.executeString("HELP, c, /FULL");
+
+         String c = "c";
+         int[][] cArray = new int[6][6];
+
+         // Access the array in a JIDLArray and then convert
+         // to native array.
+         JIDLArray jarray = ( JIDLArray ) ostock.getIDLVariable( c );
+         int[][] cjarray = (int[][])jarray.arrayValue( );
+
+         System.out.println("Results of multiplying aArray" );
+         for (int i = 0; i < aArray.length; i++) {
+            int aVal = aArray[i];
+            System.out.print(aVal + " ");
+            }
+            System.out.println();
+
+         System.out.println("times bArray " );
+         for (int i = 0; i < bArray.length; i++) {
+            int bVal = bArray[i];
+            System.out.print(bVal + " ");
+         }
+         System.out.println();
+         System.out.println("equals: ");
+         
+         for ( int i=0; i<cjarray.length; i++ ) {
+             for ( int j=0; j<cjarray[i].length; j++ ) {
+                 System.err.print(cjarray[i][j]);
+             }
+             System.err.println();
+         }
+
+    }
+}
