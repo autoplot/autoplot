@@ -108,10 +108,9 @@ public class ScreenshotsTool extends EventQueue {
     boolean pngWriterThreadRunning= false;
     boolean pngWriterThreadNotDone= false;
     /*
-     * block>0 means decrement.  block<0 means wait.
+     * block&gt;0 means decrement.  block&lt;0 means wait.
      */
     int block= 0;
-
     
     File outLocationFolder;
     BufferedWriter logFile;
@@ -120,8 +119,14 @@ public class ScreenshotsTool extends EventQueue {
     
     private static void checkFolderContents( String text, JCheckBox deleteFilesCheckBox ) {
         File f= new File( text );
-        if ( f.exists() && f.listFiles().length>1 ) {
-            deleteFilesCheckBox.setEnabled(true);
+        if ( f.exists() ) {
+            File[] ff= f.listFiles();
+            if ( ff.length>1 ) {
+                deleteFilesCheckBox.setEnabled(true);
+            } else {
+                deleteFilesCheckBox.setEnabled(false);
+                deleteFilesCheckBox.setSelected(false);
+            }
         } else {
             deleteFilesCheckBox.setEnabled(false);
             deleteFilesCheckBox.setSelected(false);
@@ -211,9 +216,12 @@ public class ScreenshotsTool extends EventQueue {
 
         if ( r==JOptionPane.OK_OPTION ) {
             File f= new File( tf.getText() );
-            if ( f.exists() && f.listFiles().length>1 && deleteFilesCheckBox.isSelected() ) {
-                if ( !FileUtil.deleteFileTree(f) ) {
-                    JOptionPane.showMessageDialog(parent,"Unable to delete files");
+            if ( f.exists() ) {
+                File[] ff= f.listFiles();
+                if ( ff!=null && ff.length>1 && deleteFilesCheckBox.isSelected() ) {
+                    if ( !FileUtil.deleteFileTree(f) ) {
+                        JOptionPane.showMessageDialog(parent,"Unable to delete files");
+                    }
                 }
             }
             try {
@@ -264,9 +272,10 @@ public class ScreenshotsTool extends EventQueue {
             fail= !this.outLocationFolder.mkdirs();
         }
         if ( fail ) throw new IOException("output folder cannot be created");
-        if ( this.outLocationFolder.listFiles().length>1 ) {
+        File[] ff= this.outLocationFolder.listFiles();
+        if ( ff!=null && ff.length>1 ) {
             if ( clearFolder ) {
-                for ( File f:this.outLocationFolder.listFiles() ) {
+                for ( File f:ff ) {
                     if ( !f.delete() ) throw new IllegalArgumentException("unable to delete file: "+f );
                 }
             } else {
@@ -524,6 +533,7 @@ public class ScreenshotsTool extends EventQueue {
         if ( !root.canRead() ) throw new IllegalArgumentException("cannot read root: "+root );
         if ( !root.isDirectory() ) throw new IllegalArgumentException("root should be directory: " +root );
         File[] ff= root.listFiles();
+        if ( ff==null ) throw new IllegalArgumentException("directory cannot be read: "+root); // this won't happen but we do this for findbugs.
         Rectangle result= null;
         int c= ff.length;
         int i= 1;
@@ -622,6 +632,7 @@ public class ScreenshotsTool extends EventQueue {
         if ( !dir.exists() ) throw new IllegalArgumentException("directory does not exist: "+dir );
         if ( !dir.canRead() ) throw new IllegalArgumentException("directory cannot be read: "+dir );
         File[] ff= dir.listFiles();
+        if ( ff==null ) throw new IllegalArgumentException("directory cannot be read: "+dir); // this won't happen but we do this for findbugs.
 
         monitor.started();
 
@@ -1112,7 +1123,10 @@ public class ScreenshotsTool extends EventQueue {
         }
         JPanel p= new JPanel();
         p.setLayout( new BorderLayout() );
-        int count= outLocationFolder.list().length;
+        
+        String[] ss= outLocationFolder.list();
+        if ( ss==null ) throw new IllegalStateException("unable to list "+outLocationFolder);
+        int count= ss.length;
         p.add( new JLabel( "<html>Screenshots have been recorded to "+outLocationFolder+
                 ".<br>Operation should now be normal.<br><br>Enter Pngwalk?" ), BorderLayout.CENTER );
         JCheckBox cb= new JCheckBox( String.format( "first trim %d images", count ) );
