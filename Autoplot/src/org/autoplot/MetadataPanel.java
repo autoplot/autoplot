@@ -1,11 +1,6 @@
-/*
- * MetadataPanel.java
- *
- * Created on July 27, 2007, 11:54 AM
- */
+
 package org.autoplot;
 
-import org.autoplot.ApplicationModel;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -49,7 +44,7 @@ import org.das2.qds.util.PropertiesTreeModel;
 import org.autoplot.metatree.NameValueTreeModel;
 
 /**
- *
+ * MetadataPanel shows statistics and metadata for the dataset, such as units and fill values.
  * @author  jbf
  */
 public class MetadataPanel extends javax.swing.JPanel {
@@ -69,7 +64,6 @@ public class MetadataPanel extends javax.swing.JPanel {
     
     private static final Logger logger= LoggerManager.getLogger("gui.metadata");
     
-    /** Creates new form MetadataPanel */
     public MetadataPanel(ApplicationModel applicationModel) {
         this.applicationModel = applicationModel;
         this.dom = applicationModel.getDocumentModel();
