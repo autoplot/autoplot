@@ -1328,7 +1328,9 @@ public class LayoutPanel extends javax.swing.JPanel {
                 double[] d2= DasDevicePosition.parseLayoutStr( r.getBottom() );
                 d2[0]= d1[0] + ( d2[0]-d1[0] ) * 1.25;
                 r.setBottom( DasDevicePosition.formatFormatStr(d2) );
-            } catch ( ParseException ex ) {}
+            } catch ( ParseException ex ) {
+                logger.info("ParseException ignored");
+            }
         }
 
         if ( dom.getOptions().isAutolayout() ) org.autoplot.dom.DomOps.newCanvasLayout(dom);
@@ -1359,7 +1361,9 @@ public class LayoutPanel extends javax.swing.JPanel {
                 emMaxBottom= Math.max( emMaxBottom, d2[1] );
                 emMaxTop= Math.max( emMaxTop, d2[1] );
                 n= n+1;
-            } catch ( ParseException ex ) {}
+            } catch ( ParseException ex ) {
+                logger.info("ParseException ignored");
+            }
         }
 
         size= size / n;
@@ -1396,7 +1400,9 @@ public class LayoutPanel extends javax.swing.JPanel {
                 double[] d2= DasDevicePosition.parseLayoutStr( r.getBottom() );
                 d2[0]= d1[0] + ( d2[0]-d1[0] ) * 0.80;
                 r.setBottom( DasDevicePosition.formatFormatStr(d2) );
-            } catch ( ParseException ex ) {}
+            } catch ( ParseException ex ) {
+                logger.info("ParseException ignored");
+            }
         }
 
         if ( dom.getOptions().isAutolayout() ) org.autoplot.dom.DomOps.newCanvasLayout(dom);
