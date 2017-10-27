@@ -733,6 +733,7 @@ public class URISplit {
                 fileEnd = rsurl.length();
             }
         }
+        if ( params!=null && params.length()==0 ) params=null;
         
         if ( ihash<rsurl.length() ) {
             result.filters= "|" + rsurl.substring(ihash+1).replaceAll("#","|");
