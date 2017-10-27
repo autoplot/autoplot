@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New scale property is bound between plot and inset plot.  Zooming out in one zooms out in the other, or resizing.  Here's the <a href=screenshot601_2.vap">.vap</a>
+        <p><small>Scale binding allows two plots of different heights to have the same scale.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,16 +24,16 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-10-21 r21566):</p>
+        <p>Bugfixes (2017-10-27 r21597):</p>
         <ul>
+            <li>metadata tab properly formats small numbers (0.00001) in a linear space, not "0.000".  Thanks, Ivar!
             <li>rfe601: temporarily remove scale bindings to v1.08 vap files, so that they can be loaded with old Autoplot versions.
             <li>1911: set canvas size would trigger the thumbnail generation, which reset the canvas size to its old size.
             <li>Positive time zone offsets (+0600) where not parsed properly.
-            <li>Huge scatter mode has branch which was dropping the last record of a rank 2 waveform.
+            <li>Huge scatter mode has branch which was dropping the last record of a rank 2 waveform. Thanks, George!
             <li>1911: respect options.autorange=False.  New autoranging code would always autorange.
             <li>1910: make sure that the script plot command sets the immutable flag so that plot operates as expected and copying the data can be avoided.  Thanks, Masafumi!
             <li>George pointed out where rank 3 waveform data would drop records.
-            <li>column keyword was ignored when the first two columns were times.
             <li>ASCII files starting with two time columns could only be read as events, so column keyword didn't work.
             <li>UriTcaSource tweaked to provide useful method for sampling data from URI.
             <li>correction to TimeParser.normalizeTimes, which would improperly round resulting in .699999. Thanks, Masafumi!
@@ -61,6 +61,8 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>improvements to cadence calculation for waveform datasets.
+            <li>eventsConjunction function returns where two events lists have overlaps.
             <li>print to PDF now has pixels per inch and (finally) overall width controls.
             <li>rfe601: new scale property allows axis scales to be bound.
             <li>tweaks to property editor so it can be used to show the DOM with updates.
