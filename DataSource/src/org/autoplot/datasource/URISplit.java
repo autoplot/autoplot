@@ -733,7 +733,9 @@ public class URISplit {
                 fileEnd = rsurl.length();
             }
         }
-        if ( params!=null && params.length()==0 ) params=null;
+        //if ( params!=null && params.length()==0 ) {  https://sourceforge.net/p/autoplot/bugs/1913/
+        //    params=null;
+        //}
         
         if ( ihash<rsurl.length() ) {
             result.filters= "|" + rsurl.substring(ihash+1).replaceAll("#","|");
