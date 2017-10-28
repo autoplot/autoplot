@@ -40,7 +40,7 @@ import org.das2.util.LoggerManager;
  */
 public class AutoRangeUtil {
     
-    private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.autorange");
+    private final static Logger logger = org.das2.util.LoggerManager.getLogger("qdataset.ops.autorange");
     
     private static void setRange( DDataSet range, DatumRange drange, boolean log ) {
         range.putProperty( QDataSet.UNITS, drange.getUnits() );
@@ -488,6 +488,9 @@ public class AutoRangeUtil {
         }
         double[] dd; // two-element array that is the min and max of the data.
         boolean mono = Boolean.TRUE.equals(ds.property(QDataSet.MONOTONIC));
+        if ( mono ) {
+            mono= DataSetUtil.isMonotonicAndIncreasingQuick(ds);
+        }
         if (null != ds.property(QDataSet.CADENCE)) {
             if (DataSetUtil.isMonotonic(ds)) {
                 mono = true;
