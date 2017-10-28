@@ -885,7 +885,7 @@ public class AutoplotUtil {
      */
     @Deprecated
     public static AutoRangeUtil.AutoRangeDescriptor autoRange(QDataSet ds, Map properties, boolean ignoreDsProps) {
-        return autoRange(ds, properties, ignoreDsProps);
+        return AutoRangeUtil.autoRange(ds, properties, ignoreDsProps);
     }
 
     /**
