@@ -24,8 +24,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-10-27 r21597):</p>
+        <p>Bugfixes (2017-10-28 r21597):</p>
         <ul>
+            <li>corrections to das2stream adapter which was incorrectly setting monotonic.  Better handle second-checks of monotonic.  Thanks, Masafumi!
+            <li>correction to ifft, which incorrectly reconstructed the timetags.
             <li>metadata tab properly formats small numbers (0.00001) in a linear space, not "0.000".  Thanks, Ivar!
             <li>rfe601: temporarily remove scale bindings to v1.08 vap files, so that they can be loaded with old Autoplot versions.
             <li>1911: set canvas size would trigger the thumbnail generation, which reset the canvas size to its old size.
@@ -61,6 +63,7 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>rfe603: refactor AutoplotUtil to extract AutoRangeUtil, which is just the Autoranging codes.
             <li>improvements to cadence calculation for waveform datasets.
             <li>eventsConjunction function returns where two events lists have overlaps.
             <li>print to PDF now has pixels per inch and (finally) overall width controls.
