@@ -4,12 +4,10 @@
  */
 package test.endtoend;
 
-import java.io.IOException;
 import java.util.Map;
 import org.das2.graph.DasAxis;
-import org.das2.graph.DasCanvas;
 import org.autoplot.AutoplotUtil;
-import org.autoplot.AutoplotUtil.AutoRangeDescriptor;
+import org.autoplot.AutoRangeUtil.AutoRangeDescriptor;
 import org.das2.qds.DataSetUtil;
 import static org.autoplot.ScriptContext.*;
 import org.das2.qds.MutablePropertyDataSet;

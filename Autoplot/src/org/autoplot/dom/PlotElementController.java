@@ -70,6 +70,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.Converter;
 import org.autoplot.ApplicationModel;
+import org.autoplot.AutoRangeUtil;
 import org.autoplot.RenderType;
 import org.autoplot.AutoplotUtil;
 import static org.autoplot.AutoplotUtil.SERIES_SIZE_LIMIT;
@@ -2259,15 +2260,15 @@ public class PlotElementController extends DomNodeController {
                 return;
             }
 
-            AutoplotUtil.AutoRangeDescriptor desc;
+            AutoRangeUtil.AutoRangeDescriptor desc;
             
-            desc = AutoplotUtil.autoRange( zds, props, ignoreDsProps );  // do the Z autoranging first for debugging.
+            desc = AutoRangeUtil.autoRange( zds, props, ignoreDsProps );  // do the Z autoranging first for debugging.
             logger.log(Level.FINE, "desc.range={0}", desc.range);
 
-            AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0), ignoreDsProps);
+            AutoRangeUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0), ignoreDsProps);
             logger.log(Level.FINE, "xdesc.range={0}", xdesc.range);
 
-            AutoplotUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds, yprops, ignoreDsProps );
+            AutoRangeUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds, yprops, ignoreDsProps );
             logger.log(Level.FINE, "ydesc.range={0}", ydesc.range);
 
             peleCopy.getPlotDefaults().getZaxis().setRange(desc.range);
@@ -2354,7 +2355,7 @@ public class PlotElementController extends DomNodeController {
             }       
         } else { // spec==RenderType.SERIES and spec==RenderType.HUGE_SCATTER
 
-            AutoplotUtil.AutoRangeDescriptor ydesc; //TODO: QDataSet can model AutoRangeDescriptors, it should be used instead.
+            AutoRangeUtil.AutoRangeDescriptor ydesc; //TODO: QDataSet can model AutoRangeDescriptors, it should be used instead.
             
             QDataSet depend0;
 
@@ -2366,7 +2367,7 @@ public class PlotElementController extends DomNodeController {
                     ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, fillDs.length(0)-1 ), props, ignoreDsProps ); 
                     Units u= ydesc.range.getUnits();
                     for ( int i=fillDs.length(0)-2; i>=0; i-- ) {
-                        AutoplotUtil.AutoRangeDescriptor ydesc1= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs,i ), props, ignoreDsProps );
+                        AutoRangeUtil.AutoRangeDescriptor ydesc1= AutoRangeUtil.autoRange( DataSetOps.unbundle(fillDs,i ), props, ignoreDsProps );
                         if ( ydesc1.range.getUnits().isConvertibleTo(u) ) {
                             ydesc.range= DatumRangeUtil.union( ydesc.range, ydesc1.range );
                         } else {
@@ -2409,7 +2410,7 @@ public class PlotElementController extends DomNodeController {
                 logger.fine("20121015: I was thinking autorange would always be true");
             }
             
-            AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0), ignoreDsProps);
+            AutoRangeUtil.AutoRangeDescriptor xdesc = AutoRangeUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0), ignoreDsProps);
 
             peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
             if ( UnitsUtil.isOrdinalMeasurement( xdesc.range.getUnits() ) ) {
@@ -2418,15 +2419,15 @@ public class PlotElementController extends DomNodeController {
             peleCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
 
             if (spec == RenderType.colorScatter) {
-                AutoplotUtil.AutoRangeDescriptor zdesc;
+                AutoRangeUtil.AutoRangeDescriptor zdesc;
                 if ( fillDs.property(QDataSet.BUNDLE_1)!=null ) {
-                    zdesc= AutoplotUtil.autoRange((QDataSet) DataSetOps.unbundle( fillDs, fillDs.length(0)-1 ),null, ignoreDsProps);
+                    zdesc= AutoRangeUtil.autoRange((QDataSet) DataSetOps.unbundle( fillDs, fillDs.length(0)-1 ),null, ignoreDsProps);
                     peleCopy.getPlotDefaults().getZaxis().setLog(zdesc.log);
                     peleCopy.getPlotDefaults().getZaxis().setRange(zdesc.range);
                 } else {
                     QDataSet plane0= (QDataSet) fillDs.property(QDataSet.PLANE_0);
                     if ( plane0!=null ) {
-                        zdesc= AutoplotUtil.autoRange(plane0,
+                        zdesc= AutoRangeUtil.autoRange(plane0,
                             (Map) props.get(QDataSet.PLANE_0), ignoreDsProps);
                         peleCopy.getPlotDefaults().getZaxis().setLog(zdesc.log);
                         peleCopy.getPlotDefaults().getZaxis().setRange(zdesc.range);
