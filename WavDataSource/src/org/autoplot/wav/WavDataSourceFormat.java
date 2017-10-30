@@ -293,6 +293,18 @@ public class WavDataSourceFormat implements DataSourceFormat {
         URISplit split= URISplit.parse(uri);
 
         QDataSet dep0= (QDataSet) data.property( QDataSet.DEPEND_0 );
+        if ( dep0!=null ) {
+            if ( !DataSetUtil.isMonotonicAndIncreasing(dep0) ) {
+                QDataSet r= Ops.where( Ops.le( Ops.diff( dep0 ), 0) );
+                if ( r.length()>0 ) {
+                    data= data.trim(0,1+(int)r.value(0));
+                    dep0= (QDataSet) data.property( QDataSet.DEPEND_0 );
+                    logger.warning("data is not monotonic, dropping records to make monotonic.");
+                } else {
+                    logger.warning("data is not monotonic, can't fix, proceding with problem with timetags.");
+                }
+            }
+        }
 
         float samplesPerSecond= 8000.0f;
 
