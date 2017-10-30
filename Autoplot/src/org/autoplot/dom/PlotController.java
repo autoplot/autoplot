@@ -25,7 +25,6 @@ import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.datum.format.DateTimeDatumFormatter;
-import org.das2.datum.format.TimeDatumFormatter;
 import org.das2.event.BoxZoomMouseModule;
 import org.das2.event.DasMouseInputAdapter;
 import org.das2.event.MouseModule;
@@ -252,12 +251,18 @@ public class PlotController extends DomNodeController {
             DasPlot p= dasPlot;
             MouseModuleType mm= (MouseModuleType) evt.getNewValue();
             MouseModule m= null;
-            if ( mm==MouseModuleType.boxZoom ) {
-                m= p.getDasMouseInputAdapter().getModuleByLabel("Box Zoom");
-            } else if ( mm==MouseModuleType.crosshairDigitizer ) {
-                m= p.getDasMouseInputAdapter().getModuleByLabel("Crosshair Digitizer");
-            } else if ( mm==MouseModuleType.zoomX ) {
-                m= p.getDasMouseInputAdapter().getModuleByLabel("Zoom X");
+            if ( null!=mm ) switch (mm) {
+                case boxZoom:
+                    m= p.getDasMouseInputAdapter().getModuleByLabel("Box Zoom");
+                    break;
+                case crosshairDigitizer:
+                    m= p.getDasMouseInputAdapter().getModuleByLabel("Crosshair Digitizer");
+                    break;
+                case zoomX:
+                    m= p.getDasMouseInputAdapter().getModuleByLabel("Zoom X");
+                    break;
+                default:
+                    break;
             }
             if ( m!=null ) {
                 p.getDasMouseInputAdapter().setPrimaryModule( m );
@@ -639,12 +644,18 @@ public class PlotController extends DomNodeController {
 
         MouseModuleType m= dom.getOptions().getMouseModule();
         MouseModule mm= null;
-        if ( m==MouseModuleType.boxZoom ) {
-            // do nothing
-        } else if ( m==MouseModuleType.crosshairDigitizer ) {
-            mm= dasPlot1.getDasMouseInputAdapter().getModuleByLabel("Crosshair Digitizer");
-        } else if ( m==MouseModuleType.zoomX ) {
-            mm= dasPlot1.getDasMouseInputAdapter().getModuleByLabel("Zoom X");
+        if ( null!=m ) switch (m) {
+            case boxZoom:
+                // do nothing
+                break;
+            case crosshairDigitizer:
+                mm= dasPlot1.getDasMouseInputAdapter().getModuleByLabel("Crosshair Digitizer");
+                break;
+            case zoomX:
+                mm= dasPlot1.getDasMouseInputAdapter().getModuleByLabel("Zoom X");
+                break;
+            default:
+                break;
         }
         if ( mm!=null ) dasPlot1.getDasMouseInputAdapter().setPrimaryModule(mm);
 
