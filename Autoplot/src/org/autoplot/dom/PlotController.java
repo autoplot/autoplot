@@ -1820,6 +1820,7 @@ public class PlotController extends DomNodeController {
         ac.unbind(dom.options, Options.PROP_DRAWGRID, p, "drawGrid");
         ac.unbind(dom.options, Options.PROP_DRAWMINORGRID, p, "drawMinorGrid");
         ac.unbind(dom.options, Options.PROP_FLIPCOLORBARLABEL, this.plot.getZaxis().getController().dasAxis, "flipLabel");
+        ac.unbind(dom.options, Options.PROP_FLIPCOLORBARLABEL, this.plot.getYaxis().getController().dasAxis, "flipLabel");
         ac.unbind(dom.options, Options.PROP_TICKLEN, p.getXAxis(), "tickLength");
         ac.unbind(dom.options, Options.PROP_TICKLEN, p.getYAxis(), "tickLength");
         ac.unbind(dom.options, Options.PROP_TICKLEN, this.dasColorBar, "tickLength");
