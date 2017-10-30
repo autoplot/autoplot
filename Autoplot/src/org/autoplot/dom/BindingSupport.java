@@ -12,6 +12,8 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -380,11 +382,24 @@ public class BindingSupport {
             }
         }
         
-        for ( Entry<Object,List<BindingImpl>> e: copy.entrySet() ) {
-            int s= e.getValue().size();
-            System.err.println( "--- "+e.getKey()+" ("+s+" bindings) ---");
+        ArrayList keys= new ArrayList( copy.keySet() );
+        Collections.sort(keys,new Comparator() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                if ( o1 instanceof DomNode && o2 instanceof DomNode ) { // they are
+                    return ((DomNode)o1).getId().compareTo(((DomNode)o2).getId());
+                } else {
+                    return o1.toString().compareTo(o2.toString());
+                }
+            }
+        });
+        
+        for ( Object key: keys ) {
+            List<BindingImpl> value= copy.get(key);
+            int s= value.size();
+            System.err.println( "--- "+key+" ("+s+" bindings) ---");
             total+= s;
-            for ( BindingImpl l: e.getValue() ) {
+            for ( BindingImpl l: value ) {
                 System.err.println( l );
             }
         }
