@@ -23,6 +23,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
@@ -40,6 +42,7 @@ import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
 import org.autoplot.jythonsupport.JythonUtil;
+import org.autoplot.jythonsupport.SimplifyScriptSupport;
 
 /**
  *
@@ -472,11 +475,34 @@ public class EditorContextMenu {
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);       
                     String doThis= editor.getSelectedText();
+                    if ( doThis==null || doThis.length()==0 ) {
+                        doThis= editor.getText();
+                    }
                     try {
                         String java= JythonToJavaConverter.convert(doThis);
                         JTextArea a= new JTextArea(10,80);
                         a.setText(java);
-                        JOptionPane.showMessageDialog( menu, a );
+                        JOptionPane.showMessageDialog( menu, new JScrollPane(a) );
+                    } catch ( Exception ex ) {
+                        JOptionPane.showMessageDialog( menu, ex.toString() );
+                    }
+                }                
+            });
+            developerMenu.add(mi);
+            
+            mi= new JMenuItem( new AbstractAction("Show Simplified Script Used for Completions") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);       
+                    String doThis= editor.getSelectedText();
+                    if ( doThis==null || doThis.length()==0 ) {
+                        doThis= editor.getText();
+                    }
+                    try {
+                        String scriptPrime= SimplifyScriptSupport.simplifyScriptToCompletions(doThis);
+                        JTextArea a= new JTextArea(10,80);
+                        a.setText(scriptPrime);
+                        JOptionPane.showMessageDialog( menu, new JScrollPane(a) );
                     } catch ( Exception ex ) {
                         JOptionPane.showMessageDialog( menu, ex.toString() );
                     }
