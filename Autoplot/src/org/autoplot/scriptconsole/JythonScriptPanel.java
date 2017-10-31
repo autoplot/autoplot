@@ -240,7 +240,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);
-                DataSourceUtil.openBrowser( "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-release/ws/autoplot/VirboAutoplot/src/scripts/" );
+                DataSourceUtil.openBrowser( "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-release2017/ws/autoplot/Autoplot/src/scripts/" );
             }
         });
 
@@ -264,7 +264,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);
-                DataSourceUtil.openBrowser( "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-release/ws/autoplot/JythonDataSource/src/" );
+                DataSourceUtil.openBrowser( "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-release2017/ws/autoplot/JythonDataSource/src/" );
             }
         });
 
