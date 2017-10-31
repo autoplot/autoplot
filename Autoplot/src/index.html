@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Scale binding allows two plots of different heights to have the same scale.
+        <p><small>Happy Halloween!
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,10 @@
         
         <p>Bugfixes (2017-10-28 r21597):</p>
         <ul>
+            <li>1888: corrections to Javadoc popup for packages, since Java 8 documentation changes this.
+            <li>export to wave checks timetags to make sure data is sorted.
+            <li>remove leftover binding between yaxis and FLIPCOLORBARLABEL, which could lead to memory leak.
+            <li>corrections to trim function, which now requires data be within cadence of bounds for it to be included.
             <li>corrections to das2stream adapter which was incorrectly setting monotonic.  Better handle second-checks of monotonic.  Thanks, Masafumi!
             <li>correction to ifft, which incorrectly reconstructed the timetags.
             <li>metadata tab properly formats small numbers (0.00001) in a linear space, not "0.000".  Thanks, Ivar!
@@ -62,7 +66,8 @@
             <li>1884: "run batch" corrections.
         </ul>
         <p>Features:</p>
-        <ul> 
+        <ul>
+            <li>prepare HAPI client for upcoming changes to HAPI spec, where units and label can be arrays.
             <li>rfe603: refactor AutoplotUtil to extract AutoRangeUtil, which is just the Autoranging codes.
             <li>improvements to cadence calculation for waveform datasets.
             <li>eventsConjunction function returns where two events lists have overlaps.
