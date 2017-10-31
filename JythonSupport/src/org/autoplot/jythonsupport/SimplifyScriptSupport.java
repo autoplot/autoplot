@@ -58,13 +58,7 @@ public class SimplifyScriptSupport {
      public static String simplifyScriptToCompletions( String script ) throws PySyntaxError {
          String[] ss= script.split("\n");
          
-         int lastLine= -1;
-         for ( int i=0; i<ss.length; i++ ) {
-             String line= ss[i];
-             int ich= line.indexOf('#');
-             if ( ich>-1 ) line= line.substring(0,ich);
-             if ( line.contains("getParam") ) lastLine= i+1;
-         }
+         int lastLine= ss.length;
          
          if ( lastLine==-1 ) {
              return "";
@@ -351,8 +345,10 @@ public class SimplifyScriptSupport {
             Call c= (Call)o;
 
             if ( !trivialFunctionCall(c) ) {
-                logger.finest( String.format( "%04d simplify->false: %s", o.beginLine, o.toString() ) );
-                return false;
+                if ( !trivialConstructorCall(c) ) {
+                    logger.finest( String.format( "%04d simplify->false: %s", o.beginLine, o.toString() ) );
+                    return false;                    
+                }
             }
         }
         MyVisitorBase vb= new MyVisitorBase(variableNames);
@@ -399,6 +395,28 @@ public class SimplifyScriptSupport {
          }
      }
              
+     
+     /**
+      * return true if the function call is trivial to execute because it's a constructor,
+      * which presumably takes little time to create.
+      * @param sn
+      * @return true if it is a constructor call
+      */
+     private static boolean trivialConstructorCall( SimpleNode sn ) {
+         if ( sn instanceof Call ) {
+             Call c= (Call)sn;
+             boolean klugdyOkay= false;
+             String ss= c.func.toString();
+             if ( Character.isUpperCase(ss.charAt(0)) ) {
+                 return true;
+             } else {
+                 return false;
+             }
+         } else {
+             return false;
+         }
+     }
+     
      private static class MyVisitorBase<R> extends VisitorBase {
          boolean looksOkay= true; 
          boolean visitNameFail= false;
