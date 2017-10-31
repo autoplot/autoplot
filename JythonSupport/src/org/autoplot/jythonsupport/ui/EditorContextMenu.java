@@ -23,6 +23,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
@@ -37,6 +38,7 @@ import org.das2.util.LoggerManager;
 import org.python.parser.SimpleNode;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSourceUtil;
+import org.autoplot.jythonsupport.JythonToJavaConverter;
 import org.autoplot.jythonsupport.JythonUtil;
 
 /**
@@ -458,8 +460,30 @@ public class EditorContextMenu {
             jumpToMenu.setToolTipText("Jump To Position in code");
             jumpToMenuPosition= actionsMenu.getItemCount();
             actionsMenu.add(jumpToMenu);
-            
+
+            JMenu developerMenu= new JMenu( "Developer" );
+            developerMenu.setToolTipText("Special actions for developers");
+            actionsMenu.add(developerMenu);
+
             JMenuItem mi;
+            
+            mi= new JMenuItem( new AbstractAction("Convert To Java") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);       
+                    String doThis= editor.getSelectedText();
+                    try {
+                        String java= JythonToJavaConverter.convert(doThis);
+                        JTextArea a= new JTextArea(10,80);
+                        a.setText(java);
+                        JOptionPane.showMessageDialog( menu, a );
+                    } catch ( Exception ex ) {
+                        JOptionPane.showMessageDialog( menu, ex.toString() );
+                    }
+                }                
+            });
+            
+            developerMenu.add(mi);
             
             mi= new JMenuItem( new AbstractAction("Plot") {
                 @Override
