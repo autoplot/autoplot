@@ -480,7 +480,7 @@ public class EditorContextMenu {
                     }
                     try {
                         String java= JythonToJavaConverter.convert(doThis);
-                        JTextArea a= new JTextArea(10,80);
+                        JTextArea a= new JTextArea(20,80);
                         a.setText(java);
                         JOptionPane.showMessageDialog( menu, new JScrollPane(a) );
                     } catch ( Exception ex ) {
@@ -500,7 +500,7 @@ public class EditorContextMenu {
                     }
                     try {
                         String scriptPrime= SimplifyScriptSupport.simplifyScriptToCompletions(doThis);
-                        JTextArea a= new JTextArea(10,80);
+                        JTextArea a= new JTextArea(20,80);
                         a.setText(scriptPrime);
                         JOptionPane.showMessageDialog( menu, new JScrollPane(a) );
                     } catch ( Exception ex ) {
