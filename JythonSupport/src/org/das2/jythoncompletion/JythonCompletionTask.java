@@ -431,9 +431,16 @@ public class JythonCompletionTask implements CompletionTask {
             String ss = s.toString();
             if (ss.startsWith(cc.completable)) {
                 String javaClass= cc.contextString + "." + ss;
-                String signature= join( javaClass.split("\\."), "/") + ".html";  
-                String link= JavadocLookup.getInstance().getLinkForJavaSignature(signature);
-                if ( link!=null ) link+= "#method_summary";
+                String signature;  
+                String link;
+                if ( ss.length()>0 && Character.isUpperCase(ss.charAt(0)) ) {
+                    signature= join( javaClass.split("\\."), "/") + ".html";  
+                    link= JavadocLookup.getInstance().getLinkForJavaSignature(signature);
+                } else {
+                    signature= join( javaClass.split("\\."), "/") + "/package-summary.html";  
+                    link= JavadocLookup.getInstance().getLinkForJavaSignature(signature);
+                }
+                if ( link!=null ) link+= "#skip.navbar.top";                
                 rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss, ss, link));
                 count++;
             }
@@ -483,9 +490,16 @@ public class JythonCompletionTask implements CompletionTask {
                 String ss = s.toString();
                 if (ss.startsWith(cc.completable)) {
                     String javaClass= cc.contextString + "." + ss;
-                    String signature= join( javaClass.split("\\."), "/") + ".html";  
-                    String link= JavadocLookup.getInstance().getLinkForJavaSignature(signature);
-                    if ( link!=null ) link+= "#method_summary";
+                    String signature;  
+                    String link;
+                    if ( ss.length()>0 && Character.isUpperCase(ss.charAt(0)) ) {
+                        signature= join( javaClass.split("\\."), "/") + ".html";  
+                        link= JavadocLookup.getInstance().getLinkForJavaSignature(signature);
+                    } else {
+                        signature= join( javaClass.split("\\."), "/") + "/package-summary.html";  
+                        link= JavadocLookup.getInstance().getLinkForJavaSignature(signature);
+                    }
+                    if ( link!=null ) link+= "#skip.navbar.top";
                     rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss, ss, link ));
                     count++;
                     results.add(ss);
