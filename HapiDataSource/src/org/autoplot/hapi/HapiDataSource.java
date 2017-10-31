@@ -143,13 +143,16 @@ public final class HapiDataSource extends AbstractDataSource {
             }
         }
 
-        String sunits= binsObject.getString("units");
-        if ( sunits!=null ) {
-            Units u= Units.lookupUnits(sunits);
-            result.putProperty( QDataSet.UNITS, u );
-            if ( hasMin && hasMax ) {
-                min.putProperty( QDataSet.UNITS, u );
-                max.putProperty( QDataSet.UNITS, u );
+        if ( binsObject.has("units") ) {
+            Object uo= binsObject.get("units");
+            if ( uo instanceof String ) {
+                String sunits= (String)uo;
+                Units u= Units.lookupUnits(sunits);
+                result.putProperty( QDataSet.UNITS, u );
+                if ( hasMin && hasMax ) {
+                    min.putProperty( QDataSet.UNITS, u );
+                    max.putProperty( QDataSet.UNITS, u );
+                }
             }
         }
         
@@ -852,8 +855,9 @@ public final class HapiDataSource extends AbstractDataSource {
             } else {
                 pds[i].type= type;
                 if ( jsonObjecti.has("units") ) {
-                    String sunits= jsonObjecti.getString("units");
-                    if ( sunits!=null ) {
+                    Object ou= jsonObjecti.get("units");
+                    if ( ou instanceof String ) {
+                        String sunits= (String)ou;
                         pds[i].units= Units.lookupUnits(sunits);
                     }
                 } else {
@@ -891,7 +895,10 @@ public final class HapiDataSource extends AbstractDataSource {
                 }
 
                 if ( jsonObjecti.has("label") ) {
-                    pds[i].label= jsonObjecti.getString("label");
+                    Object olabel= jsonObjecti.get("label");
+                    if ( olabel instanceof String ) {
+                        pds[i].label= (String)olabel;
+                    }
                     if ( pds[i].label==null ) pds[i].label= name;
                 } else {
                     pds[i].label= name;
