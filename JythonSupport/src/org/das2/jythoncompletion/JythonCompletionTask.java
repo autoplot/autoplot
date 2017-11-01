@@ -1264,7 +1264,11 @@ public class JythonCompletionTask implements CompletionTask {
                     } else if (signature != null) {
                         link= getLinkForJavaSignature(signature);
                     }
-                    result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link) );
+                    if ( po instanceof PyString ) {
+                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label+" -> "+po+"", link) );
+                    } else {
+                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link) );
+                    }
                 }
             }
         }
