@@ -151,6 +151,17 @@ public class CompletionSupport {
             return contextString;
     }
 
+    /**
+     * Get the completion context, locating the carot within the code and 
+     * identifying it as needing a package name, variable name, function, etc.
+     * This parses the line using PythonGrammar
+     * @param line the line
+     * @param pos the position within the line
+     * @param i0 always 0 (not used)
+     * @param i1 always 0 (not used)
+     * @param i2 the position within the line (not used)
+     * @return the completion context
+     */
     public static CompletionContext getCompletionContext( String line, int pos, int i0, int i1, int i2 ) {
 
         List<Token> tokens= new ArrayList<>(20);
