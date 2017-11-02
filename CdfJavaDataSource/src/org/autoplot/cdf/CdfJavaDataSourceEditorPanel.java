@@ -772,6 +772,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         }
 
         split.params= URISplit.formatParams(lparams);
+        if ( split.params!=null && split.params.length()==0 ) split.params= null;
         return URISplit.format(split);
     }
 

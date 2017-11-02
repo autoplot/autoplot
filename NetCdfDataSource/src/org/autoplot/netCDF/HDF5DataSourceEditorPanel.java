@@ -604,6 +604,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         
         split.vapScheme= vapScheme;
         split.params= URISplit.formatParams(params);
+        if ( split.params!=null && split.params.length()==0 ) split.params= null; //https://sourceforge.net/p/autoplot/bugs/1913/
         return URISplit.format(split);
     }
     

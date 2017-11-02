@@ -185,6 +185,7 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
         URISplit split = URISplit.parse(suri);
         Map<String,String> params= paramsTextArea1.getParams();
         split.params= URISplit.formatParams(params);
+        if ( split.params!=null && split.params.length()==0 ) split.params= null;
         return URISplit.format(split);
     }
 

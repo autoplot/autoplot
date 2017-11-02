@@ -592,7 +592,7 @@ private void firstRowTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FI
         }
 
         split.params = URISplit.formatParams(params);
-
+        if ( split.params!=null && split.params.length()==0 ) split.params= null; //https://sourceforge.net/p/autoplot/bugs/1913/
         return URISplit.format(split);
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
