@@ -94,6 +94,7 @@ import org.das2.qds.ops.Ops;
 import org.autoplot.metatree.MetadataUtil;
 import org.das2.datum.InconvertibleUnitsException;
 import org.das2.graph.BoundsRenderer;
+import org.das2.graph.PolarPlotRenderer;
 
 /**
  * PlotElementController manages the PlotElement, for example resolving the datasource and loading the dataset.
@@ -2299,7 +2300,7 @@ public class PlotElementController extends DomNodeController {
                 peleCopy.getPlotDefaults().getZaxis().setLog( "log".equals( qube.slice(2).property(QDataSet.SCALE_TYPE) ) );
             }
         } else if ( spec==RenderType.polar ) {
-            QDataSet qube= PitchAngleDistributionRenderer.doAutorange( fillDs );
+            QDataSet qube= PolarPlotRenderer.doAutorange( fillDs );
             if ( qube==null ) {
                 // nothing
             } else {
