@@ -146,6 +146,7 @@ import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
 import org.autoplot.datasource.capability.Caching;
 import org.das2.graph.BoundsRenderer;
+import org.das2.graph.PolarPlotRenderer;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.AutoHistogram;
 import org.das2.util.AboutUtil;
@@ -1343,7 +1344,15 @@ public class AutoplotUtil {
                 return result;
             }
 
-
+        } else if ( renderType==RenderType.polar ) {
+            if (recyclable != null && recyclable instanceof PolarPlotRenderer ) {
+                return recyclable;
+            } else {
+                Renderer result = new PolarPlotRenderer( colorbar );
+                result.setDataSetLoader(null);
+                return result;
+            }
+            
         } else if ( renderType==RenderType.pitchAngleDistribution ) {
             if (recyclable != null && recyclable instanceof PitchAngleDistributionRenderer ) {
                 return recyclable;

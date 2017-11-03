@@ -1059,6 +1059,7 @@ public class PlotElementController extends DomNodeController {
     private boolean axisDimensionsChange( RenderType oldRenderType, RenderType newRenderType ) {
         if ( oldRenderType==newRenderType ) return false;
         if ( newRenderType==RenderType.pitchAngleDistribution ) return true;
+        if ( newRenderType==RenderType.polar ) return true;
         if ( oldRenderType==RenderType.spectrogram && newRenderType==RenderType.nnSpectrogram ) {
             return false;
         } else if ( oldRenderType==RenderType.nnSpectrogram && newRenderType==RenderType.spectrogram ) {
@@ -2297,7 +2298,20 @@ public class PlotElementController extends DomNodeController {
                 peleCopy.getPlotDefaults().getZaxis().setRange( DataSetUtil.asDatumRange( qube.slice(2),true ) );
                 peleCopy.getPlotDefaults().getZaxis().setLog( "log".equals( qube.slice(2).property(QDataSet.SCALE_TYPE) ) );
             }
-
+        } else if ( spec==RenderType.polar ) {
+            QDataSet qube= PitchAngleDistributionRenderer.doAutorange( fillDs );
+            if ( qube==null ) {
+                // nothing
+            } else {
+                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
+                String label=  (String) qube.slice(0).property( QDataSet.LABEL );
+                peleCopy.getPlotDefaults().getXaxis().setLabel( label==null ? "" : label );
+                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+                label=  (String) qube.slice(1).property( QDataSet.LABEL );
+                peleCopy.getPlotDefaults().getYaxis().setLabel( label==null ? "" : label );
+                peleCopy.getPlotDefaults().getZaxis().setRange( DataSetUtil.asDatumRange( qube.slice(2),true ) );
+                peleCopy.getPlotDefaults().getZaxis().setLog( "log".equals( qube.slice(2).property(QDataSet.SCALE_TYPE) ) );
+            }
         } else if ( spec==RenderType.digital ) {
             QDataSet qube= DigitalRenderer.doAutorange( fillDs );
             if ( qube==null ) {
@@ -2527,7 +2541,10 @@ public class PlotElementController extends DomNodeController {
 
         } else if ( spec==RenderType.pitchAngleDistribution ) {
             return true;
-
+            
+        } else if ( spec==RenderType.polar ) {
+            return true;
+            
         } else if ( spec==RenderType.eventsBar ) {
             return true;
 

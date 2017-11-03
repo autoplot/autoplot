@@ -20,6 +20,7 @@ public enum RenderType {
     digital,
     image,
     pitchAngleDistribution,
+    polar,  // spectograms and line plots in polar coordinates
     eventsBar,
     stackedHistogram, // Voyager PWS uses these
     vectorPlot,
@@ -138,6 +139,10 @@ public enum RenderType {
             return org.das2.graph.PitchAngleDistributionRenderer.acceptsData(ds);
         }
 
+        if ( rt==polar ) {
+            return org.das2.graph.PolarPlotRenderer.acceptsData(ds);
+        }
+        
         if ( rt==eventsBar ) {
             return ds.rank()==2 || ds.rank()==1;
         }

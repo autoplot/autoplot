@@ -257,6 +257,9 @@ public class GuiSupport {
             case pitchAngleDistribution:
                 editorPanel= new PitchAngleDistributionStylePanel( );
                 break;
+            case polar:
+                editorPanel= new ColorScatterStylePanel( );
+                break;
             case hugeScatter:
                 editorPanel= new HugeScatterStylePanel( );
                 break;

@@ -12,7 +12,7 @@ package org.autoplot;
 public class RenderTypeUtil {
     public static boolean needsColorbar( RenderType rt ) {
         return rt==RenderType.spectrogram || rt==RenderType.nnSpectrogram
-            || rt==RenderType.colorScatter || rt==RenderType.pitchAngleDistribution
+            || rt==RenderType.colorScatter || rt==RenderType.pitchAngleDistribution || rt==RenderType.polar
             || rt==RenderType.stackedHistogram ;
     }
 }
