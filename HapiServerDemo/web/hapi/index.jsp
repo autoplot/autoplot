@@ -29,7 +29,7 @@
         Run HAPI server <a href="http://tsds.org/verify-hapi/?url=http://jfaden.net/HapiServerDemo/hapi">verifier</a>.
         <br>
         <%
-
+            try {
             String HAPI_SERVER_HOME= getServletContext().getInitParameter("HAPI_SERVER_HOME");
             Util.setHapiHome( new File( HAPI_SERVER_HOME ) );
             
@@ -77,6 +77,10 @@
                     }
                 }
                 
+            }
+            } catch ( JSONException ex ) {
+                out.print("<br><br><b>Something has gone wrong, see logs or send an email to faden at cottagesystems.com</b>");
+                out.println(""+out.toString());
             }
         %>
         <br><br>
@@ -134,6 +138,7 @@
             <li>2017-06-28: return 404 when ID is bad, instead of empty response.  Bugfix, where streaming datasources would output an extra record.  Bugfix, subset parameters in info request.  Thanks, Bob!</li>
             <li>2017-08-14: add experimental caching mechanism, where HOME/hapi/cache can contain daily cache files.  Cache is stored in .gzip form.</li>
             <li>2017-08-23: failed release was using old version, where format=binary would return ascii files from the cache.  ascii would not properly subset.</li>
+            <li>2017-11-06: put in new catch-all code on the landing page, to aid in debugging.
         </ul>
         </small>
     </body>
