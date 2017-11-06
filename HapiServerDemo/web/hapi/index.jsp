@@ -80,7 +80,7 @@
             }
             } catch ( JSONException ex ) {
                 out.print("<br><br><b>Something has gone wrong, see logs or send an email to faden at cottagesystems.com</b>");
-                out.println(""+out.toString());
+                out.println("<br>"+out.toString());
             }
         %>
         <br><br>
