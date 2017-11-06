@@ -1812,6 +1812,8 @@ public class PlotElementController extends DomNodeController {
             bindToEventsRenderer((EventsRenderer)renderer);
         } else if (renderer instanceof DigitalRenderer ) {
             bindToDigitalRenderer((DigitalRenderer)renderer);
+        } else if (renderer instanceof PolarPlotRenderer ) {
+            bindToPolarPlotRenderer((PolarPlotRenderer)renderer);
         } else if (renderer instanceof TickCurveRenderer ) {
             bindToTickCurveRenderer((TickCurveRenderer)renderer);
         } else if (renderer instanceof BoundsRenderer ) {
@@ -3117,6 +3119,11 @@ public class PlotElementController extends DomNodeController {
         ac.bind(plotElement.style, "color", renderer, "color");
     }
 
+    public void bindToPolarPlotRenderer(PolarPlotRenderer renderer) {
+        ApplicationController ac = this.dom.controller;
+        ac.bind(plotElement.style, "color", renderer, "color");
+    }
+    
     public void bindToTickCurveRenderer( TickCurveRenderer renderer) {
         ApplicationController ac = this.dom.controller;
         ac.bind(plotElement.style, "color", renderer, "color");
