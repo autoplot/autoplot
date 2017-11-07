@@ -203,15 +203,17 @@ public class JythonUtil {
     
     /**
      * invoke the python script on another thread.
-     * @param uri the address of the script.
+     * @param uri the address of the script, possibly having parameters.
      * @param dom if null, then null is passed into the script and the script must not use dom.
      * @param mon monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
      * @throws java.io.IOException
      */
     public static void invokeScriptSoon( final URI uri, final Application dom, ProgressMonitor mon ) throws IOException {
-        invokeScriptSoon( uri, dom, new HashMap(), false, false, mon );
+        URISplit split= URISplit.parse(uri);
+        Map<String,String> params= URISplit.parseParams(split.params);
+        invokeScriptSoon( split.resourceUri, dom, params, false, false, mon );
     }
-    
+
     private static final HashMap<String,String> okayed= new HashMap();
     
     private static boolean isScriptOkayed( String filename, String contents ) {
