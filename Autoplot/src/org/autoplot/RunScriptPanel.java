@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /*
  * RunScriptPanel.java
@@ -11,7 +7,6 @@
 
 package org.autoplot;
 
-import org.autoplot.ApplicationModel;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -57,13 +52,13 @@ public class RunScriptPanel extends javax.swing.JPanel {
         try {
             InputStream in= new FileInputStream(ff);
             StringBuilder buf= new StringBuilder();
-            BufferedReader read= new BufferedReader( new InputStreamReader(in) );
-            String line= read.readLine();
-            while ( line!=null ) {
-                buf.append(line).append("\n");
-                line= read.readLine();
+            try (BufferedReader read = new BufferedReader( new InputStreamReader(in) )) {
+                String line= read.readLine();
+                while ( line!=null ) {
+                    buf.append(line).append("\n");
+                    line= read.readLine();
+                }
             }
-            read.close();
             if ( buf.length()>0  ) {
                 InteractiveInterpreter interp = JythonUtil.createInterpreter(true, false);
                 interp.set("dom", model.getDocumentModel());
@@ -83,9 +78,15 @@ public class RunScriptPanel extends javax.swing.JPanel {
         return toolsCB;
     }
 
-    void loadFile( final File ff) throws IOException {
-        final String src= getTextArea().loadFileToString(ff);
+    /**
+     * load the file into the panel for review.
+     * @param ff
+     * @throws IOException
+     */
+    protected void loadFile( final File ff) throws IOException {
+        final String src= EditorTextPane.loadFileToString(ff);
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 try {
                     Document d = getTextArea().getDocument();
@@ -93,12 +94,10 @@ public class RunScriptPanel extends javax.swing.JPanel {
                     d.insertString( 0, src, null );
                     if ( ff.getCanonicalPath().startsWith( new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" ).getCanonicalPath() ) ) {
                         toolsCB.setEnabled(false);
-                    };
+                    }
                     scriptFilename.setText(ff.toString());
 
-                } catch ( IOException ex ) {
-
-                } catch ( BadLocationException ex ) {
+                } catch ( IOException | BadLocationException ex ) {
 
                 }
             }
