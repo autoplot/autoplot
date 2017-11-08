@@ -84,10 +84,10 @@ public class CdfDataSource extends AbstractDataSource {
     }
 
     private static final int FILE_CACHE_SIZE_LIMIT= 2;
-    protected static final LinkedHashMap<String,CDFReader> openFiles= new LinkedHashMap();
-    protected static final Map<CDFReader,String> openFilesRev= new HashMap();
-    protected static final Map<String,Long> openFilesFresh= new HashMap();
-    protected static final Object lock= new Object();
+    private static final LinkedHashMap<String,CDFReader> openFiles= new LinkedHashMap();
+    private static final Map<CDFReader,String> openFilesRev= new HashMap();
+    private static final Map<String,Long> openFilesFresh= new HashMap();
+    private static final Object lock= new Object();
 
     private static final int DS_CACHE_SIZE_LIMIT= 2;
     private static final LinkedHashMap<String,MutablePropertyDataSet> dsCache= new LinkedHashMap();
@@ -115,7 +115,24 @@ public class CdfDataSource extends AbstractDataSource {
             }
         }
     }
+    
+    protected static void cdfCacheReset() {
+        synchronized (CdfDataSource.lock) {
+            CdfDataSource.openFiles.clear();
+            CdfDataSource.openFilesRev.clear();
+            CdfDataSource.openFilesFresh.clear();
+        }
+        System.gc();
+    }
 
+    protected static String cdfCacheFileForReader( CDFReader cdf ) {
+        String cdfFile;
+        synchronized ( CdfDataSource.lock ) {
+            cdfFile= CdfDataSource.openFilesRev.get(cdf);
+        }
+        return cdfFile;
+    }
+    
     /**
      * put the dataset into the cache, probably removing the least valuable entry from the cache.
      * @param uri
@@ -1113,11 +1130,7 @@ public class CdfDataSource extends AbstractDataSource {
                     }
                 }
             } else {
-                if ( UnitsUtil.isTimeLocation(units) ) {
-                    logger.log(Level.FINE, "DELTA_PLUS_VAR variable is not found for {0}: {1}", new Object[] { svariable, deltaPlus } );                    
-                } else {
-                    logger.log(Level.FINE, "DELTA_PLUS_VAR variable is not found for {0}: {1}", new Object[] { svariable, deltaPlus } );
-                }
+                logger.log(Level.FINE, "DELTA_PLUS_VAR variable is not found for {0}: {1}", new Object[] { svariable, deltaPlus } );                    
             }
         }
 

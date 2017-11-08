@@ -698,20 +698,11 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     private void write( String name ) throws IOException {
         logger.log(Level.FINE, "call cdf.write({0})", new Object[] { logName(name) } );
         try {
-            synchronized (CdfDataSource.lock) {
-                CdfDataSource.openFiles.clear();
-                CdfDataSource.openFilesRev.clear();
-                CdfDataSource.openFilesFresh.clear();
-            }
-            System.gc();
+            CdfDataSource.cdfCacheReset();
             cdf.write( name );
         } catch ( FileNotFoundException ex ){
             logger.log(Level.WARNING, "first attempt to write \"{0}\" fails, try again for good measure", name);
-            synchronized (CdfDataSource.lock) {
-                CdfDataSource.openFiles.clear();
-                CdfDataSource.openFilesRev.clear();
-                CdfDataSource.openFilesFresh.clear();
-            }
+            CdfDataSource.cdfCacheReset();
             System.gc();
             try {
                 Thread.sleep(1000);

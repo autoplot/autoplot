@@ -716,9 +716,7 @@ public class CdfUtil {
 //logger.fine( "jvmMemory (MB): "+jvmMemory(result)/1024/1024 );
         if ( varType==CDFConstants.CDF_EPOCH || varType==CDFConstants.CDF_EPOCH16 || varType==CDFConstants.CDF_TT2000 ) {
             String cdfFile;
-            synchronized ( CdfDataSource.lock ) {
-                cdfFile= CdfDataSource.openFilesRev.get(cdf);
-            }
+            cdfFile= CdfDataSource.cdfCacheFileForReader(cdf);
             if ( cdfFile!=null ) {
                 String uri= cdfFile + "?" + svariable;
                 if ( recStart!=0 || recCount!=cdf.getNumberOfValues(svariable) || recInterval>1 ) {
