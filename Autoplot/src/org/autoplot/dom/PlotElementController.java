@@ -3122,6 +3122,7 @@ public class PlotElementController extends DomNodeController {
     public void bindToPolarPlotRenderer(PolarPlotRenderer renderer) {
         ApplicationController ac = this.dom.controller;
         ac.bind(plotElement.style, "color", renderer, "color");
+        ac.bind(plotElement.style, "lineWidth", renderer, "lineWidth");
     }
     
     public void bindToTickCurveRenderer( TickCurveRenderer renderer) {
