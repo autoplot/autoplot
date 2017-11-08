@@ -192,7 +192,8 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     public void removeActionListener(ActionListener list) {
-        AWTEventMulticaster.remove(eventListener, list);
+        ActionListener l= AWTEventMulticaster.remove(eventListener, list);
+        logger.log(Level.FINEST, "removed {0}", l);
     }
 
     PropertyChangeSupport das2PeerListenerSupport= new DebugPropertyChangeSupport(this);
