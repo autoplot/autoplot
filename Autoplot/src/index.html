@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New polar plot rendering mode will better support polar spectrograms and lineplots.
+        <p><small>The DataPointRecorder now allows fill to be manually entered, breaking the connecting line.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,13 +26,15 @@
         
         <p>Bugfixes (2017-11-03 r21641):</p>
         <ul>
-            <li>1912: re-fix bug where trim would include extra point, this time without dependence on cadence.
             <li>2017 update of the signature for jar files.  Thanks, Bernie!
-            <li>recent changes in pdf support broke legacy pdf output.  Thanks, Ivar, for pointing this out!
+            <li>1916: logic for working with POES dataset caused some breaks in Masafumi's data to be skipped.
+            <li>TrimDataSet trims BUNDLE_0, so that datumRange(evt[0:2]) can be used to easily get the time range.
+            <li>1912: re-fix bug where trim would include extra point, this time without dependence on cadence.  Thanks Ivar!
+            <li>recent changes in pdf support broke legacy pdf output.  Thanks, Ivar and others for pointing this out!
             <li>non-standard micro symbol was used for microseconds, making standard microseconds behave improperly and failure to render as waveform.  Thanks, Chris!
-            <li>1916: "NaN" parses to fill Datum for times.  This supports breaks in timeseries.
+            <li>1916: "NaN" parses to fill Datum for times.  This supports breaks in timeseries.  Thanks, Masafumi!
             <li>1912: new change to check cadence didn't properly consider conditions when issuing errors.  Thanks, Ivar!
-            <li>1913: data source editors shouldn't add extranous question mark
+            <li>1913: data source editors shouldn't add extranous question mark.
         </ul>
         <p>Older Bugfixes:</p>
         <ul>
@@ -66,8 +68,10 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>DataPointRecorder allows fill records to be inserted.  Thanks Masafumi!
+            <li>orbit files can now have more than three columns, where the last column is used as the label, to be more consistent with events files.  Thanks Ivar!
+            <li>invokeScriptSoon allows parameters in URI, to improve usefulness to Jython scripts.
             <li>begin support for new polar plotting mode.
+            <li>DataPointRecorder allows fill records to be inserted.  Thanks Masafumi!
             <li>Jython completions show last assignment of variable names
         </ul>
        <p>Less recent features:</p>
