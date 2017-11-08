@@ -193,6 +193,7 @@ public class PlotElementStyle extends DomNode {
     @Override
     public void syncTo( DomNode node, List<String> exclude ) {
         super.syncTo(node,exclude);
+        if ( !( node instanceof PlotElementStyle ) ) throw new IllegalArgumentException("node should be a PlotElementStyle");
         PlotElementStyle that= ( PlotElementStyle )node;
         if ( !exclude.contains(PROP_COLORTABLE ) ) this.setColortable( that.colortable );
         if ( !exclude.contains(PROP_FILL_TO_REFERENCE ) )this.setFillToReference( that.fillToReference );
@@ -208,6 +209,7 @@ public class PlotElementStyle extends DomNode {
 
     @Override
     public List<Diff> diffs(DomNode node) {
+        if ( !( node instanceof PlotElementStyle ) ) throw new IllegalArgumentException("node should be a PlotElementStyle");
         PlotElementStyle that= (PlotElementStyle)node;
 
         List<Diff> result = super.diffs(node);

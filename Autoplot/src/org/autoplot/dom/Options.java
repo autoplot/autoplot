@@ -569,6 +569,7 @@ public class Options extends DomNode {
      */
     public void syncToAll( DomNode n,List<String> exclude ) {
         this.syncTo(n,exclude);
+        if ( !( n instanceof Options ) ) throw new IllegalArgumentException("node should be a Options");                
         Options that = (Options) n;
         if ( !exclude.contains(PROP_DRAWGRID) ) this.setDrawGrid( that.isDrawGrid() );
         if ( !exclude.contains(PROP_DRAWMINORGRID) ) this.setDrawMinorGrid( that.isDrawMinorGrid() );
@@ -597,6 +598,7 @@ public class Options extends DomNode {
     @Override
     public void syncTo( DomNode n,List<String> exclude ) {
         super.syncTo(n,exclude);
+        if ( !( n instanceof Options ) ) throw new IllegalArgumentException("node should be a Options");                        
         Options that = (Options) n;
         if ( !exclude.contains(PROP_BACKGROUND) ) this.setBackground(that.getBackground());
         if ( !exclude.contains(PROP_FOREGROUND) ) this.setForeground(that.getForeground());
@@ -616,6 +618,7 @@ public class Options extends DomNode {
 
     @Override
     public List<Diff> diffs(DomNode node) {
+        if ( !( node instanceof Options ) ) throw new IllegalArgumentException("node should be a Options");                        
         Options that = (Options) node;
 
         List<Diff> result = super.diffs(node);

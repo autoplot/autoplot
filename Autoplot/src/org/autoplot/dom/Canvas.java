@@ -229,6 +229,7 @@ public class Canvas extends DomNode {
     
     @Override
     public void syncTo(DomNode n) {
+        if ( !( n instanceof Canvas ) ) throw new IllegalArgumentException("node should be a Canvas");                        
         if ( controller!=null ) {
             controller.syncTo((Canvas)n,new ArrayList<String>(),new HashMap<String, String>());
         } else {
@@ -238,6 +239,7 @@ public class Canvas extends DomNode {
 
     @Override
     public void syncTo(DomNode n,List<String> exclude) {
+        if ( !( n instanceof Canvas ) ) throw new IllegalArgumentException("node should be a Canvas");                        
         if ( controller!=null ) {
             controller.syncTo((Canvas)n,exclude,new HashMap<String, String>());
         } else {

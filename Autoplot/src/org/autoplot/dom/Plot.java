@@ -299,6 +299,7 @@ public class Plot extends DomNode {
     @Override
     public void syncTo(DomNode n, List<String> exclude) {
         super.syncTo(n,exclude);
+        if ( !( n instanceof Plot ) ) throw new IllegalArgumentException("node should be a Plot");                
         Plot that = (Plot) n;
         if (!exclude.contains(PROP_TITLE)) this.setTitle(that.getTitle());
         if (!exclude.contains(PROP_ISOTROPIC)) this.setIsotropic(that.isIsotropic());
@@ -330,6 +331,7 @@ public class Plot extends DomNode {
 
     @Override
     public List<Diff> diffs(DomNode node) {
+        if ( !( node instanceof Plot ) ) throw new IllegalArgumentException("node should be a Plot");
 
         Plot that = (Plot) node;
         List<Diff> result = super.diffs(node);

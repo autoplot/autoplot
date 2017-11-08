@@ -314,6 +314,7 @@ public class Annotation extends DomNode {
     @Override
     public void syncTo(DomNode n, List<String> exclude ) {
         super.syncTo(n,exclude);
+        if ( !( n instanceof Annotation ) ) throw new IllegalArgumentException("node should be an Annotation");                                        
         Annotation that = (Annotation) n;
         if ( !exclude.contains( PROP_TEXT ) ) this.setText(that.getText());
         if ( !exclude.contains( PROP_FONTSIZE ) ) this.setFontSize(that.getFontSize());
@@ -345,6 +346,8 @@ public class Annotation extends DomNode {
 
     @Override
     public List<Diff> diffs(DomNode node) {
+        if ( !( node instanceof Annotation ) ) throw new IllegalArgumentException("node should be an Annotation");                                        
+        
         Annotation that = (Annotation) node;
         List<Diff> result = new ArrayList();
         boolean b;

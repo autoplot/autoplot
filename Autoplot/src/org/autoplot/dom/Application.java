@@ -335,6 +335,7 @@ public class Application extends DomNode {
     @Override
     public void syncTo(DomNode n,List<String> exclude) {
         super.syncTo(n,exclude);
+        if ( !( n instanceof Application ) ) throw new IllegalArgumentException("node should be an Application");                                
         if ( this.controller!=null ) { //TODO: what if there's no controller, shouldn't we sync that?
             this.controller.syncTo( (Application)n, exclude );
         }
@@ -368,6 +369,7 @@ public class Application extends DomNode {
     @Override
     public List<Diff> diffs(DomNode node) {
 
+        if ( !( node instanceof Application ) ) throw new IllegalArgumentException("node should be an Application");                                
         Application that = (Application) node;
         
         List<Diff> result = new ArrayList<>();

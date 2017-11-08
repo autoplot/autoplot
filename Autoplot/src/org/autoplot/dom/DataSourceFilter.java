@@ -104,6 +104,7 @@ public class DataSourceFilter extends DomNode {
     @Override
     public void syncTo(DomNode n) {
         super.syncTo(n);
+        if ( !( n instanceof DataSourceFilter ) ) throw new IllegalArgumentException("node should be a DataSourceFilter");                
         DataSourceFilter that= (DataSourceFilter)n;
         this.setFill(that.getFill());
         this.setFilters(that.getFilters());
@@ -114,6 +115,7 @@ public class DataSourceFilter extends DomNode {
     @Override
     public void syncTo(DomNode n, List<String> exclude ) {
         super.syncTo(n,exclude);
+        if ( !( n instanceof DataSourceFilter ) ) throw new IllegalArgumentException("node should be a DataSourceFilter");                
         DataSourceFilter that= (DataSourceFilter)n;
         this.setFill(that.getFill());
         this.setValidRange(that.getValidRange());        
@@ -124,6 +126,7 @@ public class DataSourceFilter extends DomNode {
     @Override
     public List<Diff> diffs(DomNode node) {
         DataSourceFilter that= (DataSourceFilter)node;
+        if ( !( node instanceof DataSourceFilter ) ) throw new IllegalArgumentException("node should be a DataSourceFilter");                
         
         List<Diff> result = super.diffs(node);
         

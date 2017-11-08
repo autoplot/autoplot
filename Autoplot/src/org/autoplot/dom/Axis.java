@@ -276,6 +276,7 @@ public class Axis extends DomNode {
     @Override
     public void syncTo(DomNode n) {
         super.syncTo(n);
+        if ( !( n instanceof Axis ) ) throw new IllegalArgumentException("node should be an Axis");                        
         if ( controller!=null ) {
             controller.syncTo(n,new ArrayList<String>());
         } else {
@@ -286,6 +287,7 @@ public class Axis extends DomNode {
     @Override
     public void syncTo(DomNode n, List<String> exclude ) {
         super.syncTo(n,exclude);
+        if ( !( n instanceof Axis ) ) throw new IllegalArgumentException("node should be an Axis");                        
         if ( controller!=null ) {
             controller.syncTo(n,exclude);
         } else {
@@ -306,7 +308,7 @@ public class Axis extends DomNode {
     }
 
     @Override
-    public DomNode copy() {
+    public DomNode copy() {        
         Axis result= (Axis) super.copy();
         result.controller= null;
         return result;
@@ -316,6 +318,7 @@ public class Axis extends DomNode {
 
     @Override
     public List<Diff> diffs(DomNode node) {
+        if ( !( node instanceof Axis ) ) throw new IllegalArgumentException("node should be an Axis");                                
         Axis that = (Axis) node;
         List<Diff> result = new ArrayList<>();
         boolean b;

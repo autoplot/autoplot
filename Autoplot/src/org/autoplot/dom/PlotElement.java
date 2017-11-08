@@ -327,7 +327,7 @@ public class PlotElement extends DomNode {
     public List<Diff> diffs(DomNode node) {
         
         List<Diff> result = super.diffs(node);
-        
+        if ( !( node instanceof PlotElement ) ) throw new IllegalArgumentException("node should be a PlotElement");        
         PlotElement that = (PlotElement) node;
 
         if ( !that.plotId.equals( this.plotId ) ) {
@@ -396,9 +396,10 @@ public class PlotElement extends DomNode {
     }
     
     @Override
-    public void syncTo( DomNode n, List<String> exclude ) {
-        super.syncTo(n,exclude);
-        PlotElement that = (PlotElement) n;
+    public void syncTo( DomNode node, List<String> exclude ) {
+        super.syncTo(node,exclude);
+        if ( !( node instanceof PlotElement ) ) throw new IllegalArgumentException("node should be a PlotElement");                
+        PlotElement that = (PlotElement) node;
         if ( !exclude.contains( PROP_PLOTID ) ) this.setPlotId(that.getPlotId());
         if ( !exclude.contains( PROP_DATASOURCEFILTERID ) ) this.setDataSourceFilterId(that.getDataSourceFilterId());
         if ( !exclude.contains( PROP_PARENT ) ) this.setParent(that.getParent());
