@@ -1292,7 +1292,6 @@ public final class PngWalkTool extends javax.swing.JPanel {
         try {
             seq= new WalkImageSequence( surl );
             String tr= params.get("timerange");
-            if ( tr==null ) params.get("timeRange");
             
             if ( tr!=null ) {
                 try {
