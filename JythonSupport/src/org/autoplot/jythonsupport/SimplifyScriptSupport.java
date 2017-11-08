@@ -60,10 +60,6 @@ public class SimplifyScriptSupport {
          
          int lastLine= ss.length;
          
-         if ( lastLine==-1 ) {
-             return "";
-         }
-         
          // check for continuation in last getParam call.
          while ( ss.length>lastLine+1 && ss[lastLine].trim().length()>0 && Character.isWhitespace( ss[lastLine].charAt(0) ) ) {
              lastLine++;
