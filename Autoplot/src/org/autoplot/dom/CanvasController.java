@@ -267,7 +267,7 @@ public class CanvasController extends DomNodeController {
                         //TODO: why don't we do this right off the bat?  Hudson test autoplot-test034
                         dom.controller.getDasCanvas().setSize( dom.getCanvases(0).getWidth(), dom.getCanvases(0).getHeight() );
                         dom.controller.getDasCanvas().setFont( Font.decode( dom.getOptions().getCanvasFont() ) );
-                        rows.get(i).getController().dasRow.getParent().getHeight();
+                        logger.log(Level.FINEST, "height<10 branch, now {0}", rows.get(i).getController().dasRow.getParent().getHeight());
                 } 
                 mins[i]= rows.get(i).getController().dasRow.getDMinimum();
                 maxs[i]= rows.get(i).getController().dasRow.getDMaximum(); // bugfix: need to take em offsets into account
