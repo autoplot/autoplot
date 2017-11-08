@@ -127,11 +127,6 @@ public class DataSetURLDemo {
 
         List<CompletionResult> completions = null;
 
-        URISplit split = URISplit.parse(surl);
-        String surlDir = split.path;
-
-        final String labelPrefix = surlDir;
-
         try {
             completions = DataSetURI.getHostCompletions(surl, carotpos, mon);
         } catch ( IOException ex) {

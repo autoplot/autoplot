@@ -164,7 +164,6 @@ public class StatePersistence {
         if ( scheme.getId().equals( "1.08" ) && currentScheme.getId().equals("1.09") ) {
             logger.warning("removing all bindings to scale to support old versions");
             Application app= (Application)state;
-            List<BindingModel> bms= Arrays.asList( app.getBindings() );
             List<BindingModel> newbms= new ArrayList( Arrays.asList( app.getBindings() ) );
             for ( int i=app.getBindings().length-1; i>=0; i-- ) {
                 if ( app.getBindings(i).getSrcProperty().equals("scale") ||app.getBindings(i).getDstProperty().equals("scale") )  {
