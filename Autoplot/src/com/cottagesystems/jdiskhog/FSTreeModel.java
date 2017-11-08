@@ -4,6 +4,7 @@
  */
 package com.cottagesystems.jdiskhog;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -50,20 +51,31 @@ public class FSTreeModel implements TreeModel {
             this.f = f;
             this.parentFile = parentFile;
             this.abs = abs;
+            this.windows= System.getProperty("os.name").toLowerCase().startsWith("win");
         }
 
         public File getFile() {
             return f;
         }
 
+        boolean windows= true;
+        
+        private String fromWindows( String s ) {
+            if ( windows ) {
+                return s.replace('\\','/');
+            } else {
+                return s;
+            }
+        }
+        
         private String getName() {
             if (abs) {
-                return f.toString();
+                return fromWindows( f.toString() );
             } else {
                 if (parentFile == null) {
-                    return f.getName();
+                    return fromWindows( f.getName() );
                 } else {
-                    return f.toString().substring(parentFile.toString().length() + 1);
+                    return fromWindows( f.toString().substring(parentFile.toString().length() + 1) );
                 }
             }
         }
