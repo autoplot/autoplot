@@ -1,6 +1,8 @@
 
 package org.autoplot.pngwalk;
 
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
@@ -50,14 +52,13 @@ import java.io.BufferedWriter;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
-import java.util.Collections;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import org.das2.util.LoggerManager;
+import org.das2.graph.Painter;
 
 /**
  * MakePngWalk code implemented in Java.  This was once a Python script, but it got complex enough that it was useful to
@@ -163,8 +164,18 @@ public class CreatePngWalk {
         /**
          * autorange dependent dimensions
          */
-        public boolean autorange= false;
+        public boolean autorange= true;
 
+        /**
+         * consider autorange flags for each axis.
+         */
+        public boolean autorangeFlags= true;
+
+        /**
+         * clone the dom and run on the copy, so the original Autoplot is free.
+         */
+        public boolean runOnCopy= true;
+        
         /**
          *  version tag to apply to each image, if non-null
          */
@@ -330,29 +341,39 @@ public class CreatePngWalk {
             throw new RuntimeException(ex);
         }
         
-        ApplicationModel appmodel = new ApplicationModel();
-        appmodel.addDasPeersToAppAndWait();
-                
-        Application dom2 = appmodel.getDocumentModel();
-
-        mon.setProgressMessage("synchronize to this application");
-
-        dom2.getCanvases(0).setHeight( dom.getCanvases(0).getHeight() );
-        dom2.getCanvases(0).setWidth( dom.getCanvases(0).getWidth() );
-        int w0 = dom2.getCanvases(0).getWidth();
-        int h0 = dom2.getCanvases(0).getHeight();
-        dom2.getCanvases(0).getController().getDasCanvas().setSize( w0, h0 );
-        dom2.getCanvases(0).getController().getDasCanvas().revalidate();
+        Application dom2;
+        int w0,h0;
         
-        dom2.syncTo( dom, java.util.Arrays.asList("id") );
-        dom2.getController().waitUntilIdle();
-        dom2.syncTo( dom, java.util.Arrays.asList("id") ); // work around bug where someone resets the margin column http://jfaden.net:8080/hudson/job/autoplot-test033/5786/artifact/
-        dom2.getOptions().syncToAll( readOnlyDom.getOptions(), new ArrayList() ); // 1165 grid overlay
+        if ( params.runOnCopy ) {
+            ApplicationModel appmodel = new ApplicationModel();
+            appmodel.addDasPeersToAppAndWait();
+                
+            dom2= appmodel.getDocumentModel();
 
-        mon.setProgressMessage("write " + params.product + ".vap");
-        logger.log(Level.FINE, "write {0}.vap", params.product);
+            mon.setProgressMessage("synchronize to this application");
 
+            dom2.getCanvases(0).setHeight( dom.getCanvases(0).getHeight() );
+            dom2.getCanvases(0).setWidth( dom.getCanvases(0).getWidth() );
+            w0 = dom2.getCanvases(0).getWidth();
+            h0 = dom2.getCanvases(0).getHeight();
+            dom2.getCanvases(0).getController().getDasCanvas().setSize( w0, h0 );
+            dom2.getCanvases(0).getController().getDasCanvas().revalidate();
 
+            dom2.syncTo( dom, java.util.Arrays.asList("id") );
+            dom2.getController().waitUntilIdle();
+            dom2.syncTo( dom, java.util.Arrays.asList("id") ); // work around bug where someone resets the margin column http://jfaden.net:8080/hudson/job/autoplot-test033/5786/artifact/
+            dom2.getOptions().syncToAll( readOnlyDom.getOptions(), new ArrayList() ); // 1165 grid overlay
+
+            mon.setProgressMessage("write " + params.product + ".vap");
+            logger.log(Level.FINE, "write {0}.vap", params.product);
+        } else {
+            dom2= readOnlyDom;
+            w0= dom2.getCanvases(0).getWidth();
+            h0 = dom2.getCanvases(0).getHeight();
+        }
+
+        ApplicationModel appmodel= dom2.getController().getApplicationModel();
+        
         int thumbSize = 400;
 
         int thumbH = 0, thumbW = 0;
