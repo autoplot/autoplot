@@ -769,11 +769,14 @@ public class AutoplotUtil {
 
     public static boolean resetZoomY( Application dom ) {
         Plot plot= dom.getController().getPlot();
-
+        return resetZoomY( dom, plot );
+    }
+    
+    public static boolean resetZoomY( Application dom, Plot plot ) {
         boolean result= true;
-        Axis axis= dom.getController().getPlot().getYaxis();
+        Axis axis= plot.getYaxis();
 
-        List<PlotElement> pes= dom.getController().getPlotElementsFor(plot);
+        List<PlotElement> pes= DomUtil.getPlotElementsFor( dom, plot );
 
         DatumRange range= null;
         for ( PlotElement pe: pes ) {
@@ -797,11 +800,14 @@ public class AutoplotUtil {
 
     public static boolean resetZoomX( Application dom ) {
         Plot plot= dom.getController().getPlot();
-
+        return resetZoomX( dom, plot );
+    } 
+    
+    public static boolean resetZoomX( Application dom, Plot plot ) {
         boolean result= true;
-        Axis axis= dom.getController().getPlot().getXaxis();
+        Axis axis= plot.getXaxis();
 
-        List<PlotElement> pes= dom.getController().getPlotElementsFor(plot);
+        List<PlotElement> pes= DomUtil.getPlotElementsFor( dom, plot );
 
         DatumRange range= null;
         for ( PlotElement pe: pes ) {
@@ -823,14 +829,17 @@ public class AutoplotUtil {
         return result;
     }
 
-
     public static boolean resetZoomZ( Application dom ) {
         Plot plot= dom.getController().getPlot();
+        return resetZoomZ( dom, plot );
+    }
+
+    public static boolean resetZoomZ( Application dom, Plot plot ) {
 
         boolean result= true;
-        Axis axis= dom.getController().getPlot().getZaxis();
+        Axis axis= plot.getZaxis();
 
-        List<PlotElement> pes= dom.getController().getPlotElementsFor(plot);
+        List<PlotElement> pes= DomUtil.getPlotElementsFor( dom, plot );
 
         DatumRange range= null;
         for ( PlotElement pe: pes ) {
