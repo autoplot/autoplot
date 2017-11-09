@@ -18,7 +18,6 @@ import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 
 /**
- *
  * @author jbf
  */
 public class AxisController extends DomNodeController {
@@ -47,7 +46,7 @@ public class AxisController extends DomNodeController {
     /**
      * checks to see that the axis is still valid and clears the autoRange property.
      */
-    private PropertyChangeListener rangeChangeListener = new PropertyChangeListener() {
+    private final PropertyChangeListener rangeChangeListener = new PropertyChangeListener() {
 
         private DatumRange logCheckRange(DatumRange range, boolean log) {
 
@@ -77,6 +76,7 @@ public class AxisController extends DomNodeController {
             }
         }
 
+        @Override
         public synchronized void propertyChange(PropertyChangeEvent evt) {
             LoggerManager.logPropertyChangeEvent(evt);  
             // ensure that log doesn't make axis invalid, or min trivially close to zero.
@@ -215,11 +215,7 @@ public class AxisController extends DomNodeController {
             @Override
             public Object convertReverse(Object t) {
                 int orientation= (Integer)t;
-                if ( orientation==DasAxis.TOP || orientation==DasAxis.RIGHT ) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return orientation==DasAxis.TOP || orientation==DasAxis.RIGHT;
             }
         };
     }
