@@ -293,39 +293,46 @@ public class PlotController extends DomNodeController {
                             getPlot().getYaxis().isAutoRange(),
                             getPlot().getZaxis().isAutoRange() );
                 } else if ( evt.getPropertyName().equals("range") ) {
-                    boolean alwaysAutorange= false;
-                    if ( alwaysAutorange ) {
-                        if ( !evt.getNewValue().equals(evt.getOldValue()) ) {
-                            System.err.println( String.format( "line291 %s %s %s", getPlot().getXaxis().isAutoRange(),
-                                getPlot().getYaxis().isAutoRange(),
-                                getPlot().getZaxis().isAutoRange() ) );
-                            boolean mustAutoRange= getPlot().getXaxis().isAutoRange() ||
-                                getPlot().getYaxis().isAutoRange();
-                            if ( mustAutoRange ) {
-                                List<PlotElement> pes= getApplication().getController().getPlotElementsFor(plot);
-                                for ( PlotElement pe: pes ) {
-                                    try {
-                                        QDataSet b= AutoplotUtil.bounds( pe.getController().getDataSet(), pe.getRenderType() );
-                                        if ( getPlot().getYaxis().isAutoRange() ) {
-                                            pe.getPlotDefaults().getYaxis().setRange(DataSetUtil.asDatumRange(b.slice(1)));
-                                        }
-                                        if ( getPlot().getXaxis().isAutoRange() ) {
-                                            pe.getPlotDefaults().getXaxis().setRange(DataSetUtil.asDatumRange(b.slice(0)));
-                                        }
-                                    } catch (Exception ex) {
-                                        logger.log(Level.SEVERE, null, ex);
-                                    }
-                                }
-                                resetZoom( getPlot().getXaxis().isAutoRange(),
-                                    getPlot().getYaxis().isAutoRange(),
-                                    getPlot().getZaxis().isAutoRange() );                       
-                            }
-                        }
+                    if ( !evt.getNewValue().equals(evt.getOldValue()) ) {
+                        redoAutoranging();
                     }
                 }
             }            
         }
     };
+    
+    /**
+     * experiment with re-autoranging after the xaxis is adjusted.
+     */
+    private void redoAutoranging() {
+        boolean alwaysAutorange = false;
+        if (alwaysAutorange) {
+            System.err.println(String.format("line307 %s %s %s", getPlot().getXaxis().isAutoRange(),
+                getPlot().getYaxis().isAutoRange(),
+                getPlot().getZaxis().isAutoRange()));
+            boolean mustAutoRange = getPlot().getXaxis().isAutoRange()
+                || getPlot().getYaxis().isAutoRange();
+            if (mustAutoRange) {
+                List<PlotElement> pes = getApplication().getController().getPlotElementsFor(plot);
+                for (PlotElement pe : pes) {
+                    try {
+                        QDataSet b = AutoplotUtil.bounds(pe.getController().getDataSet(), pe.getRenderType());
+                        if (getPlot().getYaxis().isAutoRange()) {
+                            pe.getPlotDefaults().getYaxis().setRange(DataSetUtil.asDatumRange(b.slice(1)));
+                        }
+                        if (getPlot().getXaxis().isAutoRange()) {
+                            pe.getPlotDefaults().getXaxis().setRange(DataSetUtil.asDatumRange(b.slice(0)));
+                        }
+                    } catch (Exception ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+                resetZoom(getPlot().getXaxis().isAutoRange(),
+                    getPlot().getYaxis().isAutoRange(),
+                    getPlot().getZaxis().isAutoRange());
+            }
+        }
+    }
     
     /**
      * 
@@ -1576,7 +1583,9 @@ public class PlotController extends DomNodeController {
         //}
 
         if ( dom.getOptions().isAutoranging() ) {
-            resetZoom( plot.getXaxis().isAutoRange() && pele!=null && pele.getPlotDefaults().getXaxis().isAutoRange(), plot.getYaxis().isAutoRange(), plot.getZaxis().isAutoRange() );
+            resetZoom( plot.getXaxis().isAutoRange() && pele!=null && pele.getPlotDefaults().getXaxis().isAutoRange(),
+                plot.getYaxis().isAutoRange(), 
+                plot.getZaxis().isAutoRange() );
         }
     }
 
