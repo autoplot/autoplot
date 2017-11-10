@@ -135,7 +135,7 @@ public class Test033 {
     private static void makePngWalk6() throws IOException, ParseException, InterruptedException {
         Application dom= ScriptContext.getDocumentModel();
 
-        String pwd= new File("pngwalk4").getAbsoluteFile().toString();
+        String pwd= new File("pngwalk6").getAbsoluteFile().toString();
 
         CreatePngWalk.Params pp= new CreatePngWalk.Params();
         pp.outputFolder= pwd;
