@@ -109,6 +109,7 @@
                                           <Component id="versionTextField" min="-2" pref="74" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
+                                  <Component id="runOnCopyCB" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
@@ -154,7 +155,11 @@
               <Component id="autorangeCB" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="updateCB" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Component id="updateCB" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="runOnCopyCB" min="-2" max="-2" attributes="0"/>
+                  </Group>
                   <Group type="102" attributes="0">
                       <Component id="timeRangeRadioButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -386,6 +391,13 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="batchUriNameCBActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="runOnCopyCB">
+      <Properties>
+        <Property name="selected" type="boolean" value="true"/>
+        <Property name="text" type="java.lang.String" value="Run in background"/>
+        <Property name="toolTipText" type="java.lang.String" value="Run the PNG Walk on a copy in the background.  Note only properties conveyed by a .vap file will appear on the produced images."/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>
