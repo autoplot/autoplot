@@ -73,6 +73,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         eventsFileSelector.setValue(eventsFile);
 
         autorangeCB.setSelected( prefs.getBoolean( "autorange", autorangeCB.isSelected() ) );
+        autorangeFlagsCB.setSelected( prefs.getBoolean( "autorangeFlags", autorangeFlagsCB.isSelected() ) );
         rescaleComboBox.setSelectedItem( prefs.get( "rescalex", (String)rescaleComboBox.getSelectedItem() ) );
         updateCB.setSelected( prefs.getBoolean( "update", updateCB.isSelected() ) );
         runOnCopyCB.setSelected( prefs.getBoolean( "runOnCopy", runOnCopyCB.isSelected() ) );
@@ -92,6 +93,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         prefs.putBoolean( "createThumbs", createThumbsCb.isSelected() );
 
         prefs.putBoolean( "autorange", autorangeCB.isSelected() );
+        prefs.putBoolean( "autorangeFlags", autorangeFlagsCB.isSelected() );
         prefs.put( "rescalex", ((String)rescaleComboBox.getSelectedItem()).trim() );
         prefs.putBoolean( "update", updateCB.isSelected() );
         prefs.putBoolean( "runOnCopy", runOnCopyCB.isSelected() );
@@ -131,6 +133,8 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         params.createThumbs = getCreateThumbsCb().isSelected();
 
         params.autorange= autorangeCB.isSelected(); 
+        params.autorangeFlags= autorangeFlagsCB.isSelected(); 
+        
         params.rescalex= ((String)rescaleComboBox.getSelectedItem()).trim();
         params.update= updateCB.isSelected();
         params.runOnCopy= runOnCopyCB.isSelected();
@@ -229,6 +233,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         jLabel4 = new javax.swing.JLabel();
         batchUriNameCB = new javax.swing.JCheckBox();
         runOnCopyCB = new javax.swing.JCheckBox();
+        autorangeFlagsCB = new javax.swing.JCheckBox();
 
         jLabel1.setText("Filename Root:");
         jLabel1.setToolTipText("Stem to identify result within folder.");
@@ -353,6 +358,9 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         runOnCopyCB.setText("Run in background");
         runOnCopyCB.setToolTipText("Run the PNG Walk on a copy in the background.  Note only properties conveyed by a .vap file will appear on the produced images.");
 
+        autorangeFlagsCB.setText("Check Autorange flag");
+        autorangeFlagsCB.setToolTipText("A future version will allow each axis' autorange property to control this.");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -418,12 +426,13 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
                                     .add(updateCB)
                                     .add(jLabel5)
                                     .add(jLabel6)
+                                    .add(runOnCopyCB)
                                     .add(layout.createSequentialGroup()
                                         .add(12, 12, 12)
                                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                             .add(rescaleComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 174, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                            .add(versionTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 74, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                                    .add(runOnCopyCB))
+                                            .add(versionTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 74, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                            .add(autorangeFlagsCB))))
                                 .add(0, 0, Short.MAX_VALUE))))))
         );
         layout.setVerticalGroup(
@@ -456,14 +465,12 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(autorangeCB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(timeRangeRadioButton)
+                    .add(autorangeFlagsCB))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .add(updateCB)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(runOnCopyCB))
-                    .add(layout.createSequentialGroup()
-                        .add(timeRangeRadioButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                             .add(timeRangeToolButton)
                             .add(timeRangeTf, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
@@ -479,7 +486,11 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
                                 .add(pngFormatCB)
                                 .add(pdfFormatCB)
                                 .add(jLabel4))
-                            .add(createThumbsCb))))
+                            .add(createThumbsCb)))
+                    .add(layout.createSequentialGroup()
+                        .add(updateCB)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(runOnCopyCB)))
                 .addContainerGap(53, Short.MAX_VALUE))
         );
 
@@ -530,6 +541,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox autorangeCB;
+    private javax.swing.JCheckBox autorangeFlagsCB;
     private javax.swing.JCheckBox batchUriNameCB;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;

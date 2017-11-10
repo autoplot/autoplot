@@ -102,14 +102,15 @@
                                   <Component id="updateCB" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
+                                  <Component id="runOnCopyCB" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" attributes="0">
                                       <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Component id="rescaleComboBox" min="-2" pref="174" max="-2" attributes="0"/>
                                           <Component id="versionTextField" min="-2" pref="74" max="-2" attributes="0"/>
+                                          <Component id="autorangeFlagsCB" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
-                                  <Component id="runOnCopyCB" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
@@ -154,15 +155,13 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="autorangeCB" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="timeRangeRadioButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="autorangeFlagsCB" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <Component id="updateCB" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="runOnCopyCB" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" attributes="0">
-                      <Component id="timeRangeRadioButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Component id="timeRangeToolButton" min="-2" max="-2" attributes="0"/>
                           <Component id="timeRangeTf" min="-2" max="-2" attributes="0"/>
@@ -182,6 +181,11 @@
                           </Group>
                           <Component id="createThumbsCb" min="-2" max="-2" attributes="0"/>
                       </Group>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <Component id="updateCB" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="runOnCopyCB" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace pref="53" max="32767" attributes="0"/>
@@ -397,6 +401,12 @@
         <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="Run in background"/>
         <Property name="toolTipText" type="java.lang.String" value="Run the PNG Walk on a copy in the background.  Note only properties conveyed by a .vap file will appear on the produced images."/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="autorangeFlagsCB">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Check Autorange flag"/>
+        <Property name="toolTipText" type="java.lang.String" value="A future version will allow each axis&apos; autorange property to control this."/>
       </Properties>
     </Component>
   </SubComponents>
