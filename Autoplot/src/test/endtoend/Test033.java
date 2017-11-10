@@ -9,6 +9,8 @@ import org.autoplot.pngwalk.CreatePngWalk;
 import org.autoplot.ScriptContext;
 import org.autoplot.dom.Application;
 import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
 import org.das2.datum.DatumRangeUtil;
 
 
@@ -130,6 +132,26 @@ public class Test033 {
 
     }
 
+    private static void makePngWalk6() throws IOException, ParseException, InterruptedException {
+        Application dom= ScriptContext.getDocumentModel();
+
+        String pwd= new File("pngwalk4").getAbsoluteFile().toString();
+
+        CreatePngWalk.Params pp= new CreatePngWalk.Params();
+        pp.outputFolder= pwd;
+        pp.product= "product6";
+        pp.timeFormat= "$Y$m$d";
+        pp.timeRangeStr= "1979-mar";
+        pp.rescalex="0%,100%";
+        pp.autorange= true;
+        pp.version= "v1.3";
+
+        ScriptContext.load( "/home/jbf/ct/hudson/vap/multiScaleBVoyager.vap" );
+
+        System.err.println("writing pngwalk at "+pwd );
+        CreatePngWalk.doIt( dom, pp );
+        
+    }
 
     public static void main( String[] args ) throws Exception {
 
@@ -156,6 +178,10 @@ public class Test033 {
         t0= System.currentTimeMillis();
         makePngWalk5();
         System.err.printf( "test 005: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
+        
+        t0= System.currentTimeMillis();
+        makePngWalk6();
+        System.err.printf( "test 006: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
         
         System.exit(0);
     }
