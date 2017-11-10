@@ -548,12 +548,22 @@ public class CreatePngWalk {
             //LoggerManager.markTime("516");
             
             if ( params.autorange ) {
-                for ( Plot p: dom2.getPlots() ) {
-                    dom2.getController().setPlot(p);
-                    AutoplotUtil.resetZoomY(dom2);
-                    AutoplotUtil.resetZoomZ(dom2);
+                if (params.autorangeFlags) {
+                    for ( Plot p: dom2.getPlots() ) {
+                        if ( p.getYaxis().isAutoRange() ) {
+                            AutoplotUtil.resetZoomY(dom2,p);
+                        }
+                        if ( p.getZaxis().isAutoRange() ) {
+                            AutoplotUtil.resetZoomZ(dom2,p);
+                        }
+                    }
+                } else {
+                    for ( Plot p: dom2.getPlots() ) {
+                        dom2.getController().setPlot(p);
+                        AutoplotUtil.resetZoomY(dom2);
+                        AutoplotUtil.resetZoomZ(dom2);
+                    }
                 }
-
             }
             //LoggerManager.markTime("526");
             appmodel.waitUntilIdle();
@@ -571,9 +581,6 @@ public class CreatePngWalk {
             
             if ( params.outputFormat.equals("png") ) {
                 image= myWriteToPng(filename, dom2, w0, h0);
-                
-                
-                
             } else {
                 dom2.getCanvases(0).getController().getDasCanvas().writeToPDF(filename);
             }
