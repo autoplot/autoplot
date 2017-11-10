@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The DataPointRecorder now allows fill to be manually entered, breaking the connecting line.
+        <p><small>The PNGWalk tool used to look at a pile of images.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,7 @@
         
         <p>Bugfixes (2017-11-03 r21641):</p>
         <ul>
+            <li>file system names use / on Windows, in the cache tool.
             <li>2017 update of the signature for jar files.  Thanks, Bernie!
             <li>1916: logic for working with POES dataset caused some breaks in Masafumi's data to be skipped.
             <li>TrimDataSet trims BUNDLE_0, so that datumRange(evt[0:2]) can be used to easily get the time range.
@@ -68,6 +69,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>create pngwalk tool has mode where the running Autoplot is used to generate the images, not a copy, to aid with debugging and to allow decorations.
+            <li>complexMultiply promotes rank, supporting (0+1j) * complex array.
             <li>orbit files can now have more than three columns, where the last column is used as the label, to be more consistent with events files.  Thanks Ivar!
             <li>invokeScriptSoon allows parameters in URI, to improve usefulness to Jython scripts.
             <li>begin support for new polar plotting mode.
