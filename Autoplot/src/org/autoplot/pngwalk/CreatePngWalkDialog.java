@@ -360,6 +360,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
 
         autorangeFlagsCB.setText("Check Autorange flag");
         autorangeFlagsCB.setToolTipText("A future version will allow each axis' autorange property to control this.");
+        autorangeFlagsCB.setEnabled(false);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);

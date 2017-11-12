@@ -407,6 +407,7 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Check Autorange flag"/>
         <Property name="toolTipText" type="java.lang.String" value="A future version will allow each axis&apos; autorange property to control this."/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
     </Component>
   </SubComponents>
