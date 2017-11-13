@@ -344,16 +344,16 @@ public class PlotCommand extends PyObject {
                     Renderer r;
                     if (val.__tojava__(Renderer.class) != Py.NoConversion) {
                         Renderer oldRenderer= element.getController().getRenderer();
+                        String control= oldRenderer.getControl();
                         r = (Renderer) val.__tojava__(Renderer.class);
                         QDataSet ds= oldRenderer.getDataSet();
-                        PyObject doAuto= val.__findattr__("doAutorange" );
+                        PyObject doAuto= val.__findattr__( "doAutorange" );
                         if ( doAuto==null ) {
-                            doAuto= val.__findattr__("autorange" );
+                            doAuto= val.__findattr__( "autorange" );
                         }
                         if ( doAuto!=null && doAuto!=Py.None ) {
                             PyObject range= ((PyMethod)doAuto).__call__(new PyQDataSetAdapter().adapt(ds));
                             QDataSet rangeds= (QDataSet) range.__tojava__(QDataSet.class);
-                            System.err.println("hasAuto "+rangeds);
                             plot.getXaxis().setRange( DataSetUtil.asDatumRange(rangeds.slice(0) ) );
                             if ( rangeds.length()>1 ) plot.getYaxis().setRange( DataSetUtil.asDatumRange(rangeds.slice(1) ) );
                             if ( rangeds.length()>2 ) plot.getZaxis().setRange( DataSetUtil.asDatumRange(rangeds.slice(2) ) );
@@ -361,6 +361,9 @@ public class PlotCommand extends PyObject {
                         plot.getController().getDasPlot().removeRenderer(oldRenderer);
                         plot.getController().getDasPlot().addRenderer(r);
                         r.setDataSet(ds);
+                        element.getController().setRenderer(r);
+                        element.setRenderType(RenderType.internal);
+                        r.setControl(control);
                     } else {
                         logger.warning("no conversion for renderer");
                     }

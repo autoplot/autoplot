@@ -1378,6 +1378,8 @@ public class AutoplotUtil {
                 result.setDataSetLoader(null);
                 return result;
             }
+        } else if ( renderType==RenderType.internal ) {
+            return recyclable;
             
 //        } else if ( renderType==RenderType.image ) {
 //            if (recyclable != null && recyclable instanceof ImageRenderer) {
