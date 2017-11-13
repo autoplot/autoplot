@@ -7,6 +7,7 @@ package external;
 
 import java.awt.Color;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
@@ -30,6 +31,11 @@ import org.autoplot.dom.PlotElement;
 import org.autoplot.dom.Row;
 import org.das2.qds.QDataSet;
 import org.autoplot.jythonsupport.JythonOps;
+import org.autoplot.jythonsupport.PyQDataSet;
+import org.autoplot.jythonsupport.PyQDataSetAdapter;
+import org.das2.graph.Renderer;
+import org.das2.qds.DataSetUtil;
+import org.python.core.PyMethod;
 
 /**
  * new implementation of the plot command allows for keywords in the
@@ -71,6 +77,7 @@ public class PlotCommand extends PyObject {
             + " <tr><td> xdrawTickLabels</td><td>False turns off the x tick labels for the plot\n</td>"
             + " <tr><td> ydrawTickLabels</td><td>False turns off the y tick labels for the plot\n</td>"
             + " <tr><td> xautoRangeHints</td><td>hints to the autorange, see http://autoplot.org/AxisAutoRangeHints\n</td>"
+            + " <tr><td> renderer</td><td>add cutsom renderer</td>"
             + "</table></html>");
 
     private static QDataSet coerceIt( PyObject arg0 ) {
@@ -115,6 +122,7 @@ public class PlotCommand extends PyObject {
             "isotropic", "xpos", "ypos",
             "xdrawTickLabels", "ydrawTickLabels",
             "xautoRangeHints", "yautoRangeHints", "zautoRangeHints",
+            "renderer", 
             "index"
         },
         new PyObject[] { Py.None, Py.None, Py.None, Py.None,
@@ -132,6 +140,7 @@ public class PlotCommand extends PyObject {
             Py.None, Py.None, Py.None,
             Py.None, Py.None,
             Py.None, Py.None, Py.None,
+            Py.None,
             Py.None
         } );
         
@@ -245,8 +254,12 @@ public class PlotCommand extends PyObject {
             }
             DataSourceFilter dsf= dom.getDataSourceFilters(chNum);
             List<PlotElement> elements= dom.getController().getPlotElementsFor( dsf );
-
-            Plot plot= dom.getController().getPlotFor(elements.get(0));
+            if ( elements.isEmpty() ) {
+                logger.log(Level.WARNING, "no elements found for data at index={0}", iplot);
+                return Py.None;
+            }
+            PlotElement element= elements.get(0);
+            Plot plot= dom.getController().getPlotFor(element);
             plot.setIsotropic(false);
 
             for ( int i=nparm; i<args.length; i++ ) { //HERE nargs
@@ -286,29 +299,29 @@ public class PlotCommand extends PyObject {
                     plot.getZaxis().setLog( "1".equals(sval) );
                 } else if ( kw.equals("color" ) ) {
                     Color c= JythonOps.color(val);
-                    elements.get(0).getStyle().setColor( c );
+                    element.getStyle().setColor( c );
                 } else if ( kw.equals("fillColor" ) ) { // because you can specify renderType=stairSteps, we need fillColor.
                     Color c;
                     c= JythonOps.color(val);
-                    elements.get(0).getStyle().setFillColor( c );
+                    element.getStyle().setFillColor( c );
                 } else if ( kw.equals("colorTable" ) ) { 
                     DasColorBar.Type t= org.das2.graph.DasColorBar.Type.parse(sval);
-                    elements.get(0).getStyle().setColortable(t);
+                    element.getStyle().setColortable(t);
                 } else if ( kw.equals("title") ) {
                     plot.setTitle(sval);
                 } else if ( kw.equals("symsize") || kw.equals("symbolSize") ) {
-                    elements.get(0).getStyle().setSymbolSize( Double.valueOf(sval) );
+                    element.getStyle().setSymbolSize( Double.valueOf(sval) );
                 } else if ( kw.equals("linewidth" ) || kw.equals("lineWidth") ) {
-                    elements.get(0).getStyle().setLineWidth( Double.valueOf(sval) );
+                    element.getStyle().setLineWidth( Double.valueOf(sval) );
                 } else if ( kw.equals("linethick" ) || kw.equals("lineThick") ) {
-                    elements.get(0).getStyle().setLineWidth( Double.valueOf(sval) );
+                    element.getStyle().setLineWidth( Double.valueOf(sval) );
                 } else if ( kw.equals("linestyle") || kw.equals("lineStyle") ) {
                     PsymConnector p= (PsymConnector) ClassMap.getEnumElement( PsymConnector.class, sval );
-                    elements.get(0).getStyle().setSymbolConnector( p );
+                    element.getStyle().setSymbolConnector( p );
                 } else if ( kw.equals("symbol") ) {
                     PlotSymbol p= (PlotSymbol) ClassMap.getEnumElement( DefaultPlotSymbol.class, sval );
                     if ( p!=null ) {
-                        elements.get(0).getStyle().setPlotSymbol( p );
+                        element.getStyle().setPlotSymbol( p );
                     } else {
                         throw new IllegalArgumentException("unable to identify symbol: "+sval);
                     }
@@ -324,13 +337,34 @@ public class PlotCommand extends PyObject {
                             srenderType= srenderType.substring(0,ii);
                         }                    
                         RenderType rt= RenderType.valueOf(srenderType);
-                        elements.get(0).setRenderType(rt);
-                        elements.get(0).setRenderControl(renderControl);
+                        element.setRenderType(rt);
+                        element.setRenderControl(renderControl);
+                    }
+                } else if ( kw.equals("renderer") ) {
+                    Renderer r;
+                    if (val.__tojava__(Renderer.class) != Py.NoConversion) {
+                        Renderer oldRenderer= element.getController().getRenderer();
+                        r = (Renderer) val.__tojava__(Renderer.class);
+                        QDataSet ds= oldRenderer.getDataSet();
+                        PyObject doAuto= val.__findattr__("doAutorange" );
+                        if ( doAuto!=null && doAuto!=Py.None ) {
+                            PyObject range= ((PyMethod)doAuto).__call__(new PyQDataSetAdapter().adapt(ds));
+                            QDataSet rangeds= (QDataSet) range.__tojava__(QDataSet.class);
+                            System.err.println("hasAuto "+rangeds);
+                            plot.getXaxis().setRange( DataSetUtil.asDatumRange(rangeds.slice(0) ) );
+                            if ( rangeds.length()>1 ) plot.getYaxis().setRange( DataSetUtil.asDatumRange(rangeds.slice(1) ) );
+                            if ( rangeds.length()>2 ) plot.getZaxis().setRange( DataSetUtil.asDatumRange(rangeds.slice(2) ) );
+                        }
+                        plot.getController().getDasPlot().removeRenderer(oldRenderer);
+                        plot.getController().getDasPlot().addRenderer(r);
+                        r.setDataSet(ds);
+                    } else {
+                        logger.warning("no conversion for renderer");
                     }
                 } else if ( kw.equals("legendLabel" ) ) {
                     if ( !sval.equals("") ) {
-                        elements.get(0).setLegendLabel(sval);
-                        elements.get(0).setDisplayLegend(true);
+                        element.setLegendLabel(sval);
+                        element.setDisplayLegend(true);
                     }
                 } else if ( kw.equals("isotropic" ) ) {
                     plot.setIsotropic(true);
