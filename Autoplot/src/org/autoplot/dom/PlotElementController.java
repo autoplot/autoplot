@@ -1786,7 +1786,13 @@ public class PlotElementController extends DomNodeController {
         return renderer;
     }
 
-    private void setRenderer(Renderer renderer) {
+    /**
+     * set the renderer controlled by this PlotElement controller.  
+     * This should be used with caution.
+     * @param renderer 
+     * @see external.PlotCommand
+     */
+    public void setRenderer(Renderer renderer) {
         Renderer oldRenderer= this.renderer;
         ApplicationController ac = this.dom.controller;
         if ( oldRenderer!=null ) {
