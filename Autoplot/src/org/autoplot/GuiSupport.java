@@ -8,16 +8,6 @@
  */
 package org.autoplot;
 
-import org.autoplot.ImportVapDialog;
-import org.autoplot.TcaElementDialog;
-import org.autoplot.PdfOptionsPanel;
-import org.autoplot.ExportDataPanel;
-import org.autoplot.AutoplotUtil;
-import org.autoplot.RenderType;
-import org.autoplot.ImportBookmarksGui;
-import org.autoplot.ApplicationModel;
-import org.autoplot.AddAnnotationDialog;
-import org.autoplot.AddPlotElementDialog;
 import org.autoplot.renderer.ColorScatterStylePanel;
 import org.autoplot.renderer.SpectrogramStylePanel;
 import org.autoplot.renderer.SeriesStylePanel;
@@ -153,6 +143,7 @@ import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.autoplot.renderer.BoundsStylePanel;
+import org.autoplot.renderer.InternalStylePanel;
 import org.xml.sax.SAXException;
 
 /**
@@ -268,6 +259,9 @@ public class GuiSupport {
                 break;
             case contour:
                 editorPanel= new ContourStylePanel( );
+                break;
+            case internal:
+                editorPanel= new InternalStylePanel( );
                 break;
             case bounds:
                 editorPanel= new BoundsStylePanel( );

@@ -25,6 +25,7 @@ public enum RenderType {
     stackedHistogram, // Voyager PWS uses these
     vectorPlot,
     bounds,     // region colored by upper and lower bounds.
+    internal,   // user-defined or unrecognized Renderer
     orbitPlot,  // call-outs with time vs position
     contour;
 
