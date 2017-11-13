@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.dom;
 
 import java.awt.Color;
@@ -48,9 +45,7 @@ import org.das2.graph.ContoursRenderer;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasColorBar;
-import org.das2.graph.DasColumn;
 import org.das2.graph.DasPlot;
-import org.das2.graph.DasRow;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.DigitalRenderer;
 import org.das2.graph.EventsRenderer;
@@ -92,7 +87,6 @@ import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
 import org.autoplot.metatree.MetadataUtil;
-import org.das2.datum.InconvertibleUnitsException;
 import org.das2.graph.BoundsRenderer;
 import org.das2.graph.PolarPlotRenderer;
 
@@ -3045,7 +3039,7 @@ public class PlotElementController extends DomNodeController {
         } finally {
             lock.unlock();
         }
-        Renderer oldRenderer= getRenderer();
+        //Renderer oldRenderer= getRenderer();
         maybeCreateDasPeer();
         //if ( getRenderer()!=null && getRenderer()!=oldRenderer ) {
             //QDataSet oldDs= getDataSet(); // TODO: this needs review.  There was a comment about slices, but this works fine.  Old code 
