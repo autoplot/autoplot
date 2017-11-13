@@ -347,6 +347,9 @@ public class PlotCommand extends PyObject {
                         r = (Renderer) val.__tojava__(Renderer.class);
                         QDataSet ds= oldRenderer.getDataSet();
                         PyObject doAuto= val.__findattr__("doAutorange" );
+                        if ( doAuto==null ) {
+                            doAuto= val.__findattr__("autorange" );
+                        }
                         if ( doAuto!=null && doAuto!=Py.None ) {
                             PyObject range= ((PyMethod)doAuto).__call__(new PyQDataSetAdapter().adapt(ds));
                             QDataSet rangeds= (QDataSet) range.__tojava__(QDataSet.class);
