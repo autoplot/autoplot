@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The PNGWalk tool used to look at a pile of images.
+        <p><small>Custom component added in Jython to left and right plots, and the PNGWalk tool now allows PNGWalks to be run so that Jython extentions can be used.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-11-11 r21682):</p>
+        <p>Bugfixes (2017-11-14 r21693):</p>
         <ul>
+            <li>rte_0088023411: where subsetting a CDF which had non-time-varying data marked as time-varying caused RTE.
+            <li>rte_0211810917: where single column ASCII files could not be read, and Sebastian's file triggered the same bug.
             <li>"Display Data" mouse module handles events data.
             <li>file system names use / on Windows, in the cache tool.
             <li>2017 update of the signature for jar files.  Thanks, Bernie!
@@ -70,6 +72,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Jython plot command now accepts renderer, so that scripts can easily add custom renderers.
             <li>create pngwalk tool has mode where the running Autoplot is used to generate the images, not a copy, to aid with debugging and to allow decorations.
             <li>complexMultiply promotes rank, supporting (0+1j) * complex array.
             <li>orbit files can now have more than three columns, where the last column is used as the label, to be more consistent with events files.  Thanks Ivar!
