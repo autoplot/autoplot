@@ -970,11 +970,19 @@ public class CdfDataSource extends AbstractDataSource {
             }
         }
 
+        long recCount = (recs[1] - recs[0]) / recs[2];
+        if ( !reform ) {
+            if ( recCount==0 && ndimensions.length>0 && ndimensions[0]==1 ) {
+                logger.fine("variable is not marked as non-time-varying");
+                reform= true;
+            }
+        }
+        
         if (reform) {
             //result = CdfUtil.wrapCdfHyperDataHacked(variable, 0, -1, 1); //TODO: this doesn't handle strings properly.
             result = CdfUtil.wrapCdfData(cdf,svariable, 0, -1, 1, slice1, dependantVariable, new NullProgressMonitor() );
         } else {
-            long recCount = (recs[1] - recs[0]) / recs[2];
+            
             if ( slice ) {
                 recCount= -1;
                 recs[2]= 1;
