@@ -478,7 +478,7 @@ public class NamedURIListTool extends JPanel {
         
         dsSelector.setLayout( new BoxLayout(dsSelector,BoxLayout.Y_AXIS ) );
         ButtonGroup bg= new ButtonGroup();
-        JCheckBox[] butts= new JCheckBox[this.uris.size()+1];
+        JCheckBox[] butts= new JCheckBox[this.uris.size()+2];
         GridBagLayout layout= new GridBagLayout();
         dsSelector.setLayout(layout);
         GridBagConstraints c= new GridBagConstraints();
@@ -506,13 +506,18 @@ public class NamedURIListTool extends JPanel {
             dsSelector.add( label, c );
             bg.add(cb);
         }
+        
+        // ------------------------------------------------
+        
         final JCheckBox cb= new JCheckBox( "Literal: " );
-        butts[i]= cb;
+        final int ilit= i++;
+        butts[ilit]= cb;
         cb.setToolTipText("enter a literal like 0.0");
         c.gridy= this.uris.size();
         c.gridx= 1;
         c.weightx= 0.0;
         dsSelector.add( cb, c );
+        bg.add(cb);
         
         final JTextField literalTF= new JTextField("0.0");
         literalTF.setMinimumSize( new Dimension(120,literalTF.getFont().getSize()*2) );
@@ -533,11 +538,44 @@ public class NamedURIListTool extends JPanel {
                 }
             }
         } );
+        dsSelector.add( literalTF, c );
+        
+        // ------------------------------------------------
+        
+        final JCheckBox cb2= new JCheckBox( "Expression: " );
+        final int iexpr= i++;
+        butts[iexpr]= cb2;
+        cb2.setToolTipText("enter an expression");
+        c.gridy= this.uris.size()+1;
+        c.gridx= 1;
+        c.weightx= 0.0;
+        dsSelector.add( cb2, c );
+        bg.add(cb2);
+        
+        final JTextField exprTF= new JTextField(expression);
+        exprTF.setMinimumSize( new Dimension(120,exprTF.getFont().getSize()*2) );
+        exprTF.setPreferredSize( new Dimension(120,exprTF.getFont().getSize()*2) );
+        
+        c.gridx= 2;
+        c.weightx= 1.0;
+        exprTF.addFocusListener(new FocusListener() {
+            String orig=null;
+            @Override
+            public void focusGained(FocusEvent e) {
+                orig= exprTF.getText();
+            }
+            @Override
+            public void focusLost(FocusEvent e) {
+                if ( !exprTF.getText().equals(orig) ) {
+                    cb2.setSelected(true);
+                }
+            }
+        } );
         
         if ( !isValidIdentifier(id) ) {
             if ( id.startsWith("'") || id.startsWith("\"") ) { // string literals
                 literalTF.setText( id );
-                butts[i].setSelected(true);
+                butts[ilit].setSelected(true);
             } else {
                 try {
                     Double.parseDouble(id);
@@ -545,17 +583,17 @@ public class NamedURIListTool extends JPanel {
                         id= String.format( "%s", id );
                     }
                     literalTF.setText( id );
-                    butts[i].setSelected(true);
+                    butts[ilit].setSelected(true);
                 } catch ( NumberFormatException ex ) {
-                    literalTF.setText( id );
-                    butts[i].setSelected(true);
+                    exprTF.setText( id );
+                    butts[iexpr].setSelected(true);
                 }
             }
         }
-        dsSelector.add( literalTF, c );
+        dsSelector.add( exprTF, c );
         
-        c.weighty= 1.0;
-        c.gridy= this.uris.size()+1;
+        // -------------------------------------------------------
+        
         JPanel p= new JPanel();
         dsSelector.add( p, c );
         
@@ -568,11 +606,24 @@ public class NamedURIListTool extends JPanel {
             }
             if ( butts[this.uris.size()].isSelected() ) {
                 return literalTF.getText().trim();
+            } else if ( butts[this.uris.size()+1].isSelected() ) {
+                return exprTF.getText().trim();
+            } else {
+                return null;
             }
-            return null;
         } else {
             return null;
         }
         
+    }
+
+    private String expression="";
+    
+    /** 
+     * set the expression which will appear in the list of names, constants and expressions.
+     * @param expr 
+     */
+    void setExpression(String expr) {
+        this.expression= expr;
     }
 }

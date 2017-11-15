@@ -52,6 +52,8 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
@@ -1266,6 +1268,23 @@ public class DataMashUp extends javax.swing.JPanel {
         }
     }
     
+    private String getSelectedFunction() {
+        Component c= this.jTabbedPane1.getSelectedComponent();
+        if ( c instanceof JPanel ) {
+            c= ((JPanel)c).getComponent(0);
+        }
+        if ( c instanceof JScrollPane ) {
+            c= ((javax.swing.JScrollPane)c).getViewport().getComponent(0);
+        }
+        if ( c instanceof JList ) {
+            Object o= ((JList)c).getSelectedValue();
+            if ( o instanceof String ) {
+                return ((String)o);
+            }
+        }
+        return "";
+    }
+    
     private void expressionTreeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_expressionTreeMouseClicked
         if ( evt.isShiftDown() ) {
             TreePath tp= expressionTree.getClosestPathForLocation( evt.getX(), evt.getY() );
@@ -1279,6 +1298,7 @@ public class DataMashUp extends javax.swing.JPanel {
             }
             expressionTree.setSelectionPath(tp);
             String currentId= tp.getLastPathComponent().toString();
+            namedURIListTool1.setExpression(getSelectedFunction());
             String s= namedURIListTool1.selectDataId(currentId);
             if ( s!=null ) {
                 doDrop(s,tp);
@@ -1315,10 +1335,26 @@ public class DataMashUp extends javax.swing.JPanel {
     private void editMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editMenuItemActionPerformed
         TreePath tp= expressionTree.getSelectionPath();
         expressionTree.setSelectionPath(tp);
-        String currentId= tp.getLastPathComponent().toString();
-        String s= namedURIListTool1.selectDataId(currentId);
-        if ( s!=null ) {
-            doDrop(s,tp);
+        if ( !expressionTree.getModel().isLeaf(tp.getLastPathComponent()) ) {
+            String s= getAsJythonInline( (TreeNode)tp.getLastPathComponent() );
+            int i= s.lastIndexOf("&");
+            if ( i>-1 ) {
+                s= s.substring(i+1);
+            } else {
+                i= s.lastIndexOf(":");
+                s= s.substring(i+1);
+            }
+            s= namedURIListTool1.selectDataId(s);
+            if ( s!=null ) {
+                doDrop(s,tp);
+            }
+        } else {
+            String currentId= tp.getLastPathComponent().toString();
+            String s= namedURIListTool1.selectDataId(currentId);
+            namedURIListTool1.setExpression(getSelectedFunction());
+            if ( s!=null ) {
+                doDrop(s,tp);
+            }
         }
     }//GEN-LAST:event_editMenuItemActionPerformed
 
