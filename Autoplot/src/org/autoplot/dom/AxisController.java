@@ -91,10 +91,17 @@ public class AxisController extends DomNodeController {
                 DatumRange oldRange = axis.range;
                 final DatumRange range = logCheckRange(axis.range, axis.log);
                 if (!range.equals(oldRange)) {
-                    changesSupport.registerPendingChange(this,PENDING_RANGE_TWEAK);
-                    changesSupport.performingChange(this, PENDING_RANGE_TWEAK);
-                    axis.setRange(range);
-                    changesSupport.changePerformed(this, PENDING_RANGE_TWEAK);
+                    if ( new Exception().getStackTrace().length > 280 ) {
+                        changesSupport.registerPendingChange(this,PENDING_RANGE_TWEAK);
+                        changesSupport.performingChange(this, PENDING_RANGE_TWEAK);
+                        axis.setLog(false);
+                        changesSupport.changePerformed(this, PENDING_RANGE_TWEAK);
+                    } else {
+                        changesSupport.registerPendingChange(this,PENDING_RANGE_TWEAK);
+                        changesSupport.performingChange(this, PENDING_RANGE_TWEAK);
+                        axis.setRange(range);
+                        changesSupport.changePerformed(this, PENDING_RANGE_TWEAK);
+                    }
                 }
             }
             if ( evt.getPropertyName().equals( Axis.PROP_SCALE ) ) {
