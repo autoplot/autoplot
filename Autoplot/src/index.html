@@ -24,10 +24,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-11-14 r21693):</p>
+        <p>Bugfixes (2017-11-16 r21693):</p>
         <ul>
-            <li>rte_0088023411: where subsetting a CDF which had non-time-varying data marked as time-varying caused RTE.
-            <li>rte_0211810917: where single column ASCII files could not be read, and Sebastian's file triggered the same bug.
+            <li>left vertical axis with tick labels turned off, failed to draw the ticks.  Thanks, Masafumi!
+            <li>1922: Jython script which hangs the Java session.  Check for this condition and fix the situation by switching to a linear axis.  Thanks, Masafumi!
+            <li>rte_0088023411: where subsetting a CDF which had non-time-varying data marked as time-varying caused RTE.  Thanks, zhangzx!
+            <li>rte_0211810917: where single column ASCII files could not be read, and Sebastian's file triggered the same bug.  Thanks, Sebastian!
             <li>"Display Data" mouse module handles events data.
             <li>file system names use / on Windows, in the cache tool.
             <li>2017 update of the signature for jar files.  Thanks, Bernie!
@@ -38,7 +40,7 @@
             <li>non-standard micro symbol was used for microseconds, making standard microseconds behave improperly and failure to render as waveform.  Thanks, Chris!
             <li>1916: "NaN" parses to fill Datum for times.  This supports breaks in timeseries.  Thanks, Masafumi!
             <li>1912: new change to check cadence didn't properly consider conditions when issuing errors.  Thanks, Ivar!
-            <li>1913: data source editors shouldn't add extranous question mark.
+            <li>1913: data source editors shouldn't add extraneous question mark.
         </ul>
         <p>Older Bugfixes:</p>
         <ul>
@@ -72,7 +74,7 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>Jython plot command now accepts renderer, so that scripts can easily add custom renderers.
+            <li>rfe548: Jython plot command now accepts renderer, so that scripts can easily add custom renderers.
             <li>create pngwalk tool has mode where the running Autoplot is used to generate the images, not a copy, to aid with debugging and to allow decorations.
             <li>complexMultiply promotes rank, supporting (0+1j) * complex array.
             <li>orbit files can now have more than three columns, where the last column is used as the label, to be more consistent with events files.  Thanks Ivar!
