@@ -77,7 +77,7 @@ public class PlotCommand extends PyObject {
             + " <tr><td> xdrawTickLabels</td><td>False turns off the x tick labels for the plot\n</td>"
             + " <tr><td> ydrawTickLabels</td><td>False turns off the y tick labels for the plot\n</td>"
             + " <tr><td> xautoRangeHints</td><td>hints to the autorange, see http://autoplot.org/AxisAutoRangeHints\n</td>"
-            + " <tr><td> renderer</td><td>add cutsom renderer</td>"
+            + " <tr><td> renderer</td><td>add custom renderer, a class extending org.das2.graph.Renderer, see http://autoplot.org/CustomRenderers</td>"
             + "</table></html>");
 
     private static QDataSet coerceIt( PyObject arg0 ) {
@@ -191,6 +191,8 @@ public class PlotCommand extends PyObject {
             } else if ( keywords[i].equals("index") ) {
                 int sindex= Integer.parseInt( args[i+nparm].toString() );
                 iplot= sindex;
+            } else if ( keywords[i].equals("renderer") ) {
+                renderType="internal";
             }
         }
         
