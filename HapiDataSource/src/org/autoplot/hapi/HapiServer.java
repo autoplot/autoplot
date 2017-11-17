@@ -305,7 +305,7 @@ public class HapiServer {
      * @return 
      */
     private static boolean useCache() {
-        return ( "true".equals( System.getProperty("hapiServerCache","true") ) );
+        return ( "true".equals( System.getProperty("hapiServerCache","false") ) );
     }
     
     /**
