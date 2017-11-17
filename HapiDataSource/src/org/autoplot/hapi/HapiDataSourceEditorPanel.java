@@ -194,7 +194,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         } );
     }
 
-    TickleTimer resetVariableTimer= new TickleTimer( 500, new PropertyChangeListener() {
+    TickleTimer resetVariableTimer= new TickleTimer( 100, new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             try {
