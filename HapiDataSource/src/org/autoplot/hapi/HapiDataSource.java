@@ -186,23 +186,8 @@ public final class HapiDataSource extends AbstractDataSource {
         URI server = this.resourceURI;
         String id= getParam("id","" );
         if ( id.equals("") ) throw new IllegalArgumentException("missing id");
-        id= URLDecoder.decode(id,"UTF-8");
-        URL url= HapiServer.getInfoURL(server.toURL(), id);
-        StringBuilder builder= new StringBuilder();
-        logger.log(Level.FINE, "getDocument {0}", url.toString());
-        try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
-            String line= in.readLine();
-            while ( line!=null ) {                
-                builder.append(line);
-                line= in.readLine();
-            }
-        }
-        String s= builder.toString();
-        if ( s.length()==0 ) {
-            throw new JSONException("JSON response from info request is empty: "+url);
-        }
-        JSONObject o= new JSONObject(s);
-        return o;
+        id = URLDecoder.decode(id,"UTF-8");
+        return HapiServer.getInfo(server.toURL(), id);
     }
     
     private static class ParamDescription {

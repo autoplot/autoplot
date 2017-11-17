@@ -281,12 +281,16 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/org/autoplot/hapi/clearTextButton.png"/>
                 </Property>
+                <Property name="toolTipText" type="java.lang.String" value="clear search bar"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="clearButtonActionPerformed"/>
               </Events>
             </Component>
             <Component class="org.autoplot.datasource.RecentComboBox" name="filtersComboBox">
+              <Properties>
+                <Property name="toolTipText" type="java.lang.String" value="search bar"/>
+              </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filtersComboBoxActionPerformed"/>
               </Events>

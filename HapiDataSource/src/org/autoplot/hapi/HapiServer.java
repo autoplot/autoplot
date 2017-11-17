@@ -3,8 +3,11 @@ package org.autoplot.hapi;
 
 import java.awt.EventQueue;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
@@ -20,14 +23,20 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.das2.datum.DatumRange;
 import org.das2.datum.TimeParser;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.autoplot.datasource.AutoplotSettings;
+import org.autoplot.datasource.DataSetURI;
+import org.das2.util.monitor.NullProgressMonitor;
 
 /**
  * Utility methods for interacting with HAPI servers.  
@@ -45,7 +54,7 @@ public class HapiServer {
         ArrayList<String> result= new ArrayList<>();
         try {
             URL url= new URL("https://raw.githubusercontent.com/hapi-server/servers/master/all.txt");
-            String s= readFromURL(url);
+            String s= readFromURL(url,"");
             String[] ss= s.split("\n");
             result.addAll(Arrays.asList(ss));
             if ( "true".equals(System.getProperty("hapiDeveloper","false")) ) {
@@ -158,7 +167,7 @@ public class HapiServer {
         }        
         URL url;
         url= HapiServer.createURL( server, "catalog" );
-        String s= readFromURL(url);
+        String s= readFromURL(url, "json");
         JSONObject o= new JSONObject(s);
         JSONArray catalog= o.getJSONArray( HapiSpec.CATALOG );
         List<String> result= new ArrayList<>(catalog.length());
@@ -182,7 +191,7 @@ public class HapiServer {
         }        
         URL url;
         url= HapiServer.createURL( server, HapiSpec.CATALOG_URL  );
-        String s= readFromURL(url);
+        String s= readFromURL(url, "json");
         JSONObject o= new JSONObject(s);
         JSONArray catalog= o.getJSONArray( HapiSpec.CATALOG );
         return catalog;
@@ -266,7 +275,7 @@ public class HapiServer {
         URL url;
         url= HapiServer.createURL(server, HapiSpec.INFO_URL, Collections.singletonMap(HapiSpec.URL_PARAM_ID, id ) );
         logger.log(Level.FINE, "getInfo {0}", url.toString());
-        String s= readFromURL(url);
+        String s= readFromURL(url, "json");
         JSONObject o= new JSONObject(s);
         return o;
     }
@@ -285,30 +294,152 @@ public class HapiServer {
         }
         URL url;
         url= HapiServer.createURL(server, HapiSpec.CAPABILITIES_URL);
-        String s= readFromURL( url );
+        String s= readFromURL(url, "json" );
         JSONObject o= new JSONObject(s);
         return o;
     }
 
+    private static boolean useCache() {
+        return false;
+    }
+    
+    /**
+     * return the resource, if cached, or null if the data is not cached.
+     * @param url
+     * @param type "json" (the extension) or "" for no additional extension.
+     * @return the data or null.
+     * @throws IOException 
+     */
+    public static String readFromCachedURL( URL url, String type ) throws IOException {
+        String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
+        if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
+        String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
+        if ( url.getQuery()!=null ) {
+            Pattern p= Pattern.compile("id=(.+)");
+            Matcher m= p.matcher(url.getQuery());
+            if ( m.matches() ) {
+                u= u + "/" + m.group(1);
+                if ( type.length()>0 ) u= u+ "." + type;
+            } else {
+                throw new IllegalArgumentException("query not supported, implementation error");
+            }
+        } else {
+            if ( type.length()>0 ) u= u + "." + type;
+        }
+        String su= s + "/hapi/" + u;
+        File f= new File(su);
+        if ( f.exists() && f.canRead() ) {
+            logger.log(Level.FINE, "read from hapi cache: {0}", url);
+            String r= readFromFile( f );
+            return r;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * return the resource, if cached, or null if the data is not cached.
+     * @param url
+     * @param type "json" (the extension).
+     * @param data the data or null.
+     * @throws IOException 
+     */
+    public static void writeToCachedURL( URL url, String type, String data ) throws IOException {
+        String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
+        if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
+        String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
+        if ( url.getQuery()!=null ) {
+            Pattern p= Pattern.compile("id=(.+)");
+            Matcher m= p.matcher(url.getQuery());
+            if ( m.matches() ) {
+                u= u + "/" + m.group(1) + "." + type;
+            } else {
+                throw new IllegalArgumentException("query not supported, implementation error");
+            }
+        } else {
+            u= u + "." + type;
+        }
+        
+        String su= s + "/hapi/" + u;
+        File f= new File(su);
+        if ( f.exists() ) {
+            f.delete();
+        }
+        if ( !f.getParentFile().exists() ) {
+            if ( !f.getParentFile().mkdirs() ) {
+                throw new IOException("unable to make parent directories");
+            }
+        }
+        if ( !f.exists() ) {
+            logger.log(Level.FINE, "write to hapi cache: {0}", url);
+            try ( BufferedWriter w= new BufferedWriter( new FileWriter(f) ) ) {
+                w.write(data);
+            }
+        } else {
+            throw new IOException("unable to write to file: "+f);
+        }
+    }
+    
+    private static final Lock l= new ReentrantLock();
+    
+    public static String readFromFile( File f ) throws IOException {
+        StringBuilder builder= new StringBuilder();
+        try ( BufferedReader in= new BufferedReader( new InputStreamReader( new FileInputStream(f) ) ) ) {
+            String line= in.readLine();
+            while ( line!=null ) {
+                builder.append(line);
+                builder.append("\n");
+                line= in.readLine();
+            }
+        }
+        if ( builder.length()==0 ) {
+            throw new IOException("file is empty:" + f );
+        }
+        String result=builder.toString();
+        return result;
+    }
+    
     /**
      * read data from the URL.  
      * @param url the URL to read from
+     * @param type the extension to use for the cache file (json).
      * @return non-empty string
      * @throws IOException 
      */
-    public static String readFromURL( URL url ) throws IOException {
+    public static String readFromURL( URL url, String type) throws IOException {
+        l.lock();
+        try {
+            if ( useCache() ) {
+                String s= readFromCachedURL( url, type );
+                if ( s!=null ) return s;
+            }
+        } finally {
+            l.unlock();
+        }
+        
         StringBuilder builder= new StringBuilder();
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
                 builder.append(line);
+                builder.append("\n");
                 line= in.readLine();
             }
         }
         if ( builder.length()==0 ) {
             throw new IOException("empty response from "+url );
         }
-        return builder.toString();
+        String result=builder.toString();
+        
+        l.lock();
+        try {
+            if ( useCache() ) {
+                writeToCachedURL( url, type, result );
+            }
+        } finally {
+            l.unlock();
+        }
+        return result;
     }
     
     /**

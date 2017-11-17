@@ -378,12 +378,14 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         jScrollPane2.setViewportView(idsList2);
 
         clearButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/hapi/clearTextButton.png"))); // NOI18N
+        clearButton.setToolTipText("clear search bar");
         clearButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 clearButtonActionPerformed(evt);
             }
         });
 
+        filtersComboBox.setToolTipText("search bar");
         filtersComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filtersComboBoxActionPerformed(evt);
