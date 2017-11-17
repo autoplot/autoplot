@@ -85,7 +85,7 @@ public class IstpMetadataModel extends MetadataModel {
                     // hack for Onera CDFs
                     return units.parse(s.substring(16, s.length() - 1)).doubleValue(units);
                 } catch (ParseException ex) {
-                    logger.log(Level.WARNING, "unable to parse {0}", o);
+                    logger.log(Level.FINE, "unable to parse {0}", o);
                     return deflt;
                 }
             } else {
@@ -95,7 +95,7 @@ public class IstpMetadataModel extends MetadataModel {
                     try {
                         return Double.parseDouble((String) o);
                     } catch (NumberFormatException ex2) {
-                        logger.log(Level.WARNING, "unable to parse {0}", o);
+                        logger.log(Level.FINE, "unable to parse {0}", o);
                         return deflt;
                     }
                 }
