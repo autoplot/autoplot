@@ -36,6 +36,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
+import org.das2.datum.Datum;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 
@@ -398,7 +399,7 @@ public class HapiServer {
         }
     }
     
-    private static final Lock l= new ReentrantLock();
+    private static final Lock lock= new ReentrantLock();
     
     public static String readFromFile( File f ) throws IOException {
         StringBuilder builder= new StringBuilder();
@@ -425,14 +426,14 @@ public class HapiServer {
      * @throws IOException 
      */
     public static String readFromURL( URL url, String type) throws IOException {
-        l.lock();
+        lock.lock();
         try {
             if ( useCache() ) {
                 String s= readFromCachedURL( url, type );
                 if ( s!=null ) return s;
             }
         } finally {
-            l.unlock();
+            lock.unlock();
         }
         
         StringBuilder builder= new StringBuilder();
@@ -449,13 +450,13 @@ public class HapiServer {
         }
         String result=builder.toString();
         
-        l.lock();
+        lock.lock();
         try {
             if ( useCache() ) {
                 writeToCachedURL( url, type, result );
             }
         } finally {
-            l.unlock();
+            lock.unlock();
         }
         return result;
     }
@@ -504,5 +505,5 @@ public class HapiServer {
             throw new IllegalArgumentException(ex);
         }
     }
-    
+
 }

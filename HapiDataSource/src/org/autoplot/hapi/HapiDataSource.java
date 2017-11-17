@@ -2,7 +2,11 @@
 package org.autoplot.hapi;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import org.das2.qds.buffer.BufferDataSet;
 import org.das2.dataset.NoDataInIntervalException;
@@ -48,9 +54,11 @@ import org.das2.qds.SemanticOps;
 import org.das2.qds.SparseDataSetBuilder;
 import org.das2.qds.WritableDataSet;
 import org.autoplot.datasource.AbstractDataSource;
+import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DefaultTimeSeriesBrowse;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
@@ -211,6 +219,112 @@ public final class HapiDataSource extends AbstractDataSource {
             return this.name;
         }
     }
+    
+    private static final Map<String,Datum> lastRecordFound= new HashMap<>();
+          
+    private static String[] cacheFilesFor( URL url, ParamDescription[] pp, Datum xx ) {
+        String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
+        if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
+        String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
+        if ( url.getQuery()!=null ) {
+            String[] querys= url.getQuery().split("\\&");
+            Pattern p= Pattern.compile("id=(.+)");
+            for ( String q : querys ) {
+                Matcher m= p.matcher(q);
+                if ( m.matches() ) {
+                    u= u + "/" + m.group(1);
+                    break;
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("query must be specified, implementation error");
+        }
+        
+        TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d" );
+        String sxx= tp.format(xx);
+        
+        String[] result= new String[pp.length];
+        for ( int i=0; i<pp.length; i++ ){
+            result[i]= s + "/" + u + "/" + sxx + "." + pp[0].name + ".csv";
+        }
+        
+        return result;
+    }
+    
+    private static void writeToCachedData(URL url, ParamDescription[] pp, Datum xx, String[] ss) throws IOException {
+        
+        String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
+        if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
+        String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
+        if ( url.getQuery()!=null ) {
+            String[] querys= url.getQuery().split("\\&");
+            Pattern p= Pattern.compile("id=(.+)");
+            for ( String q : querys ) {
+                Matcher m= p.matcher(q);
+                if ( m.matches() ) {
+                    u= u + "/" + m.group(1);
+                    break;
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("query must be specified, implementation error");
+        }
+        
+        TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d" );
+        
+        String sxx= tp.format(xx);
+                
+        Datum t0= lastRecordFound.get( u + "/" + sxx );
+        if ( t0==null ) {
+            String f= s + "/" + u + "/" + sxx + "." + pp[0].name + ".csv";
+            File ff= new File(f);
+            if ( ff.exists() ) {
+                BufferedReader read= new BufferedReader(new FileReader(ff));
+                String line= read.readLine();
+                String lastLine= null;
+                while ( line!=null ) {
+                    lastLine= line;
+                    line= read.readLine();
+                }
+                if ( lastLine!=null ) {
+                    try {
+                        t0= Units.us2000.parse(lastLine);
+                        lastRecordFound.put( u + "/" + sxx,t0);
+                    } catch (ParseException ex) {
+                        t0= null;
+                    }
+                } else {
+                    t0= null;
+                }
+            }
+        }
+        if ( t0!=null && t0.ge(xx) ) {
+            logger.fine("clear all cached files");
+            for ( int i=0; i<pp.length; i++ ) {
+                String f= s + "/hapi/" + u + "/" + sxx + "." + pp[i].name + ".csv";
+                File ff= new File(f);
+                if ( !ff.delete() ) logger.info("unable to delete file: "+ff);
+            }
+        }
+        
+        for ( int i=0; i<pp.length; i++ ) {
+            String f= s + "/hapi/" + u + "/" + sxx + "." + pp[i].name + ".csv";
+            File ff= new File(f);
+            if ( !ff.getParentFile().exists() ) {
+                if ( !ff.getParentFile().mkdirs() ) {
+                    throw new IOException("unable to mkdirs "+ff.getParent() );
+                }
+            }
+            BufferedWriter w= new BufferedWriter( new FileWriter( ff, true ) );
+            w.write(ss[i]);
+            w.write("\n");
+            w.close();
+        }
+        
+        lastRecordFound.put( u + "/" + sxx,xx);
+        
+    }
+    
     
     /**
      * To assist in getting the CDAWeb HAPI server going, handle a few differences
@@ -760,6 +874,12 @@ public final class HapiDataSource extends AbstractDataSource {
         connection.setRequestProperty( "Accept-Encoding", "gzip" );
         connection= (HttpURLConnection)HttpUtil.checkRedirect(connection);
         connection.connect();
+        
+        //Check to see what time ranges are from entire days, then only call writeToCachedData for these intervals. 
+        Datum midnight= TimeUtil.prevMidnight( tr.min() );
+        DatumRange currentDay= new DatumRange( midnight, TimeUtil.next( TimeUtil.DAY, midnight) );
+        boolean completeDay= tr.contains(currentDay);
+                
         boolean gzip= "gzip".equals( connection.getContentEncoding() );
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( gzip ? new GZIPInputStream( connection.getInputStream() ) : connection.getInputStream() ) ) ) {
             String line= in.readLine();
@@ -783,6 +903,26 @@ public final class HapiDataSource extends AbstractDataSource {
                     line= in.readLine();
                     continue;
                 }
+                
+                //TODO: compress the file, now that we are done.
+                //if ( !currentDay.contains(xx) && tr.intersects(currentDay) && completeDay ) {
+                //    writeToCachedDataCompress( url, pds, xx, ss );
+                //}
+                
+                while ( !currentDay.contains(xx) && tr.intersects(currentDay ) ) {
+                    currentDay= currentDay.next();
+                    completeDay= tr.contains(currentDay);
+                }
+                
+                if ( !currentDay.contains(xx) ) {
+                    logger.fine("something's gone wrong, perhaps out-of-order timetags.");
+                    completeDay= false;
+                }
+                
+                if ( completeDay ) {
+                    writeToCachedData( url, pds, xx, ss );
+                }
+                        
                 builder.putValue( -1, ifield, xx );
                 ifield++;
                 for ( int i=1; i<nparam; i++ ) {  // nparam is number of parameters, which may have multiple fields.
@@ -820,7 +960,7 @@ public final class HapiDataSource extends AbstractDataSource {
         QDataSet ds= builder.getDataSet();
         return ds;
     }
-
+    
     private ParamDescription[] getParameterDescriptions(JSONObject doc) throws IllegalArgumentException, ParseException, JSONException {
         JSONArray parameters= doc.getJSONArray("parameters");
         int nparameters= parameters.length();
@@ -884,7 +1024,7 @@ public final class HapiDataSource extends AbstractDataSource {
                 
                 if ( jsonObjecti.has("fill") ) {
                     String sfill= jsonObjecti.getString("fill");
-                    if ( sfill!=null ) {
+                    if ( sfill!=null && !sfill.equals("null") ) {
                         if ( type.equals("string") ) {
                             pds[i].fillValue= ((EnumerationUnits)pds[i].units).createDatum( sfill ).doubleValue( pds[i].units );
                             pds[i].hasFill= true;
