@@ -36,6 +36,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
+import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 
 /**
@@ -299,8 +300,20 @@ public class HapiServer {
         return o;
     }
 
+    /**
+     * use cache of HAPI responses, to allow for use in offline mode.
+     * @return 
+     */
     private static boolean useCache() {
-        return false;
+        return ( "true".equals( System.getProperty("hapiServerCache","true") ) );
+    }
+    
+    /**
+     * allow cached files to be used for no more than 1 hour.
+     * @return 
+     */
+    private static long cacheAgeLimitMillis() {
+        return 3600000;
     }
     
     /**
@@ -329,9 +342,14 @@ public class HapiServer {
         String su= s + "/hapi/" + u;
         File f= new File(su);
         if ( f.exists() && f.canRead() ) {
-            logger.log(Level.FINE, "read from hapi cache: {0}", url);
-            String r= readFromFile( f );
-            return r;
+            if ( ( System.currentTimeMillis() - f.lastModified() < cacheAgeLimitMillis() ) || FileSystem.settings().isOffline() ) {
+                logger.log(Level.FINE, "read from hapi cache: {0}", url);
+                String r= readFromFile( f );
+                return r;
+            } else {
+                logger.log(Level.FINE, "old cache item will not be used: {0}", url);
+                return null;
+            }
         } else {
             return null;
         }
