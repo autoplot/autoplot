@@ -12,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -42,13 +43,22 @@ public class HapiServer {
      */
     public static List<String> getKnownServers() {
         ArrayList<String> result= new ArrayList<>();
-        if ( "true".equals(System.getProperty("hapiDeveloper","false")) ) {
-            result.add("http://tsds.org/get/IMAGE/PT1M/hapi");
-            result.add("https://cdaweb.gsfc.nasa.gov/registry/hdp/hapi");
-            result.add("http://jfaden.net/HapiServerDemo/hapi");
-        }            
+        try {
+            URL url= new URL("https://raw.githubusercontent.com/hapi-server/servers/master/all.txt");
+            String s= readFromURL(url);
+            String[] ss= s.split("\n");
+            result.addAll(Arrays.asList(ss));
+            if ( "true".equals(System.getProperty("hapiDeveloper","false")) ) {
+                result.add("http://tsds.org/get/IMAGE/PT1M/hapi");
+                result.add("https://cdaweb.gsfc.nasa.gov/registry/hdp/hapi");
+                result.add("http://jfaden.net/HapiServerDemo/hapi");
+            }
+        } catch (IOException  ex) {
+            Logger.getLogger(HapiServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        result.remove("http://datashop.elasticbeanstalk.com/hapi");
         result.add("http://datashop.elasticbeanstalk.com/hapi");
-
+            
         return result;
     }
     
@@ -148,16 +158,8 @@ public class HapiServer {
         }        
         URL url;
         url= HapiServer.createURL( server, "catalog" );
-        StringBuilder builder= new StringBuilder();
-        logger.log(Level.FINE, "getCatalogIds {0}", url.toString());
-        try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
-            String line= in.readLine();
-            while ( line!=null ) {
-                builder.append(line);
-                line= in.readLine();
-            }
-        }
-        JSONObject o= new JSONObject(builder.toString());
+        String s= readFromURL(url);
+        JSONObject o= new JSONObject(s);
         JSONArray catalog= o.getJSONArray( HapiSpec.CATALOG );
         List<String> result= new ArrayList<>(catalog.length());
         for ( int i=0; i<catalog.length(); i++ ) {
@@ -180,19 +182,8 @@ public class HapiServer {
         }        
         URL url;
         url= HapiServer.createURL( server, HapiSpec.CATALOG_URL  );
-        StringBuilder builder= new StringBuilder();
-        logger.log(Level.FINE, "getCatalog {0}", url.toString());
-        try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
-            String line= in.readLine();
-            while ( line!=null ) {
-                builder.append(line);
-                line= in.readLine();
-            }
-        }
-        if ( builder.length()==0 ) {
-            throw new IOException("empty response from "+url );
-        }
-        JSONObject o= new JSONObject(builder.toString());
+        String s= readFromURL(url);
+        JSONObject o= new JSONObject(s);
         JSONArray catalog= o.getJSONArray( HapiSpec.CATALOG );
         return catalog;
     }
@@ -274,20 +265,9 @@ public class HapiServer {
         }
         URL url;
         url= HapiServer.createURL(server, HapiSpec.INFO_URL, Collections.singletonMap(HapiSpec.URL_PARAM_ID, id ) );
-        StringBuilder builder= new StringBuilder();
         logger.log(Level.FINE, "getInfo {0}", url.toString());
-        try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
-            String line= in.readLine();
-            while ( line!=null ) {
-                builder.append(line);
-                line= in.readLine();
-            }
-        }
-        if ( builder.length()==0 ) {
-            throw new IOException("empty response from "+url );
-        }
-        JSONObject o= new JSONObject(builder.toString());
-        
+        String s= readFromURL(url);
+        JSONObject o= new JSONObject(s);
         return o;
     }
     
@@ -305,8 +285,19 @@ public class HapiServer {
         }
         URL url;
         url= HapiServer.createURL(server, HapiSpec.CAPABILITIES_URL);
+        String s= readFromURL( url );
+        JSONObject o= new JSONObject(s);
+        return o;
+    }
+
+    /**
+     * read data from the URL.  
+     * @param url the URL to read from
+     * @return non-empty string
+     * @throws IOException 
+     */
+    public static String readFromURL( URL url ) throws IOException {
         StringBuilder builder= new StringBuilder();
-        logger.log(Level.FINE, "getCapabilities {0}", url.toString());
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
@@ -314,11 +305,11 @@ public class HapiServer {
                 line= in.readLine();
             }
         }
-        JSONObject o= new JSONObject(builder.toString());
-        
-        return o;
+        if ( builder.length()==0 ) {
+            throw new IOException("empty response from "+url );
+        }
+        return builder.toString();
     }
-
     
     /**
      * return the URL by appending the text to the end of the server URL.  This
