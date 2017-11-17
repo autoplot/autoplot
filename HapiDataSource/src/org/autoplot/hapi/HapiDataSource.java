@@ -418,14 +418,22 @@ public final class HapiDataSource extends AbstractDataSource {
         DatumRange tr; // TSB = DatumRangeUtil.parseTimeRange(timeRange);
         tr= tsb.getTimeRange();
         
+        Datum cadence= null;
+        
         if ( info.has("cadence") ) { // add one cadence length to beginning and end.
             try {
                 int[] ii= DatumRangeUtil.parseISO8601Duration(info.getString("cadence"));
                 Datum t= TimeUtil.toDatumDuration(ii);
                 tr= new DatumRange( tr.min().subtract(t), tr.max().add(t) );
+                cadence= t;
             } catch ( ParseException ex ) {
                 logger.log(Level.WARNING, "unable to parse cadence as ISO8601 duration: {0}", info.getString("cadence"));
             }
+        }
+        
+        String timeStampLocation= "CENTER";
+        if ( info.has("timeStampLocation" ) ) {
+            timeStampLocation= info.getString("timeStampLocation");
         }
         
         JSONArray parametersArray= info.getJSONArray("parameters");
@@ -492,6 +500,22 @@ public final class HapiDataSource extends AbstractDataSource {
         if ( xds==null && ( UnitsUtil.isTimeLocation( SemanticOps.getUnits(ds) ) ) ) {
             xds= ds;
         }
+        
+        if ( timeStampLocation.equals("BEGIN") || timeStampLocation.equals("END" ) ) {
+            if ( cadence==null ) {
+                cadence= DataSetUtil.asDatum( DataSetUtil.guessCadenceNew( xds, null ) );
+            }
+            if ( cadence!=null ) {
+                if ( timeStampLocation.equals("BEGIN") ) {
+                    xds= Ops.add( xds, cadence.divide(2) );
+                } else if ( timeStampLocation.equals("END") ) {
+                    xds= Ops.subtract( xds, cadence.divide(2) );
+                } 
+            } else {
+                logger.info("timetags are identified as BEGIN, but cadence was not available to center the data");
+            }
+        }
+        
         if ( xds!=null ) {
             ((MutablePropertyDataSet)xds).putProperty(QDataSet.CACHE_TAG, new CacheTag(tr,null) );
         }
