@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Custom component added in Jython to left and right plots, and the PNGWalk tool now allows PNGWalks to be run so that Jython extentions can be used.
+        <p><small>Custom renderers allow anyone to define new ways of displaying data.  Here is <a href="featherPlot.jy">the script</a>.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-11-16 r21693):</p>
+        <p>Bugfixes (2017-11-17 r21710):</p>
         <ul>
+            <li>Masafumi caught a case where new series symbol connector code was too restrictive on units.
             <li>left vertical axis with tick labels turned off, failed to draw the ticks.  Thanks, Masafumi!
             <li>1922: Jython script which hangs the Java session.  Check for this condition and fix the situation by switching to a linear axis.  Thanks, Masafumi!
             <li>rte_0088023411: where subsetting a CDF which had non-time-varying data marked as time-varying caused RTE.  Thanks, zhangzx!
@@ -74,6 +75,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe609: add experimental HAPI client-side caching.
             <li>rfe548: Jython plot command now accepts renderer, so that scripts can easily add custom renderers.
             <li>create pngwalk tool has mode where the running Autoplot is used to generate the images, not a copy, to aid with debugging and to allow decorations.
             <li>complexMultiply promotes rank, supporting (0+1j) * complex array.
