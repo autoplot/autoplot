@@ -1,0 +1,75 @@
+
+package org.autoplot.hapi;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * paste several BufferedReaders together to appear as 
+ * one BufferedReader.
+ * @author jbf
+ */
+public class PasteBufferedReader implements AbstractLineReader {
+
+    List<AbstractLineReader> readers;
+    
+    char delim='\t';
+    
+    public PasteBufferedReader() {
+        readers= new ArrayList<>();
+    }
+    
+    public void setDelim( char delim ) {
+        this.delim= delim;
+    }
+    
+    public void pasteBufferedReader( AbstractLineReader r ) {
+        readers.add(r);
+    }
+    
+    @Override
+    public String readLine() throws IOException {
+        StringBuilder b= new StringBuilder();
+        boolean done= true;
+        int col=0;
+        for ( AbstractLineReader r: readers ) {
+            if ( col>0 ) b.append(delim);
+            String s= r.readLine();
+            if ( s!=null ) {
+                b.append( s );
+                done= false;
+            }
+            col++;
+        }
+        if ( done ) {
+            return null;
+        } else {
+            return b.toString();
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        for ( AbstractLineReader r: readers ) {
+            r.close();
+        }
+    }
+    
+    public static void main( String[] args ) throws IOException {
+        StringReader r1= new StringReader("a\nb\nc\n");
+        StringReader r2= new StringReader("x\ny\nz\n");
+        PasteBufferedReader r= new PasteBufferedReader();
+        r.pasteBufferedReader( new SingleFileBufferedReader(new BufferedReader(r1) ) );
+        r.pasteBufferedReader( new SingleFileBufferedReader(new BufferedReader(r2) ) );
+        
+        String s= r.readLine();
+        while ( s!=null ) {
+            System.err.println(s);
+            s= r.readLine();
+        }
+    }
+    
+}
