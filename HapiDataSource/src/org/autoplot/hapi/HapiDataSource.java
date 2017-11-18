@@ -210,11 +210,28 @@ public final class HapiDataSource extends AbstractDataSource {
         String description= "";
         String label="";
         String type= "";
-        int[] size= new int[0]; // array of scalars
-        int length= 0; // length in bytes when transferring with binary.
+        /**
+         * number of indeces in each index.
+         */
+        int[] size= new int[0]; 
+        /**
+         * total number of fields
+         */
+        int nFields= 1;
+        
+        /**
+         * length in bytes when transferring with binary.
+         */
+        int length= 0; 
         QDataSet[] depend= null;
-        String[] dependName= null; // for time-varying depend1 (not in HAPI1.1)
-        String renderType=null; // may contain hint for renderer, such as nnspectrogram
+        /**
+         *  for time-varying depend1 (not in HAPI1.1)
+         */
+        String[] dependName= null; 
+        /**
+         * may contain hint for renderer, such as nnspectrogram
+         */
+        String renderType=null; 
         private ParamDescription( String name ) {
             this.name= name;
         }
@@ -311,6 +328,7 @@ public final class HapiDataSource extends AbstractDataSource {
             }
         }
         
+        int ifield=0;
         for ( int i=0; i<pp.length; i++ ) {
             String f= s + "/hapi/" + u + "/" + sxx + "." + pp[i].name + ".csv";
             File ff= new File(f);
@@ -320,7 +338,12 @@ public final class HapiDataSource extends AbstractDataSource {
                 }
             }
             BufferedWriter w= new BufferedWriter( new FileWriter( ff, true ) );
-            w.write(ss[i]);
+            int length= pp[i].nFields;
+            for ( int k=0; k<length; k++ ) {
+                if ( k>0 ) w.write(',');
+                w.write(ss[ifield++]);
+            }
+            
             w.write("\n");
             w.close();
         }
@@ -370,6 +393,8 @@ public final class HapiDataSource extends AbstractDataSource {
         StringBuilder builder= new StringBuilder();
         logger.log(Level.FINE, "getDocument {0}", url.toString());
         HttpURLConnection httpConnect=  ((HttpURLConnection)url.openConnection());
+        httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
+        httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
         httpConnect= (HttpURLConnection) HtmlUtil.checkRedirect( httpConnect );
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( httpConnect.getInputStream() ) ) ) {
             String line= in.readLine();
@@ -636,11 +661,12 @@ public final class HapiDataSource extends AbstractDataSource {
         monitor.setProgressMessage("reading data");
         monitor.setTaskProgress(20);
         long t0 = System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        
-        connection.setRequestProperty("Accept-Encoding", "gzip");
-        connection.connect();
-        boolean gzip = "gzip".equals(connection.getContentEncoding());
+        HttpURLConnection httpConnect = (HttpURLConnection) url.openConnection();
+        httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
+        httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
+        httpConnect.setRequestProperty("Accept-Encoding", "gzip");
+        httpConnect.connect();
+        boolean gzip = "gzip".equals(httpConnect.getContentEncoding());
 
         int recordLengthBytes = 0;
         TransferType[] tts = new TransferType[pds.length];
@@ -699,7 +725,7 @@ public final class HapiDataSource extends AbstractDataSource {
         totalFields= DataSetUtil.sum(nfields);
         double[] result = new double[totalFields];
 
-        try (InputStream in = gzip ? new GZIPInputStream(connection.getInputStream()) : connection.getInputStream()) {
+        try (InputStream in = gzip ? new GZIPInputStream(httpConnect.getInputStream()) : httpConnect.getInputStream()) {
             ByteBuffer buf = TransferType.allocate( recordLengthBytes,ByteOrder.LITTLE_ENDIAN );
             byte[] bytes = buf.array();
             int bytesRead = in.read(bytes);
@@ -748,14 +774,14 @@ public final class HapiDataSource extends AbstractDataSource {
         } catch (IOException e) {
             logger.log( Level.WARNING, e.getMessage(), e );
             monitor.finished();
-            throw new IOException(String.valueOf(connection.getResponseCode()) + ":" + connection.getResponseMessage());
+            throw new IOException(String.valueOf(httpConnect.getResponseCode()) + ":" + httpConnect.getResponseMessage());
 
         } catch (Exception e) {
             logger.log( Level.WARNING, e.getMessage(), e );
             monitor.finished();
             throw e;
         } finally {
-            connection.disconnect();
+            httpConnect.disconnect();
         }
         monitor.setTaskProgress(95);
         QDataSet ds = builder.getDataSet();
@@ -781,6 +807,8 @@ public final class HapiDataSource extends AbstractDataSource {
         StringBuilder builder= new StringBuilder();
         logger.log(Level.FINE, "getDocument {0}", url.toString());
         HttpURLConnection httpConnect=  ((HttpURLConnection)url.openConnection());
+        httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
+        httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
         httpConnect= (HttpURLConnection) HttpUtil.checkRedirect(httpConnect);
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( httpConnect.getInputStream() ) ) ) {
             String line= in.readLine();
@@ -936,19 +964,26 @@ public final class HapiDataSource extends AbstractDataSource {
         monitor.setTaskProgress(20);
         long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
         
-        AbstractLineReader cacheReader= getCacheReader( url, pds, tr );
-        if ( cacheReader!=null ) {
-            logger.fine("reading from cache");
+        AbstractLineReader cacheReader;
+        if ( HapiServer.useCache() ) {
+            cacheReader= getCacheReader( url, pds, tr );
+            if ( cacheReader!=null ) {
+                logger.fine("reading from cache");
+            }
+        } else {
+            cacheReader= null;
         }
         
-        HttpURLConnection connection;
+        HttpURLConnection httpConnect;
         if ( cacheReader==null ) {
-            connection= (HttpURLConnection)url.openConnection();
-            connection.setRequestProperty( "Accept-Encoding", "gzip" );
-            connection= (HttpURLConnection)HttpUtil.checkRedirect(connection);
-            connection.connect();
+            httpConnect= (HttpURLConnection)url.openConnection();
+            httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
+            httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
+            httpConnect.setRequestProperty( "Accept-Encoding", "gzip" );
+            httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect);
+            httpConnect.connect();
         } else {
-            connection= null;
+            httpConnect= null;
         }
         
         //Check to see what time ranges are from entire days, then only call writeToCachedData for these intervals. 
@@ -956,9 +991,9 @@ public final class HapiDataSource extends AbstractDataSource {
         DatumRange currentDay= new DatumRange( midnight, TimeUtil.next( TimeUtil.DAY, midnight) );
         boolean completeDay= tr.contains(currentDay);
 
-        boolean gzip= cacheReader==null ? "gzip".equals( connection.getContentEncoding() ) : false;
+        boolean gzip= cacheReader==null ? "gzip".equals( httpConnect.getContentEncoding() ) : false;
         try ( AbstractLineReader in= ( cacheReader!=null ? cacheReader :
-                new SingleFileBufferedReader( new BufferedReader( new InputStreamReader( gzip ? new GZIPInputStream( connection.getInputStream() ) : connection.getInputStream() ) ) ) ) ) {
+                new SingleFileBufferedReader( new BufferedReader( new InputStreamReader( gzip ? new GZIPInputStream( httpConnect.getInputStream() ) : httpConnect.getInputStream() ) ) ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
                 String[] ss= lineSplit(line);
@@ -997,7 +1032,7 @@ public final class HapiDataSource extends AbstractDataSource {
                 }
                 
                 if ( completeDay ) {
-                    if ( cacheReader==null ) {
+                    if ( cacheReader==null && HapiServer.useCache() ) {
                         writeToCachedData( url, pds, xx, ss );
                     }
                 }
@@ -1026,8 +1061,8 @@ public final class HapiDataSource extends AbstractDataSource {
         } catch ( IOException e ) {
             logger.log( Level.WARNING, e.getMessage(), e );
             monitor.finished();
-            if ( connection!=null ) {
-                throw new IOException( String.valueOf(connection.getResponseCode())+": "+connection.getResponseMessage() );
+            if ( httpConnect!=null ) {
+                throw new IOException( String.valueOf(httpConnect.getResponseCode())+": "+httpConnect.getResponseMessage() );
             } else {
                 throw e;
             }
@@ -1037,8 +1072,15 @@ public final class HapiDataSource extends AbstractDataSource {
             monitor.finished();
             throw e;
         } finally {
-            if ( connection!=null ) connection.disconnect();
+            if ( httpConnect!=null ) httpConnect.disconnect();
         }
+        
+        if ( cacheReader!=null ) {
+            Map<String,String> cacheFiles= new HashMap<>();
+            cacheFiles.put( "cached", "true" );
+            builder.putProperty( QDataSet.USER_PROPERTIES, cacheFiles );
+        }
+        
         monitor.setTaskProgress(95);
         QDataSet ds= builder.getDataSet();
         return ds;
@@ -1145,9 +1187,11 @@ public final class HapiDataSource extends AbstractDataSource {
                     if ( !(o instanceof JSONArray) ) {
                         if ( o.getClass()==Integer.class ) {
                             pds[i].size= new int[] { ((Integer)o) };
+                            pds[i].nFields= ((Integer)o);
                             logger.log( Level.WARNING, "size should be an int array, found int: {0}", name);
                         } else if ( o.getClass()==String.class ) {
                             pds[i].size= new int[] { Integer.parseInt( (String)o ) };
+                            pds[i].nFields= ((Integer)o);
                             logger.log( Level.WARNING, "size should be an int array, found String: {0}", name);
                         } else {
                             throw new IllegalArgumentException( String.format( "size should be an int array: %s", name ) );
@@ -1155,9 +1199,12 @@ public final class HapiDataSource extends AbstractDataSource {
                     } else {
                         JSONArray a= (JSONArray)o;
                         pds[i].size= new int[a.length()];
+                        int nFields=1;
                         for ( int j=0; j<a.length(); j++ ) {
                             pds[i].size[j]= a.getInt(j);
+                            nFields*= pds[i].size[j];
                         }
+                        pds[i].nFields= nFields;
                     }
                     if ( jsonObjecti.has("bins") ) {
                         o= jsonObjecti.get("bins");
@@ -1168,7 +1215,7 @@ public final class HapiDataSource extends AbstractDataSource {
                             for ( int j=0; j<ja.length(); j++ ) {
                                 JSONObject bins= ja.getJSONObject(j);
                                 if ( bins.has("parameter") ) {  // deprecated, see binsParameter below.  TODO: revisit this.
-                                    int n= DataSetUtil.product(pds[i].size);
+                                    int n= pds[i].nFields;
                                     pds[i].depend[j]= Ops.findgen(n);
                                     pds[i].dependName[j]= bins.getString("parameter");
                                 } else if ( bins.has("ranges") ) {
@@ -1277,7 +1324,7 @@ public final class HapiDataSource extends AbstractDataSource {
             int ifield=1;
             int length1=ds.length(0); // this should be overwritten
             for ( int i=1; i<pds.length; i++ ) {
-                int nfields1= DataSetUtil.product(pds[i].size);
+                int nfields1= pds[i].nFields;
                 SparseDataSetBuilder sdsb= new SparseDataSetBuilder(2);
                 sdsb.setLength(nfields1);
                 int startIndex= sort==null ? ifield-1 : sort[ifield]-1;

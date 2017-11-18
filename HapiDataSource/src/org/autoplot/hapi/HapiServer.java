@@ -305,7 +305,7 @@ public class HapiServer {
      * use cache of HAPI responses, to allow for use in offline mode.
      * @return 
      */
-    private static boolean useCache() {
+    protected static boolean useCache() {
         return ( "true".equals( System.getProperty("hapiServerCache","false") ) );
     }
     
