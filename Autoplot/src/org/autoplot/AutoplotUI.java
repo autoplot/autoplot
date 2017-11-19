@@ -3699,7 +3699,7 @@ private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 private void editDomMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editDomMenuItemActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
     PropertyEditor edit= new PropertyEditor(applicationModel.dom);
-    edit.showDialog(this,"DOM Properties",new ImageIcon(this.getClass().getResource("logoA16x16.png")).getImage());
+    edit.showDialog(this,"DOM Properties",new ImageIcon(this.getClass().getResource("/logo16.png")).getImage());
 }//GEN-LAST:event_editDomMenuItemActionPerformed
 
 private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_statusLabelMouseClicked
@@ -3897,9 +3897,6 @@ private void editOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     if ( AutoplotUtil.showConfirmDialog( this, p, "Options", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
         p.copyOptions( applicationModel.dom.getOptions() );
     }
-    
-    //PropertyEditor edit= new PropertyEditor(applicationModel.dom.getOptions());
-    //edit.showDialog(this,"DOM User Options",new ImageIcon(this.getClass().getResource("logoA16x16.png")).getImage());
 }//GEN-LAST:event_editOptionsActionPerformed
 
 private void fixLayoutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixLayoutMenuItemActionPerformed
