@@ -43,7 +43,7 @@ public class GettingStartedPanel extends javax.swing.JPanel {
         jLabel5 = new javax.swing.JLabel();
 
         jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getStyle() | java.awt.Font.BOLD, jLabel1.getFont().getSize()+4));
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/logo64x64.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/logo48.png"))); // NOI18N
         jLabel1.setText("Welcome to Autoplot");
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
@@ -52,7 +52,7 @@ public class GettingStartedPanel extends javax.swing.JPanel {
 
         jLabel3.setText("Open a data file on your desktop:");
 
-        browseLocalButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/file.png"))); // NOI18N
+        browseLocalButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/file.png"))); // NOI18N
         browseLocalButton.setToolTipText("Browse local filesystem");
         browseLocalButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -75,27 +75,24 @@ public class GettingStartedPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .add(12, 12, 12)
-                        .add(jComboBox1, 0, 457, Short.MAX_VALUE)
-                        .addContainerGap())
+                        .add(jLabel4)
+                        .add(46, 46, 46))
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createSequentialGroup()
+                                .add(12, 12, 12)
+                                .add(jComboBox1, 0, 457, Short.MAX_VALUE))
                             .add(jLabel1)
                             .add(layout.createSequentialGroup()
                                 .add(12, 12, 12)
                                 .add(jTextField1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(browseLocalButton))
-                            .add(jLabel3))
-                        .addContainerGap())
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel4)
-                        .add(46, 46, 46))
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel2)
-                        .addContainerGap(348, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE)
+                            .add(jLabel3)
+                            .add(layout.createSequentialGroup()
+                                .add(jLabel2)
+                                .add(0, 336, Short.MAX_VALUE))
+                            .add(jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
@@ -116,7 +113,7 @@ public class GettingStartedPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(18, 18, 18)
-                .add(jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
+                .add(jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)
                 .add(12, 12, 12))
         );
     }// </editor-fold>//GEN-END:initComponents

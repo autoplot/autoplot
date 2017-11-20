@@ -4390,7 +4390,7 @@ private void updateFrameTitle() {
                 }
                 String action = (String) JOptionPane.showInputDialog( ScriptContext.getViewWindow(),
                         msg,
-                        "Incorporate New URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/logo64x64.png")),
+                        "Incorporate New URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/resources/logo64x64.png")),
                         new String[] { "New Window", "Replace", "Add Plot" }, "Add Plot" );
                 if ( action!=null ) {
                     switch (action) {

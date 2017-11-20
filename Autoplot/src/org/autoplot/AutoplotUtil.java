@@ -1446,11 +1446,11 @@ public class AutoplotUtil {
      * @return 
      */
     public static Image getAutoplotIcon() {
-        return new ImageIcon(AutoplotUtil.class.getResource("/logo64.png")).getImage();
+        return new ImageIcon(AutoplotUtil.class.getResource("/resources/logo64.png")).getImage();
     }
     
     public static Image getNoIcon() {
-        return new ImageIcon(AutoplotUtil.class.getResource("/logo64.png")).getImage();
+        return new ImageIcon(AutoplotUtil.class.getResource("/resources/logo64.png")).getImage();
     }
 
     public static Icon cancelIcon() {
