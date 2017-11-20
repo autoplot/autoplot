@@ -1004,6 +1004,12 @@ public final class HapiDataSource extends AbstractDataSource {
             httpConnect= null;
         }
         
+        if ( HapiServer.useCache() ) { // round out data request to day boundaries.
+            Datum minMidnight= TimeUtil.prevMidnight( tr.min() );
+            Datum maxMidnight= TimeUtil.nextMidnight( tr.max() );
+            tr= new DatumRange( minMidnight, maxMidnight );
+        }
+        
         //Check to see what time ranges are from entire days, then only call writeToCachedData for these intervals. 
         Datum midnight= TimeUtil.prevMidnight( tr.min() );
         DatumRange currentDay= new DatumRange( midnight, TimeUtil.next( TimeUtil.DAY, midnight) );
