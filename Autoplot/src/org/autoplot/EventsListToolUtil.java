@@ -155,7 +155,8 @@ public class EventsListToolUtil {
             d.getContentPane().add( ll );
             d.pack();
             d.setLocationRelativeTo(t);
-            
+            d.setResizable(true);
+        
             WindowManager.getInstance().recallWindowSizePosition(d);
        
             d.addWindowListener( new WindowAdapter() {

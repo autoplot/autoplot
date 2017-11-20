@@ -44,7 +44,8 @@
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="loadUriMenuItem">
           <Properties>
-            <Property name="text" type="java.lang.String" value="load events file..."/>
+            <Property name="text" type="java.lang.String" value="Load Events File..."/>
+            <Property name="toolTipText" type="java.lang.String" value="Load a list of time ranges from an events file."/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadUriMenuItemActionPerformed"/>

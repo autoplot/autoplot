@@ -36,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import org.autoplot.bookmarks.Bookmark;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.das2.components.DasProgressPanel;
@@ -209,7 +210,8 @@ public class BatchMaster extends javax.swing.JPanel {
         });
         jPopupMenu1.add(jMenuItem1);
 
-        loadUriMenuItem.setText("load events file...");
+        loadUriMenuItem.setText("Load Events File...");
+        loadUriMenuItem.setToolTipText("Load a list of time ranges from an events file.");
         loadUriMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 loadUriMenuItemActionPerformed(evt);
@@ -438,10 +440,15 @@ public class BatchMaster extends javax.swing.JPanel {
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void loadUriMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadUriMenuItemActionPerformed
-        DataSetSelector dataSetSelector1= new DataSetSelector();
-        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog(this, dataSetSelector1, "load events", JOptionPane.OK_CANCEL_OPTION ) ) {
+        DataSetSelector eventsDataSetSelector= new DataSetSelector();
+        
+        List<Bookmark> deft= new ArrayList<>();
+        deft.add( new Bookmark.Item("http://autoplot.org/autoplot/data/event/simpleEvent.txt") );
+        org.autoplot.bookmarks.Util.loadRecent( "eventsRecent", eventsDataSetSelector, deft );
+        
+        if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog(this, eventsDataSetSelector, "Load Events", JOptionPane.OK_CANCEL_OPTION ) ) {
             try {
-                QDataSet ds= org.autoplot.jythonsupport.Util.getDataSet(dataSetSelector1.getValue());
+                QDataSet ds= org.autoplot.jythonsupport.Util.getDataSet(eventsDataSetSelector.getValue());
                 ds= Ops.createEvents(ds);
                 Units tu= ((Units)((QDataSet)ds.property(QDataSet.BUNDLE_1)).property(QDataSet.UNITS,0));
                 StringBuilder ss= new StringBuilder();
