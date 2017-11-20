@@ -21,8 +21,10 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -932,7 +934,14 @@ public final class HapiDataSource extends AbstractDataSource {
                 if ( numberOfFilesExpected==-1 ) {
                     numberOfFilesExpected= fsm.generateNamesFor(tr).length;
                 }
-                if ( ff.length<numberOfFilesExpected ) {
+                int staleCount= 0;
+                for ( File f : ff ) {
+                    if ( ( System.currentTimeMillis() - f.lastModified() ) >= HapiServer.cacheAgeLimitMillis() ) {
+                        staleCount++;
+                    }
+                }
+                
+                if ( (ff.length-staleCount)<numberOfFilesExpected ) {
                     cacheMiss= true;
                 }
             }

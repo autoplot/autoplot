@@ -318,7 +318,7 @@ public class HapiServer {
      * allow cached files to be used for no more than 1 hour.
      * @return 
      */
-    private static long cacheAgeLimitMillis() {
+    protected static long cacheAgeLimitMillis() {
         return 3600000;
     }
     
