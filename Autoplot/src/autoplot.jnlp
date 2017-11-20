@@ -29,10 +29,12 @@
 	<homepage href="http://autoplot.org/" />
         <description>plots data from various sources, such as opendap, cdf, and netcdf using das2</description> 
         <description kind="short">data plotter</description> 
-        <icon href="logo16.png" width="16" height="16" />
-        <icon href="logo32.png" width="32" height="32" />
-        <icon href="logo64.png" width="64" height="64" />
-        <icon href="logo128.png" width="128" height="128" />
+        <icon href="resources/logo16.png" width="16" height="16" />
+        <icon href="resources/logo24.png" width="24" height="24" />
+        <icon href="resources/logo32.png" width="32" height="32" />
+        <icon href="resources/logo48.png" width="48" height="48" />
+        <icon href="resources/logo64.png" width="64" height="64" />
+        <icon href="resources/logo128.png" width="128" height="128" />
         <icon href="splash.png" kind="splash" />
         <!--XXXX  Uncomment for devel and production (latest) releases
         <offline-allowed/>
