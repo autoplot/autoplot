@@ -49,6 +49,11 @@ public class HapiServer {
     protected final static Logger logger= Logger.getLogger("apdss.hapi");
     
     /**
+     * this logger is for opening connections to remote sites.
+     */
+    protected static final Logger loggerUrl= org.das2.util.LoggerManager.getLogger( "das2.url" );
+    
+    /**
      * get known servers.  
      * @return known servers
      */
@@ -436,6 +441,7 @@ public class HapiServer {
             lock.unlock();
         }
         
+        loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );
         StringBuilder builder= new StringBuilder();
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
             String line= in.readLine();

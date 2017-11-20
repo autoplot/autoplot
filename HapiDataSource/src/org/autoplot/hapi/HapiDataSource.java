@@ -76,6 +76,11 @@ public final class HapiDataSource extends AbstractDataSource {
 
     protected final static Logger logger= LoggerManager.getLogger("apdss.hapi");
     
+    /**
+     * this logger is for opening connections to remote sites.
+     */
+    protected static final Logger loggerUrl= org.das2.util.LoggerManager.getLogger( "das2.url" );
+    
     TimeSeriesBrowse tsb;
     
     public HapiDataSource(URI uri) {
@@ -392,6 +397,7 @@ public final class HapiDataSource extends AbstractDataSource {
         
         StringBuilder builder= new StringBuilder();
         logger.log(Level.FINE, "getDocument {0}", url.toString());
+        loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );
         HttpURLConnection httpConnect=  ((HttpURLConnection)url.openConnection());
         httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
         httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
@@ -661,6 +667,7 @@ public final class HapiDataSource extends AbstractDataSource {
         monitor.setProgressMessage("reading data");
         monitor.setTaskProgress(20);
         long t0 = System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
+        loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );
         HttpURLConnection httpConnect = (HttpURLConnection) url.openConnection();
         httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
         httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
@@ -806,6 +813,7 @@ public final class HapiDataSource extends AbstractDataSource {
         
         StringBuilder builder= new StringBuilder();
         logger.log(Level.FINE, "getDocument {0}", url.toString());
+        loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );
         HttpURLConnection httpConnect=  ((HttpURLConnection)url.openConnection());
         httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
         httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
@@ -976,6 +984,7 @@ public final class HapiDataSource extends AbstractDataSource {
         
         HttpURLConnection httpConnect;
         if ( cacheReader==null ) {
+            loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );            
             httpConnect= (HttpURLConnection)url.openConnection();
             httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
             httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
