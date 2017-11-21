@@ -85,8 +85,7 @@ public class AxisController extends DomNodeController {
                     || evt.getPropertyName().equals( Axis.PROP_LOG ) ) axis.setAutoRange(false);
             if ( evt.getPropertyName().equals( Axis.PROP_LABEL ) ) {
                 axis.setAutoLabel(false);
-            }
-            if ( evt.getPropertyName().equals(Axis.PROP_LOG) || evt.getPropertyName().equals(Axis.PROP_RANGE) ) {
+            } else if ( evt.getPropertyName().equals(Axis.PROP_LOG) ) {
                 if ( isPendingChanges() ) return;
                 DatumRange oldRange = axis.range;
                 final DatumRange range = logCheckRange(axis.range, axis.log);
@@ -103,8 +102,25 @@ public class AxisController extends DomNodeController {
                         changesSupport.changePerformed(this, PENDING_RANGE_TWEAK);
                     }
                 }
-            }
-            if ( evt.getPropertyName().equals( Axis.PROP_SCALE ) ) {
+            } else if ( evt.getPropertyName().equals(Axis.PROP_RANGE) ) {
+                if ( isPendingChanges() ) return;
+                DatumRange oldRange = axis.range;
+                final DatumRange range = logCheckRange(axis.range, axis.log);
+                if (!range.equals(oldRange)) {
+                    if ( new Exception().getStackTrace().length > 280 ) {
+                        changesSupport.registerPendingChange(this,PENDING_RANGE_TWEAK);
+                        changesSupport.performingChange(this, PENDING_RANGE_TWEAK);
+                        axis.setLog(false);
+                        changesSupport.changePerformed(this, PENDING_RANGE_TWEAK);
+                    } else {
+                        changesSupport.registerPendingChange(this,PENDING_RANGE_TWEAK);
+                        changesSupport.performingChange(this, PENDING_RANGE_TWEAK);
+                        if ( axis.isLog() ) axis.setLog(false); // pretty sure it is.
+                        axis.setRange(range);
+                        changesSupport.changePerformed(this, PENDING_RANGE_TWEAK);
+                    }
+                }
+            } else if ( evt.getPropertyName().equals( Axis.PROP_SCALE ) ) {
                 if ( dasAxis!=null ) { // the scale has changed, so let's see if we can reset the range to match the scale
                     int npixels;
                     npixels= dasAxis.isHorizontal() ? dasAxis.getColumn().getWidth() : dasAxis.getRow().getHeight();                
