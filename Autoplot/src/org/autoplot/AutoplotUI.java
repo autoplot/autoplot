@@ -3699,7 +3699,7 @@ private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 private void editDomMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editDomMenuItemActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
     PropertyEditor edit= new PropertyEditor(applicationModel.dom);
-    edit.showDialog(this,"DOM Properties",new ImageIcon(this.getClass().getResource("/logo16.png")).getImage());
+    edit.showDialog(this,"DOM Properties",new ImageIcon(this.getClass().getResource("/resources/logo16.png")).getImage());
 }//GEN-LAST:event_editDomMenuItemActionPerformed
 
 private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_statusLabelMouseClicked
