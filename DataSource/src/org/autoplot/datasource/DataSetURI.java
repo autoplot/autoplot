@@ -2318,7 +2318,7 @@ public class DataSetURI {
         
         logger.fine( getResourceURI("file:C:\\documents and settings\\jbf\\pngwalk").toString() );
 
-        URL url= new URL("http://apps-pw/hudson/job/autoplot-release/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/logo64x64.png");
+        URL url= new URL("http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-release2017/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/logo64x64.png");
         File x= downloadResourceAsTempFile( url, new NullProgressMonitor() );
         logger.fine( x.toString() );
 
