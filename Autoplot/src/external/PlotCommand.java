@@ -35,6 +35,8 @@ import org.autoplot.jythonsupport.PyQDataSet;
 import org.autoplot.jythonsupport.PyQDataSetAdapter;
 import org.das2.graph.Renderer;
 import org.das2.qds.DataSetUtil;
+import org.python.core.PyJavaInstance;
+import org.python.core.PyList;
 import org.python.core.PyMethod;
 
 /**
@@ -246,6 +248,9 @@ public class PlotCommand extends PyObject {
         dom.getController().registerPendingChange( this, this );  
         dom.getController().performingChange(this,this);
 
+        final Plot fplot;
+        final PlotElement fplotElement;
+        
         try {
             int chNum= iplot;
 
@@ -388,12 +393,15 @@ public class PlotCommand extends PyObject {
                     plot.getZaxis().setAutoRangeHints( sval );
                 }
             }
+            
+            fplot= plot;
+            fplotElement= element;
 
         } finally {
             dom.getController().changePerformed(this,this);
         }
 
-        return Py.None;
+        return new PyList( new PyObject[] { new PyJavaInstance(fplot), new PyJavaInstance(fplotElement)  } );
     }
 
 }
