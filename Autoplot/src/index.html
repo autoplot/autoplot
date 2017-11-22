@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Google open-font "Fira Sans" is added to Linux ~/.fonts folder, and the font chooser GUI can be used to test if it has characters.  See https://fonts.google.com/.
+        <p><small>Autoplot used to make a Thanksgiving turkey using the contour function.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -77,9 +77,12 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>plot has symbolFill named parameter, rightAxisOf added.
+            <li>Jython plot command returns tuple of (plot,plotElement).
+            <li>Run Batch will print a png or pdf after each iteration.
             <li>Introduce experimental client-side caching to the HAPI support.
             <li>add getNextIndexStrict and getPreviousIndexStrict.
-            <li>new icons!
+            <li>new Autoplot icons!
             <li>rfe609: add experimental HAPI client-side caching.
             <li>rfe548: Jython plot command now accepts renderer, so that scripts can easily add custom renderers.
             <li>create pngwalk tool has mode where the running Autoplot is used to generate the images, not a copy, to aid with debugging and to allow decorations.
