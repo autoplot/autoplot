@@ -131,7 +131,7 @@ public class PlotCommand extends PyObject {
             "isotropic", "xpos", "ypos",
             "xdrawTickLabels", "ydrawTickLabels",
             "xautoRangeHints", "yautoRangeHints", "zautoRangeHints",
-            "renderer", 
+            "renderer", "rightAxisOf",
             "index"
         },
         new PyObject[] { Py.None, Py.None, Py.None, Py.None,
@@ -149,7 +149,7 @@ public class PlotCommand extends PyObject {
             Py.None, Py.None, Py.None,
             Py.None, Py.None,
             Py.None, Py.None, Py.None,
-            Py.None,
+            Py.None, Py.None,
             Py.None
         } );
         
@@ -183,6 +183,7 @@ public class PlotCommand extends PyObject {
         
         Row row=null; // these will be set when xpos and ypos are used.
         Column column=null;
+        Plot plot=null; // use this plot
         
         Application dom= ScriptContext.getDocumentModel();
         String renderType=null;
@@ -231,6 +232,33 @@ public class PlotCommand extends PyObject {
                     }
                 }
                 if ( column==null ) column=dom.getCanvases(0).getMarginColumn();
+            } else if ( keywords[i].equals("rightAxisOf") ) {
+                String spec= args[i+nparm].toString();
+                Plot p;
+                if ( Ops.isSafeName(spec) ) {
+                    DomNode n= DomUtil.getElementById( dom, spec );
+                    p= (Plot)n;
+                } else {
+                    p= ((Plot)args[i+nparm].__tojava__(Plot.class));
+                }
+                Plot underPlot=null;
+                row= (Row)DomUtil.getElementById(dom,p.getRowId());
+                column= (Column)DomUtil.getElementById(dom,p.getColumnId());
+                for ( Plot p1: dom.getPlots() ) {
+                    if ( p1.getRowId().equals(row.getId()) && p1.getColumnId().equals(column.getId()) ) {
+                        if ( p1.getYaxis().isOpposite() ) {
+                            plot= p1;
+                        } else {
+                            underPlot= p1;
+                        }
+                    }
+                }
+                if ( plot==null ) {
+                    plot= dom.getController().addPlot( row, column );
+                    plot.getYaxis().setOpposite(true);
+                    dom.getController().bind( underPlot.getXaxis(), "range", plot.getXaxis(), "range"  );
+                    plot.getXaxis().setVisible(false);
+                }
             } else if ( keywords[i].equals("index") ) {
                 int sindex= Integer.parseInt( args[i+nparm].toString() );
                 iplot= sindex;
@@ -241,10 +269,12 @@ public class PlotCommand extends PyObject {
         
         if ( row!=null ) {
             assert column!=null;
-            Plot p= null;
-            for ( Plot p1: dom.getPlots() ) {
-                if ( p1.getRowId().equals(row.getId()) && p1.getColumnId().equals(column.getId()) ) {
-                    p=p1;
+            Plot p= plot;
+            if ( p==null ) {
+                for ( Plot p1: dom.getPlots() ) {
+                    if ( p1.getRowId().equals(row.getId()) && p1.getColumnId().equals(column.getId()) ) {
+                        p=p1;
+                    }
                 }
             }
             if ( p==null ) p= dom.getController().addPlot( row, column );
@@ -307,7 +337,7 @@ public class PlotCommand extends PyObject {
                 return Py.None;
             }
             PlotElement element= elements.get(0);
-            Plot plot= dom.getController().getPlotFor(element);
+            plot= dom.getController().getPlotFor(element);
             plot.setIsotropic(false);
 
             for ( int i=nparm; i<args.length; i++ ) { //HERE nargs
