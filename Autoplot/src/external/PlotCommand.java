@@ -201,7 +201,13 @@ public class PlotCommand extends PyObject {
                 } else if ( args[i+nparm] instanceof PyString ) {
                     column= dom.getCanvases(0).getController().maybeAddColumn( spec );
                 } else {
-                    column= (Column)args[i+nparm].__tojava__(Column.class);
+                    try {
+                        column= (Column)args[i+nparm].__tojava__(Column.class);
+                    } catch (Exception e ) {
+                        String columnId=((Plot)args[i+nparm].__tojava__(Plot.class)).getColumnId();
+                        DomNode n= DomUtil.getElementById( dom, columnId );
+                        column= (Column)n;
+                    }
                 }
                 if ( row==null ) row=dom.getCanvases(0).getMarginRow();
             } else if ( keywords[i].equals("row") || keywords[i].equals("ypos")) {
@@ -211,12 +217,18 @@ public class PlotCommand extends PyObject {
                     if ( n instanceof Row ) {
                         row= (Row)n;                        
                     } else {
-                        throw new IllegalArgumentException("column named parameter is not the name of a row");
+                        throw new IllegalArgumentException("row named parameter is not the name of a row");
                     }
                 } else if ( args[i+nparm] instanceof PyString ) {
                     row= dom.getCanvases(0).getController().maybeAddRow( spec );                 
                 } else {
-                    row= (Row)args[i+nparm].__tojava__(Row.class);
+                    try {
+                        row= (Row)args[i+nparm].__tojava__(Row.class);
+                    } catch (Exception e ) {
+                        String rowId=((Plot)args[i+nparm].__tojava__(Plot.class)).getRowId();
+                        DomNode n= DomUtil.getElementById( dom, rowId );
+                        row= (Row)n;
+                    }
                 }
                 if ( column==null ) column=dom.getCanvases(0).getMarginColumn();
             } else if ( keywords[i].equals("index") ) {
