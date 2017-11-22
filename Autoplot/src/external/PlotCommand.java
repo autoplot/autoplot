@@ -33,7 +33,9 @@ import org.das2.qds.QDataSet;
 import org.autoplot.jythonsupport.JythonOps;
 import org.autoplot.jythonsupport.PyQDataSet;
 import org.autoplot.jythonsupport.PyQDataSetAdapter;
+import org.das2.graph.FillStyle;
 import org.das2.graph.Renderer;
+import org.das2.graph.SeriesRenderer;
 import org.das2.qds.DataSetUtil;
 import org.python.core.PyJavaInstance;
 import org.python.core.PyList;
@@ -56,6 +58,7 @@ public class PlotCommand extends PyObject {
     public static final PyString __doc__ =
         new PyString("<html><H2>plot([index],x,y,z,[named parameters])</H2>"
             + "plot (or plotx) plots the data or URI for data on the canvas.\n"
+            + "See http://autoplot.org/help.plotCommand<br>\n"
             + "<br><b>named parameters:</b>\n"
             + "<table>"
             + "<tr><td>xlog ylog zlog </td><td>explicitly set this axis to log (or linear when set equal to 0.).</td></tr>\n"
@@ -67,6 +70,7 @@ public class PlotCommand extends PyObject {
             + " <tr><td> fillColor   </td><td>the color when filling volumes.\n</td></tr>"
             + " <tr><td> colorTable  </td><td>the color table to use, like white_blue_black or black_red.\n</td></tr>"
             + " <tr><td> symbolSize     </td><td>set the point (pixel) size\n</td></tr>"
+            + " <tr><td> symbolFill     </td><td>none, outline, or solid (solid is default)\n</td></tr>"
             + " <tr><td> lineWidth   </td><td>deprecated--the line thickness in points (pixels)\n</td></tr>"
             + " <tr><td> lineThick   </td><td>the line thickness in points (pixels)\n</td></tr>"
             + " <tr><td> lineStyle   </td><td>the line style, one of solid,none,dotfine,dashfine</td></tr>"
@@ -120,7 +124,7 @@ public class PlotCommand extends PyObject {
             "symbolSize","lineWidth","lineThick","lineStyle",
             "symsize","linewidth","linethick","linestyle",
             "legendLabel",
-            "symbol",
+            "symbol", "symbolFill",
             "isotropic", "xpos", "ypos",
             "xdrawTickLabels", "ydrawTickLabels",
             "xautoRangeHints", "yautoRangeHints", "zautoRangeHints",
@@ -138,7 +142,7 @@ public class PlotCommand extends PyObject {
             Py.None,Py.None,Py.None,Py.None,
             Py.None,Py.None,Py.None,Py.None,
             Py.None,
-            Py.None,
+            Py.None, Py.None, 
             Py.None, Py.None, Py.None,
             Py.None, Py.None,
             Py.None, Py.None, Py.None,
@@ -318,6 +322,11 @@ public class PlotCommand extends PyObject {
                     plot.setTitle(sval);
                 } else if ( kw.equals("symsize") || kw.equals("symbolSize") ) {
                     element.getStyle().setSymbolSize( Double.valueOf(sval) );
+                } else if ( kw.equals("symbolFill") ) {
+                    if ( element.getController().getRenderer() instanceof SeriesRenderer ) {
+                        FillStyle sfs= (FillStyle) ClassMap.getEnumElement( FillStyle.class, sval ) ;
+                        ((SeriesRenderer) element.getController().getRenderer() ).setFillStyle(sfs);
+                    }
                 } else if ( kw.equals("linewidth" ) || kw.equals("lineWidth") ) {
                     element.getStyle().setLineWidth( Double.valueOf(sval) );
                 } else if ( kw.equals("linethick" ) || kw.equals("lineThick") ) {
