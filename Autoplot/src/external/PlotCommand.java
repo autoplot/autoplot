@@ -26,6 +26,8 @@ import org.autoplot.dom.Application;
 import org.autoplot.dom.CanvasUtil;
 import org.autoplot.dom.Column;
 import org.autoplot.dom.DataSourceFilter;
+import org.autoplot.dom.DomNode;
+import org.autoplot.dom.DomUtil;
 import org.autoplot.dom.Plot;
 import org.autoplot.dom.PlotElement;
 import org.autoplot.dom.Row;
@@ -37,6 +39,7 @@ import org.das2.graph.FillStyle;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.qds.DataSetUtil;
+import org.das2.qds.ops.Ops;
 import org.python.core.PyJavaInstance;
 import org.python.core.PyList;
 import org.python.core.PyMethod;
@@ -186,13 +189,35 @@ public class PlotCommand extends PyObject {
         for ( int i=0; i<keywords.length; i++  ) {
             if ( keywords[i].equals("renderType" ) ) {
                 renderType= args[i+nparm].toString();
-            } else if ( keywords[i].equals("xpos" ) ) {
+            } else if ( keywords[i].equals("column") || keywords[i].equals("xpos")) {
                 String spec= args[i+nparm].toString();
-                column= dom.getCanvases(0).getController().maybeAddColumn( spec );
+                if ( Ops.isSafeName(spec) ) {
+                    DomNode n= DomUtil.getElementById( dom, spec );
+                    if ( n instanceof Column ) {
+                        column= (Column)n;
+                    } else {
+                        throw new IllegalArgumentException("column named parameter is not the name of a column");
+                    }
+                } else if ( args[i+nparm] instanceof PyString ) {
+                    column= dom.getCanvases(0).getController().maybeAddColumn( spec );
+                } else {
+                    column= (Column)args[i+nparm].__tojava__(Column.class);
+                }
                 if ( row==null ) row=dom.getCanvases(0).getMarginRow();
-            } else if ( keywords[i].equals("ypos")) {
+            } else if ( keywords[i].equals("row") || keywords[i].equals("ypos")) {
                 String spec= args[i+nparm].toString();
-                row= dom.getCanvases(0).getController().maybeAddRow( spec );
+                if ( Ops.isSafeName(spec) ) {
+                    DomNode n= DomUtil.getElementById( dom, spec );
+                    if ( n instanceof Row ) {
+                        row= (Row)n;                        
+                    } else {
+                        throw new IllegalArgumentException("column named parameter is not the name of a row");
+                    }
+                } else if ( args[i+nparm] instanceof PyString ) {
+                    row= dom.getCanvases(0).getController().maybeAddRow( spec );                 
+                } else {
+                    row= (Row)args[i+nparm].__tojava__(Row.class);
+                }
                 if ( column==null ) column=dom.getCanvases(0).getMarginColumn();
             } else if ( keywords[i].equals("index") ) {
                 int sindex= Integer.parseInt( args[i+nparm].toString() );
