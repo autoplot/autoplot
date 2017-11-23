@@ -80,7 +80,11 @@ public class Test140 {
     private static String do1( String uri, int iid, boolean doTest, boolean isPublic ) throws Exception {
 
         System.err.printf( "== %03d ==\n", iid );
-        System.err.printf( "uri: %s\n", uri );
+        if ( !isPublic ) {
+            System.err.printf( "uri: %s\n", uri );
+        } else {
+            System.err.printf( "uri: (uri is not public)\n" );
+        }
 
         String label= String.format( "test%03d_%03d", testid, iid );
 
@@ -91,13 +95,15 @@ public class Test140 {
         
         QDataSet ds=null;
         if ( uri.endsWith(".vap") || uri.contains(".vap?timerange=") ) {
-            URISplit split= URISplit.parse(uri);
-            try ( InputStream in = DataSetURI.getInputStream( split.resourceUri, new NullProgressMonitor() ) ) {
-                Application dom= StatePersistence.restoreState( in, URISplit.parseParams( split.params ) );
-                for ( DataSourceFilter dsf : dom.getDataSourceFilters() ) {
-                    System.err.printf( "  %s: %s\n", dsf.getId(), dsf.getUri() );
+            if ( isPublic ) {
+                URISplit split= URISplit.parse(uri);
+                try ( InputStream in = DataSetURI.getInputStream( split.resourceUri, new NullProgressMonitor() ) ) {
+                    Application dom= StatePersistence.restoreState( in, URISplit.parseParams( split.params ) );
+                    for ( DataSourceFilter dsf : dom.getDataSourceFilters() ) {
+                        System.err.printf( "  %s: %s\n", dsf.getId(), dsf.getUri() );
+                    }
+                    System.err.println( "  timerange: "+ dom.getTimeRange() );
                 }
-                System.err.println( "  timerange: "+ dom.getTimeRange() );
             }
                     
             // for vap files, load the vap and grab the first dataset.
@@ -162,7 +168,11 @@ public class Test140 {
             psec= (System.currentTimeMillis()-t0)/1000.;
         }
 
-        System.err.println( "dataset: "+ds );
+        if ( isPublic ) {
+            System.err.println( "dataset: "+ds );
+        } else {
+            System.err.println( "dataset: (data is not public)" );
+        }
         
         String result;
 
