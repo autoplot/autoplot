@@ -228,9 +228,15 @@ public class Test140 {
             }
         }
         
-        System.err.printf( "wrote to file: %s\n", name1 );
-        System.err.printf( "Read in %9.3f seconds (%s): %s\n", tsec, label, uri );
-        System.err.printf( "Plot in %9.3f seconds (%s): %s\n", psec, label, uri );
+        if ( isPublic ) {
+            System.err.printf( "wrote to file: %s\n", name1 );
+            System.err.printf( "Read in %9.3f seconds (%s): %s\n", tsec, label, uri );
+            System.err.printf( "Plot in %9.3f seconds (%s): %s\n", psec, label, uri );
+        } else {
+            System.err.printf( "wrote to file: %s\n", "/home/jbf/ct/hudson/privateArtifacts/"+name1  );
+            System.err.printf( "Read in %9.3f seconds (%s): %s\n", tsec, label, "(uri is not public)" );
+            System.err.printf( "Plot in %9.3f seconds (%s): %s\n", psec, label, "(uri is not public)" );            
+        }
 
         if ( uri.endsWith(".vap") || uri.contains(".vap?timerange=") ) {
             reset();
