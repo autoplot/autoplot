@@ -127,20 +127,25 @@ public class Test140 {
             ds= org.autoplot.jythonsupport.Util.getDataSet( uri );
             tsec= (System.currentTimeMillis()-t0)/1000.;
             if ( ds!=null ) {
-                MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);
-                hist.putProperty( QDataSet.TITLE, uri );
+                if ( isPublic ) {
 
-                hist.putProperty( QDataSet.LABEL, label );
-                formatDataSet( hist, label+".qds");
+                    MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);
+                    hist.putProperty( QDataSet.TITLE, uri );
 
-                QDataSet dep0= (QDataSet) ds.property( QDataSet.DEPEND_0 );
-                if ( dep0!=null ) {
-                    MutablePropertyDataSet hist2= (MutablePropertyDataSet) Ops.autoHistogram(dep0);
-                    formatDataSet( hist2, label+".dep0.qds");
+                    hist.putProperty( QDataSet.LABEL, label );
+                    formatDataSet( hist, label+".qds");
+
+                    QDataSet dep0= (QDataSet) ds.property( QDataSet.DEPEND_0 );
+                    if ( dep0!=null ) {
+                        MutablePropertyDataSet hist2= (MutablePropertyDataSet) Ops.autoHistogram(dep0);
+                        formatDataSet( hist2, label+".dep0.qds");
+                    } else {
+                        try (PrintWriter pw = new PrintWriter( label+".dep0.qds" )) {
+                            pw.println("no dep0");
+                        }
+                    }
                 } else {
-                    PrintWriter pw= new PrintWriter( label+".dep0.qds" );
-                    pw.println("no dep0");
-                    pw.close();
+                    System.err.println("TODO Turkey: Make a hash of the .qds of the data");
                 }
 
                 plot( ds );
