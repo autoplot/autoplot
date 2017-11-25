@@ -20,6 +20,7 @@ import org.das2.datum.Units;
 import org.das2.util.filesystem.FileSystem;
 import org.autoplot.dom.DebugPropertyChangeSupport;
 import org.autoplot.datasource.DataSetURI;
+import org.das2.util.filesystem.FileSystemUtil;
 
 /**
  * <p>This class maintains a list of <code>WalkImage</code>s and provides functionality
@@ -186,7 +187,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
             if (datumRanges.get(i) != null) {
                 captionString = datumRanges.get(i).toString();//TODO: consider not formatting these until visible.
             } else {
-                captionString = uris.get(i).toString();
+                captionString = FileSystemUtil.uriDecode(uris.get(i).toString());
                 if ( splitIndex==-1 ) splitIndex= WalkUtil.splitIndex( template );
                 if ( template.startsWith("file:///") && captionString.length()>6 && captionString.charAt(6)!='/' ) {
                     splitIndex= splitIndex-2;
