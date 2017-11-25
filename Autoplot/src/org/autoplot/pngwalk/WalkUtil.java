@@ -29,6 +29,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.datasource.DataSetURI;
+import org.das2.util.filesystem.FileSystemUtil;
 
 /**
  *
@@ -145,9 +146,9 @@ public class WalkUtil {
                     result.add( f.toURI() );
                 } else {
                     if ( ss[i].startsWith("/") ) {
-                        result.add( fs.getRootURI().resolve( makeSafe( ss[i].substring(1) ) ) );
+                        result.add( fs.getRootURI().resolve( FileSystemUtil.uriEncode( ss[i].substring(1) ) ) );
                     } else {
-                        result.add( fs.getRootURI().resolve( makeSafe( ss[i] ) ) );
+                        result.add( fs.getRootURI().resolve( FileSystemUtil.uriEncode( ss[i] ) ) );
                     }
                 }
                 timeRanges.add(dr2);
