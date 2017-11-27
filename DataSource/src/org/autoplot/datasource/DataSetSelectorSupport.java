@@ -2,6 +2,7 @@
 package org.autoplot.datasource;
 
 import java.awt.Dimension;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -21,6 +22,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import org.das2.datum.DatumRange;
 
@@ -142,7 +144,8 @@ public class DataSetSelectorSupport {
 
         chooser.setFileFilter(select);
 
-        int result = chooser.showOpenDialog(parent);
+        Window w= SwingUtilities.getWindowAncestor(parent);
+        int result = chooser.showOpenDialog(w);
         if (result == JFileChooser.APPROVE_OPTION) {
             prefs.put(AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, chooser.getSelectedFile().getParent() );
             if ( b2.isSelected() ) {
