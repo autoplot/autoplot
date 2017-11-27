@@ -928,8 +928,8 @@ public final class HapiDataSource extends AbstractDataSource {
         boolean cacheMiss= false;
         int numberOfFilesExpected=-1;
         try {
-            for ( int i=0; i<pds.length; i++ ) {
-                FileStorageModel fsm= FileStorageModel.create( FileSystem.create( "file:" + s + "/hapi/"+ u ), "$Y/$m/$Y$m$d." + pds[i].name +".csv" );
+            for ( ParamDescription pd : pds ) {
+                FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" + s + "/hapi/"+ u ), "$Y/$m/$Y$m$d." + pd.name + ".csv");
                 File[] ff= fsm.getFilesFor(tr);
                 if ( numberOfFilesExpected==-1 ) {
                     numberOfFilesExpected= fsm.generateNamesFor(tr).length;
@@ -940,14 +940,11 @@ public final class HapiDataSource extends AbstractDataSource {
                         staleCount++;
                     }
                 }
-                
                 if ( (ff.length-staleCount)<numberOfFilesExpected ) {
                     cacheMiss= true;
                 }
             }
-        } catch ( IOException ex) {
-            return null;
-        } catch ( IllegalArgumentException ex ) {
+        } catch ( IOException | IllegalArgumentException ex) {
             return null;
         }
                 
@@ -959,12 +956,12 @@ public final class HapiDataSource extends AbstractDataSource {
         for ( int j=0; j<numberOfFilesExpected; j++ ) {
             PasteBufferedReader r1= new PasteBufferedReader();
             r1.setDelim(',');
-            for ( int i=0; i<pds.length; i++ ) {
+            for (ParamDescription pd : pds) {
                 try {
-                    FileStorageModel fsm= FileStorageModel.create( FileSystem.create( "file:" + s  + "/hapi/"+ u ), "$Y/$m/$Y$m$d." + pds[i].name +".csv" );
+                    FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" + s  + "/hapi/"+ u ), "$Y/$m/$Y$m$d." + pd.name + ".csv");
                     File[] ff= fsm.getFilesFor(tr);
                     r1.pasteBufferedReader( new SingleFileBufferedReader( new BufferedReader(new FileReader(ff[j])) ) );
-                } catch ( IOException ex ) {
+                }catch ( IOException ex ) {
                     logger.log( Level.SEVERE, ex.getMessage(), ex );
                     return null;
                 }
