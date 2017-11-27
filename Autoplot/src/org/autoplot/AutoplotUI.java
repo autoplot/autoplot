@@ -43,6 +43,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.EventQueue;
@@ -183,6 +184,7 @@ import org.das2.qds.DataSetAnnotations;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetSelector;
+import org.autoplot.datasource.DataSetSelectorSupport;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.HtmlResponseIOException;
@@ -898,6 +900,27 @@ public final class AutoplotUI extends javax.swing.JFrame {
                             logger.log(Level.WARNING,null,ex2);
                         }
                     }
+                }
+            }
+        });
+        
+        dataSetSelector.registerBrowseTrigger( ".*\\.vap(\\?.*)?", new AbstractAction("vap file" ){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String surl= dataSetSelector.getValue();
+                URISplit split= URISplit.parse(surl);
+                if ( split.path.startsWith("file:") ) {
+                    String result= DataSetSelectorSupport.browseLocalVap( dataSetSelector, surl);
+                    if (result != null ) {
+                        dataSetSelector.setValue(result);
+                        dataSetSelector.maybePlot(false);
+                    }
+                    setCursor( Cursor.getDefaultCursor() );
+                    return;
+                } else {
+                    JOptionPane.showMessageDialog( AutoplotUI.this, "Unable to inspect .vap files" );
+                    setCursor( Cursor.getDefaultCursor() );
+                    return;
                 }
             }
         });
