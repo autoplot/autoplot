@@ -38,6 +38,7 @@ import org.autoplot.jythonsupport.PyQDataSetAdapter;
 import org.das2.graph.FillStyle;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
+import org.das2.graph.TickVDescriptor;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.ops.Ops;
 import org.python.core.PyJavaInstance;
@@ -85,7 +86,8 @@ public class PlotCommand extends PyObject {
             + " <tr><td> ypos    </td><td>override vertical position of plot, eg. '0%+1em,25%-2em', 0 is top\n</td>"
             + " <tr><td> xdrawTickLabels</td><td>False turns off the x tick labels for the plot\n</td>"
             + " <tr><td> ydrawTickLabels</td><td>False turns off the y tick labels for the plot\n</td>"
-            + " <tr><td> xautoRangeHints</td><td>hints to the autorange, see http://autoplot.org/AxisAutoRangeHints\n</td>"
+            + " <tr><td> [xyz]tickValues</td><td>array of values locating the ticks\n</td>"
+            + " <tr><td> [xyz]autoRangeHints</td><td>hints to the autorange, see http://autoplot.org/AxisAutoRangeHints\n</td>"
             + " <tr><td> renderer</td><td>add custom renderer, a class extending org.das2.graph.Renderer, see http://autoplot.org/CustomRenderers</td>"
             + "</table></html>");
 
@@ -131,6 +133,7 @@ public class PlotCommand extends PyObject {
             "isotropic", "xpos", "ypos",
             "xdrawTickLabels", "ydrawTickLabels",
             "xautoRangeHints", "yautoRangeHints", "zautoRangeHints",
+            "xtickValues", "ytickValues", "ztickValues",
             "renderer", "rightAxisOf",
             "index"
         },
@@ -148,6 +151,7 @@ public class PlotCommand extends PyObject {
             Py.None, Py.None, 
             Py.None, Py.None, Py.None,
             Py.None, Py.None,
+            Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None,
             Py.None, Py.None,
             Py.None
@@ -461,6 +465,15 @@ public class PlotCommand extends PyObject {
                     plot.getXaxis().setDrawTickLabels( "1".equals(sval) );
                 } else if ( kw.equals("ydrawTickLabels") ) {
                     plot.getYaxis().setDrawTickLabels( "1".equals(sval) );
+                } else if ( kw.equals("xtickValues") ) {
+                    QDataSet vv= JythonOps.dataset(val,plot.getXaxis().getRange().getUnits());
+                    plot.getXaxis().getController().getDasAxis().setTickV( new TickVDescriptor(vv) );
+                } else if ( kw.equals("ytickValues") ) {
+                    QDataSet vv= JythonOps.dataset(val,plot.getYaxis().getRange().getUnits());
+                    plot.getYaxis().getController().getDasAxis().setTickV( new TickVDescriptor(vv) );
+                } else if ( kw.equals("ztickValues") ) {
+                    QDataSet vv= JythonOps.dataset(val,plot.getZaxis().getRange().getUnits());
+                    plot.getZaxis().getController().getDasAxis().setTickV( new TickVDescriptor(vv) );
                 } else if ( kw.equals("xautoRangeHints") ) {
                     plot.getXaxis().setAutoRangeHints( sval );
                 } else if ( kw.equals("yautoRangeHints") ) {
