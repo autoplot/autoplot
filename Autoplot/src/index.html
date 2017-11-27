@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Autoplot used to make a Thanksgiving turkey using the contour function.
+        <p><small>Jython plot command returns the plot and plotElement, and has new rightAxisOf named parameter.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-11-22 r21740):</p>
+        <p>Bugfixes (2017-11-27 r21756):</p>
         <ul>
+            <li>HAPI file caching failed to update download URL to include full days, resulting in partial cache files.
+            <li>1924: Time Range mode allows local vap timerange to be edited, as you can with the URI selector.
+            <li>PngWalk properly decodes and encodes URIs, supporting spaces and brackets in file names.
+            <li>new cadence check of waveform data had a branch which would result in NullPointerException.
             <li>run batch GUI new keeps track of events list GUI.
             <li>valid(r3) where r3 had a BUNDLE_1, as with MagEIS data, would create an invalid result.
             <li>Masafumi caught a case where new series symbol connector code was too restrictive on units.
@@ -77,6 +81,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>new autoplot_test099 allows for testing of private vaps by obfuscating tests. 
             <li>plot has symbolFill named parameter, rightAxisOf added.
             <li>Jython plot command returns tuple of (plot,plotElement).
             <li>Run Batch will print a png or pdf after each iteration.
