@@ -1009,13 +1009,17 @@ public final class HapiDataSource extends AbstractDataSource {
         
         HttpURLConnection httpConnect;
         if ( cacheReader==null ) {
-            loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );            
-            httpConnect= (HttpURLConnection)url.openConnection();
-            httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
-            httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
-            httpConnect.setRequestProperty( "Accept-Encoding", "gzip" );
-            httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect);
-            httpConnect.connect();
+            if ( FileSystem.settings().isOffline() ) {
+                throw new FileSystem.FileSystemOfflineException("file system is offline");
+            } else {
+                loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );            
+                httpConnect= (HttpURLConnection)url.openConnection();
+                httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
+                httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
+                httpConnect.setRequestProperty( "Accept-Encoding", "gzip" );
+                httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect);
+                httpConnect.connect();
+            }
         } else {
             httpConnect= null;
         }
