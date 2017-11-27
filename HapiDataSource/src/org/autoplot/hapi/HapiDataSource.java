@@ -997,6 +997,19 @@ public final class HapiDataSource extends AbstractDataSource {
             cacheReader= null;
         }
         
+        if ( useCache ) { // round out data request to day boundaries.
+            Datum minMidnight= TimeUtil.prevMidnight( tr.min() );
+            Datum maxMidnight= TimeUtil.nextMidnight( tr.max() );
+            tr= new DatumRange( minMidnight, maxMidnight );
+            URISplit split= URISplit.parse(url.toURI());
+            Map<String,String> params= URISplit.parseParams(split.params);
+            params.put("time.min",minMidnight.toString());
+            params.put("time.max",maxMidnight.toString());
+            split.params= URISplit.formatParams(params);
+            String surl= URISplit.format(split);
+            url= new URL(surl);
+        }
+        
         HttpURLConnection httpConnect;
         if ( cacheReader==null ) {
             loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );            
@@ -1009,13 +1022,7 @@ public final class HapiDataSource extends AbstractDataSource {
         } else {
             httpConnect= null;
         }
-        
-        if ( useCache ) { // round out data request to day boundaries.
-            Datum minMidnight= TimeUtil.prevMidnight( tr.min() );
-            Datum maxMidnight= TimeUtil.nextMidnight( tr.max() );
-            tr= new DatumRange( minMidnight, maxMidnight );
-        }
-        
+                
         //Check to see what time ranges are from entire days, then only call writeToCachedData for these intervals. 
         Datum midnight= TimeUtil.prevMidnight( tr.min() );
         DatumRange currentDay= new DatumRange( midnight, TimeUtil.next( TimeUtil.DAY, midnight) );
