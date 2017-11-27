@@ -981,8 +981,14 @@ public final class HapiDataSource extends AbstractDataSource {
         monitor.setTaskProgress(20);
         long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
         
+        boolean useCache= HapiServer.useCache();
+        String cacheParam= getParam( "cache", "" );
+        if ( cacheParam.equals("F") ) {
+            useCache= false;
+        }
+        
         AbstractLineReader cacheReader;
-        if ( HapiServer.useCache() ) {
+        if ( useCache ) {
             cacheReader= getCacheReader( url, pds, tr );
             if ( cacheReader!=null ) {
                 logger.fine("reading from cache");
@@ -1004,7 +1010,7 @@ public final class HapiDataSource extends AbstractDataSource {
             httpConnect= null;
         }
         
-        if ( HapiServer.useCache() ) { // round out data request to day boundaries.
+        if ( useCache ) { // round out data request to day boundaries.
             Datum minMidnight= TimeUtil.prevMidnight( tr.min() );
             Datum maxMidnight= TimeUtil.nextMidnight( tr.max() );
             tr= new DatumRange( minMidnight, maxMidnight );
@@ -1056,7 +1062,7 @@ public final class HapiDataSource extends AbstractDataSource {
                 }
                 
                 if ( completeDay ) {
-                    if ( cacheReader==null && HapiServer.useCache() ) {
+                    if ( cacheReader==null && useCache ) {
                         writeToCachedData( url, pds, xx, ss );
                     }
                 }
