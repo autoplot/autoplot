@@ -2634,7 +2634,6 @@ APSplash.checkTime("init 52.9");
     private void initComponents() {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
-        persistentStateSupport1 = new org.das2.dasml.PersistentStateSupport();
         addressBarButtonGroup = new javax.swing.ButtonGroup();
         statusLabel = new javax.swing.JLabel();
         tabbedPanelContainer = new javax.swing.JPanel();
@@ -5279,7 +5278,6 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenu optionsMenu;
     private javax.swing.JCheckBoxMenuItem overRenderingMenuItem;
     private javax.swing.JMenuItem pasteDataSetURLMenuItem;
-    private org.das2.dasml.PersistentStateSupport persistentStateSupport1;
     private javax.swing.JMenu plotStyleMenu;
     private javax.swing.JMenuItem pngWalkMenuItem;
     private javax.swing.JMenuItem redoMenuItem;
