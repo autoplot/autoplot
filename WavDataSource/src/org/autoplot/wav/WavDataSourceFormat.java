@@ -94,7 +94,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
         if ( doscale ) {
             shift= ( extent.value(1)+extent.value(0) ) / 2;
             if ( ( extent.value(1)-extent.value(0) )>0 ) {
-                scale= typeOrdinals / ( extent.value(1)-extent.value(0) );
+                scale= ( typeOrdinals - 1 ) / ( extent.value(1)-extent.value(0) );
             }
         }
 
@@ -178,7 +178,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
         if ( doscale ) {
             shift= ( extent.value(1)+extent.value(0) ) / 2;
             if ( ( extent.value(1)-extent.value(0) )>0 ) {
-                scale= typeOrdinals / ( extent.value(1)-extent.value(0) );
+                scale= ( typeOrdinals - 1 ) / ( extent.value(1)-extent.value(0) );
             }
         }
 
@@ -243,7 +243,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
         if ( doscale ) {
             shift= 0; // TODO: this is inconsistent with other branches.
             if ( ( extent.value(1)-extent.value(0) )>0 ) {
-                scale= typeOrdinals / ( extent.value(1)-extent.value(0) );
+                scale= ( typeOrdinals - 1 ) / ( extent.value(1)-extent.value(0) );
             }
         }
         
