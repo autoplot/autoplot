@@ -338,7 +338,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         contextMenus.put( canvasLayoutPanel1, plotActionsMenu );
         contextMenus.put( dataSourceList, dataSourceActionsMenu );
 
-        JPopupMenu panelContextMenu = new JPopupMenu();
+        JPopupMenu plotElementContextMenu = new JPopupMenu();
 
         item = new JMenuItem(new AbstractAction("Edit Plot Element Properties") {
             @Override
@@ -363,7 +363,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             }
         });
         item.setToolTipText("edit the plot element or elements");
-        panelContextMenu.add(item);
+        plotElementContextMenu.add(item);
 
         item = new JMenuItem(new AbstractAction("Edit Plot Element Style Properties") {
             @Override
@@ -387,7 +387,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         });
 
         item.setToolTipText("edit the style of plot element or elements");
-        panelContextMenu.add(item);
+        plotElementContextMenu.add(item);
 
         item = new JMenuItem(new AbstractAction("Delete Plot Element") {
             @Override
@@ -401,7 +401,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                 
             }
         });
-        panelContextMenu.add(item);
+        plotElementContextMenu.add(item);
         
         item = new JMenuItem(new AbstractAction("Move Plot Element Above Others") {
             @Override
@@ -420,7 +420,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                 
             }
         });
-        panelContextMenu.add(item);
+        plotElementContextMenu.add(item);
         
         item = new JMenuItem(new AbstractAction("Blur Focus") {
             @Override
@@ -430,9 +430,9 @@ public class LayoutPanel extends javax.swing.JPanel {
                 plotElementListComponent.setSelectedIndices(new int[0]);
             }
         });
-        panelContextMenu.add(item);
+        plotElementContextMenu.add(item);
 
-        contextMenus.put( plotElementListComponent, panelContextMenu );
+        contextMenus.put(plotElementListComponent, plotElementContextMenu );
         contextMenus.put( bindingListComponent, bindingActionsMenu );
 
     }
