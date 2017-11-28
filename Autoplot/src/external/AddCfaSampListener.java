@@ -18,6 +18,9 @@ import org.autoplot.datasource.DataSetSelector;
  * Listener for the Cluster Final Archive SAMP protocol.  Other clients
  * include the SOHO archive viewer, and Ulysses, will include the
  * Cluster Final Archive viewer.
+ * 
+ * @deprecated see org.autoplot.AddSampListener
+ * 
  * @author jbf
  */
 public class AddCfaSampListener {
