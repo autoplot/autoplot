@@ -44,8 +44,8 @@ public class WavDataSource2 extends AbstractDataSource {
         AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(wavFile);
         AudioFormat audioFormat = fileFormat.getFormat();
 
-        // leave 64 bytes for the header.  The wav file format is much more complex than this.  See http://www.sonicspot.com/guide/wavefiles.html
-        int headerLength= 64;
+        // See http://www.topherlee.com/software/pcm-tut-wavformat.html which says the header is 44 bytes.
+        int headerLength= 44;
 
         int frameSize = audioFormat.getFrameSize();
         int frameCount = (int) ( ( wavFile.length() - headerLength ) / frameSize );
