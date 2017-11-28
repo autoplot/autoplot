@@ -427,6 +427,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
                 dom.getController().setPlotElement(null);
+                plotElementListComponent.setSelectedIndices(new int[0]);
             }
         });
         panelContextMenu.add(item);
