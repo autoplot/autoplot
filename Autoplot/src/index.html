@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Jython plot command returns the plot and plotElement, and has new rightAxisOf named parameter.
+        <p><small>Old Autoplot splash screen uses slightly different yellow than new icon.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,9 +24,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-11-27 r21756):</p>
+        <p>Bugfixes (2017-11-28 r21765):</p>
         <ul>
+            <li>Data Mashup dialog add expression option properly removes human-readable label from "magnitude(x): the lengths of the vectors" and others.
             <li>HAPI file caching failed to update download URL to include full days, resulting in partial cache files.
+            <li>trim( ds, t1,t2) handles when ds is length 1 or length 0.  Thanks Ivar!
             <li>1924: Time Range mode allows local vap timerange to be edited, as you can with the URI selector.
             <li>PngWalk properly decodes and encodes URIs, supporting spaces and brackets in file names.
             <li>new cadence check of waveform data had a branch which would result in NullPointerException.
@@ -81,9 +83,13 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Add "blur focus" to layout to aid in debugging.
+            <li>SAMP support supports messages with das2server URLs.
+            <li>HAPI editor reports lastModified, if available.
+            <li>plot has xtickValues and ytickValues.  Thanks, Masafumi!
             <li>new autoplot_test099 allows for testing of private vaps by obfuscating tests. 
-            <li>plot has symbolFill named parameter, rightAxisOf added.
-            <li>Jython plot command returns tuple of (plot,plotElement).
+            <li>plot has symbolFill named parameter, rightAxisOf added.  Thanks, Masafumi!
+            <li>Jython plot command returns tuple of (plot,plotElement).  Thanks, Masafumi!
             <li>Run Batch will print a png or pdf after each iteration.
             <li>Introduce experimental client-side caching to the HAPI support.
             <li>add getNextIndexStrict and getPreviousIndexStrict.
