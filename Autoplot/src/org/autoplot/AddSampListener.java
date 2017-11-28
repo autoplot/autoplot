@@ -118,17 +118,19 @@ public class AddSampListener {
         Metadata meta = new Metadata();
         meta.setName("Autoplot");
         meta.setDescriptionText("Autoplot");
-        meta.setIconUrl("http://autoplot.org/wiki/images/Logo32x32.png");
+        meta.setIconUrl("http://autoplot.org/wiki/images/logo32.png");
         meta.setDocumentationUrl("http://autoplot.org");
 
         hubConnector.declareMetadata(meta);
 
         class ConcreteMessageReceiver extends AbstractMessageHandler {
             String mType;
+            boolean isFileResource;
 
             ConcreteMessageReceiver( String mType ) {
                 super( mType );
                 this.mType= mType;
+                isFileResource=  !mType.equals("table.load.das2");
             }
 
             @Override
@@ -145,7 +147,7 @@ public class AddSampListener {
                     if ( s.startsWith( "file://" ) ) s= s.substring(7);
                 } else {
                     try {
-                        if ( !FileSystemUtil.hasParent( new URL(s) ) ) {
+                        if ( isFileResource && !FileSystemUtil.hasParent( new URL(s) ) ) {
                             try {
                                 File file= DataSetURI.downloadResourceAsTempFile( new URL(s), new NullProgressMonitor() );
                                 // remove the @ part.
@@ -180,6 +182,8 @@ public class AddSampListener {
                 
                 if ( "cdf".equals(ext) || mType.equals("table.load.cdf") ) {
                     maybePlot( sel, "vap+cdf:" + s );
+                } else if ( mType.equals("table.load.das2") )  {
+                    maybePlot( sel, "vap+das2server:" + s );
                 } else if ( mType.equals("image.load.fits") )  {
                     maybePlot( sel, "vap+fits:" + s );
                 }  else if ( mType.equals("table.load.fits") ) {
@@ -197,6 +201,8 @@ public class AddSampListener {
         messageHandler= new ConcreteMessageReceiver("table.load.fits");
         hubConnector.addMessageHandler(messageHandler);
         messageHandler= new ConcreteMessageReceiver("table.load.cdf");
+        hubConnector.addMessageHandler(messageHandler);
+        messageHandler= new ConcreteMessageReceiver("table.load.das2");
         hubConnector.addMessageHandler(messageHandler);
         hubConnector.declareSubscriptions(hubConnector.computeSubscriptions());
     }
