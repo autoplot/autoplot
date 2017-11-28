@@ -22,6 +22,7 @@ import java.text.ParseException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -918,6 +919,32 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         return Units.seconds.createDatum(seconds);
     }
     
+    /**
+     * return the duration in a easily-human-consumable form.
+     * @param milliseconds the duration in milliseconds.
+     * @return a duration like "2.6 hours"
+     */
+    public static String getDurationForHumans( long milliseconds ) {
+        if ( milliseconds<2*1000 ) {
+            return milliseconds+" milliseconds";
+        } else if ( milliseconds<2*60000 ) {
+            return String.format( Locale.US, "%.1f",milliseconds/1000.)+" seconds";
+        } else if ( milliseconds<2*3600000 ) {
+            return String.format( Locale.US, "%.1f",milliseconds/60000.)+" minutes";
+        } else if ( milliseconds<2*86400000 ) {
+            return String.format( Locale.US, "%.1f",milliseconds/3600000.)+" hours";
+        } else {
+            double ddays= milliseconds/86400000.;
+            if ( ddays<48 ) {
+                return String.format( Locale.US, "%.1f",ddays)+" days";
+            } else if ( ddays<400 ) {
+                return String.format( Locale.US, "%.1f",ddays/7)+" weeks";
+            } else {
+                return String.format( Locale.US, "%.1f",ddays/365)+" years";
+            }
+        }
+    }    
+    
     private void resetVariable( URL server, String id ) {
         try {
             JSONObject info= HapiServer.getInfo( server, id );
@@ -1064,7 +1091,17 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                         }
                     }
                 } else {
-                    messagesLabel.setText( range.toString());
+                    String s= range.toString();
+                    if ( info.has("modificationDate") ) {
+                        try {
+                            Datum tmod= Units.us2000.parse(info.getString("modificationDate"));
+                            Datum ago= TimeUtil.now().subtract(tmod);
+                            s += "   last modified " + getDurationForHumans((long)ago.doubleValue(Units.milliseconds) ) + " ago.";
+                        } catch (ParseException ex) {
+                        }
+                        
+                    }
+                    messagesLabel.setText( s );
                 }
                 DefaultComboBoxModel m= new DefaultComboBoxModel(new String[] { "Example Time Ranges",sampleRange.toString() } );
                 exampleTimeRangesCB.setModel(m);
