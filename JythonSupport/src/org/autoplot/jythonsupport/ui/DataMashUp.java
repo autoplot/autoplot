@@ -1279,7 +1279,12 @@ public class DataMashUp extends javax.swing.JPanel {
         if ( c instanceof JList ) {
             Object o= ((JList)c).getSelectedValue();
             if ( o instanceof String ) {
-                return ((String)o);
+                String s= ((String)o);
+                int i= s.indexOf(":");
+                if ( i>1 && s.charAt(i-1)==')' ) {
+                    s= s.substring(0,i);
+                }
+                return s;
             }
         }
         return "";
