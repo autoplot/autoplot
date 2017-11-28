@@ -155,8 +155,10 @@ public class MetadataPanel extends javax.swing.JPanel {
             dsc.removePropertyChangeListener(propertiesListener);
             dsc.removePropertyChangeListener(fillListener);
         }
-        dsf.getController().addPropertyChangeListener(DataSourceController.PROP_RAWPROPERTIES, propertiesListener);
-        dsf.getController().addPropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillListener);
+        if ( dsf!=null ) {
+            dsf.getController().addPropertyChangeListener(DataSourceController.PROP_RAWPROPERTIES, propertiesListener);
+            dsf.getController().addPropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillListener);
+        }
         bindToDataSourceFilter= dsf; // BUGFIX
         updateProperties();
         updateStatistics();
@@ -167,7 +169,9 @@ public class MetadataPanel extends javax.swing.JPanel {
             PlotElementController pec = bindToPlotElement.getController();
             pec.removePropertyChangeListener(componentListener);
         }
-        pe.getController().addPropertyChangeListener(DataSourceController.PROP_DATASET, componentListener );
+        if ( pe!=null ) {
+            pe.getController().addPropertyChangeListener(DataSourceController.PROP_DATASET, componentListener );
+        }
         bindToPlotElement= pe;
         updateComponentDataSet();
 

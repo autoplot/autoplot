@@ -173,16 +173,20 @@ public class DataPanel extends javax.swing.JPanel {
     
     private void updateProcessDataSetLabel() {
         PlotElement lelement= getElement();
-        DataSourceFilter dsf1= dom.getController().getDataSourceFilterFor(lelement);
-        QDataSet orig= dsf1==null ? null : dsf1.getController().getFillDataSet();
-        QDataSet proc= lelement.getController().getDataSet();
-        if ( orig==proc || proc==null ) {
-            processDataSetLabel.setText( "" );
+        if ( lelement!=null ) {
+            DataSourceFilter dsf1= dom.getController().getDataSourceFilterFor(lelement);
+            QDataSet orig= dsf1==null ? null : dsf1.getController().getFillDataSet();
+            QDataSet proc= lelement.getController().getDataSet();
+            if ( orig==proc || proc==null ) {
+                processDataSetLabel.setText( "" );
+            } else {
+                String lbl= String.valueOf( proc );
+                QDataSet ds= lelement.getController().getDataSet();
+                String s=  DataSetUtil.contextAsString( ds ).trim();
+                processDataSetLabel.setText( "<html>These operations result in the dataset<br>"+lbl + ( s.length()==0 ? "" : ( "<br>@ "+ s ) ) );
+            }
         } else {
-            String lbl= String.valueOf( proc );
-            QDataSet ds= lelement.getController().getDataSet();
-            String s=  DataSetUtil.contextAsString( ds ).trim();
-            processDataSetLabel.setText( "<html>These operations result in the dataset<br>"+lbl + ( s.length()==0 ? "" : ( "<br>@ "+ s ) ) );
+            processDataSetLabel.setText( "" );
         }
     }
 
@@ -197,12 +201,20 @@ public class DataPanel extends javax.swing.JPanel {
         PlotElement p = applicationController.getPlotElement();
         plotElement= p;
 
-        plotElementFiltersPanel.setFilter(p.getComponent());
+        if ( p!=null ) {
+            plotElementFiltersPanel.setFilter(p.getComponent());
+        } else {
+            plotElementFiltersPanel.setFilter("");
+        }
 
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                plotElementFiltersPanel.setFilter(plotElement.getComponent()); // because adjusting==true.
+                if ( plotElement!=null ) {
+                    plotElementFiltersPanel.setFilter(plotElement.getComponent()); // because adjusting==true.
+                } else {
+                    plotElementFiltersPanel.setFilter(""); // because adjusting==true.
+                }
             }
         };
         if ( SwingUtilities.isEventDispatchThread() ) {
@@ -211,14 +223,19 @@ public class DataPanel extends javax.swing.JPanel {
             SwingUtilities.invokeLater(run);
         }
         
-        bc.addBinding(Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, plotElement, BeanProperty.create("component"), this.plotElementFiltersPanel, BeanProperty.create( OperationsPanel.PROP_FILTER ) ) );
-        bc.addBinding(Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, plotElement.getController(), BeanProperty.create("sliceAutoranges"), this.sliceAutorangesCB, BeanProperty.create("selected") ) );
+        if ( plotElement!=null ) {
+            bc.addBinding(Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, plotElement, BeanProperty.create("component"), this.plotElementFiltersPanel, BeanProperty.create( OperationsPanel.PROP_FILTER ) ) );
+            bc.addBinding(Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, plotElement.getController(), BeanProperty.create("sliceAutoranges"), this.sliceAutorangesCB, BeanProperty.create("selected") ) );
+        }
 
         elementBindingGroup = bc;
         bc.bind();
         setAdjusting( false );
         
-        p.getController().addPropertyChangeListener( PlotElementController.PROP_DATASET, contextListener );
+        if ( p!=null ) {
+            p.getController().addPropertyChangeListener( PlotElementController.PROP_DATASET, contextListener );
+        }
+            
         updateProcessDataSetLabel();
 
     }
