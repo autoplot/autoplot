@@ -1537,6 +1537,18 @@ APSplash.checkTime("init 270");
             }
         } );
         
+        applicationModel.dom.getController().addPropertyChangeListener( ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ( evt.getNewValue()==null ) {
+                    String current= AutoplotUI.this.stateSupport.getCurrentFile();
+                    if ( current!=null ) {
+                        AutoplotUI.this.dataSetSelector.setValue(current.toString());
+                    }
+                }
+            }
+        });
+        
 /*        applicationModel.dom.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ( dom.getController().isValueAdjusting() ) return;
