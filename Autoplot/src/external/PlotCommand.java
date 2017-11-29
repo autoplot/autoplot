@@ -53,6 +53,7 @@ import org.python.core.PyMethod;
  * plot( 1, ripples(20), color=Color.BLUE )
  * plot( 2, ripples(20), renderType='series>color=blue' )
  *}</small></pre></blockquote>
+ * @see http://autoplot.org/help.plotCommand
  * @author jbf
  */
 public class PlotCommand extends PyObject {
@@ -66,7 +67,7 @@ public class PlotCommand extends PyObject {
             + "<br><b>named parameters:</b>\n"
             + "<table>"
             + "<tr><td>xlog ylog zlog </td><td>explicitly set this axis to log (or linear when set equal to 0.).</td></tr>\n"
-            + " <tr><td> xtitle ytitle ztitle  </td><td>set the label for the axis.</td></tr>\n"
+            + " <tr><td> [xyz]title </td><td>set the label for the axis.</td></tr>\n"
             + " <tr><td> index       </td><td>plot index\n</td></tr>"
             + " <tr><td> title       </td><td>title for the plot\n</td></tr>"
             + " <tr><td> renderType  </td><td> explcitly set the render type, to scatter, series, nnSpectrogram, digital, etc\n</td></tr>"
@@ -84,11 +85,11 @@ public class PlotCommand extends PyObject {
             + " <tr><td> title   </td><td>title for the plot\n</td></tr>"
             + " <tr><td> xpos    </td><td>override horizontal position of plot, eg. '50%+1em,100%-2em'\n</td>"
             + " <tr><td> ypos    </td><td>override vertical position of plot, eg. '0%+1em,25%-2em', 0 is top\n</td>"
-            + " <tr><td> xdrawTickLabels</td><td>False turns off the x tick labels for the plot\n</td>"
-            + " <tr><td> ydrawTickLabels</td><td>False turns off the y tick labels for the plot\n</td>"
-            + " <tr><td> [xyz]tickValues</td><td>array of values locating the ticks\n</td>"
+            + " <tr><td> [xy]drawTickLabels</td><td>False turns off the x or y tick labels for the plot\n</td>"
+            + " <tr><td> [xy]tickValues</td><td>explicitly control the tick locations.</td>"
             + " <tr><td> [xyz]autoRangeHints</td><td>hints to the autorange, see http://autoplot.org/AxisAutoRangeHints\n</td>"
             + " <tr><td> renderer</td><td>add custom renderer, a class extending org.das2.graph.Renderer, see http://autoplot.org/CustomRenderers</td>"
+            + " <tr><td> rightAxisOf</td><td>specify a plot where a new plot with a new yaxis.</td>"
             + "</table></html>");
 
     private static QDataSet coerceIt( PyObject arg0 ) {
@@ -103,6 +104,15 @@ public class PlotCommand extends PyObject {
             } else {
                 return ds;
             }
+        }
+    }
+    
+    private static boolean booleanValue( PyObject arg0 ) {
+        if ( arg0.isNumberType() ) {
+            return arg0.__nonzero__();
+        } else {
+            String s= String.valueOf(arg0);
+            return s.equals("True") || s.equals("T") || s.equals("1");
         }
     }
     
@@ -122,6 +132,7 @@ public class PlotCommand extends PyObject {
             "xtitle", "xrange",
             "ytitle", "yrange",
             "ztitle", "zrange",
+            "xscale", "yscale", 
             "xlog", "ylog", "zlog",
             "title",
             "renderType",
@@ -138,6 +149,7 @@ public class PlotCommand extends PyObject {
             "index"
         },
         new PyObject[] { Py.None, Py.None, Py.None, Py.None,
+            Py.None, Py.None,
             Py.None, Py.None,
             Py.None, Py.None,
             Py.None, Py.None,
@@ -358,7 +370,9 @@ public class PlotCommand extends PyObject {
                     }
                     plot.getYaxis().setRange( newRange );
                 } else if ( kw.equals("ylog") ) {
-                    plot.getYaxis().setLog( "1".equals(sval) );
+                    plot.getYaxis().setLog( booleanValue( val ) );
+                } else if ( kw.equals("yscale") ) {
+                    plot.getYaxis().setScale(JythonOps.datum(val));
                 } else if ( kw.equals("xtitle") ) {
                     plot.getXaxis().setLabel( sval);
                 } else if ( kw.equals("xrange") ) {
@@ -368,7 +382,9 @@ public class PlotCommand extends PyObject {
                     }
                     plot.getXaxis().setRange( newRange );
                 } else if ( kw.equals("xlog") ) {
-                    plot.getXaxis().setLog( "1".equals(sval) );
+                    plot.getXaxis().setLog( booleanValue(val) );
+                } else if ( kw.equals("xscale") ) {
+                    plot.getXaxis().setScale(JythonOps.datum(val));
                 } else if ( kw.equals("ztitle") ) {
                     plot.getZaxis().setLabel( sval);
                 } else if ( kw.equals("zrange") ) {
@@ -378,7 +394,7 @@ public class PlotCommand extends PyObject {
                     }
                     plot.getZaxis().setRange( newRange );
                 } else if ( kw.equals("zlog") ) {
-                    plot.getZaxis().setLog( "1".equals(sval) );
+                    plot.getZaxis().setLog( booleanValue(val) );
                 } else if ( kw.equals("color" ) ) {
                     Color c= JythonOps.color(val);
                     element.getStyle().setColor( c );
@@ -462,9 +478,9 @@ public class PlotCommand extends PyObject {
                 } else if ( kw.equals("isotropic" ) ) {
                     plot.setIsotropic(true);
                 } else if ( kw.equals("xdrawTickLabels") ) {
-                    plot.getXaxis().setDrawTickLabels( "1".equals(sval) );
+                    plot.getXaxis().setDrawTickLabels( booleanValue(val) );
                 } else if ( kw.equals("ydrawTickLabels") ) {
-                    plot.getYaxis().setDrawTickLabels( "1".equals(sval) );
+                    plot.getYaxis().setDrawTickLabels( booleanValue(val) );
                 } else if ( kw.equals("xtickValues") ) {
                     QDataSet vv= JythonOps.dataset(val,plot.getXaxis().getRange().getUnits());
                     plot.getXaxis().getController().getDasAxis().setTickV( new TickVDescriptor(vv) );
