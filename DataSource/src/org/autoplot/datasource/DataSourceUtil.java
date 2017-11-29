@@ -70,8 +70,8 @@ public class DataSourceUtil {
     /**
      * remove escape sequences like %20 to create a human-editable string
      * This contains a kludge that looks for single spaces that are the result of
-     * cut-n-pasting on Linux.  If there is a space and a "%3A", then single spaces
-     * are removed.  <tt>&amp;</tt> is replaced with <tt>&</tt>.
+     * cut-n-pasting on Linux.  Any spaces are removed.  
+     * <code>&amp;amp;</code> is replaced with <code>&</code>.
      * @param s
      * @return
      */
