@@ -77,7 +77,7 @@ public class DataSourceUtil {
      */
     public static String unescape(String s) {
         try {
-            if ( s.contains(" ") && s.contains("%3A") ) {
+            if ( s.contains(" ") ) {
                 //copy and paste on linux sometimes inserts a space, so take these out.
                 s= s.replaceAll(" ", "");
             }
