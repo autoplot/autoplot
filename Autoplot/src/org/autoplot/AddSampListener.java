@@ -4,6 +4,7 @@ package org.autoplot;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Frame;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -63,7 +64,7 @@ public class AddSampListener {
             }       
         } else {
             sel.setValue(uri);
-            sel.maybePlot(true);
+            sel.maybePlot(KeyEvent.ALT_MASK);
         }
     }
 
