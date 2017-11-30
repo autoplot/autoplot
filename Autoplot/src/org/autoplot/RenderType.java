@@ -43,128 +43,110 @@ public enum RenderType {
      */
     public static boolean acceptsData( RenderType rt, QDataSet ds ) {
 
-        if ( rt==spectrogram || rt==nnSpectrogram ) {
-            if ( SemanticOps.isTableDataSet(ds) ) {
-                return true;
-            }
-            if ( Schemes.isXYZScatter(ds) ) return true;
-            if ( Schemes.isLegacyXYZScatter(ds) ) return true;
-            return false;
-        }
-
-        if ( rt==hugeScatter ) {
-            if ( ds.rank()==2 ) {
-                if ( SemanticOps.isBundle(ds) ) {
-                    for ( int i=0; i<ds.length(0); i++ ) {
-                        QDataSet ds1= DataSetOps.unbundle(ds,i);
-                        if ( !UnitsUtil.isIntervalOrRatioMeasurement( SemanticOps.getUnits(ds1) ) ) {
-                            return false;
-                        }
-                    }
-                    return true;
-                } else {
-                    return  SemanticOps.isRank2Waveform(ds);
-                }
-            } else if ( ds.rank()==1 ) {
-                Units u= SemanticOps.getUnits(ds);
-                return UnitsUtil.isIntervalOrRatioMeasurement( u );
-            } else {
-                return false;
-            }
-        }
-
-        if ( rt==series || rt==scatter || rt==stairSteps || rt==fillToZero ) {
-            if ( ds.rank()==1 ) {
-                Units u= SemanticOps.getUnits(ds);
-                if ( UnitsUtil.isIntervalOrRatioMeasurement(u) ) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else if ( ds.rank()==2 ) {
-                if ( ds.length()==0 ) return true;
-                if ( SemanticOps.isBundle(ds) ) {
-                    return true;
-                } else {
-                    return true;
-                }
-            } else if ( ds.rank()==3 ) {
-                return true; // we can always slice repeatedly
-            } else {
-                return false;
-            }
-        }
-
-        if ( rt==colorScatter ) {
-            if ( ds.rank()==2 ) {
-                if ( SemanticOps.isBundle(ds) ) {
-                    for ( int i=0; i<ds.length(0); i++ ) {
-                        QDataSet ds1= DataSetOps.unbundle(ds,i);
-                        if ( !UnitsUtil.isIntervalOrRatioMeasurement( SemanticOps.getUnits(ds1) ) ) {
-                            return false;
-                        }
-                    }
-                    return true;
-                } else {
-                    return false;
-                }
-            } else if ( ds.rank()==1 ) {
-                if ( ds.property(QDataSet.PLANE_0)!=null ) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        }
-
-        if ( rt==digital ) {
-            if ( SemanticOps.isBundle(ds) ) {
-                    for ( int i=0; i<ds.length(0); i++ ) {
-                        QDataSet ds1= DataSetOps.unbundle(ds,i);
-                        if ( !UnitsUtil.isIntervalOrRatioMeasurement( SemanticOps.getUnits(ds1) ) ) {
-                            return false;
-                        }
-                    }
-                    return true;
-                }
-            return true;
-        }
-
-        if ( rt==image ) {
-            return RGBImageRenderer.acceptsData(ds);
-        }
-
-        if ( rt==pitchAngleDistribution ) {
-            return org.das2.graph.PitchAngleDistributionRenderer.acceptsData(ds);
-        }
-
-        if ( rt==polar ) {
-            return org.das2.graph.PolarPlotRenderer.acceptsData(ds);
-        }
+        if ( null == rt )  return true;
         
-        if ( rt==eventsBar ) {
-            return ds.rank()==2 || ds.rank()==1;
-        }
-
-        if ( rt==vectorPlot ) {
-            return org.das2.graph.VectorPlotRenderer.acceptsData(ds);
-        }
-
-
-        if ( rt==orbitPlot ) {
-            return org.das2.graph.TickCurveRenderer.acceptsData(ds);
-        }
-
-        if ( rt==contour ) {
-            if ( ds.rank()==2 ) {
-                return true;
-            } else {
+        switch (rt) {
+            case spectrogram:
+            case nnSpectrogram:
+                if ( SemanticOps.isTableDataSet(ds) ) {
+                    return true;
+                }
+                if ( Schemes.isXYZScatter(ds) ) return true;
+                if ( Schemes.isLegacyXYZScatter(ds) ) return true;
                 return false;
-            }
+            case hugeScatter:
+                if ( ds.rank()==2 ) {
+                    if ( SemanticOps.isBundle(ds) ) {
+                        for ( int i=0; i<ds.length(0); i++ ) {
+                            QDataSet ds1= DataSetOps.unbundle(ds,i);
+                            if ( !UnitsUtil.isIntervalOrRatioMeasurement( SemanticOps.getUnits(ds1) ) ) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    } else {
+                        return  SemanticOps.isRank2Waveform(ds);
+                    }
+                } else if ( ds.rank()==1 ) {
+                    Units u= SemanticOps.getUnits(ds);
+                    return UnitsUtil.isIntervalOrRatioMeasurement( u );
+                } else {
+                    return false;
+                }
+            case series:
+            case scatter:
+            case stairSteps:
+            case fillToZero:
+                if ( ds.rank()==1 ) {
+                    Units u= SemanticOps.getUnits(ds);
+                    if ( UnitsUtil.isIntervalOrRatioMeasurement(u) ) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else if ( ds.rank()==2 ) {
+                    if ( ds.length()==0 ) return true;
+                    if ( SemanticOps.isBundle(ds) ) {
+                        return true;
+                    } else {
+                        return true;
+                    }
+                } else if ( ds.rank()==3 ) {
+                    return true; // we can always slice repeatedly
+                } else {
+                    return false;
+                }
+            case colorScatter:
+                if ( ds.rank()==2 ) {
+                    if ( SemanticOps.isBundle(ds) ) {
+                        for ( int i=0; i<ds.length(0); i++ ) {
+                            QDataSet ds1= DataSetOps.unbundle(ds,i);
+                            if ( !UnitsUtil.isIntervalOrRatioMeasurement( SemanticOps.getUnits(ds1) ) ) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else if ( ds.rank()==1 ) {
+                    if ( ds.property(QDataSet.PLANE_0)!=null ) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            case digital:
+                if ( SemanticOps.isBundle(ds) ) {
+                    for ( int i=0; i<ds.length(0); i++ ) {
+                        QDataSet ds1= DataSetOps.unbundle(ds,i);
+                        if ( !UnitsUtil.isIntervalOrRatioMeasurement( SemanticOps.getUnits(ds1) ) ) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                return true;
+            case image:
+                return RGBImageRenderer.acceptsData(ds);
+            case pitchAngleDistribution:
+                return org.das2.graph.PitchAngleDistributionRenderer.acceptsData(ds);
+            case polar:
+                return org.das2.graph.PolarPlotRenderer.acceptsData(ds);
+            case eventsBar:
+                return ds.rank()==2 || ds.rank()==1;
+            case vectorPlot:
+                return org.das2.graph.VectorPlotRenderer.acceptsData(ds);
+            case orbitPlot:
+                return org.das2.graph.TickCurveRenderer.acceptsData(ds);
+            case contour:
+                return ds.rank()==2;
+            case stackedHistogram:
+                return ds.rank()==2;
+            default:
+                return true;
         }
-
-        return true;
     }
 }
