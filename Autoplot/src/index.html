@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Old Autoplot splash screen uses slightly different yellow than new icon.
+        <p><small>The script plot command has more controls, such as symbolFill.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,10 @@
         
         <p>Bugfixes (2017-11-28 r21765):</p>
         <ul>
+            <li>Events bar renderer supports nominal data without x tags, using 0,1,2,... to mimic other renderers.
+            <li>Zoom/Pan mouse module uses precise wheel rotation interface, supporting precise mice and trackpads.  
+            <li>Zoom/Pan shift+wheel is no longer supported, since Macs use horizontal track pad motion for this.  Control+wheel still works for pan.
+            <li>1913: extraneous question mark introduced by makeCanonical(URI) corrected.
             <li>Data Mashup dialog add expression option properly removes human-readable label from "magnitude(x): the lengths of the vectors" and others.
             <li>HAPI file caching failed to update download URL to include full days, resulting in partial cache files.
             <li>trim( ds, t1,t2) handles when ds is length 1 or length 0.  Thanks Ivar!
@@ -49,7 +53,6 @@
             <li>non-standard micro symbol was used for microseconds, making standard microseconds behave improperly and failure to render as waveform.  Thanks, Chris!
             <li>1916: "NaN" parses to fill Datum for times.  This supports breaks in timeseries.  Thanks, Masafumi!
             <li>1912: new change to check cadence didn't properly consider conditions when issuing errors.  Thanks, Ivar!
-            <li>1913: data source editors shouldn't add extraneous question mark.
         </ul>
         <p>Older Bugfixes:</p>
         <ul>
@@ -83,6 +86,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Ops.dataset is more willing to return enumeration data instead of throwing ParseException.  
+            <li>add applyIndex which allows use with the mashup tool.
+            <li>loosen check for boolean named parameters of plot to support False/True, and "T".  Add xscale and yscale.
             <li>Add "blur focus" to layout to aid in debugging.
             <li>SAMP support supports messages with das2server URLs.
             <li>HAPI editor reports lastModified, if available.
