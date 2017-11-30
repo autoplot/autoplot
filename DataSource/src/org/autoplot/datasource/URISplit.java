@@ -113,6 +113,9 @@ public class URISplit {
                 params.put( k, paramsLoose.get(k) );
             }
             split.params= URISplit.formatParams(params);
+            if ( split.params.length()==0 ) {
+                split.params=null;
+            }
         }
         suri= URISplit.format(split); // make canonical
         if ( !suri.startsWith("vap+") && split.ext!=null && split.ext.length()>1 ) {
