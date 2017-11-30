@@ -50,7 +50,7 @@ public class JavadocLookup {
                 String s= lookups.get(key);
                 if ( s.startsWith("http://docs.oracle.com/javase/8/docs/api/") ) {
                     return lookups.get(key) + signature.replaceAll("[\\(\\)\\,]", "-");
-                } else if ( s.startsWith("http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc2017/ws/doc/") ) {
+                } else if ( s.startsWith("http://www-pw.physics.uiowa.edu/~jbf/autoplot/javadoc/") ) {
                     return lookups.get(key) + signature.replaceAll("[\\(\\)\\,]", "-");
                 } else {
                     return lookups.get(key) + signature.replaceAll(",", ", ");
