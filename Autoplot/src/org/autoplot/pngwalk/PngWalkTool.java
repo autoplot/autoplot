@@ -1798,14 +1798,15 @@ public final class PngWalkTool extends javax.swing.JPanel {
     
     /**
      * provide a method for setting the QCStatus externally.
-     * @param text
-     * @param status 
+     * @param text message annotating the status change or commenting on status.
+     * @param status the status
      */
     public void setQCStatus( String text, QualityControlRecord.Status status ) {
         if ( this.qcPanel==null ) {
             throw new IllegalArgumentException("QC Panel must be started");
         }
         this.qcPanel.setStatus(text, status);
+        this.repaint();
     }
 
     /** This method is called from within the constructor to
@@ -2145,7 +2146,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
     /**
      * provide means for scripts to add component to develop new applications.
-     * @return 
+     * @return the TearoffTabbedPane used.
      */
     public TearoffTabbedPane getTabs() {
         return tabs;
@@ -2496,6 +2497,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
         }
     }
         
+    /** 
+     * Write the displayed images to an animated gif.
+     */
     public void writeAnimatedGif() {
         JFileChooser choose= new JFileChooser();
         
