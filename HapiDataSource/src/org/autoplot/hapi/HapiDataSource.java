@@ -967,6 +967,11 @@ public final class HapiDataSource extends AbstractDataSource {
                         boolean isStale= ( ageMillis > HapiServer.cacheAgeLimitMillis() );
                         if ( lastModified>0 ) {
                             isStale= f.lastModified() < lastModified; // Note FAT32 only has 4sec resolution, which could cause problems.
+                            if ( !isStale ) {
+                                logger.fine("server lastModified indicates the cache file can be used");
+                            } else {
+                                logger.fine("server lastModified indicates the cache file should be updated");
+                            }
                         }
                         if ( offline || !isStale ) {
                             hits[i][j]= true;
