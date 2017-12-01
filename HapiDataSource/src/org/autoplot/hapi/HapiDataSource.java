@@ -907,7 +907,16 @@ public final class HapiDataSource extends AbstractDataSource {
         return ss;
     }
     
-    private AbstractLineReader getCacheReader( URL url, ParamDescription[] pds, DatumRange tr ) {
+    /**
+     * See if it's possible to create a Reader based on the contents of the HAPI
+     * cache.  
+     * @param url URL data request URL, where the time range parameters are ignored.
+     * @param pds the parameters to load.
+     * @param timeRange the span to cover.  This should be from midnight-to-midnight.
+     * @param offline if true, we are offline and anything available should be used.
+     * @return 
+     */
+    private AbstractLineReader getCacheReader( URL url, ParamDescription[] pds, DatumRange timeRange, boolean offline) {
         String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
         String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
@@ -925,53 +934,79 @@ public final class HapiDataSource extends AbstractDataSource {
             throw new IllegalArgumentException("query must be specified, implementation error");
         }
         
-        boolean cacheMiss= false;
-        int numberOfFilesExpected=-1;
+        
+        DatumRange aday= TimeUtil.dayContaining(timeRange.min());
+        List<DatumRange> trs= DatumRangeUtil.generateList( timeRange, aday );
+        
+        long timeNow= System.currentTimeMillis();
+        
+        // which granules are available for all parameters?
+        boolean[][] hits= new boolean[trs.size()][pds.length];
+        File[][] files= new File[trs.size()][pds.length];
+        
+        boolean staleCacheFiles= false;
+        
         try {
-            for ( ParamDescription pd : pds ) {
-                FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" + s + "/hapi/"+ u ), "$Y/$m/$Y$m$d." + pd.name + ".csv");
-                File[] ff= fsm.getFilesFor(tr);
-                if ( numberOfFilesExpected==-1 ) {
-                    numberOfFilesExpected= fsm.generateNamesFor(tr).length;
-                }
-                int staleCount= 0;
-                for ( File f : ff ) {
-                    if ( ( System.currentTimeMillis() - f.lastModified() ) >= HapiServer.cacheAgeLimitMillis() ) {
-                        staleCount++;
+            for ( int i=0; i<trs.size(); i++ ) {
+                DatumRange tr= trs.get(i);
+                for ( int j=0; j<pds.length; j++ ) {
+                    ParamDescription pd= pds[j];
+                    FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" + s + "/hapi/"+ u ), "$Y/$m/$Y$m$d." + pd.name + ".csv");
+                    File[] ff= fsm.getFilesFor(tr);
+                    if ( ff.length>1 ) {
+                        throw new IllegalArgumentException("implementation error, should get just one file per day.");
+                    } else if ( ff.length==0 ) {
+                        hits[i][j]= false;
+                    } else {
+                        File f= ff[0];
+                        long ageMillis= timeNow - f.lastModified();
+                        if ( offline || ( ageMillis < HapiServer.cacheAgeLimitMillis() ) ) {
+                            hits[i][j]= true;
+                            files[i][j]= f;
+                        } else {
+                            logger.log(Level.FINE, "cached file is too old to use: {0}", f);
+                            hits[i][j]= false;
+                            staleCacheFiles= true;
+                        }
                     }
-                }
-                if ( (ff.length-staleCount)<numberOfFilesExpected ) {
-                    cacheMiss= true;
                 }
             }
         } catch ( IOException | IllegalArgumentException ex) {
+            logger.log(Level.FINE, "exception in cache", ex );
             return null;
         }
                 
-        if ( cacheMiss ) {
+        if ( staleCacheFiles ) {
             return null;
         }
     
         ConcatenateBufferedReader result= new ConcatenateBufferedReader();
-        for ( int j=0; j<numberOfFilesExpected; j++ ) {
-            PasteBufferedReader r1= new PasteBufferedReader();
-            r1.setDelim(',');
-            for (ParamDescription pd : pds) {
-                try {
-                    FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" + s  + "/hapi/"+ u ), "$Y/$m/$Y$m$d." + pd.name + ".csv");
-                    File[] ff= fsm.getFilesFor(tr);
-                    r1.pasteBufferedReader( new SingleFileBufferedReader( new BufferedReader(new FileReader(ff[j])) ) );
-                }catch ( IOException ex ) {
-                    logger.log( Level.SEVERE, ex.getMessage(), ex );
-                    return null;
+        for ( int i=0; i<trs.size(); i++ ) {
+            boolean haveAll= true;
+            for ( int j=0; j<pds.length; j++ ) {
+                if ( hits[i][j]==false ) {
+                    haveAll= false;
                 }
             }
-            result.concatenateBufferedReader(r1);
+            if ( haveAll ) {
+                PasteBufferedReader r1= new PasteBufferedReader();
+                r1.setDelim(',');
+                for ( int j=0; j<pds.length; j++ ) {
+                    try {
+                        FileReader oneDayOneParam= new FileReader(files[i][j]);
+                        r1.pasteBufferedReader( new SingleFileBufferedReader( new BufferedReader(oneDayOneParam) ) );
+                    }catch ( IOException ex ) {
+                        logger.log( Level.SEVERE, ex.getMessage(), ex );
+                        return null;
+                    }
+                }
+                result.concatenateBufferedReader(r1);                
+            }   
         }
         
         return result;
     }
-            
+
     private QDataSet getDataSetViaCsv(int totalFields, ProgressMonitor monitor, URL url, ParamDescription[] pds, DatumRange tr, int nparam, int[] nfields) throws IllegalArgumentException, Exception, IOException {
         DataSetBuilder builder= new DataSetBuilder(2,100,totalFields);
         monitor.setProgressMessage("reading data");
@@ -986,7 +1021,7 @@ public final class HapiDataSource extends AbstractDataSource {
         
         AbstractLineReader cacheReader;
         if ( useCache ) {
-            cacheReader= getCacheReader( url, pds, tr );
+            cacheReader= getCacheReader(url, pds, tr, false );
             if ( cacheReader!=null ) {
                 logger.fine("reading from cache");
             }
