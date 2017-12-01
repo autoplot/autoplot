@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -974,9 +975,28 @@ public final class HapiDataSource extends AbstractDataSource {
         }
                 
         if ( staleCacheFiles ) {
+            logger.fine("old cache files found, but new ones are available and accessible");
             return null;
         }
     
+        boolean haveSomething= false;
+        for ( int i=0; i<trs.size(); i++ ) {
+            boolean haveAll= true;
+            for ( int j=0; j<parameters.length; j++ ) {
+                if ( hits[i][j]==false ) {
+                    haveAll= false;
+                }
+            }
+            if ( haveAll ) {
+                haveSomething= true;
+            }
+        }
+        
+        if ( !haveSomething ) {
+            logger.fine("no cached data found");
+            return null;
+        }
+            
         ConcatenateBufferedReader result= new ConcatenateBufferedReader();
         for ( int i=0; i<trs.size(); i++ ) {
             boolean haveAll= true;
@@ -1044,7 +1064,8 @@ public final class HapiDataSource extends AbstractDataSource {
         HttpURLConnection httpConnect;
         if ( cacheReader==null ) {
             if ( FileSystem.settings().isOffline() ) {
-                throw new FileSystem.FileSystemOfflineException("file system is offline");
+                throw new NoDataInIntervalException("HAPI server is offline.");
+                //throw new FileSystem.FileSystemOfflineException("file system is offline");
             } else {
                 loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );            
                 httpConnect= (HttpURLConnection)url.openConnection();
