@@ -233,6 +233,12 @@ public final class HapiDataSource extends AbstractDataSource {
          *  for time-varying depend1 (not in HAPI1.1)
          */
         String[] dependName= null; 
+        
+        /**
+         * date the parameter was last modified, or 0 if not known.
+         */
+        long modifiedDateMillis= 0;
+        
         /**
          * may contain hint for renderer, such as nnspectrogram
          */
@@ -914,7 +920,7 @@ public final class HapiDataSource extends AbstractDataSource {
      * @return null or the reader to use.
      * @see HapiServer#cacheAgeLimitMillis()
      */
-    public static AbstractLineReader getCacheReader( URL url, String[] parameters, DatumRange timeRange, boolean offline) {
+    public static AbstractLineReader getCacheReader( URL url, String[] parameters, DatumRange timeRange, boolean offline, long lastModified) {
         String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
         String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
@@ -958,7 +964,11 @@ public final class HapiDataSource extends AbstractDataSource {
                     } else {
                         File f= ff[0];
                         long ageMillis= timeNow - f.lastModified();
-                        if ( offline || ( ageMillis < HapiServer.cacheAgeLimitMillis() ) ) {
+                        boolean isStale= ( ageMillis > HapiServer.cacheAgeLimitMillis() );
+                        if ( lastModified>0 ) {
+                            isStale= f.lastModified() < lastModified; // Note FAT32 only has 4sec resolution, which could cause problems.
+                        }
+                        if ( offline || !isStale ) {
                             hits[i][j]= true;
                             files[i][j]= f;
                         } else {
@@ -1040,7 +1050,7 @@ public final class HapiDataSource extends AbstractDataSource {
         if ( useCache ) {
             String[] parameters= new String[pds.length];
             for ( int i=0; i<pds.length; i++ ) parameters[i]= pds[i].name;
-            cacheReader= getCacheReader(url, parameters, tr, false );
+            cacheReader= getCacheReader(url, parameters, tr, false, 0L );
             if ( cacheReader!=null ) {
                 logger.fine("reading from cache");
             }
@@ -1182,6 +1192,14 @@ public final class HapiDataSource extends AbstractDataSource {
     private ParamDescription[] getParameterDescriptions(JSONObject doc) throws IllegalArgumentException, ParseException, JSONException {
         JSONArray parameters= doc.getJSONArray("parameters");
         int nparameters= parameters.length();
+        
+        long modificationDate= 0L;
+        if ( doc.has("modificationDate") ) {
+            String s= doc.getString("modificationDate");
+            Datum d= Units.ms1970.parse(s);
+            modificationDate= (long)( d.doubleValue(Units.ms1970) );
+        }
+        
         ParamDescription[] pds= new ParamDescription[nparameters];
         for ( int i=0; i<nparameters; i++ ) {
             
@@ -1195,6 +1213,7 @@ public final class HapiDataSource extends AbstractDataSource {
             }
             
             pds[i]= new ParamDescription( name );
+            pds[i].modifiedDateMillis= modificationDate;
             
             String type;
             if ( jsonObjecti.has("type") ) {
