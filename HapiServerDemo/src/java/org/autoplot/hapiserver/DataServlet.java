@@ -332,7 +332,8 @@ public class DataServlet extends HttpServlet {
         File dataFileHome= new File( Util.getHapiHome(), "data" );
         File dataFile= new File( dataFileHome, id+".csv" );
         
-        try ( BufferedReader r = new BufferedReader( new InputStreamReader( request.getInputStream() ) ); BufferedWriter fout= new BufferedWriter( new FileWriter(dataFile) ) ) { //TODO: merge
+        try ( BufferedReader r = new BufferedReader( new InputStreamReader( request.getInputStream() ) );
+              BufferedWriter fout= new BufferedWriter( new FileWriter(dataFile) ) ) { //TODO: merge
             String s;
             while ( (s=r.readLine())!=null ) {
                 fout.write(s);

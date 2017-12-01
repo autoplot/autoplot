@@ -67,6 +67,12 @@ public class InfoServlet extends HttpServlet {
             }
         }
         
+        if ( o.has("modificationDate") ) { // allow modification date to be "lasthour"
+            String modificationDate= o.getString("modificationDate");
+            DatumRange tr= DatumRangeUtil.parseTimeRangeValid( modificationDate+"/now" );
+            o.put( "modificationDate", tr.min().toString() );
+        }
+        
         // support local features like "now-P3D", which are not hapi features.
         if ( o.has("startDate") && o.has("stopDate") ) { 
             String startDate= o.getString("startDate");

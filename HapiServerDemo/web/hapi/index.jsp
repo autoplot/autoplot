@@ -139,6 +139,7 @@
             <li>2017-08-14: add experimental caching mechanism, where HOME/hapi/cache can contain daily cache files.  Cache is stored in .gzip form.</li>
             <li>2017-08-23: failed release was using old version, where format=binary would return ascii files from the cache.  ascii would not properly subset.</li>
             <li>2017-11-06: put in new catch-all code on the landing page, to aid in debugging.
+            <li>2017-12-01: allow modification date to be "lastday" meaning the dataset was updated at midnight
         </ul>
         </small>
     </body>
