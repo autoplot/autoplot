@@ -5,7 +5,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,11 +16,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -328,31 +325,30 @@ public final class HapiDataSource extends AbstractDataSource {
         }
         if ( t0!=null && t0.ge(xx) ) {
             logger.fine("clear all cached files");
-            for ( int i=0; i<pp.length; i++ ) {
-                String f= s + "/hapi/" + u + "/" + sxx + "." + pp[i].name + ".csv";
+            for (ParamDescription pp1 : pp) {
+                String f = s + "/hapi/" + u + "/" + sxx + "." + pp1.name + ".csv";
                 File ff= new File(f);
-                if ( !ff.delete() ) logger.info("unable to delete file: "+ff);
+                if ( !ff.delete() ) logger.log(Level.INFO, "unable to delete file: {0}", ff);
             }
         }
         
         int ifield=0;
-        for ( int i=0; i<pp.length; i++ ) {
-            String f= s + "/hapi/" + u + "/" + sxx + "." + pp[i].name + ".csv";
+        for (ParamDescription pp1 : pp) {
+            String f = s + "/hapi/" + u + "/" + sxx + "." + pp1.name + ".csv";
             File ff= new File(f);
             if ( !ff.getParentFile().exists() ) {
                 if ( !ff.getParentFile().mkdirs() ) {
                     throw new IOException("unable to mkdirs "+ff.getParent() );
                 }
             }
-            BufferedWriter w= new BufferedWriter( new FileWriter( ff, true ) );
-            int length= pp[i].nFields;
-            for ( int k=0; k<length; k++ ) {
-                if ( k>0 ) w.write(',');
-                w.write(ss[ifield++]);
+            try (final BufferedWriter w = new BufferedWriter( new FileWriter( ff, true ) )) {
+                int length = pp1.nFields;
+                for ( int k=0; k<length; k++ ) {
+                    if ( k>0 ) w.write(',');
+                    w.write(ss[ifield++]);
+                }
+                w.write("\n");
             }
-            
-            w.write("\n");
-            w.close();
         }
         
         lastRecordFound.put( u + "/" + sxx,xx);
@@ -909,14 +905,15 @@ public final class HapiDataSource extends AbstractDataSource {
     
     /**
      * See if it's possible to create a Reader based on the contents of the HAPI
-     * cache.  
+     * cache.  null is returned when cached files cannot be used.
      * @param url URL data request URL, where the time range parameters are ignored.
-     * @param pds the parameters to load.
+     * @param parameters the parameters to load, from ParameterDescription.name
      * @param timeRange the span to cover.  This should be from midnight-to-midnight.
      * @param offline if true, we are offline and anything available should be used.
-     * @return 
+     * @return null or the reader to use.
+     * @see HapiServer#cacheAgeLimitMillis()
      */
-    private AbstractLineReader getCacheReader( URL url, ParamDescription[] pds, DatumRange timeRange, boolean offline) {
+    public static AbstractLineReader getCacheReader( URL url, String[] parameters, DatumRange timeRange, boolean offline) {
         String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
         String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
@@ -941,17 +938,17 @@ public final class HapiDataSource extends AbstractDataSource {
         long timeNow= System.currentTimeMillis();
         
         // which granules are available for all parameters?
-        boolean[][] hits= new boolean[trs.size()][pds.length];
-        File[][] files= new File[trs.size()][pds.length];
+        boolean[][] hits= new boolean[trs.size()][parameters.length];
+        File[][] files= new File[trs.size()][parameters.length];
         
         boolean staleCacheFiles= false;
         
         try {
             for ( int i=0; i<trs.size(); i++ ) {
                 DatumRange tr= trs.get(i);
-                for ( int j=0; j<pds.length; j++ ) {
-                    ParamDescription pd= pds[j];
-                    FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" + s + "/hapi/"+ u ), "$Y/$m/$Y$m$d." + pd.name + ".csv");
+                for ( int j=0; j<parameters.length; j++ ) {
+                    String parameter= parameters[j];
+                    FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" + s + "/hapi/"+ u ), "$Y/$m/$Y$m$d." + parameter + ".csv");
                     File[] ff= fsm.getFilesFor(tr);
                     if ( ff.length>1 ) {
                         throw new IllegalArgumentException("implementation error, should get just one file per day.");
@@ -983,7 +980,7 @@ public final class HapiDataSource extends AbstractDataSource {
         ConcatenateBufferedReader result= new ConcatenateBufferedReader();
         for ( int i=0; i<trs.size(); i++ ) {
             boolean haveAll= true;
-            for ( int j=0; j<pds.length; j++ ) {
+            for ( int j=0; j<parameters.length; j++ ) {
                 if ( hits[i][j]==false ) {
                     haveAll= false;
                 }
@@ -991,7 +988,7 @@ public final class HapiDataSource extends AbstractDataSource {
             if ( haveAll ) {
                 PasteBufferedReader r1= new PasteBufferedReader();
                 r1.setDelim(',');
-                for ( int j=0; j<pds.length; j++ ) {
+                for ( int j=0; j<parameters.length; j++ ) {
                     try {
                         FileReader oneDayOneParam= new FileReader(files[i][j]);
                         r1.pasteBufferedReader( new SingleFileBufferedReader( new BufferedReader(oneDayOneParam) ) );
@@ -1021,7 +1018,9 @@ public final class HapiDataSource extends AbstractDataSource {
         
         AbstractLineReader cacheReader;
         if ( useCache ) {
-            cacheReader= getCacheReader(url, pds, tr, false );
+            String[] parameters= new String[pds.length];
+            for ( int i=0; i<pds.length; i++ ) parameters[i]= pds[i].name;
+            cacheReader= getCacheReader(url, parameters, tr, false );
             if ( cacheReader!=null ) {
                 logger.fine("reading from cache");
             }
