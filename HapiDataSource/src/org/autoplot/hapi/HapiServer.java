@@ -406,6 +406,12 @@ public class HapiServer {
     
     private static final Lock lock= new ReentrantLock();
     
+    /**
+     * read the file into a string.  
+     * @param f non-empty file
+     * @return String containing file contents.
+     * @throws IOException 
+     */
     public static String readFromFile( File f ) throws IOException {
         StringBuilder builder= new StringBuilder();
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( new FileInputStream(f) ) ) ) {
@@ -426,20 +432,11 @@ public class HapiServer {
     /**
      * read data from the URL.  
      * @param url the URL to read from
-     * @param type the extension to use for the cache file (json).
+     * @param type the extension to use for the cache file (JSON).
      * @return non-empty string
      * @throws IOException 
      */
     public static String readFromURL( URL url, String type) throws IOException {
-        lock.lock();
-        try {
-            if ( useCache() ) {
-                String s= readFromCachedURL( url, type );
-                if ( s!=null ) return s;
-            }
-        } finally {
-            lock.unlock();
-        }
         
         loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );
         StringBuilder builder= new StringBuilder();
@@ -450,7 +447,21 @@ public class HapiServer {
                 builder.append("\n");
                 line= in.readLine();
             }
+        } catch ( IOException ex ) {
+            logger.log( Level.FINE, ex.getMessage(), ex );
+            lock.lock();
+            try {
+                if ( useCache() ) {
+                    String s= readFromCachedURL( url, type );
+                    if ( s!=null ) return s;
+                } else {
+                    throw ex;
+                }
+            } finally {
+                lock.unlock();
+            }
         }
+        
         if ( builder.length()==0 ) {
             throw new IOException("empty response from "+url );
         }
