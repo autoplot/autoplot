@@ -27,6 +27,14 @@
         <a href="catalog">Catalog</a> <i>Show the catalog of available data sets.</i><br>
         <a href="capabilities">Capabilities</a> <i>Capabilities of the server. For example, can it use binary streams to transfer data?</i><br>
         Run HAPI server <a href="http://tsds.org/verify-hapi/?url=http://jfaden.net/HapiServerDemo/hapi">verifier</a>.
+        <%
+            if ( request.getRemoteAddr().equals("127.0.0.1") ) {
+                String s= request.getRequestURI();
+                int i= s.indexOf("/",1);
+                s= s.substring(0,i);
+                out.println( String.format( "<br>This is run from localhost, set logging with <a href='%s/SetLogLevel'>SetLogLevel</a><br>", s ));
+            }
+            %>
         <br>
         <%
             try {
