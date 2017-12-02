@@ -80,7 +80,7 @@ public class DataServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+                
         String HAPI_SERVER_HOME= getServletContext().getInitParameter("HAPI_SERVER_HOME");
         Util.setHapiHome( new File( HAPI_SERVER_HOME ) );
             
@@ -91,11 +91,13 @@ public class DataServlet extends HttpServlet {
         String parameters= getParam( params, "parameters", "", "The comma separated list of parameters to include in the response ", null );
         String include= getParam( params, "include", "", "include header at the top", Pattern.compile("(|header)") );
         String format= getParam( params, "format", "", "The desired format for the data stream.", Pattern.compile("(|csv|binary)") );
-        String stream= getParam( params, "stream", "true", "allow/disallow streaming.", Pattern.compile("(|true|false)") );
-        
+        String stream= getParam( params, "_stream", "true", "allow/disallow streaming.", Pattern.compile("(|true|false)") );
+        String timer= getParam( params, "_timer", "false", "service request with timing output stream", Pattern.compile("(|true|false)") );
         if ( !params.isEmpty() ) {
             throw new ServletException("unrecognized parameters: "+params);
         }
+        
+        logger.fine("data request for "+id+" " + timeMin +"/"+timeMax );
         
         DataFormatter dataFormatter;
         if ( format.equals("binary") ) {
@@ -127,7 +129,10 @@ public class DataServlet extends HttpServlet {
         OutputStream out = response.getOutputStream();
         
         long t0= System.currentTimeMillis();
-        //out= new IdleClockOutputStream(out);
+        
+        if ( timer.equals("true") ) {
+            out= new IdleClockOutputStream(out);
+        }
                 
         File[] dataFiles= null;
         dsiter= null;

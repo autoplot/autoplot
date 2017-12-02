@@ -124,6 +124,8 @@ public class InfoServlet extends HttpServlet {
             
         String id= request.getParameter("id");
         
+        logger.log(Level.FINE, "info request for {0}", id);
+        
         if ( id==null ) throw new ServletException("required parameter 'id' is missing from request");
         
         response.setContentType("application/json;charset=UTF-8");        
