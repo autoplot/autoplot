@@ -31,6 +31,17 @@ public class IdleClockOutputStream extends OutputStream {
         }
         this.t0= t;
     }
+
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+        out.write(b, off, len);
+        long t= System.currentTimeMillis();
+        long dt= t-t0;
+        if ( dt>this.maxIdleTime ) {
+            this.maxIdleTime= dt;
+        }
+        this.t0= t;
+    }
     
     /**
      * return the maximum time elapsed between write calls, in milliseconds.
