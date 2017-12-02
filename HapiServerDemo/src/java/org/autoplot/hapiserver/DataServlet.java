@@ -125,6 +125,9 @@ public class DataServlet extends HttpServlet {
         boolean allowStream= !stream.equals("false");
 
         OutputStream out = response.getOutputStream();
+        
+        long t0= System.currentTimeMillis();
+        //out= new IdleClockOutputStream(out);
                 
         File[] dataFiles= null;
         dsiter= null;
@@ -221,6 +224,13 @@ public class DataServlet extends HttpServlet {
                 for ( File dataFile : dataFiles ) {
                     cachedDataCsv(out, dataFile, dr, parameters, indexMap );
                 }
+                
+                if ( out instanceof IdleClockOutputStream ) {
+                    long maxIdleTime= ((IdleClockOutputStream)out).getMaxIdleTime();
+                    logger.log(Level.FINE, "request handled with cache in {0} ms, with longest idle {1}ms.", new Object[]{System.currentTimeMillis()-t0, maxIdleTime});
+                } else {
+                    logger.log(Level.FINE, "request handled with cache in {0} ms.", System.currentTimeMillis()-t0);
+                }
                 return;
             }
             
@@ -276,6 +286,13 @@ public class DataServlet extends HttpServlet {
             
             out.close();
             
+        }
+        
+        if ( out instanceof IdleClockOutputStream ) {
+            long maxIdleTime= ((IdleClockOutputStream)out).getMaxIdleTime();
+            logger.log(Level.FINE, "request handled in {0} ms, with longest idle {1}ms.", new Object[]{System.currentTimeMillis()-t0, maxIdleTime});
+        } else {
+            logger.log(Level.FINE, "request handled in {0} ms.", System.currentTimeMillis()-t0);
         }
     }
 
@@ -387,6 +404,8 @@ public class DataServlet extends HttpServlet {
         } else {
             freader= new FileReader(dataFile);
         }
+        
+        logger.fine( "reading cache csv file: "+dataFile+" "  );
         
         //TODO: handle parameters and format=binary, think about JSON
         int[] pmap=null;
