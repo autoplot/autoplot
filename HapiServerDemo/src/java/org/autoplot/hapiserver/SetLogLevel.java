@@ -130,6 +130,11 @@ public class SetLogLevel extends HttpServlet {
                     if ( hh.length==0 ) {
                         out.println("  (no handlers)");
                     }
+                    
+                    String s= request.getRequestURI();
+                    int i= s.indexOf("/",1);
+                    s= s.substring(0,i); 
+                    out.println("<br>Return to <a href='"+s+"'>home</a><br>");
 
                 }
             }
