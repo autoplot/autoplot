@@ -20,21 +20,23 @@
         <title>HAPI Server JSP Demo</title>
     </head>
     <body>
-        <h1>This is a HAPI Server.</h1>  More information about this type of server is found at <a href="https://github.com/hapi-server/data-specification" target="_blank">github</a>.
-        This implementation of the HAPI server uses Autoplot URIs to load data, more information about Autoplot can be found <a href="http://autoplot.org" target="_blank">here</a>
-        
-        <h3>Some example requests:</h3>
-        <a href="catalog">Catalog</a> <i>Show the catalog of available data sets.</i><br>
-        <a href="capabilities">Capabilities</a> <i>Capabilities of the server. For example, can it use binary streams to transfer data?</i><br>
-        Run HAPI server <a href="http://tsds.org/verify-hapi/?url=http://jfaden.net/HapiServerDemo/hapi">verifier</a>.
+        <h1>This is a HAPI Server.</h1>  More information about this type of server is found at <a href="https://github.com/hapi-server/data-specification" target="_blank">GitHub</a>.
+        This implementation of the HAPI server uses Autoplot URIs to load data, more information about Autoplot can be found <a href="http://autoplot.org" target="_blank">here</a>.
+
+        <br>Run HAPI server <a href="http://tsds.org/verify-hapi/?url=http://jfaden.net/HapiServerDemo/hapi">verifier</a>.
         <%
             if ( request.getRemoteAddr().equals("127.0.0.1") ) {
                 String s= request.getRequestURI();
                 int i= s.indexOf("/",1);
                 s= s.substring(0,i);
-                out.println( String.format( "<br>This is run from localhost, set logging with <a href='%s/SetLogLevel'>SetLogLevel</a><br>", s ));
+                out.println( String.format( "<br>This is run from localhost, set logging with <a href='%s/SetLogLevel'>SetLogLevel</a>. ", s ));
+                out.println( "Requests from localhost will have performance monitored, which can degrade performance.<br><br>");
             }
             %>
+        
+        <h3>Some example requests:</h3>
+        <a href="catalog">Catalog</a> <i>Show the catalog of available data sets.</i><br>
+        <a href="capabilities">Capabilities</a> <i>Capabilities of the server. For example, can it use binary streams to transfer data?</i><br>
         <br>
         <%
             try {
