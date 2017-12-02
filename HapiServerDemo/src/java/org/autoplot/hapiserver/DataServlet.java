@@ -130,7 +130,7 @@ public class DataServlet extends HttpServlet {
         
         long t0= System.currentTimeMillis();
         
-        if ( timer.equals("true") ) {
+        if ( timer.equals("true") || request.getRemoteAddr().equals("127.0.0.1") ) {
             out= new IdleClockOutputStream(out);
         }
                 
@@ -403,6 +403,9 @@ public class DataServlet extends HttpServlet {
      * 
      */
     private void cachedDataCsv( OutputStream out, File dataFile, DatumRange dr, String parameters, int[] indexMap) throws FileNotFoundException, IOException {
+
+        long t0= System.currentTimeMillis();
+        
         Reader freader;
         if ( dataFile.getName().endsWith(".gz") ) {
             freader= new InputStreamReader( new GZIPInputStream( new FileInputStream(dataFile) ) );
@@ -448,6 +451,14 @@ public class DataServlet extends HttpServlet {
             }
         } finally {
             freader.close();
+        }
+        long timer= System.currentTimeMillis()-t0;
+        
+        if ( out instanceof IdleClockOutputStream ) {
+            long maxIdle= ((IdleClockOutputStream)out).getMaxIdleTime();
+            logger.fine( "done reading cache csv file ("+timer+"ms, maxIdle="+maxIdle+"ms): "+dataFile  );
+        } else {
+            logger.fine( "done reading cache csv file ("+timer+"ms): "+dataFile );
         }
     }
     
