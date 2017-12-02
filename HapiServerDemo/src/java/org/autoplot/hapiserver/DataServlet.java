@@ -219,7 +219,7 @@ public class DataServlet extends HttpServlet {
             
             if ( dataFiles!=null ) {
                 for ( File dataFile : dataFiles ) {
-                    cachedDataCsv( dataFormatter, out, dataFile, dr, parameters, indexMap );
+                    cachedDataCsv(out, dataFile, dr, parameters, indexMap );
                 }
                 return;
             }
@@ -372,15 +372,15 @@ public class DataServlet extends HttpServlet {
     /**
      * we have the csv pre-calculated, so just read from it.
      * Note the output stream is closed here!
-     * @param out
+     * @param out the output stream accepting data
      * @param dataFile file to send, which if ends in .gz, uncompress it, 
-     * @param dr
-     * @param parameters
+     * @param dr the range to which the data should be trimmed.
+     * @param parameters if non-empty, then return just these parameters of the cached data.
      * @throws FileNotFoundException
      * @throws IOException 
      * 
      */
-    private void cachedDataCsv( DataFormatter dataFormatter, OutputStream out, File dataFile, DatumRange dr, String parameters, int[] indexMap ) throws FileNotFoundException, IOException {
+    private void cachedDataCsv( OutputStream out, File dataFile, DatumRange dr, String parameters, int[] indexMap) throws FileNotFoundException, IOException {
         Reader freader;
         if ( dataFile.getName().endsWith(".gz") ) {
             freader= new InputStreamReader( new GZIPInputStream( new FileInputStream(dataFile) ) );
