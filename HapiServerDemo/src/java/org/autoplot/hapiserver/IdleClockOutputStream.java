@@ -11,14 +11,18 @@ import java.io.OutputStream;
  */
 public class IdleClockOutputStream extends OutputStream {
 
-    private OutputStream out;
+    private final OutputStream out;
     long maxIdleTime;
     long t0;
+    long totalBytes;
+    long birthMilli;
 
     public IdleClockOutputStream( OutputStream out ) {
         this.out= out;
         this.maxIdleTime= 0;
-        this.t0= System.currentTimeMillis();
+        this.birthMilli= System.currentTimeMillis();
+        this.t0= this.birthMilli;
+        this.totalBytes= 0;
     }
     
     @Override
@@ -30,6 +34,7 @@ public class IdleClockOutputStream extends OutputStream {
             this.maxIdleTime= dt;
         }
         this.t0= t;
+        this.totalBytes++;
     }
 
     @Override
@@ -41,6 +46,7 @@ public class IdleClockOutputStream extends OutputStream {
             this.maxIdleTime= dt;
         }
         this.t0= t;
+        this.totalBytes+= len;
     }
     
     /**
@@ -50,6 +56,22 @@ public class IdleClockOutputStream extends OutputStream {
         return this.maxIdleTime;
     }
 
+    /**
+     * return the maximum time elapsed between write calls, in milliseconds.
+     * @return the maximum time elapsed between write calls, in milliseconds.
+     */
+    public long getTotalBytes() {
+        return this.totalBytes;
+    }
+    
+    /**
+     * return the bytes per second.
+     * @return 
+     */
+    public long getBitsPerSecond() {
+        return this.totalBytes * 1000 / 8 / ( this.t0-this.birthMilli );
+    }
+    
     @Override
     public void close() throws IOException {
         out.close();
