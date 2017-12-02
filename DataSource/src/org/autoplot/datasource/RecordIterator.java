@@ -179,7 +179,7 @@ public class RecordIterator implements Iterator<QDataSet>  {
     public final void constrainDepend0( DatumRange dr ) {
         if ( this.src==null ) {      
             this.depend0Constraint= dr;
-            if ( streamingIterator.hasNext() ) {
+            if ( streamingIterator!=null && streamingIterator.hasNext() ) {
                 nextRecord= streamingIterator.next();
                 nextRecord= normalize(nextRecord);
                 QDataSet dep0= nextRecord.slice(0);
