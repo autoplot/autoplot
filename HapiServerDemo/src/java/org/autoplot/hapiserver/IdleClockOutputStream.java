@@ -51,6 +51,7 @@ public class IdleClockOutputStream extends OutputStream {
     
     /**
      * return the maximum time elapsed between write calls, in milliseconds.
+     * @return the maximum time elapsed between write calls, in milliseconds.
      */
     public long getMaxIdleTime() {
         return this.maxIdleTime;
@@ -65,11 +66,11 @@ public class IdleClockOutputStream extends OutputStream {
     }
     
     /**
-     * return the bytes per second.
-     * @return 
+     * return the bits per second.
+     * @return  the bits per second.
      */
     public long getBitsPerSecond() {
-        return this.totalBytes * 1000 / 8 / ( this.t0-this.birthMilli );
+        return this.totalBytes * 8 * 1000 / ( this.t0-this.birthMilli );
     }
     
     @Override

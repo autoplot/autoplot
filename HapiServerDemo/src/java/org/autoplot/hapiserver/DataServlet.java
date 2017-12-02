@@ -232,7 +232,8 @@ public class DataServlet extends HttpServlet {
                 
                 if ( out instanceof IdleClockOutputStream ) {
                     long maxIdleTime= ((IdleClockOutputStream)out).getMaxIdleTime();
-                    logger.log(Level.FINE, "request handled with cache in {0} ms, with longest idle {1}ms.", new Object[]{System.currentTimeMillis()-t0, maxIdleTime});
+                    long bps= ((IdleClockOutputStream)out).getBitsPerSecond();
+                    logger.log(Level.FINE, "request handled with cache in {0} ms, with longest idle {1}ms, and bps={2}", new Object[]{System.currentTimeMillis()-t0, maxIdleTime, bps });
                 } else {
                     logger.log(Level.FINE, "request handled with cache in {0} ms.", System.currentTimeMillis()-t0);
                 }
@@ -295,7 +296,8 @@ public class DataServlet extends HttpServlet {
         
         if ( out instanceof IdleClockOutputStream ) {
             long maxIdleTime= ((IdleClockOutputStream)out).getMaxIdleTime();
-            logger.log(Level.FINE, "request handled in {0} ms, with longest idle {1}ms.", new Object[]{System.currentTimeMillis()-t0, maxIdleTime});
+            long bps= ((IdleClockOutputStream)out).getBitsPerSecond();
+            logger.log(Level.FINE, "request handled in {0} ms, with longest idle {1}ms, and bps={2}", new Object[]{System.currentTimeMillis()-t0, maxIdleTime, bps });
         } else {
             logger.log(Level.FINE, "request handled in {0} ms.", System.currentTimeMillis()-t0);
         }
