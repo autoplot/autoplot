@@ -16,6 +16,7 @@ public class IdleClockOutputStream extends OutputStream {
     long t0;
     long totalBytes;
     long birthMilli;
+    long firstByteMilli;
 
     public IdleClockOutputStream( OutputStream out ) {
         this.out= out;
@@ -23,6 +24,7 @@ public class IdleClockOutputStream extends OutputStream {
         this.birthMilli= System.currentTimeMillis();
         this.t0= this.birthMilli;
         this.totalBytes= 0;
+        this.firstByteMilli= 0;
     }
     
     @Override
@@ -35,6 +37,7 @@ public class IdleClockOutputStream extends OutputStream {
         }
         this.t0= t;
         this.totalBytes++;
+        if ( this.firstByteMilli==0 ) this.firstByteMilli=t;
     }
 
     @Override
@@ -47,6 +50,7 @@ public class IdleClockOutputStream extends OutputStream {
         }
         this.t0= t;
         this.totalBytes+= len;
+        if ( this.firstByteMilli==0 ) this.firstByteMilli=t;
     }
     
     /**
@@ -71,6 +75,22 @@ public class IdleClockOutputStream extends OutputStream {
      */
     public long getBitsPerSecond() {
         return this.totalBytes * 8 * 1000 / ( this.t0-this.birthMilli );
+    }
+    
+    /**
+     * return time delay to the first byte sent.
+     * @return time delay to the first byte sent.
+     */
+    public long getFirstByteMilli() {
+        return this.firstByteMilli - this.birthMilli;
+    }
+    
+    /**
+     * return all the stats at once.
+     * @return  all the stats at once.
+     */
+    public String getStatsOneLine() {
+        return String.format("idleMax=%dms bps=%d first=%dms", getMaxIdleTime(), getBitsPerSecond(), getFirstByteMilli() );
     }
     
     @Override

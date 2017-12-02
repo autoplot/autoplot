@@ -64,7 +64,11 @@ public class SetLogLevel extends HttpServlet {
                     String s= request.getRequestURI();
                     int i= s.indexOf("/",1);
                     s= s.substring(0,i); 
-                    out.println("<a href=\""+s+"/SetLogLevel?logger=hapi&level=FINE&handler=T\">.../SetLogLevel?logger=hapi&level=FINE&handler=T</a><p><code><small>");
+                    out.println("Turn on logging:");
+                    out.println("<a href=\""+s+"/SetLogLevel?logger=hapi&level=FINE&handler=T\">.../SetLogLevel?logger=hapi&level=FINE&handler=T</a><p>");
+                    out.println("Turn off logging:");
+                    out.println("<a href=\""+s+"/SetLogLevel?logger=hapi&level=INFO&handler=T\">.../SetLogLevel?logger=hapi&level=INFO</a><p>");
+                    out.println("<code><small>");
                     out.println("  logger  the logger name, autoplot.servlet is used in this servlet<br>");
                     out.println("  level   the level, FINE or FINER is used in this servlet<br>");
                     out.println("  handler if T then reset and report the handler levels as well<br>");

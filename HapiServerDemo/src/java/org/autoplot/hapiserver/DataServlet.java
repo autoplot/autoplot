@@ -231,9 +231,8 @@ public class DataServlet extends HttpServlet {
                 }
                 
                 if ( out instanceof IdleClockOutputStream ) {
-                    long maxIdleTime= ((IdleClockOutputStream)out).getMaxIdleTime();
-                    long bps= ((IdleClockOutputStream)out).getBitsPerSecond();
-                    logger.log(Level.FINE, "request handled with cache in {0} ms, with longest idle {1}ms, and bps={2}", new Object[]{System.currentTimeMillis()-t0, maxIdleTime, bps });
+                    logger.log(Level.FINE, "request handled with cache in {0} ms, ", new Object[]{System.currentTimeMillis()-t0, 
+                        ((IdleClockOutputStream)out).getStatsOneLine() });
                 } else {
                     logger.log(Level.FINE, "request handled with cache in {0} ms.", System.currentTimeMillis()-t0);
                 }
@@ -295,9 +294,9 @@ public class DataServlet extends HttpServlet {
         }
         
         if ( out instanceof IdleClockOutputStream ) {
-            long maxIdleTime= ((IdleClockOutputStream)out).getMaxIdleTime();
-            long bps= ((IdleClockOutputStream)out).getBitsPerSecond();
-            logger.log(Level.FINE, "request handled in {0} ms, with longest idle {1}ms, and bps={2}", new Object[]{System.currentTimeMillis()-t0, maxIdleTime, bps });
+            logger.log(Level.FINE, "request handled in {0} ms, {1}",
+                    new Object[]{System.currentTimeMillis()-t0, 
+                        ((IdleClockOutputStream)out).getStatsOneLine() });
         } else {
             logger.log(Level.FINE, "request handled in {0} ms.", System.currentTimeMillis()-t0);
         }
@@ -457,8 +456,8 @@ public class DataServlet extends HttpServlet {
         long timer= System.currentTimeMillis()-t0;
         
         if ( out instanceof IdleClockOutputStream ) {
-            long maxIdle= ((IdleClockOutputStream)out).getMaxIdleTime();
-            logger.fine( "done reading cache csv file ("+timer+"ms, maxIdle="+maxIdle+"ms): "+dataFile  );
+            String s=  ((IdleClockOutputStream)out).getStatsOneLine();
+            logger.fine( "done reading cache csv file ("+timer+"ms, "+s +"): "+dataFile );
         } else {
             logger.fine( "done reading cache csv file ("+timer+"ms): "+dataFile );
         }
