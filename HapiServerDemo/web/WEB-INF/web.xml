@@ -30,7 +30,7 @@
     </servlet>
     <servlet>
         <servlet-name>SetLogLevel</servlet-name>
-        <servlet-class>org.autoplot.SetLogLevel</servlet-class>
+        <servlet-class>org.autoplot.hapiserver.SetLogLevel</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>CatalogServlet</servlet-name>
