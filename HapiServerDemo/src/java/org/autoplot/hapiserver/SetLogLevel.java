@@ -24,6 +24,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class SetLogLevel extends HttpServlet {
    
+    private static final Logger logger= Logger.getLogger("hapi");
+            
     /** 
     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
     * @param request servlet request
@@ -37,7 +39,7 @@ public class SetLogLevel extends HttpServlet {
         
         try (PrintWriter out = response.getWriter()) {
             
-            String logger= request.getParameter("logger");
+            String loggerName= request.getParameter("logger");
             String level= request.getParameter("level");
             String handler= request.getParameter("handler");
             String format= request.getParameter("format");
@@ -53,25 +55,36 @@ public class SetLogLevel extends HttpServlet {
                 out.println("</code>");
                 
             } else {
-                if ( logger==null ) {
+                if ( loggerName==null ) {
                     out.println("<html>");
                     out.println("<head>");
                     out.println("<title>Servlet SetLogLevel</title>");  
                     out.println("</head>");
                     out.println("<body>");
-                    out.println("<p>.../SetLogLevel?logger=autoplot.servlet&level=FINE&handler=T<p><code><small>");
+                    out.println("<p>.../SetLogLevel?logger=hapi&level=FINE&handler=T<p><code><small>");
                     out.println("  logger  the logger name, autoplot.servlet is used in this servlet<br>");
                     out.println("  level   the level, FINE or FINER is used in this servlet<br>");
                     out.println("  handler if T then reset and report the handler levels as well<br>");
                     out.println("  format  =1 for single line to millisecond.<br>");
                     out.println("</code>");
+                    out.println("<br><em>This application uses \""+logger.getName()+"\" for its logger.</em><br><br>");
+                    
+                    Handler[] hh= logger.getHandlers();
+                    out.println("<b>Handlers:</b><br>");
+                    for ( Handler h: hh ) {
+                        out.println("  "+h+" @ "+h.getLevel()+"<br>");
+                    }
+                    if ( hh.length==0 ) {
+                        out.println("  (no handlers)");
+                    }
+                    
                 } else {
 
-                    Handler[] hh= Logger.getLogger(logger).getHandlers();
+                    Handler[] hh= Logger.getLogger(loggerName).getHandlers();
                     Level lev= Level.parse(level);            
-                    Logger l= Logger.getLogger(logger);
+                    Logger l= Logger.getLogger(loggerName);
                     l.setLevel( lev );
-                    Logger.getLogger(logger).log(lev, "reset to {0}", level);
+                    Logger.getLogger(loggerName).log(lev, "reset to {0}", level);
 
                     out.println("<html>");
                     out.println("<head>");
@@ -83,8 +96,8 @@ public class SetLogLevel extends HttpServlet {
                     out.println(""+l +" @ "+l.getLevel()+"<br>" );
 
                     if ( hh.length==0 ) {
-                        Logger.getLogger(logger).addHandler( new ConsoleHandler() );
-                        hh= Logger.getLogger(logger).getHandlers();
+                        Logger.getLogger(loggerName).addHandler( new ConsoleHandler() );
+                        hh= Logger.getLogger(loggerName).getHandlers();
                         out.println("<p>Added ConsoleHandler</p>"); 
                     }
 
