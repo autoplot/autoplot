@@ -32,7 +32,7 @@
                     ip = hh.nextElement();
                 }
             }
-            if ( ip.equals("127.0.0.1") ) {
+            if ( ip.equals("127.0.0.1") || ip.equals("0:0:0:0:0:0:0:1") ) {
                 String s= request.getRequestURI();
                 int i= s.indexOf("/",1);
                 s= s.substring(0,i);
