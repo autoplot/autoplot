@@ -158,6 +158,7 @@
             <li>2017-11-06: put in new catch-all code on the landing page, to aid in debugging.
             <li>2017-12-01: allow modification date to be "lastday" meaning the dataset was updated at midnight
             <li>2017-12-02: various improvements to logging, and new class for monitoring output stream idle added.  More improvements.
+            <li>2017-12-03: correct check for localhost.
         </ul>
         </small>
     </body>
