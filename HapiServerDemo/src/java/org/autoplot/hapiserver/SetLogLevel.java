@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -44,8 +45,16 @@ public class SetLogLevel extends HttpServlet {
             String handler= request.getParameter("handler");
             String format= request.getParameter("format");
             
-            String remoteAddr= request.getRemoteAddr();
-            if ( !remoteAddr.equals("127.0.0.1" ) ) {
+            String ip= request.getRemoteAddr();
+            if (ip.equals("127.0.0.1")) {
+                Enumeration<String> hh= request.getHeaders("X-Forwarded-For");
+                if ( hh.hasMoreElements() ) {
+                    ip = hh.nextElement();
+                }
+            }
+            String remoteAddr= ip;
+            
+            if ( !remoteAddr.equals("127.0.0.1" ) && !remoteAddr.equals("0:0:0:0:0:0:0:1") ) {
                 out.println("<html>");
                 out.println("<head>");
                 out.println("<title>Servlet SetLogLevel</title>");  
