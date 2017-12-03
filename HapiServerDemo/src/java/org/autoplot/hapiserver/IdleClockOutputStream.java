@@ -90,7 +90,7 @@ public class IdleClockOutputStream extends OutputStream {
      * @return  all the stats at once.
      */
     public String getStatsOneLine() {
-        return String.format("idleMax=%dms bps=%d first=%dms", getMaxIdleTime(), getBitsPerSecond(), getFirstByteMilli() );
+        return String.format("idleMax=%dms bits/s=%d first=%dms", getMaxIdleTime(), getBitsPerSecond(), getFirstByteMilli() );
     }
     
     @Override
