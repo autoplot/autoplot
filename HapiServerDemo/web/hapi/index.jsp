@@ -25,7 +25,14 @@
 
         <br>Run HAPI server <a href="http://tsds.org/verify-hapi/?url=http://jfaden.net/HapiServerDemo/hapi">verifier</a>.
         <%
-            if ( request.getRemoteAddr().equals("127.0.0.1") ) {
+            String ip = request.getRemoteAddr();
+            if (ip.equals("127.0.0.1")) {
+                Enumeration<String> hh= request.getHeaders("X-Forwarded-For");
+                if ( hh.hasMoreElements() ) {
+                    ip = hh.nextElement();
+                }
+            }
+            if ( ip.equals("127.0.0.1") ) {
                 String s= request.getRequestURI();
                 int i= s.indexOf("/",1);
                 s= s.substring(0,i);
