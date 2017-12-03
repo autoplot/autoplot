@@ -24,7 +24,7 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-11-30 r21781):</p>
+        <p>Bugfixes (2017-12-03 r21818):</p>
         <ul>
             <li>Events bar renderer supports nominal data without x tags, using 0,1,2,... to mimic other renderers.
             <li>Zoom/Pan mouse module uses precise wheel rotation interface, supporting precise mice and trackpads.  
@@ -86,6 +86,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Mouse modules can provide feedback, so zoom/pan can indicate control should be used instead of shift.
             <li>Ops.dataset is more willing to return enumeration data instead of throwing ParseException.  
             <li>add applyIndex which allows use with the mashup tool.
             <li>loosen check for boolean named parameters of plot to support False/True, and "T".  Add xscale and yscale.
