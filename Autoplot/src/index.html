@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The script plot command has more controls, such as symbolFill.
+        <p><small>Old "isotropic" switch binds the x axis and y axis scale.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,7 @@
         
         <p>Bugfixes (2017-12-03 r21818):</p>
         <ul>
+            <li>Matlab/IDL interface disables SSL checking.
             <li>Events bar renderer supports nominal data without x tags, using 0,1,2,... to mimic other renderers.
             <li>Zoom/Pan mouse module uses precise wheel rotation interface, supporting precise mice and trackpads.  
             <li>Zoom/Pan shift+wheel is no longer supported, since Macs use horizontal track pad motion for this.  Control+wheel still works for pan.
