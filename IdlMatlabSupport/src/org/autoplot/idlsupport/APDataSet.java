@@ -147,6 +147,7 @@ public class APDataSet extends QDataSetBridge {
      * @return
      * @throws Exception
      */
+    @Override
     protected QDataSet getDataSet( ProgressMonitor mon ) throws Exception {
         logger.fine("getDataSet");
         if ( surl==null ) {
@@ -204,7 +205,7 @@ public class APDataSet extends QDataSetBridge {
     }
     public static void main(String[] args) {
         APDataSet qds = new APDataSet();
-        qds.setDataSetURI("http://www.autoplot.org/data/autoplot.dat");
+        qds.setDataSetURI("http://autoplot.org/data/autoplot.dat");
         qds.doGetDataSet( new NullProgressMonitor() );
 
         String n = qds.name();
