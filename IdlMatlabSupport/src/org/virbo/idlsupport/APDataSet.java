@@ -2,11 +2,20 @@
 package org.virbo.idlsupport;
 
 import java.net.URI;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.qds.QDataSet;
@@ -36,11 +45,46 @@ public class APDataSet extends QDataSetBridge {
      */
     public APDataSet() {
         super();
-        System.err.println("APDataSet v1.5.2");
+        System.err.println("APDataSet v1.6.1");
         String j= System.getProperty("java.version");
         System.err.println("Java Version "+j);
-    }
+        System.err.println("*** org.virbo.idlsupport is deprecated, switch to org.autoplot.idlsupport some time in 2018.");
 
+        logger.fine("disabling HTTP certificate checks.");
+        try {
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    @Override
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return new java.security.cert.X509Certificate[0];
+                    }
+                    @Override
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) {  }
+                    @Override
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) {  }
+                }
+            };
+
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+            // Create all-trusting host name verifier
+            HostnameVerifier allHostsValid = new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            };
+
+            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);    
+
+        } catch (KeyManagementException | NoSuchAlgorithmException ex) {
+            Logger.getLogger(APDataSet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    
     /**
      * set the data source URL.  This is an alias for setDataSetURI.
      * @param surl suri the dataset location, such as http://autoplot.org/data/autoplot.dat
@@ -161,7 +205,7 @@ public class APDataSet extends QDataSetBridge {
     }
     public static void main(String[] args) {
         APDataSet qds = new APDataSet();
-        qds.setDataSetURI("http://www.autoplot.org/data/autoplot.dat");
+        qds.setDataSetURI("http://autoplot.org/data/autoplot.dat");
         qds.doGetDataSet( new NullProgressMonitor() );
 
         String n = qds.name();
