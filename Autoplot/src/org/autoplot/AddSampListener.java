@@ -152,6 +152,7 @@ public class AddSampListener {
             @Override
             public Map processCall( HubConnection connection, String senderId, Message message ) {
                 logger.log(Level.FINE, "got message: {0}", message.toString());
+                logger.log(Level.FINER, "handling as file resource: {0}", isFileResource);
                 String s= (String) message.getParam("url");
                 String n= (String) message.getParam("name");
                 if ( n!=null && n.endsWith(" table") ) {
@@ -165,6 +166,7 @@ public class AddSampListener {
                     try {
                         if ( isFileResource && !FileSystemUtil.hasParent( new URL(s) ) ) {
                             try {
+                                logger.log(Level.FINER, "downloading file {0}", s );
                                 File file= DataSetURI.downloadResourceAsTempFile( new URL(s), new NullProgressMonitor() );
                                 // remove the @ part.
                                 String s1= file.getAbsolutePath();
