@@ -27,6 +27,7 @@ import org.astrogrid.samp.xmlrpc.StandardClientProfile;
 import org.astrogrid.samp.gui.GuiHubConnector;
 import org.astrogrid.samp.client.AbstractMessageHandler;
 import org.astrogrid.samp.client.HubConnection;
+import org.astrogrid.samp.client.HubConnector;
 import org.das2.util.LoggerManager;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
@@ -92,6 +93,16 @@ public class AddSampListener {
         addSampListener( sel );
     }
     
+    private static GuiHubConnector hubConnector;
+            
+    /**
+     * return the HubConnector for testing.
+     * @return 
+     */
+    public static synchronized HubConnector getHubConnector() {
+        return hubConnector;
+    }
+    
     /**
      * Add the SAMP listener to Autoplot.
      * @param sel the selector.
@@ -120,7 +131,7 @@ public class AddSampListener {
             logger.info("Client is already running.");
         }
         
-        GuiHubConnector hubConnector = new GuiHubConnector(profile);
+        hubConnector = new GuiHubConnector(profile);
         hubConnector.setAutoconnect(3);
 
         if ( ! "true".equals( System.getProperty("java.awt.headless") ) ) {
