@@ -7,16 +7,20 @@ import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ComboBoxEditor;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.Metadata;
 import org.astrogrid.samp.xmlrpc.StandardClientProfile;
@@ -64,7 +68,18 @@ public class AddSampListener {
             }       
         } else {
             sel.setValue(uri);
-            sel.maybePlot(KeyEvent.ALT_MASK);
+            final DataSetSelector fsel= sel;
+            Runnable run= new Runnable() {
+                @Override
+                public void run() {
+                    fsel.maybePlot(KeyEvent.ALT_MASK); // this needs to be done on the event thread because inspectURI gets model data from GUI. TODO: fix this after AGU!
+                }
+            };
+            try {
+                SwingUtilities.invokeAndWait(run);
+            } catch (InterruptedException | InvocationTargetException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
         }
     }
 
