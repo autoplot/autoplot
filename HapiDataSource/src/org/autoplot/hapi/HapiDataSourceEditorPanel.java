@@ -4,6 +4,7 @@ package org.autoplot.hapi;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,6 +12,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -31,6 +33,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
+import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -59,6 +62,7 @@ import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.URISplit;
+import org.das2.util.FileUtil;
 
 /**
  * Swing editor for HAPI URIs
@@ -274,6 +278,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         setAllB = new javax.swing.JButton();
         extraInfoButton = new javax.swing.JButton();
         titleLabel = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         idsList2 = new javax.swing.JList<>();
@@ -344,15 +349,24 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         titleLabel.setText(" ");
 
+        jButton2.setText("Cached Files...");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(clearAllB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(setAllB)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(extraInfoButton))
             .addComponent(titleLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -367,7 +381,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(clearAllB)
                     .addComponent(setAllB)
-                    .addComponent(extraInfoButton)))
+                    .addComponent(extraInfoButton)
+                    .addComponent(jButton2)))
         );
 
         jSplitPane1.setRightComponent(jPanel3);
@@ -598,6 +613,26 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     }//GEN-LAST:event_exampleTimeRangesCBItemStateChanged
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        
+        String[] params= getParameters(true).split(",");
+        Map<String,DatumRange> ff;
+        try {
+            ff = HapiDataSource.getCacheFiles( this.currentServer, this.currentId, params, 
+                    DatumRangeUtil.parseTimeRange((String)timeRangeComboBox.getSelectedItem()) );
+        } catch (ParseException ex) {
+            return;
+        }
+        File cacheFolder= HapiDataSource.cacheFolder(  this.currentServer, this.currentId + "/data" );
+        HapiCacheManager mm= new HapiCacheManager();
+        String[] ss= ff.keySet().toArray( new String[ff.size()] );
+        mm.setFiles( cacheFolder, ss );
+        if ( JOptionPane.showConfirmDialog(this,mm,"Manage Cached Data",JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION ) {
+            FileUtil.deleteFileTree(cacheFolder); //TODO: off of the event thread
+        }
+        
+    }//GEN-LAST:event_jButton2ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox binaryCB;
@@ -608,6 +643,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private org.autoplot.datasource.RecentComboBox filtersComboBox;
     private javax.swing.JList<String> idsList2;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
@@ -674,7 +710,12 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     }
 
-    private String getParameters() {
+    /**
+     * 
+     * @param enumerate if true show all parameters, instead of ""
+     * @return all the parameters
+     */
+    private String getParameters(boolean enumerate) {
         StringBuilder b= new StringBuilder();
         boolean areAllTrue= true;
         for ( Component c: parametersPanel.getComponents() ) {
@@ -686,7 +727,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 }
             }
         }
-        if ( areAllTrue ) {
+        if ( areAllTrue && !enumerate ) {
             return "";
         } else {
             return b.substring(1); // remove first comma.
@@ -749,7 +790,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
 
     @Override
     public String getURI() {
-        String parameters= getParameters();
+        String parameters= getParameters(false);
         String id= idsList2.getSelectedValue();
         if ( id==null ) {
             id= "";

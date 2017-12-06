@@ -22,6 +22,7 @@ import java.nio.ByteOrder;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -910,6 +911,63 @@ public final class HapiDataSource extends AbstractDataSource {
         return ss;
     }
     
+    public static File cacheFolder( URL url, String id ) {
+        String cache= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
+        if ( cache.endsWith("/") ) cache= cache.substring(0,cache.length()-1);
+        
+        String dsroot= cache + "/hapi/" + url.getProtocol() + "/" + url.getHost() + "/" + url.getPath() + "/" + id; 
+        return new File( dsroot );
+    }
+    
+    public static LinkedHashMap<String,DatumRange> getCacheFiles( URL url, String id, String[] parameters, DatumRange timeRange ) {
+        String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
+        if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
+        String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
+        int len= ( u + "/data/").length();
+        u= u + "/data/" + id;        
+        
+        DatumRange aday= TimeUtil.dayContaining(timeRange.min());
+        List<DatumRange> trs= DatumRangeUtil.generateList( timeRange, aday );
+        
+        // which granules are available for all parameters?
+        boolean[][] hits= new boolean[trs.size()][parameters.length];
+        String[][] files= new String[trs.size()][parameters.length];
+        
+        try {
+            for ( int i=0; i<trs.size(); i++ ) {
+                DatumRange tr= trs.get(i);
+                for ( int j=0; j<parameters.length; j++ ) {
+                    String parameter= parameters[j];
+                    String theFile= s + "/hapi/"+ u ;
+                    FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" +theFile ), "$Y/$m/$Y$m$d." + parameter + ".csv");
+                    String[] ff= fsm.getNamesFor(tr);
+                    if ( ff.length>1 ) {
+                        throw new IllegalArgumentException("implementation error, should get just one file per day.");
+                    } else if ( ff.length==0 ) {
+                        hits[i][j]= false;
+                    } else {
+                        String f= ff[0];
+                        hits[i][j]= true;
+                        files[i][j]= f;
+                    }
+                }
+            }
+        } catch ( IOException | IllegalArgumentException ex) {
+            logger.log(Level.FINE, "exception in cache", ex );
+            return null;
+        }
+        
+        LinkedHashMap<String,DatumRange> result= new LinkedHashMap<>();
+        for ( int i=0; i<trs.size(); i++ ) {
+            for ( int j=0; j<parameters.length; j++ ) {
+                result.put( files[i][j], trs.get(i) );
+            }
+        }
+                
+        return result;
+  
+    }
+    
     /**
      * See if it's possible to create a Reader based on the contents of the HAPI
      * cache.  null is returned when cached files cannot be used.
@@ -919,6 +977,7 @@ public final class HapiDataSource extends AbstractDataSource {
      * @param offline if true, we are offline and anything available should be used.
      * @return null or the reader to use.
      * @see HapiServer#cacheAgeLimitMillis()
+     * @see #getCacheFiles which has copied code.  TODO: fix this.
      */
     public static AbstractLineReader getCacheReader( URL url, String[] parameters, DatumRange timeRange, boolean offline, long lastModified) {
         String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
