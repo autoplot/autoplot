@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Old "isotropic" switch binds the x axis and y axis scale.
+        <p><small>Experiments with using Java 2D to find bounding regions.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,7 @@
         
         <p>Bugfixes (2017-12-03 r21818):</p>
         <ul>
+            <li>rte_0155056645: IndexOutOfBounds caused by new quick monotonic check.  Thanks, Scott!
             <li>SAMP listener was not properly passing the URI, should have done on event thread so old one was used.  Thanks Baptiste!
             <li>Matlab/IDL interface disables SSL checking.  Thanks, Kris!
             <li>Events bar renderer supports nominal data without x tags, using 0,1,2,... to mimic other renderers.
