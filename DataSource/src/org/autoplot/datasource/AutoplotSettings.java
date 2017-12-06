@@ -165,6 +165,7 @@ public final class AutoplotSettings {
      * is replaced with System.getProperty("user.home").
      * @param name the name to resolve, such as PROP_AUTOPLOTDATA or PROP_FSCACHE
      * @return the value with references resolved.
+     * TODO: this should always make result end in slash...
      */
     public String resolveProperty( String name ) {
         if ( name.equals("autoplotData") ) {
