@@ -278,7 +278,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         setAllB = new javax.swing.JButton();
         extraInfoButton = new javax.swing.JButton();
         titleLabel = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
+        cachedFileButton = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         idsList2 = new javax.swing.JList<>();
@@ -349,10 +349,10 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         titleLabel.setText(" ");
 
-        jButton2.setText("Cached Files...");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        cachedFileButton.setText("Cached Files...");
+        cachedFileButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                cachedFileButtonActionPerformed(evt);
             }
         });
 
@@ -366,7 +366,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(setAllB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2)
+                .addComponent(cachedFileButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(extraInfoButton))
             .addComponent(titleLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -382,7 +382,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     .addComponent(clearAllB)
                     .addComponent(setAllB)
                     .addComponent(extraInfoButton)
-                    .addComponent(jButton2)))
+                    .addComponent(cachedFileButton)))
         );
 
         jSplitPane1.setRightComponent(jPanel3);
@@ -613,7 +613,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     }//GEN-LAST:event_exampleTimeRangesCBItemStateChanged
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void cachedFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cachedFileButtonActionPerformed
         
         String[] params= getParameters(true).split(",");
         Map<String,DatumRange> ff;
@@ -631,11 +631,12 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             FileUtil.deleteFileTree(cacheFolder); //TODO: off of the event thread
         }
         
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_cachedFileButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox binaryCB;
+    private javax.swing.JButton cachedFileButton;
     private javax.swing.JButton clearAllB;
     private javax.swing.JButton clearButton;
     private javax.swing.JComboBox<String> exampleTimeRangesCB;
@@ -643,7 +644,6 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private org.autoplot.datasource.RecentComboBox filtersComboBox;
     private javax.swing.JList<String> idsList2;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
@@ -777,6 +777,9 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             this.binaryCB.setSelected(false);
         }
         
+        if ( !HapiServer.useCache() ) {
+            cachedFileButton.setVisible(false);
+        }
     }
 
     @Override
