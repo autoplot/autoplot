@@ -617,17 +617,17 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         
         String[] params= getParameters(true).split(",");
         Map<String,DatumRange> ff;
-        try {
-            ff = HapiDataSource.getCacheFiles( this.currentServer, this.currentId, params, 
-                    DatumRangeUtil.parseTimeRange((String)timeRangeComboBox.getSelectedItem()) );
-        } catch (ParseException ex) {
+        ff = HapiDataSource.getCacheFiles( this.currentServer, this.currentId, params, null );
+        if ( ff==null ) {
+            JOptionPane.showMessageDialog( this, "No cache files found in the interval");
             return;
         }
-        File cacheFolder= HapiDataSource.cacheFolder(  this.currentServer, this.currentId + "/data" );
+        File cacheFolder= HapiDataSource.cacheFolder(  this.currentServer, "/data/" + this.currentId  );
         HapiCacheManager mm= new HapiCacheManager();
         String[] ss= ff.keySet().toArray( new String[ff.size()] );
         mm.setFiles( cacheFolder, ss );
         if ( JOptionPane.showConfirmDialog(this,mm,"Manage Cached Data",JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION ) {
+            System.err.println("cacheFolder: "+cacheFolder );
             FileUtil.deleteFileTree(cacheFolder); //TODO: off of the event thread
         }
         
@@ -1028,6 +1028,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             extra.append("</table></html>");
             currentExtra= extra.toString();
             parametersPanel.removeAll();
+            String[] sparams= new String[parameters.length()];
             for ( int i=0; i<parameters.length(); i++ ) {
                 JSONObject parameter= parameters.getJSONObject(i);
 //                if ( parameter.has("size") ) {
@@ -1040,8 +1041,10 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
 //                    logger.log(Level.WARNING, "size is array is not supported in Autoplot.");
 //                    continue;
 //                }
-                JCheckBox cb= new JCheckBox(parameter.getString("name"));
-                cb.setName(parameter.getString("name"));
+                sparams[i]= parameter.getString("name");
+                JCheckBox cb= new JCheckBox(sparams[i]);
+                cb.setName(sparams[i]);
+                
                 cb.setSelected(true);
                 final int fi= i;
                 cb.addActionListener(new ActionListener() {
@@ -1077,7 +1080,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             parametersPanel.repaint();
             if ( currentParameters!=null ) {
                 setParameters(currentParameters);
-            }
+            }            
             DatumRange range= getRange(info);
             if ( range==null ) {
                 logger.warning("server is missing required startDate and stopDate parameters.");

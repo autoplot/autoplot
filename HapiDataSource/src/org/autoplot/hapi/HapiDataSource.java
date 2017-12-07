@@ -929,26 +929,17 @@ public final class HapiDataSource extends AbstractDataSource {
         DatumRange aday= TimeUtil.dayContaining(timeRange.min());
         List<DatumRange> trs= DatumRangeUtil.generateList( timeRange, aday );
         
-        // which granules are available for all parameters?
-        boolean[][] hits= new boolean[trs.size()][parameters.length];
-        String[][] files= new String[trs.size()][parameters.length];
-        
+        LinkedHashMap<String,DatumRange> result= new LinkedHashMap<>();
+         
         try {
-            for ( int i=0; i<trs.size(); i++ ) {
-                DatumRange tr= trs.get(i);
-                for ( int j=0; j<parameters.length; j++ ) {
-                    String parameter= parameters[j];
-                    String theFile= s + "/hapi/"+ u ;
-                    FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" +theFile ), "$Y/$m/$Y$m$d." + parameter + ".csv");
-                    String[] ff= fsm.getNamesFor(tr);
-                    if ( ff.length>1 ) {
-                        throw new IllegalArgumentException("implementation error, should get just one file per day.");
-                    } else if ( ff.length==0 ) {
-                        hits[i][j]= false;
-                    } else {
-                        String f= ff[0];
-                        hits[i][j]= true;
-                        files[i][j]= f;
+            for (String parameter : parameters) {
+                String theFile= s + "/hapi/"+ u ;
+                FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" +theFile ), "$Y/$m/$Y$m$d." + parameter + ".csv");
+                String[] ff= fsm.getNamesFor(null);
+                for (String ff1 : ff) {
+                    DatumRange tr1= fsm.getRangeFor(ff1);
+                    if ( timeRange==null || timeRange.intersects(tr1)) {
+                        result.put(ff1,tr1);
                     }
                 }
             }
@@ -956,14 +947,7 @@ public final class HapiDataSource extends AbstractDataSource {
             logger.log(Level.FINE, "exception in cache", ex );
             return null;
         }
-        
-        LinkedHashMap<String,DatumRange> result= new LinkedHashMap<>();
-        for ( int i=0; i<trs.size(); i++ ) {
-            for ( int j=0; j<parameters.length; j++ ) {
-                result.put( files[i][j], trs.get(i) );
-            }
-        }
-                
+                        
         return result;
   
     }
