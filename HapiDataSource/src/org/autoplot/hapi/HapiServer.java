@@ -442,6 +442,10 @@ public class HapiServer {
      */
     public static String readFromURL( URL url, String type) throws IOException {
         
+        if ( FileSystem.settings().isOffline() ) {
+            String s= readFromCachedURL( url, type );
+            if ( s!=null ) return s;
+        }
         loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );
         StringBuilder builder= new StringBuilder();
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
