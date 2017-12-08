@@ -14,6 +14,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,6 +38,9 @@ import org.json.JSONObject;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
 import org.das2.datum.Datum;
+import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.TimeUtil;
+import org.das2.datum.Units;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 
@@ -522,5 +526,130 @@ public class HapiServer {
             throw new IllegalArgumentException(ex);
         }
     }
+    
+    /**
+     * [yr,mon,day,hour,min,sec,nanos]
+     * @param array
+     * @return approximate seconds
+     */
+    private static Datum cadenceArrayToDatum( int[] array ) {
+        double seconds= array[6]/1e9;
+        seconds+= array[5];
+        seconds+= array[4]*60;
+        seconds+= array[3]*3600;
+        seconds+= array[2]*86400; //approx, just to get scale
+        seconds+= array[1]*86400*30; //approx, just to get scale
+        seconds+= array[0]*86400*365; // approx, just to get scale
+        return Units.seconds.createDatum(seconds);
+    }
+    
+    
+    /**
+     * return the range of available data. For example, Polar/Hydra data is available
+     * from 1996-03-20 to 2008-04-15.  Note this supports old schemas.
+     * @param info
+     * @return the range of available data.
+     */
+    public static DatumRange getRange( JSONObject info ) {
+        try {
+            if ( info.has("firstDate") && info.has("lastDate") ) { // this is deprecated behavior
+                String firstDate= info.getString("firstDate");
+                String lastDate= info.getString("lastDate");
+                if ( firstDate!=null && lastDate!=null ) {
+                    Datum t1= Units.us2000.parse(firstDate);
+                    Datum t2= Units.us2000.parse(lastDate);
+                    if ( t1.le(t2) ) {
+                        return new DatumRange( t1, t2 );
+                    } else {
+                        logger.warning( "firstDate and lastDate are out of order, ignoring.");
+                    }
+                }
+            } else if ( info.has("startDate") ) { // note startDate is required.
+                String startDate= info.getString("startDate");
+				String stopDate;
+				if ( info.has("stopDate") ) {
+					stopDate= info.getString("stopDate");
+				} else {
+					stopDate= null;
+				}
+                if ( startDate!=null ) {
+                    Datum t1= Units.us2000.parse(startDate);
+                    Datum t2= Units.us2000.parse(stopDate);
+                    if ( t1.le(t2) ) {
+                        return new DatumRange( t1, t2 );
+                    } else {
+                        logger.warning( "firstDate and lastDate are out of order, ignoring.");
+                    }
+                }
+			}
+        } catch ( JSONException | ParseException ex ) {
+            logger.log( Level.WARNING, ex.getMessage(), ex );
+        }
+        return null;
+    }    
 
+    /**
+     * return a time which is a suitable time to discover the data.
+     * @param info
+     * @return 
+     */
+    public static DatumRange getSampleTimeRange( JSONObject info ) throws JSONException {
+        DatumRange range= getRange(info);
+        if ( range==null ) {
+            logger.warning("server is missing required startDate and stopDate parameters.");
+            throw new IllegalArgumentException("here fail");
+        } else {
+            DatumRange sampleRange=null;
+            if ( info.has("sampleStartDate") && info.has("sampleStopDate") ) {
+                try {
+                    sampleRange = new DatumRange( Units.us2000.parse(info.getString("sampleStartDate")), Units.us2000.parse(info.getString("sampleStopDate")) );
+                } catch (JSONException | ParseException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+            } 
+            if ( sampleRange==null ) {
+                Datum cadence= Units.seconds.createDatum(60);  // assume default cadence of 1 minute results in 1 day sample range.
+                if ( info.has("cadence") ) {
+                    try{
+                        int[] icadence= DatumRangeUtil.parseISO8601Duration(info.getString("cadence"));
+                        cadence= cadenceArrayToDatum(icadence);
+                    } catch ( ParseException ex ) {
+                        logger.log(Level.WARNING, "parse error in cadence: {0}", info.getString("cadence"));
+                    }
+                }    
+                if ( false ) { // range.max().ge(myValidTime)) { // Note stopDate is required since 2017-01-17.
+                    logger.warning("server is missing required stopDate parameter.");
+                    sampleRange = new DatumRange(range.min(), range.min().add(1, Units.days));
+                } else {
+                    if ( cadence.ge(Units.days.createDatum(1)) ) {
+                        Datum end = TimeUtil.nextMidnight(range.max());
+                        end= end.subtract( 10,Units.days );
+                        if ( range.max().subtract(end).ge( Datum.create(1,Units.days ) ) ) {
+                            sampleRange = new DatumRange( end, end.add(10,Units.days) );
+                        } else {
+                            sampleRange = new DatumRange( end.subtract(10,Units.days), end );
+                        } 
+                    } else if ( cadence.ge(Units.seconds.createDatum(1)) ) {
+                        Datum end = TimeUtil.prevMidnight(range.max());
+                        if ( range.max().subtract(end).ge( Datum.create(1,Units.hours ) ) ) {
+                            sampleRange = new DatumRange( end, end.add(1,Units.days) );
+                        } else {
+                            sampleRange = new DatumRange( end.subtract(1,Units.days), end );
+                        } 
+                    } else {
+                        Datum end = TimeUtil.prev( TimeUtil.HOUR, range.max() );
+                        if ( range.max().subtract(end).ge( Datum.create(1,Units.minutes ) ) ) {
+                            sampleRange = new DatumRange( end, end.add(1,Units.hours) );
+                        } else {
+                            sampleRange = new DatumRange( end.subtract(1,Units.hours), end );
+                        } 
+                    }
+                    if ( !sampleRange.intersects(range) ) {
+                        sampleRange= sampleRange.next();
+                    }
+                }
+            }
+            return sampleRange;                
+        }
+    }
 }
