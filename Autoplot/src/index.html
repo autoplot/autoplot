@@ -24,8 +24,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-12-03 r21818):</p>
+        <p>Bugfixes (2017-12-08 r21837):</p>
         <ul>
+            <li>findbugs RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE.  Thanks, Fundbugs!
+            <li>HAPI getInfo needs to check offline status before attempting to get a URL resource.
+            <li>1933: Bugs when offline didn't properly use ro_cache.txt setting.  Thanks, Ivar!
             <li>rte_0155056645: IndexOutOfBounds caused by new quick monotonic check.  Thanks, Scott!
             <li>SAMP listener was not properly passing the URI, should have done on event thread so old one was used.  Thanks Baptiste!
             <li>Matlab/IDL interface disables SSL checking.  Thanks, Kris!
@@ -89,6 +92,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>das2 library GraphUtil.copyPlot added to support APL.  Thanks, James!
             <li>HAPI Client can manage a cache of local files to support offline use.
             <li>Mouse modules can provide feedback, so zoom/pan can indicate control should be used instead of shift.
             <li>Ops.dataset is more willing to return enumeration data instead of throwing ParseException.  
