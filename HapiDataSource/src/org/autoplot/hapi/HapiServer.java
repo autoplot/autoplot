@@ -367,7 +367,7 @@ public class HapiServer {
 
     /**
      * return the resource, if cached, or null if the data is not cached.
-     * @param url the resource location
+     * @param url the resource location, query param id is handled specially, but others are ignored.
      * @param type "json" (the extension), or "" if no extension should be added.
      * @param data the data.
      * @throws IOException 
