@@ -1032,7 +1032,7 @@ public final class HapiDataSource extends AbstractDataSource {
             return null;
         }
                 
-        if ( staleCacheFiles ) {
+        if ( staleCacheFiles && !offline ) {
             logger.fine("old cache files found, but new ones are available and accessible");
             return null;
         }
@@ -1098,7 +1098,7 @@ public final class HapiDataSource extends AbstractDataSource {
         if ( useCache ) {
             String[] parameters= new String[pds.length];
             for ( int i=0; i<pds.length; i++ ) parameters[i]= pds[i].name;
-            cacheReader= getCacheReader(url, parameters, tr, false, 0L );
+            cacheReader= getCacheReader(url, parameters, tr, FileSystem.settings().isOffline(), 0L );
             if ( cacheReader!=null ) {
                 logger.fine("reading from cache");
             }
