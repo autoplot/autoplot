@@ -367,9 +367,9 @@ public class HapiServer {
 
     /**
      * return the resource, if cached, or null if the data is not cached.
-     * @param url
-     * @param type "json" (the extension).
-     * @param data the data or null.
+     * @param url the resource location
+     * @param type "json" (the extension), or "" if no extension should be added.
+     * @param data the data.
      * @throws IOException 
      */
     public static void writeToCachedURL( URL url, String type, String data ) throws IOException {
@@ -380,12 +380,17 @@ public class HapiServer {
             Pattern p= Pattern.compile("id=(.+)");
             Matcher m= p.matcher(url.getQuery());
             if ( m.matches() ) {
-                u= u + "/" + m.group(1) + "." + type;
+                u= u + "/" + m.group(1);
+                if ( type.length()>0 ) {
+                    u= u + "." + type;
+                }
             } else {
                 throw new IllegalArgumentException("query not supported, implementation error");
             }
         } else {
-            u= u + "." + type;
+            if ( type.length()>0 ) {
+                u= u + "." + type;
+            }
         }
         
         String su= s + "/hapi/" + u;
