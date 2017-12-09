@@ -124,6 +124,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         
     private String currentParameters= null;
     private URL currentServer= null;
+    private DatumRange currentRange= null;
     private String currentId= null;
     private String currentExtra=null;
     private int lastParamIndex= -1; // the index of the last parameter selection.
@@ -617,7 +618,24 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         
         String[] params= getParameters(true).split(",");
         Map<String,DatumRange> ff;
-        ff = HapiDataSource.getCacheFiles( this.currentServer, this.currentId, params, null );
+        String str= (String)timeRangeComboBox.getSelectedItem();
+        try {
+            DatumRange tr;
+            if ( str==null ) {
+                tr= currentRange;
+            } else {
+                tr= DatumRangeUtil.parseTimeRange(str);
+            }
+            if ( tr==null ) {
+                JOptionPane.showMessageDialog(this,"id doesn't provide range");
+                return;
+            }
+            ff = HapiDataSource.getCacheFiles( this.currentServer, this.currentId, params, tr );
+        } catch ( ParseException ex ) {
+            JOptionPane.showMessageDialog( this, "Unable to parse timerange: "+str);
+            return;
+        }
+        
         if ( ff==null ) {
             JOptionPane.showMessageDialog( this, "No cache files found in the interval");
             return;
