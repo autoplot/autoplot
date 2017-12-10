@@ -30,15 +30,33 @@ public class PasteBufferedReader implements AbstractLineReader {
         readers.add(r);
     }
     
+    
+    boolean monotonicKludge= true;
+    String greatestValue= null;
+    
+    public void setMonotinicKludge( boolean t ) {
+        this.monotonicKludge= t;
+    }
+    
     @Override
     public String readLine() throws IOException {
         StringBuilder b= new StringBuilder();
         boolean done= true;
         int col=0;
+        boolean skipNonMono= false;
         for ( AbstractLineReader r: readers ) {
             if ( col>0 ) b.append(delim);
             String s= r.readLine();
-            if ( s!=null ) {
+            if ( col==0 && s!=null ) {
+                if ( monotonicKludge && greatestValue!=null && greatestValue.compareTo(s)>0 ) {
+                    skipNonMono= true;
+                } else {
+                    greatestValue= s;
+                } 
+                
+            }
+
+            if ( s!=null && skipNonMono==false ) {
                 b.append( s );
                 done= false;
             }
