@@ -20,6 +20,7 @@ import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -68,6 +69,7 @@ import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
 import org.das2.qstream.TransferType;
 import org.das2.util.filesystem.FileSystem;
+import org.das2.util.monitor.CancelledOperationException;
 
 /**
  * HAPI data source uses transactions with HAPI servers to collect data.
@@ -284,6 +286,8 @@ public final class HapiDataSource extends AbstractDataSource {
         return result;
     }
     
+    private static Map<String,ArrayList<String>> cache= new HashMap<>();
+    
     private static void writeToCachedData(URL url, ParamDescription[] pp, Datum xx, String[] ss) throws IOException {
         
         String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
@@ -343,6 +347,54 @@ public final class HapiDataSource extends AbstractDataSource {
         int ifield=0;
         for (ParamDescription pp1 : pp) {
             String f = s + "/hapi/" + u + "/" + sxx + "." + pp1.name + ".csv";
+            
+            ArrayList<String> sparam= cache.get(f);
+            if ( sparam==null ) {
+                sparam= new ArrayList<>();
+                cache.put(f,sparam);
+            }
+            
+            StringBuilder build= new StringBuilder();
+            
+            int length = pp1.nFields;
+            for ( int k=0; k<length; k++ ) {
+                if ( k>0 ) build.append(",");
+                build.append( ss[ifield++] );
+            }
+            
+            sparam.add(build.toString());
+            
+        }
+        
+        lastRecordFound.put( u + "/" + sxx,xx);
+        
+    }
+    
+    private static void writeToCachedDataFinish(URL url, ParamDescription[] pp, Datum xx, String[] ss ) throws IOException {
+        String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
+        if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
+        String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
+        if ( url.getQuery()!=null ) {
+            String[] querys= url.getQuery().split("\\&");
+            Pattern p= Pattern.compile("id=(.+)");
+            for ( String q : querys ) {
+                Matcher m= p.matcher(q);
+                if ( m.matches() ) {
+                    u= u + "/" + m.group(1);
+                    break;
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("query must be specified, implementation error");
+        }
+        TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d" );
+        String sxx= tp.format(xx);
+        for (ParamDescription pp1 : pp) {
+            String f = s + "/hapi/" + u + "/" + sxx + "." + pp1.name + ".csv";
+            ArrayList<String> sparam= cache.remove(f);
+            if ( sparam==null ) {
+                throw new IllegalArgumentException("something has gone wrong.");
+            }
             File ff= new File(f);
             if ( !ff.getParentFile().exists() ) {
                 if ( !ff.getParentFile().mkdirs() ) {
@@ -350,19 +402,14 @@ public final class HapiDataSource extends AbstractDataSource {
                 }
             }
             try (final BufferedWriter w = new BufferedWriter( new FileWriter( ff, true ) )) {
-                int length = pp1.nFields;
-                for ( int k=0; k<length; k++ ) {
-                    if ( k>0 ) w.write(',');
-                    w.write(ss[ifield++]);
+                for ( String s123: sparam ) {
+                    w.write(s123);
+                    w.newLine();
                 }
-                w.write("\n");
             }
         }
         
-        lastRecordFound.put( u + "/" + sxx,xx);
-        
     }
-    
     
     /**
      * To assist in getting the CDAWeb HAPI server going, handle a few differences
@@ -525,7 +572,7 @@ public final class HapiDataSource extends AbstractDataSource {
     }
     
     @Override
-    public QDataSet getDataSet(ProgressMonitor monitor) throws Exception {
+    public synchronized QDataSet getDataSet(ProgressMonitor monitor) throws Exception {
         URI server = this.resourceURI;
         
         String format= getParam("format","csv");
@@ -1161,6 +1208,8 @@ public final class HapiDataSource extends AbstractDataSource {
                         t0= System.currentTimeMillis();
                         double d= DatumRangeUtil.normalize( tr, xx );
                         monitor.setTaskProgress( 20 + (int)( 75 * d ) );
+                        if ( monitor.isCancelled() ) 
+                            throw new CancelledOperationException("cancel was pressed");
                     }
                 } catch ( ParseException ex ) {
                     line= in.readLine();
@@ -1168,9 +1217,9 @@ public final class HapiDataSource extends AbstractDataSource {
                 }
                 
                 //TODO: compress the file, now that we are done.
-                //if ( !currentDay.contains(xx) && tr.intersects(currentDay) && completeDay ) {
-                //    writeToCachedDataCompress( url, pds, xx, ss );
-                //}
+                if ( !currentDay.contains(xx) && tr.intersects(currentDay) && completeDay ) {
+                    writeToCachedDataFinish( url, pds, currentDay.middle(), ss );
+                }
                 
                 while ( !currentDay.contains(xx) && tr.intersects(currentDay ) ) {
                     currentDay= currentDay.next();
