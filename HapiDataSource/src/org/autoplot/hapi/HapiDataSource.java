@@ -998,18 +998,14 @@ public final class HapiDataSource extends AbstractDataSource {
         String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
         String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
-        int len= ( u + "/data/").length();
         u= u + "/data/" + id;        
-        
-        DatumRange aday= TimeUtil.dayContaining(timeRange.min());
-        List<DatumRange> trs= DatumRangeUtil.generateList( timeRange, aday );
-        
+                
         LinkedHashMap<String,DatumRange> result= new LinkedHashMap<>();
          
         try {
             for (String parameter : parameters) {
                 String theFile= s + "/hapi/"+ u ;
-                FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" +theFile ), "$Y/$m/$Y$m$d." + parameter + ".csv");
+                FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" +theFile ), "$Y/$m/$Y$m$d." + parameter + ".csv.gz");
                 String[] ff= fsm.getNamesFor(null);
                 for (String ff1 : ff) {
                     DatumRange tr1= fsm.getRangeFor(ff1);

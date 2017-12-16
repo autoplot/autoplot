@@ -652,7 +652,13 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         mm.setFiles( cacheFolder, ss );
         if ( JOptionPane.showConfirmDialog(this,mm,"Manage Cached Data",JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION ) {
             System.err.println("cacheFolder: "+cacheFolder );
-            FileUtil.deleteFileTree(cacheFolder); //TODO: off of the event thread
+            for ( String s: ff.keySet() ) {
+                File f1= new File( cacheFolder, s );
+                if ( !f1.delete() ) {
+                    logger.log(Level.INFO, "unable to delete {0}", f1);
+                }
+            }
+            //FileUtil.deleteFileTree(cacheFolder); //TODO: off of the event thread
         }
         
     }//GEN-LAST:event_cachedFileButtonActionPerformed
