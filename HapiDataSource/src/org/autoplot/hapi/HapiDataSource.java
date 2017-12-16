@@ -1217,7 +1217,7 @@ public final class HapiDataSource extends AbstractDataSource {
                 }
                 
                 //TODO: compress the file, now that we are done.
-                if ( !currentDay.contains(xx) && tr.intersects(currentDay) && completeDay ) {
+                if ( useCache && !currentDay.contains(xx) && tr.intersects(currentDay) && completeDay ) {
                     writeToCachedDataFinish( url, pds, currentDay.middle(), ss );
                 }
                 
