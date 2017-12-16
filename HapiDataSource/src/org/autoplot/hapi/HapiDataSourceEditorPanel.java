@@ -837,6 +837,9 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( binaryCB.isSelected() && binaryCB.isEnabled() ) {
             uri+= "&format=binary";
         }
+        if ( disableCacheCheckBox.isSelected() ) {
+            uri+= "&cache=F";
+        }
         if ( parameters.length()>0 ) {
             return uri + "&parameters="+parameters;
         } else {
