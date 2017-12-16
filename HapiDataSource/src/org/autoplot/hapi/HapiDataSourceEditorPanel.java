@@ -1061,6 +1061,11 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
 //                }
                 sparams[i]= parameter.getString("name");
                 JCheckBox cb= new JCheckBox(sparams[i]);
+                
+                String label= sparams[i];
+                if ( parameter.has("size") ) {
+                    label= label+parameter.getString("size");
+                }
                 cb.setName(sparams[i]);
                 
                 cb.setSelected(true);
@@ -1089,7 +1094,9 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     String d= parameter.getString("description");
                     //parametersPanel.add( new javax.swing.JLabel( d ) );
                     cb.setToolTipText(d);
-                    cb.setText( cb.getName()+": "+d);
+                    cb.setText( label+": "+d);
+                } else {
+                    cb.setText( label );
                 }
                 parametersPanel.add( cb );
             }
