@@ -15,7 +15,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 public class GZIPFilter implements Filter {
-    private static final Logger logger= Logger.getLogger("hapi");
+    private static final Logger logger= Logger.getLogger("hapi.gzip");
     
   public void doFilter(ServletRequest req, ServletResponse res,
       FilterChain chain) throws IOException, ServletException {
@@ -24,7 +24,7 @@ public class GZIPFilter implements Filter {
       HttpServletResponse response = (HttpServletResponse) res;
       String ae = request.getHeader("accept-encoding");
       if (ae != null && ae.contains("gzip") ) {
-        logger.log(Level.FINE,"GZIP supported, compressing.");
+        logger.log(Level.FINER,"GZIP supported, compressing.");
         GZIPResponseWrapper wrappedResponse =
           new GZIPResponseWrapper(response);
         chain.doFilter(req, wrappedResponse);

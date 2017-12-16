@@ -16,7 +16,7 @@ import javax.servlet.http.*;
 
 public class GZIPResponseStream extends ServletOutputStream {
     
-    private static final Logger logger= Logger.getLogger("hapi");
+  private static final Logger logger= Logger.getLogger("hapi.gzip");
     
   protected ByteArrayOutputStream baos = null;
   protected GZIPOutputStream gzipstream = null;
@@ -70,7 +70,7 @@ public class GZIPResponseStream extends ServletOutputStream {
   }
 
   public void write(byte b[], int off, int len) throws IOException {
-    logger.finer("writing...");
+    logger.finest("writing...");
     if (closed) {
       throw new IOException("Cannot write to a closed output stream");
     }

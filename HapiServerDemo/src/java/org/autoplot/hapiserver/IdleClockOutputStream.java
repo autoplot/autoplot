@@ -2,6 +2,8 @@ package org.autoplot.hapiserver;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Debugging output stream which times idle periods 
@@ -11,6 +13,8 @@ import java.io.OutputStream;
  */
 public class IdleClockOutputStream extends OutputStream {
 
+    private static final Logger logger= Logger.getLogger("hapi");
+    
     private final OutputStream out;
     long maxIdleTime;
     long t0;
@@ -46,6 +50,7 @@ public class IdleClockOutputStream extends OutputStream {
         long t= System.currentTimeMillis();
         long dt= t-t0;
         if ( dt>this.maxIdleTime ) {
+            logger.log(Level.FINER, "new maxIdleTime from {0} to {1} ms", new Object[]{t0-birthMilli, t-birthMilli});
             this.maxIdleTime= dt;
         }
         this.t0= t;
