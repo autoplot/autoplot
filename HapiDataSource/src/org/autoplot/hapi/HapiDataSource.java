@@ -392,7 +392,7 @@ public final class HapiDataSource extends AbstractDataSource {
         
     }
     
-    private static void writeToCachedDataFinish(URL url, ParamDescription[] pp, Datum xx, String[] ss ) throws IOException {
+    private static void writeToCachedDataFinish(URL url, ParamDescription[] pp, Datum xx ) throws IOException {
         String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
         String u= url.getProtocol() + "/" + url.getHost() + url.getPath();
@@ -414,9 +414,6 @@ public final class HapiDataSource extends AbstractDataSource {
         for (ParamDescription pp1 : pp) {
             String f = u + "/" + sxx + "." + pp1.name + ".csv" + "."+ Thread.currentThread().getName();
             ArrayList<String> sparam= cache.remove(f);
-            if ( sparam==null ) {
-                throw new IllegalArgumentException("something has gone wrong.");
-            }
             File ff= new File(s + "/hapi/" + u + "/" + sxx + "." + pp1.name + ".csv" +".gz");
             if ( !ff.getParentFile().exists() ) {
                 if ( !ff.getParentFile().mkdirs() ) {
@@ -426,10 +423,12 @@ public final class HapiDataSource extends AbstractDataSource {
             File ffTemp= new File(s + "/hapi/" + u + "/" + sxx + "." + pp1.name + ".csv"+".gz."+Thread.currentThread().getName() );
             //int line=0;
             try (final BufferedWriter w = new BufferedWriter( new OutputStreamWriter( new GZIPOutputStream( new FileOutputStream(ff) ) ) ) ) {
-                for ( String s123: sparam ) {
-                    //line++;
-                    w.write(s123);
-                    w.newLine();
+                if ( sparam!=null ) {
+                    for ( String s123: sparam ) {
+                        //line++;
+                        w.write(s123);
+                        w.newLine();
+                    }
                 }
             }
             
@@ -1122,8 +1121,8 @@ public final class HapiDataSource extends AbstractDataSource {
         }
     
         boolean haveSomething= false;
+        boolean haveAll= true;
         for ( int i=0; i<trs.size(); i++ ) {
-            boolean haveAll= true;
             for ( int j=0; j<parameters.length; j++ ) {
                 if ( hits[i][j]==false ) {
                     haveAll= false;
@@ -1134,6 +1133,11 @@ public final class HapiDataSource extends AbstractDataSource {
             }
         }
         
+        if ( !offline && !haveAll ) {
+            logger.fine("some cache files missing, but we are on-line and should retrieve all of them");
+            return null;
+        }
+        
         if ( !haveSomething ) {
             logger.fine("no cached data found");
             return null;
@@ -1141,13 +1145,13 @@ public final class HapiDataSource extends AbstractDataSource {
             
         ConcatenateBufferedReader result= new ConcatenateBufferedReader();
         for ( int i=0; i<trs.size(); i++ ) {
-            boolean haveAll= true;
+            boolean haveAllForDay= true;
             for ( int j=0; j<parameters.length; j++ ) {
                 if ( hits[i][j]==false ) {
-                    haveAll= false;
+                    haveAllForDay= false;
                 }
             }
-            if ( haveAll ) {
+            if ( haveAllForDay ) {
                 PasteBufferedReader r1= new PasteBufferedReader();
                 r1.setDelim(',');
                 for ( int j=0; j<parameters.length; j++ ) {
@@ -1255,12 +1259,16 @@ public final class HapiDataSource extends AbstractDataSource {
                 
                 //TODO: compress the file, now that we are done.
                 if ( cacheReader==null && useCache && !currentDay.contains(xx) && tr.intersects(currentDay) && completeDay ) {
-                    writeToCachedDataFinish( url, pds, currentDay.middle(), ss );
+                    writeToCachedDataFinish( url, pds, currentDay.middle() );
                 }
                 
                 while ( !currentDay.contains(xx) && tr.intersects(currentDay ) ) {
                     currentDay= currentDay.next();
                     completeDay= tr.contains(currentDay);
+                    if ( cacheReader==null && useCache && !currentDay.contains(xx) && tr.intersects(currentDay ) ) {
+                        // put empty file which is placeholder.
+                        writeToCachedDataFinish( url, pds, currentDay.middle() ); 
+                    }
                 }
                 
                 if ( !currentDay.contains(xx) ) {
@@ -1294,6 +1302,14 @@ public final class HapiDataSource extends AbstractDataSource {
                 }
                 builder.nextRecord();
                 line= in.readLine();
+            }
+            while ( completeDay && tr.intersects(currentDay) ) {
+                if ( cacheReader==null && useCache && tr.intersects(currentDay ) ) {
+                    // put empty file which is placeholder.
+                    writeToCachedDataFinish( url, pds, currentDay.middle() ); 
+                }
+                currentDay= currentDay.next();
+                completeDay= tr.contains(currentDay);
             }
         } catch ( IOException e ) {
             logger.log( Level.WARNING, e.getMessage(), e );
