@@ -164,7 +164,9 @@ public class DataServlet extends HttpServlet {
         
         if ( dataFiles==null ) {
             try {
+                logger.log(Level.FINER, "data files is null at {0} ms.", System.currentTimeMillis()-t0);
                 dsiter= checkAutoplotSource( id, dr, allowStream );
+                logger.log(Level.FINER, "done checkAutoplotSource at {0} ms.", System.currentTimeMillis()-t0);
                 if ( dsiter==null ) {
                     File dataFileHome= new File( Util.getHapiHome(), "data" );
                     File dataFile= new File( dataFileHome, id+".csv" );
@@ -172,6 +174,7 @@ public class DataServlet extends HttpServlet {
                         dataFiles= new File[] { dataFile };
                     } else {
                         if ( id.equals("0B000800408DD710.noStream") ) {
+                            logger.log(Level.FINER, "noStream demo shows without streaming" );
                             dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/0B000800408DD710.$Y$m$d.d2s", dr, false ); // allow Autoplot to select
                         } else {
                             throw new IllegalArgumentException("bad id: "+id+", does not exist: "+dataFile );
