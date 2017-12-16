@@ -16,7 +16,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jSplitPane1" alignment="0" max="32767" attributes="0"/>
+          <Component id="jSplitPane1" alignment="0" pref="707" max="32767" attributes="0"/>
           <Group type="102" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -36,7 +36,9 @@
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="messagesLabel" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <Component id="disableCacheCheckBox" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Component id="binaryCB" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -58,6 +60,7 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="messagesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="binaryCB" alignment="3" pref="25" max="32767" attributes="0"/>
+                  <Component id="disableCacheCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -129,7 +132,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane4" pref="462" max="32767" attributes="0"/>
+                  <Component id="jScrollPane4" pref="486" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="clearAllB" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -338,6 +341,11 @@
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="disableCacheCheckBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Disable Cache"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

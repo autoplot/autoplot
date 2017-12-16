@@ -289,6 +289,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         binaryCB = new javax.swing.JCheckBox();
         timeRangeComboBox = new org.autoplot.datasource.RecentComboBox();
         exampleTimeRangesCB = new javax.swing.JComboBox<>();
+        disableCacheCheckBox = new javax.swing.JCheckBox();
 
         jLabel1.setText("HAPI Server:");
 
@@ -361,7 +362,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(clearAllB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -448,11 +449,13 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         });
 
+        disableCacheCheckBox.setText("Disable Cache");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 707, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -471,6 +474,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(messagesLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(disableCacheCheckBox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(binaryCB)))
                 .addContainerGap())
         );
@@ -486,7 +491,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(messagesLabel)
-                    .addComponent(binaryCB, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE))
+                    .addComponent(binaryCB, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+                    .addComponent(disableCacheCheckBox))
                 .addGap(5, 5, 5)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -657,6 +663,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private javax.swing.JButton cachedFileButton;
     private javax.swing.JButton clearAllB;
     private javax.swing.JButton clearButton;
+    private javax.swing.JCheckBox disableCacheCheckBox;
     private javax.swing.JComboBox<String> exampleTimeRangesCB;
     private javax.swing.JButton extraInfoButton;
     private org.autoplot.datasource.RecentComboBox filtersComboBox;
@@ -797,7 +804,11 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         
         if ( !HapiServer.useCache() ) {
             cachedFileButton.setVisible(false);
+            disableCacheCheckBox.setVisible(false);
         }
+        
+        disableCacheCheckBox.setSelected( "F".equals(params.get("cache")) );
+        
     }
 
     @Override
