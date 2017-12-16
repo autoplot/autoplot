@@ -368,7 +368,7 @@ public final class HapiDataSource extends AbstractDataSource {
         
         int ifield=0;
         for (ParamDescription pp1 : pp) {
-            String f = u + "/" + sxx + "." + pp1.name + ".csv";
+            String f = u + "/" + sxx + "." + pp1.name + ".csv" + "." + Thread.currentThread().getName();
             
             ArrayList<String> sparam= cache.get(f);
             if ( sparam==null ) {
@@ -412,22 +412,29 @@ public final class HapiDataSource extends AbstractDataSource {
         TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d" );
         String sxx= tp.format(xx);
         for (ParamDescription pp1 : pp) {
-            String f = u + "/" + sxx + "." + pp1.name + ".csv";
+            String f = u + "/" + sxx + "." + pp1.name + ".csv" + "."+ Thread.currentThread().getName();
             ArrayList<String> sparam= cache.remove(f);
             if ( sparam==null ) {
                 throw new IllegalArgumentException("something has gone wrong.");
             }
-            File ff= new File(s + "/hapi/" + f+".gz");
+            File ff= new File(s + "/hapi/" + u + "/" + sxx + "." + pp1.name + ".csv" +".gz");
             if ( !ff.getParentFile().exists() ) {
                 if ( !ff.getParentFile().mkdirs() ) {
                     throw new IOException("unable to mkdirs "+ff.getParent() );
                 }
             }
+            File ffTemp= new File(s + "/hapi/" + u + "/" + sxx + "." + pp1.name + ".csv"+".gz."+Thread.currentThread().getName() );
+            //int line=0;
             try (final BufferedWriter w = new BufferedWriter( new OutputStreamWriter( new GZIPOutputStream( new FileOutputStream(ff) ) ) ) ) {
                 for ( String s123: sparam ) {
+                    //line++;
                     w.write(s123);
                     w.newLine();
                 }
+            }
+            
+            synchronized ( HapiDataSource.class ) {
+                ffTemp.renameTo(ff);
             }
         }
         
