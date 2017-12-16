@@ -6,12 +6,14 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.InterruptedIOException;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -31,6 +33,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import org.das2.qds.buffer.BufferDataSet;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.CacheTag;
@@ -61,6 +64,7 @@ import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DefaultTimeSeriesBrowse;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.datasource.capability.Caching;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
@@ -98,6 +102,22 @@ public final class HapiDataSource extends AbstractDataSource {
             }
         }
         addCapability( TimeSeriesBrowse.class, tsb );
+        addCapability( Caching.class, new Caching() {
+            @Override
+            public boolean satisfies(String surl) {
+                return false;
+            }
+
+            @Override
+            public void resetURI(String surl) {
+            }
+
+            @Override
+            public void reset() {
+                HapiDataSource.cache.clear();
+            }
+            
+        });
     }
 
     private static QDataSet getJSONBins( JSONObject binsObject ) throws JSONException {
@@ -286,13 +306,13 @@ public final class HapiDataSource extends AbstractDataSource {
         return result;
     }
     
-    private static Map<String,ArrayList<String>> cache= new HashMap<>();
+    private static final Map<String,ArrayList<String>> cache= new HashMap<>();
     
     private static void writeToCachedData(URL url, ParamDescription[] pp, Datum xx, String[] ss) throws IOException {
         
         String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
-        String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
+        String u= url.getProtocol() + "/" + url.getHost() + url.getPath();
         if ( url.getQuery()!=null ) {
             String[] querys= url.getQuery().split("\\&");
             Pattern p= Pattern.compile("id=(.+)");
@@ -340,13 +360,15 @@ public final class HapiDataSource extends AbstractDataSource {
             for (ParamDescription pp1 : pp) {
                 String f = s + "/hapi/" + u + "/" + sxx + "." + pp1.name + ".csv";
                 File ff= new File(f);
-                if ( !ff.delete() ) logger.log(Level.INFO, "unable to delete file: {0}", ff);
+                if ( ff.exists() ) {
+                    if ( !ff.delete() ) logger.log(Level.INFO, "unable to delete file: {0}", ff);
+                }
             }
         }
         
         int ifield=0;
         for (ParamDescription pp1 : pp) {
-            String f = s + "/hapi/" + u + "/" + sxx + "." + pp1.name + ".csv";
+            String f = u + "/" + sxx + "." + pp1.name + ".csv";
             
             ArrayList<String> sparam= cache.get(f);
             if ( sparam==null ) {
@@ -373,7 +395,7 @@ public final class HapiDataSource extends AbstractDataSource {
     private static void writeToCachedDataFinish(URL url, ParamDescription[] pp, Datum xx, String[] ss ) throws IOException {
         String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
-        String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
+        String u= url.getProtocol() + "/" + url.getHost() + url.getPath();
         if ( url.getQuery()!=null ) {
             String[] querys= url.getQuery().split("\\&");
             Pattern p= Pattern.compile("id=(.+)");
@@ -390,18 +412,18 @@ public final class HapiDataSource extends AbstractDataSource {
         TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d" );
         String sxx= tp.format(xx);
         for (ParamDescription pp1 : pp) {
-            String f = s + "/hapi/" + u + "/" + sxx + "." + pp1.name + ".csv";
+            String f = u + "/" + sxx + "." + pp1.name + ".csv";
             ArrayList<String> sparam= cache.remove(f);
             if ( sparam==null ) {
                 throw new IllegalArgumentException("something has gone wrong.");
             }
-            File ff= new File(f);
+            File ff= new File(s + "/hapi/" + f+".gz");
             if ( !ff.getParentFile().exists() ) {
                 if ( !ff.getParentFile().mkdirs() ) {
                     throw new IOException("unable to mkdirs "+ff.getParent() );
                 }
             }
-            try (final BufferedWriter w = new BufferedWriter( new FileWriter( ff, true ) )) {
+            try (final BufferedWriter w = new BufferedWriter( new OutputStreamWriter( new GZIPOutputStream( new FileOutputStream(ff) ) ) ) ) {
                 for ( String s123: sparam ) {
                     w.write(s123);
                     w.newLine();
@@ -1040,6 +1062,10 @@ public final class HapiDataSource extends AbstractDataSource {
         
         boolean staleCacheFiles= false;
         
+        if ( ! new File( s + "/hapi/"+ u  ).exists() ) {
+            return null;
+        }
+        
         try {
             for ( int i=0; i<trs.size(); i++ ) {
                 DatumRange tr= trs.get(i);
@@ -1047,6 +1073,10 @@ public final class HapiDataSource extends AbstractDataSource {
                     String parameter= parameters[j];
                     FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" + s + "/hapi/"+ u ), "$Y/$m/$Y$m$d." + parameter + ".csv");
                     File[] ff= fsm.getFilesFor(tr);
+                    if ( ff.length==0 ) {
+                        FileStorageModel fsmgz = FileStorageModel.create(FileSystem.create( "file:" + s + "/hapi/"+ u ), "$Y/$m/$Y$m$d." + parameter + ".csv.gz");
+                        ff= fsmgz.getFilesFor(tr);
+                    }
                     if ( ff.length>1 ) {
                         throw new IllegalArgumentException("implementation error, should get just one file per day.");
                     } else if ( ff.length==0 ) {
@@ -1217,7 +1247,7 @@ public final class HapiDataSource extends AbstractDataSource {
                 }
                 
                 //TODO: compress the file, now that we are done.
-                if ( useCache && !currentDay.contains(xx) && tr.intersects(currentDay) && completeDay ) {
+                if ( cacheReader==null && useCache && !currentDay.contains(xx) && tr.intersects(currentDay) && completeDay ) {
                     writeToCachedDataFinish( url, pds, currentDay.middle(), ss );
                 }
                 
