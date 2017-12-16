@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Experiments with using Java 2D to find bounding regions.
+        <p><small>Having fun, adding warble to Taylor Swift song.  
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-12-08 r21837):</p>
+        <p>Bugfixes (2017-12-16 r21856):</p>
         <ul>
+            <li>refactor slicers so a top painter is used instead of subclassing.
+            <li>corrections to HAPI client's caching, cached streams are zipped.
             <li>findbugs RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE.  Thanks, Findbugs!
             <li>HAPI getInfo needs to check offline status before attempting to get a URL resource.
             <li>1933: Bugs when offline didn't properly use ro_cache.txt setting.  Thanks, Ivar!
