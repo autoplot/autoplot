@@ -73,7 +73,7 @@ public class InlineDataSource extends AbstractDataSource {
     private MutablePropertyDataSet jyCommand( String c ) throws Exception {
         logger.finest(c);
         
-        PyObject result= interp.eval(c);
+        PyObject result= evalCommand( interp,c );
 
         QDataSet res;
 
@@ -97,6 +97,9 @@ public class InlineDataSource extends AbstractDataSource {
             }
         } else {
             res = (QDataSet) result.__tojava__(QDataSet.class);
+            if ( res==null ) {
+                throw new IllegalArgumentException("expression is not a QDataSet: "+c);
+            }
         }
         return DataSetOps.makePropertiesMutable(res);
     }
@@ -174,10 +177,10 @@ public class InlineDataSource extends AbstractDataSource {
         try {    
             PyObject result;
             if ( Ops.isSafeName(s) ) {
-                result= interp.eval( s ); 
+                result= evalCommand( interp, s ); 
             } else {
                 linkCommand= "link( "+s + ")";        
-                result= interp.eval( linkCommand ); //wha?
+                result= evalCommand( interp, linkCommand ); //wha?
             }
             
             QDataSet res = (QDataSet) result.__tojava__(QDataSet.class);
@@ -336,7 +339,7 @@ public class InlineDataSource extends AbstractDataSource {
                         } else {
                             try {
                                 interp.set( "monitor", mon.getSubtaskMonitor(arg));
-                                interp.exec(arg);
+                                execCommand( interp,arg );
                             } catch ( Exception ex ) {
                                 throw ex; // https://sourceforge.net/p/autoplot/bugs/1376/
                             }
@@ -347,7 +350,7 @@ public class InlineDataSource extends AbstractDataSource {
                     interp.set( "monitor", mon.getSubtaskMonitor(arg));
                     arg= URISplit.uriDecode(arg);
                     if ( arg.startsWith("timerange=") ) continue;
-                    interp.exec(arg);
+                    execCommand( interp, arg );
 
                 } else { 
                     ds= parseInlineDs(arg);
@@ -435,7 +438,26 @@ public class InlineDataSource extends AbstractDataSource {
         }
         return ds;
     }
+    
+    /**
+     * execute the command line the interpreter, with a hook for security concerns.
+     * @param interp the interpreter
+     * @param arg the command to execute.
+     */
+    private static void execCommand( PythonInterpreter interp, String arg ) {
+        if ( arg.contains("execfile") ) {
+            throw new IllegalArgumentException("inline commands cannot contain execfile");
+        }
+        interp.exec(arg);
+    }
 
+    private static PyObject evalCommand( PythonInterpreter interp, String arg ) {
+        if ( arg.contains("execfile") ) {
+            throw new IllegalArgumentException("inline commands cannot contain execfile");
+        }
+        return interp.eval(arg);
+    }
+    
     private boolean isAssignment(String arg) {
         int i= arg.indexOf("=");
         if ( i==-1 ) return false;
