@@ -447,6 +447,8 @@ public class InlineDataSource extends AbstractDataSource {
     private static void execCommand( PythonInterpreter interp, String arg ) {
         if ( arg.contains("execfile") ) {
             throw new IllegalArgumentException("inline commands cannot contain execfile");
+        } else if ( arg.contains("__import__") ) {
+            throw new IllegalArgumentException("inline commands cannot contain __import__");
         }
         interp.exec(arg);
     }
@@ -454,6 +456,8 @@ public class InlineDataSource extends AbstractDataSource {
     private static PyObject evalCommand( PythonInterpreter interp, String arg ) {
         if ( arg.contains("execfile") ) {
             throw new IllegalArgumentException("inline commands cannot contain execfile");
+        } else if ( arg.contains("__import__") ) {
+            throw new IllegalArgumentException("inline commands cannot contain __import__");
         }
         return interp.eval(arg);
     }
