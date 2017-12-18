@@ -60,20 +60,15 @@
                       </Group>
                       <Component id="fillToReferenceCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <EmptySpace min="12" pref="12" max="12" attributes="0"/>
-                                  <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="63" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="1" attributes="0">
-                                  <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                              </Group>
+                              <Component id="jLabel8" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="referenceValuePanel" alignment="0" min="-2" pref="89" max="-2" attributes="1"/>
-                              <Component id="fillColorPanel" alignment="0" min="-2" pref="104" max="-2" attributes="1"/>
+                          <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="fillColorPanel" pref="104" max="32767" attributes="1"/>
+                              <Component id="referenceValuePanel" max="32767" attributes="1"/>
                           </Group>
                       </Group>
                   </Group>
@@ -112,16 +107,13 @@
                   <Component id="fillToReferenceCheckBox" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <Component id="jLabel7" linkSize="6" min="-2" max="-2" attributes="1"/>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="jLabel8" min="-2" max="-2" attributes="1"/>
-                      </Group>
-                      <Group type="102" attributes="0">
-                          <Component id="fillColorPanel" linkSize="6" pref="24" max="32767" attributes="1"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="referenceValuePanel" min="-2" pref="25" max="-2" attributes="1"/>
-                      </Group>
+                      <Component id="fillColorPanel" linkSize="6" alignment="0" pref="24" max="32767" attributes="1"/>
+                      <Component id="jLabel7" linkSize="6" alignment="0" min="-2" max="-2" attributes="1"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="referenceValuePanel" pref="25" max="32767" attributes="1"/>
+                      <Component id="jLabel8" max="32767" attributes="1"/>
                   </Group>
                   <EmptySpace pref="47" max="32767" attributes="0"/>
               </Group>
