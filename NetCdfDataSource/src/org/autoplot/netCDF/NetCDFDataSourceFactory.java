@@ -181,6 +181,33 @@ public class NetCDFDataSourceFactory extends AbstractDataSourceFactory implement
         
     }
     
+    /**
+     * return the number of records of the variable.  The file will be 
+     * downloaded if it is not available.  This was introduced because
+     * we had a huge file where we needed to read in so many blocks at a time,
+     * instead of the entire file.
+     * @param surl the URI, including the variable to read.
+     * @param mon the monitor
+     * @return the number of records.
+     * @throws IOException 
+     */
+    public int getNumberOfRecords( String surl, ProgressMonitor mon ) throws IOException {
+        URISplit split = URISplit.parse( surl );
+        Map params= URISplit.parseParams( split.params );
+
+        File file= DataSetURI.getFile( surl, mon ); // check for non-ncml.  We always download now because ncml can be slow.
+        String svariable= (String)params.get("arg_0");
+        
+        NetcdfDataset dataset= getDataSet( file.toURI().toURL() );
+        
+        for ( Variable v : dataset.getVariables() ) {
+            if ( v.getName().replaceAll(" ", "+").equals(svariable) ) {
+                return v.getDimension(0).getLength();
+            }
+        }
+        throw new IllegalArgumentException("variable name must be specified");
+    }
+    
     
     @Override
     public boolean reject( String surl, List<String> problems, ProgressMonitor mon ) {
