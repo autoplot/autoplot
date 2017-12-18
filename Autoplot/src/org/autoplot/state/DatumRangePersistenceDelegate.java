@@ -81,7 +81,7 @@ public class DatumRangePersistenceDelegate extends PersistenceDelegate {
     }
 
     public static DatumRange newDatumRange( double min, double max, String units ) {
-        Units u= SemanticOps.lookupUnits(units);
+        Units u= Units.lookupUnits(units);
         return DatumRange.newDatumRange( min, max, u );
     }
 
