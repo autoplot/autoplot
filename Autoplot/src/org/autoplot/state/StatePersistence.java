@@ -173,7 +173,7 @@ public class StatePersistence {
             app.setBindings(newbms.toArray( new BindingModel[newbms.size()] ) );
         }
         
-        Element element = SerializeUtil.getDomElement( document, (DomNode)state, scheme );
+        Element element = SerializeUtil.getDomElement( document, (DomNode)state, scheme, true );
 
         Element vap= document.createElement("vap");
         vap.appendChild(element);
