@@ -3,6 +3,7 @@ package org.autoplot.datasource;
 
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -712,6 +713,9 @@ public class TimeRangeTool extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void scComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_scComboBoxItemStateChanged
+        if ( evt.getStateChange()==java.awt.event.ItemEvent.DESELECTED ) {
+            return;
+        }
         final String sc= (String) scComboBox.getSelectedItem();
         Runnable run= new Runnable() {
             @Override
@@ -719,7 +723,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 resetSpacecraft( sc, pendingTimeRange );
             }
         };
-        new Thread( run,"loadOrbits" ).start();
+        new Thread( run, String.format( "loadOrbits-%010d",System.currentTimeMillis() ) ).start();
 
         if ( sc.contains(":") ) {
             feedbackLabel.setText("loading orbits from "+sc );
