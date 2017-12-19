@@ -725,7 +725,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                 if ( appModel!=null ) {
                     Application state= (Application)appModel.getDocumentModel();
 
-                    Element app1 = SerializeUtil.getDomElement( doc, (DomNode)state, StatePersistence.currentScheme() );
+                    Element app1 = SerializeUtil.getDomElement( doc, (DomNode)state, StatePersistence.currentScheme(), false );
 
                     Element vap= doc.createElement("vap");
                     vap.appendChild(app1);
