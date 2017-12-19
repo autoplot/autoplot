@@ -505,7 +505,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                     try {
                                         tsb.setURI(surl);
                                         if ( tsb.getTimeRange()!=null && !timeRange.equals(tsb.getTimeRange() ) ) {
-                                            timeRange= pickTimeRange( this,
+                                            timeRange= pickTimeRange( SwingUtilities.getWindowAncestor(this),
                                                     Arrays.asList( timeRange, tsb.getTimeRange() ),
                                                     Arrays.asList( "Current", "URI" ) );
                                             tsb.setTimeRange(timeRange);
