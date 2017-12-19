@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Having fun, adding warble to Taylor Swift wav file.   With <a href="Taylor_Swift_Change_warble.wav">warble</a> and <a href="modelWarble.jy">the script</a>.
+        <p><small>Old bug where first ten records of a wav file were dropped is corrected.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,8 @@
         
         <p>Bugfixes (2017-12-16 r21856):</p>
         <ul>
+            <li>"which range" dialog is properly centered.
+            <li>corrections to series control GUI, where ReferenceValue was mislocated.
             <li>refactor slicers so a top painter is used instead of subclassing.
             <li>corrections to HAPI client's caching, cached streams are zipped.
             <li>findbugs RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE.  Thanks, Findbugs!
@@ -94,6 +96,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>prep for smaller .vaps which can be embedded within scripts.
+            <li>vap+inline checks for eval and exec, which one can imagine could be used to attack a server.
             <li>das2 library GraphUtil.copyPlot added to support APL.  Thanks, James!
             <li>HAPI Client can manage a cache of local files to support offline use.
             <li>Mouse modules can provide feedback, so zoom/pan can indicate control should be used instead of shift.
