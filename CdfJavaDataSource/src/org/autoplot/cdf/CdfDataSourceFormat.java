@@ -749,14 +749,17 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     private void copyMetadata( Units units, String name, boolean isSupport, QDataSet ds ) throws Exception {
         
         if ( units!=null ) {
-            if (units != Units.cdfEpoch) {
-                addVariableAttributeEntry( name, "UNITS", CDFDataType.CHAR, units.toString() );
-            } else {
+            if (units == Units.cdfEpoch) {
                 addVariableAttributeEntry( name, "UNITS", CDFDataType.CHAR, "ms" );
+            } else if ( units==Units.cdfTT2000 ) {
+                addVariableAttributeEntry( name, "UNITS", CDFDataType.CHAR, "ns" );
+            } else {
+                addVariableAttributeEntry( name, "UNITS", CDFDataType.CHAR, units.toString() );
             }
         } else {
             addVariableAttributeEntry( name, "UNITS", CDFDataType.CHAR, " " );
         }
+        
         String label = (String) ds.property(QDataSet.LABEL);
         if (label != null && label.length()>0 ) {
             if ( units!=null && label.endsWith("("+units+")") ) {
@@ -777,6 +780,11 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 //if ( vmin==null ) vmin= -1e38; else vmin= uc.convert(vmin);
                 //cdf.addVariableAttributeEntry( name, "VALIDMIN", CDFDataType.DOUBLE, vmin.doubleValue() );
                 //cdf.addVariableAttributeEntry( name, "VALIDMAX", CDFDataType.DOUBLE, vmax.doubleValue() );
+            } else if ( units==Units.cdfTT2000 ) {
+                if ( vmax!=null && vmin !=null ) {
+                    cdf.addVariableAttributeEntry( name, "VALIDMIN", CDFDataType.TT2000, new long[] { vmin.longValue() } );
+                    cdf.addVariableAttributeEntry( name, "VALIDMAX", CDFDataType.TT2000, new long[] { vmax.longValue() } );
+                }
             } else {
                 if ( vmax==null ) vmax= 1e38;
                 if ( vmin==null ) vmin= -1e38;
