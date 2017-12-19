@@ -24,8 +24,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-12-16 r21856):</p>
+        <p>Bugfixes (2017-12-19 r21873):</p>
         <ul>
+            <li>1935: time range GUI read recent timeranges on the event thread, which could hang the GUI.  Thanks, Ivar!
+            <li>corrections to export-to-cdf code, when TT2000 is used, to VALID_MIN and VALID_MAX, and the units.  Thanks, Ivar!
             <li>"which range" dialog is properly centered.
             <li>corrections to series control GUI, where ReferenceValue was mislocated.
             <li>refactor slicers so a top painter is used instead of subclassing.
