@@ -82,8 +82,20 @@ public class SerializeUtil {
      * @param node the dom node (Application, Plot, PlotElement, etc.)
      * @param scheme the version of the vap that we are writing.  This identifies the scheme, but also provides names for nodes.
      * @return the Document (XML) element for the node.
-     */
+     */    
     public static Element getDomElement( Document document, DomNode node, VapScheme scheme ) {
+        return getDomElement( document, node, scheme, true );
+    }
+        
+    /**
+     * Return the XML for the node.
+     * @param document the document to which the node is added.
+     * @param node the dom node (Application, Plot, PlotElement, etc.)
+     * @param scheme the version of the vap that we are writing.  This identifies the scheme, but also provides names for nodes.
+     * @param includeDefaults if true, include nodes which are the default setting
+     * @return the Document (XML) element for the node.
+     */
+    public static Element getDomElement( Document document, DomNode node, VapScheme scheme, boolean includeDefaults ) {
         try {
             String elementName = scheme.getName(node.getClass());
             DomNode defl = node.getClass().newInstance();
@@ -148,7 +160,7 @@ public class SerializeUtil {
                     Element propertyElement = document.createElement("property");
                     propertyElement.setAttribute("name", propertyName);
                     propertyElement.setAttribute("type", "DomNode");
-                    Element child = getDomElement(document, (DomNode) value, scheme);
+                    Element child = getDomElement(document, (DomNode) value, scheme, includeDefaults );
                     propertyElement.appendChild(child);
                     element.appendChild(propertyElement);
                 } else if (ipd != null && !connectorKludge107 && (DomNode.class.isAssignableFrom(ipd.getIndexedPropertyType()))) {
@@ -160,7 +172,7 @@ public class SerializeUtil {
                     propertyElement.setAttribute("length", String.valueOf(Array.getLength(value)));
                     for (int j = 0; j < Array.getLength(value); j++) {
                         Object value1 = Array.get(value, j);
-                        Element child = getDomElement(document, (DomNode) value1, scheme);
+                        Element child = getDomElement(document, (DomNode) value1, scheme, includeDefaults );
                         propertyElement.appendChild(child);
                     }
                     element.appendChild(propertyElement);
@@ -178,14 +190,16 @@ public class SerializeUtil {
                     element.appendChild(propertyElement);
                 } else {
                     Object defltValue = DomUtil.getPropertyValue(defl, pd.getName());
-                    Element prop = getElementForLeafNode(document, pd.getPropertyType(), value, defltValue);
-                    if (prop == null) {
-                        logger.log(Level.WARNING, "unable to serialize {0}", propertyName);
-                        prop = getElementForLeafNode(document, pd.getPropertyType(), value, defltValue);
-                        continue;
+                    if ( !value.equals(defltValue) || includeDefaults ) {                        
+                        Element prop = getElementForLeafNode(document, pd.getPropertyType(), value, defltValue);
+                        if (prop == null) {
+                            logger.log(Level.WARNING, "unable to serialize {0}", propertyName);
+                            //prop = getElementForLeafNode(document, pd.getPropertyType(), value, defltValue);
+                            continue;
+                        }
+                        prop.setAttribute("name", pd.getName());
+                        element.appendChild(prop);                        
                     }
-                    prop.setAttribute("name", pd.getName());
-                    element.appendChild(prop);
                 }
             }
             return element;
