@@ -210,8 +210,26 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 logger.log( Level.WARNING, ex.getMessage() , ex );
             }
         }
-                
-        write( ffile.toString() );
+         
+        if ( !append ) {
+            if ( ffile.exists() ) {
+                CdfDataSource.cdfCacheReset();
+                File tempFile= File.createTempFile( "deleteme",".cdf");
+                if ( !ffile.renameTo( tempFile) ) {
+                    ffile.delete();
+                    logger.log(Level.WARNING, "file {0} cannot be renamed", ffile);
+                } 
+                write( ffile.toString() );
+                if ( tempFile.exists() && !tempFile.delete() ) {
+                    logger.log(Level.WARNING, "file {0} cannot be deleted", tempFile);
+                }
+            } else {
+                write( ffile.toString() );
+            }
+        } else {
+            write( ffile.toString() );
+        }
+        
         
     }
 
