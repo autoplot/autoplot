@@ -1,0 +1,70 @@
+from java.awt.geom.Point2D import Double as Point
+from java.awt.geom.Line2D import Double as Line
+from java.awt.geom.Rectangle2D import Double as Rectangle
+from java.awt.geom import Area
+
+from math import cos,sin
+
+rect= Rectangle(0,0,1000,1000)
+
+class Turtle:
+    def __init__(self,g,p):
+        self.g= g
+        self.p= p
+        self.a= 0.
+    def forward(self,s):
+        p2= Point( self.p.x + cos(self.a) * s, self.p.y + sin(self.a) * s )
+        line= Line( self.p, p2 )
+        if ( line.intersects(rect) ):
+             self.g.draw( line )
+        self.p= p2
+    def left(self,a):
+        self.a+= a*TAU/360
+    def right(self,a):
+        self.a-= a*TAU/360
+
+def koch( t, s, n ):
+    if ( s<2 ):
+        t.forward(s)
+        return
+    koch( t, s/3, n-1 )
+    t.left( 60 )
+    koch( t, s/3, n-1 )
+    t.right( 120 )
+    koch( t, s/3, n-1 )
+    t.left( 60 )
+    koch( t, s/3, n-1 )
+    
+def snowflake( t, s, n ):
+    for i in range(6):
+        koch( t, s, n )
+        t.left(60)
+
+from org.das2.graph import Renderer
+class MyRenderer(Renderer):
+    def __init__(self,drawOther):
+        self.drawOther= drawOther
+    def render( self, g, xaxis, yaxis, monitor ):
+        if ( self.drawOther ):
+            xx= dom.plots[1].xaxis.range
+            yy= dom.plots[1].yaxis.range
+            xx= [ xaxis.transform(xx.min()), xaxis.transform(xx.max()) ]
+            yy= [ yaxis.transform(yy.min()), yaxis.transform(yy.max()) ]
+            g.draw( Rectangle( xx[0], yy[1], xx[1]-xx[0], yy[0]-yy[1] ) )
+        t= Turtle( g, Point( xaxis.transform(datum(0)), yaxis.transform(datum(0)) ) )
+        l= xaxis.transform(datum(1))-xaxis.transform(datum(0))
+        depth= max( int(l/100), 1 )
+        snowflake( t, l, depth )
+        
+        
+plot( None, renderer=MyRenderer(True), xrange=[-2,2], yrange=[-2,2], isotropic=1 )
+(p,pe)=plot( 1, None, renderer=MyRenderer(False), xpos='55%,80%', ypos='10%,40%', xrange=[1.0,1.04], yrange=[-0.41,-0.36], isotropic=1 ) 
+p.controller.dasPlot.drawBackground= Color.WHITE
+
+from java.beans import PropertyChangeListener
+class MyPropertyChangeListener(PropertyChangeListener):
+    def propertyChange( self, x ):
+        dom.plots[0].controller.dasPlot.invalidateCacheImage()
+        dom.plots[0].controller.dasPlot.repaint()
+dom.plots[1].xaxis.addPropertyChangeListener(MyPropertyChangeListener())
+
