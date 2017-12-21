@@ -26,6 +26,7 @@
         
         <p>Bugfixes (2017-12-19 r21873):</p>
         <ul>
+            <li>format to CDF removes old CDF file before writing new one, so new result is not affected.  Thanks, Ivar!
             <li>1935: time range GUI read recent timeranges on the event thread, which could hang the GUI.  Thanks, Ivar!
             <li>corrections to export-to-cdf code, when TT2000 is used, to VALID_MIN and VALID_MAX, and the units.  Thanks, Ivar!
             <li>"which range" dialog is properly centered.
