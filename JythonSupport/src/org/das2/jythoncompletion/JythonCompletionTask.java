@@ -652,7 +652,13 @@ public class JythonCompletionTask implements CompletionTask {
         PythonInterpreter interp = getInterpreter();
 
         String eval;
-        eval= editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
+        int eolnCarot= Utilities.getRowStart(editor, editor.getCaretPosition());
+        eval= editor.getText(0, eolnCarot);
+        int startLastLine= Utilities.getRowStart(editor, eolnCarot-1 );
+        String lastLine= editor.getText( startLastLine, eolnCarot-startLastLine );
+        if ( lastLine.startsWith("def ") ) {
+            eval= eval + "   'dummy string'\n";
+        }
         
         if ( JythonCompletionProvider.getInstance().settings().isSafeCompletions() ) {
             eval= sanitizeLeaveImports( eval );
