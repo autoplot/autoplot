@@ -1455,6 +1455,7 @@ public class JythonUtil {
      * code is run to support completions.
      * @param eval string containing the entire program.
      * @return the script as a string, with side-effects removed.
+     * @deprecated this should not be used, because newer codes use the fully-implemented Jython parser.
      */
     public static String removeSideEffects( String eval ) {
         BufferedReader reader= new BufferedReader( new StringReader( eval ) ) ;
