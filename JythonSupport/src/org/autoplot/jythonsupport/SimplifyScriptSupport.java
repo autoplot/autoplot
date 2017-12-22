@@ -284,6 +284,7 @@ public class SimplifyScriptSupport {
          if ( ( o instanceof org.python.parser.ast.ImportFrom ) ) return true;
          if ( ( o instanceof org.python.parser.ast.Import ) ) return true;
          if ( ( o instanceof org.python.parser.ast.ClassDef ) ) return true;
+         if ( ( o instanceof org.python.parser.ast.FunctionDef ) ) return true;
          if ( ( o instanceof org.python.parser.ast.Assign ) ) {
              Assign a= (Assign)o;
              if ( simplifyScriptToGetCompletionsOkayNoCalls( a.value, variableNames ) ) {
