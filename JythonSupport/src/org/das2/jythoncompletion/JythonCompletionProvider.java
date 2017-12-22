@@ -50,6 +50,7 @@ public class JythonCompletionProvider implements CompletionProvider {
                 try {
                     syncTask.query(resultSet);
                 } catch ( PyException ex ) {
+                    ex.printStackTrace();
                     if ( resultSet.isFinished() ) {
                         setMessage("warning: "+ex.toString());
                     } else {
