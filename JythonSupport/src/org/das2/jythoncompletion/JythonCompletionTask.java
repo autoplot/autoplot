@@ -654,13 +654,15 @@ public class JythonCompletionTask implements CompletionTask {
         String eval;
         int eolnCarot= Utilities.getRowStart(editor, editor.getCaretPosition());
         eval= editor.getText(0, eolnCarot);
-        int startLastLine= Utilities.getRowStart(editor, eolnCarot-1 );
-        String lastLine= editor.getText( startLastLine, eolnCarot-startLastLine );
-        Matcher m= Pattern.compile("def .*").matcher(lastLine.trim());
-        if ( m.matches() ) {
-            int i= lastLine.indexOf("def ");
-            String indent= lastLine.substring(0,i);
-            eval= eval + indent + "\t" + "__dummy__=1\n";
+        if ( eolnCarot>0 ) {
+            int startLastLine= Utilities.getRowStart(editor, eolnCarot-1 );
+            String lastLine= editor.getText( startLastLine, eolnCarot-startLastLine );
+            Matcher m= Pattern.compile("def .*").matcher(lastLine.trim());
+            if ( m.matches() ) {
+                int i= lastLine.indexOf("def ");
+                String indent= lastLine.substring(0,i);
+                eval= eval + indent + "\t" + "__dummy__=1\n";
+            }
         }
         
         if ( JythonCompletionProvider.getInstance().settings().isSafeCompletions() ) {
@@ -1135,6 +1137,7 @@ public class JythonCompletionTask implements CompletionTask {
             List<String> signatures= new ArrayList();
             List<String> argss= new ArrayList();
             if (ss.startsWith(cc.completable)) {
+                logger.finer("found completion item: "+ss);
                 PyObject po = locals.get(s);
                 String label = ss;
                 List<String> labels= new ArrayList();
@@ -1146,6 +1149,7 @@ public class JythonCompletionTask implements CompletionTask {
                     label = ss + "() ";
                     if ( po instanceof PyFunction ) {
                         label= getPyFunctionSignature((PyFunction)po);
+                        args= label.substring(ss.length());
                     }
                     PyObject doc= interp.eval(ss+".__doc__");
                     signature= makeInlineSignature( po, doc );
