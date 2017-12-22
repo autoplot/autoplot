@@ -1057,6 +1057,9 @@ public class JythonCompletionTask implements CompletionTask {
     private static void doConstructors( Constructor[] constructors, List<String> labels, List<String> signatures, String ss, List<String> argss ) {
         for (Constructor constructor : constructors) {
             String signature = constructorSignatureNew(constructor);
+            if ( signature.contains("$") ) {
+                signature= signature.replaceAll("\\$",".");
+            }
             int j= signature.indexOf("#");
             String label= ss + "() JAVA";
             if (j>-1) {
@@ -1150,6 +1153,7 @@ public class JythonCompletionTask implements CompletionTask {
                 } else if (po.isNumberType()) {
                     switch (po.getType().getFullName()) {
                         case "javaclass":
+                        case "javainnerclass":
                             label = ss;
                             PyJavaClassPeeker peek= new PyJavaClassPeeker((PyJavaClass)po);
                             Class jclass= peek.getProxyClass();
@@ -1199,7 +1203,7 @@ public class JythonCompletionTask implements CompletionTask {
                         label= labels.get(jj);
                         String link = null;
                         if (signature != null) {
-                            link= getLinkForJavaSignature(signature);
+                            link= getLinkForJavaSignature(signature);  // TODO: inner class like Rectangle.Double is only Double
                         }
                         if ( ss.equals("dom") ) {
                             link= "http://autoplot.org/developer.scripting#DOM";
