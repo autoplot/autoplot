@@ -620,69 +620,12 @@ public class JythonCompletionTask implements CompletionTask {
      * return the imports for the python script, also the def's are 
      * returned with a trivial definition, and assignments are converted to
      * be a trivial assignment.
-     * TODO: redo this using syntax tree. See JythonUtil.simplifyScriptToGetParams(src,false);
      * 
      * @param src jython source
      * @return subset sufficient to provide completions
      */
     private static String sanitizeLeaveImports( String src ) {
-        StringBuilder buf= new StringBuilder();
-        BufferedReader read= new BufferedReader( new StringReader(src) );
-        Pattern assign= Pattern.compile("([a-zA-Z_][a-zA-Z0-9_]*)\\s*=(.*)");
-        Matcher m;
-        try {
-            String s= read.readLine();
-            boolean doAddPass= false;
-            String indent= null;
-            while ( s!=null ) {
-                s= popOffComments(s);
-                if ( s.startsWith("from ") || s.startsWith("import ") ) {
-                    buf.append(s).append("\n");
-                } else if ( s.startsWith("def ") ) {
-                    buf.append(s).append("\n");
-                    doAddPass= true;
-                    indent= "  ";
-                } else if ( (m=assign.matcher(s)).matches() ) {
-                    String safeArg= m.group(2).trim();
-                    if ( safeArg.startsWith("\'") && safeArg.endsWith("\'") ) {
-                        // do nothing, it's already a string.
-                    } else if ( safeArg.startsWith("\"") && safeArg.endsWith("\"") ) {
-                        // do nothing, it's already a string.
-                    } else {
-                        if ( safeArg.startsWith("getDataSet") ) {
-                            safeArg= "fltarr(100)";
-                        } else {
-                            safeArg= "'" + safeArg.replaceAll("'","\"") + "'";
-                        }
-                    }
-                    buf.append(m.group(1)).append("=").append(safeArg).append("\n");
-                }
-                s= read.readLine();
-                if ( s!=null ) {
-                    String doc= popDoc( s, read );
-                    if ( doc!=null ) {
-                        buf.append( doc ).append("\n");
-                        int ic= 0;
-                        while ( ic<doc.length() && Character.isWhitespace(doc.charAt(ic)) ) {
-                            ic++;
-                        }
-                        indent= doc.substring(0,ic);
-                    }
-                }
-                if ( doAddPass ) {
-                    buf.append(indent).append("pass\n");
-                    doAddPass= false;
-                }
-            }
-        } catch ( IOException ex ) {
-            logger.log( Level.SEVERE, ex.getMessage(), ex );
-        } finally {
-            try {
-                read.close();
-            } catch ( IOException ex2 ) {
-            }
-        }
-        return buf.toString();
+        return SimplifyScriptSupport.simplifyScriptToCompletions( src );
     }
 
     /**
