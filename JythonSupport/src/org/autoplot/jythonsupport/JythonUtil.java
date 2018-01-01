@@ -563,6 +563,9 @@ public class JythonUtil {
              for ( String s: okay ) {
                 if ( ss.contains(s) ) klugdyOkay= true;
              }
+             if ( ss.startsWith("Attribute[") ) {
+                 klugdyOkay= true; // parms.keys()
+             }
              if ( klugdyOkay==false ) {
                  if ( ss.contains("TimeUtil") && ss.contains("now")  ) {
                      klugdyOkay= true;
