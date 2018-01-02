@@ -132,32 +132,40 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             mon= new NullProgressMonitor();
         }
 
-        URISplit split = URISplit.parse(surl);
-        Map<String,String> params= URISplit.parseParams(split.params);
+        //System.err.println("getRepr "+Integer.toHexString( mon.hashCode() ) );
 
-        String delegateFile;
-        String stimeRange= params.get( "timerange" );
-        if ( stimeRange!=null ) {
-            DatumRange tdr= null;
-            try {
-                tdr= DatumRangeUtil.parseTimeRange(stimeRange);
-            } catch ( ParseException ex ) {
-                logger.finer("unable to parse timerange, just use default delegate");
-            }
-            if ( tdr!=null ) {
-                String[] names= fsm.getBestNamesFor( tdr, mon.getSubtaskMonitor("get best names") );
-                if ( names.length>0 ) {
-                    delegateFile= names[0];
+        try {
+
+            URISplit split = URISplit.parse(surl);
+            Map<String,String> params= URISplit.parseParams(split.params);
+
+            String delegateFile;
+            String stimeRange= params.get( "timerange" );
+            if ( stimeRange!=null ) {
+                DatumRange tdr= null;
+                try {
+                    tdr= DatumRangeUtil.parseTimeRange(stimeRange);
+                } catch ( ParseException ex ) {
+                    logger.finer("unable to parse timerange, just use default delegate");
+                }
+                if ( tdr!=null ) {
+                    String[] names= fsm.getBestNamesFor( tdr, mon.getSubtaskMonitor("get best names") );
+                    if ( names.length>0 ) {
+                        delegateFile= names[0];
+                    } else {
+                        delegateFile= fsm.getRepresentativeFile( mon.getSubtaskMonitor("get delegate") );
+                    }
                 } else {
-                    delegateFile= fsm.getRepresentativeFile( mon.getSubtaskMonitor("get delegate") );
+                    delegateFile= fsm.getRepresentativeFile( mon );
                 }
             } else {
                 delegateFile= fsm.getRepresentativeFile( mon );
             }
-        } else {
-            delegateFile= fsm.getRepresentativeFile( mon );
+            return delegateFile;
+            
+        } finally {
+            mon.finished();
         }
-        return delegateFile;
     }
 
     private static CompletionContext getDelegateDataSourceCompletionContext(CompletionContext cc) throws IOException {
