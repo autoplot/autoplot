@@ -319,7 +319,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     private void timeRangeToolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeToolButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         TimeRangeTool t=new TimeRangeTool();
-        String tr= timeRangeComboBox.getSelectedItem().toString();
+        Object otr= timeRangeComboBox.getSelectedItem();
+        String tr= otr==null ? "" : otr.toString();
         if ( tr.trim().length()==0 ) {
             tr= "2010-01-01"; // default
         }
@@ -585,7 +586,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
             if ( hasTimeFields ) {
                 String timeRange = params.get("timerange");
-                if (timeRange != null && timeRange.trim().length() > 0) {
+                if ( timeRange==null ) timeRange="";
+                if ( timeRange.trim().length() > 0) {
                     timeRange= timeRange.replaceAll("\\+", " ");
                     try {
                         DatumRange dr = DatumRangeUtil.parseTimeRange(timeRange);
@@ -613,7 +615,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                 timeRangeToolButton.setEnabled(false);
             }
             
-            String delegateUrl = null;
+            String delegateUrl;
             delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(url, null);
 
             if (delegateEditorPanel == null) {
@@ -623,7 +625,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             delegateEditorPanel.setURI(delegateUrl);
             setDelegateComponent(delegateEditorPanel.getPanel());
 
-        } catch (Exception ex) {
+        } catch (IOException | IllegalArgumentException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             RuntimeException ex2 = new RuntimeException("Unable to create example file for aggregation", ex);
             throw ex2;
@@ -679,7 +681,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         allParams.putAll(URISplit.parseParams(dsplit.params));
         
         if ( hasTimeFields ) {
-            String tr = timeRangeComboBox.getSelectedItem().toString().trim();
+            Object otr= timeRangeComboBox.getSelectedItem();
+            String tr = otr==null ? "" : otr.toString().trim();
             tr= tr.replaceAll(" ","+");
             String tr0= allParams.get("timerange"); // check that the delegate didn't insert a timerange
             if ( tr0!=null && tr0.length()>0 ) {
