@@ -71,6 +71,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
     boolean focusDep0 = false;
     TableCellRenderer defaultCellRenderer;
     boolean isRichHeader= false;
+    boolean initializing= true;
     
     @Override
     public void markProblems(List<String> problems) {
@@ -250,6 +251,31 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
             public void valueChanged(ListSelectionEvent e) {
                 if ( e.getValueIsAdjusting() ) return;
                 doSelect( currentTool );
+            }
+        });
+        
+        jTable1.getTableHeader().addMouseListener( new MouseAdapter() {
+            @Override
+            public void mouseClicked( MouseEvent e ) {
+                int col= jTable1.columnAtPoint( e.getPoint() );
+                String name=null;
+                if ( columns!=null ) {
+                    name = columns.get(col);
+                }   
+                if (name == null) name = "field" + col;
+                if ( null!=currentTool ) switch (currentTool) {
+                    case COLUMN:
+                        setColumn(name);
+                        break;
+                    case DEPEND_0:
+                        setDep0(name);
+                        break;
+                    case NONE:
+                        setColumn(name);
+                        break;
+                    default:
+                        break;
+                }
             }
         });
 
@@ -1184,6 +1210,12 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
     public void setColumn(String column) {
         String oldColumn = this.column;
         this.column = column;
+        if ( initializing==false ) {
+            this.labelTextField.setText("");
+            this.titleTextField.setText("");
+            this.unitsTF.setText("");
+            this.depend0unitsCB.setSelectedItem("");
+        }
         firePropertyChange(PROP_COLUMN, oldColumn, column);
     }
     protected String dep0 = "";
@@ -1297,6 +1329,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
             jTabbedPane1.setSelectedIndex(tab);
             update();
             checkHeaders();
+            initializing= false;
 
         } catch (IOException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
