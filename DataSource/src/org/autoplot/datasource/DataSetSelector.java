@@ -985,6 +985,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         final String surl = tf.getText();
         int carotpos = tf.getCaretPosition();
         setMessage("busy: getting completions");
+        setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
         showCompletions(surl, carotpos);
 
     }
@@ -1127,6 +1128,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         //completionsPopupMenu.setFocusable(true);
         
         setMessage("done getting completions");
+        setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) );
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -1446,6 +1448,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 try {
                     completions2 = DataSetURI.getFactoryCompletions(surl, carotpos, completionsMonitor);
                     setMessage("done getting completions");
+                    setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) );
                 } catch (Exception ex ) {
                     if ( !maybeHandleException(ex) ) {
                         setMessage("" + ex.getClass().getName() + " " + ex.getMessage());
