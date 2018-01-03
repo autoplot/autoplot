@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Drawing Koch-curve snowflakes in <a href="snowflake.jy">Jython</a>.  Happy Holidays!
+        <p><small>Colorful random walk will be used for demos.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,9 @@
         
         <p>Bugfixes (2017-12-19 r21873):</p>
         <ul>
+            <li>1942: limits on interpolation in synchronize.
+            <li>collapse GUI needs to check to avoid runtime errors.
+            <li>1941: orphaned monitor with aggregation. 
             <li>format to CDF removes old CDF file before writing new one, so new result is not affected.  Thanks, Ivar!
             <li>1935: time range GUI read recent timeranges on the event thread, which could hang the GUI.  Thanks, Ivar!
             <li>corrections to export-to-cdf code, when TT2000 is used, to VALID_MIN and VALID_MAX, and the units.  Thanks, Ivar!
@@ -99,6 +102,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>617: ASCII editor improvements.
+            <li>improvements to completions in Jython script panel.
             <li>prep for smaller .vaps which can be embedded within scripts.
             <li>vap+inline checks for eval and exec, which one can imagine could be used to attack a server.
             <li>das2 library GraphUtil.copyPlot added to support APL.  Thanks, James!
