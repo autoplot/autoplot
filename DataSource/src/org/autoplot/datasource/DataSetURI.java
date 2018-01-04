@@ -1005,7 +1005,7 @@ public class DataSetURI {
      * 
      * @param url the address to download.
      * @param timeoutSeconds if positive, the number of seconds to allow use of a downloaded resource.  If -1, then the default ten seconds is used.  12 hours is the longest allowed interval.
-     * @param mon a progress monitor.
+     * @param mon a progress monitor, or null.
      * @return a File in the FileSystemCache.  The file will have question marks and ampersands removed.
      * @throws IOException
      */
@@ -1016,6 +1016,8 @@ public class DataSetURI {
         if ( timeoutSeconds>43200 ) {
             throw new IllegalArgumentException("timeoutSeconds is greater than 12 hours.");
         }
+        
+        if ( mon==null ) mon= new NullProgressMonitor();
 
         URISplit split = URISplit.parse( url.toString() ); // get the folder to put the file.
 
