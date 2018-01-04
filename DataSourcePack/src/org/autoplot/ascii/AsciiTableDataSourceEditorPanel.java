@@ -103,10 +103,11 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                         currentToolButton= ( JToggleButton ) e.getSource();
                         Util.enableComponents( (Container)jTabbedPane1.getSelectedComponent(), false, (Component)e.getSource() );
                         jTabbedPane1.setEnabled(false);
-                        currentTool = t;
+                        setCurrentTool(t);
                     } else {
                         currentToolButton= ( JToggleButton ) e.getSource();
                         currentTool = t;
+                        setCurrentTool(t);
                         doSelect( t );
                         jTable1.getSelectionModel().clearSelection();
                         jTable1.getColumnModel().getSelectionModel().clearSelection();
@@ -331,8 +332,46 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
             currentToolButton.setSelected(false);
             currentToolButton = null;
             timesStatusLabel.setText("");
+            dataStatusLabel.setText("");
             headerLabel.setText("");
         }
+    }
+    
+    /**
+     * set the current tool
+     * @param tool 
+     */
+    private void setCurrentTool( Tool tool ) {
+        this.currentTool= tool;
+        String message= "set tool "+tool;
+        if ( null!=tool ) switch (tool) {
+            case FILLVALUE:
+                message= "Click on value to use as fill (missing) value.";
+                break;
+            case GUESSTIMEFORMAT:
+                message= "Select cells which should be used to guess time format.";
+                break;
+            case TIMEFORMAT:
+                message= "Select cells to copy, which must then be converted to time format template.";
+                break;
+            case SKIPLINES:
+                message= "Click on the row of the first record.";
+                break;
+            case DEPEND_0:
+                message= "Click on the first column which is the independent parameter, often time.";
+                break;
+            case COLUMN:
+                message= "Click on the column to use.";
+                break;
+            case NONE:
+                message= "";
+                break;
+            default:
+                break;
+        }
+        this.dataStatusLabel.setText( message );
+        this.timesStatusLabel.setText( message );
+        this.headerLabel.setText( message );
     }
 
     /** This method is called from within the constructor to
@@ -438,34 +477,34 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .addContainerGap()
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel2Layout.createSequentialGroup()
-                        .add(jLabel1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(skipLinesTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 47, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(18, 18, 18)
-                        .add(jToggleButton1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(headerLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .add(jPanel2Layout.createSequentialGroup()
-                        .add(jLabel5)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(commentComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 109, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(0, 532, Short.MAX_VALUE)))
+                        .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jPanel2Layout.createSequentialGroup()
+                                .add(jLabel1)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(skipLinesTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 47, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(18, 18, 18)
+                                .add(jToggleButton1))
+                            .add(jPanel2Layout.createSequentialGroup()
+                                .add(jLabel5)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(commentComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 109, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .add(0, 582, Short.MAX_VALUE))
+                    .add(headerLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel2Layout.createSequentialGroup()
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(headerLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                        .add(skipLinesTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(jToggleButton1)
-                        .add(jLabel1)))
+                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(skipLinesTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jToggleButton1)
+                    .add(jLabel1))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(commentComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jLabel5))
-                .add(25, 25, 25))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(headerLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 19, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("header", jPanel2);
@@ -836,12 +875,6 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         );
     }// </editor-fold>//GEN-END:initComponents
 
-private void skipLinesTextFieldFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_skipLinesTextFieldFocusGained
-}//GEN-LAST:event_skipLinesTextFieldFocusGained
-
-private void skipLinesTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_skipLinesTextFieldFocusLost
-}//GEN-LAST:event_skipLinesTextFieldFocusLost
-
 private void timeFormatFieldsComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeFormatFieldsComboBoxActionPerformed
     String s= (String) timeFormatFieldsComboBox.getSelectedItem();
     int i= s.indexOf(":");
@@ -858,25 +891,6 @@ private void timeFormatFieldsComboBoxActionPerformed(java.awt.event.ActionEvent 
     timeFormatCB.setSelectedItem(n);
     timeFormatFieldsComboBox.setSelectedIndex(0);
 }//GEN-LAST:event_timeFormatFieldsComboBoxActionPerformed
-
-private void commentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_commentComboBoxActionPerformed
-    String value=  (String)commentComboBox.getSelectedItem();
-    if ( value.equals("# hash" ) ) {        
-        params.remove(PARAMS_KEY_COMMENT);
-        parser.setCommentPrefix("#");
-        update();
-    } else if ( value.equals("none") || value.trim().equals("") ) {
-        params.put(PARAMS_KEY_COMMENT,"");
-        parser.setCommentPrefix(null);
-        update();
-    } else {
-        int i= value.indexOf(" ");
-        String prefix= (i==-1) ? value : value.substring(0,i);
-        params.put( PARAMS_KEY_COMMENT, prefix );
-        parser.setCommentPrefix(prefix);
-        update();
-    }
-}//GEN-LAST:event_commentComboBoxActionPerformed
 
 private int[] getDataColumns() {
     int [] result= new int[2];
@@ -1080,10 +1094,6 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
         }
     }//GEN-LAST:event_timeFormatToggleButtonActionPerformed
 
-    private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
-        headerLabel.setText("select the first column of data or column headings");
-    }//GEN-LAST:event_jToggleButton1ActionPerformed
-
     private void guessFillButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guessFillButtonActionPerformed
         fillValueTextField.setText( "moment..." );
         guessFillButton.setEnabled(false);
@@ -1166,6 +1176,37 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
     private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_dep0ColumnsItemStateChanged
         setDep0((String) dep0Columns.getSelectedItem());
     }//GEN-LAST:event_dep0ColumnsItemStateChanged
+
+    private void commentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_commentComboBoxActionPerformed
+        String value=  (String)commentComboBox.getSelectedItem();
+        if ( value.equals("# hash" ) ) {
+            params.remove(PARAMS_KEY_COMMENT);
+            parser.setCommentPrefix("#");
+            update();
+        } else if ( value.equals("none") || value.trim().equals("") ) {
+            params.put(PARAMS_KEY_COMMENT,"");
+            parser.setCommentPrefix(null);
+            update();
+        } else {
+            int i= value.indexOf(" ");
+            String prefix= (i==-1) ? value : value.substring(0,i);
+            params.put( PARAMS_KEY_COMMENT, prefix );
+            parser.setCommentPrefix(prefix);
+            update();
+        }
+    }//GEN-LAST:event_commentComboBoxActionPerformed
+
+    private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+        headerLabel.setText("select the first column of data or column headings");
+    }//GEN-LAST:event_jToggleButton1ActionPerformed
+
+    private void skipLinesTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_skipLinesTextFieldFocusLost
+
+    }//GEN-LAST:event_skipLinesTextFieldFocusLost
+
+    private void skipLinesTextFieldFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_skipLinesTextFieldFocusGained
+
+    }//GEN-LAST:event_skipLinesTextFieldFocusGained
 
     URISplit split = null;
     Map<String,String> params;
