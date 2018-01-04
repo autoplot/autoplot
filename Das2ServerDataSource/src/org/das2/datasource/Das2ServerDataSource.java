@@ -599,11 +599,13 @@ public class Das2ServerDataSource extends AbstractDataSource {
         return new TimeSeriesBrowse() {
             @Override
             public void setTimeRange(DatumRange dr) {
+                logger.log(Level.INFO, "setTimeRange to {0} ({1})", new Object[] { dr, dr.width().toString() } );
                 timeRange = dr;
             }
 
             @Override
             public void setTimeResolution(Datum d) {
+                logger.log(Level.INFO, "setTimeResolution to {0}", d);
                 resolution = d;
             }
 
