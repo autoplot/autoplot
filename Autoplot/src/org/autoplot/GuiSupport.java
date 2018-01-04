@@ -1680,7 +1680,7 @@ public class GuiSupport {
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
                 Units u= dasAxis.getUnits();
-                Units[] uu= u.getConvertableUnits();
+                Units[] uu= u.getConvertibleUnits();
 
                 Component p= (JFrame)SwingUtilities.getWindowAncestor( controller.getDasCanvas().getParent());
                 
