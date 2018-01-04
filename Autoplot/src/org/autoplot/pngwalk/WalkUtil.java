@@ -145,9 +145,14 @@ public class WalkUtil {
                     File f= fs.getFileObject(ss[i]).getFile();
                     result.add( f.toURI() );
                 } else {
-                    if ( ss[i].startsWith("/") ) {
-                        result.add( fs.getRootURI().resolve( FileSystemUtil.uriEncode( ss[i].substring(1) ) ) );
-                    } else {
+                    try {
+                        if ( ss[i].startsWith("/") ) {
+                            result.add( fs.getRootURI().resolve( FileSystemUtil.uriEncode( ss[i].substring(1) ) ) );
+                        } else {
+                            result.add( fs.getRootURI().resolve( FileSystemUtil.uriEncode( ss[i] ) ) );
+                        }
+                    } catch ( RuntimeException ex ) {
+                        ex.printStackTrace();
                         result.add( fs.getRootURI().resolve( FileSystemUtil.uriEncode( ss[i] ) ) );
                     }
                 }
