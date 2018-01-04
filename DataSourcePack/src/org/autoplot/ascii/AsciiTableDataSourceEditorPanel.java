@@ -924,7 +924,9 @@ private int guessTimeFormatColumn( String example, int column, int current, Stri
     int min=999999999;
     for ( ; i<nl; i+=step ) {
         String s= String.valueOf( this.jTable1.getValueAt( i, column ) );
-        if ( s.length()>digits ) digits= s.length();
+        if ( this.model.isRecord( i ) ) {
+            if ( s.length()>digits ) digits= s.length();
+        }
         try {
             int value= (int)Double.parseDouble(s);
             if ( value>max ) max= value;
@@ -953,6 +955,14 @@ private int guessTimeFormatColumn( String example, int column, int current, Stri
                 } else {
                     template.append("$Y$m$d");
                     return TimeUtil.HOUR;
+                }
+            } else if ( digits==10 ) {
+                if ( !Character.isDigit( example.charAt(4) ) ) {
+                    template.append("$Y").append(example.charAt(4)).append("$m").append(example.charAt(7)).append("$d");
+                    return TimeUtil.HOUR;
+                } else {
+                    template.append("$X");
+                    return current;
                 }
             } else {
                 template.append("$X");
@@ -994,6 +1004,9 @@ private int guessTimeFormatColumn( String example, int column, int current, Stri
                 template.append("$H$M$S");
                 return TimeUtil.MILLI;
             } else if ( digits==7 && !Character.isDigit(example.charAt(2)) ) {
+                template.append("$H").append(example.charAt(2)).append("$M").append(example.charAt(5)).append("$S");
+                return TimeUtil.MILLI;
+            } else if ( digits==8 && !Character.isDigit(example.charAt(2)) ) {
                 template.append("$H").append(example.charAt(2)).append("$M").append(example.charAt(5)).append("$S");
                 return TimeUtil.MILLI;
             }       
