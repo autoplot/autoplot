@@ -145,13 +145,9 @@ public class WalkUtil {
                     File f= fs.getFileObject(ss[i]).getFile();
                     result.add( f.toURI() );
                 } else {
-                    try {
-                        if ( ss[i].startsWith("/") ) {
-                            result.add( fs.getRootURI().resolve( FileSystemUtil.uriEncode( ss[i].substring(1) ) ) );
-                        } else {
-                            result.add( fs.getRootURI().resolve( FileSystemUtil.uriEncode( ss[i] ) ) );
-                        }
-                    } catch ( IllegalArgumentException ex ) { // this happens when a colon is in the name, causing confusion with resolution of relative URI.
+                    if ( ss[i].startsWith("/") ) {
+                        result.add( fs.getRootURI().resolve( "./" + FileSystemUtil.uriEncode( ss[i].substring(1) ) ) );
+                    } else {
                         result.add( fs.getRootURI().resolve( "./" + FileSystemUtil.uriEncode( ss[i] ) ) );
                     }
                 }
