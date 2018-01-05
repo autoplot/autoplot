@@ -151,9 +151,8 @@ public class WalkUtil {
                         } else {
                             result.add( fs.getRootURI().resolve( FileSystemUtil.uriEncode( ss[i] ) ) );
                         }
-                    } catch ( RuntimeException ex ) {
-                        ex.printStackTrace();
-                        result.add( fs.getRootURI().resolve( FileSystemUtil.uriEncode( ss[i] ) ) );
+                    } catch ( IllegalArgumentException ex ) { // this happens when a colon is in the name, causing confusion with resolution of relative URI.
+                        result.add( fs.getRootURI().resolve( "./" + FileSystemUtil.uriEncode( ss[i] ) ) );
                     }
                 }
                 timeRanges.add(dr2);
