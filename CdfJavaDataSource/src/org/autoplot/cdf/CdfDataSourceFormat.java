@@ -271,7 +271,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             throw new IllegalArgumentException("not supported!");
             
         }
-        copyMetadata(units, name, isSupport, ds);
+        copyMetadata(units, name, type, isSupport, ds);
         
     }
 
@@ -682,7 +682,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             
         }
 
-        copyMetadata( units, name, isSupport, ds );
+        copyMetadata( units, name, type, isSupport, ds );
         
     }
     
@@ -764,7 +764,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
      * @param ds the dataset containing metadata.
      * @throws Exception 
      */
-    private void copyMetadata( Units units, String name, boolean isSupport, QDataSet ds ) throws Exception {
+    private void copyMetadata( Units units, String name, CDFDataType type, boolean isSupport, QDataSet ds ) throws Exception {
         
         if ( units!=null ) {
             if (units == Units.cdfEpoch) {
@@ -806,13 +806,13 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             } else {
                 if ( vmax==null ) vmax= 1e38;
                 if ( vmin==null ) vmin= -1e38;
-                cdf.addVariableAttributeEntry( name, "VALIDMIN", CDFDataType.DOUBLE, new double[] { vmin.doubleValue() } );
-                cdf.addVariableAttributeEntry( name, "VALIDMAX", CDFDataType.DOUBLE, new double[] { vmax.doubleValue() } );
+                cdf.addVariableAttributeEntry( name, "VALIDMIN", type, new double[] { vmin.doubleValue() } );
+                cdf.addVariableAttributeEntry( name, "VALIDMAX", type, new double[] { vmax.doubleValue() } );
             }
         }
         Number fillval= (Number) ds.property( QDataSet.FILL_VALUE );
         if ( fillval!=null ) {
-            //cdf.addVariableAttributeEntry( name,"FILLVAL",CDFDataType.DOUBLE,fillval.doubleValue());
+            cdf.addVariableAttributeEntry( name,"FILLVAL", type, new double[] { fillval.doubleValue() });
         } else {
             //cdf.addVariableAttributeEntry( name,"FILLVAL",CDFDataType.DOUBLE,-1e31);
         }
@@ -828,8 +828,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             } else {
                 if ( smax==null ) smax= 1e38;
                 if ( smin==null ) smin= -1e38;
-                cdf.addVariableAttributeEntry( name,"SCALEMIN", CDFDataType.DOUBLE, new double[] { smin.doubleValue() } );
-                cdf.addVariableAttributeEntry( name,"SCALEMAX", CDFDataType.DOUBLE, new double[] { smax.doubleValue() } );
+                cdf.addVariableAttributeEntry( name,"SCALEMIN", type, new double[] { smin.doubleValue() } );
+                cdf.addVariableAttributeEntry( name,"SCALEMAX", type, new double[] { smax.doubleValue() } );
             }
         }
         String scaleTyp= (String) ds.property(QDataSet.SCALE_TYPE);
