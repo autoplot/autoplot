@@ -1270,7 +1270,12 @@ public class ScriptPanelSupport {
                 if (split == null || !( split.file!=null && ( split.file.endsWith(".py") || split.file.endsWith(".jy") ) ) ) {
                     file = null;
                 } else {
-                    file = DataSetURI.getFile(DataSetURI.getURL(sfile), new NullProgressMonitor());
+                    try {
+                        file = DataSetURI.getFile(DataSetURI.getURL(sfile), new NullProgressMonitor());
+                    } catch ( IOException ex ) {
+                        logger.fine("old file reference from data set selector is ignored");
+                        file= null;
+                    }
                 }
             }
 
