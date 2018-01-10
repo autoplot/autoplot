@@ -73,7 +73,10 @@ public class QualityControlPanel extends javax.swing.JPanel {
             if ( evt.getPropertyName().equals( WalkImageSequence.PROP_BADGE_CHANGE ) ) {
                 int i= (Integer) evt.getNewValue();
                 if ( i==walkImageSequence.getIndex() ) {
-                    displayRecord( walkImageSequence.getQualityControlSequence().getQualityControlRecord(i) );
+                    QualityControlSequence qcs= walkImageSequence.getQualityControlSequence();
+                    if ( qcs!=null ) {
+                        displayRecord( qcs.getQualityControlRecord(i) );
+                    }
                 }
             }
         }
@@ -521,6 +524,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
      * provide method for programmatically setting status.
      * @param text text to accompany status.
      * @param status the status.
+     * @see PngWalkTool#setQCStatus(java.lang.String, org.autoplot.pngwalk.QualityControlRecord.Status) 
      */
     protected void setStatus( String text, QualityControlRecord.Status status ) {
         if ( text==null ) text="";
