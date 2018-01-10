@@ -848,4 +848,12 @@ public class WalkImageSequence implements PropertyChangeListener  {
         return spec;
     }
 
+    /**
+     * cause clients listing to PROP_SEQUENCE_CHANGED to get a message to
+     * update.
+     */
+    void fireBadgeChanged() {
+        pcs.firePropertyChange(PROP_BADGE_CHANGE,  -1, getIndex() );
+    }
+
 }
