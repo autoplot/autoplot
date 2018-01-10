@@ -116,7 +116,14 @@ public class QualityControlPanel extends javax.swing.JPanel {
         qcRecord = rec;
     }
 
-    public void setStatus(int numOK, int numProblem, int numIgnore, int numUnknown) {
+    /**
+     * set the status label showing number of okay, problem, etc.
+     * @param numOK
+     * @param numProblem
+     * @param numIgnore
+     * @param numUnknown 
+     */
+    protected void setStatus(int numOK, int numProblem, int numIgnore, int numUnknown) {
 
         String statustxt;
         if ( walkImageSequence==null || walkImageSequence.getQCFolder()==null ) {
