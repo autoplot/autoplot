@@ -1710,7 +1710,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
     
     /**
      * add a component that will get property change events and should respond
-     * to property changes.  This gives Ivar a way he can connect actions to
+     * to property changes.  This allows scientists a way to connect actions to
      * the PNGWalk tool.
      * @param c null or a smallish JComponent that should be about the size of a button.
      * @param p null or the listener for the selected file and timerange.
