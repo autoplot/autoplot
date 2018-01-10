@@ -56,6 +56,7 @@ public class QualityControlSequence {
                     break;
             }
         }
+        walkImageSequence.fireBadgeChanged();
         return new int[] {qcOK, qcProb, qcIgn, qcUnknown};
     }
 
