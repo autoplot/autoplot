@@ -122,13 +122,11 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
      * @param tool
      */
     private void doSelect( Tool tool  ) {
-        switch (tool) {
-            case SKIPLINES:
-                if (jTable1.getSelectedRow() != -1) {
-                    setSkipLines(jTable1.getSelectedRow());
-                    clearTool();
-                }
-                break;
+        if ( tool==Tool.SKIPLINES ) {
+            if (jTable1.getSelectedRow() != -1) {
+                setSkipLines(jTable1.getSelectedRow());
+                clearTool();
+            }
         }
 
         switch (jTable1.getColumnModel().getSelectedColumnCount()) {
