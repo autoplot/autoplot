@@ -195,6 +195,7 @@ public class UndoRedoSupport {
                 AutoplotUtil.reloadAll( applicationModel.getDocumentModel() );
             } } );
         }
+        redoLabel= getRedoLabel();
         propertyChangeSupport.firePropertyChange(PROP_REDOLABEL, oldRedoLabel, redoLabel);
         propertyChangeSupport.firePropertyChange( PROP_DEPTH, oldDepth, stateStackPos );
 
@@ -238,6 +239,7 @@ public class UndoRedoSupport {
             ignoringUpdates = false;
             stateStackPos++;
         }
+        redoLabel= getRedoLabel();
         propertyChangeSupport.firePropertyChange(PROP_REDOLABEL, oldRedoLabel, redoLabel);
         propertyChangeSupport.firePropertyChange( PROP_DEPTH, oldDepth, stateStackPos );
     }
