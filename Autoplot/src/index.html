@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2018-01-05 r21908):</p>
+        <p>Bugfixes (2018-01-11 r21928):</p>
         <ul>
+            <li>in ensureMonotonicAndIncreasingWithFill, where the last value was assigned even though the value was not monotonic.  Thanks, Ivar!
             <li>updating QC status properly repaints.
             <li>1939: FILL_VALUE is now propagated to CDF.  Thanks, Ivar!
             <li>1944: invalid .jy reference in the address bar would prevent "load" action on script panel.
@@ -108,6 +109,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>introduce cumulativeMin and cumulativeMax to scripting.
             <li>617: ASCII editor improvements.
             <li>improvements to completions in Jython script panel.
             <li>prep for smaller .vaps which can be embedded within scripts.
