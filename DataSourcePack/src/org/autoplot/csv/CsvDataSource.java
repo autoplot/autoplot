@@ -187,19 +187,17 @@ public class CsvDataSource extends AbstractDataSource {
             line++;
             mon.setProgressMessage("read line "+line);
             if ( columnUnits==null ) {
-                if ( columnUnits==null ) {
-                    boolean foundColumnNumbers= false;
-                    columnUnits= new Units[reader.getColumnCount()];
-                    for ( int j=0; j<reader.getColumnCount(); j++ ) {
-                        columnUnits[j]= guessUnits(reader.get(j));reader.get(0);
-                        if ( !( columnUnits[j] instanceof EnumerationUnits ) ) {
-                            foundColumnNumbers= true;
-                        }
+                boolean foundColumnNumbers= false;
+                columnUnits= new Units[reader.getColumnCount()];
+                for ( int j=0; j<reader.getColumnCount(); j++ ) {
+                    columnUnits[j]= guessUnits(reader.get(j));reader.get(0);
+                    if ( !( columnUnits[j] instanceof EnumerationUnits ) ) {
+                        foundColumnNumbers= true;
                     }
-                    if ( !foundColumnNumbers ) {
-                        logger.log(Level.FINER, "line appears to be a header: {0}", line);
-                        columnUnits= null;
-                    }
+                }
+                if ( !foundColumnNumbers ) {
+                    logger.log(Level.FINER, "line appears to be a header: {0}", line);
+                    columnUnits= null;
                 }
                 if ( icolumn==-1 ) {
                     if ( TimeUtil.isValidTime(reader.get(0)) && TimeUtil.isValidTime(reader.get(1) ) && reader.getColumnCount()>=2 && reader.getColumnCount()<=5 ) {
