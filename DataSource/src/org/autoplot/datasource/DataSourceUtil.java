@@ -503,11 +503,18 @@ public class DataSourceUtil {
         
         // it looks like to have $Y$m01 resolution, we would need to have a flag to only accept the aggregation if the more general one is not needed for other files.
         
-        String s= replaceLast( split.file, 
+        String s;
+        try {
+            s= replaceLast( split.file, 
                 search,
                 replac,
                 resol );
-
+        } catch ( IllegalArgumentException ex ) {
+            return null;
+        }
+        
+        if ( s==null ) return null;
+        
         try {
             TimeParser tp= TimeParser.create(s);
             timeRange= tp.parse( split.file ).getTimeRange().toString();
