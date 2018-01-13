@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Colorful random walk will be used for demos.
+        <p><small>Bug 1946, introduced between v2017a_5 and v2017a_6 shows where cadence was handled inconsistently.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2018-01-11 r21928):</p>
+        <p>Bugfixes (2018-01-13 r21934):</p>
         <ul>
+            <li>1946: cadence was handled inconsistently for filled histogram, between the fill and the outline.  Thanks, Scott!
             <li>in ensureMonotonicAndIncreasingWithFill, where the last value was assigned even though the value was not monotonic.  Thanks, Ivar!
             <li>updating QC status properly repaints.
             <li>1939: FILL_VALUE is now propagated to CDF.  Thanks, Ivar!
@@ -37,6 +38,9 @@
             <li>collapse GUI needs to check to avoid runtime errors.
             <li>1941: orphaned monitor with aggregation. 
             <li>format to CDF removes old CDF file before writing new one, so new result is not affected.  Thanks, Ivar!
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>1935: time range GUI read recent timeranges on the event thread, which could hang the GUI.  Thanks, Ivar!
             <li>corrections to export-to-cdf code, when TT2000 is used, to VALID_MIN and VALID_MAX, and the units.  Thanks, Ivar!
             <li>"which range" dialog is properly centered.
@@ -77,41 +81,14 @@
             <li>1916: "NaN" parses to fill Datum for times.  This supports breaks in timeseries.  Thanks, Masafumi!
             <li>1912: new change to check cadence didn't properly consider conditions when issuing errors.  Thanks, Ivar!
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>1888: corrections to Javadoc popup for packages, since Java 8 documentation changes this.
-            <li>export to wave checks timetags to make sure data is sorted.  Thanks Masafumi!
-            <li>remove leftover binding between yaxis and FLIPCOLORBARLABEL, which could lead to memory leak.
-            <li>corrections to trim function, which now requires data be within cadence of bounds for it to be included.
-            <li>corrections to das2stream adapter which was incorrectly setting monotonic.  Better handle second-checks of monotonic.  Thanks, Masafumi!
-            <li>correction to ifft, which incorrectly reconstructed the timetags.
-            <li>metadata tab properly formats small numbers (0.00001) in a linear space, not "0.000".  Thanks, Ivar!
-            <li>rfe601: temporarily remove scale bindings to v1.08 vap files, so that they can be loaded with old Autoplot versions.
-            <li>1911: set canvas size would trigger the thumbnail generation, which reset the canvas size to its old size.
-            <li>Positive time zone offsets (+0600) where not parsed properly.
-            <li>Huge scatter mode has branch which was dropping the last record of a rank 2 waveform. Thanks, George!
-            <li>1911: respect options.autorange=False.  New autoranging code would always autorange.
-            <li>1910: make sure that the script plot command sets the immutable flag so that plot operates as expected and copying the data can be avoided.  Thanks, Masafumi!
-            <li>George pointed out where rank 3 waveform data would drop records.
-            <li>ASCII files starting with two time columns could only be read as events, so column keyword didn't work.
-            <li>UriTcaSource tweaked to provide useful method for sampling data from URI.
-            <li>correction to TimeParser.normalizeTimes, which would improperly round resulting in .699999. Thanks, Masafumi!
-            <li>DataPointRecorder had a time resolution limit that prevented use with waveform data.  Thanks, Sadie!
-            <li>1793: CSV automatically switchies to semicolon, and allows long headers.  Thanks Chris and Bill!
-            <li>1902: improvements to pngwalk tool's write to html.
-            <li>1905: ascii table data source depend1Values were dropped.  Thanks, Victor!
-            <li>deselecting "bundle" on the ascii editor would not remove bundle keyword from URI.
-            <li>1897: tests needed for autoRangeHints.
-            <li>1899: add and subtract operators to allow sloppiness with units.
-            <li>add a couple of completions for timerange and plots[0].yaxis.range to vap file completions after the question mark (?).
-            <li>support colorLoadOrder.vap?plots[0].yaxis.range='0+to+4'
-            <li>1895: when rendererControl and color properties are inconsistent, let specific property override.
-        </ul>
         <p>Features:</p>
         <ul>
             <li>introduce cumulativeMin and cumulativeMax to scripting.
             <li>617: ASCII editor improvements.
             <li>improvements to completions in Jython script panel.
+        </ul>
+       <p>Less recent features:</p>
+       <ul>
             <li>prep for smaller .vaps which can be embedded within scripts.
             <li>vap+inline checks for eval and exec, which one can imagine could be used to attack a server.
             <li>das2 library GraphUtil.copyPlot added to support APL.  Thanks, James!
@@ -140,20 +117,6 @@
             <li>begin support for new polar plotting mode.
             <li>DataPointRecorder allows fill records to be inserted.  Thanks Masafumi!
             <li>Jython completions show last assignment of variable names
-        </ul>
-       <p>Less recent features:</p>
-       <ul>
-            <li>prepare HAPI client for upcoming changes to HAPI spec, where units and label can be arrays.
-            <li>rfe603: refactor AutoplotUtil to extract AutoRangeUtil, which is just the Autoranging codes.
-            <li>improvements to cadence calculation for waveform datasets.
-            <li>eventsConjunction function returns where two events lists have overlaps.
-            <li>print to PDF now has pixels per inch and (finally) overall width controls.
-            <li>rfe601: new scale property allows axis scales to be bound.
-            <li>tweaks to property editor so it can be used to show the DOM with updates.
-            <li>toDegrees and toRadians now set the units.
-            <li>DatumRangeUtil's time range parser properly throws parse exception with "0 to 4" (or any year&lt;1000.)
-            <li>PNGWalk save as has checkbox to reduce the image by 60%, to save time in releases.
-            <li>"Run Batch" allows times to be loaded from events file.
        </ul>
         <p>Known issues:</p>
         <ul>
