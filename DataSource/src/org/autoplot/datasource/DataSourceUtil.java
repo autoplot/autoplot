@@ -510,10 +510,9 @@ public class DataSourceUtil {
                 replac,
                 resol );
         } catch ( IllegalArgumentException ex ) {
+            logger.log( Level.FINE, ex.getMessage(), ex );
             return null;
         }
-        
-        if ( s==null ) return null;
         
         try {
             TimeParser tp= TimeParser.create(s);
