@@ -42,6 +42,8 @@ import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.DataSourceFormat;
+import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
@@ -59,6 +61,8 @@ public class AutoplotDataServer {
     private static final String DEFT_OUTFILE = "-";
     private static final String FORM_D2S = "d2s";
     private static final String FORM_QDS = "qds";
+    private static final String FORM_HAPI_INFO = "hapi-info";
+    private static final String FORM_HAPI_DATA = "hapi-data";
 
     private static final Logger logger= LoggerManager.getLogger("autoplot.server");
 
@@ -67,8 +71,8 @@ public class AutoplotDataServer {
      * @param timeRange the time range to send out, such as "May 2003"
      * @param suri the data source to read in.  If this has TimeSeriesBrowse, then we can stream the data.
      * @param step step size, such as "24 hr" or "3600s".  If the URI contains $H, "3600s" is used.
-     * @param stream if true, send data out the as it is read.
-     * @param format FORM_QDS, FORM_D2S
+     * @param stream if true, send data out as it is read.
+     * @param format FORM_QDS, FORM_D2S, FORM_HAPI
      * @param mon progress monitor to monitor the stream.
      * @param out 
      * @param ascii if true, use ascii types for qstreams and das2streams.
@@ -242,6 +246,24 @@ public class AutoplotDataServer {
                 ((MutablePropertyDataSet)ds).putProperty(QDataSet.BUNDLE_1,null);
             }
             new SimpleStreamFormatter().format(ds, out, ascii );
+            
+        } else if ( format.equals(FORM_HAPI_INFO) ) {
+            final DataSourceFormat dsf = DataSourceRegistry.getInstance().getFormatByExt("hapi");
+            File file= new File("/tmp/ap-hapi/foo.hapi");
+
+            dsf.formatData( file.toString()+"?id=temp", ds, new NullProgressMonitor() );
+            File infoFile= new File( "/tmp/ap-hapi/foo/info/temp.json" );
+            FileInputStream fin= new FileInputStream(infoFile);
+            DataSourceUtil.transfer( fin, out );
+
+        } else if ( format.equals(FORM_HAPI_DATA) ) {
+            final DataSourceFormat dsf = DataSourceRegistry.getInstance().getFormatByExt("hapi");
+            File file= new File("/tmp/ap-hapi/foo.hapi");
+            
+            dsf.formatData( file.toString()+"?id=temp", ds, new NullProgressMonitor() );
+            File infoFile= new File( "/tmp/ap-hapi/foo/data/temp.csv" );
+            FileInputStream fin= new FileInputStream(infoFile);
+            DataSourceUtil.transfer( fin, out );
             
         } else if ( format.equals("dat") || format.equals("xls") || format.equals("bin") ) {
             File file= File.createTempFile("autoplotDataServer", "."+format );
