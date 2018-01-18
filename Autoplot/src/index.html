@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Bug 1946, introduced between v2017a_5 and v2017a_6 shows where cadence was handled inconsistently.
+        <p><small>Pngwalk properly renders images from re-implementation of Neko app.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,7 +24,7 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2018-01-13 r21934):</p>
+        <p>Bugfixes (2018-01-18 r21941):</p>
         <ul>
             <li>1946: cadence was handled inconsistently for filled histogram, between the fill and the outline.  Thanks, Scott!
             <li>in ensureMonotonicAndIncreasingWithFill, where the last value was assigned even though the value was not monotonic.  Thanks, Ivar!
@@ -83,6 +83,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Check for valid access URL in CDAWeb metadata, so that valid datasets continue to work.
+            <li>LDataSet.putValue() checks for NaN and assign the smallest long value, so at least it's clear when a mistake is made.
             <li>orbit mode has control for tick spacing (e.g. "2hr"), under the controller node.
             <li>introduce cumulativeMin and cumulativeMax to scripting.
             <li>617: ASCII editor improvements.
