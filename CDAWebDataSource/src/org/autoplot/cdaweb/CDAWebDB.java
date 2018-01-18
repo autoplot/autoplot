@@ -681,7 +681,13 @@ public class CDAWebDB {
         return master;
     }
 
-    private String getURL( Node dataset ) {
+    /**
+     * return the URL used to access the files, or null if none exists.
+     * @param id the service provider id, such as "mms1_edi_srvy_l2_amb-pm2"
+     * @param dataset the node from the all.xml file.
+     * @return the URL or null.
+     */
+    private String getURL( String id, Node dataset ) {
         NodeList kids= dataset.getChildNodes();
         String lookfor= "ftp://cdaweb.gsfc.nasa.gov/pub/istp/";
         String lookfor2= "ftp://cdaweb.gsfc.nasa.gov/pub/cdaweb_data";
@@ -692,6 +698,10 @@ public class CDAWebDB {
                 NodeList kids2= childNode.getChildNodes();
                 for ( int k=0; k<kids2.getLength(); k++ ) {
                     if ( kids2.item(k).getNodeName().equals("URL") ) {
+                        if ( kids2.item(k).getFirstChild()==null ) {
+                            logger.warning("URL is missing for "+id);
+                            return null;
+                        }
                         String url= kids2.item(k).getFirstChild().getTextContent().trim();
                         if ( url.startsWith( lookfor ) ) {
                             // "ftp://cdaweb.gsfc.nasa.gov/pub/istp/ace/mfi_h2"
@@ -789,7 +799,8 @@ public class CDAWebDB {
                             && en.length()>1 && Character.isDigit(en.charAt(0))
                             //&& nssdc_ID.contains("None") ) {
                              ) {
-                        String url= getURL(node);
+                        String name= attrs.getNamedItem("serviceprovider_ID").getTextContent();
+                        String url= getURL(name,node);
                         if ( url!=null && 
                                 ( url.startsWith( CDAWeb + "istp_public/data/" ) ||
                                 url.startsWith( CDAWeb + "sp_phys/data/" ) ||
