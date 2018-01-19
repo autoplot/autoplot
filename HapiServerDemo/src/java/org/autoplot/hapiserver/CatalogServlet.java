@@ -64,6 +64,11 @@ public class CatalogServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json;charset=UTF-8");
+                
+        response.setHeader("Access-Control-Allow-Origin", "* " );
+        response.setHeader("Access-Control-Allow-Methods","GET" );
+        response.setHeader("Access-Control-Allow-Headers","Content-Type" );
+        
         File catalogFile= new File( Util.getHapiHome(), "catalog.json" );
         if ( catalogFile.exists() ) {
             logger.log(Level.FINE, "using cached catalog file {0}", catalogFile);

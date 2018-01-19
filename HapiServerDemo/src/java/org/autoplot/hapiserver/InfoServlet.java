@@ -129,6 +129,11 @@ public class InfoServlet extends HttpServlet {
         if ( id==null ) throw new ServletException("required parameter 'id' is missing from request");
         
         response.setContentType("application/json;charset=UTF-8");        
+        
+        response.setHeader("Access-Control-Allow-Origin", "* " );
+        response.setHeader("Access-Control-Allow-Methods","GET" );
+        response.setHeader("Access-Control-Allow-Headers","Content-Type" );
+        
         try (PrintWriter out = response.getWriter()) {
            try {
                JSONObject jo= getInfo( id );

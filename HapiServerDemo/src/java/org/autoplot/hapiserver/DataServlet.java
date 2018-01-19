@@ -97,7 +97,7 @@ public class DataServlet extends HttpServlet {
             throw new ServletException("unrecognized parameters: "+params);
         }
         
-        logger.fine("data request for "+id+" " + timeMin +"/"+timeMax );
+        logger.log(Level.FINE, "data request for {0} {1}/{2}", new Object[]{id, timeMin, timeMax});
         
         DataFormatter dataFormatter;
         if ( format.equals("binary") ) {
@@ -109,7 +109,12 @@ public class DataServlet extends HttpServlet {
             dataFormatter= new CsvDataFormatter();
             response.setHeader("Content-disposition", "attachment; filename="+ Ops.safeName(id) + "_"+timeMin+ "_"+timeMax + ".csv" ); 
         }
-
+        
+        
+        response.setHeader("Access-Control-Allow-Origin", "* " );
+        response.setHeader("Access-Control-Allow-Methods","GET" );
+        response.setHeader("Access-Control-Allow-Headers","Content-Type" );
+        
         DatumRange dr;
         try {
             dr = new DatumRange( Units.cdfTT2000.parse(timeMin), Units.cdfTT2000.parse(timeMax) );
