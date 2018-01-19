@@ -628,7 +628,7 @@ public class Das2ServerDataSource extends AbstractDataSource {
                 }
                 String sparams = URISplit.formatParams(c);
                 //if ( dsParams!=null && dsParams.trim().length()>0 )  sparams+= "&" + dsParams; //TODO: Double-load was caused by extra & at the end.  It's silly to have it so sensitive.
-                return "vap+das2Server:" + resourceURI + "?" + sparams;
+                return "vap+das2server:" + resourceURI + "?" + sparams;
             }
 
             @Override
@@ -641,7 +641,7 @@ public class Das2ServerDataSource extends AbstractDataSource {
                     sparams += "&" + dsParams;
                 }
 
-                return "vap+das2Server:" + resourceURI + "?" + sparams;
+                return "vap+das2server:" + resourceURI + "?" + sparams;
             }
 
             @Override
