@@ -511,6 +511,9 @@ public class DataSetURI {
         // The scheme-specific part of the URI must itself be a URI, typically a URL pointing at the data.  URIs are used
         // to support other protocols like sftp.
         String resourceSuri = uri.getRawSchemeSpecificPart();
+        if ( resourceSuri.startsWith("'") ) {
+            throw new IllegalArgumentException("URI starts with single quote");
+        }
         resourceUri = new URI(resourceSuri); //bug3055130 okay
 
         ext = DataSetURI.getExt(uri.toString());
