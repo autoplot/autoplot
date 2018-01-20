@@ -24,7 +24,7 @@ public class AutoplotServer {
         
     public static void main(String[] args) throws Exception {
           
-        System.err.println("org.autoplot.AutoplotServer 20160202");
+        System.err.println("org.autoplot.AutoplotServer 20180120");
 
         Util.addFonts();
         
@@ -40,6 +40,7 @@ public class AutoplotServer {
         alm.addBooleanSwitchArgument( "noexit", "z", "noexit", "don't exit after running, for use with scripts." );
         alm.addBooleanSwitchArgument( "nomessages", "q", "nomessages", "don't show message bubbles.");
         alm.requireOneOf( new String[] { "uri", "vap" } );
+        
         alm.process(args);
 
         String suri = alm.getValue("uri");
