@@ -9,6 +9,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import org.das2.components.propertyeditor.PropertyEditor;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -473,6 +475,21 @@ public class EditorContextMenu {
             developerMenu.setToolTipText("Special actions for developers");
             actionsMenu.add(developerMenu);
 
+            JMenuItem printMenuItem= new JMenuItem( "Print" );
+            printMenuItem.setToolTipText("Print to printer");
+            printMenuItem.addActionListener( new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        editor.print();
+                    } catch (PrinterException ex) {
+                        Logger.getLogger(EditorContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            });
+            actionsMenu.add(printMenuItem);
+
+            
             JMenuItem mi;
             
             mi= new JMenuItem( new AbstractAction("Convert To Java") {
