@@ -26,7 +26,8 @@
         
         <p>Bugfixes (2018-01-24 r21941):</p>
         <ul>
-            <li>putValues function was inadvertently broken in early January, when dataset had units.
+            <li>added programmatic method to reset the axis units to a convertible unit.  Thanks, Masafumi!
+            <li>putValues function was inadvertently broken in early January, when dataset had units.  Thanks, Sadie!
             <li>AutoplotServer "-o -" didn't work (to output to stdout), because arguments parser didn't handle "-" properly.
             <li>1946: cadence was handled inconsistently for filled histogram, between the fill and the outline.  Thanks, Scott!
             <li>in ensureMonotonicAndIncreasingWithFill, where the last value was assigned even though the value was not monotonic.  Thanks, Ivar!
