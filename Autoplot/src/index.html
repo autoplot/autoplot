@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Pngwalk properly renders images from re-implementation of Neko app.
+        <p><small>cumulativeMin and cumulativeMax functions introduced.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2018-01-18 r21941):</p>
+        <p>Bugfixes (2018-01-24 r21941):</p>
         <ul>
+            <li>putValues function was inadvertently broken in early January, when dataset had units.
+            <li>AutoplotServer "-o -" didn't work (to output to stdout), because arguments parser didn't handle "-" properly.
             <li>1946: cadence was handled inconsistently for filled histogram, between the fill and the outline.  Thanks, Scott!
             <li>in ensureMonotonicAndIncreasingWithFill, where the last value was assigned even though the value was not monotonic.  Thanks, Ivar!
             <li>updating QC status properly repaints.
@@ -83,6 +85,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>update RBSP orbits to 2017-10-02.
+            <li>script editor has "print" menu item, which provides dialog and prints with syntax highlighting.
+            <li>LDataSet can provide access to long64 values, using new capability.
             <li>Check for valid access URL in CDAWeb metadata, so that valid datasets continue to work.
             <li>LDataSet.putValue() checks for NaN and assign the smallest long value, so at least it's clear when a mistake is made.
             <li>orbit mode has control for tick spacing (e.g. "2hr"), under the controller node.
