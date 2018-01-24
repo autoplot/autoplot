@@ -216,6 +216,16 @@ public class AxisController extends DomNodeController {
         axis.setLabel(label);
         axis.setAutoLabel(true);
     }
+    
+    /**
+     * reset the axis units to a new unit which is convertable.
+     * @param nu 
+     */
+    public void resetAxisUnits( Units nu ) {
+        DatumRange oldRange=dasAxis.getDatumRange();
+        DatumRange newRange= DatumRange.newDatumRange( oldRange.min().doubleValue(nu), oldRange.max().doubleValue(nu), nu );
+        dasAxis.resetRange(newRange);
+    }
 
     private Converter getOppositeConverter( Axis axis, final DasAxis dasAxis ) {
         return new Converter() {

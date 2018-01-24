@@ -1704,9 +1704,7 @@ public class GuiSupport {
                                 p1,
                                 "Reset axis units", JOptionPane.OK_CANCEL_OPTION ) ) {
                         Units nu= (Units)cb.getSelectedItem();
-                        DatumRange oldRange= dasAxis.getDatumRange();
-                        DatumRange newRange= DatumRange.newDatumRange( oldRange.min().doubleValue(nu), oldRange.max().doubleValue(nu), nu );
-                        dasAxis.resetRange(newRange);
+                        axis.getController().resetAxisUnits(nu);
                     }
                 }
             }            
