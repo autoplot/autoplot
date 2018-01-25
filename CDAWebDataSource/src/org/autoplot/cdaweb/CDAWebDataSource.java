@@ -221,7 +221,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                                 fileParams.remove( PARAM_DS );
                                 fileParams.put( PARAM_ID, comp );
                                 URI file1;
-                                file1= new URI( file + "?" + URISplit.formatParams(fileParams) );
+                                file1= DataSetURI.getURI(  file + "?" + URISplit.formatParams(fileParams) );
 
                                 DataSource dataSource= cdfFileDataSourceFactory.getDataSource( file1 );
                                 try {
@@ -318,7 +318,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                 if ( dep1p!=null && dep1p.containsKey("NAME") && result.rank()>1 ) {
                     String dep1= (String)dep1p.get("NAME");
                     String master= db.getMasterFile( ds.toUpperCase(), new NullProgressMonitor() );
-                    DataSource masterSource= cdfFileDataSourceFactory.getDataSource( new URI( master+"?"+dep1+"[0]&doDep=no" ) );
+                    DataSource masterSource= cdfFileDataSourceFactory.getDataSource( DataSetURI.getURI( master+"?"+dep1+"[0]&doDep=no" ) );
                     QDataSet ds1= (MutablePropertyDataSet)masterSource.getDataSet( new NullProgressMonitor() );
                     result= Ops.putProperty( result, QDataSet.DEPEND_1, ds1 );
                 }
