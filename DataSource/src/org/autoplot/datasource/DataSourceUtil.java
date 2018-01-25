@@ -443,7 +443,18 @@ public class DataSourceUtil {
             }
         }
     }
-        
+    
+
+    public interface URIMutator {
+        public String mutate(String uri);
+    }
+    
+    private static final Map<String,URIMutator> makeAggSchemes= new HashMap<>();
+    
+    public static void addMakeAggregationForScheme( String scheme, URIMutator mutator ) {
+        makeAggSchemes.put(scheme,mutator);
+    }
+            
     /**
      * attempt to create an equivalent URL that uses an aggregation template
      * instead of the explicit filename.  This also return null when things go wrong.
@@ -463,6 +474,13 @@ public class DataSourceUtil {
             return surl;
         }
             
+        if ( split.vapScheme!=null ) {
+            URIMutator mutator= makeAggSchemes.get(split.vapScheme);
+            if ( mutator!=null ) {
+                return mutator.mutate(surl);
+            }
+        }
+                
         String yyyy= "/(19|20)\\d{2}/";
 
         String yyyymmdd= "(?<!\\d)(19|20)(\\d{6})(?!\\d)"; //"(\\d{8})";
