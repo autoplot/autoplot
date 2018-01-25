@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.inline;
 
@@ -31,6 +27,7 @@ import org.autoplot.datasource.CompletionContext;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
+import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.autoplot.jythonsupport.JythonOps;
@@ -44,6 +41,10 @@ import org.autoplot.jythonsupport.Util;
 public class InlineDataSourceFactory extends AbstractDataSourceFactory {
 
     private static final Logger logger= org.das2.datum.LoggerManager.getLogger("jython.inline");
+
+    public InlineDataSourceFactory() {
+        DataSourceUtil.addMakeAggregationForScheme("vap+inline", new MakeAggMap() );
+    }
     
     @Override
     public DataSource getDataSource(URI uri) throws Exception {

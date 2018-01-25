@@ -39,7 +39,9 @@ import org.autoplot.jythonsupport.Util;
 
 /**
  * Data source used mostly for demonstrations and quick modifications
- * of data.
+ * of data.  It also implements the "Mash Up Tool" which is a special
+ * case of vap+inline, where N datasets are loaded an a combination of these
+ * datasets is returned.
  * @author jbf
  */
 public class InlineDataSource extends AbstractDataSource {
