@@ -444,15 +444,24 @@ public class DataSourceUtil {
         }
     }
     
-
-    public interface URIMutator {
-        public String mutate(String uri);
+    /**
+     * something which returns a new URI given an old one.
+     */
+    public interface URIMap {
+        public String map(String uri);
     }
     
-    private static final Map<String,URIMutator> makeAggSchemes= new HashMap<>();
+    private static final Map<String,URIMap> makeAggSchemes= new HashMap<>();
     
-    public static void addMakeAggregationForScheme( String scheme, URIMutator mutator ) {
-        makeAggSchemes.put(scheme,mutator);
+    /**
+     * register a map which might modify a URI so that it uses aggregation. 
+     * This was introduced for "vap+inline" URIs which must be taken apart and
+     * then each of the getDataSet calls is aggregated.
+     * @param scheme the scheme where this should be used, e.g. "vap+inline"
+     * @param map the map, which might return the input URI or an aggregated one.
+     */
+    public static void addMakeAggregationForScheme( String scheme, URIMap map ) {
+        makeAggSchemes.put(scheme,map);
     }
             
     /**
@@ -475,9 +484,9 @@ public class DataSourceUtil {
         }
             
         if ( split.vapScheme!=null ) {
-            URIMutator mutator= makeAggSchemes.get(split.vapScheme);
-            if ( mutator!=null ) {
-                return mutator.mutate(surl);
+            URIMap map= makeAggSchemes.get(split.vapScheme);
+            if ( map!=null ) {
+                return map.map(surl);
             }
         }
                 
