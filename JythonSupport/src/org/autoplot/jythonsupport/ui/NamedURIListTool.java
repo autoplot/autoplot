@@ -554,7 +554,8 @@ public class NamedURIListTool extends JPanel {
         
         final JTextField exprTF= new JTextField(expression);
         exprTF.setMinimumSize( new Dimension(120,exprTF.getFont().getSize()*2) );
-        exprTF.setPreferredSize( new Dimension(120,exprTF.getFont().getSize()*2) );
+        exprTF.setMaximumSize( new Dimension(600,exprTF.getFont().getSize()*2) );
+        exprTF.setPreferredSize( new Dimension(600,exprTF.getFont().getSize()*2) );
         
         c.gridx= 2;
         c.weightx= 1.0;
