@@ -76,7 +76,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="812" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="821" max="32767" attributes="0"/>
                   <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
                           <Group type="103" groupAlignment="1" attributes="0">
@@ -88,7 +88,7 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="1" attributes="0">
                                       <Group type="102" alignment="0" attributes="0">
-                                          <Component id="allUrisButton" linkSize="1" min="-2" pref="104" max="-2" attributes="1"/>
+                                          <Component id="allUrisButton" linkSize="6" min="-2" pref="120" max="-2" attributes="1"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="jLabel6" linkSize="4" min="-2" pref="584" max="-2" attributes="1"/>
                                       </Group>
@@ -97,7 +97,7 @@
                                           <Component id="previewDataSetSelector" pref="776" max="32767" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
-                                          <Component id="addressBarUriButton" linkSize="1" min="-2" pref="105" max="-2" attributes="1"/>
+                                          <Component id="addressBarUriButton" linkSize="6" min="-2" pref="123" max="-2" attributes="1"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="jLabel5" linkSize="4" min="-2" pref="580" max="-2" attributes="1"/>
                                       </Group>
@@ -111,7 +111,7 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="512" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="514" max="32767" attributes="0"/>
                   <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
