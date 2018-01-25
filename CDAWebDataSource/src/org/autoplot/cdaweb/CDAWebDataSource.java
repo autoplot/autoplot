@@ -255,7 +255,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                         fileParams.remove( PARAM_TIMERANGE );
                         fileParams.remove( PARAM_DS );
                         URI file1;
-                        file1= new URI( file + "?" + URISplit.formatParams(fileParams) );
+                        file1= DataSetURI.getURI( file + "?" + URISplit.formatParams(fileParams) );
 
                         logger.log( Level.FINE, "loading {0}", file1);
                         CdfDataSource dataSource= (CdfDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
