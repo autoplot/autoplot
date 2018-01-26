@@ -4,15 +4,11 @@ package org.autoplot.jythonsupport;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.das2.datum.CacheTag;
 import org.das2.datum.Datum;
-import org.das2.datum.DatumRange;
-import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.DatumUtil;
 import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.Units;
@@ -44,7 +40,6 @@ import org.das2.qds.SemanticOps;
 import org.das2.qds.TrimStrideWrapper;
 import org.das2.qds.WritableDataSet;
 import org.das2.qds.ops.CoerceUtil;
-import static org.das2.qds.ops.Ops.datum;
 
 /**
  * PyQDataSet wraps a QDataSet to provide Python operator overloading and
