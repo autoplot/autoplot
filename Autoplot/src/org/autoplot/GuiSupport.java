@@ -2220,7 +2220,7 @@ public class GuiSupport {
             public String checkFont(Font c) {
                 Object font= PdfGraphicsOutput.ttfFromNameInteractive(c);
                 if ( font==PdfGraphicsOutput.READING_FONTS ) {
-                    return null;
+                    return "Checking which fonts are embeddable...";
                 } else if ( font!=null ) {
                     return "PDF okay";
                 } else {                    
