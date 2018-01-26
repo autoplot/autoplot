@@ -12,6 +12,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -538,6 +541,12 @@ public class NamedURIListTool extends JPanel {
                 }
             }
         } );
+        literalTF.addKeyListener( new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                cb.setSelected(true);
+            }
+        });
         dsSelector.add( literalTF, c );
         
         // ------------------------------------------------
@@ -546,7 +555,7 @@ public class NamedURIListTool extends JPanel {
         final int iexpr= i++;
         butts[iexpr]= cb2;
         cb2.setToolTipText("enter an expression");
-        c.gridy= this.uris.size()+1;
+        c.gridy++;
         c.gridx= 1;
         c.weightx= 0.0;
         dsSelector.add( cb2, c );
@@ -596,6 +605,8 @@ public class NamedURIListTool extends JPanel {
         // -------------------------------------------------------
         
         JPanel p= new JPanel();
+        c.gridy++;
+        c.weighty= 1.0;
         dsSelector.add( p, c );
         
         bg.add(cb);
