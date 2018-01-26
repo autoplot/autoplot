@@ -951,18 +951,23 @@ public class PyQDataSet extends PyJavaInstance {
         
         if ( value==null ) return value;
         
-        if ( value instanceof PyQDataSet ) {
-            value= ((PyObject)value).__tojava__(QDataSet.class);
-        } else if ( value instanceof PyDatum ) {
-            value= ((PyObject)value).__tojava__(Datum.class);
-        } else if ( value instanceof PyInteger ) {
-            value= ((PyObject)value).__tojava__(Integer.class);
-        } else if ( value instanceof PyFloat ) {
-            value= ((PyObject)value).__tojava__(Float.class);
-        } else if ( value instanceof PyLong ) {
-            value= ((PyObject)value).__tojava__(Long.class);
-        } else if ( value instanceof PyString ) {
-            value= ((PyObject)value).__tojava__(String.class);
+        if ( value instanceof PyObject ) {
+            PyObject pyvalue= (PyObject)value;
+            if ( value instanceof PyQDataSet ) {
+                value= pyvalue.__tojava__(QDataSet.class);
+            } else if ( value instanceof PyDatum ) {
+                value= pyvalue.__tojava__(Datum.class);
+            } else if ( value instanceof PyInteger ) {
+                value= pyvalue.__tojava__(Integer.class);
+            } else if ( value instanceof PyFloat ) {
+                value= pyvalue.__tojava__(Float.class);
+            } else if ( value instanceof PyLong ) {
+                value= pyvalue.__tojava__(Long.class);
+            } else if ( value instanceof PyString ) {
+                value= pyvalue.__tojava__(String.class);
+            } else {
+                value= pyvalue.__tojava__(Object.class);
+            }
         }
 
         value= Ops.convertPropertyValue( context, name, value );
