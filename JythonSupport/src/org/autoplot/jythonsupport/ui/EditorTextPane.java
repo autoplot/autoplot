@@ -2,6 +2,7 @@
 package org.autoplot.jythonsupport.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -28,10 +29,12 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
@@ -61,6 +64,7 @@ import org.autoplot.datasource.DataSourceEditorPanelUtil;
 import org.autoplot.datasource.WindowManager;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.PyQDataSet;
+import org.autoplot.jythonsupport.SimplifyScriptSupport;
 import org.das2.qstream.StreamException;
 
 /**
@@ -149,6 +153,14 @@ public class EditorTextPane extends JEditorPane {
                     }
                 } );                
 
+                getActionMap().put( "developer1", new AbstractAction( "developer1" ) {
+                    @Override
+                    public void actionPerformed( ActionEvent e ) {
+                        LoggerManager.logGuiEvent(e);                
+                        showCompletionsView();
+                    }
+                } );                
+                
                 getActionMap().put( "usages", new AbstractAction( "usages" ) {
                     @Override
                     public void actionPerformed( ActionEvent e ) {
@@ -166,6 +178,7 @@ public class EditorTextPane extends JEditorPane {
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_F5, InputEvent.SHIFT_DOWN_MASK ), "settings" );
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ), "plotItem" );
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_U, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ), "usages" );
+                getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_F12, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ), "developer1" );
                 
                 doLayout(); // kludge for DefaultSyntaxKit
                 DefaultSyntaxKit.initKit();
@@ -209,6 +222,29 @@ public class EditorTextPane extends JEditorPane {
 
     }
 
+
+    public void showCompletionsView() {
+        String doThis= this.getSelectedText();
+        if ( doThis==null || doThis.length()==0 ) {
+            doThis= this.getText();
+        }
+        try {
+            String scriptPrime= SimplifyScriptSupport.simplifyScriptToCompletions(doThis);
+            JEditorPane a= new JEditorPane();
+            DefaultSyntaxKit.initKit();
+            SyntaxStyles.getInstance().getStyle(TokenType.DELIMITER).isDrawTabs();
+            a.setContentType("text/python");
+            a.setText(scriptPrime);
+            JDialog d= new JDialog();
+            a.setMinimumSize( new Dimension(400,400) );
+            a.setPreferredSize( new Dimension(400,400) );
+            d.getContentPane().add(new JScrollPane(a));
+            d.pack();
+            d.setVisible(true);
+        } catch ( Exception ex ) {
+            JOptionPane.showMessageDialog( this, ex.toString() );
+        }
+    }    
     /**
      * Ed and I verified that this is being set off of the event thread.
      * @param doc 

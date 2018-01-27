@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.jythonsupport.ui;
 
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
@@ -28,9 +25,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
@@ -49,7 +44,6 @@ import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
 import org.autoplot.jythonsupport.JythonUtil;
-import org.autoplot.jythonsupport.SimplifyScriptSupport;
 
 /**
  *
@@ -524,26 +518,7 @@ public class EditorContextMenu {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);       
-                    String doThis= editor.getSelectedText();
-                    if ( doThis==null || doThis.length()==0 ) {
-                        doThis= editor.getText();
-                    }
-                    try {
-                        String scriptPrime= SimplifyScriptSupport.simplifyScriptToCompletions(doThis);
-                        JEditorPane a= new JEditorPane();
-                        DefaultSyntaxKit.initKit();
-                        SyntaxStyles.getInstance().getStyle(TokenType.DELIMITER).isDrawTabs();
-                        a.setContentType("text/python");
-                        a.setText(scriptPrime);
-                        JDialog d= new JDialog();
-                        a.setMinimumSize( new Dimension(400,400) );
-                        a.setPreferredSize( new Dimension(400,400) );
-                        d.getContentPane().add(new JScrollPane(a));
-                        d.pack();
-                        d.setVisible(true);
-                    } catch ( Exception ex ) {
-                        JOptionPane.showMessageDialog( menu, ex.toString() );
-                    }
+                    editor.showCompletionsView();
                 }                
             });
             
