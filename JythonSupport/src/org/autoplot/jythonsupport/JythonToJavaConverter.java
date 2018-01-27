@@ -4,6 +4,8 @@ package org.autoplot.jythonsupport;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.HashMap;
+import java.util.Map;
 import org.autoplot.datasource.DataSetURI;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.parser.SimpleNode;
@@ -50,6 +52,16 @@ public class JythonToJavaConverter {
             traverse("", sn, false);
         }
 
+        private static final Map<Integer,String> ops= new HashMap<>();
+        static {
+            ops.put( 1, "+" );
+            ops.put( 2, "-" );
+            ops.put( 3, "*" );
+            ops.put( 4, "/" );
+            ops.put( 6, "^" );
+            ops.put( 12, "/floordiv/" );
+        };
+                
         public void traverse(String indent, SimpleNode sn, boolean inline) throws Exception {
             if (includeLineNumbers && (this.builder.length() == 0 || builder.charAt(this.builder.length() - 1) == '\n')) {
                 this.builder.append(String.format("%04d: ", lineNumber));
@@ -127,7 +139,9 @@ public class JythonToJavaConverter {
                     this.builder.append(")");
                 } else {
                     traverse("", as.left, true);
-                    this.builder.append(";");
+                    String sop= ops.get(as.op);
+                    if ( sop==null ) sop= " ?? ";
+                    this.builder.append( sop );
                     traverse("", as.right, true);
                 }
             } else if (sn instanceof Assign) {
