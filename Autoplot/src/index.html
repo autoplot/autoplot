@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2018-01-26 r21970):</p>
+        <p>Bugfixes (2018-01-27 r21984):</p>
         <ul>
+            <li>getDataSet calls were invoked with completions, causing strange delays and failures.
             <li>1950: make PyQDataSet putProperty consistent with Ops.putProperty.  Support "dimensionless - Hz" to result in Hz, regardless of argument order.
             <li>tweaks to the mash up GUI, such as reducing its size and correcting layout problems.
             <li>1949: small angle bug in filled circle.  Disable path-simplifaction code which was messing this up.  Thanks, Masafumi!
