@@ -26,7 +26,11 @@ public class SimplifyScriptSupport {
     
     private static final Logger logger= LoggerManager.getLogger("jython");
         
-     
+    private static final String GETDATASET_CODE= 
+        "def getDataSet( uri, timerange='', monitor='' ):\n" +
+        "    'return a dataset for the given URI'\n" +
+        "    return dataset(0)\n\n";
+    
     public static String removeSideEffects( String script ) {
          Module n= (Module)org.python.core.parser.parse( script, "exec" );
          String[] ss= script.split("\n");
@@ -50,10 +54,11 @@ public class SimplifyScriptSupport {
     }
      
     /**
-     * extracts the parts of the program that get parameters.  
+     * extracts the parts of the program that are quickly executed, generating a
+     * code which can be run and then queried for completions.
      *
      * @param script the entire python program
-     * @return the python program with lengthy calls removed, up to the last getParam call.
+     * @return the python program with lengthy calls removed.
      */
      public static String simplifyScriptToCompletions( String script ) throws PySyntaxError {
          String[] ss= script.split("\n");
@@ -74,6 +79,7 @@ public class SimplifyScriptSupport {
          
          HashSet variableNames= new HashSet();
          variableNames.add("getParam");  // this is what allows the getParam calls to be included.
+         variableNames.add("getDataSet"); // this will be replaced with a trivial call for completions.
          variableNames.add("str");  // include casts.
          variableNames.add("int");
          variableNames.add("long");
@@ -85,7 +91,10 @@ public class SimplifyScriptSupport {
          
          try {
              Module n= (Module)org.python.core.parser.parse( script, "exec" );
-             return simplifyScriptToGetCompletions( ss, n.body, variableNames, 1, lastLine, 0 );
+             String s= simplifyScriptToGetCompletions( ss, n.body, variableNames, 1, lastLine, 0 );
+             s= GETDATASET_CODE + s;
+             return s;
+             
          } catch ( PySyntaxError ex ) {
              throw ex;
          }
@@ -192,7 +201,7 @@ public class SimplifyScriptSupport {
                      }
                  }
                  acceptLine= -1;
-             } else {
+                } else {
                  if ( simplifyScriptToGetCompletionsOkay( o, variableNames ) ) {
                      if ( acceptLine<0 ) {
                          acceptLine= (o).beginLine;
@@ -364,7 +373,7 @@ public class SimplifyScriptSupport {
      //there are a number of functions which take a trivial amount of time to execute and are needed for some scripts, such as the string.upper() function.
      //The commas are to guard against the id being a subset of another id ("lower," does not match "lowercase").
      //TODO: update this after Python upgrade.  //TODO: this should be a map and a long list
-     private static final String[] okay= new String[] { "range,", "xrange,", "getParam,", "lower,", "upper,", "URI,", "URL,", "DatumRangeUtil,", "TimeParser",
+     private static final String[] okay= new String[] { "range,", "xrange,", "getParam,", "getDataSet,", "lower,", "upper,", "URI,", "URL,", "DatumRangeUtil,", "TimeParser",
         "str,", "int,", "long,", "float,", "datum,", "findgen,", "dindgen,", "ones,", "zeros,", "linspace,", "dblarr,", "fltarr,", "color,", "colorFromString,"  };
      
      /**
@@ -405,9 +414,11 @@ public class SimplifyScriptSupport {
              if ( c.func instanceof Name ) {
                  String funcName= ((Name)c.func).id;
                  return Character.isUpperCase(funcName.charAt(0));
+             } else if ( c.func instanceof Attribute ) {  // Rectangle.Double
+                 String funcName= ((Attribute)c.func).attr;
+                 return Character.isUpperCase(funcName.charAt(0));
              } else {
-                 String ss= c.func.toString();
-                 return Character.isUpperCase(ss.charAt(0));
+                 return false;
              }
          } else {
              return false;
