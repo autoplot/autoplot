@@ -402,12 +402,12 @@ public class SimplifyScriptSupport {
      private static boolean trivialConstructorCall( SimpleNode sn ) {
          if ( sn instanceof Call ) {
              Call c= (Call)sn;
-             boolean klugdyOkay= false;
-             String ss= c.func.toString();
-             if ( Character.isUpperCase(ss.charAt(0)) ) {
-                 return true;
+             if ( c.func instanceof Name ) {
+                 String funcName= ((Name)c.func).id;
+                 return Character.isUpperCase(funcName.charAt(0));
              } else {
-                 return false;
+                 String ss= c.func.toString();
+                 return Character.isUpperCase(ss.charAt(0));
              }
          } else {
              return false;
