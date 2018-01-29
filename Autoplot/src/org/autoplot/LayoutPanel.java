@@ -1290,6 +1290,9 @@ public class LayoutPanel extends javax.swing.JPanel {
                     }
                     bottomTopPlots[1].setTitle(t);
                     bottomTopPlots[0].getXaxis().setDrawTickLabels(true);
+                    row.setTop( row.getTop().replaceAll( "(.*)\\+([\\d\\.]+)em(.*)","$1+0.5em" ) );
+                    row.setBottom( row.getBottom().replaceAll( "(.*)\\-([\\d\\.]+)em","$1-0.5em" ) );
+                    
                 }
 
             } finally {
