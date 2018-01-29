@@ -111,7 +111,7 @@ public class DomOps {
         ApplicationController ac=  srcPlot.getController().getApplication().getController();
         List<PlotElement> srcElements = ac.getPlotElementsFor(srcPlot);
 
-        List<PlotElement> newElements = new ArrayList<PlotElement>();
+        List<PlotElement> newElements = new ArrayList<>();
         for (PlotElement srcElement : srcElements) {
             if (!srcElement.getComponent().equals("")) {
                 if ( srcElement.getController().getParentPlotElement()==null ) {
@@ -253,6 +253,7 @@ public class DomOps {
     /**
      * return a list of the plots using the given row.
      * This does not use controllers.
+     * @param dom a dom
      * @param row the row to search for.
      * @param visible  if true, then the plot must also be visible.  (Note its colorbar visible is ignored.)
      * @return a list of plots.
@@ -302,7 +303,7 @@ public class DomOps {
 
         //kludge: check for duplicate names of rows.  Use the first one found.
         Map<String,Row> rowsCheck= new HashMap();
-        List<Row> rm= new ArrayList<Row>();
+        List<Row> rm= new ArrayList<>();
         for ( int i=0; i<nrow; i++ ) {           
            List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
 
