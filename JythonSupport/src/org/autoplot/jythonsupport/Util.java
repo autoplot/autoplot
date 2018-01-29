@@ -222,6 +222,8 @@ public class Util {
             rds= result.getDataSet(monitor);  //TODO nasty kludge, just try reading again...
         }
         
+        if ( rds==null ) return null;
+
         if ( tsb!=null ) {
             if ( !Schemes.isTimeSeries(rds) ) {
                 logger.fine("trim data to timerange");
@@ -229,7 +231,6 @@ public class Util {
             }
         }
         
-        if ( rds==null ) return null;
         rds= ensureWritable(rds);
         return rds;
     }
