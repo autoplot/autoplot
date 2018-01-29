@@ -4,15 +4,18 @@
  */
 package test.endtoend;
 
+import java.io.IOException;
 import java.util.Map;
 import org.das2.graph.DasAxis;
 import org.autoplot.AutoplotUtil;
 import org.autoplot.AutoRangeUtil.AutoRangeDescriptor;
+import org.autoplot.ScriptContext;
 import org.das2.qds.DataSetUtil;
 import static org.autoplot.ScriptContext.*;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.MetadataModel;
+import org.autoplot.dom.Application;
 import org.das2.qds.ops.Ops;
 import org.autoplot.jythonsupport.Util;
 import org.autoplot.metatree.MetadataUtil;
@@ -80,6 +83,26 @@ public class Test016 {
 
     }
     
+    /**
+     * just show what the ranging would have been for the given dataset URI.
+     * @param id test id number
+     * @param uri the URI
+     * @throws IOException 
+     */
+    public static void doTestQube( int id, String uri ) throws IOException {
+        ScriptContext.plot(uri);
+        ScriptContext.waitUntilIdle();
+        Application dom= ScriptContext.getDocumentModel();
+        QDataSet result= Ops.bundle( DataSetUtil.asDataSet(dom.getPlots(0).getXaxis().getRange()),
+                DataSetUtil.asDataSet(dom.getPlots(0).getYaxis().getRange()),
+                DataSetUtil.asDataSet(dom.getPlots(0).getZaxis().getRange()) );
+        writeToPng( String.format( "test016_%03d.png", id ) );
+        System.out.println( String.format( "--- %03d ---", id ) );
+        System.out.println( "xrange: "+dom.getPlots(0).getXaxis().getRange() );
+        System.out.println( "yrange: "+dom.getPlots(0).getYaxis().getRange() );
+        System.out.println( "zrange: "+dom.getPlots(0).getZaxis().getRange() );
+    }
+    
     public static void main(String[] args)  {
         try {
 
@@ -91,26 +114,31 @@ public class Test016 {
             MetadataModel mm;
             Map<String,Object> metaraw;
 
-            //ds= Util.getDataSet( "vap:http://spacedata.bu.edu/data/polar/cammice/k1/1998/po_k1_cam_19980117_v00.cdf?HCounts" );
-            ds= Util.getDataSet( "vap:file:///home/jbf/ct/hudson/data.backup/cdf/po_k1_cam_19980117_v00.cdf?HCounts" );
-            mm= MetadataUtil.getMetadataModel( (String) ds.property(QDataSet.METADATA_MODEL));
-            metaraw= (Map<String, Object>) ds.property(QDataSet.METADATA);
-            meta= mm.properties(metaraw);
+            {
+                //ds= Util.getDataSet( "vap:http://spacedata.bu.edu/data/polar/cammice/k1/1998/po_k1_cam_19980117_v00.cdf?HCounts" );
+                ds= Util.getDataSet( "vap:file:///home/jbf/ct/hudson/data.backup/cdf/po_k1_cam_19980117_v00.cdf?HCounts" );
+                mm= MetadataUtil.getMetadataModel( (String) ds.property(QDataSet.METADATA_MODEL));
+                metaraw= (Map<String, Object>) ds.property(QDataSet.METADATA);
+                meta= mm.properties(metaraw);
 
-            doTest( 3, "po_k1_cam_19980117_v00.cdf?FEDU", ds, meta, null );
-            doTest( 4, "po_k1_cam_19980117_v00.cdf?FEDU dep0", ds, meta, QDataSet.DEPEND_0 );
-            doTest( 5, "po_k1_cam_19980117_v00.cdf?FEDU dep1", ds, meta, QDataSet.DEPEND_1 );
+                doTest( 3, "po_k1_cam_19980117_v00.cdf?FEDU", ds, meta, null );
+                doTest( 4, "po_k1_cam_19980117_v00.cdf?FEDU dep0", ds, meta, QDataSet.DEPEND_0 );
+                doTest( 5, "po_k1_cam_19980117_v00.cdf?FEDU dep1", ds, meta, QDataSet.DEPEND_1 );
 
+            }
+            
+            {
+                ds= Util.getDataSet( "vap:file:///home/jbf/ct/lanl/hudson/LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU" );
+                mm= MetadataUtil.getMetadataModel( (String) ds.property(QDataSet.METADATA_MODEL));
+                metaraw= (Map<String, Object>) ds.property(QDataSet.METADATA);
+                meta= mm.properties(metaraw);
 
-            ds= Util.getDataSet( "vap:file:///home/jbf/ct/lanl/hudson/LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU" );
-            mm= MetadataUtil.getMetadataModel( (String) ds.property(QDataSet.METADATA_MODEL));
-            metaraw= (Map<String, Object>) ds.property(QDataSet.METADATA);
-            meta= mm.properties(metaraw);
-
-            doTest( 0, "LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU", ds, meta, null );
-            doTest( 1, "LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU dep0", ds, meta, QDataSet.DEPEND_0 );
-            doTest( 2, "LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU dep1", ds, meta, QDataSet.DEPEND_1 );
-
+                doTest( 0, "LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU", ds, meta, null );
+                doTest( 1, "LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU dep0", ds, meta, QDataSet.DEPEND_0 );
+                doTest( 2, "LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU dep1", ds, meta, QDataSet.DEPEND_1 );
+            }
+            
+            doTestQube( 6, "vap+inline:2016-10-12T12:00Z&RENDER_TYPE=eventsBar" );
 
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex) {
