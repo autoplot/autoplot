@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>cumulativeMin and cumulativeMax functions introduced.
+        <p><small>Spectrograms made from waveforms of Explorer 1 telemetry.  This week is the 60th anniversary of its launch.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,8 @@
         
         <p>Bugfixes (2018-01-27 r21984):</p>
         <ul>
+            <li>NullPointerException when Python getDataSet didn't properly handle null.  Thanks, Ivar!
+            <li>vap+inline:2016-10-12T12:00Z&RENDER_TYPE=eventsBar 
             <li>rank 1 Join of us2000 datums didn't properly report the units, breaking autoranging for "vap+inline:2016-10-12T12:00Z&RENDER_TYPE=eventsBar
             <li>getDataSet calls were invoked with completions, causing strange delays and failures.
             <li>1950: make PyQDataSet putProperty consistent with Ops.putProperty.  Support "dimensionless - Hz" to result in Hz, regardless of argument order.
