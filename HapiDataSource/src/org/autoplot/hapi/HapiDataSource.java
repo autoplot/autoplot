@@ -280,14 +280,14 @@ public final class HapiDataSource extends AbstractDataSource {
     private static String[] cacheFilesFor( URL url, ParamDescription[] pp, Datum xx ) {
         String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
-        String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
+        StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + "/" + url.getPath() );
         if ( url.getQuery()!=null ) {
             String[] querys= url.getQuery().split("\\&");
             Pattern p= Pattern.compile("id=(.+)");
             for ( String q : querys ) {
                 Matcher m= p.matcher(q);
                 if ( m.matches() ) {
-                    u= u + "/" + m.group(1);
+                    ub.append("/").append(m.group(1));
                     break;
                 }
             }
@@ -298,6 +298,7 @@ public final class HapiDataSource extends AbstractDataSource {
         TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d" );
         String sxx= tp.format(xx);
         
+        String u= ub.toString();
         String[] result= new String[pp.length];
         for ( int i=0; i<pp.length; i++ ){
             result[i]= s + "/" + u + "/" + sxx + "." + pp[0].name + ".csv";
@@ -312,14 +313,14 @@ public final class HapiDataSource extends AbstractDataSource {
         
         String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
-        String u= url.getProtocol() + "/" + url.getHost() + url.getPath();
+        StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + url.getPath() );
         if ( url.getQuery()!=null ) {
             String[] querys= url.getQuery().split("\\&");
             Pattern p= Pattern.compile("id=(.+)");
             for ( String q : querys ) {
                 Matcher m= p.matcher(q);
                 if ( m.matches() ) {
-                    u= u + "/" + m.group(1);
+                    ub.append("/").append(m.group(1));
                     break;
                 }
             }
@@ -331,6 +332,7 @@ public final class HapiDataSource extends AbstractDataSource {
         
         String sxx= tp.format(xx);
                 
+        String u= ub.toString();
         Datum t0= lastRecordFound.get( u + "/" + sxx );
         if ( t0==null ) {
             String f= s + "/" + u + "/" + sxx + "." + pp[0].name + ".csv";
@@ -395,14 +397,14 @@ public final class HapiDataSource extends AbstractDataSource {
     private static void writeToCachedDataFinish(URL url, ParamDescription[] pp, Datum xx ) throws IOException {
         String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
-        String u= url.getProtocol() + "/" + url.getHost() + url.getPath();
+        StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + url.getPath() );
         if ( url.getQuery()!=null ) {
             String[] querys= url.getQuery().split("\\&");
             Pattern p= Pattern.compile("id=(.+)");
             for ( String q : querys ) {
                 Matcher m= p.matcher(q);
                 if ( m.matches() ) {
-                    u= u + "/" + m.group(1);
+                    ub.append("/").append(m.group(1));
                     break;
                 }
             }
@@ -411,6 +413,7 @@ public final class HapiDataSource extends AbstractDataSource {
         }
         TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d" );
         String sxx= tp.format(xx);
+        String u= ub.toString();
         for (ParamDescription pp1 : pp) {
             String f = u + "/" + sxx + "." + pp1.name + ".csv" + "."+ Thread.currentThread().getId();
             ArrayList<String> sparam= cache.remove(f);
@@ -1037,14 +1040,14 @@ public final class HapiDataSource extends AbstractDataSource {
     public static AbstractLineReader getCacheReader( URL url, String[] parameters, DatumRange timeRange, boolean offline, long lastModified) {
         String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
-        String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
+        StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + "/" + url.getPath() );
         if ( url.getQuery()!=null ) {
             String[] querys= url.getQuery().split("\\&");
             Pattern p= Pattern.compile("id=(.+)");
             for ( String q : querys ) {
                 Matcher m= p.matcher(q);
                 if ( m.matches() ) {
-                    u= u + "/" + m.group(1);
+                    ub.append("/").append(m.group(1));
                     break;
                 }
             }
@@ -1063,6 +1066,8 @@ public final class HapiDataSource extends AbstractDataSource {
         File[][] files= new File[trs.size()][parameters.length];
         
         boolean staleCacheFiles= false;
+        
+        String u= ub.toString();
         
         if ( ! new File( s + "/hapi/"+ u  ).exists() ) {
             return null;
