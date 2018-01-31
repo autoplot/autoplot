@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Spectrograms made from waveforms of Explorer 1 telemetry.  This week is the 60th anniversary of its launch.
+        <p><small>With the PNGWalkTool and script optimizing data entry into QC annotations, a 1440 images are hand-digitized in about 10 minutes.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2018-01-27 r21984):</p>
+        <p>Bugfixes (2018-01-31 r22002):</p>
         <ul>
+            <li>minor improvements to the contours renderer.  Thanks, Masafumi!
             <li>NullPointerException when Python getDataSet didn't properly handle null.  Thanks, Ivar!
             <li>vap+inline:2016-10-12T12:00Z&RENDER_TYPE=eventsBar 
             <li>rank 1 Join of us2000 datums didn't properly report the units, breaking autoranging for "vap+inline:2016-10-12T12:00Z&RENDER_TYPE=eventsBar
