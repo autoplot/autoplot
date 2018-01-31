@@ -761,20 +761,21 @@ public class BatchMaster extends javax.swing.JPanel {
         if ( writeCheckBox.isSelected() ) {
             String template= writeFilenameCB.getSelectedItem().toString();
             String[] ss= template.split("\\$x",-2);
-            String f= ss[0];
+            StringBuilder f= new StringBuilder(ss[0]);
             if ( ss.length>1 ) {
-                f= f + f1 + ss[1];
+                f.append(f1).append(ss[1]);
             }
             if ( ss.length>2 ) {
-                f+= f2.trim() + ss[2];
+                f.append(f2.trim()).append(ss[2]);
             }
             for ( int i=3; i<ss.length; i++ ) {
-                f+= ss[i];
+                f.append( ss[i] );
             }
-            if ( f.endsWith(".png") ) {
-                ScriptContext.writeToPng(f);
-            } else if ( f.endsWith(".pdf") ) {
-                ScriptContext.writeToPdf(f);
+            String s= f.toString();
+            if ( s.endsWith(".png") ) {
+                ScriptContext.writeToPng(s);
+            } else if ( s.endsWith(".pdf") ) {
+                ScriptContext.writeToPdf(s);
             } 
         }
     }
