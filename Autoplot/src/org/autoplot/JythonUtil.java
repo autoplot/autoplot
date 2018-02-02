@@ -1,6 +1,7 @@
 
 package org.autoplot;
 
+import external.AnnotationCommand;
 import external.PlotCommand;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -82,6 +83,8 @@ public class JythonUtil {
         interp.set( "monitor", new NullProgressMonitor() );
         interp.set( "plotx", new PlotCommand() );
         interp.set( "plot", new PlotCommand() );
+        interp.set( "annotation", new AnnotationCommand() );
+        
         return interp;
     }
 
