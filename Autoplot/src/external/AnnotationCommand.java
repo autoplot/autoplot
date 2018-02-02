@@ -15,6 +15,7 @@ import org.autoplot.ScriptContext;
 import org.autoplot.dom.Annotation;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.DomNode;
+import org.autoplot.dom.Plot;
 import org.autoplot.jythonsupport.JythonOps;
 import org.das2.graph.AnchorPosition;
 import org.das2.graph.AnchorType;
@@ -54,6 +55,7 @@ public class AnnotationCommand extends PyObject {
             + " <tr><td> anchorType </td><td>PLOT means relative to the plot.<br>DATA means relative to xrange and yrange</td></tr>"
             + " <tr><td> xrange, yrange </td><td> anchor box when data coordinates</td></tr>"
             + " <tr><td> pointAt </td><td>comma separated X and Y to point the annotation arrow at.</td></tr>"
+            + " <tr><td> plotId </td><td>ID of the plot containing this annotation</td></tr>"
             + "</table></html>");
 
     private static AnchorPosition anchorPosition( PyObject val ) {
@@ -120,12 +122,14 @@ public class AnnotationCommand extends PyObject {
                 "fontSize",
                 "pointAtX", "pointAtY", "pointAt", 
                 "xrange", "yrange",
+                "rowId", "columnId"
         },
         new PyObject[] { new PyInteger(0), 
             Py.None, Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None, Py.None, Py.None,
             Py.None,
             Py.None, Py.None, Py.None,
+            Py.None, Py.None,
             Py.None, Py.None,
         } );
         
@@ -161,6 +165,8 @@ public class AnnotationCommand extends PyObject {
             dom.getController().addAnnotation( new Annotation() );
         }
         Annotation annotation= dom.getAnnotations(index);
+        
+        // reset the annotation.
         annotation.syncTo( new Annotation(), Arrays.asList( DomNode.PROP_ID, Annotation.PROP_PLOTID, Annotation.PROP_ROWID, Annotation.PROP_COLUMNID ) );
                 
         try {
@@ -227,6 +233,14 @@ public class AnnotationCommand extends PyObject {
                         annotation.setYrange(Ops.datumRange(sval));
                         annotation.setAnchorOffset("");
                         annotation.setAnchorType( AnchorType.DATA );                        
+                        break;
+                    case "rowId":
+                        annotation.setRowId(sval);
+                        annotation.setAnchorType( AnchorType.CANVAS );
+                        break;
+                    case "columnId":
+                        annotation.setColumnId(sval);
+                        annotation.setAnchorType( AnchorType.CANVAS );
                         break;
                     default:
                         break;
