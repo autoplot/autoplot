@@ -5,49 +5,22 @@
 
 package external;
 
-import java.awt.Color;
-import java.util.List;
-import java.util.logging.Level;
+import java.util.Arrays;
 import java.util.logging.Logger;
-import org.das2.datum.DatumRange;
-import org.das2.datum.Units;
-import org.das2.graph.DasColorBar;
-import org.das2.graph.DefaultPlotSymbol;
-import org.das2.graph.PlotSymbol;
-import org.das2.graph.PsymConnector;
-import org.das2.util.ClassMap;
 import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
 import org.python.core.PyString;
-import org.autoplot.RenderType;
 import org.autoplot.ScriptContext;
 import org.autoplot.dom.Annotation;
 import org.autoplot.dom.Application;
-import org.autoplot.dom.CanvasUtil;
-import org.autoplot.dom.Column;
-import org.autoplot.dom.DataSourceFilter;
 import org.autoplot.dom.DomNode;
-import org.autoplot.dom.DomUtil;
-import org.autoplot.dom.Plot;
-import org.autoplot.dom.PlotElement;
-import org.autoplot.dom.Row;
-import org.das2.qds.QDataSet;
 import org.autoplot.jythonsupport.JythonOps;
-import org.autoplot.jythonsupport.PyQDataSet;
-import org.autoplot.jythonsupport.PyQDataSetAdapter;
 import org.das2.graph.AnchorPosition;
 import org.das2.graph.AnchorType;
 import org.das2.graph.BorderType;
-import org.das2.graph.FillStyle;
-import org.das2.graph.Renderer;
-import org.das2.graph.SeriesRenderer;
-import org.das2.graph.TickVDescriptor;
-import org.das2.qds.DataSetUtil;
 import org.das2.qds.ops.Ops;
 import org.python.core.PyJavaInstance;
-import org.python.core.PyList;
-import org.python.core.PyMethod;
 
 /**
  * new implementation of the plot command allows for keywords in the
@@ -174,15 +147,15 @@ public class AnnotationCommand extends PyObject {
         
         Application dom= ScriptContext.getDocumentModel();
         
-        Annotation annotation;
-        while ( index>=dom.getAnnotations().length ) {
-            dom.getController().addAnnotation( new Annotation() );
-        }
-        annotation= dom.getAnnotations(index);
-
         dom.getController().registerPendingChange( this, this );  
         dom.getController().performingChange(this,this);
         
+        while ( index>=dom.getAnnotations().length ) {
+            dom.getController().addAnnotation( new Annotation() );
+        }
+        Annotation annotation= dom.getAnnotations(index);
+        annotation.syncTo( new Annotation(), Arrays.asList( DomNode.PROP_ID, Annotation.PROP_PLOTID, Annotation.PROP_ROWID, Annotation.PROP_COLUMNID ) );
+                
         try {
 
             for ( int i=nparm; i<args.length; i++ ) { //HERE nargs
