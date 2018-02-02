@@ -43,10 +43,17 @@ public class AnnotationCommand extends PyObject {
             + "See http://autoplot.org/help.annotationCommand<br>\n"
             + "<br><b>named parameters:</b>\n"
             + "<table>"
-            + "<tr><td>text</td><td>The message, allowing granny codes</td></tr>\n"
+            + "<tr><td>text</td><td>The message, allowing Granny codes</td></tr>"
             + " <tr><td> textColor      </td><td> text color\n</td></tr>"
             + " <tr><td> background     </td><td> background color\n</td></tr>"
             + " <tr><td> foreground     </td><td> foreground color\n</td></tr>"
+            + " <tr><td> fontSize     </td><td> size relative to parent (1.2em) or in pts (8pt)\n</td></tr>"
+            + " <tr><td> borderType     </td><td> draw a border around the annotation text<br>none,rectangle,roundedRectangle<br>.</td></tr>"
+            + " <tr><td> anchorBorderType </td><td> draw a border around the anchor box.</td></tr>"
+            + " <tr><td> anchorPosition </td><td>One of NE,NW,SE,SW,<br>N,E,W,S,<br>outsideN,outsideNNW</td></tr>"
+            + " <tr><td> anchorType </td><td>PLOT means relative to the plot.<br>DATA means relative to xrange and yrange</td></tr>"
+            + " <tr><td> xrange, yrange </td><td> anchor box when data coordinates</td></tr>"
+            + " <tr><td> pointAt </td><td>comma separated X and Y to point the annotation arrow at.</td></tr>"
             + "</table></html>");
 
     private static AnchorPosition anchorPosition( PyObject val ) {
@@ -109,14 +116,14 @@ public class AnnotationCommand extends PyObject {
         FunctionSupport fs= new FunctionSupport( "annotation", 
             new String[] { "index", 
                 "text", "textColor", "background", "foreground",
-                "anchorPosition", "anchorOffset", "anchorType", "anchorBorderType",
+                "anchorPosition", "anchorOffset", "anchorType", "borderType", "anchorBorderType",
                 "fontSize",
                 "pointAtX", "pointAtY", "pointAt", 
                 "xrange", "yrange",
         },
         new PyObject[] { new PyInteger(0), 
             Py.None, Py.None, Py.None, Py.None,
-            Py.None, Py.None, Py.None, Py.None,
+            Py.None, Py.None, Py.None, Py.None, Py.None,
             Py.None,
             Py.None, Py.None, Py.None,
             Py.None, Py.None,
@@ -190,6 +197,9 @@ public class AnnotationCommand extends PyObject {
                         break;           
                     case "anchorBorderType":
                         annotation.setAnchorBorderType( borderType(val) );
+                        break;           
+                    case "borderType":
+                        annotation.setBorderType( borderType(val) );
                         break;           
                     case "fontSize":
                         annotation.setFontSize(sval);
