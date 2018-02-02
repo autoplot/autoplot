@@ -93,6 +93,7 @@ public class SimplifyScriptSupport {
              Module n= (Module)org.python.core.parser.parse( script, "exec" );
              String s= simplifyScriptToGetCompletions( ss, n.body, variableNames, 1, lastLine, 0 );
              s= GETDATASET_CODE + s;
+             s= "PWD='file:/tmp/'\n"+s;
              return s;
              
          } catch ( PySyntaxError ex ) {
