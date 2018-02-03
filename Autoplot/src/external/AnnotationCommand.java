@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package external;
 
@@ -15,7 +11,6 @@ import org.autoplot.ScriptContext;
 import org.autoplot.dom.Annotation;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.DomNode;
-import org.autoplot.dom.Plot;
 import org.autoplot.jythonsupport.JythonOps;
 import org.das2.graph.AnchorPosition;
 import org.das2.graph.AnchorType;
@@ -27,11 +22,13 @@ import org.python.core.PyJavaInstance;
  * new implementation of the plot command allows for keywords in the
  * Jython environment.
  *<blockquote><pre><small>{@code
- * plot( 0, ripples(20) )
- * plot( 1, ripples(20), color=Color.BLUE )
- * plot( 2, ripples(20), renderType='series>color=blue' )
+ * annotation( 0, 'Anno1' )
+ * annotation( 1, 'Anno2', textColor='darkBlue', anchorPosition='NW'  )
+ * plot( 'vap+cdaweb:ds=OMNI2_H0_MRG1HR&id=DST1800&timerange=Oct+2016' )
+ * annotation( 2, 'Anno3', anchorType='DATA',pointAt='2016-10-14T07:51Z,-100', xrange='2016-10-20T00:00/PT30S', yrange='-150 to -100',
+ *     anchorPosition='OutsideNE', anchorOffset='' )
  *}</small></pre></blockquote>
- * @see http://autoplot.org/help.plotCommand
+ * @see http://autoplot.org/help.annotationCommand
  * @author jbf
  */
 public class AnnotationCommand extends PyObject {
@@ -55,7 +52,8 @@ public class AnnotationCommand extends PyObject {
             + " <tr><td> anchorType </td><td>PLOT means relative to the plot.<br>DATA means relative to xrange and yrange</td></tr>"
             + " <tr><td> xrange, yrange </td><td> anchor box when data coordinates</td></tr>"
             + " <tr><td> pointAt </td><td>comma separated X and Y to point the annotation arrow at.</td></tr>"
-            + " <tr><td> plotId </td><td>ID of the plot containing this annotation</td></tr>"
+            + " <tr><td> rowId </td><td>ID of the row containing for positioning this annotation<br>(See dom.plots[0].rowId)</td></tr>"
+            + " <tr><td> columnId </td><td>ID of the column containing for positioning this annotation</td></tr>"
             + "</table></html>");
 
     private static AnchorPosition anchorPosition( PyObject val ) {
