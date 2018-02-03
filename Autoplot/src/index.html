@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>With the PNGWalkTool and script optimizing data entry into QC annotations, a 1440 images are hand-digitized in about 10 minutes.
+        <p><small>The contours renderer got some new features this week, such as format and relative font sizes (2em means twice the canvas size).
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -22,10 +22,13 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
+        <!-- <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. -->
+        Mac DMG is not available for this release.
         
-        <p>Bugfixes (2018-01-31 r22002):</p>
+        <p>Bugfixes (2018-02-03 r22018):</p>
         <ul>
+            <li>Ivar had a code which showed where check for each of 5000000 points' properties was slowing things down, this test is limited to QDataSet.MAX_PLANE_COUNT (=50) now..
+            <li>1748: insert PWD before completions.  Thanks, Masafumi! 
             <li>minor improvements to the contours renderer.  Thanks, Masafumi!
             <li>NullPointerException when Python getDataSet didn't properly handle null.  Thanks, Ivar!
             <li>vap+inline:2016-10-12T12:00Z&RENDER_TYPE=eventsBar 
@@ -96,6 +99,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>several rebin functions renamed to binAverage, since they are unlike the IDL routines and the name causes confusion.  Thanks, Masafumi!
+            <li>new annotation command is easier to use than previous calls to create annotations from scripts.  Thanks, Masafumi!
+            <li>Contours renderer has more controls now.  LabelCadence is now a string to support "20em".  Thanks, Masafumi!
             <li>update RBSP orbits to 2017-10-02.
             <li>script editor has "print" menu item, which provides dialog and prints with syntax highlighting.
             <li>LDataSet can provide access to long64 values, using new capability.
