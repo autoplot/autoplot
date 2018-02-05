@@ -5,22 +5,6 @@
  */
 package org.autoplot;
 
-import org.autoplot.PersistentStateSupport;
-import org.autoplot.GettingStartedPanel;
-import org.autoplot.EventsListToolUtil;
-import org.autoplot.MoveCacheDialog;
-import org.autoplot.AutoplotUtil;
-import org.autoplot.OptionsDialog;
-import org.autoplot.RecentUrisDialog;
-import org.autoplot.UriTimeRangeToggleButton;
-import org.autoplot.BatchMaster;
-import org.autoplot.Util;
-import org.autoplot.DataPanel;
-import org.autoplot.CanvasSizePanel;
-import org.autoplot.ApplicationModel;
-import org.autoplot.AppManager;
-import org.autoplot.AggregateUrisDialog;
-import org.autoplot.APSplash;
 import java.awt.event.MouseEvent;
 import java.net.URISyntaxException;
 import javax.swing.Icon;
@@ -73,12 +57,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
@@ -196,6 +176,7 @@ import org.autoplot.datasource.WindowManager;
 import org.das2.qds.filters.AddFilterDialog;
 import org.das2.qds.filters.FiltersChainPanel;
 import org.autoplot.jythonsupport.ui.DataMashUp;
+import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -4424,7 +4405,7 @@ private void updateFrameTitle() {
                 }
                 String action = (String) JOptionPane.showInputDialog( ScriptContext.getViewWindow(),
                         msg,
-                        "Incorporate New URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/resources/logo64x64.png")),
+                        "Incorporate New URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/resources/logo64.png")),
                         new String[] { "New Window", "Replace", "Add Plot" }, "Add Plot" );
                 if ( action!=null ) {
                     switch (action) {
@@ -5843,13 +5824,27 @@ APSplash.checkTime("init 240");
     }
     
     /**
-     * add tickle timer, which triggers when things change.  This will go away!
+     * access tickle timer, which triggers when things change.  This will go away!
      * @return 
      */
     public TickleTimer getTickleTimer() {
         return this.tickleTimer;
     }
     
+    /**
+     * access the editor for scripts, if available.  This was initially added to provide
+     * a way to experiment with setting editor colors, but might be useful
+     * for other purposes.  
+     * @return null or the editor panel
+     */
+    public EditorTextPane getScriptPanel() {
+        if ( this.scriptPanel!=null ) {
+            return this.scriptPanel.getEditorPanel();
+        } else {
+            return null;
+        }
+    }
+
 //
 //    /**
 //     * temporary to debug https://sourceforge.net/p/autoplot/bugs/1520/
