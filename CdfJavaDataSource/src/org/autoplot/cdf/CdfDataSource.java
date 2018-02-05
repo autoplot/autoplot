@@ -534,6 +534,15 @@ public class CdfDataSource extends AbstractDataSource {
 
             Map<String, Object> istpProps = model.properties(attr1);
             CdfUtil.maybeAddValidRange(istpProps, result);
+            Number n= (Number)istpProps.get(QDataSet.FILL_VALUE);
+            if ( result instanceof BufferDataSet ) {
+                Class c= ((BufferDataSet)result).getCompatibleComponentType();
+                if ( n instanceof Double ) {
+                    if ( c==float.class ) {
+                        istpProps.put( QDataSet.FILL_VALUE, (float)n.doubleValue() );
+                    }
+                }
+            }
             result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
             result.putProperty(QDataSet.LABEL, istpProps.get(QDataSet.LABEL)  );
             result.putProperty(QDataSet.TITLE, istpProps.get(QDataSet.TITLE)  );
