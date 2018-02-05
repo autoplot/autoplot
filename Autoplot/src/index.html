@@ -27,9 +27,13 @@
         
         <p>Bugfixes (2018-02-03 r22018):</p>
         <ul>
+            <li>rte_0609678840: old icon reference in jnlp single-instance code corrected.  Thanks daekyu!
             <li>Ivar had a code which showed where a check for each of 5000000 points' properties was slowing things down, this test is limited to QDataSet.MAX_PLANE_COUNT (=50) now..
             <li>1748: insert PWD before completions.  Thanks, Masafumi! 
             <li>minor improvements to the contours renderer.  Thanks, Masafumi!
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>NullPointerException when Python getDataSet didn't properly handle null.  Thanks, Ivar!
             <li>vap+inline:2016-10-12T12:00Z&RENDER_TYPE=eventsBar 
             <li>rank 1 Join of us2000 datums didn't properly report the units, breaking autoranging for "vap+inline:2016-10-12T12:00Z&RENDER_TYPE=eventsBar
@@ -55,53 +59,14 @@
             <li>1941: orphaned monitor with aggregation. 
             <li>format to CDF removes old CDF file before writing new one, so new result is not affected.  Thanks, Ivar!
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>1935: time range GUI read recent timeranges on the event thread, which could hang the GUI.  Thanks, Ivar!
-            <li>corrections to export-to-cdf code, when TT2000 is used, to VALID_MIN and VALID_MAX, and the units.  Thanks, Ivar!
-            <li>"which range" dialog is properly centered.
-            <li>corrections to series control GUI, where ReferenceValue was mislocated.
-            <li>refactor slicers so a top painter is used instead of subclassing.
-            <li>corrections to HAPI client's caching, cached streams are zipped.
-            <li>findbugs RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE.  Thanks, Findbugs!
-            <li>HAPI getInfo needs to check offline status before attempting to get a URL resource.
-            <li>1933: Bugs when offline didn't properly use ro_cache.txt setting.  Thanks, Ivar!
-            <li>rte_0155056645: IndexOutOfBounds caused by new quick monotonic check.  Thanks, Scott!
-            <li>SAMP listener was not properly passing the URI, should have done on event thread so old one was used.  Thanks Baptiste!
-            <li>Matlab/IDL interface disables SSL checking.  Thanks, Kris!
-            <li>Events bar renderer supports nominal data without x tags, using 0,1,2,... to mimic other renderers.
-            <li>Zoom/Pan mouse module uses precise wheel rotation interface, supporting precise mice and trackpads.  
-            <li>Zoom/Pan shift+wheel is no longer supported, since Macs use horizontal track pad motion for this.  Control+wheel still works for pan.
-            <li>1913: extraneous question mark introduced by makeCanonical(URI) corrected.
-            <li>Data Mashup dialog add expression option properly removes human-readable label from "magnitude(x): the lengths of the vectors" and others.
-            <li>HAPI file caching failed to update download URL to include full days, resulting in partial cache files.
-            <li>trim( ds, t1,t2) handles when ds is length 1 or length 0.  Thanks Ivar!
-            <li>1924: Time Range mode allows local vap timerange to be edited, as you can with the URI selector.
-            <li>PngWalk properly decodes and encodes URIs, supporting spaces and brackets in file names.
-            <li>new cadence check of waveform data had a branch which would result in NullPointerException.
-            <li>run batch GUI new keeps track of events list GUI.
-            <li>valid(r3) where r3 had a BUNDLE_1, as with MagEIS data, would create an invalid result.
-            <li>Masafumi caught a case where new series symbol connector code was too restrictive on units.
-            <li>left vertical axis with tick labels turned off, failed to draw the ticks.  Thanks, Masafumi!
-            <li>1922: Jython script which hangs the Java session.  Check for this condition and fix the situation by switching to a linear axis.  Thanks, Masafumi!
-            <li>rte_0088023411: where subsetting a CDF which had non-time-varying data marked as time-varying caused RTE.  Thanks, zhangzx!
-            <li>rte_0211810917: where single column ASCII files could not be read, and Sebastian's file triggered the same bug.  Thanks, Sebastian!
-            <li>"Display Data" mouse module handles events data.
-            <li>file system names use / on Windows, in the cache tool.
-            <li>2017 update of the signature for jar files.  Thanks, Bernie!
-            <li>1916: logic for working with POES dataset caused some breaks in Masafumi's data to be skipped.
-            <li>TrimDataSet trims BUNDLE_0, so that datumRange(evt[0:2]) can be used to easily get the time range.
-            <li>1912: re-fix bug where trim would include extra point, this time without dependence on cadence.  Thanks Ivar!
-            <li>recent changes in pdf support broke legacy pdf output.  Thanks, Ivar and others for pointing this out!
-            <li>non-standard micro symbol was used for microseconds, making standard microseconds behave improperly and failure to render as waveform.  Thanks, Chris!
-            <li>1916: "NaN" parses to fill Datum for times.  This supports breaks in timeseries.  Thanks, Masafumi!
-            <li>1912: new change to check cadence didn't properly consider conditions when issuing errors.  Thanks, Ivar!
-        </ul>
         <p>Features:</p>
         <ul>
             <li>several rebin functions renamed to binAverage, since they are unlike the IDL routines and the name causes confusion.  Thanks, Masafumi!
             <li>new annotation command is easier to use than previous calls to create annotations from scripts.  Thanks, Masafumi!
             <li>Contours renderer has more controls now.  LabelCadence is now a string to support "20em".  Thanks, Masafumi!
+        </ul>
+       <p>Less recent features:</p>
+       <ul>
             <li>update RBSP orbits to 2017-10-02.
             <li>script editor has "print" menu item, which provides dialog and prints with syntax highlighting.
             <li>LDataSet can provide access to long64 values, using new capability.
@@ -111,37 +76,6 @@
             <li>introduce cumulativeMin and cumulativeMax to scripting.
             <li>617: ASCII editor improvements.
             <li>improvements to completions in Jython script panel.
-        </ul>
-       <p>Less recent features:</p>
-       <ul>
-            <li>prep for smaller .vaps which can be embedded within scripts.
-            <li>vap+inline checks for eval and exec, which one can imagine could be used to attack a server.
-            <li>das2 library GraphUtil.copyPlot added to support APL.  Thanks, James!
-            <li>HAPI Client can manage a cache of local files to support offline use.
-            <li>Mouse modules can provide feedback, so zoom/pan can indicate control should be used instead of shift.
-            <li>Ops.dataset is more willing to return enumeration data instead of throwing ParseException.  
-            <li>add applyIndex which allows use with the mashup tool.
-            <li>loosen check for boolean named parameters of plot to support False/True, and "T".  Add xscale and yscale.
-            <li>Add "blur focus" to layout to aid in debugging.
-            <li>SAMP support supports messages with das2server URLs.
-            <li>HAPI editor reports lastModified, if available.
-            <li>plot has xtickValues and ytickValues.  Thanks, Masafumi!
-            <li>new autoplot_test099 allows for testing of private vaps by obfuscating tests. 
-            <li>plot has symbolFill named parameter, rightAxisOf added.  Thanks, Masafumi!
-            <li>Jython plot command returns tuple of (plot,plotElement).  Thanks, Masafumi!
-            <li>Run Batch will print a png or pdf after each iteration.
-            <li>Introduce experimental client-side caching to the HAPI support.
-            <li>add getNextIndexStrict and getPreviousIndexStrict.
-            <li>new Autoplot icons!
-            <li>rfe609: add experimental HAPI client-side caching.
-            <li>rfe548: Jython plot command now accepts renderer, so that scripts can easily add custom renderers.
-            <li>create pngwalk tool has mode where the running Autoplot is used to generate the images, not a copy, to aid with debugging and to allow decorations.
-            <li>complexMultiply promotes rank, supporting (0+1j) * complex array.
-            <li>orbit files can now have more than three columns, where the last column is used as the label, to be more consistent with events files.  Thanks Ivar!
-            <li>invokeScriptSoon allows parameters in URI, to improve usefulness to Jython scripts.
-            <li>begin support for new polar plotting mode.
-            <li>DataPointRecorder allows fill records to be inserted.  Thanks Masafumi!
-            <li>Jython completions show last assignment of variable names
        </ul>
         <p>Known issues:</p>
         <ul>
