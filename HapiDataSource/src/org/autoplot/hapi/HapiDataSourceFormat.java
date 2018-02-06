@@ -26,6 +26,10 @@ import org.das2.qds.QubeDataSetIterator;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.URISplit;
+import org.das2.qds.FloatReadAccess;
+import org.das2.qds.Slice1DataSet;
+import org.das2.qds.buffer.BufferDataSet;
+import org.das2.qds.buffer.FloatDataSet;
 import org.das2.qds.ops.Ops;
 
 /**
@@ -62,12 +66,15 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         JSONArray parameters= new JSONArray();
         
         List<QDataSet> dss= new ArrayList<>();
-        
+        List<FloatReadAccess> ffds= new ArrayList<>();
+        //TODO: similar ought to be done for CDF TT2000 LongReadAccess.
+
         String groupTitle;
         
         QDataSet dep0= (QDataSet) data.property( QDataSet.DEPEND_0 );
         if ( dep0!=null ) {
             dss.add(dep0);
+            ffds.add(null);
         } else {
             throw new IllegalArgumentException("data must have a DEPEND_0");
         }
@@ -86,12 +93,16 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                 }
             }
         }
+        
+        FloatReadAccess fra= data.capability(FloatReadAccess.class); // note this might be null
         if ( ( dep1IsOrdinal || data.property(QDataSet.DEPEND_1)==null ) && SemanticOps.isBundle(data) ) {
             for ( int i=0; i<data.length(0); i++ ) {
                 dss.add(Ops.unbundle(data,i));
+                ffds.add(fra);
             }
         } else {
             dss.add(data);
+            ffds.add(fra);
         }
         
         groupTitle= (String) data.property(QDataSet.TITLE);
@@ -185,20 +196,32 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         int nrec= dss.get(0).length();
         try ( FileWriter fw = new FileWriter(dataFile) ) {
             for ( int irec=0; irec<nrec; irec++ ) {
-                int ids=0;
                 String delim="";
-                for ( QDataSet ds: dss ) {
+                for ( int ids=0; ids<dss.size(); ids++ ) {
+                    QDataSet ds= dss.get(ids);
                     DatumFormatter df= dfs[ids];
                     Units u= SemanticOps.getUnits(ds);
                     if ( ids>0 ) delim=",";
                     boolean uIsOrdinal= UnitsUtil.isOrdinalMeasurement(u);
+                    fra= ffds.get(ids);
                     if ( ds.rank()==1 ) {
                         if ( ids>0 ) fw.write( delim );
-                        fw.write( df.format( u.createDatum(ds.value(irec)), u ) );
+                        if ( fra!=null ) {
+                            fw.write( String.valueOf( fra.fvalue(irec) ) );
+                        } else {
+                            fw.write( df.format( u.createDatum(ds.value(irec)), u ) );
+                        }
                     } else if ( ds.rank()==2 ) {
-                        for ( int j=0; j<ds.length(0); j++ ) {
-                            if ( ids>0 ) fw.write( delim );
-                            fw.write( df.format( u.createDatum(ds.value(irec,j)), u ) );
+                        if ( fra!=null ) {
+                            for ( int j=0; j<ds.length(0); j++ ) {
+                                if ( ids>0 ) fw.write( delim );
+                                fw.write( String.valueOf( fra.fvalue(irec,j) ) );
+                            }
+                        } else {
+                            for ( int j=0; j<ds.length(0); j++ ) {
+                                if ( ids>0 ) fw.write( delim );
+                                fw.write( df.format( u.createDatum(ds.value(irec,j)), u ) );
+                            }                            
                         }
                     } else if ( ds.rank()>2 ) {
                         QDataSet ds1= ds.slice(irec);
@@ -216,7 +239,6 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                             }
                         }
                     }
-                    ids++;
                 }
                 fw.write( "\n" );
             }
