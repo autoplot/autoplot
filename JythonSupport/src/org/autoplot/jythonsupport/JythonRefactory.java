@@ -257,7 +257,7 @@ public class JythonRefactory {
                                 String s= line.substring(0,i);
                                 int singleQuoteCount= s.split("'",-2).length - 1;
                                 if ( singleQuoteCount % 2 == 1 ) break; // within string
-                                Matcher matcher= identifierP.matcher(s);
+                                Matcher matcher= identifierP.matcher(line.substring(i));
                                 if ( matcher.find() ) { // should be true
                                     String mehave= matcher.group(1);
                                     String mewant= magicMatch(mehave);
