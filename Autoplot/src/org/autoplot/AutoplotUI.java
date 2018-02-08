@@ -3754,11 +3754,13 @@ private void createPngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt
             try {
                 CreatePngWalk.doIt( applicationModel.dom, null );
             } catch ( IOException ex ) {
+                logger.log( Level.SEVERE, ex.getMessage(), ex );
+                ex.printStackTrace();
                 setStatus( AutoplotUI.ERROR_ICON,"Unable to create PNG Walk: " + ex.getMessage() );
                 applicationModel.showMessage( "<html>Unable to create PNG Walk:<br>"+ex.getMessage(), "PNG Walk Error", JOptionPane.WARNING_MESSAGE );
-                logger.log( Level.SEVERE, ex.getMessage(), ex );
             } catch ( ParseException | InterruptedException ex) {
                 logger.log( Level.SEVERE, ex.getMessage(), ex );
+                ex.printStackTrace();
                 throw new RuntimeException(ex);
                 // this mimics the jython behavior
             }
