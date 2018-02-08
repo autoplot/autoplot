@@ -300,7 +300,7 @@
       <Properties>
         <Property name="editable" type="boolean" value="true"/>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="10">
+          <StringArray count="13">
             <StringItem index="0" value="$Y$m$d"/>
             <StringItem index="1" value="$Y"/>
             <StringItem index="2" value="$Y$(m,span=3)"/>
@@ -309,8 +309,11 @@
             <StringItem index="5" value="$Y$m$d_$H"/>
             <StringItem index="6" value="$Y$m$d_$H$M"/>
             <StringItem index="7" value="$Y$m$d_$H$M$S"/>
-            <StringItem index="8" value="$(o,id=rbspa-pp)"/>
-            <StringItem index="9" value="$(o,id=http://das2.org/wiki/index.php/Orbits/crres)"/>
+            <StringItem index="8" value="$Y$m$d_$H$M$S.$(subsec,places=3)"/>
+            <StringItem index="9" value="$(o,id=rbspa-pp)"/>
+            <StringItem index="10" value="$(o,id=http://das2.org/Orbits/marsx.dat)"/>
+            <StringItem index="11" value=" "/>
+            <StringItem index="12" value=" "/>
           </StringArray>
         </Property>
       </Properties>

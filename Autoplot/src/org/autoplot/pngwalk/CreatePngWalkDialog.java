@@ -293,7 +293,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         autorangeCB.setToolTipText("Autorange in Y and Z each image of the sequence");
 
         timeFormatCB.setEditable(true);
-        timeFormatCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "$Y$m$d", "$Y", "$Y$(m,span=3)", "$Y$m", "$Y_$j", "$Y$m$d_$H", "$Y$m$d_$H$M", "$Y$m$d_$H$M$S", "$(o,id=rbspa-pp)", "$(o,id=http://das2.org/wiki/index.php/Orbits/crres)" }));
+        timeFormatCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "$Y$m$d", "$Y", "$Y$(m,span=3)", "$Y$m", "$Y_$j", "$Y$m$d_$H", "$Y$m$d_$H$M", "$Y$m$d_$H$M$S", "$Y$m$d_$H$M$S.$(subsec,places=3)", "$(o,id=rbspa-pp)", "$(o,id=http://das2.org/Orbits/marsx.dat)", " ", " " }));
 
         timeRangeToolButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/calendar.png"))); // NOI18N
         timeRangeToolButton.setToolTipText("Use time range tool");
