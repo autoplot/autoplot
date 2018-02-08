@@ -314,337 +314,340 @@ public class CreatePngWalk {
         mon.setTaskSize(n);
         mon.started();
 
-        mon.setProgressMessage("initializing child application");
-
-        TimeParser tp = TimeParser.create(params.timeFormat);
-        Application dom= (Application) readOnlyDom.copy();
-        dom.getOptions().syncToAll( readOnlyDom.getOptions(), new ArrayList() );
-        
         try {
-            String atime= times[0];
-            int ic= atime.indexOf(": ");
-            String exactTime; 
-            if ( ic>-1 ) { // rfe batchfile time.
-                exactTime= atime.substring(ic+2);
-            } else {
-                exactTime= atime;
-            }
-            // set the initial timerange to avoid an extraneous load.
-            if ( params.useBatchUri ) {
-                DatumRange tr1= DatumRangeUtil.parseTimeRange(exactTime);
-                dom.setTimeRange(tr1);        
-            } else {
-                DatumRange tr1= tp.parse(exactTime).getTimeRange(); 
-                dom.setTimeRange(tr1);        
-            }
-        } catch ( ParseException ex ) {
-            throw new RuntimeException(ex);
-        }
-        
-        Application dom2;
-        int w0,h0;
-        
-        if ( params.runOnCopy ) {
-            ApplicationModel appmodel = new ApplicationModel();
-            appmodel.addDasPeersToAppAndWait();
-                
-            dom2= appmodel.getDocumentModel();
+            mon.setProgressMessage("initializing child application");
 
-            mon.setProgressMessage("synchronize to this application");
+            TimeParser tp = TimeParser.create(params.timeFormat);
+            Application dom= (Application) readOnlyDom.copy();
+            dom.getOptions().syncToAll( readOnlyDom.getOptions(), new ArrayList() );
 
-            dom2.getCanvases(0).setHeight( dom.getCanvases(0).getHeight() );
-            dom2.getCanvases(0).setWidth( dom.getCanvases(0).getWidth() );
-            w0 = dom2.getCanvases(0).getWidth();
-            h0 = dom2.getCanvases(0).getHeight();
-            dom2.getCanvases(0).getController().getDasCanvas().setSize( w0, h0 );
-            dom2.getCanvases(0).getController().getDasCanvas().revalidate();
-
-            dom2.syncTo( dom, java.util.Arrays.asList("id") );
-            dom2.getController().waitUntilIdle();
-            dom2.syncTo( dom, java.util.Arrays.asList("id") ); // work around bug where someone resets the margin column http://jfaden.net:8080/hudson/job/autoplot-test033/5786/artifact/
-            dom2.getOptions().syncToAll( readOnlyDom.getOptions(), new ArrayList() ); // 1165 grid overlay
-
-            mon.setProgressMessage("write " + params.product + ".vap");
-            logger.log(Level.FINE, "write {0}.vap", params.product);
-        } else {
-            dom2= readOnlyDom;
-            w0= dom2.getCanvases(0).getWidth();
-            h0 = dom2.getCanvases(0).getHeight();
-        }
-
-        ApplicationModel appmodel= dom2.getController().getApplicationModel();
-        
-        int thumbSize = 400;
-
-        int thumbH = 0, thumbW = 0;
-        if (params.createThumbs) {
-            double aspect = 1. * w0 / h0;
-            thumbH = (int) (Math.sqrt(Math.pow(thumbSize, 2) / (aspect * aspect + 1.)));
-            thumbW = (int) (thumbH * aspect);
-        }
-
-        // Write out the vap file to product.vap
-        StatePersistence.saveState(new java.io.File( outputFolder, params.product + ".vap"), dom2, "");
-
-        String vap= new java.io.File( outputFolder, params.product + ".vap").toString();
-        StringBuilder build= new StringBuilder();
-        build.append( String.format( "JAVA -cp autoplot.jar org.autoplot.pngwalk.CreatePngWalk " ) );
-
-        try ( PrintWriter ff = new PrintWriter( new FileWriter( new java.io.File( outputFolder, params.product + ".pngwalk" ) ) ) ) {  // Write out the parameters used to create this pngwalk in product.pngwalk
-
-            build.append("--vap=").append(vap).append( " ");
-            build.append("--outputFolder=").append(params.outputFolder).append( " ");
-            
-            ff.println( "# set the following line to the location of the pngwalk");
-            ff.println( "baseurl=." );
-            ff.println( "product=" + params.product );
-            build.append("--product=").append(params.product).append( " ");
-            ff.println( "timeFormat=" + params.timeFormat );
-            build.append("--timeFormat='").append(params.timeFormat).append( "' ");
-            
-            if ( params.useBatchUri==false ) {
-                ff.println( "timeRange=" + params.timeRangeStr );
-                build.append("--timeRange='").append(params.timeRangeStr).append( "' ");
-            }
-            
-            if ( params.batchUriName.equals("$o") ) {
-                ff.println( "# the filePattern may need editing, depending on extension and subdirectories.");
-                ff.println( "filePattern=*.png");
-            }
-            
-            if ( params.useBatchUri ) {
-                if ( params.batchUri!=null && !params.batchUri.equals("") ) {
-                    ff.println( "batchUri=" + params.batchUri );
-                    build.append("--batchUri=").append(params.batchUri).append( " ");
-                }
-                if ( !params.batchUriName.equals("") ) {
-                    ff.println( "batchUriName=" + params.batchUri );
-                    build.append("--batchUriName=").append(params.batchUri).append( " ");
-                }
-            }
-            
-            if ( params.rescalex!=null && !params.rescalex.equals("0%,100%") ) {
-                ff.println( "rescalex="+ params.rescalex );
-                build.append("--rescalex=").append(params.rescalex).append( " ");
-            }
-            if ( params.autorange ) {
-                ff.println( "autorange="+ params.autorange );
-                build.append("--autorange=").append(params.autorange).append( " ");
-            }
-            if ( params.version!=null && params.version.trim().length()>0 ) {
-                ff.println( "version="+ params.version );
-                build.append("--version=").append( params.version);
-            }
-            
-            if ( !params.outputFormat.equals("png") ) {
-                ff.println( "outputFormat="+ params.outputFormat );
-                build.append("--outputFormat=").append( params.outputFormat );
-            }
-            
-        }
-         
-        if ( !( mon instanceof NullProgressMonitor ) ) { // only show in interactive session
-            System.err.println( build.toString() );
-        }
-        
-        dom2.getController().waitUntilIdle();
-
-        mon.setProgressMessage("making images");
-
-        long t0 = java.lang.System.currentTimeMillis();
-        int count = 0;
-
-        appmodel.setExceptionHandler( new ExceptionHandler() {
-            @Override
-            public void handle(Throwable t) {
-                logger.log( Level.WARNING, null, t );
-                returnCode1= 11;
-            }
-            @Override
-            public void handleUncaught(Throwable t) {
-                logger.log( Level.WARNING, null, t );
-                returnCode1= 12;
-            }
-        });
-        
-        //LoggerManager.setEnableTimers(true);
-        //LoggerManager.setTimerLogfile("/tmp/foo.autoplot.txt");
-        
-        String currentTimeLabel;
-        for ( String atime : times ) {
-            
-            //LoggerManager.resetTimer();
-            
-            returnCode1= 0;
-            
-            int ic= atime.indexOf(": ");
-            String exactTime= null; 
-            if ( ic>-1 ) { // rfe batchfile time.
-                exactTime= atime.substring(ic+2);
-                atime= atime.substring(0,ic);
-            }
-            
-            //LoggerManager.markTime("455");
-            
-            String filename= getFilename( params, "", atime );
-            String filenameThumb = getRelativeFilename( params, "thumbs400", atime );
-            String filenameBig = getRelativeFilename( params, "", atime );
-            
-            /**
-            * Code for adding images into global arrayList for use in HTML method
-            * @author Armond Luthens
-            * @date 09/21/15
-            */
-            pngFilenameArrayThumbs.add(filenameThumb);
-            pngFilenameArrayBig.add(filenameBig);
-            
-            //LoggerManager.markTime("469");
-            
-            count = count + 1;
-            if (mon.isCancelled()) {
-                break;
-            }
-            mon.setTaskProgress(count);
-
-            if ( params.update ) {
-                File out= new File( filename );
-                if ( out.exists() ) {
-                    mon.setProgressMessage( String.format("skipping %s", filename ) );
-                    logger.log( Level.FINE, String.format("skipping %s", filename ) );
-                    continue;
-                }
-            }
-
-            //LoggerManager.markTime("486");
-            
             try {
-                DatumRange dr;
-                if ( exactTime==null ) {
-                    dr= tp.parse(atime).getTimeRange();
+                String atime= times[0];
+                int ic= atime.indexOf(": ");
+                String exactTime; 
+                if ( ic>-1 ) { // rfe batchfile time.
+                    exactTime= atime.substring(ic+2);
                 } else {
-                    dr= DatumRangeUtil.parseTimeRange(exactTime);
+                    exactTime= atime;
                 }
-                if ( params.rescalex!=null ) {
-                    String rescalex= params.rescalex.trim();
-                    if ( rescalex.length()>0 && !params.rescalex.equals("0%,100%") ) {
-                        dr= DatumRangeUtil.rescale( dr,params.rescalex );
-                    }
-                }
-                currentTimeLabel= dr.toString();
-                timeLabels.add(currentTimeLabel);
-                
-                if ( !dom2.getTimeRange().equals(dr) ) { // don't even call it for one png--I don't think it matters.
-                    dom2.setTimeRange(dr);
-                }
-
-            } catch (ParseException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            }
-            mon.setProgressMessage( String.format("write %s", filename ) );
-            logger.log( Level.FINE, String.format("write %s", filename ) );
-
-            //LoggerManager.markTime("514");
-            appmodel.waitUntilIdle();
-            //LoggerManager.markTime("516");
-            
-            if ( params.autorange ) {
-                if (params.autorangeFlags) {
-                    for ( Plot p: dom2.getPlots() ) {
-                        if ( p.getYaxis().isAutoRange() ) {
-                            AutoplotUtil.resetZoomY(dom2,p);
-                        }
-                        if ( p.getZaxis().isAutoRange() ) {
-                            AutoplotUtil.resetZoomZ(dom2,p);
-                        }
-                    }
+                // set the initial timerange to avoid an extraneous load.
+                if ( params.useBatchUri ) {
+                    DatumRange tr1= DatumRangeUtil.parseTimeRange(exactTime);
+                    dom.setTimeRange(tr1);        
                 } else {
-                    for ( Plot p: dom2.getPlots() ) {
-                        dom2.getController().setPlot(p);
-                        AutoplotUtil.resetZoomY(dom2);
-                        AutoplotUtil.resetZoomZ(dom2);
+                    DatumRange tr1= tp.parse(exactTime).getTimeRange(); 
+                    dom.setTimeRange(tr1);        
+                }
+            } catch ( ParseException ex ) {
+                throw new RuntimeException(ex);
+            }
+
+            Application dom2;
+            int w0,h0;
+
+            if ( params.runOnCopy ) {
+                ApplicationModel appmodel = new ApplicationModel();
+                appmodel.addDasPeersToAppAndWait();
+
+                dom2= appmodel.getDocumentModel();
+
+                mon.setProgressMessage("synchronize to this application");
+
+                dom2.getCanvases(0).setHeight( dom.getCanvases(0).getHeight() );
+                dom2.getCanvases(0).setWidth( dom.getCanvases(0).getWidth() );
+                w0 = dom2.getCanvases(0).getWidth();
+                h0 = dom2.getCanvases(0).getHeight();
+                dom2.getCanvases(0).getController().getDasCanvas().setSize( w0, h0 );
+                dom2.getCanvases(0).getController().getDasCanvas().revalidate();
+
+                dom2.syncTo( dom, java.util.Arrays.asList("id") );
+                dom2.getController().waitUntilIdle();
+                dom2.syncTo( dom, java.util.Arrays.asList("id") ); // work around bug where someone resets the margin column http://jfaden.net:8080/hudson/job/autoplot-test033/5786/artifact/
+                dom2.getOptions().syncToAll( readOnlyDom.getOptions(), new ArrayList() ); // 1165 grid overlay
+
+                mon.setProgressMessage("write " + params.product + ".vap");
+                logger.log(Level.FINE, "write {0}.vap", params.product);
+            } else {
+                dom2= readOnlyDom;
+                w0= dom2.getCanvases(0).getWidth();
+                h0 = dom2.getCanvases(0).getHeight();
+            }
+
+            ApplicationModel appmodel= dom2.getController().getApplicationModel();
+
+            int thumbSize = 400;
+
+            int thumbH = 0, thumbW = 0;
+            if (params.createThumbs) {
+                double aspect = 1. * w0 / h0;
+                thumbH = (int) (Math.sqrt(Math.pow(thumbSize, 2) / (aspect * aspect + 1.)));
+                thumbW = (int) (thumbH * aspect);
+            }
+
+            // Write out the vap file to product.vap
+            StatePersistence.saveState(new java.io.File( outputFolder, params.product + ".vap"), dom2, "");
+
+            String vap= new java.io.File( outputFolder, params.product + ".vap").toString();
+            StringBuilder build= new StringBuilder();
+            build.append( String.format( "JAVA -cp autoplot.jar org.autoplot.pngwalk.CreatePngWalk " ) );
+
+            try ( PrintWriter ff = new PrintWriter( new FileWriter( new java.io.File( outputFolder, params.product + ".pngwalk" ) ) ) ) {  // Write out the parameters used to create this pngwalk in product.pngwalk
+
+                build.append("--vap=").append(vap).append( " ");
+                build.append("--outputFolder=").append(params.outputFolder).append( " ");
+
+                ff.println( "# set the following line to the location of the pngwalk");
+                ff.println( "baseurl=." );
+                ff.println( "product=" + params.product );
+                build.append("--product=").append(params.product).append( " ");
+                ff.println( "timeFormat=" + params.timeFormat );
+                build.append("--timeFormat='").append(params.timeFormat).append( "' ");
+
+                if ( params.useBatchUri==false ) {
+                    ff.println( "timeRange=" + params.timeRangeStr );
+                    build.append("--timeRange='").append(params.timeRangeStr).append( "' ");
+                }
+
+                if ( params.batchUriName.equals("$o") ) {
+                    ff.println( "# the filePattern may need editing, depending on extension and subdirectories.");
+                    ff.println( "filePattern=*.png");
+                }
+
+                if ( params.useBatchUri ) {
+                    if ( params.batchUri!=null && !params.batchUri.equals("") ) {
+                        ff.println( "batchUri=" + params.batchUri );
+                        build.append("--batchUri=").append(params.batchUri).append( " ");
+                    }
+                    if ( !params.batchUriName.equals("") ) {
+                        ff.println( "batchUriName=" + params.batchUri );
+                        build.append("--batchUriName=").append(params.batchUri).append( " ");
                     }
                 }
-            }
-            //LoggerManager.markTime("526");
-            appmodel.waitUntilIdle();
 
-            //LoggerManager.markTime("529");
-            
-            if ( atime.equals(times[0]) ) { // resetting zoomY and zoomZ can cause the labels and bounds to change.  Turn off autoranging.
-                dom2.getOptions().setAutolayout(false);
+                if ( params.rescalex!=null && !params.rescalex.equals("0%,100%") ) {
+                    ff.println( "rescalex="+ params.rescalex );
+                    build.append("--rescalex=").append(params.rescalex).append( " ");
+                }
+                if ( params.autorange ) {
+                    ff.println( "autorange="+ params.autorange );
+                    build.append("--autorange=").append(params.autorange).append( " ");
+                }
+                if ( params.version!=null && params.version.trim().length()>0 ) {
+                    ff.println( "version="+ params.version );
+                    build.append("--version=").append( params.version);
+                }
+
+                if ( !params.outputFormat.equals("png") ) {
+                    ff.println( "outputFormat="+ params.outputFormat );
+                    build.append("--outputFormat=").append( params.outputFormat );
+                }
+
+            }
+
+            if ( !( mon instanceof NullProgressMonitor ) ) { // only show in interactive session
+                System.err.println( build.toString() );
+            }
+
+            dom2.getController().waitUntilIdle();
+
+            mon.setProgressMessage("making images");
+
+            long t0 = java.lang.System.currentTimeMillis();
+            int count = 0;
+
+            appmodel.setExceptionHandler( new ExceptionHandler() {
+                @Override
+                public void handle(Throwable t) {
+                    logger.log( Level.WARNING, null, t );
+                    returnCode1= 11;
+                }
+                @Override
+                public void handleUncaught(Throwable t) {
+                    logger.log( Level.WARNING, null, t );
+                    returnCode1= 12;
+                }
+            });
+
+            //LoggerManager.setEnableTimers(true);
+            //LoggerManager.setTimerLogfile("/tmp/foo.autoplot.txt");
+
+            String currentTimeLabel;
+            for ( String atime : times ) {
+
+                //LoggerManager.resetTimer();
+
+                returnCode1= 0;
+
+                int ic= atime.indexOf(": ");
+                String exactTime= null; 
+                if ( ic>-1 ) { // rfe batchfile time.
+                    exactTime= atime.substring(ic+2);
+                    atime= atime.substring(0,ic);
+                }
+
+                //LoggerManager.markTime("455");
+
+                String filename= getFilename( params, "", atime );
+                String filenameThumb = getRelativeFilename( params, "thumbs400", atime );
+                String filenameBig = getRelativeFilename( params, "", atime );
+
+                /**
+                * Code for adding images into global arrayList for use in HTML method
+                * @author Armond Luthens
+                * @date 09/21/15
+                */
+                pngFilenameArrayThumbs.add(filenameThumb);
+                pngFilenameArrayBig.add(filenameBig);
+
+                //LoggerManager.markTime("469");
+
+                count = count + 1;
+                if (mon.isCancelled()) {
+                    break;
+                }
+                mon.setTaskProgress(count);
+
+                if ( params.update ) {
+                    File out= new File( filename );
+                    if ( out.exists() ) {
+                        mon.setProgressMessage( String.format("skipping %s", filename ) );
+                        logger.log( Level.FINE, String.format("skipping %s", filename ) );
+                        continue;
+                    }
+                }
+
+                //LoggerManager.markTime("486");
+
+                try {
+                    DatumRange dr;
+                    if ( exactTime==null ) {
+                        dr= tp.parse(atime).getTimeRange();
+                    } else {
+                        dr= DatumRangeUtil.parseTimeRange(exactTime);
+                    }
+                    if ( params.rescalex!=null ) {
+                        String rescalex= params.rescalex.trim();
+                        if ( rescalex.length()>0 && !params.rescalex.equals("0%,100%") ) {
+                            dr= DatumRangeUtil.rescale( dr,params.rescalex );
+                        }
+                    }
+                    currentTimeLabel= dr.toString();
+                    timeLabels.add(currentTimeLabel);
+
+                    if ( !dom2.getTimeRange().equals(dr) ) { // don't even call it for one png--I don't think it matters.
+                        dom2.setTimeRange(dr);
+                    }
+
+                } catch (ParseException ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                }
+                mon.setProgressMessage( String.format("write %s", filename ) );
+                logger.log( Level.FINE, String.format("write %s", filename ) );
+
+                //LoggerManager.markTime("514");
                 appmodel.waitUntilIdle();
-            }
-            
-            BufferedImage image = null;
-            
-            //LoggerManager.markTime("538");
-            
-            if ( params.outputFormat.equals("png") ) {
-                image= myWriteToPng(filename, dom2, w0, h0);
-            } else {
-                dom2.getCanvases(0).getController().getDasCanvas().writeToPDF(filename);
-            }
-            //LoggerManager.markTime("548");
-            
-            if ( returnCode1==0 ) {
-                returnCodeAll= 0;
-            } else if ( returnCodeAll==10 ) {
-                returnCodeAll= returnCode1;
-            }
-            
-            if ( params.createThumbs && params.outputFormat.equals("png") ) {
-                BufferedImage thumb400 = ImageResize.getScaledInstance(image, thumbW, thumbH, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
-                File outf= new java.io.File( getFilename(params, "thumbs400", atime ) );
-                File parentf= outf.getParentFile();
-                if ( parentf!=null && !parentf.exists() ) {
-                    if ( !parentf.mkdirs() ) {
-                        throw new IllegalArgumentException("failed to make directories: "+parentf);
+                //LoggerManager.markTime("516");
+
+                if ( params.autorange ) {
+                    if (params.autorangeFlags) {
+                        for ( Plot p: dom2.getPlots() ) {
+                            if ( p.getYaxis().isAutoRange() ) {
+                                AutoplotUtil.resetZoomY(dom2,p);
+                            }
+                            if ( p.getZaxis().isAutoRange() ) {
+                                AutoplotUtil.resetZoomZ(dom2,p);
+                            }
+                        }
+                    } else {
+                        for ( Plot p: dom2.getPlots() ) {
+                            dom2.getController().setPlot(p);
+                            AutoplotUtil.resetZoomY(dom2);
+                            AutoplotUtil.resetZoomZ(dom2);
+                        }
                     }
                 }
-                if ( !ImageIO.write(thumb400, "png", outf ) ) {
-                    throw new IllegalArgumentException("no appropriate writer is found");
+                //LoggerManager.markTime("526");
+                appmodel.waitUntilIdle();
+
+                //LoggerManager.markTime("529");
+
+                if ( atime.equals(times[0]) ) { // resetting zoomY and zoomZ can cause the labels and bounds to change.  Turn off autoranging.
+                    dom2.getOptions().setAutolayout(false);
+                    appmodel.waitUntilIdle();
                 }
-                BufferedImage thumb100 = ImageResize.getScaledInstance(thumb400, thumbW/4, thumbH/4, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
-                outf= new java.io.File( getFilename( params, "thumbs100", atime ) );
-                parentf= outf.getParentFile();
-                if ( parentf!=null && !parentf.exists() ) {
-                    if ( !parentf.mkdirs() ) {
-                        throw new IllegalArgumentException("failed to make directories: "+parentf);
+
+                BufferedImage image = null;
+
+                //LoggerManager.markTime("538");
+
+                if ( params.outputFormat.equals("png") ) {
+                    image= myWriteToPng(filename, dom2, w0, h0);
+                } else {
+                    dom2.getCanvases(0).getController().getDasCanvas().writeToPDF(filename);
+                }
+                //LoggerManager.markTime("548");
+
+                if ( returnCode1==0 ) {
+                    returnCodeAll= 0;
+                } else if ( returnCodeAll==10 ) {
+                    returnCodeAll= returnCode1;
+                }
+
+                if ( params.createThumbs && params.outputFormat.equals("png") ) {
+                    BufferedImage thumb400 = ImageResize.getScaledInstance(image, thumbW, thumbH, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
+                    File outf= new java.io.File( getFilename(params, "thumbs400", atime ) );
+                    File parentf= outf.getParentFile();
+                    if ( parentf!=null && !parentf.exists() ) {
+                        if ( !parentf.mkdirs() ) {
+                            throw new IllegalArgumentException("failed to make directories: "+parentf);
+                        }
+                    }
+                    if ( !ImageIO.write(thumb400, "png", outf ) ) {
+                        throw new IllegalArgumentException("no appropriate writer is found");
+                    }
+                    BufferedImage thumb100 = ImageResize.getScaledInstance(thumb400, thumbW/4, thumbH/4, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
+                    outf= new java.io.File( getFilename( params, "thumbs100", atime ) );
+                    parentf= outf.getParentFile();
+                    if ( parentf!=null && !parentf.exists() ) {
+                        if ( !parentf.mkdirs() ) {
+                            throw new IllegalArgumentException("failed to make directories: "+parentf);
+                        }
+                    }
+                    if ( !ImageIO.write(thumb100, "png", outf ) ) {
+                        throw new IllegalArgumentException("no appropriate writer is found");
                     }
                 }
-                if ( !ImageIO.write(thumb100, "png", outf ) ) {
-                    throw new IllegalArgumentException("no appropriate writer is found");
+
+                //LoggerManager.markTime("581");
+
+                double imagesPerSec = count * 1000. / (java.lang.System.currentTimeMillis() - t0);
+                double etaSec= (n-count) / imagesPerSec;
+                String etaStr= "";
+                if ( count>3 ) {
+                    Datum eta= org.das2.datum.DatumUtil.asOrderOneUnits( Units.seconds.createDatum(etaSec) );
+                    DatumFormatter df;
+                    df= new FormatStringFormatter("%.1f",true);
+                    etaStr= String.format( Locale.US, ", eta %s", df.format(eta) ); 
                 }
+                if ( imagesPerSec<1.0 ) {
+                    mon.setAdditionalInfo(String.format( Locale.US, "(%.1f/min%s)", imagesPerSec*60, etaStr ) );
+                } else {
+                    mon.setAdditionalInfo(String.format( Locale.US, "(%.1f/sec%s)", imagesPerSec, etaStr ) );
+                }
+                //LoggerManager.markTime("597");
             }
-            
-            //LoggerManager.markTime("581");
-            
-            double imagesPerSec = count * 1000. / (java.lang.System.currentTimeMillis() - t0);
-            double etaSec= (n-count) / imagesPerSec;
-            String etaStr= "";
-            if ( count>3 ) {
-                Datum eta= org.das2.datum.DatumUtil.asOrderOneUnits( Units.seconds.createDatum(etaSec) );
-                DatumFormatter df;
-                df= new FormatStringFormatter("%.1f",true);
-                etaStr= String.format( Locale.US, ", eta %s", df.format(eta) ); 
+
+            //LoggerManager.setEnableTimers(false);
+
+            if ( !mon.isCancelled() ) {
+                writeHTMLFile( params, pngFilenameArrayThumbs, pngFilenameArrayBig, timeLabels );
             }
-            if ( imagesPerSec<1.0 ) {
-                mon.setAdditionalInfo(String.format( Locale.US, "(%.1f/min%s)", imagesPerSec*60, etaStr ) );
-            } else {
-                mon.setAdditionalInfo(String.format( Locale.US, "(%.1f/sec%s)", imagesPerSec, etaStr ) );
-            }
-            //LoggerManager.markTime("597");
+        
+        } finally {
+            if ( !mon.isFinished() ) mon.finished();
         }
-        
-        //LoggerManager.setEnableTimers(false);
-        
-        if ( !mon.isCancelled() ) {
-            writeHTMLFile( params, pngFilenameArrayThumbs, pngFilenameArrayBig, timeLabels );
-        }
-        
-        if ( !mon.isFinished() ) mon.finished();
-        
         return returnCodeAll;
+
     }
 
     /**
