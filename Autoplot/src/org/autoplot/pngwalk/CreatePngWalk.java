@@ -580,10 +580,15 @@ public class CreatePngWalk {
 
                 //LoggerManager.markTime("538");
 
-                if ( params.outputFormat.equals("png") ) {
-                    image= myWriteToPng(filename, dom2, w0, h0);
-                } else {
-                    dom2.getCanvases(0).getController().getDasCanvas().writeToPDF(filename);
+                try {
+                    if ( params.outputFormat.equals("png") ) {
+                        image= myWriteToPng(filename, dom2, w0, h0);
+                    } else {
+                        dom2.getCanvases(0).getController().getDasCanvas().writeToPDF(filename);
+                    }
+                } catch ( IOException ex ) {
+                    logger.log( Level.SEVERE, "unable to write file "+filename, ex );
+                    throw new IOException("unable to write file "+filename,ex);
                 }
                 //LoggerManager.markTime("548");
 
