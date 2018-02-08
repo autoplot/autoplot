@@ -44,7 +44,8 @@ import org.autoplot.dom.Plot;
 import org.autoplot.datasource.AutoplotSettings;
 
 /**
- *
+ * UndoRedoSupport keeps track of a series of application states, providing
+ * "undo" and "redo" operations.
  * @author jbf
  */
 public class UndoRedoSupport {
@@ -68,6 +69,10 @@ public class UndoRedoSupport {
         });
     }
 
+    /**
+     * create all the menu items for a JMenu offering undo targets.
+     * @param undoMultipleMenu the menu
+     */
     public void refreshUndoMultipleMenu(JMenu undoMultipleMenu) {
         undoMultipleMenu.removeAll();
 
@@ -95,18 +100,23 @@ public class UndoRedoSupport {
         }
     }
 
+    /**
+     * A model containing a state, including a description of what changed and
+     * a thumbnail.
+     */
     public static class StateStackElement {
 
         Application state;
-        String deltaDesc;
-        String docString; // verbose description
+        String deltaDesc; // one-line description
+        String docString; // more verbose description, describing the transition to this state.
         BufferedImage thumb;
 
-        public StateStackElement(Application state, String deltaDesc, String docString, BufferedImage thumb ) {
-            this( state, deltaDesc, docString );
-            this.thumb= thumb;
-        }
-
+        /**
+         * create an element
+         * @param state the new state
+         * @param deltaDesc what changed to get to this state
+         * @param docString documentation string 
+         */
         public StateStackElement(Application state, String deltaDesc, String docString ) {
             this.state = state;
             this.deltaDesc = deltaDesc;
@@ -124,10 +134,9 @@ public class UndoRedoSupport {
      * points at the last saved state index + 1;
      */
     int stateStackPos = 0;
-    protected String redoLabel = null;
+    private String redoLabel = null;
+    
     public static final String PROP_REDOLABEL = "redoLabel";
-
-
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
@@ -178,6 +187,7 @@ public class UndoRedoSupport {
      * @param level the number of states to undo (1 is jump to the last state).
      */
     public synchronized void undo(int level) {
+        logger.log(Level.FINE, "undo {0}", level);
         String oldRedoLabel= getRedoLabel();
         int oldDepth= stateStackPos;
         stateStackPos -= level;
@@ -225,6 +235,7 @@ public class UndoRedoSupport {
      * redo the state change that was undone, popping up the state stack one position.
      */
     public synchronized void redo() {
+        logger.fine("redo");        
         String oldRedoLabel= getRedoLabel();
         int oldDepth= stateStackPos;
         if (stateStackPos >= stateStack.size()) {
@@ -385,14 +396,25 @@ public class UndoRedoSupport {
         return element;
     }
 
+    /**
+     * name of the property containing the number of states kept
+     */
     public static final String PROP_SIZE_LIMIT="sizeLimit";
 
     private int sizeLimit=50;
 
+    /**
+     * get the number of states which will be kept
+     * @return size 
+     */
     public int getSizeLimit() {
         return sizeLimit;
     }
 
+    /**
+     * set the number of states which will be kept
+     * @param size 
+     */
     public void setSizeLimit(int size) {
         int oldSize= this.sizeLimit;
         this.sizeLimit = size;
@@ -419,6 +441,7 @@ public class UndoRedoSupport {
      * @param label
      */
     public void pushState( PropertyChangeEvent ev, String label ) {
+        logger.log(Level.FINE, "pushState: {0}", label);
         synchronized ( this ) {
             if (ignoringUpdates) {
                 return;
@@ -492,7 +515,7 @@ public class UndoRedoSupport {
 
     /**
      * get the longer description for the action, intended to be used for the tooltip.
-     * @return
+     * @return a human-readable description
      */
     public String getUndoDescription() {
         if (stateStackPos > 1) {
@@ -504,6 +527,7 @@ public class UndoRedoSupport {
     /**
      * returns a label describing the undo operation, or null if the operation
      * doesn't exist.
+     * @return the level
      */
     public String getUndoLabel() {
         if (stateStackPos > 1) {
@@ -528,6 +552,7 @@ public class UndoRedoSupport {
     /**
      * returns a label describing the redo operation, or null if the operation
      * doesn't exist.
+     * @return 
      */
     public String getRedoLabel() {
         if (stateStackPos < stateStack.size()) {
@@ -569,8 +594,16 @@ public class UndoRedoSupport {
         this.ignoringUpdates = ignoringUpdates;
     }
 
+    /**
+     * property name of the current depth
+     */
     public static final String PROP_DEPTH = "depth";
 
+    /**
+     * get the current depth, where depth can be lower than the number of
+     * states held, when redos can be done.
+     * @return the current depth.
+     */
     public int getDepth() {
         return stateStackPos;
     }
@@ -581,10 +614,18 @@ public class UndoRedoSupport {
     public static final String PROP_SAVE_STATE_DEPTH= "saveStateDepth";
     private int saveStateDepth= 0;
 
+    /**
+     * get the current number of persistent states stored in autoplot_data/state
+     * @return 
+     */
     public int getSaveStateDepth() {
         return saveStateDepth;
     }
 
+    /**
+     * set the number of persistent states to keep, or 0 will disable the feature.
+     * @param depth zero or the number of states to keep.
+     */
     public void setSaveStateDepth( int depth ) {
         this.saveStateDepth= depth;
     }
