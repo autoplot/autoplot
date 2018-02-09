@@ -50,6 +50,7 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.util.TickleTimer;
 import org.das2.qds.ops.Ops;
 
 /**
@@ -543,21 +544,22 @@ public class PlotController extends DomNodeController {
         yaxis.setEnableHistory(false);
         //yaxis.setUseDomainDivider(true);
         
+        final TickleTimer nextPrevTickleTimer= new TickleTimer( 300, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                final DatumRange dr= (DatumRange)xaxis.getDatumRange();
+                List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
+                final QDataSet ds= pele.size()> 0 ? pele.get(0).getController().getDataSet() : null;
+                updateNextPrevious(dr,ds);
+            }
+        });
+        
         xaxis.addPropertyChangeListener( DasAxis.PROPERTY_DATUMRANGE, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 LoggerManager.logPropertyChangeEvent(evt,"xaxis datumrange");  
                 if ( dom.getOptions().isScanEnabled() ) {
-                    List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
-                    final DatumRange dr= (DatumRange)evt.getNewValue();
-                    final QDataSet ds= pele.size()> 0 ? pele.get(0).getController().getDataSet() : null;
-                    Runnable run= new Runnable() {
-                        @Override
-                        public void run() {
-                            updateNextPrevious(dr,ds);
-                        }
-                    };
-                    new Thread( run, "nextprev" ).start();
+                    nextPrevTickleTimer.tickle();
                 }
             }
         });
