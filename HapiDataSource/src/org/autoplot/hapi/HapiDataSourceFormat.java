@@ -8,8 +8,8 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +31,6 @@ import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.URISplit;
 import org.das2.qds.FloatReadAccess;
-import org.das2.qds.Slice1DataSet;
-import org.das2.qds.buffer.BufferDataSet;
-import org.das2.qds.buffer.FloatDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.qstream.AsciiTimeTransferType;
 import org.das2.qstream.DoubleTransferType;
@@ -189,7 +186,7 @@ public class HapiDataSourceFormat implements DataSourceFormat {
             fw.write( c.toString(4) );
         }
         
-        String ext= format.equals("binary") ? ".bin" : ".csv";
+        String ext= format.equals("binary") ? ".binary" : ".csv";
         File dataFile= new File( new File( hapiDir, "data" ), id+ ext );
         if ( !dataFile.getParentFile().exists() ) {
             dataFile.getParentFile().mkdirs();
@@ -214,13 +211,12 @@ public class HapiDataSourceFormat implements DataSourceFormat {
             try ( FileOutputStream out= new FileOutputStream(dataFile) ) {
                 FileChannel channel= out.getChannel();
                 ByteBuffer buf= ByteBuffer.allocate(nbytes);
+                buf.order(ByteOrder.LITTLE_ENDIAN);
                 for ( int irec=0; irec<nrec; irec++ ) {
-                    String delim="";
                     for ( int ids=0; ids<dss.size(); ids++ ) {
                         QDataSet ds= dss.get(ids);
                         TransferType tt= tts[ids];
                         //Units u= SemanticOps.getUnits(ds);
-                        if ( ids>0 ) delim=",";
                         //boolean uIsOrdinal= UnitsUtil.isOrdinalMeasurement(u);
                         //fra= ffds.get(ids); // not used b/c no float transfer types.
                         if ( ds.rank()==1 ) {
