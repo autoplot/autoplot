@@ -4,9 +4,13 @@ package org.autoplot.hapi;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +35,10 @@ import org.das2.qds.Slice1DataSet;
 import org.das2.qds.buffer.BufferDataSet;
 import org.das2.qds.buffer.FloatDataSet;
 import org.das2.qds.ops.Ops;
+import org.das2.qstream.AsciiTimeTransferType;
+import org.das2.qstream.DoubleTransferType;
+import org.das2.qstream.IntegerTransferType;
+import org.das2.qstream.TransferType;
 
 /**
  * Format the QDataSet into HAPI server info and data responses.
@@ -58,6 +66,10 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         
         String id= params.get("id");
         if ( id==null || id.length()==0 ) id="data";
+        
+        String format= params.get("format");
+        if ( format==null || format.length()==0 ) format="csv";
+        
         File infoFile= new File( new File( hapiDir, "info" ), id+".json" );
         
         JSONObject jo= new JSONObject();
@@ -177,73 +189,126 @@ public class HapiDataSourceFormat implements DataSourceFormat {
             fw.write( c.toString(4) );
         }
         
-        File dataFile= new File( new File( hapiDir, "data" ), id+".csv" );
+        String ext= format.equals("binary") ? ".bin" : ".csv";
+        File dataFile= new File( new File( hapiDir, "data" ), id+ ext );
         if ( !dataFile.getParentFile().exists() ) {
             dataFile.getParentFile().mkdirs();
         }
-        DatumFormatter[] dfs= new DatumFormatter[dss.size()];
-        for ( int ids=0; ids<dss.size(); ids++ ) {
-            QDataSet ds= dss.get(ids);
-            Units u= SemanticOps.getUnits(ds);
-            if ( UnitsUtil.isTimeLocation(u) ) {
-                dfs[ids]= DataSetUtil.bestFormatter(ds);
-            } else if ( UnitsUtil.isNominalMeasurement(u) ) {
-                dfs[ids]= DataSetUtil.bestFormatter(ds);
-            } else {
-                dfs[ids]= DefaultDatumFormatterFactory.getInstance().defaultFormatter();
+
+        if ( format.equals("binary") ) {
+            TransferType[] tts= new TransferType[dss.size()];
+            int nbytes= 0;
+            for ( int ids=0; ids<dss.size(); ids++ ) {
+                QDataSet ds= dss.get(ids);
+                Units u= SemanticOps.getUnits(ds);
+                if ( UnitsUtil.isTimeLocation(u) ) {
+                    tts[ids]= new AsciiTimeTransferType(24,u);
+                } else if ( UnitsUtil.isNominalMeasurement(u) ) {
+                    tts[ids]= new IntegerTransferType();
+                } else {
+                    tts[ids]= new DoubleTransferType();
+                }
+                nbytes+= tts[ids].sizeBytes();
             }
-        }
-        int nrec= dss.get(0).length();
-        try ( FileWriter fw = new FileWriter(dataFile) ) {
-            for ( int irec=0; irec<nrec; irec++ ) {
-                String delim="";
-                for ( int ids=0; ids<dss.size(); ids++ ) {
-                    QDataSet ds= dss.get(ids);
-                    DatumFormatter df= dfs[ids];
-                    Units u= SemanticOps.getUnits(ds);
-                    if ( ids>0 ) delim=",";
-                    boolean uIsOrdinal= UnitsUtil.isOrdinalMeasurement(u);
-                    fra= ffds.get(ids);
-                    if ( ds.rank()==1 ) {
-                        if ( ids>0 ) fw.write( delim );
-                        if ( fra!=null ) {
-                            fw.write( String.valueOf( fra.fvalue(irec) ) );
-                        } else {
-                            fw.write( df.format( u.createDatum(ds.value(irec)), u ) );
-                        }
-                    } else if ( ds.rank()==2 ) {
-                        if ( fra!=null ) {
+            int nrec= dss.get(0).length();
+            try ( FileOutputStream out= new FileOutputStream(dataFile) ) {
+                FileChannel channel= out.getChannel();
+                ByteBuffer buf= ByteBuffer.allocate(nbytes);
+                for ( int irec=0; irec<nrec; irec++ ) {
+                    String delim="";
+                    for ( int ids=0; ids<dss.size(); ids++ ) {
+                        QDataSet ds= dss.get(ids);
+                        TransferType tt= tts[ids];
+                        //Units u= SemanticOps.getUnits(ds);
+                        if ( ids>0 ) delim=",";
+                        //boolean uIsOrdinal= UnitsUtil.isOrdinalMeasurement(u);
+                        //fra= ffds.get(ids); // not used b/c no float transfer types.
+                        if ( ds.rank()==1 ) {
+                            tt.write( ds.value(irec), buf );
+                        } else if ( ds.rank()==2 ) {
                             for ( int j=0; j<ds.length(0); j++ ) {
-                                if ( ids>0 ) fw.write( delim );
-                                fw.write( String.valueOf( fra.fvalue(irec,j) ) );
+                                tt.write( ds.value(irec,j), buf );
                             }
-                        } else {
-                            for ( int j=0; j<ds.length(0); j++ ) {
-                                if ( ids>0 ) fw.write( delim );
-                                fw.write( df.format( u.createDatum(ds.value(irec,j)), u ) );
-                            }                            
-                        }
-                    } else if ( ds.rank()>2 ) {
-                        QDataSet ds1= ds.slice(irec);
-                        QubeDataSetIterator iter= new QubeDataSetIterator(ds1);
-                        while ( iter.hasNext() ) {
-                            iter.next();
-                            double d= iter.getValue(ds1);
-                            if ( ids>0 ) fw.write( delim );
-                            if ( uIsOrdinal ) {
-                                fw.write("\"");
-                                fw.write( df.format( u.createDatum(d), u ) );
-                                fw.write("\"");
-                            } else {
-                                fw.write( df.format( u.createDatum(d), u ) );
+                        } else if ( ds.rank()>2 ) {
+                            QDataSet ds1= ds.slice(irec);
+                            QubeDataSetIterator iter= new QubeDataSetIterator(ds1);
+                            while ( iter.hasNext() ) {
+                                iter.next();
+                                double d= iter.getValue(ds1);
+                                tt.write( d, buf );
                             }
                         }
                     }
+                    buf.flip();
+                    channel.write(buf);
+                    buf.flip();
                 }
-                fw.write( "\n" );
+            }
+        } else {
+            DatumFormatter[] dfs= new DatumFormatter[dss.size()];
+            for ( int ids=0; ids<dss.size(); ids++ ) {
+                QDataSet ds= dss.get(ids);
+                Units u= SemanticOps.getUnits(ds);
+                if ( UnitsUtil.isTimeLocation(u) ) {
+                    dfs[ids]= DataSetUtil.bestFormatter(ds);
+                } else if ( UnitsUtil.isNominalMeasurement(u) ) {
+                    dfs[ids]= DataSetUtil.bestFormatter(ds);
+                } else {
+                    dfs[ids]= DefaultDatumFormatterFactory.getInstance().defaultFormatter();
+                }
+            }
+
+            int nrec= dss.get(0).length();
+            try ( FileWriter fw = new FileWriter(dataFile) ) {
+                for ( int irec=0; irec<nrec; irec++ ) {
+                    String delim="";
+                    for ( int ids=0; ids<dss.size(); ids++ ) {
+                        QDataSet ds= dss.get(ids);
+                        DatumFormatter df= dfs[ids];
+                        Units u= SemanticOps.getUnits(ds);
+                        if ( ids>0 ) delim=",";
+                        boolean uIsOrdinal= UnitsUtil.isOrdinalMeasurement(u);
+                        fra= ffds.get(ids);
+                        if ( ds.rank()==1 ) {
+                            if ( ids>0 ) fw.write( delim );
+                            if ( fra!=null ) {
+                                fw.write( String.valueOf( fra.fvalue(irec) ) );
+                            } else {
+                                fw.write( df.format( u.createDatum(ds.value(irec)), u ) );
+                            }
+                        } else if ( ds.rank()==2 ) {
+                            if ( fra!=null ) {
+                                for ( int j=0; j<ds.length(0); j++ ) {
+                                    if ( ids>0 ) fw.write( delim );
+                                    fw.write( String.valueOf( fra.fvalue(irec,j) ) );
+                                }
+                            } else {
+                                for ( int j=0; j<ds.length(0); j++ ) {
+                                    if ( ids>0 ) fw.write( delim );
+                                    fw.write( df.format( u.createDatum(ds.value(irec,j)), u ) );
+                                }                            
+                            }
+                        } else if ( ds.rank()>2 ) {
+                            QDataSet ds1= ds.slice(irec);
+                            QubeDataSetIterator iter= new QubeDataSetIterator(ds1);
+                            while ( iter.hasNext() ) {
+                                iter.next();
+                                double d= iter.getValue(ds1);
+                                if ( ids>0 ) fw.write( delim );
+                                if ( uIsOrdinal ) {
+                                    fw.write("\"");
+                                    fw.write( df.format( u.createDatum(d), u ) );
+                                    fw.write("\"");
+                                } else {
+                                    fw.write( df.format( u.createDatum(d), u ) );
+                                }
+                            }
+                        }
+                    }
+                    fw.write( "\n" );
+                }
             }
         }
-        
     }
 
     private void updateCatalog(File hapiDir, String id, String groupTitle) throws JSONException, IOException {
