@@ -1,7 +1,6 @@
 
 package org.autoplot;
 
-import org.autoplot.APSplash;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -106,7 +105,7 @@ public class AutoplotDataServer {
             Datum next= first.add( Units.seconds.parse(step) );
 
             List<DatumRange> drs;
-            if ( stream && ( format.equals(FORM_D2S) || format.equals(FORM_QDS) ) ) {
+            if ( stream && ( format.equals(FORM_D2S) || format.equals(FORM_QDS) || format.equals(FORM_HAPI_DATA) || format.equals(FORM_HAPI_DATA_BINARY)) ) {
                 drs= DatumRangeUtil.generateList( outer, new DatumRange( first, next ) );
             } else {
                 // dat xls cannot stream...
@@ -418,7 +417,7 @@ public class AutoplotDataServer {
         String format = alm.getValue("format");
         String outfile = alm.getValue("outfile");
 
-        if ( format.length()>0 && !outfile.equals(DEFT_OUTFILE) ) {
+        if ( format.length()>0 && !format.startsWith("hapi") && !outfile.equals(DEFT_OUTFILE) ) {
             if ( !outfile.endsWith(format) ) {
                 System.err.println("format="+format+" doesn't match outfile extension. outfile="+outfile );
                 if ( !alm.getBooleanValue("noexit") ) System.exit(-2); else return;
@@ -430,10 +429,12 @@ public class AutoplotDataServer {
             format = FORM_D2S;
         } else if ( outfile.contains(".") ) {
             URISplit split= URISplit.parse(outfile);
-            format= split.ext;
-            if ( format==null ) {
-                split= URISplit.parse("file:///"+outfile);
+            if ( !format.startsWith("hapi") ) {
                 format= split.ext;
+                if ( format==null ) {
+                    split= URISplit.parse("file:///"+outfile);
+                    format= split.ext;
+                }
             }
         }
         if ( format.length()==0 ) { // implement default.
