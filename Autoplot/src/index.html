@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The contours renderer got some new features this week, such as format and relative font sizes (2em means twice the canvas size).
+        <p><small>Stress-testing annotations.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -22,13 +22,20 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <!-- <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. -->
-        Mac DMG is not available for this release.
+        <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-02-03 r22018):</p>
+        <p>Bugfixes (2018-02-09 r22050):</p>
         <ul>
+            <li>rte_1463914178: throw a more descriptive error do we can figure out what's going on.
+            <li>1953: kludgy code resulted in errors with some CDF_TT2000 times, showing 23:61 instead of 00:01 under some conditions.  Thanks, Ivar!
+            <li>1952: reimplement isInheritedProperty to avoid so much string searching with slice operations.
+            <li>extent code used isMonotonicAndIncreasingQuick, when new isMonotonicQuick is sufficient.  Thanks, Ivar!
+            <li>1952: rewrite within(), used in huge scatter, to dramatically improve performance.  Thanks, Ivar!
+            <li>hugeScatter optimized when data and axis units match, improving performance.
+            <li>1952: where uses bigger blocksize for 5000000 record operation, showing modest (20-30%) speed improvements.  Thanks, Ivar!
+            <li>direct access of longs from CDF file was never verified, now it's correct.
             <li>rte_0609678840: old icon reference in jnlp single-instance code corrected.  Thanks daekyu!
-            <li>Ivar had a code which showed where a check for each of 5000000 points' properties was slowing things down, this test is limited to QDataSet.MAX_PLANE_COUNT (=50) now..
+            <li>1952: Ivar had a code which showed where a check for each of 5000000 points' properties was slowing things down, this test is limited to QDataSet.MAX_PLANE_COUNT (=50) now..
             <li>1748: insert PWD before completions.  Thanks, Masafumi! 
             <li>minor improvements to the contours renderer.  Thanks, Masafumi!
         </ul>
@@ -61,6 +68,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Improve create-pngwalk feedback with $Y$j_$H$M$S(subsec,places=3), and include $H$M$S$(subsec,places=3) in examples.
+            <li>AutoplotDataServer supports HAPI by generating info and data responses.
             <li>tune huge scatter for when data units are the same as axis units.
             <li>FDataSet can provide access to raw float values, avoiding numerical noise from float-to-double casting, using new capability.
             <li>several rebin functions renamed to binAverage, since they are unlike the IDL routines and the name causes confusion.  Thanks, Masafumi!
