@@ -63,6 +63,7 @@ public class AutoplotDataServer {
     private static final String FORM_QDS = "qds";
     private static final String FORM_HAPI_INFO = "hapi-info";
     private static final String FORM_HAPI_DATA = "hapi-data";
+    private static final String FORM_HAPI_DATA_BINARY = "hapi-data-binary";
 
     private static final Logger logger= LoggerManager.getLogger("autoplot.server");
 
@@ -256,13 +257,22 @@ public class AutoplotDataServer {
             FileInputStream fin= new FileInputStream(infoFile);
             DataSourceUtil.transfer( fin, out );
 
+        } else if ( format.equals(FORM_HAPI_DATA_BINARY) ) {
+            final DataSourceFormat dsf = DataSourceRegistry.getInstance().getFormatByExt("hapi");
+            File file= new File("/tmp/ap-hapi/foo.hapi");
+            
+            dsf.formatData( file.toString()+"?id=temp&format=binary", ds, new NullProgressMonitor() );
+            File binaryFile= new File( "/tmp/ap-hapi/foo/data/temp.binary" );
+            FileInputStream fin= new FileInputStream(binaryFile);
+            DataSourceUtil.transfer( fin, out );
+
         } else if ( format.equals(FORM_HAPI_DATA) ) {
             final DataSourceFormat dsf = DataSourceRegistry.getInstance().getFormatByExt("hapi");
             File file= new File("/tmp/ap-hapi/foo.hapi");
             
             dsf.formatData( file.toString()+"?id=temp", ds, new NullProgressMonitor() );
-            File infoFile= new File( "/tmp/ap-hapi/foo/data/temp.csv" );
-            FileInputStream fin= new FileInputStream(infoFile);
+            File csvFile= new File( "/tmp/ap-hapi/foo/data/temp.csv" );
+            FileInputStream fin= new FileInputStream(csvFile);
             DataSourceUtil.transfer( fin, out );
             
         } else if ( format.equals("dat") || format.equals("xls") || format.equals("bin") ) {
@@ -340,7 +350,7 @@ public class AutoplotDataServer {
 
         ArgumentList alm = new ArgumentList("AutoplotDataServer");
         alm.addOptionalSwitchArgument("uri", "u", "uri", "", "URI to plot");
-        alm.addOptionalSwitchArgument("format", "f", "format", "", "output format qds, d2s (default=d2s if no filename) which support streaming, or xls bin dat");
+        alm.addOptionalSwitchArgument("format", "f", "format", "", "output format qds, d2s (default=d2s if no filename) which support streaming, or xls bin dat hapi-info hapi-data hapi-data-binary");
         alm.addOptionalSwitchArgument("outfile", "o", "outfile", DEFT_OUTFILE, "output filename or -, extension implies format.");
         alm.addOptionalSwitchArgument("timeRange", "t", "timeRange", "", "timerange for TimeSeriesBrowse datasources");
         alm.addOptionalSwitchArgument("timeStep", "s", "timeStep", "86400s", "atom step size for loading and sending, default is 86400s");
