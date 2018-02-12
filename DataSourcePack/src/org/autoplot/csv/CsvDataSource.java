@@ -304,6 +304,10 @@ public class CsvDataSource extends AbstractDataSource {
                             }
                         }
                         Units u1= columnUnits[icol];
+                        if ( columnHeaders.length<=icol ) {
+                            yepItsData= false;
+                            continue;
+                        }
                         if ( u1 instanceof EnumerationUnits ) {
                             cbs[icol]= ((EnumerationUnits)u1).createDatum( columnHeaders[icol] ).doubleValue(u1);
                         } else {
