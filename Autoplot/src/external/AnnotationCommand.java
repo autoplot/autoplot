@@ -223,12 +223,12 @@ public class AnnotationCommand extends PyObject {
                         annotation.setShowArrow(true);
                         break;
                     case "xrange":
-                        annotation.setXrange(Ops.datumRange(sval));
+                        annotation.setXrange(Ops.datumRange(val));
                         annotation.setAnchorOffset("");
                         annotation.setAnchorType( AnchorType.DATA );                        
                         break;
                     case "yrange":
-                        annotation.setYrange(Ops.datumRange(sval));
+                        annotation.setYrange(Ops.datumRange(val));
                         annotation.setAnchorOffset("");
                         annotation.setAnchorType( AnchorType.DATA );                        
                         break;
