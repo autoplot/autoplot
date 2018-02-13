@@ -8,8 +8,10 @@ import java.text.ParseException;
 import java.util.Locale;
 import org.das2.graph.DasAnnotation;
 import org.das2.graph.DasCanvasComponent;
+import org.das2.graph.DasColumn;
 import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasPlot;
+import org.das2.graph.DasRow;
 import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 
@@ -21,13 +23,17 @@ public class AnnotationController extends DomNodeController {
     private final Annotation annotation;
     private final Application dom;
     private final DasAnnotation dasAnnotation;
-        
+    private DasRow allRow;
+    private DasColumn allColumn;    
+    
     public AnnotationController( Application dom, Annotation annotation, DasAnnotation dasAnnotation ) {
         super( annotation );
         this.dom = dom;
         this.annotation = annotation;
         bindTo(dasAnnotation);
         this.dasAnnotation= dasAnnotation;
+        allRow= new DasRow( dasAnnotation.getCanvas(), 0., 1. );
+        allColumn= new DasColumn( dasAnnotation.getCanvas(), 0., 1. );
         annotation.controller = this;
     }    
     
@@ -110,19 +116,13 @@ public class AnnotationController extends DomNodeController {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 logger.finer("propertyChange "+Annotation.PROP_ROWID);
-                Row r= (Row) DomUtil.getElementById( dom.getCanvases(0), (String)evt.getNewValue() );
+                String id= (String)evt.getNewValue();
+                Row r=null;
+                if ( id.length()>0 ) r= (Row) DomUtil.getElementById( dom.getCanvases(0), (String)evt.getNewValue() );
                 if ( r!=null ) {
                     p.setRow(r.controller.getDasRow());
-                }
-            }
-        });
-        annotation.addPropertyChangeListener( Annotation.PROP_ROWID, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                LoggerManager.logPropertyChangeEvent(evt);                
-                Row r= (Row) DomUtil.getElementById( dom.getCanvases(0), (String)evt.getNewValue() );
-                if ( r!=null ) {
-                    p.setRow(r.controller.getDasRow());
+                } else {
+                    p.setRow(allRow);
                 }
             }
         });
@@ -130,9 +130,13 @@ public class AnnotationController extends DomNodeController {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 LoggerManager.logPropertyChangeEvent(evt);                
-                Column r= (Column) DomUtil.getElementById( dom.getCanvases(0), (String)evt.getNewValue() );
+                String id= (String)evt.getNewValue();
+                Column r= null;
+                if ( id.length()>0 ) r = (Column) DomUtil.getElementById( dom.getCanvases(0), (String)evt.getNewValue() );
                 if ( r!=null ) {
                     p.setColumn(r.controller.getDasColumn());
+                } else {
+                    p.setColumn(allColumn);
                 }
             }
         });
