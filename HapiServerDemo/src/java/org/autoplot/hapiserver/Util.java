@@ -213,7 +213,7 @@ public class Util {
             String s= jo.toString(4);
             try {
                 //response.setStatus(404);
-                response.sendError(404,"bad id 1406");
+                response.sendError(404,"HAPI 1406");
             } catch (IOException ex) {
                 Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
             }
