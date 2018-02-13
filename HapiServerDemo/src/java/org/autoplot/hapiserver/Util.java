@@ -86,7 +86,7 @@ public class Util {
     public static final String HAPI_SERVER_HOME_PROPERTY = "HAPI_SERVER_HOME";
 
     public static final String hapiVersion() {
-        return "1.1";
+        return "2.0";
     }
     
     static boolean isKey(String key) {
@@ -211,7 +211,12 @@ public class Util {
             status.put( "message", msg );
             jo.put("status",status);
             String s= jo.toString(4);
-            response.setStatus(404);
+            try {
+                //response.setStatus(404);
+                response.sendError(404,"bad id 1406");
+            } catch (IOException ex) {
+                Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
+            }
             out.write(s);
         } catch (JSONException ex) {
             throw new RuntimeException(ex);
