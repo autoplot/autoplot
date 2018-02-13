@@ -159,6 +159,7 @@
             <li>2017-12-01: allow modification date to be "lastday" meaning the dataset was updated at midnight
             <li>2017-12-02: various improvements to logging, and new class for monitoring output stream idle added.  More improvements.
             <li>2017-12-03: correct check for localhost.
+            <li>2018-02-13: add message to error message for info response.  Update version declations to HAPI 2.0.
         </ul>
         </small>
     </body>
