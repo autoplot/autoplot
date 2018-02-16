@@ -1242,7 +1242,8 @@ public final class HapiDataSource extends AbstractDataSource {
                 if ( ss.length!=totalFields ) {
                     if ( line.trim().length()==0 ) {
                         logger.log(Level.WARNING, "expected {0} fields, got empty line at line {1}", new Object[]{totalFields,linenumber});
-                        throw new IllegalArgumentException( String.format( "expected %d fields, got empty line at line %d", new Object[]{totalFields,linenumber} ) );
+                        line= in.readLine();
+                        continue;
                     } else {
                         logger.log(Level.WARNING, "expected {0} fields, got {1} at line {2}", new Object[]{totalFields, ss.length,linenumber});
                         throw new IllegalArgumentException( String.format( "expected %d fields, got %d at line {2}", new Object[]{totalFields, ss.length,linenumber} ) );
