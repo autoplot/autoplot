@@ -1232,14 +1232,21 @@ public final class HapiDataSource extends AbstractDataSource {
         boolean completeDay= tr.contains(currentDay);
 
         boolean gzip= cacheReader==null ? "gzip".equals( httpConnect.getContentEncoding() ) : false;
+        int linenumber=0;
         try ( AbstractLineReader in= ( cacheReader!=null ? cacheReader :
                 new SingleFileBufferedReader( new BufferedReader( new InputStreamReader( gzip ? new GZIPInputStream( httpConnect.getInputStream() ) : httpConnect.getInputStream() ) ) ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
+                linenumber++;
                 String[] ss= lineSplit(line);
                 if ( ss.length!=totalFields ) {
-                    logger.log(Level.WARNING, "expected {0} fields, got {1}", new Object[]{totalFields, ss.length});
-                    throw new IllegalArgumentException( String.format( "expected %d fields, got %d", new Object[]{totalFields, ss.length} ) );
+                    if ( line.trim().length()==0 ) {
+                        logger.log(Level.WARNING, "expected {0} fields, got empty line at line {1}", new Object[]{totalFields,linenumber});
+                        throw new IllegalArgumentException( String.format( "expected %d fields, got empty line at line %d", new Object[]{totalFields,linenumber} ) );
+                    } else {
+                        logger.log(Level.WARNING, "expected {0} fields, got {1} at line {2}", new Object[]{totalFields, ss.length,linenumber});
+                        throw new IllegalArgumentException( String.format( "expected %d fields, got %d at line {2}", new Object[]{totalFields, ss.length,linenumber} ) );
+                    }
                 }
                 int ifield=0;
                 Datum xx;
