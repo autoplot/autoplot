@@ -1047,7 +1047,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                     Datum y2= plot.getController().getDasPlot().getYAxis().invTransform(r.y+r.height);                   
                     annotation.setXrange( DatumRangeUtil.union(x,x2) );
                     annotation.setYrange( DatumRangeUtil.union(y,y2) );
-                    annotation.setAnchorPosition(AnchorPosition.W);
+                    //annotation.setAnchorPosition(AnchorPosition.W);
                     annotation.setAnchorOffset("");
                     annotation.setAnchorType(AnchorType.DATA);
                 } else {
