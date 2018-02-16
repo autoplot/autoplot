@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -1128,16 +1127,17 @@ public class JythonCompletionTask implements CompletionTask {
         List<DefaultCompletionItem> result= new ArrayList();
         
         PyStringMap locals = (PyStringMap) interp.getLocals();
-
+        
         PyList po2 = locals.keys();
         for (int i = 0; i < po2.__len__(); i++) {
             PyString s = (PyString) po2.__getitem__(i);
             String ss = s.toString();
+            System.err.println("xx "+ss);
             String signature = null; // java signature
             List<String> signatures= new ArrayList();
             List<String> argss= new ArrayList();
             if (ss.startsWith(cc.completable)) {
-                logger.finer("found completion item: "+ss);
+                logger.log(Level.FINER, "found completion item: {0}", ss);
                 PyObject po = locals.get(s);
                 String label = ss;
                 List<String> labels= new ArrayList();
