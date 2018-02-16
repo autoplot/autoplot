@@ -16,6 +16,8 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -66,6 +68,7 @@ import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.autoplot.GuiSupport;
 import org.autoplot.JythonUtil;
+import org.autoplot.util.TickleTimer;
 import org.xml.sax.SAXException;
 
 /**
@@ -202,6 +205,17 @@ public class LogConsole extends javax.swing.JPanel {
 
     public String getSearchText() {
         return searchText;
+    }
+    
+    private Level logStatus = Level.ALL;
+
+    /**
+     * status is the highest LOG Level seen in the past 300ms.
+     */
+    public static final String PROP_LOGSTATUS = "logStatus";
+
+    public Level getLogStatus() {
+        return logStatus;
     }
 
     private boolean isRegex( String s ) {
@@ -511,6 +525,15 @@ public class LogConsole extends javax.swing.JPanel {
         return recMsg;
     }
     
+    private TickleTimer logStatusTimer= new TickleTimer(1000,new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            Level oldLogStatus= logStatus;
+            logStatus= Level.ALL;
+            firePropertyChange( PROP_LOGSTATUS, oldLogStatus, logStatus );
+        }
+    } );
+    
     /**
      * note this is generally called from a timer that coalesces events.  But
      * may be called explicitly in response to a user event as well.  
@@ -545,6 +568,13 @@ public class LogConsole extends javax.swing.JPanel {
 //                        doc.insertString(doc.getLength(), "\n", null);
 //                    }
                     //lastT = rec.getMillis();
+                    
+                    if ( getLogStatus().intValue()<rec.getLevel().intValue() ) {
+                        Level oldLogStatus= logStatus;
+                        logStatus= rec.getLevel();
+                        logStatusTimer.tickle();
+                        firePropertyChange( PROP_LOGSTATUS, oldLogStatus, logStatus );
+                    }
                     
                     String recMsg= getRecMsg(t,rec);
                     
