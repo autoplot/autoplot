@@ -55,10 +55,6 @@ public class RequestHandler {
     public String handleRequest( InputStream in, ApplicationModel model, OutputStream out ) {
         try {
             PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
-
-            if ( org.autoplot.jythonsupport.Util.isLegacyImports() ) {
-                interp.execfile(AutoplotUI.class.getResource("/appContextImports2017.py").openStream(), "/appContextImports2017.py"); // JythonRefactory okay
-            }
             interp.setOut( out );
             interp.set("dom", model.getDocumentModel() );
             interp.set("params", new PyDictionary());
