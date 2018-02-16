@@ -1437,6 +1437,21 @@ APSplash.checkTime("init 270");
                 @Override
                 public void run() {
                     initLogConsole();
+//                    logConsole.addPropertyChangeListener( LogConsole.PROP_LOGSTATUS, new PropertyChangeListener() {
+//                        @Override
+//                        public void propertyChange(PropertyChangeEvent evt) {
+//                            if ( evt.getNewValue().equals( Level.WARNING ) ) {
+//                                lbl.setBackground( Color.RED );
+//                                lbl.setIcon(WARNING_ICON);
+//                            } else if ( evt.getNewValue().equals( Level.INFO ) ) {
+//                                lbl.setBackground( Color.DARK_GRAY );
+//                                lbl.setIcon(BUSY_ICON);
+//                            } else {
+//                                lbl.setBackground( lblBackground0 );
+//                                lbl.setIcon(null);
+//                            }
+//                        }
+//                    });
                     logConsolePanel.setViewportView( logConsole );
                 }
             }  );
