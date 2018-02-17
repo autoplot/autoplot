@@ -147,6 +147,9 @@ public class JythonUtil {
             }
         }
 
+        interp.set( "dataset", new DatasetCommand() );
+        interp.set( "monitor", new NullProgressMonitor() );
+        
 //        try {
 //            System.err.println("java2-> "+interp.eval("java") );
 //        } catch ( Exception ex ) {
