@@ -190,7 +190,8 @@ public class CsvDataSource extends AbstractDataSource {
                 boolean foundColumnNumbers= false;
                 columnUnits= new Units[reader.getColumnCount()];
                 for ( int j=0; j<reader.getColumnCount(); j++ ) {
-                    columnUnits[j]= guessUnits(reader.get(j));reader.get(0);
+                    columnUnits[j]= guessUnits(reader.get(j));
+                    reader.get(0);
                     if ( !( columnUnits[j] instanceof EnumerationUnits ) ) {
                         foundColumnNumbers= true;
                     }
