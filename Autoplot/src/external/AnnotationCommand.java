@@ -141,17 +141,21 @@ public class AnnotationCommand extends PyObject {
         // If the first (zeroth) argument is an int, than this is the data source where the value should be inserted.  Additional
         // data sources and plots will be added until there are enough.
         // this is an alias for the index argument.
-        PyObject po0= args[0];
-        if ( po0 instanceof PyInteger ) {
-            index= ((PyInteger)po0).getValue();
-            PyObject[] newArgs= new PyObject[args.length-1];
-            for ( int i=0; i<args.length-1; i++ ) {
-                newArgs[i]= args[i+1];
+        if ( args.length>0 ) {
+            PyObject po0= args[0];
+            if ( po0 instanceof PyInteger ) {
+                index= ((PyInteger)po0).getValue();
+                PyObject[] newArgs= new PyObject[args.length-1];
+                for ( int i=0; i<args.length-1; i++ ) {
+                    newArgs[i]= args[i+1];
+                }
+                args= newArgs;
+                nargs= nargs-1;
+                nparm= args.length - keywords.length;
+                po0= args[0];
             }
-            args= newArgs;
-            nargs= nargs-1;
-            nparm= args.length - keywords.length;
-            po0= args[0];
+        } else {
+            index= 0;
         }
         
         Application dom= ScriptContext.getDocumentModel();
