@@ -12,9 +12,12 @@ import org.python.core.PyString;
 import org.das2.qds.QDataSet;
 import org.autoplot.jythonsupport.JythonOps;
 import org.autoplot.jythonsupport.PyQDataSet;
+import org.das2.datum.Units;
 import org.das2.qds.ops.Ops;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
+import org.python.core.PyJavaInstance;
+import org.python.core.PySingleton;
 
 /**
  * new implementation of the dataset command allows for keywords in the
@@ -104,7 +107,20 @@ public class DatasetCommand extends PyObject {
         }
 
         QDataSet result= JythonOps.dataset( args[0] );
-            
+        
+        if ( nparm==2 ) {
+            if ( args[1] instanceof PyJavaInstance ) {
+                PyJavaInstance pji= (PyJavaInstance)args[1];
+                Object o= pji.__tojava__( Units.class );
+                if ( o==Py.NoConversion ) {
+                    throw new IllegalArgumentException("second argument must be units or string identifying units.");
+                }
+                result= Ops.putProperty( result, QDataSet.UNITS, o );
+            } else if ( args[1] instanceof PyString ) {
+                result= Ops.putProperty( result, QDataSet.UNITS, ((PyString)args[1]).toString() );
+            }
+        }
+         
         for ( int i=nparm; i<args.length; i++ ) { //HERE nargs
             String kw= keywords[i-nparm];
             PyObject val= args[i];
