@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Stress-testing annotations.
+        <p><small>PNGWalk showing snowfall for half-day periods.  Snowfall data from https://www.nohrsc.noaa.gov/snowfall/ and read in easily from NetCDF format.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-02-09 r22050):</p>
+        <p>Bugfixes (2018-02-17 r22050):</p>
         <ul>
+            <li>1957: correct where set depend0 cadence would reset improperly to picoseconds.  Thanks, Bill!
+            <li>Autoplot server (port 12345) improperly created the Jython environment, breaking plot named parameters.  Thanks, Eric!
+            <li>1952: uncommitted changes implementing flag for indexed properties and allowing just AbstractDataSet to handle properties.
             <li>rte_1463914178: throw a more descriptive error do we can figure out what's going on.
             <li>1953: kludgy code resulted in errors with some CDF_TT2000 times, showing 23:61 instead of 00:01 under some conditions.  Thanks, Ivar!
             <li>1952: reimplement isInheritedProperty to avoid so much string searching with slice operations.
@@ -67,6 +70,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Jython gets new dataset command which takes properties as named parameters.
+            <li>annotation command allows "OutsideSE", and corrects offset for OutsideNE.  Thanks, Ivar!
+            <li>annotation command allows "" for rowId and columnId, which anchors to the canvas boundaries.  
             <li>Improve create-pngwalk feedback with $Y$j_$H$M$S(subsec,places=3), and include $H$M$S$(subsec,places=3) in examples.
             <li>AutoplotDataServer supports HAPI by generating info and data responses.  Thanks, Bob!
             <li>tune huge scatter for when data units are the same as axis units.
