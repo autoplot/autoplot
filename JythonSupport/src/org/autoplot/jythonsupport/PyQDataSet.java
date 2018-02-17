@@ -66,7 +66,7 @@ public class PyQDataSet extends PyJavaInstance {
      * Note getDataSet will always provide a writable dataset.
      * @param ds 
      */
-    PyQDataSet(QDataSet ds) {
+    public PyQDataSet(QDataSet ds) {
         super(ds);
         this.serialNumber= _seq.incrementAndGet();
         
