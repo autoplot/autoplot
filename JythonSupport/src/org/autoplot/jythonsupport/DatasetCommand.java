@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.autoplot.jythonsupport.commands;
+package org.autoplot.jythonsupport;
 
 import java.util.logging.Logger;
 import org.python.core.Py;
