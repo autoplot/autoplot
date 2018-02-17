@@ -43,7 +43,7 @@ import org.autoplot.scriptconsole.MakeToolPanel;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
-import org.autoplot.jythonsupport.commands.DatasetCommand;
+import org.autoplot.jythonsupport.DatasetCommand;
 import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.autoplot.jythonsupport.ui.ScriptPanelSupport;
