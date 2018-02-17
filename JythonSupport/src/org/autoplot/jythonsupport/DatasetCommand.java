@@ -13,6 +13,8 @@ import org.das2.qds.QDataSet;
 import org.autoplot.jythonsupport.JythonOps;
 import org.autoplot.jythonsupport.PyQDataSet;
 import org.das2.qds.ops.Ops;
+import org.python.core.PyFloat;
+import org.python.core.PyInteger;
 
 /**
  * new implementation of the dataset command allows for keywords in the
@@ -36,7 +38,7 @@ public class DatasetCommand extends PyObject {
             + "<tr><td>title </td><td>title for the dataset, which could be used above a plot.</td></tr>\n"
             + "</table></html>");
 
-    private static QDataSet coerceIt( PyObject arg0 ) {
+    private static QDataSet datasetValue( PyObject arg0 ) {
         Object o = arg0.__tojava__(QDataSet.class);
         if (o == null || o == Py.NoConversion) {
             return JythonOps.dataset(arg0);
@@ -57,6 +59,18 @@ public class DatasetCommand extends PyObject {
         } else {
             String s= String.valueOf(arg0);
             return s.equals("True") || s.equals("T") || s.equals("1");
+        }
+    }
+    
+    private static Number numberValue( PyObject arg0 ) {
+        if ( arg0 instanceof PyInteger ) {
+            return ((PyInteger)arg0).getValue();
+        } else if ( arg0 instanceof PyFloat ) {
+            return ((PyFloat)arg0).getValue();
+        } else if ( arg0 instanceof PyString ) {
+            return Double.parseDouble( String.valueOf(arg0) );
+        } else {
+            return arg0.__float__().getValue();
         }
     }
     
@@ -105,19 +119,19 @@ public class DatasetCommand extends PyObject {
                     result= Ops.putProperty( result, kw.toUpperCase(), sval );
                     break;
                 case "validMin":
-                    result= Ops.putProperty( result, QDataSet.VALID_MIN, val );
+                    result= Ops.putProperty( result, QDataSet.VALID_MIN, numberValue(val) );
                     break;
                 case "validMax":
-                    result= Ops.putProperty( result, QDataSet.VALID_MAX, val );
+                    result= Ops.putProperty( result, QDataSet.VALID_MAX, numberValue(val) );
                     break;
                 case "typicalMin":
-                    result= Ops.putProperty( result, QDataSet.TYPICAL_MIN, val );
+                    result= Ops.putProperty( result, QDataSet.TYPICAL_MIN, numberValue(val) );
                     break;
                 case "typicalMax":
-                    result= Ops.putProperty( result, QDataSet.TYPICAL_MAX, val );
+                    result= Ops.putProperty( result, QDataSet.TYPICAL_MAX, numberValue(val) );
                     break;
                 case "fillValue":
-                    result= Ops.putProperty( result, QDataSet.FILL_VALUE, val );
+                    result= Ops.putProperty( result, QDataSet.FILL_VALUE, numberValue(val) );
                     break;
                 default:
                     throw new IllegalArgumentException("bad keyword");
