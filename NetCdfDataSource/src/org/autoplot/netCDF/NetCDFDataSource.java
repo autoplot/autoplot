@@ -14,7 +14,9 @@ import java.util.logging.Logger;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.dataset.NoDataInIntervalException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.LinkedHashMap;
@@ -232,13 +234,8 @@ public class NetCDFDataSource extends AbstractDataSource {
     private void readData( ProgressMonitor mon ) throws IOException {
 
         String location;
-        boolean makeLocal= true;
-        if ( makeLocal ) {
-            File file= getFile(mon.getSubtaskMonitor("getFile"));
-            location= file.toURI().toURL().toString();
-        } else {
-            location= DataSetURI.fromUri(resourceURI);
-        }
+        File file= getFile(mon.getSubtaskMonitor("getFile"));
+        location= file.toString();
         
         NetcdfDataset dataset;
 
