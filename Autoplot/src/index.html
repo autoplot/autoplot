@@ -26,7 +26,10 @@
         
         <p>Bugfixes (2018-02-17 r22050):</p>
         <ul>
+            <li>1956: FCE line which was way off-canvas still affected PDF output, messing up the bounding box.  Thanks, Bill!
             <li>1957: correct where set depend0 cadence would reset improperly to picoseconds.  Thanks, Bill!
+            <li>1958: NetCDF library didn't properly handle spaces in filenames.  Thanks, Masafumi!
+            <li>1953: Masafumi found cases where rounding was done incorrectly, probably because kludgy code was removed.  Thanks, Masafumi!
             <li>Autoplot server (port 12345) improperly created the Jython environment, breaking plot named parameters.  Thanks, Eric!
             <li>1952: uncommitted changes implementing flag for indexed properties and allowing just AbstractDataSet to handle properties.
             <li>rte_1463914178: throw a more descriptive error do we can figure out what's going on.
@@ -34,7 +37,7 @@
             <li>1952: reimplement isInheritedProperty to avoid so much string searching with slice operations.
             <li>extent code used isMonotonicAndIncreasingQuick, when new isMonotonicQuick is sufficient.  Thanks, Ivar!
             <li>1952: rewrite within(), used in huge scatter, to dramatically improve performance.  Thanks, Ivar!
-            <li>1952: where uses bigger blocksize for 5000000 record operation, showing modest (20-30%) speed improvements.  Thanks, Ivar!
+            <li>1952: "where" uses bigger blocksize for 5000000 record operation, showing modest (20-30%) speed improvements.  Thanks, Ivar!
             <li>direct access of longs from CDF file was never verified, now it's correct.
             <li>rte_0609678840: old icon reference in jnlp single-instance code corrected.  Thanks daekyu!
             <li>1952: Ivar had a code which showed where a check for each of 5000000 points' properties was slowing things down, this test is limited to QDataSet.MAX_PLANE_COUNT (=50) now..
@@ -70,7 +73,7 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>Jython gets new dataset command which takes properties as named parameters.
+            <li>Jython gets new "dataset" command which takes properties as named parameters.
             <li>annotation command allows "OutsideSE", and corrects offset for OutsideNE.  Thanks, Ivar!
             <li>annotation command allows "" for rowId and columnId, which anchors to the canvas boundaries.  
             <li>Improve create-pngwalk feedback with $Y$j_$H$M$S(subsec,places=3), and include $H$M$S$(subsec,places=3) in examples.
