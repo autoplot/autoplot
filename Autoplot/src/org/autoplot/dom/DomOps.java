@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -325,6 +326,18 @@ public class DomOps {
         rows= canvas.getRows();
         nrow= rows.length;
  
+        // sort rows, which is a refactoring.
+        Arrays.sort( rows, new Comparator<Object>() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                Row r1= (Row)o1;
+                Row r2= (Row)o2;
+                int d1= r1.getController().getDasRow().getDMinimum();
+                int d2= r2.getController().getDasRow().getDMinimum();
+                return d1-d2;
+            }
+        });
+        
         double totalPlotHeight= 0;
         for ( int i=0; i<nrow; i++ ) {           
            List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
