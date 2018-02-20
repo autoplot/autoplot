@@ -772,7 +772,7 @@ public class PyQDataSet extends PyJavaInstance {
                     lists[0]= ll[0];
                     lists[i]= ll[1];
                 }
-                for ( int i=1; i<slices.__len__(); i++) {
+                for ( int i=1; i<slices.__len__(); i++) {  //TODO: check for SVN-generated repeat code
                     ll[1]= lists[i];
                     CoerceUtil.coerce( ll[0], ll[1], false, ll );
                     lists[0]= ll[0];
@@ -846,7 +846,15 @@ public class PyQDataSet extends PyJavaInstance {
                             break;
                     }
                 }
+                if ( units==null ) { // see repeat code below.  Return requires repetition.
+                    logger.fine("resetting units based on values assigned");
+                    Units u= SemanticOps.getUnits(val);
+                    if ( u!=Units.dimensionless ) this.ds.putProperty(QDataSet.UNITS,u);
+                    units= u;
+                }
+                
                 return;
+                
             } else {
 				int[] qubeDims= DataSetUtil.qubeDims(ds);
 				for (int i = 0; i < slices.__len__(); i++) {
@@ -881,7 +889,7 @@ public class PyQDataSet extends PyJavaInstance {
         }
 
         QDataSet val = coerceDsInternal(arg1);
-        if ( units==null ) {
+        if ( units==null ) { // see repeat code above.
             logger.fine("resetting units based on values assigned");
             Units u= SemanticOps.getUnits(val);
             if ( u!=Units.dimensionless ) this.ds.putProperty(QDataSet.UNITS,u);
