@@ -233,17 +233,16 @@ public class NetCDFDataSource extends AbstractDataSource {
      */
     private void readData( ProgressMonitor mon ) throws IOException {
 
-        String location;
         File file= getFile(mon.getSubtaskMonitor("getFile"));
-        location= file.toString();
-        
+
         NetcdfDataset dataset;
 
         mon.started();
         try {
             if ( sMyUrl.endsWith(".ncml" ) ) {
-                dataset= NcMLReader.readNcML( location, null );
+                dataset= NcMLReader.readNcML( file.toURI().toURL().toString(), null ); // bug 1958: this handles %20 as escapes
             } else {
+                String location= file.toString(); // bug 1958: but this doesn't
                 NetCDFDataSourceFactory.checkMatlab(location);
                 logger.log(Level.FINE, "NetcdfFile.open( {0} )", location);
                 NetcdfFile f= NetcdfFile.open( location );
