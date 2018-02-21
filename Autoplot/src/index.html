@@ -28,6 +28,8 @@
         
         <p>Bugfixes (2018-02-17 r22050):</p>
         <ul>
+            <li>rte553: property assign units for ds[0,:]=ds1 and ds1 has units and ds does not.
+            <li>print a warning when a FloatDataSet is used to store time location data, since this is rarely going to work.
             <li>1959: fix layout doesn't swap plot positions when rows are out-of-order (item 4).
             <li>1956: FCE line which was way off-canvas still affected PDF output, messing up the bounding box.  Thanks, Bill!
             <li>1957: correct where set depend0 cadence would reset improperly to picoseconds.  Thanks, Bill!
@@ -76,6 +78,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Orbit plot allows the tick frequency to be controlled.  Thanks, Bill!
+            <li>Property editor now allows "edit selected" on root of array.  Thanks, Jeremy!
             <li>Jython gets new "dataset" command which takes properties as named parameters.
             <li>annotation command allows "OutsideSE", and corrects offset for OutsideNE.  Thanks, Ivar!
             <li>annotation command allows "" for rowId and columnId, which anchors to the canvas boundaries.  
