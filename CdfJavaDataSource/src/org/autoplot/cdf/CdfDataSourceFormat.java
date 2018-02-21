@@ -825,6 +825,11 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 //if ( smin==null ) smin= -1e38; else smin= uc.convert(smin);
                 //cdf.addVariableAttributeEntry( name,"SCALEMIN", CDFDataType.DOUBLE, smin.doubleValue() );
                 //cdf.addVariableAttributeEntry( name,"SCALEMAX", CDFDataType.DOUBLE, smax.doubleValue() );
+            } else if ( units==Units.cdfTT2000 ) {
+                if ( smax==null ) smax= Units.cdfTT2000.parse("1958-01-01T00:00").doubleValue( Units.cdfTT2000);
+                if ( smin==null ) smin= Units.cdfTT2000.parse("2058-01-01T00:00").doubleValue( Units.cdfTT2000);
+                cdf.addVariableAttributeEntry( name, "SCALEMIN", CDFDataType.TT2000, new long[] { smin.longValue() } );
+                cdf.addVariableAttributeEntry( name, "SCALEMAX", CDFDataType.TT2000, new long[] { smax.longValue() } );
             } else {
                 if ( smax==null ) smax= 1e38;
                 if ( smin==null ) smin= -1e38;
