@@ -246,6 +246,7 @@ public class LogConsole extends javax.swing.JPanel {
         } else {
             searchTextPattern = null;
         }
+        jLabel2.setToolTipText(null);
         update();
         firePropertyChange(PROP_SEARCHTEXT, oldSearchText, searchText);
     }
