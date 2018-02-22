@@ -243,8 +243,9 @@ public class EditorTextPane extends JEditorPane {
                 SyntaxStyles.getInstance().getStyle(TokenType.DELIMITER).isDrawTabs();
                 a.setContentType("text/python");
                 d= new JDialog();
-                a.setMinimumSize( new Dimension(400,400) );
-                a.setPreferredSize( new Dimension(400,400) );
+                d.setTitle("Completions Peek Editor");
+                a.setMinimumSize( new Dimension(600,800) );
+                a.setPreferredSize( new Dimension(600,800) );
                 d.getContentPane().add(new JScrollPane(a));
                 d.pack();
             } else {
