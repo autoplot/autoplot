@@ -1,22 +1,26 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.das2.jythoncompletion;
 
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
+import org.das2.datum.LoggerManager;
 import org.python.parser.*;
 
 /**
- *
+ * support functions for Jython editor completions.
  * @author jbf
  */
 public class CompletionSupport {
+    
+    private static final Logger logger= LoggerManager.getLogger("jython.editor.completion");
+    
+    private CompletionSupport() {
+        // utility class cannot be instanciated.
+    }
     
     /**
      * 
@@ -205,6 +209,7 @@ public class CompletionSupport {
         }
         
         CompletionContext result= null;
+        
         
         //HERE IS COMPLETIONS
         if ( tokens.isEmpty() ) {
