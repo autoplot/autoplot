@@ -1,12 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.das2.jythoncompletion;
 
 /**
- *
+ * CompletionContext describes a place in code where completion was triggered,
+ * containing the type of completion and the context around it.
  * @author jbf
  */
 public class CompletionContext {
