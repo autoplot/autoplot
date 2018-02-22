@@ -222,6 +222,10 @@ public class EditorTextPane extends JEditorPane {
 
     }
 
+    /**
+     * used to show the current simplified code used for completions.
+     */
+    JEditorPane completionsEditorPane= null;
 
     public void showCompletionsView() {
         String doThis= this.getSelectedText();
@@ -230,16 +234,24 @@ public class EditorTextPane extends JEditorPane {
         }
         try {
             String scriptPrime= SimplifyScriptSupport.simplifyScriptToCompletions(doThis);
-            JEditorPane a= new JEditorPane();
-            DefaultSyntaxKit.initKit();
-            SyntaxStyles.getInstance().getStyle(TokenType.DELIMITER).isDrawTabs();
-            a.setContentType("text/python");
+            JEditorPane a;
+            JDialog d;
+            if ( completionsEditorPane==null ) {
+                a= new JEditorPane();
+                completionsEditorPane= a;
+                DefaultSyntaxKit.initKit();
+                SyntaxStyles.getInstance().getStyle(TokenType.DELIMITER).isDrawTabs();
+                a.setContentType("text/python");
+                d= new JDialog();
+                a.setMinimumSize( new Dimension(400,400) );
+                a.setPreferredSize( new Dimension(400,400) );
+                d.getContentPane().add(new JScrollPane(a));
+                d.pack();
+            } else {
+                a= completionsEditorPane;
+                d= (JDialog)SwingUtilities.getWindowAncestor( completionsEditorPane );
+            }
             a.setText(scriptPrime);
-            JDialog d= new JDialog();
-            a.setMinimumSize( new Dimension(400,400) );
-            a.setPreferredSize( new Dimension(400,400) );
-            d.getContentPane().add(new JScrollPane(a));
-            d.pack();
             d.setVisible(true);
         } catch ( Exception ex ) {
             JOptionPane.showMessageDialog( this, ex.toString() );
