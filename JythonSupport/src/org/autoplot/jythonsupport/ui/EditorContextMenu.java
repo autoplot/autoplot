@@ -697,6 +697,7 @@ public class EditorContextMenu {
                             + "<tr><td>CTRL-S</td><td>  Save<br></td></tr>"
                             + "<tr><td>F6</td><td> Execute<br></td> </tr>"
                             + "<tr><td>SHIFT-F6</td><td> Execute with Parameters Dialog<br></td> </tr>"
+                            + "<tr><td>CRTL-SHIFT-F12</td><td> Used for script editor development<br></td> </tr>"
                             + "<tr><td>CTRL-SPACE</td><td> Show completions<br></td> </tr>"
                             + "</table></html>";
                             
