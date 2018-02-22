@@ -1,11 +1,3 @@
-/*
- * Util.java
- *
- * Created on November 6, 2007, 10:41 AM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
 
 package org.autoplot.datasource;
 
@@ -51,11 +43,9 @@ import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
-//import org.autoplot.qstream.SimpleStreamFormatter;
-//import org.autoplot.qstream.StreamException;
 
 /**
- *
+ * DataSource utilities.
  * @author jbf
  */
 public class DataSourceUtil {
@@ -67,6 +57,10 @@ public class DataSourceUtil {
      */
     public static final DatumRange DEFAULT_TIME_RANGE= DatumRangeUtil.parseTimeRangeValid( "2010-01-01" );
         
+    private DataSourceUtil() {
+        // this class cannot be instatiated.
+    }
+    
     /**
      * remove escape sequences like %20 to create a human-editable string
      * This contains a kludge that looks for single spaces that are the result of
@@ -447,7 +441,7 @@ public class DataSourceUtil {
     /**
      * something which returns a new URI given an old one.
      */
-    public interface URIMap {
+    public static interface URIMap {
         public String map(String uri);
     }
     
