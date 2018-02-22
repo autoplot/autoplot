@@ -27,6 +27,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
@@ -370,6 +372,23 @@ public class LogConsole extends javax.swing.JPanel {
                         int i=0;
                     }
                     if ( searchTextPattern!=null && searchTextPattern.matcher(recMsg).find() ) {
+                        ByteArrayOutputStream baos= new ByteArrayOutputStream();
+                        try (PrintWriter pw = new PrintWriter(baos)) {
+                            new Exception().printStackTrace(pw);
+                        }
+                        try {
+                            String s= (baos.toString("US-ASCII"));
+                            String[] ss= s.split("\n");
+                            StringBuilder sb= new StringBuilder();
+                            sb.append("<html>");
+                            for ( String s1: ss ) {
+                                sb.append(s1).append("<br>");
+                            }
+                            sb.append("</html>");
+                            jLabel2.setToolTipText(sb.toString());
+                        } catch (UnsupportedEncodingException ex) {
+                            logger.log( Level.WARNING, ex.getMessage(), ex );
+                        }
                         int i=0; // breakpoint here for debugging.  Set the "Highlite Lines Matching" field of the Log Console Settings dialog to the text where this should stop.
                     }
                     LogRecord copy= new LogRecord( rec.getLevel(), recMsg ); //bug 3479791: just flatten this, so we don't have to format it each time
