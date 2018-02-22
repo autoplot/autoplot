@@ -50,7 +50,6 @@ import org.python.core.PyTableCode;
 import org.python.util.PythonInterpreter;
 import org.autoplot.jythonsupport.JythonOps;
 import org.autoplot.jythonsupport.JythonRefactory;
-import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
 
 /**
@@ -1132,7 +1131,6 @@ public class JythonCompletionTask implements CompletionTask {
         for (int i = 0; i < po2.__len__(); i++) {
             PyString s = (PyString) po2.__getitem__(i);
             String ss = s.toString();
-            System.err.println("xx "+ss);
             String signature = null; // java signature
             List<String> signatures= new ArrayList();
             List<String> argss= new ArrayList();
