@@ -1136,6 +1136,7 @@ public class JythonCompletionTask implements CompletionTask {
             List<String> argss= new ArrayList();
             if (ss.startsWith(cc.completable)) {
                 logger.log(Level.FINER, "found completion item: {0}", ss);
+                boolean allStatic= false;  // true if the completion is a utility class.
                 PyObject po = locals.get(s);
                 String label = ss;
                 List<String> labels= new ArrayList();
@@ -1160,7 +1161,7 @@ public class JythonCompletionTask implements CompletionTask {
                             PyJavaClassPeeker peek= new PyJavaClassPeeker((PyJavaClass)po);
                             Class jclass= peek.getProxyClass();
                             String n= jclass.getCanonicalName();
-                            boolean allStatic= true;
+                            allStatic= true;
                             Method[] mm= jclass.getMethods();
                             for ( Method m: mm ) {
                                 if ( !m.getDeclaringClass().equals(Object.class) ) {
@@ -1168,7 +1169,8 @@ public class JythonCompletionTask implements CompletionTask {
                                         allStatic= false;
                                     }
                                 }
-                            }   if ( allStatic ) {
+                            }   
+                            if ( allStatic ) {
                                 doConstructors(jclass.getConstructors(),labels,signatures,n,argss);
                                 for ( int i1=0; i1<argss.size(); i1++ ) {
                                     argss.set(i1,"");
@@ -1188,7 +1190,8 @@ public class JythonCompletionTask implements CompletionTask {
                                 label = ss;
                             } else {
                                 label = ss + " = " + sss;
-                            }   break;
+                            }   
+                            break;
                     }
                 } else if ( po instanceof PyJavaClass ) {
                     
@@ -1225,7 +1228,11 @@ public class JythonCompletionTask implements CompletionTask {
                     if ( po instanceof PyString ) {
                         result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label+" -> "+po+"", link) );
                     } else {
-                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link) );
+                        if ( allStatic ) {
+                            result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args + ".", label, link) );
+                        } else {
+                            result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link) );
+                        }
                     }
                 }
             }
