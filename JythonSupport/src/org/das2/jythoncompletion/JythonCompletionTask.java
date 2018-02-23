@@ -1186,6 +1186,14 @@ public class JythonCompletionTask implements CompletionTask {
                         default:
                             //TODO: check for PyFloat, etc.
                             String sss= po.toString();
+                            if ( po instanceof PyJavaInstance ) {
+                                Object jo= po.__tojava__(Object.class);
+                                if ( jo instanceof org.das2.qds.QDataSet ) { //TODO: mark it so we know it is a placeholder.
+                                    sss= "dataset";
+                                } else {
+                                    sss= jo.toString();
+                                }
+                            }
                             if ( sss.contains("<") ) { // it's not what I think it is, a number
                                 label = ss;
                             } else {
