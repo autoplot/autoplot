@@ -525,7 +525,7 @@ public class SimplifyScriptSupport {
              } else if ( sn instanceof Num ) {
                  
              } else {
-                 System.err.println("unchecked: "+sn );
+                 logger.fine("unchecked: "+sn );
              }
          }
          public boolean looksOkay() {
