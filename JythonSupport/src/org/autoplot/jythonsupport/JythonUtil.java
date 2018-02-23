@@ -19,6 +19,7 @@ import java.io.StringReader;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1544,6 +1545,38 @@ public class JythonUtil {
         return result.toString();
     }
     
+    /**
+     * join the array using the delimiter 
+     * join( ['a','b'], '_' ) -> a_b
+     * Note Java 8 finally has a join, and this should be used when Java 8 is available.
+     * @param list strings to join 
+     * @param delim
+     * @return the joined string
+     */
+    public static String join(String[] list, String delim) {
+        return join(Arrays.asList(list), delim);
+    }
+
+    /**
+     * join the array using the delimiter 
+     * join( ['a','b'], '_' ) -> a_b
+     * Note Java 8 finally has a join, and this should be used when Java 8 is available.
+     * @param list strings to join 
+     * @param delim
+     * @return the joined string
+     */
+    public static String join(List<String> list, String delim) {
+        if (list.isEmpty()) {
+            return "";
+        } else {
+            StringBuilder result = new StringBuilder(list.get(0));
+            for (int i = 1; i < list.size(); i++) {
+                result.append(delim).append(list.get(i));
+            }
+            return result.toString();
+        }
+
+    }
 //    public static void main( String[] args ) throws IOException {
 //        main_test1(args);
 //    }

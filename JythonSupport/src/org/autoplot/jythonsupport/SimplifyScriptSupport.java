@@ -1,7 +1,9 @@
 
 package org.autoplot.jythonsupport;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.python.core.PySyntaxError;
@@ -12,14 +14,17 @@ import org.das2.util.LoggerManager;
 import org.python.parser.SimpleNode;
 import org.python.parser.ast.Assign;
 import org.python.parser.ast.Attribute;
+import org.python.parser.ast.BinOp;
 import org.python.parser.ast.Call;
 import org.python.parser.ast.Name;
+import org.python.parser.ast.Num;
 import org.python.parser.ast.Subscript;
 import org.python.parser.ast.VisitorBase;
 import org.python.parser.ast.exprType;
 
 /**
- * AST support for Jython completions.
+ * AST support for Jython completions.  This is not meant to be thorough, but
+ * instead should be helpful when working with scripts.  
  * @author jbf
  */
 public class SimplifyScriptSupport {
@@ -85,12 +90,21 @@ public class SimplifyScriptSupport {
          variableNames.add("long");
          variableNames.add("float");
          variableNames.add("datum");
-//         variableNames.add("datumRange");
-//         variableNames.add("URI");
-//         variableNames.add("URL");
+         variableNames.add("datumRange");
+         variableNames.add("dataset");
+         variableNames.add("URI");
+         variableNames.add("URL");
          
          try {
-             Module n= (Module)org.python.core.parser.parse( script, "exec" );
+             Module n;
+             try {
+                n = (Module)org.python.core.parser.parse( script, "exec" );
+             } catch ( PySyntaxError ex ) {
+                 script= JythonUtil.join( Arrays.copyOf(ss,ss.length-1), "\n" );
+                 n = (Module)org.python.core.parser.parse( script, "exec" );
+                 lastLine--;
+             }
+             
              String s= simplifyScriptToGetCompletions( ss, n.body, variableNames, 1, lastLine, 0 );
              s= GETDATASET_CODE + s;
              s= "PWD='file:/tmp/'\n"+s;
@@ -202,7 +216,7 @@ public class SimplifyScriptSupport {
                      }
                  }
                  acceptLine= -1;
-                } else {
+             } else {
                  if ( simplifyScriptToGetCompletionsOkay( o, variableNames ) ) {
                      if ( acceptLine<0 ) {
                          acceptLine= (o).beginLine;
@@ -374,8 +388,30 @@ public class SimplifyScriptSupport {
      //there are a number of functions which take a trivial amount of time to execute and are needed for some scripts, such as the string.upper() function.
      //The commas are to guard against the id being a subset of another id ("lower," does not match "lowercase").
      //TODO: update this after Python upgrade.  //TODO: this should be a map and a long list
-     private static final String[] okay= new String[] { "range,", "xrange,", "getParam,", "getDataSet,", "lower,", "upper,", "URI,", "URL,", "DatumRangeUtil,", "TimeParser",
-        "str,", "int,", "long,", "float,", "datum,", "findgen,", "dindgen,", "ones,", "zeros,", "linspace,", "dblarr,", "fltarr,", "color,", "colorFromString,"  };
+     private static final String[] okay= new String[] { "range,", "xrange,", 
+         "getParam,", "getDataSet,", "lower,", "upper,", "URI,", "URL,", 
+         "DatumRangeUtil,", "TimeParser",
+         "str,", "int,", "long,", "float,", "datum,", "datumRange,", "dataset,",
+         "findgen,", "dindgen,", "ones,", "zeros,", 
+         "linspace,", "dblarr,", "fltarr,", 
+         "ripples,", 
+         "color,", "colorFromString,"  };
+     
+     private static final Set<String> okaySet= new HashSet<>();
+     static {
+         for ( String o: okay ) okaySet.add(o.substring(0,o.length()-1));
+     }
+     
+     private static final String getFunctionName( exprType t ) {
+         if ( t instanceof Name ) {
+             return ((Name)t).id;
+         } else if ( t instanceof Attribute ) {
+             Attribute a= (Attribute)t;
+             return getFunctionName(a.value)+"."+a.attr;
+         } else {
+             return t.toString();
+         }
+     } 
      
      /**
       * return true if the function call is trivial to execute and can be evaluated within a few milliseconds.
@@ -386,7 +422,8 @@ public class SimplifyScriptSupport {
          if ( sn instanceof Call ) {
              Call c= (Call)sn;
              boolean klugdyOkay= false;
-             String ss= c.func.toString();
+             String ss= c.func.toString(); // we just want "DatumRangeUtil" of the Attribute
+             //String ss= getFunctionName(c.func);
              for ( String s: okay ) {
                 if ( ss.contains(s) ) klugdyOkay= true;
              }
@@ -430,7 +467,7 @@ public class SimplifyScriptSupport {
          boolean looksOkay= true; 
          boolean visitNameFail= false;
          
-         HashSet names= new HashSet();
+         HashSet names;
          MyVisitorBase( HashSet names ) {
              this.names= names;
          }
@@ -439,6 +476,7 @@ public class SimplifyScriptSupport {
         public Object visitName(Name node) throws Exception {
             if ( !names.contains(node.id) ) {
                 visitNameFail= true;
+                looksOkay= false; //TODO: check this
             }
             return super.visitName(node); //To change body of generated methods, choose Tools | Templates.
         }
@@ -463,7 +501,31 @@ public class SimplifyScriptSupport {
                      looksOkay= trivialFunctionCall(et);
                  }
              } else if ( sn instanceof Name ) {
-                 //visitName((Name)sn).id
+                 String t= ((Name)sn).id;
+                 if ( !names.contains(t)
+                         && !okaySet.contains(t)) {
+                    visitNameFail= true;
+                    looksOkay= false; //TODO: check this
+                 }
+             } else if ( sn instanceof Attribute ) {
+                 traverse( ((Attribute)sn).value );  // DatumRangeUtil
+
+             } else if ( sn instanceof Subscript ) {
+                 Subscript ss= (Subscript)sn;
+                 exprType et= ss.value;
+                 if ( et instanceof Name ) {
+                     traverse((Name)(et));
+                 }
+                 //ss.value;
+                 //visitName((Name))
+             } else if ( sn instanceof BinOp ) {
+                 BinOp bo= (BinOp)sn;
+                 traverse( bo.left );
+                 traverse( bo.right );
+             } else if ( sn instanceof Num ) {
+                 
+             } else {
+                 System.err.println("unchecked: "+sn );
              }
          }
          public boolean looksOkay() {
