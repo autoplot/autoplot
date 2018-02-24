@@ -66,7 +66,7 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
         try {
             super.firePropertyChange(event); 
         } catch ( ConcurrentModificationException ex ) {
-            ex.printStackTrace();
+            ex.printStackTrace(); // bug1962
         }
     }
 
