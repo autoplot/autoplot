@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>PNGWalk showing snowfall for half-day periods.  Snowfall data from https://www.nohrsc.noaa.gov/snowfall/ and read in easily from NetCDF file.
+        <p><small>Plotting many orbits.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,11 @@
         
         <p>Bugfixes (2018-02-21 r22097):</p>
         <ul>
+            <li>1956: horizontal lines were not drawn because bounding box had height=0.
+            <li>dataset toString method had a branch which would cause RTE when format was %d (integer).
+            <li>clean up of synchronize function, recent changes could cause index-out-of-bounds error.
+            <li>1687: various improvements and clean-up of Jython completions engine.
+            <li>rte 0413258104: format timetags of Units.cdfTT2000 was mis-handled for SCALEMIN and SCALEMAX properties.
             <li>rte553: property assign units for ds[0,:]=ds1 and ds1 has units and ds does not.
             <li>print a warning when a FloatDataSet is used to store time location data, since this is rarely going to work.
             <li>1959: fix layout doesn't swap plot positions when rows are out-of-order (item 4).
@@ -78,6 +83,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>improve error message when ISO8601 time is sent to DatumRangeUtil.parseTimeRange (not parseTime).
+            <li>add tickSpacing property to orbit control GUI.
+            <li>console "AP>" prompt tooltip shows the stack trace at the last highlighted message.
+            <li>indgen returns an IndexDataSet that takes no memory and is well-suited for Jython scripts.
             <li>Orbit plot allows the tick frequency to be controlled.  Thanks, Bill!
             <li>Property editor now allows "edit selected" on root of array.  Thanks, Jeremy!
             <li>Jython gets new "dataset" command which takes properties as named parameters.
