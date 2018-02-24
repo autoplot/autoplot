@@ -49,8 +49,10 @@ public class AnnotationCommand extends PyObject {
             + " <tr><td> borderType     </td><td> draw a border around the annotation text<br>none,rectangle,roundedRectangle<br>.</td></tr>"
             + " <tr><td> anchorBorderType </td><td> draw a border around the anchor box.</td></tr>"
             + " <tr><td> anchorPosition </td><td>One of NE,NW,SE,SW,<br>N,E,W,S,<br>outsideN,outsideNNW</td></tr>"
+            + " <tr><td> anchorOffset </td><td>position relative to the anchor, like '1em,1em'</td></tr>"
             + " <tr><td> anchorType </td><td>PLOT means relative to the plot.<br>DATA means relative to xrange and yrange</td></tr>"
             + " <tr><td> xrange, yrange </td><td> anchor box when data coordinates</td></tr>"
+            + " <tr><td> plotId </td><td> ID of the plot containing axes.</td></tr>"    
             + " <tr><td> pointAt </td><td>comma separated X and Y to point the annotation arrow at.</td></tr>"
             + " <tr><td> rowId </td><td>ID of the row containing for positioning this annotation<br>(See dom.plots[0].rowId)</td></tr>"
             + " <tr><td> columnId </td><td>ID of the column containing for positioning this annotation</td></tr>"
@@ -62,11 +64,19 @@ public class AnnotationCommand extends PyObject {
             c = (AnchorPosition) val.__tojava__(AnchorPosition.class);
         } else if (val instanceof PyString) {
             String sval = (String) val.__str__().__tojava__(String.class);
-            c = AnchorPosition.valueOf(sval);
+            c = (AnchorPosition) lookupEnum( AnchorPosition.values(), sval );
         } else {
             throw new IllegalArgumentException("anchorPosition must be a string or AnchorPosition");
         }
         return c;
+    }
+    
+    private static Object lookupEnum( Object[] vs, String s ) {
+        s= s.toLowerCase();
+        for ( Object v: vs ) {
+            if ( v.toString().toLowerCase().equals(s) ) return v;
+        }
+        throw new IllegalArgumentException("unable to find enumerated value for "+s);
     }
     
     private static AnchorType anchorType( PyObject val ) {
@@ -75,7 +85,7 @@ public class AnnotationCommand extends PyObject {
             c = (AnchorType) val.__tojava__(AnchorType.class);
         } else if (val instanceof PyString) {
             String sval = (String) val.__str__().__tojava__(String.class);
-            c = AnchorType.valueOf(sval);
+            c = (AnchorType) lookupEnum( AnchorType.values(), sval );
         } else {
             throw new IllegalArgumentException("anchorType must be a string or AnchorType");
         }
@@ -88,7 +98,7 @@ public class AnnotationCommand extends PyObject {
             c = (BorderType) val.__tojava__(BorderType.class);
         } else if (val instanceof PyString) {
             String sval = (String) val.__str__().__tojava__(String.class);
-            c = BorderType.valueOf(sval);
+            c = (BorderType) lookupEnum( BorderType.values(), sval );
         } else {
             throw new IllegalArgumentException("borderType must be a string or BorderType");
         }
@@ -119,7 +129,7 @@ public class AnnotationCommand extends PyObject {
                 "anchorPosition", "anchorOffset", "anchorType", "borderType", "anchorBorderType",
                 "fontSize",
                 "pointAtX", "pointAtY", "pointAt", 
-                "xrange", "yrange",
+                "xrange", "yrange", "plotId",
                 "rowId", "columnId"
         },
         new PyObject[] { new PyInteger(0), 
@@ -127,7 +137,7 @@ public class AnnotationCommand extends PyObject {
             Py.None, Py.None, Py.None, Py.None, Py.None,
             Py.None,
             Py.None, Py.None, Py.None,
-            Py.None, Py.None,
+            Py.None, Py.None, Py.None,
             Py.None, Py.None,
         } );
         
@@ -226,13 +236,17 @@ public class AnnotationCommand extends PyObject {
                         annotation.setPointAtY(Ops.datum(ss[1]));
                         annotation.setShowArrow(true);
                         break;
+                    case "plotId":
+                        annotation.setPlotId(sval);
+                        annotation.setAnchorType( AnchorType.DATA );
+                        break;
                     case "xrange":
-                        annotation.setXrange(Ops.datumRange(val));
+                        annotation.setXrange(JythonOps.datumRange(val));
                         annotation.setAnchorOffset("");
                         annotation.setAnchorType( AnchorType.DATA );                        
                         break;
                     case "yrange":
-                        annotation.setYrange(Ops.datumRange(val));
+                        annotation.setYrange(JythonOps.datumRange(val));
                         annotation.setAnchorOffset("");
                         annotation.setAnchorType( AnchorType.DATA );                        
                         break;
