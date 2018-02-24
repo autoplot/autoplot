@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -76,6 +77,7 @@ public class BatchMaster extends javax.swing.JPanel {
      */
     public BatchMaster( final Application dom ) {
         initComponents();
+        generateButton1.setEnabled(false);
         this.dom= dom;
         
         /**
@@ -197,7 +199,7 @@ public class BatchMaster extends javax.swing.JPanel {
         param1NameCB = new javax.swing.JComboBox<>();
         param2NameCB = new javax.swing.JComboBox<>();
         cancelButton = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        generateButton1 = new javax.swing.JButton();
         generateButton2 = new javax.swing.JButton();
         writeCheckBox = new javax.swing.JCheckBox();
         writeFilenameCB = new javax.swing.JComboBox<>();
@@ -316,8 +318,18 @@ public class BatchMaster extends javax.swing.JPanel {
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         param1NameCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
+        param1NameCB.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                param1NameCBItemStateChanged(evt);
+            }
+        });
 
         param2NameCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
+        param2NameCB.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                param2NameCBItemStateChanged(evt);
+            }
+        });
 
         cancelButton.setText("Cancel");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
@@ -326,17 +338,17 @@ public class BatchMaster extends javax.swing.JPanel {
             }
         });
 
-        jButton1.setText("Generate...");
-        jButton1.setToolTipText("Generate items for list");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        generateButton1.setText("Generate...");
+        generateButton1.setToolTipText("Generate items for list");
+        generateButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                generateButton1ActionPerformed(evt);
             }
         });
 
         generateButton2.setText("Generate...");
         generateButton2.setToolTipText("Generate items for list");
-        generateButton2.setEnabled(true);
+        generateButton2.setEnabled(false);
         generateButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 generateButton2ActionPerformed(evt);
@@ -371,7 +383,7 @@ public class BatchMaster extends javax.swing.JPanel {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(param1NameCB, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton1)))
+                                .addComponent(generateButton1)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane1)
@@ -388,7 +400,7 @@ public class BatchMaster extends javax.swing.JPanel {
                 .addContainerGap())
         );
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {generateButton2, jButton1});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {generateButton1, generateButton2});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -400,7 +412,7 @@ public class BatchMaster extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(param1NameCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(param2NameCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1)
+                    .addComponent(generateButton1)
                     .addComponent(generateButton2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -520,11 +532,24 @@ public class BatchMaster extends javax.swing.JPanel {
         doGenerate( param2NameCB, param2Values );
     }//GEN-LAST:event_generateButton2ActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void generateButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateButton1ActionPerformed
         doGenerate( param1NameCB, param1Values );
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_generateButton1ActionPerformed
+
+    private void param1NameCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_param1NameCBItemStateChanged
+        if ( evt.getStateChange()==ItemEvent.SELECTED ) {
+            generateButton1.setEnabled( param1NameCB.getSelectedItem().toString().trim().length()>0 );
+        }
+    }//GEN-LAST:event_param1NameCBItemStateChanged
+
+    private void param2NameCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_param2NameCBItemStateChanged
+        if ( evt.getStateChange()==ItemEvent.SELECTED ) {
+            generateButton2.setEnabled( param2NameCB.getSelectedItem().toString().trim().length()>0 );
+        }
+    }//GEN-LAST:event_param2NameCBItemStateChanged
 
     private void doGenerate( JComboBox cb, JTextArea ta ) {
+        if ( cb.getSelectedItem()==null ) return;
         String p= cb.getSelectedItem().toString();
         p= p.trim();
         if ( p.length()>0 ) {
@@ -896,9 +921,9 @@ public class BatchMaster extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private org.autoplot.datasource.DataSetSelector dataSetSelector1;
+    private javax.swing.JButton generateButton1;
     private javax.swing.JButton generateButton2;
     private javax.swing.JButton goButton;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

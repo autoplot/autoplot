@@ -187,7 +187,7 @@
                           <Group type="102" attributes="0">
                               <Component id="param1NameCB" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jButton1" linkSize="1" min="-2" max="-2" attributes="0"/>
+                              <Component id="generateButton1" linkSize="1" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -222,7 +222,7 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="param1NameCB" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="param2NameCB" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="generateButton1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="generateButton2" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -316,6 +316,9 @@
           </StringArray>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="param1NameCBItemStateChanged"/>
+      </Events>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>
@@ -328,6 +331,9 @@
           </StringArray>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="param2NameCBItemStateChanged"/>
+      </Events>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>
@@ -340,20 +346,20 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cancelButtonActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="jButton1">
+    <Component class="javax.swing.JButton" name="generateButton1">
       <Properties>
         <Property name="text" type="java.lang.String" value="Generate..."/>
         <Property name="toolTipText" type="java.lang.String" value="Generate items for list"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="generateButton1ActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="generateButton2">
       <Properties>
         <Property name="text" type="java.lang.String" value="Generate..."/>
         <Property name="toolTipText" type="java.lang.String" value="Generate items for list"/>
-        <Property name="enabled" type="boolean" value="true"/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="generateButton2ActionPerformed"/>
