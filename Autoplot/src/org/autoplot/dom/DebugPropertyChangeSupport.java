@@ -5,11 +5,13 @@
 
 package org.autoplot.dom;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 
 /**
@@ -59,6 +61,14 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
         if ( listener!=null ) propNames.remove( listener.toString()+ " " + propertyName );
     }
 
+    @Override
+    public void firePropertyChange(PropertyChangeEvent event) {
+        try {
+            super.firePropertyChange(event); 
+        } catch ( ConcurrentModificationException ex ) {
+            ex.printStackTrace();
+        }
+    }
 
     @Override
     public String toString() {
