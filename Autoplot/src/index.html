@@ -28,6 +28,8 @@
         
         <p>Bugfixes (2018-02-21 r22097):</p>
         <ul>
+            <li>always get the makeTutorialHtml from the website, since release showed there were issues.
+            <li>1962: catch strange ConcurrentModificationException when running http://autoplot.org/data/script/examples/plotsAndAnnos2018.jy
             <li>1956: horizontal lines were not drawn because bounding box had height=0.
             <li>dataset toString method had a branch which would cause RTE when format was %d (integer).
             <li>clean up of synchronize function, recent changes could cause index-out-of-bounds error.
