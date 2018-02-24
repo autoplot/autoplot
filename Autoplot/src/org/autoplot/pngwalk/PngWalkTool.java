@@ -47,6 +47,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -2214,18 +2215,22 @@ public final class PngWalkTool extends javax.swing.JPanel {
             monitor.finished();
         }
         
-        URL url= PngWalkTool.class.getResource("makeTutorialHtml.jy");
-        final ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(this),"write HTML");
-        Map<String,String> params= new HashMap<>();
-        params.put("dir",base.toString());
-        params.put("qconly","true");
-        params.put("outdir",f.toString());
-        params.put("name",""); //TODO: what should this be?
-        params.put("summary",summary);
         try {
-            JythonUtil.invokeScriptSoon(url,null,params,false,false,mon);
-        } catch (IOException ex) {
-            Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
+            URL url= new URL("http://autoplot.org/data/tools/makeTutorialHtml.jy");
+            final ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(this),"write HTML");
+            Map<String,String> params= new HashMap<>();
+            params.put("dir",base.toString());
+            params.put("qconly","T");
+            params.put("outdir",f.toString());
+            params.put("name",""); //TODO: what should this be?
+            params.put("summary",summary);
+            try {
+                JythonUtil.invokeScriptSoon(url,null,params,false,false,mon);
+            } catch (IOException ex) {
+                Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch ( MalformedURLException ex ) {
+            throw new IllegalArgumentException(ex);
         }
 
     }
