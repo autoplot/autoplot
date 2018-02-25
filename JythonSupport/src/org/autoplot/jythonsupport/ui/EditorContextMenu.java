@@ -44,6 +44,8 @@ import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
 import org.autoplot.jythonsupport.JythonUtil;
+import static org.das2.jythoncompletion.JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER;
+import org.das2.jythoncompletion.JythonInterpreterProvider;
 
 /**
  *
@@ -483,6 +485,42 @@ public class EditorContextMenu {
             });
             actionsMenu.add(printMenuItem);
 
+            JMenuItem runMenuItem= new JMenuItem( "Run Selected" );
+            runMenuItem.setToolTipText("Run Selected Commands");
+            runMenuItem.addActionListener( new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    final String doThis= editor.getSelectedText();
+                    String[] sss= doThis.split("\n");
+                    for ( String s: sss ) {
+                        if ( s.length()>0 && Character.isWhitespace(s.charAt(0)) ) {
+                            JOptionPane.showMessageDialog( menu, "Sorry no indents" );
+                            return;
+                        }
+                    }
+                    final JythonInterpreterProvider pp =
+                            (JythonInterpreterProvider) editor.getClientProperty(CLIENT_PROPERTY_INTERPRETER_PROVIDER);
+                    if ( pp==null ) {
+                        JOptionPane.showMessageDialog( menu, "Sorry no Jython session to run commands" );
+                        return;
+                    }
+
+                    Runnable run= new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                pp.createInterpreter().exec(doThis);
+                            } catch (IOException ex) {
+                                logger.log(Level.SEVERE, null, ex);
+                            }
+                        }                            
+                    };
+
+                    new Thread(run).start();
+
+                }
+            });
+            actionsMenu.add(runMenuItem);
             
             JMenuItem mi;
             
