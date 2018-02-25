@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import org.das2.datum.LoggerManager;
@@ -41,7 +42,13 @@ public class CompletionSupport {
         return result.toString();
     }
     
-    
+    private static boolean isContinuation( String possible, String tail ) {
+        int ipos1= 0;
+        while ( ipos1<possible.length() && Character.isWhitespace( possible.charAt(ipos1) ) ) ipos1++;
+        int ipos2= 0;
+        while ( ipos2<tail.length() && Character.isWhitespace( tail.charAt(ipos2) ) ) ipos2++;
+        return ipos1<ipos2;
+    }
     
     public static CompletionContext getCompletionContext( JTextComponent editor ) throws BadLocationException {
         int pos= editor.getCaretPosition();
@@ -52,6 +59,15 @@ public class CompletionSupport {
         int i1= i0;
         
         if ( i1==i2 ) return new CompletionContext( CompletionContext.DEFAULT_NAME, null, "" );
+        
+        if ( i0>0 ) {
+            int im1= Utilities.getRowStart( editor, i0-1 );
+            String prevLine= editor.getText( im1, i0-im1-1 );
+            if ( isContinuation( prevLine, line ) ) {
+                line= prevLine + line;
+                i0= im1;
+            }
+        }
         
         pos= pos - i0;
         //i2= i2- i0;
