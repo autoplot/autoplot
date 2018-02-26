@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -452,8 +453,11 @@ public class HapiServer {
             if ( s!=null ) return s;
         }
         loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );
+        URLConnection urlc= url.openConnection();
+        urlc.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() );
+        urlc.setReadTimeout( FileSystem.settings().getConnectTimeoutMs() );
         StringBuilder builder= new StringBuilder();
-        try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
+        try ( BufferedReader in= new BufferedReader( new InputStreamReader( urlc.getInputStream() ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
                 builder.append(line);
