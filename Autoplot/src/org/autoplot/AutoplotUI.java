@@ -5739,7 +5739,7 @@ APSplash.checkTime("init 240");
             final HashMap params= URISplit.parseParams(split.params);
             pp.loadFile(ff);
 
-            final ProgressMonitor mon= DasProgressPanel.createFramed(AutoplotUI.this,"Running script "+ff );
+            final DasProgressPanel mon= DasProgressPanel.createFramed(AutoplotUI.this,"Running script "+ff );
             File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
                         
             boolean isTool= split.path.contains(tools.toString()); // here is the trust...
@@ -5747,6 +5747,19 @@ APSplash.checkTime("init 240");
             isTool = isTool || trust!=null;
             
             final boolean fisTool= isTool;
+            
+            mon.addPropertyChangeListener( DasProgressPanel.PROP_FINISHED, new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    Runnable run= new Runnable() {
+                        public void run() {
+                            logger.info("calling code following script invocation");
+                            getDataSetSelector().setValue(script);
+                        }
+                    };
+                    SwingUtilities.invokeLater(run);
+                }
+            });
             
             Runnable run= new Runnable() {
                 @Override
