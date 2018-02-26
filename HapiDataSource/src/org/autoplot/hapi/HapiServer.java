@@ -455,7 +455,7 @@ public class HapiServer {
         loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );
         URLConnection urlc= url.openConnection();
         urlc.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() );
-        urlc.setReadTimeout( FileSystem.settings().getConnectTimeoutMs() );
+        urlc.setReadTimeout( FileSystem.settings().getReadTimeoutMs() );
         StringBuilder builder= new StringBuilder();
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( urlc.getInputStream() ) ) ) {
             String line= in.readLine();
