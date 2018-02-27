@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Plotting many orbits.
+        <p><small>Jython plot command now has "topAxisOf" named parameter.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,16 @@
         
         <p>SourceForge has made changes which require special actions in the release process.  Please be aware that this may cause unusual behavior.</p>
         
-        <p>Bugfixes (2018-02-21 r22097):</p>
+        <p>Bugfixes (2018-02-27 r22135):</p>
         <ul>
+            <li>Correct histogram mode when data x units are different than axis units.
+            <li>dasCore didn't support axis labels on top.
+            <li>1408: experiment with leaving the script name onto the address bar by replacing it when the progress bar finishes.
+            <li>HAPI html redirects didn't have timeout.  (Some normal connections too.)
+            <li>improve jython completions support by testing for second line with indent continuation.
+            <li>jython editor has new "run selected" action.
+            <li>fix runtime error which could happen when %d was the format.  Some codes didn't check for this and cast the data.
+            <li>1947: fix 1-pixel error in colorbar pointed out by Kristoff. (Now it's a half-pixel, but this is a PDF rendering problem.)
             <li>always get the makeTutorialHtml from the website, since release showed there were issues.
             <li>1962: catch strange ConcurrentModificationException when running http://autoplot.org/data/script/examples/plotsAndAnnos2018.jy
             <li>1956: horizontal lines were not drawn because bounding box had height=0.
@@ -85,6 +93,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>jython script plot command has topAxisOf keyword which makes a new plot with the axis drawn on top.
             <li>improve error message when ISO8601 time is sent to DatumRangeUtil.parseTimeRange (not parseTime).
             <li>add tickSpacing property to orbit control GUI.
             <li>console "AP>" prompt tooltip shows the stack trace at the last highlighted message.
