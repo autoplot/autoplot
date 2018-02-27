@@ -85,6 +85,8 @@ import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
+import org.python.core.PyException;
+import org.python.core.PySyntaxError;
 
 /**
  * GUI for specifying mashups, where a number of 
@@ -606,7 +608,15 @@ public class DataMashUp extends javax.swing.JPanel {
     }
     
     private MutableTreeNode getTreeNode( String expr ) {
-        Module n= (Module)org.python.core.parser.parse( "x="+expr, "exec" );
+        Module n;
+        
+        try {
+            n= (Module)org.python.core.parser.parse( "x="+expr, "exec" );
+        } catch ( PyException ex ) {
+            ex.printStackTrace();
+            n= (Module)org.python.core.parser.parse( "x='error'", "exec" ); // x=and(ds1,ds2)
+            expr="error "+expr;
+        }
         
         DefaultMutableTreeNode root;
         Assign assign= (Assign)n.body[0];
@@ -1357,6 +1367,10 @@ public class DataMashUp extends javax.swing.JPanel {
 
     private void editMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editMenuItemActionPerformed
         TreePath tp= expressionTree.getSelectionPath();
+        if ( tp==null ) {
+            JOptionPane.showMessageDialog( this, "A node must be selected", "Node must be selected", JOptionPane.PLAIN_MESSAGE );
+            return;
+        }
         expressionTree.setSelectionPath(tp);
         if ( !expressionTree.getModel().isLeaf(tp.getLastPathComponent()) ) {
             String s= getAsJythonInline( (TreeNode)tp.getLastPathComponent() );
@@ -1389,6 +1403,10 @@ public class DataMashUp extends javax.swing.JPanel {
 
     private void plotMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotMenuItemActionPerformed
         TreePath tp= expressionTree.getSelectionPath();
+        if ( tp==null ) {
+            JOptionPane.showMessageDialog( this, "A node must be selected", "Node must be selected", JOptionPane.PLAIN_MESSAGE );
+            return;
+        }
         expressionTree.setSelectionPath(tp);
         plotExpr();
     }//GEN-LAST:event_plotMenuItemActionPerformed
