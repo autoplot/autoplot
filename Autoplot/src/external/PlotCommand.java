@@ -90,6 +90,7 @@ public class PlotCommand extends PyObject {
             + " <tr><td> [xyz]autoRangeHints</td><td>hints to the autorange, see http://autoplot.org/AxisAutoRangeHints\n</td>"
             + " <tr><td> renderer</td><td>add custom renderer, a class extending org.das2.graph.Renderer, see http://autoplot.org/CustomRenderers</td>"
             + " <tr><td> rightAxisOf</td><td>specify a plot where a new plot with a new yaxis.</td>"
+            + " <tr><td> topAxisOf</td><td>specify a plot where a new plot with a new xaxis above.</td>"                
             + "</table></html>");
 
     private static QDataSet coerceIt( PyObject arg0 ) {
@@ -145,7 +146,7 @@ public class PlotCommand extends PyObject {
             "xdrawTickLabels", "ydrawTickLabels",
             "xautoRangeHints", "yautoRangeHints", "zautoRangeHints",
             "xtickValues", "ytickValues", "ztickValues",
-            "renderer", "rightAxisOf",
+            "renderer", "rightAxisOf", "topAxisOf",
             "index"
         },
         new PyObject[] { Py.None, Py.None, Py.None, Py.None,
@@ -248,7 +249,7 @@ public class PlotCommand extends PyObject {
                     }
                 }
                 if ( column==null ) column=dom.getCanvases(0).getMarginColumn();
-            } else if ( keywords[i].equals("rightAxisOf") ) {
+            } else if ( keywords[i].equals("rightAxisOf") || keywords[i].equals("topAxisOf") ) {
                 String spec= args[i+nparm].toString();
                 Plot p;
                 if ( Ops.isSafeName(spec) ) {
@@ -271,9 +272,15 @@ public class PlotCommand extends PyObject {
                 }
                 if ( plot==null ) {
                     plot= dom.getController().addPlot( row, column );
-                    plot.getYaxis().setOpposite(true);
-                    dom.getController().bind( underPlot.getXaxis(), "range", plot.getXaxis(), "range"  );
-                    plot.getXaxis().setVisible(false);
+                    if ( keywords[i].equals("rightAxisOf") ) {
+                        plot.getYaxis().setOpposite(true);
+                        dom.getController().bind( underPlot.getXaxis(), "range", plot.getXaxis(), "range"  );
+                        plot.getXaxis().setVisible(false);
+                    } else if ( keywords[i].equals("topAxisOf") ) {
+                        plot.getXaxis().setOpposite(true);
+                        dom.getController().bind( underPlot.getYaxis(), "range", plot.getYaxis(), "range"  );
+                        plot.getYaxis().setVisible(false);
+                    }
                 }
             } else if ( keywords[i].equals("index") ) {
                 int sindex= Integer.parseInt( args[i+nparm].toString() );
