@@ -235,7 +235,7 @@ public class DocumentationScrollPane extends JScrollPane {
         String text = currentDocumentation.getText();
         URL url = currentDocumentation.getURL();
         if ( bShowWeb!=null ) {
-            if ( url.toString().contains("autoplot.org") ) {
+            if ( url!=null && url.toString().contains("autoplot.org") ) {
                 bShowWeb.setToolTipText("You can view and edit this on Autoplot's wiki");
             }
         }
