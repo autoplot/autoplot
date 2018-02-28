@@ -179,6 +179,8 @@ public class DefaultCompletionItem implements CompletionItem  {
         String[] ss2= ss[1].split("\\s",2);
         //remove BR
         ss2= ss2[0].split("<br>",2);
+        ss2= ss2[0].split("'",2);
+        ss2= ss2[0].split("\"",2);
         return find + ss2[0];
     }
     
