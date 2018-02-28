@@ -124,6 +124,9 @@ public class DataMashUp extends javax.swing.JPanel {
      */
     public void setIds( List<String> ids ) {
         this.namedURIListTool1.setIds( ids );
+        List<Boolean> isAuto= new ArrayList<>(ids.size());
+        for ( int i=0; i<ids.size(); i++ ) isAuto.add(i,Boolean.FALSE);
+        this.namedURIListTool1.setIsAuto(isAuto);
     }
     
     /**
@@ -795,7 +798,7 @@ public class DataMashUp extends javax.swing.JPanel {
         
         if ( haveAllIds==false ) {
             setIds(ids);
-            setUris(uris);            
+            setUris(uris);
         }
         if ( timerange==null ) {
             timeRangeRecentComboBox.setText( "" );
