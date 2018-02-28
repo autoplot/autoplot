@@ -693,7 +693,9 @@ public class ScriptPanelSupport {
                         
                         try {
                             if (file != null && ( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) {
-                                save();
+                                if ( panel.isDirty() ) {
+                                    save();
+                                }
                                 applicationController.getApplicationModel().addRecent("script:"+file.toURI().toString());
                             }
                             InteractiveInterpreter interp = null;
