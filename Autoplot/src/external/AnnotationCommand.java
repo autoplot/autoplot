@@ -38,7 +38,7 @@ public class AnnotationCommand extends PyObject {
     public static final PyString __doc__ =
         new PyString("<html><H2>annotation([index],[named parameters])</H2>"
             + "annotation puts an annotation on the canvas.\n"
-            + "See http://autoplot.org/help.annotationCommand<br>\n"
+            + "See <a href='http://autoplot.org/help.annotationCommand'>http://autoplot.org/help.annotationCommand</a><br>\n"
             + "<br><b>named parameters:</b>\n"
             + "<table>"
             + "<tr><td>text</td><td>The message, allowing Granny codes</td></tr>"
