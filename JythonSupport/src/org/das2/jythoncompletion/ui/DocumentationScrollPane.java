@@ -203,7 +203,7 @@ public class DocumentationScrollPane extends JScrollPane {
             bShowWeb.setFocusable(false);
             bShowWeb.setContentAreaFilled(false);
             bShowWeb.setMargin(new Insets(0, 0, 0, 0));
-            bShowWeb.setToolTipText("You can view and edit this on Autoplot's wiki"); //NOI18N
+            bShowWeb.setToolTipText("Open in browser"); //NOI18N
             toolbar.add(bShowWeb, gdc);
         }
 
@@ -234,6 +234,11 @@ public class DocumentationScrollPane extends JScrollPane {
         currentDocumentation = doc;
         String text = currentDocumentation.getText();
         URL url = currentDocumentation.getURL();
+        if ( bShowWeb!=null ) {
+            if ( url.toString().contains("autoplot.org") ) {
+                bShowWeb.setToolTipText("You can view and edit this on Autoplot's wiki");
+            }
+        }
         if (text != null) {
             if (url != null) {
                 // fix of issue #58658
