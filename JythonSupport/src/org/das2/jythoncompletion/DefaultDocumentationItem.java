@@ -1,10 +1,7 @@
 /*
- * UserDocumentationItem.java
+ * DefaultDocumentationItem.java
  *
  * Created on August 3, 2006, 10:27 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
  */
 package org.das2.jythoncompletion;
 
@@ -26,7 +23,6 @@ public class DefaultDocumentationItem implements CompletionDocumentation {
     String link;
     String text;
 
-    /** Creates a new instance of UserDocumentationItem */
     public DefaultDocumentationItem(String link) {
         this( link, null );
     }
