@@ -44,6 +44,7 @@ import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.DataSourceEditorPanelUtil;
+import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
 import org.das2.qds.filters.FiltersChainPanel;
@@ -75,6 +76,8 @@ public class NamedURIListTool extends JPanel {
      * list of Java identifiers, one for each URI.
      */
     List<String> ids=null;
+    
+    List<Boolean> isAuto= null;
 
     DataMashUp dataMashUp;
     
@@ -83,6 +86,7 @@ public class NamedURIListTool extends JPanel {
         
         ids= Collections.emptyList();
         uris= Collections.emptyList();
+        isAuto= Collections.emptyList();
         
         setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.LINE_AXIS));
         add(scrollPane);
@@ -277,11 +281,14 @@ public class NamedURIListTool extends JPanel {
                     org.das2.util.LoggerManager.logGuiEvent(e);
                     List<String> ids= new ArrayList<>(NamedURIListTool.this.ids);
                     List<String> uris= new ArrayList<>(NamedURIListTool.this.uris);
+                    List<Boolean> isAuto= new ArrayList<>(NamedURIListTool.this.isAuto);
                     String newName= makeupName( ids );
                     ids.add(newName);
                     uris.add("");
+                    isAuto.add(true);
                     setIds(ids);
                     setUris(uris);
+                    setIsAuto(isAuto);
                 }
             } );
            
@@ -305,6 +312,7 @@ public class NamedURIListTool extends JPanel {
                     parent.validate();
                     uris.remove(ffi);
                     ids.remove(ffi);
+                    isAuto.remove(ffi);
                     refresh();
                 }
             } );
@@ -367,7 +375,8 @@ public class NamedURIListTool extends JPanel {
     }
     
     private void doVariableRename( int fi, String oldName, String newName ) {
-        ids.set( fi, newName );     
+        ids.set( fi, newName );
+        isAuto.set( fi,false );
         refresh();
         if ( dataMashUp!=null ) dataMashUp.rename( oldName, newName );
     }
@@ -387,18 +396,32 @@ public class NamedURIListTool extends JPanel {
     
     private void rename( int fi ) {
         String currentName= ids.get(fi);
+        boolean autoName= isAuto.get(fi);
+        
         JPanel p= new JPanel();
         p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
-        JLabel c= new JLabel( "Parameter name:" );
+        JLabel c= new JLabel( "Parameter name (a name with no spaces, made of letters, numbers and underscores):" );
         
         c.setAlignmentX( Component.LEFT_ALIGNMENT );
-        p.add(  c );
+        p.add( c );
+        
+        int em=  c.getFont().getSize();
+        JPanel p1= new JPanel();
+        p1.setLayout( new BoxLayout( p1, BoxLayout.X_AXIS ) );
+        JCheckBox cb= new JCheckBox("");
+        cb.setToolTipText("checked indicates variable name will be picked automatically");
+        cb.setSelected(autoName);
+        p1.add( cb );
         JTextField tf= new JTextField(currentName);
-        tf.setMaximumSize( new Dimension( 1000, c.getFont().getSize()*2 ) );
-        tf.setPreferredSize( new Dimension( 1000, c.getFont().getSize()*2 ) );
-        tf.setAlignmentX( Component.LEFT_ALIGNMENT );
-        p.add( tf );
-        p.add( Box.createVerticalStrut( p.getFont().getSize() ) );
+        tf.setMaximumSize( new Dimension( em*50, em*2 ) );
+        tf.setPreferredSize( new Dimension( em*50, em*2 ) );
+        
+        p1.add( tf );
+        p1.add( Box.createGlue() );
+        p1.setAlignmentX( Component.LEFT_ALIGNMENT );
+        
+        p.add( p1 );
+        p.add( Box.createVerticalStrut( em ) );
         p.add( Box.createGlue() );
         
         DataSourceEditorPanel edit=null;
@@ -411,8 +434,12 @@ public class NamedURIListTool extends JPanel {
         String title= edit!=null ? "Rename parameter and dataset editor" : "Rename parameter"; // this is so the position and size are remembered separately.
         while ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( scrollPane, p, title, JOptionPane.OK_CANCEL_OPTION ) ) {
             String newName= tf.getText();
+            if ( cb.isSelected() && edit!=null ) {
+                newName= DataSourceUtil.guessNameFor(edit.getURI());
+            }
             if ( isValidIdentifier(newName) ) {
                 doVariableRename( fi, currentName, newName );
+                isAuto.set( fi, cb.isSelected() );
                 if ( edit!=null ) {
                     uris.set( fi, edit.getURI() );
                 }
@@ -437,7 +464,10 @@ public class NamedURIListTool extends JPanel {
         if ( uris.size()==ids.size() ) refresh();
     }
     
-    
+    public void setIsAuto( List<Boolean> isAuto ) {
+        this.isAuto= new ArrayList<>(isAuto);
+        if ( isAuto.size()==isAuto.size() ) refresh();
+    }
     
     /**
      * return the Jython code that gets these.
