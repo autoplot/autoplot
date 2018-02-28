@@ -163,16 +163,36 @@ public class DefaultCompletionItem implements CompletionItem  {
         CompletionUtilities.renderHtml(null,left,right,graphics,font, color,i,i0,b);
     }
     
+    /**
+     * return the first item which looks like a link from the documentation string.
+     * @param s the inline documentation string
+     * @return the link or null.
+     */
+    private String findLink( String s ) {
+        String find= "http://";
+        String[] ss= s.split(find,2);
+        if ( ss.length==1 ) {
+            find= "https://";
+            ss= s.split(find,2);
+        }
+        if ( ss.length==1 ) return null;
+        String[] ss2= ss[1].split("\\s",2);
+        //remove BR
+        ss2= ss2[0].split("<br>",2);
+        return find + ss2[0];
+    }
+    
     @Override
     public CompletionTask createDocumentationTask() {
         if ( link==null ) {
             return null;
         } else if ( link.startsWith("inline:") ) {
-            final String flink= link;
+            final String fdoc= link.substring(7);
             return new CompletionTask() {
                 @Override
                 public void query(CompletionResultSet resultSet) {
-                    resultSet.setDocumentation( new DefaultDocumentationItem(null,flink.substring(7)) );
+                    String link= findLink(fdoc);
+                    resultSet.setDocumentation( new DefaultDocumentationItem(link,fdoc) );
                     resultSet.finish();
                 }
                 @Override
