@@ -87,6 +87,7 @@ import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
 import org.python.core.PyException;
 import org.python.core.PySyntaxError;
+import org.python.parser.ast.BinOp;
 
 /**
  * GUI for specifying mashups, where a number of 
@@ -264,17 +265,31 @@ public class DataMashUp extends javax.swing.JPanel {
     }
 
     private boolean isInfix( String op ) {
-        return op.equals("add") || op.equals("multiply");
+        switch (op) {
+            case "and":
+            case "or":
+            //case "add":
+            //case "multiply":
+                return true;
+            default:
+                return false;
+        }
     }
     
     // this is not-trivial because of parentheses.
-    // Shouldn't  this be getInline
-    private String getInline( String op ) {
+    // Shouldn't  this be getInfix
+    private String getInline( DefaultTreeModel m, Object o) {
+        String op= o.toString();
+        DefaultMutableTreeNode n= (DefaultMutableTreeNode)o;
         switch (op) {
-            case "add":
-                return "+";
+            case "and":
+                return getJython( m, m.getChild( n, 0 ) ) + ".and(" + getJython( m, m.getChild( n, 1 ) ) +")";
+            case "or":
+                return getJython( m, m.getChild( n, 0 ) ) + ".or(" + getJython( m, m.getChild( n, 1 ) ) +")";
             case "multiply":
-                return "*";
+                return getJython( m, m.getChild( n, 0 ) ) + "*" + getJython( m, m.getChild( n, 1 ) );
+            case "add":
+                return getJython( m, m.getChild( n, 0 ) ) + "+" + getJython( m, m.getChild( n, 1 ) );
             default:
                 return null;
         }
@@ -294,10 +309,14 @@ public class DataMashUp extends javax.swing.JPanel {
             int iparen= sn.indexOf("(");
             if ( iparen>-1 ) sn= sn.substring(0,iparen);
             int nchild= m.getChildCount(n);
-            if ( false && isInfix(sn) && nchild==2 ) {
-                String alt= getInline(sn);
+            if ( isInfix(sn) && nchild==2 ) {
+                String alt= getInline(m, n);
                 if ( alt!=null ) {
-                    return "("+ getJython( m, m.getChild( n, 0 ) ) + alt + getJython( m, m.getChild(n,1) ) + ")" ;
+                    if ( m.getRoot()==n ) {
+                        return alt;
+                    } else {
+                        return "("+ alt + ")" ;
+                    }
                 } else {
                     return getJython( m, m.getChild( n, 0 ) ) + "."+sn+"("+ getJython( m, m.getChild(n,1) ) +")" ;
                 }
@@ -408,6 +427,10 @@ public class DataMashUp extends javax.swing.JPanel {
                     fillTreeExprType( et1, parent, i );
                     break;
             }
+        } else if ( et instanceof BinOp ) { // a negative number appears as a unary minus op and positive number.
+            DefaultMutableTreeNode child= new DefaultMutableTreeNode( nameForBinOp( ((BinOp)et).op ) );
+            fillTreeBinOp( (BinOp)et, child );            
+            parent.insert( child, i );
         } else {
             Call call= (Call)et;
             DefaultMutableTreeNode child= new DefaultMutableTreeNode( funcCallName( call ) );
@@ -434,6 +457,11 @@ public class DataMashUp extends javax.swing.JPanel {
             fillTreeExprType( et, parent, i+1 );
         }
     }    
+    
+    private void fillTreeBinOp( BinOp c, MutableTreeNode parent ) {
+        fillTreeExprType( c.left, parent, 0 );
+        fillTreeExprType( c.right, parent, 1 );
+    }
     
     private String funcCallName( Call c ) {
         exprType et= c.func;
@@ -653,6 +681,23 @@ public class DataMashUp extends javax.swing.JPanel {
         return root;
     }
     
+    private String nameForBinOp( int op ) {
+        String sop;
+        switch(op) {
+            case 1:
+                sop= "add"; break;
+            case 2:
+                sop= "subtract"; break;
+            case 3:
+                sop= "multiply"; break;
+            case 4:
+                sop= "divide"; break;
+            default:
+                throw new IllegalArgumentException("not supported 720" );
+        }
+        return sop;
+    }
+    
     private void fillTree( String expr ) {
         Module n= (Module)org.python.core.parser.parse( "x="+expr, "exec" );
         
@@ -663,9 +708,10 @@ public class DataMashUp extends javax.swing.JPanel {
             expressionTree.setModel(model);
             expressionTree.setCellRenderer( getCellRenderer() );
         } else {
-            DefaultMutableTreeNode root= new DefaultMutableTreeNode( funcCallName( (Call)assign.value ) );
-            DefaultTreeModel model= new DefaultTreeModel( root );
-            if ( assign.value instanceof Call ) {
+            exprType et= assign.value;
+            if ( et instanceof Call ) {
+                DefaultMutableTreeNode root= new DefaultMutableTreeNode( funcCallName( (Call)assign.value ) );
+                DefaultTreeModel model= new DefaultTreeModel( root );
                 Call c= (Call)assign.value;
                 if ( c.func instanceof Attribute ) {
                     Attribute attr= (Attribute)c.func;
@@ -673,8 +719,15 @@ public class DataMashUp extends javax.swing.JPanel {
                 } else {
                     fillTreeCall( c, root );
                 }
-            }            
-            expressionTree.setModel(model);
+                expressionTree.setModel(model);
+            } else if ( et instanceof BinOp ) {
+                String sop= nameForBinOp( ((BinOp)et).op );
+                DefaultMutableTreeNode root= new DefaultMutableTreeNode( sop );
+                DefaultTreeModel model= new DefaultTreeModel( root );
+                fillTreeBinOp( (BinOp)et, root );
+                expressionTree.setModel(model);
+            }
+            
             for (int i = 0; i < expressionTree.getRowCount(); i++) {
                 expressionTree.expandRow(i);
             }
@@ -1082,7 +1135,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jTabbedPane1.addTab("dataset", jPanel3);
 
         filtersList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "putValues(ds,w,v)", "removeValues(ds,w)", "removeValuesGreaterThan(ds,v)", "removeValuesLessThan(ds,v)", "where(c)", "lt(ds1,ds2)", "le(ds1,ds2)", "gt(ds1,ds2)", "ge(ds1,ds2)", "eq(ds1,ds2)", "ne(ds1,ds2)", "or(ds1,ds2)", "and(ds1,ds2)" };
+            String[] strings = { "putValues(ds,w,v)", "removeValues(ds,w)", "removeValuesGreaterThan(ds,v)", "removeValuesLessThan(ds,v)", "where(c)", "lt(ds1,ds2)", "le(ds1,ds2)", "gt(ds1,ds2)", "ge(ds1,ds2)", "eq(ds1,ds2)", "ne(ds1,ds2)", "ds1.or(ds2)", "ds1.and(ds2)" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });

@@ -362,8 +362,8 @@
                                     <StringItem index="8" value="ge(ds1,ds2)"/>
                                     <StringItem index="9" value="eq(ds1,ds2)"/>
                                     <StringItem index="10" value="ne(ds1,ds2)"/>
-                                    <StringItem index="11" value="or(ds1,ds2)"/>
-                                    <StringItem index="12" value="and(ds1,ds2)"/>
+                                    <StringItem index="11" value="ds1.or(ds2)"/>
+                                    <StringItem index="12" value="ds1.and(ds2)"/>
                                   </StringArray>
                                 </Property>
                                 <Property name="selectionMode" type="int" value="0"/>
