@@ -32,6 +32,7 @@ import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.state.StatePersistence;
+import org.das2.components.propertyeditor.Displayable;
 import org.das2.util.ColorUtil;
 
 /**
@@ -1080,45 +1081,56 @@ public class DomUtil {
         return dsfs;
     }
     
+    private static ArrayList<String> vapToJython( ArrayList<String> jython, String nodeAddress, PropertyChangeDiff pcd ) {
+        
+        String propertyName= pcd.propertyName;
+        if ( propertyName.endsWith("scale") ) {
+            return jython;
+        } else if ( propertyName.endsWith("autoLabel") ) {
+            return jython;
+        } else if ( propertyName.startsWith("options") ) {
+            return jython;
+        }
+                        
+        Object o= pcd.newVal;
+        String s;
+        if ( o instanceof String ) {
+            s= "'"+o+"'";
+        } else if ( o instanceof Boolean ) {
+            s= o.toString();
+            s= String.valueOf( Character.toUpperCase(s.charAt(0)) ) + s.substring(1);
+        } else if ( o instanceof Color ) {
+            Color c= (Color)o;
+            s= "color('"+ColorUtil.nameForColor(c)+"')";
+        } else if ( o instanceof DatumRange ) {
+            s= "datumRange('"+o+"')";
+        } else if ( o instanceof Datum ) {
+            s= "datum('"+o+"')";
+        } else if ( o instanceof Enum ) {
+            String sclaz= ((Enum) o).getDeclaringClass().getCanonicalName();
+            jython.add( "import " + sclaz );
+            s= "" + sclaz + "."+ o;
+            //s= String.valueOf( Character.toUpperCase(s.charAt(0)) ) + s.substring(1);
+        } else if ( o instanceof Displayable ) {
+            String sclaz= ((Displayable) o).getClass().getCanonicalName();
+            jython.add( "import " + sclaz );
+            s= "" + sclaz + "."+ o.toString().toUpperCase();
+            //s= String.valueOf( Character.toUpperCase(s.charAt(0)) ) + s.substring(1);
+        } else {
+            s= String.valueOf(o);
+        }
+        jython.add( nodeAddress + "." + pcd.propertyName + " = " + s );
+
+        return jython;
+    }
+    
     private static ArrayList<String> vapToJython( String nodeAddress, DomNode src, DomNode dst ) {
         ArrayList<String> jython= new ArrayList<>();
         
         List<Diff> diffs= dst.diffs(src);
         for ( Diff d: diffs ) {
             if ( d instanceof PropertyChangeDiff ) {
-                PropertyChangeDiff pcd= (PropertyChangeDiff)d;
-                String propertyName= pcd.propertyName;
-                if ( propertyName.endsWith("scale") ) {
-                    continue;
-                } else if ( propertyName.endsWith("autoLabel") ) {
-                    continue;
-                } else if ( propertyName.startsWith("options") ) {
-                    continue;
-                }
-                Object o= pcd.newVal;
-                String s;
-                if ( o instanceof String ) {
-                    s= "'"+o+"'";
-                } else if ( o instanceof Boolean ) {
-                    s= o.toString();
-                    s= String.valueOf( Character.toUpperCase(s.charAt(0)) ) + s.substring(1);
-                } else if ( o instanceof Color ) {
-                    Color c= (Color)o;
-                    s= "color('"+ColorUtil.nameForColor(c)+"')";
-                } else if ( o instanceof DatumRange ) {
-                    s= "datumRange('"+o+"')";
-                } else if ( o instanceof Datum ) {
-                    s= "datum('"+o+"')";
-                } else if ( o instanceof Enum ) {
-                    String sclaz= ((Enum) o).getDeclaringClass().getCanonicalName();
-                    jython.add( "import " + sclaz );
-                    s= "" + sclaz + "."+ o;
-                    //s= String.valueOf( Character.toUpperCase(s.charAt(0)) ) + s.substring(1);
-                } else {
-                    s= String.valueOf(o);
-                }
-                jython.add( nodeAddress + "." + pcd.propertyName + " = " + s );
-                
+                jython = vapToJython( jython, nodeAddress, (PropertyChangeDiff)d );
 //            } else if ( d instanceof )
             } else  {
                 throw new IllegalArgumentException("only property change diffs!");
@@ -1139,27 +1151,8 @@ public class DomUtil {
         for ( Diff d: diffs ) {
             if ( d instanceof PropertyChangeDiff ) {
                 PropertyChangeDiff pcd= (PropertyChangeDiff)d;
-                String propertyName= pcd.propertyName;
-                if ( propertyName.endsWith("scale") ) {
-                    continue;
-                } else if ( propertyName.endsWith("autoLabel") ) {
-                    continue;
-                } else if ( propertyName.startsWith("options") ) {
-                    continue;
-                }
-                Object o= pcd.newVal;
-                String s;
-                if ( o instanceof String ) {
-                    s= "'"+o+"'";
-                } else if ( o instanceof Boolean ) {
-                    s= o.toString();
-                    s= String.valueOf( Character.toUpperCase(s.charAt(0)) ) + s.substring(1);
-                } else {
-                    s= String.valueOf(o);
-                }
-                jython.add( "dom." + pcd.propertyName + " = " + s );
+                jython = vapToJython( jython, "dom", pcd );
                 
-//            } else if ( d instanceof )
             } else if ( d instanceof ArrayNodeDiff ) {
                 ArrayNodeDiff and= (ArrayNodeDiff)d;
                 if ( null!=and.action ) switch (and.action) {
@@ -1184,7 +1177,7 @@ public class DomUtil {
                             jython.addAll( vapToJython( "dom.plotElements["+and.index+"]", new PlotElement(), (DomNode)and.node ) );
                         } else if ( and.node instanceof BindingModel ) {
                             BindingModel bm= (BindingModel)and.node;
-                            jython.add( "bind( dom.getElementById('" + bm.srcId +"'), " + bm.srcProperty + ",dom.getElementById('" +  bm.dstId + "'), "+ bm.dstProperty );
+                            jython.add( "bind( dom.getElementById('" + bm.srcId +"'), '" + bm.srcProperty + "' ,dom.getElementById('" +  bm.dstId + "'), '"+ bm.dstProperty + "' )" );
                         } else {
                             jython.add( "insert " + d.toString());
                         }
