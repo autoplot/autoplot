@@ -1079,10 +1079,10 @@ public class DomUtil {
         return dsfs;
     }
     
-    private static ArrayList<String> vapToJython( DomNode n0, DomNode n ) {
+    private static ArrayList<String> vapToJython( String nodeAddress, DomNode src, DomNode dst ) {
         ArrayList<String> jython= new ArrayList<>();
         
-        List<Diff> diffs= n0.diffs(n);
+        List<Diff> diffs= dst.diffs(src);
         for ( Diff d: diffs ) {
             if ( d instanceof PropertyChangeDiff ) {
                 PropertyChangeDiff pcd= (PropertyChangeDiff)d;
@@ -1101,10 +1101,15 @@ public class DomUtil {
                 } else if ( o instanceof Boolean ) {
                     s= o.toString();
                     s= String.valueOf( Character.toUpperCase(s.charAt(0)) ) + s.substring(1);
+                } else if ( o instanceof Enum ) {
+                    String sclaz= ((Enum) o).getDeclaringClass().getCanonicalName();
+                    jython.add( "import " + sclaz );
+                    s= "" + sclaz + "."+ o;
+                    //s= String.valueOf( Character.toUpperCase(s.charAt(0)) ) + s.substring(1);
                 } else {
                     s= String.valueOf(o);
                 }
-                jython.add( "dom." + pcd.propertyName + " = " + s );
+                jython.add( nodeAddress + "." + pcd.propertyName + " = " + s );
                 
 //            } else if ( d instanceof )
             } else  {
@@ -1154,7 +1159,7 @@ public class DomUtil {
                         if ( and.node instanceof Annotation ) {
                             jython.add( "from org.autoplot.dom import Annotation" );
                             jython.add( "dom.controller.addAnnotation(Annotation())" );
-                            jython.addAll( vapToJython( new Annotation(), (DomNode)and.node ) );
+                            jython.addAll( vapToJython( "dom.annotations["+and.index+"]", new Annotation(), (DomNode)and.node ) );
                         } else {
                             jython.add( "insert " + d.toString());
                         }
