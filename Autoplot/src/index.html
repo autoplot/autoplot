@@ -26,8 +26,12 @@
         
         <p>SourceForge has made changes which require special actions in the release process.  Please be aware that this may cause unusual behavior.</p>
         
-        <p>Bugfixes (2018-02-27 r22135):</p>
+        <p>Bugfixes (2018-02-28 r22149):</p>
         <ul>
+            <li>1965: "and" and "or" need to be infix operators in mashup.  Thanks, Allison!
+            <li>1963:  Ivar caught where a loop didn't check the dirty flag to see if a script needed to be saved.
+            <li>popup documentation for annotation and plot now have link to wiki.  Thanks, Ivar!
+            <li>two-argument properly accum checks units now.
             <li>Correct histogram mode when data x units are different than axis units.
             <li>dasCore didn't support axis labels on top.
             <li>1408: experiment with leaving the script name onto the address bar by replacing it when the progress bar finishes.
@@ -93,6 +97,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>mashup tool guesses names for variables.
             <li>jython script plot command has topAxisOf keyword which makes a new plot with the axis drawn on top.
             <li>improve error message when ISO8601 time is sent to DatumRangeUtil.parseTimeRange (not parseTime).
             <li>add tickSpacing property to orbit control GUI.
