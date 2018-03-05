@@ -501,6 +501,9 @@ public class CdfDataSource extends AbstractDataSource {
                 constraint1 = constraint;
             }            
             QDataSet parm= wrapDataSet( cdf, sy, constraint1, false, false, null );
+            if ( parm.length()==1 && parm.rank()==2 && result.rank()>1 && result.length()>1 ) {
+                parm= parm.slice(0); // reform rte_1731551069
+            }  // rte_1731551069: check for non-time-varying data for "Y" which needs to be reformed.  With where constraint, coerce rank 1 Y to rank 2.
             result = (MutablePropertyDataSet) Ops.link( result.property(QDataSet.DEPEND_0), parm, result );
         }
         
@@ -509,6 +512,9 @@ public class CdfDataSource extends AbstractDataSource {
             int ieq= w.indexOf(".");
             String sparm= w.substring(0,ieq);
             QDataSet parm= wrapDataSet( cdf, sparm, constraint, false, false, null );
+            if ( parm.length()==1 && parm.rank()==2 && result.rank()>1 && result.length()>1 ) {
+                parm= Ops.replicate( parm.slice(0), result.length() ); // reform rte_1731551069
+            }
             result = doWhereFilter( w, parm, result );
         }
         
