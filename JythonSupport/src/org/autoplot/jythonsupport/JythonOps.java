@@ -349,9 +349,6 @@ public class JythonOps {
     public static String addToSearchPath( PyList syspath, String path, ProgressMonitor mon ) throws IOException, URISyntaxException {
         if ( path.endsWith(".jar") ) {
             File jarFile= FileSystemUtil.doDownload( path, mon );
-            //syspath.append( new PyString(jarFile.toString()));
-            //return jarFile.toString();
-            //THE CODE BELOW DOESN'T NEED TO BE EXECUTED
             File destDir= FileSystem.settings().getLocalCacheDir();
             destDir= new File( destDir, "jar" );
             String ss= path.replace("://", "/");
