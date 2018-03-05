@@ -5753,7 +5753,6 @@ APSplash.checkTime("init 240");
                 public void propertyChange(PropertyChangeEvent evt) {
                     Runnable run= new Runnable() {
                         public void run() {
-                            logger.info("calling code following script invocation");
                             getDataSetSelector().setValue(script);
                         }
                     };
