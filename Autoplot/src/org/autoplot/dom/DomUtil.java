@@ -32,6 +32,7 @@ import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.state.StatePersistence;
+import org.das2.util.ColorUtil;
 
 /**
  * operations for the DOM, such as search-for-node and child properties
@@ -1101,6 +1102,13 @@ public class DomUtil {
                 } else if ( o instanceof Boolean ) {
                     s= o.toString();
                     s= String.valueOf( Character.toUpperCase(s.charAt(0)) ) + s.substring(1);
+                } else if ( o instanceof Color ) {
+                    Color c= (Color)o;
+                    s= "color('"+ColorUtil.nameForColor(c)+"')";
+                } else if ( o instanceof DatumRange ) {
+                    s= "datumRange('"+o+"')";
+                } else if ( o instanceof Datum ) {
+                    s= "datum('"+o+"')";
                 } else if ( o instanceof Enum ) {
                     String sclaz= ((Enum) o).getDeclaringClass().getCanonicalName();
                     jython.add( "import " + sclaz );
@@ -1160,6 +1168,23 @@ public class DomUtil {
                             jython.add( "from org.autoplot.dom import Annotation" );
                             jython.add( "dom.controller.addAnnotation(Annotation())" );
                             jython.addAll( vapToJython( "dom.annotations["+and.index+"]", new Annotation(), (DomNode)and.node ) );
+                        } else if ( and.node instanceof Plot ) {
+                            jython.add( "from org.autoplot.dom import Plot" );
+                            jython.add( "dom.controller.addPlot(Plot())" );
+                            jython.addAll( vapToJython( "dom.plots["+and.index+"]", new Plot(), (DomNode)and.node ) );
+                        } else if ( and.node instanceof Row ) {
+                        } else if ( and.node instanceof Column ) {
+                        } else if ( and.node instanceof DataSourceFilter ) {
+                            jython.add( "from org.autoplot.dom import DataSourceFilter" );
+                            jython.add( "dom.controller.addDataSourceFilter()" );
+                            jython.addAll( vapToJython( "dom.dataSourceFilters["+and.index+"]", new DataSourceFilter(), (DomNode)and.node ) );
+                        } else if ( and.node instanceof PlotElement ) {
+                            jython.add( "from org.autoplot.dom import PlotElement" );
+                            jython.add( "dom.controller.addPlotElement(None,None)" );
+                            jython.addAll( vapToJython( "dom.plotElements["+and.index+"]", new PlotElement(), (DomNode)and.node ) );
+                        } else if ( and.node instanceof BindingModel ) {
+                            BindingModel bm= (BindingModel)and.node;
+                            jython.add( "bind( dom.getElementById('" + bm.srcId +"'), " + bm.srcProperty + ",dom.getElementById('" +  bm.dstId + "'), "+ bm.dstProperty );
                         } else {
                             jython.add( "insert " + d.toString());
                         }
