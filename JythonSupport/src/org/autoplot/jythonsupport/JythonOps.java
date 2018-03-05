@@ -325,17 +325,19 @@ public class JythonOps {
      * download the resource, unpack it, and add it to the search path.
      *
      * Here is an example use:
-     * <pre>{@code
+     * <blockquote><pre><small>{@code
      *import sys
-     *addToSearchPath( sys.path, 'http://www.trieuvan.com/apache//commons/math/binaries/commons-math3-3.6.1-bin.zip/commons-math3-3.6.1/commons-math3-3.6.1.jar', monitor )
+     *addToSearchPath( sys.path, 'http://www-us.apache.org/dist//commons/math/binaries/commons-math3-3.6.1-bin.zip/commons-math3-3.6.1/commons-math3-3.6.1.jar', monitor )
      *from org.apache.commons.math3.distribution import BetaDistribution
      *beta= BetaDistribution(2,5)
+     *
      *xx= linspace(0,1.0,100)
      *yy= zeros(100)
-     *for i in indgen(100): yy[i]= beta.density(xx[i].value())
+     *for i in indgen(100):
+     *    yy[i]= beta.density(xx[i].value())
      *#yy= map( xx, beta.density )
      *plot( xx, yy )
-     *}</pre>
+     *}</small></pre></blockquote>
      * @param syspath the list of folders to search, should be sys.path.
      * @param path the path to add, which should be a jar file, possibly contained within a zip on an http site.
      * @param mon monitor for the download.
