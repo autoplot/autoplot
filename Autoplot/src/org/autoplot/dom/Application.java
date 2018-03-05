@@ -397,7 +397,7 @@ public class Application extends DomNode {
         for ( int i=0; i<Math.min(this.canvases.size(),that.canvases.size()); i++ ) {
             Canvas thisCanvas= this.canvases.get(i);
             Canvas thatCanvas= that.canvases.get(i);
-            result.addAll( DomUtil.childDiffs( "Canvases["+i+"]", thatCanvas.diffs( thisCanvas ) ) );
+            result.addAll( DomUtil.childDiffs( "canvases["+i+"]", thatCanvas.diffs( thisCanvas ) ) );
         }
 
         for ( int i=0; i<Math.min(this.plots.size(),that.plots.size()); i++ ) {
