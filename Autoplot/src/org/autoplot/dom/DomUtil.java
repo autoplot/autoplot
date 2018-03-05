@@ -1078,5 +1078,101 @@ public class DomUtil {
         }
         return dsfs;
     }
+    
+    private static ArrayList<String> vapToJython( DomNode n0, DomNode n ) {
+        ArrayList<String> jython= new ArrayList<>();
+        
+        List<Diff> diffs= n0.diffs(n);
+        for ( Diff d: diffs ) {
+            if ( d instanceof PropertyChangeDiff ) {
+                PropertyChangeDiff pcd= (PropertyChangeDiff)d;
+                String propertyName= pcd.propertyName;
+                if ( propertyName.endsWith("scale") ) {
+                    continue;
+                } else if ( propertyName.endsWith("autoLabel") ) {
+                    continue;
+                } else if ( propertyName.startsWith("options") ) {
+                    continue;
+                }
+                Object o= pcd.newVal;
+                String s;
+                if ( o instanceof String ) {
+                    s= "'"+o+"'";
+                } else if ( o instanceof Boolean ) {
+                    s= o.toString();
+                    s= String.valueOf( Character.toUpperCase(s.charAt(0)) ) + s.substring(1);
+                } else {
+                    s= String.valueOf(o);
+                }
+                jython.add( "dom." + pcd.propertyName + " = " + s );
+                
+//            } else if ( d instanceof )
+            } else  {
+                throw new IllegalArgumentException("only property change diffs!");
+            }
+        }
+        return jython;
+    }
+    
+    /**
+     * Ivar requested a vap-to-Jython converter.
+     * @param app0
+     * @param app
+     * @return 
+     */
+    public static String[] vapToJython( Application app0, Application app ) {
+        ArrayList<String> jython= new ArrayList<>();
+        List<Diff> diffs= app0.diffs(app);
+        for ( Diff d: diffs ) {
+            if ( d instanceof PropertyChangeDiff ) {
+                PropertyChangeDiff pcd= (PropertyChangeDiff)d;
+                String propertyName= pcd.propertyName;
+                if ( propertyName.endsWith("scale") ) {
+                    continue;
+                } else if ( propertyName.endsWith("autoLabel") ) {
+                    continue;
+                } else if ( propertyName.startsWith("options") ) {
+                    continue;
+                }
+                Object o= pcd.newVal;
+                String s;
+                if ( o instanceof String ) {
+                    s= "'"+o+"'";
+                } else if ( o instanceof Boolean ) {
+                    s= o.toString();
+                    s= String.valueOf( Character.toUpperCase(s.charAt(0)) ) + s.substring(1);
+                } else {
+                    s= String.valueOf(o);
+                }
+                jython.add( "dom." + pcd.propertyName + " = " + s );
+                
+//            } else if ( d instanceof )
+            } else if ( d instanceof ArrayNodeDiff ) {
+                ArrayNodeDiff and= (ArrayNodeDiff)d;
+                if ( null!=and.action ) switch (and.action) {
+                    case Insert:
+                        if ( and.node instanceof Annotation ) {
+                            jython.add( "from org.autoplot.dom import Annotation" );
+                            jython.add( "dom.controller.addAnnotation(Annotation())" );
+                            jython.addAll( vapToJython( new Annotation(), (DomNode)and.node ) );
+                        } else {
+                            jython.add( "insert " + d.toString());
+                        }
+                        break;
+                    case Delete:
+                        jython.add( "delete " + d.toString());
+                        break;
+                    case Move:
+                        jython.add( "move " + d.toString());
+                        break;
+                    default:
+                        break;
+                }
+            } else { 
+                jython.add( d.toString());
+            }
+        }
+        return jython.toArray( new String[jython.size()] );
+    }
 
 }
