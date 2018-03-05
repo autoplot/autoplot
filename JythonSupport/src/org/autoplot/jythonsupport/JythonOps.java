@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.jythonsupport;
 
@@ -12,6 +8,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 import org.autoplot.datasource.FileSystemUtil;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -43,12 +40,12 @@ import org.das2.util.monitor.ProgressMonitor;
  * Contains operations that are only available to Jython code, and is dependent
  * on the jython libraries.
  *
- * History:
- *   2011-01-29 jbf: coerce command renamed to coerceToDs
- * 
  * @author jbf
  */
 public class JythonOps {
+    
+    private static final Logger logger= Logger.getLogger("jython");
+    
     public static QDataSet applyLambda(QDataSet ds, PyFunction f ) {
         QubeDataSetIterator it = new QubeDataSetIterator(ds);
         DDataSet result = DDataSet.create(DataSetUtil.qubeDims(ds));
@@ -322,7 +319,8 @@ public class JythonOps {
     }
     
     /**
-     * download the resource, unpack it, and add it to the search path.
+     * download the resource, unpack it, and add it to the search path.  Note
+     * such scripts will not work with Webstart releases!
      *
      * Here is an example use:
      * <blockquote><pre><small>{@code
@@ -347,6 +345,9 @@ public class JythonOps {
      * @throws URISyntaxException 
      */
     public static String addToSearchPath( PyList syspath, String path, ProgressMonitor mon ) throws IOException, URISyntaxException {
+        if ( System.getProperty("javawebstart.version")!=null ) {
+            logger.warning("Jython addToSearchPath will probably fail because this is not supported with Webstart.");
+        }
         if ( path.endsWith(".jar") ) {
             File jarFile= FileSystemUtil.doDownload( path, mon );
             File destDir= FileSystem.settings().getLocalCacheDir();
