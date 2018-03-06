@@ -2183,6 +2183,8 @@ APSplash.checkTime("init 52.9");
             if ( split.file!=null && ( split.file.endsWith(".vap") || split.file.endsWith(".vapx" ) ) ) {
                 tickleTimer.tickle(); 
                 pendingVap= surl;
+            } else {
+                applicationModel.addRecent(surl);
             }
         } catch (RuntimeException ex) {
             if ( ex.getCause()!=null && ex.getCause() instanceof HtmlResponseIOException ) {
