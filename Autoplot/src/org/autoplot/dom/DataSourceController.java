@@ -1750,9 +1750,9 @@ public class DataSourceController extends DomNodeController {
                 logger.log(Level.FINE, "load {0}", dss);
                 result = dss.getDataSet(mymon);
 
-                if (dsf.getUri().length() > 0) {
-                    this.model.addRecent(dsf.getUri());
-                }
+                //if (dsf.getUri().length() > 0) {
+                //    this.model.addRecent(dsf.getUri());
+                //}
                 logger.log(Level.FINE, "{0} read dataset: {1}", new Object[]{dss, result});
                 Map<String, Object> props = dss.getMetadata(new AlertNullProgressMonitor("getMetadata"));
 
