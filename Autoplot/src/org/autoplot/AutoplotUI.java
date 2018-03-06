@@ -5718,7 +5718,8 @@ APSplash.checkTime("init 240");
     
     /**
      * run the script, using the reference on the tools menu.  The security is going to be a bit different soon.
-     * @param script 
+     * This should be called from the event thread because it creates GUI components.
+     * @param script the URI of the script to run
      */
     public void runScriptTools( final String script ) {
         runScript(script);
@@ -5727,18 +5728,18 @@ APSplash.checkTime("init 240");
     /**
      * present the "Run Script" dialog, asking the user to review the 
      * script before running it.
-     * This should be called from the event thread.
-     * @param script 
+     * This should be called from the event thread because it creates GUI components.
+     * @param script the URI of the script to run
      */
     private void runScript( final String script ) {
         try {
             final URISplit split= URISplit.parse(script);
-            final File ff = DataSetURI.getFile(DataSetURI.getURI(script), DasProgressPanel.createFramed(AutoplotUI.this,"downloading script"));
+            //final File ff = DataSetURI.getFile(DataSetURI.getURI(script), DasProgressPanel.createFramed(AutoplotUI.this,"downloading script"));
             final RunScriptPanel pp = new RunScriptPanel();
             final HashMap params= URISplit.parseParams(split.params);
-            pp.loadFile(ff);
+            pp.loadFileSoon(AutoplotUI.this,script);
 
-            final DasProgressPanel mon= DasProgressPanel.createFramed(AutoplotUI.this,"Running script "+ff );
+            final DasProgressPanel mon= DasProgressPanel.createFramed(AutoplotUI.this,"Running script "+script );
             File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
                         
             boolean isTool= split.path.contains(tools.toString()); // here is the trust...
@@ -5777,9 +5778,6 @@ APSplash.checkTime("init 240");
                 }
             };
             SwingUtilities.invokeLater(run);
-        } catch (URISyntaxException ex) {
-            setMessage(WARNING_ICON,ex.getMessage());
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (HtmlResponseIOException ex ) {
             handleHtmlResponse(script, ex);
         } catch (IOException ex) {
