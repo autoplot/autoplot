@@ -178,6 +178,8 @@ public class ApplicationModel {
 
     private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot");
 
+    private static final Logger bookmarksLogger = org.das2.util.LoggerManager.getLogger("autoplot.bookmarks");
+    
     public static final String PREF_RECENT = "recent";
     public static final String PROPERTY_RECENT = PREF_RECENT;
     public static final String PROPERTY_BOOKMARKS = "bookmarks";
@@ -423,7 +425,7 @@ public class ApplicationModel {
                     }
                     mon.setProgressMessage("done loading vap file");
                     mon.finished();
-                    addRecent( suri );
+                    //addRecent( suri );
                 } catch (HtmlResponseIOException ex ) {
                     // we know the URL here, so rethrow it.
                     URL url= ex.getURL();
@@ -634,18 +636,19 @@ public class ApplicationModel {
      * @param suri
      */
     public void addRecent(String suri) {
-
+        
+        bookmarksLogger.log(Level.FINER, "addRecent ({0})", suri);
         if ( !DasApplication.hasAllPermission() ) {
             return;
         }
 
         if ( suri.contains("nohistory=true") ) {
-            logger.fine("Not logging URI because it contains nohistory=true");
+            bookmarksLogger.fine("Not logging URI because it contains nohistory=true");
             return;
         } 
 
         if ( dontRecordHistory ) {
-            logger.finest("Not logging URI because history is turned off");
+            bookmarksLogger.finest("Not logging URI because history is turned off");
             return;
         }
         
@@ -668,7 +671,7 @@ public class ApplicationModel {
                     }
                 }
                 if ( rm.size()>0 ) {
-                    logger.log(Level.FINE, "removing {0} other TSB uris", rm.size());
+                    bookmarksLogger.log(Level.FINE, "removing {0} other TSB uris", rm.size());
                     for ( Bookmark o: rm ) {
                         newValue.remove(o);
                     }
