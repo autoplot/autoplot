@@ -756,7 +756,6 @@ public final class AutoplotUI extends javax.swing.JFrame {
             public void actionPerformed( ActionEvent ev ) {
                 if ( ScriptContext.getViewWindow()==AutoplotUI.this ) {
                     org.das2.util.LoggerManager.logGuiEvent(ev);                    
-                    applicationModel.addRecent(dataSetSelector.getValue());
                     runScript( dataSetSelector.getValue() );
                 } else {
                     org.das2.util.LoggerManager.logGuiEvent(ev);     
