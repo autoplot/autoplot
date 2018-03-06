@@ -27,6 +27,8 @@ import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.MetadataModel;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.LogNames;
+import org.das2.qds.DDataSet;
+import org.das2.qds.FDataSet;
 import org.das2.qds.ops.Ops;
 
 /**
@@ -127,6 +129,36 @@ public class IstpMetadataModel extends MetadataModel {
         }
     }
 
+    /**
+     * Return the range from VALIDMIN to VALIDMAX, as an array of two numbers.  Note I found
+     * as soon as I wrote this, that the CDF library has already converted them to doubles.  This is too
+     * bad, and should be fixed at some point.  If the unit is an ordinal unit 
+     * (see LABL_PTR_1), then return null.
+     * Note QDataSet only allows times from 1000AD to 9000AD when Units are TimeLocationUnits.
+     * Note this is used in CdfDataSource and other projects.  
+     * @param attrs the ISTP attributes
+     * @param units the units for this variable, used to interpret doubles.
+     * @return the range.
+     */
+    private static Number[] getValidRangeDs(Map attrs, Units units) {
+        Number min= (Number) attrs.get("VALIDMIN");
+        Number max= (Number) attrs.get("VALIDMAX");
+        
+        if ( UnitsUtil.isTimeLocation(units) ) {
+            DatumRange vrange= new DatumRange( 3.15569952E13, 2.840126112E14, Units.cdfEpoch ); // approx 1000AD to 9000AD
+            if ( vrange.min().doubleValue(units)>min.doubleValue() ) min= vrange.min().doubleValue(units);
+            if ( vrange.max().doubleValue(units)<max.doubleValue() ) max= vrange.max().doubleValue(units);
+            if ( vrange.min().doubleValue(units)>max.doubleValue() ) max= vrange.max().doubleValue(units); //vap+cdaweb:ds=IM_HK_FSW&id=BF_DramMbeCnt&timerange=2005-12-18
+        }
+        if ( UnitsUtil.isNominalMeasurement(units) ) {
+            logger.fine("valid range not used for ordinal units");
+            return null;
+        } else {
+            return new Number[] { min, max };
+        }
+    }
+
+    
     /**
      * Return the range from VALIDMIN to VALIDMAX.  If the unit is an ordinal unit (see LABL_PTR_1), then return null.
      * Note QDataSet only allows times from 1000AD to 9000AD when Units are TimeLocationUnits.
@@ -422,6 +454,12 @@ public class IstpMetadataModel extends MetadataModel {
                     properties.put(QDataSet.VALID_MIN, range.min().doubleValue(units));
                     properties.put(QDataSet.VALID_MAX, range.max().doubleValue(units));
                 }
+                
+//                Number[] rangeDs = getValidRangeDs(attrs, units);
+//                if ( rangeDs!=null ) {
+//                    properties.put(QDataSet.VALID_MIN, rangeDs[0]);
+//                    properties.put(QDataSet.VALID_MAX, rangeDs[1]);
+//                }
 
                 if ( ofv!=null && ofv instanceof Number ) {
                     Number fillVal= (Number) ofv;
