@@ -7,12 +7,14 @@
 
 package org.autoplot;
 
+import java.awt.Window;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JCheckBox;
@@ -23,7 +25,9 @@ import org.autoplot.jythonsupport.JythonRefactory;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.util.InteractiveInterpreter;
 import org.autoplot.datasource.AutoplotSettings;
+import org.autoplot.datasource.DataSetURI;
 import org.autoplot.jythonsupport.ui.EditorTextPane;
+import org.das2.components.DasProgressPanel;
 
 /**
  *
@@ -107,6 +111,37 @@ public class RunScriptPanel extends javax.swing.JPanel {
         } else {
             SwingUtilities.invokeLater(run);
         }
+    }
+    
+    /**
+     * load the file into the panel for review, asynchronously.
+     * @param window the dialog parent for a progress bar.
+     * @param script the script location.
+     * @throws IOException
+     */
+    protected void loadFileSoon( final Window window, final String script ) throws IOException {
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final File ff = DataSetURI.getFile( DataSetURI.getURI(script), DasProgressPanel.createFramed( window,"downloading script"));
+                    loadFile(ff);
+                } catch (URISyntaxException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    try {
+                        logger.log(Level.SEVERE, null, ex);
+                        Document d = getTextArea().getDocument();
+                        d.remove( 0, d.getLength() );
+                        d.insertString( 0, "unable to load script", null );
+                        scriptFilename.setText("unable to load script");
+                    } catch (BadLocationException ex1) {
+                        Logger.getLogger(RunScriptPanel.class.getName()).log(Level.SEVERE, null, ex1);
+                    }
+                }
+            }
+        };
+        new Thread(run,"loadScriptAsynchronously").start();
     }
     
 
