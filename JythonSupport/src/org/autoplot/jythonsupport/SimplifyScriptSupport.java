@@ -99,7 +99,7 @@ public class SimplifyScriptSupport {
              Module n;
              try {
                 n = (Module)org.python.core.parser.parse( script, "exec" );
-             } catch ( PySyntaxError ex ) {
+             } catch ( PySyntaxError ex ) { // pop off the last line and try again.
                  script= JythonUtil.join( Arrays.copyOf(ss,ss.length-1), "\n" );
                  n = (Module)org.python.core.parser.parse( script, "exec" );
                  lastLine--;
@@ -476,7 +476,6 @@ public class SimplifyScriptSupport {
         public Object visitName(Name node) throws Exception {
             if ( !names.contains(node.id) ) {
                 visitNameFail= true;
-                looksOkay= false; //TODO: check this
             }
             return super.visitName(node); //To change body of generated methods, choose Tools | Templates.
         }
@@ -493,19 +492,18 @@ public class SimplifyScriptSupport {
          @Override
          public void traverse(SimpleNode sn) throws Exception {
              if ( sn instanceof Call ) {
-                 looksOkay= trivialFunctionCall(sn);
+                 looksOkay= trivialFunctionCall(sn) || trivialConstructorCall(sn);
              } else if ( sn instanceof Assign ) { // TODO: I have to admit I don't understand what traverse means.  I would have thought it was all nodes...
                  Assign a= ((Assign)sn);
                  exprType et= a.value;
                  if ( et instanceof Call ) {
-                     looksOkay= trivialFunctionCall(et);
+                     looksOkay= trivialFunctionCall(et) || trivialConstructorCall(sn);
                  }
              } else if ( sn instanceof Name ) {
                  String t= ((Name)sn).id;
                  if ( !names.contains(t)
                          && !okaySet.contains(t)) {
                     visitNameFail= true;
-                    looksOkay= false; //TODO: check this
                  }
              } else if ( sn instanceof Attribute ) {
                  traverse( ((Attribute)sn).value );  // DatumRangeUtil
@@ -525,7 +523,7 @@ public class SimplifyScriptSupport {
              } else if ( sn instanceof Num ) {
                  
              } else {
-                 logger.fine("unchecked: "+sn );
+                 logger.log(Level.FINE, "unchecked: {0}", sn);
              }
          }
          public boolean looksOkay() {
