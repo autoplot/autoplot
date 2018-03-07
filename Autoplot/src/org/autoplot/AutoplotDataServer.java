@@ -367,6 +367,9 @@ public class AutoplotDataServer {
         alm.logPrefsSettings( logger );
 
         String suri = alm.getValue("uri");
+        if ( suri.startsWith("'") && suri.endsWith("'") ) {
+            suri= suri.substring( 1, suri.length()-1 );
+        }
 
         String timeRange = alm.getValue("timeRange");
 
