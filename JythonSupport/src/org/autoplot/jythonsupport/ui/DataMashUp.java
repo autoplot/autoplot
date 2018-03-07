@@ -886,29 +886,27 @@ public class DataMashUp extends javax.swing.JPanel {
 
         DefaultTreeModel model= (DefaultTreeModel) expressionTree.getModel();
 
-        MutableTreeNode mtn= (MutableTreeNode)tp.getLastPathComponent();
-        MutableTreeNode parent= (MutableTreeNode)mtn.getParent();
+        MutableTreeNode oldBranch= (MutableTreeNode)tp.getLastPathComponent();
+        MutableTreeNode parent= (MutableTreeNode)oldBranch.getParent();
         
-        if ( !data.startsWith("vap+") ) { //TODO: cheesy vap+ to detect URIs.
-            int index= -1;
-            String arg0= null;
-            if ( parent!=null ) {
-                index= parent.getIndex(mtn);
-                String vv= mtn.toString();
-                if ( Ops.isSafeName(vv) ) {
-                    arg0=vv;
-                }
-                parent.remove(mtn);
-                
-            } 
-
-            MutableTreeNode n= getTreeNode(data);
-
-            if ( n.getChildCount()>0 ) {
-                if ( Ops.isSafeName(n.getChildAt(0).toString()) && arg0!=null ) {
-                    ((DefaultMutableTreeNode)n.getChildAt(0)).setUserObject(arg0);
-                }
+        final MutableTreeNode newBranch= getTreeNode(data);
+        
+        int index= -1;
+        String arg0= null;
+        if ( parent!=null ) {
+            index= parent.getIndex(oldBranch);
+            String vv= oldBranch.toString();
+            if ( Ops.isSafeName(vv) && oldBranch.getChildCount()==0 ) {
+                arg0=vv;
             }
+            model.removeNodeFromParent(oldBranch);
+        } 
+
+        if ( newBranch.getChildCount()>0 ) {
+            if ( Ops.isSafeName(newBranch.getChildAt(0).toString()) && arg0!=null ) {
+                ((DefaultMutableTreeNode)newBranch.getChildAt(0)).setUserObject(arg0);
+            }
+        }
 //            if ( false ) { // my attempt to replace the first argument with the expression.
 //                if ( n.getChildCount()>0 ) {
 //                    if ( !isChildOf( mtn, n ) ) {
@@ -920,40 +918,35 @@ public class DataMashUp extends javax.swing.JPanel {
 //                    }
 //                }
 //            }
-            
-            if ( parent==null ) {
-                model.setRoot(n);
-            } else {
-                parent.insert( n, index );
-                model.nodeStructureChanged(parent);
-            }
-            tp= new TreePath(n);
-            
+
+        if ( parent==null ) {
+            model.setRoot(newBranch);
         } else {
-            mtn.setUserObject(data);
-            model.nodeChanged(mtn);
+            model.insertNodeInto( newBranch, parent, index );
         }
 
-//        if ( parent==null ) {
-//            model.setRoot( mtn );
-//        } else { 
-//            int index= model.getIndexOfChild( parent, mtn );
-//            model.removeNodeFromParent(mtn);
-//            model.insertNodeInto( mtn, parent, index );
-//        }
-
-        final TreePath ftp= tp;
-        
-        expressionTree.collapsePath(ftp);
         SwingUtilities.invokeLater( new Runnable() {
             @Override
             public void run() {
-                expressionTree.expandPath(ftp);
+                expressionTree.expandPath( getPath(newBranch) );
                 imaged.clear();
                 resolved.clear();
                 expressionTree.treeDidChange();
             }
         });        
+    }
+    
+    private static TreePath getPath(TreeNode treeNode) {
+        List<Object> nodes = new ArrayList<>();
+        if (treeNode != null) {
+            nodes.add(treeNode);
+            treeNode = treeNode.getParent();
+            while (treeNode != null) {
+                nodes.add(0, treeNode);
+                treeNode = treeNode.getParent();
+            }
+        }
+        return nodes.isEmpty() ? null : new TreePath(nodes.toArray());
     }
     
     /**
