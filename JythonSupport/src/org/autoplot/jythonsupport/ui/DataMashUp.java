@@ -901,12 +901,6 @@ public class DataMashUp extends javax.swing.JPanel {
             }
             model.removeNodeFromParent(oldBranch);
         } 
-
-//        if ( newBranch.getChildCount()>0 ) {
-//            if ( Ops.isSafeName(newBranch.getChildAt(0).toString()) && arg0!=null ) {
-//                ((DefaultMutableTreeNode)newBranch.getChildAt(0)).setUserObject(arg0);
-//            }
-//        }
         
         if ( newBranch.getChildCount()>0 ) {
             newBranch.remove(0);
