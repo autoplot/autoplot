@@ -902,22 +902,16 @@ public class DataMashUp extends javax.swing.JPanel {
             model.removeNodeFromParent(oldBranch);
         } 
 
-        if ( newBranch.getChildCount()>0 ) {
-            if ( Ops.isSafeName(newBranch.getChildAt(0).toString()) && arg0!=null ) {
-                ((DefaultMutableTreeNode)newBranch.getChildAt(0)).setUserObject(arg0);
-            }
-        }
-//            if ( false ) { // my attempt to replace the first argument with the expression.
-//                if ( n.getChildCount()>0 ) {
-//                    if ( !isChildOf( mtn, n ) ) {
-//                        String s= n.getChildAt(0).toString();
-//                        if ( s.length()>0 && Character.isJavaIdentifierStart(s.charAt(0)) ) {
-//                            n.remove( 0 );
-//                            n.insert( mtn, 0 );                    
-//                        }
-//                    }
-//                }
+//        if ( newBranch.getChildCount()>0 ) {
+//            if ( Ops.isSafeName(newBranch.getChildAt(0).toString()) && arg0!=null ) {
+//                ((DefaultMutableTreeNode)newBranch.getChildAt(0)).setUserObject(arg0);
 //            }
+//        }
+        
+        if ( newBranch.getChildCount()>0 ) {
+            newBranch.remove(0);
+            newBranch.insert( oldBranch, 0 );
+        }
 
         if ( parent==null ) {
             model.setRoot(newBranch);
