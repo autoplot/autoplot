@@ -255,6 +255,7 @@ public class EditorTextPane extends JEditorPane {
             a.setText(scriptPrime);
             d.setVisible(true);
         } catch ( Exception ex ) {
+            ex.printStackTrace();
             JOptionPane.showMessageDialog( this, ex.toString() );
         }
     }    
