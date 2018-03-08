@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.python.core.PySyntaxError;
 import org.python.parser.ast.If;
 import org.python.parser.ast.Module;
@@ -115,19 +117,25 @@ public class SimplifyScriptSupport {
          }
      }
      
-     private static String getIfBlock( String[] ss, If iff, stmtType[] body, HashSet variableNames, int lastLine1, int depth ) {
+     private static String getIfBlock( String[] ss, If iff, stmtType[] body, HashSet variableNames, int firstLine, int lastLine1, int depth) {
         StringBuilder result= new StringBuilder();
-        String ss1= simplifyScriptToGetCompletions( ss, body, variableNames, -1, lastLine1, depth+1 );
+        String ss1= simplifyScriptToGetCompletions(ss, body, variableNames, firstLine, lastLine1, depth+1 );
         if ( ss1.length()==0 ) {
             String line;
-            if ( iff.beginLine==0 && body[0].beginLine>0 ) {
+            if ( firstLine==0 && iff.beginLine>0 ) {
                 line= ss[body[0].beginLine-1]; 
             } else {
                 line= ss[iff.beginLine];
             }
-            String[] ss2= line.split("\\S",-2);
-            String indent= ss2[0];
-            result.append(indent).append("pass\n");  
+            Pattern p= Pattern.compile("(\\s*)(\\S*).*");
+            Matcher m= p.matcher(ss[firstLine-1]);
+            String indent;
+            if ( m.matches() ) {
+                indent= m.group(1);
+            } else {
+                indent= "";
+            }
+            result.append(indent).append("pass  ## huphup130 \n");  
             logger.fine("things have probably gone wrong...");
         } else {
             appendToResult( result,ss1);
@@ -149,7 +157,7 @@ public class SimplifyScriptSupport {
       */
      public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stmts, HashSet variableNames, int beginLine, int lastLine, int depth  ) {
          int acceptLine= -1;  // first line to accept
-         int currentLine= 0; // current line we are writing (0 is first line).
+         int currentLine= beginLine; // current line we are writing (0 is first line).
          StringBuilder result= new StringBuilder();
          for ( int istatement=0; istatement<stmts.length; istatement++ ) {
              stmtType o= stmts[istatement];
@@ -173,7 +181,9 @@ public class SimplifyScriptSupport {
                  boolean includeBlock;
                  if ( simplifyScriptToGetCompletionsCanResolve( iff.test, variableNames ) ) {
                      for ( int i=beginLine; i<iff.body[0].beginLine; i++ ) {
-                         result.append(ss[i-1]).append("\n");
+                         if ( i>0 && i-1<ss.length ) {
+                            result.append(ss[i-1]).append("\n");
+                         }
                      } // write out the 'if' part
                      includeBlock= true;
                  } else {
@@ -197,12 +207,23 @@ public class SimplifyScriptSupport {
                      lastLine1= lastLine;
                  }
                  if ( includeBlock ) {
-                     String ss1= getIfBlock( ss, iff, iff.body, variableNames, lastLine1, depth+1 );
+                     String ss1= getIfBlock(ss, iff, iff.body, variableNames, beginLine+1, lastLine1, depth+1 );
                      appendToResult( result,ss1);
                      if ( iff.orelse!=null ) {
-                         lastLine1= stmts[istatement+1].beginLine-1;
-                         String ss2= getIfBlock( ss, iff, iff.orelse, variableNames, lastLine1, depth+1 );
-                         appendToResult( result,ss[iff.orelse[0].beginLine-2] ); 
+                         if ( (istatement+1)>=stmts.length ) {
+                            lastLine1= lastLine;
+                         } else {
+                            lastLine1= stmts[istatement+1].beginLine-1;
+                         }
+                         if ( iff.orelse[0].beginLine==0 ) {
+                            appendToResult( result, ss[beginLine+1] + " # huphup" ); 
+                         } else {
+                            beginLine= iff.orelse[0].beginLine;
+                         }
+                         String ss2= getIfBlock(ss, iff, iff.orelse, variableNames, beginLine, lastLine1, depth+1 );
+                         if ( iff.orelse[0].beginLine>2 ) {
+                            appendToResult( result,ss[iff.orelse[0].beginLine-2] ); 
+                         }
                          result.append("\n");
                          appendToResult( result,ss2);
                      }
