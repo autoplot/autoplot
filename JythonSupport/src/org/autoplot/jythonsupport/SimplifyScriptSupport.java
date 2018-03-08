@@ -115,6 +115,26 @@ public class SimplifyScriptSupport {
          }
      }
      
+     private static String getIfBlock( String[] ss, If iff, stmtType[] body, HashSet variableNames, int lastLine1, int depth ) {
+        StringBuilder result= new StringBuilder();
+        String ss1= simplifyScriptToGetCompletions( ss, body, variableNames, -1, lastLine1, depth+1 );
+        if ( ss1.length()==0 ) {
+            String line;
+            if ( iff.beginLine==0 && body[0].beginLine>0 ) {
+                line= ss[body[0].beginLine-1]; 
+            } else {
+                line= ss[iff.beginLine];
+            }
+            String[] ss2= line.split("\\S",-2);
+            String indent= ss2[0];
+            result.append(indent).append("pass\n");  
+            logger.fine("things have probably gone wrong...");
+        } else {
+            appendToResult( result,ss1);
+        }
+        return result.toString();
+     }
+     
      /**
       * Extracts the parts of the program that get parameters or take a trivial amount of time to execute.  
       * This may call itself recursively when if blocks are encountered.
@@ -122,7 +142,7 @@ public class SimplifyScriptSupport {
       * @param ss the entire script.
       * @param stmts statements being processed.
       * @param variableNames variable names that have been resolved.
-      * @param beginLine first line of the script being processed.
+      * @param beginLine first line of the script being processed, or -1 to use stmts[0].beginLine
       * @param lastLine INCLUSIVE last line of the script being processed.
       * @param depth recursion depth, for debugging.
       * @return 
@@ -135,6 +155,7 @@ public class SimplifyScriptSupport {
              stmtType o= stmts[istatement];
              logger.log( Level.FINER, "line {0}: {1}", new Object[] { o.beginLine, o.beginLine>0 ? ss[o.beginLine-1] : "(bad line number)" } );
              if ( o.beginLine>0 ) {
+                 if ( beginLine<0 && istatement==0 ) acceptLine= o.beginLine;
                  beginLine= o.beginLine;
              } else {
                  acceptLine= beginLine; // elif clause in autoplot-test038/lastSuccessfulBuild/artifact/test038_demoParms1.jy
@@ -176,45 +197,17 @@ public class SimplifyScriptSupport {
                      lastLine1= lastLine;
                  }
                  if ( includeBlock ) {
-                     String ss1= simplifyScriptToGetCompletions( ss, iff.body, variableNames, -1, lastLine1, depth+1 );
-                     if ( ss1.length()==0 ) {
-                         String line;
-                         if ( iff.beginLine==0 && beginLine>0 && iff.body[0].beginLine>0 ) {
-                            line= ss[iff.body[0].beginLine-1]; 
-                         } else {
-                            line= ss[iff.beginLine];
-                         }
-                         String[] ss2= line.split("\\S",-2);
-                         String indent= ss2[0];
-                         result.append(indent).append("pass\n");  
-                         logger.fine("things have probably gone wrong...");
-                     } else {
-                         appendToResult( result,ss1);
-                     }
+                     String ss1= getIfBlock( ss, iff, iff.body, variableNames, lastLine1, depth+1 );
+                     appendToResult( result,ss1);
                      if ( iff.orelse!=null ) {
-                         appendToResult( result,ss[lastLine1] );
-                         int lastLine2;
-                         if ( (istatement+1)<stmts.length ) {
-                            lastLine2= stmts[istatement+1].beginLine-1;
-                         } else {
-                            lastLine2= lastLine;
-                         }
-                         String ss2= simplifyScriptToGetCompletions( ss, iff.orelse, variableNames, lastLine1+2, lastLine2, depth+1 );
-                         if ( ss2.length()>0 ) {
-                             result.append("\n");
-                         }
+                         lastLine1= stmts[istatement+1].beginLine-1;
+                         String ss2= getIfBlock( ss, iff, iff.orelse, variableNames, lastLine1, depth+1 );
+                         appendToResult( result,ss[iff.orelse[0].beginLine-2] ); 
+                         result.append("\n");
                          appendToResult( result,ss2);
-                         if ( ss2.length()==0  ) { // we didn't add anything...
-                             String line;
-                             line= ss[iff.orelse[0].beginLine-1];
-                             String[] ss3= line.split("\\S",-2);
-                             String indent= ss3[0];
-                             result.append("\n").append(indent).append("pass\n");  
-                         } else {
-                             result.append("\n");  // write of the else or elif line
-                         }
                      }
                  }
+                 currentLine= lastLine1;
                  acceptLine= -1;
              } else {
                  if ( simplifyScriptToGetCompletionsOkay( o, variableNames ) ) {
@@ -302,9 +295,7 @@ public class SimplifyScriptSupport {
       * @return 
       */
      private static boolean simplifyScriptToGetCompletionsOkay( stmtType o, HashSet<String> variableNames ) {
-         //if ( o.beginLine==607 ) {  // leave this commented code as a reference for debugging
-         //    System.err.println("here at line "+o.beginLine);
-         //}
+         logger.log(Level.FINEST, "simplify script line: {0}", o.beginLine);
          if ( ( o instanceof org.python.parser.ast.ImportFrom ) ) return true;
          if ( ( o instanceof org.python.parser.ast.Import ) ) return true;
          if ( ( o instanceof org.python.parser.ast.ClassDef ) ) return true;
@@ -346,7 +337,9 @@ public class SimplifyScriptSupport {
                  return false;
              }
          }
-         if ( ( o instanceof org.python.parser.ast.If ) )  return simplifyScriptToGetCompletionsOkayNoCalls(o,variableNames);
+         if ( ( o instanceof org.python.parser.ast.If ) )  {
+             return simplifyScriptToGetCompletionsOkayNoCalls(o,variableNames);
+         }
          if ( ( o instanceof org.python.parser.ast.Print ) ) return false;
          logger.log( Level.FINEST, "not okay to simplify: {0}", o);
          return false;
