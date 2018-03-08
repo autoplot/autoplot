@@ -177,6 +177,7 @@ import org.das2.qds.filters.AddFilterDialog;
 import org.das2.qds.filters.FiltersChainPanel;
 import org.autoplot.jythonsupport.ui.DataMashUp;
 import org.autoplot.jythonsupport.ui.EditorTextPane;
+import org.autoplot.layout.LayoutConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -2263,15 +2264,27 @@ APSplash.checkTime("init 52.9");
      * add a new plot and plotElement.  This is attached to control-enter.
      */
     private void plotAnotherUrl() {
-        plotAnotherUrl( (String) dataSetSelector.getValue() );
+        plotAnotherUrl((String) dataSetSelector.getValue(), null );
     }
 
-    private void plotAnotherUrl( final String surl ) {
+    /**
+     * 
+     * @param surl
+     * @param options null or a map containing direction.
+     */
+    private void plotAnotherUrl( final String surl, Map<String,Object> options) {
         try {
             logger.log(Level.FINE, "plotAnotherUrl({0})", surl);
-            PlotElement panel= dom.getController().addPlotElement( null,null );
-            dom.getController().getDataSourceFilterFor(panel).setUri(surl);
-            dom.getController().setPlotElement(panel);
+            if ( options!=null && LayoutConstants.ABOVE==options.get("direction") ) {
+                Plot domPlot = dom.getController().addPlot(LayoutConstants.ABOVE);
+                PlotElement panel= dom.getController().addPlotElement( domPlot,null );
+                dom.getController().getDataSourceFilterFor(panel).setUri(surl);
+                dom.getController().setPlotElement(panel);
+            } else {
+                PlotElement panel= dom.getController().addPlotElement( null,null );
+                dom.getController().getDataSourceFilterFor(panel).setUri(surl);
+                dom.getController().setPlotElement(panel);
+            }
             
         } catch (RuntimeException ex) {
             applicationModel.getExceptionHandler().handleUncaught(ex);
@@ -3481,7 +3494,12 @@ APSplash.checkTime("init 52.9");
             public void run() {
                 if ( AutoplotUI.this.isExpertMode() ) {
                     if ( ( modifiers & KeyEvent.CTRL_MASK ) == KeyEvent.CTRL_MASK ) {
-                        plotAnotherUrl();
+                        if ( ( modifiers & KeyEvent.SHIFT_MASK ) == KeyEvent.SHIFT_MASK ) {
+                            String uri= (String) dataSetSelector.getValue();
+                            plotAnotherUrl( uri, Collections.singletonMap( "direction", LayoutConstants.ABOVE ));
+                        } else {
+                            plotAnotherUrl();
+                        }
                     } else if ( ( modifiers & KeyEvent.SHIFT_MASK ) == KeyEvent.SHIFT_MASK )  {
                         overplotAnotherUrl();
                     } else {
