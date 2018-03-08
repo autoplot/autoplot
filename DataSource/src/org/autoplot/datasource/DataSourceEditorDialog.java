@@ -203,7 +203,7 @@ private void okayButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 private void plotBelowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotBelowButtonActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
     this.cancelled= false;
-    setModifiers( KeyEvent.CTRL_MASK );
+    setModifiers( KeyEvent.CTRL_MASK | evt.getModifiers() );
     this.setVisible(false);
 }//GEN-LAST:event_plotBelowButtonActionPerformed
 
