@@ -1,11 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package org.autoplot.dom;
 
-import java.util.HashMap;
-import java.util.Map;
+package org.autoplot.dom;
 
 /**
  *
@@ -64,14 +58,14 @@ public class ApplicationControllerSupport {
 //
 //    }
 
-    PlotElement plot( Plot plot, PlotElement panel, String primaryUri) {
+    protected PlotElement plot( Plot plot, PlotElement panel, String primaryUri) {
         if ( panel==null ) panel = controller.addPlotElement(plot, null ); // timeseriesbrowse
         panel.getController().getDataSourceFilter().setUri(""); // this has the side effect of removing parents
         panel.getController().getDataSourceFilter().setUri(primaryUri);
         return panel;
     }
 
-    PlotElement plot( Plot plot, PlotElement panel, String secondaryUri, String primaryUri) {
+    protected PlotElement plot( Plot plot, PlotElement panel, String secondaryUri, String primaryUri) {
         DataSourceFilter dsf1 = controller.addDataSourceFilter();
         DataSourceFilter dsf2 = controller.addDataSourceFilter();
         if ( panel==null ) panel = controller.addPlotElement(plot, null ); // timeseriesbrowse
@@ -82,7 +76,7 @@ public class ApplicationControllerSupport {
         return panel;
     }
 
-    PlotElement plot( Plot plot, PlotElement panel, String secondaryUri, String teriaryUri, String primaryUri) {
+    protected PlotElement plot( Plot plot, PlotElement panel, String secondaryUri, String teriaryUri, String primaryUri) {
         DataSourceFilter dsf1 = controller.addDataSourceFilter();
         DataSourceFilter dsf2 = controller.addDataSourceFilter();
         DataSourceFilter dsf3 = controller.addDataSourceFilter();
