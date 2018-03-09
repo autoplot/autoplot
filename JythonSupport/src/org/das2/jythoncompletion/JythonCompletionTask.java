@@ -53,7 +53,9 @@ import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
 
 /**
- * Completions for Jython code.
+ * Completions for Jython code.  The completion task is created with the
+ * editor configured for completions (code and caret position within code),
+ * and "query" is called which will fill a CompletionResultSet.
  * @author jbf
  */
 public class JythonCompletionTask implements CompletionTask {
