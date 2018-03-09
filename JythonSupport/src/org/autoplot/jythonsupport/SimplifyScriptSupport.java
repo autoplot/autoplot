@@ -98,15 +98,24 @@ public class SimplifyScriptSupport {
          variableNames.add("URL");
          
          try {
-             Module n;
-             try {
-                n = (Module)org.python.core.parser.parse( script, "exec" );
-             } catch ( PySyntaxError ex ) { // pop off the last line and try again.
-                 script= JythonUtil.join( Arrays.copyOf(ss,ss.length-1), "\n" );
-                 n = (Module)org.python.core.parser.parse( script, "exec" );
-                 lastLine--;
+             Module n=null;
+             
+             int count=4;
+             PySyntaxError ex0=null;
+             while ( lastLine>0 && count>0 ) {
+                try {
+                    n = (Module)org.python.core.parser.parse( script, "exec" );
+                    break;
+                } catch ( PySyntaxError ex ) { // pop off the last line and try again.
+                    if ( ex0==null ) ex0= ex;
+                    lastLine--;
+                    script= JythonUtil.join( Arrays.copyOf(ss,lastLine), "\n" );
+                    count--;
+                }
              }
              
+             if ( n==null ) throw ex0;
+
              String s= simplifyScriptToGetCompletions( ss, n.body, variableNames, 1, lastLine, 0 );
              s= GETDATASET_CODE + s;
              s= "PWD='file:/tmp/'\n"+s;
