@@ -273,4 +273,9 @@ public final class CompletionResultSet {
         
     }
     
+    @Override
+    public String toString() {
+        return "CompletionResultSet[items="+impl.getItems().size()+","+(impl.isFinished()?"finished":"notFinished") + "]";
+    }
+    
 }
