@@ -57,6 +57,9 @@ public class CompletionContext {
 
     @Override
     public String toString() {
-        return "" + this.contextType + ": " + this.contextString + " " + this.completable;
+        String scontextString= this.contextString==null ? "(nocontext)" : this.contextString;
+        String scompletable= this.completable==null ? "(nocompletable)" : this.completable;
+        if ( scompletable.length()==0 ) scompletable= "";
+        return "" + this.contextType + ": " + scontextString + " " + scompletable;
     }
 }
