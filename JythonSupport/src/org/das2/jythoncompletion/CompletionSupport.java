@@ -55,7 +55,7 @@ public class CompletionSupport {
         int i0= Utilities.getRowStart( editor, pos );
         int i2= Utilities.getRowEnd( editor, pos );
         
-        String line= editor.getText( i0, i2-i0 );
+        String line= editor.getText( i0, i2-i0-1 );
         int i1= i0;
         
         if ( i1==i2 ) return new CompletionContext( CompletionContext.DEFAULT_NAME, null, "" );
@@ -64,7 +64,7 @@ public class CompletionSupport {
             int im1= Utilities.getRowStart( editor, i0-1 );
             String prevLine= editor.getText( im1, i0-im1-1 );
             if ( isContinuation( prevLine, line ) ) {
-                line= prevLine + line;
+                line= prevLine + " " + line; // space is because the newline was removed.
                 i0= im1;
             }
         }
