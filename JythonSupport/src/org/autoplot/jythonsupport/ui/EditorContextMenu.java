@@ -491,6 +491,10 @@ public class EditorContextMenu {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     final String doThis= editor.getSelectedText();
+                    if ( doThis==null ) {
+                        JOptionPane.showMessageDialog( editor, "Select portion of the code to execute");
+                        return;
+                    }
                     String[] sss= doThis.split("\n");
                     for ( String s: sss ) {
                         if ( s.length()>0 && Character.isWhitespace(s.charAt(0)) ) {
