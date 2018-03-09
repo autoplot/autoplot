@@ -51,12 +51,15 @@ import org.python.util.PythonInterpreter;
 import org.autoplot.jythonsupport.JythonOps;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
+import org.das2.jythoncompletion.ui.CompletionImpl;
+import org.das2.jythoncompletion.ui.CompletionResultSetImpl;
 
 /**
  * Completions for Jython code.  The completion task is created with the
  * editor configured for completions (code and caret position within code),
  * and "query" is called which will fill a CompletionResultSet.
  * @author jbf
+ * @see  org.das2.jythoncompletion.JythonCompletionProvider
  */
 public class JythonCompletionTask implements CompletionTask {
 
@@ -151,7 +154,7 @@ public class JythonCompletionTask implements CompletionTask {
             }
         } catch ( BadLocationException ex ) {
             logger.log( Level.WARNING, null, ex );
-            arg0.addItem( new MessageCompletionItem( ex.getMessage() ) );
+            if ( arg0!=null ) arg0.addItem( new MessageCompletionItem( ex.getMessage() ) );
         } finally {
             
         }
@@ -420,7 +423,7 @@ public class JythonCompletionTask implements CompletionTask {
         try {
             interp.exec(eval);
         } catch ( PyException ex ) {
-            rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
+            if ( rs!=null ) rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
             return 0;
         }
         
@@ -441,7 +444,7 @@ public class JythonCompletionTask implements CompletionTask {
                     link= JavadocLookup.getInstance().getLinkForJavaSignature(signature);
                 }
                 if ( link!=null ) link+= "#skip.navbar.top";                
-                rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss, ss, link));
+                if ( rs!=null ) rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss, ss, link));
                 count++;
             }
         }
@@ -480,7 +483,7 @@ public class JythonCompletionTask implements CompletionTask {
             try {
                 interp.exec(eval);
             } catch ( PyException ex ) {
-                rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
+                if ( rs!=null ) rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
                 return 0;
             }
 
@@ -500,7 +503,7 @@ public class JythonCompletionTask implements CompletionTask {
                         link= JavadocLookup.getInstance().getLinkForJavaSignature(signature);
                     }
                     if ( link!=null ) link+= "#skip.navbar.top";
-                    rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss, ss, link ));
+                    if ( rs!=null ) rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss, ss, link ));
                     count++;
                     results.add(ss);
                 }
@@ -522,7 +525,7 @@ public class JythonCompletionTask implements CompletionTask {
                 if ( !ss.startsWith("#") && ss.length()>0 ) {
                     if ( ss.startsWith(search) && !results.contains(ss.substring(plen)) ) {
                         String link= "http://www-pw.physics.uiowa.edu/~jbf/autoplot/javadoc/" + ss.replaceAll("\\.","/") + "/package-summary.html";
-                        rs.addItem(new DefaultCompletionItem(ss, search.length(), ss, ss, link ));
+                        if ( rs!=null ) rs.addItem(new DefaultCompletionItem(ss, search.length(), ss, ss, link ));
                         count++;
                     }
                 }
@@ -644,7 +647,7 @@ public class JythonCompletionTask implements CompletionTask {
         String[] keywords = new String[]{"assert", "def", "elif", "except", "from", "for", "finally", "import", "while", "print", "raise"}; //TODO: not complete
         for (String kw : keywords) {
             if (kw.startsWith(cc.completable)) {
-                rs.addItem(new DefaultCompletionItem(kw, cc.completable.length(), kw, kw, null, 0));
+                if ( rs!=null ) rs.addItem(new DefaultCompletionItem(kw, cc.completable.length(), kw, kw, null, 0));
                 count++;
             }
         }
@@ -672,10 +675,10 @@ public class JythonCompletionTask implements CompletionTask {
         try {
             interp.exec( JythonRefactory.fixImports(eval) );
         } catch ( PyException ex ) {
-            rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
+            if ( rs!=null ) rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
             return 0;
         } catch (IOException ex) {
-            rs.addItem(new MessageCompletionItem("Error with completions",ex.toString()));
+            if ( rs!=null ) rs.addItem(new MessageCompletionItem("Error with completions",ex.toString()));
             return 0;
         }
         
@@ -913,7 +916,7 @@ public class JythonCompletionTask implements CompletionTask {
         int count= 0;
         List<DefaultCompletionItem> rr= getLocalsCompletions( interp, cc );
         for ( DefaultCompletionItem item: rr ) {
-            rs.addItem( item );
+            if ( rs!=null ) rs.addItem( item );
             count++;
         }
         return count;
