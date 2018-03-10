@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Jython plot command now has "topAxisOf" named parameter.
+        <p><small>Reference line is drawn when fill color is transparent.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,9 +26,11 @@
         
         <p>SourceForge has made changes which require special actions in the release process.  Please be aware that this may cause unusual behavior.</p>
 
-        <p>Bugfixes (2018-03-06 r22176):</p>
+        <p>Bugfixes (2018-03-10 r22176):</p>
         <ul>
-            <li>slice editor will look up the index as the time is changed.
+            <li>write animated gif delay times corrected, where delays were 1/10 of what they should have been.
+            <li>jython completions will evaluate constructors.  be more aggressive about dropping trailing lines to make a valid code.
+            <li>slice editor will look up the index as the time is changed.  
             <li>corrections to mash-up tool, preserving unfolded tree states and where function name was mistaken for variable name.
             <li>1956: horizontal lines were not drawn because bounding box had height=0.  Vertical lines had the same problem.
             <li>1966: runScript which should be called from the event thread, loads the script off the event thread. 
@@ -102,6 +104,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>626: ctrl+shift+play (and shift+"plot below") is plot above.
             <li>if the fill-to-reference color is transparent, then draw a line the color of the axes at the reference value.
             <li>URI history now only records human-entered URIs, so URIs loaded within vap do not clutter history.
             <li>584: addToSearchPath supports single-jar releases.
