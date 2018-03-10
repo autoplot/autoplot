@@ -24,7 +24,7 @@ public class AnimatedGifDemo {
      * See http://forums.sun.com/thread.jspa?messageID=10755673#10755673
      *
      * @author Maxideon
-     * @param delayTime String Frame delay for this frame.
+     * @param delayTime String Frame delay for this frame, in hundredths of a second.
      */
     public static void configure(IIOMetadata meta,
         String delayTime,
@@ -128,7 +128,8 @@ public class AnimatedGifDemo {
      *
      * @param file File A File in which to store the animation.
      * @param frames Iterator of BufferedImages, the frames of the animation.
-     * @param delayTimes Iterator of Strings, representing the frame delay times in formatted milliseconds.
+     * @param delayTimes Iterator of Strings, representing the frame delay times in hundredths of a second.
+     * in formatted tenths-of-seconds (hundred-millisecond units).
      * @throws java.io.IOException
      */
     public static void saveAnimate(
@@ -142,9 +143,6 @@ public class AnimatedGifDemo {
             iw.setOutput(ios);
             iw.prepareWriteSequence(null);
 
-            Iterator<String> delayTimesIterator= delayTimes;
-
-
             int i=0;
             while ( frames.hasNext() ) {
                 BufferedImage src= frames.next();
@@ -154,7 +152,7 @@ public class AnimatedGifDemo {
                 IIOMetadata metadata = iw.getDefaultImageMetadata(
                         new ImageTypeSpecifier(src), iwp);
 
-                configure(metadata, delayTimesIterator.next(), i);
+                configure(metadata, delayTimes.next(), i);
 
                 IIOImage ii = new IIOImage(src, null, metadata);
 

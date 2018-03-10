@@ -2418,13 +2418,14 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 int i=0;
                 @Override
                 public boolean hasNext() {
-                    return i<PngWalkTool.this.seq.size();
+                    return i<PngWalkTool.this.seq.size() && !monitor.isCancelled() ;
                 }
 
                 @Override
                 public Object next() {
                     BufferedImage im= seq.imageAt(i).getImage();
                     monitor.setTaskProgress(i);
+                    
                     while ( im==null ) {
                         try {
                             Thread.sleep(100);
@@ -2450,7 +2451,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 
                 @Override
                 public boolean hasNext() {
-                    return true;
+                    throw new IllegalArgumentException("use images.next");
                 }
 
                 @Override
@@ -2464,23 +2465,23 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     if ( overrideDelays!=null ) {
                         switch (overrideDelays) {
                             case "realTime":
-                                result= String.valueOf((int)( seq.imageAt(i).getDatumRange().min().subtract(lastTime).convertTo(Units.milliseconds).value()) );
+                                result= String.valueOf((int) Math.ceil( seq.imageAt(i).getDatumRange().min().subtract(lastTime).convertTo(Units.milliseconds).value()/100.) );
                                 lastTime= seq.imageAt(i).getDatumRange().min();
                                 break;
                             case "secondPerDay":
-                                result= String.valueOf((int) (seq.imageAt(i).getDatumRange().min().subtract(lastTime).convertTo(Units.milliseconds).value()/86400000) );
+                                result= String.valueOf((int) Math.ceil( seq.imageAt(i).getDatumRange().min().subtract(lastTime).convertTo(Units.milliseconds).value()/864000) );
                                 lastTime= seq.imageAt(i).getDatumRange().min();
                                 break;
                             default:
                                 try {
-                                    result= String.valueOf((int) Units.milliseconds.parse(overrideDelays).value() );
+                                    result= String.valueOf((int) Math.ceil( Units.milliseconds.parse(overrideDelays).value()/10 ) );
                                 } catch (ParseException ex) {
                                     throw new IllegalArgumentException( ex );
                                 }   
                                 break;
                         }
                     } else {
-                        result= "100";
+                        result= "1";
                     }
                     return result;
                 }
@@ -2501,18 +2502,18 @@ public final class PngWalkTool extends javax.swing.JPanel {
             monitor.finished();
         }
     }
-        
+     
     /** 
      * Write the displayed images to an animated gif.
      */
-    public void writeAnimatedGif() {
+    public void writeAnimatedGif( ) {
         JFileChooser choose= new JFileChooser();
         
         Preferences prefs= Preferences.userNodeForPackage(PngWalkTool.class);
         String fname= prefs.get( "writeToGif", "/tmp/pngwalk.gif" );
         
         choose.setSelectedFile( new File(fname) );
-        final String[] opts= new String[] { "10ms", "200ms", "400ms", "800ms", "realTime", "secondPerDay" };
+        final String[] opts= new String[] { "10ms", "200ms", "400ms", "800ms", "1000ms", "1200ms", "realTime", "secondPerDay" };
         JPanel p= new JPanel();
         p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
         
@@ -2532,7 +2533,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
             Runnable run= new Runnable() {
                 public void run() {
                     try {
-                        writeToAnimatedGifImmediately( mon , f, fdelay );
+                        writeToAnimatedGifImmediately( mon, f, fdelay );
                         JPanel panel= new javax.swing.JPanel();
                         panel.setLayout( new BoxLayout(panel,BoxLayout.Y_AXIS ));
                         panel.add( new javax.swing.JLabel("wrote file "+f) );
