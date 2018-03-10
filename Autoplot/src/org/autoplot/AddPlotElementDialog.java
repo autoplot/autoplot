@@ -372,7 +372,7 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
 
     private void plotBelowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotBelowButtonActionPerformed
         cancelled= false;
-        setModifiers( KeyEvent.CTRL_MASK );
+        setModifiers( KeyEvent.CTRL_MASK | ( evt.getModifiers() & ActionEvent.SHIFT_MASK ) );
         setVisible(false);
 }//GEN-LAST:event_plotBelowButtonActionPerformed
 

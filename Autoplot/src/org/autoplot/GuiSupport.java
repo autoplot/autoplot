@@ -1247,7 +1247,7 @@ public class GuiSupport {
         int modifiers = dia.getModifiers();
         if ( (modifiers & KeyEvent.CTRL_MASK) == KeyEvent.CTRL_MASK && (modifiers & KeyEvent.SHIFT_MASK) == KeyEvent.SHIFT_MASK ) {
             // reserve this for plot above, which we'll add soon.
-            plot = null;
+            plot = dom.getController().addPlot(LayoutConstants.ABOVE);
             pelement = null;
         } else if ((modifiers & KeyEvent.CTRL_MASK) == KeyEvent.CTRL_MASK) {
             // new plot
