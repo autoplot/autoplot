@@ -2513,7 +2513,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         String fname= prefs.get( "writeToGif", "/tmp/pngwalk.gif" );
         
         choose.setSelectedFile( new File(fname) );
-        final String[] opts= new String[] { "10ms", "200ms", "400ms", "800ms", "1000ms", "1200ms", "realTime", "secondPerDay" };
+        final String[] opts= new String[] { "10ms", "50ms", "200ms", "400ms", "800ms", "1000ms", "1200ms", "realTime", "secondPerDay" };
         JPanel p= new JPanel();
         p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
         
