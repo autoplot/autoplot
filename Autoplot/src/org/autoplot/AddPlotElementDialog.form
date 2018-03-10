@@ -167,7 +167,7 @@
     <Component class="javax.swing.JButton" name="plotBelowButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Plot Below"/>
-        <Property name="toolTipText" type="java.lang.String" value="Plot below the current plot, possibly inserting a plot."/>
+        <Property name="toolTipText" type="java.lang.String" value="Plot below the current plot, possibly inserting a plot.  Holding shift will plot above."/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="plotBelowButtonActionPerformed"/>

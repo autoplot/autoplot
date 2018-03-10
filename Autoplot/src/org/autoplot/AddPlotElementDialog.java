@@ -205,7 +205,7 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
         });
 
         plotBelowButton.setText("Plot Below");
-        plotBelowButton.setToolTipText("Plot below the current plot, possibly inserting a plot.");
+        plotBelowButton.setToolTipText("Plot below the current plot, possibly inserting a plot.  Holding shift will plot above.");
         plotBelowButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 plotBelowButtonActionPerformed(evt);
