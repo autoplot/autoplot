@@ -41,33 +41,42 @@ public class Das2StreamDataSourceFormat implements DataSourceFormat {
                 if ( fo!=null ) fo.close();
             }
         } else {
-            if (data.rank()==3 ) {
-                TableDataSet tds = TableDataSetAdapter.create(data);
-                FileOutputStream fo = new FileOutputStream( new File( split.resourceUri ) );
-                if ( binary ) {
-                    TableUtil.dumpToBinaryStream(tds, fo);
-                } else {
-                    TableUtil.dumpToAsciiStream(tds, fo);
+            switch(data.rank()){
+            case 3:
+                {
+                    TableDataSet tds = TableDataSetAdapter.create(data);
+                    FileOutputStream fo = new FileOutputStream( new File( split.resourceUri ) );
+                    if ( binary ) {
+                        TableUtil.dumpToBinaryStream(tds, fo);
+                    } else {
+                        TableUtil.dumpToAsciiStream(tds, fo);
+                    }   fo.close();
+                    break;
                 }
-                fo.close();
-            } else if (data.rank() == 2) {
-                TableDataSet tds = TableDataSetAdapter.create(data);
-                FileOutputStream fo = new FileOutputStream( new File( split.resourceUri ) );
-                if ( binary ) {
-                    TableUtil.dumpToBinaryStream(tds, fo);
-                } else {
-                    TableUtil.dumpToAsciiStream(tds, fo);
+            case 2:
+                {
+                    TableDataSet tds = TableDataSetAdapter.create(data);
+                    FileOutputStream fo = new FileOutputStream( new File( split.resourceUri ) );
+                    if ( binary ) {
+                        TableUtil.dumpToBinaryStream(tds, fo);
+                    } else {
+                        TableUtil.dumpToAsciiStream(tds, fo);
+                    }   fo.close();
+                    break;
                 }
-                fo.close();
-            } else if (data.rank() == 1) {
-                VectorDataSet vds = VectorDataSetAdapter.create(data);
-                FileOutputStream fo = new FileOutputStream( new File( split.resourceUri ) );
-                if ( binary ) {
-                    VectorUtil.dumpToBinaryStream(vds, fo);
-                } else {
-                    VectorUtil.dumpToAsciiStream(vds, fo);
+            case 1:
+                {
+                    VectorDataSet vds = VectorDataSetAdapter.create(data);
+                    FileOutputStream fo = new FileOutputStream( new File( split.resourceUri ) );
+                    if ( binary ) {
+                        VectorUtil.dumpToBinaryStream(vds, fo);
+                    } else {
+                        VectorUtil.dumpToAsciiStream(vds, fo);
+                    }   fo.close();
+                    break;
                 }
-                fo.close();
+            default:
+                break;
             }
         }
     }

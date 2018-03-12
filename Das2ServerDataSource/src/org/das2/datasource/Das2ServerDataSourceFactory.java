@@ -6,9 +6,13 @@ package org.das2.datasource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +29,7 @@ import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.das2.util.filesystem.FileSystem;
 
 /**
  * DataSourceFactory for communicating with Das2servers.
@@ -88,7 +93,22 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
             BufferedReader reader = null;
             try {
                 URL url = new URL(surl + "?server=list");
-                reader = new BufferedReader(new InputStreamReader(url.openStream(),"US-ASCII"));
+                URLConnection conn = url.openConnection();
+                conn.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
+                conn.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
+                InputStream in = null;
+                if(conn instanceof HttpURLConnection){
+                    HttpURLConnection httpConn = (HttpURLConnection) conn;
+                    int nStatus = httpConn.getResponseCode();
+                    
+                    // Just fail on 400's and 500's
+                    if(nStatus >= 400)
+                        throw new java.io.IOException("Server returned HTTP response "
+                           + "code:" + nStatus + " for URL: " + url);
+                }
+                
+                in = conn.getInputStream();
+                reader = new BufferedReader(new InputStreamReader(in,StandardCharsets.UTF_8));
                 String s = reader.readLine();
                 ArrayList<String> list = new ArrayList<>();
                 while (s != null) {
