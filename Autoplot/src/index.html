@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Reference line is drawn when fill color is transparent.
+        <p><small>Contour plot overplotted on spectrogram.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
         
         <p>SourceForge has made changes which require special actions in the release process.  Please be aware that this may cause unusual behavior.</p>
 
-        <p>Bugfixes (2018-03-10 r22176):</p>
+        <p>Bugfixes (2018-03-13 r22201):</p>
         <ul>
+            <li>Chris put in support for the Das2Server to support redirects from http to https.
             <li>write animated gif delay times corrected, where delays were 1/10 of what they should have been.
             <li>jython completions will evaluate constructors.  be more aggressive about dropping trailing lines to make a valid code.
             <li>slice editor will look up the index as the time is changed.  
