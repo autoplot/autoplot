@@ -4,6 +4,7 @@
  */
 package org.das2.datasource;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.logging.Level;
 import org.das2.client.DataSetStreamHandler;
@@ -53,8 +54,12 @@ import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.das2.DasException;
+import org.das2.client.AccessDeniedException;
+import org.das2.client.DasServerException;
 import org.das2.qds.ops.Ops;
 import org.das2.qstream.QDataSetStreamHandler;
+import org.das2.util.CredentialsManager;
 
 /**
  * DataSource for communicating with Das2servers.
@@ -245,9 +250,8 @@ public class Das2ServerDataSource extends AbstractDataSource {
                 String dsdfURL = this.resourceURI + "?server=dsdf&dataset=" + dataset;
                 URL url3 = new URL(dsdfURL);
                 logger.log(Level.FINE, "opening {0}", url3);
-                //URLConnection c= url3.openConnection();
-                //c.setRequestProperty( "User-agent", "" );
-                InputStream in = url3.openStream();
+                  
+                InputStream in = getInputStream(url3, dataset);
 
                 ReadableByteChannel channel = Channels.newChannel(in);
 
@@ -320,73 +324,7 @@ public class Das2ServerDataSource extends AbstractDataSource {
         // Allow response bodies that are Das2 streams or QStreams to be processed
         // normally even when the HTTP Status code indicates an error.  This is to handle
         // errors that are packaged properly.
-        InputStream in = null;
-        URLConnection conn = url2.openConnection();
-        conn.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
-        conn.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
-        if (conn instanceof HttpURLConnection) {
-            HttpURLConnection httpConn = (HttpURLConnection) conn;
-            int nStatus = httpConn.getResponseCode();
-            while (nStatus == 401) {
-                //URL keyChainUrl= new URL( url2.getProtocol() + "://user@" + url2.getHost() + url2.getPath() + "/" + params2.get("dataset" ) );
-                //String userInfo= KeyChain.getDefault().getUserInfo(keyChainUrl);
-
-                org.das2.util.CredentialsManager cm = org.das2.util.CredentialsManager.getMannager();
-                String sLocId;
-
-                String readAccessGroup;
-                String auth = httpConn.getHeaderField("WWW-Authenticate");
-                Pattern p = Pattern.compile("Basic realm=\"(.*)\"");
-                Matcher m = p.matcher(auth);
-                if (m.matches()) {
-                    readAccessGroup = m.group(1);
-                } else {
-                    readAccessGroup = "das2 server";
-                }
-
-                sLocId = this.resourceURI.toURL().toString() + "|" + readAccessGroup;
-                //String sLocId = "planet.physics.uiowa.edu/das/das2Server|voyager1/pwi/SpecAnalyzer-4s-Efield";
-                if (!cm.hasCredentials(sLocId)) {
-                    DasServer svr = DasServer.create(this.resourceURI.toURL());
-                    String sDesc = String.format("<html><h3>%s</h3><hr>Server: <b>%s</b><br>" + "Data Set: <b>%s</b>",
-                        svr.getName(), svr.getHost(),
-                        dataset);
-                    cm.setDescription(sLocId, sDesc, svr.getLogo());
-                }
-                String sHash = cm.getHttpBasicHash(sLocId);
-                if (sHash == null) {
-                    throw new java.io.IOException("User credentials are not available "
-                        + " for URL: " + url2);
-                }
-                //String sHashRaw=  cm.getHttpBasicHashRaw(sLocId);
-                //KeyChain.getDefault().setUserInfo( keyChainUrl, sHashRaw );
-
-                conn = url2.openConnection(); //TODO: stderr should be consumed.
-                conn.setRequestProperty("Authorization", "Basic " + sHash);
-                conn.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
-                conn.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
-                httpConn = (HttpURLConnection) conn;
-                nStatus = httpConn.getResponseCode();
-                if (nStatus == 401) {
-                    cm.invalidate(sLocId);
-                }
-            }
-
-            if (nStatus >= 400) {
-                String sMime = httpConn.getContentType();
-
-                // if this isn't a Das2 stream or QStream, go ahead and throw
-                if (!MIME.isDataStream(sMime)) {
-                    throw new java.io.IOException("Server returned HTTP response code: "
-                        + nStatus + " for URL: " + url2);
-                } else {
-                    in = httpConn.getErrorStream();
-                }
-            }
-        }
-        if (in == null) {
-            in = conn.getInputStream();
-        }
+        InputStream in = getInputStream(url2, dataset);
 
         final DasProgressMonitorInputStream mpin = new DasProgressMonitorInputStream(in, mon);
 
@@ -594,7 +532,131 @@ public class Das2ServerDataSource extends AbstractDataSource {
         return result1;
 
     }
+    
+    //////////////////////////////////////////////////////////////////////////
+    // Get an input stream or don't.  Handles all the HTTP stuff stuch as 
+    // redirection and authentication if this is an http URL.  Would be okay
+    // to put special handling for other urls as well such as sftp.
+    
+    private InputStream getInputStream(URL url, String sDataSetId) 
+		 throws IOException, DasException{
+		InputStream in = null;
+		
+		int nRedirects = 0;
+		String sLocId = null;
+		String sBasicHash = null;
+		CredentialsManager cm = CredentialsManager.getMannager();
+		
+		while(true){
+			URLConnection conn = url.openConnection();
+			
+			if(sBasicHash != null)
+				conn.setRequestProperty("Authorization", "Basic " + sBasicHash);
+			
+			conn.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
+			conn.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
+			
+			if(! (conn instanceof HttpURLConnection) ){
+				in = conn.getInputStream();
+				break;
+			}
+			HttpURLConnection httpConn = (HttpURLConnection) conn;
+			int nStatus = httpConn.getResponseCode();
+			
+			if((nStatus / 100) == 2){  // Some version of okay
+				in = conn.getInputStream();
+				break;
+			}
+			
+			if((nStatus / 100) == 3){  // Redirected
+				String sLoc = httpConn.getHeaderField("Location");
+				if(sLoc == null)
+					throw new DasServerException("Redirection response missing location header");
+				
+				if(nRedirects > 20)
+					throw new DasServerException("Client has been redirected more than 20 times");
+				
+				// Update the URL and continue
+				url = new URL(sLoc);
+				++nRedirects;
+				continue;
+			}
+			
+			if(nStatus / 100 == 5 ){  // Some kind of Server Error
+				// You're not going to go to space today but maybe the message is a valid 
+				// das2 error stream
+				String sMime = httpConn.getContentType();
 
+				// if this isn't a Das2 stream or QStream, go ahead and throw
+				if(!MIME.isDataStream(sMime)){
+					throw new DasServerException(String.format(
+						"Server error encountered accessing URL %s", url.toString()
+					));
+				}
+				else{
+					in = httpConn.getErrorStream();
+				}
+				break;
+			}
+			
+			if(nStatus == 401){
+				// If hash was sent before, it obviously didn't work so invalidate the entry
+				if(sLocId != null) cm.invalidate(sLocId);
+				
+				//URL keyChainUrl= new URL( url2.getProtocol() + 
+				//     "://user@" + url2.getHost() + url2.getPath() + 
+				//     "/" + params2.get("dataset" ) );
+				//String userInfo= KeyChain.getDefault().getUserInfo(keyChainUrl);
+				
+				String readAccessGroup;
+				String auth = httpConn.getHeaderField("WWW-Authenticate");
+				Pattern p = Pattern.compile("Basic realm=\"(.*)\"");
+				Matcher m = p.matcher(auth);
+				if(m.matches())
+					readAccessGroup = m.group(1);
+				else
+					readAccessGroup = "das2 server";
+
+				sLocId = this.resourceURI.toURL().toString() + "|" + readAccessGroup;
+				//String sLocId = "planet.physics.uiowa.edu/das/das2Server|voyager1/pwi/SpecAnalyzer-4s-Efield";
+				
+				if(!cm.hasCredentials(sLocId)){
+					DasServer svr = DasServer.create(url);
+					String sDesc = String.format(
+						"<html><h3>%s</h3><hr>Server: <b>%s</b><br>Data Set: <b>%s</b>",
+						svr.getName(), svr.getHost(), sDataSetId
+					);
+					cm.setDescription(sLocId, sDesc, svr.getLogo());
+				}
+				sBasicHash = cm.getHttpBasicHash(sLocId);
+				if(sBasicHash == null){
+					throw new AccessDeniedException(
+						"User credentials are not available for URL: " + url
+					);
+				}
+				
+				//String sHashRaw=  cm.getHttpBasicHashRaw(sLocId);
+				//KeyChain.getDefault().setUserInfo( keyChainUrl, sHashRaw );
+				continue;
+			}
+			
+			if((nStatus == 400)||(nStatus == 404))
+				throw new DasServerException("Query error in request for URL: " + url);
+			
+			if(nStatus == 403)
+				throw new AccessDeniedException("Access denied for URL:" + url);
+			
+			
+			// Some other response, call it a server error
+			throw new DasServerException(String.format(
+				"Completly unexpected server error encountered accessing URL %s, status "+
+				"code %d received from server.", url.toString(), nStatus
+			));
+		}
+		
+		return in;
+	}
+ 
     public final TimeSeriesBrowse getTimeSeriesBrowse() {
         return new TimeSeriesBrowse() {
             @Override
