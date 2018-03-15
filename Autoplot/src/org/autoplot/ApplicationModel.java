@@ -37,6 +37,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -726,6 +727,24 @@ public class ApplicationModel {
         
             // always tack on the URI to history.dat file
             final File f3 = new File( f2, "history.txt");
+//            if ( !f3.exists() ) {  // This is code to restrict read access.  No one has asked for this, but it probably should be done.
+//                try {
+//                    if ( f3.createNewFile() ) {
+//                        if ( f3.setReadable( false, false ) ) {
+//                            if ( f3.setReadable( true, true ) ) {
+//                                logger.fine("created history.txt file permissions set so that only user can read.");
+//                            } else {
+//                                f3.setReadable( true );
+//                                logger.info("created history.txt, file permissions cannot be set.");
+//                            }
+//                        } else {
+//                            logger.info("created history.txt, file permissions cannot be set.");
+//                        }
+//                    }
+//                } catch (IOException ex) {
+//                    Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//            }
             try ( FileWriter out3= new FileWriter( f3, true ) ) {
                 TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
                 long lnow= System.currentTimeMillis();
