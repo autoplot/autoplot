@@ -40,10 +40,13 @@ public class Das2StreamDataSourceFormatEditorPanel extends javax.swing.JPanel im
 
         jLabel1 = new javax.swing.JLabel();
         typeComboBox = new javax.swing.JComboBox();
+        jLabel2 = new javax.swing.JLabel();
 
         jLabel1.setText("Type:");
 
         typeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "ascii", "binary" }));
+
+        jLabel2.setText("Das2Stream options");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -51,19 +54,24 @@ public class Das2StreamDataSourceFormatEditorPanel extends javax.swing.JPanel im
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jLabel1)
-                .add(18, 18, 18)
-                .add(typeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 124, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createSequentialGroup()
+                        .add(jLabel1)
+                        .add(18, 18, 18)
+                        .add(typeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 124, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(jLabel2))
                 .addContainerGap(204, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(12, 12, 12)
+                .addContainerGap()
+                .add(jLabel2)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
                     .add(typeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(261, Short.MAX_VALUE))
+                .addContainerGap(246, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -92,6 +100,7 @@ public class Das2StreamDataSourceFormatEditorPanel extends javax.swing.JPanel im
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JComboBox typeComboBox;
     // End of variables declaration//GEN-END:variables
 

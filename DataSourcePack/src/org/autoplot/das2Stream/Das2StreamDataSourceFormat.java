@@ -12,7 +12,7 @@ import org.das2.qstream.QdsToD2sStream;
 import org.das2.qstream.StreamException;
 
 /**
- * Format the data into das2streams and QStreams.
+ * Format the data into das2streams.
  * @author jbf
  */
 public class Das2StreamDataSourceFormat implements DataSourceFormat {
@@ -69,7 +69,7 @@ public class Das2StreamDataSourceFormat implements DataSourceFormat {
 
     @Override
     public String getDescription() {
-        return "QDataSet QStream and Das2Stream transfer format";
+        return "Das2Stream data transfer format";
     }
 
 }
