@@ -1,4 +1,5 @@
 org.autoplot.ascii.AsciiTableDataSourceFormat dat txt
-org.autoplot.das2Stream.Das2StreamDataSourceFormat d2s qds
+org.autoplot.das2Stream.Das2StreamDataSourceFormat d2s
+org.autoplot.das2Stream.QStreamDataSourceFormat qds
 org.autoplot.csv.CsvDataSourceFormat csv
 org.autoplot.html.HtmlTableFormat htm html
