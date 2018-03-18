@@ -411,6 +411,7 @@ public final class HapiDataSource extends AbstractDataSource {
         } else {
             throw new IllegalArgumentException("query must be specified, implementation error");
         }
+        long currentTimeMillis= pp[0].modifiedDateMillis;
         TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d" );
         String sxx= tp.format(xx);
         String u= ub.toString();
@@ -437,6 +438,7 @@ public final class HapiDataSource extends AbstractDataSource {
             
             synchronized ( HapiDataSource.class ) {
                 ffTemp.renameTo(ff);
+                if ( currentTimeMillis>0 ) ff.setLastModified(currentTimeMillis);
             }
         }
         
@@ -1266,17 +1268,24 @@ public final class HapiDataSource extends AbstractDataSource {
                     continue;
                 }
                 
-                //TODO: compress the file, now that we are done.
+                // "close" the current file, gzipping it.
                 if ( cacheReader==null && useCache && !currentDay.contains(xx) && tr.intersects(currentDay) && completeDay ) {
-                    writeToCachedDataFinish( url, pds, currentDay.middle() );
+                    // https://sourceforge.net/p/autoplot/bugs/1968/ HAPI caching must not cache after "modificationDate" or partial days remain in cache
+                    if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
+                        writeToCachedDataFinish( url, pds, currentDay.middle() );
+                    } else {
+                        logger.fine("data after modification date is not cached.");
+                    }
                 }
                 
                 while ( !currentDay.contains(xx) && tr.intersects(currentDay ) ) {
                     currentDay= currentDay.next();
                     completeDay= tr.contains(currentDay);
                     if ( cacheReader==null && useCache && !currentDay.contains(xx) && tr.intersects(currentDay ) ) {
-                        // put empty file which is placeholder.
-                        writeToCachedDataFinish( url, pds, currentDay.middle() ); 
+                        if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
+                            // put empty file which is placeholder.
+                            writeToCachedDataFinish( url, pds, currentDay.middle() ); 
+                        }
                     }
                 }
                 
@@ -1287,7 +1296,9 @@ public final class HapiDataSource extends AbstractDataSource {
                 
                 if ( completeDay ) {
                     if ( cacheReader==null && useCache ) {
-                        writeToCachedData( url, pds, xx, ss );
+                        if ( pds[0].modifiedDateMillis==0 || xx.doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
+                            writeToCachedData( url, pds, xx, ss );
+                        }
                     }
                 }
                         
@@ -1314,8 +1325,10 @@ public final class HapiDataSource extends AbstractDataSource {
             }
             while ( completeDay && tr.intersects(currentDay) ) {
                 if ( cacheReader==null && useCache && tr.intersects(currentDay ) ) {
-                    // put empty file which is placeholder.
-                    writeToCachedDataFinish( url, pds, currentDay.middle() ); 
+                    if ( currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
+                        // put empty file which is placeholder.
+                        writeToCachedDataFinish( url, pds, currentDay.middle() ); 
+                    }
                 }
                 currentDay= currentDay.next();
                 completeDay= tr.contains(currentDay);
