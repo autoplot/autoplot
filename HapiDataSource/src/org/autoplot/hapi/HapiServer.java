@@ -37,13 +37,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.autoplot.datasource.AutoplotSettings;
-import org.autoplot.datasource.DataSetURI;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.util.filesystem.FileSystem;
-import org.das2.util.monitor.NullProgressMonitor;
 
 /**
  * Utility methods for interacting with HAPI servers.  
@@ -367,7 +365,8 @@ public class HapiServer {
     }
 
     /**
-     * return the resource, if cached, or null if the data is not cached.
+     * write the data (for example, an info response) to a cache file.  This is called
+     * from readFromURL to cache the data.
      * @param url the resource location, query param id is handled specially, but others are ignored.
      * @param type "json" (the extension), or "" if no extension should be added.
      * @param data the data.
