@@ -1449,18 +1449,24 @@ public class DataMashUp extends javax.swing.JPanel {
     }//GEN-LAST:event_plotMenuItemActionPerformed
 
     private void timeRangeRecentComboBoxFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_timeRangeRecentComboBoxFocusLost
-        try {
-            namedURIListTool1.setTimeRange( DatumRangeUtil.parseTimeRange(timeRangeRecentComboBox.getText()));
-        } catch (ParseException ex) {
-            Logger.getLogger(DataMashUp.class.getName()).log(Level.SEVERE, null, ex);
+        String s= timeRangeRecentComboBox.getText().trim();
+        if ( s.length()>0 ) {
+            try {
+                namedURIListTool1.setTimeRange( DatumRangeUtil.parseTimeRange(timeRangeRecentComboBox.getText()));
+            } catch (ParseException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_timeRangeRecentComboBoxFocusLost
 
     private void timeRangeRecentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeRecentComboBoxActionPerformed
-        try {
-            namedURIListTool1.setTimeRange( DatumRangeUtil.parseTimeRange(timeRangeRecentComboBox.getText()));
-        } catch (ParseException ex) {
-            Logger.getLogger(DataMashUp.class.getName()).log(Level.SEVERE, null, ex);
+        String s= timeRangeRecentComboBox.getText().trim();
+        if ( s.length()>0 ) {
+            try {
+                namedURIListTool1.setTimeRange( DatumRangeUtil.parseTimeRange(timeRangeRecentComboBox.getText()));
+            } catch (ParseException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_timeRangeRecentComboBoxActionPerformed
 
@@ -1492,7 +1498,25 @@ public class DataMashUp extends javax.swing.JPanel {
         DataSourceUtil.openBrowser("http://autoplot.org/help.mashup");
     }//GEN-LAST:event_helpButtonActionPerformed
 
-    private void checkForTSB() {
+    /**
+     * this should be called from the event thread, but will start a new thread
+     * to check for a TSB capability.  
+     */
+    private void checkForTSB() {        
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            Runnable run= new Runnable() {
+                @Override
+                public void run() {
+                    checkForTSBImmediately();
+                }
+            };
+            new Thread(run,"checkForTSB").start();
+        } else {
+            checkForTSBImmediately();
+        }
+    }
+    
+    private void checkForTSBImmediately() {
         String[] suris= namedURIListTool1.getUris();
         String timerange= null;
         for ( String suri: suris ) {
@@ -1521,14 +1545,20 @@ public class DataMashUp extends javax.swing.JPanel {
                 }
             }
         }
-        if ( timerange!=null ) {
-            timeRangeRecentComboBox.setEnabled(true);
-            timeRangeLabel.setEnabled(true);
-            timeRangeRecentComboBox.setText( timerange );
-        } else {
-            timeRangeRecentComboBox.setEnabled(false);
-            timeRangeLabel.setEnabled(false);
-        }
+        final String ftimerange= timerange;
+        Runnable run= new Runnable() {
+            public void run() {
+                if ( ftimerange!=null ) {
+                    timeRangeRecentComboBox.setEnabled(true);
+                    timeRangeLabel.setEnabled(true);
+                    timeRangeRecentComboBox.setText( ftimerange );
+                } else {
+                    timeRangeRecentComboBox.setEnabled(false);
+                    timeRangeLabel.setEnabled(false);
+                }
+            }
+        };
+        SwingUtilities.invokeLater(run);
     }
     
     private void removeFromScratch( int index ) {
