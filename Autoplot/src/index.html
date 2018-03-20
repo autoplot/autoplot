@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>1-Wire sensor and HAPI server hosted on Raspberry Pi monitor pool temperature.
+        <p><small>Mash up tool is used to look at data in an HDF file.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,9 +26,15 @@
         
         <p>SourceForge has made changes which require special actions in the release process.  Please be aware that this may cause unusual behavior.</p>
 
-        <p>Bugfixes (2018-03-16 r22211):</p>
+        <p>Bugfixes (2018-03-20 r22216):</p>
         <ul>
-            <li>QStream and Das2Stream export split into separate codes.
+            <li>setDepend1Cadence filter is properly handled and has a GUI.
+            <li>Experimental HAPI caching does not cache after modified date.
+            <li>AggregratingDataSource had code branches which misused progress monitors, causing warning message on stderr.
+            <li>Mashup was checking for TimeSeriesBrowse, which can rely on web transactions, on the event thread, causing hangs with slow websites.
+            <li>pngwalk of file:///home/jbf/ictemp/2018/*/*/ic_*_12.jpg (star multiple levels deep) showed a bug where the filenames were incorrectly handled, resulting in runtime error in Autoplot's pngwalk.
+            <li>1899: don't display a warning about units if yaxis units are dimensionless.
+            <li>QStream and Das2Stream export split into separate codes.  Thanks, Chris!
             <li>1969: MutablePropertyDataSet no longer implies mutable.  Thanks, Jon N.!
             <li>Chris put in support for the Das2Server to support redirects from http to https.
             <li>write animated gif delay times corrected, where delays were 1/10 of what they should have been.
