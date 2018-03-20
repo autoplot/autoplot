@@ -636,7 +636,9 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             @Override
             public void run() {
                 updateTimeRanges();
-                updateDropLists(true, true);
+                if ( ranges!=null ) {
+                    updateDropLists(true, true);
+                }
             }
         };
 
