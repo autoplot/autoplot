@@ -653,6 +653,14 @@ public class ApplicationModel {
             return;
         }
         
+        if ( suri.contains("fscache") ) {
+            File local = new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE) );
+            if ( suri.contains(local.toString() ) ) {
+                bookmarksLogger.info("Not logging reference to fscache");
+                return;
+            }
+        }
+        
         if ( recent==null ) recent= new ArrayList<>(); // kludge for rpwg TODO: why is this null?
         List oldValue = Collections.unmodifiableList(recent);
         ArrayList<Bookmark> newValue = new ArrayList<>(recent);
