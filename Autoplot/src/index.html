@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Mash up tool is used to look at data in an HDF file.
+        <p><small>Temperature trend of compost bin and garden pool both seem to change at the same time.  Clouds?  Happy Spring!
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,7 @@
 
         <p>Bugfixes (2018-03-20 r22222):</p>
         <ul>
+            <li>Overzealous check for valid y tags prevented use of MAGEIS data from script.
             <li>rte_1235389582: failed listing in Aggregation GUI caused runtime error.
             <li>setDepend1Cadence filter is properly handled and has a GUI.
             <li>Experimental HAPI caching does not cache after modified date.
