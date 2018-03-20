@@ -438,7 +438,7 @@ public class URISplit {
             params.remove(p);
         }
         split.params= URISplit.formatParams(params);
-        if ( params.size()==0 ) split.params=null;
+        if ( params.isEmpty() ) split.params=null;
         if ( split.vapScheme!=null && !surl.startsWith(split.vapScheme) ) split.vapScheme=null;
         return URISplit.format(split);
     }
@@ -848,9 +848,13 @@ public class URISplit {
     }
 
     /**
-     * spaces and other URI syntax elements are URL-encoded.
+     * spaces and other URI syntax elements are URL-encoded.  
+     * Note some calls of this routine should check for an empty string result
+     * and then set split.params=null instead of "", to avoid the extraneous
+     * question mark.
+     * 
      * @param parms
-     * @return
+     * @return "" or the parameters delimited by ampersands.
      */
     public static String formatParams(Map<String,String> parms) {
         StringBuilder result = new StringBuilder("");
