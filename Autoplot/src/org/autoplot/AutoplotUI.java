@@ -791,6 +791,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                         if ( JOptionPane.OK_OPTION==JythonUtil.invokeScriptSoon( split.resourceUri, dom, 
                                 args, true, true, scriptPanel, new NullProgressMonitor() ) ) {
                             split.params= URISplit.formatParams(args);
+                            if ( split.params.trim().length()==0 ) split.params=null;
                             String history= URISplit.format(split);
                             dataSetSelector.setValue( history );
                             applicationModel.addRecent( history );
