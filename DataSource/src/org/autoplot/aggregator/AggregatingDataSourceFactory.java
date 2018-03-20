@@ -156,10 +156,10 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
                         delegateFile= fsm.getRepresentativeFile( mon.getSubtaskMonitor("get delegate") );
                     }
                 } else {
-                    delegateFile= fsm.getRepresentativeFile( mon );
+                    delegateFile= fsm.getRepresentativeFile( mon.getSubtaskMonitor("get delegate") );
                 }
             } else {
-                delegateFile= fsm.getRepresentativeFile( mon );
+                delegateFile= fsm.getRepresentativeFile( mon.getSubtaskMonitor("get delegate") );
             }
             return delegateFile;
             
