@@ -44,7 +44,7 @@ public class Das2StreamDataSourceFormatEditorPanel extends javax.swing.JPanel im
 
         jLabel1.setText("Type:");
 
-        typeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "ascii", "binary" }));
+        typeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "ascii" }));
 
         jLabel2.setText("Das2Stream options");
 
