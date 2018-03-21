@@ -41,7 +41,7 @@ public class Das2StreamDataSourceFormat implements DataSourceFormat {
            try {
 				  fo= new FileOutputStream( new File( split.resourceUri ) );
 				  QdsToD2sStream writer;
-				  if(binary)  writer = new QdsToD2sStream(QdsToD2sStream.FORMAT_2_3);
+				  if(binary)  writer = new QdsToD2sStream(QdsToD2sStream.FORMAT_2_2);
 				  else writer = new QdsToD2sStream(QdsToD2sStream.FORMAT_2_2, 5, 3);  
 				  
 				  if(!writer.write(data, fo)){
