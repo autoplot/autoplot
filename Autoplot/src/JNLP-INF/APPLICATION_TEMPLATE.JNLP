@@ -36,7 +36,7 @@
         </j2se>
 
         <jar href="AutoplotVolatile.jar" />
-        <jar href="*" />
+        <jar href="AutoplotStable.jar" />
 
         <extension name="cdf" href="*" />
 
