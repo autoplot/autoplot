@@ -38,7 +38,13 @@ public class DatasetCommand extends PyObject {
             + "See http://autoplot.org/help.datasetCommand<br>\n"
             + "<br><b>named parameters:</b>\n"
             + "<table>"
-            + "<tr><td>title </td><td>title for the dataset, which could be used above a plot.</td></tr>\n"
+            + "<tr><td>title </td><td>title for the data, which could be used above a plot.</td></tr>\n"
+            + "<tr><td>label </td><td>label for the data, which could be used as an axis label.</td></tr>\n"
+            + "<tr><td>name </td><td>name for the data, which should be a legal Jython variable name.</td></tr>\n"
+            + "<tr><td>units </td><td>units for the data, which string representing the units of the data.</td></tr>\n"
+            + "<tr><td>validMin validMax</td><td>range of valid values for the data.</td></tr>\n"
+            + "<tr><td>typicalMin typicalMax</td><td>typical range dataset, used for suggesting axis ranges.</td></tr>\n"
+            + "<tr><td>scaleType</td><td>'log' or 'linear'</td></tr>\n"
             + "</table></html>");
 
     private static QDataSet datasetValue( PyObject arg0 ) {
@@ -88,14 +94,16 @@ public class DatasetCommand extends PyObject {
 
         FunctionSupport fs= new FunctionSupport( "dataset", 
             new String[] { "ds", 
-            "title", "label", 
+            "title", "label", "name",
             "units", 
             "fillValue", "validMin", "validMax", "typicalMin", "typicalMax",
+            "scaleType",
         },
         new PyObject[] { Py.None,
-            Py.None, Py.None,
+            Py.None, Py.None, Py.None,
             Py.None, 
             Py.None, Py.None, Py.None, Py.None, Py.None,
+            Py.None,
         } );
         
         fs.args( args, keywords );
@@ -129,10 +137,15 @@ public class DatasetCommand extends PyObject {
             switch ( kw ) {
                 case "title":
                 case "label":
+                case "name":
                     result= Ops.putProperty( result, kw.toUpperCase(), sval );
                     break;
                 case "units":
-                    result= Ops.putProperty( result, kw.toUpperCase(), sval );
+                    if ( val.__tojava__(Units.class)!= Py.NoConversion ) {
+                        result= Ops.putProperty( result, kw.toUpperCase(), val.__tojava__(Units.class)  );
+                    } else {
+                        result= Ops.putProperty( result, kw.toUpperCase(), sval );
+                    }
                     break;
                 case "validMin":
                     result= Ops.putProperty( result, QDataSet.VALID_MIN, numberValue(val) );
@@ -148,6 +161,9 @@ public class DatasetCommand extends PyObject {
                     break;
                 case "fillValue":
                     result= Ops.putProperty( result, QDataSet.FILL_VALUE, numberValue(val) );
+                    break;
+                case "scaleType":
+                    result= Ops.putProperty( result, QDataSet.SCALE_TYPE, sval );
                     break;
                 default:
                     throw new IllegalArgumentException("bad keyword");
