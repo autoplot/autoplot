@@ -613,6 +613,13 @@ public class DataMashUp extends javax.swing.JPanel {
                         }
                     }
                     
+                } else {
+                    if ( !((DefaultMutableTreeNode)value).isLeaf() && tree.isCollapsed( row ) ) {
+                        //DefaultMutableTreeNode n= (DefaultMutableTreeNode)value;
+                        String jy=  getJython( (DefaultTreeModel)tree.getModel(), value );
+                            //getAsJythonInline(n);
+                        s= "<html>" + s + " <span color='gray'>" +jy + "</span>";
+                    }
                 }
                 JLabel result= new JLabel( s );
                 if ( icon!=null ) {
