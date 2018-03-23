@@ -221,6 +221,7 @@ public class NamedURIListTool extends JPanel {
     private JPanel onePanel( final int fi ) {
         logger.entering( CLASS_NAME, "onePanel", fi );
         final JPanel sub= new JPanel( new BorderLayout() );
+        sub.setName("sub"+fi);
         
         Dimension limit= new Dimension(100,24);
         if ( !showIds ) {
