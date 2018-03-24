@@ -3081,18 +3081,19 @@ public class PlotElementController extends DomNodeController {
 
     public void bindToSeriesRenderer(SeriesRenderer seriesRenderer) {
         ApplicationController ac = this.dom.controller;
-        ac.bind(plotElement.style, "lineWidth", seriesRenderer, "lineWidth");
-        ac.bind(plotElement.style, "color", seriesRenderer, "color");
-        ac.bind(plotElement.style, "symbolSize", seriesRenderer, "symSize");
-        ac.bind(plotElement.style, "symbolConnector", seriesRenderer, "psymConnector");
-        ac.bind(plotElement.style, "plotSymbol", seriesRenderer, "psym");
-        ac.bind(plotElement.style, "fillColor", seriesRenderer, "fillColor");
+        ac.bind(plotElement.style, PlotElementStyle.PROP_LINE_WIDTH, seriesRenderer, "lineWidth");
+        ac.bind(plotElement.style, PlotElementStyle.PROP_COLOR, seriesRenderer, Renderer.CONTROL_KEY_COLOR );
+        ac.bind(plotElement.style, PlotElementStyle.PROP_SYMBOL_SIZE, seriesRenderer, "symSize");
+        ac.bind(plotElement.style, PlotElementStyle.PROP_SYMBOL_CONNECTOR, seriesRenderer, "psymConnector");
+        ac.bind(plotElement.style, PlotElementStyle.PROP_PLOT_SYMBOL, seriesRenderer, "psym");
+        ac.bind(plotElement.style, PlotElementStyle.PROP_FILLCOLOR, seriesRenderer, Renderer.CONTROL_KEY_FILL_COLOR );
         ac.bind(plotElement.style, PlotElementStyle.PROP_FILL_TO_REFERENCE, seriesRenderer, "fillToReference");
-        ac.bind(plotElement.style, "reference", seriesRenderer, "reference");
-        ac.bind(plotElement.style, "antiAliased", seriesRenderer, "antiAliased");
+        ac.bind(plotElement.style, PlotElementStyle.PROP_REFERENCE, seriesRenderer, "reference");
+        ac.bind(plotElement.style, PlotElementStyle.PROP_FILL_DIRECTION, seriesRenderer, Renderer.CONTROL_KEY_FILL_DIRECTION );
+        ac.bind(plotElement.style, PlotElementStyle.PROP_ANTIALIASED, seriesRenderer, "antiAliased");
         ac.bind(plotElement, PlotElement.PROP_CADENCECHECK, seriesRenderer, "cadenceCheck");
         if ( seriesRenderer.getColorBar()!=null )
-            ac.bind(plotElement.style, "colortable", seriesRenderer.getColorBar(), "type");
+            ac.bind(plotElement.style, PlotElementStyle.PROP_COLORTABLE, seriesRenderer.getColorBar(), "type");
     }
 
     public void bindToSpectrogramRenderer(SpectrogramRenderer spectrogramRenderer) {
