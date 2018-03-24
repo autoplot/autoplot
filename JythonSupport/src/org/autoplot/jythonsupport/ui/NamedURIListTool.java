@@ -327,6 +327,7 @@ public class NamedURIListTool extends JPanel {
         if ( fi>=0 ) {
             final DataSetSelector dss= new DataSetSelector();
             dss.setPlotItButtonVisible(false);
+            dss.setPlayButton(false);
             dss.setValue( uris.get(fi) );
             bindTimeRange(dss);
             
