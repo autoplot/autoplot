@@ -251,7 +251,7 @@ public class DataMashUp extends javax.swing.JPanel {
         scratchList.setCellRenderer( myListCellRenderer );
         allList.setCellRenderer( myListCellRenderer );
         
-        String data = "ds1";
+        String data = "ds";
         TreePath tp= new TreePath( ( (DefaultMutableTreeNode) expressionTree.getModel().getRoot() ).getPath() );
         doDrop(data,tp);
         
