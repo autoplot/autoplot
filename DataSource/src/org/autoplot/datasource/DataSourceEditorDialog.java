@@ -122,7 +122,20 @@ public class DataSourceEditorDialog extends javax.swing.JDialog {
         });
 
         plotBelowButton.setText("Plot Below");
-        plotBelowButton.setToolTipText("Plot below the current plot.");
+        plotBelowButton.setToolTipText("Plot below the current plot.  Holding shift will plot above.");
+        plotBelowButton.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                plotBelowButtonMouseMoved(evt);
+            }
+        });
+        plotBelowButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                plotBelowButtonMouseExited(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                plotBelowButtonMouseEntered(evt);
+            }
+        });
         plotBelowButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 plotBelowButtonActionPerformed(evt);
@@ -213,6 +226,26 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     setModifiers( KeyEvent.SHIFT_MASK );
     this.setVisible(false);
 }//GEN-LAST:event_overplotButtonActionPerformed
+
+    private void plotBelowUpdate( boolean above ) {    
+        if ( above ) {
+            plotBelowButton.setText("Plot Above");
+        } else {
+            plotBelowButton.setText("Plot Below");
+        }    
+    }
+    
+    private void plotBelowButtonMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_plotBelowButtonMouseMoved
+        plotBelowUpdate( evt.isShiftDown() );
+    }//GEN-LAST:event_plotBelowButtonMouseMoved
+
+    private void plotBelowButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_plotBelowButtonMouseEntered
+        plotBelowUpdate( evt.isShiftDown() );
+    }//GEN-LAST:event_plotBelowButtonMouseEntered
+
+    private void plotBelowButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_plotBelowButtonMouseExited
+        plotBelowUpdate( evt.isShiftDown() );
+    }//GEN-LAST:event_plotBelowButtonMouseExited
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
