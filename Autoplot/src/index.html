@@ -29,6 +29,9 @@
         <p>Bugfixes (2018-03-24 r22249):</p>
         <ul>
             <li>mashup starts with "ds" for the first tree, so that is valid.
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>JNLP template supports builds on new machines.
             <li>Overzealous check for valid y tags prevented use of MAGEIS data from script.
             <li>rte_1235389582: failed listing in Aggregation GUI caused runtime error.
@@ -88,33 +91,6 @@
             <li>1748: insert PWD before completions.  Thanks, Masafumi! 
             <li>minor improvements to the contours renderer.  Thanks, Masafumi!
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>NullPointerException when Python getDataSet didn't properly handle null.  Thanks, Ivar!
-            <li>vap+inline:2016-10-12T12:00Z&RENDER_TYPE=eventsBar 
-            <li>rank 1 Join of us2000 datums didn't properly report the units, breaking autoranging for "vap+inline:2016-10-12T12:00Z&RENDER_TYPE=eventsBar
-            <li>getDataSet calls were invoked with completions, causing strange delays and failures.
-            <li>1950: make PyQDataSet putProperty consistent with Ops.putProperty.  Support "dimensionless - Hz" to result in Hz, regardless of argument order.
-            <li>tweaks to the mash up GUI, such as reducing its size and correcting layout problems.  Thanks, Craig!
-            <li>1949: small angle bug in filled circle.  Disable path-simplifaction code which was messing this up.  Thanks, Masafumi!
-            <li>1948: spaces in CDF parameter names fails.
-            <li>1596: Mash-Up URIs, which use vap+inline, support make-aggregation.  Thanks, Craig!
-            <li>added programmatic method to reset the axis units to a convertible unit.  Thanks, Masafumi!
-            <li>putValues function was inadvertently broken in early January, when dataset had units.  Thanks, Sadie!
-            <li>AutoplotServer "-o -" didn't work (to output to stdout), because arguments parser didn't handle "-" properly.
-            <li>1946: cadence was handled inconsistently for filled histogram, between the fill and the outline.  Thanks, Scott!
-            <li>in ensureMonotonicAndIncreasingWithFill, where the last value was assigned even though the value was not monotonic.  Thanks, Ivar!
-            <li>updating QC status properly repaints.
-            <li>1939: FILL_VALUE is now propagated to CDF.  Thanks, Ivar!
-            <li>1944: invalid .jy reference in the address bar would prevent "load" action on script panel.
-            <li>improve error feedback when time location is added to time location.
-            <li>colons in filenames of pngwalks are again handled properly.  Correct interpolation used to make thumbnails of small images, and properly handle .gif files.
-            <li>downloadResourceAsTempFile assumed it had a monitor, and old code example used None for monitor. 
-            <li>1942: limits on interpolation in synchronize.
-            <li>collapse GUI needs to check to avoid runtime errors.
-            <li>1941: orphaned monitor with aggregation. 
-            <li>format to CDF removes old CDF file before writing new one, so new result is not affected.  Thanks, Ivar!
-        </ul>
         <p>Features:</p>
         <ul>
             <li>Series rendering mode supports fill below reference and fill above reference.
@@ -122,6 +98,9 @@
             <li>mashup tool shows jython code for collapsed nodes.
             <li>Autoplot servlet supports HAPI data sources.
             <li>inverse white-blue-black colorbar added.  Thanks, Masafumi!
+        </ul>
+       <p>Less recent features:</p>
+       <ul>
             <li>626: ctrl+shift+play (and shift+"plot below") is plot above.
             <li>if the fill-to-reference color is transparent, then draw a line the color of the axes at the reference value.
             <li>URI history now only records human-entered URIs, so URIs loaded within vap do not clutter history.
@@ -144,18 +123,6 @@
             <li>several rebin functions renamed to binAverage, since they are unlike the IDL routines and the name causes confusion.  Thanks, Masafumi!
             <li>new annotation command is easier to use than previous calls to create annotations from scripts.  Thanks, Masafumi!
             <li>Contours renderer has more controls now.  LabelCadence is now a string to support "20em".  Thanks, Masafumi!
-        </ul>
-       <p>Less recent features:</p>
-       <ul>
-            <li>update RBSP orbits to 2017-10-02.
-            <li>script editor has "print" menu item, which provides dialog and prints with syntax highlighting.
-            <li>LDataSet can provide access to long64 values, using new capability.
-            <li>Check for valid access URL in CDAWeb metadata, so that valid datasets continue to work.
-            <li>LDataSet.putValue() checks for NaN and assign the smallest long value, so at least it's clear when a mistake is made.
-            <li>orbit mode has control for tick spacing (e.g. "2hr"), under the controller node.
-            <li>introduce cumulativeMin and cumulativeMax to scripting.
-            <li>617: ASCII editor improvements.
-            <li>improvements to completions in Jython script panel.
        </ul>
         <p>Known issues:</p>
         <ul>
