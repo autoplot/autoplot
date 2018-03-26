@@ -746,6 +746,194 @@ public final class HapiDataSource extends AbstractDataSource {
         return ds;
         
     }
+    
+    private QDataSet getDataSetViaCsv(int totalFields, ProgressMonitor monitor, URL url, ParamDescription[] pds, DatumRange tr, int nparam, int[] nfields) throws IllegalArgumentException, Exception, IOException {
+        DataSetBuilder builder= new DataSetBuilder(2,100,totalFields);
+        monitor.setProgressMessage("reading data");
+        monitor.setTaskProgress(20);
+        long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
+        
+        boolean useCache= HapiServer.useCache();
+        String cacheParam= getParam( "cache", "" );
+        if ( cacheParam.equals("F") ) {
+            useCache= false;
+        }
+        
+        AbstractLineReader cacheReader;
+        if ( useCache ) {
+            String[] parameters= new String[pds.length];
+            for ( int i=0; i<pds.length; i++ ) parameters[i]= pds[i].name;
+            cacheReader= getCacheReader(url, parameters, tr, FileSystem.settings().isOffline(), 0L );
+            if ( cacheReader!=null ) {
+                logger.fine("reading from cache");
+            }
+        } else {
+            cacheReader= null;
+        }
+        
+        if ( useCache ) { // round out data request to day boundaries.
+            Datum minMidnight= TimeUtil.prevMidnight( tr.min() );
+            Datum maxMidnight= TimeUtil.nextMidnight( tr.max() );
+            tr= new DatumRange( minMidnight, maxMidnight );
+            URISplit split= URISplit.parse(url.toURI());
+            Map<String,String> params= URISplit.parseParams(split.params);
+            params.put("time.min",minMidnight.toString());
+            params.put("time.max",maxMidnight.toString());
+            split.params= URISplit.formatParams(params);
+            String surl= URISplit.format(split);
+            url= new URL(surl);
+        }
+        
+        HttpURLConnection httpConnect;
+        if ( cacheReader==null ) {
+            if ( FileSystem.settings().isOffline() ) {
+                throw new NoDataInIntervalException("HAPI server is offline.");
+                //throw new FileSystem.FileSystemOfflineException("file system is offline");
+            } else {
+                loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );            
+                httpConnect= (HttpURLConnection)url.openConnection();
+                httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
+                httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
+                httpConnect.setRequestProperty( "Accept-Encoding", "gzip" );
+                httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect);
+                httpConnect.connect();
+            }
+        } else {
+            httpConnect= null;
+        }
+                
+        //Check to see what time ranges are from entire days, then only call writeToCachedData for these intervals. 
+        Datum midnight= TimeUtil.prevMidnight( tr.min() );
+        DatumRange currentDay= new DatumRange( midnight, TimeUtil.next( TimeUtil.DAY, midnight) );
+        boolean completeDay= tr.contains(currentDay);
+
+        boolean gzip= cacheReader==null ? "gzip".equals( httpConnect.getContentEncoding() ) : false;
+        int linenumber=0;
+        try ( AbstractLineReader in= ( cacheReader!=null ? cacheReader :
+                new SingleFileBufferedReader( new BufferedReader( new InputStreamReader( gzip ? new GZIPInputStream( httpConnect.getInputStream() ) : httpConnect.getInputStream() ) ) ) ) ) {
+            String line= in.readLine();
+            while ( line!=null ) {
+                linenumber++;
+                String[] ss= lineSplit(line);
+                if ( ss.length!=totalFields ) {
+                    if ( line.trim().length()==0 ) {
+                        logger.log(Level.WARNING, "expected {0} fields, got empty line at line {1}", new Object[]{totalFields,linenumber});
+                        line= in.readLine();
+                        continue;
+                    } else {
+                        logger.log(Level.WARNING, "expected {0} fields, got {1} at line {2}", new Object[]{totalFields, ss.length,linenumber});
+                        throw new IllegalArgumentException( String.format( "expected %d fields, got %d at line {2}", new Object[]{totalFields, ss.length,linenumber} ) );
+                    }
+                }
+                int ifield=0;
+                Datum xx;
+                try {
+                    xx= pds[ifield].units.parse(ss[ifield]);
+                    if ( System.currentTimeMillis()-t0 > 100 ) {
+                        monitor.setProgressMessage("reading "+xx);
+                        t0= System.currentTimeMillis();
+                        double d= DatumRangeUtil.normalize( tr, xx );
+                        monitor.setTaskProgress( 20 + (int)( 75 * d ) );
+                        if ( monitor.isCancelled() ) 
+                            throw new CancelledOperationException("cancel was pressed");
+                    }
+                } catch ( ParseException ex ) {
+                    line= in.readLine();
+                    continue;
+                }
+                
+                // "close" the current file, gzipping it.
+                if ( cacheReader==null && useCache && !currentDay.contains(xx) && tr.intersects(currentDay) && completeDay ) {
+                    // https://sourceforge.net/p/autoplot/bugs/1968/ HAPI caching must not cache after "modificationDate" or partial days remain in cache
+                    if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
+                        writeToCachedDataFinish( url, pds, currentDay.middle() );
+                    } else {
+                        logger.fine("data after modification date is not cached.");
+                    }
+                }
+                
+                while ( !currentDay.contains(xx) && tr.intersects(currentDay ) ) {
+                    currentDay= currentDay.next();
+                    completeDay= tr.contains(currentDay);
+                    if ( cacheReader==null && useCache && !currentDay.contains(xx) && tr.intersects(currentDay ) ) {
+                        if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
+                            // put empty file which is placeholder.
+                            writeToCachedDataFinish( url, pds, currentDay.middle() ); 
+                        }
+                    }
+                }
+                
+                if ( !currentDay.contains(xx) ) {
+                    logger.fine("something's gone wrong, perhaps out-of-order timetags.");
+                    completeDay= false;
+                }
+                
+                if ( completeDay ) {
+                    if ( cacheReader==null && useCache ) {
+                        if ( pds[0].modifiedDateMillis==0 || xx.doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
+                            writeToCachedData( url, pds, xx, ss );
+                        }
+                    }
+                }
+                        
+                builder.putValue( -1, ifield, xx );
+                ifield++;
+                for ( int i=1; i<nparam; i++ ) {  // nparam is number of parameters, which may have multiple fields.
+                    for ( int j=0; j<nfields[i]; j++ ) {
+                        try {
+                            String s= ss[ifield];
+                            if ( pds[i].units instanceof EnumerationUnits ) {
+                                builder.putValue( -1, ifield, ((EnumerationUnits)pds[i].units).createDatum(s).doubleValue(pds[i].units) );
+                            } else {
+                                builder.putValue( -1, ifield, pds[i].units.parse(s) );
+                            }
+                        } catch ( ParseException ex ) {
+                            builder.putValue( -1, ifield, pds[i].fillValue );
+                            pds[i].hasFill= true;
+                        }
+                        ifield++;
+                    } 
+                }
+                builder.nextRecord();
+                line= in.readLine();
+            }
+            while ( completeDay && tr.intersects(currentDay) ) {
+                if ( cacheReader==null && useCache && tr.intersects(currentDay ) ) {
+                    if ( currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
+                        // put empty file which is placeholder.
+                        writeToCachedDataFinish( url, pds, currentDay.middle() ); 
+                    }
+                }
+                currentDay= currentDay.next();
+                completeDay= tr.contains(currentDay);
+            }
+        } catch ( IOException e ) {
+            logger.log( Level.WARNING, e.getMessage(), e );
+            monitor.finished();
+            if ( httpConnect!=null ) {
+                throw new IOException( String.valueOf(httpConnect.getResponseCode())+": "+httpConnect.getResponseMessage() );
+            } else {
+                throw e;
+            }
+            
+        } catch ( Exception e ) {
+            logger.log( Level.WARNING, e.getMessage(), e );
+            monitor.finished();
+            throw e;
+        } finally {
+            if ( httpConnect!=null ) httpConnect.disconnect();
+        }
+        
+        if ( cacheReader!=null ) {
+            Map<String,String> cacheFiles= new HashMap<>();
+            cacheFiles.put( "cached", "true" );
+            builder.putProperty( QDataSet.USER_PROPERTIES, cacheFiles );
+        }
+        
+        monitor.setTaskProgress(95);
+        QDataSet ds= builder.getDataSet();
+        return ds;
+    }
 
     private QDataSet getDataSetViaBinary(int totalFields, ProgressMonitor monitor, URL url, ParamDescription[] pds, DatumRange tr, int nparam,
             int[] nfields) throws IllegalArgumentException, Exception, IOException {
@@ -1171,194 +1359,6 @@ public final class HapiDataSource extends AbstractDataSource {
         }
         
         return result;
-    }
-
-    private QDataSet getDataSetViaCsv(int totalFields, ProgressMonitor monitor, URL url, ParamDescription[] pds, DatumRange tr, int nparam, int[] nfields) throws IllegalArgumentException, Exception, IOException {
-        DataSetBuilder builder= new DataSetBuilder(2,100,totalFields);
-        monitor.setProgressMessage("reading data");
-        monitor.setTaskProgress(20);
-        long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
-        
-        boolean useCache= HapiServer.useCache();
-        String cacheParam= getParam( "cache", "" );
-        if ( cacheParam.equals("F") ) {
-            useCache= false;
-        }
-        
-        AbstractLineReader cacheReader;
-        if ( useCache ) {
-            String[] parameters= new String[pds.length];
-            for ( int i=0; i<pds.length; i++ ) parameters[i]= pds[i].name;
-            cacheReader= getCacheReader(url, parameters, tr, FileSystem.settings().isOffline(), 0L );
-            if ( cacheReader!=null ) {
-                logger.fine("reading from cache");
-            }
-        } else {
-            cacheReader= null;
-        }
-        
-        if ( useCache ) { // round out data request to day boundaries.
-            Datum minMidnight= TimeUtil.prevMidnight( tr.min() );
-            Datum maxMidnight= TimeUtil.nextMidnight( tr.max() );
-            tr= new DatumRange( minMidnight, maxMidnight );
-            URISplit split= URISplit.parse(url.toURI());
-            Map<String,String> params= URISplit.parseParams(split.params);
-            params.put("time.min",minMidnight.toString());
-            params.put("time.max",maxMidnight.toString());
-            split.params= URISplit.formatParams(params);
-            String surl= URISplit.format(split);
-            url= new URL(surl);
-        }
-        
-        HttpURLConnection httpConnect;
-        if ( cacheReader==null ) {
-            if ( FileSystem.settings().isOffline() ) {
-                throw new NoDataInIntervalException("HAPI server is offline.");
-                //throw new FileSystem.FileSystemOfflineException("file system is offline");
-            } else {
-                loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );            
-                httpConnect= (HttpURLConnection)url.openConnection();
-                httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
-                httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
-                httpConnect.setRequestProperty( "Accept-Encoding", "gzip" );
-                httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect);
-                httpConnect.connect();
-            }
-        } else {
-            httpConnect= null;
-        }
-                
-        //Check to see what time ranges are from entire days, then only call writeToCachedData for these intervals. 
-        Datum midnight= TimeUtil.prevMidnight( tr.min() );
-        DatumRange currentDay= new DatumRange( midnight, TimeUtil.next( TimeUtil.DAY, midnight) );
-        boolean completeDay= tr.contains(currentDay);
-
-        boolean gzip= cacheReader==null ? "gzip".equals( httpConnect.getContentEncoding() ) : false;
-        int linenumber=0;
-        try ( AbstractLineReader in= ( cacheReader!=null ? cacheReader :
-                new SingleFileBufferedReader( new BufferedReader( new InputStreamReader( gzip ? new GZIPInputStream( httpConnect.getInputStream() ) : httpConnect.getInputStream() ) ) ) ) ) {
-            String line= in.readLine();
-            while ( line!=null ) {
-                linenumber++;
-                String[] ss= lineSplit(line);
-                if ( ss.length!=totalFields ) {
-                    if ( line.trim().length()==0 ) {
-                        logger.log(Level.WARNING, "expected {0} fields, got empty line at line {1}", new Object[]{totalFields,linenumber});
-                        line= in.readLine();
-                        continue;
-                    } else {
-                        logger.log(Level.WARNING, "expected {0} fields, got {1} at line {2}", new Object[]{totalFields, ss.length,linenumber});
-                        throw new IllegalArgumentException( String.format( "expected %d fields, got %d at line {2}", new Object[]{totalFields, ss.length,linenumber} ) );
-                    }
-                }
-                int ifield=0;
-                Datum xx;
-                try {
-                    xx= pds[ifield].units.parse(ss[ifield]);
-                    if ( System.currentTimeMillis()-t0 > 100 ) {
-                        monitor.setProgressMessage("reading "+xx);
-                        t0= System.currentTimeMillis();
-                        double d= DatumRangeUtil.normalize( tr, xx );
-                        monitor.setTaskProgress( 20 + (int)( 75 * d ) );
-                        if ( monitor.isCancelled() ) 
-                            throw new CancelledOperationException("cancel was pressed");
-                    }
-                } catch ( ParseException ex ) {
-                    line= in.readLine();
-                    continue;
-                }
-                
-                // "close" the current file, gzipping it.
-                if ( cacheReader==null && useCache && !currentDay.contains(xx) && tr.intersects(currentDay) && completeDay ) {
-                    // https://sourceforge.net/p/autoplot/bugs/1968/ HAPI caching must not cache after "modificationDate" or partial days remain in cache
-                    if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
-                        writeToCachedDataFinish( url, pds, currentDay.middle() );
-                    } else {
-                        logger.fine("data after modification date is not cached.");
-                    }
-                }
-                
-                while ( !currentDay.contains(xx) && tr.intersects(currentDay ) ) {
-                    currentDay= currentDay.next();
-                    completeDay= tr.contains(currentDay);
-                    if ( cacheReader==null && useCache && !currentDay.contains(xx) && tr.intersects(currentDay ) ) {
-                        if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
-                            // put empty file which is placeholder.
-                            writeToCachedDataFinish( url, pds, currentDay.middle() ); 
-                        }
-                    }
-                }
-                
-                if ( !currentDay.contains(xx) ) {
-                    logger.fine("something's gone wrong, perhaps out-of-order timetags.");
-                    completeDay= false;
-                }
-                
-                if ( completeDay ) {
-                    if ( cacheReader==null && useCache ) {
-                        if ( pds[0].modifiedDateMillis==0 || xx.doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
-                            writeToCachedData( url, pds, xx, ss );
-                        }
-                    }
-                }
-                        
-                builder.putValue( -1, ifield, xx );
-                ifield++;
-                for ( int i=1; i<nparam; i++ ) {  // nparam is number of parameters, which may have multiple fields.
-                    for ( int j=0; j<nfields[i]; j++ ) {
-                        try {
-                            String s= ss[ifield];
-                            if ( pds[i].units instanceof EnumerationUnits ) {
-                                builder.putValue( -1, ifield, ((EnumerationUnits)pds[i].units).createDatum(s).doubleValue(pds[i].units) );
-                            } else {
-                                builder.putValue( -1, ifield, pds[i].units.parse(s) );
-                            }
-                        } catch ( ParseException ex ) {
-                            builder.putValue( -1, ifield, pds[i].fillValue );
-                            pds[i].hasFill= true;
-                        }
-                        ifield++;
-                    } 
-                }
-                builder.nextRecord();
-                line= in.readLine();
-            }
-            while ( completeDay && tr.intersects(currentDay) ) {
-                if ( cacheReader==null && useCache && tr.intersects(currentDay ) ) {
-                    if ( currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
-                        // put empty file which is placeholder.
-                        writeToCachedDataFinish( url, pds, currentDay.middle() ); 
-                    }
-                }
-                currentDay= currentDay.next();
-                completeDay= tr.contains(currentDay);
-            }
-        } catch ( IOException e ) {
-            logger.log( Level.WARNING, e.getMessage(), e );
-            monitor.finished();
-            if ( httpConnect!=null ) {
-                throw new IOException( String.valueOf(httpConnect.getResponseCode())+": "+httpConnect.getResponseMessage() );
-            } else {
-                throw e;
-            }
-            
-        } catch ( Exception e ) {
-            logger.log( Level.WARNING, e.getMessage(), e );
-            monitor.finished();
-            throw e;
-        } finally {
-            if ( httpConnect!=null ) httpConnect.disconnect();
-        }
-        
-        if ( cacheReader!=null ) {
-            Map<String,String> cacheFiles= new HashMap<>();
-            cacheFiles.put( "cached", "true" );
-            builder.putProperty( QDataSet.USER_PROPERTIES, cacheFiles );
-        }
-        
-        monitor.setTaskProgress(95);
-        QDataSet ds= builder.getDataSet();
-        return ds;
     }
     
     private ParamDescription[] getParameterDescriptions(JSONObject doc) throws IllegalArgumentException, ParseException, JSONException {
