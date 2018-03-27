@@ -67,8 +67,6 @@ import org.jdesktop.beansbinding.Bindings;
 import org.jdesktop.beansbinding.Converter;
 import org.jdesktop.beansbinding.Property;
 import org.autoplot.ApplicationModel;
-import org.autoplot.AutoplotUI;
-import org.autoplot.AutoplotUtil;
 import org.autoplot.ColumnColumnConnectorMouseModule;
 import org.autoplot.GuiSupport;
 import org.autoplot.LayoutListener;
@@ -77,7 +75,8 @@ import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.layout.LayoutConstants;
 import org.autoplot.util.RunLaterListener;
-import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.das2.system.DefaultMonitorFactory;
+import org.das2.system.DefaultMonitorFactory.MonitorEntry;
 
 /**
  * The ApplicationController, one per dom, is in charge of managing the 
@@ -1952,6 +1951,23 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     /**
+     * go through the monitors we keep track of, and cancel each one.
+     */
+    public void cancelAllPendingTasks() {
+        MonitorFactory mf= application.controller.getMonitorFactory();
+        if ( mf instanceof DefaultMonitorFactory ) {
+            DefaultMonitorFactory dmf= (DefaultMonitorFactory)mf;
+            MonitorEntry[] mes= dmf.getMonitors();
+            for ( MonitorEntry me: mes ) {
+                ProgressMonitor m= me.getMonitor();
+                if ( !( m.isCancelled() || m.isFinished() ) ) {
+                    m.cancel();
+                }
+            }
+        }
+    }
+    
+    /**
      * resets the dom to the initial state by deleting added 
      * plotElements, plots and data sources.
      */
@@ -2204,6 +2220,13 @@ public class ApplicationController extends DomNodeController implements RunLater
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
 
+            Runnable cancelAllRun= new Runnable() {
+                public void run() {
+                    cancelAllPendingTasks();
+                }
+            };
+            new Thread(cancelAllRun).start();
+                
 
         } finally {
             canvasLock.unlock();
@@ -3119,20 +3142,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @return the source of monitors.
      */
     public MonitorFactory getMonitorFactory() {
-        return new MonitorFactory() {
-            @Override
-            public ProgressMonitor getMonitor(DasCanvas canvas, String string, String desc) {
-                return DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(canvas, string, desc);
-            }
-            @Override
-            public ProgressMonitor getMonitor(DasCanvasComponent context, String label, String description) {
-                return DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(context, label, description);
-            }
-            @Override
-            public ProgressMonitor getMonitor(String label, String description) {
-                return DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(getDasCanvas(), label, description);
-            }
-        };
+        return DasApplication.getDefaultApplication().getMonitorFactory();
     }
 
     /**
