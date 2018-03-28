@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Old availability plot.  The aggregation dialog has a checkbox to show only if files are found.
+        <p><small>Mentions of the word "plot", provided by Google.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
         
         <p>SourceForge has made changes which require special actions in the release process.  Please be aware that this may cause unusual behavior.</p>
 
-        <p>Bugfixes (2018-03-24 r22249):</p>
+        <p>Bugfixes (2018-03-28 r22249):</p>
         <ul>
+            <li>1973: experiment with clearing the focus URI when script or .vap is run.
+            <li>1972: "reset" method cancels all the tasks it knows about.
             <li>mashup starts with "ds" for the first tree, so that is valid.
         </ul>
         <p>Older Bugfixes:</p>
@@ -93,7 +95,10 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>Series rendering mode supports fill below reference and fill above reference.
+            <li>add inverse_white_blue_black.  Thanks, Masafumi!
+            <li>DasAxis now has "reference" property which will draw a line at the reference.  Thanks, Kris and Ivar!
+            <li>add two more symbol connection styles, requested by Ivar.
+            <li>Series rendering mode supports fill below reference and fill above reference.  Thanks, Kris and Ivar!
             <li>allow "45 Deg F" + 2 = "47 Deg F"
             <li>mashup tool shows jython code for collapsed nodes.
             <li>Autoplot servlet supports HAPI data sources.
