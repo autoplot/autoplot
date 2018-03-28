@@ -127,6 +127,11 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     private static final String PENDING_BREAK_APART = "breakApart";
     
+    /**
+     * use this value to blur the focus.
+     */
+    public static final String VALUE_BLUR_FOCUS= "";
+    
     public ApplicationController(ApplicationModel model, Application application) {
         super( application );
 
@@ -2020,6 +2025,8 @@ public class ApplicationController extends DomNodeController implements RunLater
             if ( p0.getXaxis().getController()==null )  throw new NullPointerException("p0.getXaxis().getController() is null");
             if ( p0.getXaxis().getController().getDasAxis()==null )  throw new NullPointerException("p0.getXaxis().getController().getDasAxis() is null");
             p0.getXaxis().getController().getDasAxis().setTcaFunction(null);
+            p0.getXaxis().getController().getDasAxis().setReference("");
+            p0.getYaxis().getController().getDasAxis().setReference("");
 
             for ( int i=application.getPlotElements().length-1; i>0; i-- ) {
                 deletePlotElement( application.getPlotElements(i) ); //may delete dsf and plots as well.
@@ -2646,6 +2653,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     protected String focusUri = "";
     /**
      * property focusUri is the uri that has gained focus.  This can be the datasource uri, or the location of the .vap file.
+     * @see #VALUE_BLUR_FOCUS
      */
     public static final String PROP_FOCUSURI = "focusUri";
 
@@ -2654,6 +2662,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     public void setFocusUri(String focusUri) {
+        logger.log(Level.FINE, "setFocusUri({0})", focusUri);
         if (focusUri == null) {
             focusUri = "";
         }
