@@ -767,6 +767,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     }
                     runScript( dataSetSelector.getValue() );
                 }
+                dom.getController().setFocusUri(ApplicationController.VALUE_BLUR_FOCUS);
             }
         });
 
@@ -809,6 +810,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     }
                     runScript( dataSetSelector.getValue() );
                 }
+                dom.getController().setFocusUri(ApplicationController.VALUE_BLUR_FOCUS);                
             }
         });
 
@@ -824,12 +826,13 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     applicationModel.addRecent(dataSetSelector.getValue());
                     runScript( script );
                 }
+                dom.getController().setFocusUri(ApplicationController.VALUE_BLUR_FOCUS);
             }
         });
         dataSetSelector.registerBrowseTrigger( "script:(.*)", new AbstractAction( "script") {
             @Override
             public void actionPerformed( ActionEvent ev ) {
-                org.das2.util.LoggerManager.logGuiEvent(ev);                    
+                org.das2.util.LoggerManager.logGuiEvent(ev);        
                 DataSetSelector source= (DataSetSelector)ev.getSource();
                 String s= source.getValue();
                 if ( s.endsWith(".jy") ) {
@@ -842,6 +845,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 } else {
                     source.showFileSystemCompletions( false, true, "[^\\s]+\\.jy" );
                 }
+                dom.getController().setFocusUri(ApplicationController.VALUE_BLUR_FOCUS);            
                 //do nothing
             }
         });
@@ -857,7 +861,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerActionTrigger( "vapfile:(.*)", new AbstractAction( "vapfile") {
             @Override
             public void actionPerformed( ActionEvent ev ) { // TODO: underimplemented
-                org.das2.util.LoggerManager.logGuiEvent(ev);                    
+                org.das2.util.LoggerManager.logGuiEvent(ev);
                 String vapfile= dataSetSelector.getValue().substring(8);
                 URISplit split= URISplit.parse(vapfile);
                 if ( !( vapfile.endsWith(".xml") ) && ( split.params==null || split.params.length()==0 ) ) {
@@ -883,6 +887,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                         }
                     }
                 }
+                dom.getController().setFocusUri(ApplicationController.VALUE_BLUR_FOCUS);
             }
         });
         
@@ -897,13 +902,11 @@ public final class AutoplotUI extends javax.swing.JFrame {
                         dataSetSelector.setValue(result);
                         dataSetSelector.maybePlot(false);
                     }
-                    setCursor( Cursor.getDefaultCursor() );
-                    return;
                 } else {
                     JOptionPane.showMessageDialog( AutoplotUI.this, "Unable to inspect .vap files" );
-                    setCursor( Cursor.getDefaultCursor() );
-                    return;
                 }
+                setCursor( Cursor.getDefaultCursor() );
+                dom.getController().setFocusUri(ApplicationController.VALUE_BLUR_FOCUS);
             }
         });
 
