@@ -42,21 +42,31 @@ public class AudioSystemDataSourceFactory extends AbstractDataSourceFactory {
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
-            List<CompletionContext> result= new ArrayList<CompletionContext>();
+            List<CompletionContext> result= new ArrayList<>();
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "len=", "sample length in seconds" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "spec=", "make spectrogram using FFT" ) );
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "rate=", "sampling rate in samples per second" ) );
             return result;
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             String paramName= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
             if ( paramName.equals("spec") ) {
-                List<CompletionContext> result= new ArrayList<CompletionContext>();
+                List<CompletionContext> result= new ArrayList<>();
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "128") );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "256") );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "512") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "1024") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "2048") );
                 return result;
             } else if (paramName.equals("len")) {
-                List<CompletionContext> result= new ArrayList<CompletionContext>();
+                List<CompletionContext> result= new ArrayList<>();
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "1.0") );
+                return result;
+            } else if (paramName.equals("rate")) {
+                List<CompletionContext> result= new ArrayList<>();
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "8000") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "16000") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "32000") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "64000") );
                 return result;
             } else {
                 return Collections.emptyList();

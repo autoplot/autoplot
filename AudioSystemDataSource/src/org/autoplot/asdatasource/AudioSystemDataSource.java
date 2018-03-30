@@ -34,8 +34,6 @@ import org.das2.qds.ops.Ops;
  */
 public class AudioSystemDataSource extends AbstractDataSource implements Updating {
 
-    public static final int SAMPLE_RATE = 8000; // SAMPLE_RATE * SAMPLE_LENGTH_SEC should be multiple of BUFSIZE
-
     public AudioSystemDataSource( URI uri ) {
         super(uri);
         String sspec= (String) getParams().get("spec");
@@ -56,7 +54,9 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
 
         double lenSeconds = Double.parseDouble( getParam( "len", "1.0") );
 
-        nsamples = (int) (lenSeconds * SAMPLE_RATE);
+        int sampleRate= Integer.parseInt( getParam( "rate", "8000" ) );
+        
+        nsamples = (int) (lenSeconds * sampleRate );
         int len = nsamples * 4;
         int nchannels= 1;
         int bitsPerSample= 16;
@@ -69,7 +69,7 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
 
         AudioFormat audioFormat = new AudioFormat(
                 AudioFormat.Encoding.PCM_SIGNED,
-                SAMPLE_RATE, bitsPerSample, nchannels, frameSize, SAMPLE_RATE, false);
+                sampleRate, bitsPerSample, nchannels, frameSize, sampleRate, false);
         DataLine.Info info = new DataLine.Info(TargetDataLine.class, audioFormat);
 
         targetDataLine = (TargetDataLine) AudioSystem.getLine(info);
@@ -91,7 +91,7 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
 
         dataBuffer.order( ByteOrder.LITTLE_ENDIAN );
 
-        TagGenDataSet t= new TagGenDataSet( nsamples, 1./SAMPLE_RATE, 0.0, Units.seconds );
+        TagGenDataSet t= new TagGenDataSet( nsamples, 1./sampleRate, 0.0, Units.seconds );
         t.putProperty( QDataSet.LABEL, "Seconds Offset");
         //startUpdateTimer();
         
@@ -119,13 +119,15 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
             int frameSizeBytes= bitsPerSample / ( nchannels * 8 );
 
             dataBuffer = ByteBuffer.allocateDirect(len);
-
+            
+            final int sampleRate= Integer.parseInt( getParam( "rate", "8000" ) );
+        
             final TargetDataLine targetDataLine;
             AudioInputStream audioInputStream;
 
             AudioFormat audioFormat = new AudioFormat(
                     AudioFormat.Encoding.PCM_SIGNED,
-                    SAMPLE_RATE, bitsPerSample, nchannels, frameSizeBytes, SAMPLE_RATE, false);
+                    sampleRate, bitsPerSample, nchannels, frameSizeBytes, sampleRate, false);
             DataLine.Info info = new DataLine.Info(TargetDataLine.class, audioFormat);
 
             targetDataLine = (TargetDataLine) AudioSystem.getLine(info);
@@ -157,7 +159,7 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
                         
                         dataBuffer.order( ByteOrder.LITTLE_ENDIAN );
                         
-                        TagGenDataSet t= new TagGenDataSet( nsamples, 1./SAMPLE_RATE, 0.0, Units.seconds );
+                        TagGenDataSet t= new TagGenDataSet( nsamples, 1./sampleRate, 0.0, Units.seconds );
                         t.putProperty( QDataSet.LABEL, "Seconds Offset");
                                                 
                         MutablePropertyDataSet ds= BufferDataSet.makeDataSet( 1, 2, 0, nsamples, 1, 1, 1, dataBuffer, BufferDataSet.SHORT );
