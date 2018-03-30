@@ -22,8 +22,10 @@ import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -487,7 +489,7 @@ public final class HapiDataSource extends AbstractDataSource {
         HttpURLConnection httpConnect=  ((HttpURLConnection)url.openConnection());
         httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
         httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
-        httpConnect= (HttpURLConnection) HtmlUtil.checkRedirect( httpConnect );
+        httpConnect= (HttpURLConnection) HttpUtil.checkRedirect( httpConnect );
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( httpConnect.getInputStream() ) ) ) {
             String line= in.readLine();
             lineNum++;
@@ -1216,6 +1218,62 @@ public final class HapiDataSource extends AbstractDataSource {
   
     }
     
+    private static AbstractLineReader calculateCacheReader( File[][] files ) {
+        
+        ConcatenateBufferedReader cacheReader= new ConcatenateBufferedReader();
+        for ( int i=0; i<files.length; i++ ) {
+            boolean haveAllForDay= true;
+            if ( haveAllForDay ) {
+                PasteBufferedReader r1= new PasteBufferedReader();
+                r1.setDelim(',');
+                for ( int j=0; j<files[i].length; j++ ) {
+                    try {
+                        FileReader oneDayOneParam= new FileReader(files[i][j]);
+                        r1.pasteBufferedReader( new SingleFileBufferedReader( new BufferedReader(oneDayOneParam) ) );
+                    }catch ( IOException ex ) {
+                        logger.log( Level.SEVERE, ex.getMessage(), ex );
+                        return null;
+                    }
+                }
+                cacheReader.concatenateBufferedReader(r1);                
+            }   
+        }
+        return cacheReader;
+    }
+    
+    /**
+     * make a connection to the server, expecting that the server might send back a 
+     * 304 indicating the cache files should be used.
+     * @param url
+     * @param files
+     * @param lastModified non-zero to indicate time stamp of the oldest file found locally.
+     * @return
+     * @throws IOException 
+     */
+    public static AbstractLineReader maybeGetCacheReader( URL url, File[][] files, long lastModified) throws IOException {
+        HttpURLConnection httpConnect;
+        if ( FileSystem.settings().isOffline() ) {
+            return null;
+            //throw new FileSystem.FileSystemOfflineException("file system is offline");
+        } else {
+            loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );            
+            httpConnect= (HttpURLConnection)url.openConnection();
+            httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
+            httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
+            httpConnect.setRequestProperty( "Accept-Encoding", "gzip" );
+            String s= new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z").format(new Date(lastModified));
+            httpConnect.setRequestProperty( "If-Modified-Since", s );
+            httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect);
+            httpConnect.connect();
+        }
+        if ( httpConnect.getResponseCode()==304 ) {
+            return calculateCacheReader( files );
+        }
+        boolean gzip= "gzip".equals( httpConnect.getContentEncoding() );
+        return new SingleFileBufferedReader( new BufferedReader( 
+            new InputStreamReader( gzip ? new GZIPInputStream( httpConnect.getInputStream() ) : httpConnect.getInputStream() ) ) );
+    }
+
     /**
      * See if it's possible to create a Reader based on the contents of the HAPI
      * cache.  null is returned when cached files cannot be used.
@@ -1333,32 +1391,29 @@ public final class HapiDataSource extends AbstractDataSource {
             logger.fine("no cached data found");
             return null;
         }
-            
-        ConcatenateBufferedReader result= new ConcatenateBufferedReader();
+        
+        AbstractLineReader result;
+        
+        // digest all this into a single timestamp.  
+        // For each day, what is the oldest any of the granules was created?
+        // For each interval, what was the oldest of any granule?
+        long timeStamp= Long.MAX_VALUE;
         for ( int i=0; i<trs.size(); i++ ) {
-            boolean haveAllForDay= true;
             for ( int j=0; j<parameters.length; j++ ) {
-                if ( hits[i][j]==false ) {
-                    haveAllForDay= false;
-                }
+                timeStamp= Math.min( timeStamp, files[i][j].lastModified() );
             }
-            if ( haveAllForDay ) {
-                PasteBufferedReader r1= new PasteBufferedReader();
-                r1.setDelim(',');
-                for ( int j=0; j<parameters.length; j++ ) {
-                    try {
-                        FileReader oneDayOneParam= new FileReader(files[i][j]);
-                        r1.pasteBufferedReader( new SingleFileBufferedReader( new BufferedReader(oneDayOneParam) ) );
-                    }catch ( IOException ex ) {
-                        logger.log( Level.SEVERE, ex.getMessage(), ex );
-                        return null;
-                    }
-                }
-                result.concatenateBufferedReader(r1);                
-            }   
         }
         
-        return result;
+        try {
+            result= maybeGetCacheReader( url, files, timeStamp );
+            if ( result!=null ) return result;
+        } catch ( IOException ex ) {
+            logger.log( Level.WARNING, null, ex );
+        }
+            
+        AbstractLineReader cacheReader= calculateCacheReader( files );
+        return cacheReader;
+                
     }
     
     private ParamDescription[] getParameterDescriptions(JSONObject doc) throws IllegalArgumentException, ParseException, JSONException {
