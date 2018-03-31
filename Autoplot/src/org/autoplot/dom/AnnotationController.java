@@ -92,10 +92,11 @@ public class AnnotationController extends DomNodeController {
         String plotId= annotation.getPlotId();
         if ( plotId!=null && plotId.length()>0 ) {
             LabelConverter lc= new LabelConverter( dom, (Plot)DomUtil.getElementById( dom, plotId  ), null, null, annotation );
-            ac.bind( annotation, "text", p, "text", lc );
+            ac.bind( annotation, Annotation.PROP_TEXT, p, "text", lc );
         } else {
-            ac.bind( annotation, "text", p, "text");
+            ac.bind( annotation, Annotation.PROP_TEXT, p, "text");
         }
+        ac.bind( annotation, Annotation.PROP_URL, p, "url" );
         ac.bind( annotation, "fontSize", p, "fontSize", getFontConverter(p) );
         ac.bind( annotation, "borderType", p, "borderType" );
         ac.bind( annotation, "anchorPosition", p, "anchorPosition" );

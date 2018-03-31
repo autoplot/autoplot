@@ -43,6 +43,20 @@ public class Annotation extends DomNode {
         this.text = text;
         propertyChangeSupport.firePropertyChange(PROP_TEXT, oldText, text);
     }
+    
+    private String url = "";
+
+    public static final String PROP_URL = "url";
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        String oldUrl = this.url;
+        this.url = url;
+        propertyChangeSupport.firePropertyChange(PROP_URL, oldUrl, url);
+    }
 
     private String fontSize = "1.4em";
 
@@ -317,6 +331,7 @@ public class Annotation extends DomNode {
         if ( !( n instanceof Annotation ) ) throw new IllegalArgumentException("node should be an Annotation");                                        
         Annotation that = (Annotation) n;
         if ( !exclude.contains( PROP_TEXT ) ) this.setText(that.getText());
+        if ( !exclude.contains( PROP_URL ) ) this.setUrl(that.getUrl());
         if ( !exclude.contains( PROP_FONTSIZE ) ) this.setFontSize(that.getFontSize());
         if ( !exclude.contains( PROP_BORDERTYPE ) ) this.setBorderType(that.getBorderType() );
         if ( !exclude.contains( PROP_ANCHORPOSITION ) ) this.setAnchorPosition(that.getAnchorPosition() );
@@ -354,6 +369,8 @@ public class Annotation extends DomNode {
 
         b=  that.text.equals(this.text) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_TEXT, that.text, this.text ) );
+        b=  that.url.equals(this.url) ;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_URL, that.url, this.url ) );
         b=  that.fontSize.equals(this.fontSize) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_FONTSIZE, that.fontSize, this.fontSize ) );
         b=  that.borderType.equals(this.borderType) ;
