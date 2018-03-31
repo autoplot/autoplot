@@ -1561,6 +1561,7 @@ public class GuiSupport {
             }
         });
         bindingMenu.add(item);
+        
         item = new JMenuItem(new AbstractAction("Bind Scale to Plot Below") {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1571,6 +1572,16 @@ public class GuiSupport {
                 } else {
                     bindToPlotPeer(controller,dstPlot, plot, axis, new String[] { Axis.PROP_LOG, Axis.PROP_SCALE });
                 }
+            }
+        });
+        bindingMenu.add(item);
+
+        item = new JMenuItem(new AbstractAction("Bind Scale to Opposite Axis") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
+                controller.bind( plot.getXaxis(), Axis.PROP_LOG, plot.getYaxis(), Axis.PROP_LOG );
+                controller.bind( plot.getXaxis(), Axis.PROP_SCALE, plot.getYaxis(), Axis.PROP_SCALE );
             }
         });
         bindingMenu.add(item);
