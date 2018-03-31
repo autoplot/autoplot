@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Mentions of the word "plot", provided by Google.
+        <p><small>quicklatex.com is used to render LaTeX code to an image, annotation draws the image on the plot.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -95,6 +95,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>New url property of Annotation clarifies use, and allows URL to cache image of LaTeX-rendering site, and LaTeX code can be stored in the text for safe-keeping.
+            <li>HAPI client will use "If-Modified-Since" request header and supports 304 (not modified) responses, when caching is enabled.
+            <li>audiosystem data source allows control of sampling rate.
+            <li>add "bind scale to opposite axis.  Isotropic should no longer be used.
             <li>add "normalize" function.  Thanks, Allison!
             <li>add inverse_white_blue_black.  Thanks, Masafumi!
             <li>DasAxis now has "reference" property which will draw a line at the reference.  Thanks, Kris and Ivar!
