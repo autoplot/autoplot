@@ -1376,7 +1376,7 @@ public final class HapiDataSource extends AbstractDataSource {
         }
                 
         if ( staleCacheFiles && !offline ) {
-            logger.fine("old cache files found, but new ones are available and accessible");
+            logger.fine("old cache files found, but new data is available and accessible");
             return null;
         }
     
