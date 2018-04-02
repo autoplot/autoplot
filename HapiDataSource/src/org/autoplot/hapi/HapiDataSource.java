@@ -360,7 +360,7 @@ public final class HapiDataSource extends AbstractDataSource {
             }
         }
         if ( t0!=null && t0.ge(xx) ) {
-            logger.fine("clear all cached files");
+            logger.log(Level.FINE, "clear all cached files for {0}", sxx);
             for (ParamDescription pp1 : pp) {
                 String f = s + "/hapi/" + u + "/" + sxx + "." + pp1.name + ".csv";
                 File ff= new File(f);
@@ -761,18 +761,6 @@ public final class HapiDataSource extends AbstractDataSource {
             useCache= false;
         }
         
-        AbstractLineReader cacheReader;
-        if ( useCache ) {
-            String[] parameters= new String[pds.length];
-            for ( int i=0; i<pds.length; i++ ) parameters[i]= pds[i].name;
-            cacheReader= getCacheReader(url, parameters, tr, FileSystem.settings().isOffline(), 0L );
-            if ( cacheReader!=null ) {
-                logger.fine("reading from cache");
-            }
-        } else {
-            cacheReader= null;
-        }
-        
         if ( useCache ) { // round out data request to day boundaries.
             Datum minMidnight= TimeUtil.prevMidnight( tr.min() );
             Datum maxMidnight= TimeUtil.nextMidnight( tr.max() );
@@ -784,6 +772,18 @@ public final class HapiDataSource extends AbstractDataSource {
             split.params= URISplit.formatParams(params);
             String surl= URISplit.format(split);
             url= new URL(surl);
+        }
+        
+        AbstractLineReader cacheReader;
+        if ( useCache ) { // this branch posts the request, expecting that the server may respond with 304, indicating the cache should be used.
+            String[] parameters= new String[pds.length];
+            for ( int i=0; i<pds.length; i++ ) parameters[i]= pds[i].name;
+            cacheReader= getCacheReader(url, parameters, tr, FileSystem.settings().isOffline(), 0L );
+            if ( cacheReader!=null ) {
+                logger.fine("reading from cache");
+            }
+        } else {
+            cacheReader= null;
         }
         
         HttpURLConnection httpConnect;
@@ -1189,6 +1189,16 @@ public final class HapiDataSource extends AbstractDataSource {
         return new File( dsroot );
     }
     
+    /**
+     * return the files that would be used for these parameters and time interval.
+     * This is repeated code from getCacheReader.
+     * @param url HAPI data request URL
+     * @param id identifier for the dataset on the server.
+     * @param parameters
+     * @param timeRange
+     * @see #getCacheReader(java.net.URL, java.lang.String[], org.das2.datum.DatumRange, boolean, long) 
+     * @return 
+     */
     public static LinkedHashMap<String,DatumRange> getCacheFiles( URL url, String id, String[] parameters, DatumRange timeRange ) {
         String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
@@ -1244,10 +1254,10 @@ public final class HapiDataSource extends AbstractDataSource {
     /**
      * make a connection to the server, expecting that the server might send back a 
      * 304 indicating the cache files should be used.
-     * @param url
-     * @param files
+     * @param url HAPI data request URL
+     * @param files corresponding files within cache.
      * @param lastModified non-zero to indicate time stamp of the oldest file found locally.
-     * @return
+     * @return null or the cache reader.
      * @throws IOException 
      */
     public static AbstractLineReader maybeGetCacheReader( URL url, File[][] files, long lastModified) throws IOException {
@@ -1267,6 +1277,7 @@ public final class HapiDataSource extends AbstractDataSource {
             httpConnect.connect();
         }
         if ( httpConnect.getResponseCode()==304 ) {
+            logger.fine("using cache files because server says nothing has changed (304)");
             return calculateCacheReader( files );
         }
         boolean gzip= "gzip".equals( httpConnect.getContentEncoding() );
