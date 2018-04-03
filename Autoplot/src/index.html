@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>quicklatex.com is used to render LaTeX code to an image, annotation draws the image on the plot.
+        <p><small>PNGWalk is used to quickly find the image where 5-digit power meter rolls over.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,13 @@
         
         <p>SourceForge has made changes which require special actions in the release process.  Please be aware that this may cause unusual behavior.</p>
 
-        <p>Bugfixes (2018-03-28 r22249):</p>
+        <p>Bugfixes (2018-04-03 r22273):</p>
         <ul>
+            <li>1956: limit off-screen drawing of event bars, which can result in PDFs which don't import well into MS Word.
+            <li>"now" supported in low-level parse time.  Before only application-level parsers would handle this.
+            <li>Annotation has URL property, to avoid text="http://..." kludge and allow text to be used to document web address.
+            <li>FileUtil.fileCopy of A to A would destroy the contents of A!
+            <li>PNGWalkTool's make HTML would fail miserably when the result was written to the same folder as the pngwalk.
             <li>1973: experiment with clearing the focus URI when script or .vap is run.
             <li>1972: "reset" method cancels all the tasks it knows about.
             <li>mashup starts with "ds" for the first tree, so that is valid.
@@ -95,10 +100,11 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>draw the last QC message below the full-sized image.
             <li>New url property of Annotation clarifies use, and allows URL to cache image of LaTeX-rendering site, and LaTeX code can be stored in the text for safe-keeping.
             <li>HAPI client will use "If-Modified-Since" request header and supports 304 (not modified) responses, when caching is enabled.
             <li>audiosystem data source allows control of sampling rate.
-            <li>add "bind scale to opposite axis.  Isotropic should no longer be used.
+            <li>add "bind scale to opposite axis."  Isotropic should no longer be used.
             <li>add "normalize" function.  Thanks, Allison!
             <li>add inverse_white_blue_black.  Thanks, Masafumi!
             <li>DasAxis now has "reference" property which will draw a line at the reference.  Thanks, Kris and Ivar!
