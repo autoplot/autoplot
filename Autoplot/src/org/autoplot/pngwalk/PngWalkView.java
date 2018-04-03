@@ -240,6 +240,12 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
         }
         if (PngWalkTool.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
             paintQualityControlIcon( seq.getIndex(), g2, xpos, ypos, true );
+            QualityControlRecord rec = seq.getQualityControlSequence().getQualityControlRecord(seq.getIndex());
+            if ( rec!=null ) {
+                int cx = xpos;
+                int cy = ypos + ys + 2 *fm.getHeight();
+                g2.drawString( rec.getLastComment(), cx, cy );
+            }
         }
         return new Rectangle( xpos, ypos, xs, ys );
     }
