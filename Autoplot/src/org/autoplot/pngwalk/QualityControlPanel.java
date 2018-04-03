@@ -21,8 +21,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractButton;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.KeyChain;
@@ -65,6 +66,16 @@ public class QualityControlPanel extends javax.swing.JPanel {
         ignoreRadioButton.addItemListener(l);
         statusButtonGroup.setSelected(nullRadioButton.getModel(), true);
         
+        previousCommentEditorPane.addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                if ( e.getEventType()==HyperlinkEvent.EventType.ACTIVATED ) {
+                    String t= qcRecord.doCopyLink(e);
+                    newCommentTextArea.insert( t, newCommentTextArea.getCaretPosition() );
+                }
+            }
+        });
+
     }
 
     transient PropertyChangeListener pc= new PropertyChangeListener() {
@@ -137,11 +148,6 @@ public class QualityControlPanel extends javax.swing.JPanel {
 
         statusLabel.setText(statustxt);
         statusLabel.setToolTipText(statustxt);
-        if ( qcRecord==null ) {
-            copyLastEntryButton.setEnabled(false);
-        } else {
-            copyLastEntryButton.setEnabled( qcRecord.getLastComment().length()>0 );
-        }
     }
 
     /**
@@ -288,7 +294,6 @@ public class QualityControlPanel extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         newCommentTextArea = new javax.swing.JTextArea();
-        copyLastEntryButton = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         statusLabel = new javax.swing.JLabel();
 
@@ -386,8 +391,8 @@ public class QualityControlPanel extends javax.swing.JPanel {
         commentSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         commentSplitPane.setResizeWeight(1.0);
 
-        previousCommentEditorPane.setContentType("text/html"); // NOI18N
         previousCommentEditorPane.setEditable(false);
+        previousCommentEditorPane.setContentType("text/html"); // NOI18N
         // Set HTML renderer to use java system default font instead of Times New Roman
         java.awt.Font font = javax.swing.UIManager.getFont("Label.font");
         String bodyRule = "body { font-family: " + font.getFamily() + "; " +
@@ -404,13 +409,6 @@ public class QualityControlPanel extends javax.swing.JPanel {
         newCommentTextArea.setWrapStyleWord(true);
         jScrollPane2.setViewportView(newCommentTextArea);
 
-        copyLastEntryButton.setText("Copy");
-        copyLastEntryButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                copyLastEntryButtonActionPerformed(evt);
-            }
-        });
-
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -418,17 +416,14 @@ public class QualityControlPanel extends javax.swing.JPanel {
             .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)
             .add(jPanel2Layout.createSequentialGroup()
                 .add(jLabel1)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(copyLastEntryButton))
+                .add(0, 0, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel2Layout.createSequentialGroup()
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 17, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(copyLastEntryButton))
+                .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 17, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE))
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE))
         );
 
         commentSplitPane.setRightComponent(jPanel2);
@@ -571,14 +566,9 @@ public class QualityControlPanel extends javax.swing.JPanel {
         login();
     }//GEN-LAST:event_loginButtonActionPerformed
 
-    private void copyLastEntryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyLastEntryButtonActionPerformed
-        newCommentTextArea.insert( qcRecord.getLastComment(), newCommentTextArea.getCaretPosition() );
-    }//GEN-LAST:event_copyLastEntryButtonActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSplitPane commentSplitPane;
-    private javax.swing.JButton copyLastEntryButton;
     private javax.swing.JRadioButton ignoreRadioButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
