@@ -2181,6 +2181,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
             }
         }
         
+        boolean writeInSitu= this.seq.getQCFolder().relativize(f.toURI() ).toString().trim().length()==0;
+                    
         try {
             for ( int i= 0; i<this.seq.size(); i++ ) {
                 monitor.setTaskProgress(i);
@@ -2197,15 +2199,17 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 }
                 try {
                     String n;
-                    n= base.relativize( this.seq.imageAt(i).getUri() ).getPath();
-                    ImageIO.write( im, "png", new File( f, n ) );
-                    File qcFile= new File( this.seq.imageAt(i).getUri().getPath() + ".ok" );
-                    if ( qcFile.exists() ) {
-                        FileUtil.fileCopy( qcFile, new File( f, n+".ok" ) );
-                    }
-                    qcFile= new File( this.seq.imageAt(i).getUri().getPath() + ".problem" );
-                    if ( qcFile.exists() ) {
-                        FileUtil.fileCopy( qcFile, new File( f, n+".problem" ) );
+                    if ( !writeInSitu ) {
+                        n= base.relativize( this.seq.imageAt(i).getUri() ).getPath();
+                        ImageIO.write( im, "png", new File( f, n ) );
+                        File qcFile= new File( this.seq.imageAt(i).getUri().getPath() + ".ok" );
+                        if ( qcFile.exists() ) {
+                            FileUtil.fileCopy( qcFile, new File( f, n+".ok" ) );
+                        }
+                        qcFile= new File( this.seq.imageAt(i).getUri().getPath() + ".problem" );
+                        if ( qcFile.exists() ) {
+                            FileUtil.fileCopy( qcFile, new File( f, n+".problem" ) );
+                        }
                     }
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
