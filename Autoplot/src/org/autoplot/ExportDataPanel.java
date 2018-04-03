@@ -471,6 +471,9 @@ public class ExportDataPanel extends javax.swing.JPanel {
             String t=  getFilenameTF().getText();
             if ( t.contains("/" ) && t.startsWith("file:") ) {
                 editorPanel.setURI( t );
+            } else {
+                t= URISplit.makeCanonical(t);
+                editorPanel.setURI( t );
             }
         } else {
             editorPanel= null;
