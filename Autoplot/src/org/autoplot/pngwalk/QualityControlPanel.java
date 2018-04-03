@@ -114,9 +114,8 @@ public class QualityControlPanel extends javax.swing.JPanel {
         }
         QualityControlSequence seq= walkImageSequence.getQualityControlSequence();
         int[] t= seq.getQCTotals();
-        setStatus( t[0], t[1], t[2], t[3] );
-
         qcRecord = rec;
+        setStatus( t[0], t[1], t[2], t[3] );
     }
 
     /**
@@ -132,11 +131,17 @@ public class QualityControlPanel extends javax.swing.JPanel {
         if ( walkImageSequence==null || walkImageSequence.getQCFolder()==null ) {
             statustxt= " ";
         } else {
-            statustxt= String.format("%d OK | %d Prob | %d Ign | %d Unknown", numOK, numProblem, numIgnore, numUnknown);
+            int index= walkImageSequence.getIndex();
+            statustxt= String.format("#%d of %d OK | %d Prob | %d Ign | %d Unknown", (index+1), numOK, numProblem, numIgnore, numUnknown);
         }
 
         statusLabel.setText(statustxt);
         statusLabel.setToolTipText(statustxt);
+        if ( qcRecord==null ) {
+            copyLastEntryButton.setEnabled(false);
+        } else {
+            copyLastEntryButton.setEnabled( qcRecord.getLastComment().length()>0 );
+        }
     }
 
     /**
@@ -283,6 +288,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         newCommentTextArea = new javax.swing.JTextArea();
+        copyLastEntryButton = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         statusLabel = new javax.swing.JLabel();
 
@@ -398,6 +404,13 @@ public class QualityControlPanel extends javax.swing.JPanel {
         newCommentTextArea.setWrapStyleWord(true);
         jScrollPane2.setViewportView(newCommentTextArea);
 
+        copyLastEntryButton.setText("Copy");
+        copyLastEntryButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                copyLastEntryButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -405,14 +418,17 @@ public class QualityControlPanel extends javax.swing.JPanel {
             .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)
             .add(jPanel2Layout.createSequentialGroup()
                 .add(jLabel1)
-                .addContainerGap(141, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(copyLastEntryButton))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel2Layout.createSequentialGroup()
-                .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 17, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 17, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(copyLastEntryButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE))
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE))
         );
 
         commentSplitPane.setRightComponent(jPanel2);
@@ -555,9 +571,14 @@ public class QualityControlPanel extends javax.swing.JPanel {
         login();
     }//GEN-LAST:event_loginButtonActionPerformed
 
+    private void copyLastEntryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyLastEntryButtonActionPerformed
+        newCommentTextArea.insert( qcRecord.getLastComment(), newCommentTextArea.getCaretPosition() );
+    }//GEN-LAST:event_copyLastEntryButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSplitPane commentSplitPane;
+    private javax.swing.JButton copyLastEntryButton;
     private javax.swing.JRadioButton ignoreRadioButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
