@@ -1595,7 +1595,7 @@ public class DataSourceController extends DomNodeController {
     /**
      * see setDataSetInternal, which does autoranging, etc. TODO: fix this and
      * the fillDataSet stuff...
-     *
+     * @see #setDataSetInternal(org.das2.qds.QDataSet) 
      * @param dataSet
      */
     public void setDataSet(QDataSet dataSet) {
