@@ -145,7 +145,7 @@ public class Das2StreamDataSourceFormat implements DataSourceFormat {
 		else
 			args.put("precision",  Integer.toString(sigdigit));
 		
-		if(fracsec == QdsToD2sStream.DEFAUT_FRAC_SEC) args.remove("facsec");
+		if(fracsec == QdsToD2sStream.DEFAUT_FRAC_SEC) args.remove("fracsec");
 		else args.put("fracsec", Integer.toString(fracsec));
 		
 		if(version.equalsIgnoreCase(QdsToD2sStream.FORMAT_2_2)) args.remove("version");
