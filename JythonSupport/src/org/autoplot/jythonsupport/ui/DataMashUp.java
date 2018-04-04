@@ -673,6 +673,11 @@ public class DataMashUp extends javax.swing.JPanel {
             } else {
                 root= new DefaultMutableTreeNode( "0.0" );
             }
+        } else if ( assign.value instanceof BinOp ) {
+            BinOp op= (BinOp)assign.value;
+            String sop= nameForBinOp( op.op );
+            root= new DefaultMutableTreeNode( sop );
+            fillTreeBinOp( op, root );
         } else {
             root= new DefaultMutableTreeNode( funcCallName( (Call)assign.value ) );
             if ( assign.value instanceof Call ) {
@@ -890,7 +895,17 @@ public class DataMashUp extends javax.swing.JPanel {
     }
     
     private void doDrop( String data, TreePath tp ) {
-
+        doDrop( data, tp, true );
+    }
+    
+    /**
+     * 
+     * @param data the expression to incorporate into the tree
+     * @param tp the path where the expression is to be inserted
+     * @param moveOldNodeDown if true, then make the drop target the first child.
+     */
+    private void doDrop( String data, TreePath tp, boolean moveOldNodeDown ) {
+    
         DefaultTreeModel model= (DefaultTreeModel) expressionTree.getModel();
 
         MutableTreeNode oldBranch= (MutableTreeNode)tp.getLastPathComponent();
@@ -909,7 +924,7 @@ public class DataMashUp extends javax.swing.JPanel {
             model.removeNodeFromParent(oldBranch);
         } 
         
-        if ( newBranch.getChildCount()>0 ) {
+        if ( moveOldNodeDown && newBranch.getChildCount()>0 ) {
             newBranch.remove(0);
             newBranch.insert( oldBranch, 0 );
         }
@@ -1427,14 +1442,14 @@ public class DataMashUp extends javax.swing.JPanel {
             }
             s= namedURIListTool1.selectDataId(s);
             if ( s!=null ) {
-                doDrop(s,tp);
+                doDrop(s,tp,false);
             }
         } else {
             String currentId= tp.getLastPathComponent().toString();
             String s= namedURIListTool1.selectDataId(currentId);
             namedURIListTool1.setExpression(getSelectedFunction());
             if ( s!=null ) {
-                doDrop(s,tp);
+                doDrop(s,tp,false);
             }
         }
     }//GEN-LAST:event_editMenuItemActionPerformed
@@ -1713,8 +1728,13 @@ public class DataMashUp extends javax.swing.JPanel {
                     DefaultMutableTreeNode n= (DefaultMutableTreeNode)tp.getLastPathComponent();
                     String old= getJython( (DefaultTreeModel)expressionTree.getModel(), n );
                     addToScratch( old );
-
-                    doDrop(data,tp);
+                    if ( data.endsWith(REPLACEARGSFLAG) ) {
+                        data= data.substring(0,data.length()-17);
+                        doDrop(data,tp,true);
+                    } else {
+                        doDrop(data,tp,false);
+                    }
+                    
                     
                 } catch (UnsupportedFlavorException | IOException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
@@ -1723,6 +1743,12 @@ public class DataMashUp extends javax.swing.JPanel {
             }
         };
     }
+    
+    /**
+     * when the drop target ends with this string (kludge), don't clobber
+     * what's in the tree, instead make it the first argument.
+     */
+    private static final String REPLACEARGSFLAG = "(REPLACEARGSFLAG)";
     
     final DropTargetListener createListDropTargetListener() {
         return new DropTargetListener() {
@@ -1751,7 +1777,9 @@ public class DataMashUp extends javax.swing.JPanel {
             public void drop(DropTargetDropEvent dtde) {
                 try {
                     String data = (String) dtde.getTransferable().getTransferData(DataFlavor.stringFlavor);
-
+                    if ( data.endsWith(REPLACEARGSFLAG) ) {
+                        data= data.substring(0,data.length()-17);
+                    }
                     addToScratch( data );
                     
                 } catch (UnsupportedFlavorException | IOException ex) {
@@ -1769,8 +1797,10 @@ public class DataMashUp extends javax.swing.JPanel {
             public void dragGestureRecognized(DragGestureEvent dge) {
                 String s=null;
                 
+                boolean replaceArgs= false;
                 if ( dge.getComponent() instanceof JList ) {
                     s= (String)((JList)dge.getComponent()).getSelectedValue();
+                    replaceArgs= true;
                 } else if  ( dge.getComponent()==expressionTree ) {
                     if ( expressionTree.getSelectionCount()==1 ) {
                         TreePath tp= expressionTree.getSelectionPath();
@@ -1785,6 +1815,7 @@ public class DataMashUp extends javax.swing.JPanel {
                         int i= s.lastIndexOf(": ");
                         s= s.substring(0,i).trim();
                     }
+                    if ( replaceArgs ) s= s + REPLACEARGSFLAG;
                     dge.startDrag(null, new StringSelection(s) ) ;
                 }
             }
