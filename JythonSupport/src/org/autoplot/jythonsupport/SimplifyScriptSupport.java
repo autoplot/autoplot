@@ -526,7 +526,7 @@ public class SimplifyScriptSupport {
                  String t= ((Name)sn).id;
                  if ( !names.contains(t)
                          && !okaySet.contains(t)) {
-                    visitNameFail= true;
+                    looksOkay= false; // TODO: why are there both looksOkay and visitNameFail?
                  }
              } else if ( sn instanceof Attribute ) {
                  traverse( ((Attribute)sn).value );  // DatumRangeUtil
