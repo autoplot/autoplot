@@ -8,6 +8,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -20,6 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.LoggerManager;
@@ -30,6 +37,11 @@ import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.util.filesystem.FileSystem;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * DataSourceFactory for communicating with Das2servers.
@@ -57,6 +69,7 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "dataset=", "dataset identifier"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "start_time=", "ISO8601 start time"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "end_time=", "ISO8601 end time"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "timerange=", "time range"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "intrinsic=true", "do not reduce on server"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "interval=", "cadence in seconds for TCAs"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "item=", "item number for TCAs"));
@@ -74,6 +87,48 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
                         } else {
                             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, ds.substring(0,i), ds.substring(i+1).trim() ) );
                         }
+                    }
+                }
+            } else if ( paramName.equals("timerange") ) {
+                URI uri= cc.resourceURI;
+                URISplit split= URISplit.parse(uri);
+                Map<String,String> params= URISplit.parseParams(cc.params);
+                String dataset= params.get("dataset");
+                if ( dataset!=null ) {
+                    String surl = split.resourceUri + "?server=dsdf&dataset=" + dataset;
+                    InputStream in = new URL(surl).openStream();
+                    StringBuilder sb = new StringBuilder();
+                    int by = in.read();
+                    while (by != -1) {
+                        sb.append((char) by);
+                        by = in.read();
+                    }
+                    in.close();
+                    String s = sb.toString();
+                    final int packetTagLength=10;
+
+                    int contentLength = Integer.parseInt(s.substring(4, packetTagLength )); // "[00]000192<stream > <properties validRange="1999-228 to 2010-359" server="http://planet.physics.uiowa.edu/das-test/das2Server" das2Stream="0" qstream="1" exampleRange="2010-001 to 2010-002" /> </stream>"
+                    String sxml = s.substring( packetTagLength, packetTagLength + contentLength);
+                    Reader xin = new BufferedReader(new StringReader(sxml));
+                    DocumentBuilder builder;
+                    builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                    InputSource source = new InputSource(xin);
+                    try {
+                        final Document document = builder.parse(source);
+                        XPathFactory factory = XPathFactory.newInstance();
+                        XPath xpath = (XPath) factory.newXPath();
+                        NodeList exs=  (NodeList) xpath.evaluate( "/stream/properties/@*", document, XPathConstants.NODESET );
+
+                        for ( int i=0; i<exs.getLength(); i++ ) {
+                            Node ex= exs.item(i);
+                            String name= ex.getNodeName();
+                            if ( name.startsWith("exampleRange")) {
+                                String ss= ex.getNodeValue();
+                                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, ss ) );
+                            }
+                        }
+                    } catch ( SAXException ex ) {
+                        System.err.println("SAX Exception: "+surl );
                     }
                 }
             }
