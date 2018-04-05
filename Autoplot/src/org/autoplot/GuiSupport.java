@@ -610,7 +610,7 @@ public class GuiSupport {
                     URISplit split= URISplit.parse(currentFileString);
                     edp.getFilenameTF().setText(split.file);
                     edp.getFormatDL().setSelectedItem( "." + split.ext );
-                    if ( currentFileString.contains("/") && currentFileString.startsWith("file:")) {
+                    if ( currentFileString.contains("/") && ( currentFileString.startsWith("file:") || currentFileString.startsWith("/") ) ) {
                         edp.setFile( currentFileString );
                         if ( split.params!=null && edp.getDataSourceFormatEditorPanel()!=null ) {
                             edp.getDataSourceFormatEditorPanel().setURI(currentFileString);
@@ -653,6 +653,11 @@ public class GuiSupport {
                         
                         DataSourceFormatEditorPanel opts= edp.getDataSourceFormatEditorPanel();
                         if ( opts!=null ) {
+//                            try {
+//                                opts.getURI();
+//                            } catch ( NullPointerException ex ) {
+//                                System.err.println("here bug 1975");
+//                            }
                             URISplit splitopts= URISplit.parse(opts.getURI());
                             if ( splitopts.params!=null && splitopts.params.length()==0 ) {
                                 splitopts.params= null;

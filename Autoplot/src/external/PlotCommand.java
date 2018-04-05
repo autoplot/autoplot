@@ -410,8 +410,13 @@ public class PlotCommand extends PyObject {
                     c= JythonOps.color(val);
                     element.getStyle().setFillColor( c );
                 } else if ( kw.equals("colorTable" ) ) { 
-                    DasColorBar.Type t= org.das2.graph.DasColorBar.Type.parse(sval);
-                    element.getStyle().setColortable(t);
+                    if ( val.__tojava__(DasColorBar.Type.class) == Py.NoConversion) {
+                        DasColorBar.Type t= org.das2.graph.DasColorBar.Type.parse(sval);
+                        element.getStyle().setColortable(t);
+                    } else {
+                        DasColorBar.Type t = (DasColorBar.Type) val.__tojava__(DasColorBar.Type.class);
+                        element.getStyle().setColortable( t );
+                    }
                 } else if ( kw.equals("title") ) {
                     plot.setTitle(sval);
                 } else if ( kw.equals("symsize") || kw.equals("symbolSize") ) {

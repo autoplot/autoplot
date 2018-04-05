@@ -76,6 +76,8 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.URISplit;
+import org.das2.graph.DasColorBar;
+import static org.das2.graph.DasColorBar.Type.makeColorTable;
 import org.das2.qds.DataSetOps;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.MutablePropertyDataSet;
@@ -611,6 +613,47 @@ public class ScriptContext extends PyJavaInstance {
         plot( chNum, (String)null, x, y, z );
     }
 
+    /**
+     * returns a color table 
+     * using QDataSets as inputs to make it easier to use in scripts.
+     * 
+     * @param name the name for the colortable
+     * @param index control points for the colors, or None
+     * @param rgb dataset of ds[N,3] where N is the number of colors
+     * @return object representing the color table.
+     * @see rgbColorDataset
+     */
+    public static DasColorBar.Type makeColorTable( String name, QDataSet index, QDataSet rgb ) {
+        boolean implicitWarn= false;
+        if ( index==null ) {
+            index= Ops.indgen(rgb.length());
+            implicitWarn= true;
+        }
+        int[] iindex= new int[index.length()];
+        int[] red= new int[rgb.length()];
+        int[] green= new int[rgb.length()];
+        int[] blue= new int[rgb.length()];
+        int bottom= 0;
+        int top= 0;
+        for ( int i=0; i<iindex.length; i++ ) {
+            iindex[i]= (int)Math.round(index.value(i));
+            red[i]= (int)Math.round(rgb.value(i,0));
+            green[i]= (int)Math.round(rgb.value(i,1));
+            blue[i]= (int)Math.round(rgb.value(i,2));
+            top= Math.max( top, iindex[i] );
+        }
+        if ( top>254 ) {
+            if ( implicitWarn ) {
+                throw new IllegalArgumentException("no more than 254 colors.");
+            } else {
+                throw new IllegalArgumentException("the top index must be less than 254.");
+            }
+        } 
+        int[] tt= DasColorBar.Type.makeColorTable( iindex, red, green, blue, top, bottom, top );
+        return new DasColorBar.Type( name, tt );
+
+    }    
+    
     private static MutablePropertyDataSet ensureMutable( QDataSet ds ) {
         if ( ds==null ) return null;
         if ( DataSetUtil.isQube(ds) ) {
