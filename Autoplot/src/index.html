@@ -26,8 +26,11 @@
         
         <p>SourceForge has made changes which require special actions in the release process.  Please be aware that this may cause unusual behavior.</p>
 
-        <p>Bugfixes (2018-04-03 r22273):</p>
+        <p>Bugfixes (2018-04-05 r22284):</p>
         <ul>
+            <li>1975: route to generate hang in export for new users because "/..." was default filename, not "file:/..."
+            <li>more tweaks to the Mashup tool where drag source is considered when replacing child node.
+            <li>bugfix with completions, RTE when tot=nn[0]*nn[1] was used and nn not properly culled.
             <li>1956: limit off-screen drawing of event bars, which can result in PDFs which don't import well into MS Word.
             <li>"now" supported in low-level parse time.  Before only application-level parsers would handle this.
             <li>Annotation has URL property, to avoid text="http://..." kludge and allow text to be used to document web address.
@@ -100,6 +103,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>experiments with nominal level and warning level lines in series renderer.
             <li>draw the last QC message below the full-sized image.
             <li>New url property of Annotation clarifies use, and allows URL to cache image of LaTeX-rendering site, and LaTeX code can be stored in the text for safe-keeping.
             <li>HAPI client will use "If-Modified-Since" request header and supports 304 (not modified) responses, when caching is enabled.
