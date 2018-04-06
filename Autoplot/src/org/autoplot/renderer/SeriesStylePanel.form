@@ -231,6 +231,7 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Show Limits"/>
             <Property name="toolTipText" type="java.lang.String" value="Show nominal and warning limits if found in data.  See http://autoplot.org/developer.limits"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel1">

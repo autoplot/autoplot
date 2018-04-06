@@ -12,6 +12,9 @@ import org.das2.components.propertyeditor.EnumerationEditor;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.FocusAdapter;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Map;
 import javax.swing.SpinnerNumberModel;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.graph.DasColorBar;
@@ -23,10 +26,12 @@ import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
 import org.autoplot.PlotStylePanel;
 import org.autoplot.dom.PlotElement;
+import org.autoplot.dom.PlotElementController;
 import org.autoplot.dom.PlotElementStyle;
+import org.das2.qds.QDataSet;
 
 /**
- *
+ * Like the SeriesStylePanel, but color is removed and colorbar added.
  * @author  jbf
  */
 public class ColorScatterStylePanel extends javax.swing.JPanel implements PlotStylePanel.StylePanel {
@@ -39,6 +44,7 @@ public class ColorScatterStylePanel extends javax.swing.JPanel implements PlotSt
     ColorEditor fillColorEditor;
     DatumEditor referenceEditor;
     BindingGroup elementBindingContext;
+    PlotElement plotElement;
 
     /** Creates new form PlotStylePanel */
     public ColorScatterStylePanel( ) {
@@ -110,7 +116,13 @@ public class ColorScatterStylePanel extends javax.swing.JPanel implements PlotSt
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_FILL_DIRECTION ), fillDirectionComboBox, BeanProperty.create("selectedItem")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_SHOWLIMITS ), showLimitsCheckBox, BeanProperty.create("selected")));
         
-        if ( elementBindingContext!=null ) releaseElementBindings();
+        if ( elementBindingContext!=null ) {
+            releaseElementBindings();
+            PlotElement oldPlotElement= this.plotElement;
+            oldPlotElement.getController().removePropertyChangeListener( PlotElementController.PROP_DATASET, limitsPCL );
+        }
+        
+        this.plotElement= element;
         bc.bind();
         
         repaint();
@@ -120,6 +132,24 @@ public class ColorScatterStylePanel extends javax.swing.JPanel implements PlotSt
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, PlotStylePanel.STYLEPANEL_HELP_ID );
 
     }
+    
+    PropertyChangeListener limitsPCL= new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            boolean limitsEnabled= false;
+            QDataSet ds= plotElement.getController().getDataSet();
+            if ( ds!=null ) {
+                Map<String,Object> meta= (Map<String,Object>) ds.property(QDataSet.METADATA);
+                if ( meta!=null ) {
+                    if ( meta.containsKey("LIMITS_WARN_MAX") || meta.containsKey("LIMITS_WARN_MIN") 
+                        || meta.containsKey("LIMITS_NOMINAL_MIN") || meta.containsKey("LIMITS_NOMINAL_MAX") ) {
+                        limitsEnabled= true;
+                    }
+                }
+            }
+            showLimitsCheckBox.setEnabled(limitsEnabled);
+        }
+    };
 
     /** This method is called from within the constructor to
      * initialize the form.
