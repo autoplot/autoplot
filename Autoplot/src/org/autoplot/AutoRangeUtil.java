@@ -767,6 +767,7 @@ public class AutoRangeUtil {
             if (uu == null) {
                 uu = Units.dimensionless;
             }
+            if ( UnitsUtil.isTimeLocation(u) ) uu= u;
             if (UnitsUtil.isIntervalOrRatioMeasurement(uu)) {
                 Datum ftmin = uu.createDatum(tmin == null ? -1 * Double.MAX_VALUE : tmin);
                 if (isLog && tmin != null && tmin.doubleValue() <= 0) {
