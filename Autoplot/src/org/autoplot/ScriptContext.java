@@ -1356,16 +1356,20 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      *<blockquote><pre><small>{@code
      * ds= getDataSet('http://autoplot.org/data/somedata.cdf?BGSEc')
      * formatDataSet( ds, 'vap+dat:file:/home/jbf/temp/foo.dat?tformat=minutes&format=6.2f')
+     * formatDataSet( ds, 'foo.dat' ) # also okay
      *}</small></pre></blockquote>
      * 
      * @param ds
-     * @param file local file name that is the target
+     * @param file local file name that is the target.
      * @param monitor
      * @throws java.lang.Exception
      */
     public static void formatDataSet(QDataSet ds, String file, ProgressMonitor monitor ) throws Exception {
-        
-        getLocalFilename(file);  
+
+        if ( !file.startsWith("/") && !file.startsWith("vap+") ) {
+            String s= getLocalFilename(file);
+            file= s;
+        }
 
         DataSourceFormat format = DataSetURI.getDataSourceFormat( DataSetURI.getURI(file) );
         
