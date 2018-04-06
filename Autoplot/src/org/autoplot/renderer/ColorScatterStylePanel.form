@@ -40,54 +40,63 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel10" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Group type="102" alignment="1" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel6" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                  <Component id="colortableTypePanel" linkSize="13" alignment="0" min="-2" pref="130" max="-2" attributes="0"/>
+                                  <Component id="colorPanel" linkSize="13" alignment="0" pref="130" max="32767" attributes="1"/>
+                                  <Component id="psymPanel" linkSize="13" alignment="0" pref="104" max="32767" attributes="1"/>
+                                  <Component id="symSizeSpinner" linkSize="21" alignment="0" min="-2" pref="60" max="-2" attributes="1"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="177" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="lineThickSpinner" linkSize="21" min="-2" pref="61" max="-2" attributes="1"/>
-                              <Component id="lineStylePanel" linkSize="13" min="-2" pref="125" max="-2" attributes="1"/>
-                          </Group>
-                      </Group>
-                      <Component id="fillToReferenceCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Group type="102" alignment="1" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel6" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                              <Component id="colortableTypePanel" linkSize="13" alignment="0" min="-2" pref="130" max="-2" attributes="0"/>
-                              <Component id="colorPanel" linkSize="13" alignment="0" pref="130" max="32767" attributes="1"/>
-                              <Component id="psymPanel" linkSize="13" alignment="0" pref="104" max="32767" attributes="1"/>
-                              <Component id="symSizeSpinner" linkSize="21" alignment="0" min="-2" pref="60" max="-2" attributes="1"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="177" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" attributes="0">
-                          <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" attributes="0">
-                                          <EmptySpace min="-2" pref="63" max="-2" attributes="0"/>
-                                          <Component id="referenceValuePanel" min="-2" pref="89" max="-2" attributes="1"/>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="jLabel10" alignment="0" min="-2" max="-2" attributes="0"/>
                                       </Group>
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <EmptySpace min="-2" pref="41" max="-2" attributes="0"/>
-                                          <Component id="fillColorPanel" linkSize="13" min="-2" pref="126" max="-2" attributes="1"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="lineThickSpinner" linkSize="21" min="-2" pref="61" max="-2" attributes="1"/>
+                                          <Component id="lineStylePanel" linkSize="13" min="-2" pref="125" max="-2" attributes="1"/>
+                                      </Group>
+                                  </Group>
+                                  <Component id="fillToReferenceCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                          <Group type="102" alignment="0" attributes="0">
+                                              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                                              <Component id="fillDirectionComboBox" max="32767" attributes="0"/>
+                                          </Group>
+                                          <Group type="102" alignment="0" attributes="0">
+                                              <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="referenceValuePanel" max="32767" attributes="1"/>
+                                          </Group>
+                                          <Group type="102" alignment="0" attributes="0">
+                                              <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace min="-2" pref="41" max="-2" attributes="0"/>
+                                              <Component id="fillColorPanel" linkSize="13" min="-2" pref="126" max="-2" attributes="1"/>
+                                          </Group>
                                       </Group>
                                   </Group>
                               </Group>
-                              <Component id="jLabel8" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
+                      <Component id="showLimitsCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
           </Group>
@@ -132,11 +141,18 @@
                       <Component id="fillColorPanel" linkSize="6" pref="24" max="32767" attributes="1"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jLabel8" alignment="0" min="-2" max="-2" attributes="1"/>
-                      <Component id="referenceValuePanel" alignment="1" min="-2" pref="25" max="-2" attributes="1"/>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="referenceValuePanel" pref="25" max="32767" attributes="1"/>
+                      <Component id="jLabel8" max="32767" attributes="1"/>
                   </Group>
-                  <EmptySpace pref="65" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="fillDirectionComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="showLimitsCheckBox" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="14" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -144,13 +160,13 @@
       <SubComponents>
         <Component class="javax.swing.JLabel" name="jLabel3">
           <Properties>
-            <Property name="text" type="java.lang.String" value="line thickness:"/>
+            <Property name="text" type="java.lang.String" value="Line Thickness:"/>
             <Property name="toolTipText" type="java.lang.String" value="thickness of the plot trace"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel2">
           <Properties>
-            <Property name="text" type="java.lang.String" value="symbol size:"/>
+            <Property name="text" type="java.lang.String" value="Symbol Size:"/>
             <Property name="toolTipText" type="java.lang.String" value="size of the plot symbols"/>
           </Properties>
         </Component>
@@ -170,13 +186,13 @@
         </Container>
         <Component class="javax.swing.JLabel" name="jLabel6">
           <Properties>
-            <Property name="text" type="java.lang.String" value="line color:"/>
+            <Property name="text" type="java.lang.String" value="Line Color:"/>
             <Property name="toolTipText" type="java.lang.String" value="color of the line and plot symbols"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel7">
           <Properties>
-            <Property name="text" type="java.lang.String" value="fill color:"/>
+            <Property name="text" type="java.lang.String" value="Fill Color:"/>
             <Property name="toolTipText" type="java.lang.String" value="Fill with this color"/>
           </Properties>
         </Component>
@@ -189,7 +205,7 @@
         </Container>
         <Component class="javax.swing.JCheckBox" name="fillToReferenceCheckBox">
           <Properties>
-            <Property name="text" type="java.lang.String" value="fill to reference"/>
+            <Property name="text" type="java.lang.String" value="Fill to Reference"/>
             <Property name="toolTipText" type="java.lang.String" value="Fill from the plot trace to a reference value"/>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
@@ -203,7 +219,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel8">
           <Properties>
-            <Property name="text" type="java.lang.String" value="reference value:"/>
+            <Property name="text" type="java.lang.String" value="Reference Value:"/>
             <Property name="toolTipText" type="java.lang.String" value="Fill to this value"/>
           </Properties>
         </Component>
@@ -219,7 +235,7 @@
         </Container>
         <Component class="javax.swing.JLabel" name="jLabel9">
           <Properties>
-            <Property name="text" type="java.lang.String" value="plot symbol:"/>
+            <Property name="text" type="java.lang.String" value="Plot Symbol:"/>
             <Property name="toolTipText" type="java.lang.String" value="type of symbol, or none."/>
           </Properties>
         </Component>
@@ -229,7 +245,7 @@
         </Container>
         <Component class="javax.swing.JLabel" name="jLabel10">
           <Properties>
-            <Property name="text" type="java.lang.String" value="line style:"/>
+            <Property name="text" type="java.lang.String" value="Line Style:"/>
             <Property name="toolTipText" type="java.lang.String" value="style of the plot trace, or none"/>
           </Properties>
         </Component>
@@ -239,7 +255,7 @@
         </Container>
         <Component class="javax.swing.JLabel" name="jLabel4">
           <Properties>
-            <Property name="text" type="java.lang.String" value="colortable:"/>
+            <Property name="text" type="java.lang.String" value="Colortable:"/>
             <Property name="toolTipText" type="java.lang.String" value="colortable for spectrograms"/>
           </Properties>
         </Component>
@@ -250,6 +266,31 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
         </Container>
+        <Component class="javax.swing.JCheckBox" name="showLimitsCheckBox">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Show Limits"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel1">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Fill Direction:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="fillDirectionComboBox">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+              <StringArray count="3">
+                <StringItem index="0" value="above"/>
+                <StringItem index="1" value="below"/>
+                <StringItem index="2" value="both"/>
+              </StringArray>
+            </Property>
+            <Property name="selectedIndex" type="int" value="2"/>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
+        </Component>
       </SubComponents>
     </Container>
   </SubComponents>

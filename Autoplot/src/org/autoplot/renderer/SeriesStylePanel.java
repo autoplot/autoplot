@@ -100,7 +100,9 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_FILL_TO_REFERENCE ), fillToReferenceCheckBox, BeanProperty.create("selected")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_FILLCOLOR ), fillColorEditor, BeanProperty.create("value")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_REFERENCE ), referenceEditor, BeanProperty.create("value")));
-        
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_FILL_DIRECTION ), fillDirectionComboBox, BeanProperty.create("selectedItem")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_SHOWLIMITS ), showLimitsCheckBox, BeanProperty.create("selected")));
+
         if ( elementBindingContext!=null ) {
             releaseElementBindings();
         }
@@ -139,6 +141,8 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
         jLabel10 = new javax.swing.JLabel();
         lineStylePanel = new javax.swing.JPanel();
         showLimitsCheckBox = new javax.swing.JCheckBox();
+        jLabel1 = new javax.swing.JLabel();
+        fillDirectionComboBox = new javax.swing.JComboBox<>();
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Series [?]"));
 
@@ -187,6 +191,11 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
         showLimitsCheckBox.setText("Show Limits");
         showLimitsCheckBox.setToolTipText("Show nominal and warning limits if found in data.  See http://autoplot.org/developer.limits");
 
+        jLabel1.setText("Fill Direction:");
+
+        fillDirectionComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "above", "below", "both" }));
+        fillDirectionComboBox.setSelectedIndex(2);
+
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -211,13 +220,19 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
                     .add(fillToReferenceCheckBox)
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(12, 12, 12)
-                        .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jLabel8)
-                            .add(jLabel7))
-                        .add(12, 12, 12)
                         .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                            .add(fillColorPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE)
-                            .add(referenceValuePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .add(jPanel2Layout.createSequentialGroup()
+                                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(jLabel8)
+                                    .add(jLabel7))
+                                .add(12, 12, 12)
+                                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                                    .add(fillColorPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE)
+                                    .add(referenceValuePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .add(jPanel2Layout.createSequentialGroup()
+                                .add(jLabel1)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(fillDirectionComboBox, 0, 137, Short.MAX_VALUE))))
                     .add(showLimitsCheckBox))
                 .addContainerGap(22, Short.MAX_VALUE))
         );
@@ -259,8 +274,12 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
                     .add(referenceValuePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
                     .add(jLabel8, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel1)
+                    .add(fillDirectionComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(8, 8, 8)
                 .add(showLimitsCheckBox)
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addContainerGap(45, Short.MAX_VALUE))
         );
 
         jPanel2Layout.linkSize(new java.awt.Component[] {fillColorPanel, jLabel7}, org.jdesktop.layout.GroupLayout.VERTICAL);
@@ -288,7 +307,9 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel colorPanel;
     private javax.swing.JPanel fillColorPanel;
+    private javax.swing.JComboBox<String> fillDirectionComboBox;
     private javax.swing.JCheckBox fillToReferenceCheckBox;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
