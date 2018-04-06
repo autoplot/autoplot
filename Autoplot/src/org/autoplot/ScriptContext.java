@@ -1344,19 +1344,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      */
     public static void formatDataSet(QDataSet ds, String file) throws Exception {
         
-        file= getLocalFilename(file);
-
-        URISplit split= URISplit.parse(file);
-        
-        URI uri = split.resourceUri; 
-        
-        DataSourceFormat format = DataSetURI.getDataSourceFormat(uri);
-        
-        if (format == null) {
-            throw new IllegalArgumentException("no format for extension: " + file);
-        }
-
-        format.formatData( file, ds, new NullProgressMonitor());
+        formatDataSet( ds, file, new NullProgressMonitor());
 
     }
     
@@ -1377,13 +1365,9 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      */
     public static void formatDataSet(QDataSet ds, String file, ProgressMonitor monitor ) throws Exception {
         
-        file= getLocalFilename(file);
+        getLocalFilename(file);  
 
-        URISplit split= URISplit.parse(file);
-        
-        URI uri = split.resourceUri; 
-        
-        DataSourceFormat format = DataSetURI.getDataSourceFormat(uri);
+        DataSourceFormat format = DataSetURI.getDataSourceFormat( DataSetURI.getURI(file) );
         
         if (format == null) {
             throw new IllegalArgumentException("no format for extension: " + file);
