@@ -202,6 +202,21 @@ public class PlotElementStyle extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_ANTIALIASED, oldAntiAliased, antiAliased);
     }
     
+    private boolean showLimits = true;
+
+    public static final String PROP_SHOWLIMITS = "showLimits";
+
+    public boolean isShowLimits() {
+        return showLimits;
+    }
+
+    public void setShowLimits(boolean showLimits) {
+        boolean oldShowLimits = this.showLimits;
+        this.showLimits = showLimits;
+        propertyChangeSupport.firePropertyChange(PROP_SHOWLIMITS, oldShowLimits, showLimits);
+    }
+
+    
     /*  DomNode Stuff ******************/
 
     @Override
@@ -225,6 +240,7 @@ public class PlotElementStyle extends DomNode {
         if ( !exclude.contains(PROP_SYMBOL_SIZE ) )this.setSymbolSize( that.getSymbolSize() );
         if ( !exclude.contains(PROP_SYMBOL_CONNECTOR ) )this.setSymbolConnector( that.getSymbolConnector() );
         if ( !exclude.contains(PROP_REBINMETHOD ) ) this.setRebinMethod(that.getRebinMethod());
+        if ( !exclude.contains(PROP_SHOWLIMITS ) ) this.setShowLimits(that.showLimits);
     }
 
     @Override
@@ -257,6 +273,8 @@ public class PlotElementStyle extends DomNode {
         if ( !b ) result.add( new PropertyChangeDiff( PROP_REBINMETHOD, that.rebinMethod, this.rebinMethod ) );
         b= that.reference.equals( this.reference );
         if ( !b ) result.add( new PropertyChangeDiff( PROP_REFERENCE,  that.reference, this.reference ));
+        b= that.showLimits==this.showLimits;
+        if ( !b ) result.add( new PropertyChangeDiff( PROP_SHOWLIMITS,  that.showLimits, this.showLimits ));
 
         return result;
     }
