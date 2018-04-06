@@ -71,6 +71,7 @@
                               <Component id="referenceValuePanel" max="32767" attributes="1"/>
                           </Group>
                       </Group>
+                      <Component id="showLimitsCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace pref="22" max="32767" attributes="0"/>
               </Group>
@@ -115,7 +116,9 @@
                       <Component id="referenceValuePanel" pref="25" max="32767" attributes="1"/>
                       <Component id="jLabel8" max="32767" attributes="1"/>
                   </Group>
-                  <EmptySpace pref="47" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="showLimitsCheckBox" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="23" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -210,6 +213,12 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
         </Container>
+        <Component class="javax.swing.JCheckBox" name="showLimitsCheckBox">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Show Limits"/>
+            <Property name="toolTipText" type="java.lang.String" value="Show nominal and warning limits if found in data.  See http://autoplot.org/developer.limits"/>
+          </Properties>
+        </Component>
       </SubComponents>
     </Container>
   </SubComponents>

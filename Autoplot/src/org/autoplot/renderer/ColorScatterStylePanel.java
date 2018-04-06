@@ -101,17 +101,17 @@ public class ColorScatterStylePanel extends javax.swing.JPanel implements PlotSt
         PlotElementStyle style= element.getStyle();
         BindingGroup bc = new BindingGroup();
 
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "colortable" ), edit, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_COLORTABLE ), edit, BeanProperty.create("value")));
 
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style,BeanProperty.create(  "symbolSize" ), symSizeSpinner, BeanProperty.create("value")) );
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "plotSymbol" ), psymEditor,BeanProperty.create( "value")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "lineWidth" ), lineThickSpinner, BeanProperty.create("value")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "symbolConnector" ), lineEditor, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style,BeanProperty.create(  PlotElementStyle.PROP_SYMBOL_SIZE), symSizeSpinner, BeanProperty.create("value")) );
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_PLOT_SYMBOL ), psymEditor,BeanProperty.create( "value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_LINE_WIDTH ), lineThickSpinner, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_SYMBOL_CONNECTOR ), lineEditor, BeanProperty.create("value")));
 
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "color" ), colorEditor, BeanProperty.create("value")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "fillToReference" ), fillToReferenceCheckBox, BeanProperty.create("selected")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "fillColor" ), fillColorEditor, BeanProperty.create("value")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "reference" ), referenceEditor, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_COLOR ), colorEditor, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_FILL_TO_REFERENCE ), fillToReferenceCheckBox, BeanProperty.create("selected")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_FILLCOLOR ), fillColorEditor, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_REFERENCE ), referenceEditor, BeanProperty.create("value")));
         
         if ( elementBindingContext!=null ) releaseElementBindings();
         bc.bind();

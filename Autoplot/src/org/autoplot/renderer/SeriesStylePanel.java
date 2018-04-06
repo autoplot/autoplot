@@ -91,15 +91,15 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
         PlotElementStyle style= element.getStyle();
         BindingGroup bc = new BindingGroup();
 
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style,BeanProperty.create(  "symbolSize" ), symSizeSpinner, BeanProperty.create("value")) );
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "plotSymbol" ), psymEditor,BeanProperty.create( "value")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "lineWidth" ), lineThickSpinner, BeanProperty.create("value")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "symbolConnector" ), lineEditor, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style,BeanProperty.create( PlotElementStyle.PROP_SYMBOL_SIZE ), symSizeSpinner, BeanProperty.create("value")) );
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_PLOT_SYMBOL ), psymEditor,BeanProperty.create( "value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_LINE_WIDTH ), lineThickSpinner, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_SYMBOL_CONNECTOR ), lineEditor, BeanProperty.create("value")));
 
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "color" ), colorEditor, BeanProperty.create("value")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "fillToReference" ), fillToReferenceCheckBox, BeanProperty.create("selected")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "fillColor" ), fillColorEditor, BeanProperty.create("value")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "reference" ), referenceEditor, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_COLOR ), colorEditor, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_FILL_TO_REFERENCE ), fillToReferenceCheckBox, BeanProperty.create("selected")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_FILLCOLOR ), fillColorEditor, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_REFERENCE ), referenceEditor, BeanProperty.create("value")));
         
         if ( elementBindingContext!=null ) {
             releaseElementBindings();
@@ -138,6 +138,7 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
         psymPanel = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
         lineStylePanel = new javax.swing.JPanel();
+        showLimitsCheckBox = new javax.swing.JCheckBox();
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Series [?]"));
 
@@ -183,6 +184,9 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
 
         lineStylePanel.setLayout(new java.awt.BorderLayout());
 
+        showLimitsCheckBox.setText("Show Limits");
+        showLimitsCheckBox.setToolTipText("Show nominal and warning limits if found in data.  See http://autoplot.org/developer.limits");
+
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -213,7 +217,8 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
                         .add(12, 12, 12)
                         .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                             .add(fillColorPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE)
-                            .add(referenceValuePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .add(referenceValuePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .add(showLimitsCheckBox))
                 .addContainerGap(22, Short.MAX_VALUE))
         );
 
@@ -253,7 +258,9 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                     .add(referenceValuePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
                     .add(jLabel8, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(47, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(showLimitsCheckBox)
+                .addContainerGap(23, Short.MAX_VALUE))
         );
 
         jPanel2Layout.linkSize(new java.awt.Component[] {fillColorPanel, jLabel7}, org.jdesktop.layout.GroupLayout.VERTICAL);
@@ -294,6 +301,7 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
     private javax.swing.JSpinner lineThickSpinner;
     private javax.swing.JPanel psymPanel;
     private javax.swing.JPanel referenceValuePanel;
+    private javax.swing.JCheckBox showLimitsCheckBox;
     private javax.swing.JSpinner symSizeSpinner;
     // End of variables declaration//GEN-END:variables
 }
