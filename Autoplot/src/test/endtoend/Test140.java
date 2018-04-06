@@ -35,6 +35,7 @@ import org.autoplot.dom.Application;
 import org.autoplot.dom.DataSourceFilter;
 import org.autoplot.state.StatePersistence;
 import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
 import org.xml.sax.SAXException;
 
@@ -285,19 +286,25 @@ public class Test140 {
     private static int doHtml( URL url, int iid, Map<String,Exception> exceptions, Map<String,Integer> exceptionNumbers ) throws IOException, CancelledOperationException {
         try (InputStream in = url.openStream()) {
             URL[] urls= HtmlUtil.getDirectoryListing(url,in,false);
-            List<URL> result= new ArrayList();
+            List<URL> result= new ArrayList<>();
+            List<String> sresult= new ArrayList<>();
             for ( URL url1: urls ) {
                 if ( url1.getFile().endsWith(".vap") || url1.getFile().contains("autoplot.jnlp?") ) {
-                    result.add(url1);
+                    String s= url1.toString();
+                    if ( s.startsWith("http://autoplot.org/autoplot.jnlp?") ) {
+                        s= s.substring(34);
+                    }
+                    s= s.replaceAll(" ","+");
+                    s= DataSourceUtil.unescape(s);
+                    sresult.add(s);
                 }
             }
-            for ( URL url1 : result ) {
-                String uri= url1.toString();
+            for ( String suri : sresult ) {
                 try {
-                    do1(url1.toString(), iid, true, true );
+                    do1(suri, iid, true, true );
                 } catch (Exception ex) {
-                    exceptions.put( uri, ex );
-                    exceptionNumbers.put( uri, iid );
+                    exceptions.put( suri, ex );
+                    exceptionNumbers.put( suri, iid );
                 } finally {
                     iid++;
                 }
