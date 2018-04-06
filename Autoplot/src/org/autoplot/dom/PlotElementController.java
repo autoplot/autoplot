@@ -3090,6 +3090,7 @@ public class PlotElementController extends DomNodeController {
         ac.bind(plotElement.style, PlotElementStyle.PROP_FILL_TO_REFERENCE, seriesRenderer, "fillToReference");
         ac.bind(plotElement.style, PlotElementStyle.PROP_REFERENCE, seriesRenderer, "reference");
         ac.bind(plotElement.style, PlotElementStyle.PROP_FILL_DIRECTION, seriesRenderer, Renderer.CONTROL_KEY_FILL_DIRECTION );
+        ac.bind(plotElement.style, PlotElementStyle.PROP_SHOWLIMITS, seriesRenderer, SeriesRenderer.PROP_SHOWLIMITS );
         ac.bind(plotElement.style, PlotElementStyle.PROP_ANTIALIASED, seriesRenderer, "antiAliased");
         ac.bind(plotElement, PlotElement.PROP_CADENCECHECK, seriesRenderer, "cadenceCheck");
         if ( seriesRenderer.getColorBar()!=null )
