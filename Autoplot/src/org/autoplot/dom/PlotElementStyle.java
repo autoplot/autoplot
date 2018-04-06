@@ -202,7 +202,7 @@ public class PlotElementStyle extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_ANTIALIASED, oldAntiAliased, antiAliased);
     }
     
-    private boolean showLimits = true;
+    private boolean showLimits = true; 
 
     public static final String PROP_SHOWLIMITS = "showLimits";
 
