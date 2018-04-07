@@ -274,9 +274,9 @@ class ImageDataSource extends AbstractDataSource {
         String yaxis= getParam( "yaxis", null );
         if ( yaxis!=null ) {
             Datum[] transform= tryParseArray( yaxis );
-            if ( transform[1].getUnits()!=Units.dimensionless ) throw new IllegalArgumentException("xaxis second and last components must be dimensionless.");
+            if ( transform[1].getUnits()!=Units.dimensionless ) throw new IllegalArgumentException("yaxis second and last components must be dimensionless.");
             if ( transform[3].subtract(transform[1]).value()< 0 ) throw new IllegalArgumentException("yaxis=[datamin,pixmin,datamax,pixmax] pixmin must be less than pixmax value"); 
-            Units yunits= transform[1].getUnits();
+            Units yunits= transform[0].getUnits();
             QDataSet yy= Ops.findgen(result.length(0));
             yy= Ops.subtract( yy, transform[1] );
             yy= Ops.multiply( yy, (transform[2].subtract(transform[0]).doubleValue(yunits.getOffsetUnits())/transform[3].subtract(transform[1]).value() ) );
