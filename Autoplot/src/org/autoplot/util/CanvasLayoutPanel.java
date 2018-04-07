@@ -461,6 +461,7 @@ public class CanvasLayoutPanel extends JLabel {
     private final transient PropertyChangeListener repaintListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            logger.fine("canvas was painted, get a screenshot.");
             if ( itsme ) {
                 logger.finer("its me...");
             } else {
