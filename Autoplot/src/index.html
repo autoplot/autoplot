@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>PNGWalk is used to quickly find the image where 5-digit power meter rolls over.
+        <p><small>PNGWalk is used select frames and write captions for a tutorial.  The tutorial shows how to use LaTeX in annotations and is available <a href="http://autoplot.org/data/tutorials/20180403_annotation_latex/latexInAnnotations.pdf">here</a>
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,12 +24,15 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-04-05 r22284):</p>
+        <p>Bugfixes (2018-04-07 r22284):</p>
         <ul>
-            <li>1975: route to generate hang in export for new users because "/..." was default filename, not "file:/..."
+            <li>1672: annotations were triggering a repaint, so it was repainting continuously.
+            <li>formatDataSet command checks for prefix so that the extension can be different than the format.
+            <li>yaxis switch mishandled in image data source, units can now be non-dimensionless.  Thanks, Chris!
+            <li>1975: route to generate hang in export for new users because "/..." was default filename, not "file:/..."  Thanks, Chris!
             <li>more tweaks to the Mashup tool where drag source is considered when replacing child node.
             <li>bugfix with completions, RTE when tot=nn[0]*nn[1] was used and nn not properly culled.
-            <li>1956: limit off-screen drawing of event bars, which can result in PDFs which don't import well into MS Word.
+            <li>1956: limit off-screen drawing of event bars, which can result in PDFs which don't import well into MS Word.  Thanks, Bill!
             <li>"now" supported in low-level parse time.  Before only application-level parsers would handle this.
             <li>Annotation has URL property, to avoid text="http://..." kludge and allow text to be used to document web address.
             <li>FileUtil.fileCopy of A to A would destroy the contents of A!
@@ -101,8 +104,10 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>new makeColorTable command, for use with plot command.
-            <li>experiments with nominal level and warning level lines in series renderer.
+            <li>Series rendering mode supports fill below reference and fill above reference.  Thanks, Kris and Ivar!
+            <li>rfe629: experiments with nominal level and warning level lines in series renderer.  Thanks, Jon N!
+            <li>expendWaveform filter added, to aid in browsing waveform data with low duty cycles.  Thanks, George!
+            <li>rfe515: new makeColorTable command, for use with plot command.  Thanks, Masafumi!
             <li>draw the last QC message below the full-sized image.
             <li>New url property of Annotation clarifies use, and allows URL to cache image of LaTeX-rendering site, and LaTeX code can be stored in the text for safe-keeping.
             <li>HAPI client will use "If-Modified-Since" request header and supports 304 (not modified) responses, when caching is enabled.
@@ -112,7 +117,6 @@
             <li>add inverse_white_blue_black.  Thanks, Masafumi!
             <li>DasAxis now has "reference" property which will draw a line at the reference.  Thanks, Kris and Ivar!
             <li>add two more symbol connection styles, requested by Ivar.
-            <li>Series rendering mode supports fill below reference and fill above reference.  Thanks, Kris and Ivar!
             <li>allow "45 Deg F" + 2 = "47 Deg F"
             <li>mashup tool shows jython code for collapsed nodes.
             <li>Autoplot servlet supports HAPI data sources.
