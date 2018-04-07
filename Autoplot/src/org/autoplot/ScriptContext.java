@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -1371,7 +1372,14 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
             file= s;
         }
 
-        DataSourceFormat format = DataSetURI.getDataSourceFormat( DataSetURI.getURI(file) );
+        DataSourceFormat format;
+        try {
+            format = DataSetURI.getDataSourceFormat( DataSetURI.getURI(file) );
+        } catch ( URISyntaxException ex ) {
+            URISplit split= URISplit.parse(file); // fall back to the old logic
+            URI uri = split.resourceUri; 
+            format = DataSetURI.getDataSourceFormat( uri );
+        }
         
         if (format == null) {
             throw new IllegalArgumentException("no format for extension: " + file);
