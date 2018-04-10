@@ -247,7 +247,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
     }
 
     private String[] getSpacecraft() {
-        String[] ss= new String[] { "rbspa-pp", "rbspb-pp", "crres", "cassini", "marsx", "junoPJ", "junoEqx" };
+        String[] ss= new String[] { "rbspa-pp", "rbspb-pp", "crres", "cassini", "cassini.perikrone.120min", "cassini.perikrone.40min", "marsx", "junoPJ", "junoEqx" };
         int n= ss.length;
         String[] result= new String[ n + extraSpacecraft.length ];
         System.arraycopy(ss, 0, result, 0, n);
