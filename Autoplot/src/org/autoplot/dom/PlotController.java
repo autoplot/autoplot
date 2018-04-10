@@ -1019,8 +1019,13 @@ public class PlotController extends DomNodeController {
                 logger.log(Level.WARNING, null, ex);
             }              
         }
-        axis.setRange( range );
-        axis.setLog(log);
+        AxisController ac= axis.getController();
+        if ( ac!=null ) {
+            ac.setRangeAutomatically( range, log );
+        } else {
+            axis.setRange(range);
+            axis.setLog(log);
+        }
     }
     
     /**
