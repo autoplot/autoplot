@@ -410,8 +410,10 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Check Autorange flag"/>
         <Property name="toolTipText" type="java.lang.String" value="A future version will allow each axis&apos; autorange property to control this."/>
-        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
+      <BindingProperties>
+        <BindingProperty name="enabled" source="autorangeCB" sourcePath="${selected}" target="autorangeFlagsCB" targetPath="enabled" updateStrategy="0" immediately="false"/>
+      </BindingProperties>
     </Component>
   </SubComponents>
 </Form>
