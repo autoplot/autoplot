@@ -913,9 +913,9 @@ public class PlotController extends DomNodeController {
      * </pre></blockquote>
 
      * @param axis the axis to which we are applying the hints.
-     * @param hintsString the string, ampersand-delimited.
+     * @param hintsString the string, ampersand-delimited; or null when no hints should be applied.
      */
-    private void doHints( Axis axis, String hintsString ) {
+    public static void doHints( Axis axis, String hintsString ) {
         Map<String,String> hints= URISplit.parseParams(hintsString);
         DatumRange range=axis.getRange();
         boolean log= axis.isLog();

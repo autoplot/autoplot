@@ -6,7 +6,7 @@
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
  */
-package org.autoplot;
+package org.autoplot; 
 
 import java.awt.Component;
 import java.awt.Graphics2D;
@@ -18,7 +18,6 @@ import java.util.logging.Level;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasColumn;
@@ -86,13 +85,7 @@ import javax.swing.border.TitledBorder;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import static org.autoplot.AutoplotUI.getProcessId;
-import org.das2.datum.DomainDivider;
-import org.das2.datum.DomainDividerUtil;
 import org.das2.datum.EnumerationUnits;
-import org.das2.datum.TimeLocationUnits;
-import org.das2.datum.TimeUtil;
-import org.das2.datum.UnitsConverter;
 import org.das2.graph.ContoursRenderer;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasColorBar;
@@ -115,7 +108,6 @@ import org.das2.graph.TickCurveRenderer;
 import org.das2.graph.VectorPlotRenderer;
 import org.das2.system.RequestProcessor;
 import org.das2.util.ExceptionHandler;
-import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.LocalFileSystem;
 import org.das2.util.filesystem.WebFileSystem;
@@ -129,14 +121,9 @@ import org.autoplot.dom.Plot;
 import org.autoplot.dom.PlotElement;
 import org.autoplot.dom.PlotElementController;
 import org.das2.qds.DDataSet;
-import org.das2.qds.DRank0DataSet;
 import org.das2.qds.DataSetAnnotations;
 import org.das2.qds.QDataSet;
-import org.das2.qds.DataSetOps;
 import org.das2.qds.DataSetUtil;
-import org.das2.qds.JoinDataSet;
-import org.das2.qds.QubeDataSetIterator;
-import org.das2.qds.RankZeroDataSet;
 import org.das2.qds.SemanticOps;
 import org.das2.qds.examples.Schemes;
 import org.autoplot.datasource.AutoplotSettings;
@@ -145,10 +132,9 @@ import org.autoplot.datasource.ReferenceCache;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
 import org.autoplot.datasource.capability.Caching;
+import org.autoplot.dom.PlotController;
 import org.das2.graph.BoundsRenderer;
 import org.das2.graph.PolarPlotRenderer;
-import org.das2.qds.ops.Ops;
-import org.das2.qds.util.AutoHistogram;
 import org.das2.util.AboutUtil;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -794,7 +780,8 @@ public class AutoplotUtil {
             }
         }
         if ( range!=null ) axis.setRange(range);
-
+        PlotController.doHints( axis, axis.getAutoRangeHints() );
+        
         return result;
     }
 
@@ -825,7 +812,8 @@ public class AutoplotUtil {
             }
         }
         if ( range!=null ) axis.setRange(range);
-
+        PlotController.doHints( axis, axis.getAutoRangeHints() );
+        
         return result;
     }
 
@@ -858,7 +846,8 @@ public class AutoplotUtil {
             }
         }
         if ( range!=null ) axis.setRange(range);
-
+        PlotController.doHints( axis, axis.getAutoRangeHints() );
+        
         return result;
     }
 
