@@ -779,7 +779,7 @@ public class AutoplotUtil {
                 }
             }
         }
-        if ( range!=null ) axis.getController().setRangeAutomatically( range, axis.isAutoRange() );
+        if ( range!=null ) axis.getController().setRangeAutomatically( range, axis.isLog() );
         PlotController.doHints( axis, axis.getAutoRangeHints() );
         
         return result;
@@ -811,7 +811,7 @@ public class AutoplotUtil {
                 }
             }
         }
-        if ( range!=null ) axis.getController().setRangeAutomatically( range, axis.isAutoRange() );
+        if ( range!=null ) axis.getController().setRangeAutomatically( range, axis.isLog() );
         PlotController.doHints( axis, axis.getAutoRangeHints() );
         
         return result;
@@ -845,7 +845,7 @@ public class AutoplotUtil {
                 }
             }
         }
-        if ( range!=null ) axis.getController().setRangeAutomatically( range, axis.isAutoRange() );
+        if ( range!=null ) axis.getController().setRangeAutomatically( range, axis.isLog() );
         PlotController.doHints( axis, axis.getAutoRangeHints() );
         
         return result;
