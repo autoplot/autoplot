@@ -410,14 +410,41 @@ public class JythonUtil {
             final boolean makeTool, 
             final JythonScriptPanel scriptPanel,
             ProgressMonitor mon1) throws IOException {
+        if ( EventQueue.isDispatchThread() ) {
+            System.err.println("THIS IS THE EVENT THREAD!");
+        }
+        final File file = DataSetURI.getFile( uri, new NullProgressMonitor() ); //EVENT THREAD!!!!
+        return invokeScriptSoon( uri, file, dom, params, askParams, makeTool, scriptPanel, mon1 );
+    }
         
+    /**
+     * invoke the python script on another thread.  Script parameters can be passed in, and the user can be 
+     * provided a dialog to set the parameters.  Note this will return before the script is actually
+     * executed, and monitor should be used to detect that the script is finished.
+     * This should be called from the event thread!
+     * @param uri the resource URI of the script (without parameters).
+     * @param file the file which has been downloaded.
+     * @param dom if null, then null is passed into the script and the script must not use dom.
+     * @param params values for parameters, or null.
+     * @param askParams if true, query the user for parameter settings.
+     * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
+     * @param scriptPanel null or place to mark error messages and to mark as running a script.
+     * @param mon1 monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
+     * @return JOptionPane.OK_OPTION of the script is invoked.
+     * @throws java.io.IOException
+     */
+    public static int invokeScriptSoon( final URI uri, final File file, final Application dom, 
+            Map<String,String> params, 
+            boolean askParams, 
+            final boolean makeTool, 
+            final JythonScriptPanel scriptPanel,
+            ProgressMonitor mon1) throws IOException {        
         final ProgressMonitor mon;
         if ( mon1==null ) {
             mon= new NullProgressMonitor();
         } else {
             mon= mon1;
         }
-        final File file;
         
         final Map<String,String> fparams;
         if ( params==null ) {
@@ -436,7 +463,7 @@ public class JythonUtil {
         
         int response= JOptionPane.OK_OPTION;
         if ( askParams ) {     
-            file = DataSetURI.getFile( uri, new NullProgressMonitor() );
+            
             Map<String,Object> args= new HashMap();
             args.put( "dom", dom );
             args.put( "PWD", split.path ); 
@@ -447,7 +474,6 @@ public class JythonUtil {
             response= showScriptDialog( dom.getController().getDasCanvas(), args, file, fparams, makeTool, uri );
             
         } else {
-            file = DataSetURI.getFile( uri, new NullProgressMonitor() );
             fd=  pfp.doVariables( env, file, params, null );
         }
         
