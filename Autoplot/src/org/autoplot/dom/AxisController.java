@@ -198,11 +198,10 @@ public class AxisController extends DomNodeController {
      * @param log true if the axis should be log.
      */
     public void setRangeAutomatically( DatumRange range, boolean log ) {
-        axis.range= range; // don't fire off property change events.
-        axis.log= log;
+        boolean oldAutoRange= axis.autoRange;
         axis.setRange(range);
         axis.setLog(log);
-        axis.setAutoRange(true);
+        axis.autoRange=oldAutoRange;
     }
 
     /**
