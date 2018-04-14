@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>PNGWalk is used select frames and write captions for a tutorial.  The tutorial shows how to use LaTeX in annotations and is available <a href="http://autoplot.org/data/tutorials/20180403_annotation_latex/latexInAnnotations.pdf">here</a>
+        <p><small>New CDF metadata for nominal and warning limits causes yellow and red lines in lineplots.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-04-12 r22314):</p>
+        <p>Bugfixes (2018-04-14 r22317):</p>
         <ul>
+            <li>format the channel labels for array of vectors when exporting to CDF.
             <li>1897: allow some, but not all, plots to autorange when creating pngwalks.
             <li>1672: annotations were triggering a repaint, so it was repainting continuously.
             <li>formatDataSet command checks for prefix so that the extension can be different than the format.
