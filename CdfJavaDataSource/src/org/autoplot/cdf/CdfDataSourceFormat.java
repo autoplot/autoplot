@@ -177,6 +177,17 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             if ( !append && data.rank()==2 ) {
                 if ( dep1==null ) {
                     logger.fine("writing bundled datasets to CDF separately.");
+                    String[] names= new String[bds.length()];
+                    int maxLen= 0;
+                    for ( int j=0; j<names.length; j++ ) {
+                        names[j]= (String)bds.slice(j).property(QDataSet.LABEL);
+                        if ( names[j]==null ) names[j]= "data_"+j;
+                        maxLen= Math.max( names[j].length(), maxLen );
+                    }
+                    String sbname= nameFor(bds); 
+                    //bgsm= getDataSet('https://emfisis.physics.uiowa.edu/Flight/RBSP-A/L3/2013/02/02/rbsp-a_magnetometer_4sec-gsm_emfisis-L3_20130202_v1.3.3.cdf?Mag')
+                    //formatDataSet(bgsm,'/tmp/ap/gsm.cdf')
+                    cdf.addNRVVariable( sbname, CDFDataType.CHAR, new int[] { names.length }, maxLen, names );
                 } else {
                     String name= nameFor(bds);
                     addVariableRank1NoVary(bds, name, true, new HashMap<String,String>(), new NullProgressMonitor() );
