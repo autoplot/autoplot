@@ -35,6 +35,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -468,6 +469,52 @@ public class ScreenshotsTool extends EventQueue {
     }
 
     /**
+     * identify parts of the desktop that are Autoplot, for the user's privacy.
+     * @param g the graphics to paint on.
+     * @param b the rectangle showing the display translation.
+     * @param active the list which will be populates
+     * @return true if the mouse pointer is within a rectangle boundary.
+     */
+    private static Rectangle getActiveBackground( Rectangle b, List<Rectangle> active ) {
+        
+        long t0= System.currentTimeMillis();
+        
+        Rectangle r= null;
+
+        boolean containsPointer= false;
+        
+        Frame[] frames = Frame.getFrames();
+        for (Frame frame : frames) {
+            if ( frame.isVisible() ) {
+                if( frame.getExtendedState() != Frame.ICONIFIED ) {
+                    Rectangle rect= frame.getBounds();
+                    logger.log(Level.FINER, "showing {0} {1}", new Object[]{rect, frame.getTitle()});
+                    rect.translate( -b.x, -b.y );
+                    if ( r==null ) r=rect; else r.add( rect );
+                    active.add( rect );
+                }
+            }
+        }
+
+        Window[] windows= Window.getWindows();
+        for ( Window window: windows ) {
+            if ( window.isVisible() ) {
+                if ( window.isShowing() ) {
+                    Rectangle rect= window.getBounds();
+                    logger.log(Level.FINER, "showing {0} {1}", new Object[]{rect, window.getType()});
+                    rect.translate( -b.x, -b.y );
+                    if ( r==null ) r=rect; else r.add( rect );
+                    active.add( rect );
+                }
+            }
+        }
+        
+        logger.log(Level.FINE, "getActiveBackground in {0}ms", (System.currentTimeMillis()-t0));
+        return r;
+        
+    }
+    
+    /**
      * mask out parts of the desktop that are not Autoplot, for the user's privacy.
      * It's been shown that this takes just a few milliseconds.
      * @param g the graphics to paint on.
@@ -711,14 +758,24 @@ public class ScreenshotsTool extends EventQueue {
         Point mousePointerLocation= info.getLocation();
         bounds= gs[i].getDefaultConfiguration().getBounds();
         Rectangle b= new Rectangle(bounds);
+
+        List<Rectangle> activeRects= new ArrayList<>();
+        
+        Rectangle appRect= getActiveBackground( bounds, activeRects );
+        
         try {
-            logger.log(Level.FINE, "getting screenshot from screen {0}.", i);
+            long t1= System.currentTimeMillis();
+            logger.log(Level.FINER, "getting screenshot from screen {0}.", i);
             screenshot = new Robot(gs[i]).createScreenCapture(bounds);
+            logger.log(Level.FINER, "got screenshot from screen {0} in {1}ms.", new Object[]{i, System.currentTimeMillis()-t1});
             boolean allBlack= true;
             if ( bounds.x>0 ) {
-                for ( int ii=0; ii<screenshot.getWidth(); ii++ ) {
+                for ( int ii=0; ii<screenshot.getWidth() && allBlack; ii++ ) {
                     for ( int jj=0; jj<screenshot.getHeight(); jj++ ) {
-                        if ( screenshot.getRGB(ii,jj)>0 ) allBlack= false;
+                        if ( screenshot.getRGB(ii,jj)!=0 ) {
+                            allBlack= false;
+                            break;
+                        }
                     }
                 }
                 if ( allBlack ) {
@@ -735,7 +792,10 @@ public class ScreenshotsTool extends EventQueue {
             screenshot = new BufferedImage( gs[i].getDisplayMode().getWidth(), gs[i].getDisplayMode().getHeight(), BufferedImage.TYPE_INT_ARGB );
         }
 
+        logger.log(Level.FINER, "got screenshot at {0}ms", (System.currentTimeMillis()-t0));
+        
         boolean appContainsPointer= filterBackground( (Graphics2D)screenshot.getGraphics(), b, mousePointerLocation );
+        //boolean appContainsPointer= true;
         
         boolean screenHasPointer= info.getDevice()==gs[i];
 
@@ -758,8 +818,9 @@ public class ScreenshotsTool extends EventQueue {
                 } else {
                     pointer= pnt;
                 }
-                
+                logger.log(Level.FINER, "pointer identified at {0}ms", (System.currentTimeMillis()-t0));
                 screenshot.getGraphics().drawImage( pointer, mousePointerLocation.x - b.x - ptrXOffset, mousePointerLocation.y - b.y - ptrYOffset, null );
+                logger.log(Level.FINER, "pointer drawn at {0}ms", (System.currentTimeMillis()-t0));
             }
         }
         
