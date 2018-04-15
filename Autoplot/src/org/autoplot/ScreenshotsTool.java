@@ -473,9 +473,9 @@ public class ScreenshotsTool extends EventQueue {
      * @param g the graphics to paint on.
      * @param b the rectangle showing the display translation.
      * @param active the list which will be populates
-     * @return true if the mouse pointer is within a rectangle boundary.
+     * @return the rectangle union of all frames, in the same frame as mouse events.
      */
-    private static Rectangle getActiveBackground( Rectangle b, List<Rectangle> active ) {
+    private static Rectangle getActiveBackground( List<Rectangle> active ) {
         
         long t0= System.currentTimeMillis();
         
@@ -489,7 +489,6 @@ public class ScreenshotsTool extends EventQueue {
                 if( frame.getExtendedState() != Frame.ICONIFIED ) {
                     Rectangle rect= frame.getBounds();
                     logger.log(Level.FINER, "showing {0} {1}", new Object[]{rect, frame.getTitle()});
-                    rect.translate( -b.x, -b.y );
                     if ( r==null ) r=rect; else r.add( rect );
                     active.add( rect );
                 }
@@ -502,7 +501,6 @@ public class ScreenshotsTool extends EventQueue {
                 if ( window.isShowing() ) {
                     Rectangle rect= window.getBounds();
                     logger.log(Level.FINER, "showing {0} {1}", new Object[]{rect, window.getType()});
-                    rect.translate( -b.x, -b.y );
                     if ( r==null ) r=rect; else r.add( rect );
                     active.add( rect );
                 }
@@ -761,17 +759,24 @@ public class ScreenshotsTool extends EventQueue {
 
         List<Rectangle> activeRects= new ArrayList<>();
         
-        Rectangle appRect= getActiveBackground( bounds, activeRects );
+        Rectangle appRect= getActiveBackground( activeRects );
+        
+        boolean screenHasPointer= info.getDevice()==gs[i];
+        boolean appContainsPointer= appRect.contains(mousePointerLocation);
         
         try {
             long t1= System.currentTimeMillis();
+            
             logger.log(Level.FINER, "getting screenshot from screen {0}.", i);
             screenshot = new Robot(gs[i]).createScreenCapture(bounds);
             logger.log(Level.FINER, "got screenshot from screen {0} in {1}ms.", new Object[]{i, System.currentTimeMillis()-t1});
+            
             boolean allBlack= true;
             if ( bounds.x>0 ) {
-                for ( int ii=0; ii<screenshot.getWidth() && allBlack; ii++ ) {
-                    for ( int jj=0; jj<screenshot.getHeight(); jj++ ) {
+                int lastX= bounds.width; // appRect.x+appRect.width;
+                int lastY= bounds.height; //appRect.y+appRect.height;
+                for ( int ii=0; ii<lastX && allBlack; ii++ ) {
+                    for ( int jj=0; jj<lastY; jj++ ) {
                         if ( screenshot.getRGB(ii,jj)!=0 ) {
                             allBlack= false;
                             break;
@@ -794,15 +799,15 @@ public class ScreenshotsTool extends EventQueue {
 
         logger.log(Level.FINER, "got screenshot at {0}ms", (System.currentTimeMillis()-t0));
         
-        boolean appContainsPointer= filterBackground( (Graphics2D)screenshot.getGraphics(), b, mousePointerLocation );
+        filterBackground( (Graphics2D)screenshot.getGraphics(), b, mousePointerLocation );
         //boolean appContainsPointer= true;
         
-        boolean screenHasPointer= info.getDevice()==gs[i];
-
         if ( includePointer ) {
             if ( screenHasPointer && appContainsPointer ) {
-                // get the mouse info before grabbing the screenshot, which takes several hundred millis.
+                int pntrX, pntrY; 
                 BufferedImage pointer;
+        
+                // get the mouse info before grabbing the screenshot, which takes several hundred millis.
                 if ( ( button & MouseEvent.BUTTON1_DOWN_MASK ) == MouseEvent.BUTTON1_DOWN_MASK ) {
                     pointer= pnt_b1;
                 } else if ( ( button & MouseEvent.BUTTON2_DOWN_MASK ) == MouseEvent.BUTTON2_DOWN_MASK ) {
@@ -819,7 +824,10 @@ public class ScreenshotsTool extends EventQueue {
                     pointer= pnt;
                 }
                 logger.log(Level.FINER, "pointer identified at {0}ms", (System.currentTimeMillis()-t0));
-                screenshot.getGraphics().drawImage( pointer, mousePointerLocation.x - b.x - ptrXOffset, mousePointerLocation.y - b.y - ptrYOffset, null );
+                pntrX= mousePointerLocation.x - b.x - ptrXOffset;
+                pntrY= mousePointerLocation.y - b.y - ptrYOffset;
+                
+                screenshot.getGraphics().drawImage( pointer, pntrX, pntrY, null );
                 logger.log(Level.FINER, "pointer drawn at {0}ms", (System.currentTimeMillis()-t0));
             }
         }
