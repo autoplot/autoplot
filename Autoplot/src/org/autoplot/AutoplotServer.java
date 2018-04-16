@@ -10,6 +10,7 @@ import static org.autoplot.ScriptContext.*;
 import org.das2.util.ArgumentList;
 import org.autoplot.dom.Application;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.dom.Plot;
 
 /**
  * Server for producing images from Autoplot URIs, first requested by U. Michigan.
@@ -39,6 +40,8 @@ public class AutoplotServer {
         alm.addBooleanSwitchArgument( "enableResponseMonitor", null, "enableResponseMonitor", "monitor the event thread for long unresponsive pauses");
         alm.addBooleanSwitchArgument( "noexit", "z", "noexit", "don't exit after running, for use with scripts." );
         alm.addBooleanSwitchArgument( "nomessages", "q", "nomessages", "don't show message bubbles.");
+        alm.addBooleanSwitchArgument( "autorange", null, "autorange", "autorange the Y and Z axes of each plot in the vap");
+        alm.addBooleanSwitchArgument( "autorangeFlags", null, "autorangeFlags", "autorange the Y and Z axes of each plot where the autorange flag is set in the vap");
         alm.requireOneOf( new String[] { "uri", "vap" } );
         
         alm.process(args);
@@ -66,6 +69,11 @@ public class AutoplotServer {
         String format= alm.getValue("format");
         String outfile= alm.getValue("outfile");
 
+        boolean autorange= alm.getBooleanValue("autorange");
+        boolean autorangeFlags= alm.getBooleanValue("autorangeFlags");
+        
+        if ( autorangeFlags ) autorange= true;
+        
         if ( outfile.endsWith(".pdf") ) format= "pdf";
 
         //AutoplotUtil.maybeLoadSystemProperties();
@@ -106,6 +114,27 @@ public class AutoplotServer {
                 height= dom.getController().getCanvas().getHeight();
             }
             DasCanvas c = dom.getController().getCanvas().getController().getDasCanvas();
+            
+            Application dom2= getDocumentModel();
+            
+            if ( autorange ) {
+                if ( autorangeFlags) {
+                    for ( Plot p: dom2.getPlots() ) {
+                        if ( p.getYaxis().isAutoRange() ) {
+                            AutoplotUtil.resetZoomY(dom2,p);
+                        }
+                        if ( p.getZaxis().isAutoRange() ) {
+                            AutoplotUtil.resetZoomZ(dom2,p);
+                        }
+                    }
+                } else {
+                    for ( Plot p: dom2.getPlots() ) {
+                        dom2.getController().setPlot(p);
+                        AutoplotUtil.resetZoomY(dom2);
+                        AutoplotUtil.resetZoomZ(dom2);
+                    }
+                }
+            }
             
             c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
         } else {
