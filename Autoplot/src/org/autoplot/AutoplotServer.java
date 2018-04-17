@@ -11,6 +11,7 @@ import org.das2.util.ArgumentList;
 import org.autoplot.dom.Application;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.dom.Plot;
+import org.das2.datum.DatumRangeUtil;
 
 /**
  * Server for producing images from Autoplot URIs, first requested by U. Michigan.
@@ -37,6 +38,7 @@ public class AutoplotServer {
         alm.addOptionalSwitchArgument("canvas.aspect", "a", "canvas.aspect", "", "aspect ratio" );
         alm.addOptionalSwitchArgument("format", "f", "format", "png", "output format png or pdf (default=png)");
         alm.addOptionalSwitchArgument("outfile", "o", "outfile", "-", "output filename or -");
+        alm.addOptionalSwitchArgument("timeRange", "r", "timeRange", "", "set this to the timerange, instead of the range within the vap" );
         alm.addBooleanSwitchArgument( "enableResponseMonitor", null, "enableResponseMonitor", "monitor the event thread for long unresponsive pauses");
         alm.addBooleanSwitchArgument( "noexit", "z", "noexit", "don't exit after running, for use with scripts." );
         alm.addBooleanSwitchArgument( "nomessages", "q", "nomessages", "don't show message bubbles.");
@@ -55,6 +57,8 @@ public class AutoplotServer {
             System.exit(-1);
         }
 
+        String timeRange= alm.getValue("timeRange").trim();
+        
         int width = Integer.parseInt(alm.getValue("width"));
         int height = Integer.parseInt(alm.getValue("height"));
         
@@ -104,7 +108,11 @@ public class AutoplotServer {
         
         if ( !vap.equals("") ) {
             logger.log(Level.FINE, "about to load the vap {0}", vap);
-            
+
+            if ( timeRange.length()>0 ) {
+                vap= URISplit.putParam( vap, "timerange", timeRange );
+            }
+                        
             load(vap);
             
             logger.log(Level.FINE, "vap is loaded");
