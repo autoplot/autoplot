@@ -427,9 +427,9 @@ public class URISplit {
 
     /**
      * convenient method to remove a parameter (or parameters) from the list of parameters
-     * @param surl
-     * @param parm
-     * @return
+     * @param surl any URI or web address
+     * @param parm the name to remove
+     * @return the URI with the parameter removed, and the question mark removed when no parameters remain.
      */
     public static String removeParam( String surl, String ... parm ) {
         URISplit split= URISplit.parse(surl);
@@ -446,10 +446,10 @@ public class URISplit {
 
     /**
      * convenient method for adding or replacing a parameter to the URI.
-     * @param surl
-     * @param name
-     * @param value
-     * @return
+     * @param surl any URI or web address
+     * @param name the parameter name to add
+     * @param value the parameter value to add
+     * @return the uri with the question mark and parameter added.
      */
     public static String putParam( String surl, String name, String value ) {
         URISplit split= URISplit.parse(surl);
@@ -799,7 +799,7 @@ public class URISplit {
      * Split the parameters (if any) into name,value pairs. URLEncoded parameters are decoded, but the string may be decoded 
      * already.  Items without equals (=) are inserted as "arg_N"=name.
      * @param params null or String containing the list of ampersand-delimited parameters.
-     * @return null or the map.
+     * @return the map, which will be empty when there are no params.
      */
     public static LinkedHashMap<String, String> parseParams(String params) {
         LinkedHashMap<String, String> result = new LinkedHashMap<>();
