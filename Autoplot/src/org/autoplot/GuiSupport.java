@@ -1464,6 +1464,23 @@ public class GuiSupport {
         
         mouseAdapter.addMenuItem(new JSeparator());
 
+        item= new JMenuItem( new AbstractAction("Reset Zoom" ) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
+                if ( plot.getZaxis()==axis ) {
+                    AutoplotUtil.resetZoomZ( controller.getApplication(), plot );
+                } else {
+                    if ( axis==plot.getXaxis() ) {
+                        AutoplotUtil.resetZoomX( controller.getApplication(), plot );
+                    } else {
+                        AutoplotUtil.resetZoomY( controller.getApplication(), plot );
+                    }
+                }
+            }            
+        } );
+        mouseAdapter.addMenuItem(item);
+                
         if (axis == plot.getXaxis()) {
             JMenu addPlotMenu = new JMenu("Add Plot");
             mouseAdapter.addMenuItem(addPlotMenu);
