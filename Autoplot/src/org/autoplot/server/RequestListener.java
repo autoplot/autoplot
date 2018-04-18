@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.server;
 
 import java.beans.PropertyChangeListener;
@@ -15,12 +12,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * 
  * @author jbf
  */
 public class RequestListener {
 
-    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.server");
 
     public RequestListener() {
     }
@@ -61,7 +58,7 @@ public class RequestListener {
                     // wait for connections forever
                     while (listening) {
                         Socket socket = listen.accept();
-                        System.err.println("connect @"+new Date( System.currentTimeMillis() ) );
+                        logger.log(Level.INFO, "connect @{0}", new Date( System.currentTimeMillis() ));
                         setSocket(socket);
 
                         if (readData) {
@@ -153,7 +150,7 @@ public class RequestListener {
     public void setData(String newdata) {
         String olddata = data;
         this.data = newdata;
-        System.err.println("fire data property change");
+        logger.fine("fire data property change");
         propertyChangeSupport.firePropertyChange(PROP_DATA, olddata, newdata);
     }
     private boolean listening = false;

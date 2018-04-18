@@ -28,7 +28,7 @@ import org.autoplot.ScriptContext;
  */
 public class RequestHandler {
 
-    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.server");
 
     public RequestHandler() {
     }
