@@ -60,10 +60,19 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     private synchronized String nameFor(QDataSet dep0) {
         String name= names.get(dep0);
         
+        if ( name!=null ) {
+            return name;
+        }
+        
         if ( name==null ) {
             name = (String) dep0.property(QDataSet.NAME);
             while ( seman.containsKey(name) ) {
-                name= name + "_1";
+                QDataSet ds1= seman.get(name);
+                if ( ds1!=null ) {
+                    name= name + "_1";
+                } else {
+                    break;
+                }
             }
         }
         
