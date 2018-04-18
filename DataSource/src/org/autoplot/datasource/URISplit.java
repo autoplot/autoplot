@@ -608,6 +608,7 @@ public class URISplit {
      * @param surl  the string to parse
      * @param caretPos the position of the caret, the relative position will be preserved through normalization in formatCaretPos
      * @param normalize normalize the surl by adding implicit "vap", etc.
+     * @throws IllegalArgumentException 
      * @return the decomposed uri.
      */
     public static URISplit parse( String surl, int caretPos, boolean normalize) {
