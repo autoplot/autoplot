@@ -23,11 +23,13 @@ public class RequestListener {
     }
 
     public void startListening() {
+        logger.fine("start listening");
         this.listening = true;
         new Thread(run).start();
     }
     
     public void stopListening() {
+        logger.fine("stop listening");
         this.listening= false;
     }
     
@@ -53,19 +55,20 @@ public class RequestListener {
                     ServerSocket listen = new ServerSocket(port, 1000);
                     setPort( listen.getLocalPort() );
                     
-                    System.out.println("autoplot is listening on port "+port+".");
+                    System.err.println("Autoplot is listening on port "+port+".");
+                    logger.log(Level.FINE, "Autoplot is listening on port {0}.", port);
 
                     // wait for connections forever
                     while (listening) {
                         Socket socket = listen.accept();
-                        logger.log(Level.INFO, "connect @{0}", new Date( System.currentTimeMillis() ));
+                        logger.log(Level.INFO, "connect @ {0}", new Date( System.currentTimeMillis() ));
                         setSocket(socket);
 
                         if (readData) {
                             try {
                                 InputStream in = socket.getInputStream();
 
-                                StringBuffer buf = new StringBuffer();
+                                StringBuilder buf = new StringBuilder();
 
                                 int i = in.read();
                                 while (i != -1) {
@@ -150,9 +153,10 @@ public class RequestListener {
     public void setData(String newdata) {
         String olddata = data;
         this.data = newdata;
-        logger.fine("fire data property change");
+        logger.log(Level.FINE, "setData({0})", newdata);
         propertyChangeSupport.firePropertyChange(PROP_DATA, olddata, newdata);
     }
+    
     private boolean listening = false;
     public static final String PROP_LISTENING = "listening";
 
@@ -161,6 +165,7 @@ public class RequestListener {
     }
 
     public void setListening(boolean newlistening) {
+        logger.log(Level.FINE, "setListening({0})", newlistening);
         boolean oldlistening = listening;
         this.listening = newlistening;
         propertyChangeSupport.firePropertyChange(PROP_LISTENING, oldlistening, newlistening);
