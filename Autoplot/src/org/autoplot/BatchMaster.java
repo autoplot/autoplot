@@ -145,6 +145,7 @@ public class BatchMaster extends javax.swing.JPanel {
                     }
                     ComboBoxModel m1= new DefaultComboBoxModel(Arrays.copyOfRange(items,1,items.length));
                     param1NameCB.setModel(m1);
+                    generateButton1.setEnabled( items.length>1 );
                     ComboBoxModel m2= new DefaultComboBoxModel(items);
                     param2NameCB.setModel(m2);
                 } catch (IOException ex) {
@@ -653,7 +654,23 @@ public class BatchMaster extends javax.swing.JPanel {
                         break;
                     }
                 } else if ( pd.type=='R' ) {
+                    String deft= String.valueOf(pd.deft);
+                    File f= null;
+                    try {
+                        URISplit split= URISplit.parse(deft);
+                        if ( split.path.startsWith("file:") ) {
+                            f= new File( split.path.substring(5) );
+                        }
+                    } catch ( IllegalArgumentException ex ) {
+                    }
+                    String lastItem= ta.getText().trim();
+                    if ( lastItem.length()>0  ) {
+                        int i= lastItem.lastIndexOf("\n");
+                        lastItem= lastItem.substring(i+1);
+                        f= new File( lastItem.substring(5) );
+                    }
                     JFileChooser cf= new JFileChooser();
+                    if ( f!=null ) cf.setCurrentDirectory(f);
                     cf.setMultiSelectionEnabled(true);
                     if ( cf.showOpenDialog(this)==JFileChooser.APPROVE_OPTION ) {
                         File[] ff= cf.getSelectedFiles();
