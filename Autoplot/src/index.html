@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New CDF metadata for nominal and warning limits causes yellow and red lines in lineplots.
+        <p><small>Create Pngwalk is able to Autorange the top Y axis while leaving the bottom one fixed.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-04-14 r22317):</p>
+        <p>Bugfixes (2018-04-18 r22332):</p>
         <ul>
+            <li>run batch tool resourceURI argument list generation initial directory is improved.
             <li>format the channel labels for array of vectors when exporting to CDF.
             <li>1897: allow some, but not all, plots to autorange when creating pngwalks.
             <li>1672: annotations were triggering a repaint, so it was repainting continuously.
@@ -106,6 +107,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Axes have "reset zoom" menu item.
+            <li>AutoplotServer supports autorange keywords to match createPngWalk, to support groups which make one image at a time.
+            <li>tighten security on Autoplot servlet, so that evel and import statements are not allowed.
             <li>Series rendering mode supports fill below reference and fill above reference.  Thanks, Kris and Ivar!
             <li>rfe629: experiments with nominal level and warning level lines in series renderer.  Thanks, Jon N!
             <li>expandWaveform filter added, to aid in browsing waveform data with low duty cycles.  Thanks, George!
