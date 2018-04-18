@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.server;
 
 import java.io.BufferedReader;
@@ -17,7 +14,6 @@ import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.util.PythonInterpreter;
 import org.autoplot.ApplicationModel;
-import org.autoplot.AutoplotUI;
 import org.autoplot.JythonUtil;
 import org.autoplot.ScriptContext;
 
@@ -33,16 +29,27 @@ public class RequestHandler {
     public RequestHandler() {
     }
 
-//    /**
-//     * this is a hook to remind myself we want to filter the stream to ensure
-//     * a secure sandbox.  This will be done by removing import statements and
-//     * exec/eval statements.
-//     * @param in
-//     * @return
-//     */
-//    private InputStream untaint( InputStream in ) {
-//        return in;
-//    }
+    /**
+     * this is a hook to remind myself we want to filter the stream to ensure
+     * a secure sandbox.  This will be done by removing import statements and
+     * exec/eval statements, but note the formatDataSet command could be used to
+     * write files.
+     * @param in
+     * @return null if the command should not be executed.
+     */
+    private String untaint( String in, OutputStream out ) {
+        try {
+            if ( in.contains("import") ) {
+                out.write("commands cannot contain import\n".getBytes());
+                in= null;
+            } else if ( in.contains("eval") ) {
+                out.write("commands cannot contain eval\n".getBytes());
+                in= null;
+            }
+        } catch ( IOException ex ) {
+        }
+        return in;
+    }
     
     /**
      * process the python code in data.  
@@ -68,12 +75,16 @@ public class RequestHandler {
             if ( echo ) out.write("autoplot> ".getBytes());
             String s= reader.readLine();
             while ( s!=null ) {
-                try {
-                    echo = !s.trim().endsWith(";");
-                    interp.exec(JythonRefactory.fixImports(s));
-                } catch ( RuntimeException ex ) {
-                    ex.printStackTrace( new PrintStream( out ) );
-                    ex.printStackTrace();
+                s= untaint(s,out);
+                if ( s!=null ) {
+                    logger.log(Level.FINE, "executing command: \"{0}\"", s);
+                    try {
+                        echo = !s.trim().endsWith(";");
+                        interp.exec(JythonRefactory.fixImports(s));
+                    } catch ( RuntimeException ex ) {
+                        ex.printStackTrace( new PrintStream( out ) );
+                        ex.printStackTrace();
+                    }
                 }
                 try {
                     if ( echo ) out.write("autoplot> ".getBytes());
