@@ -1725,10 +1725,12 @@ public class PlotController extends DomNodeController {
                 } else {
                     dom.setTimeRange( newSettings.getXaxis().getRange() );      // fall back to old logic.
                 }
-                shouldBindX= true;
                 shouldSetAxisRange= true;
             }
             if ( !plot.getXaxis().isAutoRange() ) {
+                if ( needToAutorangeAfterAll && bm!=null ) {
+                    dom.getController().removeBinding(bm);
+                }
                 plot.getXaxis().setAutoRange(true); // setting the time range would clear autoRange here.
             }
             shouldBindX= shouldBindX(newSettings.getXaxis());
