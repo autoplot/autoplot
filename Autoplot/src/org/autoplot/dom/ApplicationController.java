@@ -2548,7 +2548,21 @@ public class ApplicationController extends DomNodeController implements RunLater
         bindingSupport.unbind(src);
     }
 
+    /**
+     * remove the binding and its implementation.
+     * @param binding 
+     * @deprecated see removeBinding(binding)
+     * @see #removeBinding(org.autoplot.dom.BindingModel) 
+     */
     public void deleteBinding(BindingModel binding) {
+        removeBinding(binding);
+    }
+
+    /**
+     * remove the binding and its implementation.
+     * @param binding 
+     */
+    public void removeBinding(BindingModel binding) {
         Binding b = bindingImpls.get(binding);
         if ( b==null ) {
             logger.log(Level.SEVERE, "didn''t find the binding implementation for {0}, ignoring", binding);
