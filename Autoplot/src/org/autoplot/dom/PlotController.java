@@ -1004,15 +1004,16 @@ public class PlotController extends DomNodeController {
             Units u= range.getUnits();
             try {
                 if ( log ) {
-                    double w= Math.log10( range.max().divide(range.min() ).value() );
-                    w= w/2;
-                    Datum currentCenter;
-                    currentCenter = u.parse(center);
+                    Datum currentCenter = u.parse(center);
+                    double w1= Math.abs( Math.log10( range.min().divide(currentCenter).value() ) );
+                    double w2= Math.abs( Math.log10( range.max().divide(currentCenter).value() ) );
+                    double w= w1>=w2 ? w1 : w2;
                     range= new DatumRange( currentCenter.divide( Math.pow(10,w) ), currentCenter.multiply( Math.pow(10,w) ) );
                 } else {
-                    Datum w= range.width();
-                    w= w.divide(2);
                     Datum currentCenter= u.parse(center);
+                    Datum w1= range.min().subtract(currentCenter).abs();
+                    Datum w2= range.max().subtract(currentCenter).abs();
+                    Datum w= w1.ge(w2) ? w1 : w2;
                     range= new DatumRange( currentCenter.subtract(w), currentCenter.add(w) );
                 }
             } catch (ParseException | InconvertibleUnitsException ex ) {
