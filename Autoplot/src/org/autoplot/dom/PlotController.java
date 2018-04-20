@@ -942,16 +942,29 @@ public class PlotController extends DomNodeController {
         
         if ( width!=null ) {
             Units u= range.getUnits().getOffsetUnits();
+            Datum currentCenter=null;
+            if ( center!=null ) {
+                try {
+                    currentCenter= u.parse(center);
+                } catch (ParseException ex) {
+                    logger.log( Level.WARNING, null, ex );
+                }
+            }
+            if ( currentCenter==null ) {
+                if ( log ) {
+                    currentCenter= DatumRangeUtil.rescaleLog( range, 0.5, 0.5 ).min();
+                } else {
+                    currentCenter= DatumRangeUtil.rescale( range, 0.5, 0.5 ).min();
+                }
+            }
             try {
                 if ( log ) {
                     Datum w= Units.log10Ratio.parse(width);
                     w= w.divide(2);
-                    Datum currentCenter= DatumRangeUtil.rescaleLog( range, 0.5, 0.5 ).min();
                     range= new DatumRange( currentCenter.divide( Math.pow(10,w.value()) ), currentCenter.multiply( Math.pow(10,w.value()) ) );
                 } else {
                     Datum w= u.parse(width);
                     w= w.divide(2);
-                    Datum currentCenter= DatumRangeUtil.rescale( range, 0.5, 0.5 ).min();
                     range= new DatumRange( currentCenter.subtract(w), currentCenter.add(w) );
                 }
             } catch (ParseException | InconvertibleUnitsException ex ) {
