@@ -213,7 +213,7 @@ public class Axis extends DomNode {
      * <li>includeZero
      * <li>log=T or log=F
      * <li>center=DATUM
-     * <li>width=DATUM, note percent increase can be used with log.
+     * <li>width=DATUM, for log this is the number of 10-fold cycles.
      * <li>reluctant=true
      * <li>units=UNITS, explicitly set the units.
      * These are formed by combining them with ampersands, so for example:
