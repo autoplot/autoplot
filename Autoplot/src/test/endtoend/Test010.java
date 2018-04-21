@@ -33,7 +33,8 @@ public class Test010 {
         //tests.add("ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/");
         //tests.add("http://caa.estec.esa.int/caa/search.xml");
         tests.add("http://papco.org/data");
-
+        tests.add("http://demo:demo@www-pw.physics.uiowa.edu/~jbf/data/restrict/data_2010_03_02_v1.02.qds");
+        
         List<Exception> exceptions= new ArrayList();
         for ( String uri: tests ) {
             System.out.println("## "+uri+" ##");
