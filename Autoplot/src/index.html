@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Create Pngwalk is able to Autorange the top Y axis while leaving the bottom one fixed.
+        <p><small>Bottom plot has the scale bound between the X and Y axes, and the top plot shows a third parameter during the same interval.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-04-18 r22332):</p>
+        <p>Bugfixes (2018-04-22 r22342):</p>
         <ul>
+            <li>1981: sequence where histogram operation should have unbound the timeaxis.
+            <li>tweak the logic for autorange hints "center" and "width"
             <li>rte_1634285758: NullPointerException when annotation is added when a connector (context overview) is visible.
             <li>run batch tool resourceURI argument list generation initial directory is improved.
             <li>format the channel labels for array of vectors when exporting to CDF.
