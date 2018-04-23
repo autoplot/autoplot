@@ -1,8 +1,6 @@
 
 package org.autoplot.pngwalk;
 
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
@@ -58,10 +56,11 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import org.das2.graph.Painter;
 
 /**
- * MakePngWalk code implemented in Java.  This was once a Python script, but it got complex enough that it was useful to
+ * CreatePngWalk makes a sequence of images from a .vap file or the current state.
+ * This is used with PngWalkTool to quickly flip through the images once they
+ * are created.  This was once a Python script, but it got complex enough that it was useful to
  * rewrite it in Java.
  * @author jbf
  */
