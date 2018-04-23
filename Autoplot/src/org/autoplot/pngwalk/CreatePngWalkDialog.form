@@ -409,7 +409,7 @@
     <Component class="javax.swing.JCheckBox" name="autorangeFlagsCB">
       <Properties>
         <Property name="text" type="java.lang.String" value="Check Autorange flag"/>
-        <Property name="toolTipText" type="java.lang.String" value="A future version will allow each axis&apos; autorange property to control this."/>
+        <Property name="toolTipText" type="java.lang.String" value="Check each axis&apos; autorange property, true indicates the axis should be reset."/>
       </Properties>
       <BindingProperties>
         <BindingProperty name="enabled" source="autorangeCB" sourcePath="${selected}" target="autorangeFlagsCB" targetPath="enabled" updateStrategy="0" immediately="false"/>

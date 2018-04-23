@@ -359,7 +359,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         runOnCopyCB.setToolTipText("Run the PNG Walk on a copy in the background.  Note only properties conveyed by a .vap file will appear on the produced images.");
 
         autorangeFlagsCB.setText("Check Autorange flag");
-        autorangeFlagsCB.setToolTipText("A future version will allow each axis' autorange property to control this.");
+        autorangeFlagsCB.setToolTipText("Check each axis' autorange property, true indicates the axis should be reset.");
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, autorangeCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), autorangeFlagsCB, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
