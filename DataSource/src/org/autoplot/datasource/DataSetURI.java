@@ -64,6 +64,9 @@ import org.autoplot.aggregator.AggregatingDataSourceFactory;
 import org.autoplot.aggregator.AggregatingDataSourceFormat;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
+import org.das2.util.Base64;
+import org.das2.util.filesystem.KeyChain;
+import org.das2.util.monitor.CancelledOperationException;
 
 /**
  *
@@ -1011,6 +1014,7 @@ public class DataSetURI {
      * @param mon a progress monitor, or null.
      * @return a File in the FileSystemCache.  The file will have question marks and ampersands removed.
      * @throws IOException
+     * @see HtmlUtil#getInputStream(java.net.URL) which is not used but serves a similar function.
      */
     public static File downloadResourceAsTempFile( URL url, int timeoutSeconds, ProgressMonitor mon ) throws IOException {
 
@@ -1022,6 +1026,15 @@ public class DataSetURI {
         
         if ( mon==null ) mon= new NullProgressMonitor();
 
+                                
+        String userInfo;
+        try {
+            userInfo = KeyChain.getDefault().getUserInfo(url);
+        } catch ( CancelledOperationException ex ) {
+            userInfo= null;
+        }
+
+                
         URISplit split = URISplit.parse( url.toString() ); // get the folder to put the file.
 
         if ( split.file.startsWith("file:/") ) {
@@ -1038,7 +1051,13 @@ public class DataSetURI {
         File local= FileSystem.settings().getLocalCacheDir();
         //FileSystem fs = FileSystem.create( toUri(split.path) );
 
-        String id= split.scheme + "/" + split.path.substring(split.scheme.length()+3); // fs.getLocalRoot().toString().substring(FileSystem.settings().getLocalCacheDir().toString().length());
+        int is;
+        if ( split.path.contains("@") ) {
+            is= split.path.indexOf("@")+1;
+        } else {
+            is= split.scheme.length()+3;
+        }
+        String id= split.scheme + "/" + split.path.substring(is); // fs.getLocalRoot().toString().substring(FileSystem.settings().getLocalCacheDir().toString().length());
 
         final long tnow= System.currentTimeMillis();
 
@@ -1206,11 +1225,19 @@ public class DataSetURI {
                 logger.log(Level.FINEST,"downloadResourceAsTempFile-> transfer");
                 logger.log(Level.FINE, "reading URL {0}", url);
                 loggerUrl.log(Level.FINE,"GET to get data {0}", url);
+
                 URLConnection urlc= url.openConnection();
                 urlc.setRequestProperty("Accept-Encoding", "gzip"); // RFE
                 urlc.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() ); // Reiner describes hang at LANL
                 urlc.setReadTimeout( FileSystem.settings().getReadTimeoutMs() );
+                urlc.setAllowUserInteraction(false);
+                if ( userInfo != null) {
+                    String encode = Base64.encodeBytes( userInfo.getBytes());
+                    urlc.setRequestProperty("Authorization", "Basic " + encode);
+                }
+                
                 in= urlc.getInputStream();
+                
                 Map<String, List<String>> headers = urlc.getHeaderFields();
                 List<String> contentEncodings=headers.get("Content-Encoding");
                 boolean hasGzipHeader=false;
