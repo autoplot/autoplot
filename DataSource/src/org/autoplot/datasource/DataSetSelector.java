@@ -79,6 +79,7 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.text.DefaultEditorKit;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
@@ -1782,6 +1783,20 @@ public class DataSetSelector extends javax.swing.JPanel {
                     } else if (split.scheme.equals("file")) {
                         JFileChooser chooser = new JFileChooser( new File( DataSetURI.toUri(split.path) ) );
                         chooser.setMultiSelectionEnabled(true);
+                        final Pattern p= Pattern.compile(acceptPattern);
+                        if ( acceptPattern!=null ) {
+                            chooser.setFileFilter( new FileFilter() {
+                                @Override
+                                public boolean accept(File f) {
+                                    return p.matcher(f.toString()).matches();
+                                }
+
+                                @Override
+                                public String getDescription() {
+                                    return "files matching "+acceptPattern;
+                                }
+                            });
+                        }
                         int result = chooser.showOpenDialog(this);
                         if (result == JFileChooser.APPROVE_OPTION) {
                             File[] ff=  chooser.getSelectedFiles();
