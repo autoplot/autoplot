@@ -86,6 +86,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
     private FileStorageModel fsm;
     DataSourceFactory delegateDataSourceFactory;
     AggregationPollUpdating upd; // allow a group of files to be watched.  This is experimental.
+    String delegateVapScheme= null;
     
     /**
      * metadata from the last read.
@@ -107,6 +108,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
     public AggregatingDataSource(URI uri,DataSourceFactory delegateFactory) throws MalformedURLException, FileSystem.FileSystemOfflineException, IOException, ParseException {
         super(uri);
         this.delegateDataSourceFactory = delegateFactory;
+        try {
+            URISplit split= URISplit.parse(uri);
+            this.delegateVapScheme= split.vapScheme;
+        } catch ( RuntimeException ex ) {
+            logger.log( Level.WARNING, null, ex );
+        }
         if ( AggregatingDataSourceFactory.hasTimeFields( uri.toString() ) ) {
             tsb= new AggTimeSeriesBrowse();
             addCapability( TimeSeriesBrowse.class, tsb );
@@ -473,7 +480,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     scompUrl += "?" + sparams;
                 }
 
-                URI delegateUri= DataSetURI.getURIValid(scompUrl);
+                URI delegateUri;
+                if ( delegateVapScheme!=null ) { //TODO: I don't believe delegateVapScheme will be null.
+                    delegateUri = DataSetURI.getURIValid(delegateVapScheme+":"+scompUrl);
+                } else {
+                    delegateUri = DataSetURI.getURIValid(scompUrl);
+                }
 
                 DataSource delegateDataSource = delegateDataSourceFactory.getDataSource(delegateUri);
 
