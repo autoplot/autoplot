@@ -22,7 +22,11 @@ public class JythonExtensionDataSourceFactory extends AbstractDataSourceFactory 
     public static String getScriptForResource( URI uri ) {
         String script;
         URISplit split= URISplit.parse(uri);
-        switch (split.vapScheme) {
+        String scheme= split.vapScheme;
+        if ( scheme==null ) {
+            scheme= "vap+"+split.ext.substring(1);
+        }
+        switch (scheme) {
             case "vap+sps":
                 script= "http://www-pw.physics.uiowa.edu/~jbf/autoplot/jyds/formats/radiojove/readTypeSps.jyds";
                 break;
