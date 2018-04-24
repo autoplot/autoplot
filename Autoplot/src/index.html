@@ -24,8 +24,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-04-22 r22342):</p>
+        <p>Bugfixes (2018-04-24 r22350):</p>
         <ul>
+            <li>keep track of delegate's scheme ("vap+xxx") when aggregating, to support WDC (World Data Center) files, other issues.
+            <li>downloadResourceAsTempFile supports user:pass in URLs.
             <li>1981: sequence where histogram operation should have unbound the timeaxis.
             <li>tweak the logic for autorange hints "center" and "width"
             <li>rte_1634285758: NullPointerException when annotation is added when a connector (context overview) is visible.
@@ -110,16 +112,17 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe632: New "jython extension" readers for World Data Center files and Radiojove .sps and spd files.  Thanks, Masafumi!
             <li>Axes have "reset zoom" menu item.
             <li>AutoplotServer supports autorange keywords to match createPngWalk, to support groups which make one image at a time.
-            <li>tighten security on Autoplot servlet, so that evel and import statements are not allowed.
+            <li>tighten security on Autoplot servlet, so that eval and import statements are not allowed.
             <li>Series rendering mode supports fill below reference and fill above reference.  Thanks, Kris and Ivar!
             <li>rfe629: experiments with nominal level and warning level lines in series renderer.  Thanks, Jon N!
             <li>expandWaveform filter added, to aid in browsing waveform data with low duty cycles.  Thanks, George!
             <li>rfe515: new makeColorTable command, for use with plot command.  Thanks, Masafumi!
             <li>draw the last QC message below the full-sized image.
             <li>New url property of Annotation clarifies use, and allows URL to cache image of LaTeX-rendering site, and LaTeX code can be stored in the text for safe-keeping.
-            <li>HAPI client will use "If-Modified-Since" request header and supports 304 (not modified) responses, when caching is enabled.
+            <li>HAPI client will use "If-Modified-Since" request header and supports 304 (not modified) responses, when caching is enabled.  Thanks, Bernie!
             <li>audiosystem data source allows control of sampling rate.
             <li>add "bind scale to opposite axis."  Isotropic should no longer be used.
             <li>add "normalize" function.  Thanks, Allison!
