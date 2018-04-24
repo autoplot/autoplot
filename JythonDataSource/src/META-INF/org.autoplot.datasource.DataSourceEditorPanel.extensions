@@ -1,2 +1,3 @@
 org.autoplot.datasource.jython.JythonEditorPanel jyds
+org.autoplot.datasource.jython.JythonExtensionDataSourceEditorPanel sps spd wdc
 org.autoplot.inline.InlineDataSourceEditorPanel inline
