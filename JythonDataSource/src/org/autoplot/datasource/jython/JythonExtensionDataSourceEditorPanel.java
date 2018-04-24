@@ -38,6 +38,7 @@ public class JythonExtensionDataSourceEditorPanel implements DataSourceEditorPan
     @Override
     public void setURI(String uri) {
         try {
+            this.uri= uri;
             String jydsUri= JythonExtensionDataSourceFactory.getJydsUri( new URI(uri) );
             edit.setURI(jydsUri);
         } catch ( URISyntaxException ex ) { // this would have happened by now, in reject.
@@ -62,6 +63,8 @@ public class JythonExtensionDataSourceEditorPanel implements DataSourceEditorPan
         Map<String,String> params= URISplit.parseParams(split.params);
         params.remove(JythonDataSource.PARAM_SCRIPT);
         split.params= URISplit.formatParams(params);
+        URISplit mySplit= URISplit.parse(uri);
+        split.vapScheme= mySplit.vapScheme;
         return URISplit.format(split);
     }
     
