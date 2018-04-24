@@ -19,6 +19,8 @@ import java.net.URLClassLoader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.autoplot.aggregator.AggregatingDataSourceFactory;
@@ -746,7 +749,17 @@ public class DataSourceRegistry {
         {
             buf.append("<h1>Plugins by Extension:</h1>");
             Map<String,Object> m = DataSourceRegistry.getInstance().dataSourcesByExt;
-            for ( Entry<String,Object> e: m.entrySet() ) {
+            Set<Entry<String,Object>> ss1= m.entrySet();
+            List<Entry<String,Object>> ss= new ArrayList(ss1);
+            Collections.sort( ss, new Comparator() {
+                @Override
+                public int compare(Object o1, Object o2) {
+                    Entry<String,Object> s1= (Entry<String,Object>)o1;
+                    Entry<String,Object> s2= (Entry<String,Object>)o2;
+                    return s1.getKey().compareTo(s2.getKey());
+                }
+            });
+            for ( Entry<String,Object> e: ss ) {
                 String k= e.getKey();
                 buf.append("").append(k).append(": ").append(e.getValue()).append("<br>");
             }
