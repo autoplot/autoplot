@@ -4,6 +4,7 @@ package org.autoplot.datasource;
 import java.awt.Component;
 import java.lang.reflect.Constructor;
 import java.net.URI;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
 import org.das2.util.LoggerManager;
@@ -71,6 +72,13 @@ public class DataSourceEditorPanelUtil {
                 DataSourceEditorPanel edit = getEditorByExt(eext);
                 if (edit != null) {
                     result.setDelegateEditorPanel(edit);
+                    try {
+                        if ( edit.reject(suri) ) { // contracts say that reject should be called before getPanel.
+                            logger.log( Level.WARNING, null, "delegate editor rejects URI, ignoring: " +suri );   
+                        }
+                    } catch (Exception ex) {
+                        logger.log( Level.WARNING, null, ex );
+                    }
                     result.setName( edit.getPanel().getName() );
                 }
                 return result;
