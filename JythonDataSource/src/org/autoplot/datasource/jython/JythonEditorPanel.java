@@ -389,6 +389,10 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     sel.setSuggestFiles(true);
                     sel.setSuggestFsAgg(true);
                     String val;
+                    URISplit split= URISplit.parse((String)parm.deft);
+                    if ( split.ext!=null ) {
+                        sel.setAcceptPattern(".*\\"+split.ext);
+                    }
                     if (params.get(vname)!=null ) {
                         val= params.get(vname);
                         if ( val.startsWith("'") ) val= val.substring(1);
