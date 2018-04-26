@@ -26,6 +26,10 @@
         
         <p>Bugfixes (2018-04-25 r22356):</p>
         <ul>
+            <li>format to QStream supports events data sets.
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>JythonEditorPanel resource URI file chooser will restrict the extension listed based on the example resource URI.
             <li>about:plugins report is sorted alphabetically.
             <li>keep track of delegate's scheme ("vap+xxx") when aggregating, to support WDC (World Data Center) files, other issues.
@@ -51,69 +55,13 @@
             <li>1972: "reset" method cancels all the tasks it knows about.
             <li>mashup starts with "ds" for the first tree, so that is valid.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>JNLP template supports builds on new machines.
-            <li>Overzealous check for valid y tags prevented use of MAGEIS data from script.
-            <li>rte_1235389582: failed listing in Aggregation GUI caused runtime error.
-            <li>setDepend1Cadence filter is properly handled and has a GUI.
-            <li>Experimental HAPI caching does not cache after modified date.
-            <li>AggregratingDataSource had code branches which misused progress monitors, causing warning message on stderr.
-            <li>Mashup was checking for TimeSeriesBrowse, which can rely on web transactions, on the event thread, causing hangs with slow websites.
-            <li>pngwalk of file:///home/jbf/ictemp/2018/*/*/ic_*_12.jpg (star multiple levels deep) showed a bug where the filenames were incorrectly handled, resulting in runtime error in Autoplot's pngwalk.
-            <li>1899: don't display a warning about units if yaxis units are dimensionless.
-            <li>QStream and Das2Stream export split into separate codes.  Thanks, Chris!
-            <li>1969: MutablePropertyDataSet no longer implies mutable.  Thanks, Jon N.!
-            <li>Chris put in support for the Das2Server to support redirects from http to https.
-            <li>write animated gif delay times corrected, where delays were 1/10 of what they should have been.
-            <li>jython completions will evaluate constructors.  be more aggressive about dropping trailing lines to make a valid code.
-            <li>slice editor will look up the index as the time is changed.  
-            <li>corrections to mash-up tool, preserving unfolded tree states and where function name was mistaken for variable name.
-            <li>1956: horizontal lines were not drawn because bounding box had height=0.  Vertical lines had the same problem.
-            <li>1966: runScript which should be called from the event thread, loads the script off the event thread. 
-            <li>1600: in history.txt, only log URIs which are human-entered.
-            <li>rte_1731551069: filtering with "where" in CDF files, when data has different rank.
-            <li>1965: "and" and "or" need to be infix operators in mashup.  Thanks, Allison!
-            <li>1963:  Ivar caught where a loop didn't check the dirty flag to see if a script needed to be saved.
-            <li>popup documentation for annotation and plot now have link to wiki.  Thanks, Ivar!
-            <li>two-argument properly accum checks units now.
-            <li>Correct histogram mode when data x units are different than axis units.
-            <li>dasCore didn't support axis labels on top.
-            <li>1408: experiment with leaving the script name onto the address bar by replacing it when the progress bar finishes.
-            <li>HAPI html redirects didn't have timeout.  (Some normal connections too.)
-            <li>improve jython completions support by testing for second line with indent continuation.
-            <li>jython editor has new "run selected" action.
-            <li>fix runtime error which could happen when %d was the format.  Some codes didn't check for this and cast the data.
-            <li>1947: fix 1-pixel error in colorbar pointed out by Kristoff. (Now it's a half-pixel, but this is a PDF rendering problem.)
-            <li>always get the makeTutorialHtml from the website, since release showed there were issues.
-            <li>1962: catch strange ConcurrentModificationException when running http://autoplot.org/data/script/examples/plotsAndAnnos2018.jy
-            <li>dataset toString method had a branch which would cause RTE when format was %d (integer).
-            <li>clean up of synchronize function, recent changes could cause index-out-of-bounds error.
-            <li>1687: various improvements and clean-up of Jython completions engine.
-            <li>rte 0413258104: format timetags of Units.cdfTT2000 was mis-handled for SCALEMIN and SCALEMAX properties.
-            <li>rte553: property assign units for ds[0,:]=ds1 and ds1 has units and ds does not.
-            <li>print a warning when a FloatDataSet is used to store time location data, since this is rarely going to work.
-            <li>1959: fix layout doesn't swap plot positions when rows are out-of-order (item 4).
-            <li>1956: FCE line which was way off-canvas still affected PDF output, messing up the bounding box.  Thanks, Bill!
-            <li>1957: correct where set depend0 cadence would reset improperly to picoseconds.  Thanks, Bill!
-            <li>1958: NetCDF library didn't properly handle spaces in filenames.  Thanks, Masafumi!
-            <li>1953: Masafumi found cases where rounding was done incorrectly, probably because kludgy code was removed.  Thanks, Masafumi!
-            <li>Autoplot server (port 12345) improperly created the Jython environment, breaking plot named parameters.  Thanks, Eric!
-            <li>1952: uncommitted changes implementing flag for indexed properties and allowing just AbstractDataSet to handle properties.
-            <li>rte_1463914178: throw a more descriptive error do we can figure out what's going on.
-            <li>1953: kludgy code resulted in errors with some CDF_TT2000 times, showing 23:61 instead of 00:01 under some conditions.  Thanks, Ivar!
-            <li>1952: reimplement isInheritedProperty to avoid so much string searching with slice operations.
-            <li>extent code used isMonotonicAndIncreasingQuick, when new isMonotonicQuick is sufficient.  Thanks, Ivar!
-            <li>1952: rewrite within(), used in huge scatter, to dramatically improve performance.  Thanks, Ivar!
-            <li>1952: "where" uses bigger blocksize for 5000000 record operation, showing modest (20-30%) speed improvements.  Thanks, Ivar!
-            <li>direct access of longs from CDF file was never verified, now it's correct.
-            <li>rte_0609678840: old icon reference in jnlp single-instance code corrected.  Thanks daekyu!
-            <li>1952: Ivar had a code which showed where a check for each of 5000000 points' properties was slowing things down, this test is limited to QDataSet.MAX_PLANE_COUNT (=50) now..
-            <li>1748: insert PWD before completions.  Thanks, Masafumi! 
-            <li>minor improvements to the contours renderer.  Thanks, Masafumi!
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>Vertical averager mouse tool has export data function.  Thanks, Seth!
+            <li>AutoplotUI has getDom() method, to support Jython properties like ap2.dom.timeRange.
+        </ul>
+       <p>Less recent features:</p>
+       <ul>
             <li>rfe632: New "jython extension" readers for World Data Center files and Radiojove .sps and spd files.  Thanks, Masafumi!
             <li>Axes have "reset zoom" menu item.
             <li>AutoplotServer supports autorange keywords to match createPngWalk, to support groups which make one image at a time.
@@ -135,31 +83,6 @@
             <li>mashup tool shows jython code for collapsed nodes.
             <li>Autoplot servlet supports HAPI data sources.
             <li>inverse white-blue-black colorbar added.  Thanks, Masafumi!
-        </ul>
-       <p>Less recent features:</p>
-       <ul>
-            <li>626: ctrl+shift+play (and shift+"plot below") is plot above.
-            <li>if the fill-to-reference color is transparent, then draw a line the color of the axes at the reference value.
-            <li>URI history now only records human-entered URIs, so URIs loaded within vap do not clutter history.
-            <li>584: addToSearchPath supports single-jar releases.
-            <li>mashup tool guesses names for variables.
-            <li>jython script plot command has topAxisOf keyword which makes a new plot with the axis drawn on top.
-            <li>improve error message when ISO8601 time is sent to DatumRangeUtil.parseTimeRange (not parseTime).
-            <li>add tickSpacing property to orbit control GUI.
-            <li>console "AP>" prompt tooltip shows the stack trace at the last highlighted message.
-            <li>indgen returns an IndexDataSet that takes no memory and is well-suited for Jython scripts.
-            <li>Orbit plot allows the tick frequency to be controlled.  Thanks, Bill!
-            <li>Property editor now allows "edit selected" on root of array.  Thanks, Jeremy!
-            <li>Jython gets new "dataset" command which takes properties as named parameters.
-            <li>annotation command allows "OutsideSE", and corrects offset for OutsideNE.  Thanks, Ivar!
-            <li>annotation command allows "" for rowId and columnId, which anchors to the canvas boundaries.  
-            <li>Improve create-pngwalk feedback with $Y$j_$H$M$S(subsec,places=3), and include $H$M$S$(subsec,places=3) in examples.
-            <li>AutoplotDataServer supports HAPI by generating info and data responses.  Thanks, Bob!
-            <li>tune huge scatter for when data units are the same as axis units.
-            <li>FDataSet can provide access to raw float values, avoiding numerical noise from float-to-double casting, using new capability.
-            <li>several rebin functions renamed to binAverage, since they are unlike the IDL routines and the name causes confusion.  Thanks, Masafumi!
-            <li>new annotation command is easier to use than previous calls to create annotations from scripts.  Thanks, Masafumi!
-            <li>Contours renderer has more controls now.  LabelCadence is now a string to support "20em".  Thanks, Masafumi!
        </ul>
         <p>Known issues:</p>
         <ul>
