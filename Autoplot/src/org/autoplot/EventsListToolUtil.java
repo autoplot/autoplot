@@ -87,7 +87,7 @@ public class EventsListToolUtil {
             getEventsList( t );
             dialog= instances.get(t);
         }
-        String uri= t.getDocumentModel().getEventsListUri();
+        String uri= t.getDom().getEventsListUri();
         if ( uri!=null && uri.length()>0 ) {
             instances2.get(t).getDataSetSelector().setValue(uri);
             instances2.get(t).getDataSetSelector().maybePlot(0);
@@ -144,7 +144,7 @@ public class EventsListToolUtil {
             ll.getDataSetSelector().addActionListener( new ActionListener() {
                 @Override
                 public void actionPerformed( ActionEvent ev ) {
-                    t.getDocumentModel().setEventsListUri( ll.getDataSetSelector().getValue() );
+                    t.getDom().setEventsListUri( ll.getDataSetSelector().getValue() );
                 }
             });
             

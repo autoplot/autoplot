@@ -316,7 +316,7 @@ public class PersistentStateSupport {
                     
                     if ( embedData ) {
                         if ( component instanceof AutoplotUI ) {
-                            Application dom= ((AutoplotUI)component).getDocumentModel();
+                            Application dom= ((AutoplotUI)component).getDom();
                             EmbedDataExperiment.save( dom, f );
                         } else {
                             throw new IllegalArgumentException("Unable to embed data, please submit this error so the problem can be corrected");

@@ -427,7 +427,7 @@ public class GuiSupport {
                 Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        Application dom= parent.getDocumentModel();
+        Application dom= parent.getDom();
         String uri= furi;
         DatumRange dr;
         if ( !(dom.getTimeRange()==Application.DEFAULT_TIME_RANGE) && !dom.getTimeRange().equals( uriRange ) ) {

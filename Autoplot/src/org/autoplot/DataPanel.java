@@ -51,7 +51,7 @@ public class DataPanel extends javax.swing.JPanel {
         dataSourceFiltersPanel.setName("operationsPanel");
         this.app= app;
         
-        this.dom = app.getDocumentModel();
+        this.dom = app.getDom();
         this.applicationController= this.dom.getController();
         this.applicationController.addPropertyChangeListener( ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
             @Override
