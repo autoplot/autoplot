@@ -173,6 +173,7 @@ import org.autoplot.datasource.SourceTypesBrowser;
 import org.autoplot.datasource.TimeRangeEditor;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
+import org.autoplot.dom.DomUtil;
 import org.das2.qds.filters.AddFilterDialog;
 import org.das2.qds.filters.FiltersChainPanel;
 import org.autoplot.jythonsupport.ui.DataMashUp;
@@ -226,6 +227,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
     String applicationName= "";
     void setApplicationName(String id) {
         this.applicationName= id;
+        if ( DomUtil.getElementById(dom, id)==null ) { // make sure there are no other nodes with this id.
+            this.dom.setId(id);
+        }
     }
     
     transient PersistentStateSupport.SerializationStrategy serStrategy = new PersistentStateSupport.SerializationStrategy() {
@@ -5546,8 +5550,17 @@ APSplash.checkTime("init 240");
      * return the current state of this application window.  Note this is
      * the actual and not a copy, so it should not be modified.
      * @return the application state.
+     * @see #getDom() 
      */
     public Application getDocumentModel() {
+        return this.applicationModel.getDocumentModel();
+    }
+    
+    /**
+     * return the dom (application state) associated with this application.
+     * @return the dom associated with this application.
+     */
+    public Application getDom() {
         return this.applicationModel.getDocumentModel();
     }
     
