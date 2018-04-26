@@ -2,6 +2,7 @@
 package org.autoplot.dom;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.Window;
@@ -24,6 +25,7 @@ import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -87,6 +89,10 @@ import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
 import org.autoplot.metatree.MetadataUtil;
+import org.das2.components.VerticalSpectrogramAverager;
+import org.das2.components.VerticalSpectrogramSlicer;
+import org.das2.event.DataRangeSelectionListener;
+import org.das2.event.HorizontalDragRangeSelectorMouseModule;
 import org.das2.graph.BoundsRenderer;
 import org.das2.graph.PolarPlotRenderer;
 
@@ -2772,6 +2778,55 @@ public class PlotElementController extends DomNodeController {
         }
     };
     
+    private Action getExportDataAction( final Component parent, final Object slicer ) {
+        return new AbstractAction("Export Data...") { 
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
+                final QDataSet ds;
+                if ( slicer instanceof VerticalSpectrogramSlicer ) {
+                    ds= ((VerticalSpectrogramSlicer)slicer).getDataSet();
+                } else if ( slicer instanceof VerticalSpectrogramAverager ) {
+                    ds= ((VerticalSpectrogramAverager)slicer).getDataSet();
+                } else {
+                    throw new IllegalArgumentException("not supported");
+                }
+                ExportDataPanel p= new ExportDataPanel();
+                p.setDataSet(ds);
+                if ( AutoplotUtil.showConfirmDialog2( parent, p, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                    final String f= p.getFilename();
+                    String ext= p.getExtension();
+                    final DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext); //OKAY
+                    if (format == null) {
+                        JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
+                        return;
+                    }
+                    try {
+                        format.formatData( f, ds, DasProgressPanel.createFramed("export slice data") );
+                        JPanel panel= new JPanel();
+                        panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
+                        panel.add( new JLabel( "<html>Data formatted to<br>" + f ) );
+                        panel.add( new JButton( new AbstractAction("Copy filename to clipboard") {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                StringSelection stringSelection = new StringSelection( f );
+                                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                                clipboard.setContents(stringSelection, new ClipboardOwner() {
+                                    @Override
+                                    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+                                    }
+                                } );
+                            }
+                        } ) );
+                        JOptionPane.showMessageDialog(parent, panel );
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(parent, "Exception while formatting: " + ex.getMessage() );
+                    }
+                }
+            }
+        };
+    }
+    
     /**
      * create the peer that will actually do the painting.  This may be called from either the event thread or off the event thread,
      * but work will be done on the event thread in either case using SwingUtilities.invokeAndWait.
@@ -2928,45 +2983,18 @@ public class PlotElementController extends DomNodeController {
                                     mm= plot.getDasMouseInputAdapter().getModuleByLabel("Vertical Slice");
                                     final VerticalSlicerMouseModule vmm= ((VerticalSlicerMouseModule)mm);
                                     if ( vmm!=null ) { // for example in headless mode
-                                        vmm.getSlicer().addAction( new AbstractAction("Export Data...") {
-                                            @Override
-                                            public void actionPerformed(ActionEvent e) {
-                                                org.das2.util.LoggerManager.logGuiEvent(e);
-                                                final QDataSet ds= vmm.getSlicer().getDataSet();
-                                                ExportDataPanel p= new ExportDataPanel();
-                                                p.setDataSet(ds);
-                                                if ( AutoplotUtil.showConfirmDialog2( parent, p, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-                                                    final String f= p.getFilename();
-                                                    String ext= p.getExtension();
-                                                    final DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext); //OKAY
-                                                    if (format == null) {
-                                                        JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
-                                                        return;
-                                                    }
-                                                    try {
-                                                        format.formatData( f, ds, DasProgressPanel.createFramed("export slice data") );
-                                                        JPanel panel= new JPanel();
-                                                        panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
-                                                        panel.add( new JLabel( "<html>Data formatted to<br>" + f ) );
-                                                        panel.add( new JButton( new AbstractAction("Copy filename to clipboard") {
-                                                            @Override
-                                                            public void actionPerformed(ActionEvent e) {
-                                                                StringSelection stringSelection = new StringSelection( f );
-                                                                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                                                                clipboard.setContents(stringSelection, new ClipboardOwner() {
-                                                                    @Override
-                                                                    public void lostOwnership(Clipboard clipboard, Transferable contents) {
-                                                                    }
-                                                                } );
-                                                            }
-                                                        } ) );
-                                                        JOptionPane.showMessageDialog(parent, panel );
-                                                    } catch (Exception ex) {
-                                                        JOptionPane.showMessageDialog(parent, "Exception while formatting: " + ex.getMessage() );
-                                                    }
-                                                }
+                                        vmm.getSlicer().addAction( getExportDataAction( parent, vmm.getSlicer() ) );
+                                    }
+                                    mm= plot.getDasMouseInputAdapter().getModuleByLabel("Interval Average");
+                                    final HorizontalDragRangeSelectorMouseModule vsa= ((HorizontalDragRangeSelectorMouseModule)mm);
+                                    if ( vsa!=null ) { // for example in headless mode
+                                        if ( vsa.getDataRangeSelectionListenerCount()>0 ) {
+                                            DataRangeSelectionListener ddr= vsa.getDataRangeSelectionListener(0);
+                                            if ( ddr instanceof VerticalSpectrogramAverager ) {
+                                                ((VerticalSpectrogramAverager)ddr).addAction( getExportDataAction( parent, ddr ) );
                                             }
-                                        });                                
+                                        }
+                                        
                                     }
                                 } else {
                                     Renderer[] rends= plot.getRenderers();
