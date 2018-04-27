@@ -28,13 +28,13 @@ public class JythonExtensionDataSourceFactory extends AbstractDataSourceFactory 
         }
         switch (scheme) {
             case "vap+sps":
-                script= "http://www-pw.physics.uiowa.edu/~jbf/autoplot/jyds/formats/radiojove/readTypeSps.jyds";
+                script= "https://saturn.physics.uiowa.edu/svn/earth/public/jyds/readTypeSps.jyds";
                 break;
             case "vap+spd":
-                script= "http://www-pw.physics.uiowa.edu/~jbf/autoplot/jyds/formats/radiojove/readTypeSpd.jyds";
+                script= "https://saturn.physics.uiowa.edu/svn/earth/public/jyds/readTypeSpd.jyds";
                 break;
             case "vap+wdc":
-                script= "http://autoplot.org/data/jyds/wdc_kp_ap.jyds";
+                script= "https://raw.githubusercontent.com/autoplot/jyds/master/wdc_kp_ap.jyds";
                 break;
             default:
                 throw new IllegalArgumentException("resource extension is not supported: "+split.ext);
