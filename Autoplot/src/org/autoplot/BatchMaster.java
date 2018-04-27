@@ -445,6 +445,8 @@ public class BatchMaster extends javax.swing.JPanel {
             @Override
             public void run() {
                 try {
+                    String scriptName= dataSetSelector1.getValue();
+                    dom.getController().getApplicationModel().addRecent(scriptName);
                     doIt();
                 } catch (IOException ex) {
                     messageLabel.setText(ex.getMessage());
@@ -669,7 +671,10 @@ public class BatchMaster extends javax.swing.JPanel {
                     if ( lastItem.length()>0  ) {
                         int i= lastItem.lastIndexOf("\n");
                         lastItem= lastItem.substring(i+1);
-                        f= new File( lastItem.substring(5) );
+                        URISplit split= URISplit.parse(lastItem);
+                        if ( split.path.startsWith("file:") ) {
+                            f= new File( split.path.substring(5) );
+                        }
                     }
                     JFileChooser cf= new JFileChooser();
                     if ( f!=null ) cf.setCurrentDirectory(f);
