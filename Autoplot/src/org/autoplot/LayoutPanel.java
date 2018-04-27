@@ -798,6 +798,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         biggerMI = new javax.swing.JMenuItem();
         smallerMI = new javax.swing.JMenuItem();
         sameSizeMI = new javax.swing.JMenuItem();
+        setHeightMI = new javax.swing.JMenuItem();
         swapMenuItem = new javax.swing.JMenuItem();
         addHiddenMenuItem = new javax.swing.JMenuItem();
         bindingActionsMenu = new javax.swing.JPopupMenu();
@@ -888,6 +889,14 @@ public class LayoutPanel extends javax.swing.JPanel {
             }
         });
         sizeMenu.add(sameSizeMI);
+
+        setHeightMI.setText("Set Height to 1em");
+        setHeightMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                setHeightMIActionPerformed(evt);
+            }
+        });
+        sizeMenu.add(setHeightMI);
 
         plotsMenu.add(sizeMenu);
 
@@ -1476,6 +1485,36 @@ public class LayoutPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_editMenuItemActionPerformed
 
+    private void setHeightMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setHeightMIActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
+        
+        double emHeight= 1.0;
+        
+        List<Row> rows= new ArrayList<>();
+        for ( Plot p1: getSelectedPlots() ) {
+            if ( p1.isVisible() ) {
+                Row row= p1.getController().getRow();
+                if ( !rows.contains(row) ) rows.add(row);
+            }
+        }
+        
+        for ( Row r: rows ) {
+            try {
+                double[] d1= DasDevicePosition.parseLayoutStr( r.getTop() );
+                double[] d2= DasDevicePosition.parseLayoutStr( r.getBottom() );
+                d2[0]= d1[0];
+                d2[1]= d1[1]+emHeight;
+                d2[2]= 0;
+                r.setBottom( DasDevicePosition.formatFormatStr(d2) );
+            } catch ( ParseException ex ) {
+                logger.info("ParseException ignored");
+            }
+        }
+
+        //if ( dom.getOptions().isAutolayout() ) org.autoplot.dom.DomOps.newCanvasLayout(dom);
+
+    }//GEN-LAST:event_setHeightMIActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem addHiddenMenuItem;
     private javax.swing.JMenuItem addPlotsBelowMenuItem;
@@ -1512,6 +1551,7 @@ public class LayoutPanel extends javax.swing.JPanel {
     private javax.swing.JButton sameHeightButton;
     private javax.swing.JMenuItem sameSizeMI;
     private javax.swing.JLabel selectedPlotLabel;
+    private javax.swing.JMenuItem setHeightMI;
     private javax.swing.JButton shorterButton;
     private javax.swing.JMenu sizeMenu;
     private javax.swing.JMenuItem smallerMI;
