@@ -3,9 +3,12 @@ package org.autoplot.datasource.jython;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.autoplot.datasource.AbstractDataSourceFactory;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.URISplit;
+import org.das2.datum.LoggerManager;
 
 /**
  * Creates JythonExceptionDataSource's, which are data sources defined
@@ -14,6 +17,8 @@ import org.autoplot.datasource.URISplit;
  */
 public class JythonExtensionDataSourceFactory extends AbstractDataSourceFactory {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.jyds");
+    
     /**
      * this is the lookup table from URI (*.sps) to script (readTypeSps.jyds)
      * @param uri
@@ -38,7 +43,17 @@ public class JythonExtensionDataSourceFactory extends AbstractDataSourceFactory 
                 break;
             default:
                 throw new IllegalArgumentException("resource extension is not supported: "+split.ext);
-        }        
+        }
+        String alt= System.getProperty("jydsExtension_"+split.ext.substring(1),"");
+        logger.log(Level.FINER, "check for alternate system property jydsExtension_{0}", new Object[]{split.ext.substring(1)});
+        
+        if ( alt.length()>0 ) {
+            logger.log(Level.FINE, "system property jydsExtension_{0}={1}", new Object[]{split.ext.substring(1), alt});
+            script= alt;
+        }
+        
+        logger.log(Level.FINE, "Using script {0}", script);
+        
         return script;
     }
     
