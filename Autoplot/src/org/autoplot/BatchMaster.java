@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,9 +30,12 @@ import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -148,6 +153,14 @@ public class BatchMaster extends javax.swing.JPanel {
                     generateButton1.setEnabled( items.length>1 );
                     ComboBoxModel m2= new DefaultComboBoxModel(items);
                     param2NameCB.setModel(m2);
+                    
+                    param1Values.setText("");
+                    param2Values.setText("");
+                    
+                    messageLabel.setText("Load up those parameters and hit Go!");
+                    jScrollPane3.getViewport().setView(param1Values);
+                    
+                    
                 } catch (IOException ex) {
                     Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -165,6 +178,10 @@ public class BatchMaster extends javax.swing.JPanel {
             }
             dataSetSelector1.setRecent( recentUris );
         }
+        
+        jScrollPane3.getVerticalScrollBar().setUnitIncrement(jScrollPane3.getFont().getSize());
+        jScrollPane1.getVerticalScrollBar().setUnitIncrement(jScrollPane1.getFont().getSize());
+        
     }
 
     /**
@@ -544,6 +561,8 @@ public class BatchMaster extends javax.swing.JPanel {
     private void param1NameCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_param1NameCBItemStateChanged
         if ( evt.getStateChange()==ItemEvent.SELECTED ) {
             generateButton1.setEnabled( param1NameCB.getSelectedItem().toString().trim().length()>0 );
+            jScrollPane3.getViewport().setView(param1Values);
+            messageLabel.setText("Load up those parameters and hit Go!");
         }
     }//GEN-LAST:event_param1NameCBItemStateChanged
 
@@ -662,7 +681,7 @@ public class BatchMaster extends javax.swing.JPanel {
                     File f= null;
                     try {
                         URISplit split= URISplit.parse(deft);
-                        if ( split.path.startsWith("file:") ) {
+                        if ( split.path!=null && split.path.startsWith("file:") ) {
                             f= new File( split.path.substring(5) );
                         }
                     } catch ( IllegalArgumentException ex ) {
@@ -672,7 +691,7 @@ public class BatchMaster extends javax.swing.JPanel {
                         int i= lastItem.lastIndexOf("\n");
                         lastItem= lastItem.substring(i+1);
                         URISplit split= URISplit.parse(lastItem);
-                        if ( split.path.startsWith("file:") ) {
+                        if ( split.path!=null && split.path.startsWith("file:") ) {
                             f= new File( split.path.substring(5) );
                         }
                     }
@@ -694,6 +713,8 @@ public class BatchMaster extends javax.swing.JPanel {
                     StringBuilder b= new StringBuilder();
                     for ( String s: ss ) b.append(s).append("\n");
                     ta.setText( b.toString() );
+                    messageLabel.setText("Load up those parameters and hit Go!");
+                    jScrollPane3.getViewport().setView(param1Values);
                 }
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog( this, "bad parameter name" );
@@ -831,6 +852,50 @@ public class BatchMaster extends javax.swing.JPanel {
     
     public void doIt() throws IOException {
         ProgressMonitor monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(this), "Run Batch");
+
+        Icon queued= new ImageIcon(BatchMaster.class.getResource("/resources/grey.gif"));
+        Icon working= new ImageIcon(BatchMaster.class.getResource("/resources/blue_anime.gif"));
+        Icon okay= new ImageIcon(BatchMaster.class.getResource("/resources/blue.gif"));
+        Icon prob= new ImageIcon(BatchMaster.class.getResource("/resources/red.gif"));    
+        
+        List<JLabel> jobs=null;
+        Component textField= null;
+        {
+            String[] ff1= param1Values.getText().split("\n");
+            JPanel p= new JPanel();
+            jobs= new ArrayList<>();
+            p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
+            for ( String f: ff1 ) {
+                JLabel l= new JLabel(f);
+                l.setIcon(queued);
+                p.add( l );
+                jobs.add(l);
+            }
+            
+            p.addMouseListener( new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    messageLabel.setText("Load up those parameters and hit Go!");
+                    jScrollPane3.getViewport().setView(param1Values);
+                }
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    messageLabel.setText("Load up those parameters and hit Go!");
+                    jScrollPane3.getViewport().setView(param1Values);
+                }
+            });
+
+            JScrollPane scrollp= new JScrollPane(p);
+            scrollp.getVerticalScrollBar().setUnitIncrement( scrollp.getFont().getSize());
+            scrollp.setPreferredSize( new Dimension(640,640));
+            scrollp.setMaximumSize( new Dimension(640,640));
+            
+            textField= jScrollPane3.getViewport().getComponent(0);
+            messageLabel.setText("Running jobs, click on labels above to edit.");
+            jScrollPane3.getViewport().setView(p);
+            
+        }
+        
         try {
             String scriptName= dataSetSelector1.getValue();
             
@@ -882,8 +947,11 @@ public class BatchMaster extends javax.swing.JPanel {
             for ( String f1 : ff1 ) {
                 try {
                     monitor.setProgressMessage(f1);
-                    if ( monitor.isCancelled() ) break;
+                    if ( monitor.isCancelled() ) {
+                        break;
+                    }
                     monitor.setTaskProgress(monitor.getTaskProgress()+1);
+                    jobs.get(i1).setIcon(working);
                     if ( f1.trim().length()==0 ) continue;
                     //interp.set( "monitor", monitor.getSubtaskMonitor(f1) );
                     interp.set( "monitor", new NullProgressMonitor() ); // subtask would reset indeterminate.
@@ -902,6 +970,7 @@ public class BatchMaster extends javax.swing.JPanel {
                         if ( writeCheckBox.isSelected() ) {
                             doWrite( f1, "" );
                         }
+                        jobs.get(i1).setIcon(okay);
                     } else {
                         String[] ff2= param2Values.getText().split("\n");
                         int i2=0;
@@ -915,16 +984,22 @@ public class BatchMaster extends javax.swing.JPanel {
                                 doWrite( f1,f2 );
                             }
                         }
+                        jobs.get(i1).setIcon(okay);
                     }
                     
                 } catch (IOException ex) {
                     Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
+                    jobs.get(i1).setIcon(prob);
+                    jobs.get(i1).setToolTipText(ex.toString());
                 } catch ( Exception ex ) {
                     Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
+                    jobs.get(i1).setIcon(prob);
+                    jobs.get(i1).setToolTipText(ex.toString());
                 }
-                i1=i1+f1.length()+1;
+                i1=i1+1;
             }
         } finally {
+            messageLabel.setText("Jobs are complete, click above to edit.");
             monitor.finished();
             goButton.setEnabled(true);
         }
