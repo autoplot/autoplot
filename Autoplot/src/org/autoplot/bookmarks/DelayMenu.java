@@ -70,7 +70,7 @@ public class DelayMenu extends JMenu {
                                     ui.runScriptTools( uri );
                                     return;
                                 }
-                                if ( ui.getDocumentModel().getDataSourceFilters().length==1 &&  ui.getDocumentModel().getDataSourceFilters(0).getUri().length()==0 ) {
+                                if ( ui.getDom().getDataSourceFilters().length==1 &&  ui.getDom().getDataSourceFilters(0).getUri().length()==0 ) {
                                     sel.setValue(((Bookmark.Item) book).getUri());
                                     sel.maybePlot(e.getModifiers());
                                 } else {
