@@ -50,6 +50,8 @@ public class JythonExtensionDataSourceFactory extends AbstractDataSourceFactory 
         if ( alt.length()>0 ) {
             logger.log(Level.FINE, "system property jydsExtension_{0}={1}", new Object[]{split.ext.substring(1), alt});
             script= alt;
+        } else {
+            logger.log(Level.FINER, "System.getProperty(\"jydsExtension_{0}\",\"\") returns \"\"", new Object[]{split.ext.substring(1), script});
         }
         
         logger.log(Level.FINE, "Using script {0}", script);
