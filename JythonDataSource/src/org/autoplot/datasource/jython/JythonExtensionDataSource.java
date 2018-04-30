@@ -4,6 +4,7 @@ package org.autoplot.datasource.jython;
 import java.net.URI;
 import java.util.Map;
 import org.autoplot.datasource.AbstractDataSource;
+import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.datasource.URISplit;
 import org.das2.qds.QDataSet;
@@ -36,7 +37,7 @@ public class JythonExtensionDataSource extends AbstractDataSource {
         split.params= URISplit.formatParams(params);
         String thisUri= URISplit.format(split);
         
-        JythonDataSource jyds= (JythonDataSource) jdsf.getDataSource( new URI(thisUri) );
+        JythonDataSource jyds= (JythonDataSource) jdsf.getDataSource( DataSetURI.getURI(thisUri) );
         return jyds.getDataSet(mon);
         
     }
