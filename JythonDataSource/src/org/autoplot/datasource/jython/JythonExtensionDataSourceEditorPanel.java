@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JPanel;
+import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.URISplit;
 import org.das2.util.monitor.ProgressMonitor;
@@ -23,15 +24,15 @@ public class JythonExtensionDataSourceEditorPanel implements DataSourceEditorPan
     
     @Override
     public boolean reject(String uri) throws Exception {
-        script= JythonExtensionDataSourceFactory.getScriptForResource( new URI(uri) );
+        script= JythonExtensionDataSourceFactory.getScriptForResource( DataSetURI.getURI(uri) );
         edit= new JythonEditorPanel();
-        String jydsUri= JythonExtensionDataSourceFactory.getJydsUri( new URI(uri) );
+        String jydsUri= JythonExtensionDataSourceFactory.getJydsUri( DataSetURI.getURI(uri) );
         return edit.reject(jydsUri);
     }
 
     @Override
     public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
-        String jydsUri= JythonExtensionDataSourceFactory.getJydsUri( new URI(uri) );
+        String jydsUri= JythonExtensionDataSourceFactory.getJydsUri( DataSetURI.getURI(uri) );
         return edit.prepare(jydsUri, parent, mon);
     }
 
@@ -39,7 +40,7 @@ public class JythonExtensionDataSourceEditorPanel implements DataSourceEditorPan
     public void setURI(String uri) {
         try {
             this.uri= uri;
-            String jydsUri= JythonExtensionDataSourceFactory.getJydsUri( new URI(uri) );
+            String jydsUri= JythonExtensionDataSourceFactory.getJydsUri( DataSetURI.getURI(uri) );
             edit.setURI(jydsUri);
         } catch ( URISyntaxException ex ) { // this would have happened by now, in reject.
             throw new IllegalArgumentException(ex);
