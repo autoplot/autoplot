@@ -24,8 +24,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-04-25 r22356):</p>
+        <p>Bugfixes (2018-04-30 r22391):</p>
         <ul>
+            <li>rte_0176698267: mishandling of URIs in new JythonExtensionDataSource.  Thanks, Larry!
+            <li>1984: error in inspecting .vap file would clear the address bar, destroying the scientist's URI.
+            <li>rte_0395859275: whoops, new code in branch was never tested for "/home/jbf/&lt;TAB&gt;" where NullPointerException was encountered.
             <li>rfe 545: entries for resourceURI were incorrectly used to create the current directory.
             <li>format to QStream supports events data sets.
         </ul>
@@ -58,6 +61,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>QStreams have new "enumerationUnit" tag within packetDescriptor to avoid old kludgey method for encoding nominal datums.
             <li>rfe545: run batch tool shows the success/fail for each task.
             <li>Vertical averager mouse tool has export data function.  Thanks, Seth!
             <li>AutoplotUI has getDom() method, to support Jython properties like ap2.dom.timeRange.
