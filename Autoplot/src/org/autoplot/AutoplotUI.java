@@ -900,17 +900,19 @@ public final class AutoplotUI extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 String surl= dataSetSelector.getValue();
                 URISplit split= URISplit.parse(surl);
+                boolean blurFocus= false;
                 if ( split.path.startsWith("file:") ) {
                     String result= DataSetSelectorSupport.browseLocalVap( dataSetSelector, surl);
                     if (result != null ) {
                         dataSetSelector.setValue(result);
                         dataSetSelector.maybePlot(false);
+                        blurFocus= true;
                     }
                 } else {
                     JOptionPane.showMessageDialog( AutoplotUI.this, "Unable to inspect .vap files" );
                 }
                 setCursor( Cursor.getDefaultCursor() );
-                dom.getController().setFocusUri(ApplicationController.VALUE_BLUR_FOCUS);
+                if ( blurFocus ) dom.getController().setFocusUri(ApplicationController.VALUE_BLUR_FOCUS);
             }
         });
 
