@@ -1783,8 +1783,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                     } else if (split.scheme.equals("file")) {
                         JFileChooser chooser = new JFileChooser( new File( DataSetURI.toUri(split.path) ) );
                         chooser.setMultiSelectionEnabled(true);
-                        final Pattern p= Pattern.compile(acceptPattern);
                         if ( acceptPattern!=null ) {
+                            final Pattern p= Pattern.compile(acceptPattern);
                             chooser.setFileFilter( new FileFilter() {
                                 @Override
                                 public boolean accept(File f) {
