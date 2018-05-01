@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -93,6 +94,7 @@ public class ParametersFormPanel {
          * A (String)
          * F (Double or Integer)
          * R (URI)
+         * L (URL) a resource URL (local file or web file).
          * D Datum
          * S DatumRange
          * </pre></blockquote>
@@ -118,6 +120,12 @@ public class ParametersFormPanel {
                             paramsDictionary.__setitem__( param, Py.java2py( new java.net.URI( value ) ) );
                         } catch (URISyntaxException ex) {
                             throw new ParseException( "URI is not formed properly",0);
+                        }
+                    } else if ( typesList.get(i).equals('L') ) {
+                        try {
+                            paramsDictionary.__setitem__( param, Py.java2py( new java.net.URL( value ) ) );
+                        } catch (MalformedURLException ex) {
+                            logger.log(Level.SEVERE, null, ex);
                         }
                     } else if ( typesList.get(i).equals('A') ) {
                         value= org.autoplot.jythonsupport.Util.popString(value);
