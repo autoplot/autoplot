@@ -99,6 +99,7 @@ import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.autoplot.datasource.ui.PromptComboBoxEditor;
 import org.autoplot.datasource.ui.PromptTextField;
 import org.das2.qds.ops.Ops;
+import org.das2.util.filesystem.Glob;
 
 /**
  * Swing component for selecting dataset URIs.  This provides hooks for completions.
@@ -1760,7 +1761,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     || split.scheme.equals("http") || split.scheme.equals("https")
                     || split.scheme.equals("ftp") || split.scheme.equals("sftp" ) ) ) {
                 try {
-                    if (FileSystemUtil.resourceExists(context)  && FileSystemUtil.resourceIsFile(context) ) {
+                    if ( enableDataSource && FileSystemUtil.resourceExists(context)  && FileSystemUtil.resourceIsFile(context) ) {
                         if ( !FileSystemUtil.resourceIsLocal(context) ) {
                             Runnable run= new Runnable() {
                                 @Override
@@ -1793,7 +1794,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
                                 @Override
                                 public String getDescription() {
-                                    return "files matching "+acceptPattern;
+                                    return "files matching "+Glob.getGlobFromRegex(acceptPattern);
                                 }
                             });
                         }
