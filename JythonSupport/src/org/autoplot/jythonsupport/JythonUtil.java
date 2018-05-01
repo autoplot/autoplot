@@ -504,7 +504,7 @@ public class JythonUtil {
          * <li>D (Datum),
          * <li>S (DatumRange),
          * <li>U (Dataset URI),
-         * <li>L (URL), 
+         * <li>L (URL), a file location, not a URI with parameters.
          * <li>or R (the resource URI) 
          * </ul>
          */
