@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>vap+wdc prefix parses the World Data Center KP/AP files without mention of the .jyds script which reads the data files.  The script editor is used to show one of the files.
+        <p><small>PNG Walk Tool used to look at soil temperatures from http://mesonet.agron.iastate.edu/data/soilt_day*.png.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-04-30 r22391):</p>
+        <p>Bugfixes (2018-05-01 r22391):</p>
         <ul>
+            <li>"Run Batch" didn't handle URL parameters correctly.
             <li>rte_0176698267: mishandling of URIs in new JythonExtensionDataSource.  Thanks, Larry!
             <li>1984: error in inspecting .vap file would clear the address bar, destroying the scientist's URI.
             <li>rte_0395859275: whoops, new code in branch was never tested for "/home/jbf/&lt;TAB&gt;" where NullPointerException was encountered.
@@ -61,6 +62,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>jnlp file registers .pngwalk with the desktop.
             <li>QStreams have new "enumerationUnit" tag within packetDescriptor to avoid old kludgey method for encoding nominal datums.
             <li>rfe545: run batch tool shows the success/fail for each task.
             <li>Vertical averager mouse tool has export data function.  Thanks, Seth!
