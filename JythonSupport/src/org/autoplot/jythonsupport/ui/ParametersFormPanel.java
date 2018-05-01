@@ -408,6 +408,17 @@ public class ParametersFormPanel {
                         {
                             final DataSetSelector sel= new DataSetSelector();
                             sel.setPlotItButtonVisible(false);
+                            sel.setSuggestFiles(true);
+                            sel.setSuggestFsAgg(false);
+                            sel.setDisableDataSources(true);
+                            String surl= parm.deft.toString();
+                            int i= surl.lastIndexOf(".");
+                            int j= surl.lastIndexOf("/");
+                            if ( i>j ) {
+                                String ext= surl.substring(i);
+                                sel.setAcceptPattern(".*\\"+ext);
+                            }
+                            
                             String val;
                             if (params.get(vname)!=null ) {
                                 val= params.get(vname);
