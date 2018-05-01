@@ -24,6 +24,7 @@
         </shortcut>
         <association mime-type="application/autoplot+xml" extensions="vap"/>
         <association mime-type="application/x-cdf" extensions="cdf"/>        
+        <association mime-type="application/x-pngwalk" extensions="pngwalk"/> 
     </information>
     
     <security>
