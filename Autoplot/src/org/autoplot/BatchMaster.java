@@ -705,6 +705,35 @@ public class BatchMaster extends javax.swing.JPanel {
                             ss[i]= "file:"+ff[i].toString();
                         }
                     }
+                } else if ( pd.type=='L' ) {
+                    String deft= String.valueOf(pd.deft);
+                    File f= null;
+                    try {
+                        URISplit split= URISplit.parse(deft);
+                        if ( split.path!=null && split.path.startsWith("file:") ) {
+                            f= new File( split.path.substring(5) );
+                        }
+                    } catch ( IllegalArgumentException ex ) {
+                    }
+                    String lastItem= ta.getText().trim();
+                    if ( lastItem.length()>0  ) {
+                        int i= lastItem.lastIndexOf("\n");
+                        lastItem= lastItem.substring(i+1);
+                        URISplit split= URISplit.parse(lastItem);
+                        if ( split.path!=null && split.path.startsWith("file:") ) {
+                            f= new File( split.path.substring(5) );
+                        }
+                    }
+                    JFileChooser cf= new JFileChooser();
+                    if ( f!=null ) cf.setCurrentDirectory(f);
+                    cf.setMultiSelectionEnabled(true);
+                    if ( cf.showOpenDialog(this)==JFileChooser.APPROVE_OPTION ) {
+                        File[] ff= cf.getSelectedFiles();
+                        ss= new String[ff.length];
+                        for ( int i=0; i<ff.length; i++ ) {
+                            ss[i]= "file:"+ff[i].toString();
+                        }
+                    }
                 } else {
                     JOptionPane.showMessageDialog( this, "Parameter type isn't supported." );
                     return;
@@ -784,6 +813,9 @@ public class BatchMaster extends javax.swing.JPanel {
                 }   interp.set("_apuri", uri );
                 interp.exec("autoplot2017.params[\'"+paramName+"\']=_apuri"); // JythonRefactory okay
                 break;
+            case 'L': 
+                interp.exec("autoplot2017.params[\'"+paramName+"\']=URL(\'"+f1+"\')"); // JythonRefactory okay
+                break;
             case 'A':
                 interp.exec("autoplot2017.params[\'"+paramName+"\']=\'"+f1+"\'");// JythonRefactory okay
                 break;
@@ -850,6 +882,10 @@ public class BatchMaster extends javax.swing.JPanel {
         }
     }
     
+    /**
+     * run the batch process.  The
+     * @throws IOException 
+     */
     public void doIt() throws IOException {
         ProgressMonitor monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(this), "Run Batch");
 
