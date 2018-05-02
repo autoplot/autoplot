@@ -90,7 +90,8 @@ public class PlotCommand extends PyObject {
             + " <tr><td> [xyz]autoRangeHints</td><td>hints to the autorange, see http://autoplot.org/AxisAutoRangeHints\n</td>"
             + " <tr><td> renderer</td><td>add custom renderer, a class extending org.das2.graph.Renderer, see http://autoplot.org/CustomRenderers</td>"
             + " <tr><td> rightAxisOf</td><td>specify a plot where a new plot with a new yaxis.</td>"
-            + " <tr><td> topAxisOf</td><td>specify a plot where a new plot with a new xaxis above.</td>"                
+            + " <tr><td> topAxisOf</td><td>specify a plot where a new plot with a new xaxis above.</td>"
+            + " <tr><td> overplotOf</td><td>a plot or plot element with which this should share axes.  Note something should reset the plot!</td>"
             + "</table></html>");
 
     private static QDataSet coerceIt( PyObject arg0 ) {
@@ -146,7 +147,7 @@ public class PlotCommand extends PyObject {
             "xdrawTickLabels", "ydrawTickLabels",
             "xautoRangeHints", "yautoRangeHints", "zautoRangeHints",
             "xtickValues", "ytickValues", "ztickValues",
-            "renderer", "rightAxisOf", "topAxisOf",
+            "renderer", "rightAxisOf", "topAxisOf", "overplotOf",
             "index"
         },
         new PyObject[] { Py.None, Py.None, Py.None, Py.None,
@@ -166,7 +167,7 @@ public class PlotCommand extends PyObject {
             Py.None, Py.None,
             Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None,
-            Py.None, Py.None,
+            Py.None, Py.None, Py.None, Py.None,
             Py.None
         } );
         
@@ -249,27 +250,46 @@ public class PlotCommand extends PyObject {
                     }
                 }
                 if ( column==null ) column=dom.getCanvases(0).getMarginColumn();
-            } else if ( keywords[i].equals("rightAxisOf") || keywords[i].equals("topAxisOf") ) {
+            } else if ( keywords[i].equals("rightAxisOf") || keywords[i].equals("topAxisOf") || keywords[i].equals("overplotOf") ) {
                 String spec= args[i+nparm].toString();
-                Plot p;
+                Plot p=null;
                 if ( Ops.isSafeName(spec) ) {
                     DomNode n= DomUtil.getElementById( dom, spec );
+                    if ( n instanceof PlotElement ) {
+                        n= DomUtil.getElementById( dom, ((PlotElement)n).getPlotId() );
+                    }
                     p= (Plot)n;
                 } else {
-                    p= ((Plot)args[i+nparm].__tojava__(Plot.class));
+                    try {
+                        p = (Plot)args[i+nparm].__tojava__(Plot.class);
+                    } catch ( Exception e ) {
+                        PlotElement pe= ((PlotElement)args[i+nparm].__tojava__(PlotElement.class));
+                        if ( pe!=null ) {
+                            p= (Plot) DomUtil.getElementById( dom, ((PlotElement)pe).getPlotId() );
+                        }                        
+                    }
+                }
+                if ( p==null ) {
+                    throw new IllegalArgumentException("unable to identify plot");
                 }
                 Plot underPlot=null;
                 row= (Row)DomUtil.getElementById(dom,p.getRowId());
                 column= (Column)DomUtil.getElementById(dom,p.getColumnId());
-                for ( Plot p1: dom.getPlots() ) {
-                    if ( p1.getRowId().equals(row.getId()) && p1.getColumnId().equals(column.getId()) ) {
-                        if ( p1.getYaxis().isOpposite() ) {
-                            plot= p1;
-                        } else {
-                            underPlot= p1;
+                if ( keywords[i].equals("overplotOf") ) {
+                    plot= p;
+                    iplot= dom.getDataSourceFilters().length;
+                } else {
+                    for ( Plot p1: dom.getPlots() ) {
+                        if ( p1.getRowId().equals(row.getId()) && p1.getColumnId().equals(column.getId()) ) {
+                            if ( p1.getYaxis().isOpposite() ) {
+                                plot= p1;
+                            } else {
+                                underPlot= p1;
+                            }
                         }
                     }
                 }
+                
                 if ( plot==null ) {
                     plot= dom.getController().addPlot( row, column );
                     if ( keywords[i].equals("rightAxisOf") ) {
@@ -282,6 +302,7 @@ public class PlotCommand extends PyObject {
                         plot.getYaxis().setVisible(false);
                     }
                 }
+                
             } else if ( keywords[i].equals("index") ) {
                 int sindex= Integer.parseInt( args[i+nparm].toString() );
                 iplot= sindex;
