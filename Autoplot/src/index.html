@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-05-01 r22391):</p>
+        <p>Bugfixes (2018-05-04 r22406):</p>
         <ul>
+            <li>Pngwalk's resizeImage code doesn't resize if the dimensions don't change, which happens often.
             <li>"Run Batch" didn't handle URL parameters correctly.
             <li>rte_0176698267: mishandling of URIs in new JythonExtensionDataSource.  Thanks, Larry!
             <li>1984: error in inspecting .vap file would clear the address bar, destroying the scientist's URI.
@@ -62,6 +63,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add units "mjd" (for days since midnight, Nov 17, 1958) as a default for the ascii table data source.
+            <li>"overplotOf" added to plot command.
+            <li>sps and spd readers have a built-in code in case there is no internet.
+            <li>maximum number of bundled datasets allowed is increased to 96 from 50, to include HOPE data.  Thanks, Seth!
             <li>jnlp file registers .pngwalk with the desktop.
             <li>QStreams have new "enumerationUnit" tag within packetDescriptor to avoid old kludgey method for encoding nominal datums.
             <li>rfe545: run batch tool shows the success/fail for each task.
