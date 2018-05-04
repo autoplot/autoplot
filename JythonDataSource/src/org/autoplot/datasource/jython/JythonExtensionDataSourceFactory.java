@@ -38,7 +38,7 @@ public class JythonExtensionDataSourceFactory extends AbstractDataSourceFactory 
         }
         switch (scheme) {
             case "vap+sps":
-                script= "https://saturn.physics.uiowa.edu/svn/earth/public/jyds/readTypeSpsx.jyds";
+                script= "https://saturn.physics.uiowa.edu/svn/earth/public/jyds/readTypeSps.jyds";
                 break;
             case "vap+spd":
                 script= "https://saturn.physics.uiowa.edu/svn/earth/public/jyds/readTypeSpd.jyds";
