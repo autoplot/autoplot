@@ -388,7 +388,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         };
         new Thread(run).start();
 
-        JFrame frame = new JFrame("PNG Walk Viewer");
+        JFrame frame = new JFrame("PNG Walk Tool");
         frame.setIconImage( AutoplotUtil.getAutoplotIcon() );
 
         frame.setJMenuBar( createMenuBar(tool,frame) );
@@ -1037,7 +1037,21 @@ public final class PngWalkTool extends javax.swing.JPanel {
         man.updateBookmarks( bookmarksMenu, tool.getSelector() );
 
         result.add( bookmarksMenu );
-
+        
+        final JMenu helpMenu= new JMenu( "Help" );
+        final JMenuItem helpContentsMI= new JMenuItem( new AbstractAction( "Help Contents..." ) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);        
+                String surl = "http://autoplot.org/PNGWalks";
+                AutoplotUtil.openBrowser(surl);
+            }
+        });
+        helpContentsMI.setToolTipText("Help page for the PNG Walk Tool.");
+        helpMenu.add( helpContentsMI );
+        
+        result.add( helpMenu );
+        
         return result;
     }
 
