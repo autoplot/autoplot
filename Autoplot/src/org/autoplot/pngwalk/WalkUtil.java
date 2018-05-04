@@ -193,6 +193,9 @@ public class WalkUtil {
      * @return
      */
     public static BufferedImage resizeImage( BufferedImage originalImage, int width, int height ) {
+        if ( Math.abs(originalImage.getWidth()-width)<2 && Math.abs(originalImage.getHeight()-height)<2 ) { // allow for rounding errors
+            return originalImage;
+        }
         BufferedImage resizedImage = new BufferedImage( width, height, originalImage.getType() );
         Graphics2D g = resizedImage.createGraphics();
         g.fillRect(0,0,width,height);
