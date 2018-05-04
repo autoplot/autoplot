@@ -1,0 +1,190 @@
+resourceURI= getParam( 'resourceURI', 'file:/home/jbf/project/juno/u/masafumi/20180416/1522678471UT180402061200_HNRAO_1.spd', 'example file to load' )
+
+antenna= getParam( 'antenna', 0, 'the antenna to load when multiple dual antenna file is used.', [0,1] )
+
+#Type SkyPipeHeader
+#    version As String * 10
+#    Start As Double
+#    Finish As Double
+#    Lat As Double
+#    Lng As Double
+#    MaxY As Double
+#    MinY As Double
+#    TimeZone As Integer
+#    Source As String * 10
+#    Author As String * 20
+#    LocalName As String * 20
+#    Location As String * 40
+#    Channels As Integer
+#    NoteLength As Long
+#End Type
+
+headerLength= 10 + 6*8 + 2 + 10 + 20 + 20  + 40 + 2 + 4
+print headerLength
+
+header= getDataSet( 'vap+bin:'+resourceURI+'?byteOffset=0&byteLength=%d' % (headerLength ) )
+headerDoubles= getDataSet( 'vap+bin:'+resourceURI+'?type=double&byteOffset=10&byteLength=48')
+
+lat= headerDoubles[2]
+lon= headerDoubles[3]
+
+timezone= getDataSet( 'vap+bin:'+resourceURI+'?type=short&byteOffset=58&byteLength=2')
+timezone= timezone[0]
+obsauthor= map( chr, map( int, header[70:90] ) )
+obsauthor= ''.join(obsauthor)
+obsauthor= obsauthor.strip()
+obsname= map( chr, map( int, header[90:110] ) )
+obsname= ''.join(obsname)
+obsname= obsname.strip()
+obslocation= map( chr, map( int, header[110:150] ) )
+obslocation= ''.join(obslocation)
+obslocation= obslocation.strip()
+
+noteLength= getDataSet( 'vap+bin:'+resourceURI+'?recLength=4&type=int&byteOffset=%d&recCount=1' % (headerLength-4) )
+noteLength= noteLength[0]
+print 'noteLength=', noteLength
+
+noteUri='vap+bin:'+resourceURI+'?byteOffset=%d&byteLength=%d' % (headerLength, noteLength ) 
+print 'noteUri=', noteUri
+note= getDataSet(  noteUri )
+
+r= where( note.eq(255) )
+note[r]= 10
+note= map( chr, map( int, note ) )
+note= ''.join(note)
+
+from java.util import LinkedHashMap
+meta= LinkedHashMap()
+
+istart= note.find('*[[*')
+print 'istart=', istart
+meta.put( 'Nones', note[0:istart] )
+note= note[istart+4:]
+
+note= note[0:-4]
+note= note.strip()
+
+print '===note===' 
+print note
+print '======='
+
+meta.put( 'LoggedUsingUT', 'False' )
+meta.put( 'IntegerSave', 'False' )
+meta.put( 'NoTimeStamps', 'False' )
+meta.put( 'lat', lat )
+meta.put( 'lon', lon )
+meta.put( 'ObsAuthor', obsauthor)
+meta.put( 'ObsName', obsname)
+meta.put( 'ObsLocation', obslocation)
+meta.put( 'TimeZone', timezone)
+
+sIntegerSave='F'
+sNoTimeStamps= 'F'
+iCh2= 0
+index= 0
+for n in note.split('\n'):
+    if n.startswith('ANTENNATYPE'):
+        meta.put( n[0:11], n[11:] )
+    elif n.startswith('ANTENNAAZIMUTH'):
+        i= n[14:]
+        meta.put( n[0:14], i )
+    elif n.startswith('ANTENNAELEVATION'):
+        i= n[16:]
+        meta.put( n[0:16], i )
+    elif n.startswith('ANTENNAPOLARIZATION'):
+        meta.put( n[0:20], n[20:] )
+    elif n.startswith('Integer Save'):
+        sIntegerSave='T'
+        meta.put( 'IntegerSave', 'True' )
+    elif n.startswith('No Time Stamps'):
+        sNoTimeStamps= 'T'
+        meta.put( 'NoTimeStamps', 'True' )
+    elif n.startswith('Logged Using UT'):
+        meta.put( 'LoggedUsingUT', 'True' )
+    elif n.startswith('XALABEL'):
+        meta.put( 'XALABEL', n[7:] )
+    elif n.startswith('YALABEL'):
+        meta.put( 'YALABEL', n[7:] )
+    elif n.startswith('CH'):
+        iCh2= iCh2+1
+        meta.put( n[0:4], n[4:] )
+    elif n.startswith('MetaData_'):
+        label= n[9:]
+        ss= label.split(chr(200))
+        meta.put( ss[0], ss[1] )
+    else:
+        indexColon= n.find(': ')
+        if indexColon>-1:
+            meta.put( n[0:indexColon], n[indexColon+2:] )
+        else:
+            meta.put( 'index%03d'%index , n )
+            index= index+1
+
+iCh= iCh2 / 2
+
+# 0. Default Format
+#   meta('IntegerSave') == 'False'
+#   meta('NoTimeSamps') == 'False'
+# [Date] (8 bytes)
+# [Channel 1 Data] (8 bytes)
+# [Channel 2 Data] (8 bytes)
+
+# 1. Integer Save Format
+#   meta('IntegerSave') == 'True'
+#   meta('NoTimeSamps') == 'False'
+# [Date] (8 bytes)
+# [Channel 1 Data] (2 bytes)
+# [Channel 2 Data] (2 bytes)
+
+# 2. No Timestamps Format (non-Integer)
+#   meta('IntegerSave') == 'False'
+#   meta('NoTimeSamps') == 'True'
+# [Channel 1 Data] (8 bytes)
+# [Channel 2 Data] (8 bytes)
+
+# 3. No Timestamps Format (Integer)
+#   meta('IntegerSave') == 'True'
+#   meta('NoTimeSamps') == 'True'
+# [Channel 1 Data] (2 bytes)
+# [Channel 2 Data] (2 bytes)
+
+if sNoTimeStamps == 'F':
+  if sIntegerSave == 'F':
+    if iCh == 1:
+      iRecLength= 16
+      iRecOffset= 8
+    else:
+      iRecLength= 24
+      iRecOffset= ([8,16])[antenna] # [Ch 1, Ch 2]
+  else:
+    if iCh == 1:
+      iRecLength= 10
+      iRecOffset= 8
+    else:
+      iRecLength= 12
+      iRecOffset= ([8,10])[antenna] # [Ch 1, Ch 2]
+
+  tt= getDataSet( 'vap+bin:'+resourceURI+'?recLength=%d&type=double&byteOffset=%d&validMax=1e20&validMin=-1e20' % ( iRecLength, headerLength + noteLength ) )
+  ds= getDataSet( 'vap+bin:'+resourceURI+'?recLength=%d&type=double&byteOffset=%d&validMax=1e20&validMin=-1e20&recOffset=%d' % ( iRecLength, headerLength + noteLength, iRecOffset ) )
+  tt= putProperty( tt, QDataSet.UNITS, Units.lookupTimeUnits('days since 1899-12-30T00:00') )
+  result= link( tt, ds )
+  
+else:
+  if sIntegerSave == 'F': iRecLength= 8
+  else: iRecLength= 2
+  ds= getDataSet( 'vap+bin:'+resourceURI+'?recLength=%d&type=double&byteOffset=%d&validMax=1e20&validMin=-1e20' % ( iRecLength, headerLength + noteLength ) )
+  result= ds
+
+#e= extent(tt)
+#print 'extent: ',( e[1]-e[0] )  , ( e[1]-e[0] )  / 19 * 3600 # 19 minutes
+
+
+#plot( ds[-1000:] )
+result= putProperty( result, QDataSet.METADATA, meta )
+result= putProperty( result, QDataSet.LABEL, meta.get('YALABEL'))
+#result= putProperty( result, QDataSet.TITLE, meta.get('XALABEL'))
+result= putProperty( result, QDataSet.TITLE, "Channel %i: %s (%s) @ %s"%(antenna+1,obsname, obsauthor, obslocation))
+xds= result.property( QDataSet.DEPEND_0 )
+xds.putProperty( QDataSet.LABEL, 'Time (UT)' )
+
+#plot(tt,ds)

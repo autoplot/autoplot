@@ -1,0 +1,172 @@
+resourceURI= getParam( 'resourceURI', 'http://www-pw.physics.uiowa.edu/~jbf/autoplot/jyds/formats/radiojove/1522660086180402060700.sps', 'example file to load' )
+
+antenna= getParam( 'antenna', 0, 'the antenna to load when multiple dual antenna file is used.', [0,1] )
+
+#resourceURI='/home/masafumi/Linux/sps_example/150127042000.sps'
+#Type SkyPipeHeader
+#    version As String * 10
+#    Start As Double
+#    Finish As Double
+#    Lat As Double
+#    Lng As Double
+#    MaxY As Double
+#    MinY As Double
+#    TimeZone As Integer
+#    Source As String * 10
+#    Author As String * 20
+#    LocalName As String * 20
+#    Location As String * 40
+#    Channels As Integer
+#    NoteLength As Long
+#End Type
+
+start= getDataSet( 'vap+bin:'+resourceURI+'?recLength=8&type=double&byteOffset=10&recCount=1' )
+finish= getDataSet( 'vap+bin:'+resourceURI+'?recLength=8&type=double&byteOffset=18&recCount=1' )
+
+start= putProperty( start[0], QDataSet.UNITS, Units.lookupTimeUnits('days since 1899-12-30T00:00') )
+finish= putProperty( finish[0], QDataSet.UNITS, Units.lookupTimeUnits('days since 1899-12-30T00:00') )
+
+headerLength= 10 + 6*8 + 2 + 10 + 20 + 20  + 40 + 2 + 4
+
+header= getDataSet( 'vap+bin:'+resourceURI+'?byteOffset=0&byteLength=%d' % (headerLength ) )
+headerDoubles= getDataSet( 'vap+bin:'+resourceURI+'?type=double&byteOffset=10&byteLength=48')
+
+lat= headerDoubles[2]
+lon= headerDoubles[3]
+
+timezone= getDataSet( 'vap+bin:'+resourceURI+'?type=short&byteOffset=58&byteLength=2')
+timezone= timezone[0]
+obsauthor= map( chr, map( int, header[70:90] ) )
+obsauthor= ''.join(obsauthor)
+obsauthor= obsauthor.strip()
+obsname= map( chr, map( int, header[90:110] ) )
+obsname= ''.join(obsname)
+obsname= obsname.strip()
+obslocation= map( chr, map( int, header[110:150] ) )
+obslocation= ''.join(obslocation)
+obslocation= obslocation.strip()
+
+noteLength= getDataSet( 'vap+bin:'+resourceURI+'?recLength=4&type=int&byteOffset=%d&recCount=1' % (headerLength-4) )
+noteLength= noteLength[0]
+
+noteUri='vap+bin:'+resourceURI+'?byteOffset=%d&byteLength=%d' % (headerLength, noteLength ) 
+note= getDataSet(  noteUri )
+
+r= where( note.eq(255) )
+note[r]= 10
+note= map( chr, map( int, note ) )
+note= ''.join(note)
+note= note[4:-4]
+
+sDualSpecFile='F'
+
+from java.util import LinkedHashMap
+meta= LinkedHashMap()
+meta.put( 'lat', lat )
+meta.put( 'lon', lon )
+meta.put( 'ObsAuthor', obsauthor)
+meta.put( 'ObsName', obsname)
+meta.put( 'ObsLocation', obslocation)
+meta.put( 'TimeZone', timezone)
+
+index= 0
+for n in note.split('\n'):
+    if n.startswith('HIF'):
+        hif= dataset( float( n[3:] ), Units.hertz )
+        meta.put( 'HIF', hif )
+    elif n.startswith('LOWF'):
+        lowf= dataset( float( n[4:] ), Units.hertz )
+        meta.put( 'LOWF', lowf )
+    elif n.startswith('SWEEPS'):
+        i= int( n[6:] )
+        meta.put( 'SWEEPS', i )
+    elif n.startswith('STEPS'):
+        i= int( n[5:] )
+        meta.put( 'STEPS', i )
+    elif n.startswith('DUALSPECFILE'):
+        i= n[12:]
+        sDualSpecFile= n[12:13]
+        meta.put( 'DUALSPECFILE', i )
+    elif n.startswith('RCP'):
+        i= n[3:]
+        meta.put( 'RCP', i )
+    elif n.startswith('ANTENNATYPE'):
+        meta.put( n[0:11], n[11:] )
+    elif n.startswith('ANTENNAAZIMUTH'):
+        i= n[14:]
+        meta.put( n[0:14], i )
+    elif n.startswith('ANTENNAELEVATION'):
+        i= n[16:]
+        meta.put( n[0:16], i )
+    elif n.startswith('ANTENNAPOLARIZATION'):
+        meta.put( n[0:20], n[20:] )
+    elif n.startswith('COLORFILE'):
+        meta.put( n[0:9], n[9:] ) 
+    elif n.startswith('COLOROFFSET'):
+        meta.put( n[0:12], n[12:] ) 
+    elif n.startswith('COLORGAIN'):
+        meta.put( n[0:10], n[10:] )
+    elif n.startswith('COLORRES'):
+        # no tag means 10-bit data
+        sDataBit='10-bit'
+        if int(n[8])  == 1: sDataBit='12-bit'
+        meta.put( 'COLORRES', sDataBit )
+    elif n.startswith('BANNER'):
+        meta.put( n[0:7], n[7:] )
+    elif n.startswith('RCVR'):
+        meta.put( 'RCVR', n[4:] )
+    else:
+        meta.put( 'index%03d'%index , n )
+        index= index+1
+
+#print 'note=', note
+
+print 'sDualSpecFile %s'%(sDualSpecFile)
+print 'byteOffset=%d' % ( headerLength + noteLength ) 
+
+channelsUri=  'vap+bin:'+resourceURI+'?recLength=2&type=ushort&byteOffset=%d&recCount=1&byteOrder=little' % (headerLength-6)
+print 'channelsUri=', channelsUri
+channels= getDataSet( channelsUri ) 
+channels= channels[0]
+print 'channels=', channels
+
+print 'file length should be %d ' % ( headerLength + noteLength + ( 2 + channels*2 ) *621 )
+ 
+#ds= getDataSet( 'vap+bin:'+resourceURI+'?recLength=16&type=double&byteOffset=%d&validMax=1e20&validMin=-1e20&recOffset=8' % ( headerLength + noteLength ) )
+ds= getDataSet( 'vap+bin:'+resourceURI+'?recLength=%d&byteOffset=%d&type=ushort&rank2=0:%d&recOffset=2&byteOrder=big' % ( 2 + channels*2, headerLength + noteLength, channels) )
+
+if ( sDualSpecFile=='T' ):
+    ds= ds[antenna::2]
+
+ttag= linspace( start, finish, ds.length() )
+
+#ds= putProperty( ds, QDataSet.METADATA, 
+#tt= putProperty( tt, QDataSet.UNITS, Units.lookupTimeUnits('days since 1900-01-03T00:00') )
+
+#plot( ds[-1000:] )
+
+#plot( 1, tt )
+
+#d= ds[:,::2]
+
+print hif, lowf
+ytags= linspace( hif, lowf, int(channels) )
+
+#plot( ttag, ytags, ds ) 
+result= link( ttag, ytags, ds ) 
+result= putProperty( result, QDataSet.METADATA, meta )
+yds= result.property( QDataSet.DEPEND_1 )
+yds.putProperty( QDataSet.UNITS,Units.hertz)
+yds.putProperty( QDataSet.LABEL, 'Frequency (MHz)' )
+yds= convertUnitsTo( yds, Units.megaHertz )
+
+xds= result.property( QDataSet.DEPEND_0 )
+xds.putProperty( QDataSet.LABEL, 'Time (UT)' )
+
+result= putProperty( result, QDataSet.DEPEND_1,yds)
+result= putProperty( result, QDataSet.DEPEND_0,xds)
+
+result= putProperty( result, QDataSet.TITLE, "%s (%s) @ %s"%(obsname, obsauthor, obslocation))
+
+#plot( 1, ds[:,1::2] )
+#plot(tt,ds)
