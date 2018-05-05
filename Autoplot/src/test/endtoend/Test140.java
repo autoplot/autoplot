@@ -37,6 +37,9 @@ import org.autoplot.state.StatePersistence;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
+import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
+import org.das2.qds.SemanticOps;
 import org.xml.sax.SAXException;
 
 /**
@@ -130,11 +133,14 @@ public class Test140 {
             if ( ds!=null ) {
                 if ( isPublic ) {
 
-                    MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);
-                    hist.putProperty( QDataSet.TITLE, uri );
+                    Units u= SemanticOps.getUnits(ds);
+                    if ( !UnitsUtil.isNominalMeasurement(u) ) {
+                        MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);
+                        hist.putProperty( QDataSet.TITLE, uri );
 
-                    hist.putProperty( QDataSet.LABEL, label );
-                    formatDataSet( hist, label+".qds");
+                        hist.putProperty( QDataSet.LABEL, label );
+                        formatDataSet( hist, label+".qds");        
+                    }
 
                     QDataSet dep0= (QDataSet) ds.property( QDataSet.DEPEND_0 );
                     if ( dep0!=null ) {
