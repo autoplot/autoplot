@@ -52,7 +52,7 @@ public class GettingStartedPanel extends javax.swing.JPanel {
 
         jLabel3.setText("Open a data file on your desktop:");
 
-        browseLocalButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/file.png"))); // NOI18N
+        browseLocalButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/file.png"))); // NOI18N
         browseLocalButton.setToolTipText("Browse local filesystem");
         browseLocalButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -60,7 +60,7 @@ public class GettingStartedPanel extends javax.swing.JPanel {
             }
         });
 
-        jLabel4.setText("Or open a data file from a remote location:");
+        jLabel4.setText("Or open a data file from a remote location, this list shows some examples:");
 
         jComboBox1.setEditable(true);
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { " ", "http://autoplot.org/data/autoplot.xls", "ftp://ftp.virbo.org/LANL/LANL1991/SOPA+ESP/H0/LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf", " " }));
@@ -81,18 +81,19 @@ public class GettingStartedPanel extends javax.swing.JPanel {
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(layout.createSequentialGroup()
                                 .add(12, 12, 12)
-                                .add(jComboBox1, 0, 457, Short.MAX_VALUE))
-                            .add(jLabel1)
+                                .add(jComboBox1, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
                                 .add(12, 12, 12)
-                                .add(jTextField1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
+                                .add(jTextField1)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(browseLocalButton))
-                            .add(jLabel3)
+                            .add(jLabel5)
                             .add(layout.createSequentialGroup()
-                                .add(jLabel2)
-                                .add(0, 336, Short.MAX_VALUE))
-                            .add(jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE))
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(jLabel1)
+                                    .add(jLabel3)
+                                    .add(jLabel2))
+                                .add(0, 0, Short.MAX_VALUE)))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
