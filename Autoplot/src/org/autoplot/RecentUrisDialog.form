@@ -132,7 +132,7 @@
     <Component class="javax.swing.JButton" name="plotButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/org/virbo/datasource/go.png"/>
+          <Image iconType="3" name="/org/autoplot/datasource/go.png"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Plot"/>
         <Property name="toolTipText" type="java.lang.String" value="Replace the current plot with this"/>
@@ -144,7 +144,7 @@
     <Component class="javax.swing.JButton" name="editUriButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/org/virbo/autoplot/fileMag.png"/>
+          <Image iconType="3" name="/org/autoplot/fileMag.png"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Edit"/>
         <Property name="toolTipText" type="java.lang.String" value="Inspect this resource.  If an editor panel is available, this will enter the editor panel before plotting.  Otherwise the&#xa;URI is copied to the address bar for editing with completions."/>
