@@ -82,7 +82,7 @@
         <BindingProperty name="enabled" source="jCheckBox1" sourcePath="${selected}" target="jTextField1" targetPath="enabled" updateStrategy="0" immediately="false"/>
       </BindingProperties>
     </Component>
-    <Component class="org.virbo.datasource.DataSetSelector" name="dataSetSelector1">
+    <Component class="org.autoplot.datasource.DataSetSelector" name="dataSetSelector1">
       <BindingProperties>
         <BindingProperty name="enabled" source="jCheckBox1" sourcePath="${selected}" target="dataSetSelector1" targetPath="enabled" updateStrategy="0" immediately="false"/>
       </BindingProperties>

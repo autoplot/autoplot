@@ -75,7 +75,7 @@
     <Component class="javax.swing.JButton" name="editComponentPanel">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/org/virbo/autoplot/resources/pipeMag2.png"/>
+          <Image iconType="3" name="/org/autoplot/resources/pipeMag2.png"/>
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="Open filters editor"/>
       </Properties>

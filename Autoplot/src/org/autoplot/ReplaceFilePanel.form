@@ -77,7 +77,7 @@
     <Component class="javax.swing.JButton" name="jButton1">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/org/virbo/autoplot/file.png"/>
+          <Image iconType="3" name="/org/autoplot/file.png"/>
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="Pick file"/>
       </Properties>
