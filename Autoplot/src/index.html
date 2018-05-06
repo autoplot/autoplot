@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>PNG Walk Tool used to look at soil temperatures from http://mesonet.agron.iastate.edu/data/soilt_day*.png.
+        <p><small>Autoplot can read .sps and .spd files from NASA's Radio JOVE project.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-05-04 r22406):</p>
+        <p>Bugfixes (2018-05-06 r22412):</p>
         <ul>
+            <li>rte_1578811180: "Getting started" dialog was missing image resource since package renamimg.
             <li>Pngwalk's resizeImage code doesn't resize if the dimensions don't change, which happens often.
             <li>"Run Batch" didn't handle URL parameters correctly.
             <li>rte_0176698267: mishandling of URIs in new JythonExtensionDataSource.  Thanks, Larry!
