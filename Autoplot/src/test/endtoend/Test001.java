@@ -1,15 +1,13 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package test.endtoend;
 
+import java.io.File;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import static org.das2.qds.ops.Ops.*;
 import static org.autoplot.ScriptContext.*;
+import org.autoplot.datasource.AutoplotSettings;
 import org.das2.qds.ops.Ops;
 import org.autoplot.jythonsupport.Util;
 
@@ -20,6 +18,11 @@ import org.autoplot.jythonsupport.Util;
 public class Test001 {
     public static void main(String[] args)  {
         try {
+            
+            System.err.println("pwd: "+(new File(".")).getCanonicalPath());
+            System.err.println("autoplot_data: "+AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA) );
+            System.err.println("fscache: "+AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE) );
+                    
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
             
