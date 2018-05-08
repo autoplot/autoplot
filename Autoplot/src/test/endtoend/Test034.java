@@ -8,6 +8,7 @@ import org.das2.datum.DatumRange;
 import org.autoplot.dom.Application;
 
 import static org.autoplot.ScriptContext.*;
+import org.autoplot.datasource.AutoplotSettings;
 
 /**
  * Test tool to simulate more sophistocated GUI operations
@@ -74,7 +75,9 @@ public class Test034 {
         getDocumentModel().getOptions().setAutolayout(false);
 
         System .err.println("pwd: "+(new File(".")).getCanonicalPath());
-
+        System.err.println("autoplot_data: "+AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA) );
+        System.err.println("fscache: "+AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE) );
+        
         t0= System.currentTimeMillis();
         test003();
         System.err.printf( "test 003a: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
