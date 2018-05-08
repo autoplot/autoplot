@@ -156,7 +156,7 @@ public class Test017 {
         //This fails because negative CADENCE and MONOTONIC=true.
 
         // This shows that I'm doing something wrong with fits files.  Using FITS liberator it looks good, with AP it is distorted.
-        "020 https://www.spacetelescope.org/static/projects/fits_liberator/datasets/m42/m42_40min_red.zip/m42_40min_red.fits",
+        "020 file:/home/jbf/ct/hudson/data/fits/m42_40min_red.zip/m42_40min_red.fits",
         //"020 vap:http://www.astro.princeton.edu/~frei/Gcat_htm/Catalog/Fits/n4013_lR.fits",
 
         //TEST DATA SOURCE TYPE: 6 ASCII
