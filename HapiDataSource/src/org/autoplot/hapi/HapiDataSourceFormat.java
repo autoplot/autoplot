@@ -70,8 +70,14 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         File infoFile= new File( new File( hapiDir, "info" ), id+".json" );
         
         JSONObject jo= new JSONObject();
-        jo.put("HAPI","1.1");
+        jo.put("HAPI","2.0");
         jo.put("createdAt",TimeUtil.now().toString());
+        jo.put("modificationDate", TimeUtil.now().toString());
+        JSONObject jo1= new JSONObject();
+        jo1.put("code", 1200 );
+        jo1.put("message", "OK request successful");
+        jo.put( "status", jo1 );
+        
         JSONArray parameters= new JSONArray();
         
         List<QDataSet> dss= new ArrayList<>();
@@ -126,7 +132,7 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                 time.put("length", 24 );
                 time.put("name", "Time" );
                 time.put("type", "isotime" );
-                time.put("fill", "NaN" );
+                time.put("fill", (Object)null );
                 parameters.put(i,time);
             } else {
                 JSONObject j1= new JSONObject();
@@ -141,7 +147,7 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                 }
                 Number f= (Number)ds.property(QDataSet.FILL_VALUE);
                 if ( f!=null ) {
-                    j1.put("fill",f); //TODO: check that this is properly handled as Object.
+                    j1.put("fill",f.toString()); //TODO: check that this is properly handled as Object.
                 } else {
                     j1.put("fill","NaN"); 
                 }
@@ -374,6 +380,8 @@ public class HapiDataSourceFormat implements DataSourceFormat {
             for ( int i=1; i<ds.rank(); i++ ) {
                 QDataSet dep= (QDataSet) ds.property("DEPEND_"+i);
                 if ( dep==null ) dep= Ops.findgen(qube[i]);
+                String desc= (String)dep.property(QDataSet.TITLE);
+                if ( desc==null ) desc= (String)dep.property(QDataSet.LABEL);
                 if ( dep.rank()==2 ) {
                     if ( SemanticOps.isBins( dep ) ) {
                         String n= Ops.guessName(dep,"dep"+i);
@@ -389,6 +397,7 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                             ranges.put(j,range);
                         }
                         jo.put( "ranges", ranges );
+                        if ( desc!=null ) jo.put( "description", desc );
                         binsArray.put( i-1, jo ); // -1 is because DEPEND_0 is the streaming index.                        
                     } else {
                         throw new IllegalArgumentException("independent variable must be a simple 1-D array");
@@ -404,7 +413,7 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                         centers.put(j,dep.value(j));
                     }
                     jo.put( "centers", centers );
-                    
+                    if ( desc!=null ) jo.put( "description", desc );
                     QDataSet binMax= (QDataSet) dep.property(QDataSet.BIN_MAX);
                     QDataSet binMin= (QDataSet) dep.property(QDataSet.BIN_MIN);
                     if ( binMin!=null && binMax!=null ) {
