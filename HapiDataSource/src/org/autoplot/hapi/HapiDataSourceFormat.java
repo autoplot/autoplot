@@ -73,10 +73,7 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         jo.put("HAPI","2.0");
         jo.put("createdAt",TimeUtil.now().toString());
         jo.put("modificationDate", TimeUtil.now().toString());
-        JSONObject jo1= new JSONObject();
-        jo1.put("code", 1200 );
-        jo1.put("message", "OK request successful");
-        jo.put( "status", jo1 );
+        jo.put( "status", getHapiStatusObject() );
         
         JSONArray parameters= new JSONArray();
         
@@ -182,11 +179,13 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         
         File capabilitiesFile= new File( hapiDir, "capabilities.json" );
         JSONObject c= new JSONObject();
-        c.put("HAPI","1.1");
+        c.put("HAPI","2.0");
         JSONArray f= new JSONArray();
         f.put( 0, "csv" );
         f.put( 1, "binary" );
         c.put( "outputFormats", f );
+        
+        c.put( "status", getHapiStatusObject() );
         try ( FileWriter fw = new FileWriter(capabilitiesFile) ) {
             c.write( fw );
             fw.write( c.toString(4) );
@@ -313,6 +312,13 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         }
     }
 
+    private JSONObject getHapiStatusObject() throws JSONException {
+        JSONObject jo1= new JSONObject();
+        jo1.put("code", 1200 );
+        jo1.put("message", "OK request successful");
+        return jo1;
+    }
+
     private void updateCatalog(File hapiDir, String id, String groupTitle) throws JSONException, IOException {
         File catalogFile= new File( hapiDir, "catalog.json" );
         JSONObject catalog;
@@ -330,7 +336,7 @@ public class HapiDataSourceFormat implements DataSourceFormat {
             catalogArray= catalog.getJSONArray("catalog");
         } else {
             catalog= new JSONObject();
-            catalog.put( "HAPI", "1.1" );
+            catalog.put( "HAPI", "2.0" );
             catalogArray= new JSONArray();
             catalog.put( "catalog", catalogArray );
         }
@@ -342,6 +348,8 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                 itemIndex= j;
             }
         }
+        
+        catalog.put( "status", getHapiStatusObject() );
         
         if ( itemIndex==-1 ) {
             item= new JSONObject();
@@ -360,10 +368,7 @@ public class HapiDataSourceFormat implements DataSourceFormat {
 
     @Override
     public boolean canFormat(QDataSet ds) {
-        if ( SemanticOps.isJoin(ds) ) { 
-            return false;
-        }   
-        return true;
+        return !SemanticOps.isJoin(ds);
     }
 
     @Override
