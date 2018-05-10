@@ -11,6 +11,7 @@ import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
@@ -2743,14 +2744,16 @@ public class PlotElementController extends DomNodeController {
     /**
      * see button added to the slicer.
      * @param ds 
+     * @param y reference for dataset, similar to the CONTEXT property.
+     * @param above if true, then plot above instead of below.
      */
-    private void addPlotBelow( QDataSet ds, Datum y ) {
+    private void addPlotBelow( QDataSet ds, Datum y, boolean above) {
         ApplicationController controller= dom.getController();
         DomLock lock= mutatorLock();
         lock.lock("adding slice below");
         try {
             Plot focus= controller.getPlotFor(plotElement);
-            Plot p= controller.addPlot( focus, LayoutConstants.BELOW );
+            Plot p= controller.addPlot( focus, above ? LayoutConstants.ABOVE : LayoutConstants.BELOW );
             PlotElement pe=controller.addPlotElement( p, null );
             DataSourceFilter dsfl= controller.getDataSourceFilterFor( pe );
             dsfl.getController().setDataSetInternal(ds); // setDataSet doesn't autorange, etc.
@@ -2759,7 +2762,7 @@ public class PlotElementController extends DomNodeController {
             if ( bms.size()>0 && UnitsUtil.isTimeLocation( p.getXaxis().getRange().getUnits() ) ) {
                 controller.bind( controller.getApplication(), Application.PROP_TIMERANGE, p.getXaxis(), Axis.PROP_RANGE );
             }
-            p.setTitle( focus.getTitle() + " @ " + y );
+            p.setTitle(focus.getTitle() + " @ " + y );
         } finally {
             lock.unlock();
         }
@@ -2926,16 +2929,17 @@ public class PlotElementController extends DomNodeController {
                                     MouseModule mm= plot.getDasMouseInputAdapter().getModuleByLabel("Horizontal Slice");
                                     final HorizontalSlicerMouseModule hmm= ((HorizontalSlicerMouseModule)mm);
                                     if ( hmm!=null ) { // for example in headless mode
-                                        hmm.getSlicer().addAction( new AbstractAction("Plot Below") {
+                                        hmm.getSlicer().addAction(new AbstractAction("Plot Below") {
                                             @Override
                                             public void actionPerformed(ActionEvent e) {
                                                 org.das2.util.LoggerManager.logGuiEvent(e);
+                                                final boolean above= ( e.getModifiers() & KeyEvent.SHIFT_MASK ) == KeyEvent.SHIFT_MASK;
                                                 final QDataSet ds= hmm.getSlicer().getDataSet();
                                                 final Datum y= hmm.getSlicer().getSliceY();
-                                                RequestProcessor.invokeLater( new Runnable() {
+                                                RequestProcessor.invokeLater(new Runnable() {
                                                     @Override
                                                     public void run() {
-                                                        addPlotBelow(ds,y);
+                                                        addPlotBelow(ds,y,above);
                                                     }
                                                 });
                                             }
