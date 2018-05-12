@@ -11,7 +11,9 @@ package org.autoplot.datasource;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -139,6 +141,20 @@ public abstract class AbstractDataSource implements DataSource {
 
     FilePollUpdating pollingUpdater;
 
+    /**
+     * get an input stream from the data source.
+     * @param mon
+     * @return
+     * @throws IOException 
+     */
+    protected InputStream getInputStream( ProgressMonitor mon ) throws IOException {
+        if ( uri.getScheme().equals("jar") ) {
+            return uri.toURL().openStream(); //TODO: experiment, make this production-quality
+        } else {
+            return new FileInputStream( getFile(mon) );
+        }
+    }
+    
     /**
      * make the remote file available.
      * @param mon
