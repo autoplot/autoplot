@@ -3,10 +3,19 @@ package org.autoplot.csv;
 
 import com.csvreader.CsvReader;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.text.ParseException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -25,9 +34,12 @@ import org.das2.qds.SemanticOps;
 import org.das2.qds.SparseDataSet;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.capability.Streaming;
+import org.autoplot.html.AsciiTableStreamer;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.AsciiParser;
 import org.das2.qds.util.DataSetBuilder;
+import org.das2.util.monitor.NullProgressMonitor;
 
 /**
  * Specialized reader only reads csv files.  These csv files must be simple tables with the same number of fields in each record.
@@ -42,6 +54,7 @@ public class CsvDataSource extends AbstractDataSource {
      */
     public CsvDataSource(URI uri) {
         super(uri);
+        addCapability( Streaming.class, new CsvTableStreamingSource() );
     }
 
     private QDataSet parseHeader( int icol, String header, String sval ) {
@@ -394,5 +407,57 @@ public class CsvDataSource extends AbstractDataSource {
 
         return ds;
     }
+    
+    /**
+     * like the non-streaming source, but:<ul>
+     * <li> delimiter is not automatic.
+     * <li> rank2 is always used.
+     * </ul>
+     */
+    private class CsvTableStreamingSource implements Streaming {
 
+        public CsvTableStreamingSource() {
+        }
+ 
+        
+        @Override
+        public Iterator<QDataSet> streamDataSet(ProgressMonitor mon) throws Exception {
+            
+            final AsciiTableStreamer result= new AsciiTableStreamer();
+            
+            final BufferedReader reader = new BufferedReader( new InputStreamReader( getInputStream(new NullProgressMonitor() ) ) );
+
+            Runnable run= new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        String line;
+                        String sdelimiter= getParam("delim", ",");
+                        if ( sdelimiter.equals("COMMA") ) sdelimiter= ",";
+                        if ( sdelimiter.equals("SEMICOLON") ) sdelimiter= ";";
+                        while ( (line=reader.readLine())!=null ) {
+                            String[] fields= line.split(sdelimiter);
+                            result.addRecord( Arrays.asList(fields) );
+                        }
+                        result.setHasNext(false);
+                        logger.log(Level.FINE, "Done parsing {0}", getURI() );
+                    } catch ( IOException ex ) {
+
+                    } finally {
+                        try {
+                            reader.close();
+                        } catch ( IOException ex ) {
+                            logger.log( Level.WARNING, ex.getMessage(), ex );
+                        }
+                    }
+                }
+            };
+
+            new Thread( run, "CsvTableDataStreamer" ).start();
+            //new ParserDelegator().parse( reader, callback, true );
+
+            return result;
+
+        }
+    }
 }
