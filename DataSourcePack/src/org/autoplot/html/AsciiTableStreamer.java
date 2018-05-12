@@ -111,7 +111,14 @@ public class AsciiTableStreamer implements Iterator<QDataSet> {
         }
     }
     
-    protected void addRecord(List<String> values) {
+    public void addRecord(List<String> values) {
+        if ( units==null ) {
+            String s= values.get(Math.min(1,values.size()-1)).trim();
+            if ( s.length()>0 && Character.isAlphabetic(s.charAt(0)) ) {
+                addHeader(values);
+                return;
+            }
+        }
         if ( fieldCount==-1 ) {
             return;
         }
@@ -148,6 +155,15 @@ public class AsciiTableStreamer implements Iterator<QDataSet> {
         sendRecord( result );
     }
 
+    /**
+     * indicate that no more records will be added.  This can only be set to 
+     * false.
+     * @param t this must be set to false.
+     */
+    public void setHasNext( boolean t ) {
+        hasNextRecord= false;
+    }
+    
     private void sendRecord( QDataSet result ) {
         records.add(result);
     }
