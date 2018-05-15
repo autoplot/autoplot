@@ -1143,6 +1143,11 @@ public class PyQDataSet extends PyJavaInstance {
         };
     }
 
+    /**
+     * This is what does the magical coersion, see https://sourceforge.net/p/autoplot/bugs/1861/
+     * @param c the class needed.
+     * @return instance of the class if available.
+     */
     @Override
     public Object __tojava__(Class c) {
         if ( c.isArray() && c.getComponentType()==double.class && rods.rank()==1 ) {
@@ -1157,6 +1162,19 @@ public class PyQDataSet extends PyJavaInstance {
             return mpds;
         } else if ( c.isAssignableFrom(WritableDataSet.class) ) {
             return ds;
+        } else if ( rods.rank()==0 ) {
+            Datum datum= DataSetUtil.asDatum(rods);
+            if ( c==double.class ) {
+                return datum.value();
+            } else if ( c==Double.class ) {
+                return datum.value();
+            } else if ( c==float.class ) {
+                return (float)datum.value();
+            } else if ( c==Float.class ) {
+                return (float)datum.value();
+            } else if ( c==Number.class ) {
+                return datum.value();
+            }
         }
         return super.__tojava__(c);
     }
