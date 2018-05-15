@@ -29,7 +29,7 @@ public class AutoplotServer {
         
     public static void main(String[] args) throws Exception {
           
-        System.err.println("org.autoplot.AutoplotServer 20180120");
+        System.err.println("org.autoplot.AutoplotServer 20180515");
 
         Util.addFonts();
         
