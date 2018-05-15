@@ -1,6 +1,8 @@
 
 package org.autoplot;
 
+import java.awt.Font;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Units;
@@ -10,6 +12,7 @@ import static org.autoplot.ScriptContext.*;
 import org.das2.util.ArgumentList;
 import org.autoplot.dom.Application;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.dom.DomUtil;
 import org.autoplot.dom.Plot;
 import org.das2.datum.DatumRangeUtil;
 
@@ -31,8 +34,8 @@ public class AutoplotServer {
         Util.addFonts();
         
         ArgumentList alm= new ArgumentList("AutoplotServer");
-        alm.addOptionalSwitchArgument("uri", "u", "uri", "", "URI to plot");
-        alm.addOptionalSwitchArgument("vap", "v", "vap", "", "VAP to plot");
+        alm.addOptionalSwitchArgument("uri", "u", "uri", "", "URI to plot, or if .vap then rescale to width and height");
+        alm.addOptionalSwitchArgument("vap", "v", "vap", "", "VAP to plot without scaling.");
         alm.addOptionalSwitchArgument("width", "w", "width", "-1", "width of result (default=700)");
         alm.addOptionalSwitchArgument("height", "h", "height", "-1", "height of result (default=400)");
         alm.addOptionalSwitchArgument("canvas.aspect", "a", "canvas.aspect", "", "aspect ratio" );
@@ -44,12 +47,16 @@ public class AutoplotServer {
         alm.addBooleanSwitchArgument( "nomessages", "q", "nomessages", "don't show message bubbles.");
         alm.addBooleanSwitchArgument( "autorange", null, "autorange", "autorange the Y and Z axes of each plot in the vap");
         alm.addBooleanSwitchArgument( "autorangeFlags", null, "autorangeFlags", "autorange the Y and Z axes of each plot where the autorange flag is set in the vap");
+        alm.addBooleanSwitchArgument( "rescaleFonts", null, "rescaleFonts", "when the .vap is rescaled, also scale the fonts");
+        
         alm.requireOneOf( new String[] { "uri", "vap" } );
         
         alm.process(args);
 
         String suri = alm.getValue("uri");
         String vap = alm.getValue("vap");
+
+        boolean rescaleFonts= alm.getBooleanValue("rescaleFonts" );
 
         if ( suri.equals("") && vap.equals("") ) {
             alm.printUsage();
@@ -66,7 +73,11 @@ public class AutoplotServer {
             URISplit split= URISplit.parse(suri);
             if ( ".vap".equals(split.ext) ) {
                 logger.warning("use --vap=file.vap to preserve width and height");
-            } 
+            }
+        }
+        
+        if ( !vap.equals("") && ( width!=-1 || height!=-1 ) ) {
+            logger.warning("use --uri=file.vap if the canvas is to be resized");
         }
         
         String scanvasAspect = alm.getValue("canvas.aspect");
@@ -156,6 +167,16 @@ public class AutoplotServer {
             plot(suri);
             
             logger.log(Level.FINE, "done plot {0}", suri);
+        }
+        
+        if ( suri.endsWith(".vap") && rescaleFonts ) {
+            Application state= getDocumentModel();
+            double scale= width / ( (double)state.getCanvases(0).getWidth() );
+            Font f= Font.decode( state.getCanvases(0).getFont() );
+            Font newFont= f.deriveFont( f.getSize2D() * (float)scale );
+            state.getCanvases(0).getController().getDasCanvas().setBaseFont(newFont);
+            Font f2= state.getCanvases(0).getController().getDasCanvas().getFont();
+            state.getOptions().setCanvasFont( DomUtil.encodeFont(f2) );
         }
 
         logger.fine("get the model which provides the canvas");
