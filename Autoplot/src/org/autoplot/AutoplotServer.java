@@ -2,7 +2,7 @@
 package org.autoplot;
 
 import java.awt.Font;
-import java.net.URL;
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Units;
@@ -14,7 +14,6 @@ import org.autoplot.dom.Application;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.dom.DomUtil;
 import org.autoplot.dom.Plot;
-import org.das2.datum.DatumRangeUtil;
 
 /**
  * Server for producing images from Autoplot URIs, first requested by U. Michigan.
@@ -117,6 +116,8 @@ public class AutoplotServer {
             }
         }
         
+        double scale; // the scale factor should we want to rescale fonts.
+        
         if ( !vap.equals("") ) {
             logger.log(Level.FINE, "about to load the vap {0}", vap);
 
@@ -128,9 +129,15 @@ public class AutoplotServer {
             
             logger.log(Level.FINE, "vap is loaded");
             
-            if ( width==-1 || height==-1) {
+            if ( width==-1 && height==-1) {
                 width= dom.getController().getCanvas().getWidth();
                 height= dom.getController().getCanvas().getHeight();
+            } else if ( width==-1 ) {
+                double aspect= ((double)dom.getController().getCanvas().getHeight()) / dom.getController().getCanvas().getWidth();
+                width= (int)( height / aspect );
+            } else if ( height==-1 ) {
+                double aspect= ((double)dom.getController().getCanvas().getHeight()) / dom.getController().getCanvas().getWidth();
+                height= (int)( width * aspect );
             }
             DasCanvas c = dom.getController().getCanvas().getController().getDasCanvas();
             
@@ -155,7 +162,15 @@ public class AutoplotServer {
                 }
             }
             
+            scale=  ((double)width) / dom.getController().getCanvas().getWidth();
+            if ( scale!=1.0 ) rescaleFonts= true;
+            
+            dom.getController().getCanvas().setWidth(width);
+            dom.getController().getCanvas().setHeight(height);
+            dom.getController().getCanvas().getController().getDasCanvas().setSize(width, height);
+            
             c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
+
         } else {
             dom.getController().getCanvas().setWidth(width);
             dom.getController().getCanvas().setHeight(height);
@@ -166,12 +181,13 @@ public class AutoplotServer {
             
             plot(suri);
             
-            logger.log(Level.FINE, "done plot {0}", suri);
+            logger.log(Level.FINE, "done plot {0}", suri); 
+            
+            scale= ((double)width) / dom.getCanvases(0).getWidth();
         }
         
-        if ( suri.endsWith(".vap") && rescaleFonts ) {
+        if ( rescaleFonts ) {
             Application state= getDocumentModel();
-            double scale= width / ( (double)state.getCanvases(0).getWidth() );
             Font f= Font.decode( state.getCanvases(0).getFont() );
             Font newFont= f.deriveFont( f.getSize2D() * (float)scale );
             state.getCanvases(0).getController().getDasCanvas().setBaseFont(newFont);
@@ -193,7 +209,9 @@ public class AutoplotServer {
                     model.getCanvases(0).setHeight(height);
                     writeToPng( System.out );
                 } else {
+                    logger.log(Level.INFO, "write to {0}", outfile);
                     writeToPng( outfile, width, height );
+                    System.err.println("write to "+ outfile);
                 }
                 break;
             case "pdf":
@@ -204,6 +222,8 @@ public class AutoplotServer {
                 } else {
                     model.getCanvases(0).setWidth(width);
                     model.getCanvases(0).setHeight(height);
+                    logger.log(Level.INFO, "write to {0}", outfile);
+                    System.err.println("write to "+ outfile);
                     writeToPdf( outfile );
                 }   
                 break;
