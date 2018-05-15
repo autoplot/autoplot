@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Autoplot can read .sps and .spd files from NASA's Radio JOVE project.
+        <p><small>"Interval Average" mouse tool is now able to export data.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-05-06 r22412):</p>
+        <p>Bugfixes (2018-05-15 r22431):</p>
         <ul>
+            <li>horizontal slicer is now able to "plot above", though there is no way to swap out the label.
+            <li>export to HAPI (and AutoplotServlet HAPI output) is properly marked as 2.0.
             <li>rte_1578811180: "Getting started" dialog was missing image resource since package renamimg.
             <li>Pngwalk's resizeImage code doesn't resize if the dimensions don't change, which happens often.
             <li>"Run Batch" didn't handle URL parameters correctly.
@@ -64,6 +66,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Radio JOVE community AJ4CO_RAINBOW colorbar is added, using a subset of its 4096 colors.  (4096 color version should be available soon.)
+            <li>CSV Data Source supports streaming.  AbstractDataSource has "getInputStream" method to support streaming subclasses.
+            <li>medianFilter supports rank 2 data, performing the operation on slices of the 1st axis.
             <li>add units "mjd" (for days since midnight, Nov 17, 1958) as a default for the ascii table data source.
             <li>"overplotOf" added to plot command.
             <li>sps and spd readers have a built-in code in case there is no internet.
