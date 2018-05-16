@@ -24,14 +24,16 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-05-15 r22431):</p>
+        <p>Bugfixes (2018-05-16 r22437):</p>
         <ul>
-            <li>1987: revisit height and width parameters of AutoplotServlet.
+            <li>"degrees" and "Degrees" are now equivalent.  
+            <li>1861: in Jython, rank 0 data can be used as a double automatically.
+            <li>1987: revisit height and width parameters of AutoplotServlet.  Thanks, Jon!
             <li>horizontal slicer is now able to "plot above", though there is no way to swap out the label.
             <li>export to HAPI (and AutoplotServlet HAPI output) is properly marked as 2.0.
-            <li>rte_1578811180: "Getting started" dialog was missing image resource since package renamimg.
+            <li>rte_1578811180: "Getting started" dialog was missing image resource since package renamimg.  Thanks, Dapit!
             <li>Pngwalk's resizeImage code doesn't resize if the dimensions don't change, which happens often.
-            <li>"Run Batch" didn't handle URL parameters correctly.
+            <li>"Run Batch" didn't handle URL-type parameters correctly.
             <li>rte_0176698267: mishandling of URIs in new JythonExtensionDataSource.  Thanks, Larry!
             <li>1984: error in inspecting .vap file would clear the address bar, destroying the scientist's URI.
             <li>rte_0395859275: whoops, new code in branch was never tested for "/home/jbf/&lt;TAB&gt;" where NullPointerException was encountered.
