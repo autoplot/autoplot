@@ -2,6 +2,7 @@ package org.autoplot.scriptconsole;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,7 +28,7 @@ public class LoggingOutputStream extends ByteArrayOutputStream {
         this.level = level;
         lineSeparator = System.getProperty("line.separator"); // applet okay    
     }
-    
+
     /** 
      * upon flush() write the existing contents of the OutputStream
      * to the logger as a log record. 
@@ -39,8 +40,12 @@ public class LoggingOutputStream extends ByteArrayOutputStream {
         String record;
         synchronized (this) {
             super.flush();
-            record = this.toString("UTF-8");  // Try "print Units.microseconds3" (µs) at the command line to see where the encoding is messed up.
-
+            try {
+                record = this.toString("ISO-8859-1");  // Try "print Units.microseconds3" (µs) at the command line to see where the encoding is messed up.
+            } catch ( UnsupportedEncodingException ex ) {
+                record = this.toString(); 
+            }
+            
             if ( !record.contains(lineSeparator ) ) return;
             super.reset();
 
