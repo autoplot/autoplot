@@ -343,16 +343,18 @@ public class PyDatum extends PyJavaInstance {
      */
     @Override
     public Object __tojava__(Class c) {
-        if ( c==double.class ) {
-            return datum.value();
-        } else if ( c==Double.class ) {
-            return datum.value();
-        } else if ( c==float.class ) {
-            return (float)datum.value();
-        } else if ( c==Float.class ) {
-            return (float)datum.value();
-        } else if ( c==Number.class ) {
-            return datum.value();
+        if ( datum.getUnits()==Units.dimensionless ) {
+            if ( c==double.class ) {
+                return datum.value();
+            } else if ( c==Double.class ) {
+                return datum.value();
+            } else if ( c==float.class ) {
+                return (float)datum.value();
+            } else if ( c==Float.class ) {
+                return (float)datum.value();
+            } else if ( c==Number.class ) {
+                return datum.value();
+            }    
         }
         return super.__tojava__(c);        
     }
