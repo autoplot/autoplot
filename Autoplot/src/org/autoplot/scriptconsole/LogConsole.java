@@ -152,7 +152,6 @@ public class LogConsole extends javax.swing.JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int caret= logTextArea.viewToModel( new Point( e.getX(), e.getY() ) );
-                System.err.println("caret="+caret);
                 try {
                     String word= org.das2.jythoncompletion.Utilities.getWordAt( logTextArea, caret );
                     if ( word.startsWith("http:") || word.startsWith("https:") ) {
