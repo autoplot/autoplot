@@ -6,7 +6,9 @@
 package org.das2.jythoncompletion;
 
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 
@@ -67,6 +69,22 @@ public class Utilities {
     public static int getRowEnd( JTextArea a, int offset) throws BadLocationException {
         int line = getLineNumberForOffset( a, offset );
         return a.getLineEndOffset(line);
+    }
+
+    /**
+     * look for adjacent whitespace to identify the word at the location.
+     * @param logTextArea
+     * @param caret
+     * @return
+     * @throws BadLocationException 
+     */
+    public static String getWordAt(JTextPane logTextArea, int caret) throws BadLocationException {
+        Document d= logTextArea.getDocument();
+        while ( caret>0 && !Character.isWhitespace( d.getText(caret,1).charAt(0) ) ) caret--;
+        caret++;
+        int caretEnd= caret;
+        while ( caretEnd<d.getLength() && !Character.isWhitespace( d.getText(caretEnd,1).charAt(0) ) ) caretEnd++;
+        return d.getText( caret, caretEnd-caret );
     }
         
 }
