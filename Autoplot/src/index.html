@@ -26,9 +26,10 @@
         
         <p>Bugfixes (2018-05-16 r22437):</p>
         <ul>
+            <li>1861: in Jython, dimensionless rank 0 data and datums can be used as a double automatically.  Thanks, Ed!
             <li>1988: link command, used all over the place, would always copy Z when link(x,y,Z) was used, wasting tons of space...
+            <li>1989: msec vs ms in testing.  Canonical units (e.g. ms) are always displayed.
             <li>"degrees" and "Degrees" are now equivalent.  
-            <li>1861: in Jython, rank 0 data can be used as a double automatically.  Thanks, Ed!
             <li>1987: revisit height and width parameters of AutoplotServlet.  Thanks, Jon!
             <li>horizontal slicer is now able to "plot above", though there is no way to swap out the label.
             <li>export to HAPI (and AutoplotServlet HAPI output) is properly marked as 2.0.
