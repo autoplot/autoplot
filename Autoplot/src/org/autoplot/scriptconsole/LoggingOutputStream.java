@@ -27,7 +27,7 @@ public class LoggingOutputStream extends ByteArrayOutputStream {
         this.level = level;
         lineSeparator = System.getProperty("line.separator"); // applet okay    
     }
-
+    
     /** 
      * upon flush() write the existing contents of the OutputStream
      * to the logger as a log record. 
@@ -39,7 +39,7 @@ public class LoggingOutputStream extends ByteArrayOutputStream {
         String record;
         synchronized (this) {
             super.flush();
-            record = this.toString();
+            record = this.toString("UTF-8");  // Try "print Units.microseconds3" (µs) at the command line to see where the encoding is messed up.
 
             if ( !record.contains(lineSeparator ) ) return;
             super.reset();
