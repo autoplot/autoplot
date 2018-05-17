@@ -8,6 +8,7 @@ package org.autoplot.scriptconsole;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
@@ -16,6 +17,8 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
@@ -70,6 +73,7 @@ import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.autoplot.GuiSupport;
 import org.autoplot.JythonUtil;
+import org.autoplot.help.Util;
 import org.autoplot.util.TickleTimer;
 import org.xml.sax.SAXException;
 
@@ -143,6 +147,22 @@ public class LogConsole extends javax.swing.JPanel {
                 return interp;
             }
         });
+        
+        this.logTextArea.addMouseListener( new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int caret= logTextArea.viewToModel( new Point( e.getX(), e.getY() ) );
+                System.err.println("caret="+caret);
+                try {
+                    String word= org.das2.jythoncompletion.Utilities.getWordAt( logTextArea, caret );
+                    if ( word.startsWith("http:") || word.startsWith("https:") ) {
+                        Util.openBrowser(word);
+                    }
+                } catch (BadLocationException ex) {
+                    Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        } );
 
         timer2 = new Timer(300, new ActionListener() {
             @Override
