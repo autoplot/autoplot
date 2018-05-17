@@ -92,6 +92,7 @@ public class JythonUtil {
         }
         ///  http://www.gossamer-threads.com/lists/python/python/697524
         org.python.core.PySystemState pySys = new org.python.core.PySystemState();
+        //pySys.setdefaultencoding("utf8"); //doesn't work with Jython2.2, try with 2.5
         
         String[] loadClasses= new String[] { "glob.py", "autoplot2017.py", "autoplotapp2017.py" }; // these must be in the root of the interpretter search path.
         for ( String pysrc: loadClasses ) {
