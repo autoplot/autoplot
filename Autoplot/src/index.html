@@ -26,6 +26,8 @@
         
         <p>Bugfixes (2018-05-16 r22437):</p>
         <ul>
+            <li>1871: recent entries of timeranges and operations were lost because of new code that appends the recent file using a move.
+            <li>use ISO-8859-1 encoding with Jython output, so that micro symbol paints properly.
             <li>1861: in Jython, dimensionless rank 0 data and datums can be used as a double automatically.  Thanks, Ed!
             <li>1988: link command, used all over the place, would always copy Z when link(x,y,Z) was used, wasting tons of space...
             <li>1989: msec vs ms in testing.  Canonical units (e.g. ms) are always displayed.
@@ -71,6 +73,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>clicking on http and https links in the console tab will point the browse (Firefox,etc) to the link.
             <li>Radio JOVE community AJ4CO_RAINBOW colorbar is added, using a subset of its 4096 colors.  (4096 color version should be available soon.)
             <li>CSV Data Source supports streaming.  AbstractDataSource has "getInputStream" method to support streaming subclasses.
             <li>medianFilter supports rank 2 data, performing the operation on slices of the 1st axis.
