@@ -343,7 +343,9 @@ public class PyDatum extends PyJavaInstance {
      */
     @Override
     public Object __tojava__(Class c) {
-        if ( datum.getUnits()==Units.dimensionless ) {
+        logger.fine("this is not supported because the double version would be used where a dataset would work.");
+        // See sftp://nudnik.physics.uiowa.edu/home/jbf/project/autoplot/tests/1861/demo1861UsesDoubleNotQDataSet.jy        
+        if ( false && datum.getUnits()==Units.dimensionless ) {
             if ( c==double.class ) {
                 return datum.value();
             } else if ( c==Double.class ) {

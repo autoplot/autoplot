@@ -1163,8 +1163,10 @@ public class PyQDataSet extends PyJavaInstance {
         } else if ( c.isAssignableFrom(WritableDataSet.class) ) {
             return ds;
         } else if ( rods.rank()==0 ) {
+            logger.fine("this is not supported because the double version would be used where a dataset would work.");
+            // See sftp://nudnik.physics.uiowa.edu/home/jbf/project/autoplot/tests/1861/demo1861UsesDoubleNotQDataSet.jy
             Datum datum= DataSetUtil.asDatum(rods);
-            if ( datum.getUnits()==Units.dimensionless ) {
+            if ( false && datum.getUnits()==Units.dimensionless ) {
                 if ( c==double.class ) {
                     return datum.value();
                 } else if ( c==Double.class ) {
