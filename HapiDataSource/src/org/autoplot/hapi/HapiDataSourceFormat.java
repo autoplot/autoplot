@@ -30,6 +30,7 @@ import org.das2.qds.QubeDataSetIterator;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.URISplit;
+import org.das2.datum.format.TimeDatumFormatter;
 import org.das2.qds.FloatReadAccess;
 import org.das2.qds.ops.Ops;
 import org.das2.qstream.AsciiTimeTransferType;
@@ -251,7 +252,8 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                 QDataSet ds= dss.get(ids);
                 Units u= SemanticOps.getUnits(ds);
                 if ( UnitsUtil.isTimeLocation(u) ) {
-                    dfs[ids]= DataSetUtil.bestFormatter(ds);
+                    //dfs[ids]= DataSetUtil.bestFormatter(ds);
+                    dfs[ids]= new TimeDatumFormatter("yyyy-MM-dd'T'HH:mm:ss.SSS'Z')");
                 } else if ( UnitsUtil.isNominalMeasurement(u) ) {
                     dfs[ids]= DataSetUtil.bestFormatter(ds);
                 } else {
