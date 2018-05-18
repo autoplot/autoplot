@@ -121,6 +121,7 @@ public class RecentComboBox extends JComboBox {
      * and should not be called on the event thread.
      */
     private void loadRecent() {
+        logger.log(Level.FINER, "loadRecent()");
         List<String> items= new ArrayList( RECENT_SIZE+2 );
         try {
             if ( recentFile!=null && recentFile.exists() ) {
@@ -175,6 +176,7 @@ public class RecentComboBox extends JComboBox {
      * @param items
      */
     private void saveRecent( List<String> items ) {
+        logger.log(Level.FINER, "saveRecent({0} items)", items.size());
         if ( recentFile==null || !bookmarksFolder.exists() ) {
             return; //not yet, we're initializing for the first time.
         }
@@ -216,6 +218,7 @@ public class RecentComboBox extends JComboBox {
      * @param s the item
      */
     public void addToRecent( final String s ) {
+        logger.log(Level.FINE, "addToRecent({0})", s);
         if ( verifier!=null ) {
             if ( !verifier.verify(s) ) {
                 return;
@@ -225,33 +228,19 @@ public class RecentComboBox extends JComboBox {
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                File recentFileTemp;
-                try {
-                    recentFileTemp= File.createTempFile( "recent."+ preferenceNode, ".txt", bookmarksFolder );
-                } catch (IOException ex) {
-                    logger.warning(ex.getMessage());
-                    return;
-                }
-                BufferedWriter w = null;
-                try {
-                    if ( recentFile!=null ) {
-                        w = new BufferedWriter(new FileWriter(recentFileTemp));
-                        w.append(s, 0, s.length());
-                        w.append("\n");
-                        w.close();
-                    }
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                } finally {
-                    try {
-                        if ( w!=null ) w.close();
-                    } catch (IOException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
+                List<String> items= new ArrayList<>();
+                items.add(s);
+                if ( recentFile!=null ) {
+                    try ( BufferedReader r= new BufferedReader(new FileReader(recentFile)) ) {
+                        String l;
+                        while ( (l=r.readLine())!=null ) {
+                            items.add(items.size(),l);
+                        }
+                    } catch ( IOException ex ) {
+                        logger.log( Level.WARNING, null, ex );
                     }
                 }
-                if ( !recentFileTemp.renameTo(recentFile) ) {
-                   logger.log(Level.WARNING, "unable to overwrite file {0}", recentFile);
-                }
+                saveRecent(items);
                 loadRecent();        
             }
         };
