@@ -94,164 +94,171 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     @Override
     public void formatData( String uri, QDataSet data, ProgressMonitor mon) throws Exception {
 
-        URISplit split= URISplit.parse( uri );
-        java.util.Map<String, String> params= URISplit.parseParams( split.params );
-
-        File ffile= new File( split.resourceUri.getPath() );
-           
-        boolean append= "T".equals( params.get("append") ) ;
+        mon.started();
         
-        if ( ! append ) {
-            logger.log(Level.FINE, "create CDF file {0}", ffile);
-            logger.log(Level.FINE, "call cdf= new CDFWriter( false )");
-            cdf = new CDFWriter( false );
-        } else {
-            CDFReader read= new CDFReader( ffile.toString() );
-            for ( String n : read.getVariableNames() ) {
-                seman.put( n,null );
-            }
-            logger.log(Level.FINE, "call cdf= new CDFWriter( {0}, false )", ffile.toString() );
-            cdf = new CDFWriter( ffile.toString(), false ); // read in the old file first
-            
-        }
-        
-        String name1= params.get( "arg_0" );
+        try {
+            URISplit split= URISplit.parse( uri );
+            java.util.Map<String, String> params= URISplit.parseParams( split.params );
 
-        if ( name1!=null ) {
-            names.put(data,name1);
-            seman.put(name1,data);
-        }
-        
-        nameFor(data); // allocate a good name
+            File ffile= new File( split.resourceUri.getPath() );
 
-        QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
+            boolean append= "T".equals( params.get("append") ) ;
 
-        if ( dep0 != null ) {
-            if ( !append ) {
-                String name= nameFor(dep0);
-                Map<String,String> params1= new HashMap<>();
-                params1.put( "timeType",params.get("timeType") );
-                addVariableRankN( dep0, name, true, params1, mon );
+            if ( ! append ) {
+                logger.log(Level.FINE, "create CDF file {0}", ffile);
+                logger.log(Level.FINE, "call cdf= new CDFWriter( false )");
+                cdf = new CDFWriter( false );
             } else {
-                String name= nameFor(dep0);
-                Map<String,String> params1= new HashMap<>();
-                params1.put( "timeType",params.get("timeType") );
-                try {
-                    addVariableRankN( dep0, name, true, params1, mon );
-                } catch ( Exception e ) {
-                    logger.fine("CDF Exception, presumably because the variable already exists.");
+                CDFReader read= new CDFReader( ffile.toString() );
+                for ( String n : read.getVariableNames() ) {
+                    seman.put( n,null );
                 }
-            }
-        }
-        
-        QDataSet dep1 = (QDataSet) data.property(QDataSet.DEPEND_1);
+                logger.log(Level.FINE, "call cdf= new CDFWriter( {0}, false )", ffile.toString() );
+                cdf = new CDFWriter( ffile.toString(), false ); // read in the old file first
 
-        if (dep1 != null) {
-            if ( !append ) {
-                String name= nameFor(dep1);
-                if ( dep1.rank()==1 ) {
-                    addVariableRank1NoVary(dep1, name, true, new HashMap<String,String>(), mon );
+            }
+
+            String name1= params.get( "arg_0" );
+
+            if ( name1!=null ) {
+                names.put(data,name1);
+                seman.put(name1,data);
+            }
+
+            nameFor(data); // allocate a good name
+
+            QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
+
+            if ( dep0 != null ) {
+                if ( !append ) {
+                    String name= nameFor(dep0);
+                    Map<String,String> params1= new HashMap<>();
+                    params1.put( "timeType",params.get("timeType") );
+                    addVariableRankN( dep0, name, true, params1, mon.getSubtaskMonitor("dep0") );
                 } else {
-                    addVariableRankN( dep1, name, true, new HashMap<String,String>(), mon );
+                    String name= nameFor(dep0);
+                    Map<String,String> params1= new HashMap<>();
+                    params1.put( "timeType",params.get("timeType") );
+                    try {
+                        addVariableRankN( dep0, name, true, params1, mon.getSubtaskMonitor("dep0") );
+                    } catch ( Exception e ) {
+                        logger.fine("CDF Exception, presumably because the variable already exists.");
+                    }
                 }
-            } else {
-                String name= nameFor(dep1);
-                Map<String,String> params1= new HashMap<>();
-                try {
+            }
+
+            QDataSet dep1 = (QDataSet) data.property(QDataSet.DEPEND_1);
+
+            if (dep1 != null) {
+                if ( !append ) {
+                    String name= nameFor(dep1);
                     if ( dep1.rank()==1 ) {
-                        addVariableRank1NoVary( dep1, name, true, params1, mon );
+                        addVariableRank1NoVary(dep1, name, true, new HashMap<String,String>(), mon.getSubtaskMonitor("dep1") );
                     } else {
-                        addVariableRankN( dep1, name, true, params1, mon );
+                        addVariableRankN( dep1, name, true, new HashMap<String,String>(), mon.getSubtaskMonitor("dep1") );
                     }
-                } catch ( Exception e ) {
-                    logger.fine("CDF Exception, presumably because the variable already exists.");
-                }                
-            }
-        }
-
-        QDataSet dep2 = (QDataSet) data.property(QDataSet.DEPEND_2);
-
-        if (dep2 != null) {
-            if ( !append ) {
-                String name= nameFor(dep2);
-                if ( dep2.rank()==1 ) {
-                    addVariableRank1NoVary(dep2, name, true, new HashMap<String,String>(), new NullProgressMonitor() );
                 } else {
-                    addVariableRankN( dep2, name, true, new HashMap<String,String>(), mon );
+                    String name= nameFor(dep1);
+                    Map<String,String> params1= new HashMap<>();
+                    try {
+                        if ( dep1.rank()==1 ) {
+                            addVariableRank1NoVary( dep1, name, true, params1, mon.getSubtaskMonitor("dep1") );
+                        } else {
+                            addVariableRankN( dep1, name, true, params1, mon.getSubtaskMonitor("dep1") );
+                        }
+                    } catch ( Exception e ) {
+                        logger.fine("CDF Exception, presumably because the variable already exists.");
+                    }                
                 }
-            } else {
-                String name= nameFor(dep2);
-                Map<String,String> params1= new HashMap<>();
-                try {
-                    if ( dep2.rank()==1 ) {
-                        addVariableRank1NoVary( dep2, name, true, params1, mon );
-                    } else {
-                        addVariableRankN( dep2, name, true, params1, mon );
-                    }
-                } catch ( Exception e ) {
-                    logger.fine("CDF Exception, presumably because the variable already exists.");
-                }                
             }
-        }
 
-        QDataSet bds= (QDataSet) data.property(QDataSet.BUNDLE_1);
-        if ( bds != null) {
-            if ( !append && data.rank()==2 ) {
-                if ( dep1==null ) {
-                    logger.fine("writing bundled datasets to CDF separately.");
+            QDataSet dep2 = (QDataSet) data.property(QDataSet.DEPEND_2);
+
+            if (dep2 != null) {
+                if ( !append ) {
+                    String name= nameFor(dep2);
+                    if ( dep2.rank()==1 ) {
+                        addVariableRank1NoVary(dep2, name, true, new HashMap<String,String>(), mon.getSubtaskMonitor("dep2") );
+                    } else {
+                        addVariableRankN( dep2, name, true, new HashMap<String,String>(), mon.getSubtaskMonitor("dep2") );
+                    }
+                } else {
+                    String name= nameFor(dep2);
+                    Map<String,String> params1= new HashMap<>();
+                    try {
+                        if ( dep2.rank()==1 ) {
+                            addVariableRank1NoVary( dep2, name, true, params1, mon.getSubtaskMonitor("dep2") );
+                        } else {
+                            addVariableRankN( dep2, name, true, params1, mon.getSubtaskMonitor("dep2") );
+                        }
+                    } catch ( Exception e ) {
+                        logger.fine("CDF Exception, presumably because the variable already exists.");
+                    }                
+                }
+            }
+
+            QDataSet bds= (QDataSet) data.property(QDataSet.BUNDLE_1);
+            if ( bds != null) {
+                if ( !append && data.rank()==2 ) {
+                    if ( dep1==null ) {
+                        logger.fine("writing bundled datasets to CDF separately.");
+                    } else {
+                        String name= nameFor(bds);
+                        addVariableRank1NoVary(bds, name, true, new HashMap<String,String>(), mon.getSubtaskMonitor("bundle1") );
+                    }
                 } else {
                     String name= nameFor(bds);
-                    addVariableRank1NoVary(bds, name, true, new HashMap<String,String>(), new NullProgressMonitor() );
+                    Map<String,String> params1= new HashMap<>();
+                    try {
+                        addVariableRank1NoVary( bds, name, true, params1, mon.getSubtaskMonitor("bundle1") );
+                    } catch ( Exception e ) {
+                        logger.fine("CDF Exception, presumably because the variable already exists.");
+                    }                
                 }
-            } else {
-                String name= nameFor(bds);
-                Map<String,String> params1= new HashMap<>();
-                try {
-                    addVariableRank1NoVary( bds, name, true, params1, mon );
-                } catch ( Exception e ) {
-                    logger.fine("CDF Exception, presumably because the variable already exists.");
-                }                
             }
-        }
-        
-        if ( bds!=null && dep1==null && "T".equals(params.get("bundle")) ) {
-            for ( int i=0; i<bds.length(); i++ ) {
-                QDataSet data1= Ops.unbundle( data, i ) ;
-                addVariableRankN( data1, nameFor(data1), false, params, mon );
-                if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data1), "DEPEND_0", CDFDataType.CHAR, nameFor(dep0) );
-            }
-        } else {
-            addVariableRankN(data, nameFor(data), false, params, mon );
 
-            try {
-                if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_0", CDFDataType.CHAR, nameFor(dep0) );
-                if ( dep1!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_1", CDFDataType.CHAR, nameFor(dep1) );
-                if ( dep2!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_2", CDFDataType.CHAR, nameFor(dep2) );
-                if ( bds!=null )  cdf.addVariableAttributeEntry( nameFor(data), "LABL_PTR_1", CDFDataType.CHAR, nameFor(bds) );
-            } catch ( CDFException.WriterError ex ) {
-                logger.log( Level.WARNING, ex.getMessage() , ex );
+            if ( bds!=null && dep1==null && "T".equals(params.get("bundle")) ) {
+                for ( int i=0; i<bds.length(); i++ ) {
+                    QDataSet data1= Ops.unbundle( data, i ) ;
+                    addVariableRankN( data1, nameFor(data1), false, params, mon );
+                    if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data1), "DEPEND_0", CDFDataType.CHAR, nameFor(dep0) );
+                }
+            } else {
+                addVariableRankN(data, nameFor(data), false, params, mon );
+
+                try {
+                    if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_0", CDFDataType.CHAR, nameFor(dep0) );
+                    if ( dep1!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_1", CDFDataType.CHAR, nameFor(dep1) );
+                    if ( dep2!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_2", CDFDataType.CHAR, nameFor(dep2) );
+                    if ( bds!=null )  cdf.addVariableAttributeEntry( nameFor(data), "LABL_PTR_1", CDFDataType.CHAR, nameFor(bds) );
+                } catch ( CDFException.WriterError ex ) {
+                    logger.log( Level.WARNING, ex.getMessage() , ex );
+                }
             }
-        }
-         
-        if ( !append ) {
-            if ( ffile.exists() ) {
-                CdfDataSource.cdfCacheReset();
-                File tempFile= File.createTempFile( "deleteme",".cdf");
-                if ( !ffile.renameTo( tempFile) ) {
-                    ffile.delete();
-                    logger.log(Level.WARNING, "file {0} cannot be renamed", ffile);
-                } 
-                write( ffile.toString() );
-                if ( tempFile.exists() && !tempFile.delete() ) {
-                    logger.log(Level.WARNING, "file {0} cannot be deleted", tempFile);
+
+            mon.setProgressMessage("writing file");
+            if ( !append ) {
+                if ( ffile.exists() ) {
+                    CdfDataSource.cdfCacheReset();
+                    File tempFile= File.createTempFile( "deleteme",".cdf");
+                    if ( !ffile.renameTo( tempFile) ) {
+                        ffile.delete();
+                        logger.log(Level.WARNING, "file {0} cannot be renamed", ffile);
+                    } 
+                    write( ffile.toString() );
+                    if ( tempFile.exists() && !tempFile.delete() ) {
+                        logger.log(Level.WARNING, "file {0} cannot be deleted", tempFile);
+                    }
+                } else {
+                    write( ffile.toString() );
                 }
             } else {
                 write( ffile.toString() );
             }
-        } else {
-            write( ffile.toString() );
-        }
         
+        } finally {
+            mon.finished();
+        }
         
     }
 
