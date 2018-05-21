@@ -197,6 +197,31 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 }
             }
 
+            QDataSet dep3 = (QDataSet) data.property(QDataSet.DEPEND_3);
+
+            if (dep3 != null) {
+                if ( !append ) {
+                    String name= nameFor(dep3);
+                    if ( dep3.rank()==1 ) {
+                        addVariableRank1NoVary(dep3, name, true, new HashMap<String,String>(), mon.getSubtaskMonitor("dep3") );
+                    } else {
+                        addVariableRankN( dep3, name, true, new HashMap<String,String>(), mon.getSubtaskMonitor("dep3") );
+                    }
+                } else {
+                    String name= nameFor(dep3);
+                    Map<String,String> params1= new HashMap<>();
+                    try {
+                        if ( dep3.rank()==1 ) {
+                            addVariableRank1NoVary( dep3, name, true, params1, mon.getSubtaskMonitor("dep3") );
+                        } else {
+                            addVariableRankN( dep3, name, true, params1, mon.getSubtaskMonitor("dep3") );
+                        }
+                    } catch ( Exception e ) {
+                        logger.fine("CDF Exception, presumably because the variable already exists.");
+                    }                
+                }
+            }
+            
             QDataSet bds= (QDataSet) data.property(QDataSet.BUNDLE_1);
             if ( bds != null) {
                 if ( !append && data.rank()==2 ) {
@@ -230,6 +255,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                     if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_0", CDFDataType.CHAR, nameFor(dep0) );
                     if ( dep1!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_1", CDFDataType.CHAR, nameFor(dep1) );
                     if ( dep2!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_2", CDFDataType.CHAR, nameFor(dep2) );
+                    if ( dep3!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_3", CDFDataType.CHAR, nameFor(dep3) );
                     if ( bds!=null )  cdf.addVariableAttributeEntry( nameFor(data), "LABL_PTR_1", CDFDataType.CHAR, nameFor(bds) );
                 } catch ( CDFException.WriterError ex ) {
                     logger.log( Level.WARNING, ex.getMessage() , ex );
