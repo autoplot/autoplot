@@ -24,8 +24,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-05-16 r22437):</p>
+        <p>Bugfixes (2018-05-21 r22458):</p>
         <ul>
+            <li>format to CDF properly supports rank 2 depend 1.
+            <li>HAPI export format properly formats to HAPI 2.0, which requires "Z" in timetags.
             <li>1871: recent entries of timeranges and operations were lost because of new code that appends the recent file using a move.
             <li>use ISO-8859-1 encoding with Jython output, so that micro symbol paints properly.
             <li>1861: in Jython, dimensionless rank 0 data and datums can be used as a double automatically.  Thanks, Ed!
