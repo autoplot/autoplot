@@ -24,13 +24,13 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-05-21 r22458):</p>
+        <p>Bugfixes (2018-05-21 r22460):</p>
         <ul>
-            <li>format to CDF properly supports rank 2 depend 1.
+            <li>1861: back off automatic conversion until Jython 2.5 is used, Java 2.2 is too aggressive in using the conversion and old scripts were breaking.
+            <li>format to CDF properly supports rank 2 depend 1 and supports rank 4 data.
             <li>HAPI export format properly formats to HAPI 2.0, which requires "Z" in timetags.
             <li>1871: recent entries of timeranges and operations were lost because of new code that appends the recent file using a move.
             <li>use ISO-8859-1 encoding with Jython output, so that micro symbol paints properly.
-            <li>1861: in Jython, dimensionless rank 0 data and datums can be used as a double automatically.  Thanks, Ed!
             <li>1988: link command, used all over the place, would always copy Z when link(x,y,Z) was used, wasting tons of space...
             <li>1989: msec vs ms in testing.  Canonical units (e.g. ms) are always displayed.
             <li>"degrees" and "Degrees" are now equivalent.  
