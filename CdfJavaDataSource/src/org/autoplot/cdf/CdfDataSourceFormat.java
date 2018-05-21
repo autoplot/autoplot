@@ -149,7 +149,11 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         if (dep1 != null) {
             if ( !append ) {
                 String name= nameFor(dep1);
-                addVariableRank1NoVary(dep1, name, true, new HashMap<String,String>(), new NullProgressMonitor() );
+                if ( dep1.rank()==1 ) {
+                    addVariableRank1NoVary(dep1, name, true, new HashMap<String,String>(), mon );
+                } else {
+                    addVariableRankN( dep1, name, true, new HashMap<String,String>(), mon );
+                }
             } else {
                 String name= nameFor(dep1);
                 Map<String,String> params1= new HashMap<>();
@@ -170,7 +174,11 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         if (dep2 != null) {
             if ( !append ) {
                 String name= nameFor(dep2);
-                addVariableRank1NoVary(dep2, name, true, new HashMap<String,String>(), new NullProgressMonitor() );
+                if ( dep2.rank()==1 ) {
+                    addVariableRank1NoVary(dep2, name, true, new HashMap<String,String>(), new NullProgressMonitor() );
+                } else {
+                    addVariableRankN( dep2, name, true, new HashMap<String,String>(), mon );
+                }
             } else {
                 String name= nameFor(dep2);
                 Map<String,String> params1= new HashMap<>();
