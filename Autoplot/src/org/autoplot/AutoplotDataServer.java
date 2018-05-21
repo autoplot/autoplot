@@ -89,6 +89,8 @@ public class AutoplotDataServer {
 
         boolean someValid= false;
 
+        boolean trimTimes= format.equals(FORM_HAPI_BINARY) || format.equals(FORM_HAPI_CSV) || format.equals(FORM_HAPI_DATA) || format.equals(FORM_HAPI_DATA_BINARY);
+        
         if (!timeRange.equals("")) {
             logger.fine("org.autoplot.jythonsupport.Util.getDataSet( suri,timeRange ):");
             logger.log(Level.FINE, "   suri={0}", suri);
@@ -135,6 +137,11 @@ public class AutoplotDataServer {
                 } catch ( Exception ex ) {
                     logger.log( Level.WARNING, "exception when trying to read "+dr, ex ); 
                 }
+                
+                if ( trimTimes ) {                                    
+                    ds1= Ops.trim( ds1, outer );
+                }
+                
                 logger.log( Level.FINE, "  --> {0} )", ds1 );
                 if ( ds1!=null ) {
                     if ( !SemanticOps.isTimeSeries(ds1) ) { //automatically fall back to -nostream
