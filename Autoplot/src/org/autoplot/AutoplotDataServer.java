@@ -3,6 +3,7 @@ package org.autoplot;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -70,13 +71,13 @@ public class AutoplotDataServer {
 
     /**
      * Perform the data service.
-     * @param timeRange the time range to send out, such as "May 2003"
+     * @param timeRange the time range to send out, such as "May 2003", or "" for none, or null for none.
      * @param suri the data source to read in.  If this has TimeSeriesBrowse, then we can stream the data.
      * @param step step size, such as "24 hr" or "3600s".  If the URI contains $H, "3600s" is used.
      * @param stream if true, send data out as it is read.
      * @param format FORM_QDS, FORM_D2S, FORM_HAPI
      * @param mon progress monitor to monitor the stream.
-     * @param out 
+     * @param out stream which receives the data.
      * @param ascii if true, use ascii types for qstreams and das2streams.
      * @param outEmpty for the streaming library, so we don't put progress out until we've output the initial header.
      * @throws Exception 
@@ -91,7 +92,8 @@ public class AutoplotDataServer {
 
         boolean trimTimes= format.equals(FORM_HAPI_BINARY) || format.equals(FORM_HAPI_CSV) || format.equals(FORM_HAPI_DATA) || format.equals(FORM_HAPI_DATA_BINARY);
         
-        if (!timeRange.equals("")) {
+        if ( timeRange==null ) timeRange="";
+        if ( !timeRange.equals("")) {
             logger.fine("org.autoplot.jythonsupport.Util.getDataSet( suri,timeRange ):");
             logger.log(Level.FINE, "   suri={0}", suri);
             logger.log(Level.FINE, "   timeRange={0}", timeRange);
@@ -109,7 +111,7 @@ public class AutoplotDataServer {
             Datum next= first.add( Units.seconds.parse(step) );
 
             List<DatumRange> drs;
-            if ( stream && ( format.equals(FORM_D2S) || format.equals(FORM_QDS) || format.equals(FORM_HAPI_DATA) || format.equals(FORM_HAPI_DATA_BINARY)) ) {
+            if ( stream && ( format.equals(FORM_D2S) || format.equals(FORM_QDS) || format.equals(FORM_HAPI_DATA) || format.equals(FORM_HAPI_CSV) || format.equals(FORM_HAPI_DATA_BINARY)) ) {
                 drs= DatumRangeUtil.generateList( outer, new DatumRange( first, next ) );
             } else {
                 // dat xls cannot stream...
@@ -132,13 +134,16 @@ public class AutoplotDataServer {
                     ds1= org.autoplot.jythonsupport.Util.getDataSet(suri, dr.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
                     
                 } catch ( NoDataInIntervalException ex ) {
-                    logger.log( Level.INFO, "no data trying to read "+dr, ex ); 
+                    logger.log( Level.FINE, "no data trying to read "+dr, ex ); 
+                    
+                } catch ( FileNotFoundException ex ) {
+                    logger.log( Level.FINE, "no files found trying to read "+dr, ex ); 
                     
                 } catch ( Exception ex ) {
                     logger.log( Level.WARNING, "exception when trying to read "+dr, ex ); 
                 }
                 
-                if ( trimTimes ) {                                    
+                if ( ds1!=null && trimTimes ) {                                    
                     ds1= Ops.trim( ds1, outer );
                 }
                 
