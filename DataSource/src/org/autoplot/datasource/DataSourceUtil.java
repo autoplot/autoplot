@@ -729,17 +729,35 @@ public class DataSourceUtil {
      * @throws java.io.IOException
      */
     public static void transfer( InputStream src, OutputStream dest ) throws IOException {
+        transfer( src, dest, true );
+    }
+    
+    
+    /**
+     * transfers the data from one channel to another.  src and dest are
+     * closed after the operation is complete.
+     * @param src
+     * @param dest
+     * @param close if true then close the streams after.
+     * @throws java.io.IOException
+     */
+    public static void transfer( InputStream src, OutputStream dest, boolean close ) throws IOException {
         final byte[] buffer = new byte[ 16 * 1024 ];
 
-        int i= src.read(buffer);
-        while ( i != -1) {
-            dest.write(buffer,0,i);
-            i= src.read(buffer);
+        try {
+            int i= src.read(buffer);
+            while ( i != -1) {
+                dest.write(buffer,0,i);
+                i= src.read(buffer);
+            }
+        } finally {
+            if ( close ) {
+                dest.close();
+                src.close();
+            }
         }
-        dest.close();
-        src.close();
     }
-
+    
     /**
      * returns the [ start, stop, stride ] or [ start, -1, -1 ] for slice, but also
      * supports slice notations like [:,1]. This is
