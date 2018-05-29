@@ -6,6 +6,7 @@
 package org.autoplot.servlet;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.HashSet;
@@ -84,7 +85,7 @@ public class DataServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-         try {
+         try (OutputStream outs = response.getOutputStream()) {
              long t0 = System.currentTimeMillis();
              String suniq = request.getParameter("requestId");
              long uniq;
@@ -119,7 +120,7 @@ public class DataServlet extends HttpServlet {
              
              Set outEmpty= new HashSet<>();
              AutoplotDataServer.doService( stimeRange, suri, step, true, format,
-                     new PrintStream( response.getOutputStream() ),
+                     new PrintStream( outs ),
                      true, outEmpty, new NullProgressMonitor() );
          } catch (Exception ex) {
              Logger.getLogger(DataServlet.class.getName()).log(Level.SEVERE, null, ex);
