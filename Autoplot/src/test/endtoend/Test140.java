@@ -31,6 +31,7 @@ import org.das2.qds.ops.Ops;
 import static org.autoplot.ScriptContext.*;
 import org.autoplot.bookmarks.Bookmark;
 import org.autoplot.bookmarks.BookmarksException;
+import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.DataSourceFilter;
 import org.autoplot.state.StatePersistence;
@@ -379,6 +380,9 @@ public class Test140 {
     public static void main( String[] args ) throws Exception {
         //Logger l= LoggerManager.getLogger("apdss");
         //l.setLevel( Level.ALL );
+        
+        System.err.println("autoplot_data: "+AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA));
+        System.err.println("fscache: "+AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE));
         
         if ( args.length==0 ) {
             //args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140.txt", "http://www.sarahandjeremy.net/~jbf/temperatures2012.xml" };
