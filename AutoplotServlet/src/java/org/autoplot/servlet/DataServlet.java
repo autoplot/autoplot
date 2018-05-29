@@ -25,7 +25,8 @@ import org.das2.util.TimerConsoleFormatter;
 import org.das2.util.monitor.NullProgressMonitor;
 
 /**
- *
+ * DataServlet wraps the command-line data server, so that start-up time is 
+ * not an issue and memory caching is used.
  * @author jbf
  */
 public class DataServlet extends HttpServlet {
@@ -103,6 +104,7 @@ public class DataServlet extends HttpServlet {
              if ( suri==null ) {
                  suri = request.getParameter("url");
              }
+             String stimeRange = ServletUtil.getStringParameter(request, "timeRange", "");
              String step= request.getParameter("timeStep");
              if ( step==null ) {
                  step= "86400s";
@@ -111,8 +113,12 @@ public class DataServlet extends HttpServlet {
              if ( format==null ) {
                  format="hapi-csv";
              }
+             
+             ServletUtil.SecurityResponse check= ServletUtil.checkSecurity( response, null, suri, null );
+             ServletUtil.securityCheckPart2(check);
+             
              Set outEmpty= new HashSet<>();
-             AutoplotDataServer.doService( debug, suri, step, true, format,
+             AutoplotDataServer.doService( stimeRange, suri, step, true, format,
                      new PrintStream( response.getOutputStream() ),
                      true, outEmpty, new NullProgressMonitor() );
          } catch (Exception ex) {
