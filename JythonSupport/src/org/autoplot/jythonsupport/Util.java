@@ -139,6 +139,9 @@ public class Util {
      * @throws java.lang.Exception plug-in readers can throw exception.
      */
     public static QDataSet getDataSet( String suri, String stimeRange, ProgressMonitor mon ) throws Exception {
+        if ( stimeRange==null ) {
+            throw new IllegalArgumentException("stimeRange cannot be null");
+        }
         DatumRange timeRange= DatumRangeUtil.parseTimeRange(stimeRange);
         return getDataSet( suri, timeRange, mon );
     }
