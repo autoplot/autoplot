@@ -268,7 +268,7 @@ public class AutoplotDataServer {
             dsf.formatData( file.toString()+"?id=temp", ds, new NullProgressMonitor() );
             File infoFile= new File( "/tmp/ap-hapi/foo/info/temp.json" );
             FileInputStream fin= new FileInputStream(infoFile);
-            DataSourceUtil.transfer( fin, out );
+            DataSourceUtil.transfer( fin, out, false );
 
         } else if ( format.equals(FORM_HAPI_DATA_BINARY) || format.equals(FORM_HAPI_BINARY) ) {
             final DataSourceFormat dsf = DataSourceRegistry.getInstance().getFormatByExt("hapi");
@@ -277,7 +277,7 @@ public class AutoplotDataServer {
             dsf.formatData( file.toString()+"?id=temp&format=binary", ds, new NullProgressMonitor() );
             File binaryFile= new File( "/tmp/ap-hapi/foo/data/temp.binary" );
             FileInputStream fin= new FileInputStream(binaryFile);
-            DataSourceUtil.transfer( fin, out );
+            DataSourceUtil.transfer( fin, out, false );
 
         } else if ( format.equals(FORM_HAPI_DATA) || format.equals(FORM_HAPI_CSV)  ) {
             final DataSourceFormat dsf = DataSourceRegistry.getInstance().getFormatByExt("hapi");
@@ -286,7 +286,7 @@ public class AutoplotDataServer {
             dsf.formatData( file.toString()+"?id=temp", ds, new NullProgressMonitor() );
             File csvFile= new File( "/tmp/ap-hapi/foo/data/temp.csv" );
             FileInputStream fin= new FileInputStream(csvFile);
-            DataSourceUtil.transfer( fin, out );
+            DataSourceUtil.transfer( fin, out, false );
             
         } else if ( format.equals("dat") || format.equals("xls") || format.equals("bin") ) {
             File file= File.createTempFile("autoplotDataServer", "."+format );
@@ -294,7 +294,7 @@ public class AutoplotDataServer {
             formatDataSet( ds, file.toString() );
             
             FileInputStream fin= new FileInputStream(file);
-            DataSourceUtil.transfer( fin, out );
+            DataSourceUtil.transfer( fin, out, false );
             
         } else {
             throw new IllegalAccessException("bad format: "+format );
@@ -482,6 +482,7 @@ public class AutoplotDataServer {
         }
         
         doService( timeRange, suri, step, stream, format,out, ascii, outEmpty, mon );
+        out.close();
         
         if ( !alm.getBooleanValue("noexit") ) System.exit(0);
 
