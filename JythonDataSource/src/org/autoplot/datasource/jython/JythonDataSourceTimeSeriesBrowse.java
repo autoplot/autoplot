@@ -131,7 +131,7 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
 
             String line= reader.readLine();
             String timeRangeRegex= "\\'(.*)?\\'";
-            Pattern s= Pattern.compile(".*getParam\\(\\s*\\'timerange\\',\\s*"+timeRangeRegex+"\\s*(,\\s*\\'.*\\')?\\s*\\).*");  //TODO: default time strings must not contain whitespace.
+            Pattern s= Pattern.compile(".*getParam\\(\\s*\\'timerange\\',\\s*"+timeRangeRegex+"\\s*(,\\s*\\'.*\\')?\\s*\\).*"); 
             while ( line!=null ) {
                 String[] ss= Util.guardedSplit( line, '#', '\'', '\"' );
                 line= ss[0];
