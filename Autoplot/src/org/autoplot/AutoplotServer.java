@@ -74,11 +74,7 @@ public class AutoplotServer {
                 logger.warning("use --vap=file.vap to preserve width and height");
             }
         }
-        
-        if ( !vap.equals("") && ( width!=-1 || height!=-1 ) ) {
-            logger.warning("use --uri=file.vap if the canvas is to be resized");
-        }
-        
+                
         String scanvasAspect = alm.getValue("canvas.aspect");
         String format= alm.getValue("format");
         String outfile= alm.getValue("outfile");
