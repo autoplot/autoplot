@@ -388,7 +388,7 @@ public class LogConsole extends javax.swing.JPanel {
                         rec.getThrown().printStackTrace();
                         // This is interesting--I've wondered where the single-line-message items have been coming from...
                     } else {
-                        // no message.  breakpoint here for debugging.
+                        // no message.  
                         int i=0;
                     }
                     if ( searchTextPattern!=null && searchTextPattern.matcher(recMsg).find() ) {
