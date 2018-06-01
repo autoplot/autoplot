@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A new colorbar is introduced.
+        <p><small>A new colorbar is introduced to support the Radio JOVE community.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-05-29 r22474):</p>
+        <p>Bugfixes (2018-06-01 r22484):</p>
         <ul>
+            <li>1987: remove incorrect warning about width and height parameters used with -v in AutoplotServer.
+            <li>1994: orbit timerange could not be used as the default timerange in scripts, because it would not recognize the correctly formatted time.
             <li>AutoplotDataServer hapi-csv response is now properly streamed.
             <li>FormatDataSet properly trims HAPI responses, used by AutoplotDataServer.
             <li>1861: back off automatic conversion until Jython 2.5 is used, Java 2.2 is too aggressive in using the conversion and old scripts were breaking.
@@ -77,6 +79,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>logspace function added.
             <li>DataServer implemented as servlet to improve performance.
             <li>DataSetBuilder nextRecord supports rank 1 string data.
             <li>clicking on http and https links in the console tab will point the browse (Firefox,etc) to the link.
