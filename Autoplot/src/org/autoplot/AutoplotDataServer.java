@@ -93,6 +93,16 @@ public class AutoplotDataServer {
         boolean trimTimes= format.equals(FORM_HAPI_BINARY) || format.equals(FORM_HAPI_CSV) || format.equals(FORM_HAPI_DATA) || format.equals(FORM_HAPI_DATA_BINARY);
         
         if ( timeRange==null ) timeRange="";
+
+        // peek to see if there is a timeRange within the URI, and make this equivalent to the case where timerange is specified.
+        if ( timeRange.length()==0 ) {
+            DataSource dss1= DataSetURI.getDataSource(suri);
+            TimeSeriesBrowse tsb1= dss1.getCapability(TimeSeriesBrowse.class); // Note some Jyds scripts allow TSB to be present after the load.
+            if ( tsb1!=null ) {
+                timeRange= tsb1.getTimeRange().toString();
+            }
+        }
+            
         if ( !timeRange.equals("")) {
             logger.fine("org.autoplot.jythonsupport.Util.getDataSet( suri,timeRange ):");
             logger.log(Level.FINE, "   suri={0}", suri);
