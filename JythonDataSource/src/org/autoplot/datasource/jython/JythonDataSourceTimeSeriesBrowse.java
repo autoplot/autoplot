@@ -130,7 +130,7 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
             reader = new LineNumberReader( new FileReader( jythonScript ) );
 
             String line= reader.readLine();
-            String timeRangeRegex= "\\'(.*)?\\'";
+            String timeRangeRegex= "\\'([^']*)?\\'";
             Pattern s= Pattern.compile(".*getParam\\(\\s*\\'timerange\\',\\s*"+timeRangeRegex+"\\s*(,\\s*\\'.*\\')?\\s*\\).*"); 
             while ( line!=null ) {
                 String[] ss= Util.guardedSplit( line, '#', '\'', '\"' );
