@@ -49,6 +49,7 @@ import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
 import org.das2.qstream.SimpleStreamFormatter;
+import org.das2.util.FileUtil;
 
 /**
  * Data server for U. Iowa P.W. Group converts URIs into streams of data.  These would typically
@@ -273,30 +274,36 @@ public class AutoplotDataServer {
             
         } else if ( format.equals(FORM_HAPI_INFO) ) {
             final DataSourceFormat dsf = DataSourceRegistry.getInstance().getFormatByExt("hapi");
-            File file= new File("/tmp/ap-hapi/foo.hapi");
-
+            int irand= (int)( Math.round( Math.random() * 100000000 ) );
+            String n= String.format( "/tmp/ap-hapi/ads%09d", irand );
+            File file= new File( n+".hapi");
             dsf.formatData( file.toString()+"?id=temp", ds, new NullProgressMonitor() );
-            File infoFile= new File( "/tmp/ap-hapi/foo/info/temp.json" );
+            File infoFile= new File( n+"/info/temp.json" );
             FileInputStream fin= new FileInputStream(infoFile);
             DataSourceUtil.transfer( fin, out, false );
+            FileUtil.deleteFileTree( new File(n) );
 
         } else if ( format.equals(FORM_HAPI_DATA_BINARY) || format.equals(FORM_HAPI_BINARY) ) {
             final DataSourceFormat dsf = DataSourceRegistry.getInstance().getFormatByExt("hapi");
-            File file= new File("/tmp/ap-hapi/foo.hapi");
-            
+            int irand= (int)( Math.round( Math.random() * 100000000 ) );
+            String n= String.format( "/tmp/ap-hapi/ads%09d", irand );
+            File file= new File( n+".hapi");
             dsf.formatData( file.toString()+"?id=temp&format=binary", ds, new NullProgressMonitor() );
-            File binaryFile= new File( "/tmp/ap-hapi/foo/data/temp.binary" );
+            File binaryFile= new File(  n+"/data/temp.binary" );
             FileInputStream fin= new FileInputStream(binaryFile);
             DataSourceUtil.transfer( fin, out, false );
-
+            FileUtil.deleteFileTree( new File(n) );
+            
         } else if ( format.equals(FORM_HAPI_DATA) || format.equals(FORM_HAPI_CSV)  ) {
             final DataSourceFormat dsf = DataSourceRegistry.getInstance().getFormatByExt("hapi");
-            File file= new File("/tmp/ap-hapi/foo.hapi");
-            
+            int irand= (int)( Math.round( Math.random() * 100000000 ) );
+            String n= String.format( "/tmp/ap-hapi/ads%09d", irand );
+            File file= new File( n+".hapi");
             dsf.formatData( file.toString()+"?id=temp", ds, new NullProgressMonitor() );
-            File csvFile= new File( "/tmp/ap-hapi/foo/data/temp.csv" );
+            File csvFile= new File( n+"/data/temp.csv" );
             FileInputStream fin= new FileInputStream(csvFile);
             DataSourceUtil.transfer( fin, out, false );
+            FileUtil.deleteFileTree( new File(n) );
             
         } else if ( format.equals("dat") || format.equals("xls") || format.equals("bin") ) {
             File file= File.createTempFile("autoplotDataServer", "."+format );
