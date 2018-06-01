@@ -8,10 +8,15 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.das2.datum.DatumRange;
@@ -80,7 +85,6 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         
         List<QDataSet> dss= new ArrayList<>();
         List<FloatReadAccess> ffds= new ArrayList<>();
-        //TODO: similar ought to be done for CDF TT2000 LongReadAccess.
 
         String groupTitle;
         
@@ -438,5 +442,186 @@ public class HapiDataSourceFormat implements DataSourceFormat {
             }
             return binsArray;
         }
+    }
+
+    
+    @Override
+    public boolean streamData(Map<String, String> params, Iterator<QDataSet> dataIt, OutputStream out) throws Exception {
+        String format= params.get("format");
+        if ( format==null || format.length()==0 ) format="csv";
+        
+        WritableByteChannel channel= null;
+        OutputStreamWriter fw=null;
+        
+        if ( format.equals("binary") ) {
+            channel= Channels.newChannel(out);
+        } else if ( format.equals("csv") ) {
+            fw= new OutputStreamWriter(out);
+        }
+        
+        while ( dataIt.hasNext() ) {
+            QDataSet data= dataIt.next();
+            
+            List<QDataSet> dss= new ArrayList<>();
+            List<FloatReadAccess> ffds= new ArrayList<>();
+
+            QDataSet dep0= (QDataSet) data.property( QDataSet.CONTEXT_0 );
+            if ( dep0!=null ) {
+                dss.add(dep0);
+                ffds.add(null);
+            } else {
+                throw new IllegalArgumentException("data must have a DEPEND_0");
+            }
+            
+            boolean dep1IsOrdinal= false;
+            QDataSet dep1= (QDataSet)data.property(QDataSet.DEPEND_1);
+            if ( dep1!=null && dep1.rank()==1 ) {
+                if ( UnitsUtil.isOrdinalMeasurement( SemanticOps.getUnits(dep1) ) ) {
+                    dep1IsOrdinal= true;
+                } else {
+                    dep1IsOrdinal= true;
+                    for ( int i=0; dep1IsOrdinal && i<dep1.length(); i++ ) {
+                        if ( dep1.value(i)!=(i+1) ) { // silly vap+cdaweb:ds=THA_L1_STATE&filter=pos&id=tha_pos&timerange=2016-10-02
+                            dep1IsOrdinal= false;
+                        }
+                    }
+                }
+            }
+            
+            FloatReadAccess fra= data.capability(FloatReadAccess.class); // note this might be null
+            if ( ( dep1IsOrdinal || data.property(QDataSet.DEPEND_1)==null ) && SemanticOps.isBundle(data) ) {
+                for ( int i=0; i<data.length(0); i++ ) {
+                    dss.add(Ops.unbundle(data,i));
+                    ffds.add(fra);
+                }
+            } else {
+                dss.add(data);
+                ffds.add(fra);
+            }
+            
+            if ( format.equals("binary") ) {
+                TransferType[] tts= new TransferType[dss.size()];
+                int nbytes= 0;
+                for ( int ids=0; ids<dss.size(); ids++ ) {
+                    QDataSet ds= dss.get(ids);
+                    Units u= SemanticOps.getUnits(ds);
+                    if ( UnitsUtil.isTimeLocation(u) ) {
+                        tts[ids]= new AsciiTimeTransferType(24,u);
+                    } else if ( UnitsUtil.isNominalMeasurement(u) ) {
+                        tts[ids]= new IntegerTransferType();
+                    } else {
+                        tts[ids]= new DoubleTransferType();
+                    }
+                    if ( ds.rank()==0 ) {
+                        nbytes+= tts[ids].sizeBytes();
+                    } else if ( ds.rank()==1 ) {
+                        nbytes+= tts[ids].sizeBytes()*ds.length();
+                    } else {
+                        throw new IllegalArgumentException("not supported!");
+                    }
+                }
+
+                ByteBuffer buf= ByteBuffer.allocate(nbytes);
+                buf.order(ByteOrder.LITTLE_ENDIAN);
+                for ( int ids=0; ids<dss.size(); ids++ ) {
+                    QDataSet ds= dss.get(ids);
+                    TransferType tt= tts[ids];
+                    //Units u= SemanticOps.getUnits(ds);
+                    //boolean uIsOrdinal= UnitsUtil.isOrdinalMeasurement(u);
+                    //fra= ffds.get(ids); // not used b/c no float transfer types.
+                    if ( ds.rank()==0 ) {
+                        tt.write( ds.value(), buf );
+                    } else if ( ds.rank()==1 ) {
+                        for ( int j=0; j<ds.length(); j++ ) {
+                            tt.write( ds.value(j), buf );
+                        }
+                    } else if ( ds.rank()>1 ) {
+                        QDataSet ds1= ds;
+                        QubeDataSetIterator iter= new QubeDataSetIterator(ds1);
+                        while ( iter.hasNext() ) {
+                            iter.next();
+                            double d= iter.getValue(ds1);
+                            tt.write( d, buf );
+                        }
+                    }
+                }
+                buf.flip();
+                assert channel!=null;
+                channel.write(buf);
+                buf.flip();
+                
+            } else {
+                DatumFormatter[] dfs= new DatumFormatter[dss.size()];
+                for ( int ids=0; ids<dss.size(); ids++ ) {
+                    QDataSet ds= dss.get(ids);
+                    Units u= SemanticOps.getUnits(ds);
+                    if ( UnitsUtil.isTimeLocation(u) ) {
+                        //dfs[ids]= DataSetUtil.bestFormatter(ds);
+                        dfs[ids]= new TimeDatumFormatter("yyyy-MM-dd'T'HH:mm:ss.SSS'Z')");
+                    } else if ( UnitsUtil.isNominalMeasurement(u) ) {
+                        dfs[ids]= DataSetUtil.bestFormatter(ds);
+                    } else {
+                        dfs[ids]= DefaultDatumFormatterFactory.getInstance().defaultFormatter();
+                    }
+                }
+
+//                int nrec= dss.get(0).length();
+
+                assert fw!=null;
+                
+//                for ( int irec=0; irec<nrec; irec++ ) {
+                    String delim="";
+                    for ( int ids=0; ids<dss.size(); ids++ ) {
+                        QDataSet ds= dss.get(ids);
+                        DatumFormatter df= dfs[ids];
+                        Units u= SemanticOps.getUnits(ds);
+                        if ( ids>0 ) delim=",";
+                        boolean uIsOrdinal= UnitsUtil.isOrdinalMeasurement(u);
+                        fra= ffds.get(ids);
+                        if ( ds.rank()==0 ) {
+                            if ( ids>0 ) fw.write( delim );
+                            if ( fra!=null ) {
+                                fw.write( String.valueOf( fra.fvalue() ) );
+                            } else {
+                                fw.write( df.format( u.createDatum(ds.value()), u ) );
+                            }
+                        } else if ( ds.rank()==1 ) {
+                            if ( fra!=null ) {
+                                for ( int j=0; j<ds.length(); j++ ) {
+                                    if ( ids>0 ) fw.write( delim );
+                                    fw.write( String.valueOf( fra.fvalue(j) ) );
+                                }
+                            } else {
+                                for ( int j=0; j<ds.length(); j++ ) {
+                                    if ( ids>0 ) fw.write( delim );
+                                    fw.write( df.format( u.createDatum(ds.value(j)), u ) );
+                                }                            
+                            }
+                        } else if ( ds.rank()>1 ) {
+                            QDataSet ds1= ds;
+                            QubeDataSetIterator iter= new QubeDataSetIterator(ds1);
+                            while ( iter.hasNext() ) {
+                                iter.next();
+                                double d= iter.getValue(ds1);
+                                if ( ids>0 ) fw.write( delim );
+                                if ( uIsOrdinal ) {
+                                    fw.write("\"");
+                                    fw.write( df.format( u.createDatum(d), u ) );
+                                    fw.write("\"");
+                                } else {
+                                    fw.write( df.format( u.createDatum(d), u ) );
+                                }
+                            }
+                        }
+                    }
+                    fw.write( "\n" );
+                //}
+            }
+        }
+        
+        if ( fw!=null ) fw.close();
+        if ( channel!=null ) channel.close();
+        
+        return true;
     }
 }
