@@ -15,7 +15,9 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.capability.Streaming;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.ops.Ops;
+import org.das2.qds.util.DataSetBuilder;
 
 /**
  * Introduce class to hold code for iterating through any dataset.
@@ -289,5 +291,46 @@ public class RecordIterator implements Iterator<QDataSet>  {
     @Override
     public void remove() {  //JAVA7: this can be removed when Java 8 is required.
         // do nothing.
+    }
+    
+    /**
+     * do the opposite function, collect all the records and return a dataset.
+     * @param qds
+     * @return 
+     */
+    public static QDataSet collect( Iterator<QDataSet> qds ) {
+        QDataSet rec= qds.next();
+        DataSetBuilder b;
+        DataSetBuilder dep0b= new DataSetBuilder(1,100);
+        switch ( rec.rank() ) {
+            case 0:
+                b= new DataSetBuilder(1,100);
+                break;
+            case 1:
+                b= new DataSetBuilder(2,100,rec.length());
+                break;                
+            case 2:
+                b= new DataSetBuilder(2,100,rec.length(),rec.length(0));
+                break;                
+            case 3:
+                b= new DataSetBuilder(2,100,rec.length(),rec.length(0),rec.length(1));
+                break; 
+            default:
+                throw new IllegalArgumentException("bad rank");
+        }
+        b.nextRecord(rec);
+        QDataSet dep0= (QDataSet)rec.property(QDataSet.CONTEXT_0);
+        if ( dep0!=null ) dep0b.nextRecord();
+        while ( qds.hasNext() ) {
+            rec= qds.next();
+            b.nextRecord(rec);
+            dep0= (QDataSet)rec.property(QDataSet.CONTEXT_0);
+            if ( dep0!=null ) dep0b.nextRecord();
+        }
+        MutablePropertyDataSet result= b.getDataSet();
+        if ( dep0b.getLength()>0 ) {
+            result.putProperty( QDataSet.DEPEND_0, dep0b.getDataSet());
+        }
+        return result;
     }
 }
