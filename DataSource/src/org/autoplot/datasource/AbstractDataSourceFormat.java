@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.datasource;
 
@@ -10,7 +6,6 @@ import java.net.URI;
 import java.util.Iterator;
 import java.util.Map;
 import org.das2.qds.QDataSet;
-import org.das2.qds.util.DataSetBuilder;
 
 /**
  * provides getParam to extensions and the file part.  
@@ -80,7 +75,7 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
      * @return
      * @throws Exception 
      */
-    @Override
+    //@Override
     public boolean streamData(Map<String, String> params, Iterator<QDataSet> data, OutputStream out) throws Exception {
         return false;
     }

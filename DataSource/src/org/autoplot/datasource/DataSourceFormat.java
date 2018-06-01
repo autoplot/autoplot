@@ -33,16 +33,16 @@ public interface DataSourceFormat {
      */
     public boolean canFormat( QDataSet ds );
 
-    /**
-     * stream the data.  
-     * Do not use this--it is likely to change.
-     * @param params parameters for streaming.
-     * @param data iterator of records to be streamed.
-     * @param out the output stream accepting the formatted data
-     * @return true if the data can be streamed.
-     * @throws Exception 
-     */
-    public boolean streamData( Map<String,String> params, Iterator<QDataSet> data, OutputStream out ) throws Exception;
+//    /**
+//     * stream the data.  
+//     * Do not use this--it is likely to change.
+//     * @param params parameters for streaming.
+//     * @param data iterator of records to be streamed.
+//     * @param out the output stream accepting the formatted data
+//     * @return true if the data can be streamed.
+//     * @throws Exception 
+//     */
+//    public boolean streamData( Map<String,String> params, Iterator<QDataSet> data, OutputStream out ) throws Exception;
         
     /**
      * return a description of this format

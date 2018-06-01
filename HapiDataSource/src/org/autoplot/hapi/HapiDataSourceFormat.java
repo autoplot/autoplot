@@ -445,7 +445,7 @@ public class HapiDataSourceFormat implements DataSourceFormat {
     }
 
     
-    @Override
+    //@Override
     public boolean streamData(Map<String, String> params, Iterator<QDataSet> dataIt, OutputStream out) throws Exception {
         String format= params.get("format");
         if ( format==null || format.length()==0 ) format="csv";

@@ -6,7 +6,9 @@
 
 package org.autoplot.aggregator;
 
+import java.io.OutputStream;
 import java.net.URI;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -73,6 +75,11 @@ public class AggregatingDataSourceFormat implements DataSourceFormat {
     @Override
     public String getDescription() {
         return "Aggregating Data Source Format";
+    }
+
+    //@Override
+    public boolean streamData(Map<String, String> params, Iterator<QDataSet> data, OutputStream out) throws Exception {
+        return false;
     }
     
 }

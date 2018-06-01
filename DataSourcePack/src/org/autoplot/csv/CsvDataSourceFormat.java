@@ -8,7 +8,9 @@ package org.autoplot.csv;
 import com.csvreader.CsvWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.das2.datum.Datum;
@@ -27,6 +29,11 @@ import org.autoplot.datasource.URISplit;
  */
 public class CsvDataSourceFormat implements DataSourceFormat {
 
+    //@Override
+    public boolean streamData(Map<String, String> params, Iterator<QDataSet> data, OutputStream out) throws Exception {
+        return false;
+    }
+    
     @Override
     public void formatData(String uri, QDataSet data, ProgressMonitor mon) throws Exception {
         URISplit split = URISplit.parse( uri );

@@ -8,10 +8,12 @@ package org.autoplot.binarydatasource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
+import java.util.Iterator;
 import java.util.Map;
 import org.das2.qds.buffer.BufferDataSet;
 import org.das2.util.monitor.ProgressMonitor;
@@ -170,4 +172,9 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
         return "Binary Table";
     }
 
+    //@Override
+    public boolean streamData(Map<String, String> params, Iterator<QDataSet> data, OutputStream out) throws Exception {
+        return false; //TODO: this can easily be made true!
+    }
+    
 }

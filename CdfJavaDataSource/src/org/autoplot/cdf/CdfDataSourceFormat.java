@@ -13,10 +13,12 @@ import org.das2.datum.UnitsUtil;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -57,6 +59,12 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         seman= new HashMap<>();
     }
 
+    //@Override
+    public boolean streamData(Map<String, String> params, Iterator<QDataSet> data, OutputStream out) throws Exception {
+        return false;
+    }
+
+    
     private synchronized String nameFor(QDataSet dep0) {
         String name= names.get(dep0);
         
