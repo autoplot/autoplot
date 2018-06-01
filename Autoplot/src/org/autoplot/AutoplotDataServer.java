@@ -35,7 +35,6 @@ import org.das2.util.monitor.AbstractProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
-import org.das2.qds.ArrayDataSet;
 import org.das2.qds.DataSetOps;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
@@ -235,86 +234,103 @@ public class AutoplotDataServer {
 
     private static void formatD2S( QDataSet data, OutputStream fo, boolean ascii, boolean stream ) {
         boolean binary = !ascii;
-        if (data.rank() == 3) {
-            TableDataSet tds = TableDataSetAdapter.create(data);
-            if (binary) {
-                TableUtil.dumpToDas2Stream( tds, Channels.newChannel(fo), false, !stream );
-            } else {
-                TableUtil.dumpToDas2Stream( tds, Channels.newChannel(fo), true, !stream );
-            }
-        } else if (data.rank() == 2) {
-            TableDataSet tds = TableDataSetAdapter.create(data);
-            if (binary) {
-                TableUtil.dumpToDas2Stream( tds, Channels.newChannel(fo), false, !stream );
-            } else {
-                TableUtil.dumpToDas2Stream( tds, Channels.newChannel(fo), true, !stream );
-            }
-        } else if (data.rank() == 1) {
-            VectorDataSet vds = VectorDataSetAdapter.create(data);
-            if (binary) {
-                VectorUtil.dumpToDas2Stream( vds, Channels.newChannel(fo), false, !stream );
-            } else {
-                VectorUtil.dumpToDas2Stream( vds, Channels.newChannel(fo), true, !stream );
-            }
+        switch (data.rank()) {
+            case 3: {
+                    TableDataSet tds = TableDataSetAdapter.create(data);
+                    if (binary) {
+                        TableUtil.dumpToDas2Stream( tds, Channels.newChannel(fo), false, !stream );
+                    } else {
+                        TableUtil.dumpToDas2Stream( tds, Channels.newChannel(fo), true, !stream );
+                    }       
+                    break;
+                }
+            case 2: {
+                    TableDataSet tds = TableDataSetAdapter.create(data);
+                    if (binary) {
+                        TableUtil.dumpToDas2Stream( tds, Channels.newChannel(fo), false, !stream );
+                    } else {
+                        TableUtil.dumpToDas2Stream( tds, Channels.newChannel(fo), true, !stream );
+                    }
+                    break;
+                }
+            case 1:
+                VectorDataSet vds = VectorDataSetAdapter.create(data);
+                if (binary) {
+                    VectorUtil.dumpToDas2Stream( vds, Channels.newChannel(fo), false, !stream );
+                } else {
+                    VectorUtil.dumpToDas2Stream( vds, Channels.newChannel(fo), true, !stream );
+                }   
+                break;
+            default:
+                break;
         }
     }
 
     private static void writeData( String format, OutputStream out, QDataSet ds, boolean ascii, boolean stream) throws Exception {
-        if ( format.equals(FORM_D2S) ) {
-            
-            formatD2S( ds, out, ascii, stream );
-            
-        } else if ( format.equals(FORM_QDS) ) {
-            if ( ds.property( QDataSet.DEPEND_1 )!=null && ds.property( QDataSet.BUNDLE_1 )!=null ) {
-                logger.info("dropping BUNDLE_1 when DEPEND_1 is present");
-                ds= Ops.maybeCopy(ds);
-                ((MutablePropertyDataSet)ds).putProperty(QDataSet.BUNDLE_1,null);
-            }
-            new SimpleStreamFormatter().format(ds, out, ascii );
-            
-        } else if ( format.equals(FORM_HAPI_INFO) ) {
-            final DataSourceFormat dsf = DataSourceRegistry.getInstance().getFormatByExt("hapi");
-            int irand= (int)( Math.round( Math.random() * 100000000 ) );
-            String n= String.format( "/tmp/ap-hapi/ads%09d", irand );
-            File file= new File( n+".hapi");
-            dsf.formatData( file.toString()+"?id=temp", ds, new NullProgressMonitor() );
-            File infoFile= new File( n+"/info/temp.json" );
-            FileInputStream fin= new FileInputStream(infoFile);
-            DataSourceUtil.transfer( fin, out, false );
-            FileUtil.deleteFileTree( new File(n) );
-
-        } else if ( format.equals(FORM_HAPI_DATA_BINARY) || format.equals(FORM_HAPI_BINARY) ) {
-            final DataSourceFormat dsf = DataSourceRegistry.getInstance().getFormatByExt("hapi");
-            int irand= (int)( Math.round( Math.random() * 100000000 ) );
-            String n= String.format( "/tmp/ap-hapi/ads%09d", irand );
-            File file= new File( n+".hapi");
-            dsf.formatData( file.toString()+"?id=temp&format=binary", ds, new NullProgressMonitor() );
-            File binaryFile= new File(  n+"/data/temp.binary" );
-            FileInputStream fin= new FileInputStream(binaryFile);
-            DataSourceUtil.transfer( fin, out, false );
-            FileUtil.deleteFileTree( new File(n) );
-            
-        } else if ( format.equals(FORM_HAPI_DATA) || format.equals(FORM_HAPI_CSV)  ) {
-            final DataSourceFormat dsf = DataSourceRegistry.getInstance().getFormatByExt("hapi");
-            int irand= (int)( Math.round( Math.random() * 100000000 ) );
-            String n= String.format( "/tmp/ap-hapi/ads%09d", irand );
-            File file= new File( n+".hapi");
-            dsf.formatData( file.toString()+"?id=temp", ds, new NullProgressMonitor() );
-            File csvFile= new File( n+"/data/temp.csv" );
-            FileInputStream fin= new FileInputStream(csvFile);
-            DataSourceUtil.transfer( fin, out, false );
-            FileUtil.deleteFileTree( new File(n) );
-            
-        } else if ( format.equals("dat") || format.equals("xls") || format.equals("bin") ) {
-            File file= File.createTempFile("autoplotDataServer", "."+format );
-            
-            formatDataSet( ds, file.toString() );
-            
-            FileInputStream fin= new FileInputStream(file);
-            DataSourceUtil.transfer( fin, out, false );
-            
-        } else {
-            throw new IllegalAccessException("bad format: "+format );
+        switch (format) {
+            case FORM_D2S:
+                formatD2S( ds, out, ascii, stream );
+                break;
+            case FORM_QDS:
+                if ( ds.property( QDataSet.DEPEND_1 )!=null && ds.property( QDataSet.BUNDLE_1 )!=null ) {
+                    logger.info("dropping BUNDLE_1 when DEPEND_1 is present");
+                    ds= Ops.maybeCopy(ds);
+                    ((MutablePropertyDataSet)ds).putProperty(QDataSet.BUNDLE_1,null);
+                }   new SimpleStreamFormatter().format(ds, out, ascii );
+                break;
+            case FORM_HAPI_INFO:
+                {
+                    final DataSourceFormat dsf = DataSourceRegistry.getInstance().getFormatByExt("hapi");
+                    int irand= (int)( Math.round( Math.random() * 100000000 ) );
+                    String n= String.format( "/tmp/ap-hapi/ads%09d", irand );
+                    File file= new File( n+".hapi");
+                    dsf.formatData( file.toString()+"?id=temp", ds, new NullProgressMonitor() );
+                    File infoFile= new File( n+"/info/temp.json" );
+                    FileInputStream fin= new FileInputStream(infoFile);
+                    DataSourceUtil.transfer( fin, out, false );
+                    FileUtil.deleteFileTree( new File(n) );
+                    break;
+                }
+            case FORM_HAPI_DATA_BINARY:
+            case FORM_HAPI_BINARY:
+                {
+                    final DataSourceFormat dsf = DataSourceRegistry.getInstance().getFormatByExt("hapi");
+                    int irand= (int)( Math.round( Math.random() * 100000000 ) );
+                    String n= String.format( "/tmp/ap-hapi/ads%09d", irand );
+                    File file= new File( n+".hapi");
+                    dsf.formatData( file.toString()+"?id=temp&format=binary", ds, new NullProgressMonitor() );
+                    File binaryFile= new File(  n+"/data/temp.binary" );
+                    FileInputStream fin= new FileInputStream(binaryFile);
+                    DataSourceUtil.transfer( fin, out, false );
+                    FileUtil.deleteFileTree( new File(n) );
+                    break;
+                }
+            case FORM_HAPI_DATA:
+            case FORM_HAPI_CSV:
+                {
+                    final DataSourceFormat dsf = DataSourceRegistry.getInstance().getFormatByExt("hapi");
+                    int irand= (int)( Math.round( Math.random() * 100000000 ) );
+                    String n= String.format( "/tmp/ap-hapi/ads%09d", irand );
+                    File file= new File( n+".hapi");
+                    dsf.formatData( file.toString()+"?id=temp", ds, new NullProgressMonitor() );
+                    File csvFile= new File( n+"/data/temp.csv" );
+                    FileInputStream fin= new FileInputStream(csvFile);
+                    DataSourceUtil.transfer( fin, out, false );
+                    FileUtil.deleteFileTree( new File(n) );
+                    break;
+                }
+            case "dat":
+            case "xls":
+            case "bin":
+                {
+                    File file= File.createTempFile("autoplotDataServer", "."+format );
+                    formatDataSet( ds, file.toString() );
+                    FileInputStream fin= new FileInputStream(file);
+                    DataSourceUtil.transfer( fin, out, false );
+                    break;
+                }
+            default:
+                throw new IllegalAccessException("bad format: "+format );
         }
     }
 
