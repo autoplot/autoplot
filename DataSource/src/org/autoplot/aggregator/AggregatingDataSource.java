@@ -533,6 +533,20 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         if ( ds1==null ) continue;
                     }
                     
+                    // check to see if it is enumeration and all values are present in the enumeration unit.
+                    Units u= (Units) ds1.property(QDataSet.UNITS);
+                    if ( u!=null && u instanceof EnumerationUnits && ds1.rank()==1 ) {
+                        for ( int i2=0; i2<ds1.length(); i2++ ) {
+                            try {
+                                Datum d= u.createDatum(ds1.value(i2));
+                            } catch ( IllegalArgumentException ex ) {
+                                ex.printStackTrace();
+                                System.err.println("no datum exists for this ordinal in agg");
+                                Datum d= u.createDatum(ds1.value(i2));
+                            }
+                        }
+                    }
+                    
                     QDataSet xds= SemanticOps.xtagsDataSet(ds1);
                     if ( xds!=null && UnitsUtil.isTimeLocation( SemanticOps.getUnits(xds) )) {
                         if ( SemanticOps.isJoin(xds) ) {
