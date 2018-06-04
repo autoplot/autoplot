@@ -151,14 +151,16 @@ public class LogConsole extends javax.swing.JPanel {
         this.logTextArea.addMouseListener( new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int caret= logTextArea.viewToModel( new Point( e.getX(), e.getY() ) );
-                try {
-                    String word= org.das2.jythoncompletion.Utilities.getWordAt( logTextArea, caret );
-                    if ( word.startsWith("http:") || word.startsWith("https:") ) {
-                        Util.openBrowser(word);
+                if ( e.getButton()==MouseEvent.BUTTON1 && e.getClickCount()==2 ) {
+                    int caret= logTextArea.viewToModel( new Point( e.getX(), e.getY() ) );
+                    try {
+                        String word= org.das2.jythoncompletion.Utilities.getWordAt( logTextArea, caret );
+                        if ( word.startsWith("http:") || word.startsWith("https:") ) {
+                            Util.openBrowser(word);
+                        }
+                    } catch (BadLocationException ex) {
+                        Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                } catch (BadLocationException ex) {
-                    Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         } );
