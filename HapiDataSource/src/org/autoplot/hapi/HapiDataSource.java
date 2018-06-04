@@ -914,7 +914,7 @@ public final class HapiDataSource extends AbstractDataSource {
             monitor.finished();
             if ( httpConnect!=null ) {
                 logger.log(Level.WARNING, "IOException when trying to read {0}", httpConnect.getURL());
-                throw new IOException( String.valueOf(httpConnect.getResponseCode())+": "+httpConnect.getResponseMessage() );
+                throw new IOException( httpConnect.getURL() + " results in\n"+String.valueOf(httpConnect.getResponseCode())+": "+httpConnect.getResponseMessage() );
             } else {
                 throw e;
             }
