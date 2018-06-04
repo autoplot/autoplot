@@ -913,6 +913,7 @@ public final class HapiDataSource extends AbstractDataSource {
             logger.log( Level.WARNING, e.getMessage(), e );
             monitor.finished();
             if ( httpConnect!=null ) {
+                logger.log(Level.WARNING, "IOException when trying to read {0}", httpConnect.getURL());
                 throw new IOException( String.valueOf(httpConnect.getResponseCode())+": "+httpConnect.getResponseMessage() );
             } else {
                 throw e;
@@ -1541,7 +1542,7 @@ public final class HapiDataSource extends AbstractDataSource {
                             logger.log( Level.WARNING, "size should be an int array, found int: {0}", name);
                         } else if ( o.getClass()==String.class ) {
                             pds[i].size= new int[] { Integer.parseInt( (String)o ) };
-                            pds[i].nFields= ((Integer)o);
+                            pds[i].nFields= (Integer.parseInt((String)o));
                             logger.log( Level.WARNING, "size should be an int array, found String: {0}", name);
                         } else {
                             throw new IllegalArgumentException( String.format( "size should be an int array: %s", name ) );
