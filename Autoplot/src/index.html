@@ -24,8 +24,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-06-01 r22492):</p>
+        <p>Bugfixes (2018-06-04 r22500):</p>
         <ul>
+            <li>minor tweaks to HAPI GUI, to improve transparency.</li>
+            <li>output console's click-on URL is too easy to trigger, causing confusion.  Make double click.</li>
+            <li>1995: corrections to code which aggregates qstreams containing nominal data.</li>
+            <li>GUI logger would get extraneous events because of Autoplot printing thread.  Check for these and log with lower verbosity.</li>
             <li>1994: orbit timerange could not be used as the default timerange in scripts, because it would not recognize the correctly formatted time.
             <li>1987: remove incorrect warning about width and height parameters used with -v in AutoplotServer.
             <li>AutoplotDataServer hapi-csv response is now properly streamed.
