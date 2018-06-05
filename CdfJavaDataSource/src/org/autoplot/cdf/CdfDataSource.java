@@ -572,7 +572,9 @@ public class CdfDataSource extends AbstractDataSource {
                 renderType= null;
             }
             String os1= (String)map.get(PARAM_SLICE1);
-            if ( os1!=null && os1.length()>0 ) {
+            if ( constraint!=null ) {
+                logger.finer("dropping render type because of constraint");
+            } else if ( os1!=null && os1.length()>0 ) {
                 logger.finer("dropping render type because of slice1");
             } else {
                 result.putProperty(QDataSet.RENDER_TYPE, renderType );
