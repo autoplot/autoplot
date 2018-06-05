@@ -211,6 +211,12 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
         jSplitPane1.setRightComponent(jPanel3);
 
+        jTabbedPane1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jTabbedPane1StateChanged(evt);
+            }
+        });
+
         parameterTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
                 parameterTreeValueChanged(evt);
@@ -327,6 +333,12 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
     private void parameterTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTree1ValueChanged
         xCheckBox.setSelected(true);
+        TreePath tp= evt.getPath();
+        if ( isValidCDF ) {
+            xparameter= String.valueOf(tp.getPathComponent(1));
+            String longName= xparameterInfo.get(xparameter);
+            paramInfo.setText( longName );
+        }
     }//GEN-LAST:event_parameterTree1ValueChanged
 
     private void parameterTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTreeValueChanged
@@ -344,17 +356,51 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
     private void parameterTree2ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTree2ValueChanged
         yCheckBox.setSelected(true);
+        TreePath tp= evt.getPath();
+        if ( isValidCDF ) {
+            yparameter= String.valueOf(tp.getPathComponent(1));
+            String longName= yparameterInfo.get(yparameter);
+            paramInfo.setText( longName );
+        }
     }//GEN-LAST:event_parameterTree2ValueChanged
 
     private void xCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xCheckBoxActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_xCheckBoxActionPerformed
 
+    private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
+        int tab= jTabbedPane1.getSelectedIndex();
+        updateMetadata(tab);
+    }//GEN-LAST:event_jTabbedPane1StateChanged
+
     private void updateMetadata() {
-       String longName= parameterInfo.get(parameter);
-       paramInfo.setText( longName );
+       updateMetadata(0);
     }
 
+    private void updateMetadata( int tab ) {
+        switch (tab) {
+            case 0:
+                if ( parameter!=null ) {
+                    String longName= parameterInfo.get(parameter);
+                    paramInfo.setText( longName );
+                    break;
+                }
+            case 1:
+                if ( xparameter!=null ) {
+                    String longName= xparameterInfo.get(xparameter);
+                    paramInfo.setText( longName );
+                    break;
+                }
+            case 2:
+                if ( yparameter!=null ) {
+                    String longName= yparameterInfo.get(yparameter);
+                    paramInfo.setText( longName );
+                    break;
+                }
+            default:
+                break;
+        }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel interpretMetadataLabel;
     private javax.swing.JLabel jLabel4;
@@ -427,7 +473,19 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
      */
     Map<String,String> parameterInfo;
 
+    /**
+     * long descriptions html formatted metadata about each parameter.
+     */
+    Map<String,String> xparameterInfo;
+
+    /**
+     * long descriptions html formatted metadata about each parameter.
+     */
+    Map<String,String> yparameterInfo;
+    
     String parameter;
+    String xparameter;
+    String yparameter;
 
     boolean showAllInitially= false;
     
@@ -538,6 +596,8 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 parameterInfo= dataParameterInfo;
                 label= "Select CDF Variable (%d data, %d support not shown):";
             }
+            xparameterInfo= allParameterInfo;
+            yparameterInfo= allParameterInfo;
             
             this.isValidCDF= true;
             jPanel3.setVisible(true);
