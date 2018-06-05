@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -116,6 +117,7 @@ public final class HapiDataSource extends AbstractDataSource {
 
             @Override
             public void reset() {
+                logger.fine("reset cache");
                 HapiDataSource.cache.clear();
             }
             
@@ -311,6 +313,20 @@ public final class HapiDataSource extends AbstractDataSource {
     
     private static final Map<String,ArrayList<String>> cache= new HashMap<>();
     
+    /**
+     * print the cache stats.
+     * @see https://sourceforge.net/p/autoplot/bugs/1996/
+     */
+    public static void printCacheStats() {
+        if ( cache==null || cache.isEmpty() ) {
+            System.err.println( "(cache is empty)" );
+        } else {
+            for ( Entry<String,ArrayList<String>> s: cache.entrySet() ) {
+                System.err.println( "" + s.getKey() +": "+s.getValue().size()+" records");
+            }
+        }
+    }
+        
     private static void writeToCachedData(URL url, ParamDescription[] pp, Datum xx, String[] ss) throws IOException {
         
         String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
@@ -373,11 +389,12 @@ public final class HapiDataSource extends AbstractDataSource {
         int ifield=0;
         for (ParamDescription pp1 : pp) {
             String f = u + "/" + sxx + "." + pp1.name + ".csv" + "." + Thread.currentThread().getId();
-            
+            logger.log(Level.FINE, "cache.get({0})", f);
             ArrayList<String> sparam= cache.get(f);
             if ( sparam==null ) {
                 sparam= new ArrayList<>();
                 cache.put(f,sparam);
+                logger.log(Level.FINE, "cache.put({0},ArrayList({1}))", new Object[]{f, sparam.size()});
             }
             
             StringBuilder build= new StringBuilder();
@@ -419,6 +436,7 @@ public final class HapiDataSource extends AbstractDataSource {
         String u= ub.toString();
         for (ParamDescription pp1 : pp) {
             String f = u + "/" + sxx + "." + pp1.name + ".csv" + "."+ Thread.currentThread().getId();
+            logger.log(Level.FINE, "remove from cache: {0}", f);
             ArrayList<String> sparam= cache.remove(f);
             File ff= new File(s + "/hapi/" + u + "/" + sxx + "." + pp1.name + ".csv" +".gz");
             if ( !ff.getParentFile().exists() ) {
