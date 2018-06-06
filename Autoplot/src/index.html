@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A new colorbar is introduced to support the Radio JOVE community.
+        <p><small>Binary reader is used to quickly reverse engineer a DICOM file of an x-ray.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,12 +24,15 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-06-04 r22500):</p>
+        <p>Bugfixes (2018-06-06 r22509):</p>
         <ul>
-            <li>minor tweaks to HAPI GUI, to improve transparency.</li>
-            <li>output console's click-on URL is too easy to trigger, causing confusion.  Make double click.</li>
-            <li>1995: corrections to code which aggregates qstreams containing nominal data.</li>
-            <li>GUI logger would get extraneous events because of Autoplot printing thread.  Check for these and log with lower verbosity.</li>
+            <li>1995: corrections to code which aggregates qstreams containing nominal data.
+            <li>1996: correction to caching code which would fail to unload data from memory to hard disk, causing out-of-memory exceptions.
+            <li>rte_0761821100: CDF gui attempts to clarify error message about rank 2 DEPEND_0.  Swap description of parameter when X or Y tab is selected.
+            <li>drop the render type property when param[:,0] is read.
+            <li>minor tweaks to HAPI GUI, to improve transparency.
+            <li>output console's click-on URL is too easy to trigger, causing confusion.  Make double click.
+            <li>GUI logger would get extraneous events because of Autoplot printing thread.  Check for these and log with lower verbosity.
             <li>1994: orbit timerange could not be used as the default timerange in scripts, because it would not recognize the correctly formatted time.
             <li>1987: remove incorrect warning about width and height parameters used with -v in AutoplotServer.
             <li>AutoplotDataServer hapi-csv response is now properly streamed.
