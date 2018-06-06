@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -311,7 +312,7 @@ public final class HapiDataSource extends AbstractDataSource {
         return result;
     }
     
-    private static final Map<String,ArrayList<String>> cache= new HashMap<>();
+    private static final Map<String,ArrayList<String>> cache= new ConcurrentHashMap<>();
     
     /**
      * print the cache stats.
@@ -326,7 +327,7 @@ public final class HapiDataSource extends AbstractDataSource {
             }
         }
     }
-        
+     
     private static void writeToCachedData(URL url, ParamDescription[] pp, Datum xx, String[] ss) throws IOException {
         
         String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
@@ -389,7 +390,7 @@ public final class HapiDataSource extends AbstractDataSource {
         int ifield=0;
         for (ParamDescription pp1 : pp) {
             String f = u + "/" + sxx + "." + pp1.name + ".csv" + "." + Thread.currentThread().getId();
-            logger.log(Level.FINE, "cache.get({0})", f);
+            logger.log(Level.FINER, "cache.get({0})", f);
             ArrayList<String> sparam= cache.get(f);
             if ( sparam==null ) {
                 sparam= new ArrayList<>();
@@ -414,10 +415,11 @@ public final class HapiDataSource extends AbstractDataSource {
     }
     
     private static void writeToCachedDataFinish(URL url, ParamDescription[] pp, Datum xx ) throws IOException {
+        logger.log(Level.FINE, "writeToCachedDataFinish: {0}", xx);
         String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
         StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + url.getPath() );
-        if ( url.getQuery()!=null ) {
+        if ( url.getQuery()!=null ) { // get the id from the url
             String[] querys= url.getQuery().split("\\&");
             Pattern p= Pattern.compile("id=(.+)");
             for ( String q : querys ) {
@@ -918,8 +920,8 @@ public final class HapiDataSource extends AbstractDataSource {
                 line= in.readLine();
             }
             while ( completeDay && tr.intersects(currentDay) ) {
-                if ( cacheReader==null && useCache && tr.intersects(currentDay ) ) {
-                    if ( currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
+                if ( cacheReader==null && useCache ) {
+                    if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
                         // put empty file which is placeholder.
                         writeToCachedDataFinish( url, pds, currentDay.middle() ); 
                     }
