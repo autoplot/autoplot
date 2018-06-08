@@ -840,25 +840,25 @@ public class CreatePngWalk {
         
         String htmlOpen= "<html>\n";
         String htmlHead="\t<head><title>PNG Gallery "+params.product+"</title></head>\n";
-        String htmlBody="\t<body style=\"background-color: #6B6B6B; margin=0;\">\n";
-        String htmlClose1= "\t\t</div2Close>\n";
+        String htmlBody="\t<body style=\"background-color: #6B6B6B; margin:0;\">\n";
+        String htmlClose1= "\t\t</div>\n";
         String htmlClose2= "\t</body>\n";
         String htmlClose3= "</html>";
         
         //String pageHeaderOpen= "\t\t<div style=\"padding:20px; top: 0px; margin-right=0px; background-color:black; color:white;height:30px;\">\n\t\t\t"
         //            + "<strong>" + params.product + "_"+ params.timeFormat + "</strong>\n" + "\t\t</div>\n";
         
-        String pageHeaderOpen= "\t\t<div style=\"padding:20px; top: 0px; margin-right=0px; background-color:black; color:white;height:30px;\">\n\t\t\t"
+        String pageHeaderOpen= "\t\t<div style=\"padding:20px; top: 0px; margin-right:0px; background-color:black; color:white;height:30px;\">\n\t\t\t"
                     + "<strong>" + "PNG WALK" + "</strong>\n" + "\t\t</div>\n";
         String addImageString;
         String htmlAnchorStringOpen = "\t\t\t\t<a href=\"";
         String htmlAnchorStringClose = "\">\n";
         String htmlImageStringOpen = "\t\t\t\t<img src=\"";
-        String htmlImageStringClose = "\" style=\"width:304px;height:304px;margin-left:10px;margin-bottom:10px;\"></a>\n";
+        String htmlImageStringClose = "\" style=\"width:72px;height:68px;margin-left:10px;margin-bottom:10px;\"></a>\n";
         String htmlImageCaptionOpen = "\t\t\t\t<figcaption style=\"color: white; text-align:center;\">";
         String htmlImageCaptionClose = "\t\t\t\t</figcaption>\n";
-        String htmlImageContainer = "\t\t<div style=\"background-color: #6B6B6B;margin-left:100px;\">\n";
-        String htmlFigureOpen = "\t\t\t<figure style=\"width:350px; float:left;\">\n";
+        String htmlImageContainer = "\t\t<div style=\"background-color: #6B6B6B;margin-left:20px;\">\n";
+        String htmlFigureOpen = "\t\t\t<figure style=\"width:78px; float:left;\">\n";
         String htmlFigureClose = "\t\t\t</figure>\n";
         
         String currentPngFilename;
