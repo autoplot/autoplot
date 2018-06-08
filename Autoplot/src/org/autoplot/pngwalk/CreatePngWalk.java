@@ -487,16 +487,14 @@ public class CreatePngWalk {
                 //LoggerManager.markTime("455");
 
                 String filename= getFilename( params, "", atime );
-                String filenameThumb = getRelativeFilename( params, "thumbs400", atime );
-                String filenameBig = getRelativeFilename( params, "", atime );
 
                 /**
                 * Code for adding images into global arrayList for use in HTML method
                 * @author Armond Luthens
-                * @date 09/21/15
+                * @date 09/21/2015
                 */
-                pngFilenameArrayThumbs.add(filenameThumb);
-                pngFilenameArrayBig.add(filenameBig);
+                pngFilenameArrayThumbs.add( getRelativeFilename( params, "thumbs100", atime ) );
+                pngFilenameArrayBig.add( getRelativeFilename( params, "", atime ) );
 
                 //LoggerManager.markTime("469");
 
