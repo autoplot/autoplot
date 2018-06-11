@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Binary reader is used to quickly reverse engineer a DICOM file of an x-ray.
+        <p><small>Corrections to tri-scat rebin mode, to support slicing.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-06-06 r22509):</p>
+        <p>Bugfixes (2018-06-11 r22512):</p>
         <ul>
+            <li>support for https das2servers.  Thanks, Chris!
             <li>1995: corrections to code which aggregates qstreams containing nominal data.
             <li>1996: correction to caching code which would fail to unload data from memory to hard disk, causing out-of-memory exceptions.
             <li>rte_0761821100: CDF gui attempts to clarify error message about rank 2 DEPEND_0.  Swap description of parameter when X or Y tab is selected.
@@ -86,6 +87,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>tweaks to the static html file created for pngwalks, which improves performance over slow networks.
             <li>logspace function added.
             <li>DataServer implemented as servlet to improve performance.
             <li>DataSetBuilder nextRecord supports rank 1 string data.
