@@ -133,7 +133,23 @@ public class CDAWebDB {
             refreshTime= t;
         }
     }
-
+//
+//    public synchronized void refreshViaWebServices( ProgressMonitor mon ) throws IOException {
+//        try {
+//            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+//            mon.setProgressMessage("refreshing database");//TODO: is this working
+//            mon.started();
+//            mon.setTaskSize(30);
+//            mon.setProgressMessage("call WS for listing" );
+//            
+//        } catch (SAXException ex) {
+//            logger.log(Level.SEVERE, ex.getMessage(), ex);
+//        } catch (ParserConfigurationException | URISyntaxException ex) {
+//            logger.log(Level.SEVERE, ex.getMessage(), ex);
+//        }
+//        
+//    }
+//    
     /**
      * Download and parse the all.xml to create a database of available products.
      * @param mon progress monitor for the task
