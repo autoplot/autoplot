@@ -18,6 +18,7 @@ import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map.Entry;
 
 /**
@@ -122,25 +123,47 @@ public final class WriteIDLSav {
     }
 
     private ByteBuffer writeArrayDesc( Object data ) {
-        int nmax= 8; // ?? see python code.
+        int nmax= 8; // max number of indeces (IDL supports rank 8 data)
         int capacity= ( 8 + nmax ) * 4; //TODO: 1D
         int eleLen= 8; // bytes
         int ndims= 1;
 
+        Class c= data.getClass();
+        Class c1= c;
+        int rank=0;
+        int totalElements= 1;
+        Object d1= data;
+        while ( c1.isArray() ) {
+            c1= c1.getComponentType();
+            rank++;
+            totalElements*= Array.getLength(d1);
+            d1= Array.get(d1,0);
+        }        
+        ndims= rank;
+        
         ByteBuffer result= ByteBuffer.allocateDirect( capacity );
         result.order(ByteOrder.BIG_ENDIAN);
         result.putInt( 8 ); // normal array.  There's a 64-bit array read as well that is not implemented.
         result.putInt( eleLen ); // bytes per element TODO: only 8 byte.
-        result.putInt( Array.getLength(data)*eleLen ); //TODO: 1D
-        result.putInt( Array.getLength(data) );
+        result.putInt( totalElements*eleLen ); 
+        result.putInt( totalElements );
         result.putInt( ndims );
-        result.putInt( 0 );  // should be 1*256+83
+        result.putInt( 0 );  // should be 1*256+83  //http://www.physics.wisc.edu/~craigm/idl/savefmt/node20.html
         result.putInt( 0 );  // should be 1*256+83
 
         result.putInt( nmax );
 
-        for ( int i=0; i<nmax; i++ ) {
-            result.putInt( i==0 ? Array.getLength(data) : 1 ); //TODO: guess
+        LinkedList<Integer> l= new LinkedList<>();  
+        d1= data;
+        for ( int i=0; i<rank; i++ ) {
+            l.add( 0, Array.getLength(d1) );    // reverse the order
+            d1= Array.get( d1, 0 );
+        }
+        for ( int i=0; i<rank; i++ ) {
+            result.putInt( l.get(i) );
+        }
+        for ( int i=rank; i<nmax; i++ ) {
+            result.putInt( 1 );
         }
 
         result.flip();
@@ -198,6 +221,18 @@ public final class WriteIDLSav {
         return buf;
     }
 
+    private ByteBuffer writeDDoubleArray( double[][] data ) {
+        ByteBuffer buf= ByteBuffer.allocateDirect( data.length*data[0].length*8 );
+        buf.order(ByteOrder.BIG_ENDIAN);
+        for ( int i=0; i<data.length; i++ ) {
+            for ( int j=0; j<data[0].length; j++ ) { // must be qube.
+                buf.putDouble(data[i][j]);
+            }
+        }
+        buf.flip();
+        return buf;
+    }
+    
     private ByteBuffer writeLongArray( long[] data ) {
         ByteBuffer buf= ByteBuffer.allocateDirect( data.length*8 );
         buf.order(ByteOrder.BIG_ENDIAN);
@@ -247,6 +282,8 @@ public final class WriteIDLSav {
         ByteBuffer varData;
         if ( data.getClass().isArray() && data.getClass().getComponentType()==double.class ) {
             varData= writeDoubleArray( (double[])data );
+        } else if ( data.getClass().isArray() && data.getClass().getComponentType().isArray() && data.getClass().getComponentType().getComponentType()==double.class ) {
+            varData= writeDDoubleArray( (double[][])data );
         } else if (data.getClass().isArray() && data.getClass().getComponentType() == long.class) {
             varData= writeLongArray( (long[])data );
         } else if ( data.getClass()==Short.class ) {
@@ -318,7 +355,16 @@ public final class WriteIDLSav {
 
     public void checkVariableType( String name, Object data ) {
         Class c= data.getClass();
-        if ( !( c.isArray() && ( c.getComponentType()==double.class || c.getComponentType()==long.class ) ) && c!=Short.class ) {
+        Class componentType;
+        Class c1= c;
+        int rank=1;
+        while ( c1.isArray() && c1.getComponentType().isArray() ) {
+            c1= c1.getComponentType();
+            rank++;
+        }
+        componentType= c1.getComponentType();
+        if ( rank>2 ) throw new IllegalArgumentException("unsupported rank, only rank 1 or rank 2 data");
+        if ( !( c.isArray() && ( componentType==double.class || componentType==long.class ) ) && c!=Short.class ) {
             throw new IllegalArgumentException("\"" + name + "\" is unsupported data type: "+data.getClass() );
         }
     }
@@ -358,6 +404,7 @@ public final class WriteIDLSav {
         widls.addVariable( "myvar", new double[] { 120,100,120,45,46,47,48,49,120,100,120 } );
         widls.addVariable( "second", new double[] { -1,-1,-2,-3,-3,4,5,6,7,7,8,9,9,10 } );
         widls.addVariable( "mylong", new long[] { -1, 100000, 100000000000L } );
+        widls.addVariable( "mydoublearr", new double[][] { { 120,100,120,45}, {46,47,48,49}, {1.2,1.10,1.4,1.25} } );
 
         //widls.addVariable( "oneval", 19.95 );
         widls.write(fos);
