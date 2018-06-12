@@ -1348,6 +1348,8 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
             }
             if ( params.containsKey("depend0Units") ) {
                 depend0unitsCB.setSelectedItem(params.get("depend0Units"));
+            } else {
+                depend0unitsCB.setSelectedItem("");
             }
             String arg0= params.get("arg_0"); // typically we're going to specify a range.
             if ( arg0!=null ) {
@@ -1466,7 +1468,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
         setParam( params, "title", titleTextField.getText() );
         setParam( params, "label", labelTextField.getText() );
         setParam( params, "units", unitsTF.getText() );
-        if ( depend0unitsCB.getSelectedItem()!=null ) {
+        if ( depend0unitsCB.getSelectedItem()!=null && depend0unitsCB.getSelectedItem().toString().trim().length()>0 ) {
             setParam( params, "depend0Units", depend0unitsCB.getSelectedItem().toString() );
         } else {
             params.remove("depend0Units");
