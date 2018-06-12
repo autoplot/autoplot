@@ -49,6 +49,40 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
         write.addVariable( Ops.guessName(data,guessName), dd );
          
     }
+    
+    private void formatRank2( WriteIDLSav write, QDataSet data, String guessName ) {
+
+        String su= getParam( "tunits", "t1970" );
+
+        QDataSet wds= Ops.valid(data);
+
+        double[][] dd= new double[data.length()][];
+        for ( int i=0; i<dd.length; i++ ) {
+            dd[i]= new double[data.length(i)];
+            for ( int j=0; j<data.length(i); j++ ) {
+                dd[i][j]= wds.value(i,j)==0 ? Double.NaN : data.value(i,j);
+            }
+        }
+
+        Units dep0u= SemanticOps.getUnits(data);
+        
+        if ( UnitsUtil.isTimeLocation( dep0u ) ) {
+            Units targetUnits= Units.lookupUnits(su.replaceAll("_"," ").replaceAll("\\+"," "));
+            UnitsConverter uc= UnitsConverter.IDENTITY;
+            if ( UnitsUtil.isTimeLocation(dep0u) ) {
+                uc= UnitsConverter.getConverter(dep0u,targetUnits);
+            }
+            for ( int i=0; i<dd.length; i++ ) {
+                for ( int j=0; j<dd[i].length; j++ ) {
+                    dd[i][j]= uc.convert( dd[i][j] );
+                }
+            }
+        }
+        
+        write.addVariable( Ops.guessName(data,guessName), dd );
+         
+    }
+    
     private void formatRank2Bundle(  String uri, QDataSet data, ProgressMonitor mon ) throws Exception {
         setUri(uri);
 
@@ -80,7 +114,7 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
 
         setUri(uri);
 
-        if ( data.rank()!=1 ) {
+        if ( data.rank()!=1 && data.rank()!=2 ) {
             if ( SemanticOps.isBundle(data) ) {
                 formatRank2Bundle( uri, data, mon );
                 return;
@@ -96,11 +130,19 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
             doOne( write,dep0,"dep0" );
         }
         
-        doOne( write,data,"data" );
+        if ( data.rank()==2 ) {
+            formatRank2(write, data, "data");
+        } else {
+            doOne( write,data,"data" );
+        }
         
         QDataSet dep1= (QDataSet) data.property(QDataSet.DEPEND_1);
         if ( dep1!=null ) {
-            doOne( write,dep1,"dep1" );
+            if ( dep1.rank()==2 ) {
+                formatRank2(write, dep1, "dep1");
+            } else {
+                doOne( write,dep1,"dep1" );
+            }
         }
         
         setUri(uri);
@@ -116,7 +158,7 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
     }
 
     public boolean canFormat(QDataSet ds) {
-        return ds.rank()==1 || ( ds.rank()==2 && SemanticOps.isBundle(ds) );
+        return ds.rank()==1 || ds.rank()==2 || ( ds.rank()==2 && SemanticOps.isBundle(ds) );
     }
 
     public String getDescription() {
