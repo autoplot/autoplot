@@ -285,7 +285,7 @@ public class AutoplotDataServer {
                     String n= String.format( "/tmp/ap-hapi/ads%09d", irand );
                     File file= new File( n+".hapi");
                     dsf.formatData( file.toString()+"?id=temp", ds, new NullProgressMonitor() );
-                    File infoFile= new File( n+"/info/temp.json" );
+                    File infoFile= new File( n+"/hapi/info/temp.json" );
                     FileInputStream fin= new FileInputStream(infoFile);
                     DataSourceUtil.transfer( fin, out, false );
                     FileUtil.deleteFileTree( new File(n) );
@@ -299,7 +299,7 @@ public class AutoplotDataServer {
                     String n= String.format( "/tmp/ap-hapi/ads%09d", irand );
                     File file= new File( n+".hapi");
                     dsf.formatData( file.toString()+"?id=temp&format=binary", ds, new NullProgressMonitor() );
-                    File binaryFile= new File(  n+"/data/temp.binary" );
+                    File binaryFile= new File(  n+"/hapi/data/temp.binary" );
                     FileInputStream fin= new FileInputStream(binaryFile);
                     DataSourceUtil.transfer( fin, out, false );
                     FileUtil.deleteFileTree( new File(n) );
@@ -313,7 +313,7 @@ public class AutoplotDataServer {
                     String n= String.format( "/tmp/ap-hapi/ads%09d", irand );
                     File file= new File( n+".hapi");
                     dsf.formatData( file.toString()+"?id=temp", ds, new NullProgressMonitor() );
-                    File csvFile= new File( n+"/data/temp.csv" );
+                    File csvFile= new File( n+"/hapi/data/temp.csv" );
                     FileInputStream fin= new FileInputStream(csvFile);
                     DataSourceUtil.transfer( fin, out, false );
                     FileUtil.deleteFileTree( new File(n) );
