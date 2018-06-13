@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Corrections to tri-scat rebin mode, to support slicing.
+        <p><small>Export to IDLSave now supports rank 2 (spectral) data.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,7 @@
         
         <p>Bugfixes (2018-06-11 r22512):</p>
         <ul>
+            <li>ASCII editor panel would incorrectly set depend0units.
             <li>support for https das2servers.  Thanks, Chris!
             <li>1995: corrections to code which aggregates qstreams containing nominal data.
             <li>1996: correction to caching code which would fail to unload data from memory to hard disk, causing out-of-memory exceptions.
@@ -49,6 +50,9 @@
             <li>1987: revisit height and width parameters of AutoplotServlet.  Thanks, Jon!
             <li>horizontal slicer is now able to "plot above", though there is no way to swap out the label.
             <li>export to HAPI (and AutoplotServlet HAPI output) is properly marked as 2.0.
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>rte_1578811180: "Getting started" dialog was missing image resource since package renamimg.  Thanks, Dapit!
             <li>Pngwalk's resizeImage code doesn't resize if the dimensions don't change, which happens often.
             <li>"Run Batch" didn't handle URL-type parameters correctly.
@@ -58,43 +62,21 @@
             <li>rfe 545: entries for resourceURI were incorrectly used to create the current directory.
             <li>format to QStream supports events data sets.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>JythonEditorPanel resource URI file chooser will restrict the extension listed based on the example resource URI.
-            <li>about:plugins report is sorted alphabetically.
-            <li>keep track of delegate's scheme ("vap+xxx") when aggregating, to support WDC (World Data Center) files, other issues.
-            <li>downloadResourceAsTempFile supports user:pass in URLs.
-            <li>1981: sequence where histogram operation should have unbound the timeaxis.
-            <li>tweak the logic for autorange hints "center" and "width"
-            <li>rte_1634285758: NullPointerException when annotation is added when a connector (context overview) is visible.
-            <li>run batch tool resourceURI argument list generation initial directory is improved.
-            <li>format the channel labels for array of vectors when exporting to CDF.
-            <li>1897: allow some, but not all, plots to autorange when creating pngwalks.
-            <li>1672: annotations were triggering a repaint, so it was repainting continuously.
-            <li>formatDataSet command checks for prefix so that the extension can be different than the format.
-            <li>yaxis switch mishandled in image data source, units can now be non-dimensionless.  Thanks, Chris!
-            <li>1975: route to generate hang in export for new users because "/..." was default filename, not "file:/..."  Thanks, Chris!
-            <li>more tweaks to the Mashup tool where drag source is considered when replacing child node.
-            <li>bugfix with completions, RTE when tot=nn[0]*nn[1] was used and nn not properly culled.
-            <li>1956: limit off-screen drawing of event bars, which can result in PDFs which don't import well into MS Word.  Thanks, Bill!
-            <li>"now" supported in low-level parse time.  Before only application-level parsers would handle this.
-            <li>Annotation has URL property, to avoid text="http://..." kludge and allow text to be used to document web address.
-            <li>FileUtil.fileCopy of A to A would destroy the contents of A!
-            <li>PNGWalkTool's make HTML would fail miserably when the result was written to the same folder as the pngwalk.
-            <li>1973: experiment with clearing the focus URI when script or .vap is run.
-            <li>1972: "reset" method cancels all the tasks it knows about.
-            <li>mashup starts with "ds" for the first tree, so that is valid.
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>tweaks to HAPI export, including adding "hapi" in the path and adding documentation to GUI.
+            <li>rfe638: export-to-idlsav supports rank 2 data.  Thanks, cj2g13!
             <li>tweaks to the static html file created for pngwalks, which improves performance over slow networks.
-            <li>logspace function added.
-            <li>DataServer implemented as servlet to improve performance.
+            <li>logspace function added.  Thanks, Kristoff!
+            <li>DataServer implemented as servlet to improve performance.  Thanks, Bob!
             <li>DataSetBuilder nextRecord supports rank 1 string data.
             <li>clicking on http and https links in the console tab will point the browse (Firefox,etc) to the link.
             <li>Radio JOVE community AJ4CO_RAINBOW colorbar is added, using a subset of its 4096 colors.  (4096 color version should be available soon.)
             <li>CSV Data Source supports streaming.  AbstractDataSource has "getInputStream" method to support streaming subclasses.
             <li>medianFilter supports rank 2 data, performing the operation on slices of the 1st axis.
+        </ul>
+       <p>Less recent features:</p>
+       <ul>
             <li>add units "mjd" (for days since midnight, Nov 17, 1958) as a default for the ascii table data source.
             <li>"overplotOf" added to plot command.
             <li>sps and spd readers have a built-in code in case there is no internet.
@@ -104,30 +86,6 @@
             <li>rfe545: run batch tool shows the success/fail for each task.
             <li>Vertical averager mouse tool has export data function.  Thanks, Seth!
             <li>AutoplotUI has getDom() method, to support Jython properties like ap2.dom.timeRange.
-        </ul>
-       <p>Less recent features:</p>
-       <ul>
-            <li>rfe632: New "jython extension" readers for World Data Center files and Radiojove .sps and spd files.  Thanks, Masafumi!
-            <li>Axes have "reset zoom" menu item.
-            <li>AutoplotServer supports autorange keywords to match createPngWalk, to support groups which make one image at a time.
-            <li>tighten security on Autoplot servlet, so that eval and import statements are not allowed.
-            <li>Series rendering mode supports fill below reference and fill above reference.  Thanks, Kris and Ivar!
-            <li>rfe629: experiments with nominal level and warning level lines in series renderer.  Thanks, Jon N!
-            <li>expandWaveform filter added, to aid in browsing waveform data with low duty cycles.  Thanks, George!
-            <li>rfe515: new makeColorTable command, for use with plot command.  Thanks, Masafumi!
-            <li>draw the last QC message below the full-sized image.
-            <li>New url property of Annotation clarifies use, and allows URL to cache image of LaTeX-rendering site, and LaTeX code can be stored in the text for safe-keeping.
-            <li>HAPI client will use "If-Modified-Since" request header and supports 304 (not modified) responses, when caching is enabled.  Thanks, Bernie!
-            <li>audiosystem data source allows control of sampling rate.
-            <li>add "bind scale to opposite axis."  Isotropic should no longer be used.
-            <li>add "normalize" function.  Thanks, Allison!
-            <li>add inverse_white_blue_black.  Thanks, Masafumi!
-            <li>DasAxis now has "reference" property which will draw a line at the reference.  Thanks, Kris and Ivar!
-            <li>add two more symbol connection styles, requested by Ivar.
-            <li>allow "45 Deg F" + 2 = "47 Deg F"
-            <li>mashup tool shows jython code for collapsed nodes.
-            <li>Autoplot servlet supports HAPI data sources.
-            <li>inverse white-blue-black colorbar added.  Thanks, Masafumi!
        </ul>
         <p>Known issues:</p>
         <ul>
