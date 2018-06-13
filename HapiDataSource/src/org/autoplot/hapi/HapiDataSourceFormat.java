@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
@@ -35,6 +37,7 @@ import org.das2.qds.QubeDataSetIterator;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.URISplit;
+import org.das2.datum.LoggerManager;
 import org.das2.datum.format.TimeDatumFormatter;
 import org.das2.qds.FloatReadAccess;
 import org.das2.qds.ops.Ops;
@@ -49,9 +52,13 @@ import org.das2.qstream.TransferType;
  */
 public class HapiDataSourceFormat implements DataSourceFormat {
     
+    private static final Logger logger= LoggerManager.getLogger("apdss.hapi");
+    
     @Override
     public void formatData(String uri, QDataSet data, ProgressMonitor mon) throws Exception {
         // file:///home/jbf/hapi?id=mydata
+        logger.log(Level.FINE, "formatData {0} {1}", new Object[]{uri, data});
+        
         URISplit split= URISplit.parse(uri);
         Map<String,String> params= URISplit.parseParams(split.params);
         String s= split.file;
@@ -66,6 +73,12 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         }
         
         File hapiDir= new File( s.substring(0,ix) );
+        hapiDir= new File( hapiDir, "hapi" );
+        
+        if ( !hapiDir.exists() ) {
+            logger.log(Level.FINE, "mkdir {0}", hapiDir);
+            hapiDir.mkdirs();
+        }
         
         String id= params.get("id");
         if ( id==null || id.length()==0 ) id="data";
