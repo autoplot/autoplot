@@ -239,6 +239,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
                         if ( column.length()>1 ) vds.putProperty( QDataSet.NAME, column );
                         vds.putProperty( QDataSet.LABEL, parser.getFieldNames()[icol] );
                     } else {
+                        //BUG2000: bundleDescriptor is supposed to be a AsciiHeadersParser.BundleDescriptor.  Message is poor when wrong column name is used.
+                        //https://sourceforge.net/p/autoplot/bugs/1999/
                         QDataSet _vds= AsciiHeadersParser.getInlineDataSet( bundleDescriptor, column );
                         if ( _vds==null ) {
                             throw new IllegalArgumentException("No such dataset: " +column );
