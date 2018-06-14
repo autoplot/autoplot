@@ -433,7 +433,7 @@ public abstract class QDataSetBridge {
         UnitsConverter uc= UnitsConverter.IDENTITY;
         if ( prefUnits!=null ) {
             for ( Units prefUnit: prefUnits ) {
-                if ( prefUnit.isConvertableTo(u) ) {
+                if ( prefUnit.isConvertibleTo(u) ) {
                     uc= u.getConverter(prefUnit);
                     if ( uc!=UnitsConverter.IDENTITY ) {
                         if ( debug ) {
@@ -528,41 +528,49 @@ public abstract class QDataSetBridge {
         UnitsConverter uc= maybeGetConverter(ds1);
         QDataSet wds= DataSetUtil.weightsDataSet(ds1);
         for (int i0 = 0; i0 < ds1.length(); i0++) {
+            float[] result1= result[i0];
             for (int i1 = 0; i1 < ds1.length(i0); i1++) {
                 if ( useFill && wds.value(i0, i1 )==0 ) {
-                    result[i0][i1] = ffill;
+                    result1[i1] = ffill;
                 } else {
-                    result[i0][i1] = (float)uc.convert( ds1.value(i0, i1) );
+                    result1[i1] = (float)uc.convert( ds1.value(i0, i1) );
                 }
             }
         }
     }
+    
     private void copyValues( QDataSet ds1, float[][][] result ) {
         UnitsConverter uc= maybeGetConverter(ds1);
         QDataSet wds= DataSetUtil.weightsDataSet(ds1);
         for (int i0 = 0; i0 < ds1.length(); i0++) {
+            float[][] result1= result[i0];            
             for (int i1 = 0; i1 < ds1.length(i0); i1++) {
+                float[] result2= result1[i1];            
                 for (int i2 = 0; i2 < ds1.length(i0,i1); i2++) {
                     if ( useFill && wds.value(i0, i1, i2 )==0 ) {
-                        result[i0][i1][i2] = ffill;
+                        result2[i2] = ffill;
                     } else {
-                        result[i0][i1][i2] = (float)uc.convert( ds1.value(i0, i1, i2) );
+                        result2[i2] = (float)uc.convert( ds1.value(i0, i1, i2) );
                     }
                 }
             }
         }
     }
+    
     private void copyValues( QDataSet ds1, float[][][][] result ) {
         UnitsConverter uc= maybeGetConverter(ds1);
         QDataSet wds= DataSetUtil.weightsDataSet(ds1);
         for (int i0 = 0; i0 < ds1.length(); i0++) {
+            float[][][] result1= result[i0];  
             for (int i1 = 0; i1 < ds1.length(i0); i1++) {
+                float[][] result2= result1[i1];  
                 for (int i2 = 0; i2 < ds1.length(i0,i1); i2++) {
+                    float[] result3= result2[i2];   
                     for (int i3 = 0; i3 < ds1.length(i0,i1,i2); i2++) {
                         if ( useFill && wds.value(i0, i1, i2, i3 )==0 ) {
-                            result[i0][i1][i2][i3] = ffill;
+                            result3[i3] = ffill;
                         } else {
-                            result[i0][i1][i2][i3] = (float)uc.convert( ds1.value(i0, i1, i2, i3 ) );
+                            result3[i3] = (float)uc.convert( ds1.value(i0, i1, i2, i3 ) );
                         }
                     }
                 }
@@ -590,11 +598,12 @@ public abstract class QDataSetBridge {
         UnitsConverter uc= maybeGetConverter(ds1);
         QDataSet wds= DataSetUtil.weightsDataSet(ds1);
         for (int i0 = 0; i0 < ds1.length(); i0++) {
+            double[] result1= result[i0];
             for (int i1 = 0; i1 < ds1.length(i0); i1++) {
                 if ( useFill && wds.value(i0, i1 )==0 ) {
-                    result[i0][i1] = fill;
+                    result1[i1] = fill;
                 } else {
-                    result[i0][i1] = uc.convert( ds1.value(i0, i1) );
+                    result1[i1] = uc.convert( ds1.value(i0, i1) );
                 }
             }
         }
@@ -603,12 +612,14 @@ public abstract class QDataSetBridge {
         UnitsConverter uc= maybeGetConverter(ds1);
         QDataSet wds= DataSetUtil.weightsDataSet(ds1);
         for (int i0 = 0; i0 < ds1.length(); i0++) {
+            double[][] result1= result[i0];            
             for (int i1 = 0; i1 < ds1.length(i0); i1++) {
+                double[] result2= result1[i1];            
                 for (int i2 = 0; i2 < ds1.length(i0,i1); i2++) {
                     if ( useFill && wds.value(i0, i1, i2 )==0 ) {
-                        result[i0][i1][i2] = fill;
+                        result2[i2] = fill;
                     } else {
-                        result[i0][i1][i2] = uc.convert( ds1.value(i0, i1, i2) );
+                        result2[i2] = uc.convert( ds1.value(i0, i1, i2) );
                     }
                 }
             }
@@ -618,13 +629,16 @@ public abstract class QDataSetBridge {
         UnitsConverter uc= maybeGetConverter(ds1);
         QDataSet wds= DataSetUtil.weightsDataSet(ds1);
         for (int i0 = 0; i0 < ds1.length(); i0++) {
+            double[][][] result1= result[i0];  
             for (int i1 = 0; i1 < ds1.length(i0); i1++) {
+                double[][] result2= result1[i1];  
                 for (int i2 = 0; i2 < ds1.length(i0,i1); i2++) {
+                    double[] result3= result2[i2];   
                     for (int i3 = 0; i3 < ds1.length(i0,i1,i2); i2++) {
                         if ( useFill && wds.value(i0, i1, i2, i3 )==0 ) {
-                            result[i0][i1][i2][i3] = fill;
+                            result3[i3] = fill;
                         } else {
-                            result[i0][i1][i2][i3] = uc.convert( ds1.value(i0, i1, i2, i3 ) );
+                            result3[i3] = uc.convert( ds1.value(i0, i1, i2, i3 ) );
                         }
                     }
                 }
