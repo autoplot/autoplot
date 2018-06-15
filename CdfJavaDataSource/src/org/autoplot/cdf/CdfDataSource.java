@@ -907,6 +907,7 @@ public class CdfDataSource extends AbstractDataSource {
             int slice1, 
             ProgressMonitor mon) throws Exception, ParseException {
         
+        logger.fine("wrapDataSet("+svariable+")");
         if ( !hasVariable(cdf, svariable) ) {
             throw new IllegalArgumentException( "No such variable: "+svariable );
         }
@@ -1127,31 +1128,39 @@ public class CdfDataSource extends AbstractDataSource {
                 && ( deltaPlus!=null && deltaPlus instanceof String && !deltaPlus.equals(svariable) ) 
                 && (  deltaMinus!=null && deltaMinus instanceof String ) && !deltaPlus.equals(svariable) ) {
             if ( hasVariable( cdf, (String)deltaPlus ) ) {
-                QDataSet delta= getDeltaPlusMinus( cdf, result, (String)deltaPlus, constraints ); //TODO: slice1
-                Units deltaUnits= SemanticOps.getUnits(delta);
-                if ( UnitsUtil.isRatioMeasurement(deltaUnits)
-                        && deltaUnits.isConvertibleTo( SemanticOps.getUnits(result).getOffsetUnits() )
-                        && ( delta.rank()==0 || result.length()==delta.length() ) ) {
-                    result.putProperty( QDataSet.BIN_PLUS, delta );
-                    if ( !deltaMinus.equals(deltaPlus) ) {
-                        delta= getDeltaPlusMinus( cdf, result, (String)deltaMinus, constraints );
-                        if ( delta.length()==1 && delta.rank()==1 && delta.length()!=result.length() ) {
-                           delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
+                QDataSet delta; 
+                try {
+                    delta = getDeltaPlusMinus( cdf, result, (String)deltaPlus, constraints );//TODO: slice1
+                } catch ( NoDataInIntervalException ex ) {  // file:///home/jbf/autoplot/data/u/jonn/20180615/psp_isois-epilo_l2-ic_20100104_v0.0.0.cdf
+                    logger.log(Level.FINE, "DELTA_PLUS_VAR variable has no records {0}: {1}", new Object[] { svariable, deltaPlus } );                    
+                    delta= null;
+                }
+                if ( delta!=null ) {
+                    Units deltaUnits= SemanticOps.getUnits(delta);
+                    if ( UnitsUtil.isRatioMeasurement(deltaUnits)
+                            && deltaUnits.isConvertibleTo( SemanticOps.getUnits(result).getOffsetUnits() )
+                            && ( delta.rank()==0 || result.length()==delta.length() ) ) {
+                        result.putProperty( QDataSet.BIN_PLUS, delta );
+                        if ( !deltaMinus.equals(deltaPlus) ) {
+                            delta= getDeltaPlusMinus( cdf, result, (String)deltaMinus, constraints );
+                            if ( delta.length()==1 && delta.rank()==1 && delta.length()!=result.length() ) {
+                               delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
+                            }
                         }
-                    }
-                    if ( SemanticOps.getUnits(delta).isConvertibleTo( SemanticOps.getUnits(result).getOffsetUnits() ) ) {
-                        result.putProperty( QDataSet.BIN_MINUS, delta );
+                        if ( SemanticOps.getUnits(delta).isConvertibleTo( SemanticOps.getUnits(result).getOffsetUnits() ) ) {
+                            result.putProperty( QDataSet.BIN_MINUS, delta );
+                        } else {
+                            result.putProperty( QDataSet.BIN_PLUS, null );
+                            logger.log(Level.FINE, "DELTA_MINUS_VAR units are not convertible: {0}", SemanticOps.getUnits(delta));
+                        }
                     } else {
-                        result.putProperty( QDataSet.BIN_PLUS, null );
-                        logger.log(Level.FINE, "DELTA_MINUS_VAR units are not convertible: {0}", SemanticOps.getUnits(delta));
-                    }
-                } else {
-                    if ( !UnitsUtil.isRatioMeasurement(deltaUnits) ) {
-                        logger.log(Level.FINE, "DELTA_PLUS_VAR units are not ratio measurements having a meaningful zero: {0}", new Object[] { deltaUnits } );
-                    } else if ( result.length()!=delta.length() ) {
-                        logger.log(Level.FINE, "DELTA_PLUS_VAR length ({0,number,#})!= data length ({1,number,#})", new Object[] { delta.length(), result.length() } );
-                    } else {
-                        logger.log(Level.FINE, "DELTA_PLUS_VAR units are not convertible: {0}", SemanticOps.getUnits(delta));
+                        if ( !UnitsUtil.isRatioMeasurement(deltaUnits) ) {
+                            logger.log(Level.FINE, "DELTA_PLUS_VAR units are not ratio measurements having a meaningful zero: {0}", new Object[] { deltaUnits } );
+                        } else if ( result.length()!=delta.length() ) {
+                            logger.log(Level.FINE, "DELTA_PLUS_VAR length ({0,number,#})!= data length ({1,number,#})", new Object[] { delta.length(), result.length() } );
+                        } else {
+                            logger.log(Level.FINE, "DELTA_PLUS_VAR units are not convertible: {0}", SemanticOps.getUnits(delta));
+                        }
                     }
                 }
             } else {
