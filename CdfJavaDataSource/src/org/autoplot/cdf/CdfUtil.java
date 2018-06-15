@@ -880,7 +880,7 @@ public class CdfUtil {
             if ( hasAttribute( cdf, svar, "DEPEND_"+dim ) ) {  // check for metadata for DEPEND_1
                 Object att= getAttribute( cdf, svar, "DEPEND_"+dim );
                 if ( att!=null && rank>1 ) {
-                    logger.log(Level.FINE, "get attribute DEPEND_"+dim+" entry for {0}", svar );
+                    logger.log(Level.FINER, "get attribute DEPEND_"+dim+" entry for {0}", svar );
                     result.dep = String.valueOf(att);
                     if ( cdf.getDimensions( result.dep ).length>0 && cdf.getNumberOfValues( result.dep )>1 && cdf.recordVariance( result.dep ) ) {
                         result.rank2= true;
@@ -907,7 +907,7 @@ public class CdfUtil {
              if (result.nrec==-1 && hasAttribute( cdf, svar, "LABL_PTR_"+dim ) ) {  // check for metadata for LABL_PTR_1
                 Object att= getAttribute( cdf, svar, "LABL_PTR_"+dim );
                 if ( att!=null && rank>1  ) {
-                    logger.log(Level.FINE, "get attribute LABL_PTR_"+dim+" entry for {0}", svar );
+                    logger.log(Level.FINER, "get attribute LABL_PTR_"+dim+" entry for {0}", svar );
                     result.labl = String.valueOf(att);
                     if ( !cdf.existsVariable(result.labl) ) throw new Exception("No such variable: "+String.valueOf(att));
                     result.nrec = cdf.getNumberOfValues( result.labl );
@@ -921,7 +921,7 @@ public class CdfUtil {
             } else if ( hasAttribute( cdf, svar, "LABL_PTR_"+dim ) ) { // check that the LABL_PTR_i is the right length as well.
                 Object att= getAttribute( cdf, svar, "LABL_PTR_"+dim );
                 if ( att!=null && rank>1  ) {
-                    logger.log(Level.FINE, "get attribute LABL_PTR_"+dim+" entry for {0}", svar );
+                    logger.log(Level.FINER, "get attribute LABL_PTR_"+dim+" entry for {0}", svar );
                     result.labl= String.valueOf(att);
                     int nrec = cdf.getNumberOfValues(result.labl);
                     if ( nrec == 1 ) {
@@ -1066,7 +1066,7 @@ public class CdfUtil {
                     continue;
                 }
                 if ( svar.equals("Time_PB5") ) {
-                    logger.log(Level.FINE, "skipping {0} because we always skip Time_PB5", svar );
+                    logger.log(Level.FINER, "skipping {0} because we always skip Time_PB5", svar );
                     continue;
                 }
                 if ( dataOnly ) {
@@ -1074,13 +1074,13 @@ public class CdfUtil {
                 }
                 Object att= getAttribute( cdf, svar, "VIRTUAL" );
                 if ( att!=null ) {
-                    logger.log(Level.FINE, "get attribute VIRTUAL entry for {0}", svar );
+                    logger.log(Level.FINER, "get attribute VIRTUAL entry for {0}", svar );
                     if ( String.valueOf(att).toUpperCase().equals("TRUE") ) {
                         String funct= (String)getAttribute( cdf, svar, "FUNCTION" );
                         if ( funct==null ) funct= (String) getAttribute( cdf, svar, "FUNCT" ) ; // in alternate_view in IDL: 11/5/04 - TJK - had to change FUNCTION to FUNCT for IDL6.* compatibili
                         if ( !CdfVirtualVars.isSupported(funct) ) {
                             if ( !funct.startsWith("comp_themis") ) {
-                                logger.log(Level.FINE, "virtual function not supported: {0}", funct);
+                                logger.log(Level.FINER, "virtual function not supported: {0}", funct);
                             }
                             continue;
                         } else {
@@ -1114,7 +1114,7 @@ public class CdfUtil {
                 if ( hasAttribute( cdf, svar, "DEPEND_0" )) {  // check for metadata for DEPEND_0
                     Object att= getAttribute( cdf, svar, "DEPEND_0" );
                     if ( att!=null ) {
-                        logger.log(Level.FINE, "get attribute DEPEND_0 entry for {0}", svar);
+                        logger.log(Level.FINER, "get attribute DEPEND_0 entry for {0}", svar);
                         xDependVariable = String.valueOf(att);
                         if ( !hasVariable(cdf,xDependVariable ) ) throw new Exception("No such variable: "+String.valueOf(att));
                         xMaxRec = cdf.getNumberOfValues( xDependVariable );
@@ -1144,12 +1144,12 @@ public class CdfUtil {
             if (deep) {
                 Object o= (Object) getAttribute( cdf, svar, "CATDESC" );
                 if ( o != null && o instanceof String ) {
-                    logger.log(Level.FINE, "get attribute CATDESC entry for {0}", svar );
+                    logger.log(Level.FINER, "get attribute CATDESC entry for {0}", svar );
                     scatDesc = (String)o ;
                 }
                 o=  getAttribute( cdf, svar, "VAR_NOTES" );
                 if ( o!=null  && o instanceof String ) {
-                    logger.log(Level.FINE, "get attribute VAR_NOTES entry for {0}", svar );
+                    logger.log(Level.FINER, "get attribute VAR_NOTES entry for {0}", svar );
                     svarNotes = (String)o ;
                 }
             }
