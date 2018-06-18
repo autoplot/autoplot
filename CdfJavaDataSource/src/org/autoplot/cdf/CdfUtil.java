@@ -415,6 +415,8 @@ public class CdfUtil {
      * <li>vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/lep/2011/ge_k0_lep_20111016_v01.cdf?V0
      * <li>vap+cdfj:file:///home/jbf/ct/autoplot/data.backup/examples/cdf/seth/rbspb_pre_ect-mageisHIGH-sp-L1_20130709_v1.0.0.cdf?Histogram_prot
      * </ul>
+     * @param varies array of boolean indicating if a dimension varies.
+     * @return the rank
      */
     protected static int getEffectiveRank( boolean[] varies ) {
         int rank = 0;
@@ -899,8 +901,6 @@ public class CdfUtil {
             }
         } catch ( CDFException e) {
             warn.add( "problem with DEPEND_"+dim+": " + e.getMessage() );//e.printStackTrace();
-        } catch ( Exception e) {
-            warn.add( "problem with DEPEND_"+dim+": " + e.getMessage() );//e.printStackTrace();
         }
 
         try {
@@ -972,8 +972,8 @@ public class CdfUtil {
      */
     public static Map<String, String> getPlottable(CDFReader cdf, boolean dataOnly, int rankLimit, boolean deep, boolean master) throws Exception {
 
-        Map<String, String> result = new LinkedHashMap<String, String>();
-        Map<String, String> dependent= new LinkedHashMap<String, String>();
+        Map<String, String> result = new LinkedHashMap<>();
+        Map<String, String> dependent= new LinkedHashMap<>();
 
         boolean isMaster= master; //cdf.getName().contains("MASTERS"); // don't show of Epoch=0, just "Epoch"
 
@@ -1105,9 +1105,7 @@ public class CdfUtil {
                         isVirtual= true;
                     }
                 }
-            }catch (CDFException e) {
-                logger.fine(e.getMessage());
-            }catch (Exception e) {
+            }catch (CDFException | RuntimeException e) {
                 logger.fine(e.getMessage());
             }
             try {
