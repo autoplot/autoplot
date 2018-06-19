@@ -1235,7 +1235,11 @@ public class CdfDataSource extends AbstractDataSource {
                             depDs= (MutablePropertyDataSet)depDs.slice(0);
                             //depDs= Ops.reform(depDs);  // This would be more explicit, but reform doesn't handle metadata properly.
                         }
-
+                        
+                        if ( depDs.rank()>1 && !cdf.recordVariance( depName ) ) {// file:///home/jbf/autoplot/data/u/jonn/20180615/psp_isois-epilo_l2-ic_20100104_v0.0.0.cdf?H_Flux_HiEnergyRes
+                            depDs= Ops.replicate( depDs, result.length() );
+                        }
+                        
                         if ( idep==0 ) { //TODO: check for spareness property.  
                             if ( cdf.getNumberOfValues(svariable)==1 && depDs.length()>1 ) {
                                 MutablePropertyDataSet nresult;
