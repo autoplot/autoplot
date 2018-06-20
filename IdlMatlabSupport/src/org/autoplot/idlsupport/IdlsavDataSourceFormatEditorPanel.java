@@ -1,12 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /*
- * BinaryDataSourceFormatEditorPanel.java
+ * IdlsavDataSourceFormatEditorPanel.java
  *
- * Created on Jul 18, 2011, 4:43:42 PM
  */
 package org.autoplot.idlsupport;
 
@@ -48,7 +43,7 @@ public class IdlsavDataSourceFormatEditorPanel extends javax.swing.JPanel implem
         typeComboBox.setEditable(true);
         typeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "t1970", "t2000", "cdfTT2000", "seconds since 2010-02-03T00:00" }));
 
-        jLabel2.setText("Presently only 1-D data can be exported to IDLSav files.");
+        jLabel2.setText("1-D, 2-D and 3-D data can be exported to IDLSave sets.");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);

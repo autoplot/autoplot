@@ -66,7 +66,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Presently only 1-D data can be exported to IDLSav files."/>
+        <Property name="text" type="java.lang.String" value="1-D, 2-D and 3-D data can be exported to IDLSave sets."/>
       </Properties>
     </Component>
   </SubComponents>

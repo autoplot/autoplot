@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.idlsupport;
 
 import java.io.File;
@@ -27,12 +24,12 @@ import java.util.Map.Entry;
  * @author jbf
  */
 public final class WriteIDLSav {
-    public static final int DATATYPE_DOUBLE = 5;
-    public static final int RECTYPE_ENDMARKER = 6;
-    public static final int RECTYPE_TIMESTAMP = 10;
-    public static final int RECTYPE_VARIABLE = 2;
-    public static final int RECTYPE_VERSION = 14;
-    public static final int VARFLAG_ARRAY = 4;
+    private static final int DATATYPE_DOUBLE = 5;
+    private static final int RECTYPE_ENDMARKER = 6;
+    private static final int RECTYPE_TIMESTAMP = 10;
+    private static final int RECTYPE_VARIABLE = 2;
+    private static final int RECTYPE_VERSION = 14;
+    private static final int VARFLAG_ARRAY = 4;
 
     private String nameFor( int type ) {
         if ( type==RECTYPE_VARIABLE ) {
