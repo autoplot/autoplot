@@ -233,6 +233,20 @@ public final class WriteIDLSav {
         return buf;
     }
     
+    private ByteBuffer writeDDDoubleArray( double[][][] data ) {
+        ByteBuffer buf= ByteBuffer.allocateDirect( data.length*data[0].length*data[0][0].length*8 );
+        buf.order(ByteOrder.BIG_ENDIAN);
+        for ( int i=0; i<data.length; i++ ) {
+            for ( int j=0; j<data[0].length; j++ ) {
+                for ( int k=0; k<data[0][0].length; k++ ) { // must be qube.
+                    buf.putDouble(data[i][j][k]);
+                }
+            }
+        }
+        buf.flip();
+        return buf;
+    }
+    
     private ByteBuffer writeLongArray( long[] data ) {
         ByteBuffer buf= ByteBuffer.allocateDirect( data.length*8 );
         buf.order(ByteOrder.BIG_ENDIAN);
@@ -284,6 +298,10 @@ public final class WriteIDLSav {
             varData= writeDoubleArray( (double[])data );
         } else if ( data.getClass().isArray() && data.getClass().getComponentType().isArray() && data.getClass().getComponentType().getComponentType()==double.class ) {
             varData= writeDDoubleArray( (double[][])data );
+        } else if ( data.getClass().isArray() && data.getClass().getComponentType().isArray() 
+            && data.getClass().getComponentType().getComponentType().isArray()
+            && data.getClass().getComponentType().getComponentType().getComponentType()==double.class ) {
+            varData= writeDDDoubleArray( (double[][][])data );
         } else if (data.getClass().isArray() && data.getClass().getComponentType() == long.class) {
             varData= writeLongArray( (long[])data );
         } else if ( data.getClass()==Short.class ) {
@@ -363,7 +381,7 @@ public final class WriteIDLSav {
             rank++;
         }
         componentType= c1.getComponentType();
-        if ( rank>2 ) throw new IllegalArgumentException("unsupported rank, only rank 1 or rank 2 data");
+        if ( rank==0 || rank>3 ) throw new IllegalArgumentException("unsupported rank, only rank 1 or rank 2 data");
         if ( !( c.isArray() && ( componentType==double.class || componentType==long.class ) ) && c!=Short.class ) {
             throw new IllegalArgumentException("\"" + name + "\" is unsupported data type: "+data.getClass() );
         }
