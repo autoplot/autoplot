@@ -1236,7 +1236,8 @@ public class CdfDataSource extends AbstractDataSource {
                             //depDs= Ops.reform(depDs);  // This would be more explicit, but reform doesn't handle metadata properly.
                         }
                         
-                        if ( depDs.rank()>1 && !cdf.recordVariance( depName ) ) {// file:///home/jbf/autoplot/data/u/jonn/20180615/psp_isois-epilo_l2-ic_20100104_v0.0.0.cdf?H_Flux_HiEnergyRes
+                        if ( depDs.rank()>1 && result.rank()>2 && !cdf.recordVariance( depName ) 
+                            && depDs.length()==result.length(0) && depDs.length(0)==result.length(0,0) ) {// file:///home/jbf/autoplot/data/u/jonn/20180615/psp_isois-epilo_l2-ic_20100104_v0.0.0.cdf?H_Flux_HiEnergyRes
                             depDs= Ops.replicate( depDs, result.length() );
                         }
                         
