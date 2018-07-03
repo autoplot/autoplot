@@ -255,6 +255,8 @@ if ! $JAVAC $JAVAARGS org/das2/components/DataPointRecorderNew.java; then echo "
 if ! $JAVAC $JAVAARGS org/das2/components/AngleSpectrogramSlicer.java; then echo "*****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/das2/graph/Auralizor.java; then echo "*****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/das2/graph/CurveRenderer.java' ; then echo "*****"; hasErrors=1; fi  
+if ! $JAVAC $JAVAARGS org/das2/graph/RangeLabel.java' ; then echo "*****"; hasErrors=1; fi  
+if ! $JAVAC $JAVAARGS org/das2/graph/CollapseSpectrogramRenderer.java' ; then echo "*****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/das2/qstream/*.java; then echo "*****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/das2/qstream/filter/*.java; then echo "*****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/das2/datum/SIUnits.java; then echo "****"; hasErrors=1; fi  
