@@ -325,7 +325,12 @@ public class SimpleServlet extends HttpServlet {
                     response.setContentType("text/html");
                     String s = AboutUtil.getAboutHtml();
                     s = s.substring(0, s.length() - 7);
-                    s = s + "<br><br>servlet version="+version+"<br></html>";
+                    s = s + "<br>";
+                    s = s + "hapiServerCache="+ System.getProperty( "hapiServerCache" ) + "<br>";
+                    s = s + "cdawebHttps=" + System.getProperty( "cdawebHttps" ) + "<br>";
+                    s = s + "enableReferenceCache=" + System.getProperty( "enableReferenceCache" ) + "<br>";
+                    s = s + "<br><br>servlet version="+version+"<br>";
+                    s = s + "</html>";
                     out.write(s.getBytes());
                 }
                 return;
