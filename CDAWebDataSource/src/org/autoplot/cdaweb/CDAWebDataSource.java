@@ -273,24 +273,38 @@ public class CDAWebDataSource extends AbstractDataSource {
                 }
 
                 if ( ds1!=null ) {
-                    if ( result==null && accum==null ) {
-                        range= range1;
-                        if ( files.length==1 ) {
-                            result= (MutablePropertyDataSet)ds1;
+                    ArrayList<String> p= new ArrayList<>();
+                    if ( !DataSetUtil.validate( ds1, p ) ) {
+                        if ( p.size()>0 ) {
+                            logger.warning(p.get(0));
                         } else {
-                            accum = ArrayDataSet.maybeCopy(ds1);
-                            accum.grow(accum.length()*files.length*11/10);  //110%
+                            logger.warning("problem");
                         }
                     } else {
-                        assert accum!=null; // because files.length>1.
-                        ArrayDataSet ads1= ArrayDataSet.maybeCopy(accum.getComponentType(),ds1);
-                        if ( accum.canAppend(ads1) ) {
-                            accum.append( ads1 );
+                        logger.log(Level.FINE, "load {0} -> {1}", new Object[]{file, ds1});
+                    }
+                    if ( ds1.length()==1 ) { // See https://sourceforge.net/p/autoplot/bugs/2001/
+                        logger.log(Level.WARNING, "bug 2001: files with only one record are skipped: {0}", file);
+                    } else {
+                        if ( result==null && accum==null ) {
+                            range= range1;
+                            if ( files.length==1 ) {
+                                result= (MutablePropertyDataSet)ds1;
+                            } else {
+                                accum = ArrayDataSet.maybeCopy(ds1);
+                                accum.grow(accum.length()*files.length*11/10);  //110%
+                            }
                         } else {
-                            accum.grow( accum.length() + ads1.length() * ( files.length-i) );
-                            accum.append( ads1 );
+                            assert accum!=null; // because files.length>1.
+                            ArrayDataSet ads1= ArrayDataSet.maybeCopy(accum.getComponentType(),ds1);
+                            if ( accum.canAppend(ads1) ) {
+                                accum.append( ads1 );
+                            } else {
+                                accum.grow( accum.length() + ads1.length() * ( files.length-i) );
+                                accum.append( ads1 );
+                            }
+                            range= DatumRangeUtil.union( range, range1 );
                         }
-                        range= DatumRangeUtil.union( range, range1 );
                     }
                 } else {
                     logger.log(Level.FINE, "failed to read data for granule: {0}", files[i]);
