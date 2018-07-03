@@ -16,6 +16,7 @@ import org.das2.qds.DDataSet;
 import org.das2.qds.JoinDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
+import org.das2.qds.SparseDataSet;
 import org.das2.qds.ops.Ops;
 
 /**
@@ -42,7 +43,8 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
     // see usages elsewhere, this is sloppy.
     // TODO: consider if [ DSA, DSB ] should append( DSA, DSB ) where DSA DSB are datasets.
     /**
-     * adapts list to QDataSet.
+     * adapts list to QDataSet.  
+     * If this contains datums or rank 0 datasets with different units, then a bundle is returned.
      * TODO: Consider: if element is a string, then enumeration units are used.
      * @param p
      * @return
@@ -52,6 +54,9 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
         QDataSet d1;
         JoinDataSet jds= null; // support list of lists.
         Units u= null;
+        Units[] us= new Units[p.size()]; // in case it's a bundle
+        boolean isBundle= false;
+        
         for ( int i=0; i<p.size(); i++ ) {
             Object n= p.get(i);
             //if ( u!=null || n instanceof String ) {
@@ -66,8 +71,16 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
             
             if ( u==null ) u= SemanticOps.getUnits(d1);
           
-            if ( SemanticOps.getUnits(d1)!=u ) {
-                d1= Ops.convertUnitsTo(d1, u);
+            Units ud1= SemanticOps.getUnits(d1);
+            
+            us[i]= ud1;
+            
+            if ( ud1!=u ) {
+                if ( u.isConvertibleTo(ud1)) {
+                    d1= Ops.convertUnitsTo(d1, u);
+                } else {
+                    isBundle= true;
+                }
             }
             
             if ( d1.rank()==0 ) {
@@ -83,7 +96,16 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
         
         if ( jds==null ) {
             DDataSet q= DDataSet.wrap( j );
-            q.putProperty( QDataSet.UNITS, u );
+            if ( isBundle ) {
+                SparseDataSet bds= SparseDataSet.createRankLen( 2,p.size() );
+                for ( int i=0; i<p.size(); i++ ) {
+                    bds.putProperty( QDataSet.UNITS, i, us[i] );
+                    bds.putProperty( QDataSet.NAME, i, "ch"+i );
+                }
+                q.putProperty( QDataSet.BUNDLE_0, bds );
+            } else {
+                q.putProperty( QDataSet.UNITS, u );
+            }
             return q;
         } else {
             jds.putProperty( QDataSet.UNITS, u );
