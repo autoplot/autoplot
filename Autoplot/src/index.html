@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Fun with vap+inline and alternate colorbars.
+        <p><small>makeColorTable is used to make a custom color table.  Happy 4th, Americans!
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-06-15 r22530):</p>
+        <p>Bugfixes (2018-07-03 r22550):</p>
         <ul>
+            <li>when index lists are used to access high-rank dataset, check that all lists have the same length.
+            <li>2001: CDAWeb skips over 1-record CDF files to avoid bug where time-varying DEPEND_1 is lost.
+            <li>With CDAWeb, when DEPEND_1 was time-varying, incorrect warning message about length mismatch is no longer shown.
+            <li>corrections to new expandToFillGaps filter.
             <li>ASCII editor panel would incorrectly set depend0units.
             <li>support for https das2servers.  Thanks, Chris!
             <li>1995: corrections to code which aggregates qstreams containing nominal data.
@@ -64,6 +68,11 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>SeriesRenderer can now be used as a delegate to allow use in scripts.
+            <li>More anchor positions, including OutsideS and OutsideSSW, OutsideW.
+            <li>DataSetBuilder has new nextRecords function, which accepts multiple records, to avoid confusion caused by use of putValues function.
+            <li>U. Iowa group's RangeLabel and CollapseSpectrogramRenderer is now compiled in.
+            <li>bug2000: abs now returns units when the data is ratiometric.
             <li>add more positions for annotations, like "West" and OutsideSSE.
             <li>allow no-record DELTA_PLUS, issuing a warning, to aid in development.
             <li>expandToFillGaps process added.
