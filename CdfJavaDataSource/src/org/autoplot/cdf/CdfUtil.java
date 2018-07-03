@@ -873,7 +873,7 @@ public class CdfUtil {
      * @param warn
      * @return
      */
-    private static DepDesc getDepDesc( CDFReader cdf, String svar, int rank, int[] dims, int dim, List<String> warn ) {
+    private static DepDesc getDepDesc( CDFReader cdf, String svar, int rank, int[] dims, int dim, List<String> warn, boolean isMaster ) {
         DepDesc result= new DepDesc();
 
         result.nrec=-1;
@@ -884,7 +884,7 @@ public class CdfUtil {
                 if ( att!=null && rank>1 ) {
                     logger.log(Level.FINER, "get attribute DEPEND_"+dim+" entry for {0}", svar );
                     result.dep = String.valueOf(att);
-                    if ( cdf.getDimensions( result.dep ).length>0 && cdf.getNumberOfValues( result.dep )>1 && cdf.recordVariance( result.dep ) ) {
+                    if ( cdf.getDimensions( result.dep ).length>0 && ( isMaster || cdf.getNumberOfValues( result.dep )>1 ) && cdf.recordVariance( result.dep ) ) {
                         result.rank2= true;
                         result.nrec = cdf.getDimensions( result.dep )[0];
                         warn.add( "NOTE: " + result.dep + " is record varying" );
@@ -1136,9 +1136,9 @@ public class CdfUtil {
             } catch (Exception e) {
                 warn.add( "problem with DEPEND_0: " + e.getMessage() );
             }
-            DepDesc dep1desc= getDepDesc( cdf, svar, rank, dims, 1, warn );
-            DepDesc dep2desc= getDepDesc( cdf, svar, rank, dims, 2, warn );
-            DepDesc dep3desc= getDepDesc( cdf, svar, rank, dims, 3, warn );
+            DepDesc dep1desc= getDepDesc( cdf, svar, rank, dims, 1, warn, isMaster );
+            DepDesc dep2desc= getDepDesc( cdf, svar, rank, dims, 2, warn, isMaster );
+            DepDesc dep3desc= getDepDesc( cdf, svar, rank, dims, 3, warn, isMaster );
             if (deep) {
                 Object o= (Object) getAttribute( cdf, svar, "CATDESC" );
                 if ( o != null && o instanceof String ) {
