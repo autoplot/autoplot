@@ -1414,6 +1414,25 @@ public final class HapiDataSource extends AbstractDataSource {
             }
         }
         
+        if ( !haveAll ) {
+            DatumRange missingRange=null;
+            for ( int i=0; i<trs.size(); i++ ) {
+                for ( int j=0; j<parameters.length; j++ ) {
+                    if ( hits[i][j]==false ) {
+                        if ( missingRange==null ) {
+                            missingRange= trs.get(i);
+                        } else {
+                            missingRange= DatumRangeUtil.union( missingRange, trs.get(i) );
+                        }
+                    }
+                }
+            }
+            System.err.println("missingRange="+missingRange );
+            if ( missingRange!=null && missingRange.min().equals(timeRange.min()) || missingRange.max().equals(timeRange.max()) ) {
+                System.err.println("candidate for new partial cache");
+            }
+        }
+        
         if ( !offline && !haveAll ) {
             logger.fine("some cache files missing, but we are on-line and should retrieve all of them");
             return null;
