@@ -1429,7 +1429,7 @@ public final class HapiDataSource extends AbstractDataSource {
             }
             System.err.println("missingRange="+missingRange );
             if ( missingRange!=null && missingRange.min().equals(timeRange.min()) || missingRange.max().equals(timeRange.max()) ) {
-                System.err.println("candidate for new partial cache");
+                System.err.println("candidate for new partial cache, only "+missingRange+" needs to be loaded.");
             }
         }
         
