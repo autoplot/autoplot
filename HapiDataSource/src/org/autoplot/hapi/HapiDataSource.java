@@ -726,7 +726,34 @@ public final class HapiDataSource extends AbstractDataSource {
                 ds= getDataSetViaJSON(totalFields, monitor, url, pds, tr, nparam, nfields);
                 break;
             default:
-                ds= getDataSetViaCsv(totalFields, monitor, url, pds, tr, nparam, nfields);
+                boolean useCache= useCache();
+                if ( useCache ) { // round out to day boundaries, and load each day separately.
+                    Datum minMidnight= TimeUtil.prevMidnight( tr.min() );
+                    Datum maxMidnight= TimeUtil.nextMidnight( tr.max() );
+                    tr= new DatumRange( minMidnight, maxMidnight );
+                    Datum midnight= TimeUtil.prevMidnight( tr.min() );
+                    DatumRange currentDay= new DatumRange( midnight, TimeUtil.next( TimeUtil.DAY, midnight) );
+                    QDataSet dsall= null;
+                    int nday= (int)Math.ceil( tr.width().doubleValue(Units.days) );
+                    if ( nday>1 ) {
+                        monitor.setTaskSize(nday*10);
+                        monitor.started();
+                    }
+                    int iday=0;
+                    while ( currentDay.min().le(tr.max()) ) {
+                        ProgressMonitor mon1= nday==1 ? monitor : monitor.getSubtaskMonitor( 10*iday, 10*(iday+1), "read "+currentDay );
+                        QDataSet ds1= getDataSetViaCsv(totalFields, mon1, url, pds, currentDay, nparam, nfields);
+                        if ( ds1.length()>0 ) {
+                            dsall= Ops.append( dsall, ds1 );
+                        }
+                        currentDay= currentDay.next();
+                        iday++;
+                    }
+                    ds= dsall;
+                    ds= Ops.putProperty( ds, QDataSet.UNITS, null ); // kludge, otherwise time units are messed up. TODO: who puts unit here?
+                } else {
+                    ds= getDataSetViaCsv(totalFields, monitor, url, pds, tr, nparam, nfields);
+                }
                 break;
         }
         
@@ -769,17 +796,22 @@ public final class HapiDataSource extends AbstractDataSource {
         
     }
     
+    private boolean useCache() {
+        boolean useCache= HapiServer.useCache();
+        String cacheParam= getParam( "cache", "" );
+        if ( cacheParam.equals("F") ) {
+            useCache= false;
+        }
+        return useCache;
+    }
+    
     private QDataSet getDataSetViaCsv(int totalFields, ProgressMonitor monitor, URL url, ParamDescription[] pds, DatumRange tr, int nparam, int[] nfields) throws IllegalArgumentException, Exception, IOException {
         DataSetBuilder builder= new DataSetBuilder(2,100,totalFields);
         monitor.setProgressMessage("reading data");
         monitor.setTaskProgress(20);
         long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
         
-        boolean useCache= HapiServer.useCache();
-        String cacheParam= getParam( "cache", "" );
-        if ( cacheParam.equals("F") ) {
-            useCache= false;
-        }
+        boolean useCache= useCache();
         
         if ( useCache ) { // round out data request to day boundaries.
             Datum minMidnight= TimeUtil.prevMidnight( tr.min() );
