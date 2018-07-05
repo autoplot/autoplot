@@ -136,6 +136,8 @@ import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.dom.Application;
+import org.autoplot.dom.Plot;
 import org.xml.sax.SAXException;
 
 /**
@@ -559,6 +561,17 @@ public final class PngWalkTool extends javax.swing.JPanel {
                         if ( suri!=null ) {
                             raiseApWindowSoon(apWindow);
                             ScriptContext.plot(suri);
+                        }
+                        // go through and check for the axis autorange flag, and autorange if necessary.
+                        Application dom= ScriptContext.getDocumentModel();
+                        for ( int i=0; i<dom.getPlots().length; i++ ) {
+                            Plot p= dom.getPlots(i);
+                            if ( p.getYaxis().isAutoRange() ) {
+                                AutoplotUtil.resetZoomY(dom,p);
+                            }
+                            if ( p.getZaxis().isAutoRange() ) {
+                                AutoplotUtil.resetZoomZ(dom,p);
+                            }
                         }
                         if ( parent==null ) {
                             apWindow.setVisible(true);
