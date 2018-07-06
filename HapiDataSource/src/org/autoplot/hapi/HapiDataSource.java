@@ -728,6 +728,7 @@ public final class HapiDataSource extends AbstractDataSource {
             default:
                 boolean useCache= useCache();
                 if ( useCache ) { // round out to day boundaries, and load each day separately.
+                    logger.finer("useCache, so make daily requests to form granules");
                     Datum minMidnight= TimeUtil.prevMidnight( tr.min() );
                     Datum maxMidnight= TimeUtil.nextMidnight( tr.max() );
                     tr= new DatumRange( minMidnight, maxMidnight );
@@ -741,6 +742,7 @@ public final class HapiDataSource extends AbstractDataSource {
                     }
                     int iday=0;
                     while ( currentDay.min().le(tr.max()) ) {
+                        logger.log(Level.FINER, "useCache, request {0}", currentDay);
                         ProgressMonitor mon1= nday==1 ? monitor : monitor.getSubtaskMonitor( 10*iday, 10*(iday+1), "read "+currentDay );
                         QDataSet ds1= getDataSetViaCsv(totalFields, mon1, url, pds, currentDay, nparam, nfields);
                         if ( ds1.length()>0 ) {
@@ -749,6 +751,7 @@ public final class HapiDataSource extends AbstractDataSource {
                         currentDay= currentDay.next();
                         iday++;
                     }
+                    logger.finer("done useCache, so make daily requests to form granules");
                     ds= dsall;
                     ds= Ops.putProperty( ds, QDataSet.UNITS, null ); // kludge, otherwise time units are messed up. TODO: who puts unit here?
                 } else {
@@ -861,6 +864,7 @@ public final class HapiDataSource extends AbstractDataSource {
         DatumRange currentDay= new DatumRange( midnight, TimeUtil.next( TimeUtil.DAY, midnight) );
         boolean completeDay= tr.contains(currentDay);
 
+        logger.log(Level.FINER, "parse {0}", cacheReader);
         boolean gzip= cacheReader==null ? "gzip".equals( httpConnect.getContentEncoding() ) : false;
         int linenumber=0;
         try ( AbstractLineReader in= ( cacheReader!=null ? cacheReader :
@@ -978,6 +982,8 @@ public final class HapiDataSource extends AbstractDataSource {
         } finally {
             if ( httpConnect!=null ) httpConnect.disconnect();
         }
+        
+        logger.log(Level.FINER, "done parsing {0}", cacheReader);
         
         if ( cacheReader!=null ) {
             Map<String,String> cacheFiles= new HashMap<>();
@@ -1177,7 +1183,7 @@ public final class HapiDataSource extends AbstractDataSource {
                 }
             }
         }
-        httpConnect.disconnect();
+        httpConnect.disconnect();  // See unix tcptrack which shows there are many connections to the server. jbf@gardenhousepi:~ $ sudo tcptrack -i eth0
 
         monitor.setProgressMessage("parsing data");
                 
@@ -1193,7 +1199,6 @@ public final class HapiDataSource extends AbstractDataSource {
             JSONArray record= data.getJSONArray(i);
             
             for ( ParamDescription pd: pds ) {
-                Units u= pd.units;
                 if ( nfields[ipd]>1 ) {
                     JSONArray fields= record.getJSONArray(ipd);
                     int nf= nfields[ipd];
