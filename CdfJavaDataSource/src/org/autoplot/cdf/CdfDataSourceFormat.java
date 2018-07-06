@@ -852,6 +852,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         if (title != null && title.length()>0 ) {
             addVariableAttributeEntry( name,"CATDESC", CDFDataType.CHAR, title);
         }
+        
         Number vmax= (Number) ds.property( QDataSet.VALID_MAX );
         Number vmin= (Number) ds.property( QDataSet.VALID_MIN );
         if ( vmax!=null || vmin !=null ) {
@@ -875,7 +876,13 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         }
         Number fillval= (Number) ds.property( QDataSet.FILL_VALUE );
         if ( fillval!=null ) {
-            cdf.addVariableAttributeEntry( name,"FILLVAL", type, new double[] { fillval.doubleValue() });
+            if ( units==Units.cdfEpoch ) {
+                
+            } else if ( units==Units.cdfTT2000 ) {
+                cdf.addVariableAttributeEntry( name, "FILLVAL", CDFDataType.TT2000, new long[] { fillval.longValue() } ); //TODO: use long access, if available.
+            } else {
+                cdf.addVariableAttributeEntry( name,"FILLVAL", type, new double[] { fillval.doubleValue() });
+            }
         } else {
             //cdf.addVariableAttributeEntry( name,"FILLVAL",CDFDataType.DOUBLE,-1e31);
         }
