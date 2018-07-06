@@ -13,6 +13,7 @@ import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.das2.qds.DataSetUtil;
+import org.das2.qds.QDataSet;
 
 /**
  * Wrap a das2 Datum, implementing operators.
@@ -229,6 +230,16 @@ public class PyDatum extends PyJavaInstance {
             return new PyDatum( Units.dimensionless.createDatum( darg ).power( datum ) );            
         } else {
             return new PyQDataSet( DataSetUtil.asDataSet(datum) ).__rpow__(arg0);
+        }
+    }
+
+    @Override
+    public boolean __nonzero__() {
+        Units u= datum.getUnits();
+        if ( u!=null && u.getOffsetUnits()!=u ) {
+            throw new IllegalArgumentException("data must be dimensionless or a ratiometric datum.");
+        } else {
+            return datum.value()!=0;
         }
     }
 

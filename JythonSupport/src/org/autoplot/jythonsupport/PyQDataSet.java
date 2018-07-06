@@ -207,6 +207,19 @@ public class PyQDataSet extends PyJavaInstance {
         QDataSet that = coerce_ds(arg0);
         return new PyQDataSet(Ops.pow(that, rods));
     }
+    
+    @Override
+    public boolean __nonzero__() {
+        if ( this.rods.rank()>0 ) {
+            throw new IllegalArgumentException("data must be rank 0");
+        }
+        Units u= (Units)this.rods.property(QDataSet.UNITS);
+        if ( u!=null && u.getOffsetUnits()!=u ) {
+            throw new IllegalArgumentException("data must be dimensionless or a ratiometric datum.");
+        } else {
+            return this.rods.value()!=0;
+        }
+    }
 
     @Override
     public PyObject __int__() {
