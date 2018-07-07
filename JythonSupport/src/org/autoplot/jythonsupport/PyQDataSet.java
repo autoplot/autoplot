@@ -1098,11 +1098,6 @@ public class PyQDataSet extends PyJavaInstance {
 
     }
 
-    public QDataSet gt( Object o ) {
-        logger.fine(String.valueOf(o));
-        return null;
-    }
-
     public PyQDataSet append( PyObject arg0 ) {
         Object o = arg0.__tojava__(QDataSet.class);
         DDataSet result;
