@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>makeColorTable is used to make a custom color table.  Happy 4th, Americans!
+        <p><small>CDF metadata can be used to indicate nominal and warning ranges.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,15 +24,20 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-07-05 r22550):</p>
+        <p>Bugfixes (2018-07-07 r22563):</p>
         <ul>
+            <li>export-to-CDF failed when TT2000 data had fill value.  Thanks, Ivar!
+            <li>2002: gt(r0ds1,r0ds2) is now supported, avoiding confusion.  Thanks, Kristoff and Ed!
             <li>in pngwalk tool, autorange after loading vap if the autorange flag is set.
             <li>rte 1055121094: exporting ephemeris data to qds, when data column contains format specification.  Thanks fallegrini!
-            <li>tweak formatting used when printing numbers in metadata tab.
-            <li>when index lists are used to access high-rank dataset, check that all lists have the same length.
+            <li>tweak formatting used when printing numbers in metadata tab.  Thanks, Ivar!
+            <li>when index lists are used to access high-rank dataset, check that all lists have the same length.  Thanks, Ivar!
             <li>2001: CDAWeb skips over 1-record CDF files to avoid bug where time-varying DEPEND_1 is lost.
             <li>With CDAWeb, when DEPEND_1 was time-varying, incorrect warning message about length mismatch is no longer shown.
             <li>corrections to new expandToFillGaps filter.
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>ASCII editor panel would incorrectly set depend0units.
             <li>support for https das2servers.  Thanks, Chris!
             <li>1995: corrections to code which aggregates qstreams containing nominal data.
@@ -58,19 +63,9 @@
             <li>horizontal slicer is now able to "plot above", though there is no way to swap out the label.
             <li>export to HAPI (and AutoplotServlet HAPI output) is properly marked as 2.0.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>rte_1578811180: "Getting started" dialog was missing image resource since package renamimg.  Thanks, Dapit!
-            <li>Pngwalk's resizeImage code doesn't resize if the dimensions don't change, which happens often.
-            <li>"Run Batch" didn't handle URL-type parameters correctly.
-            <li>rte_0176698267: mishandling of URIs in new JythonExtensionDataSource.  Thanks, Larry!
-            <li>1984: error in inspecting .vap file would clear the address bar, destroying the scientist's URI.
-            <li>rte_0395859275: whoops, new code in branch was never tested for "/home/jbf/&lt;TAB&gt;" where NullPointerException was encountered.
-            <li>rfe 545: entries for resourceURI were incorrectly used to create the current directory.
-            <li>format to QStream supports events data sets.
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>641: HAPI caching experiment where request is broken up into daily requests so that caching is more effective.
             <li>SeriesRenderer can now be used as a delegate to allow use in scripts.
             <li>More anchor positions, including OutsideS and OutsideSSW, OutsideW.
             <li>DataSetBuilder has new nextRecords function, which accepts multiple records, to avoid confusion caused by use of putValues function.
@@ -79,6 +74,9 @@
             <li>add more positions for annotations, like "West" and OutsideSSE.
             <li>allow no-record DELTA_PLUS, issuing a warning, to aid in development.
             <li>expandToFillGaps process added.
+        </ul>
+       <p>Less recent features:</p>
+       <ul>
             <li>tweaks to HAPI export, including adding "hapi" in the path and adding documentation to GUI.
             <li>rfe638: export-to-idlsav supports rank 2 data.  Thanks, cj2g13!
             <li>tweaks to the static html file created for pngwalks, which improves performance over slow networks.
@@ -89,18 +87,6 @@
             <li>Radio JOVE community AJ4CO_RAINBOW colorbar is added, using a subset of its 4096 colors.  (4096 color version should be available soon.)
             <li>CSV Data Source supports streaming.  AbstractDataSource has "getInputStream" method to support streaming subclasses.
             <li>medianFilter supports rank 2 data, performing the operation on slices of the 1st axis.
-        </ul>
-       <p>Less recent features:</p>
-       <ul>
-            <li>add units "mjd" (for days since midnight, Nov 17, 1958) as a default for the ascii table data source.
-            <li>"overplotOf" added to plot command.
-            <li>sps and spd readers have a built-in code in case there is no internet.
-            <li>maximum number of bundled datasets allowed is increased to 96 from 50, to include HOPE data.  Thanks, Seth!
-            <li>jnlp file registers .pngwalk with the desktop.
-            <li>QStreams have new "enumerationUnit" tag within packetDescriptor to avoid old kludgey method for encoding nominal datums.
-            <li>rfe545: run batch tool shows the success/fail for each task.
-            <li>Vertical averager mouse tool has export data function.  Thanks, Seth!
-            <li>AutoplotUI has getDom() method, to support Jython properties like ap2.dom.timeRange.
        </ul>
         <p>Known issues:</p>
         <ul>
