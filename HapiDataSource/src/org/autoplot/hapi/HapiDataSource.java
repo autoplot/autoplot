@@ -751,6 +751,10 @@ public final class HapiDataSource extends AbstractDataSource {
                         currentDay= currentDay.next();
                         iday++;
                     }
+                    if ( dsall==null ) {
+                        logger.info("no records found");
+                        return null;
+                    }
                     logger.finer("done useCache, so make daily requests to form granules");
                     ds= dsall;
                     ds= Ops.putProperty( ds, QDataSet.UNITS, null ); // kludge, otherwise time units are messed up. TODO: who puts unit here?
