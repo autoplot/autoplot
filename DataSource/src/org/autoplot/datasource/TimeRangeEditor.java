@@ -89,6 +89,12 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     }
 
     DatumRange range= DatumRangeUtil.parseTimeRangeValid( "2010-01-01" );
+    
+    /**
+     * this is the range which is displayed, and will be the same as range
+     * when rescale is "" or "0%,100%"
+     */
+    DatumRange controlRange= range;
 
     public static final String PROP_USE_DOY= "useDoy";
 
@@ -116,6 +122,37 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         firePropertyChange( PROP_USE_DOY,old,useDoy);
     }
 
+    private String rescale = "";
+
+    public static final String PROP_RESCALE = "rescale";
+
+    public String getRescale() {
+        return rescale;
+    }
+
+    /**
+     * Add extra time to the range, and account for this extra time
+     * with the next and previous buttons.  Example values are:
+     * <li>"" the default behavior
+     * <li>0%,100% also the default behavior
+     * <li>-10%,110% add ten percent before and after the interval
+     * <li>0%-1hr,100%+1hr add an hour before and after the interval
+     * Note the GUI will always report the 0%,100% time, without the context.
+     * @param rescale 
+     */
+    public void setRescale(String rescale) {
+        String oldRescale = this.rescale;
+        this.rescale = rescale;
+        DatumRange oldRange= this.range;
+        try {
+            this.range= DatumRangeUtil.rescale( controlRange, rescale );
+        } catch (ParseException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        firePropertyChange(PROP_RESCALE, oldRescale, rescale);
+        firePropertyChange(PROP_RANGE, oldRange, range );
+    }
+
     public static final String PROP_RANGE= "range";
 
     /**
@@ -131,16 +168,72 @@ public class TimeRangeEditor extends javax.swing.JPanel {
      */
     private boolean suppressRecentComboBoxActionEvents= false;
 
+    /**
+     * set the range for the controller.  Note that if the rescale range
+     * is not "" or "0%,100%" then the controlRange will be different.
+     * @param value 
+     */
     public void setRange( final DatumRange value ) {
         if ( !UnitsUtil.isTimeLocation(value.getUnits()) ) return;
         final DatumRange oldValue= this.range;
+        final DatumRange oldControlRange= this.controlRange;
         this.range= value;
+        try {
+            if ( this.rescale.length()==0 ) {
+                this.controlRange= value;
+            } else {
+                this.controlRange= DatumRangeUtil.rescaleInverse(value, rescale );
+            }
+        } catch (ParseException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
         if (oldValue != value && oldValue != null && !oldValue.equals(value)) {
             if ( !suppressRecentComboBoxActionEvents ) {
-                SwingUtilities.invokeLater( new Runnable() {
+                SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         TimeRangeEditor.super.firePropertyChange( PROP_RANGE, oldValue, value);
+                        TimeRangeEditor.super.firePropertyChange( PROP_CONTROL_RANGE, oldControlRange, TimeRangeEditor.this.controlRange);
+                    }
+                } );
+            }
+        }
+        this.suppressRecentComboBoxActionEvents= true;
+        if ( value==noOneListening ) {
+            this.recentComboBox.setSelectedItem("");
+        } else {
+            this.recentComboBox.setSelectedItem( controlRange.toString() );
+        }
+        this.suppressRecentComboBoxActionEvents= false;
+    }
+    
+    public static final String PROP_CONTROL_RANGE= "controlRange";
+    
+    /**
+     * set the range displayed, regardless of the rescaling.
+     * @param value
+     */
+    public void setControlRange( final DatumRange value ) {
+        if ( !UnitsUtil.isTimeLocation(value.getUnits()) ) return;
+        final DatumRange oldValue= this.controlRange;
+        final DatumRange oldRange= this.range;
+        this.controlRange= value;
+        try {
+            if ( this.rescale.length()==0 ) {
+                this.range= value;
+            } else {
+                this.range= DatumRangeUtil.rescale(value, rescale );
+            }
+        } catch (ParseException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        if (oldValue != value && oldValue != null && !oldValue.equals(value)) {
+            if ( !suppressRecentComboBoxActionEvents ) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        TimeRangeEditor.super.firePropertyChange( PROP_CONTROL_RANGE, oldValue, value);
+                        TimeRangeEditor.super.firePropertyChange( PROP_RANGE, oldRange, TimeRangeEditor.this.range );
                     }
                 } );
             }
@@ -151,7 +244,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         } else {
             this.recentComboBox.setSelectedItem( value.toString() );
         }
-        this.suppressRecentComboBoxActionEvents= false;
+        this.suppressRecentComboBoxActionEvents= false;        
     }
 
     DatumRange noOneListening= range;
@@ -196,7 +289,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
     private void parseRange() {
         DatumRange dr;
-        DatumRange value= this.range;
+        DatumRange value= this.controlRange;
 
         String text= (String)recentComboBox.getSelectedItem();
         if ( text==null || text.equals("") ) return;
@@ -204,7 +297,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         try {
             String rangeString= text;
             dr= DatumRangeUtil.parseTimeRange(rangeString);
-            setRange(dr);
+            setControlRange(dr);
         } catch ( ParseException e ) {
             boolean isUri= isUri( text );
             if ( isUri ) {
@@ -224,7 +317,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             }
         } catch ( IllegalArgumentException e ) {
             if ( value!=null ) {
-                setRange( value ); // cause reformat of old Datum
+                setControlRange( value ); // cause reformat of old Datum
                 if ( e.getMessage().contains("min > max") ) {
                     showErrorUsage( text, "min cannot be greater than max" );
                 } else {
@@ -358,12 +451,12 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
-        setRange( range.next() );
+        setControlRange( controlRange.next() );
     }//GEN-LAST:event_nextButtonActionPerformed
 
     private void prevButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prevButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
-        setRange( range.previous() );
+        setControlRange( controlRange.previous() );
     }//GEN-LAST:event_prevButtonActionPerformed
 
     DataSetSelector peer;
@@ -425,13 +518,13 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     private void timeRangeToolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeToolButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         TimeRangeTool t=new TimeRangeTool();
-        t.setSelectedRange(getRange().toString());//TODO: goofy
+        t.setSelectedRange(controlRange.toString());//TODO: goofy
         if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( SwingUtilities.getWindowAncestor(this), t, "Select time range",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, 
                 new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/calendar.png"))) ) {
             String str= t.getSelectedRange();
             try {
-                setRange( DatumRangeUtil.parseTimeRangeValid(str) );
+                setControlRange( DatumRangeUtil.parseTimeRangeValid(str) );
             } catch ( IllegalArgumentException ex ) {
                 logger.log(Level.FINE, "unable to parse time/orbit: {0}", str);
             }
@@ -442,7 +535,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
     public static void main( String[] args ) {
         TimeRangeEditor p= new TimeRangeEditor();
-        p.addPropertyChangeListener( TimeRangeEditor.PROP_RANGE, new PropertyChangeListener() {
+        p.addPropertyChangeListener(TimeRangeEditor.PROP_RANGE, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 System.err.println(evt.getOldValue()+" -> "+ evt.getNewValue() ); // logger okay
@@ -482,7 +575,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
     
     private void addMousePopupListener() {
-        recentComboBox.getEditor().getEditorComponent().addMouseListener( new MouseAdapter() {
+        recentComboBox.getEditor().getEditorComponent().addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -538,7 +631,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         
         if ( this.alternatePeerCard!=null ) {
             result.add( new JSeparator() );
-            result.add( new AbstractAction( alternatePeer ) {
+            result.add(new AbstractAction( alternatePeer ) {
                 @Override
                 public void actionPerformed(ActionEvent ev) {
                     org.das2.util.LoggerManager.logGuiEvent(ev);                    
