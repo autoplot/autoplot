@@ -1032,9 +1032,45 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     }    
     
-    private void resetVariable( URL server, String id ) {
+    private void resetVariableReportError( URL server, String id, Exception ex ) {
+            logger.log(Level.SEVERE, null, ex);
+            parametersPanel.removeAll();
+            parametersPanel.add(new javax.swing.JLabel("Error reported on server:"));
+            String s= ex.getMessage();
+            parametersPanel.add(new javax.swing.JLabel(s));
+            JLabel space= new javax.swing.JLabel(" ");
+            //space.setMinimumSize(new Dimension(30,30));
+            //space.setPreferredSize(new Dimension(30,30));
+            parametersPanel.add(space);
+            final URL url= HapiServer.createURL(server, HapiSpec.INFO_URL, Collections.singletonMap(HapiSpec.URL_PARAM_ID, id ) );
+            javax.swing.JButton l= new javax.swing.JButton("Load URL in Browser");
+            l.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        Desktop.getDesktop().browse( url.toURI() );
+                    } catch (URISyntaxException | IOException ex1) {
+                        logger.log(Level.SEVERE, null, ex1);
+                    }
+                }
+            });
+            parametersPanel.add(l);
+            titleLabel.setText("");        
+    }
+    
+    private void resetVariable( final URL server, final String id ) {
+        
+        final JSONObject info;
         try {
-            JSONObject info= HapiServer.getInfo( server, id );
+            info = HapiServer.getInfo( server, id );
+        } catch (IOException | JSONException ex) {
+            logger.log(Level.SEVERE, null, ex);
+            resetVariableReportError(server, id, ex);
+            return;
+        }
+        Runnable run= new Runnable() {
+            public void run() {
+                try {
             for ( JSONObject item : new JSONArrayIterator(idsJSON) ) {
                 if ( item.getString("id").equals(id) ) {
                     if ( item.has(HapiSpec.TITLE) ) {
@@ -1207,31 +1243,13 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     timeRangeComboBox.setText( sampleRange.toString() );
                 }
             }
-        } catch (IOException | JSONException ex) {
-            logger.log(Level.SEVERE, null, ex);
-            parametersPanel.removeAll();
-            parametersPanel.add(new javax.swing.JLabel("Error reported on server:"));
-            String s= ex.getMessage();
-            parametersPanel.add(new javax.swing.JLabel(s));
-            JLabel space= new javax.swing.JLabel(" ");
-            //space.setMinimumSize(new Dimension(30,30));
-            //space.setPreferredSize(new Dimension(30,30));
-            parametersPanel.add(space);
-            final URL url= HapiServer.createURL(server, HapiSpec.INFO_URL, Collections.singletonMap(HapiSpec.URL_PARAM_ID, id ) );
-            javax.swing.JButton l= new javax.swing.JButton("Load URL in Browser");
-            l.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        Desktop.getDesktop().browse( url.toURI() );
-                    } catch (URISyntaxException | IOException ex1) {
-                        logger.log(Level.SEVERE, null, ex1);
+                    } catch ( JSONException ex) {
+            resetVariableReportError(server, id, ex);
                     }
                 }
-            });
-            parametersPanel.add(l);
-            titleLabel.setText("");
-        }
+            };
+            SwingUtilities.invokeLater(run);
+                
                 
     }
     private static final int MAX_LENGTH_CHARACTERS = 100000;
