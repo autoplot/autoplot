@@ -497,6 +497,7 @@ public class SimplifyScriptSupport {
 
         @Override
         public Object visitName(Name node) throws Exception {
+            logger.log(Level.FINER, "visitName({0})", node);
             if ( !names.contains(node.id) ) {
                 visitNameFail= true;
             }
@@ -505,6 +506,7 @@ public class SimplifyScriptSupport {
 
         @Override
         public Object visitCall(Call node) throws Exception {
+            logger.log(Level.FINER, "visitCall({0})", node);
             return super.visitCall(node); //To change body of generated methods, choose Tools | Templates.
         }
         
@@ -514,19 +516,27 @@ public class SimplifyScriptSupport {
          }
          @Override
          public void traverse(SimpleNode sn) throws Exception {
+             logger.log(Level.FINER, "traverse({0})", sn);
              if ( sn instanceof Call ) {
                  looksOkay= trivialFunctionCall(sn) || trivialConstructorCall(sn);
+                 logger.log(Level.FINER, "looksOkay={0}", looksOkay);
              } else if ( sn instanceof Assign ) { // TODO: I have to admit I don't understand what traverse means.  I would have thought it was all nodes...
                  Assign a= ((Assign)sn);
                  exprType et= a.value;
                  if ( et instanceof Call ) {
                      looksOkay= trivialFunctionCall(et) || trivialConstructorCall(sn);
+                     logger.log(Level.FINER, "looksOkay={0}", looksOkay);
                  }
              } else if ( sn instanceof Name ) {
                  String t= ((Name)sn).id;
+                 if ( t.length()>1 && Character.isUpperCase( t.charAt(0) ) ) {
+                     logger.log(Level.FINER, "name is assumed to be a constructor call name: {0}", t);
+                     return;
+                 }
                  if ( !names.contains(t)
                          && !okaySet.contains(t)) {
                     looksOkay= false; // TODO: why are there both looksOkay and visitNameFail?
+                    logger.log(Level.FINER, "looksOkay={0}", looksOkay);
                  }
              } else if ( sn instanceof Attribute ) {
                  traverse( ((Attribute)sn).value );  // DatumRangeUtil
