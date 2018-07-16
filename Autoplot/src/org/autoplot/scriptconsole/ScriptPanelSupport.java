@@ -1274,7 +1274,7 @@ public class ScriptPanelSupport {
                 } else {
                     try {
                         file = DataSetURI.getFile(DataSetURI.getURL(sfile), new NullProgressMonitor());
-                    } catch ( IOException ex ) {
+                    } catch ( IOException | IllegalArgumentException ex ) {
                         logger.fine("old file reference from data set selector is ignored");
                         file= null;
                     }
