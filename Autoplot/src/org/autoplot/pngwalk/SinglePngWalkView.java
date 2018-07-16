@@ -16,6 +16,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.text.ParseException;
@@ -93,15 +95,19 @@ public class SinglePngWalkView extends PngWalkView {
                 if ( clickDigitizerSelect==-1 ) {
                     Rectangle lrect= imageLocation;
                     if ( imageLocation==null ) return;
+                    Point2D clickPos= new Point2D.Double(e.getX(),e.getY());
                     if ( !affineTransform.isIdentity() ) {
-                        seq.setStatus(  "digitizing is not supported with image zoom and pan, Reset Zoom with right-click." );
-                        return;
+                        try {
+                            clickPos= affineTransform.inverseTransform(clickPos,null);
+                        } catch (NoninvertibleTransformException ex) {
+                            Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                     BufferedImage i = seq.currentImage().getImage();
                     if ( i==null ) return;
                     double factor = (double) lrect.getWidth() / (double) i.getWidth(null);
-                    int imageX= (int)( ( e.getX() - lrect.x ) / factor );
-                    int imageY= (int)( ( e.getY() - lrect.y ) / factor );                    
+                    int imageX= (int)( ( clickPos.getX() - lrect.x ) / factor );
+                    int imageY= (int)( ( clickPos.getY() - lrect.y ) / factor );                    
                     try {
                         clickDigitizer.doLookupMetadata( imageX, imageY, false );
                     } catch (IOException | ParseException ex) {
@@ -132,15 +138,21 @@ public class SinglePngWalkView extends PngWalkView {
                 if ( clickDigitizerSelect==-1 ) {
                     Rectangle lrect= imageLocation;
                     if ( imageLocation==null ) return;
+                    
+                    Point2D clickPos= new Point2D.Double(e.getX(),e.getY());
                     if ( !affineTransform.isIdentity() ) {
-                        seq.setStatus(  "digitizing is not supported with image zoom and pan, Reset Zoom with right-click." );
-                        return;
+                        try {
+                            clickPos= affineTransform.inverseTransform(clickPos,null);
+                        } catch (NoninvertibleTransformException ex) {
+                            Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                     BufferedImage i = seq.currentImage().getImage();
                     if ( i==null ) return;
                     double factor = (double) lrect.getWidth() / (double) i.getWidth(null);
-                    int imageX= (int)( ( e.getX() - lrect.x ) / factor );
-                    int imageY= (int)( ( e.getY() - lrect.y ) / factor );                    
+                    int imageX= (int)( ( clickPos.getX() - lrect.x ) / factor );
+                    int imageY= (int)( ( clickPos.getY() - lrect.y ) / factor );                    
+                    
                     try {
                         clickDigitizer.doLookupMetadata( imageX, imageY, true );
                     } catch (IOException | ParseException ex) {
