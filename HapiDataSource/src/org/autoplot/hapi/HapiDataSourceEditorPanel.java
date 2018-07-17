@@ -172,7 +172,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     if ( !selectedValue.equals(currentId) ) {
                         currentParameters= null;
                     }
-                    if ( currentId.equals(selectedValue) ) {
+                    if ( currentId!=null && currentId.equals(selectedValue) ) {
                         return;
                     }
                     currentId= selectedValue;
@@ -194,8 +194,13 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         filtersComboBox.getEditor().getEditorComponent().addKeyListener( new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
-                final String search= (String)filtersComboBox.getEditor().getItem();
-                resetServerCatalog( currentServer, search );
+                Runnable run= new Runnable() {
+                    public void run() {
+                        final String search= (String)filtersComboBox.getEditor().getItem();
+                        resetServerCatalog( currentServer, search );                        
+                    }
+                };
+                SwingUtilities.invokeLater(run);
             }
         } );
     }
@@ -206,7 +211,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             try {
                 String s= idsList2.getSelectedValue();
                 if ( s!=null ) {
-                    resetVariable( new URL( (String)serversComboBox.getSelectedItem() ), idsList2.getSelectedValue() );  
+                    resetId( new URL( (String)serversComboBox.getSelectedItem() ), idsList2.getSelectedValue() );  
                 } else {
                     parametersPanel.removeAll();
                     parametersPanel.add(new JLabel(" "));
@@ -1047,7 +1052,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     }    
     
-    private void resetVariableReportError( URL server, String id, Exception ex ) {
+    private void resetIdReportError( URL server, String id, Exception ex ) {
             logger.log(Level.SEVERE, null, ex);
             parametersPanel.removeAll();
             parametersPanel.add(new javax.swing.JLabel("Error reported on server:"));
@@ -1073,46 +1078,46 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             titleLabel.setText("");        
     }
     
-    private void resetVariableImmediately(String id,JSONObject info) throws JSONException {
-            for ( JSONObject item : new JSONArrayIterator(idsJSON) ) {
-                if ( item.getString("id").equals(id) ) {
-                    if ( item.has(HapiSpec.TITLE) ) {
-                        String title= item.getString(HapiSpec.TITLE);
-                        titleLabel.setText(title);
-                        titleLabel.setToolTipText(title);
-                        titleLabel.setMinimumSize(new Dimension(100,titleLabel.getFont().getSize()));
-                    } else {
-                        titleLabel.setText(id);
-                    }
+    private void resetIdImmediately(String id,JSONObject info) throws JSONException {
+        for ( JSONObject item : new JSONArrayIterator(idsJSON) ) {
+            if ( item.getString("id").equals(id) ) {
+                if ( item.has(HapiSpec.TITLE) ) {
+                    String title= item.getString(HapiSpec.TITLE);
+                    titleLabel.setText(title);
+                    titleLabel.setToolTipText(title);
+                    titleLabel.setMinimumSize(new Dimension(100,titleLabel.getFont().getSize()));
+                } else {
+                    titleLabel.setText(id);
                 }
             }
-            JSONArray parameters= info.getJSONArray("parameters");
-            
-            StringBuilder extra= new StringBuilder();
-            extra.append("<html><table>");
-            Iterator iter= info.keys();
-            String k;
-            for ( ; iter.hasNext(); ) {
-                k=iter.next().toString();
-                //if ( !k.equals("parameters") ) {
-                    Object v= info.get(k);
-                    extra.append("<tr valign=top><td>").append(k).append("</td><td>");
-                    String s= getHtmlFor(v);
-                    if ( v.toString().length()>MAX_LENGTH_CHARACTERS ) {
-                        extra.append("<i>(").append(v.toString().length()).append(" characters)</i>");
-                        //extra.append( s ) ; //v.toString() );
-                    } else {
-                        extra.append( s );
-                    }
-                    extra.append("</td></tr>");
-                //}
-            }
-            extra.append("</table></html>");
-            currentExtra= extra.toString();
-            parametersPanel.removeAll();
-            String[] sparams= new String[parameters.length()];
-            for ( int i=0; i<parameters.length(); i++ ) {
-                JSONObject parameter= parameters.getJSONObject(i);
+        }
+        JSONArray parameters= info.getJSONArray("parameters");
+
+        StringBuilder extra= new StringBuilder();
+        extra.append("<html><table>");
+        Iterator iter= info.keys();
+        String k;
+        for ( ; iter.hasNext(); ) {
+            k=iter.next().toString();
+            //if ( !k.equals("parameters") ) {
+                Object v= info.get(k);
+                extra.append("<tr valign=top><td>").append(k).append("</td><td>");
+                String s= getHtmlFor(v);
+                if ( v.toString().length()>MAX_LENGTH_CHARACTERS ) {
+                    extra.append("<i>(").append(v.toString().length()).append(" characters)</i>");
+                    //extra.append( s ) ; //v.toString() );
+                } else {
+                    extra.append( s );
+                }
+                extra.append("</td></tr>");
+            //}
+        }
+        extra.append("</table></html>");
+        currentExtra= extra.toString();
+        parametersPanel.removeAll();
+        String[] sparams= new String[parameters.length()];
+        for ( int i=0; i<parameters.length(); i++ ) {
+            JSONObject parameter= parameters.getJSONObject(i);
 //                if ( parameter.has("size") ) {
 //                    Object o= parameter.get("size");
 //                    if ( !( o instanceof JSONArray ) ) {
@@ -1123,149 +1128,149 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
 //                    logger.log(Level.WARNING, "size is array is not supported in Autoplot.");
 //                    continue;
 //                }
-                sparams[i]= parameter.getString("name");
-                JCheckBox cb= new JCheckBox(sparams[i]);
-                
-                String label= sparams[i];
-                if ( parameter.has("size") ) {
-                    label= label+parameter.getString("size");
-                }
-                cb.setName(sparams[i]);
-                
-                cb.setSelected(true);
-                final int fi= i;
-                cb.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if ( ( e.getModifiers() & ActionEvent.SHIFT_MASK ) == ActionEvent.SHIFT_MASK ) {
-                            if ( lastParamIndex>-1 ) {
-                                if ( lastParamIndex<fi ) {
-                                    for ( int i=lastParamIndex; i<=fi; i++ ) {
-                                        ( (JCheckBox)parametersPanel.getComponent(i) ).setSelected(true);
-                                    } 
-                                } else {
-                                    for ( int i=fi; i<=lastParamIndex; i++ ) {
-                                        ( (JCheckBox)parametersPanel.getComponent(i) ).setSelected(true);
-                                    } 
-                                }
+            sparams[i]= parameter.getString("name");
+            JCheckBox cb= new JCheckBox(sparams[i]);
+
+            String label= sparams[i];
+            if ( parameter.has("size") ) {
+                label= label+parameter.getString("size");
+            }
+            cb.setName(sparams[i]);
+
+            cb.setSelected(true);
+            final int fi= i;
+            cb.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if ( ( e.getModifiers() & ActionEvent.SHIFT_MASK ) == ActionEvent.SHIFT_MASK ) {
+                        if ( lastParamIndex>-1 ) {
+                            if ( lastParamIndex<fi ) {
+                                for ( int i=lastParamIndex; i<=fi; i++ ) {
+                                    ( (JCheckBox)parametersPanel.getComponent(i) ).setSelected(true);
+                                } 
+                            } else {
+                                for ( int i=fi; i<=lastParamIndex; i++ ) {
+                                    ( (JCheckBox)parametersPanel.getComponent(i) ).setSelected(true);
+                                } 
                             }
                         }
-                        lastParamIndex= fi;
                     }
-                    
-                });
-                if ( parameter.has("description") ) {
-                    String d= parameter.getString("description");
-                    //parametersPanel.add( new javax.swing.JLabel( d ) );
-                    cb.setToolTipText(d);
-                    cb.setText( label+": "+d);
-                } else {
-                    cb.setText( label );
+                    lastParamIndex= fi;
                 }
-                parametersPanel.add( cb );
-            }
-            parametersPanel.setToolTipText("shift-click will select range of parameters");
-            parametersPanel.revalidate();
-            parametersPanel.repaint();
-            if ( currentParameters!=null ) {
-                setParameters(currentParameters);
-            }            
-            DatumRange range= getRange(info);
-            if ( range==null ) {
-                logger.warning("server is missing required startDate and stopDate parameters.");
-                messagesLabel.setText( "range is not provided (non-compliant server)" );
+
+            });
+            if ( parameter.has("description") ) {
+                String d= parameter.getString("description");
+                //parametersPanel.add( new javax.swing.JLabel( d ) );
+                cb.setToolTipText(d);
+                cb.setText( label+": "+d);
             } else {
-                DatumRange sampleRange=null;
-                if ( info.has("sampleStartDate") && info.has("sampleStopDate") ) {
-                    try {
-                        sampleRange = new DatumRange( Units.us2000.parse(info.getString("sampleStartDate")), Units.us2000.parse(info.getString("sampleStopDate")) );
-                    } catch (JSONException | ParseException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    }
-                } 
-                if ( sampleRange==null ) {
-                    Datum cadence= Units.seconds.createDatum(60);  // assume default cadence of 1 minute results in 1 day sample range.
-                    if ( info.has("cadence") ) {
-                        try{
-                            int[] icadence= DatumRangeUtil.parseISO8601Duration(info.getString("cadence"));
-                            cadence= cadenceArrayToDatum(icadence);
-                        } catch ( ParseException ex ) {
-                            logger.log(Level.WARNING, "parse error in cadence: {0}", info.getString("cadence"));
-                        }
-                    }    
-                    if (range.max().ge(myValidTime)) { // Note stopDate is required since 2017-01-17.
-                        logger.warning("server is missing required stopDate parameter.");
-                        messagesLabel.setText(range.min().toString() + " to ?");
-                        sampleRange = new DatumRange(range.min(), range.min().add(1, Units.days));
-                    } else {
-                        messagesLabel.setText(range.toString());
-                        if ( cadence.ge(Units.days.createDatum(1)) ) {
-                            Datum end = TimeUtil.nextMidnight(range.max());
-                            end= end.subtract( 10,Units.days );
-                            if ( range.max().subtract(end).ge( Datum.create(1,Units.days ) ) ) {
-                                sampleRange = new DatumRange( end, end.add(10,Units.days) );
-                            } else {
-                                sampleRange = new DatumRange( end.subtract(10,Units.days), end );
-                            } 
-                        } else if ( cadence.ge(Units.seconds.createDatum(1)) ) {
-                            Datum end = TimeUtil.prevMidnight(range.max());
-                            if ( range.max().subtract(end).ge( Datum.create(1,Units.hours ) ) ) {
-                                sampleRange = new DatumRange( end, end.add(1,Units.days) );
-                            } else {
-                                sampleRange = new DatumRange( end.subtract(1,Units.days), end );
-                            } 
-                        } else {
-                            Datum end = TimeUtil.prev( TimeUtil.HOUR, range.max() );
-                            if ( range.max().subtract(end).ge( Datum.create(1,Units.minutes ) ) ) {
-                                sampleRange = new DatumRange( end, end.add(1,Units.hours) );
-                            } else {
-                                sampleRange = new DatumRange( end.subtract(1,Units.hours), end );
-                            } 
-                        }
-                        if ( !sampleRange.intersects(range) ) {
-                            sampleRange= sampleRange.next();
-                        }
-                    }
-                } else {
-                    String s= range.toString();
-                    if ( info.has("modificationDate") ) {
-                        try {
-                            Datum tmod= Units.us2000.parse(info.getString("modificationDate"));
-                            Datum ago= TimeUtil.now().subtract(tmod);
-                            s += "   last modified " + getDurationForHumans((long)ago.doubleValue(Units.milliseconds) ) + " ago.";
-                        } catch (ParseException ex) {
-                        }
-                        
-                    }
-                    messagesLabel.setText( s );
-                }
-                DefaultComboBoxModel m= new DefaultComboBoxModel(new String[] { "Example Time Ranges",sampleRange.toString() } );
-                exampleTimeRangesCB.setModel(m);
-                
-                if ( providedTimeRange==null ) {
-                    timeRangeComboBox.setText( sampleRange.toString() );
-                }
+                cb.setText( label );
             }
+            parametersPanel.add( cb );
+        }
+        parametersPanel.setToolTipText("shift-click will select range of parameters");
+        parametersPanel.revalidate();
+        parametersPanel.repaint();
+        if ( currentParameters!=null ) {
+            setParameters(currentParameters);
+        }            
+        DatumRange range= getRange(info);
+        if ( range==null ) {
+            logger.warning("server is missing required startDate and stopDate parameters.");
+            messagesLabel.setText( "range is not provided (non-compliant server)" );
+        } else {
+            DatumRange sampleRange=null;
+            if ( info.has("sampleStartDate") && info.has("sampleStopDate") ) {
+                try {
+                    sampleRange = new DatumRange( Units.us2000.parse(info.getString("sampleStartDate")), Units.us2000.parse(info.getString("sampleStopDate")) );
+                } catch (JSONException | ParseException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+            } 
+            if ( sampleRange==null ) {
+                Datum cadence= Units.seconds.createDatum(60);  // assume default cadence of 1 minute results in 1 day sample range.
+                if ( info.has("cadence") ) {
+                    try{
+                        int[] icadence= DatumRangeUtil.parseISO8601Duration(info.getString("cadence"));
+                        cadence= cadenceArrayToDatum(icadence);
+                    } catch ( ParseException ex ) {
+                        logger.log(Level.WARNING, "parse error in cadence: {0}", info.getString("cadence"));
+                    }
+                }    
+                if (range.max().ge(myValidTime)) { // Note stopDate is required since 2017-01-17.
+                    logger.warning("server is missing required stopDate parameter.");
+                    messagesLabel.setText(range.min().toString() + " to ?");
+                    sampleRange = new DatumRange(range.min(), range.min().add(1, Units.days));
+                } else {
+                    messagesLabel.setText(range.toString());
+                    if ( cadence.ge(Units.days.createDatum(1)) ) {
+                        Datum end = TimeUtil.nextMidnight(range.max());
+                        end= end.subtract( 10,Units.days );
+                        if ( range.max().subtract(end).ge( Datum.create(1,Units.days ) ) ) {
+                            sampleRange = new DatumRange( end, end.add(10,Units.days) );
+                        } else {
+                            sampleRange = new DatumRange( end.subtract(10,Units.days), end );
+                        } 
+                    } else if ( cadence.ge(Units.seconds.createDatum(1)) ) {
+                        Datum end = TimeUtil.prevMidnight(range.max());
+                        if ( range.max().subtract(end).ge( Datum.create(1,Units.hours ) ) ) {
+                            sampleRange = new DatumRange( end, end.add(1,Units.days) );
+                        } else {
+                            sampleRange = new DatumRange( end.subtract(1,Units.days), end );
+                        } 
+                    } else {
+                        Datum end = TimeUtil.prev( TimeUtil.HOUR, range.max() );
+                        if ( range.max().subtract(end).ge( Datum.create(1,Units.minutes ) ) ) {
+                            sampleRange = new DatumRange( end, end.add(1,Units.hours) );
+                        } else {
+                            sampleRange = new DatumRange( end.subtract(1,Units.hours), end );
+                        } 
+                    }
+                    if ( !sampleRange.intersects(range) ) {
+                        sampleRange= sampleRange.next();
+                    }
+                }
+            } else {
+                String s= range.toString();
+                if ( info.has("modificationDate") ) {
+                    try {
+                        Datum tmod= Units.us2000.parse(info.getString("modificationDate"));
+                        Datum ago= TimeUtil.now().subtract(tmod);
+                        s += "   last modified " + getDurationForHumans((long)ago.doubleValue(Units.milliseconds) ) + " ago.";
+                    } catch (ParseException ex) {
+                    }
+
+                }
+                messagesLabel.setText( s );
+            }
+            DefaultComboBoxModel m= new DefaultComboBoxModel(new String[] { "Example Time Ranges",sampleRange.toString() } );
+            exampleTimeRangesCB.setModel(m);
+
+            if ( providedTimeRange==null ) {
+                timeRangeComboBox.setText( sampleRange.toString() );
+            }
+        }
                     
     }
     
-    private void resetVariable( final URL server, final String id ) {
+    private void resetId( final URL server, final String id ) {
         
         final JSONObject info;
         try {
             info = HapiServer.getInfo( server, id );
         } catch (IOException | JSONException ex) {
             logger.log(Level.SEVERE, null, ex);
-            resetVariableReportError(server, id, ex);
+            resetIdReportError(server, id, ex);
             return;
         }
         Runnable run= new Runnable() {
             @Override
             public void run() {
                 try {
-                    resetVariableImmediately( id, info );
+                    resetIdImmediately( id, info );
                 } catch ( JSONException ex) {
-                    resetVariableReportError(server, id, ex);
+                    resetIdReportError(server, id, ex);
                 }
             }
         };
