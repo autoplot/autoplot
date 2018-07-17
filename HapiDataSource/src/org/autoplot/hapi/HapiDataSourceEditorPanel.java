@@ -73,6 +73,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private static final Logger logger= LoggerManager.getLogger("apdss.hapi");
     
     private JSONArray idsJSON;
+    private boolean supportsBinary;
     
     private URL defaultServer;
 	
@@ -164,14 +165,19 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if ( !e.getValueIsAdjusting() ) {
-                    if ( idsList2.getSelectedValue()!=null && !idsList2.getSelectedValue().equals(currentId) ) {
+                    String selectedValue= idsList2.getSelectedValue();
+                    if ( selectedValue==null ) {
+                        return;
+                    }
+                    if ( !selectedValue.equals(currentId) ) {
                         currentParameters= null;
                     }
-                    if ( idsList2.getSelectedValue()!=null ) {
-                        currentId= idsList2.getSelectedValue();
-                        if ( currentId.startsWith("Error:" ) ) {
-                            return;
-                        }
+                    if ( currentId.equals(selectedValue) ) {
+                        return;
+                    }
+                    currentId= selectedValue;
+                    if ( currentId.startsWith("Error:" ) ) {
+                        return;
                     }
                     if ( currentId!=null ) {
                         titleLabel.setText("Retrieving info for "+currentId+"...");
@@ -189,13 +195,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             @Override
             public void keyTyped(KeyEvent e) {
                 final String search= (String)filtersComboBox.getEditor().getItem();
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        resetServerCatalog( currentServer, search );
-                    }
-                };
-                new Thread( run,"resetServerCatalog" ).start();
+                resetServerCatalog( currentServer, search );
             }
         } );
     }
@@ -227,6 +227,10 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     });
             
+    /**
+     * load the known servers and set the GUI.  This should not be called from
+     * the event thread, and a runnable for the event thread will be submitted.
+     */
     public void loadKnownServersImmediately() {
         final String[] servers= HapiServer.listHapiServersArray();
         Runnable run= new Runnable() {
@@ -249,6 +253,11 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         SwingUtilities.invokeLater(run);
     }
     
+    /**
+     * request that the known servers be displayed.  This will spawn an 
+     * asynchronous thread to get the server names, and then will load the GUI 
+     * on the event thread.  This can be called from the event thread.
+     */
     public void loadKnownServersSoon() {
         Runnable run= new Runnable() {
             @Override
@@ -532,12 +541,6 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                         DefaultListModel m= new DefaultListModel() ;
                         m.add(0,"Error: unable to connect");
                         idsList2.setModel( m );
-                        Runnable run= new Runnable() {
-                            public void run() {
-                                serversComboBox.setSelectedItem("http://datashop.elasticbeanstalk.com/hapi");
-                            }
-                        };
-                        //SwingUtilities.invokeLater(run);
                     }
                 }
             };
@@ -858,7 +861,40 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     }
     
+    private void loadServerCapabilities( URL server ) throws JSONException {
+        boolean binaryIsEnabled= false;
+        try {
+            JSONObject capabilitiesDoc= HapiServer.getCapabilities(server);
+            if ( capabilitiesDoc.has(HapiSpec.OUTPUT_FORMATS ) ) { // new 2016-11-21.  Other is deprecated.
+                JSONArray outputFormats= capabilitiesDoc.getJSONArray(HapiSpec.OUTPUT_FORMATS );
+                for ( int i=0; i<outputFormats.length(); i++ ) {
+                    if ( outputFormats.getString(i).equals(HapiSpec.BINARY) ) {
+                        binaryIsEnabled= true;
+                    }
+                }                    
+            } else {
+                JSONArray capabilities= capabilitiesDoc.getJSONArray("capabilities"); // deprecated.
+                for ( int i=0; i<capabilities.length(); i++ ) {
+                    JSONObject c= capabilities.getJSONObject(i);
+                    if ( c.has(HapiSpec.FORMATS) ) {
+                        JSONArray formats= c.getJSONArray(HapiSpec.FORMATS);
+                        for ( int j=0; j<formats.length(); j++ ) {
+                            if ( formats.getString(j).equals(HapiSpec.BINARY) ) {
+                                binaryIsEnabled= true;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch ( IOException ex ) {
+            // this is okay, we'll just assume it doesn't support binary.
+            logger.log( Level.WARNING, ex.getMessage(), ex );
+        }
+        this.supportsBinary= binaryIsEnabled;
+    }
+    
     /**
+     * This will load the ids into the GUI.
      * See https://github.com/hapi-server/data-specification#catalog
      * @param filter
      * @throws IOException
@@ -903,36 +939,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     idsList2.ensureIndexIsVisible( i==-1 ? 0 : i );
                 }
             }
-            boolean binaryIsEnabled= false;
-            try {
-                JSONObject capabilitiesDoc= HapiServer.getCapabilities(server);
-                if ( capabilitiesDoc.has(HapiSpec.OUTPUT_FORMATS ) ) { // new 2016-11-21.  Other is deprecated.
-                    JSONArray outputFormats= capabilitiesDoc.getJSONArray(HapiSpec.OUTPUT_FORMATS );
-                    for ( int i=0; i<outputFormats.length(); i++ ) {
-                        if ( outputFormats.getString(i).equals(HapiSpec.BINARY) ) {
-                            binaryIsEnabled= true;
-                        }
-                    }                    
-                } else {
-                    JSONArray capabilities= capabilitiesDoc.getJSONArray("capabilities"); // deprecated.
-                    for ( int i=0; i<capabilities.length(); i++ ) {
-                        JSONObject c= capabilities.getJSONObject(i);
-                        if ( c.has(HapiSpec.FORMATS) ) {
-                            JSONArray formats= c.getJSONArray(HapiSpec.FORMATS);
-                            for ( int j=0; j<formats.length(); j++ ) {
-                                if ( formats.getString(j).equals(HapiSpec.BINARY) ) {
-                                    binaryIsEnabled= true;
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch ( IOException ex ) {
-                // this is okay, we'll just assume it doesn't support binary.
-                logger.log( Level.WARNING, ex.getMessage(), ex );
-            }
-            binaryCB.setEnabled(binaryIsEnabled);
-
+            binaryCB.setEnabled(supportsBinary);
+            
         } catch ( JSONException ex ) {
             logger.log(Level.SEVERE, null, ex );
         }
@@ -940,14 +948,21 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     }
         
     /**
-     * get the catalog of the server.  
+     * get the catalog of the server.  This should not be called from the event
+     * thread.
      * @param server
      * @throws IOException
      * @throws JSONException 
      */
-    private void resetServer( URL server ) throws IOException, JSONException {
+    private void resetServer( final URL server ) throws IOException, JSONException {
         idsJSON= HapiServer.getCatalog(server);
-        resetServerCatalog(server,"");
+        loadServerCapabilities(server);
+        Runnable run= new Runnable() {
+            public void run() {
+                resetServerCatalog(server,"");
+            }
+        };
+        SwingUtilities.invokeLater(run);
     }
     
     private String getHtmlFor( Object o ) throws JSONException {
