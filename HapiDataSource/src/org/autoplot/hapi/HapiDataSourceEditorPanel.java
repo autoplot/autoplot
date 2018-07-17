@@ -1073,19 +1073,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             titleLabel.setText("");        
     }
     
-    private void resetVariable( final URL server, final String id ) {
-        
-        final JSONObject info;
-        try {
-            info = HapiServer.getInfo( server, id );
-        } catch (IOException | JSONException ex) {
-            logger.log(Level.SEVERE, null, ex);
-            resetVariableReportError(server, id, ex);
-            return;
-        }
-        Runnable run= new Runnable() {
-            public void run() {
-                try {
+    private void resetVariableImmediately(String id,JSONObject info) throws JSONException {
             for ( JSONObject item : new JSONArrayIterator(idsJSON) ) {
                 if ( item.getString("id").equals(id) ) {
                     if ( item.has(HapiSpec.TITLE) ) {
@@ -1258,15 +1246,33 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     timeRangeComboBox.setText( sampleRange.toString() );
                 }
             }
-                    } catch ( JSONException ex) {
-            resetVariableReportError(server, id, ex);
-                    }
-                }
-            };
-            SwingUtilities.invokeLater(run);
-                
-                
+                    
     }
+    
+    private void resetVariable( final URL server, final String id ) {
+        
+        final JSONObject info;
+        try {
+            info = HapiServer.getInfo( server, id );
+        } catch (IOException | JSONException ex) {
+            logger.log(Level.SEVERE, null, ex);
+            resetVariableReportError(server, id, ex);
+            return;
+        }
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    resetVariableImmediately( id, info );
+                } catch ( JSONException ex) {
+                    resetVariableReportError(server, id, ex);
+                }
+            }
+        };
+        SwingUtilities.invokeLater(run);
+                            
+    }
+    
     private static final int MAX_LENGTH_CHARACTERS = 100000;
     
     public static void main( String[] args ) {
