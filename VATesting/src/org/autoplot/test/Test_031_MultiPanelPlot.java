@@ -116,7 +116,7 @@ public class Test_031_MultiPanelPlot implements Scenario {
             //JPopupMenuOperator popup1 = new JPopupMenuOperator();
             //popup1.pushMenuNoBlock("Plot|Delete", "|");
             
-            Application dom= app.getDocumentModel();
+            Application dom= app.getDom();
             dom.getController().deletePlot( dom.getPlots(0) );
             
             Thread.sleep(1000);
