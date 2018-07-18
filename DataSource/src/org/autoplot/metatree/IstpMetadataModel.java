@@ -181,7 +181,12 @@ public class IstpMetadataModel extends MetadataModel {
             logger.fine("valid range not used for ordinal units");
             return null;
         } else {
-            return DatumRange.newDatumRange(min, max, units);
+            if ( min<max ) {
+                return DatumRange.newDatumRange(min, max, units);
+            } else {
+                logger.log(Level.WARNING, "VALIDMIN and VALIDMAX has min value greater than max value: {0} > {1}", new Object[]{min, max});
+                return null;
+            }
         }
     }
 
@@ -224,8 +229,17 @@ public class IstpMetadataModel extends MetadataModel {
             if ( vrange.max().doubleValue(units)<max ) max= vrange.max().doubleValue(units);
             if ( vrange.min().doubleValue(units)>max ) max= vrange.max().doubleValue(units); //vap+cdaweb:ds=IM_HK_FSW&id=BF_DramMbeCnt&timerange=2005-12-18
         }
-        range = new DatumRange(min, max, units);
-        return range;
+         if ( UnitsUtil.isNominalMeasurement(units) ) {
+            logger.fine("range not used for ordinal units");
+            return null;
+        } else {
+            if ( min<max ) {
+                return DatumRange.newDatumRange(min, max, units);
+            } else {
+                logger.log(Level.WARNING, "SCALEMIN and SCALEMAX has min value greater than max value: {0} > {1}", new Object[]{min, max});
+                return null;
+            }
+        }
     }
 
     /**
@@ -464,7 +478,7 @@ public class IstpMetadataModel extends MetadataModel {
                 if ( ofv!=null && ofv instanceof Number ) {
                     Number fillVal= (Number) ofv;
                     double fillVald= fillVal.doubleValue();
-                    if( fillVald>=range.min().doubleValue(units) && fillVald<=range.max().doubleValue(units) ) {
+                    if( range!=null && fillVald>=range.min().doubleValue(units) && fillVald<=range.max().doubleValue(units) ) {
                         properties.put( QDataSet.FILL_VALUE, fillVal );
                     }
                 } else if ( ofv!=null && ofv.getClass().isArray() ) {
@@ -477,7 +491,7 @@ public class IstpMetadataModel extends MetadataModel {
                         }
                     }
                     double fillVald= fillVal.doubleValue();
-                    if( fillVald>=range.min().doubleValue(units) && fillVald<=range.max().doubleValue(units) ) {
+                    if( range!=null && fillVald>=range.min().doubleValue(units) && fillVald<=range.max().doubleValue(units) ) {
                         properties.put( QDataSet.FILL_VALUE, fillVal );
                     }
                     
