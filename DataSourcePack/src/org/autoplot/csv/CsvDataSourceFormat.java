@@ -4,11 +4,10 @@ package org.autoplot.csv;
 import com.csvreader.CsvWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.autoplot.datasource.AbstractDataSourceFormat;
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.datum.format.DatumFormatter;
@@ -16,22 +15,19 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
-import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.URISplit;
 
 /**
  * Format data to CSV (comma separated values) file.
  * @author jbf
  */
-public class CsvDataSourceFormat implements DataSourceFormat {
+public class CsvDataSourceFormat extends AbstractDataSourceFormat {
 
-    //@Override
-    public boolean streamData(Map<String, String> params, Iterator<QDataSet> data, OutputStream out) throws Exception {
-        return false;
-    }
-    
     @Override
     public void formatData(String uri, QDataSet data, ProgressMonitor mon) throws Exception {
+        
+        super.setUri(uri);
+                
         URISplit split = URISplit.parse( uri );
         
         Map<String,String> params= URISplit.parseParams(split.params);
@@ -44,8 +40,10 @@ public class CsvDataSourceFormat implements DataSourceFormat {
             delim= sdelimiter.charAt(0);
         }
         
-        File f= new File( split.resourceUri );
-        FileWriter fw= new FileWriter(f);
+        super.maybeMkdirs();
+
+        File outFile= new File( split.resourceUri );
+        FileWriter fw= new FileWriter(outFile);
         CsvWriter writer= null;
         try {
             writer= new CsvWriter( fw, delim );

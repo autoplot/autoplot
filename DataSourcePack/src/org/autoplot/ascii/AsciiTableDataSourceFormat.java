@@ -938,6 +938,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
     public void formatData( String uri, QDataSet data, ProgressMonitor mon) throws IOException {
 
         setUri(uri);
+        maybeMkdirs();
         
         String doDep= getParam("doDep", "");
         if ( doDep.length()>0 && doDep.toUpperCase().charAt(0)=='F' ) {

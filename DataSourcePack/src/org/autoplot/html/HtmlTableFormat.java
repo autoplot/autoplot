@@ -31,43 +31,46 @@ public class HtmlTableFormat  extends AbstractDataSourceFormat {
     
     public void formatDataRank2(String uri, QDataSet data, ProgressMonitor mon) throws Exception {    
         setUri(uri);
+        
+        maybeMkdirs();
+        
         File f= new File( getResourceURI() );
-        BufferedWriter w= new BufferedWriter( new FileWriter(f) );
-        QDataSet bds= (QDataSet) data.property(QDataSet.BUNDLE_1);
-        w.write("<body><table>\n");
-        for ( int j=0; j<bds.length(); j++ ) {
-            w.append("<th>");
-            Units u= (Units) bds.property(QDataSet.UNITS,j);
-            if ( u==null ) u= Units.dimensionless;
-            String h= (String)bds.property(QDataSet.LABEL,j);
-            if ( h!=null ) {
-                w.append(h);
-            }
-            if ( u!=Units.dimensionless ){
-                w.append("(");
-                w.append(u.toString());
-                w.append(")");
-            }
-            w.append("</th>\n");
-        }
-        w.append("</tr>\n");
-
-        for ( int i=0; i<data.length(); i++ ) {
-            StringBuilder b= new StringBuilder();
-            b.append("<tr>");
-            for ( int j=0; j<data.length(0); j++ ) {
-                b.append("<td>");
+        try (BufferedWriter w = new BufferedWriter( new FileWriter(f) )) {
+            QDataSet bds= (QDataSet) data.property(QDataSet.BUNDLE_1);
+            w.write("<body><table>\n");
+            for ( int j=0; j<bds.length(); j++ ) {
+                w.append("<th>");
                 Units u= (Units) bds.property(QDataSet.UNITS,j);
                 if ( u==null ) u= Units.dimensionless;
-                Datum d= u.createDatum(data.value(i,j));
-                b.append( d.getFormatter().format(d,u) );
-                b.append("</td>\n");
+                String h= (String)bds.property(QDataSet.LABEL,j);
+                if ( h!=null ) {
+                    w.append(h);
+                }
+                if ( u!=Units.dimensionless ){
+                    w.append("(");
+                    w.append(u.toString());
+                    w.append(")");
+                }
+                w.append("</th>\n");
             }
-            b.append("</tr>\n");
-            w.write( b.toString() );
+            w.append("</tr>\n");
+            
+            for ( int i=0; i<data.length(); i++ ) {
+                StringBuilder b= new StringBuilder();
+                b.append("<tr>");
+                for ( int j=0; j<data.length(0); j++ ) {
+                    b.append("<td>");
+                    Units u= (Units) bds.property(QDataSet.UNITS,j);
+                    if ( u==null ) u= Units.dimensionless;
+                    Datum d= u.createDatum(data.value(i,j));
+                    b.append( d.getFormatter().format(d,u) );
+                    b.append("</td>\n");
+                }
+                b.append("</tr>\n");
+                w.write( b.toString() );
+            }
+            w.write("</table></body>");
         }
-        w.write("</table></body>");
-        w.close();
     }
 
     public void formatDataRank1(String uri, QDataSet data, ProgressMonitor mon) throws Exception {
