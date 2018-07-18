@@ -729,6 +729,7 @@ public class ScriptPanelSupport {
                                             s = text.substring(i0, i1);
                                         } else {
                                             s = text.substring(i0);
+                                            i1= text.length();
                                         }
                                         try {
                                             annotationsSupport.clearAnnotations();
