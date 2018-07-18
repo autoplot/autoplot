@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.csv;
 
@@ -24,7 +20,7 @@ import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.URISplit;
 
 /**
- *
+ * Format data to CSV (comma separated values) file.
  * @author jbf
  */
 public class CsvDataSourceFormat implements DataSourceFormat {
@@ -74,12 +70,15 @@ public class CsvDataSourceFormat implements DataSourceFormat {
             }
             ldss.add(data);
             lwdss.add(DataSetUtil.weightsDataSet(data));
-            if ( data.rank()==1 ) {
-                col++;
-            } else if ( data.rank()==2 ) {
-                col+= data.length(0);
-            } else {
-                throw new IllegalArgumentException("rank limit, data must be rank 1 sequence or a rank 2 table of data");
+            switch (data.rank()) {
+                case 1:
+                    col++;
+                    break;
+                case 2:
+                    col+= data.length(0);
+                    break;
+                default:
+                    throw new IllegalArgumentException("rank limit, data must be rank 1 sequence or a rank 2 table of data");
             }
             dss= ldss.toArray( new QDataSet[ldss.size()] );
             wdss= lwdss.toArray( new QDataSet[lwdss.size()] );
@@ -154,10 +153,12 @@ public class CsvDataSourceFormat implements DataSourceFormat {
         }
     }
 
+    @Override
     public boolean canFormat(QDataSet ds) {
         return ds.rank()==1 || ds.rank()==2;
     }
 
+    @Override
     public String getDescription() {
         return "Comma Separated Values";
     }
