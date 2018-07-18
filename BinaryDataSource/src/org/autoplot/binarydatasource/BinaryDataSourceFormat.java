@@ -1,33 +1,29 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.binarydatasource;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
-import java.util.Iterator;
 import java.util.Map;
+import org.autoplot.datasource.AbstractDataSourceFormat;
 import org.das2.qds.buffer.BufferDataSet;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.qds.QDataSet;
 import org.das2.qds.QubeDataSetIterator;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.URISplit;
-import org.autoplot.datasource.DataSourceFormat;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.MutablePropertyDataSet;
 
 /**
  * Format data to binary file.
  * @author jbf
  */
-public class BinaryDataSourceFormat implements DataSourceFormat {
+public class BinaryDataSourceFormat extends AbstractDataSourceFormat {
 
     /**
      * copy the dataset into a DoubleBuffer by wrapping a DoubleBuffer with
@@ -142,6 +138,18 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
     @Override
     public void formatData( String uri, QDataSet data, ProgressMonitor mon) throws IOException {
         
+        super.setUri(uri);
+        super.maybeMkdirs();
+
+        String doDep= getParam("doDep", "");
+        if ( doDep.length()>0 && doDep.toUpperCase().charAt(0)=='F' ) {
+            MutablePropertyDataSet mpds= DataSetOps.makePropertiesMutable(data);
+            mpds.putProperty( QDataSet.DEPEND_0, null );
+            mpds.putProperty( QDataSet.DEPEND_1, null );
+            mpds.putProperty( QDataSet.BUNDLE_1, null );
+            data= mpds;
+        }
+
         URISplit split= URISplit.parse(uri);
         java.util.Map<String,String> params= URISplit.parseParams(split.params);
 
@@ -156,12 +164,8 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
             default:
                 throw new IllegalArgumentException("rank not supported");
         }
-        
-        File outFile= new File( split.resourceUri );
-        if ( !outFile.getParentFile().exists() ) {
-            outFile.getParentFile().mkdirs();
-        }
-        
+                        
+        File outFile= new File( split.resourceUri );        
         try (WritableByteChannel channel = Channels.newChannel( new FileOutputStream( outFile ) )) {
             channel.write(result);
         }
@@ -176,11 +180,6 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
     @Override
     public String getDescription() {
         return "Binary Table";
-    }
-
-    //@Override
-    public boolean streamData(Map<String, String> params, Iterator<QDataSet> data, OutputStream out) throws Exception {
-        return false; //TODO: this can easily be made true!
     }
     
 }

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /*
  * BinaryDataSourceFormatEditorPanel.java
@@ -18,7 +14,7 @@ import java.lang.Short; // because of Short object in this package.
 import org.autoplot.datasource.DataSourceFormatEditorPanel;
 
 /**
- *
+ * Format to flat binary tables.
  * @author jbf
  */
 public class BinaryDataSourceFormatEditorPanel extends javax.swing.JPanel implements DataSourceFormatEditorPanel {
@@ -43,6 +39,7 @@ public class BinaryDataSourceFormatEditorPanel extends javax.swing.JPanel implem
         typeComboBox = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
         endianComboBox = new javax.swing.JComboBox();
+        justDataCB = new javax.swing.JCheckBox();
 
         jLabel1.setText("Type:");
 
@@ -51,6 +48,8 @@ public class BinaryDataSourceFormatEditorPanel extends javax.swing.JPanel implem
         jLabel2.setText("Byte Order / Endianness:");
 
         endianComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "big", "little", " " }));
+
+        justDataCB.setText("Just Data, don't format timetags and other dependencies");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -67,7 +66,11 @@ public class BinaryDataSourceFormatEditorPanel extends javax.swing.JPanel implem
                         .add(jLabel2)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(endianComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(154, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(justDataCB)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -80,7 +83,9 @@ public class BinaryDataSourceFormatEditorPanel extends javax.swing.JPanel implem
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel2)
                     .add(endianComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(228, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(justDataCB)
+                .addContainerGap(204, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -89,9 +94,11 @@ public class BinaryDataSourceFormatEditorPanel extends javax.swing.JPanel implem
     private javax.swing.JComboBox endianComboBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JCheckBox justDataCB;
     private javax.swing.JComboBox typeComboBox;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public JPanel getPanel() {
         return this;
     }
@@ -104,6 +111,8 @@ public class BinaryDataSourceFormatEditorPanel extends javax.swing.JPanel implem
             return s;
         }
     }
+    
+    @Override
     public void setURI(String uri) {
         URISplit split= URISplit.parse(uri);
         Map<String,String> args= URISplit.parseParams(split.params);
@@ -115,9 +124,15 @@ public class BinaryDataSourceFormatEditorPanel extends javax.swing.JPanel implem
         s= getParam( args, "byteOrder", "little" );
         endianComboBox.setSelectedItem(s);
 
+        s= args.get("doDep");
+        if ( s!=null && s.length()>0 && 'F'==s.substring(0,1).toUpperCase().charAt(0) ) {
+            justDataCB.setSelected(true);
+        }
+        
         file= split.file;
     }
 
+    @Override
     public String getURI() {
         String result= file;
         Map<String,String> args= new HashMap();
@@ -129,6 +144,10 @@ public class BinaryDataSourceFormatEditorPanel extends javax.swing.JPanel implem
         s= (String) endianComboBox.getSelectedItem();
         if ( !s.equals("little") ) args.put( "byteOrder", s );
 
+        if ( justDataCB.isSelected() ) {
+            args.put( "doDep", "F" );
+        }
+        
         String params= URISplit.formatParams(args);
         if ( result==null ) result= "file:///";
         URISplit ss= URISplit.parse(result);

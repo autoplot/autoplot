@@ -1,6 +1,8 @@
 
 package org.autoplot.datasource;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.Iterator;
@@ -19,6 +21,10 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
     protected AbstractDataSourceFormat( ) {
     }
 
+    /**
+     * this must be called immediately in formatDataSet of subclasses.
+     * @param uri 
+     */
     protected void setUri( String uri ) {
         URISplit split= URISplit.parse(uri);
         params= URISplit.parseParams(split.params);
@@ -80,5 +86,21 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
         return false;
     }
     
+    /**
+     * If necessary attempt to create the folder which will contain the file, and
+     * throw an IOException if the folder cannot be created or written to.
+     * @throws java.io.IOException
+     */
+    public void maybeMkdirs() throws IOException {
+        File outFile= new File( resourceUri  );
+        if ( !outFile.getParentFile().exists() ) {
+            if ( !outFile.getParentFile().mkdirs() ) {
+                throw new IOException("folder cannot be created: "+outFile.getParentFile());
+            }
+        }
+        if ( !outFile.getParentFile().canWrite() ) {
+            throw new IOException("cannot write to folder: "+outFile.getParentFile());
+        }
+    }
     
 }

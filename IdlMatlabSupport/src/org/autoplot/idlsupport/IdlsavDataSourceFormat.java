@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.idlsupport;
 
@@ -17,7 +13,7 @@ import org.autoplot.datasource.AbstractDataSourceFormat;
 import org.das2.qds.ops.Ops;
 
 /**
- * Export to idlsav support.  rank 1 datasets, and rank 2 bundles are supported.
+ * Export to idlsav support.  rank 1 datasets, rank 2 datasets, rank 3 datasets, and rank 2 bundles are supported.
  * @author jbf
  */
 public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
@@ -72,9 +68,9 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
             if ( UnitsUtil.isTimeLocation(dep0u) ) {
                 uc= UnitsConverter.getConverter(dep0u,targetUnits);
             }
-            for ( int i=0; i<dd.length; i++ ) {
-                for ( int j=0; j<dd[i].length; j++ ) {
-                    dd[i][j]= uc.convert( dd[i][j] );
+            for (double[] dd1 : dd) {
+                for (int j = 0; j < dd1.length; j++) {
+                    dd1[j] = uc.convert(dd1[j]);
                 }
             }
         }
@@ -108,10 +104,10 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
             if ( UnitsUtil.isTimeLocation(dep0u) ) {
                 uc= UnitsConverter.getConverter(dep0u,targetUnits);
             }
-            for ( int i=0; i<dd.length; i++ ) {
-                for ( int j=0; j<dd[i].length; j++ ) {
-                    for ( int k=0; k<dd[i][j].length; k++ ) {
-                        dd[i][j][k]= uc.convert( dd[i][j][k] );
+            for (double[][] dd1 : dd) {
+                for (double[] dd11 : dd1) {
+                    for (int k = 0; k < dd11.length; k++) {
+                        dd11[k] = uc.convert(dd11[k]);
                     }
                 }
             }
@@ -136,22 +132,19 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
             doOne( write,ds1,"data"+i );
         }
         
-        setUri(uri);
-
         File f= new File( getResourceURI().toURL().getFile() );
-        FileOutputStream fos= new FileOutputStream(f);
-        try {
+        try (FileOutputStream fos = new FileOutputStream(f)) {
             write.write( fos );
-        } finally {
-            fos.close();
         }        
         
     }
     
+    @Override
     public void formatData( String uri, QDataSet data, ProgressMonitor mon ) throws Exception {
 
         setUri(uri);
-
+        maybeMkdirs();
+        
         if ( data.rank()!=1 && data.rank()!=2 && data.rank()!=3 ) {
             if ( SemanticOps.isBundle(data) ) {
                 formatRank2Bundle( uri, data, mon );
@@ -168,12 +161,16 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
             doOne( write,dep0,"dep0" );
         }
         
-        if ( data.rank()==2 ) {
-            formatRank2(write, data, "data");
-        } else if ( data.rank()==3 ) {
-            formatRank3(write, data, "data");
-        } else {
-            doOne( write,data,"data" );
+        switch (data.rank()) {
+            case 2:
+                formatRank2(write, data, "data");
+                break;
+            case 3:
+                formatRank3(write, data, "data");
+                break;
+            default:
+                doOne( write,data,"data" );
+                break;
         }
         
         QDataSet dep1= (QDataSet) data.property(QDataSet.DEPEND_1);
@@ -188,19 +185,18 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
         setUri(uri);
 
         File f= new File( getResourceURI().toURL().getFile() );
-        FileOutputStream fos= new FileOutputStream(f);
-        try {
+        try (FileOutputStream fos = new FileOutputStream(f)) {
             write.write( fos );
-        } finally {
-            fos.close();
         }
 
     }
 
+    @Override
     public boolean canFormat(QDataSet ds) {
         return ds.rank()==1 || ds.rank()==2 || ds.rank()==3;
     }
 
+    @Override
     public String getDescription() {
         return "IDL Saveset";
     }

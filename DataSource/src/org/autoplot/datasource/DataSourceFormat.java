@@ -1,13 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.datasource;
 
-import java.io.OutputStream;
-import java.util.Iterator;
-import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.qds.QDataSet;
 
@@ -15,10 +8,12 @@ import org.das2.qds.QDataSet;
  * @author jbf
  */
 public interface DataSourceFormat {
+
     /**
      * Format the dataset using the specified URI.  This should be parsed the same way 
      * read URIs are parsed, and arguments should reflect those of the reader 
-     * when possible.
+     * when possible.  If the uri refers to a file and the folder which will contain
+     * the file does not exist, it should be created.
      * @param uri
      * @param data
      * @param mon

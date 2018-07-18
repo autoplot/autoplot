@@ -134,6 +134,7 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
     public void formatData(String uri, QDataSet data, ProgressMonitor mon) throws Exception {
 
         setUri(uri);
+        maybeMkdirs();
 
         String typeSuggest= getParam( "type", "double" );
         
