@@ -36,6 +36,9 @@ import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.capability.Streaming;
 import org.autoplot.html.AsciiTableStreamer;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumUtil;
+import org.das2.datum.InconvertibleUnitsException;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.AsciiParser;
 import org.das2.qds.util.DataSetBuilder;
@@ -325,7 +328,13 @@ public class CsvDataSource extends AbstractDataSource {
                         if ( u1 instanceof EnumerationUnits ) {
                             cbs[icol]= ((EnumerationUnits)u1).createDatum( columnHeaders[icol] ).doubleValue(u1);
                         } else {
-                            cbs[icol]= u1.parse(columnHeaders[icol]).doubleValue(u1);
+                            try {
+                                cbs[icol]= u1.parse(columnHeaders[icol]).doubleValue(u1);
+                            } catch ( InconvertibleUnitsException ex ) {
+                                Datum d= DatumUtil.parse(columnHeaders[icol]);
+                                cbs[icol]= d.doubleValue(d.getUnits());
+                                if ( yepItsData && !UnitsUtil.isNominalMeasurement(d.getUnits()) ) columnUnits[icol]= d.getUnits();
+                            }
                         }
                     } catch ( ParseException ex ) {
                         yepItsData= false;
