@@ -7,6 +7,7 @@
 
 package org.autoplot.binarydatasource;
 
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -96,6 +97,7 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jScrollPane2.setViewportView(jTable1);
 
         jButton1.setText("Update");
