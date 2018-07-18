@@ -75,10 +75,9 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
             it.putValue( ddata, it.getValue(data) );
         }
 
-        if ( dep0!=null ) {
-            BufferDataSet ddep0= BufferDataSet.makeDataSet( 1,
-                recSize, 0, 
-                data.length(), data.length(0), 1, 1,
+        if ( dep0!=null && dep0.rank()==1 ) {
+            BufferDataSet ddep0= BufferDataSet.makeDataSet( 1, recSize, 0, 
+                dep0.length(), 1, 1, 1,
                 result, dep0Type );
 
             it= new QubeDataSetIterator(dep0);
