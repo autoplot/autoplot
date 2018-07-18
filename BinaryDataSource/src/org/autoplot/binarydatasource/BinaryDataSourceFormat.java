@@ -146,24 +146,31 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
         java.util.Map<String,String> params= URISplit.parseParams(split.params);
 
         ByteBuffer result;
-        if (data.rank() == 2) {
-            result= formatRank2( data, mon, params );
-        } else if (data.rank() == 1) {
-            result= formatRank1( data, mon, params );
-        } else {
-            throw new IllegalArgumentException("rank not supported");
+        switch (data.rank()) {
+            case 2:
+                result= formatRank2( data, mon, params );
+                break;
+            case 1:
+                result= formatRank1( data, mon, params );
+                break;
+            default:
+                throw new IllegalArgumentException("rank not supported");
         }
         
-        WritableByteChannel channel= Channels.newChannel( new FileOutputStream( new File( split.resourceUri ) ) );
-        channel.write(result);
+        File outFile= new File( split.resourceUri );
+        if ( !outFile.getParentFile().exists() ) {
+            outFile.getParentFile().mkdirs();
+        }
         
-        channel.close();
+        try (WritableByteChannel channel = Channels.newChannel( new FileOutputStream( outFile ) )) {
+            channel.write(result);
+        }
         
     }
 
     @Override
     public boolean canFormat(QDataSet ds) {
-        return ! ( ds.rank()==0  || SemanticOps.isJoin(ds) );
+        return ds.rank()<3 && ( ! ( ds.rank()==0  || SemanticOps.isJoin(ds) ) );
     }
 
     @Override
