@@ -47,7 +47,7 @@ class OrbitDataSource extends AbstractDataSource {
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         Orbits o= Orbits.getOrbitsFor(sc);
         DatumRange tr= tsb.getTimeRange();
-        String s= o.getOrbit(tr.min());
+        String s= o.getOrbitOnOrBefore(tr.min());
         
         QDataSet result= null;
         while ( s!=null ) {
