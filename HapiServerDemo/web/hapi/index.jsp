@@ -25,6 +25,11 @@
 
         <br>Run HAPI server <a href="http://tsds.org/verify-hapi/?url=http://jfaden.net/HapiServerDemo/hapi">verifier</a>.
         <%
+            if ( Util.getHapiHome()==null ) {
+                String HAPI_SERVER_HOME= getServletContext().getInitParameter("HAPI_SERVER_HOME");
+                Util.setHapiHome( new File( HAPI_SERVER_HOME ) );
+            }
+            
             String ip = request.getRemoteAddr();
             if (ip.equals("127.0.0.1")) {
                 Enumeration<String> hh= request.getHeaders("X-Forwarded-For");
