@@ -2,6 +2,7 @@
 package org.autoplot.jythonsupport.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
@@ -24,6 +25,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -39,6 +41,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.EditorKit;
 import javax.swing.undo.UndoManager;
 import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.SyntaxDocument;
@@ -46,6 +49,7 @@ import jsyntaxpane.SyntaxStyles;
 import jsyntaxpane.TokenType;
 import jsyntaxpane.actions.ActionUtils;
 import jsyntaxpane.actions.IndentAction;
+import org.autoplot.datasource.AutoplotSettings;
 import org.das2.DasApplication;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.jythoncompletion.CompletionContext;
@@ -85,7 +89,8 @@ public class EditorTextPane extends JEditorPane {
     
     public EditorTextPane() {
 
-        Runnable run= new Runnable() {
+        Runnable run;
+        run = new Runnable() {
             @Override
             public void run() {
 
@@ -101,31 +106,31 @@ public class EditorTextPane extends JEditorPane {
                 getActionMap().put( "redo", new AbstractAction( undo.getRedoPresentationName() ) {
                     @Override
                     public void actionPerformed( ActionEvent e ) {
-                       try {
+                        try {
                             if ( undo.canRedo() ) undo.redo();
-                       } catch ( javax.swing.undo.CannotRedoException ex ) {
-
-                       }
+                        } catch ( javax.swing.undo.CannotRedoException ex ) {
+                            
+                        }
                     }
                 });
 
                 getActionMap().put( "biggerFont", new AbstractAction( "Text Size Bigger" ) {
                     @Override
                     public void actionPerformed( ActionEvent e ) {
-                       Font f= getFont();
-                       float size= f.getSize2D();
-                       float step= size < 14 ? 1 : 2;
-                       setFont( f.deriveFont( Math.min( 40, size + step ) ) );
+                        Font f= getFont();
+                        float size= f.getSize2D();
+                        float step= size < 14 ? 1 : 2;
+                        setFont( f.deriveFont( Math.min( 40, size + step ) ) );
                     }
                 } );
 
                 getActionMap().put( "smallerFont", new AbstractAction( "Text Size Smaller" ) {
                     @Override
                     public void actionPerformed( ActionEvent e ) {
-                       Font f= getFont();
-                       float size= f.getSize2D();
-                       float step= size < 14 ? 1 : 2;
-                       setFont( f.deriveFont( Math.max( 4, size - step ) ) );
+                        Font f= getFont();
+                        float size= f.getSize2D();
+                        float step= size < 14 ? 1 : 2;
+                        setFont( f.deriveFont( Math.max( 4, size - step ) ) );
                     }
                 } );
 
@@ -148,11 +153,11 @@ public class EditorTextPane extends JEditorPane {
                             plotSoon(doThis);
                         } catch ( IllegalArgumentException ex ) {
                             JOptionPane.showMessageDialog(EditorTextPane.this,
-                                    "<html>A debugging session must be active.  Insert stop to halt script execution.</html>");
+                                "<html>A debugging session must be active.  Insert stop to halt script execution.</html>");
                         }
                     }
-                } );                
-
+                } );
+                
                 getActionMap().put( "developer1", new AbstractAction( "developer1" ) {
                     @Override
                     public void actionPerformed( ActionEvent e ) {
@@ -167,8 +172,8 @@ public class EditorTextPane extends JEditorPane {
                         LoggerManager.logGuiEvent(e);  
                         showUsages();
                     }
-                } );                
-
+                } );
+                
                 Toolkit tk= Toolkit.getDefaultToolkit();
 
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_Z,tk.getMenuShortcutKeyMask() ), "undo" );
@@ -187,6 +192,24 @@ public class EditorTextPane extends JEditorPane {
 
                 JPopupMenu oldPopup= EditorTextPane.this.getComponentPopupMenu();
                 EditorTextPane.this.setContentType("text/python");
+
+                EditorKit k= EditorTextPane.this.getEditorKit();
+                
+                Properties p= new Properties();
+                String f= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA );
+                File config= new File( new File(f), "config" );
+                if ( config.exists() ) {
+                    logger.log(Level.INFO, "Resetting editor colors using {0}", config);
+                    try {
+                        p.load( new FileInputStream( new File( config, "jsyntaxpane.properties" ) ) );
+                    } catch (FileNotFoundException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                    ((jsyntaxpane.syntaxkits.PythonSyntaxKit)k).setConfig( p );
+                    EditorTextPane.this.setBackground( Color.decode( p.getProperty("Background", "0xFFFFFF") ) );
+                }
 
                 String v= System.getProperty("java.version");
                 if ( v.startsWith("1.8") || v.startsWith("1.7") ) {
