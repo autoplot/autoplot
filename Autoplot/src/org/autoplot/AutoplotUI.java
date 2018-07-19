@@ -346,41 +346,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         }
         
         if ( System.getProperty( "noCheckCertificate","true").equals("true") ) {
-            logger.info("disabling HTTP certificate checks.");
-            try {
-                TrustManager[] trustAllCerts = new TrustManager[]{
-                    new X509TrustManager() {
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                            System.err.println("getAcceptedIssuers ");
-                            return new java.security.cert.X509Certificate[0];
-                        }
-                        
-                        public void checkClientTrusted(X509Certificate[] certs, String authType) {  }
-                        
-                        public void checkServerTrusted(X509Certificate[] certs, String authType) {  }
-                        
-                    }
-                };
-                
-                SSLContext sc = SSLContext.getInstance("SSL");
-                sc.init(null, trustAllCerts, new java.security.SecureRandom());
-                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-                
-                // Create all-trusting host name verifier
-                HostnameVerifier allHostsValid = new HostnameVerifier() {
-                    public boolean verify(String hostname, SSLSession session) {
-                        System.err.println("verify "+hostname);
-                        return true;
-                    }
-                };
-                
-                HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-                
-            } catch (NoSuchAlgorithmException ex) {
-                logger.log(Level.SEVERE, null, ex);
-            } catch ( KeyManagementException ex) {
-                logger.log(Level.SEVERE, null, ex);
-            }
+            AutoplotUtil.disableCertificates();
         }
 
         // Initialize help system now so it's ready for components to register IDs with
