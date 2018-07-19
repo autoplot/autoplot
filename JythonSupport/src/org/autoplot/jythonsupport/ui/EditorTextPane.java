@@ -216,6 +216,7 @@ public class EditorTextPane extends JEditorPane {
                     
                 } else {
                     ((SyntaxDocument)EditorTextPane.this.getDocument()).setUndoManager( new UndoManager() );
+                    //TODO: jsyntaxpane has been fixed...
                 }
                 
                 if ( JythonCompletionProvider.getInstance().settings().isTabIsCompletion()==false ) {
