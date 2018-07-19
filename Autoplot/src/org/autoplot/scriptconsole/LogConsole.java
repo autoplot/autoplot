@@ -41,6 +41,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -73,7 +74,9 @@ import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.autoplot.GuiSupport;
 import org.autoplot.JythonUtil;
+import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.help.Util;
+import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.util.TickleTimer;
 import org.xml.sax.SAXException;
 
@@ -107,6 +110,29 @@ public class LogConsole extends javax.swing.JPanel {
     /** Creates new form LogConsole */
     public LogConsole() {
         initComponents();
+        
+        
+        String f= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA );
+        File config= new File( new File(f), "config" );
+        Properties p= new Properties();
+        if ( config.exists() ) {
+            logger.log(Level.INFO, "Resetting editor colors using {0}", config);
+            try {
+                p.load( new FileInputStream( new File( config, "jsyntaxpane.properties" ) ) );
+            } catch (FileNotFoundException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+            logTextArea.setBackground( Color.decode( p.getProperty("Background", "0xFFFFFF") ) );
+            String foreground= p.getProperty("Style.DEFAULT", "0x000000");
+            int i= foreground.indexOf(",");
+            if ( i>-1 ) {
+                foreground= foreground.substring(0,i);
+            }
+            logTextArea.setForeground( Color.decode( foreground ) );
+        }
+
 
         commandLineTextPane1.addActionListener(new ActionListener() {
             @Override
