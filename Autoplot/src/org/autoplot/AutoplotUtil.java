@@ -1726,7 +1726,6 @@ public class AutoplotUtil {
             TrustManager[] trustAllCerts = new TrustManager[]{
                 new X509TrustManager() {
                     public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                        System.err.println("getAcceptedIssuers ");
                         return new java.security.cert.X509Certificate[0];
                     }
                     
@@ -1744,7 +1743,6 @@ public class AutoplotUtil {
             // Create all-trusting host name verifier
             HostnameVerifier allHostsValid = new HostnameVerifier() {
                 public boolean verify(String hostname, SSLSession session) {
-                    System.err.println("verify "+hostname);
                     return true;
                 }
             };
