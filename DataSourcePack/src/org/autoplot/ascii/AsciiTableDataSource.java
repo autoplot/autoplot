@@ -362,6 +362,9 @@ public class AsciiTableDataSource extends AbstractDataSource {
         
         
         if ( bundle!=null ) {
+            if ( bundle[0]==-1 ) {
+                throw new IllegalArgumentException("bad parameter: bundle");
+            }
             rank2= bundle;
         }
 
