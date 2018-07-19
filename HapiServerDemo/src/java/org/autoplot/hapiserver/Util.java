@@ -56,7 +56,7 @@ public class Util {
      */
     public static File getHapiHome() {
         if ( Util.HAPI_HOME==null ) {
-            throw new IllegalArgumentException("Util.HAPI_HOME is not set.");
+            throw new IllegalArgumentException("Util.HAPI_HOME is not set, load info page first.");
         } else {
             return Util.HAPI_HOME;
         }
