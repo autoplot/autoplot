@@ -26,6 +26,9 @@
         
         <p>Bugfixes (2018-07-17 r22577):</p>
         <ul>
+            <li>binary data source editor uses scrollbars when there are many columns.
+            <li>make export data set more consistent between types, calling maybeMkdirs so the folder is created.
+            <li>support where CSV column header contains units, like "50 Hz"
             <li>2004: HAPI editor panel would sometimes switch servers, because of thread mishandling.
             <li>completions on Jython variables where constructor is used works again.
             <li>improve error feedback when dataset('6 to 7') was passed into histogram2d, where the argument was a rank 0 enumeration and not a range.
@@ -69,6 +72,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>DasAxis reference can now be a comma-separated list of datums.
+            <li>FileStorageModel now has getNames(datumRange) and getRoot(), to support use in IDL.
+            <li>catch when CDF has validmin>validmax, and print a warning rather than refusing to plot the data.
             <li>allow pngwalk digitizing when zoomed in on image.
             <li>time range controller has "rescale" property, which is accessible to scripts.
             <li>641: HAPI caching experiment where request is broken up into daily requests so that caching is more effective.
