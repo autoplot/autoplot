@@ -346,11 +346,12 @@ public final class AutoplotUI extends javax.swing.JFrame {
         }
         
         if ( System.getProperty( "noCheckCertificate","true").equals("true") ) {
-            logger.fine("disabling HTTP certificate checks.");
+            logger.info("disabling HTTP certificate checks.");
             try {
                 TrustManager[] trustAllCerts = new TrustManager[]{
                     new X509TrustManager() {
                         public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            System.err.println("getAcceptedIssuers ");
                             return new java.security.cert.X509Certificate[0];
                         }
                         
@@ -368,6 +369,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 // Create all-trusting host name verifier
                 HostnameVerifier allHostsValid = new HostnameVerifier() {
                     public boolean verify(String hostname, SSLSession session) {
+                        System.err.println("verify "+hostname);
                         return true;
                     }
                 };
