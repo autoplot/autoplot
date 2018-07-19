@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import javax.imageio.ImageIO;
+import org.autoplot.AutoplotUtil;
 import org.das2.util.filesystem.HtmlUtil;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -380,6 +381,9 @@ public class Test140 {
     public static void main( String[] args ) throws Exception {
         //Logger l= LoggerManager.getLogger("apdss");
         //l.setLevel( Level.ALL );
+        
+        System.err.println("disable certificate checking");
+        AutoplotUtil.disableCertificates();
         
         System.err.println("autoplot_data: "+AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA));
         System.err.println("fscache: "+AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE));
