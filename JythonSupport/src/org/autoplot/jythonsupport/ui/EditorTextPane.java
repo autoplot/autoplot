@@ -208,7 +208,11 @@ public class EditorTextPane extends JEditorPane {
                         logger.log(Level.SEVERE, null, ex);
                     }
                     ((jsyntaxpane.syntaxkits.PythonSyntaxKit)k).setConfig( p );
-                    EditorTextPane.this.setBackground( Color.decode( p.getProperty("Background", "0xFFFFFF") ) );
+                    String s;
+                    s= p.getProperty("Background", "0xFFFFFF");
+                    EditorTextPane.this.setBackground( Color.decode( s ) );
+                    s= p.getProperty("CaretColor", "0x000000" );
+                    EditorTextPane.this.setCaretColor( Color.decode( s ) );
                 }
 
                 String v= System.getProperty("java.version");
