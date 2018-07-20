@@ -44,6 +44,7 @@ import javax.swing.text.Document;
 import javax.swing.text.EditorKit;
 import javax.swing.undo.UndoManager;
 import jsyntaxpane.DefaultSyntaxKit;
+import static jsyntaxpane.DefaultSyntaxKit.CONFIG_SELECTION;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.SyntaxStyles;
 import jsyntaxpane.TokenType;
@@ -194,7 +195,6 @@ public class EditorTextPane extends JEditorPane {
                 EditorTextPane.this.setContentType("text/python");
 
                 EditorKit k= EditorTextPane.this.getEditorKit();
-                
                 Properties p= new Properties();
                 String f= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA );
                 File config= new File( new File(f), "config" );
@@ -213,6 +213,9 @@ public class EditorTextPane extends JEditorPane {
                     EditorTextPane.this.setBackground( Color.decode( s ) );
                     s= p.getProperty("CaretColor", "0x000000" );
                     EditorTextPane.this.setCaretColor( Color.decode( s ) );
+                    s= p.getProperty( CONFIG_SELECTION,"0x99ccff");
+                    EditorTextPane.this.setSelectionColor( Color.decode( s ) );
+                    
                 }
 
                 String v= System.getProperty("java.version");
@@ -268,6 +271,26 @@ public class EditorTextPane extends JEditorPane {
                 a= new JEditorPane();
                 completionsEditorPane= a;
                 DefaultSyntaxKit.initKit();
+                Properties p= new Properties();
+                String f= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA );
+                File config= new File( new File(f), "config" );
+                if ( config.exists() ) {
+                    logger.log(Level.INFO, "Resetting editor colors using {0}", config);
+                    try {
+                        p.load( new FileInputStream( new File( config, "jsyntaxpane.properties" ) ) );
+                    } catch (FileNotFoundException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                    String s;
+                    s= p.getProperty("Background", "0xFFFFFF");
+                    a.setBackground( Color.decode( s ) );
+                    s= p.getProperty("CaretColor", "0x000000" );
+                    a.setCaretColor( Color.decode( s ) );
+                    s= p.getProperty( CONFIG_SELECTION,"0x99ccff");
+                    EditorTextPane.this.setSelectionColor( Color.decode( s ) );                    
+                }
                 SyntaxStyles.getInstance().getStyle(TokenType.DELIMITER).isDrawTabs();
                 a.setContentType("text/python");
                 d= new JDialog();
