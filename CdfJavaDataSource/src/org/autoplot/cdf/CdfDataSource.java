@@ -643,6 +643,8 @@ public class CdfDataSource extends AbstractDataSource {
                 }
             }
         }
+        
+        //DataSetUtil.validate( result, new ArrayList<String>() );
 
         result.makeImmutable(); // this may cause problems with scripts that assume data is mutable.        
         if ( !mon.isFinished() ) mon.finished();  
