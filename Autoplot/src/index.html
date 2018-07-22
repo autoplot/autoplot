@@ -74,12 +74,13 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe643: allow autoplot_data/config/jsyntaxpane.properties to reset the colors used for the editor, allowing dark editors.
             <li>DasAxis reference can now be a comma-separated list of datums.
             <li>FileStorageModel now has getNames(datumRange) and getRoot(), to support use in IDL.
             <li>catch when CDF has validmin>validmax, and print a warning rather than refusing to plot the data.
             <li>allow pngwalk digitizing when zoomed in on image.
             <li>time range controller has "rescale" property, which is accessible to scripts.
-            <li>641: HAPI caching experiment where request is broken up into daily requests so that caching is more effective.
+            <li>rfe641: HAPI caching experiment where request is broken up into daily requests so that caching is more effective.
             <li>SeriesRenderer can now be used as a delegate to allow use in scripts.
             <li>More anchor positions, including OutsideS and OutsideSSW, OutsideW.
             <li>DataSetBuilder has new nextRecords function, which accepts multiple records, to avoid confusion caused by use of putValues function.
