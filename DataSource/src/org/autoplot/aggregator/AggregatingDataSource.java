@@ -381,6 +381,14 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
     }
     
+    /**
+     * read the data, not using the reference cache.
+     * @param mon monitor for the load
+     * @param lviewRange the time span to load
+     * @param lresolution resolution which is used where reduce=T
+     * @return
+     * @throws Exception 
+     */
     public QDataSet getDataSet( ProgressMonitor mon, DatumRange lviewRange, Datum lresolution ) throws Exception {
         try {
 
@@ -738,6 +746,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
             userProps.put( "files", ss );
 
             if ( altResult!=null ) {
+                DataSetUtil.validate( altResult, new ArrayList<String>() );
+            
                 ArrayDataSet dep0 = (ArrayDataSet) altResult.property(DDataSet.DEPEND_0);
                 Units dep0units= dep0==null ? null : SemanticOps.getUnits(dep0);
                 if ( dep0==null ) {
@@ -760,6 +770,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 return altResult;
 
             } else {
+                DataSetUtil.validate( result, new ArrayList<String>() );
                 MutablePropertyDataSet dep0;
                 if ( dep0Builder!=null ) {
                     assert result!=null;
