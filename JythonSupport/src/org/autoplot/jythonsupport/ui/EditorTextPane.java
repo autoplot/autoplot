@@ -198,7 +198,7 @@ public class EditorTextPane extends JEditorPane {
                 Properties p= new Properties();
                 String f= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA );
                 File config= new File( new File(f), "config" );
-                if ( config.exists() ) {
+                if ( config.exists() && k instanceof jsyntaxpane.syntaxkits.PythonSyntaxKit ) {
                     logger.log(Level.INFO, "Resetting editor colors using {0}", config);
                     try {
                         p.load( new FileInputStream( new File( config, "jsyntaxpane.properties" ) ) );
@@ -274,7 +274,7 @@ public class EditorTextPane extends JEditorPane {
                 Properties p= new Properties();
                 String f= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA );
                 File config= new File( new File(f), "config" );
-                if ( config.exists() ) {
+                if ( config.exists() ) { // Note the syntax kit has already been configured.
                     logger.log(Level.INFO, "Resetting editor colors using {0}", config);
                     try {
                         p.load( new FileInputStream( new File( config, "jsyntaxpane.properties" ) ) );
