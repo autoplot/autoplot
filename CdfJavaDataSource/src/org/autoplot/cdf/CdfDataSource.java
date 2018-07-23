@@ -909,7 +909,7 @@ public class CdfDataSource extends AbstractDataSource {
             int slice1, 
             ProgressMonitor mon) throws Exception, ParseException {
         
-        logger.fine("wrapDataSet("+svariable+")");
+        logger.log(Level.FINE, "wrapDataSet({0})", svariable);
         if ( !hasVariable(cdf, svariable) ) {
             throw new IllegalArgumentException( "No such variable: "+svariable );
         }
@@ -992,8 +992,8 @@ public class CdfDataSource extends AbstractDataSource {
 
         long recCount = (recs[1] - recs[0]) / recs[2];
         if ( !reform ) {
-            if ( recCount==0 && ndimensions.length>0 && ndimensions[0]==1 ) {
-                logger.fine("variable is not marked as non-time-varying");
+            if ( recs[1]==1 && ndimensions.length>0 && ndimensions[0]==1 ) {
+                logger.fine("variable is not marked as non-time-varying, but the single record implies it should be.");
                 reform= true;
             }
         }
