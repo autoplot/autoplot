@@ -604,6 +604,14 @@ public final class AggregatingDataSource extends AbstractDataSource {
                             logger.fine("data is not time series, cannot reduce");
                         }
                     }
+                    
+                    
+                    if (result!=null ) { // check for special case where non-time-varying data has been loaded.
+                        QDataSet dep0 = (QDataSet) result.property(QDataSet.DEPEND_0);
+                        if ( dep0==null && result.rank()==1 && Ops.equivalent( result, ds1 ) ) {
+                            continue; // do not append the results.
+                        }
+                    }
 
                     if (result == null && altResult==null ) {
                         if ( ds1 instanceof JoinDataSet ) {
