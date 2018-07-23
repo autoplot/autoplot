@@ -992,7 +992,7 @@ public class CdfDataSource extends AbstractDataSource {
 
         long recCount = (recs[1] - recs[0]) / recs[2];
         if ( !reform ) {
-            if ( recs[1]==1 && ndimensions.length>0 && ndimensions[0]==1 ) {
+            if ( recs[1]==1 && recs[2]>1 && ndimensions.length>0 && ndimensions[0]==1 ) {
                 logger.fine("variable is not marked as non-time-varying, but the single record implies it should be.");
                 reform= true;
             }
