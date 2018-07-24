@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.asdatasource;
 
 import java.awt.Window;
@@ -120,19 +117,18 @@ public class AudioSystemDataSourceEditorPanel extends javax.swing.JPanel impleme
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public boolean reject(String uri) throws Exception {
         boolean allowDiscovery= false;
-        if ( allowDiscovery ) {
-            return true;
-        } else {
-            return false;
-        }
+        return allowDiscovery;
     }
 
+    @Override
     public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
         return true;
     }
 
+    @Override
     public void setURI(String uri) {
         URISplit split= URISplit.parse(uri);
         Map<String,String> params= URISplit.parseParams(split.params);
@@ -149,14 +145,17 @@ public class AudioSystemDataSourceEditorPanel extends javax.swing.JPanel impleme
         }
     }
 
+    @Override
     public void markProblems(List<String> problems) {
         
     }
 
+    @Override
     public JPanel getPanel() {
         return this;
     }
 
+    @Override
     public String getURI() {
         String result=  "vap+audiosystem:len="+this.lenTF.getValue();
         if ( fftCB.isSelected() ) {
