@@ -235,7 +235,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
             @Override
             public void propertyChange(PropertyChangeEvent e) {
                 if (columns != null) {
-                    updateColumns();
+                    updateColumns(jTable1,columns);
                 }
                 jTable1.repaint();
 
@@ -1542,7 +1542,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
     public javax.swing.JTextField validMinTextField;
     // End of variables declaration//GEN-END:variables
 
-    private void updateColumns() {
+    private static void updateColumns( javax.swing.JTable jTable1, Map<Integer,String> columns ) {
         int n= jTable1.getColumnCount();
         int wide= n<5 ? 210 : 170;
         int norm= n<5 ? 100 : 70;
@@ -1572,6 +1572,9 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
 
     }
 
+    /**
+     * check for JSON Rich ASCII header.
+     */
     private void checkHeaders() {
         try {
             AsciiParser.DelimParser p = parser.guessSkipAndDelimParser(file.toString());
@@ -1626,7 +1629,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
 
             list.putAll(columns);
 
-            updateColumns();
+            updateColumns(jTable1,columns);
 
             String lcol = getColumn();
             int icol = jTable1.getSelectedColumn();
