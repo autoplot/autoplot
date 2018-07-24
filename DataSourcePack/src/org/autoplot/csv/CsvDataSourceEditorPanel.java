@@ -665,7 +665,7 @@ protected File file = null;
         if ( delim.charAt(0)==';' ) {
             params.put("delim",delim.substring(0,1) );
         }
-        split.params = URISplit.formatParams(params);
+        split.params = params.isEmpty() ? null : URISplit.formatParams(params);
         
         return URISplit.format(split);
     }
