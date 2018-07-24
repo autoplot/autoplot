@@ -13,6 +13,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.datasource.CompletionContext;
 import org.autoplot.datasource.DataSetURI;
@@ -111,7 +112,13 @@ public class CsvDataSourceFactory implements DataSourceFactory {
         return result;
 
     }
-
+    
+    /**
+     * detect identifiers for columns.  Copied from AsciiParser.java
+     * @see AsciiParser#COLUMN_ID_HEADER_PATTERN
+     */
+    private static Pattern COLUMN_ID_HEADER_PATTERN = Pattern.compile("\\s*\"?([a-zA-Z][a-zA-Z _0-9]*)([\\(\\[]([a-zA-Z_\\.\\[\\-\\]0-9//\\*\\^]*)[\\)\\]])?\"?\\s*");    
+    
     /**
      * get the column headers for each column, and possibly switch over
      * to using a semicolon as a field delimiter.
@@ -124,6 +131,11 @@ public class CsvDataSourceFactory implements DataSourceFactory {
         if ( reader.readHeaders() ) {
             //int ncol= reader.getHeaderCount();
             columnHeaders= reader.getHeaders();
+            for ( int i=0; i<columnHeaders.length; i++ ) {
+                if ( !COLUMN_ID_HEADER_PATTERN.matcher(columnHeaders[i]).matches() ) {
+                    columnHeaders[i]= "field"+i;
+                }
+            }
         } else {
             columnHeaders= new String[reader.getColumnCount()];
             for ( int i=0; i<columnHeaders.length; i++ ) {
