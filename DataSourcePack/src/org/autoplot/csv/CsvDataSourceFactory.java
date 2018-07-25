@@ -119,21 +119,28 @@ public class CsvDataSourceFactory implements DataSourceFactory {
      */
     private static Pattern COLUMN_ID_HEADER_PATTERN = Pattern.compile("\\s*\"?([a-zA-Z][a-zA-Z _0-9]*)([\\(\\[]([a-zA-Z_\\.\\[\\-\\]0-9//\\*\\^]*)[\\)\\]])?\"?\\s*");    
     
+    public static String[] getColumnHeaders( CsvReader reader) throws IOException {
+        return getColumnHeaders( reader, false );
+    }
+    
     /**
      * get the column headers for each column, and possibly switch over
      * to using a semicolon as a field delimiter.
      * @param reader
+     * @param returnData if true, when data is detected, they are returned instead.
      * @return
      * @throws IOException 
      */
-    public static String[] getColumnHeaders( CsvReader reader) throws IOException {
+    public static String[] getColumnHeaders( CsvReader reader, boolean returnData ) throws IOException {
         String[] columnHeaders;
         if ( reader.readHeaders() ) {
             //int ncol= reader.getHeaderCount();
             columnHeaders= reader.getHeaders();
-            for ( int i=0; i<columnHeaders.length; i++ ) {
-                if ( !COLUMN_ID_HEADER_PATTERN.matcher(columnHeaders[i]).matches() ) {
-                    columnHeaders[i]= "field"+i;
+            if ( !returnData ) {
+                for ( int i=0; i<columnHeaders.length; i++ ) {
+                    if ( !COLUMN_ID_HEADER_PATTERN.matcher(columnHeaders[i]).matches() ) {
+                        columnHeaders[i]= "field"+i;
+                    }
                 }
             }
         } else {

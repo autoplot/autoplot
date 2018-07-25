@@ -133,7 +133,7 @@ public class CsvDataSource extends AbstractDataSource {
         
         String[] columnHeaders;
 
-        columnHeaders= CsvDataSourceFactory.getColumnHeaders(reader);
+        columnHeaders= CsvDataSourceFactory.getColumnHeaders(reader,true);
 
         String column= getParam( "column", null );
         /**
