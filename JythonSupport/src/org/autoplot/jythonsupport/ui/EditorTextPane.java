@@ -46,6 +46,7 @@ import javax.swing.undo.UndoManager;
 import jsyntaxpane.DefaultSyntaxKit;
 import static jsyntaxpane.DefaultSyntaxKit.CONFIG_SELECTION;
 import jsyntaxpane.SyntaxDocument;
+import jsyntaxpane.SyntaxStyle;
 import jsyntaxpane.SyntaxStyles;
 import jsyntaxpane.TokenType;
 import jsyntaxpane.actions.ActionUtils;
@@ -215,6 +216,12 @@ public class EditorTextPane extends JEditorPane {
                     EditorTextPane.this.setCaretColor( Color.decode( s ) );
                     s= p.getProperty( CONFIG_SELECTION,"0x99ccff");
                     EditorTextPane.this.setSelectionColor( Color.decode( s ) );
+                    SyntaxStyle deft= SyntaxStyles.getInstance().getStyle(null);
+                    if ( EditorTextPane.this.getBackground().getRed()<128 ) {
+                        deft.setColorString("0xFFFFFF");
+                    } else {
+                        deft.setColorString("0x000000");
+                    }
                     
                 }
 
@@ -289,7 +296,13 @@ public class EditorTextPane extends JEditorPane {
                     s= p.getProperty("CaretColor", "0x000000" );
                     a.setCaretColor( Color.decode( s ) );
                     s= p.getProperty( CONFIG_SELECTION,"0x99ccff");
-                    EditorTextPane.this.setSelectionColor( Color.decode( s ) );                    
+                    EditorTextPane.this.setSelectionColor( Color.decode( s ) );
+                    SyntaxStyle deft= SyntaxStyles.getInstance().getStyle(null);
+                    if ( a.getBackground().getRed()<128 ) {
+                        deft.setColorString("0xFFFFFF");
+                    } else {
+                        deft.setColorString("0x000000");
+                    }
                 }
                 SyntaxStyles.getInstance().getStyle(TokenType.DELIMITER).isDrawTabs();
                 a.setContentType("text/python");
