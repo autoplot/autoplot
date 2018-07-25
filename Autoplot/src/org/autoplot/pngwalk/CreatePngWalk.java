@@ -984,6 +984,7 @@ public class CreatePngWalk {
         params.rescalex= alm.getValue("rescalex");
         params.version= alm.getValue("version");
         params.autorange= alm.getBooleanValue("autorange");
+        params.autorangeFlags= alm.getBooleanValue("autorangeFlags");
         params.update= alm.getBooleanValue("update");
         params.batchUri= alm.getValue("batchUri");
         if ( params.batchUri!=null && params.batchUri.length()>0 ) {
