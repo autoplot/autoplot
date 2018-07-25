@@ -277,6 +277,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                     if ( !DataSetUtil.validate( ds1, p ) ) {
                         if ( p.size()>0 ) {
                             logger.warning(p.get(0));
+                            continue; // vap+cdaweb:ds=MMS1_FPI_FAST_L2_DES-MOMS&filter=mms1&id=mms1_des_energyspectr_mx_fast&timerange=2016-02-29
                         } else {
                             logger.warning("problem");
                         }
