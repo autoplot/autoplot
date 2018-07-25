@@ -1700,6 +1700,7 @@ public class AutoplotUtil {
         String aboutContent = "<ul>" +
             "<li>Java version: " + javaVersion + " " + javaVersionWarning + 
             memWarning +    
+            "<li>Java home: "+ System.getProperty("java.home") +            
             "<li>max memory (MB): " + mem + " (memory available to process)" +
             "<li>total memory (MB): " + tmem + " (amount allocated to the process)" +
             "<li>free memory (MB): " + fmem + " (amount available before more must be allocated)" + 
