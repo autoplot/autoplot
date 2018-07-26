@@ -716,8 +716,18 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 
         DatumFormatter tf= getTimeFormatter();
 
-        String dfs= getParam( "format", "" );
-        DatumFormatter df= dfs.equals("") ? u.getDatumFormatterFactory().defaultFormatter() : getDataFormatter( dfs, u );
+        DatumFormatter df;
+        String format= getParam( "format", "" );
+        if ( format.equals("") ) {
+            String dfs= (String)data.property(QDataSet.FORMAT);
+            if ( dfs!=null && dfs.trim().length()>0 ) {
+                df= getDataFormatter( dfs, u );
+            } else {
+                df= u.getDatumFormatterFactory().defaultFormatter();
+            }
+        } else {
+            df= getDataFormatter(format, u );
+        }
 
         DatumFormatter cf0= dep0==null ? null : ( UnitsUtil.isTimeLocation(u0) ? tf : df );
         DatumFormatter cf1= UnitsUtil.isTimeLocation(u) ? tf : df;
@@ -901,7 +911,17 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         }
         
         String format= getParam( "format", "" );
-        DatumFormatter df= format.equals("") ? u.getDatumFormatterFactory().defaultFormatter() : getDataFormatter(format, u );
+        DatumFormatter df;
+        if ( format.equals("") ) {
+            String dfs= (String)data.property(QDataSet.FORMAT);
+            if ( dfs!=null && dfs.trim().length()>0 ) {
+                df= getDataFormatter( dfs, u );
+            } else {
+                df= u.getDatumFormatterFactory().defaultFormatter();
+            }
+        } else {
+            df= getDataFormatter(format, u );
+        }
 
         DatumFormatter cf0= dep0==null ? null : ( UnitsUtil.isTimeLocation(u0) ? tf : df );
         DatumFormatter cf1= UnitsUtil.isTimeLocation(u) ? tf : df;
