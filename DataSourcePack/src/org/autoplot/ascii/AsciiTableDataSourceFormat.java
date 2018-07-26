@@ -674,7 +674,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         if ( u!=Units.dimensionless && !"rich".equals( head )  ) maybeOutputProperty( out, data, QDataSet.UNITS );
         
         if (dep1 != null && !"none".equals(head) ) {
-            out.print("#");
+            //out.print("#"); // Autoplot must be able to read what it formats.
             if (dep0 != null) {
                 String l = (String) dep0.property(QDataSet.LABEL);
                 if ( l==null ) {
