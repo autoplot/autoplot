@@ -925,6 +925,7 @@ public class CreatePngWalk {
         alm.addOptionalSwitchArgument( "rescalex", null, "rescalex", "0%,100%", "rescale factor, such as '0%-1hr,100%+1hr', to provide context to each image");
         alm.addOptionalSwitchArgument( "version", null, "version", null, "additional version string to add to each filename, like v1.0");
         alm.addBooleanSwitchArgument( "autorange", null, "autorange", "rerange dependent dimensions Y and Z");
+        alm.addBooleanSwitchArgument( "autorangeFlags", null, "autorangeFlags", "only autorange axes with autorange=true");
         alm.addBooleanSwitchArgument( "update", null, "update", "only calculate missing images");
         alm.addBooleanSwitchArgument( "testException", null, "testException", "throw a runtime exception to test exit code");
         alm.process(args);
