@@ -41,7 +41,10 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
         }
         
         super.maybeMkdirs();
-
+        
+        mon.setTaskSize( data.length() );
+        mon.started();
+        
         File outFile= new File( split.resourceUri );
         FileWriter fw= new FileWriter(outFile);
         CsvWriter writer= null;
@@ -124,6 +127,7 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
             }
 
             for ( int i=0; i<data.length(); i++ ) {
+                mon.setTaskProgress(i);
                 col= 0;
                 for ( int ids=0; ids<dss.length; ids++ ) {
                     Units u= SemanticOps.getUnits(dss[ids]);
@@ -148,6 +152,7 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
         } finally {
             if ( writer!=null ) writer.close();
             fw.close();
+            mon.finished();
         }
     }
 
