@@ -160,7 +160,7 @@ public class AutoplotDataServer {
                 logger.log( Level.FINE, "  --> {0} )", ds1 );
                 if ( ds1!=null ) {
                     if ( !SemanticOps.isTimeSeries(ds1) ) { //automatically fall back to -nostream
-                        logger.fine( String.format( "dataset doesn't appear to be a timeseries, reloading everything" ) );
+                        logger.fine( String.format( "dataset doesn't appear to be a time series, reloading everything" ) );
                         ds1 = org.autoplot.jythonsupport.Util.getDataSet(suri, outer.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
                         logger.log( Level.FINE, "  --> {0} )", ds1 );
                         writeData(format, out, ds1, ascii, stream );

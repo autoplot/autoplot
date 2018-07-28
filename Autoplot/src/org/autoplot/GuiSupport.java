@@ -501,7 +501,7 @@ public class GuiSupport {
                     logger.fine("looks like a TSB is used, but the data is not a time series, don't reload");
                 } else {
                     dsf.getController().getTsb().setTimeResolution(null);
-                    mon= DasProgressPanel.createFramed(parent, "reloading timeseries at native resolution");
+                    mon= DasProgressPanel.createFramed(parent, "reloading data at native resolution");
                     ds= dss.getDataSet( mon );
                     if ( mon.isCancelled() ) {
                         parent.setStatus( "export data cancelled" );
