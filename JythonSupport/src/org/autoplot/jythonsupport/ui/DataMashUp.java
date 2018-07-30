@@ -376,7 +376,7 @@ public class DataMashUp extends javax.swing.JPanel {
     }
     
     /**
-     * return the jython for just the node.
+     * return the Jython for just the node.
      * @param tn
      * @return 
      */
@@ -384,15 +384,15 @@ public class DataMashUp extends javax.swing.JPanel {
         StringBuilder b= new StringBuilder("vap+inline:");
         b.append( namedURIListTool1.getAsJythonInline() );
         
+        String timerange= timeRangeRecentComboBox.getText();
+        if ( timeRangeRecentComboBox.isEnabled() ) {
+            b.append("timerange=\'").append(timerange.trim().replaceAll(" ","+")).append("\'&");
+        }
+        
         DefaultTreeModel m= (DefaultTreeModel) expressionTree.getModel();
         
         b.append( getJython( m, tn ) );
         b.append( getJythonSynchronize("&") );
-        
-        String timerange= timeRangeRecentComboBox.getText();
-        if ( timeRangeRecentComboBox.isEnabled() ) {
-            b.append("&timerange=\'").append(timerange.trim().replaceAll(" ","+")).append("\'");
-        }
         
         return b.toString();
     }
