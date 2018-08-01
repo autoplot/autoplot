@@ -24,8 +24,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-07-28 r22639):</p>
+        <p>Bugfixes (2018-08-01 r22646):</p>
         <ul>
+            <li>SeriesRenderer, when data breaks exist on both sides of a valid point, would fail to draw the point.
+            <li>1999: correct error message in ASCII when non-existent column is requested.
+            <li>new data set builder nextRecords function had a bug where 0th record was always copied.  Thanks, Ivar!
             <li>orbit files with gaps could not be used with orbit data source.
             <li>CreatePngWalk command line has autorangeFlags.
             <li>export-to-CSV uses FORMAT metadata and shows progress as the data is exported.
