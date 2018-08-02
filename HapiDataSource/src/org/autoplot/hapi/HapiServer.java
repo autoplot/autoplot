@@ -63,10 +63,17 @@ public class HapiServer {
     public static List<String> getKnownServers() {
         ArrayList<String> result= new ArrayList<>();
         try {
-            URL url= new URL("https://raw.githubusercontent.com/hapi-server/servers/master/all.txt");
-            String s= readFromURL(url,"");
-            String[] ss= s.split("\n");
-            result.addAll(Arrays.asList(ss));
+            URL url= new URL("https://raw.githubusercontent.com/hapi-server/servers/master/server_list.txt");
+            try {
+                String s= readFromURL(url,"");
+                String[] ss= s.split("\n");
+                result.addAll(Arrays.asList(ss));
+            } catch ( IOException ex ) {
+                url= new URL("https://raw.githubusercontent.com/hapi-server/servers/master/all.txt");
+                String s= readFromURL(url,"");
+                String[] ss= s.split("\n");
+                result.addAll(Arrays.asList(ss));
+            }
             if ( "true".equals(System.getProperty("hapiDeveloper","false")) ) {
                 result.add("http://tsds.org/get/IMAGE/PT1M/hapi");
                 result.add("https://cdaweb.gsfc.nasa.gov/registry/hdp/hapi");
@@ -77,8 +84,13 @@ public class HapiServer {
         }
         result.remove("http://datashop.elasticbeanstalk.com/hapi");
         result.add("http://datashop.elasticbeanstalk.com/hapi");
-            
-        return result;
+        
+        ArrayList<String> uniq= new ArrayList<>();
+        for ( String s: result ) {
+            if ( !uniq.contains(s) ) uniq.add(s);
+        }
+
+        return uniq;
     }
     
     /**
