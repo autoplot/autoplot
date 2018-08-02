@@ -1793,6 +1793,13 @@ public class DataSourceController extends DomNodeController {
                 if (dsf.getUri().length() > 0) {
                     this.model.addException(dsf.getUri(), ex);
                 }
+            } catch ( org.das2.client.AccessDeniedException ex ) {
+                setException(ex);
+                setDataSet(null); //TODO: maybe we should allow the old dataset to stay, in case TSB....
+                setStatus("access denied");
+                if (dsf.getUri().length() > 0) {
+                    this.model.addException(dsf.getUri(), ex);
+                }
             } catch (org.das2.util.monitor.CancelledOperationException | CancelledOperationException ex) {
                 setException(ex);
                 setDataSet(null);
