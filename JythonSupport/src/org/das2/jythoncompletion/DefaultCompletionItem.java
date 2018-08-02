@@ -75,7 +75,7 @@ public class DefaultCompletionItem implements CompletionItem  {
      * @param link  handed over to DefaultDocumentationItem, if non null.  May be "inline:&lt;html&gt;..."
      */
     public DefaultCompletionItem( String text, int offset, String complete, String label, String link ) {
-        //http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/ws/doc/org/autoplot/jythonsupport/Util.html#getCompletions(java.lang.String)
+        //http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc2018/ws/doc/org/autoplot/jythonsupport/Util.html#getCompletions(java.lang.String)
         this(text, offset, complete, label, link, 1);
     }
     

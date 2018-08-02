@@ -524,7 +524,7 @@ public class JythonCompletionTask implements CompletionTask {
             while ( ss!=null ) {
                 if ( !ss.startsWith("#") && ss.length()>0 ) {
                     if ( ss.startsWith(search) && !results.contains(ss.substring(plen)) ) {
-                        String link= "http://www-pw.physics.uiowa.edu/~jbf/autoplot/javadoc/" + ss.replaceAll("\\.","/") + "/package-summary.html";
+                        String link= "http://www-pw.physics.uiowa.edu/~jbf/autoplot/javadoc2018/" + ss.replaceAll("\\.","/") + "/package-summary.html";
                         if ( rs!=null ) rs.addItem(new DefaultCompletionItem(ss, search.length(), ss, ss, link ));
                         count++;
                     }
