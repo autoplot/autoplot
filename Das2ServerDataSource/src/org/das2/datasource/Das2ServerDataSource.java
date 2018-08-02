@@ -53,6 +53,7 @@ import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.datasource.capability.Caching;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.DasException;
 import org.das2.client.AccessDeniedException;
@@ -70,11 +71,27 @@ public class Das2ServerDataSource extends AbstractDataSource {
 
     private static final Map<String, String> keys = new HashMap();
 
+    private Exception offlineException= null;
+    
     public Das2ServerDataSource(URI uri) throws ParseException {
         super(uri);
         if (!"no".equals(params.get("tsb"))) {
             addCapability(TimeSeriesBrowse.class, getTimeSeriesBrowse());
         }
+        addCapability( Caching.class, new Caching() {
+            @Override
+            public boolean satisfies(String surl) {
+                return false;
+            }
+            @Override
+            public void resetURI(String surl) {
+            }
+            @Override
+            public void reset() {
+                offlineException= null;
+            }
+        });
+        
         HashMap<String, String> params2 = new HashMap(params);
         params2.put("server", "dataset");
 
@@ -324,7 +341,16 @@ public class Das2ServerDataSource extends AbstractDataSource {
         // Allow response bodies that are Das2 streams or QStreams to be processed
         // normally even when the HTTP Status code indicates an error.  This is to handle
         // errors that are packaged properly.
-        InputStream in = getInputStream(url2, dataset);
+        InputStream in;
+        try {
+            if ( offlineException!=null  ) {
+                throw offlineException;
+            }
+            in = getInputStream(url2, dataset);
+        } catch ( AccessDeniedException ex ) {
+            offlineException= ex;
+            throw offlineException;
+        }
 
         final DasProgressMonitorInputStream mpin = new DasProgressMonitorInputStream(in, mon);
 
