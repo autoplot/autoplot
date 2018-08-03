@@ -1770,5 +1770,51 @@ public class AutoplotUtil {
         }
     }
 
-    
+    public static void maybeInitializeEditorColors() {
+        File config= new File( new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) ), "config" );
+        if ( !config.exists() ) {
+            if ( !config.mkdirs() ) {
+                logger.log(Level.WARNING, "mkdir {0} failed", config);
+                return;
+            }
+        }
+        File propFile= new File( config, "jsyntaxpane.properties" );
+        if ( !propFile.exists() ) {
+            try (PrintWriter w = new PrintWriter( new FileWriter( propFile ) )) {                                
+                w.println("TokenMarker.Color = 0xffeeaa");
+                w.println("PairMarker.Color = 0xffbb77");
+                w.println("LineNumbers.Foreground = 0x333300");
+                w.println("LineNumbers.Background = 0xeeeeff");
+                w.println("LineNumbers.CurrentBack = 0xccccee");
+                w.println("CaretColor = 0x000000");
+                w.println("Background = 0xFFFFFF");
+                w.println("SelectionColor = 0x556677");
+                w.println("# These are the various Attributes for each TokenType.");
+                w.println("# The keys of this map are the TokenType Strings, and the values are:");
+                w.println("# color (hex, or integer), Font.Style attribute");
+                w.println("# Style is one of: 0 = plain, 1=bold, 2=italic, 3=bold/italic");
+                w.println("Style.OPERATOR = 0x000000, 0");
+                w.println("Style.DELIMITER = 0x000000, 1");
+                w.println("Style.KEYWORD = 0x3333ee, 0");
+                w.println("Style.KEYWORD2 = 0x3333ee, 3");
+                w.println("Style.TYPE = 0x000000, 2");
+                w.println("Style.TYPE2 = 0x000000, 1");
+                w.println("Style.TYPE3 = 0x000000, 3");
+                w.println("Style.STRING = 0xcc6600, 0");
+                w.println("Style.STRING2 = 0xcc6600, 1");
+                w.println("Style.NUMBER = 0x999933, 1");
+                w.println("Style.REGEX = 0xcc6600, 0");
+                w.println("Style.IDENTIFIER = 0x000000, 0");
+                w.println("Style.COMMENT = 0x339933, 2");
+                w.println("Style.COMMENT2 = 0x339933, 3");
+                w.println("Style.DEFAULT = 0x000000, 0");
+                w.println("Style.WARNING = 0xCC0000, 0");
+                w.println("Style.ERROR = 0xCC0000, 3");
+                w.close();
+            } catch ( IOException ex ) {
+                logger.log(Level.WARNING, "write initial {0} failed.  {1}", new Object[] { propFile, ex } );
+            }
+        }
+    }
+
 }

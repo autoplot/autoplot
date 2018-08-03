@@ -4650,6 +4650,7 @@ private void updateFrameTitle() {
         }
 
         AutoplotUtil.maybeLoadSystemProperties();
+        AutoplotUtil.maybeInitializeEditorColors();
                         
         String welcome= "welcome to autoplot";
         String tag;
