@@ -741,44 +741,10 @@ public class EditorContextMenu {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);
-                    
-                    String f= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA );
-                    File config= new File( new File(f), "config" );
-                    EditorKit k= editor.getEditorKit();
-                    Properties p= new Properties();
-                    if ( config.exists() ) {
-                        logger.log(Level.INFO, "Resetting editor colors using {0}", config);
-                        try {
-                            File syntaxPropertiesFile= new File( config, "jsyntaxpane.properties" );
-                            if ( !syntaxPropertiesFile.exists() ) {
-                                JOptionPane.showMessageDialog( editor, "Download http://autoplot.org/data/config/jsyntaxpane.properties to autoplot_data/config/jsyntaxpane.properties");
-                                return;
-                            }
-                            if ( syntaxPropertiesFile.exists() ) {
-                                p.load( new FileInputStream( syntaxPropertiesFile  ) );
-                            }
-                        } catch (FileNotFoundException ex) {
-                            logger.log(Level.SEVERE, null, ex);
-                        } catch (IOException ex) {
-                            logger.log(Level.SEVERE, null, ex);
-                        }
-                    }
-                    ((jsyntaxpane.syntaxkits.PythonSyntaxKit)k).setConfig( p );
-                    editor.repaint();
-                    String s;
-                    s= p.getProperty("Background", "0xFFFFFF");
-                    editor.setBackground( Color.decode( s ) );
-                    s= p.getProperty("CaretColor", "0x000000" );
-                    editor.setCaretColor( Color.decode( s ) );
-                    s= p.getProperty( CONFIG_SELECTION,"0x99ccff");
-                    editor.setSelectionColor( Color.decode( s ) );
-                    SyntaxStyle deft= SyntaxStyles.getInstance().getStyle(null);
-                    if ( editor.getBackground().getRed()<128 ) {
-                        deft.setColorString("0xFFFFFF");
-                    } else {
-                        deft.setColorString("0x000000");
-                    }
-
+                    String s= editor.getText();
+                    editor.setEditorKit(null);
+                    editor.getInitializeRunnable().run();
+                    editor.setText(s);
                 }
             } );
             mi.setToolTipText("Reload editor colors from autoplot_data/config/jsyntaxpane.properties");

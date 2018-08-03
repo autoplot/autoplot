@@ -91,8 +91,16 @@ public class EditorTextPane extends JEditorPane {
     
     public EditorTextPane() {
 
-        Runnable run;
-        run = new Runnable() {
+        Runnable run= getInitializeRunnable();
+        
+        if ( !DasApplication.getDefaultApplication().isHeadless() ) {
+            SwingUtilities.invokeLater(run);
+        }
+
+    }
+
+    public final Runnable getInitializeRunnable() {
+        return  new Runnable() {
             @Override
             public void run() {
 
@@ -253,13 +261,8 @@ public class EditorTextPane extends JEditorPane {
             }
 
         };
-        
-        if ( !DasApplication.getDefaultApplication().isHeadless() ) {
-            SwingUtilities.invokeLater(run);
-        }
-
     }
-
+    
     /**
      * used to show the current simplified code used for completions.
      */
