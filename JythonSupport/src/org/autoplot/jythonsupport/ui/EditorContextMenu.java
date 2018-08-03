@@ -2,6 +2,7 @@
 package org.autoplot.jythonsupport.ui;
 
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import org.das2.components.propertyeditor.PropertyEditor;
@@ -13,9 +14,13 @@ import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -32,13 +37,16 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.EditorKit;
 import javax.swing.text.Element;
 import jsyntaxpane.DefaultSyntaxKit;
+import static jsyntaxpane.DefaultSyntaxKit.CONFIG_SELECTION;
 import jsyntaxpane.SyntaxStyle;
 import jsyntaxpane.SyntaxStyles;
 import jsyntaxpane.TokenType;
 import jsyntaxpane.actions.ActionUtils;
 import jsyntaxpane.actions.IndentAction;
+import org.autoplot.datasource.AutoplotSettings;
 import org.das2.jythoncompletion.CompletionSettings;
 import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.util.LoggerManager;
@@ -47,6 +55,7 @@ import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
 import org.autoplot.jythonsupport.JythonUtil;
+import org.das2.dataset.DataSetUtil;
 import static org.das2.jythoncompletion.JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
 
@@ -728,6 +737,53 @@ public class EditorContextMenu {
             mi.setToolTipText("Pick Font for editor");
             settingsMenu.add( mi );
 
+            mi= new JMenuItem( new AbstractAction("Reload Syntax Colors") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);
+                    
+                    String f= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA );
+                    File config= new File( new File(f), "config" );
+                    EditorKit k= editor.getEditorKit();
+                    Properties p= new Properties();
+                    if ( config.exists() ) {
+                        logger.log(Level.INFO, "Resetting editor colors using {0}", config);
+                        try {
+                            File syntaxPropertiesFile= new File( config, "jsyntaxpane.properties" );
+                            if ( !syntaxPropertiesFile.exists() ) {
+                                JOptionPane.showMessageDialog( editor, "Download http://autoplot.org/data/config/jsyntaxpane.properties to autoplot_data/config/jsyntaxpane.properties");
+                                return;
+                            }
+                            if ( syntaxPropertiesFile.exists() ) {
+                                p.load( new FileInputStream( syntaxPropertiesFile  ) );
+                            }
+                        } catch (FileNotFoundException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        } catch (IOException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    ((jsyntaxpane.syntaxkits.PythonSyntaxKit)k).setConfig( p );
+                    editor.repaint();
+                    String s;
+                    s= p.getProperty("Background", "0xFFFFFF");
+                    editor.setBackground( Color.decode( s ) );
+                    s= p.getProperty("CaretColor", "0x000000" );
+                    editor.setCaretColor( Color.decode( s ) );
+                    s= p.getProperty( CONFIG_SELECTION,"0x99ccff");
+                    editor.setSelectionColor( Color.decode( s ) );
+                    SyntaxStyle deft= SyntaxStyles.getInstance().getStyle(null);
+                    if ( editor.getBackground().getRed()<128 ) {
+                        deft.setColorString("0xFFFFFF");
+                    } else {
+                        deft.setColorString("0x000000");
+                    }
+
+                }
+            } );
+            mi.setToolTipText("Reload editor colors from autoplot_data/config/jsyntaxpane.properties");
+            settingsMenu.add( mi );
+            
             mi = new JMenuItem(new AbstractAction("Keyboard Shortcuts...") {
                 @Override
                 public void actionPerformed(ActionEvent e) {

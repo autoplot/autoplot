@@ -195,10 +195,10 @@ public class EditorTextPane extends JEditorPane {
                 JPopupMenu oldPopup= EditorTextPane.this.getComponentPopupMenu();
                 EditorTextPane.this.setContentType("text/python");
 
-                EditorKit k= EditorTextPane.this.getEditorKit();
                 Properties p= new Properties();
                 String f= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA );
                 File config= new File( new File(f), "config" );
+                EditorKit k= EditorTextPane.this.getEditorKit();
                 if ( config.exists() && k instanceof jsyntaxpane.syntaxkits.PythonSyntaxKit ) {
                     logger.log(Level.INFO, "Resetting editor colors using {0}", config);
                     try {
