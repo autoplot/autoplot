@@ -888,6 +888,40 @@ public class CdfDataSource extends AbstractDataSource {
     }
 
     /**
+     * tests to see if this variable has a DEPEND_0, and if so is the DEPEND_0 also 1 record; or if another
+     * variable has a DEPEND_0 which is this, then does it have just 1 record.
+     * @param cdf
+     * @param svariable
+     * @return 
+     */
+    private boolean reformTest( final CDFReader cdf, final String svariable, Map<String,Object> thisAttributes ) throws CDFException.ReaderError {
+        if ( thisAttributes.containsKey("DEPEND_0") ) {
+            Object o=  thisAttributes.get("DEPEND_0");
+            if ( o!=null ) {
+                Map<String,Object> so= (Map)thisAttributes.get("DEPEND_0");
+                String dep0= (String) so.get("NAME");
+                int numDep0= cdf.getNumberOfValues(dep0);
+                if ( numDep0==1 ) {
+                    return false;
+                }
+            } else {
+                String[] dependents= cdf.getDependent(svariable);
+                int numDep0= cdf.getNumberOfValues(dependents[0]);
+                if ( numDep0==1 ) {
+                    return false;
+                }
+            }
+        } else {
+            String[] dependents= cdf.getDependent(svariable);
+            int numDep0= cdf.getNumberOfValues(dependents[0]);
+            if ( numDep0==1 ) {
+                return false;
+            }            
+        }
+        return true;
+    }
+    
+    /**
      * Read the variable into a QDataSet, possibly recursing to get depend variables.
      *
      * @param cdf the CDFReader
@@ -993,8 +1027,10 @@ public class CdfDataSource extends AbstractDataSource {
         long recCount = (recs[1] - recs[0]) / recs[2];
         if ( !reform ) { // bug 2007
             if ( recs[1]==1 && ndimensions[ndimensions.length-1]>1 && ndimensions.length>0 && ndimensions[0]==1 ) {
-                logger.fine("variable is not marked as non-time-varying, but the single record implies it should be.");
-                reform= true;
+                if ( reformTest( cdf, svariable, thisAttributes ) ) {
+                    logger.fine("variable is not marked as non-time-varying, but the single record implies it should be.");
+                    reform= true;
+                }
             }
         }
         
