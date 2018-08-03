@@ -913,10 +913,14 @@ public class CdfDataSource extends AbstractDataSource {
             }
         } else {
             String[] dependents= cdf.getDependent(svariable);
-            int numDep0= cdf.getNumberOfValues(dependents[0]);
-            if ( numDep0==1 ) {
-                return false;
-            }            
+            if ( dependents.length==0 ) {
+                return true;
+            } else {
+                int numDep0= cdf.getNumberOfValues(dependents[0]);
+                if ( numDep0==1 ) {
+                    return false;
+                }       
+            }
         }
         return true;
     }
