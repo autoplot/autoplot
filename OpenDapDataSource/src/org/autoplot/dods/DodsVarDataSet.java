@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import org.das2.datum.EnumerationUnits;
 import org.das2.util.LoggerManager;
 import org.das2.qds.DDataSet;
+import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.das2.qds.Slice0DataSet;
 import org.das2.qds.TrimDataSet;
@@ -69,6 +70,16 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         return rank;
     }
 
+    @Override
+    public String svalue() {
+        Units u= (Units)property( QDataSet.UNITS );
+        if ( u==null ) {
+            return String.valueOf( value() );
+        } else {
+            return u.createDatum(value()).toString();
+        }
+    }
+    
     @Override
     abstract public double value(int i);
 
