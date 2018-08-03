@@ -870,7 +870,7 @@ public class PlotElementController extends DomNodeController {
      * Resolve the renderType and renderControl for the dataset.
      * 
      * @param fillds 
-     * @return the render string with canonical types.  The result will always contain a greater than (>).
+     * @return the render string with canonical types.  The result will always contain a greater than (&gt;).
      */
     private static String resolveRenderType( QDataSet fillds ) {
         String srenderType= (String) fillds.property(QDataSet.RENDER_TYPE);
@@ -884,16 +884,21 @@ public class PlotElementController extends DomNodeController {
                 renderControl= srenderType.substring(i+1);
                 srenderType= srenderType.substring(0,i);
             }
+            boolean useHugeScatter= "true".equals( System.getProperty("useHugeScatter","true") );
             switch (srenderType) {
                 case "time_series":
-                    if (fillds.length() > SERIES_SIZE_LIMIT) {
+                    if ( useHugeScatter && fillds.length() > SERIES_SIZE_LIMIT) {
                         renderType = RenderType.hugeScatter;
                     } else {
                         renderType = RenderType.series;
                     }
                     break;
                 case "waveform":
-                    renderType = RenderType.hugeScatter;
+                    if ( useHugeScatter ) {
+                        renderType = RenderType.hugeScatter;
+                    } else {
+                        renderType = RenderType.series;
+                    }
                     break;
                 case "spectrogram":
                     RenderType specPref= RenderType.spectrogram;

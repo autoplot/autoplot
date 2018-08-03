@@ -668,6 +668,9 @@ public class AutoplotUtil {
                 w.println("# turn off certificate checks.");
                 w.println("#noCheckCertificate=true");
                 w.println("");
+                w.println("# use huge scatter for large data sets.");
+                w.println("#useHugeScatter=true");
+                w.println("");
                 w.close();
             } catch ( IOException ex ) {
                 logger.log(Level.WARNING, "write initial {0} failed.  {1}", new Object[] { propFile, ex } );
@@ -1059,18 +1062,24 @@ public class AutoplotUtil {
         if ( nn ) {
             specPref = RenderType.nnSpectrogram;
         }
+        
+        boolean useHugeScatter= "true".equals( System.getProperty("useHugeScatter","true") );
 
         String srenderType= (String) fillds.property(QDataSet.RENDER_TYPE);
         if ( srenderType!=null ) {
             if ( srenderType.equals("time_series") ) { //TODO: CDAWeb time_series will be fixed to "series" once it can automatically reduce data.
-                if (fillds.length() > SERIES_SIZE_LIMIT) {
+                if ( useHugeScatter && fillds.length() > SERIES_SIZE_LIMIT) {
                     spec = RenderType.hugeScatter;
                 } else {
                     spec = RenderType.series;
                 }
                 return spec;
             } else if ( srenderType.equals("waveform" ) ) {
-                spec = RenderType.hugeScatter;
+                if ( useHugeScatter ) {
+                    spec = RenderType.hugeScatter;
+                } else {
+                    spec = RenderType.series;
+                }
                 return spec;
             }
             try {
@@ -1115,7 +1124,11 @@ public class AutoplotUtil {
 
         if ( fillds.rank()==2 ) {
             if ( SemanticOps.isRank2Waveform(fillds) ) {
-                return RenderType.hugeScatter;
+                if ( useHugeScatter ) {
+                    return RenderType.hugeScatter;
+                } else {
+                    return RenderType.series;
+                }
             }
         }
 
@@ -1124,7 +1137,7 @@ public class AutoplotUtil {
 //                spec = specPref; // favor spectrograms when we have a BUNDLE_1 and DEPEND_1.
 //            } else if ( bundle1!=null || (dep1 != null && isVectorOrBundleIndex(dep1) ) ) {
             if ( ( bundle1!=null && bundle1.length()<30 ) || (dep1 != null && isVectorOrBundleIndex(dep1) ) ) {
-                if (fillds.length() > SERIES_SIZE_LIMIT) {
+                if ( useHugeScatter && fillds.length() > SERIES_SIZE_LIMIT) {
                     spec = RenderType.hugeScatter;
                 } else {
                     spec = RenderType.series;
@@ -1172,7 +1185,7 @@ public class AutoplotUtil {
                 spec= RenderType.eventsBar;
             }
         } else {
-            if (fillds.length() > SERIES_SIZE_LIMIT) {
+            if ( useHugeScatter && fillds.length() > SERIES_SIZE_LIMIT) {
                 spec = RenderType.hugeScatter;
             } else {
                 spec = RenderType.series;
