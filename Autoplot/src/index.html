@@ -26,8 +26,13 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-08-01 r22646):</p>
+        <p>Bugfixes (2018-08-03 r22659):</p>
         <ul>
+            <li>javadoc popup in Jython editor was using old javadoc.
+            <li>HAPI uses server_list.txt now instead of all.txt.
+            <li>binAverage reduction method used old QDataSet form which is no longer used (indexed property vs slice then property).
+            <li>rte_0183234259: Corrections to Das2Server authentication dialog, such as NullPointerException and allow scientist to opt out when password is not known.
+            <li>rte 1924252302: "display data" mouse action correctly uses format specifiers found in data.
             <li>SeriesRenderer, when data breaks exist on both sides of a valid point, would fail to draw the point.
             <li>1999: correct error message in ASCII when non-existent column is requested.
             <li>new data set builder nextRecords function had a bug where 0th record was always copied.  Thanks, Ivar!
@@ -84,6 +89,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe460: add configuration setting which will always use Series for rendering, never Huge Scatter.
+            <li>add link to JNLP which will use 4GB on 64bit JVMs.
             <li>rfe646: export to Matlab .mat files.
             <li>Location of Java used to run Autoplot is displayed in the "about" window.
             <li>Export-to-CSV no longer comments first line containing spectrogram channels, allowing the file to be used with Autoplot.
