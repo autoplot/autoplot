@@ -442,6 +442,7 @@ rm dist/AutoplotVolatile_pack_gz.jar
 
 echo "=== create jnlp file for build..."
 cp src/autoplot.jnlp dist
+cp src/autoplot-4GB.jnlp dist
 
 echo "=== copy branding for release, such as png icon images"
 cp src/*.png dist
