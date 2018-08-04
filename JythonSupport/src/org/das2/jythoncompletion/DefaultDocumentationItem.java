@@ -78,7 +78,12 @@ public class DefaultDocumentationItem implements CompletionDocumentation {
         }
         if (link.contains("://")) {
             try {
-                return new URL(link);
+                //experiments with refactoring Javadoc to work in popup window.
+                //if ( link.contains("http://docs.oracle.com/javase/8/docs/api/java/awt/Color.html#Color-float-float-float-") ) {
+                //    return new URL("http://jfaden.net/~jbf/autoplot/tmp/Color.html#Color-float-float-float-");
+                //} else {
+                    return new URL(link);
+                //}
             } catch (MalformedURLException ex) {
                 logger.severe(ex.toString());
                 return null;
