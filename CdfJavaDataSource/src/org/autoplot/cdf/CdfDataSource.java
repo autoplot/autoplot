@@ -898,11 +898,20 @@ public class CdfDataSource extends AbstractDataSource {
         if ( thisAttributes.containsKey("DEPEND_0") ) {
             Object o=  thisAttributes.get("DEPEND_0");
             if ( o!=null ) {
-                Map<String,Object> so= (Map)thisAttributes.get("DEPEND_0");
-                String dep0= (String) so.get("NAME");
-                int numDep0= cdf.getNumberOfValues(dep0);
-                if ( numDep0==1 ) {
-                    return false;
+                Object mapo= thisAttributes.get("DEPEND_0");
+                if ( mapo instanceof Map ) {
+                    Map<String,Object> so= (Map)mapo;
+                    String dep0= (String) so.get("NAME");
+                    int numDep0= cdf.getNumberOfValues(dep0);
+                    if ( numDep0==1 ) {
+                        return false;
+                    }
+                } else if ( mapo instanceof String ) {
+                    String dep0= (String)mapo;
+                    int numDep0= cdf.getNumberOfValues(dep0);
+                    if ( numDep0==1 ) {
+                        return false;
+                    }
                 }
             } else {
                 String[] dependents= cdf.getDependent(svariable);
