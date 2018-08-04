@@ -532,7 +532,9 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
                     logger.log(Level.FINER, "delegate URI: {0}", new Object[]{ delegateDataSource.getURI() } );
                     
-                   QDataSet ds1 = delegateDataSource.getDataSet(mon1);
+                    // Here is the single-granule read, the heart of aggregation.
+                    QDataSet ds1 = delegateDataSource.getDataSet(mon1);
+                   
                     logger.log(Level.FINER, "  read: {0}", new Object[]{ ds1 } );
                     
                     if ( ds1==null ) {
