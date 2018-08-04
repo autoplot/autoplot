@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -888,6 +889,28 @@ public class CdfDataSource extends AbstractDataSource {
     }
 
     /**
+     * test to see if any other variables depend on this variable with DEPEND_0.
+     * @param cdf the cdf
+     * @param svariable the variable (e.g. Epoch)
+     * @return true if another variable uses svariable as DEPEND_0.
+     */
+    private boolean someonesDepend0( final CDFReader cdf, String svariable ) throws CDFException.ReaderError {
+        cdf.variableAttributeNames(svariable);
+        String[] ss= cdf.getVariableNames();
+        for ( String s:  ss ) {
+            Object o= cdf.getAttribute(s,"DEPEND_0");
+            if ( o!=null ) {
+                if ( o instanceof Vector ) { // TODO: library should be updated
+                    if ( ((Vector)o).size()>0 ) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
      * tests to see if this variable has a DEPEND_0, and if so is the DEPEND_0 also 1 record; or if another
      * variable has a DEPEND_0 which is this, then does it have just 1 record.
      * @param cdf
@@ -921,14 +944,8 @@ public class CdfDataSource extends AbstractDataSource {
                 }
             }
         } else {
-            String[] dependents= cdf.getDependent(svariable);
-            if ( dependents.length==0 ) {
-                return true;
-            } else {
-                int numDep0= cdf.getNumberOfValues(dependents[0]);
-                if ( numDep0==1 ) {
-                    return false;
-                }       
+            if ( someonesDepend0(cdf, svariable) ) {
+                return false;
             }
         }
         return true;
