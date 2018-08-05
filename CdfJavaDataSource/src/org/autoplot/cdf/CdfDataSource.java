@@ -901,8 +901,12 @@ public class CdfDataSource extends AbstractDataSource {
             Object o= cdf.getAttribute(s,"DEPEND_0");
             if ( o!=null ) {
                 if ( o instanceof Vector ) { // TODO: library should be updated
-                    if ( ((Vector)o).size()>0 ) {
-                        return true;
+                    if ( ((Vector)o).size()==1 ) {
+                        String depend0value= String.valueOf( ((Vector)o).get(0) );
+                        if ( depend0value.equals(svariable) ) {
+                            logger.log(Level.FINER, "some CDF variable ({0}) uses variable as DEPEND_0: {1}", new Object[]{s, svariable});
+                            return true;
+                        }
                     }
                 }
             }
@@ -918,6 +922,7 @@ public class CdfDataSource extends AbstractDataSource {
      * @return 
      */
     private boolean reformTest( final CDFReader cdf, final String svariable, Map<String,Object> thisAttributes ) throws CDFException.ReaderError {
+        boolean result= true;
         if ( thisAttributes.containsKey("DEPEND_0") ) {
             Object o=  thisAttributes.get("DEPEND_0");
             if ( o!=null ) {
@@ -927,28 +932,29 @@ public class CdfDataSource extends AbstractDataSource {
                     String dep0= (String) so.get("NAME");
                     int numDep0= cdf.getNumberOfValues(dep0);
                     if ( numDep0==1 ) {
-                        return false;
+                        result= false;
                     }
                 } else if ( mapo instanceof String ) {
                     String dep0= (String)mapo;
                     int numDep0= cdf.getNumberOfValues(dep0);
                     if ( numDep0==1 ) {
-                        return false;
+                        result= false;
                     }
                 }
             } else {
                 String[] dependents= cdf.getDependent(svariable);
                 int numDep0= cdf.getNumberOfValues(dependents[0]);
                 if ( numDep0==1 ) {
-                    return false;
+                    result= false;
                 }
             }
         } else {
             if ( someonesDepend0(cdf, svariable) ) {
-                return false;
+                result= false;
             }
         }
-        return true;
+        logger.log(Level.FINE, "reformTest for {0}: {1}", new Object[]{svariable, result});
+        return result;
     }
     
     /**
