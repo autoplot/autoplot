@@ -10,6 +10,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.AbstractDataSourceFormat;
+import org.das2.qds.DataSetUtil;
 import org.das2.qds.ops.Ops;
 
 /**
@@ -193,7 +194,7 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
 
     @Override
     public boolean canFormat(QDataSet ds) {
-        return ds.rank()==1 || ds.rank()==2 || ds.rank()==3;
+        return DataSetUtil.isQube(ds) && ( ds.rank()==1 || ds.rank()==2 || ds.rank()==3 );
     }
 
     @Override
