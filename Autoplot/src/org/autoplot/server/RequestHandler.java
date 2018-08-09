@@ -67,14 +67,16 @@ public class RequestHandler {
             interp.set("params", new PyDictionary());
             interp.set("resourceURI", Py.None );
             
+            model.setPrompt("autoplot> "); // always reset the prompt.
+            
             ScriptContext._setOutputStream(out); // TODO: this is very kludgy and will surely cause problems
             
             BufferedReader reader= new BufferedReader( new InputStreamReader(in) );
             
             boolean echo= true;
-            if ( echo ) out.write("autoplot> ".getBytes());
-            String s= reader.readLine();
-            while ( s!=null ) {
+            if ( echo ) out.write( model.getPrompt().getBytes());
+            String s;
+            while ( (s=reader.readLine())!=null ) {
                 s= untaint(s,out);
                 if ( s!=null ) {
                     logger.log(Level.FINE, "executing command: \"{0}\"", s);
@@ -87,11 +89,10 @@ public class RequestHandler {
                     }
                 }
                 try {
-                    if ( echo ) out.write("autoplot> ".getBytes());
+                    if ( echo ) out.write( model.getPrompt().getBytes());
                 } catch ( IOException ex ) {
                     // client didn't stick around to get response.
                 }
-                s = reader.readLine();
             }
                         
             return null;
