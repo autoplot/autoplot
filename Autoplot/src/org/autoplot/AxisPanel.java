@@ -40,6 +40,7 @@ import org.autoplot.dom.PlotElement;
 import org.autoplot.dom.Plot;
 import org.autoplot.dom.TimeSeriesBrowseController;
 import org.autoplot.datasource.TimeRangeEditor;
+import org.autoplot.dom.DataSourceController;
 
 /**
  * Panel for controlling the axes of the current focus plot.
@@ -253,7 +254,9 @@ public class AxisPanel extends javax.swing.JPanel {
         List<PlotElement> pes= dom.getController().getPlotElementsFor(p);
         for ( PlotElement pe: pes ) {
             DataSourceFilter dsf= pe.getController().getDataSourceFilter();
-            TimeSeriesBrowseController tsbc= dsf.getController().getTimeSeriesBrowseController();
+            DataSourceController dsfc= dsf.getController();
+            if ( dsfc==null ) return false;
+            TimeSeriesBrowseController tsbc= dsfc.getTimeSeriesBrowseController();
             if ( tsbc!=null ) {
                 if ( p.getId().equals(tsbc.getPlotId()) ) {
                     return true;
