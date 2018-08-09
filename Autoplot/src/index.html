@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A JNLP release which will run Autoplot with 4G of ram memory is available for 64 bit Java installations.
+        <p><small>Jython editor shows red squiggle where the problem occurred, and evaluates highlited expressions.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-08-07 r22689):</p>
+        <p>Bugfixes (2018-08-09 r22697):</p>
         <ul>
+            <li>synchronizeOne now has same make-monotonic logic that synchronize(many) has.
             <li>Matlab and IDL export methods check for non-qubes.
             <li>2007: aggregation of non-time-varying data.  More issues found with single-record waveform files.
             <li>javadoc popup in Jython editor was using old javadoc.
@@ -90,6 +91,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>server's prompt can be reset to include newlines to support buffered read by clients.
             <li>"dataIntersection" function returns values found in two datasets.
             <li>rfe619: all datasets have svalue accessor for rank 0 data.
             <li>rfe460: add configuration setting which will always use Series for rendering, never Huge Scatter.
