@@ -62,13 +62,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -87,12 +85,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.help.CSH;
 import javax.jnlp.SingleInstanceListener;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
@@ -5140,6 +5132,7 @@ APSplash.checkTime("init 240");
                     } else {
                         logger.log(Level.FINE, "connection from {0}", socket);
                         rhandler.handleRequest( socket.getInputStream(), model, socket.getOutputStream());
+                        org.das2.util.LoggerManager.getLogger("autoplot.server").log(Level.INFO, "disconnect @ {0}", new Date( System.currentTimeMillis() ));
                     }
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
