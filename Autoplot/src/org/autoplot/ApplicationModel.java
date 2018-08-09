@@ -112,6 +112,24 @@ public class ApplicationModel {
         return this.applet;
     }
     
+    private String prompt = "autoplot> ";
+
+    public static final String PROP_PROMPT = "prompt";
+
+    public String getPrompt() {
+        return prompt;
+    }
+
+    /**
+     * set the prompt used for command line sessions.
+     * @param prompt 
+     */
+    public void setPrompt(String prompt) {
+        String oldPrompt = this.prompt;
+        this.prompt = prompt;
+        propertyChangeSupport.firePropertyChange(PROP_PROMPT, oldPrompt, prompt);
+    }
+
     public ExceptionHandler getExceptionHandler() {
         return exceptionHandler;
     }
