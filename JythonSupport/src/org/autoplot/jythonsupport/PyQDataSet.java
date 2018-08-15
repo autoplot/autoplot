@@ -930,9 +930,11 @@ public class PyQDataSet extends PyJavaInstance {
             while (it.hasNext()) {
                 it.next();
                 double d = uc.convert(it.getValue(val));
+                if ( !iter.hasNext() ) throw new IllegalArgumentException("assigned dataset has too many elements");
                 iter.next();
                 iter.putValue(ds, d);
             }
+            if ( iter.hasNext() ) throw new IllegalArgumentException("assigned dataset has too few elements");
         }
                 
     }
