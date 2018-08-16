@@ -690,20 +690,22 @@ public class EditorContextMenu {
             mi= new JMenuItem( new AbstractAction("Show Usages") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    LoggerManager.logGuiEvent(e);  
-                    String script= editor.getText();
-                    String var= editor.getSelectedText();
-                    if ( var==null || var.length()==0 ) {
-                        var= EditorAnnotationsSupport.getSymbolAt( editor );
-                    }
-                    editor.getEditorAnnotationsSupport().clearAnnotations();
-                    List<SimpleNode> usages= JythonUtil.showUsage( script,var );
-                    for ( SimpleNode n: usages ) {
-                        editor.getEditorAnnotationsSupport().annotateChars( n.beginLine, n.beginColumn, n.beginColumn+var.length(), EditorAnnotationsSupport.ANNO_USAGE, var, null );
-                    }
+                    LoggerManager.logGuiEvent(e);
+                    editor.showUsages();
+//                    String script= editor.getText();
+//                    String var= editor.getSelectedText();
+//                    if ( var==null || var.length()==0 ) {
+//                        var= EditorAnnotationsSupport.getSymbolAt( editor );
+//                    }
+//                    editor.getEditorAnnotationsSupport().clearAnnotations();
+//                    List<SimpleNode> usages= JythonUtil.showUsage( script,var );
+//                    for ( SimpleNode n: usages ) {
+//                        editor.getEditorAnnotationsSupport().annotateChars( n.beginLine, n.beginColumn, n.beginColumn+var.length(), EditorAnnotationsSupport.ANNO_USAGE, var, null );
+//                    }
                 }
             } );
-            mi.setToolTipText( "highlite usages" );
+            mi.setToolTipText( "highlite use of name" );
+            mi.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_U, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ) );
             actionsMenu.add( mi );
 
             JMenu settingsMenu= new JMenu("Settings");

@@ -60,9 +60,9 @@ public class EditorAnnotationsSupport {
     public static final String ANNO_USAGE = "usage";
 
     /**
-     * return the symbol at the current location, or ""
+     * return the symbol (e.g. variable name) at the current caret location, or "".
      * @param editor
-     * @return the symbol (e.g. variable name) at the current location
+     * @return the symbol (e.g. variable name) at the current caret location
      */
     public static String getSymbolAt( EditorTextPane editor ) {
         int i= editor.getCaretPosition();
@@ -70,15 +70,22 @@ public class EditorAnnotationsSupport {
         if ( i>=1 && !Character.isJavaIdentifierPart(s.charAt(i)) && Character.isJavaIdentifierPart(s.charAt(i-1)) ) {
             i=i-1;
         }
-        while ( i>=0 && Character.isJavaIdentifierPart(s.charAt(i)) ) {
+        while ( i>=0 && i<s.length() && Character.isJavaIdentifierPart(s.charAt(i)) ) {
             i=i-1;
+        }
+        if ( i>=s.length() ) {
+            return "";
         }
         if ( !Character.isJavaIdentifierPart(s.charAt(i)) ) i=i+1;
         int i0= i;
         while ( i<s.length() && Character.isJavaIdentifierPart(s.charAt(i)) ) {
             i=i+1;
         }
-        return s.substring(i0,i);
+        if ( s.length()>=i ) {
+            return s.substring(i0,i);
+        } else {
+            return "";
+        }
     }
 
     private final JEditorPane editorPanel;

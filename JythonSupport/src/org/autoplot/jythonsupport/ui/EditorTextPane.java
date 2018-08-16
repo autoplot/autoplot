@@ -338,9 +338,10 @@ public class EditorTextPane extends JEditorPane {
         super.setDocument(doc); //To change body of generated methods, choose Tools | Templates.
     }
     
-    
-
-    private void showUsages() {
+    /**
+     * highlite the places where a variable name is used.
+     */
+    protected void showUsages() {
         String script= getText();
         String var= getSelectedText();
         if ( var==null || var.length()==0 ) {
