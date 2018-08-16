@@ -66,6 +66,12 @@ class ImageDataSource extends AbstractDataSource {
         super(uri);
     }
 
+    /**
+     * convert the rgb value to HSV.  Only one H, S, or V is returned.
+     * @param rgb the integer rgb value.
+     * @param channel
+     * @return value (0-100), saturation (0-100), or hue (0-360)
+     */
     private double toHSV(int rgb, int channel) {
         double r = (rgb & 0xFF0000) >> 16;
         double g = (rgb & 0x00FF00) >> 8;

@@ -13,6 +13,9 @@ import org.das2.qds.QDataSet;
 import org.das2.qds.QubeDataSetIterator;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.DataSourceFormat;
+import static org.autoplot.imagedatasource.ImageDataSource.CHANNEL_VALUE;
+import org.das2.qds.ArrayDataSet;
+import org.das2.qds.DataSetUtil;
 
 /**
  * Format data to RGB images, or ARGB images.
@@ -27,6 +30,79 @@ import org.autoplot.datasource.DataSourceFormat;
  */
 public class ImageDataSourceFormat implements DataSourceFormat {
 
+    /**
+     * convert HSV QDataSet to RGB.
+     * @param hsv rank 3, [rows,columns,colors] dataset.
+     * @return rgb rank 3, [rows,columns,colors] dataset.
+     * @see java.awt.Color#HSBtoRGB(float, float, float) where this code was found and converted to QDataSet.
+     */
+    public static QDataSet fromHSVtoRGB( QDataSet hsv ) {
+        
+        ArrayDataSet result= ArrayDataSet.create( float.class, DataSetUtil.qubeDims(hsv) );
+        
+        int rows= hsv.length();
+        int cols= hsv.length(0);
+        
+        for ( int ii=0; ii<rows; ii++ ) {
+            for ( int jj=0; jj<cols; jj++ ) {
+                int r = 0, g = 0, b = 0;
+                float saturation= (float)(hsv.value(ii,jj,1)/100);
+                float brightness= (float)(hsv.value(ii,jj,2)/100);
+                
+                if (saturation == 0) {
+                    r = g = b = (int) (brightness * 255.0f + 0.5f);
+                } else {
+                    float hue= ((float)hsv.value(ii,jj,0)/360);
+                    
+                    float h = (hue - (float)Math.floor(hue)) * 6.0f;
+                    float f = h - (float)java.lang.Math.floor(h);
+                    float p = brightness * (1.0f - saturation);
+                    float q = brightness * (1.0f - saturation * f);
+                    float t = brightness * (1.0f - (saturation * (1.0f - f)));
+                    switch ((int) h) {
+                    case 0:
+                        r = (int) (brightness * 255.0f + 0.5f);
+                        g = (int) (t * 255.0f + 0.5f);
+                        b = (int) (p * 255.0f + 0.5f);
+                        break;
+                    case 1:
+                        r = (int) (q * 255.0f + 0.5f);
+                        g = (int) (brightness * 255.0f + 0.5f);
+                        b = (int) (p * 255.0f + 0.5f);
+                        break;
+                    case 2:
+                        r = (int) (p * 255.0f + 0.5f);
+                        g = (int) (brightness * 255.0f + 0.5f);
+                        b = (int) (t * 255.0f + 0.5f);
+                        break;
+                    case 3:
+                        r = (int) (p * 255.0f + 0.5f);
+                        g = (int) (q * 255.0f + 0.5f);
+                        b = (int) (brightness * 255.0f + 0.5f);
+                        break;
+                    case 4:
+                        r = (int) (t * 255.0f + 0.5f);
+                        g = (int) (p * 255.0f + 0.5f);
+                        b = (int) (brightness * 255.0f + 0.5f);
+                        break;
+                    case 5:
+                        r = (int) (brightness * 255.0f + 0.5f);
+                        g = (int) (p * 255.0f + 0.5f);
+                        b = (int) (q * 255.0f + 0.5f);
+                        break;
+                    }
+                }
+                
+                result.putValue(ii,jj,0,r);
+                result.putValue(ii,jj,1,g);
+                result.putValue(ii,jj,2,b);
+            }
+        }
+        return result;
+    }
+    
+    
+    
     @Override
     public void formatData(String uri, QDataSet data, ProgressMonitor mon) throws Exception {
         BufferedImage im;
