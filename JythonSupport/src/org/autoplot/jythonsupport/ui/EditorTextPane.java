@@ -176,7 +176,7 @@ public class EditorTextPane extends JEditorPane {
                     }
                 } );                
                 
-                getActionMap().put( "usages", new AbstractAction( "usages" ) {
+                getActionMap().put( "showUsages", new AbstractAction( "showUsages" ) {
                     @Override
                     public void actionPerformed( ActionEvent e ) {
                         LoggerManager.logGuiEvent(e);  
@@ -192,7 +192,7 @@ public class EditorTextPane extends JEditorPane {
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_MINUS, tk.getMenuShortcutKeyMask() ), "smallerFont" );
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_F5, InputEvent.SHIFT_DOWN_MASK ), "settings" );
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ), "plotItem" );
-                getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_U, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ), "usages" );
+                getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_U, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ), "showUsages" );
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_F12, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ), "developer1" );
                 
                 doLayout(); // kludge for DefaultSyntaxKit
