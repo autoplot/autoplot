@@ -450,18 +450,13 @@ public class EditorTextPane extends JEditorPane {
                     MutablePropertyDataSet mpds= ArrayDataSet.copy(pds.getQDataSet());
                     String oldTitle= (String) mpds.property(QDataSet.TITLE);
                     mpds.putProperty(QDataSet.TITLE, oldTitle==null ? doThis : ( doThis+": "+oldTitle ) );
-                    FileOutputStream fout= new FileOutputStream(tmpfile);
-                    try {
+                    try (FileOutputStream fout = new FileOutputStream(tmpfile)) {
                         new org.das2.qstream.SimpleStreamFormatter().format(mpds, fout, true );
-                    } finally {
-                        fout.close();
                     }
                     Socket s= new Socket("localhost",12345);
-                    OutputStream out= s.getOutputStream();
-                    try {
+                    try (OutputStream out = s.getOutputStream()) {
+                        out.write( ( "plot(None)\n").getBytes() );
                         out.write( ( cmd + "\n").getBytes() );
-                    } finally {
-                        out.close();
                     }
                 } catch (StreamException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
