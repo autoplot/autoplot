@@ -60,12 +60,13 @@ public class EditorAnnotationsSupport {
     public static final String ANNO_USAGE = "usage";
 
     /**
-     * return the symbol (e.g. variable name) at the current caret location, or "".
-     * @param editor
+     * return the symbol (e.g. variable name) at the caret position, or "".
+     * @param editor the code editor
+     * @param position typically editor.getCarotPosition
      * @return the symbol (e.g. variable name) at the current caret location
      */
-    public static String getSymbolAt( EditorTextPane editor ) {
-        int i= editor.getCaretPosition();
+    public static String getSymbolAt( EditorTextPane editor, int position) {
+        int i= position;
         String s= editor.getText();
         if ( i>=1 && i<s.length() && !Character.isJavaIdentifierPart(s.charAt(i)) && Character.isJavaIdentifierPart(s.charAt(i-1)) ) {
             i=i-1;

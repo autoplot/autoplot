@@ -156,15 +156,8 @@ public class EditorTextPane extends JEditorPane {
                 getActionMap().put( "plotItem", new AbstractAction( "plotItem" ) {
                     @Override
                     public void actionPerformed( ActionEvent e ) {
-                        LoggerManager.logGuiEvent(e);                
-                        String doThis= getSelectedText();
-                        if ( doThis==null ) return;
-                        try {
-                            plotSoon(doThis);
-                        } catch ( IllegalArgumentException ex ) {
-                            JOptionPane.showMessageDialog(EditorTextPane.this,
-                                "<html>A debugging session must be active.  Insert stop to halt script execution.</html>");
-                        }
+                        LoggerManager.logGuiEvent(e);
+                        plotItem();
                     }
                 } );
                 
@@ -345,12 +338,30 @@ public class EditorTextPane extends JEditorPane {
         String script= getText();
         String var= getSelectedText();
         if ( var==null || var.length()==0 ) {
-            var= EditorAnnotationsSupport.getSymbolAt( this );
+            var= EditorAnnotationsSupport.getSymbolAt(this, this.getCaretPosition() );
         }
         support.clearAnnotations();
         List<SimpleNode> usages= JythonUtil.showUsage( script,var );
         for ( SimpleNode n: usages ) {
             support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+var.length(), EditorAnnotationsSupport.ANNO_USAGE, var, null );
+        }
+    }
+    
+    /**
+     * plot the selected expression, assuming that it is defined where the interpretter is stopped.
+     */
+    protected void plotItem() {
+        String doThis= getSelectedText();
+        if ( doThis==null || doThis.length()==0 ) {
+           doThis= EditorAnnotationsSupport.getSymbolAt( EditorTextPane.this, EditorTextPane.this.getCaretPosition() );
+        }
+        logger.log(Level.FINE, "plotItem: {0}", doThis);
+        if ( doThis==null ) return;
+        try {
+            plotSoon(doThis);
+        } catch ( IllegalArgumentException ex ) {
+            JOptionPane.showMessageDialog(EditorTextPane.this,
+                "<html>A debugging session must be active.  Insert stop to halt script execution.</html>");
         }
     }
     

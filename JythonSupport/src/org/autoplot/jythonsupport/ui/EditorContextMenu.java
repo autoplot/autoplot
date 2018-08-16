@@ -583,14 +583,7 @@ public class EditorContextMenu {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
-                    String doThis= editor.getSelectedText();
-                    if ( doThis==null ) return;
-                    try {
-                        editor.plotSoon(doThis);
-                    } catch ( IllegalArgumentException ex ) {
-                        JOptionPane.showMessageDialog( editor,
-                            "<html>A debugging session must be active.  Insert stop to halt script execution.</html>");
-                    }
+                    editor.plotItem();
                 }
             } );
             mi.setToolTipText("Plot dataset reference in a second Autoplot with its server port open");
@@ -692,16 +685,6 @@ public class EditorContextMenu {
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);
                     editor.showUsages();
-//                    String script= editor.getText();
-//                    String var= editor.getSelectedText();
-//                    if ( var==null || var.length()==0 ) {
-//                        var= EditorAnnotationsSupport.getSymbolAt( editor );
-//                    }
-//                    editor.getEditorAnnotationsSupport().clearAnnotations();
-//                    List<SimpleNode> usages= JythonUtil.showUsage( script,var );
-//                    for ( SimpleNode n: usages ) {
-//                        editor.getEditorAnnotationsSupport().annotateChars( n.beginLine, n.beginColumn, n.beginColumn+var.length(), EditorAnnotationsSupport.ANNO_USAGE, var, null );
-//                    }
                 }
             } );
             mi.setToolTipText( "highlite use of name" );
