@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Jython editor shows red squiggle where the problem occurred, and evaluates highlited expressions.
+        <p><small>New "dataIntersection" command returns the data found in both datasets.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,14 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-08-09 r22697):</p>
+        <p>Bugfixes (2018-08-16 r22708):</p>
         <ul>
+            <li>FileSystem's unzip action now handles where NetCDF .jar file had missing files, issuing warning instead of crashing.
+            <li>2015: show keystrokes for editor "find usages" and "plot" actions, corrections to "plot" action.
+            <li>2017: bug where weights with incorrect rank would cause RTE on event thread.
+            <li>confusing error message for dr[indgen(4)]=findgen(5), make more precise.
+            <li>corrections to "trim" filter GUI.
+            <li>rte 276343956: transitional case in "isSomeoneListening" caused RTE.  Make local copies for thread safety.
             <li>synchronizeOne now has same make-monotonic logic that synchronize(many) has.
             <li>Matlab and IDL export methods check for non-qubes.
             <li>2007: aggregation of non-time-varying data.  More issues found with single-record waveform files.
@@ -43,6 +49,9 @@
             <li>CreatePngWalk command line has autorangeFlags.
             <li>export-to-CSV uses FORMAT metadata and shows progress as the data is exported.
             <li>1682: CSV editor was adding extraneous question mark, corrections to editor such as column width and column names.
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>rte_1148065736: check for bad division with Huge Scatter.
             <li>poor feedback when bundle parameter was used with ascii ("bad parameter: rank2" was indicated).
             <li>binary data source editor uses scrollbars when there are many columns.
@@ -62,33 +71,6 @@
             <li>With CDAWeb, when DEPEND_1 was time-varying, incorrect warning message about length mismatch is no longer shown.
             <li>corrections to new expandToFillGaps filter.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>ASCII editor panel would incorrectly set depend0units.
-            <li>support for https das2servers.  Thanks, Chris!
-            <li>1995: corrections to code which aggregates qstreams containing nominal data.
-            <li>1996: correction to caching code which would fail to unload data from memory to hard disk, causing out-of-memory exceptions.
-            <li>rte_0761821100: CDF gui attempts to clarify error message about rank 2 DEPEND_0.  Swap description of parameter when X or Y tab is selected.
-            <li>drop the render type property when param[:,0] is read.
-            <li>minor tweaks to HAPI GUI, to improve transparency.
-            <li>output console's click-on URL is too easy to trigger, causing confusion.  Make double click.
-            <li>GUI logger would get extraneous events because of Autoplot printing thread.  Check for these and log with lower verbosity.
-            <li>1994: orbit timerange could not be used as the default timerange in scripts, because it would not recognize the correctly formatted time.
-            <li>1987: remove incorrect warning about width and height parameters used with -v in AutoplotServer.
-            <li>AutoplotDataServer hapi-csv response is now properly streamed.
-            <li>FormatDataSet properly trims HAPI responses, used by AutoplotDataServer.
-            <li>1861: back off automatic conversion until Jython 2.5 is used, Java 2.2 is too aggressive in using the conversion and old scripts were breaking.
-            <li>format to CDF properly supports rank 2 depend 1 and supports rank 4 data.
-            <li>HAPI export format properly formats to HAPI 2.0, which requires "Z" in timetags.
-            <li>1871: recent entries of timeranges and operations were lost because of new code that appends the recent file using a move.
-            <li>use ISO-8859-1 encoding with Jython output, so that micro symbol paints properly.
-            <li>1988: link command, used all over the place, would always copy Z when link(x,y,Z) was used, wasting tons of space...
-            <li>1989: msec vs ms in testing.  Canonical units (e.g. ms) are always displayed.
-            <li>"degrees" and "Degrees" are now equivalent.  
-            <li>1987: revisit height and width parameters of AutoplotServlet.  Thanks, Jon!
-            <li>horizontal slicer is now able to "plot above", though there is no way to swap out the label.
-            <li>export to HAPI (and AutoplotServlet HAPI output) is properly marked as 2.0.
-        </ul>
         <p>Features:</p>
         <ul>
             <li>server's prompt can be reset to include newlines to support buffered read by clients.
@@ -99,6 +81,9 @@
             <li>rfe646: export to Matlab .mat files.
             <li>Location of Java used to run Autoplot is displayed in the "about" window.
             <li>Export-to-CSV no longer comments first line containing spectrogram channels, allowing the file to be used with Autoplot.
+        </ul>
+       <p>Less recent features:</p>
+       <ul>
             <li>rfe643: allow autoplot_data/config/jsyntaxpane.properties to reset the colors used for the editor, allowing dark editors.
             <li>DasAxis reference can now be a comma-separated list of datums.
             <li>FileStorageModel now has getNames(datumRange) and getRoot(), to support use in IDL.
@@ -114,19 +99,6 @@
             <li>add more positions for annotations, like "West" and OutsideSSE.
             <li>allow no-record DELTA_PLUS, issuing a warning, to aid in development.
             <li>expandToFillGaps process added.
-        </ul>
-       <p>Less recent features:</p>
-       <ul>
-            <li>tweaks to HAPI export, including adding "hapi" in the path and adding documentation to GUI.
-            <li>rfe638: export-to-idlsav supports rank 2 data.  Thanks, cj2g13!
-            <li>tweaks to the static html file created for pngwalks, which improves performance over slow networks.
-            <li>logspace function added.  Thanks, Kristoff!
-            <li>DataServer implemented as servlet to improve performance.  Thanks, Bob!
-            <li>DataSetBuilder nextRecord supports rank 1 string data.
-            <li>clicking on http and https links in the console tab will point the browse (Firefox,etc) to the link.
-            <li>Radio JOVE community AJ4CO_RAINBOW colorbar is added, using a subset of its 4096 colors.  (4096 color version should be available soon.)
-            <li>CSV Data Source supports streaming.  AbstractDataSource has "getInputStream" method to support streaming subclasses.
-            <li>medianFilter supports rank 2 data, performing the operation on slices of the 1st axis.
        </ul>
         <p>Known issues:</p>
         <ul>
