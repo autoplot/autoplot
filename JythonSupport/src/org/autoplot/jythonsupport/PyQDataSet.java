@@ -934,7 +934,15 @@ public class PyQDataSet extends PyJavaInstance {
                 iter.next();
                 iter.putValue(ds, d);
             }
-            if ( iter.hasNext() ) throw new IllegalArgumentException("assigned dataset has too few elements");
+            if ( iter.hasNext() ) {
+                iter.next();
+                if ( iter.hasNext() ) {
+                    throw new IllegalArgumentException("assigned dataset has too few elements");
+                } else {
+                    logger.info("dataset assignment looks suspect, where there is an extra element which was not assigned: "+iter );
+                }
+                
+            }
         }
                 
     }
