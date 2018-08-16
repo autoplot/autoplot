@@ -587,6 +587,7 @@ public class EditorContextMenu {
                 }
             } );
             mi.setToolTipText("Plot dataset reference in a second Autoplot with its server port open");
+            mi.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ) ); 
             actionsMenu.add( mi );
                         
             mi= new JMenuItem( new AbstractAction("Inspect URI") {
