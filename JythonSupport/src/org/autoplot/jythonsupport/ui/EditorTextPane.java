@@ -201,9 +201,10 @@ public class EditorTextPane extends JEditorPane {
                 File config= new File( new File(f), "config" );
                 EditorKit k= EditorTextPane.this.getEditorKit();
                 if ( config.exists() && k instanceof jsyntaxpane.syntaxkits.PythonSyntaxKit ) {
-                    logger.log(Level.INFO, "Resetting editor colors using {0}", config);
                     try {
-                        p.load( new FileInputStream( new File( config, "jsyntaxpane.properties" ) ) );
+                        File syntaxPropertiesFile= new File( config, "jsyntaxpane.properties" );
+                        logger.log(Level.FINE, "Resetting editor colors using {0}", syntaxPropertiesFile );
+                        p.load( new FileInputStream( syntaxPropertiesFile ) );
                     } catch (FileNotFoundException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     } catch (IOException ex) {
@@ -278,9 +279,10 @@ public class EditorTextPane extends JEditorPane {
                 String f= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA );
                 File config= new File( new File(f), "config" );
                 if ( config.exists() ) { // Note the syntax kit has already been configured.
-                    logger.log(Level.INFO, "Resetting editor colors using {0}", config);
                     try {
-                        p.load( new FileInputStream( new File( config, "jsyntaxpane.properties" ) ) );
+                        File syntaxPropertiesFile= new File( config, "jsyntaxpane.properties" );
+                        logger.log(Level.FINE, "Resetting editor colors using {0}", syntaxPropertiesFile );
+                        p.load( new FileInputStream( syntaxPropertiesFile ) );
                     } catch (FileNotFoundException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     } catch (IOException ex) {

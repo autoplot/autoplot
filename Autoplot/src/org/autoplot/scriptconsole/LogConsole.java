@@ -109,16 +109,15 @@ public class LogConsole extends javax.swing.JPanel {
 
     /** Creates new form LogConsole */
     public LogConsole() {
-        initComponents();
-        
+        initComponents(); 
         
         String f= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA );
         File config= new File( new File(f), "config" );
         Properties p= new Properties();
         if ( config.exists() ) {
-            logger.log(Level.INFO, "Resetting editor colors using {0}", config);
             try {
                 File syntaxPropertiesFile= new File( config, "jsyntaxpane.properties" );
+                logger.log(Level.FINE, "Resetting editor colors using {0}", syntaxPropertiesFile );
                 if ( syntaxPropertiesFile.exists() ) {
                     p.load( new FileInputStream( syntaxPropertiesFile  ) );
                 }
