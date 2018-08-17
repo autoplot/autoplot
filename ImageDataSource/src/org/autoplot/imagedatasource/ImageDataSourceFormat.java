@@ -31,10 +31,78 @@ import org.das2.qds.DataSetUtil;
 public class ImageDataSourceFormat implements DataSourceFormat {
 
     /**
-     * convert HSV QDataSet to RGB.
-     * @param hsv rank 3, [rows,columns,colors] dataset.
-     * @return rgb rank 3, [rows,columns,colors] dataset.
+     * Converts the components of a color, as specified by the default RGB
+     * model, to an equivalent set of values for hue, saturation, and
+     * brightness that are the three components of the HSB model.
+     * NOTE these values will be a bit different than those returned by 
+     * ImageDataSource's hue, saturation, and value channels, because of slightly
+     * different mappings.
+     * @param rgb
+     * @return hsv array [h,w,3]
+     * @see       java.awt.Color#RGBtoHSB(int, int, int, float[]) 
+     * @see #fromHSVtoRGB(org.das2.qds.QDataSet) 
+     */
+    public static QDataSet fromRGBtoHSV( QDataSet rgb ) {
+        float hue, saturation, brightness;
+
+        ArrayDataSet result= ArrayDataSet.create( float.class, DataSetUtil.qubeDims(rgb) );
+        
+        int rows= rgb.length();
+        int cols= rgb.length(0);
+        
+        for ( int ii=0; ii<rows; ii++ ) {
+            for ( int jj=0; jj<cols; jj++ ) {
+                int r= (int)rgb.value( ii, jj, 0 );
+                int g= (int)rgb.value( ii, jj, 1 );
+                int b= (int)rgb.value( ii, jj, 2 );
+                int cmax = (r > g) ? r : g;
+                if (b > cmax) cmax = b;
+                int cmin = (r < g) ? r : g;
+                if (b < cmin) cmin = b;
+
+                brightness = ((float) cmax) / 255.0f;
+                if (cmax != 0)
+                    saturation = ((float) (cmax - cmin)) / ((float) cmax);
+                else
+                    saturation = 0;
+                if (saturation == 0)
+                    hue = 0;
+                else {
+                    float redc = ((float) (cmax - r)) / ((float) (cmax - cmin));
+                    float greenc = ((float) (cmax - g)) / ((float) (cmax - cmin));
+                    float bluec = ((float) (cmax - b)) / ((float) (cmax - cmin));
+                    if (r == cmax)
+                        hue = bluec - greenc;
+                    else if (g == cmax) {
+                        hue = 2.0f + redc - bluec;
+                    } else {
+                        hue = 4.0f + greenc - redc;
+                    }
+                    hue = hue / 6.0f;
+                    if (hue < 0) {
+                        hue = hue + 1.0f;
+                    }
+                }
+                result.putValue( ii, jj, 0, hue*360 );
+                result.putValue( ii, jj, 1, saturation*100 );
+                result.putValue( ii, jj, 2, brightness*100 );
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * convert HSV QDataSet to RGB.  The input should be a rank 3 dataset
+     * with rows for the first index, columns for the second index, and 
+     * 3 indeces for the last index:<ul>
+     * <li>H, the hue, should vary from 0 to 360.
+     * <li>S, the Saturation, should vary from 0 to 100.
+     * <li>V, the Value, should vary from 0 to 100.
+     * </ul>
+     * @param hsv rank 3, [rows;columns;h,s,v] dataset.
+     * @return rank 3, [rows;columns;r,g,b] dataset.
      * @see java.awt.Color#HSBtoRGB(float, float, float) where this code was found and converted to QDataSet.
+     * @see #fromRGBtoHSV(org.das2.qds.QDataSet) 
      */
     public static QDataSet fromHSVtoRGB( QDataSet hsv ) {
         
