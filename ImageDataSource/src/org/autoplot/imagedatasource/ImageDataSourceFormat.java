@@ -13,7 +13,6 @@ import org.das2.qds.QDataSet;
 import org.das2.qds.QubeDataSetIterator;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.DataSourceFormat;
-import static org.autoplot.imagedatasource.ImageDataSource.CHANNEL_VALUE;
 import org.das2.qds.ArrayDataSet;
 import org.das2.qds.DataSetUtil;
 
@@ -21,7 +20,7 @@ import org.das2.qds.DataSetUtil;
  * Format data to RGB images, or ARGB images.
  * Formatter presumes data is:<ul>
  * <li>(m,n,4) for ARGB 
- * <li>(3,m,n) RGB.
+ * <li>(3,m,n) RGB. (this should not be used)
  * <li>(m,n,3) RGB.
  * </ul>
  * When data is (m,n,4) then ds[:,:,0] should be the alpha channel,
