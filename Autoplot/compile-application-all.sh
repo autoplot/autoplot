@@ -14,7 +14,7 @@
 # On OS 10.5.8, this worked:
 #  JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
 #
-# Used by: autoplot-jar-all on http://jfaden.net:8080/hudson.  This is used for testing.
+# Used by: autoplot-jar-all on http://jfaden.net/jenkins.  This is used for testing.
 #
 
 if [ "" = "$JAVA_HOME" ]; then
@@ -261,7 +261,8 @@ compilef 'org/autoplot/jythonsupport/ui/DataMashUp.java'
 compilef 'org/das2/util/*Formatter.java'
 compilef 'org/autoplot/util/jemmy/*.java'
 compilef 'org/das2/qds/filters/*.java'
-compilef 'org/virbo/autoplot/*.java'
+compilef 'org/das2/qds/demos/PlasmaModel.java'
+compilef 'org/virbo/autoplot/*.java' # why is this repeated?
 
 cat ../temp-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
