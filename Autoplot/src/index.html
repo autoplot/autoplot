@@ -26,12 +26,13 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-08-16 r22708):</p>
+        <p>Bugfixes (2018-08-18 r22715):</p>
         <ul>
+            <li>rte_2038937185: correct the poor error message reported ("unrecognized units:00") for parseDatumRange('2017-001 03:00 to 02:00')
+            <li>confusing error message for dr[indgen(4)]=findgen(5), make more precise.  Loosen test slightly, See "svn log -r22709:22710"
             <li>FileSystem's unzip action now handles where NetCDF .jar file had missing files, issuing warning instead of crashing.
             <li>2015: show keystrokes for editor "find usages" and "plot" actions, corrections to "plot" action.
             <li>2017: bug where weights with incorrect rank would cause RTE on event thread.
-            <li>confusing error message for dr[indgen(4)]=findgen(5), make more precise.
             <li>corrections to "trim" filter GUI.
             <li>rte 276343956: transitional case in "isSomeoneListening" caused RTE.  Make local copies for thread safety.
             <li>synchronizeOne now has same make-monotonic logic that synchronize(many) has.
