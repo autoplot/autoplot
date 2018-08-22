@@ -385,7 +385,7 @@ public class TimeSeriesBrowseController {
                     Canvas c= this.dataSourceController.getApplication().getCanvases(0);
                     xAxis.getCanvas().setSize(c.width,c.height);
                     if ( xAxis.getDLength()<=2 ) {
-                        logger.warning("WARNING: xaxis isn't sized, loading data at full resolution!"); //TODO: check into this
+                        logger.warning("xaxis isn't sized, loading data at full resolution!"); //TODO: check into this
                     } else {
                         newResolution = visibleRange.width().divide(xAxis.getDLength());
                     }
