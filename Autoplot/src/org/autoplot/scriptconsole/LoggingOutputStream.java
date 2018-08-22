@@ -13,9 +13,9 @@ import java.util.logging.Logger;
  */
 public class LoggingOutputStream extends ByteArrayOutputStream {
 
-    private String lineSeparator;
-    private Logger logger;
-    private Level level;
+    private final String lineSeparator;
+    private final Logger logger;
+    private final Level level;
 
     /** 
      * Constructor 
@@ -41,7 +41,7 @@ public class LoggingOutputStream extends ByteArrayOutputStream {
         synchronized (this) {
             super.flush();
             try {
-                record = this.toString("ISO-8859-1");  // Try "print Units.microseconds3" (µs) at the command line to see where the encoding is messed up.
+                record = this.toString("ISO-8859-1");  // Try "print Units.microseconds3" (&micro;s) at the command line to see where the encoding is messed up.
             } catch ( UnsupportedEncodingException ex ) {
                 record = this.toString(); 
             }
@@ -57,8 +57,8 @@ public class LoggingOutputStream extends ByteArrayOutputStream {
 
             String[] ss= record.split("\n");
 
-            for ( int i=0; i<ss.length; i++ ) {
-                logger.logp(level, "", "", ss[i]);
+            for (String s : ss) {
+                logger.logp(level, "", "", s);
             }
             
         }
