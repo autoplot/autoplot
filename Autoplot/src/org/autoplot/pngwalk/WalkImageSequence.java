@@ -855,5 +855,10 @@ public class WalkImageSequence implements PropertyChangeListener  {
     void fireBadgeChanged() {
         pcs.firePropertyChange(PROP_BADGE_CHANGE,  -1, getIndex() );
     }
+    
+    @Override
+    public String toString() {
+        return this.template + " ("+this.size()+")";
+    }
 
 }
