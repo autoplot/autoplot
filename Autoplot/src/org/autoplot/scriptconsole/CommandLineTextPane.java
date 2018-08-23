@@ -40,7 +40,7 @@ public class CommandLineTextPane extends JTextPane {
             try {
                 prefs.flush();
             } catch (BackingStoreException ex) {
-                Logger.getLogger(CommandLineTextPane.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger("autoplot.jython.console").log(Level.SEVERE, null, ex);
             }
         }
     });

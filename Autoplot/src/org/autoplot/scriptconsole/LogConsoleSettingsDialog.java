@@ -9,6 +9,10 @@ package org.autoplot.scriptconsole;
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
 import java.awt.Color;
 import java.awt.Component;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EventObject;
@@ -30,6 +34,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.das2.datum.LoggerManager;
 import org.autoplot.AutoplotUtil;
+import org.autoplot.datasource.AutoplotSettings;
 
 /**
  * Settings GUI for the Log Console dialog. The log console is more complex than
@@ -529,6 +534,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         jTable1 = new javax.swing.JTable();
         consoleFontButton = new javax.swing.JButton();
         showOnlyHighlitedCB = new javax.swing.JCheckBox();
+        saveLoggerConfigButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -615,6 +621,14 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             }
         });
 
+        saveLoggerConfigButton.setText("Save...");
+        saveLoggerConfigButton.setToolTipText("Save this configuration to persistent settings.");
+        saveLoggerConfigButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveLoggerConfigButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -643,7 +657,9 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(threadsCB)
                                 .add(18, 18, 18)
-                                .add(consoleFontButton)))
+                                .add(consoleFontButton)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(saveLoggerConfigButton)))
                         .add(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -660,7 +676,8 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                     .add(logLevelCheckBox)
                     .add(loggerIDCheckBox)
                     .add(threadsCB)
-                    .add(consoleFontButton))
+                    .add(consoleFontButton)
+                    .add(saveLoggerConfigButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(highliteLinesLabel)
@@ -725,6 +742,52 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         updateSearchText();
     }//GEN-LAST:event_showOnlyHighlitedCBActionPerformed
 
+    private void saveLoggerConfigButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveLoggerConfigButtonActionPerformed
+        final StringBuilder b= new StringBuilder();
+        b.append("handlers = java.util.logging.ConsoleHandler\n");
+        b.append("\n");
+        for ( String s: org.das2.util.LoggerManager.getLoggers() ) {
+            Logger l= org.das2.util.LoggerManager.getLogger(s);
+            if ( l.isLoggable(Level.FINE) ) {
+                Level level= l.getLevel();
+                while ( l!=null && level==null ) {
+                    l= l.getParent();
+                    if ( l!=null ) level= l.getLevel();
+                }
+                if ( level!=null ) {
+                    b.append(s).append(".level=").append(l.getLevel().toString()).append("\n");
+                }
+            }
+        }
+        for ( String s: LoggerManager.getLoggers() ) {
+            Logger l= LoggerManager.getLogger(s);
+            if ( l.isLoggable(Level.FINE) ) {
+                Level level= l.getLevel();
+                while ( l!=null && level==null ) {
+                    l= l.getParent();
+                    if ( l!=null ) level= l.getLevel();
+                }
+                if ( level!=null ) {
+                    b.append(s).append(".level=").append(l.getLevel().toString()).append("\n");
+                }
+            }
+        }
+        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( rootPane, "Save settings to AUTOPLOT_DATA/config/logging.properties?", "Save Logging", JOptionPane.OK_CANCEL_OPTION ) ) {
+            new Thread( new Runnable() {
+                @Override
+                public void run() {
+                    String apd= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA);
+                    File dd= new File( new File( new File( apd ), "config" ), "logging.properties" );
+                    try ( FileOutputStream out= new FileOutputStream(dd) ) {
+                        out.write( b.toString().getBytes() );
+                    } catch (IOException ex) {
+                        Logger.getLogger("autoplot.jython.console").log(Level.SEVERE, null, ex);
+                    }
+                }
+            }, "writeLoggerSettings" ).start();
+        }
+    }//GEN-LAST:event_saveLoggerConfigButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -760,6 +823,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
     private javax.swing.JTable jTable1;
     private javax.swing.JCheckBox logLevelCheckBox;
     private javax.swing.JCheckBox loggerIDCheckBox;
+    private javax.swing.JButton saveLoggerConfigButton;
     private javax.swing.JTextField searchForTextField;
     private javax.swing.JCheckBox showOnlyHighlitedCB;
     private javax.swing.JCheckBox threadsCB;
