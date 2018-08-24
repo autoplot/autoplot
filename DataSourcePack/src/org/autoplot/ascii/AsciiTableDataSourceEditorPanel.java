@@ -380,6 +380,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
@@ -840,6 +841,10 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         whereCB.setText("Only load data where:");
 
         whereParamList.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, whereCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), whereParamList, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
         whereParamList.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 whereParamListActionPerformed(evt);
@@ -848,7 +853,13 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         whereOp.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { ".eq", ".gt", ".lt", ".ne", ".within" }));
 
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, whereCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), whereOp, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
         whereValueCB.setEditable(true);
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, whereCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), whereValueCB, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
 
         org.jdesktop.layout.GroupLayout jPanel5Layout = new org.jdesktop.layout.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -918,6 +929,8 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                     .add(jLayeredPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(0, 0, Short.MAX_VALUE)))
         );
+
+        bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
 
 private void timeFormatFieldsComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeFormatFieldsComboBoxActionPerformed
@@ -1620,6 +1633,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
     public javax.swing.JComboBox<String> whereOp;
     public javax.swing.JComboBox<String> whereParamList;
     public javax.swing.JComboBox<String> whereValueCB;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
     private static void updateColumns( javax.swing.JTable jTable1, Map<Integer,String> columns ) {
