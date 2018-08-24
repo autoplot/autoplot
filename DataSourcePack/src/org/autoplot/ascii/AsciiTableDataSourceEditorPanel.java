@@ -851,7 +851,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         });
 
-        whereOp.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { ".eq", ".gt", ".lt", ".ne", ".within" }));
+        whereOp.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { ".eq", ".ne", ".ge", ".gt", ".le", ".lt", ".within", ".matches" }));
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, whereCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), whereOp, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -874,7 +874,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .add(whereOp, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(whereValueCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(428, Short.MAX_VALUE))
+                .addContainerGap(410, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
