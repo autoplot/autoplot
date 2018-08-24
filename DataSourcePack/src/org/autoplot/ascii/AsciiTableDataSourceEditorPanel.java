@@ -381,8 +381,6 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -427,12 +425,16 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         jLabel13 = new javax.swing.JLabel();
         unitsTF = new javax.swing.JTextField();
         depend0unitsCB = new javax.swing.JComboBox<>();
+        jPanel5 = new javax.swing.JPanel();
+        whereCB = new javax.swing.JCheckBox();
+        whereParamList = new javax.swing.JComboBox<>();
+        whereOp = new javax.swing.JComboBox<>();
+        whereValueCB = new javax.swing.JComboBox<>();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
         jLayeredPane1 = new javax.swing.JLayeredPane();
 
         setName("asciiTableDataSourceEditorPanel"); // NOI18N
-
-        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        jScrollPane1.setViewportView(jTable1);
 
         jLabel1.setText("Skip Lines:");
         jLabel1.setToolTipText("Skip this many lines before attempting to parse data.  Note if the first line contains parsable column labels, they will be used to identify each column.\n");
@@ -835,6 +837,52 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         jTabbedPane1.addTab("labels", jPanel4);
 
+        whereCB.setText("Only load data where:");
+
+        whereParamList.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        whereParamList.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                whereParamListActionPerformed(evt);
+            }
+        });
+
+        whereOp.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { ".eq", ".gt", ".lt", ".ne", ".within" }));
+
+        whereValueCB.setEditable(true);
+
+        org.jdesktop.layout.GroupLayout jPanel5Layout = new org.jdesktop.layout.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(whereParamList, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 145, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(whereCB))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(whereOp, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(whereValueCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(428, Short.MAX_VALUE))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(whereCB)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(whereParamList, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(whereOp, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(whereValueCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(28, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("subset", jPanel5);
+
+        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jScrollPane1.setViewportView(jTable1);
+
         org.jdesktop.layout.GroupLayout jLayeredPane1Layout = new org.jdesktop.layout.GroupLayout(jLayeredPane1);
         jLayeredPane1.setLayout(jLayeredPane1Layout);
         jLayeredPane1Layout.setHorizontalGroup(
@@ -1205,6 +1253,10 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
 
     }//GEN-LAST:event_skipLinesTextFieldFocusGained
 
+    private void whereParamListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_whereParamListActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_whereParamListActionPerformed
+
     URISplit split = null;
     Map<String,String> params;
 
@@ -1378,10 +1430,27 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
             fillValueTextField.setText( getParam(params, "fill" ));
             validMinTextField.setText( getParam(params, "validMin" ));
             validMaxTextField.setText( getParam(params, "validMax" ));
-
+            
             jTabbedPane1.setSelectedIndex(tab);
             update();
             checkHeaders();
+
+            whereParamList.setModel( new DefaultComboBoxModel( columns.values().toArray() ) );
+            String where= getParam( params, "where" );
+            if ( where!=null && where.length()>0 ) {
+                whereCB.setSelected(true);
+                int i= where.indexOf(".");
+                if ( i>-1 ) {
+                    whereParamList.setSelectedItem(where.substring(0,i)); 
+                    int i0= where.indexOf("(");
+                    int i1= where.indexOf(")",i0);
+                    whereOp.setSelectedItem(where.substring(i,i0));
+                    whereValueCB.setSelectedItem( where.substring(i0+1,i1).replaceAll("\\+"," "));
+                }
+            } else {
+                whereCB.setSelected(false);
+            }
+            
             initializing= false;
 
         } catch (IOException ex) {
@@ -1486,6 +1555,12 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
         setParam( params, "validMin", validMinTextField.getText() );
         setParam( params, "validMax", validMaxTextField.getText() );
 
+        if ( whereCB.isSelected() ) {
+            setParam( params, "where", String.format( "%s%s(%s)", whereParamList.getSelectedItem(), whereOp.getSelectedItem(), whereValueCB.getSelectedItem().toString().replaceAll(" ","+") ) );
+        } else {
+            setParam( params, "where", "" );
+        }
+        
         split.params = URISplit.formatParams(params);
         if ( split.params!=null && split.params.length()==0 ) split.params= null; //https://sourceforge.net/p/autoplot/bugs/1913/
 
@@ -1522,6 +1597,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
     public javax.swing.JPanel jPanel2;
     public javax.swing.JPanel jPanel3;
     public javax.swing.JPanel jPanel4;
+    public javax.swing.JPanel jPanel5;
     public javax.swing.JScrollPane jScrollPane1;
     public javax.swing.JSeparator jSeparator1;
     public javax.swing.JTabbedPane jTabbedPane1;
@@ -1540,6 +1616,10 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
     public javax.swing.JTextField unitsTF;
     public javax.swing.JTextField validMaxTextField;
     public javax.swing.JTextField validMinTextField;
+    public javax.swing.JCheckBox whereCB;
+    public javax.swing.JComboBox<String> whereOp;
+    public javax.swing.JComboBox<String> whereParamList;
+    public javax.swing.JComboBox<String> whereValueCB;
     // End of variables declaration//GEN-END:variables
 
     private static void updateColumns( javax.swing.JTable jTable1, Map<Integer,String> columns ) {
