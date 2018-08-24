@@ -241,13 +241,13 @@ public class JythonToJavaConverter {
     }
 
     public static String convert(String script) throws Exception {
-        Module n = (Module) org.python.core.parser.parse(script, "exec");
+        org.python.parser.ast.Module n = (org.python.parser.ast.Module) org.python.core.parser.parse(script, "exec");
         StringBuilder b = new StringBuilder();
         convert(b, n);
         return b.toString();
     }
 
-    private static void convert(StringBuilder sb, Module n) throws Exception {
+    private static void convert(StringBuilder sb, org.python.parser.ast.Module n) throws Exception {
         VisitorBase vb = new MyVisitorBase(sb);
         n.traverse(vb);
 
