@@ -79,10 +79,15 @@ public class LayoutListener implements PropertyChangeListener {
                     });
                     t.setRepeats(false);
                 }
-
-                cc.registerPendingChange(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
-                dasCanvas.registerPendingChange(this, PENDING_CHANGE_AUTOLAYOUT);
-                t.restart();
+                
+                if ( dasCanvas.isPendingChanges(PENDING_CHANGE_AUTOLAYOUT) ) {
+                    logger.fine("autolayout is already pending");
+                } else {
+                    cc.registerPendingChange(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
+                    dasCanvas.registerPendingChange(this, PENDING_CHANGE_AUTOLAYOUT);
+                    t.restart();
+                }
+                
 
             }
         }
