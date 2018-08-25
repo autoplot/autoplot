@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New "dataIntersection" command returns the data found in both datasets.
+        <p><small>Studying Scatter performance with the goal of removing the confusing Huge Scatter mode.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,13 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-08-18 r22720):</p>
+        <p>Bugfixes (2018-08-25 r22735):</p>
         <ul>
+            <li>Corrections to handling of Socket Timeouts (no network), properly fall into offline mode when remote server is off-line.
+            <li>2020: logging checkboxes were not initialized properly.
+            <li>2021: clarification and correction of DataPointRecorder.select javadoc.
+            <li>2022: minor clean-up in layout listener changes support, where one path would fail to see a change was still pending.  (Bug 1022 lingers)
+            <li>Dan fixed Java 9 ambiguity with Class Module.
             <li>2017: bug where weights with incorrect rank would cause RTE on event thread, and replicate properly handles WEIGHTS now.
             <li>rte_2038937185: correct the poor error message reported ("unrecognized units:00") for parseDatumRange('2017-001 03:00 to 02:00')
             <li>confusing error message for dr[indgen(4)]=findgen(5), make more precise.  Loosen test slightly, See "svn log -r22709:22710"
@@ -74,6 +79,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe460: study performance of SeriesRenderer under extreme conditions, with the goal of removing Huge Scatter.
+            <li>ASCII dialog has "subset" tab with "where" GUI.
             <li>server's prompt can be reset to include newlines to support buffered read by clients.
             <li>"dataIntersection" function returns values found in two datasets.
             <li>rfe619: all datasets have svalue accessor for rank 0 data.
