@@ -73,7 +73,7 @@ public class DodsAdapter {
     private String constraint;
     
     private DDS dds;
-    private final HashMap properties;
+    private final HashMap<String,Object> properties;
 
     /** Creates a new instance of DodsAdapter
      * @param source the base URL, like http://acdisc.gsfc.nasa.gov/opendap/HDF-EOS5/Aura_OMI_Level3/OMAEROe.003/2005/OMI-Aura_L3-OMAEROe_2005m0101_v003-2011m1109t081947.he5
@@ -83,7 +83,7 @@ public class DodsAdapter {
         logger.entering("org.virbo.dods.DodsAdapter", "DodsAdapter" );
         this.source = source;
         this.variable = variable;
-        properties = new HashMap();
+        properties = new HashMap<>();
         logger.exiting("org.virbo.dods.DodsAdapter", "DodsAdapter" );
     }
 
@@ -314,8 +314,12 @@ public class DodsAdapter {
             if (type.equals("Grid")) {
                 DGrid zgrid = (DGrid) btvar;
                 DArray z = (DArray) zgrid.getVar(0);
-
-                zds = DodsVarDataSet.newDataSet(z, properties);
+                if ( properties.size()==0 ) {
+                    zds = DodsVarDataSet.newDataSet(z, attributes);
+                } else {
+                    zds = DodsVarDataSet.newDataSet(z, properties);
+                }
+                
                 if (zds.property(QDataSet.UNITS) == null) {
                     zds.putProperty(QDataSet.UNITS, units);
                 }

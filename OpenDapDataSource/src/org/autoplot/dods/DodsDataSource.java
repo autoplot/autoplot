@@ -30,6 +30,8 @@ import java.util.Collections;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.datum.Units;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
@@ -381,7 +383,26 @@ public class DodsDataSource extends AbstractDataSource {
 
             try {
                 AttributeTable at = das.getAttributeTable(variable);
-                ds.putProperty(QDataSet.METADATA,at);
+                Map<String,Object> meta= new LinkedHashMap<>();
+                Enumeration en= at.getNames();
+                while ( en.hasMoreElements() ) {
+                    String n= String.valueOf(en.nextElement());
+                    Attribute a= at.getAttribute(n);
+                    Iterator i= a.getValuesIterator();
+                    if ( i.hasNext() ) {
+                        Object o= i.next();
+                        meta.put( n, o );
+                        if ( n.equals("_FillValue") ) {
+                            try {
+                                double d= Double.parseDouble(String.valueOf(o));
+                                ds.putProperty( QDataSet.FILL_VALUE, d );
+                            } catch ( NumberFormatException ex ) {
+                                logger.fine("unable to parse fill value");
+                            }
+                        }
+                    }
+                }
+                ds.putProperty(QDataSet.METADATA,meta);
             } catch ( NoSuchAttributeException ex ) {
                 logger.log(Level.WARNING,ex.getMessage(),ex);
             }
