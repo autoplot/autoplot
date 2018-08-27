@@ -361,17 +361,18 @@ public class DodsDataSource extends AbstractDataSource {
             }
             
             String sunits = (String) metadata.get("units");
-            if (sunits != null) {
-                if (sunits.contains("since")) {
-                    Units u;
-                    try {
-                        u = Units.lookupTimeUnits(sunits);
-                        ds.putProperty(QDataSet.UNITS, u);
-                    } catch (java.text.ParseException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    }
-                }
-            }            
+            DodsAdapter.checkTimeUnits( sunits, ds );
+            
+            // check depends
+            QDataSet dep0= (QDataSet) ds.property( QDataSet.DEPEND_0 );
+            if ( dep0!=null ) {
+                String n=(String)dep0.property(QDataSet.NAME);
+                adapter.setVariable(n);
+                Map<String,Object> m= getMetaData(n);
+                //adapter.loadDataset(mon, m);
+                dep0= adapter.getDataSet(m);
+                ds.putProperty( QDataSet.DEPEND_0, dep0 );
+            }
             
             if (isIstp ) {
                 assert interpretedMetadata!=null;

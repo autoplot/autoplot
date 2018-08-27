@@ -38,7 +38,10 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import opendap.dap.Attribute;
+import opendap.dap.AttributeTable;
 import opendap.dap.DAP2Exception;
+import opendap.dap.DASException;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.qds.DDataSet;
 import org.das2.qds.QDataSet;
@@ -314,7 +317,7 @@ public class DodsAdapter {
             if (type.equals("Grid")) {
                 DGrid zgrid = (DGrid) btvar;
                 DArray z = (DArray) zgrid.getVar(0);
-                if ( properties.size()==0 ) {
+                if ( properties.isEmpty() ) {
                     zds = DodsVarDataSet.newDataSet(z, attributes);
                 } else {
                     zds = DodsVarDataSet.newDataSet(z, properties);
@@ -339,10 +342,17 @@ public class DodsAdapter {
 
             } else if (type.equals("Array")) {
                 DArray z = (DArray) btvar;
-
-                zds = DodsVarDataSet.newDataSet(z, properties);
+                if ( properties.isEmpty() ) {
+                    zds = DodsVarDataSet.newDataSet(z, attributes);
+                } else {
+                    zds = DodsVarDataSet.newDataSet(z, properties);
+                }
                 if (zds.property(QDataSet.UNITS) == null) {
                     zds.putProperty(QDataSet.UNITS, units);
+                }
+                if (zds.property(QDataSet.UNITS) == null) {
+                    String s= String.valueOf( attributes.get("units") );
+                    checkTimeUnits( s, zds);
                 }
                 for (int idim = 0; idim < z.numDimensions(); idim++) {
                     if (dependName[idim] != null) {
@@ -440,17 +450,8 @@ public class DodsAdapter {
                 MutablePropertyDataSet dep0 = (MutablePropertyDataSet) zresult.property( QDataSet.DEPEND_0 );
                 
                 String sunits = (String) MetadataUtil.getNode(attributes, new String[]{labels[0], "units"});
-                if (sunits != null) {
-                    if (sunits.contains("since")) {
-                        Units u;
-                        try {
-                            u = Units.lookupTimeUnits(sunits);
-                            dep0.putProperty(QDataSet.UNITS, u);
-                        } catch (java.text.ParseException ex) {
-                            logger.log(Level.SEVERE, null, ex);
-                        }
-                    }
-                }
+                checkTimeUnits( sunits, dep0);
+                
                 return zresult;
 
             } else {
@@ -467,6 +468,25 @@ public class DodsAdapter {
         QDataSet ds = zds;
 
         return ds;
+    }
+
+    /**
+     * check for time units and attach them to the data.
+     * @param sunits labels for the units, or null.
+     * @param dep0 the data
+     */
+    protected static void checkTimeUnits(String sunits, MutablePropertyDataSet dep0) {
+        if (sunits != null) {
+            if (sunits.contains("since")) {
+                Units u;
+                try {
+                    u = Units.lookupTimeUnits(sunits);
+                    dep0.putProperty(QDataSet.UNITS, u);
+                } catch (java.text.ParseException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+            }
+        }
     }
 
     /**
