@@ -52,6 +52,7 @@ public class AutoplotServer {
         alm.requireOneOf( new String[] { "uri", "vap" } );
         
         alm.process(args);
+        logger.log(Level.FINE, "process command line options");
 
         String suri = alm.getValue("uri");
         String vap = alm.getValue("vap");
@@ -95,6 +96,7 @@ public class AutoplotServer {
             emon.start();
         }
         
+        logger.log(Level.FINE, "getDocumentModel");
         Application dom= getDocumentModel();
         
         // do dimensions
@@ -127,7 +129,7 @@ public class AutoplotServer {
             //dom.syncTo( readOnlyDom );
             dom.getOptions().syncToAll( readOnlyDom.getOptions(), new ArrayList<String>() );
             
-            logger.log(Level.FINE, "vap is loaded");
+            logger.log(Level.FINE, "vap is loaded and printable with data loaded");
             
             if ( width==-1 && height==-1) {
                 width= dom.getController().getCanvas().getWidth();
@@ -143,14 +145,17 @@ public class AutoplotServer {
             
             Application dom2= getDocumentModel();
             
+            boolean isAutoranged= false;
             if ( autorange ) {
                 if ( autorangeFlags) {
                     for ( Plot p: dom2.getPlots() ) {
                         if ( p.getYaxis().isAutoRange() ) {
                             AutoplotUtil.resetZoomY(dom2,p);
+                            isAutoranged= true;
                         }
                         if ( p.getZaxis().isAutoRange() ) {
                             AutoplotUtil.resetZoomZ(dom2,p);
+                            isAutoranged= true;
                         }
                     }
                 } else {
@@ -158,9 +163,11 @@ public class AutoplotServer {
                         dom2.getController().setPlot(p);
                         AutoplotUtil.resetZoomY(dom2);
                         AutoplotUtil.resetZoomZ(dom2);
+                        isAutoranged= true;
                     }
                 }
             }
+            logger.log(Level.FINE, "axes were autoranged: {0}", isAutoranged);
             
             scale=  ((double)width) / dom.getController().getCanvas().getWidth();
             if ( scale!=1.0 ) rescaleFonts= true;
