@@ -1288,7 +1288,10 @@ public class DataSourceController extends DomNodeController {
 
             }
 
-            if ( false ) { // don't rely on code which assumes fillDs is mutable.
+            if ( true ) { // don't rely on code which assumes fillDs is mutable.
+                if ( fillDs.isImmutable() ) {
+                    fillDs= Ops.copy(fillDs); //TODO: fix this, there should be no need to copy.
+                }
                 // add the cadence property to each dimension of the dataset, so that
                 // the plot element doesn't have to worry about it.  TODO: review this
                 for (int i = 0; i < fillDs.rank(); i++) {
