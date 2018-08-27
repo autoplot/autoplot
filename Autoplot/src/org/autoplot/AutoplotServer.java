@@ -3,6 +3,7 @@ package org.autoplot;
 
 import java.awt.Font;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Units;
@@ -121,7 +122,10 @@ public class AutoplotServer {
                 vap= URISplit.putParam( vap, "timerange", timeRange );
             }
                         
+            Application readOnlyDom= loadVap(vap); // read again to get options.
             load(vap);
+            //dom.syncTo( readOnlyDom );
+            dom.getOptions().syncToAll( readOnlyDom.getOptions(), new ArrayList<String>() );
             
             logger.log(Level.FINE, "vap is loaded");
             
