@@ -1288,20 +1288,22 @@ public class DataSourceController extends DomNodeController {
 
             }
 
-            // add the cadence property to each dimension of the dataset, so that
-            // the plot element doesn't have to worry about it.  TODO: review this
-            for (int i = 0; i < fillDs.rank(); i++) {
-                QDataSet dep = (QDataSet) fillDs.property("DEPEND_" + i);
-                if (dep != null) {
-                    dep = DataSetOps.makePropertiesMutable(dep);
-                    if (i == 0 && dep.rank() == 1) {
-                        guessCadence((MutablePropertyDataSet) dep, fillDs);
-                    } else {
-                        if (dep.rank() == 1) {
-                            guessCadence((MutablePropertyDataSet) dep, null);
+            if ( false ) { // don't rely on code which assumes fillDs is mutable.
+                // add the cadence property to each dimension of the dataset, so that
+                // the plot element doesn't have to worry about it.  TODO: review this
+                for (int i = 0; i < fillDs.rank(); i++) {
+                    QDataSet dep = (QDataSet) fillDs.property("DEPEND_" + i);
+                    if (dep != null) {
+                        dep = DataSetOps.makePropertiesMutable(dep);
+                        if (i == 0 && dep.rank() == 1) {
+                            guessCadence((MutablePropertyDataSet) dep, fillDs);
+                        } else {
+                            if (dep.rank() == 1) {
+                                guessCadence((MutablePropertyDataSet) dep, null);
+                            }
                         }
+                        fillDs= Ops.putProperty( fillDs, "DEPEND_" + i, dep);
                     }
-                    fillDs= Ops.putProperty( fillDs, "DEPEND_" + i, dep);
                 }
             }
 
