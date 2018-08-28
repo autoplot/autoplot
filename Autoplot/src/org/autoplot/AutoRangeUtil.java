@@ -491,7 +491,8 @@ public class AutoRangeUtil {
         if ( mono ) {
             mono= DataSetUtil.isMonotonicAndIncreasingQuick(ds);
         }
-        if (null != ds.property(QDataSet.CADENCE)) {
+        //TODO: consider calculating any cadence here, and using the dataSetAnnotations to store this.
+        if (null != ds.property(QDataSet.CADENCE)) { // this is where the earlier check for cadence in DataSourceController is important.
             if (DataSetUtil.isMonotonic(ds)) {
                 mono = true;
             }
@@ -537,7 +538,7 @@ public class AutoRangeUtil {
             }
             result.robustMin = result.range.min().doubleValue(result.range.getUnits());
             result.robustMax = result.range.max().doubleValue(result.range.getUnits());
-            logger1.exiting("orgautoplot.AutoRangeUtil", "autoRange", ds);
+            logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", ds);
             return result;
         }
         if (mono && ds.rank() == 1) {
