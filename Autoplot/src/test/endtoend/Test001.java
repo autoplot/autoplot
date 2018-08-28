@@ -31,7 +31,7 @@ public class Test001 {
                
             System.err.println( "--- test001_001 ---" );
             t0= System.currentTimeMillis();
-            ds= Util.getDataSet( "http://www.autoplot.org/data/fireworks.wav" );
+            ds= Util.getDataSet( "http://autoplot.org/data/fireworks.wav" );
             plot( 0, ds );
             plot( 1, fftWindow( ds, 512 ) );
             setCanvasSize( 800, 600 );
@@ -40,7 +40,7 @@ public class Test001 {
             
             System.err.println( "--- test001_004 ---" );
             t0= System.currentTimeMillis();
-            ds= Util.getDataSet( "http://www.autoplot.org/data/fireworks.wav" );
+            ds= Util.getDataSet( "http://autoplot.org/data/fireworks.wav" );
             plot( 0, ds );
             plot( 1, fftPower( ds, Ops.windowFunction( FFTFilterType.Hanning, 1024 ), 2, new NullProgressMonitor() ) );
             setCanvasSize( 800, 600 );
