@@ -273,7 +273,7 @@ public class AutoRangeUtil {
     public static AutoRangeDescriptor autoRange(QDataSet hist, QDataSet ds, Map properties) {
         Logger logger1 = LoggerManager.getLogger("qdataset.ops.autorange");
         logger1.log(Level.FINE, "enter autoRange {0}", ds);
-        logger1.entering("org.virbo.autoplot.AutoplotUtil", "autoRange");
+        logger1.entering("org.autoplot.AutoRangeUtil", "autoRange");
         Units u = (Units) ds.property(QDataSet.UNITS);
         if (u == null) {
             u = Units.dimensionless;
@@ -405,7 +405,7 @@ public class AutoRangeUtil {
                     // and the stats min is less then the typical range max().
                     result.range = range;
                     // just use the metadata settings.
-                    logger1.exiting("org.virbo.autoplot.AutoplotUtil", "autoRange");
+                    logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange");
                     return result; // DANGER--EXIT POINT
                 }
             }
@@ -429,7 +429,7 @@ public class AutoRangeUtil {
         } else {
             result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
         }
-        logger1.exiting("org.virbo.autoplot.AutoplotUtil", "autoRange");
+        logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange");
         return result;
     }
 
@@ -463,7 +463,7 @@ public class AutoRangeUtil {
      */
     public static AutoRangeDescriptor autoRange(QDataSet ds, Map properties, boolean ignoreDsProps) {
         Logger logger1 = LoggerManager.getLogger("qdataset.ops.autorange");
-        logger1.entering("org.virbo.autoplot.AutoplotUtil", "autoRange", ds);
+        logger1.entering("org.autoplot.AutoRangeUtil", "autoRange", ds);
         Units u = (Units) ds.property(QDataSet.UNITS);
         if (u == null) {
             if (ds.property(QDataSet.JOIN_0) != null) {
@@ -483,7 +483,7 @@ public class AutoRangeUtil {
             result.range = DataSetUtil.asDatumRange(ext, true);
             result.robustMin = result.range.min().doubleValue(u);
             result.robustMax = result.range.max().doubleValue(u);
-            logger1.exiting("org.virbo.autoplot.AutoplotUtil", "autoRange", ds);
+            logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", ds);
             return result;
         }
         double[] dd; // two-element array that is the min and max of the data.
@@ -537,7 +537,7 @@ public class AutoRangeUtil {
             }
             result.robustMin = result.range.min().doubleValue(result.range.getUnits());
             result.robustMax = result.range.max().doubleValue(result.range.getUnits());
-            logger1.exiting("org.virbo.autoplot.AutoplotUtil", "autoRange", ds);
+            logger1.exiting("orgautoplot.AutoRangeUtil", "autoRange", ds);
             return result;
         }
         if (mono && ds.rank() == 1) {
@@ -853,7 +853,7 @@ public class AutoRangeUtil {
                         result.range = range;
                         // just use the metadata settings.
                         logger1.fine("using TYPICAL_MIN, TYPICAL_MAX from metadata");
-                        logger1.exiting("org.virbo.autoplot.AutoplotUtil", "autoRange", ds);
+                        logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", ds);
                         return result; // DANGER--EXIT POINT
                     } else {
                         logger1.log(Level.FINE, "TYPICAL_MIN={0} and TYPICAL_MAX={1} from metadata rejected because it clipped or squished the data {2}", new Object[]{tmin.toString(), tmax.toString(), result.range});
@@ -908,7 +908,7 @@ public class AutoRangeUtil {
         } else {
             result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
         }
-        logger1.exiting("org.virbo.autoplot.AutoplotUtil", "autoRange", ds);
+        logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", ds);
         if (typical != null) {
             if (result.log && typical.log) {
                 if (typical.range.min().doubleValue(typical.range.getUnits()) <= 0) {
