@@ -26,9 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-08-25 r22735):</p>
+        <p>Bugfixes (2018-08-28 r22750):</p>
         <ul>
-            <li>Corrections to handling of Socket Timeouts (no network), properly fall into offline mode when remote server is off-line.
+            <li>2022: new, more careful code had new bug where it could hang process.
+            <li>Corrections to handling of Socket Timeouts (server down), properly fall into offline mode when remote server is off-line.
             <li>2020: logging checkboxes were not initialized properly.
             <li>2021: clarification and correction of DataPointRecorder.select javadoc.
             <li>2022: minor clean-up in layout listener changes support, where one path would fail to see a change was still pending.  (Bug 1022 lingers)
@@ -79,6 +80,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>PoissonDistribution is now thread-safe, and multiple concurrent calls to PlasmaModel can be made.
+            <li>rfe460: cache cadence calculation in SeriesRenderer.
             <li>logger verbosity settings can be saved for future invocations.
             <li>rfe460: study performance of SeriesRenderer under extreme conditions, with the goal of removing Huge Scatter.
             <li>ASCII dialog has "subset" tab with "where" GUI.
