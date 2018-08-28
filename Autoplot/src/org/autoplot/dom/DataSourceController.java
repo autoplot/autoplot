@@ -1289,9 +1289,6 @@ public class DataSourceController extends DomNodeController {
             }
 
             if ( true ) { // don't rely on code which assumes fillDs is mutable.
-                if ( fillDs.isImmutable() ) {
-                    fillDs= Ops.copy(fillDs); //TODO: fix this, there should be no need to copy.
-                }
                 // add the cadence property to each dimension of the dataset, so that
                 // the plot element doesn't have to worry about it.  TODO: review this
                 for (int i = 0; i < fillDs.rank(); i++) {
@@ -1305,7 +1302,13 @@ public class DataSourceController extends DomNodeController {
                                 guessCadence((MutablePropertyDataSet) dep, null);
                             }
                         }
-                        fillDs= Ops.putProperty( fillDs, "DEPEND_" + i, dep);
+                        try {
+                            fillDs= Ops.putProperty( fillDs, "DEPEND_" + i, dep);
+                        } catch ( IllegalArgumentException ex ) {
+                            logger.info("dataset become immutable.  Making mutable copy.");
+                            fillDs= Ops.copy(fillDs); //TODO: fix this, there should be no need to copy.
+                            fillDs= Ops.putProperty( fillDs, "DEPEND_" + i, dep);
+                        }
                     }
                 }
             }
