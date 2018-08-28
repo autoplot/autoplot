@@ -85,7 +85,7 @@ public class Test140 {
      */
     private static String do1( String uri, int iid, boolean doTest, boolean isPublic ) throws Exception {
 
-        System.err.printf( "== %03d ==\n", iid );
+        System.err.printf( "== %03d %03d ==\n", testid, iid );
         if ( isPublic ) {
             System.err.printf( "uri: %s\n", uri );
         } else {
