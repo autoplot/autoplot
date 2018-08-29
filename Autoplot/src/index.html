@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-08-28 r22750):</p>
+        <p>Bugfixes (2018-08-28 r22756):</p>
         <ul>
+            <li>removed bit of experimental code would fail to connect symbols when data contained non-monotonic tags, which was inadvertently released.
             <li>2022: new, more careful code had new bug where it could hang process.
             <li>Corrections to handling of Socket Timeouts (server down), properly fall into offline mode when remote server is off-line.
             <li>2020: logging checkboxes were not initialized properly.
