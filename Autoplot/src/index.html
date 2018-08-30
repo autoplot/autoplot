@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Having fun with RGB to HSV conversions.  Here's <a href='demoImageFun.jy'>the script</a>.  Inset shows non-monotonic data which should be connected, which was broken in v2018a_8.
+        <p><small>Experiment with reading ESRI shape files shows Autoplot can handle 1,380 plot elements.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,6 +27,12 @@
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
         <p>Bugfixes (2018-08-28 r22756):</p>
+        <ul>
+            <li>matlab export options was using the IDL options dialog.
+            <li>horizontal and vertical slicers allow units sloppiness.
+            <li>"clean" method removed from Matlab export to support compiling under Java 9.  Thanks, Dan!
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>removed bit of experimental code would fail to connect symbols when data contained non-monotonic tags, which was inadvertently released.
             <li>2022: new, more careful code had new bug where it could hang process.
@@ -58,29 +64,12 @@
             <li>export-to-CSV uses FORMAT metadata and shows progress as the data is exported.
             <li>1682: CSV editor was adding extraneous question mark, corrections to editor such as column width and column names.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>rte_1148065736: check for bad division with Huge Scatter.
-            <li>poor feedback when bundle parameter was used with ascii ("bad parameter: rank2" was indicated).
-            <li>binary data source editor uses scrollbars when there are many columns.
-            <li>make export data set more consistent between types, calling maybeMkdirs so the folder is created.
-            <li>support where CSV column header contains units, like "50 Hz"
-            <li>2004: HAPI editor panel would sometimes switch servers, because of thread mishandling.
-            <li>completions on Jython variables where constructor is used works again.
-            <li>improve error feedback when dataset('6 to 7') was passed into histogram2d, where the argument was a rank 0 enumeration and not a range.
-            <li>null pointer with hapi caching corrected.
-            <li>export-to-CDF failed when TT2000 data had fill value.  Thanks, Ivar!
-            <li>2002: gt(r0ds1,r0ds2) is now supported, avoiding confusion.  Thanks, Kristoff and Ed!
-            <li>in pngwalk tool, autorange after loading vap if the autorange flag is set.
-            <li>rte 1055121094: exporting ephemeris data to qds, when data column contains format specification.  Thanks fallegrini!
-            <li>tweak formatting used when printing numbers in metadata tab.  Thanks, Ivar!
-            <li>when index lists are used to access high-rank dataset, check that all lists have the same length.  Thanks, Ivar!
-            <li>2001: CDAWeb skips over 1-record CDF files to avoid bug where time-varying DEPEND_1 is lost.
-            <li>With CDAWeb, when DEPEND_1 was time-varying, incorrect warning message about length mismatch is no longer shown.
-            <li>corrections to new expandToFillGaps filter.
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>CDF reader shows data types, record count, block size, and varies flag.
+        </ul>
+       <p>Less recent features:</p>
+       <ul>
             <li>PoissonDistribution is now thread-safe, and multiple concurrent calls to PlasmaModel can be made.
             <li>rfe460: cache cadence calculation in SeriesRenderer.
             <li>logger verbosity settings can be saved for future invocations.
@@ -94,24 +83,6 @@
             <li>rfe646: export to Matlab .mat files.
             <li>Location of Java used to run Autoplot is displayed in the "about" window.
             <li>Export-to-CSV no longer comments first line containing spectrogram channels, allowing the file to be used with Autoplot.
-        </ul>
-       <p>Less recent features:</p>
-       <ul>
-            <li>rfe643: allow autoplot_data/config/jsyntaxpane.properties to reset the colors used for the editor, allowing dark editors.
-            <li>DasAxis reference can now be a comma-separated list of datums.
-            <li>FileStorageModel now has getNames(datumRange) and getRoot(), to support use in IDL.
-            <li>catch when CDF has validmin>validmax, and print a warning rather than refusing to plot the data.
-            <li>allow pngwalk digitizing when zoomed in on image.
-            <li>time range controller has "rescale" property, which is accessible to scripts.
-            <li>rfe641: HAPI caching experiment where request is broken up into daily requests so that caching is more effective.
-            <li>SeriesRenderer can now be used as a delegate to allow use in scripts.
-            <li>More anchor positions, including OutsideS and OutsideSSW, OutsideW.
-            <li>DataSetBuilder has new nextRecords function, which accepts multiple records, to avoid confusion caused by use of putValues function.
-            <li>U. Iowa group's RangeLabel and CollapseSpectrogramRenderer is now compiled in.
-            <li>bug2000: abs now returns units when the data is ratiometric.
-            <li>add more positions for annotations, like "West" and OutsideSSE.
-            <li>allow no-record DELTA_PLUS, issuing a warning, to aid in development.
-            <li>expandToFillGaps process added.
        </ul>
         <p>Known issues:</p>
         <ul>
