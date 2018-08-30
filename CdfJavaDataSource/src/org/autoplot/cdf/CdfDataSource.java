@@ -839,7 +839,15 @@ public class CdfDataSource extends AbstractDataSource {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
-
+            
+            boolean[] vvs= cdf.getVarys(var);
+            if ( vvs.length>0 ) {
+                props.put( "_Varies", vvs[0] );
+            }
+            props.put( "_BlockingFactor", cdf.getBlockingFactor(var) );
+            props.put( "_Type", CdfUtil.getStringDataType(cdf.getType(var)) );
+            props.put( "_RecCount", cdf.getNumberOfValues(var) );
+            
             return props;
         } catch ( CDFException ex ) {
             return new HashMap<>();
