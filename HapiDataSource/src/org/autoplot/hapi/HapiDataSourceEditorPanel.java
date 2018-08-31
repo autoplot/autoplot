@@ -531,7 +531,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private void serversComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serversComboBoxActionPerformed
         try {
             final URL url= new URL( (String)serversComboBox.getSelectedItem() );
-            if ( !url.equals(currentServer) ) {
+            if ( currentServer==null || !url.toExternalForm().equals(currentServer.toExternalForm()) ) {
                 DefaultListModel m= new DefaultListModel() ;
                 m.add(0,"Reading list of available datasets...");
                 idsList2.setModel( m );
