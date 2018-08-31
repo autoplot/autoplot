@@ -780,7 +780,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 return altResult;
 
             } else {
-                DataSetUtil.validate( result, new ArrayList<String>() );
+                if ( result!=null ) DataSetUtil.validate( result, new ArrayList<String>() );
                 MutablePropertyDataSet dep0;
                 if ( dep0Builder!=null ) {
                     assert result!=null;
