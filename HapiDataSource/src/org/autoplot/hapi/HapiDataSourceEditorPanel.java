@@ -176,14 +176,15 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                         return;
                     }
                     currentId= selectedValue;
+                    if ( currentId==null ) {
+                        titleLabel.setText(" ");
+                        return;
+                    }
                     if ( currentId.startsWith("Error:" ) ) {
                         return;
                     }
-                    if ( currentId!=null ) {
-                        titleLabel.setText("Retrieving info for "+currentId+"...");
-                    } else {
-                        titleLabel.setText(" ");
-                    }
+                    titleLabel.setText("Retrieving info for "+currentId+"...");
+
                     parametersPanel.removeAll();
                     parametersPanel.revalidate();
                     parametersPanel.repaint();
