@@ -1,19 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.fits;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.logging.Level;
 import org.das2.util.monitor.ProgressMonitor;
 import org.eso.fits.FitsData;
 import org.eso.fits.FitsFile;
@@ -30,10 +23,12 @@ import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.MetadataModel;
+import org.das2.datum.Units;
 import org.das2.qds.ops.Ops;
+import org.eso.fits.FitsColumn;
 
 /**
- *
+ * Support for reading FITS files using eso.org's JFITS library.
  * @author jbf
  */
 public class FitsDataSource extends AbstractDataSource {
@@ -52,6 +47,10 @@ public class FitsDataSource extends AbstractDataSource {
         if (name != null) {
             ihdu = plottable.get(name);
         }
+        
+        if ( ihdu==0 && !plottable.containsValue(0) && plottable.size()>0 ) {
+            ihdu= plottable.values().iterator().next();
+        }
 
         FitsFile file = new FitsFile(getFile(mon));
         FitsHDUnit hdu = file.getHDUnit(ihdu);
@@ -60,7 +59,7 @@ public class FitsDataSource extends AbstractDataSource {
         ArrayDataSet result;
 
         if ( fd instanceof FitsMatrix ) {
-            FitsMatrix dm = (FitsMatrix) hdu.getData();
+            FitsMatrix dm = (FitsMatrix) fd;
             int naxis[] = dm.getNaxis();
             double crval[] = dm.getCrval();
             double crpix[] = dm.getCrpix();
@@ -110,74 +109,75 @@ public class FitsDataSource extends AbstractDataSource {
             }            
         } else if ( fd instanceof FitsTable ) {
             final FitsTable ft= (FitsTable)fd;
+            
+            ft.getNoColumns();
+            ft.getColumn(1);
 
-            MutablePropertyDataSet mpds= new AbstractDataSet() {
-                @Override
-                public int rank() {
-                    return 2;
-                }
-
-                @Override
-                public double value( int i0, int i1 ) {
-                    return ft.getColumn(i1).getReal(i0);
-                }
-
-                @Override
-                public int length() {
-                    return ft.getNoRows();
-                }
-
-                @Override
-                public int length(int i0) {
-                    return ft.getNoColumns();
-                }
-
-            };
+            MutablePropertyDataSet mpds= adaptColumn( ft.getColumn(1), ft.getNoRows() );
             mpds.putProperty(QDataSet.QUBE,Boolean.TRUE);
-            QDataSet bds= new AbstractDataSet() {
-                @Override
-                public int rank() {
-                    return 2;
-                }
-                @Override
-                public double value( int i0, int i1 ) {
-                    return 1;
-                }
-                @Override
-                public int length() {
-                    return ft.getNoColumns();
-                }
-                @Override
-                public int length(int i) {
-                    return 0;
-                }
-                @Override
-                public Object property( String name, int i ) {
-                    if ( name.equals(QDataSet.LABEL) ) {
-                        return ft.getColumn(i).getLabel();
-                    } else if ( name.equals(QDataSet.NAME) ) {
-                        return Ops.safeName(ft.getColumn(i).getLabel());
-                    } else {
-                        return super.property(name);
-                    }
-                }
-            };
-            mpds.putProperty(QDataSet.BUNDLE_1,bds);
-
-            if ( bds.length()==1 ) {
-                return DataSetOps.unbundle(mpds,0); // scalar
-            } else {
-                return mpds;
-            }
-
+            mpds.putProperty( QDataSet.NAME, Ops.safeName(ft.getColumn(1).getLabel()) );
+            
+            MutablePropertyDataSet dep0= adaptColumn( ft.getColumn(0), ft.getNoRows() );
+            dep0.putProperty( QDataSet.NAME, Ops.safeName(ft.getColumn(0).getLabel()) );
+            
+            mpds.putProperty( QDataSet.DEPEND_0, Ops.copy(dep0) );
+                        
+            return Ops.copy( mpds );
+            
         } else {
             throw new IllegalArgumentException("fitsdata type not supported: "+fd.getClass() );
 
         }
         
-        
     }
 
+    private MutablePropertyDataSet adaptColumn( final FitsColumn fc, final int len0 ) {
+        fc.getDataType();
+        
+        final int rank= fc.getRepeat()==1 ? 1 : 2;
+        final int len1= fc.getRepeat();
+                
+        AbstractDataSet result= new AbstractDataSet() {
+            @Override
+            public int rank() {
+                return rank;
+            }
+
+            @Override
+            public double value( int i0 ) {
+                return fc.getReal(i0);
+            }
+
+            @Override
+            public double value( int i0, int i1 ) {
+                double[] dd= fc.getReals(i0);
+                return dd[i1];
+            }
+
+            @Override
+            public int length() {
+                return len0;
+            }
+
+            @Override
+            public int length(int i0) {
+                return len1;
+            }
+
+        };
+        
+        if ( fc.getUnit().equals("s") ) {
+            try {
+                result.putProperty( QDataSet.UNITS, Units.lookupTimeUnits( "seconds since 2000-01-01T00:00Z") );
+            } catch (ParseException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        } else {
+            result.putProperty( QDataSet.UNITS, Units.lookupUnits( fc.getUnit() ) );
+        }
+        
+        return result;
+    }
 
 
     @Override
