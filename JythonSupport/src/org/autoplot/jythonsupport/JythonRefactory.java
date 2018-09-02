@@ -120,7 +120,6 @@ public class JythonRefactory {
                 i= i-ss[k-1].length()-1;
             } else {
                 cl= p.substring(i);
-                p= path;
                 break;
             }
         }
@@ -256,7 +255,7 @@ public class JythonRefactory {
                             while ( i>-1 ) {
                                 String s= line.substring(0,i);
                                 int singleQuoteCount= s.split("'",-2).length - 1;
-                                if ( singleQuoteCount % 2 == 1 ) break; // within string
+                                if ( singleQuoteCount % 2 != 0 ) break; // within string
                                 Matcher matcher= identifierP.matcher(line.substring(i));
                                 if ( matcher.find() ) { // should be true
                                     String mehave= matcher.group(1);
