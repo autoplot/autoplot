@@ -35,7 +35,7 @@ public class CefMetadataModel extends MetadataModel {
         if (o instanceof Float) {
             return ((Float) o).doubleValue();
         } else if (o instanceof Double) {
-            return ((Double) o).doubleValue();
+            return ((Double) o);
         } else if (o instanceof Short) {
             return ((Short) o).doubleValue();
         } else if (o instanceof String) {
