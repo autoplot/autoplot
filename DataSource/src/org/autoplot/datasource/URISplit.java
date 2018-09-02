@@ -231,12 +231,6 @@ public class URISplit {
      */
     public int formatCarotPos;
 
-    /**
-     * if true, then "vap:" for the vapScheme was implicitly added.
-     * This is not used any more and should always be false, since we should never add imformationless "vap:" prefix.
-     */
-    public boolean implicitVap= false;
-
     static List<String> otherSchemes= Collections.emptyList();
 
     /**
