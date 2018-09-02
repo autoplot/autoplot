@@ -144,7 +144,7 @@ public class DataSetSelectorSupport {
 
         chooser.setFileFilter(select);
 
-        Window w= SwingUtilities.getWindowAncestor(parent);
+        Window w= parent==null ? null : SwingUtilities.getWindowAncestor( parent);
         int result = chooser.showOpenDialog(w);
         if (result == JFileChooser.APPROVE_OPTION) {
             prefs.put(AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, chooser.getSelectedFile().getParent() );
