@@ -884,7 +884,7 @@ public final class HapiDataSource extends AbstractDataSource {
                         continue;
                     } else {
                         logger.log(Level.WARNING, "expected {0} fields, got {1} at line {2}", new Object[]{totalFields, ss.length,linenumber});
-                        throw new IllegalArgumentException( String.format( "expected %d fields, got %d at line {2}", new Object[]{totalFields, ss.length,linenumber} ) );
+                        throw new IllegalArgumentException( String.format( "expected %d fields, got %d at line %d", new Object[]{totalFields, ss.length,linenumber} ) );
                     }
                 }
                 int ifield=0;
