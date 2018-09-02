@@ -110,17 +110,24 @@ public class FitsDataSource extends AbstractDataSource {
         } else if ( fd instanceof FitsTable ) {
             final FitsTable ft= (FitsTable)fd;
             
-            ft.getNoColumns();
-            ft.getColumn(1);
+            //ft.getNoColumns();
+            //ft.getColumn(1);
 
-            MutablePropertyDataSet mpds= adaptColumn( ft.getColumn(1), ft.getNoRows() );
-            mpds.putProperty(QDataSet.QUBE,Boolean.TRUE);
-            mpds.putProperty( QDataSet.NAME, Ops.safeName(ft.getColumn(1).getLabel()) );
+            MutablePropertyDataSet mpds;
+            if ( ft.getNoColumns()==2 ) {
+                mpds= adaptColumn( ft.getColumn(1), ft.getNoRows() );
+                mpds.putProperty(QDataSet.QUBE,Boolean.TRUE);
+                mpds.putProperty( QDataSet.NAME, Ops.safeName(ft.getColumn(1).getLabel()) );
             
-            MutablePropertyDataSet dep0= adaptColumn( ft.getColumn(0), ft.getNoRows() );
-            dep0.putProperty( QDataSet.NAME, Ops.safeName(ft.getColumn(0).getLabel()) );
+                MutablePropertyDataSet dep0= adaptColumn( ft.getColumn(0), ft.getNoRows() );
+                dep0.putProperty( QDataSet.NAME, Ops.safeName(ft.getColumn(0).getLabel()) );
             
-            mpds.putProperty( QDataSet.DEPEND_0, Ops.copy(dep0) );
+                mpds.putProperty( QDataSet.DEPEND_0, Ops.copy(dep0) );
+            } else {
+                mpds= adaptColumn( ft.getColumn(0), ft.getNoRows() );
+                mpds.putProperty( QDataSet.NAME, Ops.safeName(ft.getColumn(0).getLabel()) );
+            
+            }
                         
             return Ops.copy( mpds );
             
