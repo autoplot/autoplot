@@ -157,6 +157,8 @@ public class ImageDataSourceFormat implements DataSourceFormat {
                         g = (int) (p * 255.0f + 0.5f);
                         b = (int) (q * 255.0f + 0.5f);
                         break;
+                    default:
+                        // do nothing (gray)
                     }
                 }
                 
