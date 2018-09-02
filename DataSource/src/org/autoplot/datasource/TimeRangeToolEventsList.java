@@ -494,8 +494,8 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         int de= i1-i0+1;
         i1= Math.min( jTable1.getRowCount()-1,i1+1);
         i0= i1-de+1;
-        int[] indexes= new int[de];
-        for ( int i=i0; i<=i1; i++ ) indexes[i-i0]= i;
+        //int[] indexes= new int[de];
+        //for ( int i=i0; i<=i1; i++ ) indexes[i-i0]= i;
         jTable1.getSelectionModel().setSelectionInterval(i0,i1);
     }//GEN-LAST:event_nextButtonActionPerformed
 
