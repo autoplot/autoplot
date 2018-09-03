@@ -108,6 +108,9 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
         i = splitIndex(sansArgs);
         FileSystem fs;
+        
+        if ( i==-1 ) i= sansArgs.lastIndexOf("/");
+        
         fs = FileSystem.create( DataSetURI.toUri(sansArgs.substring(0, i)));
 
         if ( sansArgs.charAt(i)=='/' ) i=i+1; // kludgy
