@@ -35,7 +35,7 @@ import org.das2.datum.format.TimeDatumFormatter;
  * GUI for creating valid time ranges by calendar times, orbit, or NRT
  * @author jbf
  */
-public class TimeRangeTool extends javax.swing.JPanel {
+public final class TimeRangeTool extends javax.swing.JPanel {
 
     private static final Logger logger= LoggerManager.getLogger("apdss.gui");
 
