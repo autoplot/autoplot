@@ -411,13 +411,9 @@ public class JythonUtil {
             }
             String[] ss= new String[] { "autoplot2017.py", "autoplotapp2017.py" };
             for ( String s: ss ) {
-                InputStream in= JythonUtil.class.getResourceAsStream("/"+s);
-                FileOutputStream out= new FileOutputStream( new File( ff3, s ) );
-                try {
+                try ( InputStream in=JythonUtil.class.getResourceAsStream("/"+s);
+                      FileOutputStream out= new FileOutputStream( new File( ff3, s ) ) ) {
                     transferStream(in,out);
-                } finally {
-                    out.close();
-                    in.close();
                 }
                 if ( new File( ff3, s ).setReadOnly()==false ) {
                     logger.log( Level.FINER, "set read-only on file {0} failed", s );
