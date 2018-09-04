@@ -297,7 +297,6 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
     
     static class LevelCellRenderer implements TableCellRenderer {
 
-        JComponent component = null;
         TableCellRenderer delegate;
         Color backgroundColor;
         Color oddColor= Color.LIGHT_GRAY;
@@ -306,7 +305,6 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         Color focusColor;
         Color focusBackgroundColor;      
         public LevelCellRenderer(TableCellRenderer delegate) {
-            this.component = null;
             this.delegate = delegate;
             Component c=  delegate.getTableCellRendererComponent(
                     null, "", false, false, 0, 0 );
@@ -343,13 +341,6 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                     } while (value == null);
                     value = "INHERITED(" + value + ")";
 
-                    if (component != null) {
-                        String name = anscestor.getName();
-                        if (name.equals("")) {
-                            name = "<anonymous>";
-                        }
-                        component.setToolTipText("inherited from " + name);
-                    }
                 }
             } else {
                 ((JComponent) delegate).setToolTipText(null);
