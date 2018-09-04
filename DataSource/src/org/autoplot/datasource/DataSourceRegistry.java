@@ -737,8 +737,9 @@ public class DataSourceRegistry {
      * @return
      */
     String getExtensionFor(DataSourceFactory factory) {
-        for (  String ext: this.dataSourcesByExt.keySet() ) {
-            if ( dataSourcesByExt.get(ext)==factory ) return ext;
+        for (  Entry<String,Object> ent: this.dataSourcesByExt.entrySet() ) {
+            String key= ent.getKey();
+            if ( ent.getValue()==factory ) return key;
         }
         return null;
     }

@@ -2,6 +2,7 @@
 package org.das2.jythoncompletion;
 
 import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -44,16 +45,17 @@ public class JavadocLookup {
     public String getLinkForJavaSignature(String signature) {
         if ( signature==null ) return null;
         String lookfor= signature.replaceAll("\\.","/");
-        Set<String> keys= lookups.keySet();
-        for ( String key : keys ) {
+        Set<Entry<String,String>> entries= lookups.entrySet();
+        for ( Entry<String,String> entry : entries ) {
+            String key= entry.getKey();
             if ( lookfor.startsWith(key) ) {
-                String s= lookups.get(key);
+                String s= entry.getValue();
                 if ( s.startsWith("http://docs.oracle.com/javase/8/docs/api/") ) {
-                    return lookups.get(key) + signature.replaceAll("[\\(\\)\\,]", "-");
+                    return s + signature.replaceAll("[\\(\\)\\,]", "-");
                 } else if ( s.startsWith("http://www-pw.physics.uiowa.edu/~jbf/autoplot/javadoc2018/") ) {
-                    return lookups.get(key) + signature.replaceAll("[\\(\\)\\,]", "-");
+                    return s + signature.replaceAll("[\\(\\)\\,]", "-");
                 } else {
-                    return lookups.get(key) + signature.replaceAll(",", ", ");
+                    return s + signature.replaceAll(",", ", ");
                 }
             }
         }
