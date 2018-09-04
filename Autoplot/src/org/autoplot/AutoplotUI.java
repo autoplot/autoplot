@@ -5735,6 +5735,11 @@ APSplash.checkTime("init 240");
     private void runScript( final String script ) {
         try {
             final URISplit split= URISplit.parse(script);
+            
+            if ( split.path==null ) {
+                JOptionPane.showMessageDialog( AutoplotUI.this, "Unable to run script because path is missing: "+script, "script missing path", JOptionPane.OK_OPTION );
+                return;
+            }
             //final File ff = DataSetURI.getFile(DataSetURI.getURI(script), DasProgressPanel.createFramed(AutoplotUI.this,"downloading script"));
             final RunScriptPanel pp = new RunScriptPanel();
             final HashMap params= URISplit.parseParams(split.params);
