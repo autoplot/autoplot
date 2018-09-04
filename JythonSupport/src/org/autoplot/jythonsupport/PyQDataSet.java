@@ -40,6 +40,7 @@ import org.das2.qds.SemanticOps;
 import org.das2.qds.TrimStrideWrapper;
 import org.das2.qds.WritableDataSet;
 import org.das2.qds.ops.CoerceUtil;
+import org.das2.qds.util.DataSetBuilder;
 
 /**
  * PyQDataSet wraps a QDataSet to provide Python operator overloading and
@@ -1116,9 +1117,11 @@ public class PyQDataSet extends PyJavaInstance {
                 double d = (Double) arg0.__tojava__(Double.class);
                 result= (DDataSet) ArrayDataSet.copy( double.class, rods);
                 result= (DDataSet) ArrayDataSet.append( result, DDataSet.wrap( new double[] { d } ) );
-            } else if (arg0.isSequenceType()) {
+            } else if (arg0 instanceof PyList) {
                 result= (DDataSet) ArrayDataSet.copy( double.class, rods );
                 result= (DDataSet) ArrayDataSet.append( result, DDataSet.copy( PyQDataSetAdapter.adaptList((PyList) arg0) ) );
+            } else if (arg0.isSequenceType()) {
+                throw Py.TypeError("unable to coerce sequence: " + arg0);
             } else {
                 throw Py.TypeError("unable to coerce: " + arg0);
             }
