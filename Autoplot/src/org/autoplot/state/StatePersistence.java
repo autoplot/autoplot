@@ -542,10 +542,13 @@ public class StatePersistence {
         PushbackInputStream pbin= new PushbackInputStream(in,10);
 
         if ( pbin.available()<5 ) {
-            System.err.println("less than 5 chars available, can't check");
+            throw new IllegalArgumentException("expected to find file that contained at least 5 characters");
         } else {
             byte[] five= new byte[5];
-            pbin.read(five);
+            int bytesRead= pbin.read(five);
+            while ( bytesRead<5 ) {
+                bytesRead+= pbin.read(five,bytesRead,5-bytesRead);
+            }
             String magic= new String( five );
             if ( !( magic.equals("<?xml") || magic.equals("<vap ") || magic.equals("<java") ) ) {
                 throw new IllegalArgumentException("expected to find document that started with \"<?xml\" , this starts with \""+magic+"\"." );
