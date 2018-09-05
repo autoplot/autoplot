@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Experiment with reading ESRI shape files shows Autoplot can handle 1,380 plot elements.
+        <p><small>Bug where non-numeric sort order for columns in Display Data mouse tool is corrected.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2018-09-05 r22786):</p>
         <ul>
+            <li>2016: plot title macros should always listen to the first plotElement.
             <li>Findbugs tests restored and a round of Findbugs citations were resolved.
             <li>Auralizer code would show index out of bounds with some data, check for constant data. 
             <li>AggregatingDataSourceFactory.getFileStorageModel(uri) would fail if the uri didn't have any fields.  Thanks, Ivar!
