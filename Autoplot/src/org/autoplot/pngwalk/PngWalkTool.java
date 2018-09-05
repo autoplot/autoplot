@@ -652,7 +652,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     int size= (int)Math.sqrt( im.getWidth()*im.getWidth() + im.getHeight()*im.getHeight() );
                     im= ImageResize.getScaledInstance( im, size*60/100 );
                     String ext= chooser.getSelectedFile().toString();
-                    int i= ext.lastIndexOf(".");
+                    int i= ext.lastIndexOf('.');
                     ext= ext.substring(i+1);
                     ImageIO.write( im, ext, chooser.getSelectedFile() );
                             
