@@ -719,9 +719,9 @@ public class ScriptPanelSupport {
                                     String text = panel.getEditorPanel().getText();
                                     int i0 = 0;
                                     while (i0 < text.length()) {
-                                        int i1 = text.indexOf("\n", i0);
+                                        int i1 = text.indexOf('\n', i0);
                                         while (i1 < text.length() - 1 && Character.isWhitespace(text.charAt(i1 + 1))) {
-                                            i1 = text.indexOf("\n", i1 + 1);
+                                            i1 = text.indexOf('\n', i1 + 1);
                                         }
                                         String s;
                                         if (i1 != -1) {
