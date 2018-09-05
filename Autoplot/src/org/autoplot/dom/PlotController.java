@@ -1190,6 +1190,14 @@ public class PlotController extends DomNodeController {
     };
 
     PlotElement plotElement;
+    
+    /**
+     * return the plotElement we are listening to.
+     * @return 
+     */
+    public PlotElement getPlotElement() {
+        return this.plotElement;
+    }
 
     private final PropertyChangeListener plotElementDataSetListener= new PropertyChangeListener() {
         @Override
@@ -1205,6 +1213,7 @@ public class PlotController extends DomNodeController {
             } else {
                 ds1= null;
             }
+            
             logger.log(Level.FINE, "titleConverter should use for dataset: {0}", ds1);
                     
             String t= (String)titleConverter.convertForward( plot.getTitle() );
@@ -1217,6 +1226,11 @@ public class PlotController extends DomNodeController {
             if ( pds!=null && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(pds)) ) {
                 updateNextPrevious( plot.getXaxis().getRange(), pds );
             }
+        }
+        
+        @Override
+        public String toString() {
+            return "plotElementDataSetListener for "+PlotController.this.getPlot().getId();
         }
     };
 
@@ -1368,7 +1382,7 @@ public class PlotController extends DomNodeController {
     /**
      * add the plot element to the plot, including the renderer and bindings.
      * @param p
-     * @param reset
+     * @param reset if true then reset the render type.
      */
     synchronized void addPlotElement(PlotElement p,boolean reset) {
         
@@ -1400,13 +1414,25 @@ public class PlotController extends DomNodeController {
         if ( !dom.controller.isValueAdjusting() ) {
             doPlotElementDefaultsChange(p);
         } else {
+            boolean isFirst= false;
+            for ( PlotElement pete: this.dom.getPlotElements() ) {
+                if ( pete.plotId.equals(this.plot.id ) ) {
+                    if ( pete==p ) {
+                        isFirst=true;
+                    }
+                    break;
+                }
+            }
+            
             //TODO: there's a copy of this code in doPlotElementDefaultsChange
-            if ( this.plotElement!=null ) {
+            if ( this.plotElement!=null && isFirst ) {
                 this.plotElement.getController().removePropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
             }
-            this.plotElement= p;
-            // this used to happen in doPlotElementDefaultsChange
-            p.getController().addPropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
+            if ( isFirst ) {
+                this.plotElement= p;
+                // this used to happen in doPlotElementDefaultsChange
+                p.getController().addPropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
+            }
         }
         if ( !pdListen.contains(p) ) {
             p.addPropertyChangeListener( PlotElement.PROP_PLOT_DEFAULTS, plotDefaultsListener );
@@ -1578,11 +1604,23 @@ public class PlotController extends DomNodeController {
                 logger.fine("value is adjusting, no reset autorange");
             }
 
-            if ( this.plotElement!=null ) {
+            boolean isFirst= false;
+            for ( PlotElement pete: this.dom.getPlotElements() ) {
+                if ( pete.plotId.equals(this.plot.id ) ) {
+                    if ( pete==p ) {
+                        isFirst=true;
+                    }
+                    break;
+                }
+            }
+            
+            if ( this.plotElement!=null && isFirst ) {
                 this.plotElement.getController().removePropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
             }
-            this.plotElement= p;
-            this.plotElement.getController().addPropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
+            if ( isFirst ) {
+                this.plotElement= p;
+                this.plotElement.getController().addPropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
+            }
             if ( true ) {   // bugfix 1157: simplify logic, was: if ( pele==null || defaults.getXaxis().isAutoRange()!=false ) { //TODO: why is this?  /home/jbf/ct/hudson/vap/geo_1.vap wants it
                 if ( defaults!=null ) {
                     if ( plot.isAutoLabel() ) plot.getController().setTitleAutomatically( defaults.getTitle() );
