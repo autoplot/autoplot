@@ -26,10 +26,14 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-08-28 r22756):</p>
+        <p>Bugfixes (2018-09-05 r22786):</p>
         <ul>
-            <li>matlab export options was using the IDL options dialog.
-            <li>horizontal and vertical slicers allow units sloppiness.
+            <li>Findbugs tests restored and a round of Findbugs citations were resolved.
+            <li>Auralizer code would show index out of bounds with some data, check for constant data. 
+            <li>AggregatingDataSourceFactory.getFileStorageModel(uri) would fail if the uri didn't have any fields.  Thanks, Ivar!
+            <li>Fits reader supports where default object is not a readable table.
+            <li>Matlab export options was using the IDL options dialog.
+            <li>horizontal and vertical slicers allow units sloppiness.  Thanks, Chris!
             <li>"clean" method removed from Matlab export to support compiling under Java 9.  Thanks, Dan!
         </ul>
         <p>Older Bugfixes:</p>
@@ -66,6 +70,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>DDataSet slice checks for out-of-bounds on slice, producing a more readable error.
             <li>CDF reader shows data types, record count, block size, and varies flag.
         </ul>
        <p>Less recent features:</p>
