@@ -688,7 +688,7 @@ public class BatchMaster extends javax.swing.JPanel {
                     }
                     String lastItem= ta.getText().trim();
                     if ( lastItem.length()>0  ) {
-                        int i= lastItem.lastIndexOf("\n");
+                        int i= lastItem.lastIndexOf('\n');
                         lastItem= lastItem.substring(i+1);
                         URISplit split= URISplit.parse(lastItem);
                         if ( split.path!=null && split.path.startsWith("file:") ) {
@@ -717,7 +717,7 @@ public class BatchMaster extends javax.swing.JPanel {
                     }
                     String lastItem= ta.getText().trim();
                     if ( lastItem.length()>0  ) {
-                        int i= lastItem.lastIndexOf("\n");
+                        int i= lastItem.lastIndexOf('\n');
                         lastItem= lastItem.substring(i+1);
                         URISplit split= URISplit.parse(lastItem);
                         if ( split.path!=null && split.path.startsWith("file:") ) {
