@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.dom;
 
 import java.awt.Component;
@@ -86,7 +83,8 @@ public class BindingSupport {
         final String srcProp;
         final String pprop;
 
-        private MyPropChangeListener( final Object p, final Method setter, final Method getter, final Converter c, final boolean forward, final String srcProp, final String pprop ) {
+        private MyPropChangeListener( final Object p, final Method setter, final Method getter, final Converter c, 
+                final boolean forward, final String srcProp, final String pprop ) {
             this.p= p;
             this.setter= setter;
             this.getter= getter;
@@ -124,11 +122,7 @@ public class BindingSupport {
                             setter.invoke(p, c.convertReverse(evt.getNewValue()));
                         }
                     }
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } catch (IllegalArgumentException e) {
-                    throw new RuntimeException(e);
-                } catch (InvocationTargetException e) {
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                     throw new RuntimeException(e);
                 }
         }
@@ -222,13 +216,7 @@ public class BindingSupport {
         } catch (IllegalArgumentException ex) {
             String msg= String.format( "failed to bind %s.%s to %s.%s", src, srcProp, dst, dstProp );
             throw new RuntimeException(msg,ex);
-        } catch (InvocationTargetException ex) {
-            String msg= String.format( "failed to bind %s.%s to %s.%s", src, srcProp, dst, dstProp );
-            throw new RuntimeException(msg,ex);
-        } catch (IllegalAccessException ex) {
-            String msg= String.format( "failed to bind %s.%s to %s.%s", src, srcProp, dst, dstProp );
-            throw new RuntimeException(msg,ex);
-        } catch (RuntimeException ex) {
+        } catch (InvocationTargetException | IllegalAccessException | RuntimeException ex) {
             String msg= String.format( "failed to bind %s.%s to %s.%s", src, srcProp, dst, dstProp );
             throw new RuntimeException(msg,ex);
         }
@@ -244,15 +232,7 @@ public class BindingSupport {
         try {
             Method apcl = dst.getClass().getMethod("addPropertyChangeListener", String.class, PropertyChangeListener.class);
             apcl.invoke(dst, dstProp, dstListener);
-        } catch (IllegalAccessException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (IllegalArgumentException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (InvocationTargetException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (NoSuchMethodException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (SecurityException ex) {
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
@@ -307,15 +287,7 @@ public class BindingSupport {
                 try {
                     Method apcl = bi.dst.getClass().getMethod("removePropertyChangeListener", String.class, PropertyChangeListener.class);
                     apcl.invoke(bi.dst, bi.dstProp, bi.dstListener);
-                } catch (IllegalAccessException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                } catch (IllegalArgumentException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                } catch (InvocationTargetException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                } catch (NoSuchMethodException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                } catch (SecurityException ex) {
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
                 bi.src.removePropertyChangeListener(bi.srcProp, bi.srcListener);
@@ -339,15 +311,7 @@ public class BindingSupport {
                     try {
                         Method apcl = bi.dst.getClass().getMethod("removePropertyChangeListener", String.class, PropertyChangeListener.class);
                         apcl.invoke(bi.dst, bi.dstProp, bi.dstListener);
-                    } catch (IllegalAccessException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    } catch (IllegalArgumentException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    } catch (InvocationTargetException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    } catch (NoSuchMethodException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    } catch (SecurityException ex) {
+                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
                         logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                     bi.src.removePropertyChangeListener(bi.srcProp, bi.srcListener);
