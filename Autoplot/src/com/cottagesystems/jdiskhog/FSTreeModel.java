@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,7 +52,7 @@ public class FSTreeModel implements TreeModel {
             this.f = f;
             this.parentFile = parentFile;
             this.abs = abs;
-            this.windows= System.getProperty("os.name").toLowerCase().startsWith("win");
+            this.windows= System.getProperty("os.name").toLowerCase(Locale.US).startsWith("win");
         }
 
         public File getFile() {
