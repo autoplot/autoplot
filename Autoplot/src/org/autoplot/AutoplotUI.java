@@ -1509,7 +1509,7 @@ APSplash.checkTime("init 270");
                 if ( evt.getNewValue()==null ) {
                     String current= AutoplotUI.this.stateSupport.getCurrentFile();
                     if ( current!=null ) {
-                        AutoplotUI.this.dataSetSelector.setValue(current.toString());
+                        AutoplotUI.this.dataSetSelector.setValue(current);
                     }
                 }
             }
