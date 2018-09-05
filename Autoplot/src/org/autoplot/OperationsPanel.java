@@ -518,7 +518,8 @@ public class OperationsPanel extends javax.swing.JPanel {
             public void run() {
                 QDataSet oldDataSet= filtersChainPanel.getInput();
                 String oldFilter= filtersChainPanel.getFilter();
-                if ( oldFilter!=null && oldFilter.equals(filter) && oldDataSet!=null && oldDataSet.equals(dataSet) ) {
+                if ( oldFilter==null ) oldFilter= "";
+                if ( oldFilter.equals(filter) && oldDataSet!=null && oldDataSet.equals(dataSet) ) {
                     //return;
                     if ( !filter.equals(operatorsTextField.getText()) ) {
                         try {
