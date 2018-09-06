@@ -217,9 +217,9 @@ public class DataSourceUtil {
      * @return list of aggregations found.
      */
     public static List<String> findAggregations( List<String> files, boolean remove, boolean loose ) {
-        List<String> accountedFor= new ArrayList<String>();
-        List<String> result= new ArrayList<String>();
-        List<String> nonAgg= new ArrayList<String>();
+        List<String> accountedFor= new ArrayList<>();
+        List<String> result= new ArrayList<>();
+        List<String> nonAgg= new ArrayList<>();
 
         List<String> notAccountedFor;
         notAccountedFor= new LinkedList(files);
@@ -262,7 +262,7 @@ public class DataSourceUtil {
                         tp.parse(s);
                         dr = DatumRangeUtil.union(dr, tp.getTimeRange() );
                         moveUs.add( s );
-                    } catch (ParseException ex) {
+                    } catch (IllegalArgumentException | ParseException ex) {
                         // it's not part of the agg.
                     }
                 }
