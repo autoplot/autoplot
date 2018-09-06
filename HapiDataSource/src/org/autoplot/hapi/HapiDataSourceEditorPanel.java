@@ -799,6 +799,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             try {
                 id= URLDecoder.decode(id,"UTF-8");
                 idsList2.setSelectedValue( id, true );
+                resetVariableTimer.tickle("initialUpdate");
             } catch (UnsupportedEncodingException ex) {
                 throw new RuntimeException(ex);
             }
