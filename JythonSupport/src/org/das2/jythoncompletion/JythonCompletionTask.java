@@ -665,6 +665,12 @@ public class JythonCompletionTask implements CompletionTask {
                 int i= lastLine.indexOf("def ");
                 String indent= lastLine.substring(0,i);
                 eval= eval + indent + "\t" + "__dummy__=1\n";
+            } else {
+                int i= lastLine.indexOf("for "); //TODO: find the correct expression
+                if ( i>-1 ) {
+                    String indent= lastLine.substring(0,i);
+                    eval= eval + indent + "\t" + "__dummy__=1\n";
+                }
             }
         }
         
