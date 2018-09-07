@@ -53,10 +53,10 @@ public class MetadataPanel extends javax.swing.JPanel {
     Application dom;
     CombinedTreeModel tree;
     TreeModel dsTree;
+    private QDataSet dsTreeDs;
     TreeModel componentDataSetTree=null;
     DataSourceFilter bindToDataSourceFilter = null;  //TODO: these should be weak references or such.
     PlotElement bindToPlotElement =null;
-    private QDataSet dsTreeDs;
     private NameValueTreeModel statsTree;
 
     Thread updateComponentDataSetThread= null;
@@ -381,6 +381,9 @@ public class MetadataPanel extends javax.swing.JPanel {
         });
     }
 
+    /**
+     * update the "Processed Dataset" node
+     */
     private synchronized void updateComponentDataSetPropertiesView() {
         assert EventQueue.isDispatchThread() == false;
         final TreeModel unmount;
