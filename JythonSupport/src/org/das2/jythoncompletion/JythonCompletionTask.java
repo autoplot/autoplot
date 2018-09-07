@@ -660,17 +660,11 @@ public class JythonCompletionTask implements CompletionTask {
         if ( eolnCarot>0 ) {
             int startLastLine= Utilities.getRowStart(editor, eolnCarot-1 );
             String lastLine= editor.getText( startLastLine, eolnCarot-startLastLine );
-            Matcher m= Pattern.compile("def .*").matcher(lastLine.trim());
+            Matcher m= Pattern.compile("(\\s*)(\\S+).*").matcher(lastLine.trim());
             if ( m.matches() ) {
-                int i= lastLine.indexOf("def ");
+                int i= m.group(1).length();
                 String indent= lastLine.substring(0,i);
                 eval= eval + indent + "\t" + "__dummy__=1\n";
-            } else {
-                int i= lastLine.indexOf("for "); //TODO: find the correct expression
-                if ( i>-1 ) {
-                    String indent= lastLine.substring(0,i);
-                    eval= eval + indent + "\t" + "__dummy__=1\n";
-                }
             }
         }
         
