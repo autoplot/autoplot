@@ -287,6 +287,7 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         double scaleFactor = 1.0;
         double addOffset = 0.0;
         double validMin, validMax;
+        Integer fillValue= null;
 
         public Int16Array(DArray array, Map<String,Object> properties) {
             super(array);
@@ -297,6 +298,13 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             if (properties.get("scale_factor") != null) {
                 scaleFactor = toDoubleValue( properties.get("scale_factor"));
             }
+            if ( properties.get("_FillValue")!=null ) {
+                try {
+                    fillValue= Integer.parseInt(String.valueOf(properties.get("_FillValue")));
+                } catch ( NumberFormatException ex ) {
+                    logger.info( ex.toString() );
+                }
+            }
             validMin = Double.NEGATIVE_INFINITY;
             validMax = Double.POSITIVE_INFINITY;
             if (properties.get("VALID_MIN") != null) {
@@ -305,6 +313,12 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             if (properties.get("VALID_MAX") != null) {
                 validMax = toDoubleValue( properties.get("VALID_MAX") );
             }
+            if ( properties.get("valid_min") !=null ) {
+                validMin = toDoubleValue( properties.get("valid_min") );
+            }
+            if ( properties.get("valid_max") !=null ) {
+                validMin = toDoubleValue( properties.get("valid_max") );
+            }
             if (properties.get("valid_range") != null) {
                 String s = (String) properties.get("valid_range");
                 String[] ss = s.split(",");
@@ -312,11 +326,16 @@ public abstract class DodsVarDataSet implements WritableDataSet {
                 validMax = Double.parseDouble(ss[1]);
             }
             this.properties.putAll( properties );
+            if ( validMin!=Double.NEGATIVE_INFINITY ) this.putProperty( QDataSet.VALID_MIN, validMin );
+            if ( validMax!=Double.POSITIVE_INFINITY ) this.putProperty( QDataSet.VALID_MAX, validMax );
         }
 
         private double doubleValue(short val) {
+            if ( fillValue!=null && val==fillValue ) {
+                return Units.dimensionless.getFillDouble();
+            }
             double r = val * scaleFactor + addOffset;
-            return r >= validMin && r <= validMax ? r : Units.dimensionless.getFillDouble();
+            return r;
         }
 
         @Override
