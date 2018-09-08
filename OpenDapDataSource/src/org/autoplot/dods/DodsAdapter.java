@@ -119,16 +119,22 @@ public class DodsAdapter {
     
     private long getSizeForType( DArray v, boolean streaming ) {
         PrimitiveVector pv = v.getPrimitiveVector();
+        Enumeration e= v.getDimensions();
+        int n=1;
+        while ( e.hasMoreElements() ) {
+            DArrayDimension a= (DArrayDimension)e.nextElement();
+            n= n * a.getSize();
+        }
         if (pv instanceof Float32PrimitiveVector) {
-            return 4 * ( streaming ? v.getFirstDimension().getSize() : 1 );
+            return 4 * n * ( streaming ? v.getFirstDimension().getSize() : 1 );
         } else if (pv instanceof Float64PrimitiveVector) {
-            return 8 * ( streaming ? v.getFirstDimension().getSize() : 1 );
+            return 8 * n *( streaming ? v.getFirstDimension().getSize() : 1 );
         } else if (pv instanceof Int32PrimitiveVector ) {
-            return 4 * ( streaming ? v.getFirstDimension().getSize() : 1 );
+            return 4 * n *( streaming ? v.getFirstDimension().getSize() : 1 );
         } else if (pv instanceof Int16PrimitiveVector ) {
-            return 2 * ( streaming ? v.getFirstDimension().getSize() : 1 );
+            return 2 * n *( streaming ? v.getFirstDimension().getSize() : 1 );
         } else {
-            return 1;
+            return n;
         }
     }
 
@@ -162,8 +168,10 @@ public class DodsAdapter {
             long size = 0;
             while (variables.hasMoreElements()) {
                 Object o = variables.nextElement();
+                String n;
                 if (o instanceof DSequence) {
                     Enumeration enume1 = ((DSequence) o).getVariables();
+                    n= ((DSequence)o).getName();
                     int j = 0;
                     while (enume1.hasMoreElements()) {
                         Object ele = enume1.nextElement();
@@ -171,16 +179,18 @@ public class DodsAdapter {
                             DStructure ds = (DStructure) ele;
 
                             Enumeration enume2 = ds.getVariables();
-                            int jj = 0;
                             while (enume2.hasMoreElements()) {
                                 Object k = enume2.nextElement();
-                                j += getSizeForType((BaseType) k,true);
+                                long s= getSizeForType((BaseType) k,true);
+                                j += s;
+                                logger.log(Level.FINE, "   calcSize {0}: {1}", new Object[]{ ((BaseType)k).getName(), s });                    
                             }
                         } else if ( ele instanceof DSequence ) {
                             j+= 0;
                         } else if (ele instanceof BaseType) {
-                            j += getSizeForType((BaseType) ele,true);
-
+                            long s= getSizeForType((BaseType) ele,true);
+                            j += s;
+                            logger.log(Level.FINE, "   calcSize {0}: {1}", new Object[]{ ((BaseType)ele).getName(), s });                    
                         } else {
                             throw new IllegalArgumentException("huh");
                         }
@@ -192,9 +202,33 @@ public class DodsAdapter {
                         size = -1; // we don't know number of records.
                     }
                 } else if ( o instanceof DGrid ) {
-                    return -1;
+                    DGrid dg= (DGrid) o;
+                    n= dg.getName();
+                    Enumeration enume1= dg.getVariables();
+                    int j= 0;
+                    while ( enume1.hasMoreElements() ) {
+                        Object ele= enume1.nextElement();
+                        if (ele instanceof DStructure) {
+                            DStructure ds = (DStructure) ele;
+
+                            Enumeration enume2 = ds.getVariables();
+                            while (enume2.hasMoreElements()) {
+                                Object k = enume2.nextElement();
+                                long s= getSizeForType((BaseType) k,false);
+                                j += s;
+                                logger.log(Level.FINE, "   calcSize {0}: {1}", new Object[]{ ((BaseType)k).getName(), s });
+                            }
+                        } else if ( ele instanceof DSequence ) {
+                            j+= 0;
+                        } else if ( ele instanceof BaseType ) {
+                            j += getSizeForType((BaseType) ele,false);
+                        }
+                    }
+                    size= j;
+                    
                 } else {
                     DArray v = (DArray) o;
+                    n= ((DArray)o).getName();
                     Enumeration dimensions = v.getDimensions();
                     long s1 = getSizeForType(v, false);
                     s1 *= 2;   // not sure why
@@ -204,7 +238,9 @@ public class DodsAdapter {
                     }
                     size += s1;
                 }
+                logger.log(Level.FINE, "calcSize {0}: {1}", new Object[]{n, size});
             }
+            
             logger.exiting("org.virbo.dods.DodsAdapter", "calcSize" );
             
             return size;
@@ -263,6 +299,7 @@ public class DodsAdapter {
         
         long size = calcSize(  attr );
         mon.setTaskSize(size);
+        if ( mon.isCancelled() ) throw new CancelledOperationException("OpenDap load cancelled");
         
         logger.log(Level.FINE, "constructing dconnect on {0}", source.toString() );
         DConnect dconnect = new DConnect(source.toString(), true);
@@ -272,6 +309,7 @@ public class DodsAdapter {
         
         try {
             logger.log(Level.FINE, "calling dconnect.getData constraint={0}", constraint);
+            if ( mon.isCancelled() ) throw new CancelledOperationException("OpenDap load cancelled");
             dds = dconnect.getData(constraint, statusUI);
             logger.log(Level.FINE, "called dconnect.getData -> {0}", dds );
             if ( dds==null ) {
@@ -306,7 +344,7 @@ public class DodsAdapter {
      * @return
      */
     public QDataSet getDataSet(Map<String, Object> attributes) {
-        DodsVarDataSet zds;
+        MutablePropertyDataSet zds;
 
         logger.entering("org.virbo.dods.DodsAdapter", "getDataSet" );
         if (attributes == null) attributes = new HashMap<>();
@@ -352,7 +390,7 @@ public class DodsAdapter {
                 }
                 if (zds.property(QDataSet.UNITS) == null) {
                     String s= String.valueOf( attributes.get("units") );
-                    checkTimeUnits( s, zds);
+                    zds= checkTimeUnits( s, zds );
                 }
                 for (int idim = 0; idim < z.numDimensions(); idim++) {
                     if (dependName[idim] != null) {
@@ -474,8 +512,9 @@ public class DodsAdapter {
      * check for time units and attach them to the data.
      * @param sunits labels for the units, or null.
      * @param dep0 the data
+     * @return dep0, which may have been rewritten to support "days since 1970-01-01T00:00:00Z"
      */
-    protected static void checkTimeUnits(String sunits, MutablePropertyDataSet dep0) {
+    protected static MutablePropertyDataSet checkTimeUnits(String sunits, MutablePropertyDataSet dep0) {
         if (sunits != null) {
             if (sunits.contains("since")) {
                 Units u;
@@ -483,10 +522,20 @@ public class DodsAdapter {
                     u = Units.lookupTimeUnits(sunits);
                     dep0.putProperty(QDataSet.UNITS, u);
                 } catch (java.text.ParseException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    if ( sunits.equals("days since 1-1-1 00:00:0.0") ) {
+                        dep0= Ops.maybeCopy( Ops.subtract( dep0, DataSetUtil.asDataSet(719529) ) ); // from https://www.epochconverter.com/seconds-days-since-y0
+                        try {
+                            dep0.putProperty( QDataSet.UNITS, Units.lookupTimeUnits( "days since 1970-01-01T00:00:00Z" ) );
+                        } catch (java.text.ParseException ex1) {
+                            logger.log(Level.SEVERE, null, ex1);
+                        }
+                    } else {
+                        logger.log(Level.SEVERE, null, ex);
+                    }                    
                 }
             }
         }
+        return dep0;
     }
 
     /**

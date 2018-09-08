@@ -48,6 +48,7 @@ import org.das2.qds.MutablePropertyDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
+import org.das2.qds.ops.Ops;
 import org.das2.qds.util.TransposeRankNDataSet;
 
 /**
@@ -358,20 +359,26 @@ public class DodsDataSource extends AbstractDataSource {
             val= metadata.get("title");
             if ( val!=null ) {
                 ds.putProperty( QDataSet.TITLE, String.valueOf(val) );
+            } else {
+                val= metadata.get("long_name");
+                ds.putProperty( QDataSet.TITLE, String.valueOf(val) );
             }
-            
+               
             String sunits = (String) metadata.get("units");
-            DodsAdapter.checkTimeUnits( sunits, ds );
+            ds= DodsAdapter.checkTimeUnits( sunits, ds );
             
             // check depends
-            QDataSet dep0= (QDataSet) ds.property( QDataSet.DEPEND_0 );
-            if ( dep0!=null ) {
-                String n=(String)dep0.property(QDataSet.NAME);
-                adapter.setVariable(n);
-                Map<String,Object> m= getMetaData(n);
-                //adapter.loadDataset(mon, m);
-                dep0= adapter.getDataSet(m);
-                ds.putProperty( QDataSet.DEPEND_0, dep0 );
+            for ( int i= 0; i<ds.rank(); i++ ) {
+                QDataSet dep= (QDataSet) ds.property( "DEPEND_"+i );
+                if ( dep!=null ) {
+                    String n=(String)dep.property(QDataSet.NAME);
+                    adapter.setVariable(n);
+                    Map<String,Object> m= getMetaData(n);
+                    //adapter.loadDataset(mon, m);
+                    adapter.setDependName( i,null );
+                    dep= adapter.getDataSet(m);
+                    ds.putProperty( "DEPEND_"+i, dep );
+                }
             }
             
             if (isIstp ) {
