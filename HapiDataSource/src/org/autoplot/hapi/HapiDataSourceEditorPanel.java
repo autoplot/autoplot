@@ -210,9 +210,9 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             try {
-                String s= idsList2.getSelectedValue();
+                String s= currentId;
                 if ( s!=null ) {
-                    resetId( new URL( (String)serversComboBox.getSelectedItem() ), idsList2.getSelectedValue() );  
+                    resetId( new URL( (String)serversComboBox.getSelectedItem() ), s );  
                 } else {
                     parametersPanel.removeAll();
                     parametersPanel.add(new JLabel(" "));
@@ -799,7 +799,6 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             try {
                 id= URLDecoder.decode(id,"UTF-8");
                 idsList2.setSelectedValue( id, true );
-                resetVariableTimer.tickle("initialUpdate");
             } catch (UnsupportedEncodingException ex) {
                 throw new RuntimeException(ex);
             }
@@ -816,6 +815,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( parameters!=null ) {
             this.currentParameters= parameters;
             setParameters(this.currentParameters);
+            resetVariableTimer.tickle("initialUpdate");
         }
         if ( HapiSpec.BINARY.equals(params.get("format") ) ) {
             this.binaryCB.setSelected(true);
