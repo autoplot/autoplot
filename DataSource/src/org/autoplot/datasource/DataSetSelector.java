@@ -1657,7 +1657,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         inspectButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
         inspectButton.setMaximumSize(new java.awt.Dimension(27, 27));
         inspectButton.setMinimumSize(new java.awt.Dimension(27, 27));
-        inspectButton.setName("browse"); // NOI18N
+        inspectButton.setName("inspect"); // NOI18N
         inspectButton.setPreferredSize(new java.awt.Dimension(27, 27));
         inspectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
