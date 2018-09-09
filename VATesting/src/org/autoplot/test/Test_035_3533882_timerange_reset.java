@@ -57,7 +57,7 @@ public class Test_035_3533882_timerange_reset implements Scenario {
 
             dom.setTimeRange( DatumRangeUtil.parseTimeRange("2005-09-08") );
 
-            new JButtonOperator( mainFrame, new NameComponentChooser("browse") ).clickMouse();
+            new JButtonOperator( mainFrame, new NameComponentChooser("inspect") ).clickMouse();
 
             DialogOperator diaFrame = new DialogOperator( new RegexComponentChooser( "Editing .*") );
 

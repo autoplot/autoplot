@@ -83,7 +83,7 @@ public class Test_052_FocusSwitching implements Scenario {
             
             ScriptContext.waitUntilIdle(); 
             
-            new JButtonOperator( mainFrame, new NameComponentChooser("browse") ).clickMouse();
+            new JButtonOperator( mainFrame, new NameComponentChooser("inspect") ).clickMouse();
 
             DialogOperator diaFrame = new DialogOperator( new RegexComponentChooser( "Editing .*") );
 

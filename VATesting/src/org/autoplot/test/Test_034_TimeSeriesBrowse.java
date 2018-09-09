@@ -79,7 +79,7 @@ public class Test_034_TimeSeriesBrowse implements Scenario {
             xaxis.scanNext(); // no gui test, but that's okay...
             System.err.println( "4: "+xaxis.getDatumRange() );
             
-            new JButtonOperator( mainFrame, new NameComponentChooser("browse") ).clickMouse();
+            new JButtonOperator( mainFrame, new NameComponentChooser("inspect") ).clickMouse();
                     //app.getDataSetSelector().getBrowseButton()).clickMouse();
 
             DialogOperator diaFrame = new DialogOperator( new RegexComponentChooser( "Editing .*") );

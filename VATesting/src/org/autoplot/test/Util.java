@@ -7,6 +7,7 @@ package org.autoplot.test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -65,5 +66,16 @@ public class Util {
      */
     static void switchToTab( AutoplotUI app, String name ) {
         new JTabbedPaneOperator( app.getTabs() ).selectPage(name);
+    }
+    
+    /**
+     * print a report about the logger to stderr.
+     * @param l 
+     */
+    public static void reportLogger( Logger l ) {
+        System.err.println( "handlers: " + logger.getHandlers().length );
+        for ( Handler h: logger.getHandlers() ) {
+            System.err.println( "handlers: " + h.getClass().toString() + " " + h.getLevel() + " " + h.getFormatter().getClass().toString() );
+        }
     }
 }
