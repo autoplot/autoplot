@@ -64,7 +64,7 @@ public class Test_060_HapiEditorPanel implements Scenario {
             createGui();
             
             AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
-            ScreenshotsTool st= new ScreenshotsTool( ScriptContext.getApplication(), "Test_060_HapiEditorPanel/", true );
+            //ScreenshotsTool st= new ScreenshotsTool( ScriptContext.getApplication(), "Test_060_HapiEditorPanel/", true );
               
             JFrameOperator mainFrame= new JFrameOperator(app);
             
@@ -89,7 +89,7 @@ public class Test_060_HapiEditorPanel implements Scenario {
             waitUntilIdle(1000);
             //st.takePicture(90,"Two plots.");
             ScriptContext.writeToPng("Test_060_HapiEditorPanel_2.png");
-            st.requestFinish(true);
+            //st.requestFinish(true);
             
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
