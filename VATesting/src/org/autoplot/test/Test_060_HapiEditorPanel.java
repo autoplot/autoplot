@@ -73,21 +73,21 @@ public class Test_060_HapiEditorPanel implements Scenario {
             new JButtonOperator( mainFrame, new NameComponentChooser("inspect") ).clickMouse();
 
             DialogOperator diaFrame = new DialogOperator( new RegexComponentChooser( "Editing .*") );
-            st.takePicture(61,"This is the HAPI editor panel with id and parameters set for URI.");
-            wait(1000);
+            //st.takePicture(61,"This is the HAPI editor panel with id and parameters set for URI.");
+            wait(3000);
             new JButtonOperator( diaFrame, "Plot" ).clickMouse();
             waitUntilIdle(1000);
             ScriptContext.writeToPng("Test_060_HapiEditorPanel_1.png");
             new JButtonOperator( mainFrame, new NameComponentChooser("inspect") ).clickMouse();
             wait(1000);
             diaFrame = new DialogOperator( new RegexComponentChooser( "Editing .*") );
-            st.takePicture(69,"This is the HAPI editor panel with id and parameters set.");
+            //st.takePicture(69,"This is the HAPI editor panel with id and parameters set.");
             wait(1000);
             new JListOperator( diaFrame ).selectItem("Iowa City Forecast"); 
             wait(1000);
             new JButtonOperator( diaFrame, "Plot Below" ).clickMouse();
             waitUntilIdle(1000);
-            st.takePicture(90,"Two plots.");
+            //st.takePicture(90,"Two plots.");
             ScriptContext.writeToPng("Test_060_HapiEditorPanel_2.png");
             st.requestFinish(true);
             
