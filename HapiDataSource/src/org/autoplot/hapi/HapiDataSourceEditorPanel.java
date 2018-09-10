@@ -1136,6 +1136,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         currentExtra= extra.toString();
         parametersPanel.removeAll();
         String[] sparams= new String[parameters.length()];
+        Boolean startRank2= null;
         for ( int i=0; i<parameters.length(); i++ ) {
             JSONObject parameter= parameters.getJSONObject(i);
 //                if ( parameter.has("size") ) {
@@ -1156,8 +1157,17 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 label= label+parameter.getString("size");
             }
             cb.setName(sparams[i]);
+            
+            if ( i==0 ) {
+                cb.setSelected(true);
+            } else if ( startRank2==null ) {
+                startRank2= label.contains("[");
+                cb.setSelected(true);
+            } else {
+                boolean otherIsRank2= label.contains("[");
+                cb.setSelected( otherIsRank2 ? false : ( !startRank2 ) );
+            }
 
-            cb.setSelected(true);
             final int fi= i;
             cb.addActionListener(new ActionListener() {
                 @Override
@@ -1176,6 +1186,16 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                         }
                     }
                     lastParamIndex= fi;
+                    String label= ((JCheckBox)parametersPanel.getComponent(fi)).getText();
+                    boolean rank2= label.contains("[");
+                    for ( int i=1; i<parametersPanel.getComponentCount(); i++ ) {
+                        Component c= parametersPanel.getComponent(i);
+                        if ( c instanceof JCheckBox && c!=((JCheckBox)parametersPanel.getComponent(fi)) ) {
+                            boolean otherIsRank2= ((JCheckBox)c).getText().contains("[");
+                            boolean isAlreadySelected= ((JCheckBox)c).isSelected();
+                            ((JCheckBox)c).setSelected( otherIsRank2 ? false : ( isAlreadySelected && !rank2 ) );
+                        }
+                    }
                 }
 
             });
