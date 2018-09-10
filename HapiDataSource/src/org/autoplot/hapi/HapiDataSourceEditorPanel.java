@@ -5,6 +5,8 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -78,6 +80,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private URL defaultServer;
 	
     private Datum myValidTime;
+    
+    private Component firstParameter=null;
 	
     /**
      * return the range of available data. For example, Polar/Hydra data is available
@@ -153,7 +157,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         initComponents();
         filtersComboBox.setPreferenceNode("hapi.filters");
         timeRangeComboBox.setPreferenceNode(RecentComboBox.PREF_NODE_TIMERANGE);
-        jScrollPane4.getVerticalScrollBar().setUnitIncrement( parametersPanel.getFont().getSize() );
+        parametersScrollPane.getVerticalScrollBar().setUnitIncrement( parametersPanel.getFont().getSize() );
 
         parametersPanel.setLayout( new BoxLayout( parametersPanel, BoxLayout.Y_AXIS ) );
 
@@ -288,7 +292,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         jButton1 = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel3 = new javax.swing.JPanel();
-        jScrollPane4 = new javax.swing.JScrollPane();
+        parametersScrollPane = new javax.swing.JScrollPane();
         parametersPanel = new javax.swing.JPanel();
         clearAllB = new javax.swing.JButton();
         setAllB = new javax.swing.JButton();
@@ -341,7 +345,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             .addGap(0, 195, Short.MAX_VALUE)
         );
 
-        jScrollPane4.setViewportView(parametersPanel);
+        parametersScrollPane.setViewportView(parametersPanel);
 
         clearAllB.setText("Clear All");
         clearAllB.addActionListener(new java.awt.event.ActionListener() {
@@ -377,7 +381,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
+            .addComponent(parametersScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(clearAllB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -393,7 +397,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(titleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+                .addComponent(parametersScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(clearAllB)
@@ -694,10 +698,10 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JLabel messagesLabel;
     private javax.swing.JPanel parametersPanel;
+    private javax.swing.JScrollPane parametersScrollPane;
     private javax.swing.JComboBox<String> serversComboBox;
     private javax.swing.JButton setAllB;
     private org.autoplot.datasource.RecentComboBox timeRangeComboBox;
@@ -735,6 +739,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         if ( parameters.length()>0 ) {
             String[] ss= parameters.split(",");
+            int iparam=0;
             for ( Component c: parametersPanel.getComponents() ) {
                 if ( c instanceof JCheckBox ) {
                     String name= ((JCheckBox)c).getName();
@@ -742,8 +747,12 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     for (String s : ss) {
                         if (s.equals(name)) {
                             ((JCheckBox)c).setSelected(true);
+                            if ( iparam>0 && firstParameter==null ) {
+                                firstParameter= c;
+                            }
                         }
                     }
+                    iparam++;
                 }
             }
         } else {
@@ -752,6 +761,15 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     ((JCheckBox)c).setSelected(true);
                 }
             }
+        }
+        if ( firstParameter!=null ) {
+            SwingUtilities.invokeLater( new Runnable() {
+                public void run() {
+                    Rectangle r= firstParameter.getBounds();
+                    parametersScrollPane.getViewport().setViewPosition( new Point( 0, Math.max( 0, r.y - parametersScrollPane.getHeight()/4 ) ) );
+                }
+            });
+            
         }
     }
 
@@ -1176,7 +1194,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         parametersPanel.repaint();
         if ( currentParameters!=null ) {
             setParameters(currentParameters);
-        }            
+        }
         DatumRange range= getRange(info);
         if ( range==null ) {
             logger.warning("server is missing required startDate and stopDate parameters.");
