@@ -834,6 +834,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             this.currentParameters= parameters;
             setParameters(this.currentParameters);
             resetVariableTimer.tickle("initialUpdate");
+        } else {
+            resetVariableTimer.tickle("initialUpdateNoParams");
         }
         if ( HapiSpec.BINARY.equals(params.get("format") ) ) {
             this.binaryCB.setSelected(true);
