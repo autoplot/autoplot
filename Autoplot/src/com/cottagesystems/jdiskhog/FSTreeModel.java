@@ -113,7 +113,7 @@ public class FSTreeModel implements TreeModel {
 //        }
 //    }
     
-    FSTreeModel( DiskUsageModel model, File root ) {
+    public FSTreeModel( DiskUsageModel model, File root ) {
         this.model = model;
 //        model.addPropertyChangeListener( new PropertyChangeListener() {
 //            @Override

@@ -28,7 +28,22 @@ public class DiskUsageModel {
             return false;
         }
     }
+    
+    /**
+     * initialize the search, recursing into subdirectories.
+     * @param f the root directory of the search
+     * @param mon progress monitor
+     */
+    public void search(File f, ProgressMonitor mon) {
+        search( f, 0, mon );
+    }
 
+    /**
+     * search from this point, recursing into subdirectories.
+     * @param f the root directory of the search
+     * @param depth the current depth
+     * @param mon progress monitor
+     */
     @SuppressWarnings("unchecked")
     public void search(File f, int depth, ProgressMonitor mon) {
 
