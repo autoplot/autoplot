@@ -228,6 +228,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                                     ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1 );
                                 } catch ( Exception ex ) {
                                     ds1= null; // !!!!
+                                    logger.log( Level.WARNING, ex.getMessage(), ex );
                                 }
                                 comps.add( ds1 );
                                 nc++;
@@ -246,6 +247,8 @@ public class CDAWebDataSource extends AbstractDataSource {
                                 } catch (IllegalArgumentException ex ){
                                     throw new IllegalArgumentException("The virtual variable " + id + " cannot be plotted because the function is not supported: "+function );
                                 }
+                            } else {
+                                throw new IllegalArgumentException("The virtual variable "+id + " cannot be plotted because a component is missing");
                             }
                         } else {
                         throw new IllegalArgumentException("The virtual variable " + id + " cannot be plotted because the function is not identified" );
