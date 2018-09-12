@@ -39,6 +39,7 @@ import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.Slice0DataSet;
 import org.autoplot.datasource.DataSourceUtil;
 import org.das2.qds.ops.Ops;
+import org.das2.util.monitor.NullProgressMonitor;
 
 /**
  * static methods supporting CdfFileDataSource
@@ -467,10 +468,33 @@ public class CdfUtil {
         return result;
     }
     
+    /**
+     * Return the named variable as a QDataSet.  This does not look at the
+     * metadata for DEPEND_0, etc, and only adds metadata to represent time units
+     * (e.g. the data is in TT2000) and ordinal data.
+     * @param cdf the value of CDF
+     * @param svariable name of the variable
+     * @return the dataset
+     * @throws Exception
+     * @deprecated use loadCdfVariable instead
+     */
     public static synchronized MutablePropertyDataSet wrapCdfData(
-        CDFReader cdf, String svariable, long recStart, long recCount, long recInterval, 
-        int slice1, ProgressMonitor mon) throws Exception {
-        return wrapCdfData(cdf, svariable, recStart, recCount, recInterval, slice1, false, mon);
+            CDFReader cdf, String svariable) throws Exception {
+        return CdfUtil.loadVariable(cdf, svariable, 0, -1, 1, -1, new NullProgressMonitor() );
+    }
+    
+    /**
+     * Return the named variable as a QDataSet.  This does not look at the
+     * metadata for DEPEND_0, etc, and only adds metadata to represent time units
+     * (e.g. the data is in TT2000) and ordinal data.
+     * @param cdf the value of CDF
+     * @param svariable name of the variable
+     * @return the dataset
+     * @throws Exception
+     */
+    public static synchronized MutablePropertyDataSet loadVariable(
+            CDFReader cdf, String svariable) throws Exception {
+        return CdfUtil.loadVariable(cdf, svariable, 0, -1, 1, -1, new NullProgressMonitor() );
     }
     
     /**
@@ -487,17 +511,37 @@ public class CdfUtil {
      * @param mon progress monitor (currently not used), or null.
      * @return the dataset
      * @throws Exception
+     * @deprecated use loadCdfVariable instead
      */
     public static synchronized MutablePropertyDataSet wrapCdfData(
             CDFReader cdf, String svariable, long recStart, long recCount, long recInterval, 
             int slice1, boolean depend, ProgressMonitor mon) throws Exception {
-
-        if ( recCount==0 ) {
-            throw new IllegalArgumentException("recCount must be greater than 0 or -1");
-        }
-        if ( recCount<-1 ) throw new IllegalArgumentException("recCount must be greater than 0 or -1");
+        return CdfUtil.loadVariable(cdf,  svariable,  recStart,  recCount,  recInterval, 
+             slice1,  mon );
         
-        logger.log( Level.FINE, "wrapCdfData {0}[{1}:{2}:{3}]", new Object[] { svariable, String.valueOf(recStart), // no commas in {1}
+    }
+    
+    /**
+     * Return the named variable as a QDataSet.  This does not look at the
+     * metadata for DEPEND_0, etc, and only adds metadata to represent time units
+     * (e.g. the data is in TT2000) and ordinal data.
+     * @param cdf the value of CDF
+     * @param svariable name of the variable
+     * @param recStart the first record to retrieve (0 is the first record in the file).
+     * @param recCount the number of records to retrieve, -1 means the record is flag for slice
+     * @param recInterval the number of records to increment, typically 1 (e.g. 2= every other record).
+     * @param slice1 if non-negative, return the slice at this point.
+     * @param mon progress monitor (currently not used), or null.
+     * @return the dataset
+     * @throws Exception
+     */
+    public static synchronized MutablePropertyDataSet loadVariable(
+            CDFReader cdf, String svariable, long recStart, long recCount, long recInterval, int slice1, ProgressMonitor mon) throws Exception {        
+
+        if ( recCount==0 ) throw new IllegalArgumentException("recCount must be greater than 0 or -1");
+        if ( recCount<-1 ) throw new IllegalArgumentException("recCount must be greater than -1");
+        
+        logger.log(Level.FINE, "loadVariable {0}[{1}:{2}:{3}]", new Object[] { svariable, String.valueOf(recStart), // no commas in {1}
                  ""+(recCount+recStart), recInterval } );
         
         //MutablePropertyDataSet cresult= maybeGetCached( cdf, svariable, recStart, recCount, recInterval );
@@ -577,13 +621,13 @@ public class CdfUtil {
                 if ( stype.equals("string") ) {
                     buff2= null;
                 } else {
-                    buff2= cdf.getBuffer( svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, preserve  );
+                    buff2= cdf.getBuffer(svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, preserve  );
                 }
             } catch ( CDFException ex ) {
-                buff2= myGetBuffer( cdf, svariable, (int)recStart, (int)(recStart+rc*recInterval), (int)recInterval  );
+                buff2= myGetBuffer(cdf, svariable, (int)recStart, (int)(recStart+rc*recInterval), (int)recInterval  );
             }
         } else {
-            buff2= myGetBuffer( cdf, svariable, (int)recStart, (int)(recStart+rc*recInterval), (int)recInterval  );
+            buff2= myGetBuffer(cdf, svariable, (int)recStart, (int)(recStart+rc*recInterval), (int)recInterval  );
         }
         
         logger.exiting("gov.nasa.gsfc.spdf.cdfj.CDFReader", "getBuffer" );

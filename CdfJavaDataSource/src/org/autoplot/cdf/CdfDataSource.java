@@ -445,11 +445,11 @@ public class CdfDataSource extends AbstractDataSource {
             List<QDataSet> args= new ArrayList();
             String function= (String)attr1.get("FUNCTION");
             if ( function==null ) function= (String)attr1.get("FUNCT");
-            if ( attr1.get("COMPONENT_0")!=null ) args.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_0"), constraint, false, true, null, -1, mon.getSubtaskMonitor("c0") ) );
-            if ( attr1.get("COMPONENT_1")!=null ) args.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_1"), constraint, false, true, null, -1, mon.getSubtaskMonitor("c1") ) );
-            if ( attr1.get("COMPONENT_2")!=null ) args.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_2"), constraint, false, true, null, -1, mon.getSubtaskMonitor("c2") ) );
-            if ( attr1.get("COMPONENT_3")!=null ) args.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_3"), constraint, false, true, null, -1, mon.getSubtaskMonitor("c3") ) );
-            if ( attr1.get("COMPONENT_4")!=null ) args.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_4"), constraint, false, true, null, -1, mon.getSubtaskMonitor("c4") ) );
+            if ( attr1.get("COMPONENT_0")!=null ) args.add( loadVariableAndDependents( cdf, (String)attr1.get("COMPONENT_0"), constraint, false, true, null, -1, mon.getSubtaskMonitor("c0") ) );
+            if ( attr1.get("COMPONENT_1")!=null ) args.add( loadVariableAndDependents( cdf, (String)attr1.get("COMPONENT_1"), constraint, false, true, null, -1, mon.getSubtaskMonitor("c1") ) );
+            if ( attr1.get("COMPONENT_2")!=null ) args.add( loadVariableAndDependents( cdf, (String)attr1.get("COMPONENT_2"), constraint, false, true, null, -1, mon.getSubtaskMonitor("c2") ) );
+            if ( attr1.get("COMPONENT_3")!=null ) args.add( loadVariableAndDependents( cdf, (String)attr1.get("COMPONENT_3"), constraint, false, true, null, -1, mon.getSubtaskMonitor("c3") ) );
+            if ( attr1.get("COMPONENT_4")!=null ) args.add( loadVariableAndDependents( cdf, (String)attr1.get("COMPONENT_4"), constraint, false, true, null, -1, mon.getSubtaskMonitor("c4") ) );
             try {
                 Map<String,Object> qmetadata= new IstpMetadataModel().properties(attr1);
                 result= (MutablePropertyDataSet) CdfVirtualVars.execute( qmetadata, function, args, mon.getSubtaskMonitor("virtual variable") );
@@ -465,9 +465,9 @@ public class CdfDataSource extends AbstractDataSource {
             String os1= (String)map.get(PARAM_SLICE1);
             if ( os1!=null && !os1.equals("") && cdf.getDimensions(svariable).length>0 ) {
                 int is= Integer.parseInt(os1);
-                result= wrapDataSet( cdf, svariable, constraint, false, doDep, attr1, is, mon.getSubtaskMonitor("reading "+svariable+" from CDF file") );
+                result= loadVariableAndDependents( cdf, svariable, constraint, false, doDep, attr1, is, mon.getSubtaskMonitor("reading "+svariable+" from CDF file") );
             } else {
-                result= wrapDataSet(cdf, svariable, constraint, false, doDep, attr1, -1, mon.getSubtaskMonitor("reading "+svariable+" from CDF file") );
+                result= loadVariableAndDependents(cdf, svariable, constraint, false, doDep, attr1, -1, mon.getSubtaskMonitor("reading "+svariable+" from CDF file") );
             }
         }
 
@@ -487,7 +487,7 @@ public class CdfDataSource extends AbstractDataSource {
             } else {
                 constraint1 = constraint;
             }
-            QDataSet parm= wrapDataSet( cdf, sx, constraint1, false, false, null );
+            QDataSet parm= loadVariableAndDependents(cdf, sx, constraint1, false);
             result = (MutablePropertyDataSet) Ops.link( parm, result );
         }
 
@@ -501,7 +501,7 @@ public class CdfDataSource extends AbstractDataSource {
             } else {
                 constraint1 = constraint;
             }            
-            QDataSet parm= wrapDataSet( cdf, sy, constraint1, false, false, null );
+            QDataSet parm= loadVariableAndDependents(cdf, sy, constraint1, false);
             if ( parm.length()==1 && parm.rank()==2 && result.rank()>1 && result.length()>1 ) {
                 parm= parm.slice(0); // reform rte_1731551069
             }  // rte_1731551069: check for non-time-varying data for "Y" which needs to be reformed.  With where constraint, coerce rank 1 Y to rank 2.
@@ -512,7 +512,7 @@ public class CdfDataSource extends AbstractDataSource {
         if ( w!=null && w.length()>0 ) {
             int ieq= w.indexOf(".");
             String sparm= w.substring(0,ieq);
-            QDataSet parm= wrapDataSet( cdf, sparm, constraint, false, false, null );
+            QDataSet parm= loadVariableAndDependents(cdf, sparm, constraint, false);
             if ( parm.length()==1 && parm.rank()==2 && result.rank()>1 && result.length()>1 ) {
                 parm= Ops.replicate( parm.slice(0), result.length() ); // reform rte_1731551069
             }
@@ -714,7 +714,7 @@ public class CdfDataSource extends AbstractDataSource {
             boolean labelsAreRead= false;
             if ( labl_ptr_1!=null ){
                 try {
-                    MutablePropertyDataSet v= CdfUtil.wrapCdfData( cdf, labl_ptr_1, 0, -1, 1, -1, new NullProgressMonitor() );                    
+                    MutablePropertyDataSet v= CdfUtil.loadVariable(cdf, labl_ptr_1);                    
                     xyAttributes.put( ATTR_SLICE1_LABELS,v);
                     xyAttributes.put( ATTR_SLICE1, slice );
                     labelsAreRead= true;
@@ -822,7 +822,7 @@ public class CdfDataSource extends AbstractDataSource {
             Object o=props.get("UNIT_PTR");
             if ( o!=null && o instanceof String ) {
                 try {
-                    Object v= CdfUtil.wrapCdfData( cdf,(String)o, 0, -1, 1, -1, new NullProgressMonitor() );
+                    Object v= CdfUtil.loadVariable(cdf,(String)o);
                     props.put( "UNIT_PTR_VALUE", v );
 
                 } catch (Exception ex) {
@@ -833,7 +833,7 @@ public class CdfDataSource extends AbstractDataSource {
             o= props.get("LABL_PTR_1");
             if ( o!=null ) {
                 try {
-                    Object v= CdfUtil.wrapCdfData( cdf,(String)o, 0, -1, 1, -1, new NullProgressMonitor() );
+                    Object v= CdfUtil.loadVariable(cdf,(String)o);
                     props.put( ATTR_SLICE1_LABELS, v );
                 } catch (Exception ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
@@ -873,7 +873,7 @@ public class CdfDataSource extends AbstractDataSource {
      * @throws Exception 
      */
     private QDataSet getDeltaPlusMinus( final CDFReader cdf, QDataSet ds, final String deltaPlus, final String constraints ) throws Exception {
-        QDataSet delta= wrapDataSet( cdf, (String)deltaPlus, constraints, cdf.recordVariance((String)deltaPlus), false, null ); //TODO: slice1
+        QDataSet delta= loadVariableAndDependents(cdf, (String)deltaPlus, constraints, cdf.recordVariance((String)deltaPlus)); //TODO: slice1
         if ( delta.rank()>0 && delta.length()==1 && delta.length()!=ds.length() ) {
             delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
         }
@@ -892,8 +892,18 @@ public class CdfDataSource extends AbstractDataSource {
         return !(Double.isInfinite(v) || Double.isNaN(v));
     }
     
-    private MutablePropertyDataSet wrapDataSet(final CDFReader cdf, final String svariable, final String constraints, boolean reform, boolean depend, Map<String,Object> attr ) throws Exception, ParseException {
-        return wrapDataSet( cdf, svariable, constraints, reform, depend, attr, -1, new NullProgressMonitor() );
+    /**
+     * load the CDF variable with no slicing.
+     * @param cdf
+     * @param svariable
+     * @param constraints
+     * @param reform
+     * @return
+     * @throws Exception
+     * @throws ParseException 
+     */
+    private MutablePropertyDataSet loadVariableAndDependents(final CDFReader cdf, final String svariable, final String constraints, boolean reform) throws Exception, ParseException {
+        return loadVariableAndDependents( cdf, svariable, constraints, reform, false, null, -1, new NullProgressMonitor() );
     }
 
     /**
@@ -973,12 +983,12 @@ public class CdfDataSource extends AbstractDataSource {
      * @param constraints null or a constraint string like "[0:10000]" to read a subset of records.
      * @param reform for depend_1, we read the one and only rec, and the rank is decreased by 1.
      * @param dependantVariable if true, recurse to read variables this depends on.
-     * @param slice1 if >-1, then slice on the first dimension.  This is to support extracting components.
+     * @param slice1 if &gt;-1, then slice on the first dimension.  This is to support extracting components.
      * @return the dataset 
      * @throws CDFException
      * @throws ParseException
      */
-    private synchronized MutablePropertyDataSet wrapDataSet(final CDFReader cdf, 
+    private synchronized MutablePropertyDataSet loadVariableAndDependents(final CDFReader cdf, 
             final String svariable, 
             final String constraints, 
             boolean reform, 
@@ -987,7 +997,7 @@ public class CdfDataSource extends AbstractDataSource {
             int slice1, 
             ProgressMonitor mon) throws Exception, ParseException {
         
-        logger.log(Level.FINE, "wrapDataSet({0})", svariable);
+        logger.log(Level.FINE, "loadVariableAndDependents {0} constraints={1} dependVar={2} slice1={3}", new Object[] { svariable, constraints, dependantVariable, slice1 } );
         if ( !hasVariable(cdf, svariable) ) {
             throw new IllegalArgumentException( "No such variable: "+svariable );
         }
@@ -1008,9 +1018,9 @@ public class CdfDataSource extends AbstractDataSource {
                 // themis kludge that CDAWeb supports, so we support it too.  The variable has no records, but has
                 // two attributes, COMPONENT_0 and COMPONENT_1.  These are two datasets that should be added to
                 // get the result.  Note cdf_epoch16 fixes the shortcoming that themis was working around.
-                QDataSet c0 = wrapDataSet(cdf, (String) thisAttributes.get("COMPONENT_0"), constraints, true, false, null );
+                QDataSet c0 = loadVariableAndDependents(cdf, (String) thisAttributes.get("COMPONENT_0"), constraints, true);
                 if ( thisAttributes.containsKey("COMPONENT_1")) {
-                    QDataSet c1 = wrapDataSet(cdf, (String) thisAttributes.get("COMPONENT_1"), constraints, false, false, null );
+                    QDataSet c1 = loadVariableAndDependents(cdf, (String) thisAttributes.get("COMPONENT_1"), constraints, false);
                     if (c0.rank() == 1 && CdfDataSetUtil.validCount(c0, 2) == 1 && c1.length() > 1) { // it should have been rank 0.
                         c0 = DataSetOps.slice0(c0, 0);
                         // Convert the units to the more precise Units.us2000.  We may still truncate here, and the only way
@@ -1080,14 +1090,14 @@ public class CdfDataSource extends AbstractDataSource {
         
         if (reform) {
             //result = CdfUtil.wrapCdfHyperDataHacked(variable, 0, -1, 1); //TODO: this doesn't handle strings properly.
-            result = CdfUtil.wrapCdfData(cdf,svariable, 0, -1, 1, slice1, dependantVariable, new NullProgressMonitor() );
+            result = CdfUtil.loadVariable(cdf,svariable, 0, -1, 1, slice1, new NullProgressMonitor() );
         } else {
             
             if ( slice ) {
                 recCount= -1;
                 recs[2]= 1;
             }
-            result = CdfUtil.wrapCdfData(cdf,svariable, recs[0], recCount, recs[2], slice1, dependantVariable, mon);
+            result = CdfUtil.loadVariable(cdf,svariable, recs[0], recCount, recs[2], slice1, mon);
             //result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2]);
         }
         
@@ -1124,7 +1134,7 @@ public class CdfDataSource extends AbstractDataSource {
                     QDataSet s=null;
                     try {
                         if ( hasVariable(cdf, svar) ) {
-                            s= CdfUtil.wrapCdfData( cdf, svar, 0, 1, 1, -1, true, new NullProgressMonitor() );
+                            s= CdfUtil.loadVariable(cdf, svar, 0, 1, 1, -1, new NullProgressMonitor() );
                             s= s.slice(0);
                             double s1= s.value(0);
                             for ( int i=1; i<s.length(); i++ ) {
@@ -1196,7 +1206,7 @@ public class CdfDataSource extends AbstractDataSource {
         if ( slice && dependantVariable ) {
             Map dep0map= (Map) thisAttributes.get( "DEPEND_0" );
             if ( dep0map!=null ) {
-                QDataSet dep0= wrapDataSet( cdf, (String) dep0map.get("NAME"), constraints, false, false, null );
+                QDataSet dep0= loadVariableAndDependents(cdf, (String) dep0map.get("NAME"), constraints, false);
                 result.putProperty( QDataSet.CONTEXT_0, dep0 );
             }
         }
@@ -1274,7 +1284,7 @@ public class CdfDataSource extends AbstractDataSource {
 
                 if ( labl!=null ) {
                     try {
-                        lablDs= wrapDataSet(cdf, labl, constraints, idep > 0, false, null);
+                        lablDs= loadVariableAndDependents(cdf, labl, constraints, idep > 0);
                         if ( idep==1 && attributes!=null ) attributes.put( "LABL_PTR_1", lablDs );
                     } catch ( Exception ex ) {
                         logger.log( Level.FINE, "unable to load LABL_PTR_"+sidep+" for "+svariable, ex );
@@ -1311,7 +1321,7 @@ public class CdfDataSource extends AbstractDataSource {
                             reformDep= false;
                         }
 
-                        depDs = wrapDataSet(cdf, depName, constraints, reformDep, false, dep, -1, null);
+                        depDs = loadVariableAndDependents(cdf, depName, constraints, reformDep, false, dep, -1, null);
 
                         if ( idep>0 && reformDep==false && depDs.length()==1 && ( qubeDims[0]==1 || qubeDims[0]>depDs.length() ) ) { //bugfix https://sourceforge.net/p/autoplot/bugs/471/
                             depDs= (MutablePropertyDataSet)depDs.slice(0);
