@@ -379,6 +379,7 @@ public class CdfDataSource extends AbstractDataSource {
 
             // Now call the other getDataSet...
             QDataSet result= getDataSet(mon,attributes);
+            
             if ( rcent!=null ) rcent.finished(result);
             return result;
             
@@ -577,6 +578,9 @@ public class CdfDataSource extends AbstractDataSource {
                 logger.finer("dropping render type because of constraint");
             } else if ( os1!=null && os1.length()>0 ) {
                 logger.finer("dropping render type because of slice1");
+                for ( int i1=1; i1<result.rank()+1; i1++ ) {
+                    istpProps.put( "DEPEND_"+i1, istpProps.get( "DEPEND_"+(i1+1) ) );
+                }
             } else {
                 result.putProperty(QDataSet.RENDER_TYPE, renderType );
             }
@@ -1263,9 +1267,8 @@ public class CdfDataSource extends AbstractDataSource {
 
         int[] qubeDims= DataSetUtil.qubeDims(result);
         if ( loadDependents ) {
-            for (int idep = 0; idep < result.rank(); idep++) {
-                //int sidep= slice ? (idep+1) : idep; // idep taking slice into account.
-                int sidep= idep;
+            for (int idep = 0; idep <= dimensions.length; idep++) {
+                int sidep= idep; // Note slice1 will be implemented towards the end of this loop.
                 Map depAttr = (Map) thisAttributes.get( "DEPEND_" + sidep );
                 // sometime LABL_PTR_1 is a QDataSet, sometimes it's a string.  Thanks VATesting for catching this.
                 Object oo= thisAttributes.get("LABL_PTR_" + sidep);
@@ -1294,13 +1297,6 @@ public class CdfDataSource extends AbstractDataSource {
                         logger.log(Level.FINER, "setting null displayType to time_series" );
                         displayType= "time_series";
                     }
-                }
-
-                if ( depAttr != null && qubeDims.length<=idep ) {
-                    if ( slice1==-1 ) {
-                        logger.log(Level.INFO, "DEPEND_{0} found but data is lower rank", idep);
-                    }
-                    continue;
                 }
 
                 MutablePropertyDataSet  depDs=null;
@@ -1554,7 +1550,20 @@ public class CdfDataSource extends AbstractDataSource {
                 }
             }
         }
-        return attributes;
+        
+        Map<String,Object> result= new HashMap<>();
+        result.putAll( attributes );
+        if ( attributes.get(PARAM_SLICE1)!=null ) {
+            if ( String.valueOf( attributes.get(PARAM_SLICE1) ).length()>0 ) {
+                for ( int i=1; i<QDataSet.MAX_RANK-1; i++ ) {
+                    Object o= attributes.get("DEPEND_"+(i+1));
+                    if ( o!=null ) {
+                        result.put( "DEPEND_"+i, o );
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     private QDataSet labelToBundleDs( QDataSet depDs ) {
