@@ -1354,7 +1354,7 @@ public class CdfDataSource extends AbstractDataSource {
                             result.putProperty("DEPEND_" + idep, depDs);
                         } else {
                             if ( idep==1 ) {
-                                // continue
+                                result.putProperty( QDataSet.CONTEXT_0, depDs.slice(idep) ); 
                             } else {
                                 if ( idep>1 ) {
                                     result.putProperty( "DEPEND_"+(idep-1), depDs );                    
