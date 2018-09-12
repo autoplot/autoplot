@@ -982,7 +982,7 @@ public class CdfDataSource extends AbstractDataSource {
      * @param svariable the name of the variable to read
      * @param constraints null or a constraint string like "[0:10000]" to read a subset of records.
      * @param reform for depend_1, we read the one and only rec, and the rank is decreased by 1.
-     * @param dependantVariable if true, recurse to read variables this depends on.
+     * @param loadDependents if true, recurse to read variables this depends on.
      * @param slice1 if &gt;-1, then slice on the first dimension.  This is to support extracting components.
      * @return the dataset 
      * @throws CDFException
@@ -992,12 +992,12 @@ public class CdfDataSource extends AbstractDataSource {
             final String svariable, 
             final String constraints, 
             boolean reform, 
-            boolean dependantVariable, 
+            boolean loadDependents, 
             Map<String,Object> thisAttributes, 
             int slice1, 
             ProgressMonitor mon) throws Exception, ParseException {
         
-        logger.log(Level.FINE, "loadVariableAndDependents {0} constraints={1} dependVar={2} slice1={3}", new Object[] { svariable, constraints, dependantVariable, slice1 } );
+        logger.log(Level.FINE, "loadVariableAndDependents {0} constraints={1} dependVar={2} slice1={3}", new Object[] { svariable, constraints, loadDependents, slice1 } );
         if ( !hasVariable(cdf, svariable) ) {
             throw new IllegalArgumentException( "No such variable: "+svariable );
         }
@@ -1181,7 +1181,7 @@ public class CdfDataSource extends AbstractDataSource {
                 QDataSet extentds= Ops.extentSimple( result,null );
                 if ( isFinite( extentds.value(0) ) ) {
                     DatumRange extent= DataSetUtil.asDatumRange( extentds );
-                    if ( dependantVariable || extent.intersects(vrange) ) { // if this data depends on other independent data, or intersects the valid range.
+                    if ( loadDependents || extent.intersects(vrange) ) { // if this data depends on other independent data, or intersects the valid range.
                         // typical route
                         if ( UnitsUtil.isTimeLocation( vrange.getUnits() ) ) {
                             if ( extent.intersects(vrange) ) {
@@ -1203,7 +1203,7 @@ public class CdfDataSource extends AbstractDataSource {
             }
         }
 
-        if ( slice && dependantVariable ) {
+        if ( slice && loadDependents ) {
             Map dep0map= (Map) thisAttributes.get( "DEPEND_0" );
             if ( dep0map!=null ) {
                 QDataSet dep0= loadVariableAndDependents(cdf, (String) dep0map.get("NAME"), constraints, false);
@@ -1213,7 +1213,7 @@ public class CdfDataSource extends AbstractDataSource {
 
         // CDF uses DELTA_PLUS and DELTA_MINUS on a dependency to represent the BIN boundaries.
         // vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/po_h0_tim_19960409_v03.cdf?Flux_H has units error.
-        boolean doPlusMinus= dependantVariable==false;
+        boolean doPlusMinus= loadDependents==false;
         Object deltaPlus= thisAttributes.get( "DELTA_PLUS_VAR" );
         Object deltaMinus= thisAttributes.get( "DELTA_MINUS_VAR" );
         if ( doPlusMinus 
@@ -1262,11 +1262,11 @@ public class CdfDataSource extends AbstractDataSource {
 
 
         int[] qubeDims= DataSetUtil.qubeDims(result);
-        if ( dependantVariable ) {
+        if ( loadDependents ) {
             for (int idep = 0; idep < result.rank(); idep++) {
                 //int sidep= slice ? (idep+1) : idep; // idep taking slice into account.
                 int sidep= idep;
-                Map dep = (Map) thisAttributes.get( "DEPEND_" + sidep );
+                Map depAttr = (Map) thisAttributes.get( "DEPEND_" + sidep );
                 // sometime LABL_PTR_1 is a QDataSet, sometimes it's a string.  Thanks VATesting for catching this.
                 Object oo= thisAttributes.get("LABL_PTR_" + sidep);
                 MutablePropertyDataSet lablDs=null;
@@ -1296,7 +1296,7 @@ public class CdfDataSource extends AbstractDataSource {
                     }
                 }
 
-                if ( dep != null && qubeDims.length<=idep ) {
+                if ( depAttr != null && qubeDims.length<=idep ) {
                     if ( slice1==-1 ) {
                         logger.log(Level.INFO, "DEPEND_{0} found but data is lower rank", idep);
                     }
@@ -1306,9 +1306,9 @@ public class CdfDataSource extends AbstractDataSource {
                 MutablePropertyDataSet  depDs=null;
 
                 logger.log(Level.FINER, "displayType={0}", displayType);
-                if ( dep != null ) {
+                if ( depAttr != null ) {
 
-                        String depName= (String)dep.get("NAME");
+                        String depName= (String)depAttr.get("NAME");
 
                         if ( !hasVariable(cdf,depName) ) {
                             logger.log(Level.FINE, "unable to find variable \"{0}\" for DEPEND_{1} of {2}", new Object[]{depName, sidep, svariable});
@@ -1321,7 +1321,8 @@ public class CdfDataSource extends AbstractDataSource {
                             reformDep= false;
                         }
 
-                        depDs = loadVariableAndDependents(cdf, depName, constraints, reformDep, false, dep, -1, null);
+                        depDs = loadVariableAndDependents(cdf, depName, constraints, reformDep, false, depAttr, -1, null);
+                        //depDs = CdfUtil.loadVariable(cdf, depName ); // EXPERIMENT--DO NOT COMMIT
 
                         if ( idep>0 && reformDep==false && depDs.length()==1 && ( qubeDims[0]==1 || qubeDims[0]>depDs.length() ) ) { //bugfix https://sourceforge.net/p/autoplot/bugs/471/
                             depDs= (MutablePropertyDataSet)depDs.slice(0);
