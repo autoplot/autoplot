@@ -466,7 +466,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                 logger.log(Level.SEVERE, null, ex);
             }
         }
-        fireDataRangeSelectionListenerDataRangeSelected( new DataRangeSelectionEvent(this,fire.min(),fire.max()) );
+        fireDataRangeSelectionListenerDataRangeSelected( new DataRangeSelectionEvent(this,fire) );
         
     }                                          
     
