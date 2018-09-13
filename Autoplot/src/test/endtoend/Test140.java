@@ -157,10 +157,12 @@ public class Test140 {
                     System.err.println("TODO Turkey: Make a hash of the .qds of the data");
                 }
 
+                reset();
                 plot( ds );
                 setCanvasSize( 450, 300 );
-                ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setLeft("5.0em");
-                ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100.00%-10.0em");
+                getDocumentModel().getOptions().setCanvasFont("sans-10");
+                getDocumentModel().getCanvases(0).getMarginColumn().setLeft("5.0em");
+                getDocumentModel().getCanvases(0).getMarginColumn().setRight("100.00%-10.0em");
                 
                 int i= uri.lastIndexOf("/");
 
