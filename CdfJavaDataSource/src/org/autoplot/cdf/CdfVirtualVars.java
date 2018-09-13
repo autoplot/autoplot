@@ -157,34 +157,42 @@ public class CdfVirtualVars {
             int n= DataSetUtil.product(DataSetUtil.qubeDims(esa_data.slice(0)));
             for ( int i=0; i<quality_data.length(); i++ ) {
                 if ( quality_data.value(i) > 0 ) {
-                    if ( esa_data.rank()==1 ) {
-                        esa_data.putValue(i,dfill);
-                    } else if ( esa_data.rank()==2 ) {
-                        int n1= esa_data.length(0);
-                        for ( int j=0; j<n1; j++ ) {
-                            esa_data.putValue(i,j,dfill);
-                        }
-                    } else if ( esa_data.rank()==3 ) {
-                        int n1= esa_data.length(0);
-                        for ( int j=0; j<n1; j++ ) {
-                            int n2= esa_data.length(0,0);
-                            for ( int k=0; k<n2; k++ ) {
-                                esa_data.putValue(i,j,k,dfill);
+                    switch (esa_data.rank()) {
+                        case 1:
+                            esa_data.putValue(i,dfill);
+                            break;
+                        case 2:
+                            {
+                                int n1= esa_data.length(0);
+                                for ( int j=0; j<n1; j++ ) {
+                                    esa_data.putValue(i,j,dfill);
+                                }       break;
                             }
-                        }
-                    } else if ( esa_data.rank()==3 ) {
-                        int n1= esa_data.length(0);
-                        for ( int j=0; j<n1; j++ ) {
-                            int n2= esa_data.length(0,0);
-                            for ( int k=0; k<n2; k++ ) {
-                                int n3= esa_data.length(0,0);
-                                for ( int l=0; l<n3; l++ ) {
-                                    esa_data.putValue(i,j,k,1,dfill);
-                                }
+                        case 3:
+                            {
+                                int n1= esa_data.length(0);
+                                for ( int j=0; j<n1; j++ ) {
+                                    int n2= esa_data.length(0,0);
+                                    for ( int k=0; k<n2; k++ ) {
+                                        esa_data.putValue(i,j,k,dfill);
+                                    }
+                                }       break;
                             }
-                        }
-                    } else {
-                        throw new IllegalArgumentException("unsupported rank ");
+                        case 4:
+                            {
+                                int n1= esa_data.length(0);
+                                for ( int j=0; j<n1; j++ ) {
+                                    int n2= esa_data.length(0,0);
+                                    for ( int k=0; k<n2; k++ ) {
+                                        int n3= esa_data.length(0,0);
+                                        for ( int l=0; l<n3; l++ ) {
+                                            esa_data.putValue(i,j,k,1,dfill);
+                                        }
+                                    }
+                                }       break;
+                            }
+                        default:
+                            throw new IllegalArgumentException("unsupported rank ");
                     }
                 }
             }
