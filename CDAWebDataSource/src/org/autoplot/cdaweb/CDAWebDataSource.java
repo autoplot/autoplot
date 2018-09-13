@@ -213,6 +213,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                         if ( function==null ) {
                             function= (String)metadata.get( "FUNCT" ); // THA_L2_ESA
                         }
+                        String missingComponentName= null;
                         if ( function!=null ) {
                             String comp= (String)metadata.get( "COMPONENT_"  + nc );
                             while ( comp!=null ) {
@@ -222,13 +223,14 @@ public class CDAWebDataSource extends AbstractDataSource {
                                 fileParams.put( PARAM_ID, comp );
                                 URI file1;
                                 file1= DataSetURI.getURI(  file + "?" + URISplit.formatParams(fileParams) );
-
+                                logger.log(Level.FINER, "loading component for virtual variable: {0}", file1);
                                 DataSource dataSource= cdfFileDataSourceFactory.getDataSource( file1 );
                                 try {
-                                    ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1 );
+                                    ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1.getSubtaskMonitor("load "+comp) );
                                 } catch ( Exception ex ) {
                                     ds1= null; // !!!!
                                     logger.log( Level.WARNING, ex.getMessage(), ex );
+                                    missingComponentName= comp;
                                 }
                                 comps.add( ds1 );
                                 nc++;
@@ -248,7 +250,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                                     throw new IllegalArgumentException("The virtual variable " + id + " cannot be plotted because the function is not supported: "+function );
                                 }
                             } else {
-                                throw new IllegalArgumentException("The virtual variable "+id + " cannot be plotted because a component is missing");
+                                throw new IllegalArgumentException("The virtual variable "+id + " cannot be plotted because a component "+missingComponentName+" is missing");
                             }
                         } else {
                         throw new IllegalArgumentException("The virtual variable " + id + " cannot be plotted because the function is not identified" );
