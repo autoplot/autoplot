@@ -689,7 +689,12 @@ public class PlotElementController extends DomNodeController {
                     PlotController pc= plot.getController();
                     pc.doPlotElementDefaultsUnitsChange(plotElement);
                 }
-                QDataSet context= (QDataSet) fillDs.property(QDataSet.CONTEXT_0);
+                Object ocontext= fillDs.property(QDataSet.CONTEXT_0);
+                if ( ocontext!=null && !( ocontext instanceof QDataSet ) ) {
+                    logger.warning("CONTEXT_0 is not a QDataSet");
+                    ocontext= null;
+                }
+                QDataSet context= (QDataSet)ocontext;
                 if ( context!=null ) {
                     DatumRange cdr;
                     try {
