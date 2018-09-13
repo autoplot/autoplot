@@ -153,15 +153,38 @@ public class CdfVirtualVars {
             QDataSet quality_data= args.get(1);
             Number fill= (Number) metadata.get(QDataSet.FILL_VALUE);
             if ( fill==null ) fill= Double.NaN;
+            double dfill= fill.doubleValue();
             int n= DataSetUtil.product(DataSetUtil.qubeDims(esa_data.slice(0)));
             for ( int i=0; i<quality_data.length(); i++ ) {
                 if ( quality_data.value(i) > 0 ) {
                     if ( esa_data.rank()==1 ) {
-                        esa_data.putValue(i,fill.doubleValue());
-                    } else {
-                        for ( int j=0; j<n; j++ ) {
-                            esa_data.putValue(i,j,fill.doubleValue()); // CAUTION: this uses array aliasing of ArrayDataSet for rank>2
+                        esa_data.putValue(i,dfill);
+                    } else if ( esa_data.rank()==2 ) {
+                        int n1= esa_data.length(0);
+                        for ( int j=0; j<n1; j++ ) {
+                            esa_data.putValue(i,j,dfill);
                         }
+                    } else if ( esa_data.rank()==3 ) {
+                        int n1= esa_data.length(0);
+                        for ( int j=0; j<n1; j++ ) {
+                            int n2= esa_data.length(0,0);
+                            for ( int k=0; k<n2; k++ ) {
+                                esa_data.putValue(i,j,k,dfill);
+                            }
+                        }
+                    } else if ( esa_data.rank()==3 ) {
+                        int n1= esa_data.length(0);
+                        for ( int j=0; j<n1; j++ ) {
+                            int n2= esa_data.length(0,0);
+                            for ( int k=0; k<n2; k++ ) {
+                                int n3= esa_data.length(0,0);
+                                for ( int l=0; l<n3; l++ ) {
+                                    esa_data.putValue(i,j,k,1,dfill);
+                                }
+                            }
+                        }
+                    } else {
+                        throw new IllegalArgumentException("unsupported rank ");
                     }
                 }
             }
