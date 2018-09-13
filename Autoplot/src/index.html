@@ -26,8 +26,15 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-09-05 r22786):</p>
+        <p>Bugfixes (2018-09-13 r22832):</p>
         <ul>
+            <li>peaks in histogram renderer didn't clip properly. 
+            <li>cdaweb filter apply_esa_flag used old code that relied on dataset aliasing, which is no longer allowed.
+            <li>CDF virtual variables would not load because of tighter handling of monitors and sloppy code.
+            <li>CDF source's slice1 parameter should better match |slice1.
+            <li>add TableRowSorter which minds the data type.  Thanks, Masafumi for pointing this out!
+            <li>rename codes within CDF reader to be more consistent.
+            <li>completions work when coding in indented bug.
             <li>2025: HAPI GUI failed to initialize properly when the id was already set.
             <li>rte_1870708520: catch runtime exception when trying to find aggregations.
             <li>2016: plot title macros should always listen to the first plotElement.
