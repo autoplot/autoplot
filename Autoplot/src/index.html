@@ -26,11 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-09-13 r22832):</p>
+        <p>Bugfixes (2018-09-14 r22834):</p>
         <ul>
+            <li>2032: extraneous decimal point in tick labels.
             <li>peaks in histogram renderer didn't clip properly. 
-            <li>cdaweb filter apply_esa_flag used old code that relied on dataset aliasing, which is no longer allowed.
-            <li>CDF virtual variables would not load because of tighter handling of monitors and sloppy code.
+            <li>2029: cdaweb filter apply_esa_flag used old code that relied on dataset aliasing, which is no longer allowed.
+            <li>2029: CDF virtual variables would not load because of tighter handling of monitors and sloppy code.
             <li>CDF source's slice1 parameter should better match |slice1.
             <li>add TableRowSorter which minds the data type.  Thanks, Masafumi for pointing this out!
             <li>rename codes within CDF reader to be more consistent.
