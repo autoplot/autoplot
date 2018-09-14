@@ -98,6 +98,7 @@ public class AnnotationController extends DomNodeController {
         }
         ac.bind( annotation, Annotation.PROP_URL, p, "url" );
         ac.bind( annotation, "fontSize", p, "fontSize", getFontConverter(p) );
+        ac.bind( annotation, "scale", p, "scale" );
         ac.bind( annotation, "borderType", p, "borderType" );
         ac.bind( annotation, "anchorPosition", p, "anchorPosition" );
         ac.bind( annotation, Annotation.PROP_ANCHORTYPE, p, DasAnnotation.PROP_ANCHORTYPE );

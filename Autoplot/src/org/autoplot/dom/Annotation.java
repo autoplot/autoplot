@@ -58,6 +58,25 @@ public class Annotation extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_URL, oldUrl, url);
     }
 
+    private double scale = 1.0;
+
+    public static final String PROP_SCALE = "scale";
+
+    public double getScale() {
+        return scale;
+    }
+
+    /**
+     * set the amount to scale the image by, if using URL to point at an image, where 0.5 is half of the
+     * original image size.
+     * @param scale 
+     */
+    public void setScale(double scale) {
+        double oldScale = this.scale;
+        this.scale = scale;
+        propertyChangeSupport.firePropertyChange(PROP_SCALE, oldScale, scale);
+    }
+    
     private String fontSize = "1.4em";
 
     public static final String PROP_FONTSIZE = "fontSize";
