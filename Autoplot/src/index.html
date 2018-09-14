@@ -26,7 +26,7 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-09-14 r22834):</p>
+        <p>Bugfixes (2018-09-14 r22836):</p>
         <ul>
             <li>2032: extraneous decimal point in tick labels.
             <li>peaks in histogram renderer didn't clip properly. 
@@ -81,6 +81,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>annotations now have scale property, to support 300dpi printing of externally rendered LaTeX.
             <li>DDataSet slice checks for out-of-bounds on slice, producing a more readable error.
             <li>CDF reader shows data types, record count, block size, and varies flag.
         </ul>
