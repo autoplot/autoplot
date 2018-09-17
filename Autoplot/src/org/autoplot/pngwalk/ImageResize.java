@@ -1,15 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.pngwalk;
 
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Transparency;
 import java.awt.image.BufferedImage;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.util.ImageUtil;
 import org.das2.util.LoggerManager;
 
 /**
@@ -28,15 +22,7 @@ public class ImageResize {
      * @return buffered image that is thumbSize across.
      */
     public static BufferedImage getScaledInstance( BufferedImage img, int thumbSize ) {
-        int w0= img.getWidth();
-        int h0= img.getHeight();
-        int thumbH, thumbW;
-
-        double aspect = 1. * w0 / h0;
-        thumbH = (int) (Math.sqrt(Math.pow(thumbSize, 2) / (aspect * aspect + 1.)));
-        thumbW = (int) (thumbH * aspect);
-
-        return getScaledInstance( img, thumbW, thumbH, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true );
+        return ImageUtil.getScaledInstance(img, thumbSize);
     }
 
     /**
@@ -67,55 +53,7 @@ public class ImageResize {
                                            Object hint,
                                            boolean higherQuality)
     {
-        int type = (img.getTransparency() == Transparency.OPAQUE) ?
-            BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
-        BufferedImage ret = (BufferedImage)img;
-        int w, h;
-        if (higherQuality) {
-            // Use multi-step technique: start with original size, then
-            // scale down in multiple passes with drawImage()
-            // until the target size is reached
-            w = img.getWidth();
-            h = img.getHeight();
-        } else {
-            // Use one-step technique: scale directly from original
-            // size to target size with a single drawImage() call
-            w = targetWidth;
-            h = targetHeight;
-        }
-
-        int count= 0;
-        do {
-            if (higherQuality && w > targetWidth) {
-                w /= 2;
-                if (w < targetWidth) {
-                    w = targetWidth;
-                }
-            }
-
-            if (higherQuality && h > targetHeight) {
-                h /= 2;
-                if (h < targetHeight) {
-                    h = targetHeight;
-                }
-            }
-
-            BufferedImage tmp = new BufferedImage(w, h, type);
-            Graphics2D g2 = tmp.createGraphics();
-            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, hint );
-            g2.drawImage(ret, 0, 0, w, h, null);
-            g2.dispose();
-
-            ret = tmp;
-            count++; // I noticed a case where it hung in this loop.
-            
-        } while ( count<50 && ( w != targetWidth || h != targetHeight) );
-
-        if ( count==50 ) {
-            logger.log( Level.WARNING, "ran out of iterations in imageResize" );
-        }
-
-        return ret;
+        return ImageUtil.getScaledInstance(img, targetWidth, targetHeight, hint, higherQuality);
     }
 
 }
