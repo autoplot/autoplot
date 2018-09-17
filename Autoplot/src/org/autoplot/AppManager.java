@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.JFrame;
@@ -25,7 +26,7 @@ import org.das2.util.LoggerManager;
  */
 public class AppManager {
 
-    private static Logger logger= LoggerManager.getLogger("autoplot.appmanager");
+    private static final Logger logger= LoggerManager.getLogger("autoplot.appmanager");
     
     private static AppManager instance;
 
@@ -39,6 +40,7 @@ public class AppManager {
     List<Object> apps= new ArrayList();
 
     public void addApplication( Object app ) {
+        logger.log(Level.FINE, "addApplication({0})", app);        
         this.apps.add(app);
         if ( app instanceof JFrame ) {
             ((JFrame)app).setDefaultCloseOperation( JFrame.DO_NOTHING_ON_CLOSE );
@@ -62,6 +64,7 @@ public class AppManager {
     }
 
     public void closeApplication( Object app ) {
+        logger.log(Level.FINE, "closeApplication({0})", app);
         if ( app instanceof AutoplotUI ) { // there's a bug here--we need to associate just with autoplot app.
             boolean resetMain= false;
             if ( ScriptContext.getViewWindow()==null ) {
@@ -118,6 +121,7 @@ public class AppManager {
      * @return
      */
     public boolean requestQuit() {
+        logger.log(Level.FINE, "requestQuit()");        
         boolean okay= true;
         for ( Entry<Object,Map<String,CloseCallback>> closeCallbacks : appCloseCallbacks.entrySet() ) {
             Object app= closeCallbacks.getKey();
@@ -133,6 +137,7 @@ public class AppManager {
      * @return true if the callback okays the close.
      */
     public boolean requestClose( Object app ) {
+        logger.log(Level.FINE, "requestClose({0})", app);        
         boolean okay= true;
         Map<String,CloseCallback> closeCallbacks= appCloseCallbacks.get(app);
         if ( closeCallbacks==null ) return true;
