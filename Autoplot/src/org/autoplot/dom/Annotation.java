@@ -352,6 +352,7 @@ public class Annotation extends DomNode {
         if ( !exclude.contains( PROP_TEXT ) ) this.setText(that.getText());
         if ( !exclude.contains( PROP_URL ) ) this.setUrl(that.getUrl());
         if ( !exclude.contains( PROP_FONTSIZE ) ) this.setFontSize(that.getFontSize());
+        if ( !exclude.contains( PROP_SCALE ) ) this.setScale(that.getScale() );
         if ( !exclude.contains( PROP_BORDERTYPE ) ) this.setBorderType(that.getBorderType() );
         if ( !exclude.contains( PROP_ANCHORPOSITION ) ) this.setAnchorPosition(that.getAnchorPosition() );
         if ( !exclude.contains( PROP_ANCHOROFFSET ) ) this.setAnchorOffset(that.getAnchorOffset() );
@@ -390,6 +391,8 @@ public class Annotation extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff( PROP_TEXT, that.text, this.text ) );
         b=  that.url.equals(this.url) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_URL, that.url, this.url ) );
+        b=  that.scale==this.scale;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_SCALE, that.scale, this.scale ) );
         b=  that.fontSize.equals(this.fontSize) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_FONTSIZE, that.fontSize, this.fontSize ) );
         b=  that.borderType.equals(this.borderType) ;
