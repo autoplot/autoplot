@@ -42,6 +42,9 @@ import org.autoplot.datasource.URISplit;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.qds.SemanticOps;
+import org.das2.system.DefaultMonitorFactory;
+import org.das2.system.MonitorFactory;
+import org.das2.util.monitor.ProgressMonitor;
 import org.xml.sax.SAXException;
 
 /**
@@ -75,6 +78,20 @@ public class Test140 {
          return name;
       }
     }
+    
+    private static void listAllPendingTasks() {
+        MonitorFactory mf= getDocumentModel().getController().getMonitorFactory();
+        if ( mf instanceof DefaultMonitorFactory ) {
+            DefaultMonitorFactory dmf= (DefaultMonitorFactory)mf;
+            DefaultMonitorFactory.MonitorEntry[] mes= dmf.getMonitors();
+            for ( DefaultMonitorFactory.MonitorEntry me: mes ) {
+                ProgressMonitor m= me.getMonitor();
+                if ( !( m.isCancelled() || m.isFinished() ) ) {
+                    System.err.println( m );  // sometimes we can catch one!
+                }
+            }
+        }
+    }    
     /**
      *
      * @param uri the URI to load
@@ -157,6 +174,8 @@ public class Test140 {
                     System.err.println("TODO Turkey: Make a hash of the .qds of the data");
                 }
 
+                listAllPendingTasks();
+                
                 reset();
                 plot( ds );
                 setCanvasSize( 450, 300 );
