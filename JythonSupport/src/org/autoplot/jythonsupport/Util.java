@@ -261,7 +261,6 @@ public class Util {
         if ( !mon.isFinished() ) {
             if ( !mon.isStarted() ) mon.started();
             mon.finished();
-            System.err.println("here never started");
         }
 
         try {
