@@ -2227,13 +2227,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
 
-            Runnable cancelAllRun= new Runnable() {
-                public void run() {
-                    cancelAllPendingTasks();
-                }
-            };
-            new Thread(cancelAllRun).start();
-                
+            cancelAllPendingTasks();                
 
         } finally {
             canvasLock.unlock();
