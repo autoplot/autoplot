@@ -3147,6 +3147,8 @@ public class PlotElementController extends DomNodeController {
         ApplicationController ac = this.dom.controller;
 
         ac.bind(plotElement.style, "rebinMethod", spectrogramRenderer, "rebinner");
+        ac.bind(plotElement, PlotElement.PROP_CADENCECHECK, spectrogramRenderer, "cadenceCheck");
+        
         if ( spectrogramRenderer.getColorBar()!=null )
             ac.bind(plotElement.style, "colortable", spectrogramRenderer.getColorBar(), "type");
 
