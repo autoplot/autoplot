@@ -258,6 +258,11 @@ public class Util {
             mon = new NullProgressMonitor();
         }
         QDataSet rds= result.getDataSet(mon);
+        if ( !mon.isFinished() ) {
+            if ( !mon.isStarted() ) mon.started();
+            mon.finished();
+            System.err.println("here never started");
+        }
 
         try {
             metadata= result.getMetadata( new NullProgressMonitor() );
@@ -490,22 +495,16 @@ public class Util {
         ext= (i==-1) ? ss[0] : ss[0].substring(i+1);
         File f= File.createTempFile("autoplot", "."+ext );
 
-        ReadableByteChannel chin= Channels.newChannel(in);
-        try {
-            FileOutputStream fout= new FileOutputStream(f);    
-            try {
+        try (ReadableByteChannel chin = Channels.newChannel(in)) {
+            try (FileOutputStream fout = new FileOutputStream(f)) {
                 WritableByteChannel chout= fout.getChannel();
                 DataSourceUtil.transfer(chin, chout);
-            } finally {
-                fout.close();
             }
 
             String virtUrl= ss[0]+":"+ f.toURI().toString() + ss[1];
             QDataSet ds= getDataSet(virtUrl,mon);
             return ds;
             
-        } finally {
-            chin.close();
         }
     }
 
