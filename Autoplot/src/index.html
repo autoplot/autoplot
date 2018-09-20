@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-09-15 r22836):</p>
+        <p>Bugfixes (2018-09-20 r22848):</p>
         <ul>
+            <li>improve error feedback when DatumRange string is passed to the Datum parser.
+            <li>2034: reset method must cancel existing monitors on the reset thread.
             <li>2032: extraneous decimal point in tick labels.
             <li>peaks in stacked histogram renderer didn't clip properly.  Thanks, Chris!
             <li>2029: cdaweb filter apply_esa_flag used old code that relied on monitor reuse, which is no longer allowed.
@@ -81,6 +83,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>checkCadence==False is respected by the spectrogram renderer with most rebin types.
             <li>annotations now have scale property, to support 300dpi printing of externally rendered LaTeX.
             <li>DDataSet slice checks for out-of-bounds on slice, producing a more readable error.
             <li>CDF reader shows data types, record count, block size, and varies flag.
