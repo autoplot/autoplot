@@ -926,7 +926,6 @@ public class BatchMaster extends javax.swing.JPanel {
             scrollp.setPreferredSize( new Dimension(640,640));
             scrollp.setMaximumSize( new Dimension(640,640));
             
-            textField= jScrollPane3.getViewport().getComponent(0);
             messageLabel.setText("Running jobs, click on labels above to edit.");
             jScrollPane3.getViewport().setView(p);
             
