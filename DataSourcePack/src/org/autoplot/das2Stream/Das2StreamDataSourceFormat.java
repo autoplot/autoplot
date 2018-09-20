@@ -160,7 +160,6 @@ public class Das2StreamDataSourceFormat implements DataSourceFormat {
 		throws Exception{
 
 		URISplit split = URISplit.parse(url);
-		java.util.Map<String, String> params = URISplit.parseParams(split.params);
 
 		boolean binary = getBinary(url);
 		int nSigDigit = getSigDigits(url);
