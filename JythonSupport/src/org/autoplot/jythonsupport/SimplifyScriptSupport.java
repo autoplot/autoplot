@@ -130,12 +130,12 @@ public class SimplifyScriptSupport {
         StringBuilder result= new StringBuilder();
         String ss1= simplifyScriptToGetCompletions(ss, body, variableNames, firstLine, lastLine1, depth+1 );
         if ( ss1.length()==0 ) {
-            String line;
-            if ( firstLine==0 && iff.beginLine>0 ) {
-                line= ss[body[0].beginLine-1]; 
-            } else {
-                line= ss[iff.beginLine];
-            }
+//            String line;
+//            if ( firstLine==0 && iff.beginLine>0 ) {
+//                line= ss[body[0].beginLine-1]; 
+//            } else {
+//                line= ss[iff.beginLine];
+//            }
             Pattern p= Pattern.compile("(\\s*)(\\S*).*");
             Matcher m= p.matcher(ss[firstLine-1]);
             String indent;
