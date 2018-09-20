@@ -187,7 +187,9 @@ public class UriTcaSource extends AbstractQFunction {
             d= DataSetUtil.asDatum( parms.slice(i).slice(0) );
             dr= DatumRangeUtil.union( dr, d );
         }
-        Datum neededResolution= DataSetUtil.asDatum( gcd ).divide(24); // something arbitrarily close.
+        Datum neededResolution= DataSetUtil.asDatum( gcd ).divide(2); // something arbitrarily close.
+        
+        logger.log(Level.FINE, "loading TCAs at {0} (gcd={1})", new Object[]{neededResolution, gcd});
             
         if ( tsb!=null ) {
             DatumRange timeRange= tsb.getTimeRange();
@@ -260,6 +262,9 @@ public class UriTcaSource extends AbstractQFunction {
                 findex= Ops.dataset(0);
             } else {
                 findex= Ops.findex( dep0, d0 );
+                if ( Math.abs( findex.value() % 1.0 ) > 0.1 ) {
+                    logger.log(Level.FINE, "interpolating to calculate tick for {0}", d);
+                }
             }
             
             QDataSet result;
