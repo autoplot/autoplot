@@ -2934,7 +2934,7 @@ public class PlotElementController extends DomNodeController {
                         }
                         if ( oldPlot==null || oldRenderer!=newRenderer ) {
                             synchronized ( dom ) {
-                                if ( newRenderer instanceof SpectrogramRenderer ) {
+                                if ( false && newRenderer instanceof SpectrogramRenderer ) {
                                     plot.addRenderer(0,newRenderer);
                                     setUpSpectrogramActions(plot);
                                 } else {
@@ -2952,7 +2952,8 @@ public class PlotElementController extends DomNodeController {
                                     for ( i=0; i<myPos; i++ ) {
                                         if ( i>best && i<myPos
                                                 && dom.getPlotElements(i).getPlotId().equals(plotElement.getPlotId())
-                                                && arends.contains( dom.getPlotElements(i).getController().getRenderer() ) ) lastRend= dom.getPlotElements(i).getController().getRenderer();
+                                                && arends.contains( dom.getPlotElements(i).getController().getRenderer() ) )
+                                            lastRend= dom.getPlotElements(i).getController().getRenderer();
                                     }
 
                                     // find the index of the renderer that is just underneath this one.
@@ -2962,6 +2963,9 @@ public class PlotElementController extends DomNodeController {
                                     }
 
                                     plot.addRenderer(indexUnder+1,newRenderer);
+                                }
+                                if ( newRenderer instanceof SpectrogramRenderer ) {
+                                    setUpSpectrogramActions(plot);
                                 }
                             }
 
