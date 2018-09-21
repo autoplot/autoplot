@@ -2934,7 +2934,7 @@ public class PlotElementController extends DomNodeController {
                         }
                         if ( oldPlot==null || oldRenderer!=newRenderer ) {
                             synchronized ( dom ) {
-                                if ( false && newRenderer instanceof SpectrogramRenderer ) {
+                                if ( false && newRenderer instanceof SpectrogramRenderer ) { // https://sourceforge.net/p/autoplot/bugs/2013/
                                     plot.addRenderer(0,newRenderer);
                                     setUpSpectrogramActions(plot);
                                 } else {
