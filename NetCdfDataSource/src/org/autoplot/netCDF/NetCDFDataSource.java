@@ -366,7 +366,16 @@ public class NetCDFDataSource extends AbstractDataSource {
             Map<String,Object> result= new LinkedHashMap<>();
             for (Object attr1 : attr) {
                 Attribute at = (Attribute) attr1;
-                result.put( at.getName(), at.getStringValue() );
+                if ( at.getLength()==1 && ( at.getName().equals("valid_min") || at.getName().equals("valid_max") || at.getName().equals("missing_value") ) ) {
+                    try {
+                        Object o= at.getValue(0);
+                        if ( o!=null ) result.put( at.getName(), o );
+                    } catch ( Exception e ) {
+                        result.put( at.getName(), at.getStringValue() );
+                    }
+                } else {
+                    result.put( at.getName(), at.getStringValue() );
+                }
             }
 
             try {
