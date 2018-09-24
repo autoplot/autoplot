@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Bird song rendered as spectrogram, and a context overview is used to zoom in.  Images as annotations can now be scaled.  Happy Fall!
+        <p><small>Annotations can contain images, so LaTeX rendered on remote sites can be rendered at 300 dpi.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-09-22 r22864):</p>
+        <p>Bugfixes (2018-09-24 r22866):</p>
         <ul>
+            <li>rte_1888141829: digitizer table could only load files containing nominal data if the nominal datums had been created already.
             <li>2037: correctly read valid_min, valid_max, and fill_value from DSCOVR mission NetCDF files.
             <li>2013: loading vap should not automatically move spectrograms under line plots.
             <li>improve error feedback when DatumRange string is passed to the Datum parser.
