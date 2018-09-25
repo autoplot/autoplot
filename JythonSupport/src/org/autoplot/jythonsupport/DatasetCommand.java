@@ -93,13 +93,13 @@ public class DatasetCommand extends PyObject {
     public PyObject __call__(PyObject[] args, String[] keywords) {
 
         FunctionSupport fs= new FunctionSupport( "dataset", 
-            new String[] { "ds", 
+            new String[] { "ds", "ds1", "ds2", "ds3", 
             "title", "label", "name",
             "units", 
             "fillValue", "validMin", "validMax", "typicalMin", "typicalMax",
             "scaleType",
         },
-        new PyObject[] { Py.None,
+        new PyObject[] { Py.None, Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None,
             Py.None, 
             Py.None, Py.None, Py.None, Py.None, Py.None,
@@ -110,25 +110,48 @@ public class DatasetCommand extends PyObject {
         
         int nparm= args.length - keywords.length;
 
-        if ( nparm==0 ) {
-            throw new IllegalArgumentException("dataset needs at least one argument");
-        }
-
-        QDataSet result= JythonOps.dataset( args[0] );
+        QDataSet result;
         
-        if ( nparm==2 ) {
-            if ( args[1] instanceof PyJavaInstance ) {
-                PyJavaInstance pji= (PyJavaInstance)args[1];
-                Object o= pji.__tojava__( Units.class );
-                if ( o==Py.NoConversion ) {
-                    throw new IllegalArgumentException("second argument must be units or string identifying units.");
+        switch (nparm) {
+            case 0:
+                throw new IllegalArgumentException("dataset needs at least one argument");
+            case 1:
+                result= JythonOps.dataset( args[0] );
+                break;
+            case 2: {
+                if ( args[1] instanceof PyJavaInstance ) { // legacy use allowed the second argument to be a units object.
+                    PyJavaInstance pji= (PyJavaInstance)args[1];
+                    Object o= pji.__tojava__( Units.class );
+                    if ( o!=Py.NoConversion ) {
+                        logger.info("legacy script uses second argument for units, use units=... instead");
+                        result= JythonOps.dataset( args[0] );
+                        result= Ops.putProperty( result, QDataSet.UNITS, o );
+                        break;
+                    }
                 }
-                result= Ops.putProperty( result, QDataSet.UNITS, o );
-            } else if ( args[1] instanceof PyString ) {
-                result= Ops.putProperty( result, QDataSet.UNITS, ((PyString)args[1]).toString() );
+                result= JythonOps.dataset( args[1] );
+                QDataSet xds= JythonOps.dataset( args[0] );
+                result= Ops.link( xds, result );
+                break;
             }
+            case 3: {
+                result= JythonOps.dataset( args[2] );
+                QDataSet xds= JythonOps.dataset( args[0] );
+                QDataSet yds= JythonOps.dataset( args[1] );
+                result= Ops.link( xds, yds, result );
+                break;
+            }
+            case 4:        
+                result= JythonOps.dataset( args[3] );
+                QDataSet ds0= JythonOps.dataset( args[0] );
+                QDataSet ds1= JythonOps.dataset( args[1] );
+                QDataSet ds2= JythonOps.dataset( args[2] );
+                result= Ops.link( ds0, ds1, ds2, result );
+                break;
+            default:
+                throw new IllegalArgumentException("dataset needs between one and four parameters.");
         }
-         
+        
         for ( int i=nparm; i<args.length; i++ ) { //HERE nargs
             String kw= keywords[i-nparm];
             PyObject val= args[i];
