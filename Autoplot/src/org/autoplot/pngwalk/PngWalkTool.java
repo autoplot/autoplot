@@ -11,12 +11,19 @@
 
 package org.autoplot.pngwalk;
 
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPHeaderCell;
+import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import external.AnimatedGifDemo;
 import java.awt.Color;
@@ -2319,6 +2326,12 @@ public final class PngWalkTool extends javax.swing.JPanel {
                       
             QualityControlSequence qcseq= this.seq.getQualityControlSequence();
             
+            Font lightGreyFont= new Font();
+            lightGreyFont.setColor( BaseColor.LIGHT_GRAY );
+            
+            Chunk lineChunk= new Chunk("________________________________"+
+                            "_________________________________", lightGreyFont );
+            
             for ( int i= 0; i<this.seq.size(); i++ ) {
                 monitor.setTaskProgress(i);
                 PdfContentByte cb = writer.getDirectContent();
@@ -2343,22 +2356,74 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     pdfImage.setAbsolutePosition(36,11*72-36-h);
                     pdfImage.scaleToFit(w,h);
                     
-                    cb.addImage( pdfImage );
-                    doc.add( pdfImage.rectangle(36,11*72-36-h) );
+                    PdfPTable table= new PdfPTable(1);
+                    
+                    table.getDefaultCell().setBorder( Rectangle.NO_BORDER );
+                    table.getDefaultCell().setPaddingLeft( 48 );
+                    table.getDefaultCell().setPaddingRight( 24 );
+                    
+                    table.setWidthPercentage(100);
+                    
+                    PdfPCell cell;
+                    
+                    cell= new PdfPHeaderCell();
+                    cell.setFixedHeight(72);
+                    cell.setPaddingLeft( 48 );
+                    cell.setPaddingRight( 24 );
+                    cell.setHorizontalAlignment(  Element.ALIGN_RIGHT );
+                    cell.setVerticalAlignment( Element.ALIGN_BOTTOM );
+                    
+                    Paragraph p;
+                    p= new Paragraph();
+                    p.setAlignment( Element.ALIGN_RIGHT );
+                    p.add( String.format("%d of %d", imageNumber, this.seq.size() ) );
+                    
+                    cell.addElement( p );
+                    cell.setBorder( Rectangle.NO_BORDER );
+                    cell.setPaddingLeft( 48 );
+                    cell.setPaddingRight( 48 );
+                    table.addCell( cell );
+                    
+                    cell = new PdfPCell( pdfImage );
+                    cell.setBorder( Rectangle.NO_BORDER );
+                    cell.setPaddingLeft( 48 );
+                    cell.setPaddingRight( 24 );
+                    
+                    table.addCell( cell );
+                    
                     String caption;
                     if ( qcseq!=null ) {
                         QualityControlRecord r= qcseq.getQualityControlRecord(i);
                         if ( r!=null ) {
-                            caption= String.format("%d. %s", imageNumber, r.getLastComment());
+                            caption= r.getLastComment();
                         } else {
-                            caption= String.format("%d.", imageNumber ); 
+                            caption= ""; 
                         }
                     } else {
-                        caption= String.format("%d.", imageNumber ); 
+                        caption= ""; 
                     }
-                    Paragraph p= new Paragraph();
-                    p.add(caption);
-                    doc.add(p);
+                    
+                    p= new Paragraph();
+                    p.add( caption );
+                    cell = new PdfPCell( p );
+                    cell.setBorder( Rectangle.NO_BORDER );
+                    cell.setPaddingLeft( 48 );
+                    cell.setPaddingRight( 48 );
+
+                    table.addCell(cell);
+
+                    cell = new PdfPCell( p );
+                    cell.addElement( new Paragraph(" ") );
+                    for ( int j=0;j<10; j++ ) {
+                        p= new Paragraph(lineChunk);
+                        cell.addElement( p );
+                    }
+                    cell.setBorder( Rectangle.NO_BORDER );
+                    cell.setPaddingLeft( 48 );
+                    cell.setPaddingRight( 48 );
+                    table.addCell(cell);
+                    
+                    doc.add( table );
                     
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
