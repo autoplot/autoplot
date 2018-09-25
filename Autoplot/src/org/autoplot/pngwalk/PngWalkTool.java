@@ -2423,6 +2423,13 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     cell.setPaddingRight( 48 );
                     table.addCell(cell);
                     
+                    Chunk nameChunk= new Chunk( this.seq.imageAt(i).uriString, lightGreyFont );
+                    cell= new PdfPCell( new Paragraph(nameChunk) );
+                    cell.setBorder( Rectangle.NO_BORDER );
+                    cell.setPaddingLeft( 48 );
+                    cell.setPaddingRight( 48 );
+                    table.addCell( cell );
+                    
                     doc.add( table );
                     
                 } catch (IOException ex) {
