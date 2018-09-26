@@ -548,9 +548,11 @@ public class ScriptPanelSupport {
             //logger.log(Level.SEVERE, ex.getMessage(), ex);
             PyObject otraceback= ex.traceback;
             int line=0;
-            int count=0; // just in case limit to three, because of recursion, etc.
+            final int STACK_LIMIT=7;
+            
+            int count=0; // just in case limit to STACK_LIMIT, because of recursion, etc.
             //PyFrame theFrame= null;
-            while ( otraceback instanceof PyTraceback && count<3 ) {
+            while ( otraceback instanceof PyTraceback && count<STACK_LIMIT ) {
                 PyTraceback traceback= ((PyTraceback)otraceback);
 //                if ( theFrame==null ) { //TODO: check that we don't switch files.  this code doesn't work...
 //                    theFrame= traceback.tb_frame;
