@@ -17,6 +17,7 @@ import org.das2.graph.AnchorType;
 import org.das2.graph.BorderType;
 import org.das2.qds.ops.Ops;
 import org.python.core.PyJavaInstance;
+import org.python.core.PyList;
 
 /**
  * new implementation of the plot command allows for keywords in the
@@ -94,7 +95,9 @@ public class AnnotationCommand extends PyObject {
 
     private static BorderType borderType( PyObject val ) {
         BorderType c=null;
-        if (val.__tojava__(BorderType.class) != Py.NoConversion) {
+        if ( val==Py.None ) {
+            return BorderType.NONE;
+        } else if (val.__tojava__(BorderType.class) != Py.NoConversion) {
             c = (BorderType) val.__tojava__(BorderType.class);
         } else if (val instanceof PyString) {
             String sval = (String) val.__str__().__tojava__(String.class);
@@ -231,10 +234,16 @@ public class AnnotationCommand extends PyObject {
                         annotation.setShowArrow(true);
                         break;
                     case "pointAt":
-                        String[] ss= sval.split(",",-2);
-                        annotation.setPointAtX(Ops.datum(ss[0]));
-                        annotation.setPointAtY(Ops.datum(ss[1]));
-                        annotation.setShowArrow(true);
+                        if ( val instanceof PyList ) {
+                            annotation.setPointAtX(Ops.datum(((PyList)val).get(0)));
+                            annotation.setPointAtY(Ops.datum(((PyList)val).get(1)));
+                            annotation.setShowArrow(true);
+                        } else {
+                            String[] ss= sval.split(",",-2);
+                            annotation.setPointAtX(Ops.datum(ss[0]));
+                            annotation.setPointAtY(Ops.datum(ss[1]));
+                            annotation.setShowArrow(true);
+                        }
                         break;
                     case "plotId":
                         annotation.setPlotId(sval);
