@@ -51,7 +51,7 @@ public class AnnotationCommand extends PyObject {
             + " <tr><td> anchorPosition </td><td>One of NE,NW,SE,SW,<br>N,E,W,S,<br>outsideN,outsideNNW</td></tr>"
             + " <tr><td> anchorOffset </td><td>position relative to the anchor, like '1em,1em'</td></tr>"
             + " <tr><td> anchorType </td><td>PLOT means relative to the plot.<br>DATA means relative to xrange and yrange</td></tr>"
-            + " <tr><td> xrange, yrange </td><td> anchor box when data coordinates</td></tr>"
+            + " <tr><td> xrange, yrange </td><td> anchor box when using data anchor</td></tr>"
             + " <tr><td> plotId </td><td> ID of the plot containing axes.</td></tr>"    
             + " <tr><td> pointAt </td><td>comma separated X and Y to point the annotation arrow at.</td></tr>"
             + " <tr><td> rowId </td><td>ID of the row containing for positioning this annotation<br>(See dom.plots[0].rowId)</td></tr>"
