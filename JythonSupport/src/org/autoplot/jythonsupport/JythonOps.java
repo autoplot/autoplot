@@ -293,7 +293,9 @@ public class JythonOps {
      */
     public static Color color( PyObject val ) {
         Color c=null;
-        if (val.__tojava__(Color.class) != Py.NoConversion) {
+        if (val==Py.None) {
+            c= new Color( 0, 0, 0, 0 );
+        } else if (val.__tojava__(Color.class) != Py.NoConversion) {
             c = (Color) val.__tojava__(Color.class);
         } else if (val instanceof PyFloat) {
             c = new Color((int) ((PyFloat) val).getValue());
