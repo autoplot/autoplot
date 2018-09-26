@@ -26,8 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-09-24 r22866):</p>
+        <p>Bugfixes (2018-09-25 r22871):</p>
         <ul>
+            <li>"about Autoplot" page had the wrong version number.
+            <li>2038: ephemeris labels didn't line up with the values for some tick lengths.
+            <li>digitizer labels were not set properly for the addDataPoint(rank1bundle) method, because getComponentNames did not support rank 1 bundle.
             <li>rte_1888141829: digitizer table could only load files containing nominal data if the nominal datums had been created already.
             <li>2037: correctly read valid_min, valid_max, and fill_value from DSCOVR mission NetCDF files.
             <li>2013: loading vap should not automatically move spectrograms under line plots.
@@ -86,6 +89,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>PNGWalkTool's write-to-PDF now writes caption below, supporting long captions, and includes lines for notes and the file name.
+            <li>Jython dataset command now allows dataset(x,y,z) as an experimental alternate to the link command.
             <li>add FileUtil.readFileToString, to simplify scripts.
             <li>checkCadence==False is respected by the spectrogram renderer with most rebin types.
             <li>annotations now have scale property, to support 300dpi printing of externally rendered LaTeX.
