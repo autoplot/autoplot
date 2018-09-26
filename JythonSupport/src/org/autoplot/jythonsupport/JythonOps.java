@@ -123,6 +123,8 @@ public class JythonOps {
             return PyQDataSetAdapter.adaptList( (PyList)arg0 ) ;
         } else if ( arg0 instanceof PyArray ) {
             return PyQDataSetAdapter.adaptArray( (PyArray) arg0 );
+        } else if ( arg0 instanceof PyTuple ) {
+            return PyQDataSetAdapter.adaptTuple( (PyTuple) arg0 );            
         } else if ( arg0 instanceof PyInteger ) {
             return DataSetUtil.asDataSet( ((Double)arg0.__tojava__( Double.class )).doubleValue() );
         } else if ( arg0 instanceof PyLong ) {

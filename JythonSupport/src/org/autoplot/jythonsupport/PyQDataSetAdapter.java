@@ -18,6 +18,7 @@ import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.das2.qds.SparseDataSet;
 import org.das2.qds.ops.Ops;
+import org.python.core.PyTuple;
 
 /**
  * Adapt QDataSet results to PyQDataSet, which provides __getitem__
@@ -158,6 +159,71 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
         }
     }
     
+    public static QDataSet adaptTuple( PyTuple p ) {
+        double[] j= new double[ p.size() ];
+        QDataSet d1;
+        JoinDataSet jds= null; // support list of lists.
+        Units u= null;
+        Units[] us= new Units[p.size()]; // in case it's a bundle
+        boolean isBundle= false;
+        
+        for ( int i=0; i<p.size(); i++ ) {
+            Object n= p.get(i);
+            //if ( u!=null || n instanceof String ) {
+            //    u= EnumerationUnits.getByName("default");
+            //    j[i]= ((EnumerationUnits)u).createDatum( n ).doubleValue( u );
+            //} else {
+            if ( n instanceof PyObject ) {
+                d1= JythonOps.dataset((PyObject)n);
+            } else {
+                d1= Ops.dataset(n);
+            }
+            
+            if ( u==null ) u= SemanticOps.getUnits(d1);
+          
+            Units ud1= SemanticOps.getUnits(d1);
+            
+            us[i]= ud1;
+            
+            if ( ud1!=u ) {
+                if ( u.isConvertibleTo(ud1)) {
+                    d1= Ops.convertUnitsTo(d1, u);
+                } else {
+                    isBundle= true;
+                }
+            }
+            
+            if ( d1.rank()==0 ) {
+                j[i]= d1.value();
+            } else {
+                if ( jds==null ) {
+                    jds= new JoinDataSet(d1);
+                } else {
+                    jds.join(d1);
+                }
+            }
+        }
+        
+        if ( jds==null ) {
+            DDataSet q= DDataSet.wrap( j );
+            if ( isBundle ) {
+                SparseDataSet bds= SparseDataSet.createRankLen( 2,p.size() );
+                for ( int i=0; i<p.size(); i++ ) {
+                    bds.putProperty( QDataSet.UNITS, i, us[i] );
+                    bds.putProperty( QDataSet.NAME, i, "ch"+i );
+                }
+                q.putProperty( QDataSet.BUNDLE_0, bds );
+            } else {
+                q.putProperty( QDataSet.UNITS, u );
+            }
+            return q;
+        } else {
+            jds.putProperty( QDataSet.UNITS, u );
+            return jds;
+        }
+    }
+    
+    
     // see usages elsewhere, this is sloppy.
     // TODO: consider if [ DSA, DSB ] should append( DSA, DSB ) where DSA DSB are datasets.
     /**
@@ -167,6 +233,49 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
      * @return
      */
     public static QDataSet adaptList( PyList p, Units u ) {
+        double[] j= new double[ p.size() ];
+        QDataSet d1;
+        JoinDataSet jds= null; // support list of lists.
+        for ( int i=0; i<p.size(); i++ ) {
+            Object n= p.get(i);
+            //if ( u!=null || n instanceof String ) {
+            //    u= EnumerationUnits.getByName("default");
+            //    j[i]= ((EnumerationUnits)u).createDatum( n ).doubleValue( u );
+            //} else {
+            if ( n instanceof PyObject ) {
+                d1= JythonOps.dataset((PyObject)n,u);
+            } else {
+                d1= Ops.dataset(n,u);
+            }
+          
+            if ( d1.rank()==0 ) {
+                j[i]= d1.value();
+            } else {
+                if ( jds==null ) {
+                    jds= new JoinDataSet(d1);
+                } else {
+                    jds.join(d1);
+                }
+            }
+        }
+        
+        if ( jds==null ) {
+            DDataSet q= DDataSet.wrap( j );
+            q.putProperty( QDataSet.UNITS, u );
+            return q;
+        } else {
+            jds.putProperty( QDataSet.UNITS, u );
+            return jds;
+        }
+    }
+
+    /**
+     * adapts the Python Tuple to a QDataSet, using the provided units.
+     * @param p
+     * @param u the units which are often known.
+     * @return 
+     */
+    public static QDataSet adaptTuple( PyTuple p, Units u ) {
         double[] j= new double[ p.size() ];
         QDataSet d1;
         JoinDataSet jds= null; // support list of lists.
