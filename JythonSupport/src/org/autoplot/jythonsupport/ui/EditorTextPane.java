@@ -358,7 +358,6 @@ public class EditorTextPane extends JEditorPane {
            doThis= EditorAnnotationsSupport.getSymbolAt( EditorTextPane.this, EditorTextPane.this.getCaretPosition() );
         }
         logger.log(Level.FINE, "plotItem: {0}", doThis);
-        if ( doThis==null ) return;
         try {
             plotSoon(doThis);
         } catch ( IllegalArgumentException ex ) {

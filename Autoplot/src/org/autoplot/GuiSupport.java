@@ -1022,8 +1022,7 @@ public class GuiSupport {
         chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
             @Override
             public boolean accept(File f) {
-                String s= f.toString();
-                if ( s==null ) return false; // Findbugs OK: There was a Windows bug where file.toString could return null.
+                String s= f.getName();
                 return f.isDirectory() || s.endsWith(".xml");
             }
             @Override
@@ -1051,8 +1050,7 @@ public class GuiSupport {
         return new FileFilter() {
             @Override
             public boolean accept(File f) {
-                String s= f.toString();
-                if ( s==null ) return false;// Findbugs OK: There was a Windows bug where file.toString could return null.
+                String s= f.getName();
                 return f.isDirectory() || s.endsWith(ext);
             }
             @Override
@@ -2193,8 +2191,7 @@ public class GuiSupport {
 
             @Override
             public boolean accept(File f) {
-                String s= f.toString();
-                if ( s==null ) return false; // Old Windows bug.  FINDBUGS OKAY
+                String s= f.getName();
                 return s.endsWith(".vap") || f.isDirectory();
             }
 

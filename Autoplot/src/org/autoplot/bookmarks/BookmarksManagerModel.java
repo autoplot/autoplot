@@ -38,7 +38,6 @@ public class BookmarksManagerModel {
         chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
             @Override
             public boolean accept(File f) {
-                if ( f.toString()==null ) return false; // Findbugs OK: There was a Windows bug where file.toString could return null.
                 return f.isDirectory() || f.getName().endsWith(".xml");
             }
             @Override
@@ -81,7 +80,6 @@ public class BookmarksManagerModel {
         chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
             @Override
             public boolean accept(File f) {
-                if ( f.toString()==null ) return false;// Findbugs OK: There was a Windows bug where file.toString could return null.
                 return f.isDirectory() || f.getName().endsWith(".xml");
             }
             @Override

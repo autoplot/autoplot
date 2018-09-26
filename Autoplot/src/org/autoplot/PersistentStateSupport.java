@@ -177,7 +177,6 @@ public class PersistentStateSupport {
         return new FileFilter() {
             @Override
             public boolean accept( File pathname ) {
-                if ( pathname.toString()==null ) return false;// Findbugs OK: There was a Windows bug where file.toString could return null.
                 return pathname.isDirectory() || pattern.matcher(pathname.getName()).matches();
             }
             @Override

@@ -124,11 +124,7 @@ public class DataSetSelectorSupport {
                 if (f.isDirectory()) {
                     return true;
                 }
-                String t = f.toString();
-                if (t==null ) {
-                    // bug https://sourceforge.net/p/autoplot/bugs/429/, where Windows returns an f whose toString returns null.
-                    return false;
-                }
+                String t = f.getName();
                 return t.endsWith(".vap");
             }
 
@@ -187,11 +183,7 @@ public class DataSetSelectorSupport {
                 if (f.isDirectory()) {
                     return true;
                 }
-                String t = f.toString();
-                if (t==null ) {
-                    // bug https://sourceforge.net/p/autoplot/bugs/429/, where Windows returns an f whose toString returns null.
-                    return false;
-                }
+                String t = f.getName();
                 String ext = DataSetURI.getExt(t);
                 if ( ext!=null ) ext= "."+ext;
                 return ( t.endsWith(".zip") || t.endsWith(".ZIP") ) || (ext != null && ( exts.containsKey(ext) ) || ( isAutoplotApp && t.endsWith(".vap") ));
@@ -213,11 +205,10 @@ public class DataSetSelectorSupport {
 
                 @Override
                 public boolean accept(File f) {
-                    if ( f.toString()==null ) return false;
                     if (f.isDirectory()) {
                         return true;
                     }
-                    String t = f.toString();
+                    String t = f.getName();
                     String ext = DataSetURI.getExt(t);
                     if ( ext!=null ) ext= "."+ext;
                     return (ext != null && extf.equals(ext));
@@ -235,11 +226,10 @@ public class DataSetSelectorSupport {
             ff = new FileFilter() {
                 @Override
                 public boolean accept(File f) {
-                    if ( f.toString()==null ) return false;
                     if (f.isDirectory()) {
                         return true;
                     }
-                    String t = f.toString();
+                    String t = f.getName();
                     String ext = DataSetURI.getExt(t);
                     if ( ext!=null ) ext= "."+ext;
                     return (ext != null && ".vap".equals(ext));
