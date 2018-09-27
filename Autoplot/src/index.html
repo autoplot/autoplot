@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Annotations can contain images, so LaTeX rendered on remote sites can be rendered at 300 dpi.
+        <p><small>Short but complex Jython script shows Apache Math's Bessel function.  It uses many features, described in comments <a href='bessel.jy'>here</a>.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-09-25 r22871):</p>
+        <p>Bugfixes (2018-09-27 r22879):</p>
+        <ul>
+            <li>Jython dataset(o) now allows o to be a tuple, and background=None uses a transparent background, other minor changes to annotation command.
+            <li>when a stack trace is processed in Jython, to jump to the error, allow the stack trace to be deeper, to support Geopack file.
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>"about Autoplot" page had the wrong version number.
             <li>2038: ephemeris labels didn't line up with the values for some tick lengths.
@@ -55,40 +60,11 @@
             <li>horizontal and vertical slicers allow units sloppiness.  Thanks, Chris!
             <li>"clean" method removed from Matlab export to support compiling under Java 9.  Thanks, Dan!
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>removed bit of experimental code would fail to connect symbols when data contained non-monotonic tags, which was inadvertently released.
-            <li>2022: new, more careful code had new bug where it could hang process.
-            <li>Corrections to handling of Socket Timeouts (server down), properly fall into offline mode when remote server is off-line.
-            <li>2020: logging checkboxes were not initialized properly.
-            <li>2021: clarification and correction of DataPointRecorder.select javadoc.
-            <li>2022: minor clean-up in layout listener changes support, where one path would fail to see a change was still pending.  (Bug 1022 lingers)
-            <li>Dan fixed Java 9 ambiguity with Class Module.
-            <li>2017: bug where weights with incorrect rank would cause RTE on event thread, and replicate properly handles WEIGHTS now.
-            <li>rte_2038937185: correct the poor error message reported ("unrecognized units:00") for parseDatumRange('2017-001 03:00 to 02:00')
-            <li>confusing error message for dr[indgen(4)]=findgen(5), make more precise.  Loosen test slightly, See "svn log -r22709:22710"
-            <li>FileSystem's unzip action now handles where NetCDF .jar file had missing files, issuing warning instead of crashing.
-            <li>2015: show keystrokes for editor "find usages" and "plot" actions, corrections to "plot" action.
-            <li>corrections to "trim" filter GUI.
-            <li>rte 276343956: transitional case in "isSomeoneListening" caused RTE.  Make local copies for thread safety.
-            <li>synchronizeOne now has same make-monotonic logic that synchronize(many) has.
-            <li>Matlab and IDL export methods check for non-qubes.
-            <li>2007: aggregation of non-time-varying data.  More issues found with single-record waveform files.
-            <li>javadoc popup in Jython editor was using old javadoc.
-            <li>HAPI uses server_list.txt now instead of all.txt.
-            <li>binAverage reduction method used old QDataSet form which is no longer used (indexed property vs slice then property).
-            <li>rte_0183234259: Corrections to Das2Server authentication dialog, such as NullPointerException and allow scientist to opt out when password is not known.
-            <li>rte 1924252302: "display data" mouse action correctly uses format specifiers found in data.
-            <li>SeriesRenderer, when data breaks exist on both sides of a valid point, would fail to draw the point.
-            <li>1999: correct error message in ASCII when non-existent column is requested.
-            <li>new data set builder nextRecords function had a bug where 0th record was always copied.  Thanks, Ivar!
-            <li>orbit files with gaps could not be used with orbit data source.
-            <li>CreatePngWalk command line has autorangeFlags.
-            <li>export-to-CSV uses FORMAT metadata and shows progress as the data is exported.
-            <li>1682: CSV editor was adding extraneous question mark, corrections to editor such as column width and column names.
-        </ul>
         <p>Features:</p>
         <ul>
+        </ul>
+       <p>Less recent features:</p>
+       <ul>
             <li>PNGWalkTool's write-to-PDF now writes caption below, supporting long captions, and includes lines for notes and the file name.
             <li>Jython dataset command now allows dataset(x,y,z) as an experimental alternate to the link command.
             <li>add FileUtil.readFileToString, to simplify scripts.
@@ -96,22 +72,6 @@
             <li>annotations now have scale property, to support 300dpi printing of externally rendered LaTeX.
             <li>DDataSet slice checks for out-of-bounds on slice, producing a more readable error.
             <li>CDF reader shows data types, record count, block size, and varies flag.
-        </ul>
-       <p>Less recent features:</p>
-       <ul>
-            <li>PoissonDistribution is now thread-safe, and multiple concurrent calls to PlasmaModel can be made.
-            <li>rfe460: cache cadence calculation in SeriesRenderer.
-            <li>logger verbosity settings can be saved for future invocations.
-            <li>rfe460: study performance of SeriesRenderer under extreme conditions, with the goal of removing Huge Scatter.
-            <li>ASCII dialog has "subset" tab with "where" GUI.
-            <li>server's prompt can be reset to include newlines to support buffered read by clients.
-            <li>"dataIntersection" function returns values found in two datasets.
-            <li>rfe619: all datasets have svalue accessor for rank 0 data.
-            <li>rfe460: add configuration setting which will always use Series for rendering, never Huge Scatter.
-            <li>add link to JNLP which will use 4GB on 64bit JVMs.
-            <li>rfe646: export to Matlab .mat files.
-            <li>Location of Java used to run Autoplot is displayed in the "about" window.
-            <li>Export-to-CSV no longer comments first line containing spectrogram channels, allowing the file to be used with Autoplot.
        </ul>
         <p>Known issues:</p>
         <ul>
