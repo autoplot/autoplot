@@ -22,6 +22,7 @@ import java.net.UnknownHostException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.FileUtil;
@@ -237,7 +238,7 @@ public class FileSystemUtil {
     
     /**
      * deletes all files where shouldDelete returns true and empty 
-     * folders below root, and root.
+     * folders below root, and root.  If a directory is left empty, then it is also deleted.
      * @param root the root of the tree to start searching.  If root does not exist, return true!
      * @param shouldDelete an object which returns true if the file should be deleted, or if null is used, then any file is deleted.
      * @throws IllegalArgumentException if it is unable to delete a file
@@ -250,7 +251,6 @@ public class FileSystemUtil {
         File[] children = root.listFiles(); 
         if ( children==null ) return true;
         boolean success = true;
-        boolean notEmpty= children.length>0;
         for (File children1 : children) {
             if (children1.isDirectory()) {
                 success = success && deleteFilesInTree(children1, shouldDelete);
@@ -264,9 +264,9 @@ public class FileSystemUtil {
             }
         }
         
-        if ( notEmpty && children.length==0 ) {
-            success = success && (!root.exists() || root.delete());
-        } else if ( children.length==0 ) {
+        children= root.listFiles();
+        if ( children==null ) children= new File[0]; // this won't happen.
+        if ( children.length==0 ) {
             success = success && (!root.exists() || root.delete());
         }
         
