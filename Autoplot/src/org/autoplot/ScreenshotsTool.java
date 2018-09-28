@@ -122,7 +122,7 @@ public class ScreenshotsTool extends EventQueue {
         File f= new File( text );
         if ( f.exists() ) {
             File[] ff= f.listFiles();
-            if ( ff.length>1 ) {
+            if ( ff!=null && ff.length>1 ) {
                 deleteFilesCheckBox.setEnabled(true);
             } else {
                 deleteFilesCheckBox.setEnabled(false);

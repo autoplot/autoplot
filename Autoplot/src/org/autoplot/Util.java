@@ -167,6 +167,7 @@ public class Util {
      * @param root the root of the tree.
      * @throws IllegalArgumentException if it is unable to delete a file
      * @return true if the operation was successful.
+     * @see #pruneFileTree(java.io.File, java.util.List) which probably does the same thing.
      */
     public static boolean deleteFileTree(File root) throws IllegalArgumentException {
         if (!root.exists()) {
@@ -175,14 +176,15 @@ public class Util {
         if ( !root.canRead() ) throw new IllegalArgumentException("cannot read root: "+root );
         if ( !root.isDirectory() ) throw new IllegalArgumentException("root should be directory: " +root );
         File[] children = root.listFiles();
+        if ( children==null ) return true;
         boolean success = true;
-        for (int i = 0; i < children.length; i++) {
-            if (children[i].isDirectory()) {
-                success = success && deleteFileTree(children[i]);
+        for (File children1 : children) {
+            if (children1.isDirectory()) {
+                success = success && deleteFileTree(children1);
             } else {
-                success = success && ( !children[i].exists() || children[i].delete() );
+                success = success && (!children1.exists() || children1.delete());
                 if (!success) {
-                    throw new IllegalArgumentException("unable to delete file " + children[i]);
+                    throw new IllegalArgumentException("unable to delete file " + children1);
                 }
             }
         }
@@ -302,6 +304,7 @@ public class Util {
      * @param root the root directory from which to start a search.
      * @param problems any files which could not be deleted are listed here.
      * @return true if successful.
+     * @see #deleteFileTree(java.io.File) which probably does the same thing.
      */
     public static boolean pruneFileTree( File root, List<String> problems ) {
         if (!root.exists()) {
@@ -310,11 +313,13 @@ public class Util {
         if ( !root.canRead() ) throw new IllegalArgumentException("cannot read root: "+root );
         if ( !root.isDirectory() ) throw new IllegalArgumentException("root should be directory: " +root );
         File[] children = root.listFiles();
+        if ( children==null ) return false;
+        
         boolean success = true;
 
-        for (int i = 0; i < children.length; i++) {
-            if (children[i].isDirectory()) {
-                success = success && pruneFileTree( children[i], problems );
+        for (File children1 : children) {
+            if (children1.isDirectory()) {
+                success = success && pruneFileTree(children1, problems);
             }
         }
         
