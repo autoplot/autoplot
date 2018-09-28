@@ -740,25 +740,17 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         b.append("\n");
         for ( String s: org.das2.util.LoggerManager.getLoggers() ) {
             Logger l= org.das2.util.LoggerManager.getLogger(s);
-            if ( l.isLoggable(Level.FINE) ) {
+            if ( l.isLoggable(Level.CONFIG) ) {
                 Level level= l.getLevel();
-                while ( l!=null && level==null ) {
-                    l= l.getParent();
-                    if ( l!=null ) level= l.getLevel();
-                }
                 if ( level!=null ) {
                     b.append(s).append(".level=").append(l.getLevel().toString()).append("\n");
                 }
             }
         }
-        for ( String s: LoggerManager.getLoggers() ) {
-            Logger l= LoggerManager.getLogger(s);
+        for ( String s: org.das2.datum.LoggerManager.getLoggers() ) { // Note there are two LoggerManagers!
+            Logger l= org.das2.datum.LoggerManager.getLogger(s);
             if ( l.isLoggable(Level.FINE) ) {
                 Level level= l.getLevel();
-                while ( l!=null && level==null ) {
-                    l= l.getParent();
-                    if ( l!=null ) level= l.getLevel();
-                }
                 if ( level!=null ) {
                     b.append(s).append(".level=").append(l.getLevel().toString()).append("\n");
                 }
