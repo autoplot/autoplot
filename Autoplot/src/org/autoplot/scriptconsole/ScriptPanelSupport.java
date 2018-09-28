@@ -421,6 +421,7 @@ public class ScriptPanelSupport {
         watcher = FileSystems.getDefault().newWatchService();
         Path fpath= file.toPath();
         Path parent= fpath.getParent();
+        if ( parent==null ) return;
         try {
             parent.register( watcher, StandardWatchEventKinds.ENTRY_MODIFY,
                 StandardWatchEventKinds.ENTRY_CREATE,
