@@ -239,7 +239,7 @@ public class FileSystemUtil {
      * deletes all files where shouldDelete returns true and empty 
      * folders below root, and root.
      * @param root the root of the tree to start searching.  If root does not exist, return true!
-     * @param shouldDelete return true if the file should be deleted.
+     * @param shouldDelete an object which returns true if the file should be deleted, or if null is used, then any file is deleted.
      * @throws IllegalArgumentException if it is unable to delete a file
      * @return true if the operation was successful.
      * @see org.das2.util.filesystem.FileSystemUtil#deleteAllFiles(java.io.File, java.lang.String) 
@@ -247,25 +247,26 @@ public class FileSystemUtil {
     public static boolean deleteFilesInTree( File root, Check shouldDelete ) throws IllegalArgumentException {
         if (!root.exists()) return true;
         if (!root.canRead()) throw new IllegalArgumentException("cannot read folder: "+root );
-        File[] children = root.listFiles(); // root is known to exist.
+        File[] children = root.listFiles(); 
+        if ( children==null ) return true;
         boolean success = true;
         boolean notEmpty= children.length>0;
-        for (int i = 0; i < children.length; i++) {
-            if (children[i].isDirectory()) {
-                success = success && deleteFilesInTree(children[i],shouldDelete);
+        for (File children1 : children) {
+            if (children1.isDirectory()) {
+                success = success && deleteFilesInTree(children1, shouldDelete);
             } else {
-                if ( shouldDelete.check(children[i]) ) {
-                    success = success && ( !children[i].exists() || children[i].delete() );
+                if ( shouldDelete==null || shouldDelete.check(children1)) {
+                    success = success && (!children1.exists() || children1.delete());
                     if (!success) {
-                        throw new IllegalArgumentException("unable to delete file " + children[i]);
+                        throw new IllegalArgumentException("unable to delete file " + children1);
                     }
                 }
             }
         }
         
-        if ( notEmpty && root.listFiles().length==0 ) {
+        if ( notEmpty && children.length==0 ) {
             success = success && (!root.exists() || root.delete());
-        } else if (  root.listFiles().length==0 ) {
+        } else if ( children.length==0 ) {
             success = success && (!root.exists() || root.delete());
         }
         
