@@ -1,0 +1,61 @@
+# Try to reproduce http://mathworld.wolfram.com/images/eps-gif/BesselJ_800.gif
+
+# The next two lines show how remote Java libraries can be downloaded and imported into the script.  
+# (Security is a concern here, and Webstart launches of Autoplot can't do this.)
+import sys
+addToSearchPath(sys.path, 'http://www-pw.physics.uiowa.edu/~jbf/autoplot/lib/commons-math3-3.6.1/commons-math3-3.6.1.jar', monitor ) 
+
+# Import the Bessel function from the library.  Apache Math's Javadocs can be explored here:
+# http://commons.apache.org/proper/commons-math/javadocs/api-3.6/index.html?org/apache/commons/math3/util/package-summary.html
+from org.apache.commons.math3.special import BesselJ
+
+# This is a trick to make special.j0 be a function like the one found in SciPy.
+J1= BesselJ(1)
+J0= BesselJ(0)
+class Special:
+    def j0(self,j):
+        return J0.value(float(j))
+    def j1(self,j):
+        return J1.value(float(j))
+special= Special()
+
+# we'll plot xx,yy.  lx are the x positions of each number.  The plot will be a stack of 6 plot elements on one plot, 
+# so setLayoutOverplot is used.
+xx= linspace(0,10,1000)
+lx= [ 1.0, 2.0, 3.0, 4.2, 5.5, 6.5 ]
+setLayoutOverplot(6)
+
+# to shorten code, we have a function to locate the y position of the annotation and add it with many options.  
+# "background=None" was just added, so the production version v2018a_10 doesn't work properly.
+def addAnno(i,xx,yy):
+    ii= imin( abs( xx-lx[i] ) )
+    ann= annotation(i,text='J!B%d!n(x)'%i,anchorType='data', anchorPosition='SW',
+        xrange=[xx[ii],xx[ii]], yrange=[yy[ii],yy[ii]], background=None,
+        anchorOffset='0em,0em', borderType=None )
+        
+# "map" is a Python function which applies a 1-to-1 function to each of the elements in an array.
+yy= map( special.j0, xx )
+plot( 0, xx, yy, color='black' )
+addAnno(0,xx,yy)
+
+yy= map( special.j1, xx )
+plot( 1, xx, yy, color='red' )
+addAnno(1,xx,yy)
+
+# Here we map the function "value" of a new BesseJ object.  We have to map the dataset xx to an array of Python floats for the Bessel function.
+# Note the Bessel function is a Java function, and Python floats will be used in the Java function calls.
+yy= map( BesselJ(2).value, map( float, xx ) )
+plot( 2, xx, yy, color='yellow' )
+addAnno(2,xx,yy)
+
+yy= map( BesselJ(3).value, map( float, xx ) )
+plot( 3, xx, yy, color='green' )
+addAnno(3,xx,yy)
+
+yy= map( BesselJ(4).value, map( float, xx ) )
+plot( 4, xx, yy, color='blue' )
+addAnno(4,xx,yy)
+
+yy= map( BesselJ(5).value, map( float, xx ) )
+plot( 5, xx, yy, color='purple' )
+addAnno(5,xx,yy)
