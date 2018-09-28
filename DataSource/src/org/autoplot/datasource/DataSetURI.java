@@ -1559,6 +1559,8 @@ public class DataSetURI {
 
         if (!cacheF.exists()) return Collections.emptyList();
         s = cacheF.list();
+        
+        if ( s==null ) return Collections.emptyList();
 
         boolean foldCase = true;
         if (foldCase) {
@@ -1721,7 +1723,8 @@ public class DataSetURI {
             if (scomp.startsWith(prefix) && !scomp.endsWith(".listing")) {
                 File ff = new File(cacheF, item);
                 if ( ! ff.isDirectory() ) continue;
-                if ( ff.list().length==0 ) continue;
+                String[] ss= ff.list();
+                if ( ss==null || ss.length==0 ) continue;
                 StringBuilder result1 = new StringBuilder(item);
                 result1.append( "/" );
                 // drill down single entries, since often the root doesn't provide a list.
