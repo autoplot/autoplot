@@ -21,6 +21,7 @@ import javax.swing.text.Document;
 import javax.swing.text.Element;
 import jsyntaxpane.components.Markers;
 import jsyntaxpane.components.Markers.SimpleMarker;
+import org.das2.util.ColorUtil;
 import org.python.core.PyException;
 import org.python.core.PyInteger;
 import org.python.core.PyJavaInstance;
@@ -344,18 +345,23 @@ public class EditorAnnotationsSupport {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-
+                
+                boolean lightBackground= ( ( 
+                        editorPanel.getBackground().getRed() +
+                        editorPanel.getBackground().getGreen() +
+                        editorPanel.getBackground().getBlue() ) / 3 ) > 100;
+                        
                 SimpleMarker mark;
                 Object highlightInfo=null;
                 
                 if ( name.equals(ANNO_WARNING) ) {
-                    mark= new SimpleMarker(Color.YELLOW);
+                    mark= new SimpleMarker( lightBackground ? Color.YELLOW : new Color(160,150,0) );
                 } else if ( name.equals(ANNO_USAGE) ) {
-                    mark= new SimpleMarker(Color.YELLOW.brighter());
+                    mark= new SimpleMarker( lightBackground ? Color.YELLOW.brighter() : new Color(180,170,0) );
                 } else if ( name.equals(ANNO_ERROR) ) {
-                    mark= new SimpleMarker(Color.PINK);
+                    mark= new SimpleMarker( lightBackground ? Color.PINK : new Color(120,80,80));
                 } else if ( name.equals(ANNO_PROGRAM_COUNTER) ){
-                    mark=  new SimpleMarker( new Color( 0, 255, 0,80 ) );
+                    mark=  new SimpleMarker( lightBackground ? new Color( 0,255,0,80 ) :  new Color( 0,200,0,80 ) );
                 } else {
                     mark=  new SimpleMarker(Color.GRAY );
                 }
