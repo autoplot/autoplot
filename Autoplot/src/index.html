@@ -26,8 +26,13 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-09-27 r22879):</p>
+        <p>Bugfixes (2018-09-29 r22892):</p>
         <ul>
+            <li>some annotation position icons were missing.
+            <li>StackedHistogram (peaks-and-averages) renderer max values could go past the min of the next channel, creating ambiguity.
+            <li>check for dark background color in Jython editor for warnings, program counter, and usages.
+            <li>findbugs NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE.
+            <li>When saving logger properties, logger inheritance was not considered, making an overly-explicit configuration.
             <li>Jython dataset(o) now allows o to be a tuple, and background=None uses a transparent background, other minor changes to annotation command.
             <li>when a stack trace is processed in Jython, to jump to the error, allow the stack trace to be deeper, to support Geopack file.
         </ul>
