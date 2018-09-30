@@ -28,7 +28,7 @@ import org.das2.qds.ops.Ops;
  */
 public class DebuggerConsole extends javax.swing.JPanel {
 
-    private static PipedOutputStream myout;
+    private static final PipedOutputStream myout = new PipedOutputStream();
     private static JDialog dialog;
     
     private static Thread workerThread=null;
@@ -52,7 +52,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
      * 
      */
     
-    static {
+    private static void initChannels() {
         try {
             queue= new LinkedBlockingQueue<>();
             Runnable run= new Runnable() {
@@ -67,7 +67,11 @@ public class DebuggerConsole extends javax.swing.JPanel {
                                     myout.write(cmd.getBytes());
                                     myout.flush();
                                 } catch (IOException ex) {
-                                    logger.log(Level.SEVERE, null, ex);
+                                    if ( ex.getMessage().contains("Read end dead") ) {
+                                        logger.log(Level.FINER, null, ex);
+                                    } else {
+                                        logger.log(Level.SEVERE, null, ex);
+                                    }
                                 }
                             } };                            
                             doRun.run();
@@ -80,12 +84,11 @@ public class DebuggerConsole extends javax.swing.JPanel {
             };
             workerThread= new Thread(run,"debuggerConsoleWorker");
             workerThread.start();
-            myout = new PipedOutputStream();
             pin= new PipedInputStream(myout);
             Py.getSystemState().stdin= new PyFile( pin ); 
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
-        }
+        }        
     }
     
     private static DebuggerConsole instance;
@@ -97,6 +100,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
      */
     public static DebuggerConsole getInstance( JPanel panel ) {
         if ( instance==null ) {
+            initChannels();
             instance= new DebuggerConsole();
             JDialog d= new JDialog( SwingUtilities.getWindowAncestor(panel), "Jython Debugger" );
             d.setModal(false);
@@ -131,12 +135,12 @@ public class DebuggerConsole extends javax.swing.JPanel {
     PythonInterpreter out;
     
     public void println( String s ) {
-        jTextArea1.append(s);
-        jTextArea1.append("\n");
+        jythonOutputTextArea.append(s);
+        jythonOutputTextArea.append("\n");
     }
     
     public void print( String s ) {
-        jTextArea1.append(s);
+        jythonOutputTextArea.append(s);
     }
     
     /**
@@ -183,13 +187,13 @@ public class DebuggerConsole extends javax.swing.JPanel {
     }
     
     public void print( String s, Object state ) {
-        jTextArea1.append(s);
-        String ss= getCharsForState( s, state );
-        jTextArea2.append(ss);
+        jythonOutputTextArea.append(s);
+        String charsForState= getCharsForState( s, state );
+        jythonStateTextArea.append(charsForState);
         if ( s.endsWith("\n") ) {
-            jTextArea2.append("\n");
-            jTextArea1.setCaretPosition( jTextArea1.getDocument().getLength());
-            jTextArea2.setCaretPosition( jTextArea2.getDocument().getLength());
+            jythonStateTextArea.append("\n");
+            jythonOutputTextArea.setCaretPosition( jythonOutputTextArea.getDocument().getLength());
+            jythonStateTextArea.setCaretPosition( jythonStateTextArea.getDocument().getLength());
         }
     }
     
@@ -206,9 +210,9 @@ public class DebuggerConsole extends javax.swing.JPanel {
         whereButton = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        jythonOutputTextArea = new javax.swing.JTextArea();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
+        jythonStateTextArea = new javax.swing.JTextArea();
         stepButton = new javax.swing.JButton();
         pdbInput = new javax.swing.JTextField();
         continueButton = new javax.swing.JButton();
@@ -242,17 +246,17 @@ public class DebuggerConsole extends javax.swing.JPanel {
 
         jSplitPane1.setDividerLocation(300);
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setFont(new java.awt.Font("Ubuntu", 0, 8)); // NOI18N
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        jythonOutputTextArea.setColumns(20);
+        jythonOutputTextArea.setFont(new java.awt.Font("Ubuntu", 0, 8)); // NOI18N
+        jythonOutputTextArea.setRows(5);
+        jScrollPane1.setViewportView(jythonOutputTextArea);
 
         jSplitPane1.setLeftComponent(jScrollPane1);
 
-        jTextArea2.setColumns(20);
-        jTextArea2.setFont(new java.awt.Font("Ubuntu", 0, 8)); // NOI18N
-        jTextArea2.setRows(5);
-        jScrollPane2.setViewportView(jTextArea2);
+        jythonStateTextArea.setColumns(20);
+        jythonStateTextArea.setFont(new java.awt.Font("Ubuntu", 0, 8)); // NOI18N
+        jythonStateTextArea.setRows(5);
+        jScrollPane2.setViewportView(jythonStateTextArea);
 
         jSplitPane1.setRightComponent(jScrollPane2);
 
@@ -344,8 +348,8 @@ public class DebuggerConsole extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextArea jTextArea2;
+    private javax.swing.JTextArea jythonOutputTextArea;
+    private javax.swing.JTextArea jythonStateTextArea;
     private javax.swing.JButton nextButton;
     private javax.swing.JTextField pdbInput;
     private javax.swing.JButton stepButton;
