@@ -892,14 +892,6 @@ public class ScriptPanelSupport {
         protected final Object STATE_FORM_PDB_RESPONSE="RESPONSE";
         
         Object state= STATE_OPEN;
-        
-        
-        @Override
-        public void write(byte[] b) throws IOException {
-            for ( int i=0; i<b.length; i++ ) {
-               this.write(b[i]);
-            }
-        }
 
         public void writeNew( int b ) throws IOException {
             if ( dc!=null ) dc.print(String.valueOf((char)b));
@@ -998,8 +990,7 @@ public class ScriptPanelSupport {
             
         }
        
-        @Override
-        public void write(int b) throws IOException {
+        public void writeOld(int b) throws IOException {
 
             if ( dc!=null ) dc.print(String.valueOf((char)b),state);
             
@@ -1074,6 +1065,18 @@ public class ScriptPanelSupport {
                         }
                     }
                 }
+            }
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            this.writeOld(b); 
+        }
+        
+        @Override
+        public void write(byte[] b) throws IOException {
+            for ( int i=0; i<b.length; i++ ) {
+               this.write(b[i]);
             }
         }
 
