@@ -621,6 +621,14 @@ public class ScriptPanelSupport {
 
     /**
      * Execute the script.  For context data source, this means putting the URI in the data set selector and telling it to plot.
+     * "mode" controls how the script is run, for example by bringing up the parameters GUI first, or by tracing execution.
+     * The bit array is:<ul>
+     * <li>0 normal
+     * <li>1 parameters GUI (SHIFT is pressed)
+     * <li>2 trace (CRTL is pressed)
+     * <li>8 enter editor (ALT is pressed)
+     * </ul>
+     * TODO: what's the difference between ALT and SHIFT?
      * @param mode =0 normal.  =2=CTRL_MASK= trace.  ALT_MASK is enter editor.  SHIFT_MASK brings up parameters GUI.
      */
     protected void executeScript(final int mode) {
