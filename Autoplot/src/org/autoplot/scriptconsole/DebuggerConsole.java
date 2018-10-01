@@ -247,14 +247,14 @@ public class DebuggerConsole extends javax.swing.JPanel {
         jSplitPane1.setDividerLocation(300);
 
         jythonOutputTextArea.setColumns(20);
-        jythonOutputTextArea.setFont(new java.awt.Font("FreeMono", 0, 8)); // NOI18N
+        jythonOutputTextArea.setFont(new java.awt.Font("DejaVu Sans", 0, 10)); // NOI18N
         jythonOutputTextArea.setRows(5);
         jScrollPane1.setViewportView(jythonOutputTextArea);
 
         jSplitPane1.setLeftComponent(jScrollPane1);
 
         jythonStateTextArea.setColumns(20);
-        jythonStateTextArea.setFont(new java.awt.Font("FreeMono", 0, 8)); // NOI18N
+        jythonStateTextArea.setFont(new java.awt.Font("FreeMono", 0, 10)); // NOI18N
         jythonStateTextArea.setRows(5);
         jScrollPane2.setViewportView(jythonStateTextArea);
 
