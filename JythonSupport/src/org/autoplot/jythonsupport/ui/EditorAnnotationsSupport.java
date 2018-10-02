@@ -3,6 +3,7 @@ package org.autoplot.jythonsupport.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -160,6 +161,16 @@ public class EditorAnnotationsSupport {
                 }
             } );
         }
+    }
+
+    /**
+     * scroll to make sure offset is visible.
+     * @param offset
+     * @throws BadLocationException 
+     */
+    public void scrollToOffset( int  offset  ) throws BadLocationException {
+        Rectangle r= editorPanel.modelToView( offset );
+        editorPanel.scrollRectToVisible(r);
     }
 
     private static class Annotation {
