@@ -52,7 +52,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
      * 
      */
     
-    private static void initChannels() {
+    private void initChannels() {
         try {
             queue= new LinkedBlockingQueue<>();
             Runnable run= new Runnable() {
@@ -66,8 +66,10 @@ public class DebuggerConsole extends javax.swing.JPanel {
                                 try {
                                     myout.write(cmd.getBytes());
                                     myout.flush();
+                                    print(cmd);
                                 } catch (IOException ex) {
                                     if ( ex.getMessage().contains("Read end dead") ) {
+                                        finished();
                                         logger.log(Level.FINER, null, ex);
                                     } else {
                                         logger.log(Level.SEVERE, null, ex);
@@ -100,8 +102,8 @@ public class DebuggerConsole extends javax.swing.JPanel {
      */
     public static DebuggerConsole getInstance( JPanel panel ) {
         if ( instance==null ) {
-            initChannels();
             instance= new DebuggerConsole();
+            instance.initChannels();
             JDialog d= new JDialog( SwingUtilities.getWindowAncestor(panel), "Jython Debugger" );
             d.setModal(false);
             d.getContentPane().add(instance);
@@ -170,6 +172,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
      */
     protected final Object STATE_FORM_PDB_RESPONSE="RESPONSE";
             
+    
     private String getCharsForState( String s, Object state ) {
         StringBuilder result= new StringBuilder();
         if ( state.toString().equals(STATE_OPEN) ) {
@@ -187,6 +190,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
     }
     
     public void print( String s, Object state ) {
+        currentModeLabel.setText( state.toString() );
         jythonOutputTextArea.append(s);
         String charsForState= getCharsForState( s, state );
         jythonStateTextArea.append(charsForState);
@@ -216,6 +220,8 @@ public class DebuggerConsole extends javax.swing.JPanel {
         stepButton = new javax.swing.JButton();
         pdbInput = new javax.swing.JTextField();
         continueButton = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        currentModeLabel = new javax.swing.JLabel();
 
         nextButton.setText("Next");
         nextButton.setToolTipText("step to the next line, stepping over called function");
@@ -285,24 +291,35 @@ public class DebuggerConsole extends javax.swing.JPanel {
             }
         });
 
+        jLabel1.setText("Current Mode:");
+
+        currentModeLabel.setText("currentModeLabel");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 586, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(stepButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(nextButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(upButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(whereButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(continueButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pdbInput))
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 586, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(stepButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(nextButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(upButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(whereButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(continueButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pdbInput))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(currentModeLabel)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -314,8 +331,12 @@ public class DebuggerConsole extends javax.swing.JPanel {
                     .addComponent(stepButton)
                     .addComponent(pdbInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(continueButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(currentModeLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -345,6 +366,8 @@ public class DebuggerConsole extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton continueButton;
+    private javax.swing.JLabel currentModeLabel;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
