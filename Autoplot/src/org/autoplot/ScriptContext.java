@@ -96,7 +96,7 @@ import org.das2.util.filesystem.FileSystem;
  */
 public class ScriptContext extends PyJavaInstance {
 
-    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.script");
 
     private static ApplicationModel model = null;
     private static Application dom= null;
@@ -1036,6 +1036,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
 
         int width= model.getDocumentModel().getCanvases(0).getWidth();
         int height= model.getDocumentModel().getCanvases(0).getHeight();
+        logger.log(Level.FINER, "writeToPng {0} by {1} {2}", new Object[]{width, height, filename});
         writeToPng( filename, width, height );
         File f= new File(filename);
         setStatus("wrote to "+f.getAbsolutePath());
