@@ -912,105 +912,8 @@ public class ScriptPanelSupport {
         protected final Object STATE_FORM_PDB_RESPONSE="RESPONSE";
         
         Object state= STATE_OPEN;
-
-        public void writeNew( int b ) throws IOException {
-            if ( dc!=null ) dc.print(String.valueOf((char)b));
-            if ( state==STATE_OPEN ) {
-                if ( b>=0 ) currentLine.append((char)b);
-                if ( currentLine.length()==1 && currentLine.substring(0,1).equals("(") ) {
-                    state= STATE_FORM_PDB_PROMPT;
-                } else if ( currentLine.length()==1 && currentLine.substring(0,1).equals(">") ) {
-                    state= STATE_FORM_PDB_RESPONSE;
-                } else if ( currentLine.length()>10 && currentLine.substring(0,10).equals("--Return--") ) {
-                    state= STATE_RETURN_INIT_PROMPT;
-                } else if ( currentLine.length()>0 && ( b==10 || b==13 ) ) {
-                    currentLine= new StringBuilder();
-                }
-            } else if ( state==STATE_RETURN_INIT_PROMPT ) {
-                if ( b>=0 ) currentLine.append((char)b);
-                if ( currentLine.length()==1 && currentLine.substring(0,1).equals("(") ) {
-                    state= STATE_FORM_PDB_PROMPT;
-                } else if ( currentLine.length()>0 && ( b==10 || b==13 ) ) {
-                    currentLine= new StringBuilder();
-                }
-            } else if ( state==STATE_FORM_PDB_PROMPT ) {
-                if ( b>=0 ) currentLine.append((char)b);
-                if ( currentLine.length()>=6 ) {
-                    if ( currentLine.substring(0,5).equals("(Pdb) ") ) {
-                        state= STATE_PDB;
-                    } else {
-                        sink.write(currentLine.toString().getBytes());
-                        state= STATE_OPEN;
-                    }
-                } else if ( currentLine.length()>0 && ( b==10 || b==13 ) ) { // newlines should clear the currentLine
-                    sink.write(currentLine.toString().getBytes());
-                    currentLine= new StringBuilder();
-                    state= STATE_OPEN;
-                }
-            } else if ( state==STATE_FORM_PDB_RESPONSE ) {
-                if ( b>=0 && b!=10 && b!=13 ) currentLine.append((char)b);  
-                
-                Pattern p= Pattern.compile("\\>? \\S+\\((\\d+)\\)\\S+\\(\\)");
-                Matcher m= p.matcher(currentLine);
-                if ( m.matches() ) {
-                    String linenum= m.group(1);
-                    annotationsSupport.clearAnnotations();
-                    int[] pos= annotationsSupport.getLinePosition(Integer.parseInt(linenum));
-                    annotationsSupport.annotateChars( pos[0], pos[1], "programCounter", "pc", interruptible );
-                    state= STATE_OPEN;
-                    currentLine= new StringBuilder();
-                } else {
-                    
-                    if ( b==13 || b==10 ) {
-                        state= STATE_OPEN;
-                        sink.write(currentLine.toString().getBytes());
-                        currentLine= new StringBuilder();
-                        
-                    }
-                }
-                
-            } else if ( state==STATE_PDB ) { // the beginning of the currentLine is (Pdb) and we want a terminator
-                Pattern p= Pattern.compile("\\(Pdb\\) (.*)>? <string>\\((\\d+)\\)\\?\\(\\)\\s*");
-                Pattern p2= Pattern.compile("\\(Pdb\\) (.*)--Return--.*>? <string>\\((\\d+)\\)\\?\\(\\)\\s*.*");
-                
-                int l= currentLine.length();
-                if ( b>=0 && b!=10 && b!=13 ) currentLine.append((char)b);  //TODO: why is my regex not working when newlines get in there?
-                if ( l>2 && currentLine.substring(l-2,l).equals("()") ) {
-                    Matcher m= p.matcher(currentLine);
-                    if ( m.matches() ) {
-                        String linenum= m.group(2);
-                        annotationsSupport.clearAnnotations();
-                        int[] pos= annotationsSupport.getLinePosition(Integer.parseInt(linenum));
-                        annotationsSupport.annotateChars( pos[0], pos[1], "programCounter", "pc", interruptible );
-                        String userOutput= m.group(1);
-                        if ( userOutput.length()>0 ) {
-                            sink.write(userOutput.getBytes());
-                            sink.write("\n".getBytes());
-                        }
-                        state= STATE_OPEN;
-                        currentLine= new StringBuilder();
-                    } else {
-                        Matcher m2= p2.matcher(currentLine);
-                        if ( m2.matches() ) {
-                            annotationsSupport.clearAnnotations();
-                            String userOutput= m2.group(1);
-                            if ( userOutput.length()>0 ) {
-                                sink.write(userOutput.getBytes());
-                                sink.write("\n".getBytes());
-                            }
-                            state= STATE_OPEN;
-                            currentLine= new StringBuilder();
-                        } else {
-                            state= STATE_OPEN;
-                            currentLine= new StringBuilder();
-                        }
-                    }
-                }
-            }
-            
-        }
        
-        public void writeOld(int b) throws IOException {
+        public void checkState(int b) throws IOException {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException ex) {
@@ -1120,7 +1023,7 @@ public class ScriptPanelSupport {
 
         @Override
         public void write(int b) throws IOException {
-            this.writeOld(b); 
+            this.checkState(b); 
         }
         
         @Override
