@@ -24,7 +24,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -809,8 +811,21 @@ public class ScriptPanelSupport {
                                         if ( warning ) {
                                             System.err.println("code contains data that will not be represented properly!");
                                         }
-                                        try (InputStream in = new ByteArrayInputStream( code.getBytes() )) {
-                                            interp.execfile(JythonRefactory.fixImports(in),file.getName());
+                                        //experiment with writing to a temporary file and executing it.
+                                        if ( experiment ) {
+                                            String fixedCode= JythonRefactory.fixImports( code );
+                                            if ( fixedCode.equals(code) ) {
+                                                interp.execfile( file.getAbsolutePath() );
+                                            } else {
+                                                File tempFile= new File( file.getAbsolutePath() + ".t" );
+                                                Files.copy( new ByteArrayInputStream( fixedCode.getBytes() ), 
+                                                        tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
+                                                interp.execfile( tempFile.getAbsolutePath() );
+                                            }
+                                        } else {
+                                            try (InputStream in = new ByteArrayInputStream( code.getBytes() )) {
+                                                interp.execfile(JythonRefactory.fixImports(in),file.getName());
+                                            }
                                         }
                                     } else {
                                         interp.exec(JythonRefactory.fixImports(code));
@@ -868,6 +883,11 @@ public class ScriptPanelSupport {
         }
 
         StringBuilder currentLine= new StringBuilder();
+        
+        /**
+         * PDB has just returned from a routine, so don't close the debugging session.
+         */
+        boolean returnFlag= false;
         
         /**
          * standard mode output.
@@ -991,6 +1011,11 @@ public class ScriptPanelSupport {
         }
        
         public void writeOld(int b) throws IOException {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
             if ( dc!=null ) dc.print(String.valueOf((char)b),state);
             
@@ -998,6 +1023,8 @@ public class ScriptPanelSupport {
                 if ( b>=0 ) currentLine.append((char)b);
                 if ( currentLine.length()==1 && currentLine.substring(0,1).equals("(") ) {
                     state= STATE_FORM_PDB_PROMPT;
+                } else if ( currentLine.length()==1 && currentLine.substring(0,1).equals(">") ) {
+                    state= STATE_FORM_PDB_RESPONSE;                    
                 } else if ( currentLine.length()>10 && currentLine.substring(0,10).equals("--Return--") ) {
                     state= STATE_RETURN_INIT_PROMPT;
                     dc.started();
@@ -1017,6 +1044,7 @@ public class ScriptPanelSupport {
                 if ( currentLine.length()>=5 ) {
                     if ( currentLine.substring(0,5).equals("(Pdb)") ) {
                         state= STATE_PDB;
+                        dc.started();
                     } else {
                         sink.write(currentLine.toString().getBytes());
                         state= STATE_OPEN;
@@ -1026,6 +1054,27 @@ public class ScriptPanelSupport {
                     currentLine= new StringBuilder();
                     state= STATE_OPEN;
                 }
+            } else if ( state==STATE_FORM_PDB_RESPONSE ) {
+                if ( b>=0 && b!=10 && b!=13 ) currentLine.append((char)b);  
+                
+                Pattern p= Pattern.compile("\\>? \\S+\\((\\d+)\\)\\S+\\(\\)");
+                Matcher m= p.matcher(currentLine);
+                if ( m.matches() ) {
+                    String linenum= m.group(1);
+                    annotationsSupport.clearAnnotations();
+                    int[] pos= annotationsSupport.getLinePosition(Integer.parseInt(linenum));
+                    annotationsSupport.annotateChars( pos[0], pos[1], "programCounter", "pc", interruptible );
+                    state= STATE_OPEN;
+                    currentLine= new StringBuilder();
+                } else {
+                    
+                    if ( b==13 || b==10 ) {
+                        state= STATE_OPEN;
+                        sink.write(currentLine.toString().getBytes());
+                        currentLine= new StringBuilder();
+                        
+                    }
+                }                
             } else if ( state==STATE_PDB ) { // the beginning of the currentLine is (Pdb) and we want a terminator
                 Pattern p= Pattern.compile("\\(Pdb\\) (.*)> .*\\.jy\\((\\d+)\\).*\\(\\)\\s*"); // TODO: replace ).* with more precise value.
                 Pattern p2= Pattern.compile("\\(Pdb\\) (.*)--Return--.*");
@@ -1058,6 +1107,7 @@ public class ScriptPanelSupport {
                             state= STATE_OPEN;
                             currentLine= new StringBuilder();
                             dc.finished();
+                            returnFlag= true;
                             dc.next();
                         } else {
                             state= STATE_OPEN;
