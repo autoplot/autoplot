@@ -659,10 +659,11 @@ public class CanvasController extends DomNodeController {
         DomLock lock = changesSupport.mutatorLock();
         lock.lock("Delete Row");
         try {
-            List<Row> rows = new ArrayList<Row>(Arrays.asList(canvas.getRows()));
+            List<Row> rows = new ArrayList<>(Arrays.asList(canvas.getRows()));
 
             rows.remove(row);
-
+            row.getController().getDasRow().removeListeners();
+            
             canvas.setRows(rows.toArray(new Row[rows.size()]));
         } finally {
             lock.unlock();
@@ -673,9 +674,10 @@ public class CanvasController extends DomNodeController {
         DomLock lock = changesSupport.mutatorLock();
         lock.lock("Delete Column");
         try {
-            List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
+            List<Column> columns = new ArrayList<>(Arrays.asList(canvas.getColumns()));
 
             columns.remove(column);
+            column.getController().getDasColumn().removeListeners();
 
             canvas.setColumns(columns.toArray(new Column[columns.size()]));
         } finally {
