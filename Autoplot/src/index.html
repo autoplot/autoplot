@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Short but complex Jython script shows Apache Math's Bessel function.  It uses many features, described in comments <a href='bessel.jy'>here</a>.
+        <p><small>Tutorials can be made easily, showing graphics for each step and providing a place for workshop attendees to write notes.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-09-29 r22892):</p>
+        <p>Bugfixes (2018-10-03 r22906):</p>
         <ul>
+            <li>2042: correct code which would resize the canvas in scripts running in headful mode, which would occasionally fail.
+            <li>2042: remove old listeners which were preventing DasRows and DasColumns from garbage collection.
+            <li>tweaks to pdb (Python debugger) support, trying to improve its utility.
             <li>some annotation position icons were missing.
             <li>StackedHistogram (peaks-and-averages) renderer max values could go past the min of the next channel, creating ambiguity.
             <li>check for dark background color in Jython editor for warnings, program counter, and usages.
