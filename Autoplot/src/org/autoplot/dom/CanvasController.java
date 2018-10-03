@@ -6,6 +6,7 @@ package org.autoplot.dom;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -51,7 +52,12 @@ public class CanvasController extends DomNodeController {
     private final Application application;
     private final Canvas canvas;
     private final Timer repaintSoonTimer;
-
+    
+    /**
+     * the setSizeTimer makes sure that the canvas preferred size is set on the event thread.
+     */
+    private final Timer setSizeTimer;
+        
     public CanvasController(Application dom, Canvas canvas) {
         super(canvas);
         this.application = dom;
@@ -64,6 +70,16 @@ public class CanvasController extends DomNodeController {
             }
         });
         repaintSoonTimer.setRepeats(false);
+        
+        setSizeTimer= new Timer( 0,  new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                dasCanvas.setPreferredSize( new Dimension( Math.min( 4000, CanvasController.this.canvas.getWidth()), 
+                    Math.min( 4000, CanvasController.this.canvas.getHeight()) ) );
+            }
+        } );
+        setSizeTimer.setRepeats(false);
+    
     }
 
     /**
@@ -119,21 +135,23 @@ public class CanvasController extends DomNodeController {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 LoggerManager.logPropertyChangeEvent(evt);  
-                dasCanvas.setPreferredWidth( Math.min( 4000, CanvasController.this.canvas.getWidth()) );
+                setSizeTimer.restart();
+                //dasCanvas.setSize( dasCanvas.getPreferredSize().width, 0);
             }
         });
         this.canvas.addPropertyChangeListener(Canvas.PROP_HEIGHT, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 LoggerManager.logPropertyChangeEvent(evt);  
-                dasCanvas.setPreferredHeight( Math.min( 4000, CanvasController.this.canvas.getHeight()) );
+                setSizeTimer.restart();
+                //System.err.println("dasCanvas.height="+dasCanvas.getHeight());
             }
         });
         ac.bind(this.canvas, Canvas.PROP_FITTED, dasCanvas, "fitted");
         ac.bind(this.canvas, Canvas.PROP_FONT, dasCanvas, DasCanvas.PROP_BASEFONT, DomUtil.STRING_TO_FONT);  //TODO: bind this to the dasCanvas.
 
     }
-
+    
     public DasCanvas getDasCanvas() {
         return dasCanvas;
     }
