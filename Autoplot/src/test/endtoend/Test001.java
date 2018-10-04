@@ -2,6 +2,12 @@
 package test.endtoend;
 
 import java.io.File;
+//import java.io.FileInputStream;
+//import java.io.FileNotFoundException;
+//import java.io.IOException;
+//import java.util.logging.Level;
+//import java.util.logging.LogManager;
+//import java.util.logging.Logger;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
@@ -10,6 +16,7 @@ import static org.autoplot.ScriptContext.*;
 import org.autoplot.datasource.AutoplotSettings;
 import org.das2.qds.ops.Ops;
 import org.autoplot.jythonsupport.Util;
+//import org.das2.util.LoggerManager;
 
 /**
  * Test Autoplot
@@ -19,6 +26,15 @@ public class Test001 {
     public static void main(String[] args)  {
         try {
             
+//            try {
+//                LogManager.getLogManager().readConfiguration( new FileInputStream("/home/jbf/autoplot_data/config/logging.properties") );
+//                LoggerManager.getLogger("autoplot.script").fine("Hello");
+//            } catch (FileNotFoundException ex) {
+//                Logger.getLogger(Test001.class.getName()).log(Level.SEVERE, null, ex);
+//            } catch (IOException | SecurityException ex) {
+//                Logger.getLogger(Test001.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//            
             System.err.println("pwd: "+(new File(".")).getCanonicalPath());
             System.err.println("autoplot_data: "+AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA) );
             System.err.println("fscache: "+AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE) );
