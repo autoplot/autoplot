@@ -41,6 +41,7 @@ import org.das2.util.LoggerManager;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import static org.autoplot.dom.DomNodeController.logger;
 import org.autoplot.layout.LayoutConstants;
+import org.das2.DasApplication;
 
 /**
  * Controller for canvases.
@@ -74,8 +75,7 @@ public class CanvasController extends DomNodeController {
         setSizeTimer= new Timer( 0,  new ActionListener() {
             @Override
             public void actionPerformed( ActionEvent e ) {
-                dasCanvas.setPreferredSize( new Dimension( Math.min( 4000, CanvasController.this.canvas.getWidth()), 
-                    Math.min( 4000, CanvasController.this.canvas.getHeight()) ) );
+                setDasCanvasSize();
             }
         } );
         setSizeTimer.setRepeats(false);
@@ -104,6 +104,13 @@ public class CanvasController extends DomNodeController {
         canvas.getMarginRow().setTop(ss[0]);
     }
 
+    private void setDasCanvasSize() {
+        dasCanvas.setPreferredSize( new Dimension( Math.min( 4000, CanvasController.this.canvas.getWidth()), 
+                    Math.min( 4000, CanvasController.this.canvas.getHeight()) ) );
+        dasCanvas.setSize( new Dimension( Math.min( 4000, CanvasController.this.canvas.getWidth()), 
+                    Math.min( 4000, CanvasController.this.canvas.getHeight()) ) );
+    }
+    
     protected void setDasCanvas(final DasCanvas canvas) {
         assert (dasCanvas != null);
         this.dasCanvas = canvas;
@@ -136,7 +143,9 @@ public class CanvasController extends DomNodeController {
             public void propertyChange(PropertyChangeEvent evt) {
                 LoggerManager.logPropertyChangeEvent(evt);  
                 setSizeTimer.restart();
-                //dasCanvas.setSize( dasCanvas.getPreferredSize().width, 0);
+                if ( "true".equals( System.getProperty("java.awt.headless","false") ) ) {
+                    setDasCanvasSize();
+                }
             }
         });
         this.canvas.addPropertyChangeListener(Canvas.PROP_HEIGHT, new PropertyChangeListener() {
@@ -144,7 +153,9 @@ public class CanvasController extends DomNodeController {
             public void propertyChange(PropertyChangeEvent evt) {
                 LoggerManager.logPropertyChangeEvent(evt);  
                 setSizeTimer.restart();
-                //System.err.println("dasCanvas.height="+dasCanvas.getHeight());
+                if ( "true".equals( System.getProperty("java.awt.headless","false") ) ) {
+                    setDasCanvasSize();
+                }
             }
         });
         ac.bind(this.canvas, Canvas.PROP_FITTED, dasCanvas, "fitted");
