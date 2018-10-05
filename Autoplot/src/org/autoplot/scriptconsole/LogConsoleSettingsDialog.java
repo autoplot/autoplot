@@ -218,12 +218,12 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         
     static class TimeTaggingCellRenderer implements TableCellRenderer {
 
-        JComponent component = null;
-        TableCellRenderer delegate;
+        //JComponent component = null;
+        //TableCellRenderer delegate;
 
         public TimeTaggingCellRenderer(TableCellRenderer delegate) {
-            this.component = null;
-            this.delegate = delegate;
+            //this.component = null;
+            //this.delegate = delegate;
         }
 
         @Override
@@ -250,27 +250,15 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
     static class MyCellRenderer implements TableCellRenderer {
 
         TableCellRenderer delegate;
-        Color backgroundColor;
-        Color oddColor= Color.LIGHT_GRAY;
-        Color selectedColor;
-        Color selectedBackgroundColor;
-        Color focusColor;
-        Color focusBackgroundColor;
+        //Color backgroundColor;
+        //Color oddColor= Color.LIGHT_GRAY;
+        //Color selectedColor;
+        //Color selectedBackgroundColor;
+        //Color focusColor;
+        //Color focusBackgroundColor;
         
         public MyCellRenderer(TableCellRenderer delegate) {
-            this.delegate = delegate;
-            Component c=  delegate.getTableCellRendererComponent(
-                    null, "", false, false, 0, 0 );
-            backgroundColor= c.getBackground();
-            c=  delegate.getTableCellRendererComponent(
-                    null, "", true, false, 0, 0 );
-            selectedBackgroundColor= c.getBackground();
-            selectedColor= c.getForeground();
-            c=  delegate.getTableCellRendererComponent(
-                    null, "", false, true, 0, 0 );
-            focusBackgroundColor= c.getBackground();
-            focusColor= c.getForeground();
-            
+            this.delegate = delegate;            
         }
 
         @Override
@@ -298,26 +286,14 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
     static class LevelCellRenderer implements TableCellRenderer {
 
         TableCellRenderer delegate;
-        Color backgroundColor;
-        Color oddColor= Color.LIGHT_GRAY;
-        Color selectedColor;
-        Color selectedBackgroundColor;
-        Color focusColor;
-        Color focusBackgroundColor;      
+        //Color backgroundColor;
+        //Color oddColor= Color.LIGHT_GRAY;
+        //Color selectedColor;
+        //Color selectedBackgroundColor;
+        //Color focusColor;
+        //Color focusBackgroundColor;      
         public LevelCellRenderer(TableCellRenderer delegate) {
             this.delegate = delegate;
-            Component c=  delegate.getTableCellRendererComponent(
-                    null, "", false, false, 0, 0 );
-            backgroundColor= c.getBackground();
-            c=  delegate.getTableCellRendererComponent(
-                    null, "", true, false, 0, 0 );
-            selectedBackgroundColor= c.getBackground();
-            selectedColor= c.getForeground();
-            c=  delegate.getTableCellRendererComponent(
-                    null, "", false, true, 0, 0 );
-            focusBackgroundColor= c.getBackground();
-            focusColor= c.getForeground();
-                        
         }
 
         @Override
