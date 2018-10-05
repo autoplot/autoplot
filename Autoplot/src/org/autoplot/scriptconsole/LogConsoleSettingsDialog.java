@@ -46,7 +46,7 @@ import org.autoplot.datasource.AutoplotSettings;
  *
  * @author jbf
  */
-public class LogConsoleSettingsDialog extends javax.swing.JDialog {
+public final class LogConsoleSettingsDialog extends javax.swing.JDialog {
 
     LogConsole console;
 
