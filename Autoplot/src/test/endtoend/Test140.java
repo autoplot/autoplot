@@ -19,6 +19,7 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import org.autoplot.AutoplotUtil;
 import org.das2.util.filesystem.HtmlUtil;
@@ -44,6 +45,7 @@ import org.das2.datum.UnitsUtil;
 import org.das2.qds.SemanticOps;
 import org.das2.system.DefaultMonitorFactory;
 import org.das2.system.MonitorFactory;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.xml.sax.SAXException;
 
@@ -402,6 +404,10 @@ public class Test140 {
     public static void main( String[] args ) throws Exception {
         //Logger l= LoggerManager.getLogger("apdss");
         //l.setLevel( Level.ALL );
+        
+        //LoggerManager.readConfiguration("/home/jbf/autoplot_data/config/logging.properties");
+        //Logger.getLogger("autoplot.dom.canvas").info("info level");
+        //Logger.getLogger("autoplot.dom.canvas").finer("finer level");
         
         System.err.println("disable certificate checking");
         AutoplotUtil.disableCertificates();
