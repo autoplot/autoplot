@@ -114,4 +114,10 @@ public class StreamingCapability implements Streaming {
         }
         
     }
+
+    @Override
+    public String toString() {
+        return "stream of "+uri;
+    }
+    
 }
