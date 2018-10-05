@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.dom;
 
 import java.awt.BasicStroke;
@@ -26,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.das2.graph.DasCanvas;
@@ -39,9 +37,7 @@ import org.das2.graph.Renderer;
 import org.das2.graph.SelectionUtil;
 import org.das2.util.LoggerManager;
 import org.autoplot.dom.ChangesSupport.DomLock;
-import static org.autoplot.dom.DomNodeController.logger;
 import org.autoplot.layout.LayoutConstants;
-import org.das2.DasApplication;
 
 /**
  * Controller for canvases.
@@ -49,6 +45,8 @@ import org.das2.DasApplication;
  */
 public class CanvasController extends DomNodeController {
 
+    protected static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.dom.canvas" );
+    
     DasCanvas dasCanvas;
     private final Application application;
     private final Canvas canvas;
@@ -72,7 +70,7 @@ public class CanvasController extends DomNodeController {
         });
         repaintSoonTimer.setRepeats(false);
         
-        setSizeTimer= new Timer( 0,  new ActionListener() {
+        setSizeTimer= new Timer( 100,  new ActionListener() {
             @Override
             public void actionPerformed( ActionEvent e ) {
                 setDasCanvasSize();
@@ -104,11 +102,17 @@ public class CanvasController extends DomNodeController {
         canvas.getMarginRow().setTop(ss[0]);
     }
 
+    /**
+     * copy over the current size in the DOM to the DasCanvas.  This is done
+     * on the event thread.
+     */
     private void setDasCanvasSize() {
-        dasCanvas.setPreferredSize( new Dimension( Math.min( 4000, CanvasController.this.canvas.getWidth()), 
-                    Math.min( 4000, CanvasController.this.canvas.getHeight()) ) );
-        dasCanvas.setSize( new Dimension( Math.min( 4000, CanvasController.this.canvas.getWidth()), 
-                    Math.min( 4000, CanvasController.this.canvas.getHeight()) ) );
+        int w= Math.min( 4000, CanvasController.this.canvas.getWidth());
+        int h= Math.min( 4000, CanvasController.this.canvas.getHeight());
+        Dimension d= new Dimension( w,h );
+        logger.log(Level.FINER, "setDasCanvasSize {0}", d);
+        dasCanvas.setPreferredSize( d );
+        dasCanvas.setSize( d );
     }
     
     protected void setDasCanvas(final DasCanvas canvas) {
@@ -120,11 +124,17 @@ public class CanvasController extends DomNodeController {
         dasCanvas.addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
-                if (CanvasController.this.canvas.getWidth() != dasCanvas.getWidth()) {
-                    CanvasController.this.canvas.setWidth(dasCanvas.getWidth());
+                if ( setSizeTimer.isRunning() ) {
+                    return;
                 }
-                if (CanvasController.this.canvas.getHeight() != dasCanvas.getHeight()) {
-                    CanvasController.this.canvas.setHeight(dasCanvas.getHeight());
+                int w= dasCanvas.getWidth();
+                int h= dasCanvas.getHeight();
+                logger.log(Level.FINER, "got componentResize {0}x{1}", new Object[]{w, h});
+                if (CanvasController.this.canvas.getWidth() != w) {
+                    CanvasController.this.canvas.setWidth(w);
+                }
+                if (CanvasController.this.canvas.getHeight() != h) {
+                    CanvasController.this.canvas.setHeight(h);
                 }
             }
             @Override
