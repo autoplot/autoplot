@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Tutorials can be made easily, showing graphics for each step and providing a place for workshop attendees to write notes.
+        <p><small>Tutorials can be made easily, showing graphics for each step and providing a place for workshop attendees to write notes.  See this <a href='http://autoplot.org/data/tutorials/20181008/20181008.pdf'>tutorial</a>.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-10-03 r22906):</p>
+        <p>Bugfixes (2018-10-06 r22906):</p>
         <ul>
+            <li>2042: correction to the ticks code which would detect when new ticks were needed during pngwalk generation, sometimes failing.
             <li>2042: correct code which would resize the canvas in scripts running in headful mode, which would occasionally fail.
             <li>2042: remove old listeners which were preventing DasRows and DasColumns from garbage collection.
             <li>tweaks to pdb (Python debugger) support, trying to improve its utility.
@@ -70,6 +71,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>support for renderType="spectrogram>rebin=triScat"
+            <li>LoggerManager.readConfiguration can read any file now, not just that named by -Djava.util.logging.config.file=...
         </ul>
        <p>Less recent features:</p>
        <ul>
