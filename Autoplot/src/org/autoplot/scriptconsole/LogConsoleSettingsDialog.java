@@ -713,6 +713,8 @@ public final class LogConsoleSettingsDialog extends javax.swing.JDialog {
     private void saveLoggerConfigButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveLoggerConfigButtonActionPerformed
         final StringBuilder b= new StringBuilder();
         b.append("handlers = java.util.logging.ConsoleHandler\n");
+        b.append("java.util.logging.ConsoleHandler.level = ALL\n");
+        
         b.append("\n");
         for ( String s: org.das2.util.LoggerManager.getLoggers() ) {
             Logger l= org.das2.util.LoggerManager.getLogger(s);
