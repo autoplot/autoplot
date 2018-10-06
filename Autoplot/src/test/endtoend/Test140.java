@@ -405,7 +405,7 @@ public class Test140 {
         //Logger l= LoggerManager.getLogger("apdss");
         //l.setLevel( Level.ALL );
         
-        //LoggerManager.readConfiguration("/home/jbf/autoplot_data/config/logging.properties");
+        //LoggerManager.readConfiguration( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA) + "config/logging.properties" );
         //Logger.getLogger("autoplot.dom.canvas").info("info level");
         //Logger.getLogger("autoplot.dom.canvas").finer("finer level");
         
