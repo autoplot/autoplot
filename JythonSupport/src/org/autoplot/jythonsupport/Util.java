@@ -285,6 +285,8 @@ public class Util {
             }
         }
 
+        if ( rds==null ) return null;
+        
         TimeSeriesBrowse tsb= result.getCapability(TimeSeriesBrowse.class);
         if ( tsb!=null ) {
             if ( !Schemes.isTimeSeries(rds) ) {
@@ -293,8 +295,6 @@ public class Util {
             }
         }
 
-        if ( rds==null ) return null;
-        
         rds= ensureWritable(rds);
         return rds;
         
