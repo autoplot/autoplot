@@ -414,6 +414,11 @@ public final class HapiDataSource extends AbstractDataSource {
         
     }
     
+    /** 
+     * TODO: this needs to use HAPI_DATA to locate the directory.
+     * See https://sourceforge.net/p/autoplot/bugs/2043/
+     * 
+     */
     private static void writeToCachedDataFinish(URL url, ParamDescription[] pp, Datum xx ) throws IOException {
         logger.log(Level.FINE, "writeToCachedDataFinish: {0}", xx);
         String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
