@@ -70,6 +70,7 @@ import org.autoplot.datasource.DefaultTimeSeriesBrowse;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.Caching;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.das2.datum.DatumUtil;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.fsm.FileStorageModel;
@@ -671,8 +672,8 @@ public final class HapiDataSource extends AbstractDataSource {
             try {
                 int[] ii= DatumRangeUtil.parseISO8601Duration(info.getString("cadence"));
                 Datum t= TimeUtil.toDatumDuration(ii);
-                tr= new DatumRange( tr.min().subtract(t), tr.max().add(t) );
                 cadence= t;
+                tr= new DatumRange( tr.min().subtract(cadence), tr.max().add(cadence) );
             } catch ( ParseException ex ) {
                 logger.log(Level.WARNING, "unable to parse cadence as ISO8601 duration: {0}", info.getString("cadence"));
             }
@@ -702,6 +703,26 @@ public final class HapiDataSource extends AbstractDataSource {
             }
             //TODO: the parameters must also be sorted by position in stream.
             pds= subsetPds;   
+        }
+        
+        // 2043: trim the request to startDate/stopDate.  TODO: caching needs to consider this as well.
+        DatumRange startStopDate= null;
+        try {
+            startStopDate= DatumRangeUtil.parseTimeRange( info.getString("startDate") + "/"+info.getString("stopDate") );
+            if ( tr.intersects( startStopDate ) ) {
+                tr= tr.intersection( startStopDate );
+            } else {
+                if ( tr.max().lt(startStopDate.min() ) ) {
+                    throw new NoDataInIntervalException("data begins after this time range");
+                } else {
+                    throw new NoDataInIntervalException("data ends before this time range");
+                }
+            }
+            //TODO: caching when enabled may round out to day boundaries.
+        } catch ( ParseException ex ) {
+            logger.log(Level.INFO, "unable to parse startDate/stopDate: {0}", ex.getMessage());
+        } catch ( NullPointerException ex ) {
+            logger.info("startDate and stopDate was missing");
         }
         
         URL url= HapiServer.getDataURL( server.toURL(), id, tr, pp );
