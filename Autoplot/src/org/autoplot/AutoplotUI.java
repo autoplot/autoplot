@@ -715,7 +715,64 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 SwingUtilities.invokeLater(run);
             }
         });  
-                
+        dataSetSelector.registerActionTrigger( "http.*/hapi(/data\\?.*)?", new AbstractAction( "hapiServer") {
+            @Override
+            public void actionPerformed( final ActionEvent ev ) { 
+                org.das2.util.LoggerManager.logGuiEvent(ev);                
+                final String value= dataSetSelector.getValue();
+                Pattern p= Pattern.compile("(http.*/hapi)(/data\\?id=(.*))?");
+                URISplit split= URISplit.parse(value);
+                if ( split.file.endsWith("/data") ) {
+                    split.file= split.file.substring(0,split.file.length()-5);
+                }
+                Map<String,String> params= URISplit.parseParams(split.params);
+                if ( params.containsKey("time.min") && params.containsKey("time.max") ) {
+                    params.put( "timerange", params.get("time.min")+"/"+params.get("time.max") );
+                    params.remove("time.min");
+                    params.remove("time.max");
+                }
+                split.vapScheme= "vap+hapi";
+                split.params= URISplit.formatParams(params);
+                final String newValue= URISplit.format(split);
+                Runnable run= new Runnable() {
+                    public void run() {
+                        dataSetSelector.setValue(newValue);
+                        dataSetSelector.maybePlot( ev.getModifiers() );
+                    }
+                };
+                SwingUtilities.invokeLater(run);
+            }
+        });  
+        
+        dataSetSelector.registerBrowseTrigger( "http.*/hapi(/data\\?.*)?", new AbstractAction( "hapiServer") {
+            @Override
+            public void actionPerformed( final ActionEvent ev ) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);                
+                final String value= dataSetSelector.getValue();
+                Pattern p= Pattern.compile("(http.*/hapi)(/data\\?id=(.*))?");
+                URISplit split= URISplit.parse(value);
+                if ( split.file.endsWith("/data") ) {
+                    split.file= split.file.substring(0,split.file.length()-5);
+                }
+                Map<String,String> params= URISplit.parseParams(split.params);
+                if ( params.containsKey("time.min") && params.containsKey("time.max") ) {
+                    params.put( "timerange", params.get("time.min")+"/"+params.get("time.max") );
+                    params.remove("time.min");
+                    params.remove("time.max");
+                }
+                split.vapScheme= "vap+hapi";
+                split.params= URISplit.formatParams(params);
+                final String newValue= URISplit.format(split);
+                Runnable run= new Runnable() {
+                    public void run() {
+                        dataSetSelector.setValue(newValue);
+                        dataSetSelector.maybePlot( ev.getModifiers() );
+                    }
+                };
+                SwingUtilities.invokeLater(run);
+            }
+        });  
+                        
         dataSetSelector.registerActionTrigger( "(.*)\\.jy(\\?.*)?", new AbstractAction( TAB_SCRIPT) {
             @Override
             public void actionPerformed( ActionEvent ev ) {
