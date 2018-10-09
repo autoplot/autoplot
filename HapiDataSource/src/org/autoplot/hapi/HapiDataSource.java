@@ -78,6 +78,7 @@ import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
 import org.das2.qstream.TransferType;
 import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.FileSystemSettings;
 import org.das2.util.monitor.CancelledOperationException;
 
 /**
@@ -328,11 +329,45 @@ public final class HapiDataSource extends AbstractDataSource {
             }
         }
     }
+    
+    /**
+     * return the location of the cache for HAPI data.
+     * @return 
+     */
+    public static String getHapiCache() {
+        String hapiCache= System.getProperty("HAPI_DATA");
+        if ( hapiCache!=null ) {
+            String home=System.getProperty("user.home") ;
+            if ( hapiCache.contains("${HOME}") ) { // the filesystem settings used ${}, %{} seems more conventional.
+                hapiCache= hapiCache.replace("${HOME}", home );
+            } else if ( hapiCache.contains("%{HOME}") ) {
+                hapiCache= hapiCache.replace("%{HOME}", home );
+            }            
+        }
+        if ( hapiCache!=null && hapiCache.contains("\\") ) { // Windows path sep
+            hapiCache= hapiCache.replaceAll("\\\\", "/" );
+        }
+        if ( hapiCache==null ) {
+            String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
+            if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
+            hapiCache= s + "/hapi/";
+        }
+        if ( !hapiCache.endsWith("/") ) hapiCache= hapiCache + "/";
+        
+        if ( !hapiCache.endsWith("/") ) {
+            throw new IllegalArgumentException("hapiCache must end with /");
+        }
+        if ( HapiServer.useCache() ) {
+            if ( !new File(hapiCache).exists() ) {
+                new File(hapiCache).mkdirs();
+            }
+        }
+        return hapiCache;
+
+    }
      
     private static void writeToCachedData(URL url, ParamDescription[] pp, Datum xx, String[] ss) throws IOException {
         
-        String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
-        if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
         StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + url.getPath() );
         if ( url.getQuery()!=null ) {
             String[] querys= url.getQuery().split("\\&");
@@ -347,6 +382,8 @@ public final class HapiDataSource extends AbstractDataSource {
         } else {
             throw new IllegalArgumentException("query must be specified, implementation error");
         }
+                
+        String hapiCache= getHapiCache();
         
         TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d" );
         
@@ -355,7 +392,7 @@ public final class HapiDataSource extends AbstractDataSource {
         String u= ub.toString();
         Datum t0= lastRecordFound.get( u + "/" + sxx );
         if ( t0==null ) {
-            String f= s + "/" + u + "/" + sxx + "." + pp[0].name + ".csv";
+            String f= hapiCache + u + "/" + sxx + "." + pp[0].name + ".csv";
             File ff= new File(f);
             if ( ff.exists() ) {
                 BufferedReader read= new BufferedReader(new FileReader(ff));
@@ -380,7 +417,7 @@ public final class HapiDataSource extends AbstractDataSource {
         if ( t0!=null && t0.ge(xx) ) {
             logger.log(Level.FINE, "clear all cached files for {0}", sxx);
             for (ParamDescription pp1 : pp) {
-                String f = s + "/hapi/" + u + "/" + sxx + "." + pp1.name + ".csv";
+                String f = hapiCache + u + "/" + sxx + "." + pp1.name + ".csv";
                 File ff= new File(f);
                 if ( ff.exists() ) {
                     if ( !ff.delete() ) logger.log(Level.INFO, "unable to delete file: {0}", ff);
@@ -422,8 +459,7 @@ public final class HapiDataSource extends AbstractDataSource {
      */
     private static void writeToCachedDataFinish(URL url, ParamDescription[] pp, Datum xx ) throws IOException {
         logger.log(Level.FINE, "writeToCachedDataFinish: {0}", xx);
-        String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
-        if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
+
         StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + url.getPath() );
         if ( url.getQuery()!=null ) { // get the id from the url
             String[] querys= url.getQuery().split("\\&");
@@ -438,6 +474,9 @@ public final class HapiDataSource extends AbstractDataSource {
         } else {
             throw new IllegalArgumentException("query must be specified, implementation error");
         }
+        
+        String hapiCache= getHapiCache();
+        
         long currentTimeMillis= pp[0].modifiedDateMillis;
         TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d" );
         String sxx= tp.format(xx);
@@ -446,13 +485,13 @@ public final class HapiDataSource extends AbstractDataSource {
             String f = u + "/" + sxx + "." + pp1.name + ".csv" + "."+ Thread.currentThread().getId();
             logger.log(Level.FINE, "remove from cache: {0}", f);
             ArrayList<String> sparam= cache.remove(f);
-            File ff= new File(s + "/hapi/" + u + "/" + sxx + "." + pp1.name + ".csv" +".gz");
+            File ff= new File( hapiCache + u + "/" + sxx + "." + pp1.name + ".csv" +".gz");
             if ( !ff.getParentFile().exists() ) {
                 if ( !ff.getParentFile().mkdirs() ) {
                     throw new IOException("unable to mkdirs "+ff.getParent() );
                 }
             }
-            File ffTemp= new File(s + "/hapi/" + u + "/" + sxx + "." + pp1.name + ".csv"+".gz."+Thread.currentThread().getId() );
+            File ffTemp= new File( hapiCache + u + "/" + sxx + "." + pp1.name + ".csv"+".gz."+Thread.currentThread().getId() );
             //int line=0;
             try (final BufferedWriter w = new BufferedWriter( new OutputStreamWriter( new GZIPOutputStream( new FileOutputStream(ff) ) ) ) ) {
                 if ( sparam!=null ) {
@@ -770,9 +809,18 @@ public final class HapiDataSource extends AbstractDataSource {
                     while ( currentDay.min().le(tr.max()) ) {
                         logger.log(Level.FINER, "useCache, request {0}", currentDay);
                         ProgressMonitor mon1= nday==1 ? monitor : monitor.getSubtaskMonitor( 10*iday, 10*(iday+1), "read "+currentDay );
-                        QDataSet ds1= getDataSetViaCsv(totalFields, mon1, url, pds, currentDay, nparam, nfields);
-                        if ( ds1.length()>0 ) {
-                            dsall= Ops.append( dsall, ds1 );
+                        QDataSet ds1;
+                        try {
+                            ds1 = getDataSetViaCsv(totalFields, mon1, url, pds, currentDay, nparam, nfields);
+                            if ( ds1.length()>0 ) {
+                                dsall= Ops.append( dsall, ds1 );
+                            }
+                        } catch ( NoDataInIntervalException ex ) {
+                            if ( ! FileSystem.settings().isOffline() ) {
+                                throw ex;
+                            } else {
+                                logger.log(Level.FINE, "no granule found for day, but we are offline: {0}", currentDay);
+                            }
                         }
                         currentDay= currentDay.next();
                         iday++;

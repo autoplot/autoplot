@@ -345,8 +345,9 @@ public class HapiServer {
      * @throws IOException 
      */
     public static String readFromCachedURL( URL url, String type ) throws IOException {
-        String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
-        if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
+        
+        String hapiCache= HapiDataSource.getHapiCache();
+        
         String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
         if ( url.getQuery()!=null ) {
             Pattern p= Pattern.compile("id=(.+)");
@@ -360,7 +361,7 @@ public class HapiServer {
         } else {
             if ( type.length()>0 ) u= u + "." + type;
         }
-        String su= s + "/hapi/" + u;
+        String su= hapiCache + u;
         File f= new File(su);
         if ( f.exists() && f.canRead() ) {
             if ( ( System.currentTimeMillis() - f.lastModified() < cacheAgeLimitMillis() ) || FileSystem.settings().isOffline() ) {
@@ -385,8 +386,9 @@ public class HapiServer {
      * @throws IOException 
      */
     public static void writeToCachedURL( URL url, String type, String data ) throws IOException {
-        String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
-        if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
+        
+        String hapiCache= HapiDataSource.getHapiCache();
+        
         String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
         if ( url.getQuery()!=null ) {
             Pattern p= Pattern.compile("id=(.+)");
@@ -405,7 +407,7 @@ public class HapiServer {
             }
         }
         
-        String su= s + "/hapi/" + u;
+        String su= hapiCache + u;
         File f= new File(su);
         if ( f.exists() ) {
             f.delete();
