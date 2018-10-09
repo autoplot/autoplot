@@ -732,7 +732,8 @@ public final class HapiDataSource extends AbstractDataSource {
                 map.put( parametersArray.getJSONObject(i).getString("name"), i ); // really--should name/id are two names for the same thing...
             }
             if ( !pps[0].equals(parametersArray.getJSONObject(0).getString("name")) ) { // add Time if it wasn't specified.
-                throw new IllegalArgumentException("first parameter must be \"" + parametersArray.getJSONObject(0).getString("name") + "\"" );
+                pp= parametersArray.getJSONObject(0).getString("name") + ","+ pp;
+                pps= pp.split(",");
             }
             nparam= pps.length;
             ParamDescription[] subsetPds= new ParamDescription[pps.length];
