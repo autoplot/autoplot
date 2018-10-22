@@ -289,12 +289,13 @@ public class DomOps {
     
     /**
      * New layout mechanism which fixes a number of shortcomings of the old layout mechanism, 
-     * newCanvasLayout.  This one:
+     * newCanvasLayout.  This one:<ul>
      * <li> Removes extra whitespace
      * <li> Preserves relative size weights.
      * <li> Preserves em heights, to support components which should not be rescaled.
      * <li> Preserves space taken by strange objects, to support future canvas components.
      * <li> Renormalizes the margin row, so it is nice.
+     * </ul>
      * @param dom 
      */
     public static void fixLayout( Application dom ) {
