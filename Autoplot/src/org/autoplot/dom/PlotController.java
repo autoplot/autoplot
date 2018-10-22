@@ -901,7 +901,7 @@ public class PlotController extends DomNodeController {
     }
     
     /**
-     * implement hints like width=40&includeZero=T.  
+     * implement hints like width=40&amp;includeZero=T.  
      * <blockquote><pre>
      * includeZero   T or F     make sure that zero is within the result.
      * width         30nT       use this width.  This is a formatted datum which 
@@ -1649,7 +1649,7 @@ public class PlotController extends DomNodeController {
     }
 
     /** 
-     * see https://sourceforge.net/tracker/?func=detail&aid=3104572&group_id=199733&atid=970682  We've loaded an old
+     * See <a href='https://sourceforge.net/p/autoplot/bugs/547/'>sourceforge ticket</a>. We've loaded an old
      * vap file and we need to convert units.dimensionless to a correct unit.
      * @param e
      */
