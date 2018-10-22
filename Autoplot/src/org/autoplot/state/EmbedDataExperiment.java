@@ -34,6 +34,7 @@ import org.autoplot.dom.DataSourceFilter;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.dom.Plot;
 import org.das2.qstream.SimpleStreamFormatter;
 import org.das2.qstream.StreamException;
 import org.das2.qstream.StreamTool;
@@ -154,36 +155,47 @@ public class EmbedDataExperiment {
         Set<URI> result= new HashSet();
         for ( DataSourceFilter dsf: dom.getDataSourceFilters() ) {
             String suri = dsf.getUri();
-            if ( suri.trim().length()==0 ) continue;
-            URISplit split= URISplit.parse(suri);
-            if ( split.resourceUri!=null ) {
-                URI uri= makeCanonical( split.resourceUri );
-                if ( hasNoResource( split ) ) { 
-                    continue;
-                }
-                if ( DataSetURI.isAggregating( uri.toString() ) ) {
-                    try {
-                        String [] rr= DataSetURI.unaggregate( uri.toString(), dom.getTimeRange() );
-                        for ( String r: rr ) {
-                            try {
-                                result.add( new URI( r ) );
-                            } catch (URISyntaxException ex) {
-                                logger.log(Level.SEVERE, ex.getMessage(), ex);
-                            }
+            maybeAddResource( suri, dom, result );
+        }
+        for ( Plot p: dom.getPlots() ) {
+            String s= p.getTicksURI();
+            maybeAddResource( s, dom, result );
+        }
+        String s= dom.getEventsListUri();
+        maybeAddResource( s, dom, result );
+        return result;
+    }
+
+    private static boolean maybeAddResource(String suri, Application dom, Set<URI> result) {
+        if ( suri.trim().length()==0 ) return false;
+        URISplit split= URISplit.parse(suri);
+        if (split.resourceUri!=null) {
+            URI uri= makeCanonical( split.resourceUri );
+            if (hasNoResource( split )) {
+                return false;
+            }
+            if ( DataSetURI.isAggregating( uri.toString() ) ) {
+                try {
+                    String [] rr= DataSetURI.unaggregate( uri.toString(), dom.getTimeRange() );
+                    for ( String r: rr ) {
+                        try {
+                            result.add( new URI( r ) );
+                        } catch (URISyntaxException ex) {
+                            logger.log(Level.SEVERE, ex.getMessage(), ex);
                         }
-                    } catch (FileSystem.FileSystemOfflineException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    } catch (UnknownHostException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    } catch (IOException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
-                } else {
-                    result.add( uri );
+                } catch (FileSystem.FileSystemOfflineException ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                } catch (UnknownHostException ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
+            } else {
+                result.add( uri );
             }
         }
-        return result;
+        return true;
     }
     
     /**
@@ -303,6 +315,24 @@ public class EmbedDataExperiment {
                     nameGenCount++;
                 }
                 dsfCount++;
+            }
+            for ( Plot p: dom.getPlots() ) {
+                String uri = p.getTicksURI();
+                URISplit split= URISplit.parse(uri);
+                if ( uri.trim().length()>0 && !hasNoResource(split) ) {
+                    String name= makeRelativeName(commonPath,split.resourceUri);
+                    split.file= "%{PWD}/"+name;
+                    p.setTicksURI( URISplit.format(split) );
+                } 
+            }
+            {
+                String uri = dom.getEventsListUri();
+                URISplit split= URISplit.parse(uri);
+                if ( uri.trim().length()>0 && !hasNoResource(split) ) {
+                    String name= makeRelativeName(commonPath,split.resourceUri);
+                    split.file= "%{PWD}/"+name;
+                    dom.setEventsListUri( URISplit.format(split) );
+                } 
             }
             ZipEntry e= new ZipEntry("default.vap");
             out.putNextEntry(e);
