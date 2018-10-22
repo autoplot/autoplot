@@ -238,7 +238,7 @@ public class PersistentStateSupport {
 
             String v= vapVersion.getScheme();
             if ( v.length()>0 ) {
-                save( new File( getCurrentFile()),v, vapVersion.isEmbedData() );
+                save( new File( getCurrentFile()), v, vapVersion.isEmbedData() );
             } else {
                 save( new File( getCurrentFile()), "", vapVersion.isEmbedData() );
             }
