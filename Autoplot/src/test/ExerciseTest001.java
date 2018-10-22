@@ -15,7 +15,7 @@ import org.das2.qds.ops.Ops;
 import static org.autoplot.ScriptContext.*;
 
 /**
- * code to work out https://sourceforge.net/tracker/?func=detail&aid=3015945&group_id=199733&atid=970682
+ * code to work out <a href='https://sourceforge.net/p/autoplot/bugs/360/'>sourceforge ticket</a>
  * @author jbf
  */
 public class ExerciseTest001 {
