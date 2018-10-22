@@ -782,6 +782,7 @@ public class AutoplotUtil {
             QDataSet ds= pe.getController().getDataSet();
             if ( ds!=null ) {
                 ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), null );
+                if ( ds.length()==0 ) break;
                 PlotElement pcopy1= (PlotElement)pe.copy();
                 PlotElementController.doAutoranging(pcopy1, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
                 if ( range==null ) {
@@ -814,6 +815,7 @@ public class AutoplotUtil {
             QDataSet ds= pe.getController().getDataSet();
             if ( ds!=null ) {
                 ds= SemanticOps.trim( ds, null, plot.getYaxis().getRange() );
+                if ( ds.length()==0 ) break;
                 PlotElement pcopy1= (PlotElement)pe.copy(); // TODO: something ain't right below...
                 PlotElementController.doAutoranging(pcopy1, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
                 if ( range==null ) {
@@ -848,6 +850,7 @@ public class AutoplotUtil {
             QDataSet ds= pe.getController().getDataSet();
             if ( ds!=null ) {
                 ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), plot.getYaxis().getRange() );
+                if ( ds.length()==0 ) break;
                 PlotElement pcopy1= (PlotElement)pe.copy();
                 PlotElementController.doAutoranging(pcopy1, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
                 if ( range==null ) {
