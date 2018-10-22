@@ -618,7 +618,6 @@ public class DomUtil {
      *
      * @param node1
      * @param node2
-     * @return
      */
     public static void syncTo(DomNode node1, DomNode node2) {
         List<Diff> diffs = node2.diffs(node1);
@@ -674,7 +673,7 @@ public class DomUtil {
     public static final Converter AUTO_TO_COLOR= new Converter() {
         @Override
         public Object convertForward(Object value) {
-            boolean b= ((Boolean)value).booleanValue();
+            boolean b= ((Boolean)value);
             return b ? Color.WHITE : Color.LIGHT_GRAY;
         }
 
