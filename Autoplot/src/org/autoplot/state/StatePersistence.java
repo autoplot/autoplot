@@ -465,6 +465,7 @@ public class StatePersistence {
      *   DOM after it's loaded.  
      * @return the DOM.
      * @throws IOException 
+     * @see #restoreState(java.io.InputStream) which just restores the state.
      */
     public static Application restoreState(InputStream in, LinkedHashMap<String, String> deltas) throws IOException {
         
@@ -537,6 +538,7 @@ public class StatePersistence {
      * @param in, an input stream that starts with the xml.  This will be left open.  
      * @return the Application object.
      * @throws IOException
+     * @see #restoreState(java.io.InputStream, java.util.LinkedHashMap) which has macros like "PWD"
      */
     public static Object restoreState( InputStream in )  throws IOException {
         PushbackInputStream pbin= new PushbackInputStream(in,10);
