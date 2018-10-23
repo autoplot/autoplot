@@ -125,7 +125,7 @@ public class CDAWebDataSource extends AbstractDataSource {
 
             try {
                 mon.setProgressMessage("refreshing database");
-                db.maybeRefresh( SubTaskMonitor.create(mon,0,10) ); //TODO: this ain't right, what's the taskSize?
+                db.maybeRefresh( mon.getSubtaskMonitor(0,10,"refreshing database") ); 
             } catch ( IOException ex ) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
                 mon.setProgressMessage("unable to connect via ftp");
