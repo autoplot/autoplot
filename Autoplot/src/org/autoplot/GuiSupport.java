@@ -730,7 +730,7 @@ public class GuiSupport {
                 
                 edw.setUris( uris.toArray(new String[uris.size()]) );
                 
-                if ( JOptionPane.showConfirmDialog( parent, edw, "export all", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                if ( AutoplotUtil.showConfirmDialog( parent, edw, "Export All", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                     try {
                         ScriptContext.formatDataSet( edw.getDataSet(), edw.getUri() );
                         parent.setStatus("Wrote " + org.autoplot.datasource.DataSourceUtil.unescape(edw.getUri()) );
