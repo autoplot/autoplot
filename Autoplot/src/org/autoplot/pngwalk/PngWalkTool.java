@@ -2568,7 +2568,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     if ( overrideDelays!=null ) {
                         switch (overrideDelays) {
                             case "realTime":
-                                result= String.valueOf((int) Math.ceil( seq.imageAt(i).getDatumRange().min().subtract(lastTime).convertTo(Units.milliseconds).value()/100.) );
+                                result= String.valueOf((int) Math.ceil( seq.imageAt(i).getDatumRange().min().subtract(lastTime).convertTo(Units.milliseconds).value()/10. ) );
                                 lastTime= seq.imageAt(i).getDatumRange().min();
                                 break;
                             case "secondPerDay":
