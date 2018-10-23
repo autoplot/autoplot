@@ -128,7 +128,7 @@ public class CDAWebDB {
      */
     public synchronized void maybeRefresh( ProgressMonitor mon ) throws IOException {
         long t= System.currentTimeMillis();
-        if ( t - refreshTime > 600000 ) { // 10 minutes
+        if ( true || t - refreshTime > 600000 ) { // 10 minutes
             refresh(mon);
             refreshTime= t;
         }
@@ -160,7 +160,7 @@ public class CDAWebDB {
 
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
-            mon.setProgressMessage("refreshing database");//TODO: is this working
+            mon.setProgressMessage("refreshing database");
             mon.started();
             mon.setTaskSize(30);
             mon.setProgressMessage("downloading file "+dbloc );
