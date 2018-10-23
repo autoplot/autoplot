@@ -63,7 +63,7 @@ public class ExportDataFormatPanel extends javax.swing.JPanel {
         
         for ( String s: exts ) {
             DataSourceFormat dsf= DataSourceRegistry.getInstance().getFormatByExt(s);
-            if ( dsf.canFormat(dataset) ) {
+            if ( dataset==null || dsf.canFormat(dataset) ) {
                 newExts.add(s);
             }
         }

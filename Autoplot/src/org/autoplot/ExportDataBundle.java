@@ -21,7 +21,7 @@ import org.das2.util.monitor.ProgressMonitor;
  *
  * @author jbf
  */
-public class ExportDataBundle extends javax.swing.JPanel {
+public final class ExportDataBundle extends javax.swing.JPanel {
 
     private static final Logger logger= LoggerManager.getLogger("autoplot.export");
     /**
@@ -30,6 +30,7 @@ public class ExportDataBundle extends javax.swing.JPanel {
     public ExportDataBundle() {
         initComponents();
         namedURIListTool1.setShowIds(false);
+        refresh();
     }
 
     /**
@@ -177,21 +178,23 @@ public class ExportDataBundle extends javax.swing.JPanel {
         try {
             List<QDataSet> dssa= org.autoplot.jythonsupport.Util.getDataSets( Arrays.asList(uris), createProgressMonitor() );
             dss= dssa.toArray( dss );
-            dssa= Ops.synchronizeNN( dssa.get(0), dss );
-            bundle= Ops.bundle( (QDataSet)dssa.get(0).property(QDataSet.DEPEND_0) );
-            for ( int i=0; i<dssa.size(); i++ ) {
-                QDataSet ds1= dssa.get(i);
-                switch (ds1.rank()) {
-                    case 1:
-                        bundle= Ops.bundle( bundle, dssa.get(i) );
-                        break;
-                    case 2:
-                        for ( int j=0; j<ds1.length(0); j++ ) {
-                            bundle= Ops.bundle( bundle, Ops.slice1(ds1,j) );
-                        }   break;
-                    default:
-                        logger.warning("unable to use data, rank is not 1 or 2");
-                        break;
+            if ( dss.length>0 ) {
+                dssa= Ops.synchronizeNN( dssa.get(0), dss );
+                bundle= Ops.bundle( (QDataSet)dssa.get(0).property(QDataSet.DEPEND_0) );
+                for ( int i=0; i<dssa.size(); i++ ) {
+                    QDataSet ds1= dssa.get(i);
+                    switch (ds1.rank()) {
+                        case 1:
+                            bundle= Ops.bundle( bundle, dssa.get(i) );
+                            break;
+                        case 2:
+                            for ( int j=0; j<ds1.length(0); j++ ) {
+                                bundle= Ops.bundle( bundle, Ops.slice1(ds1,j) );
+                            }   break;
+                        default:
+                            logger.warning("unable to use data, rank is not 1 or 2");
+                            break;
+                    }    
                 }
             }
         } catch (Exception ex) {
@@ -237,10 +240,13 @@ public class ExportDataBundle extends javax.swing.JPanel {
             DefaultTableModel n= new DefaultTableModel(1,1);
             n.setValueAt( "No Data", 0, 0 );
             jTable1.setModel( n );
+            exportDataFormatPanel1.setDataSet(bundle);
+            exportDataFormatPanel1.setEnabled(true);
+            
         } else {
             QDataSetTableModel tm= new QDataSetTableModel(bundle);
             exportDataFormatPanel1.setDataSet(bundle);
-
+            exportDataFormatPanel1.setEnabled(true);
             jTable1.setModel(tm);
             jTable1.getTableHeader().addMouseListener( tm.getTableHeaderMouseListener(jTable1) );
         }
