@@ -211,13 +211,10 @@ public class Util {
             status.put( "message", msg );
             jo.put("status",status);
             String s= jo.toString(4);
-            try {
-                //response.setStatus(404);
-                response.sendError(404,"Bad request - unknown dataset id (HAPI 1406)");
-            } catch (IOException ex) {
-                Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            response.setStatus(404);
+            response.setContentType("application/json;charset=UTF-8");
             out.write(s);
+            
         } catch (JSONException ex) {
             throw new RuntimeException(ex);
         }
