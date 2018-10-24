@@ -640,7 +640,16 @@ public class DataSourceController extends DomNodeController {
 
             List<PlotElement> pele = dom.controller.getPlotElementsFor(dsf);
             if (pele.isEmpty()) {
-                setStatus("warning: done loading data but no plot elements are listening");
+                boolean parentUses= false;
+                for ( DataSourceFilter dsf1: dom.dataSourceFilters ) {
+                    if ( Arrays.asList( dsf1.getController().getParentSources() ).contains(dsf) ) {
+                        parentUses= true;
+                        break;
+                    }
+                }
+                if ( !parentUses ) {
+                    setStatus("warning: done loading data but no plot elements are listening");
+                }
             }
 
         }
