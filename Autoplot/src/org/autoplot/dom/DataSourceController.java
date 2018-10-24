@@ -366,7 +366,7 @@ public class DataSourceController extends DomNodeController {
             } else {
                 changesSupport.performingChange(this, PENDING_SET_DATA_SOURCE);
                 setCaching(dataSource.getCapability(Caching.class));
-                PlotElement pe = getPlotElement();
+                PlotElement pe = getPlotElement(false);
                 if (pe != null && this.doesPlotElementSupportTsb(pe)) {  //TODO: less flakey
                     setTsb(dataSource.getCapability(TimeSeriesBrowse.class));
                 } else {
@@ -674,6 +674,21 @@ public class DataSourceController extends DomNodeController {
             }
             return parentSources1;
         }
+    }
+    
+    /**
+     * return a DSF for which this is a parent.
+     * @return null or a child source.
+     */
+    protected DataSourceFilter getChildSource() {
+        for ( DataSourceFilter dsf1: dom.getDataSourceFilters() ) {
+            for ( DataSourceFilter dsf2: dsf1.controller.getParentSources() ) {
+                if ( dsf2==this.dsf ) {
+                    return dsf1;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -1798,7 +1813,7 @@ public class DataSourceController extends DomNodeController {
                 // look again to see if it has timeSeriesBrowse now--JythonDataSource
                 if ( ltsb== null && dss.getCapability(TimeSeriesBrowse.class) != null) {
                     TimeSeriesBrowse tsb1 = dss.getCapability(TimeSeriesBrowse.class);
-                    PlotElement pe = getPlotElement();
+                    PlotElement pe = getPlotElement(false);
                     if (pe != null && this.doesPlotElementSupportTsb(pe)) {  //TODO: less flakey
                         setTsb(tsb1);
                         ltsbc= new TimeSeriesBrowseController(this, pe);
@@ -2166,19 +2181,31 @@ public class DataSourceController extends DomNodeController {
      *
      * @return null or a plot element.
      */
-    private PlotElement getPlotElement() {
+    private PlotElement getPlotElement(boolean checkChildren) {
         List<PlotElement> pele = dom.controller.getPlotElementsFor(dsf);
         if (pele.isEmpty()) {
-            return null;
+            if ( checkChildren ) {
+                DataSourceFilter dsf2= getChildSource();
+                if ( dsf2==null ) {
+                    return null;
+                } else {
+                    return dsf2.controller.getPlotElement(false);
+                }
+            } else {
+                return null;
+            }
         } else {
             return pele.get(0);
         }
-
     }
 
     private ProgressMonitor getMonitor(String label, String description) {
 
-        PlotElement pele = getPlotElement();
+        PlotElement pele = getPlotElement(true);
+        if ( pele==null ) {
+            pele = getPlotElement(true);
+        }
+        
         DasPlot p = null;
         if (pele != null) {
             Plot plot = dom.controller.getPlotFor(pele);
