@@ -299,8 +299,12 @@ public class PlotStylePanel extends javax.swing.JPanel {
     /**
      * check to see that foreground!=background. Check for each plot element,
      * foreground!=background
+     * @return true if the foreground and background colors are the same
      */
     private boolean checkColors() {
+        
+        if ( dom.getController().isPendingChanges() ) return false;
+                
         Color back = dom.getOptions().getBackground();
         Color fore = dom.getOptions().getForeground();
         Color color = dom.getOptions().getColor();
