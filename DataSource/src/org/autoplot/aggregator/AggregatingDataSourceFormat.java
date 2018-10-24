@@ -45,6 +45,9 @@ public class AggregatingDataSourceFormat implements DataSourceFormat {
         
         FileStorageModel fsm = AggregatingDataSourceFactory.getFileStorageModel(surl);
         QDataSet dep0= (QDataSet) data.property(QDataSet.DEPEND_0);
+        if ( dep0==null ) {
+            throw new IllegalArgumentException("data must have DEPEND_0 property to be exported to aggregation");
+        }
         DatumRange lviewRange= DataSetUtil.asDatumRange( Ops.extent(dep0) );
         DatumRange limit= str==null ? null : DatumRangeUtil.parseTimeRange(str);
         
