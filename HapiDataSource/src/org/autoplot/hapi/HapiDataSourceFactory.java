@@ -30,10 +30,14 @@ public class HapiDataSourceFactory extends AbstractDataSourceFactory {
     public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
         URISplit split= URISplit.parse(surl);
         String server= split.file;
+        if ( server==null ) {
+            problems.add("server is not identified");
+        } else {
+            if ( !server.endsWith("hapi") ) problems.add("server name must end in /hapi");
+        }
         LinkedHashMap<String,String> params= URISplit.parseParams(split.params);
         String id= params.get("id");
         String timerange= params.get( URISplit.PARAM_TIME_RANGE );
-        if ( server==null ) problems.add("server is not identified");
         if ( id==null ) problems.add("the parameter id is needed");
         if ( timerange==null ) {
             problems.add("the timerange is needed");
