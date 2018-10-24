@@ -768,12 +768,15 @@ public class GuiSupport {
                         parent.applicationModel.setVapFile(null);
                         parent.stateSupport.close();
                         parent.tickleTimer.tickle();
+                        if ( parent.isExpertMode() ) {
+                            parent.setEditorCard(AutoplotUI.CARD_DATA_SET_SELECTOR);
+                        }
                     }
                 };
 
                 // https://sourceforge.net/tracker/?func=detail&aid=3557440&group_id=199733&atid=970682
                 new Thread(run).start(); // allow reset when all the request processor threads are full.  TODO: I'm not sure why this appeared to be the case.
-                //RequestProcessor.invokeLater(run);
+                
             }
         };
     }
