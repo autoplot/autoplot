@@ -128,7 +128,7 @@ public class CDAWebDB {
      */
     public synchronized void maybeRefresh( ProgressMonitor mon ) throws IOException {
         long t= System.currentTimeMillis();
-        if ( true || t - refreshTime > 600000 ) { // 10 minutes
+        if ( t - refreshTime > 600000 ) { // 10 minutes
             refresh(mon);
             refreshTime= t;
         }
