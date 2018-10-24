@@ -2797,9 +2797,9 @@ public class ApplicationController extends DomNodeController implements RunLater
     public List<PlotElement> getPlotElementsFor(DataSourceFilter dsf) {
         String id = dsf.getId();
         List<PlotElement> result = new ArrayList<>();
-        for (PlotElement p : application.getPlotElements()) {
-            if (p.getDataSourceFilterId().equals(id)) {
-                result.add(p);
+        for (PlotElement pe : application.getPlotElements()) {
+            if (pe.getDataSourceFilterId().equals(id)) {
+                result.add(pe);
             }
         }
         return result;
