@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>OpenDAP server sends Hawaii map with lat and lons which Autoplot can't easily use.
+        <p><small>Mashup tool used to flatten rank 2 Lat,Lon,Precip so that "link" command can be used.  This is now done automatically in link command.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,14 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-10-09 r22923):</p>
+        <p>Bugfixes (2018-10-24 r22958):</p>
         <ul>
+            <li>File->Reset resets to the data set selector.
+            <li>DataSources with parents (vap+internal:data_8,data_9,data_10) would get a progress bar not connected to any plot, which would grab the mouse focus during batch processing.
+            <li>trim of rank 3 join would add empty tables for each table.  Instead this should only join the non-empty ones.
+            <li>embed data in .vap option didn't check for ephemeris and events lists.
+            <li>HAPI properly handles when time is not in the list of parameters.
+            <li>SeriesRenderer properly looks at cadenceCheck again.  Thanks, Ivar!
             <li>2043: use HAPI_DATA environment variable to set the location of the cache.  Don't request data outside of the startDate, stopDate range.
             <li>allow dataPointRecorder's select method to be called on or off the event thread.
             <li>2042: correction to the ticks code which would detect when new ticks were needed during pngwalk generation, sometimes failing.
@@ -73,6 +79,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>write-pngwalk-from-events lists supports zero-width events, when using settings like "0%-1hr,100%+1hr"
+            <li>export to very old vap formats, like 2013, removed because they are clutter.
+            <li>support link(r2x,r2y,r2z) by flattening the three tables.
+            <li>catch http://.../hapi/data and make into HAPI URI.
             <li>support for renderType="spectrogram>rebin=triScat"
             <li>LoggerManager.readConfiguration can read any file now, not just that named by -Djava.util.logging.config.file=...
         </ul>
