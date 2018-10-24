@@ -1036,7 +1036,9 @@ public class DataSourceController extends DomNodeController {
             LoggerManager.logPropertyChangeEvent(evt);  
             String prob = checkParents();
             if (prob != null) {
-                setStatus("warning: " + prob);
+                if ( !dom.controller.isPendingChanges() ) {
+                    setStatus("warning: " + prob);
+                }
                 setDataSetInternal(null, null, dom.controller.isValueAdjusting());
             }
             if (DataSourceController.this.haveCheckedInternalTsb == false) {
@@ -1080,7 +1082,9 @@ public class DataSourceController extends DomNodeController {
             resolveParents();
             String prob = checkParents();
             if (prob != null) {
-                setStatus("warning: " + prob);
+                if ( !dom.controller.isPendingChanges() ) {
+                    setStatus("warning: " + prob);
+                }
                 return false;
             }
             dom.addPropertyChangeListener(Application.PROP_DATASOURCEFILTERS, dsfListener);
