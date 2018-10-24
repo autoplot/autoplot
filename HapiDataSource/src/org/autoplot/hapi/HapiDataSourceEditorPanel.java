@@ -719,6 +719,12 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( split.file==null || split.file.equals("file:///") ) { // use TSDS's one by default.
             split.file= defaultServer.toString();
         }  
+        if ( !split.file.endsWith("/hapi") ) {
+            int i= split.file.lastIndexOf("/hapi");
+            if ( i>-1 ) {
+                split.file= split.file.substring(0,i+5);
+            }
+        }
         try {
             idsJSON= HapiServer.getCatalog(new URL(split.file));
         } catch ( IOException ex ) {
@@ -803,6 +809,12 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( split.file==null || split.file.equals("file:///") ) { // use TSDS's one by default.
             split.file= defaultServer.toString();
         } else {
+            if ( !split.file.endsWith("/hapi") ) {
+                int i= split.file.lastIndexOf("/hapi");
+                if ( i>-1 ) {
+                    split.file= split.file.substring(0,i+5);
+                }
+            }
             try {
                 currentServer= new URL(split.file);
             } catch (MalformedURLException ex) {
