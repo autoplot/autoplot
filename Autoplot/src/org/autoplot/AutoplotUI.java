@@ -207,6 +207,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
     transient GuiSupport support;
     transient LayoutListener autoLayout;
     private boolean dsSelectTimerangeBound= false; // true if there is a binding between the app timerange and the dataSetSelector.
+    
+    // true means don't bring up an initial security dialog asking
+    private boolean noAskParams;
 
     /**
      * the vap that is currently loading.  We keep track of this so we can push it to the top of the recent list.
@@ -778,7 +781,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
             public void actionPerformed( ActionEvent ev ) {
                 if ( ScriptContext.getViewWindow()==AutoplotUI.this ) {
                     org.das2.util.LoggerManager.logGuiEvent(ev);                    
-                    runScript( dataSetSelector.getValue() );
+                    runScript( dataSetSelector.getValue(), !AutoplotUI.this.noAskParams );
                 } else {
                     org.das2.util.LoggerManager.logGuiEvent(ev);     
                     if ( JOptionPane.YES_OPTION==
@@ -4654,6 +4657,7 @@ private void updateFrameTitle() {
         alm.addOptionalSwitchArgument( "server", null, "server", "-1", "start server at the given port listening to commands. (Replaces port)");
         alm.addBooleanSwitchArgument( "nop", null, "nop", "no operation, to be a place holder for jnlp script.");
         alm.addBooleanSwitchArgument( "headless", null, "headless", "run in headless mode" );
+        alm.addBooleanSwitchArgument( "noAskParams", null, "noAskParams", "don't ask for parameters when running a script");
         
        for ( int i=0; i<args.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
            if ( args[i].equals("-print") ) args[i]="--print";
@@ -4719,7 +4723,7 @@ private void updateFrameTitle() {
         final ApplicationModel model = new ApplicationModel();
         String initialURL;
         final String bookmarks;
-
+        
         if (alm.getValue("URI") != null) {
             initialURL = alm.getValue("URI").trim();
         } else if ( alm.getValue("open") !=null ) {
@@ -4785,7 +4789,7 @@ private void updateFrameTitle() {
                 logger.log( Level.SEVERE, e.getMessage(), e );
             }
         }
-       
+        
         logger.fine("invokeLater()");
 
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -4850,9 +4854,9 @@ APSplash.checkTime("init 200");
                         org.autoplot.AddSampListener.addSampListener( app );
                         app.setMessage("SAMP listener started");
                     }
-
+                    app.noAskParams= alm.getBooleanValue("noAskParams");
                 }
-
+                
 APSplash.checkTime("init 210");
 
                 if ( !headless && finitialURL!=null && app!=null ) {
@@ -5782,7 +5786,7 @@ APSplash.checkTime("init 240");
     public void runScriptTools( final String script ) {
         runScript(script);
     }
-    
+        
     /**
      * present the "Run Script" dialog, asking the user to review the 
      * script before running it.
@@ -5790,6 +5794,16 @@ APSplash.checkTime("init 240");
      * @param script the URI of the script to run
      */
     private void runScript( final String script ) {
+        runScript( script, true );
+    }
+    
+    /**
+     * present the "Run Script" dialog, asking the user to review the 
+     * script before running it.
+     * This should be called from the event thread because it creates GUI components.
+     * @param script the URI of the script to run
+     */
+    private void runScript( final String script, final boolean askParams ) {
         try {
             final URISplit split= URISplit.parse(script);
             
@@ -5828,7 +5842,7 @@ APSplash.checkTime("init 240");
                 public void run() {
                     try {
                         int res= JythonUtil.invokeScriptSoon( split.resourceUri, dom, 
-                                params, true, !fisTool, scriptPanel, mon );
+                                params, askParams, !fisTool, scriptPanel, mon );
                         if ( res==JOptionPane.OK_OPTION ) {
                             split.params= params.isEmpty() ? null : URISplit.formatParams(params);
                             dom.getController().getApplicationModel().addRecent(URISplit.format(split));
