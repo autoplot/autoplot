@@ -53,8 +53,19 @@
                 if ( id!=null ) {
                     throw new IllegalArgumentException("id specified contains no vap files in "+ ServletUtil.getServletHome().toString()+"/users" );
                 } else {
-                    throw new IllegalArgumentException("vap file or uri not specified.");
+                    out.println("vap file or uri not specified, or id can be one of:<br>");
+                    File f= new File( ServletUtil.getServletHome().toString()+"/users" );
+                    String[] ff= f.list();
+                    if ( ff==null ) {
+                        out.println("Server has not been configured.  It should contain folders in " +ServletUtil.getServletHome().toString()+"/users");
+                    } else {
+                        for ( String s: ff ) {
+                            out.println("<a href='demo.jsp?id="+s+"'>"+s+"</a><br>");
+                        }
+                    }
+                    out.println("<br><br>");
                 }
+                ssArg=null;
              }
          } else if ( vap!=null ) {
              ssArg= "vap="+URLEncoder.encode(vap,"US-ASCII");
@@ -64,10 +75,12 @@
          
      %>
 	<div id="iddivimg">
+            <% if (ssArg!=null ) { %>
 		<img id="idplot" 
                      src="../../SimpleServlet?<%= ssArg %>"
                      onload="logloaded();" 
                 >
+            <% } %>
 	</div>
     <div id="divprogress">
         <img src="spinner.gif" id="progress" alt="Busy..."></img>
@@ -122,7 +135,11 @@
      			     			
      		}) */
         </script>
-
+        
+<br>
+    <div id="idstatus">status</div>
+        
+<hr></hr>
         <%
             if ( id!=null ) {
                 File f= new File( new File( ServletUtil.getServletHome(), "users" ), id );
@@ -135,20 +152,14 @@
                 }
             }
         %>
-        
-<br>
-    <form>
-    <input id='vapta' size="80">
-        <button onclick="resetUrl(''); return false;">GO</button>
-    </form>
-<hr></hr>
+
 <p>Click and drag a range on the plot to zoom in.  Buttons below zoom out
         and scan.  Click to read coordinates, and the center button will center the 
         plot on this click position.</p>
+Note there is also a version of this at http://autoplot.org/git/web/thin/zoom/demo.html.<br>
         
         <!-- <p>img src url: 
             <pre><small><div id="idechourl"></div></small></pre></p> -->
-        <div id="idstatus">status</div>
         <!-- src="../../SimpleServlet?url=tsds.http%3A%2F%2Ftimeseries.org%2Fget.cgi%3FStartDate%3D20050101%26EndDate%3D20060101%26ext%3Dbin%26out%3Dtsml%26ppd%3D1440%26param1%3DOMNI_OMNIHR-26-v0&font=sans-8&format=image%2Fpng&width=700&height=400&column=5em%2C100%25-10em&row=3em%2C100%25-3em" />-->
         
         <small><%= SimpleServlet.version  %></small>
