@@ -1985,6 +1985,18 @@ public class GuiSupport {
         } );
         item.setToolTipText("Add a plot at an arbitrary position.");
         addPlotMenu.add(item);
+
+        item = new JMenuItem( new AbstractAction("Add Right Axis Plot") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Plot p= controller.addPlot( domPlot, null );
+                PlotElement pe= controller.addPlotElement( p, null );
+                p.getYaxis().setOpposite( true );
+                controller.bind( domPlot.getXaxis(), Axis.PROP_RANGE, p.getXaxis(), Axis.PROP_RANGE  );
+            }
+        } );
+        item.setToolTipText("Add a plot in the same position but with its own axis on right side.");
+        addPlotMenu.add(item);
         
 //        item = new JMenuItem(new AbstractAction("Copy Plot Elements Right") {
 //
