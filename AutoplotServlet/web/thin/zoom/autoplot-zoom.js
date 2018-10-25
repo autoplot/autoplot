@@ -301,7 +301,7 @@ function setTime(startMilliseconds, endMilliseconds) {
     $('#idplot').attr('src', zoomurl);
     $('#xwidth').val( ''+((endMilliseconds-startMilliseconds) /3600000) );
     $('#timerange').val( iso8601RangeStr(startMilliseconds,endMilliseconds) );
-    $('#idstatus').text("setTime "+iso8601RangeStr(startMilliseconds,endMilliseconds));
+    $('#idstatus').text("set time "+iso8601RangeStr(startMilliseconds,endMilliseconds));
     $('#progress').attr('src', 'spinner.gif');
 
     // update imgurl

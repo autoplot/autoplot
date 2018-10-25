@@ -25,6 +25,7 @@
          String id= request.getParameter("id");
 
          String[] dropList= null;
+         String loadingMessage= null;
          
          if ( id!=null ) {
              File f= new File( new File( ServletUtil.getServletHome(), "users" ), id );
@@ -34,6 +35,7 @@
                  int count=0;
                  for ( int i=0; i<ss.length; i++ ) {
                      if ( ss[i].endsWith(".vap") ) {
+                         if ( i==0 ) loadingMessage= ss[0];
                          ss[count]= s + "/" + ss[i];
                          count=count+1;
                      }
@@ -137,7 +139,7 @@
         </script>
         
 <br>
-    <div id="idstatus">status</div>
+    <div id="idstatus">loading <%=loadingMessage!=null ? loadingMessage : ssArg %></div>
         
 <hr></hr>
         <%
