@@ -786,7 +786,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     org.das2.util.LoggerManager.logGuiEvent(ev);     
                     if ( JOptionPane.YES_OPTION==
                             JOptionPane.showConfirmDialog( AutoplotUI.this, "Scripts can only be run from the main window.  Make this the main window?", 
-                                    "Reset Main Window", JOptionPane.YES_NO_OPTION ) ) {
+                                    "Set Main Window", JOptionPane.YES_NO_OPTION ) ) {
                         ScriptContext.setApplication(AutoplotUI.this);
                     }
                     runScript( dataSetSelector.getValue() );
@@ -828,7 +828,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     org.das2.util.LoggerManager.logGuiEvent(ev);  
                     if ( JOptionPane.YES_OPTION==
                             JOptionPane.showConfirmDialog( AutoplotUI.this, "Scripts can only be run from the main window.  Make this the main window?", 
-                                    "Reset Main Window", JOptionPane.YES_NO_OPTION ) ) {
+                                    "Set Main Window", JOptionPane.YES_NO_OPTION ) ) {
                         ScriptContext.setApplicationModel(AutoplotUI.this.applicationModel);
                         ScriptContext.setView(AutoplotUI.this);
                     }
