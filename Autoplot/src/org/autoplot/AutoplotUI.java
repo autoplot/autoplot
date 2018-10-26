@@ -5613,7 +5613,59 @@ APSplash.checkTime("init 240");
         return dataPanel;
     }
 
+    JComponent leftPanel=null;
+    
+    /**
+     * add the component (typically a JPanel) to the left
+     * side of the application.
+     * @param c null or the component to add
+     */
+    public void setLeftPanel( JComponent c ) {
+        if ( leftPanel!=null ) tabbedPanelContainer.remove(leftPanel);
+        if ( c==null ) throw new NullPointerException("use clearLeftPanel");
+        JScrollPane p= new JScrollPane();
+        p.setViewportView(c);
+        tabbedPanelContainer.add( p, BorderLayout.WEST );
+        leftPanel= p;
+        revalidate();
+    }
 
+    /**
+     * remove any extra component added to the left of the tabs.
+     */
+    public void clearLeftPanel() {
+        if ( leftPanel!=null ) tabbedPanelContainer.remove(leftPanel);
+        leftPanel= null;
+        revalidate();
+    }
+    
+    JComponent rightPanel= null;
+    
+    /**
+     * add the component (typically a JPanel) to the right
+     * side of the application.
+     * @param c  null or the component to add
+     */
+    public void setRightPanel( JComponent c ) {
+        tabbedPanelContainer.getComponents();
+        if ( rightPanel!=null ) tabbedPanelContainer.remove(rightPanel);
+        if ( c==null ) throw new NullPointerException("use clearRightPanel");
+        JScrollPane p= new JScrollPane();
+        p.setViewportView(c);
+        tabbedPanelContainer.add( p, BorderLayout.EAST );
+        rightPanel= p;
+        revalidate();
+    }
+
+    /**
+     * remove any extra component added to the right of the tabs.
+     */
+    public void clearRightPanel() {
+        if ( rightPanel!=null ) tabbedPanelContainer.remove(rightPanel);
+        rightPanel= null;
+        revalidate();
+    }
+    
     /**
      * turn on basic mode, where users can only use the app for browsing existing products.
      */
