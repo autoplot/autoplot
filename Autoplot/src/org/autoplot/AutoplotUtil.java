@@ -671,6 +671,12 @@ public class AutoplotUtil {
                 w.println("# use huge scatter for large data sets.");
                 w.println("#useHugeScatter=true");
                 w.println("");
+                w.println("# HAPI cache location.");
+                w.println("#HAPI_DATA=${HOME}/hapi_data");
+                w.println("");
+                w.println("# Enable HAPI Caching.");
+                w.println("#hapiServerCache=true");
+                w.println("");
                 w.close();
             } catch ( IOException ex ) {
                 logger.log(Level.WARNING, "write initial {0} failed.  {1}", new Object[] { propFile, ex } );
@@ -685,7 +691,9 @@ public class AutoplotUtil {
                 in.close();
                 for ( Entry p: props.entrySet()) {
                     logger.log( Level.FINEST, "%s=%s", new Object[] { p.getKey(), p.getValue() } );
-                    System.setProperty( (String)p.getKey(), (String)p.getValue() );
+                    if ( System.getProperty( (String)p.getKey() )==null ) { // command line should override.
+                        System.setProperty( (String)p.getKey(), (String)p.getValue() );
+                    }
                 }
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
