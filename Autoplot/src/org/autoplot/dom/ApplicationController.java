@@ -1346,10 +1346,6 @@ public class ApplicationController extends DomNodeController implements RunLater
      */
     public synchronized Plot addPlot( final Plot focus, Object direction ) {
 
-        if ( !SwingUtilities.isEventDispatchThread() ) {
-            logger.fine("SF Bug 3516412: addPlot is called off the event thread!!!");
-        }
-
         logger.fine("enter addPlot");
         DomLock lock= changesSupport.mutatorLock();
         lock.lock("Add Plot");
@@ -1445,17 +1441,9 @@ public class ApplicationController extends DomNodeController implements RunLater
             domPlot.setRowId( domRow.getId() );
             domPlot.setColumnId( domColumn.getId() );
 
-            List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
+            List<Plot> plots = new ArrayList<>(Arrays.asList(application.getPlots()));
 
-            if (focus != null) {
-                int idx = plots.indexOf(focus);
-                if ( direction==null || direction == LayoutConstants.BELOW) {
-                    idx = idx + 1;
-                }
-                plots.add(idx, domPlot);
-            } else {
-                plots.add(domPlot);
-            }
+            plots.add(domPlot);
 
             application.setPlots(plots.toArray(new Plot[plots.size()]));
             if ( getPlot()==null ) setPlot(domPlot);
