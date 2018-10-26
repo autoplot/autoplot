@@ -1443,7 +1443,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             List<Plot> plots = new ArrayList<>(Arrays.asList(application.getPlots()));
 
-            plots.add(domPlot);
+            plots.add(domPlot); 
 
             application.setPlots(plots.toArray(new Plot[plots.size()]));
             if ( getPlot()==null ) setPlot(domPlot);
