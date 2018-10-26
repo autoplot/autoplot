@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-10-26 r22967):</p>
+        <p>Bugfixes (2018-10-26 r22969):</p>
         <ul>
+            <li>2049: setLayout(3,3) gets IDs backwards.
             <li>File->Reset resets to the data set selector.
             <li>DataSources with parents (vap+internal:data_8,data_9,data_10) would get a progress bar not connected to any plot, which would grab the mouse focus during batch processing.
             <li>trim of rank 3 join would add empty tables for each table.  Instead this should only join the non-empty ones.  Thanks, Masafumi!
