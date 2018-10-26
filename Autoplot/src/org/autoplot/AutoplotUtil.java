@@ -684,11 +684,8 @@ public class AutoplotUtil {
         } else {
             logger.log( Level.FINER, "loading %s", propFile );
             Properties props= new Properties();
-            InputStream in=null;
-            try {
-                in = new FileInputStream(propFile);
+            try ( InputStream in=new FileInputStream(propFile) ) {
                 props.load( in );
-                in.close();
                 for ( Entry p: props.entrySet()) {
                     logger.log( Level.FINEST, "%s=%s", new Object[] { p.getKey(), p.getValue() } );
                     if ( System.getProperty( (String)p.getKey() )==null ) { // command line should override.
@@ -697,15 +694,7 @@ public class AutoplotUtil {
                 }
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
-            } finally {
-                if ( in!=null ) {
-                    try {
-                        in.close();
-                    } catch (IOException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    }
-                }
-            }
+            } 
         }
     }
 
