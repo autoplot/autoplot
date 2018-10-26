@@ -26,11 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-10-24 r22958):</p>
+        <p>Bugfixes (2018-10-26 r22967):</p>
         <ul>
             <li>File->Reset resets to the data set selector.
             <li>DataSources with parents (vap+internal:data_8,data_9,data_10) would get a progress bar not connected to any plot, which would grab the mouse focus during batch processing.
-            <li>trim of rank 3 join would add empty tables for each table.  Instead this should only join the non-empty ones.
+            <li>trim of rank 3 join would add empty tables for each table.  Instead this should only join the non-empty ones.  Thanks, Masafumi!
             <li>embed data in .vap option didn't check for ephemeris and events lists.
             <li>HAPI properly handles when time is not in the list of parameters.
             <li>SeriesRenderer properly looks at cadenceCheck again.  Thanks, Ivar!
@@ -79,6 +79,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>"add right-axis plot" which adds a plot at the same position but with a right-axis which is independent.  Thanks, Ivar!
             <li>657: --noAskParams will prevent the script parameters / security verification from showing.
             <li>write-pngwalk-from-events lists supports zero-width events, when using settings like "0%-1hr,100%+1hr"
             <li>export to very old vap formats, like 2013, removed because they are clutter.
