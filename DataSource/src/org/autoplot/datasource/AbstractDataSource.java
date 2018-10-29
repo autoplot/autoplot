@@ -26,6 +26,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import static org.autoplot.datasource.DataSetURI.fromUri;
+import static org.autoplot.datasource.DataSetURI.getFile;
 import org.das2.qds.buffer.BufferDataSet;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.DatumRange;
@@ -170,7 +172,9 @@ public abstract class AbstractDataSource implements DataSource {
 
     // Practically identical to the URL version below...
     protected File getFile(URI uri, ProgressMonitor mon) throws IOException {
-        File f = DataSetURI.getFile(uri, mon);
+        //DataSetURI.getFile(uri, mon);
+        String suri= fromUri( uri );
+        File f = DataSetURI.getFile(suri,"T".equals(params.get("allowHtml")),mon);
         if (params.containsKey("filePollUpdates")) {
             int poll= (int)(Double.parseDouble(params.get("filePollUpdates")) );
             pollingUpdater= new FilePollUpdating(uri,poll);
@@ -209,6 +213,7 @@ public abstract class AbstractDataSource implements DataSource {
      * @param mon
      * @return
      * @throws IOException
+     * @see #getFile(java.net.URI, org.das2.util.monitor.ProgressMonitor) which checks for "allowHtml=T"
      */
     protected File getHtmlFile( URL url, ProgressMonitor mon ) throws IOException {
         File f = DataSetURI.getHtmlFile( url, mon );
