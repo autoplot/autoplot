@@ -1746,6 +1746,40 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     /**
+     * delete the named plot, plotElement, annotation, or dataSource
+     * @param id node name like "plot_5", see dom.plots[0].id.
+     * @throws IllegalArgumentException if the node can't be found.
+     * @throws IllegalArgumentException if the node type is not supported.
+     */
+    public void delete(String id) {
+        DomNode n= getElementById(id);
+        if ( n==null ) {
+            throw new IllegalArgumentException("no dom node found with the name: "+id);
+        }
+        delete(n);
+    }
+    
+    /**
+     * delete the dom node.
+     * @param n 
+     */
+    public void delete(DomNode n) {
+        if ( n instanceof Plot ) {
+            deletePlot((Plot)n);
+        } else if ( n instanceof PlotElement ) {
+            deletePlotElement((PlotElement)n);
+        } else if ( n instanceof DataSourceFilter ) {
+            deleteDataSourceFilter((DataSourceFilter)n);
+        } else if ( n instanceof Annotation ) {
+            deleteAnnotation((Annotation)n);
+        } else if ( n instanceof Connector ) {
+            deleteConnector((Connector)n);
+        } else {
+            throw new IllegalArgumentException("node type is not supported: "+n);
+        }        
+    }
+    
+    /**
      * delete the plot from the application.
      * TODO: this should really call the plot.controller.deleteDasPeer()
      * @param domPlot
