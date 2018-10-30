@@ -5666,6 +5666,33 @@ APSplash.checkTime("init 240");
         revalidate();
     }
     
+    JComponent bottomPanel= null;
+    
+    /**
+     * add the component (typically a JPanel) below the tabs and above the 
+     * status indicator
+     * @param c  null or the component to add
+     */
+    public void setBottomPanel( JComponent c ) {
+        tabbedPanelContainer.getComponents();
+        if ( bottomPanel!=null ) tabbedPanelContainer.remove(bottomPanel);
+        if ( c==null ) throw new NullPointerException("use clearBottomPanel");
+        JScrollPane p= new JScrollPane();
+        p.setViewportView(c);
+        tabbedPanelContainer.add( p, BorderLayout.SOUTH );
+        bottomPanel= p;
+        revalidate();
+    }
+
+    /**
+     * remove any extra component added below the tabs.
+     */
+    public void clearBottomPanel() {
+        if ( bottomPanel!=null ) tabbedPanelContainer.remove(bottomPanel);
+        bottomPanel= null;
+        revalidate();
+    }
+    
     /**
      * turn on basic mode, where users can only use the app for browsing existing products.
      */
