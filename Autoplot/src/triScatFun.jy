@@ -1,0 +1,6 @@
+a= randu(1000)*TAU
+r= randn(1000)+6
+x= cos(a)*r
+y= sin(a)*r
+z= x + y + randn(1000)
+plot( bundle( x,y,z ), renderType='spectrogram>rebin=triScat' ) 
