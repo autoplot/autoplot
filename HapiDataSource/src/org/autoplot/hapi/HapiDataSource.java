@@ -846,7 +846,8 @@ public final class HapiDataSource extends AbstractDataSource {
         
         ds = repackage(ds,pds,null);
         
-        if ( ds.property(QDataSet.UNITS)!=null ) {
+        String u= (String) ds.property(QDataSet.UNITS);
+        if ( ds.property(QDataSet.UNITS)!=null && u.trim().length()>0 ) {
             String l= (String) ds.property(QDataSet.LABEL);
             if ( l==null ) {
                 ds= Ops.putProperty( ds, QDataSet.LABEL, "%{UNITS}" );
