@@ -5906,7 +5906,7 @@ APSplash.checkTime("init 240");
                     }
                 }
             };
-            SwingUtilities.invokeLater(run);
+            new Thread(run,"downloadReviewScript").start();
         } catch (HtmlResponseIOException ex ) {
             handleHtmlResponse(script, ex);
         } catch (IOException ex) {
