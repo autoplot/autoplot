@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Mashup tool used to flatten rank 2 Lat,Lon,Precip so that "link" command can be used.  This is now done automatically in link command.
+        <p><small>"triScat" spectrogram rendering mode draws spectrogram from buckshot data.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-10-26 r22969):</p>
+        <p>Bugfixes (2018-10-30 r22984):</p>
         <ul>
+            <li>NullPointerException would occur when type "Datum" was encountered, in a qstream Autoplot produced.
+            <li>rfe609: handle case where 1-point dataset would mess up the autoranging.  Thanks, Masafumi!
+            <li>invokeScriptSoon on the event thread, causing warning message and potentially hanging GUI during file download.
+            <li>rte_2055330411: "|reducex('1day')" would not parse properly.
             <li>2049: setLayout(3,3) gets IDs backwards.
             <li>File->Reset resets to the data set selector.
             <li>DataSources with parents (vap+internal:data_8,data_9,data_10) would get a progress bar not connected to any plot, which would grab the mouse focus during batch processing.
@@ -80,6 +84,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>HAPI data is displayed with the units in the label.
+            <li>658: add method for adding right and left panels to the GUI, to develop custom applications.
             <li>"add right-axis plot" which adds a plot at the same position but with a right-axis which is independent.  Thanks, Ivar!
             <li>657: --noAskParams will prevent the script parameters / security verification from showing.
             <li>write-pngwalk-from-events lists supports zero-width events, when using settings like "0%-1hr,100%+1hr"
