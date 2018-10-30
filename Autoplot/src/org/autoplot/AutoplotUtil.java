@@ -780,12 +780,21 @@ public class AutoplotUtil {
             if ( ds!=null ) {
                 ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), null );
                 if ( ds.length()==0 ) break;
-                PlotElement pcopy1= (PlotElement)pe.copy();
-                PlotElementController.doAutoranging(pcopy1, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
-                if ( range==null ) {
-                    range= pcopy1.getPlotDefaults().getYaxis().getRange();
+                if ( ds.rank()==0 || ( ds.rank()==1 && ds.length()==1 ) ) {
+                    if ( ds.rank()==1 ) ds= ds.slice(0);
+                    if ( range==null ) {
+                        range= new DatumRange( DataSetUtil.asDatum(ds),DataSetUtil.asDatum(ds) );
+                    } else {
+                        range= DatumRangeUtil.union( range, DataSetUtil.asDatum(ds) );
+                    }
                 } else {
-                    range= DatumRangeUtil.union( range, pcopy1.getPlotDefaults().getYaxis().getRange() );
+                    PlotElement pcopy1= (PlotElement)pe.copy();
+                    PlotElementController.doAutoranging(pcopy1, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
+                    if ( range==null ) {
+                        range= pcopy1.getPlotDefaults().getYaxis().getRange();
+                    } else {
+                        range= DatumRangeUtil.union( range, pcopy1.getPlotDefaults().getYaxis().getRange() );
+                    }
                 }
             }
         }
@@ -848,15 +857,15 @@ public class AutoplotUtil {
             if ( ds!=null ) {
                 ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), plot.getYaxis().getRange() );
                 if ( ds.length()==0 ) break;
-                PlotElement pcopy1= (PlotElement)pe.copy();
-                PlotElementController.doAutoranging(pcopy1, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
-                if ( range==null ) {
-                    range= pcopy1.getPlotDefaults().getZaxis().getRange();
-                } else {
-                    range= DatumRangeUtil.union( range, pcopy1.getPlotDefaults().getZaxis().getRange() );
+                    PlotElement pcopy1= (PlotElement)pe.copy();
+                    PlotElementController.doAutoranging(pcopy1, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
+                    if ( range==null ) {
+                        range= pcopy1.getPlotDefaults().getZaxis().getRange();
+                    } else {
+                        range= DatumRangeUtil.union( range, pcopy1.getPlotDefaults().getZaxis().getRange() );
+                    }
                 }
             }
-        }
         if ( range!=null ) axis.getController().setRangeAutomatically( range, axis.isLog() );
         PlotController.doHints( axis, axis.getAutoRangeHints() );
         
