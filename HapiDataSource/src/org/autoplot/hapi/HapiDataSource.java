@@ -677,7 +677,7 @@ public final class HapiDataSource extends AbstractDataSource {
         
         String format= getParam("format","csv");
         
-        {
+        { // This kludge was to support an early HAPI server which did not give a conformant data response.
             String serverStr= server.toString();
             if ( format.equals("json1") ||
                     ( serverStr.startsWith("http://cdaweb") && serverStr.endsWith( "gsfc.nasa.gov/registry/hdp/hapi") ) )  {
@@ -845,6 +845,15 @@ public final class HapiDataSource extends AbstractDataSource {
         }
         
         ds = repackage(ds,pds,null);
+        
+        if ( ds.property(QDataSet.UNITS)!=null ) {
+            String l= (String) ds.property(QDataSet.LABEL);
+            if ( l==null ) {
+                ds= Ops.putProperty( ds, QDataSet.LABEL, "%{UNITS}" );
+            } else {
+                ds= Ops.putProperty( ds, QDataSet.LABEL, l.trim() + " (%{UNITS})" );
+            }
+        }
         
         // install a cacheTag.  The following code assumes depend_0 is mutable.
         QDataSet xds= (QDataSet) ds.property(QDataSet.DEPEND_0);
