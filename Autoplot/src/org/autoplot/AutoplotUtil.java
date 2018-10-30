@@ -779,7 +779,7 @@ public class AutoplotUtil {
             QDataSet ds= pe.getController().getDataSet();
             if ( ds!=null ) {
                 ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), null );
-                if ( ds.length()==0 ) break;
+                if ( ds.rank()>0 && ds.length()==0 ) break;
                 if ( ds.rank()==0 || ( ds.rank()==1 && ds.length()==1 ) ) {
                     if ( ds.rank()==1 ) ds= ds.slice(0);
                     if ( range==null ) {
