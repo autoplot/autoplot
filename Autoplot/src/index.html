@@ -26,13 +26,16 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-10-30 r22984):</p>
+        <p>Bugfixes (2018-10-30 r22997):</p>
         <ul>
+            <li>update to new certificate signatures for 2018-2019.
+            <li>NullPointerException when params was escaped.
+            <li>2049: setLayout(3,3) gets IDs backwards.  Revert this change which breaks many old scripts.
+            <li>Orbits' definition files can be read via an HTTP redirect now.
             <li>NullPointerException would occur when type "Datum" was encountered, in a qstream Autoplot produced.
             <li>rfe609: handle case where 1-point dataset would mess up the autoranging.  Thanks, Masafumi!
             <li>invokeScriptSoon on the event thread, causing warning message and potentially hanging GUI during file download.
             <li>rte_2055330411: "|reducex('1day')" would not parse properly.
-            <li>2049: setLayout(3,3) gets IDs backwards.
             <li>File->Reset resets to the data set selector.
             <li>DataSources with parents (vap+internal:data_8,data_9,data_10) would get a progress bar not connected to any plot, which would grab the mouse focus during batch processing.
             <li>trim of rank 3 join would add empty tables for each table.  Instead this should only join the non-empty ones.  Thanks, Masafumi!
@@ -84,6 +87,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add method for replacing the navigation panel in PNGWalk.
+            <li>Update to new CDF reader, where the source is available.
             <li>HAPI data is displayed with the units in the label.
             <li>658: add method for adding right and left panels to the GUI, to develop custom applications.
             <li>"add right-axis plot" which adds a plot at the same position but with a right-axis which is independent.  Thanks, Ivar!

@@ -61,7 +61,7 @@
 
         <jar href="AutoplotVolatile.jar" />
         <jar href="AutoplotStable.jar" /><!--XXXX   Uncomment for devel and production (latest) releases
-        <jar href="AutoplotStable.20171104.jar" />
+        <jar href="AutoplotStable.20181101.jar" />
         XXXX-->
 
         <property name="jnlp.packEnabled" value="true"/>
