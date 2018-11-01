@@ -695,7 +695,9 @@ public final class HapiDataSource extends AbstractDataSource {
         id= URLDecoder.decode( id,"UTF-8" );
 
         String pp= getParam("parameters","");
-        
+        if ( pp.contains("%2C") ) {  // commas are escaped
+            pp= URLDecoder.decode(pp,"UTF-8");
+        }
         JSONObject info= getInfo();
         monitor.setProgressMessage("got info");
         monitor.setTaskProgress(20);
