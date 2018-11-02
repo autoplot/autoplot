@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Voyager PRA data from a Das2Server.
+        <p><small>Study for bug 2051, where rank 2 y tags would slow things down inordinately.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-10-30 r22997):</p>
+        <p>Bugfixes (2018-11-01 r23006):</p>
         <ul>
+            <li>2051: rank 2 ytags was slow, when looking at a tiny slice in x.
+            <li>improve support for datumRange, URI, and URL parameters in Jython scripts, when creating GUIs.
             <li>update to new certificate signatures for 2018-2019.
             <li>NullPointerException when params was escaped.
             <li>2049: setLayout(3,3) gets IDs backwards.  Revert this change which breaks many old scripts.
