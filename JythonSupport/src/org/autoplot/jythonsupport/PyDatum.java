@@ -14,6 +14,7 @@ import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
+import org.das2.qds.ops.Ops;
 
 /**
  * Wrap a das2 Datum, implementing operators.
@@ -30,6 +31,9 @@ public class PyDatum extends PyJavaInstance {
         this.datum= d;
     }
     
+    public PyDatum( String s ) {
+        this.datum= Ops.datum(s);
+    }
     
     /* plus, minus, multiply, divide */
     @Override
