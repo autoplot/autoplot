@@ -31,8 +31,12 @@ public class PyDatum extends PyJavaInstance {
         this.datum= d;
     }
     
+    /**
+     * create a PyDatum by parsing to Datum with Ops.datum.
+     * @param s 
+     */
     public PyDatum( String s ) {
-        this.datum= Ops.datum(s);
+        this(Ops.datum(s));
     }
     
     /* plus, minus, multiply, divide */
