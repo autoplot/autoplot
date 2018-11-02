@@ -549,7 +549,7 @@ public class JythonUtil {
      //The commas are to guard against the id being a subset of another id ("lower," does not match "lowercase").
      //TODO: update this after Python upgrade.
      private static final String[] okay= new String[] { "range,", "xrange,", "getParam,", "lower,", "upper,", "URI,", "URL,", "DatumRangeUtil,", "TimeParser",
-        "str,", "int,", "long,", "float,", "datum," };
+        "str,", "int,", "long,", "float,", "datum,", "datumRange," };
      
      /**
       * return true if the function call is trivial to execute and can be evaluated within a few milliseconds.
@@ -1078,9 +1078,9 @@ public class JythonUtil {
          variableNames.add("long");
          variableNames.add("float");
          variableNames.add("datum");
-//         variableNames.add("datumRange");
-//         variableNames.add("URI");
-//         variableNames.add("URL");
+         variableNames.add("datumRange");
+         variableNames.add("URI");
+         variableNames.add("URL");
          
          try {
              Module n= (Module)org.python.core.parser.parse( script, "exec" );
