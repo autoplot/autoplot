@@ -1180,6 +1180,7 @@ public class JythonUtil {
       * A string
       * F float, double, or int
       * U URI
+      * L URL
       * D Datum
       * S DatumRange
       * 
