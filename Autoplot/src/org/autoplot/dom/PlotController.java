@@ -790,6 +790,14 @@ public class PlotController extends DomNodeController {
         }
     }
 
+    private PropertyChangeListener plotListener= new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            dasPlot.setTitle( (String)titleConverter.convertForward(plot.getTitle()) );
+        }
+    };
+            
+            
     private PropertyChangeListener listener = new PropertyChangeListener() {
         @Override
         public String toString() {
@@ -1744,7 +1752,7 @@ public class PlotController extends DomNodeController {
      * @param newSettings the new plot settings from autoranging.
      */
     private void doCheckBindings( Plot plot, Plot newSettings ) {
-        logger.entering( "org.virbo.autoplot.PlotController", "doCheckBindings" );
+        logger.entering( "PlotController", "doCheckBindings" );
         boolean shouldBindX= false;
         boolean shouldSetAxisRange= false; // true indicates that the dom.timeRange already contains the range
         List<BindingModel> bms= dom.getController().findBindings( dom, Application.PROP_TIMERANGE, null, Axis.PROP_RANGE );
@@ -1752,6 +1760,7 @@ public class PlotController extends DomNodeController {
         if ( bm!=null ) bms.remove(bm);
 
         if ( ! plot.isAutoBinding() ) {
+            logger.exiting( "PlotController", "doCheckBindings" );
             return;
         }
 
@@ -1830,7 +1839,7 @@ public class PlotController extends DomNodeController {
         }
 
         plot.setAutoBinding(false);
-        
+        logger.exiting( "PlotController", "doCheckBindings" );
     }
 
     /**
@@ -1874,6 +1883,7 @@ public class PlotController extends DomNodeController {
                 }
             }
         };
+        this.plot.addPropertyChangeListener(plotListener);
         ac.bind( this.plot, Plot.PROP_CONTEXT, p, DasPlot.PROP_CONTEXT, plotContextConverter );
         ac.bind( this.plot, Plot.PROP_ISOTROPIC, p, DasPlot.PROP_ISOTROPIC );
         ac.bind( this.plot, Plot.PROP_DISPLAYTITLE, p, DasPlot.PROP_DISPLAYTITLE );
@@ -1912,6 +1922,7 @@ public class PlotController extends DomNodeController {
         ac.unbind( dom.options, Options.PROP_OVERRENDERING, p, DasPlot.PROP_OVERSIZE );
         dom.options.removePropertyChangeListener( Options.PROP_DAY_OF_YEAR, dayOfYearListener );
         dom.options.removePropertyChangeListener( Options.PROP_MOUSEMODULE, mouseModuleListener );
+        this.plot.removePropertyChangeListener(plotListener);
         //System.err.println("removeBindings "+i+" -> "+dom.options.boundCount() );
     }
     
