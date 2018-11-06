@@ -9,11 +9,15 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
 import org.autoplot.AutoplotUtil;
 import org.autoplot.dom.Annotation;
 import org.autoplot.dom.Canvas;
@@ -23,13 +27,17 @@ import org.autoplot.dom.Row;
 import org.das2.components.DatumRangeEditor;
 import org.das2.components.propertyeditor.ColorEditor;
 import org.das2.components.propertyeditor.EnumerationEditor;
+import org.das2.datum.Datum;
 import org.das2.datum.LoggerManager;
+import org.das2.datum.Units;
 import org.das2.graph.AnchorPosition;
 import org.das2.graph.AnchorType;
 import org.jdesktop.beansbinding.AutoBinding;
 import org.jdesktop.beansbinding.BeanProperty;
+import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
+import org.jdesktop.beansbinding.Converter;
 
 /**
  * Friendly editor for Annotation objects.
@@ -46,6 +54,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     BindingGroup bindings;
     DatumRangeEditor xrangeEditor, yrangeEditor;
     AnchorType anchorType;
+    Annotation ann;
             
     /**
      * Creates new form AnnotationEditorPanel
@@ -92,12 +101,42 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
             return;
         }
         this.validate();
+        this.repaint();
         firePropertyChange( "anchorType", oldValue, anchorType );
     }
+    
+
+    private Converter datumToStringConverter= new Converter() {
+        Units u= null;
+        @Override
+        public Object convertForward(Object s) {
+            if ( u==null ) {
+                u= ((Datum)s).getUnits();
+            }
+            return s.toString();
+        }
+
+        @Override
+        public Object convertReverse(Object t) {
+            try {
+                return u.parse((String)t);
+            } catch (ParseException ex) {
+                return u.createDatum(0);
+            }
+        }
+        
+    };
     
     
     private void addBinding( BindingGroup bc, Object ann, String srcprop, Object dest, String destprop ) {
         bc.addBinding( Bindings.createAutoBinding( AutoBinding.UpdateStrategy.READ_WRITE, ann, BeanProperty.create( srcprop ), dest, BeanProperty.create(destprop)));
+    }
+    
+    private void addBinding( BindingGroup bc, Object ann, String srcprop, Object dest, String destprop, Converter c ) {
+        Binding b= Bindings.createAutoBinding( AutoBinding.UpdateStrategy.READ_WRITE, ann, BeanProperty.create( srcprop ), 
+            dest, BeanProperty.create(destprop) );
+        b.setConverter( c );
+        bc.addBinding( b );
     }
     
     /**
@@ -106,8 +145,10 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
      */
     public void doBindings( final Annotation ann ) {
         if ( bindings!=null ) throw new IllegalArgumentException("already bound");
+
+        this.ann= ann;
         
-        plotIdComboBox.setModel( new DefaultComboBoxModel<String>( new String[] { ann.getPlotId() } ) );
+        plotIdComboBox.setModel( new DefaultComboBoxModel<>( new String[] { ann.getPlotId() } ) );
         
         ArrayList<String> rows= new ArrayList<>();
         rows.add("");
@@ -136,7 +177,9 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
                 
         BindingGroup bc = new BindingGroup();
 
-        addBinding( bc, ann, Annotation.PROP_TEXT, textField, "text" );
+        addBinding( bc, ann, Annotation.PROP_TEXT, textField, "text_ON_ACTION_OR_FOCUS_LOST" );
+        addBinding( bc, ann, Annotation.PROP_URL, urlTextField, "text_ON_ACTION_OR_FOCUS_LOST" );
+        addBinding( bc, ann, Annotation.PROP_SCALE, scaleCB, "selectedItem" );
         addBinding( bc, ann, Annotation.PROP_ANCHORPOSITION, anchorPositionEditor, "value" );        
         addBinding( bc, ann, Annotation.PROP_ANCHORTYPE, this, "anchorType" );
         addBinding( bc, ann, Annotation.PROP_OVERRIDECOLORS, customColorsCheckBox, "selected" );
@@ -149,25 +192,35 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         addBinding( bc, ann, Annotation.PROP_ROWID, rowIdComboBox, "selectedItem" );
         addBinding( bc, ann, Annotation.PROP_COLUMNID, columnIdComboBox, "selectedItem" );
         addBinding( bc, ann, Annotation.PROP_ANCHOROFFSET, anchorOffsetTF, "selectedItem" );
+        addBinding( bc, ann, Annotation.PROP_SCALE, scaleCB, "selectedItem" );
+        addBinding( bc, ann, Annotation.PROP_SHOWARROW, pointAtCheckBox, "selected" );
+        addBinding( bc, ann, Annotation.PROP_POINTATX, pointAtXTF, "text_ON_ACTION_OR_FOCUS_LOST", datumToStringConverter );
+        addBinding( bc, ann, Annotation.PROP_POINTATY, pointAtYTF, "text_ON_ACTION_OR_FOCUS_LOST", datumToStringConverter );
         bc.bind();
         
         bindings= bc;
         
-        if ( ann.getUrl().trim().length()>0 ) {
-            useUrl.setSelected(true);
-            textField.setText(ann.getUrl());
-        }
+        useUrl.setSelected( ann.getUrl().trim().length()>0 );
 
-        useUrl.addActionListener( new ActionListener() {
+        useUrl.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if ( useUrl.isSelected() ) {
-                    textField.setText(ann.getUrl());
-                } else {
-                    textField.setText(ann.getText());
-                }
+                resetTextUrlPanel( useUrl );
             }
         });
+        
+        resetTextUrlPanel( useUrl );
+        
+    }
+    
+    private void resetTextUrlPanel( JRadioButton useUrl ) {
+        textUrlPanel.removeAll();
+        if ( useUrl.isSelected() ) {
+            textUrlPanel.add( urlPanel );
+        } else {
+            textUrlPanel.add( textField );
+        }
+        textUrlPanel.validate();
     }
     
     /**
@@ -205,7 +258,11 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         rowIdComboBox = new javax.swing.JComboBox<>();
         jLabel11 = new javax.swing.JLabel();
         columnIdComboBox = new javax.swing.JComboBox<>();
+        textField = new javax.swing.JTextField();
+        urlPanel = new javax.swing.JPanel();
+        urlTextField = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
+        scaleCB = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
         anchorPositionPanel = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
@@ -221,10 +278,20 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         jLabel4 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         foregroundColorPanel = new javax.swing.JPanel();
-        textField = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
         anchorOffsetTF = new javax.swing.JComboBox<>();
-        useUrl = new javax.swing.JCheckBox();
+        pointAtCheckBox = new javax.swing.JCheckBox();
+        jRadioButton1 = new javax.swing.JRadioButton();
+        useUrl = new javax.swing.JRadioButton();
+        textUrlPanel = new javax.swing.JPanel();
+        pointAtPanel = new javax.swing.JPanel();
+        pointAtXTF = new javax.swing.JTextField();
+        jLabel15 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        pointAtYTF = new javax.swing.JTextField();
+
+        dataControlPanel.setAlignmentX(0.0F);
+        dataControlPanel.setAlignmentY(0.0F);
 
         jLabel6.setText("x:");
 
@@ -241,35 +308,32 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         dataControlPanelLayout.setHorizontalGroup(
             dataControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(dataControlPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(dataControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(dataControlPanelLayout.createSequentialGroup()
-                        .addComponent(jLabel6)
-                        .addGap(3, 3, 3)
-                        .addComponent(xrangePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel8)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(yrangePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(6, 6, 6))
-                    .addComponent(jLabel7)))
+                .addComponent(jLabel6)
+                .addGap(3, 3, 3)
+                .addComponent(xrangePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(yrangePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jLabel7)
         );
         dataControlPanelLayout.setVerticalGroup(
             dataControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dataControlPanelLayout.createSequentialGroup()
-                .addContainerGap()
+            .addGroup(dataControlPanelLayout.createSequentialGroup()
                 .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(dataControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(dataControlPanelLayout.createSequentialGroup()
-                        .addGroup(dataControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel8))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(yrangePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(xrangePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                    .addComponent(yrangePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(xrangePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        dataControlPanelLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jLabel6, jLabel8, xrangePanel, yrangePanel});
+
+        plotControlPanel.setAlignmentX(0.0F);
+        plotControlPanel.setAlignmentY(0.0F);
 
         jLabel9.setText("Plot containing annotation:");
 
@@ -280,21 +344,19 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         plotControlPanelLayout.setHorizontalGroup(
             plotControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(plotControlPanelLayout.createSequentialGroup()
-                .addContainerGap()
                 .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(plotIdComboBox, 0, 128, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(plotIdComboBox, 0, 140, Short.MAX_VALUE))
         );
         plotControlPanelLayout.setVerticalGroup(
             plotControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(plotControlPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(plotControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9)
-                    .addComponent(plotIdComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(plotControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(jLabel9)
+                .addComponent(plotIdComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
+
+        canvasControlPanel.setAlignmentX(0.0F);
+        canvasControlPanel.setAlignmentY(0.0F);
 
         jLabel10.setText("Row:");
 
@@ -309,32 +371,52 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         canvasControlPanelLayout.setHorizontalGroup(
             canvasControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(canvasControlPanelLayout.createSequentialGroup()
-                .addContainerGap()
                 .addComponent(jLabel10)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(rowIdComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(rowIdComboBox, 0, 84, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel11)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(columnIdComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addComponent(columnIdComboBox, 0, 84, Short.MAX_VALUE)
+                .addGap(18, 18, 18))
         );
-
-        canvasControlPanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {columnIdComboBox, rowIdComboBox});
-
         canvasControlPanelLayout.setVerticalGroup(
             canvasControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(canvasControlPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(canvasControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel10)
-                    .addComponent(rowIdComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel11)
-                    .addComponent(columnIdComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(canvasControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(jLabel10)
+                .addComponent(rowIdComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel11)
+                .addComponent(columnIdComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        jLabel1.setText("Annotation Text:");
+        textField.setText("jTextField1");
+
+        urlTextField.setText("jTextField1");
+
+        jLabel1.setText("Scale:");
+
+        scaleCB.setEditable(true);
+        scaleCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1.10", "1.00", ".80", ".60", ".50", ".20", ".10", " " }));
+        scaleCB.setToolTipText("Scale the image by this amount");
+
+        javax.swing.GroupLayout urlPanelLayout = new javax.swing.GroupLayout(urlPanel);
+        urlPanel.setLayout(urlPanelLayout);
+        urlPanelLayout.setHorizontalGroup(
+            urlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(urlPanelLayout.createSequentialGroup()
+                .addComponent(urlTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(scaleCB, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        urlPanelLayout.setVerticalGroup(
+            urlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(urlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(urlTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel1)
+                .addComponent(scaleCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
 
         jLabel2.setText("Position:");
 
@@ -377,10 +459,10 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
 
         customColorsCheckBox.setText("Custom Colors");
 
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, customColorsPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), customColorsCheckBox, org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, customColorsPanel, org.jdesktop.beansbinding.ELProperty.create("${visible}"), customColorsCheckBox, org.jdesktop.beansbinding.BeanProperty.create("selected"));
         bindingGroup.addBinding(binding);
 
-        anchorToPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        anchorToPanel.setAlignmentX(0.0F);
         anchorToPanel.setLayout(new java.awt.BorderLayout());
 
         textColorPanel.setLayout(new java.awt.BorderLayout());
@@ -405,7 +487,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
                     .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(customColorsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(backgroundColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(backgroundColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
                     .addComponent(textColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
             .addGroup(customColorsPanelLayout.createSequentialGroup()
                 .addComponent(jLabel12)
@@ -415,21 +497,21 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         customColorsPanelLayout.setVerticalGroup(
             customColorsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(customColorsPanelLayout.createSequentialGroup()
-                .addGroup(customColorsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(textColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel4))
+                .addGroup(customColorsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel4)
+                    .addComponent(textColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(customColorsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(foregroundColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(customColorsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(foregroundColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel12))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(customColorsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(backgroundColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 12, Short.MAX_VALUE))
+                .addGroup(customColorsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(backgroundColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        textField.setText("jTextField1");
+        customColorsPanelLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {backgroundColorPanel, foregroundColorPanel, textColorPanel});
 
         jLabel13.setText("Anchor Offset:");
         jLabel13.setToolTipText("<html>The offset from the anchor position, in ems or pixels. <br>The offset direction depends on the anchor position. <br>For example, if the anchor is \"N\" then offsets move towards <br>the south and east.");
@@ -437,7 +519,48 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         anchorOffsetTF.setEditable(true);
         anchorOffsetTF.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0em,0em", "1em,1em", "10px,10px", " " }));
 
-        useUrl.setText("use image URL instead");
+        pointAtCheckBox.setSelected(false);
+        pointAtCheckBox.setText("Point At:");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, pointAtPanel, org.jdesktop.beansbinding.ELProperty.create("${visible}"), pointAtCheckBox, org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        bindingGroup.addBinding(binding);
+
+        jRadioButton1.setText("Annotation Text:");
+
+        useUrl.setText("Image URL:");
+
+        textUrlPanel.setLayout(new java.awt.BorderLayout());
+
+        pointAtXTF.setText("0.0");
+
+        jLabel15.setText("y:");
+
+        jLabel14.setText("x:");
+
+        pointAtYTF.setText("0.0");
+
+        javax.swing.GroupLayout pointAtPanelLayout = new javax.swing.GroupLayout(pointAtPanel);
+        pointAtPanel.setLayout(pointAtPanelLayout);
+        pointAtPanelLayout.setHorizontalGroup(
+            pointAtPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pointAtPanelLayout.createSequentialGroup()
+                .addComponent(jLabel14)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pointAtXTF, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel15)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pointAtYTF, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(217, Short.MAX_VALUE))
+        );
+        pointAtPanelLayout.setVerticalGroup(
+            pointAtPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pointAtPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(jLabel14)
+                .addComponent(pointAtXTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel15)
+                .addComponent(pointAtYTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -447,66 +570,78 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(anchorPositionPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(textField, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(anchorToPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(dataAnchorTypeButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(textUrlPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(22, 22, 22)
-                        .addComponent(customColorsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jRadioButton1)
+                        .addGap(18, 18, 18)
+                        .addComponent(useUrl)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(customColorsCheckBox)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel13)
+                                .addComponent(jLabel2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(anchorOffsetTF, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 90, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(useUrl)))
+                                .addComponent(anchorPositionPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(customColorsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(jLabel13)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(anchorOffsetTF, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(customColorsCheckBox)))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(pointAtCheckBox)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(22, 22, 22)
+                                .addComponent(pointAtPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(anchorToPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 731, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
+                    .addComponent(jRadioButton1)
                     .addComponent(useUrl))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(textUrlPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(dataAnchorTypeButton))
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(anchorToPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
+                .addComponent(anchorToPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(anchorPositionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 21, Short.MAX_VALUE)
+                    .addComponent(anchorPositionPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel13)
-                    .addComponent(anchorOffsetTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(anchorOffsetTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pointAtCheckBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(customColorsCheckBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(customColorsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(77, 77, 77))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(customColorsCheckBox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(customColorsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(pointAtPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
 
         bindingGroup.bind();
@@ -550,6 +685,8 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -559,12 +696,21 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JPanel plotControlPanel;
     private javax.swing.JComboBox<String> plotIdComboBox;
+    private javax.swing.JCheckBox pointAtCheckBox;
+    private javax.swing.JPanel pointAtPanel;
+    private javax.swing.JTextField pointAtXTF;
+    private javax.swing.JTextField pointAtYTF;
     private javax.swing.JComboBox<String> rowIdComboBox;
+    private javax.swing.JComboBox<String> scaleCB;
     private javax.swing.JPanel textColorPanel;
     private javax.swing.JTextField textField;
-    private javax.swing.JCheckBox useUrl;
+    private javax.swing.JPanel textUrlPanel;
+    private javax.swing.JPanel urlPanel;
+    private javax.swing.JTextField urlTextField;
+    private javax.swing.JRadioButton useUrl;
     private javax.swing.JPanel xrangePanel;
     private javax.swing.JPanel yrangePanel;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
