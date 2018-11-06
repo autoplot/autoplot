@@ -38,6 +38,14 @@ public class AnnotationController extends DomNodeController {
     }    
     
     /**
+     * return the canvas where this annotation lives.
+     * @return 
+     */
+    public Canvas getCanvas() {
+        return dom.getCanvases(0);
+    }
+    
+    /**
      * converts forward from relative font spec to point size, used by
      * the annotation and axis nodes.
      * @param dcc the canvas component.
