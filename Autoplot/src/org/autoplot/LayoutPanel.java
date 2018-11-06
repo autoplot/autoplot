@@ -376,7 +376,10 @@ public class LayoutPanel extends javax.swing.JPanel {
                     org.das2.util.LoggerManager.logGuiEvent(e);
                     PlotStylePanel.StylePanel editorPanel= getStylePanel( p.getRenderType() );
                     editorPanel.doElementBindings(p);
-                    AutoplotUtil.showMessageDialog( LayoutPanel.this, editorPanel, p.getRenderType() + " Style", JOptionPane.OK_OPTION );
+                    PlotElement oldp= (PlotElement)p.copy();
+                    if ( JOptionPane.CANCEL_OPTION==AutoplotUtil.showConfirmDialog( LayoutPanel.this, editorPanel, p.getRenderType() + " Style", JOptionPane.OK_CANCEL_OPTION ) ) {
+                        p.syncTo(oldp);
+                    }
                 } else if ( os.size()>1 ) {
                     PlotElementStyle[] peers= new PlotElementStyle[os.size()];
                     for ( int i=0; i<os.size(); i++ ) peers[i]= (os.get(i)).getStyle();
