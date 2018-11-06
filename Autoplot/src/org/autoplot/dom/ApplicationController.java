@@ -36,6 +36,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.das2.DasApplication;
 import org.das2.components.propertyeditor.PropertyEditor;
@@ -67,6 +68,7 @@ import org.jdesktop.beansbinding.Bindings;
 import org.jdesktop.beansbinding.Converter;
 import org.jdesktop.beansbinding.Property;
 import org.autoplot.ApplicationModel;
+import org.autoplot.AutoplotUtil;
 import org.autoplot.ColumnColumnConnectorMouseModule;
 import org.autoplot.GuiSupport;
 import org.autoplot.LayoutListener;
@@ -74,6 +76,7 @@ import org.autoplot.ScriptContext;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.layout.LayoutConstants;
+import org.autoplot.renderer.AnnotationEditorPanel;
 import org.autoplot.util.RunLaterListener;
 import org.das2.system.DefaultMonitorFactory;
 import org.das2.system.DefaultMonitorFactory.MonitorEntry;
@@ -1030,6 +1033,22 @@ public class ApplicationController extends DomNodeController implements RunLater
         });        
         impl.getDasMouseInputAdapter().addMenuItem(mi);
         
+        mi= new JMenuItem(new AbstractAction("Annotation Editor") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
+                AnnotationEditorPanel pp= new AnnotationEditorPanel();
+                Annotation ann0= (Annotation)annotation.copy();
+                pp.doBindings(annotation);
+                Component parent= application.getCanvases(0).getController().getDasCanvas();
+                if ( JOptionPane.CANCEL_OPTION == AutoplotUtil.showConfirmDialog( parent, pp, "Edit Annotation", JOptionPane.OK_CANCEL_OPTION ) ) {
+                    annotation.syncTo(ann0);
+                }
+                pp.releaseBindings();
+            }
+        });        
+        impl.getDasMouseInputAdapter().addMenuItem(mi);
+                
         mi= new JMenuItem(new AbstractAction("Delete Annotation") {
             @Override
             public void actionPerformed(ActionEvent e) {
