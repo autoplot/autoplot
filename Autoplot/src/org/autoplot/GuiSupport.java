@@ -1881,9 +1881,12 @@ public class GuiSupport {
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);
                 PlotElement p = controller.getPlotElement();
+                PlotElement oldP= (PlotElement)p.copy();
                 PlotStylePanel.StylePanel editorPanel= getStylePanel( p.getRenderType() );
                 editorPanel.doElementBindings(p);
-                AutoplotUtil.showMessageDialog( app, editorPanel, p.getRenderType() + " Style", JOptionPane.OK_OPTION );
+                if ( JOptionPane.CANCEL_OPTION==AutoplotUtil.showConfirmDialog( app, editorPanel, p.getRenderType() + " Style", JOptionPane.OK_CANCEL_OPTION ) ) {
+                    p.syncTo(oldP);
+                };
             }
         });
         plotController.setPlotElementPropsMenuItem(panelPropsMenuItem);        
