@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Tool for debugging.
+ * PropertyChangeSupport implementation that provides debugging information, 
+ * such as toString.
  * @author jbf
  */
 public class DebugPropertyChangeSupport extends PropertyChangeSupport {
@@ -46,6 +47,10 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
 
     @Override
     public synchronized void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        //TODO: danger--remove this from production code.
+        if ( Arrays.asList(getPropertyChangeListeners()).contains( listener ) ) {
+            return;
+        }
         super.addPropertyChangeListener(propertyName, listener);
         if ( listener!=null ) {
             propNames.add( listener.toString()+ " " + propertyName );
@@ -85,12 +90,12 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
     public String toString() {
         PropertyChangeListener[] listeners= getPropertyChangeListeners();
         StringBuilder result= new StringBuilder(super.toString());
-        for ( int i=0; i<listeners.length; i++ ) {
-            if ( listeners[i] instanceof PropertyChangeListenerProxy ) {
-                PropertyChangeListenerProxy proxy= (PropertyChangeListenerProxy)listeners[i];
+        for (PropertyChangeListener listener : listeners) {
+            if (listener instanceof PropertyChangeListenerProxy) {
+                PropertyChangeListenerProxy proxy = (PropertyChangeListenerProxy) listener;
                 result.append("\n").append(proxy.getListener()).append(" (property ").append(proxy.getPropertyName()).append(")");
             } else {
-                result.append("\n").append(listeners[i]);
+                result.append("\n").append(listener);
             }
         }
         return result.toString();
