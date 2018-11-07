@@ -262,27 +262,40 @@ public class AxisController extends DomNodeController {
     
     protected LabelConverter labelConverter;
     
-    public final synchronized void bindTo(DasAxis p) {
+    public final synchronized void bindTo(DasAxis dasAxis) {
         ApplicationController ac = dom.controller;
-        ac.bind(axis, "range", p, "datumRange");
-        ac.bind(axis, "log", p, "log");
+        ac.bind(axis, "range", dasAxis, "datumRange");
+        ac.bind(axis, "log", dasAxis, "log");
         labelConverter= new LabelConverter( dom, plot, axis, null, null );
-        ac.bind(axis, Axis.PROP_LABEL, p, DasAxis.PROP_LABEL, labelConverter );
+        ac.bind(axis, Axis.PROP_LABEL, dasAxis, DasAxis.PROP_LABEL, labelConverter );
         ///ac.bind(axis, "label", p, "label", plot.getController().labelContextConverter(axis) );
-        ac.bind(axis, "fontSize", p, "fontSize" );
-        ac.bind(axis, "drawTickLabels", p, "tickLabelsVisible");
-        ac.bind(axis, "flipped", p, "flipped");
-        ac.bind(axis, "visible", p, "visible" );
-        ac.bind(axis, "opposite", p, "orientation", getOppositeConverter(axis,dasAxis) );
-        if ( p.isHorizontal() ) {
-            p.getColumn().addPropertyChangeListener(scaleListener);
+        ac.bind(axis, "fontSize", dasAxis, "fontSize" );
+        ac.bind(axis, "drawTickLabels", dasAxis, "tickLabelsVisible");
+        ac.bind(axis, "flipped", dasAxis, "flipped");
+        ac.bind(axis, "visible", dasAxis, "visible" );
+        ac.bind(axis, "opposite", dasAxis, "orientation", getOppositeConverter(axis,dasAxis) );
+        if ( dasAxis.isHorizontal() ) {
+            dasAxis.getColumn().addPropertyChangeListener(scaleListener);
         } else {
-            p.getRow().addPropertyChangeListener(scaleListener);
+            dasAxis.getRow().addPropertyChangeListener(scaleListener);
         }
         axis.addPropertyChangeListener( Axis.PROP_RANGE, scaleListener );
         axis.addPropertyChangeListener( Axis.PROP_LOG, scaleListener );
     }
 
+    public final synchronized void removeBindings() {
+        axis.removePropertyChangeListener( Axis.PROP_RANGE, scaleListener );
+        axis.removePropertyChangeListener( Axis.PROP_LOG, scaleListener );
+        labelConverter= null;
+        if ( dasAxis.isHorizontal() ) {
+            dasAxis.getColumn().removePropertyChangeListener(scaleListener);
+        } else {
+            dasAxis.getRow().removePropertyChangeListener(scaleListener);
+        }
+        dom.controller.unbind(axis);
+        axis.removePropertyChangeListener( Axis.PROP_LOG, scaleListener );
+        axis.removePropertyChangeListener( rangeChangeListener );
+    }
     
     private final PropertyChangeListener scaleListener= new PropertyChangeListener() {
         @Override
