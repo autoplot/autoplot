@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.dom;
 
@@ -12,10 +8,12 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- *
+ * Tool for debugging.
  * @author jbf
  */
 public class DebugPropertyChangeSupport extends PropertyChangeSupport {
@@ -26,6 +24,7 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
     public long t= System.currentTimeMillis() - t0;
     
     List<String> propNames= new ArrayList();
+    Map<String,StackTraceElement[]> sources= new HashMap<>();
 
     public DebugPropertyChangeSupport( Object bean ) {
         super(bean);
@@ -39,26 +38,38 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
             return;
         }
         super.addPropertyChangeListener(listener);
-        if ( listener!=null ) propNames.add( listener.toString() );
+        if ( listener!=null ) {
+            propNames.add( listener.toString() );
+            sources.put( listener.toString(), new Exception().getStackTrace() );
+        }
     }
 
     @Override
     public synchronized void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         super.addPropertyChangeListener(propertyName, listener);
-        if ( listener!=null ) propNames.add( listener.toString()+ " " + propertyName );
+        if ( listener!=null ) {
+            propNames.add( listener.toString()+ " " + propertyName );
+            sources.put( listener.toString()+ " " + propertyName, new Exception().getStackTrace() );
+        }
     }
 
     @Override
     public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
         super.removePropertyChangeListener(listener);
-        if ( listener!=null ) propNames.remove( listener.toString() );
+        if ( listener!=null ) {
+            propNames.remove( listener.toString() );
+            sources.remove(listener.toString() );
+        }
     }
 
     @Override
     public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         super.removePropertyChangeListener(propertyName, listener);
         //TODO: possible bug: sometimes with TSBs listener is null.
-        if ( listener!=null ) propNames.remove( listener.toString()+ " " + propertyName );
+        if ( listener!=null ) {
+            propNames.remove( listener.toString()+ " " + propertyName );
+            sources.remove(listener.toString()+ " " + propertyName );
+        }
     }
 
     @Override
