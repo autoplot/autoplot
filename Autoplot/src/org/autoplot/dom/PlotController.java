@@ -1923,6 +1923,15 @@ public class PlotController extends DomNodeController {
         dom.options.removePropertyChangeListener( Options.PROP_DAY_OF_YEAR, dayOfYearListener );
         dom.options.removePropertyChangeListener( Options.PROP_MOUSEMODULE, mouseModuleListener );
         this.plot.removePropertyChangeListener(plotListener);
+        this.plot.xaxis.controller.removeBindings();
+        this.plot.yaxis.controller.removeBindings();
+        this.plot.zaxis.controller.removeBindings();
+        this.plot.getXaxis().removePropertyChangeListener( autorangeListener );
+        this.plot.getYaxis().removePropertyChangeListener( autorangeListener );
+        this.plot.getZaxis().removePropertyChangeListener( autorangeListener );
+        this.plot.removePropertyChangeListener( Plot.PROP_TITLE, labelListener );
+        this.plot.removePropertyChangeListener( Plot.PROP_TICKS_URI, ticksURIListener );
+        this.plot.removePropertyChangeListener( Plot.PROP_ID, idListener );
         //System.err.println("removeBindings "+i+" -> "+dom.options.boundCount() );
     }
     
