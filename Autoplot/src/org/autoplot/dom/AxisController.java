@@ -263,6 +263,7 @@ public class AxisController extends DomNodeController {
     protected LabelConverter labelConverter;
     
     public final synchronized void bindTo(DasAxis dasAxis) {
+        System.err.println("       bindTo  for "+axis + " " + scaleListener ); //bug2053
         ApplicationController ac = dom.controller;
         ac.bind(axis, "range", dasAxis, "datumRange");
         ac.bind(axis, "log", dasAxis, "log");
@@ -284,6 +285,7 @@ public class AxisController extends DomNodeController {
     }
 
     public final synchronized void removeBindings() {
+        System.err.println("removeBindings for "+axis + " " +scaleListener );//bug2053
         axis.removePropertyChangeListener( Axis.PROP_RANGE, scaleListener );
         axis.removePropertyChangeListener( Axis.PROP_LOG, scaleListener );
         labelConverter= null;
@@ -293,7 +295,6 @@ public class AxisController extends DomNodeController {
             dasAxis.getRow().removePropertyChangeListener(scaleListener);
         }
         dom.controller.unbind(axis);
-        axis.removePropertyChangeListener( Axis.PROP_LOG, scaleListener );
         axis.removePropertyChangeListener( rangeChangeListener );
     }
     
@@ -314,6 +315,12 @@ public class AxisController extends DomNodeController {
             Datum scale= w.divide(npixels);
             axis.setScale( scale );
         }
+
+        @Override
+        public String toString() {//bug2053
+            return "scaleListener " + hashCode() + " for "+axis;
+        }
+        
     };
             
     public DasAxis getDasAxis() {
