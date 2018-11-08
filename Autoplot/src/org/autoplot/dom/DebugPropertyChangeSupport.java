@@ -11,6 +11,7 @@ import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * PropertyChangeSupport implementation that provides debugging information, 
@@ -26,6 +27,7 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
     
     List<String> propNames= new ArrayList();
     Map<String,StackTraceElement[]> sources= new HashMap<>();
+    Map<String,Long> birthMilli= new HashMap<>();
 
     public DebugPropertyChangeSupport( Object bean ) {
         super(bean);
@@ -42,7 +44,13 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
         if ( listener!=null ) {
             propNames.add( listener.toString() );
             sources.put( listener.toString(), new Exception().getStackTrace() );
+            if ( System.currentTimeMillis() - t0 < 50000 ) {
+                birthMilli.put( listener.toString(), 0L );
+            } else {
+                birthMilli.put( listener.toString(), System.currentTimeMillis() );
+           }
         }
+
     }
 
     @Override
@@ -53,8 +61,14 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
         }
         super.addPropertyChangeListener(propertyName, listener);
         if ( listener!=null ) {
-            propNames.add( listener.toString()+ " " + propertyName );
-            sources.put( listener.toString()+ " " + propertyName, new Exception().getStackTrace() );
+            String key= listener.toString()+ " " + propertyName;
+            propNames.add( key );
+            sources.put( key, new Exception().getStackTrace() );
+            if ( System.currentTimeMillis() - t0 < 50000 ) {
+                birthMilli.put( key, 0L );
+            } else {
+                birthMilli.put( key, System.currentTimeMillis() );
+            }
         }
     }
 
@@ -64,7 +78,9 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
         if ( listener!=null ) {
             propNames.remove( listener.toString() );
             sources.remove(listener.toString() );
+            birthMilli.remove(listener.toString() );
         }
+        printOldListeners();
     }
 
     @Override
@@ -72,11 +88,27 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
         super.removePropertyChangeListener(propertyName, listener);
         //TODO: possible bug: sometimes with TSBs listener is null.
         if ( listener!=null ) {
-            propNames.remove( listener.toString()+ " " + propertyName );
-            sources.remove(listener.toString()+ " " + propertyName );
+            String key= listener.toString()+ " " + propertyName;
+            propNames.remove( key );
+            sources.remove( key );
+            birthMilli.remove( key );
         }
+        printOldListeners();
     }
 
+    private void printOldListeners() {
+        long tnow= System.currentTimeMillis();
+        for ( Entry<String,Long> e: birthMilli.entrySet() ) {
+            if ( e.getValue()>0 && ( tnow-e.getValue() ) > 60000 ) {
+                StackTraceElement[] sts= sources.get(e.getKey());
+                System.err.println("== "+e.getKey()+" ==");
+                for ( StackTraceElement st: sts ) {
+                    System.err.println( st.toString() );
+                }
+            } 
+        }
+    }
+    
     @Override
     public void firePropertyChange(PropertyChangeEvent event) {
         try {
