@@ -1848,6 +1848,16 @@ public class ApplicationController extends DomNodeController implements RunLater
                 }
             }
 
+            Column deleteColumn = null; // if non-null, delete this row.
+            Column column = (Column) DomUtil.getElementById(application, domPlot.getColumnId());
+            if ( column!=null ) { // leftover bug from "Add Hidden Plot"
+                List<DomNode> plotsUsingColumn = DomUtil.columnUsages(application, column.getId());
+                plotsUsingColumn.remove(domPlot);
+                if (plotsUsingColumn.isEmpty()) {
+                    deleteColumn = column;
+                }
+            }
+            
             //domPlot.removePropertyChangeListener(application.childListener);
             domPlot.removePropertyChangeListener(domListener);
             unbind(domPlot);
@@ -1883,6 +1893,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                         }
                     }
                 } );
+                cb.getColumn().removeListeners();
             }
 
             synchronized (this) {
@@ -1906,6 +1917,12 @@ public class ApplicationController extends DomNodeController implements RunLater
                         cc.removeGaps();
                     }
                 }
+                
+                if (deleteColumn != null) {
+                    assert column!=null;
+                    CanvasController cc = column.controller.getCanvas().controller;
+                    cc.deleteColumn(deleteColumn);
+                }                
             }
 
             if ( domPlot.controller==null ) {
