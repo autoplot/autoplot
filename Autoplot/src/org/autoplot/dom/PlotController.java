@@ -129,11 +129,13 @@ public class PlotController extends DomNodeController {
                 if ( col==null ) col= dom.controller.getCanvas().marginColumn;
                 DasColumn dasColumn= col.controller.getDasColumn();
                 dasPlot.setColumn(dasColumn);
+                DasColumn oldColorbarColumn= plot.getZaxis().getController().getDasAxis().getColumn();
                 plot.getXaxis().getController().getDasAxis().setColumn(dasColumn);
                 plot.getYaxis().getController().getDasAxis().setColumn(dasColumn);
                 // need to remove old column if no one is listening to it
                 DasColumn c= DasColorBar.getColorBarColumn(dasColumn);
-                dasColorBar.setColumn(c);
+                dasColorBar.setColumn(c); //TODO verify updateListeners are removed.
+                oldColorbarColumn.removeListeners();
             }
         }
 
