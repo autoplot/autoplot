@@ -204,16 +204,19 @@ public class DomUtil {
     }
 
     /**
-     * return the list of nodes (Plots) that is this row.
+     * return the list of nodes (Plots or Annotations) that use this row.
+     * @param dom
+     * @param rowId the row id.
+     * @return list of nodes
      */
-    static List<DomNode> rowUsages(Application app, String rowId) {
+    static List<DomNode> rowUsages(Application dom, String rowId) {
         List<DomNode> result = new ArrayList<>();
-        for (Plot p : app.getPlots()) {
+        for (Plot p : dom.getPlots()) {
             if (p.getRowId().equals(rowId)) {
                 result.add(p);
             }
         }
-        for (Annotation a : app.getAnnotations()) {
+        for (Annotation a : dom.getAnnotations()) {
             if (a.getRowId().equals(rowId)) {
                 result.add(a);
             }
@@ -221,6 +224,27 @@ public class DomUtil {
         return result;
     }
 
+    /**
+     * return the list of nodes (Plots or Annotations) that use this column.
+     * @param dom
+     * @param columnId the column id.
+     * @return list of nodes
+     */
+    static List<DomNode> columnUsages(Application dom, String columnId) {
+        List<DomNode> result = new ArrayList<>();
+        for (Plot p : dom.getPlots()) {
+            if (p.getColumnId().equals(columnId)) {
+                result.add(p);
+            }
+        }
+        for (Annotation a : dom.getAnnotations()) {
+            if (a.getColumnId().equals(columnId)) {
+                result.add(a);
+            }
+        }
+        return result;
+    }
+    
     private static DatumRange round(DatumRange range) {
         Datum w = range.width();
         Datum w0 = DatumUtil.asOrderOneUnits(w);
