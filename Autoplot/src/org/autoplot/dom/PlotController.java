@@ -1934,6 +1934,8 @@ public class PlotController extends DomNodeController {
         this.plot.removePropertyChangeListener( Plot.PROP_TITLE, labelListener );
         this.plot.removePropertyChangeListener( Plot.PROP_TICKS_URI, ticksURIListener );
         this.plot.removePropertyChangeListener( Plot.PROP_ID, idListener );
+        this.plot.removePropertyChangeListener( Plot.PROP_ROWID, rowColListener );
+        this.plot.removePropertyChangeListener( Plot.PROP_COLUMNID, rowColListener );
         //System.err.println("removeBindings "+i+" -> "+dom.options.boundCount() );
     }
     
