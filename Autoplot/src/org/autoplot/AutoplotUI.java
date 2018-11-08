@@ -4709,7 +4709,12 @@ private void updateFrameTitle() {
         String tag;
         try {
             tag = AboutUtil.getReleaseTag(APSplash.class);
-            welcome+=" ("+tag+")";
+            String pid= AutoplotUtil.getProcessId("???");
+            if ( tag.equals("(dev)") ) {
+                welcome+=" ("+tag.substring(1,4)+"-"+pid+")";
+            } else {
+                welcome+=" ("+tag+")";
+            }
             System.setProperty("http.agent", "Autoplot-"+tag );
             
         } catch (IOException ex) {
