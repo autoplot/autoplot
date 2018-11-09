@@ -31,16 +31,13 @@ public class RowController extends DomNodeController {
         row.controller= this;
     }
 
-    protected void createDasPeer( Canvas canvas, DasRow parent ) {
-        DasCanvas c= canvas.controller.getDasCanvas();
-        dasRow= DasRow.create( c, parent, row.getTop(), row.getBottom() );
-
-        final List<String> minList= Arrays.asList( DasDevicePosition.PROP_MINIMUM, DasDevicePosition.PROP_EMMINIMUM, DasDevicePosition.PROP_PTMINIMUM );
-        final List<String> maxList= Arrays.asList( DasDevicePosition.PROP_MAXIMUM, DasDevicePosition.PROP_EMMAXIMUM, DasDevicePosition.PROP_PTMAXIMUM );
-        PropertyChangeListener list= new PropertyChangeListener() {
-            @Override            
+    PropertyChangeListener dasRowPosListener;
+    
+    PropertyChangeListener createDasRowPosListener( final List<String> minList, final List<String> maxList ) {
+        dasRowPosListener= new PropertyChangeListener( ) {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                LoggerManager.logPropertyChangeEvent(evt);
+                LoggerManager.logPropertyChangeEvent(evt);  
                 if ( maxList.contains( evt.getPropertyName() ) ) {
                     row.setBottom( DasDevicePosition.formatLayoutStr(dasRow, false ) );
                 } else if ( minList.contains( evt.getPropertyName() ) ) {
@@ -48,9 +45,13 @@ public class RowController extends DomNodeController {
                 }
             }
         };
-
-        dasRow.addPropertyChangeListener(list);
-        list= new PropertyChangeListener() {
+        return dasRowPosListener;
+    }
+      
+    PropertyChangeListener rowPosListener;
+    
+    PropertyChangeListener createRowPosListener( ) {
+        rowPosListener= new PropertyChangeListener() {
             @Override            
             public void propertyChange(PropertyChangeEvent evt) {
                 LoggerManager.logPropertyChangeEvent(evt);                
@@ -69,8 +70,22 @@ public class RowController extends DomNodeController {
                 }
             }
         };
-        row.addPropertyChangeListener(Row.PROP_BOTTOM,list);
-        row.addPropertyChangeListener(Row.PROP_TOP,list);
+        return rowPosListener;
+    }
+    
+    protected void createDasPeer( Canvas canvas, DasRow parent ) {
+        DasCanvas c= canvas.controller.getDasCanvas();
+        dasRow= DasRow.create( c, parent, row.getTop(), row.getBottom() );
+
+        final List<String> minList= Arrays.asList( DasDevicePosition.PROP_MINIMUM, DasDevicePosition.PROP_EMMINIMUM, DasDevicePosition.PROP_PTMINIMUM );
+        final List<String> maxList= Arrays.asList( DasDevicePosition.PROP_MAXIMUM, DasDevicePosition.PROP_EMMAXIMUM, DasDevicePosition.PROP_PTMAXIMUM );
+
+        dasRowPosListener= createDasRowPosListener( minList, maxList);
+        dasRow.addPropertyChangeListener(dasRowPosListener);
+
+        rowPosListener= createRowPosListener();
+        row.addPropertyChangeListener(Row.PROP_BOTTOM,rowPosListener);
+        row.addPropertyChangeListener(Row.PROP_TOP,rowPosListener);
         this.canvas= canvas;
     }
     
@@ -89,6 +104,18 @@ public class RowController extends DomNodeController {
         return true;
     }    
 
+    public void removeBindings() {
+        dasRow.removePropertyChangeListener(dasRowPosListener);
+        row.removePropertyChangeListener(Column.PROP_LEFT,rowPosListener);
+        row.removePropertyChangeListener(Column.PROP_RIGHT,rowPosListener);
+    }
+    
+    public void removeReferences() {
+        //row= null;
+        //dasRow= null;
+        //canvas= null;
+    }
+    
     public DasRow getDasRow() {
         return dasRow;
     }

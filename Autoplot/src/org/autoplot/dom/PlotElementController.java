@@ -151,16 +151,31 @@ public class PlotElementController extends DomNodeController {
         plotElement.getStyle().addPropertyChangeListener(styleListener);
     }
 
+    /**
+     * remove all property change listeners.
+     */
     protected void disconnect() {
         plotElement.removePropertyChangeListener(PlotElement.PROP_RENDERTYPE, plotElementListener);
         plotElement.removePropertyChangeListener(PlotElement.PROP_DATASOURCEFILTERID, plotElementListener);
         plotElement.removePropertyChangeListener(PlotElement.PROP_COMPONENT, plotElementListener);
+        plotElement.getStyle().removePropertyChangeListener(styleListener);
         PlotElement parent= getParentPlotElement();
         if ( parent!=null ) {
             parent.removePropertyChangeListener( getParentComponentLister() );
         }
     }
 
+    /**
+     * remove any direct references this controller has as it is being deleted.
+     */
+    protected void removeReferences() {
+        this.processDataSet= null;
+        this.plotElement= null;
+        this.dsf= null;
+        this.deleted= true;
+        //this.dom= null;
+    }
+    
     /**
      * return child plotElements, which are plotElements that share a datasource but pull out
      * a component of the data.

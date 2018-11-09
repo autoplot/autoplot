@@ -316,7 +316,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                         for ( DomNode k: d.childNodes() ) {
                             k.addPropertyChangeListener(domListener);
                             c= DomNodeController.getController(k);
-                            if ( c!=null ) c.removePropertyChangeListener(controllerListener);
+                            if ( c!=null ) c.addPropertyChangeListener(controllerListener);
                         }
                     }
                 }
@@ -330,11 +330,12 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @return
      */
     private static String getFocusUriFor( PlotElement p ) {
+        if ( p.controller==null ) return "";
         DataSourceFilter dsf= p.controller.getDataSourceFilter();
         if ( dsf!=null ) {
-                     return dsf.getUri();
+            return dsf.getUri();
         } else {
-                    return "";
+            return "";
         }
     }
     
@@ -842,21 +843,23 @@ public class ApplicationController extends DomNodeController implements RunLater
                 pelement.controller.disconnect();
                 pelement.controller.dataSet= null; // get rid of these for now, until we can figure out why these are not G/C'd.
                 if ( r!=null ) r.setColorBar(null);
-                //PlotController.pdListen
+                
                 if ( domplot!=null ) {
                     domplot.controller.pdListen.remove(pelement);
                 }
                 if ( r!=null ) r.setDataSet(null);
                 pelement.controller.deleted= true;
-                //pelement.controller.renderer=null; //TODO: check that the renderer gets GC'd.
+                pelement.controller.renderer=null;
                 //pelement.controller.changesSupport=null;
-                //pelement.controller= null; // we need this to unbind later.
                 pelement.removePropertyChangeListener(plotIdListener);
-
+                
                 PlotElement parent= pelement.controller.getParentPlotElement();
                 if ( parent!=null ) {
                     parent.getStyle().removePropertyChangeListener( pelement.controller.parentStyleListener );
                 }
+
+                pelement.controller.removeReferences();
+                //pelement.controller= null; // causes problems to delete...
 
             }
 
@@ -1894,6 +1897,14 @@ public class ApplicationController extends DomNodeController implements RunLater
                     }
                 } );
                 cb.getColumn().removeListeners();
+                
+                domPlot.xaxis.controller.removeReferences();
+                domPlot.yaxis.controller.removeReferences();
+                domPlot.zaxis.controller.removeReferences();
+                
+                domPlot.xaxis.controller= null;
+                domPlot.yaxis.controller= null;
+                domPlot.zaxis.controller= null;
             }
 
             synchronized (this) {
@@ -1916,12 +1927,16 @@ public class ApplicationController extends DomNodeController implements RunLater
                     if ( application.getOptions().isAutolayout() ) {
                         cc.removeGaps();
                     }
+                    deleteRow.getController().removeBindings();
+                    deleteRow.getController().removeReferences();
                 }
                 
                 if (deleteColumn != null) {
                     assert column!=null;
                     CanvasController cc = column.controller.getCanvas().controller;
                     cc.deleteColumn(deleteColumn);
+                    deleteColumn.getController().removeBindings();
+                    deleteColumn.getController().removeReferences();
                 }                
             }
 

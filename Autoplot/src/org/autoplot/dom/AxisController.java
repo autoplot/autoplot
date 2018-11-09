@@ -298,10 +298,25 @@ public class AxisController extends DomNodeController {
         axis.removePropertyChangeListener( rangeChangeListener );
     }
     
+    /**
+     * remove any references this object has before as it is deleted.
+     */
+    public final synchronized void removeReferences() {
+        labelConverter= null;
+        //this.dom= null;
+        //this.axis= null;
+        System.err.println("* removeReferences for "+scaleListener + " " + this.axis);
+        this.dasAxis= null;
+        //this.plot= null;
+    }
+    
     private final PropertyChangeListener scaleListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             int npixels;
+            if ( dasAxis==null ) {
+                return;
+            }
             npixels= dasAxis.isHorizontal() ? dasAxis.getColumn().getWidth() : dasAxis.getRow().getHeight();                
             Datum w;
             Units u= dasAxis.getUnits();

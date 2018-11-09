@@ -565,7 +565,7 @@ public class PlotController extends DomNodeController {
                 }
             }
         });
-        
+
         xaxis.setNextAction( "scan", new AbstractAction( "scannext" ) {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -769,6 +769,9 @@ public class PlotController extends DomNodeController {
      */
     private Axis getDomAxis( DasAxis axis ) {
         Axis domAxis;
+        if ( plot.xaxis.controller==null ) {
+            return null;
+        }
         if ( plot.xaxis.controller.dasAxis == axis ) {
             domAxis= plot.xaxis;
         } else if ( plot.yaxis.controller.dasAxis==axis ) {
@@ -1937,6 +1940,18 @@ public class PlotController extends DomNodeController {
         this.plot.removePropertyChangeListener( Plot.PROP_ROWID, rowColListener );
         this.plot.removePropertyChangeListener( Plot.PROP_COLUMNID, rowColListener );
         //System.err.println("removeBindings "+i+" -> "+dom.options.boundCount() );
+    }
+    
+    /** 
+     * remove references this controller has so that they are more likely to be
+     * garbage collected.  This must be called after removeBindings.
+     */
+    protected void removeReferences() {
+        this.plot= null;
+        this.dom= null;
+        this.dasPlot= null;
+        this.dasColorBar= null;
+        this.pdListen= null;
     }
     
     public BindingModel[] getBindings() {
