@@ -2211,7 +2211,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             application.setEventsListUri("");
             
-            resetIdSequenceNumbers();
+            //resetIdSequenceNumbers();
 
             //clean up controllers after seeing the junk left behind in the profiler.
             for ( PlotElement pe :application.getPlotElements() ) {
@@ -2993,7 +2993,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         return min;
     }
     /**
-     * reset the sequence id numbers based on the number if instances in the 
+     * reset the sequence id numbers based on the number of instances in the 
      * application.  For example, we sync to a new state, so the id numbers 
      * are now invalid.
      */
@@ -3180,7 +3180,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             syncSupport.syncAnnotations( that.getAnnotations() );
             
-            resetIdSequenceNumbers();
+            //resetIdSequenceNumbers();
         } finally {
             canvasLock.unlock();
             lock.unlock();

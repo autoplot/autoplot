@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.dom;
 
 import java.beans.PropertyChangeEvent;
@@ -14,6 +11,8 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasAxis.Lock;
+import org.das2.graph.DasColumn;
+import org.das2.graph.DasRow;
 import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 
@@ -23,9 +22,12 @@ import org.jdesktop.beansbinding.Converter;
 public class AxisController extends DomNodeController {
 
     DasAxis dasAxis;
+    private DasColumn column;
+    private DasRow row;
+    
     private Application dom;
     Plot plot;
-    Axis axis;
+    final Axis axis;
     private final static Object PENDING_RANGE_TWEAK="pendingRangeTweak";
     private boolean defaultOppositeRight= false;
 
@@ -39,7 +41,7 @@ public class AxisController extends DomNodeController {
         if ( plot.zaxis==axis ) {
             defaultOppositeRight= true;
         }
-        bindTo(dasAxis);
+        bindTo();
         axis.addPropertyChangeListener(rangeChangeListener);
     }
 
@@ -262,8 +264,8 @@ public class AxisController extends DomNodeController {
     
     protected LabelConverter labelConverter;
     
-    public final synchronized void bindTo(DasAxis dasAxis) {
-        System.err.println("       bindTo  for "+axis + " " + scaleListener ); //bug2053
+    public final synchronized void bindTo() {
+        //System.err.println("       bindTo  for "+axis + " " + scaleListener ); //bug2053
         ApplicationController ac = dom.controller;
         ac.bind(axis, "range", dasAxis, "datumRange");
         ac.bind(axis, "log", dasAxis, "log");
@@ -275,24 +277,33 @@ public class AxisController extends DomNodeController {
         ac.bind(axis, "flipped", dasAxis, "flipped");
         ac.bind(axis, "visible", dasAxis, "visible" );
         ac.bind(axis, "opposite", dasAxis, "orientation", getOppositeConverter(axis,dasAxis) );
+        //if ( this.axis.getId().equals("xaxis_2") ) {
+        //    System.err.println("here2 bind xaxis_2="+this.axis+ "@"+ this.axis.hashCode() + "dasColumn=@"+dasAxis.getColumn().hashCode()+" dasAxis="+ dasAxis.getDasName() + "@" + dasAxis.hashCode() );
+        //}
+        column= dasAxis.getColumn();
+        row= dasAxis.getRow();
         if ( dasAxis.isHorizontal() ) {
-            dasAxis.getColumn().addPropertyChangeListener(scaleListener);
+            column.addPropertyChangeListener(scaleListener);
         } else {
-            dasAxis.getRow().addPropertyChangeListener(scaleListener);
+            row.addPropertyChangeListener(scaleListener);
         }
         axis.addPropertyChangeListener( Axis.PROP_RANGE, scaleListener );
         axis.addPropertyChangeListener( Axis.PROP_LOG, scaleListener );
     }
 
     public final synchronized void removeBindings() {
-        System.err.println("removeBindings for "+axis + " " +scaleListener );//bug2053
+        //System.err.println("removeBindings for "+axis + " " +scaleListener );//bug2053
         axis.removePropertyChangeListener( Axis.PROP_RANGE, scaleListener );
         axis.removePropertyChangeListener( Axis.PROP_LOG, scaleListener );
         labelConverter= null;
         if ( dasAxis.isHorizontal() ) {
-            dasAxis.getColumn().removePropertyChangeListener(scaleListener);
+            //if ( this.axis.getId().equals("xaxis_2") ) {
+            //    System.err.println("here2 rm xaxis_2="+this.axis+ "@"+ this.axis.hashCode() + "dasColumn=@"+dasAxis.getColumn().hashCode()+" dasAxis="+ dasAxis.getDasName() + "@" + dasAxis.hashCode());
+            //    System.err.println();
+            //}
+            column.removePropertyChangeListener(scaleListener);
         } else {
-            dasAxis.getRow().removePropertyChangeListener(scaleListener);
+            row.removePropertyChangeListener(scaleListener);
         }
         dom.controller.unbind(axis);
         axis.removePropertyChangeListener( rangeChangeListener );
@@ -305,8 +316,8 @@ public class AxisController extends DomNodeController {
         labelConverter= null;
         //this.dom= null;
         //this.axis= null;
-        System.err.println("* removeReferences for "+scaleListener + " " + this.axis);
-        this.dasAxis= null;
+        //System.err.println("* removeReferences for "+scaleListener + " " + this.axis);
+        //this.dasAxis= null;
         //this.plot= null;
     }
     
