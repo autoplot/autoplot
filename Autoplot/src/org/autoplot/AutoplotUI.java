@@ -4747,8 +4747,8 @@ private void updateFrameTitle() {
         if ( initialURL!=null && initialURL.length()>1 ) { // check for relative filenames 
             int i= initialURL.indexOf(':');
             logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", initialURL);
-            if ( i==-1 ) { // it's a file.
-                boolean isAbsolute= initialURL.startsWith("/");
+            if ( i==-1 || i>8 ) { // it's a file, no http:
+                boolean isAbsolute= initialURL.startsWith("/") || initialURL.startsWith("\\") || ( initialURL.length()>2 && initialURL.charAt(1)==':' );
                 if ( !isAbsolute ) {
                     try {
                         String pwd= new File(".").getCanonicalPath();
