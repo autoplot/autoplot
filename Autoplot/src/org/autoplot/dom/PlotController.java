@@ -465,19 +465,23 @@ public class PlotController extends DomNodeController {
         Runnable run= new Runnable() {
             @Override
             public void run() {
+                Plot p= getPlot();
+                if ( p==null ) return;
+                Axis a= p.getXaxis();
+                if ( a==null ) return;
+                AxisController c= a.getController();
+                if ( c==null ) return;
+                DasAxis da= c.getDasAxis();
+                if ( da==null ) return;
                 if ( scanNextRange.min().equals(dr0.max()) ) {
-                    getPlot().getXaxis().getController().getDasAxis()
-                            .setNextActionLabel("step >>","<html>step to next interval<br>"+scanNextRange);
+                    da.setNextActionLabel("step >>","<html>step to next interval<br>"+scanNextRange);
                 } else {
-                    getPlot().getXaxis().getController().getDasAxis()
-                            .setNextActionLabel("scan >>","<html>scan to <br>"+scanNextRange);
+                    da.setNextActionLabel("scan >>","<html>scan to <br>"+scanNextRange);
                 }
                 if ( scanPrevRange.max().equals(dr0.min()) ) {
-                    getPlot().getXaxis().getController().getDasAxis()
-                            .setPreviousActionLabel("<< step","<html>step to previous interval<br>"+scanPrevRange);
+                    da.setPreviousActionLabel("<< step","<html>step to previous interval<br>"+scanPrevRange);
                 } else {
-                    getPlot().getXaxis().getController().getDasAxis()
-                            .setPreviousActionLabel("<< scan","<html>scan to <br>"+scanPrevRange);
+                    da.setPreviousActionLabel("<< scan","<html>scan to <br>"+scanPrevRange);
                 }
             }
         };
