@@ -20,6 +20,7 @@ public class TickleTimer {
     long tickleTime;
     long delay;
     boolean running;
+    boolean firing=false; // true when the listener is being invoked.
     List<String> messages;
     
     private static final Logger log= org.das2.util.LoggerManager.getLogger("autoplot");
@@ -64,8 +65,10 @@ public class TickleTimer {
                     d= System.currentTimeMillis() - tickleTime;
                 }
                 log.log(Level.FINER, "tickleTimer fire after {0}", d );
+                firing= true;
                 running= false; //sometimes listeners need to retickle the timer...
                 propertyChangeSupport.firePropertyChange("running",true,false);
+                firing= false;
                 messages= new ArrayList<>();
             }
         };
