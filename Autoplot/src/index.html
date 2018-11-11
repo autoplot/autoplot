@@ -26,13 +26,13 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-11-10 r23036):</p>
+        <p>Bugfixes (2018-11-11 r23043):</p>
         <ul>
+            <li>2054: study reference leaks for columns and rows.  Masafumi observed a new NullPointerException.
             <li>2056: tickleTimer would restart timer while its event was running, which for slow events can cause threads to build up, slowing or crashing machine.  Thanks, Masafumi!
             <li>filenames with colons (data_2019-01-01T00:00.dat) would not allow relative reference launch.  Now colons past the eighth position are ignored.
             <li>2053: timerange macro doesn't update as timerange changes.
             <li>"delete plot" didn't check to see if there were columns which could be deleted.
-            <li>2054: study reference leaks for columns and rows.
             <li>in DataPointRecorder's reset units, handle when nominal units are used in the table.  Thanks, Bill!
             <li>2051: rank 2 ytags was slow, when looking at a tiny slice in x.  Thanks, Masafumi!
             <li>2052: improve support for datumRange, URI, and URL parameters in Jython scripts, when creating GUIs.
