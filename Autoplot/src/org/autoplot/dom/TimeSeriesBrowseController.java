@@ -128,14 +128,24 @@ public class TimeSeriesBrowseController {
                 final DataSourceFilter fdsf= p!=null ? p.getController().getDataSourceFilter() : null;
                 final TimeSeriesBrowse ftsb= fdsf!=null ?  fdsf.getController().getTsb() : null;
 
+                // TODO: why not just return if fpe is null?
                 if ( dom.getController().isValueAdjusting() ) {
                     updateTsbTimer.tickle(); 
                     logger.log( Level.FINEST, "applicationController is adjusting" );
                 } else {
                     Map<Object,Object> changes= new HashMap<>();
                     if ( fpe!=null ) {
-                        fpe.getController().getDataSourceFilter().getController().pendingChanges(changes);
-                        changes.remove( PENDING_AXIS_OR_TIMERANGE_DIRTY );
+                        PlotElementController pec= fpe.getController();
+                        if ( pec!=null ) {
+                            DataSourceFilter dsf= pec.getDataSourceFilter();
+                            if ( dsf!=null ) {
+                                DataSourceController dsc= dsf.getController();
+                                if ( dsc!=null ) {
+                                    dsc.pendingChanges(changes);
+                                    changes.remove( PENDING_AXIS_OR_TIMERANGE_DIRTY );
+                                }
+                            }
+                        }
                     }
                     if ( fpe!=null && !changes.isEmpty() ) {
                         logger.log( Level.FINEST, "DataSourceFilter is already pending changes, retickle");
