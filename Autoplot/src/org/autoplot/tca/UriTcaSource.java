@@ -79,9 +79,9 @@ public class UriTcaSource extends AbstractQFunction {
         ProgressMonitor mon= new NullProgressMonitor(); // DasProgressPanel.createFramed("loading data");
 
         if ( this.tsb!=null ) {
-            logger.log(Level.INFO, "reading TCAs from TSB {0}", this.tsb.getURI());
+            logger.log(Level.FINE, "reading TCAs from TSB {0}", this.tsb.getURI());
         } else {
-            logger.log(Level.INFO, "reading TCAs from {0}", dss);
+            logger.log(Level.FINE, "reading TCAs from {0}", dss);
         }
         needToRead= false; // clear the flag in case there is an exception.
         ds= dss.getDataSet( mon );
