@@ -127,7 +127,7 @@ public class CsvDataSource extends AbstractDataSource {
         int irecCount= recCount.length()==0 ? Integer.MAX_VALUE : Integer.parseInt(recCount);
 
         String recStart= getParam( "recStart", "" );
-        int irecStart= recStart.length()==0 ? Integer.MAX_VALUE : Integer.parseInt(recStart);
+        int irecStart= recStart.length()==0 ? 0 : Integer.parseInt(recStart);
         
         if ( irecStart>0 && irecCount<(Integer.MAX_VALUE-irecStart) ) {
             irecCount+= irecStart;
