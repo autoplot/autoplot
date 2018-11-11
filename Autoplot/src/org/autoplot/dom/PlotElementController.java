@@ -170,8 +170,8 @@ public class PlotElementController extends DomNodeController {
      */
     protected void removeReferences() {
         this.processDataSet= null;
-        this.plotElement= null;
-        this.dsf= null;
+        //this.plotElement= null; // bug 2054: if the thing we link to has no other references, then there is no reason to clear the reference to it.
+        //this.dsf= null;
         this.deleted= true;
         //this.dom= null;
     }
