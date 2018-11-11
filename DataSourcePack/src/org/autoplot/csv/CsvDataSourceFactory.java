@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.csv;
 
@@ -26,13 +22,15 @@ import org.autoplot.datasource.DataSourceFactory;
  */
 public class CsvDataSourceFactory implements DataSourceFactory {
 
+    @Override
     public DataSource getDataSource(URI uri) throws Exception {
         return new CsvDataSource(uri);
     }
 
+    @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
-            List<CompletionContext> result = new ArrayList<CompletionContext>();
+            List<CompletionContext> result = new ArrayList<>();
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "column="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "bundle=", "read in more than one column to create a rank 2 bundle dataset."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "depend0="));
@@ -43,11 +41,13 @@ public class CsvDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "delim=",
                     "override the default delimiter (comma)."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "skipLines=", "skip this many lines before parsing"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "recCount=", "the number of records to read in"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "recStart=", "skip this number of records"));
             return result;
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
             if (paramName.equals("bundle")) {
-                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                List<CompletionContext> result = new ArrayList<>();
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "number of columns to expect"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "Bx-Bz", "three named columns"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:", "all but first column"));
@@ -55,7 +55,7 @@ public class CsvDataSourceFactory implements DataSourceFactory {
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "-5:", "last five columns"));
                 return result;
             } else if ( paramName.equals("delim") ) {
-                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                List<CompletionContext> result = new ArrayList<>();
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, ",", "force comma delimiter"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, ";", "force semicolon delimiter"));
                 return result;
@@ -66,9 +66,15 @@ public class CsvDataSourceFactory implements DataSourceFactory {
                 List<CompletionContext> result = getFieldNames(cc, mon);
                 return result;
             } else if ( (paramName.equals("skip")) || paramName.equals("skipLines") ) {
-                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                List<CompletionContext> result = new ArrayList<>();
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "number of lines to skip"));
                 return result;
+            } else if ( paramName.equals("recCount") ) {
+                return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "limit number of records to parse."));
+
+            } else if ( paramName.equals("recStart") ) {
+                return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "record number to start."));
+                
             } else {
                 return Collections.emptyList();
             }
@@ -87,15 +93,14 @@ public class CsvDataSourceFactory implements DataSourceFactory {
         FileReader fr= new FileReader(f);
         CsvReader reader= null;
 
-        List<CompletionContext> result = new ArrayList<CompletionContext>();
+        List<CompletionContext> result = new ArrayList<>();
         try {
             reader= new CsvReader( fr );
 
             String[] columnHeaders;
             columnHeaders = getColumnHeaders( reader);
             
-            for ( int i=0; i<columnHeaders.length; i++ ) {
-                String s= columnHeaders[i];
+            for (String s : columnHeaders) {
                 String label= s;
                 //if ( ! label.equals(fields[i]) && label.startsWith("field") ) label += " ("+fields[i]+")";
 
@@ -117,7 +122,7 @@ public class CsvDataSourceFactory implements DataSourceFactory {
      * detect identifiers for columns.  Copied from AsciiParser.java
      * @see AsciiParser#COLUMN_ID_HEADER_PATTERN
      */
-    private static Pattern COLUMN_ID_HEADER_PATTERN = Pattern.compile("\\s*\"?([a-zA-Z][a-zA-Z _0-9]*)([\\(\\[]([a-zA-Z_\\.\\[\\-\\]0-9//\\*\\^]*)[\\)\\]])?\"?\\s*");    
+    private static final Pattern COLUMN_ID_HEADER_PATTERN = Pattern.compile("\\s*\"?([a-zA-Z][a-zA-Z _0-9]*)([\\(\\[]([a-zA-Z_\\.\\[\\-\\]0-9//\\*\\^]*)[\\)\\]])?\"?\\s*");    
     
     public static String[] getColumnHeaders( CsvReader reader) throws IOException {
         return getColumnHeaders( reader, false );
@@ -168,14 +173,17 @@ public class CsvDataSourceFactory implements DataSourceFactory {
         return columnHeaders;
     }
 
+    @Override
     public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
         return false;
     }
 
+    @Override
     public <T> T getCapability(Class<T> clazz) {
         return null;
     }
 
+    @Override
     public boolean supportsDiscovery() {
         return false;
     }
