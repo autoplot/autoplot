@@ -3,19 +3,13 @@ package org.autoplot.csv;
 
 import com.csvreader.CsvReader;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.net.URLDecoder;
 import java.text.ParseException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -39,6 +33,7 @@ import org.autoplot.html.AsciiTableStreamer;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumUtil;
 import org.das2.datum.InconvertibleUnitsException;
+import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.AsciiParser;
 import org.das2.qds.util.DataSetBuilder;
@@ -118,7 +113,7 @@ public class CsvDataSource extends AbstractDataSource {
         char delimiter= sdelimiter.charAt(0);
         
         BufferedReader breader= new BufferedReader( new InputStreamReader(in) );        
-        
+            
         String skip= getParam( "skipLines", "" );
         if ( skip.length()==0 ) skip= getParam( "skip", "" );
         if ( skip.length()>0 ) {
@@ -127,14 +122,24 @@ public class CsvDataSource extends AbstractDataSource {
                 breader.readLine();
             }
         }
+        
+        String recCount= getParam( "recCount", "" );
+        int irecCount= recCount.length()==0 ? Integer.MAX_VALUE : Integer.parseInt(recCount);
 
+        String recStart= getParam( "recStart", "" );
+        int irecStart= recStart.length()==0 ? Integer.MAX_VALUE : Integer.parseInt(recStart);
+        
+        if ( irecStart>0 && irecCount<(Integer.MAX_VALUE-irecStart) ) {
+            irecCount+= irecStart;
+        }
+        
         CsvReader reader= new CsvReader( breader );
         if ( delimiter!=',' ) reader.setDelimiter(delimiter);
         
         String[] columnHeaders;
 
         columnHeaders= CsvDataSourceFactory.getColumnHeaders(reader,true);
-
+        
         String column= getParam( "column", null );
         /**
          * icolumn is the column we are reading, or -1 when reading multiple columns.
@@ -341,7 +346,7 @@ public class CsvDataSource extends AbstractDataSource {
                     }
                 }
                 
-                if ( yepItsData ) {
+                if ( yepItsData && builder.getLength()<irecCount ) {
                     if ( idep0column>=0 ) {
                         tbuilder.putValue( -1, cbs[idep0column] );
                         tbuilder.nextRecord();
@@ -362,7 +367,7 @@ public class CsvDataSource extends AbstractDataSource {
                 needToCheckHeader= false;
             }
                 
-            if ( columnUnits!=null ) {
+            if ( columnUnits!=null && builder.getLength()<irecCount ) {
                 if ( idep0column>=0 ) {
                     tbuilder.putValue( -1, tb );
                     tbuilder.nextRecord();
@@ -389,6 +394,11 @@ public class CsvDataSource extends AbstractDataSource {
         }
         
         DDataSet ds= builder.getDataSet();
+        
+        if ( irecStart>0 ) { // TODO: skip records, so that memory isn't consumed.
+            ds= (DDataSet)ds.trim(irecStart,ds.length());
+        }
+        
         if ( idep0column>=0 && dep0ds!=null ) {
             DDataSet tds= tbuilder.getDataSet();
             tds.putProperty(QDataSet.UNITS,dep0u);
