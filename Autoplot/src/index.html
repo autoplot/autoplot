@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2018-11-11 r23043):</p>
         <ul>
+            <li>add recCount and recStart controls to csv reader.
             <li>2054: study reference leaks for columns and rows.  Masafumi observed a new NullPointerException.
             <li>2056: tickleTimer would restart timer while its event was running, which for slow events can cause threads to build up, slowing or crashing machine.  Thanks, Masafumi!
             <li>filenames with colons (data_2019-01-01T00:00.dat) would not allow relative reference launch.  Now colons past the eighth position are ignored.
