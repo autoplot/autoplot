@@ -415,21 +415,25 @@ public class CreatePngWalk {
                 if ( params.useBatchUri ) {
                     if ( params.batchUri!=null && !params.batchUri.equals("") ) {
                         ff.println( "batchUri=" + params.batchUri );
-                        build.append("--batchUri=").append(params.batchUri).append( " ");
+                        build.append("--batchUri=").append(params.batchUri).append(" ");
                     }
                     if ( !params.batchUriName.equals("") ) {
                         ff.println( "batchUriName=" + params.batchUri );
-                        build.append("--batchUriName=").append(params.batchUri).append( " ");
+                        build.append("--batchUriName=").append(params.batchUri).append(" ");
                     }
                 }
 
                 if ( params.rescalex!=null && !params.rescalex.equals("0%,100%") ) {
                     ff.println( "rescalex="+ params.rescalex );
-                    build.append("--rescalex=").append(params.rescalex).append( " ");
+                    build.append("--rescalex=").append(params.rescalex).append(" ");
                 }
                 if ( params.autorange ) {
                     ff.println( "autorange="+ params.autorange );
-                    build.append("--autorange=").append(params.autorange).append( " ");
+                    build.append("--autorange=").append(params.autorange).append(" ");
+                }
+                if ( params.autorangeFlags ) {
+                    ff.println( "autorangeFlags="+ params.autorangeFlags );
+                    build.append("--autorangeFlags=").append(params.autorangeFlags).append(" ");
                 }
                 if ( params.version!=null && params.version.trim().length()>0 ) {
                     ff.println( "version="+ params.version );
