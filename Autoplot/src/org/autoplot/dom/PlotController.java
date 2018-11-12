@@ -371,7 +371,13 @@ public class PlotController extends DomNodeController {
         int STEP_LIMIT=10000;
         if ( ds!=null &&  ds.rank()>0 && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(ds) ) ) {
             try {
-                QDataSet bounds= SemanticOps.bounds(ds).slice(0);
+                QDataSet bounds;
+                QDataSet xtags= SemanticOps.xtagsDataSet(ds);
+                if ( xtags!=null ) {
+                    bounds= SemanticOps.bounds(xtags).slice(1);
+                } else {
+                    bounds= SemanticOps.bounds(ds).slice(0);
+                }
                 if ( !validBounds(bounds) || !SemanticOps.getUnits(bounds).isConvertibleTo(dr.getUnits() ) || !DataSetUtil.asDatumRange(bounds).contains(dr) ) {
                     dr= dr.next();
                 } else {
