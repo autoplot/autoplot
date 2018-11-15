@@ -1017,8 +1017,8 @@ public class ApplicationModel {
 
         AWTEvent ev= Toolkit.getDefaultToolkit().getSystemEventQueue().peekEvent(DasUpdateEvent.DAS_UPDATE_EVENT_ID);
         if ( ev!=null ) {
-            logger.fine("bug 3574147: not getting thumbnail, because it would cause hang.");
-            return null; // bug 3574147
+            logger.fine("bug 917: not getting thumbnail, because it would cause hang.");
+            return null; // bug 917 on sourceforge was bug 3574147 on sourceforge
         }
 
         int w= getCanvas().getPreferredSize().width;
