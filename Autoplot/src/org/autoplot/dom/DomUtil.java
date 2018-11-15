@@ -577,8 +577,12 @@ public class DomUtil {
             node2List.add(idx, nodes1[idx]);
         }
 
-        //TODO: handle resort with Action.Move
+        if ( node1List.size()!=node2List.size() ) {
+            logger.warning("2057: bug where two nodes have the duplicate ID detected.");
+        }
         
+        //TODO: handle resort with Action.Move
+         
         if (isDomNode) {
             for (int i = 0; i < node1List.size(); i++) {
                 result.addAll(childDiffs(property + "[" + i + "]", getDiffs((DomNode)node1List.get(i), (DomNode)node2List.get(i))));
