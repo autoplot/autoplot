@@ -3180,7 +3180,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             syncSupport.syncAnnotations( that.getAnnotations() );
             
-            //resetIdSequenceNumbers();
+            resetIdSequenceNumbers();
         } finally {
             canvasLock.unlock();
             lock.unlock();
