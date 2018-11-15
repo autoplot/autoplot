@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Slices of each image of fireplace video creates new image.
+        <p><small>Garden Play House and Reflecting Pool temperatures are alive again, after the old Raspberry Pi died in a rain storm when the window was left open.  <a href='http://autoplot.org/data/tools/realTime.jy'>This script<a> updates the axis to the last 24 hours.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,9 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-11-11 r23043):</p>
-        <ul>
-            <li>add recCount and recStart controls to csv reader.
+        <p>Bugfixes (2018-11-15 r23054):</p>
+        <ul> 
+            <li>timeranges like 'lastday+P1D/P1D' now work, to represent "tomorrow".  Before only "lastday-" was handled.
+            <li>2058: devel release showed bug where not resetting IDs would cause failure in "clone to new application" and pngwalk generation.  Thanks Ivar and Masafumi!
+            <li>next and previous scan button updating was calling the 2-D bounds code when it only needed a bounds on X, causing performance issues.
+            <li>add recCount and recStart controls to CSV reader, so that create png events lists can be subsetted.
             <li>2054: study reference leaks for columns and rows.  Masafumi observed a new NullPointerException.
             <li>2056: tickleTimer would restart timer while its event was running, which for slow events can cause threads to build up, slowing or crashing machine.  Thanks, Masafumi!
             <li>filenames with colons (data_2019-01-01T00:00.dat) would not allow relative reference launch.  Now colons past the eighth position are ignored.
