@@ -1023,8 +1023,10 @@ public class ApplicationModel {
 
         int w= getCanvas().getPreferredSize().width;
         int h= getCanvas().getPreferredSize().height;
+        logger.finer("getting image from canvas..."); // 20181115: observed where this hangs, causing no undo.
         BufferedImage im= (BufferedImage) getCanvas().getImageNonPrint( w,h );
-
+        logger.finer("got image from canvas.");
+        
         if ( im.getHeight() / height > 3 ) {
             thickenLines(im);
         }
