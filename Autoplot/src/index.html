@@ -26,8 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-11-15 r23054):</p>
-        <ul> 
+        <p>Bugfixes (2018-11-16 r23062):</p>
+        <ul>
+            <li>2058: reset needs to reset id number sequencing.
+            <li>don't allow URI parameters to be preceded or followed by spaces.
+            <li>2025: corrections to initialization of HAPI dialog.
+            <li>2059: check for inconsistency when BINS_1 is used along with BUNDLE_1 imply differing units.
             <li>timeranges like 'lastday+P1D/P1D' now work, to represent "tomorrow".  Before only "lastday-" was handled.
             <li>2058: devel release showed bug where not resetting IDs would cause failure in "clone to new application" and pngwalk generation.  Thanks Ivar and Masafumi!
             <li>next and previous scan button updating was calling the 2-D bounds code when it only needed a bounds on X, causing performance issues.
