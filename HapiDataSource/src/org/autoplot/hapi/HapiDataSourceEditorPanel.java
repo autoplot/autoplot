@@ -866,7 +866,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         
         disableCacheCheckBox.setSelected( "F".equals(params.get("cache")) );
-        
+        messagesLabel.setText("Select dataset above");
     }
 
     @Override
