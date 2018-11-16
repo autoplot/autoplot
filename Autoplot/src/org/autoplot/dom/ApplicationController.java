@@ -2152,7 +2152,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             application.getPlots(0).getZaxis().setAutoRangeHints("");
             
             for ( int i=application.getBindings().length-1; i>=0; i-- ) {
-                deleteBinding( application.getBindings(i) );
+                removeBinding( application.getBindings(i) );
             }
             // one row within.
             Canvas c= application.getCanvases(0);
@@ -2211,7 +2211,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             application.setEventsListUri("");
             
-            //resetIdSequenceNumbers();
+            resetIdSequenceNumbers();
 
             //clean up controllers after seeing the junk left behind in the profiler.
             for ( PlotElement pe :application.getPlotElements() ) {
