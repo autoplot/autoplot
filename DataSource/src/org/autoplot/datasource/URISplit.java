@@ -829,7 +829,7 @@ public class URISplit {
                 name = name.replaceAll("%3D", "=" ); // https://sourceforge.net/tracker/?func=detail&aid=3049295&group_id=199733&atid=970682
                 result.put("arg_" + (argc++), name);
             } else {
-                name = s.substring(0, j);
+                name = s.substring(0, j).trim();
                 value = s.substring(j + 1);
                 if ( name.equals( URISplit.PARAM_TIME_RANGE ) ) {
                     value= value.replaceAll("\\+", " ");
