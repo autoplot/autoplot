@@ -179,7 +179,12 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     if ( currentId!=null && currentId.equals(selectedValue) ) {
                         return;
                     }
-                    currentId= selectedValue;
+                    if ( currentServer!=null ) {
+                        currentId= selectedValue;
+                    } else {
+                        currentId= null;
+                    }
+                    
                     if ( currentId==null ) {
                         titleLabel.setText(" ");
                         return;
