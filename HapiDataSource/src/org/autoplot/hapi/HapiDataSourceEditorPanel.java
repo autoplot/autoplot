@@ -220,7 +220,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         public void propertyChange(PropertyChangeEvent evt) {
             try {
                 String s= currentId;
-                if ( s!=null ) {
+                if ( s!=null && s.trim().length()>0 ) {
                     resetId( new URL( (String)serversComboBox.getSelectedItem() ), s );  
                 } else {
                     parametersPanel.removeAll();
