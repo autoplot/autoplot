@@ -213,6 +213,7 @@ public final class HapiDataSource extends AbstractDataSource {
         } else {
             result= (DDataSet)ArrayDataSet.copy( double.class, Ops.bundle( min, max ) );
             result.putProperty( QDataSet.BINS_1, QDataSet.VALUE_BINS_MIN_MAX );
+            result.putProperty( QDataSet.UNITS, min.property(QDataSet.UNITS) ); 
         }
         
         if ( binsObject.has("name") ) {
