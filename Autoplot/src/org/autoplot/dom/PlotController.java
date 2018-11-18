@@ -1242,8 +1242,14 @@ public class PlotController extends DomNodeController {
             String t= (String)titleConverter.convertForward( plot.getTitle() );
 
             dasPlot.setTitle( t );
-            dasPlot.getYAxis().setLabel( (String)plot.getYaxis().getController().labelConverter.convertForward( plot.getYaxis().getLabel() ) );
-            dasPlot.getXAxis().setLabel( (String)plot.getXaxis().getController().labelConverter.convertForward( plot.getXaxis().getLabel() ) );
+            AxisController xaxisController= plot.getXaxis().getController();
+            AxisController yaxisController= plot.getYaxis().getController();
+            if ( xaxisController==null || yaxisController==null ) return;
+            LabelConverter yaxisLabelConverter= yaxisController.labelConverter;
+            LabelConverter xaxisLabelConverter= xaxisController.labelConverter;
+            if ( xaxisLabelConverter==null || yaxisLabelConverter==null ) return;
+            dasPlot.getYAxis().setLabel( (String)yaxisLabelConverter.convertForward( plot.getYaxis().getLabel() ) );
+            dasPlot.getXAxis().setLabel( (String)xaxisLabelConverter.convertForward( plot.getXaxis().getLabel() ) );
             QDataSet pds= plotElement.getController().getDataSet();
             logger.log( Level.FINE, "{0} dataSetListener", plot);
             if ( pds!=null && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(pds)) ) {
