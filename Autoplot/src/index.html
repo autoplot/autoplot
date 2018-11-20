@@ -29,13 +29,13 @@
         <p>Bugfixes (2018-11-16 r23062):</p>
         <ul>
             <li>2058: reset needs to reset id number sequencing.
-            <li>don't allow URI parameters to be preceded or followed by spaces.
+            <li>don't allow URI parameters to be preceded or followed by spaces, improving support for cut-n-paste from emails.
             <li>2025: corrections to initialization of HAPI dialog.
             <li>2059: check for inconsistency when BINS_1 is used along with BUNDLE_1 imply differing units.
             <li>timeranges like 'lastday+P1D/P1D' now work, to represent "tomorrow".  Before only "lastday-" was handled.
             <li>2058: devel release showed bug where not resetting IDs would cause failure in "clone to new application" and pngwalk generation.  Thanks Ivar and Masafumi!
-            <li>next and previous scan button updating was calling the 2-D bounds code when it only needed a bounds on X, causing performance issues.
-            <li>add recCount and recStart controls to CSV reader, so that create png events lists can be subsetted.
+            <li>next and previous scan button updating was calling the 2-D bounds code when it only needed a bounds on X, causing performance issues.  Thanks Masafumi!
+            <li>add recCount and recStart controls to CSV reader, so that create png events lists can be subsetted.  Thanks Masafumi!
             <li>2054: study reference leaks for columns and rows.  Masafumi observed a new NullPointerException.
             <li>2056: tickleTimer would restart timer while its event was running, which for slow events can cause threads to build up, slowing or crashing machine.  Thanks, Masafumi!
             <li>filenames with colons (data_2019-01-01T00:00.dat) would not allow relative reference launch.  Now colons past the eighth position are ignored.
@@ -44,10 +44,10 @@
             <li>in DataPointRecorder's reset units, handle when nominal units are used in the table.  Thanks, Bill!
             <li>2051: rank 2 ytags was slow, when looking at a tiny slice in x.  Thanks, Masafumi!
             <li>2052: improve support for datumRange, URI, and URL parameters in Jython scripts, when creating GUIs.
-            <li>update to new certificate signatures for 2018-2019.
+            <li>update to new certificate signatures for 2018-2019.  Thanks, Larry!
             <li>NullPointerException when params was escaped.
             <li>2049: setLayout(3,3) gets IDs backwards.  Revert this change which breaks many old scripts.
-            <li>Orbits' definition files can be read via an HTTP redirect now.
+            <li>Orbits' definition files can be read via an HTTP redirect now.  Thanks, Larry!
             <li>NullPointerException would occur when type "Datum" was encountered, in a qstream Autoplot produced.
             <li>rfe609: handle case where 1-point dataset would mess up the autoranging.  Thanks, Masafumi!
             <li>invokeScriptSoon on the event thread, causing warning message and potentially hanging GUI during file download.
@@ -56,9 +56,9 @@
             <li>DataSources with parents (vap+internal:data_8,data_9,data_10) would get a progress bar not connected to any plot, which would grab the mouse focus during batch processing.
             <li>trim of rank 3 join would add empty tables for each table.  Instead this should only join the non-empty ones.  Thanks, Masafumi!
             <li>embed data in .vap option didn't check for ephemeris and events lists.
-            <li>HAPI properly handles when time is not in the list of parameters.
+            <li>HAPI properly handles when time is not in the list of parameters.  Thanks, Bob!
             <li>SeriesRenderer properly looks at cadenceCheck again.  Thanks, Ivar!
-            <li>2043: use HAPI_DATA environment variable to set the location of the cache.  Don't request data outside of the startDate, stopDate range.
+            <li>2043: use HAPI_DATA environment variable to set the location of the cache.  Don't request data outside of the startDate, stopDate range.  Thanks, Bob!
             <li>allow dataPointRecorder's select method to be called on or off the event thread.
             <li>2042: correction to the ticks code which would detect when new ticks were needed during pngwalk generation, sometimes failing.
             <li>2042: correct code which would resize the canvas in scripts running in headful mode, which would occasionally fail.
@@ -66,7 +66,7 @@
             <li>tweaks to pdb (Python debugger) support, trying to improve its utility.
             <li>some annotation position icons were missing.
             <li>StackedHistogram (peaks-and-averages) renderer max values could go past the min of the next channel, creating ambiguity.
-            <li>check for dark background color in Jython editor for warnings, program counter, and usages.
+            <li>rfe 643: check for dark background color in Jython editor for warnings, program counter, and usages.  
             <li>findbugs NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE.
             <li>When saving logger properties, logger inheritance was not considered, making an overly-explicit configuration.
             <li>Jython dataset(o) now allows o to be a tuple, and background=None uses a transparent background, other minor changes to annotation command.
@@ -104,16 +104,16 @@
         <p>Features:</p>
         <ul>
             <li>plot element style properties dialog now has cancel which will revert to original settings.
-            <li>add method for replacing the navigation panel in PNGWalk.
+            <li>add method for replacing the navigation panel in PNGWalk.  Thanks, Ivar!
             <li>Update to new CDF reader, where the source is available.
             <li>HAPI data is displayed with the units in the label.
-            <li>658: add method for adding right and left panels to the GUI, to develop custom applications.
+            <li>658: add method for adding right and left panels to the GUI, to develop custom applications.  Thanks, Jon V!
             <li>"add right-axis plot" which adds a plot at the same position but with a right-axis which is independent.  Thanks, Ivar!
-            <li>657: --noAskParams will prevent the script parameters / security verification from showing.
+            <li>657: --noAskParams will prevent the script parameters / security verification from showing.  Thanks, Bob!
             <li>write-pngwalk-from-events lists supports zero-width events, when using settings like "0%-1hr,100%+1hr"
             <li>export to very old vap formats, like 2013, removed because they are clutter.
             <li>support link(r2x,r2y,r2z) by flattening the three tables.
-            <li>catch http://.../hapi/data and make into HAPI URI.
+            <li>catch http://.../hapi/data and make into HAPI URI.  Thanks, Bob!
             <li>support for renderType="spectrogram>rebin=triScat"
             <li>LoggerManager.readConfiguration can read any file now, not just that named by -Djava.util.logging.config.file=...
         </ul>
