@@ -139,6 +139,9 @@ public class BatchMaster extends javax.swing.JPanel {
                     File scriptFile= DataSetURI.getFile( split.file, monitor );
                     String script= readScript( scriptFile );
 
+                    env.put( "dom", dom );
+                    env.put( "PWD", split.path );
+                    
                     Map<String,org.autoplot.jythonsupport.JythonUtil.Param> parms= Util.getParams( env, script, URISplit.parseParams(split.params), new NullProgressMonitor() );
 
                     String[] items= new String[parms.size()+1];
