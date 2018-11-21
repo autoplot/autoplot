@@ -778,6 +778,7 @@ public class BatchMaster extends javax.swing.JPanel {
         String script= readScript( scriptFile );
         
         env.put("dom",this.dom);
+        env.put("PWD",pwd);
                                 
         Map<String,Param> parms= Util.getParams( env, script, params, new NullProgressMonitor() );
 
@@ -953,6 +954,7 @@ public class BatchMaster extends javax.swing.JPanel {
             Map<String,String> params= URISplit.parseParams(split.params);
             Map<String,Object> env= new HashMap<>();
             env.put("dom",this.dom);
+            env.put("PWD",pwd);
 
             File scriptFile= DataSetURI.getFile( split.file, monitor.getSubtaskMonitor("download script") );
             String script= readScript( scriptFile );
