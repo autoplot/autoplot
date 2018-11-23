@@ -46,6 +46,9 @@
             <li>in DataPointRecorder's reset units, handle when nominal units are used in the table.  Thanks, Bill!
             <li>2051: rank 2 ytags was slow, when looking at a tiny slice in x.  Thanks, Masafumi!
             <li>2052: improve support for datumRange, URI, and URL parameters in Jython scripts, when creating GUIs.
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>update to new certificate signatures for 2018-2019.  Thanks, Larry!
             <li>NullPointerException when params was escaped.
             <li>2049: setLayout(3,3) gets IDs backwards.  Revert this change which breaks many old scripts.
@@ -74,38 +77,12 @@
             <li>Jython dataset(o) now allows o to be a tuple, and background=None uses a transparent background, other minor changes to annotation command.
             <li>when a stack trace is processed in Jython, to jump to the error, allow the stack trace to be deeper, to support Geopack file.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>"about Autoplot" page had the wrong version number.
-            <li>2038: ephemeris labels didn't line up with the values for some tick lengths.
-            <li>digitizer labels were not set properly for the addDataPoint(rank1bundle) method, because getComponentNames did not support rank 1 bundle.
-            <li>rte_1888141829: digitizer table could only load files containing nominal data if the nominal datums had been created already.
-            <li>2037: correctly read valid_min, valid_max, and fill_value from DSCOVR mission NetCDF files.
-            <li>2013: loading vap should not automatically move spectrograms under line plots.
-            <li>improve error feedback when DatumRange string is passed to the Datum parser.
-            <li>2034: reset method must cancel existing monitors on the reset thread.
-            <li>2032: extraneous decimal point in tick labels.
-            <li>peaks in stacked histogram renderer didn't clip properly.  Thanks, Chris!
-            <li>2029: cdaweb filter apply_esa_flag used old code that relied on monitor reuse, which is no longer allowed.
-            <li>2029: CDF virtual variables would not load because of tighter handling of monitors and sloppy code.
-            <li>CDF source's slice1 parameter should better match |slice1.
-            <li>add TableRowSorter which minds the data type.  Thanks, Masafumi for pointing this out!
-            <li>rename codes within CDF reader to be more consistent.
-            <li>completions work when coding in indented bug.
-            <li>2025: HAPI GUI failed to initialize properly when the id was already set.
-            <li>rte_1870708520: catch runtime exception when trying to find aggregations.
-            <li>2016: plot title macros should always listen to the first plotElement.
-            <li>Findbugs tests restored and a round of Findbugs citations were resolved.
-            <li>Auralizer code would show index out of bounds with some data, check for constant data. 
-            <li>AggregatingDataSourceFactory.getFileStorageModel(uri) would fail if the uri didn't have any fields.  Thanks, Ivar!
-            <li>Fits reader supports where default object is not a readable table.
-            <li>Matlab export options was using the IDL options dialog.
-            <li>horizontal and vertical slicers allow units sloppiness.  Thanks, Chris!
-            <li>"clean" method removed from Matlab export to support compiling under Java 9.  Thanks, Dan!
-        </ul>
         <p>Features:</p>
         <ul>
             <li>plot element style properties dialog now has cancel which will revert to original settings.
+        </ul>
+       <p>Less recent features:</p>
+       <ul>
             <li>add method for replacing the navigation panel in PNGWalk.  Thanks, Ivar!
             <li>Update to new CDF reader, where the source is available.
             <li>HAPI data is displayed with the units in the label.
@@ -118,16 +95,6 @@
             <li>catch http://.../hapi/data and make into HAPI URI.  Thanks, Bob!
             <li>support for renderType="spectrogram>rebin=triScat"
             <li>LoggerManager.readConfiguration can read any file now, not just that named by -Djava.util.logging.config.file=...
-        </ul>
-       <p>Less recent features:</p>
-       <ul>
-            <li>PNGWalkTool's write-to-PDF now writes caption below, supporting long captions, and includes lines for notes and the file name.
-            <li>Jython dataset command now allows dataset(x,y,z) as an experimental alternate to the link command.
-            <li>add FileUtil.readFileToString, to simplify scripts.
-            <li>checkCadence==False is respected by the spectrogram renderer with most rebin types.
-            <li>annotations now have scale property, to support 300dpi printing of externally rendered LaTeX.
-            <li>DDataSet slice checks for out-of-bounds on slice, producing a more readable error.
-            <li>CDF reader shows data types, record count, block size, and varies flag.
        </ul>
         <p>Known issues:</p>
         <ul>
