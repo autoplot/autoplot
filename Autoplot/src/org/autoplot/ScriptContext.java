@@ -1860,6 +1860,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
     public static void reset() {
         maybeInitModel();
         dom.getController().reset();
+        getApplication().getUndoRedoSupport().resetHistory();
     }
 
     /**
