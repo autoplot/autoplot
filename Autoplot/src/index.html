@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2018-11-21 r23066):</p>
         <ul>
+            <li>scripting reset method didn't reset undo/redo operations, potentially causing object leaks.
             <li>2062: Run batch facility didn't properly set PWD, causing runtime exception.
             <li>2054: any NullPointerException when a leftover thread assumed the controller reference was still valid.
             <li>2058: reset needs to reset id number sequencing.
