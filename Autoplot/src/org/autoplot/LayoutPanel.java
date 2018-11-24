@@ -36,6 +36,7 @@ import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -637,12 +638,12 @@ public class LayoutPanel extends javax.swing.JPanel {
                     if ( rend!=null ) {
                         javax.swing.Icon icon= rend.getListIcon();
                         label.setIcon(icon);
-                        rend.addPropertyChangeListener( new PropertyChangeListener() {
-                            @Override
-                            public void propertyChange(PropertyChangeEvent evt) {
-                                plotElementListComponent.repaint();
-                            }
-                        });
+                        //rend.addPropertyChangeListener( new PropertyChangeListener() {
+                        //    @Override
+                        //    public void propertyChange(PropertyChangeEvent evt) {
+                        //        plotElementListComponent.repaint();
+                        //    }
+                        //});
                     }
                 }
             }
@@ -662,6 +663,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                 return foo[index];
             }
         };
+        plotElementListComponent.removeAll();
         plotElementListComponent.setModel(elementsList);
         plotElementListComponent.setCellRenderer( myListCellRenderer );
     }
@@ -715,38 +717,32 @@ public class LayoutPanel extends javax.swing.JPanel {
         bindingListComponent.setModel(elementsList);
         bindingListComponent.repaint();
     }
-
-    private void updateDataSourceList() {
-        final List list= new ArrayList( Arrays.asList(dom.getDataSourceFilters() ) );
-        AbstractListModel elementsList = new AbstractListModel() {
-            @Override
-            public int getSize() {
-                return list.size();
-            }
-            @Override
-            public Object getElementAt(int index) {
-                return list.get(index);
-            }
-        };
-        dataSourceList.setCellRenderer( new DefaultListCellRenderer()  {
-            @Override
-            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                JLabel l= (JLabel)super.getListCellRendererComponent( list, value, index, isSelected, cellHasFocus );
-                DataSourceFilter dsf= (DataSourceFilter)value;
-                if ( dsf.getController().getTsb()!=null ) {
-                    l.setIcon( new ImageIcon( LayoutPanel.class.getResource("/resources/blue.gif" ) ) );
-                    l.setToolTipText( "<html>"+dsf.getUri()+"<br>Data source provides Time Series Browsing");
+    
+    private class MyListCellRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            JLabel l= (JLabel)super.getListCellRendererComponent( list, value, index, isSelected, cellHasFocus );
+            DataSourceFilter dsf= (DataSourceFilter)value;
+            if ( dsf.getController().getTsb()!=null ) {
+                l.setIcon( new ImageIcon( LayoutPanel.class.getResource("/resources/blue.gif" ) ) );
+                l.setToolTipText( "<html>"+dsf.getUri()+"<br>Data source provides Time Series Browsing");
+            } else {
+                l.setIcon( new ImageIcon( LayoutPanel.class.getResource("/org/autoplot/resources/idle-icon.png" ) ) );
+                if ( dsf.getUri().length()==0 ) {
+                    l.setToolTipText(null);
                 } else {
-                    l.setIcon( new ImageIcon( LayoutPanel.class.getResource("/org/autoplot/resources/idle-icon.png" ) ) );
-                    if ( dsf.getUri().length()==0 ) {
-                        l.setToolTipText(null);
-                    } else {
-                        l.setToolTipText( "<html>"+dsf.getUri() );
-                    }
+                    l.setToolTipText( "<html>"+dsf.getUri() );
                 }
-                return l;
             }
-        });
+            return l;
+        }
+    }
+    
+    private void updateDataSourceList() {
+        final List<DataSourceFilter> list= new ArrayList( Arrays.asList(dom.getDataSourceFilters() ) );
+        DefaultListModel elementsList = new DefaultListModel();
+        for ( DataSourceFilter dsf: list ) elementsList.addElement(dsf);
+        dataSourceList.setCellRenderer( new MyListCellRenderer() );
         dataSourceList.setModel(elementsList);
         dataSourceList.repaint();
     }    
