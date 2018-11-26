@@ -626,7 +626,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         }        
     }
 
-    private ListCellRenderer myListCellRenderer=  new DefaultListCellRenderer() {
+    private ListCellRenderer plotElementListCellRenderer=  new DefaultListCellRenderer() {
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             final javax.swing.JLabel label= (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
@@ -665,7 +665,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         };
         plotElementListComponent.removeAll();
         plotElementListComponent.setModel(elementsList);
-        plotElementListComponent.setCellRenderer( myListCellRenderer );
+        plotElementListComponent.setCellRenderer( plotElementListCellRenderer );
     }
 
     private void updatePlotElementList() {
@@ -718,7 +718,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         bindingListComponent.repaint();
     }
     
-    private class MyListCellRenderer extends DefaultListCellRenderer {
+    ListCellRenderer dsfListCellRenderer= new DefaultListCellRenderer() {
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             JLabel l= (JLabel)super.getListCellRendererComponent( list, value, index, isSelected, cellHasFocus );
@@ -736,13 +736,13 @@ public class LayoutPanel extends javax.swing.JPanel {
             }
             return l;
         }
-    }
+    };
     
     private void updateDataSourceList() {
         final List<DataSourceFilter> list= new ArrayList( Arrays.asList(dom.getDataSourceFilters() ) );
         DefaultListModel elementsList = new DefaultListModel();
         for ( DataSourceFilter dsf: list ) elementsList.addElement(dsf);
-        dataSourceList.setCellRenderer( new MyListCellRenderer() );
+        dataSourceList.setCellRenderer( dsfListCellRenderer );
         dataSourceList.setModel(elementsList);
         dataSourceList.repaint();
     }    
