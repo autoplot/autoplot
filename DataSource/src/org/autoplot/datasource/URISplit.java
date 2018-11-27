@@ -155,8 +155,8 @@ public class URISplit {
      * ensure that the reference, which may be relative, absolute.
      * NOTE this is only implemented for unix filenames. TODO: Windows.
      * For example:<ul>
-     * <li>/tmp/,foo.dat -> /home/t/foo.dat
-     * <li>/tmp/,/home/jbf/foo.dat -> /home/jbf/foo.dat
+     * <li>/tmp/,foo.dat &rarr; /home/t/foo.dat
+     * <li>/tmp/,/home/jbf/foo.dat &rarr; /home/jbf/foo.dat
      * </ul>
      * @param path the absolute directory.
      * @param suri the URI, which may be relative to path.
