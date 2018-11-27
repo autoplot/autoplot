@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Autoplot is used to diagnose a problem when identifying continuous L-shell sweeps.
+        <p><small>SciPy "Plasma" colorbar nicely shows minute structure at different levels.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-11-21 r23066):</p>
+        <p>Bugfixes (2018-11-26 r23076):</p>
         <ul>
+            <li>2063: "convertUnitsTo" didn't properly reset the DOM range, when it reset the implementing DasAxis range.
+            <li>2054: object leaks which occur as the GUI follows focus are corrected.
+            <li>LICENSE.txt should be LGPL, not GPL.
             <li>scripting reset method didn't reset undo/redo operations, potentially causing object leaks.
             <li>2062: Run batch facility didn't properly set PWD, causing runtime exception.
             <li>2054: any NullPointerException when a leftover thread assumed the controller reference was still valid.
