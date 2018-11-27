@@ -35,6 +35,7 @@ public class TcaElementDialog extends javax.swing.JDialog {
         initComponents();
         setLocationRelativeTo(parent);
         primaryDataSetSelector.setPlotItButtonVisible(false);
+        primaryDataSetSelector.setPlayButton(false); // TODO: did I add the same control twice?
         DefaultComboBoxModel m= new DefaultComboBoxModel();
         m.addElement("Add from...");
         final List<String> ss= DataSetURI.getSortedDiscoverableExtentions();
