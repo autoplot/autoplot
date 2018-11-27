@@ -950,11 +950,12 @@ public class URISplit {
      * The problem is we want valid URIs that are also readable, so just using
      * simple encode/decode logic is not practical.
      *
-     * This means:
-     * - no spaces
-     * - contains %[0-9][0-9]
-     * @param surl
-     * @return
+     * This means:<ul>
+     * <li> no spaces
+     * <li> contains %[0-9][0-9]
+     * </ul>
+     * @param surl the URI
+     * @return true if it appears to be encoded.
      */
     public static boolean isUriEncoded( String surl ) {
         boolean result= false;
@@ -968,8 +969,8 @@ public class URISplit {
     /**
      * convert " " to "%20", etc, by looking for and encoding illegal characters.
      * We can't just aggressively convert...
-     * @param surl 
-     * @return
+     * @param surl the URI
+     * @return the URL-encoded URI
      */
     public static String uriEncode(String surl) {
         if ( isUriEncoded(surl) ) return surl;
