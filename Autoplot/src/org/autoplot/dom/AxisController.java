@@ -226,6 +226,7 @@ public class AxisController extends DomNodeController {
         DatumRange oldRange=dasAxis.getDatumRange();
         DatumRange newRange= DatumRange.newDatumRange( oldRange.min().doubleValue(nu), oldRange.max().doubleValue(nu), nu );
         dasAxis.resetRange(newRange);
+        axis.setRange(newRange);
     }
 
     private Converter getOppositeConverter( Axis axis, final DasAxis dasAxis ) {
