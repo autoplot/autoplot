@@ -3,6 +3,7 @@ package org.autoplot.dom;
 
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
@@ -542,6 +543,8 @@ public class PlotController extends DomNodeController {
         }
     }
     
+    PropertyChangeListener xaxisRangeListener;
+            
     private void createDasPeerImmediately( Canvas canvas, Row domRow, Column domColumn ) {
                 
         Application application= dom;
@@ -566,7 +569,7 @@ public class PlotController extends DomNodeController {
             }
         });
         
-        xaxis.addPropertyChangeListener( DasAxis.PROPERTY_DATUMRANGE, new PropertyChangeListener() {
+        xaxisRangeListener= new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 LoggerManager.logPropertyChangeEvent(evt,"xaxis datumrange");  
@@ -574,9 +577,10 @@ public class PlotController extends DomNodeController {
                     nextPrevTickleTimer.tickle();
                 }
             }
-        });
+        };
+        xaxis.addPropertyChangeListener( DasAxis.PROPERTY_DATUMRANGE, xaxisRangeListener );
 
-        xaxis.setNextAction( "scan", new AbstractAction( "scannext" ) {
+        AbstractAction nextListener= new AbstractAction( "scannext" ) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);
@@ -594,9 +598,10 @@ public class PlotController extends DomNodeController {
                     xaxis.setDatumRange(dr);
                 }
             }
-        });
+        };
+        xaxis.setNextAction( "scan", nextListener );
 
-        xaxis.setPreviousAction( "scan", new AbstractAction( "scanprev" ) {
+        AbstractAction prevListener= new AbstractAction( "scanprev" ) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);                
@@ -618,7 +623,8 @@ public class PlotController extends DomNodeController {
                     xaxis.setDatumRange(dr);
                 }
             }
-        });
+        };
+        xaxis.setPreviousAction( "scan", prevListener );
 
         if (UnitsUtil.isTimeLocation(xaxis.getUnits())) {
             xaxis.setUserDatumFormatter(new DateTimeDatumFormatter(dom.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 )); //See kludge in TimeSeriesBrowseController
@@ -1880,6 +1886,7 @@ public class PlotController extends DomNodeController {
                 }
             } );
         }
+        p.getDasMouseInputAdapter().releaseAll();
     }
 
     private synchronized void bindTo(DasPlot p) {
@@ -1956,6 +1963,12 @@ public class PlotController extends DomNodeController {
         this.plot.removePropertyChangeListener( Plot.PROP_ROWID, rowColListener );
         this.plot.removePropertyChangeListener( Plot.PROP_COLUMNID, rowColListener );
         //System.err.println("removeBindings "+i+" -> "+dom.options.boundCount() );
+        final DasAxis a= p.getXAxis();
+        a.removePropertyChangeListener( xaxisRangeListener );
+        a.setPreviousAction( "scan", null );
+        a.setNextAction( "scan", null );
+        expertMenuItems= null;
+        this.pdListen= null;
     }
     
     /** 
