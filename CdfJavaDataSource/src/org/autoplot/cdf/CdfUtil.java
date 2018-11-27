@@ -541,8 +541,8 @@ public class CdfUtil {
         if ( recCount==0 ) throw new IllegalArgumentException("recCount must be greater than 0 or -1");
         if ( recCount<-1 ) throw new IllegalArgumentException("recCount must be greater than -1");
         
-        logger.log(Level.FINE, "loadVariable {0}[{1}:{2}:{3}]", new Object[] { svariable, String.valueOf(recStart), // no commas in {1}
-                 ""+(recCount+recStart), recInterval } );
+        logger.log(Level.FINE, "loadVariable {0}[{1}:{2}:{3}] slice1={4}", new Object[] { svariable, String.valueOf(recStart), // no commas in {1}
+                 ""+(recCount+recStart), recInterval, slice1 } );
         
         //MutablePropertyDataSet cresult= maybeGetCached( cdf, svariable, recStart, recCount, recInterval );
         //if ( cresult!=null ) return cresult;
@@ -666,7 +666,9 @@ public class CdfUtil {
         
         if ( slice1>-1 && qube.length>1 ) {
             buf[0]= doSlice1( buf[0], varType, qube, slice1, cdf.rowMajority() );
-            if ( recCount==-1 ) throw new IllegalArgumentException("recCount==-1 and slice1>-1");
+            if ( recCount==-1 ) {
+                throw new IllegalArgumentException("recCount==-1 and slice1>-1 when loading "+svariable);
+            }
             int[] nqube= new int[qube.length-1];
             nqube[0]= qube[0];
             for ( int i=2;i<qube.length;i++ ) {
