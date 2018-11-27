@@ -1001,7 +1001,7 @@ public class CdfDataSource extends AbstractDataSource {
             int slice1, 
             ProgressMonitor mon) throws Exception, ParseException {
         
-        logger.log(Level.FINE, "loadVariableAndDependents {0} constraints={1} dependVar={2} slice1={3}", new Object[] { svariable, constraints, loadDependents, slice1 } );
+        logger.log(Level.FINE, "loadVariableAndDependents {0} constraints={1} dependVar={2} slice1={3} reform={4}", new Object[] { svariable, constraints, loadDependents, slice1, reform } );
         if ( !hasVariable(cdf, svariable) ) {
             throw new IllegalArgumentException( "No such variable: "+svariable );
         }
@@ -1057,6 +1057,10 @@ public class CdfDataSource extends AbstractDataSource {
             long[] slice1s= mc.get(1);
             if ( slice1s!=null && ( slice1s[0]!=-1 && slice1s[1]==-1 && slice1s[2]==-1 ) ) {
                 slice1= (int)(slice1s[0]);
+                if ( reform ) {
+                    logger.fine("clearing reform flag because of slice1");
+                    reform= false;
+                }
             }
         }        
         
