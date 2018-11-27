@@ -115,9 +115,14 @@ public class DataSetURI {
 
     /**
      * returns the explicit extension, or the file extension if found, or null.
-     * The extension will not contain a period.
+     * The extension will not contain a period.  
+     * Inputs include:<ul>
+     * <li>ac_h2_cris_20111221_v06.cdf &rarr; "cdf"
+     * <li>/tmp/ac_h2_cris_20111221_v06.cdf &rarr; "cdf"
+     * <li>/tmp/ac_h2_cris_20111221_v06 &rarr; null
+     * </ul>
      * @param surl
-     * @return the extension found, or null if no period is found in the filename.
+     * @return the extension found, without the ".", or null if no period is found in the filename.
      */
     public static String getExt(String surl) {
         if ( surl==null ) throw new NullPointerException();
@@ -127,7 +132,6 @@ public class DataSetURI {
         } else {
             URISplit split = URISplit.parse(surl);
             if (split.file != null) {
-
                 int i0 = split.file.lastIndexOf('/');
                 if (i0 == -1) return null;
                 int i1 = split.file.lastIndexOf('.');
@@ -137,7 +141,16 @@ public class DataSetURI {
                     return null;
                 }
             } else {
-                return null;
+                if ( !surl.contains("/") && !surl.contains("\\") ) { // \\ is for Windows.
+                    int i= surl.lastIndexOf(".");
+                    if ( i>-1 ) {
+                        return surl.substring(i+1);
+                    } else {
+                        return null;
+                    }
+                } else {
+                    return null;
+                }
             }
         }
     }
