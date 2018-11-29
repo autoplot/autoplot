@@ -891,7 +891,7 @@ public class BatchMaster extends javax.swing.JPanel {
      * @throws IOException 
      */
     public void doIt() throws IOException {
-        ProgressMonitor monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(this), "Run Batch");
+        final ProgressMonitor monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(this), "Run Batch");
 
         Icon queued= new ImageIcon(BatchMaster.class.getResource("/resources/grey.gif"));
         Icon working= new ImageIcon(BatchMaster.class.getResource("/resources/blue_anime.gif"));
@@ -994,7 +994,12 @@ public class BatchMaster extends javax.swing.JPanel {
                     jobs.get(i1).setIcon(working);
                     if ( f1.trim().length()==0 ) continue;
                     //interp.set( "monitor", monitor.getSubtaskMonitor(f1) );
-                    interp.set( "monitor", new NullProgressMonitor() ); // subtask would reset indeterminate.
+                    interp.set( "monitor", new NullProgressMonitor() {
+                        @Override
+                        public boolean isCancelled() {
+                            return monitor.isCancelled();
+                        }
+                    }); // subtask would reset indeterminate.
                     interp.set( "dom", this.dom );
                     interp.set( "PWD", split.path );
                     String paramName= param1NameCB.getSelectedItem().toString();
