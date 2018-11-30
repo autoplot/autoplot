@@ -926,6 +926,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     if (result != null ) {
                         dataSetSelector.setValue(result);
                         dataSetSelector.maybePlot(false);
+                        pendingVap= result;
                         blurFocus= true;
                     }
                 } else {
