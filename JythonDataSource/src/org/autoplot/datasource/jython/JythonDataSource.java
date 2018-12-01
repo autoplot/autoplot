@@ -430,7 +430,12 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             } else if ( result instanceof PyFloat ) {
                 res = JythonOps.dataset((PyFloat) result);
             } else {
-                res = (QDataSet) result.__tojava__(QDataSet.class);
+                try {
+                    res = (QDataSet) result.__tojava__(QDataSet.class);
+                } catch ( ClassCastException ex ) {
+                    Object os= (Object) result.__tojava__(Object.class);
+                    throw new IllegalArgumentException("variable is not a dataset: "+expr + " ("+os.toString()+")" );
+                }
             }
 
             if ( label!=null && res instanceof MutablePropertyDataSet ) {
