@@ -851,7 +851,10 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
         editDescriptionButton.setEnabled( true );
         editDescriptionButton.setText( remoteUrl.length()==0 ? "Edit" : "View" );
         titleTextField.setEditable(remoteUrl.length()==0);
-
+        plotButton.setEnabled( b instanceof Bookmark.Item );
+        overplotButton.setEnabled( b instanceof Bookmark.Item );
+        plotBelowButton.setEnabled( b instanceof Bookmark.Item );
+        editButton.setEnabled( b instanceof Bookmark.Item );
     } else {
         titleTextField.setText("");
         descriptionTextField.setText("");
@@ -861,6 +864,10 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
         viewDetailsButton.setEnabled(false);
         viewDetailsButton.setToolTipText("(no details URL)");
         titleTextField.setEditable(false);
+        plotButton.setEnabled( false );
+        overplotButton.setEnabled( false );
+        plotBelowButton.setEnabled( false );
+        editButton.setEnabled( false );
     }
 }//GEN-LAST:event_jTree1ValueChanged
 
