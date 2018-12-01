@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>IBEX data from CDAWeb.
+        <p><small>IBEX data from CDAWeb, using strange font to explore where font metrics are mishandled.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-11-30 r23090):</p>
+        <p>Bugfixes (2018-12-01 r23095):</p>
         <ul>
+            <li>2067: a multi-line colorbar label was not center-justified.  Thanks, Ivar!
+            <li>rte_1659505011: improve feedback in the Bookmarks GUI, for example where you can "plot" a bookmarks folder.
+            <li>rte_0577071170: improve feedback with Jython Data Source when a non-plottable variable unintentionally selected.  Thanks Kris!
+            <li>2054: object leaks which occur as the GUI follows focus are corrected.
             <li>2066: check for negative font metrics getDescent, which would cause the axis ticks to clip.
             <li>inspect button to look for .vap files works again.
             <li>"run batch" cancel button cancels the sub-task.
@@ -35,7 +39,6 @@
             <li>2064: MMS mms1_edi_vdrift_gse_srvy_l2[:,1]&x=mms1_edi_t_delta_plus_srvy_l2&y=mms1_edi_e_dsl_srvy_l2[:,1] works properly now, where reform flag was incorrectly set.  Thanks, sritam!
             <li>"Open Local File" would only show files when "show all" was selected.  Thanks, Bob!
             <li>2063: "convertUnitsTo" didn't properly reset the DOM range, when it reset the implementing DasAxis range.  Thanks, Masafumi!
-            <li>2054: object leaks which occur as the GUI follows focus are corrected.
             <li>LICENSE.txt should be LGPL, not GPL.
             <li>scripting reset method didn't reset undo/redo operations, potentially causing object leaks.
             <li>2062: Run batch facility didn't properly set PWD, causing runtime exception.
@@ -49,7 +52,7 @@
             <li>next and previous scan button updating was calling the 2-D bounds code when it only needed a bounds on X, causing performance issues.  Thanks Masafumi!
             <li>add recCount and recStart controls to CSV reader, so that create png events lists can be subsetted.  Thanks Masafumi!
             <li>2056: tickleTimer would restart timer while its event was running, which for slow events can cause threads to build up, slowing or crashing machine.  Thanks, Masafumi!
-            <li>filenames with colons (data_2019-01-01T00:00.dat) would not allow relative reference launch.  Now colons past the eighth position are ignored.
+            <li>filenames with colons (data_2019-01-01T00:00.dat) would not allow relative reference launch.  Now colons past the eighth position are ignored.  Thanks, Chris!
             <li>2053: timerange macro doesn't update as timerange changes.
             <li>"delete plot" didn't check to see if there were columns which could be deleted.
             <li>in DataPointRecorder's reset units, handle when nominal units are used in the table.  Thanks, Bill!
