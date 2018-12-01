@@ -285,6 +285,7 @@
         </Property>
         <Property name="text" type="java.lang.String" value="Plot"/>
         <Property name="toolTipText" type="java.lang.String" value="Plot the URI in the current focus position"/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="plotButtonActionPerformed"/>
@@ -293,6 +294,7 @@
     <Component class="javax.swing.JButton" name="plotBelowButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Plot Below"/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="plotBelowButtonActionPerformed"/>
@@ -301,6 +303,7 @@
     <Component class="javax.swing.JButton" name="overplotButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Overplot"/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="overplotButtonActionPerformed"/>
@@ -323,6 +326,7 @@
         </Property>
         <Property name="text" type="java.lang.String" value="Edit"/>
         <Property name="toolTipText" type="java.lang.String" value="Inspect this resource before plotting.  If an editor is available, this will enter the editor before plotting."/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editButtonActionPerformed"/>

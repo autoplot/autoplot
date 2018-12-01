@@ -555,6 +555,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         plotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/go.png"))); // NOI18N
         plotButton.setText("Plot");
         plotButton.setToolTipText("Plot the URI in the current focus position");
+        plotButton.setEnabled(false);
         plotButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 plotButtonActionPerformed(evt);
@@ -562,6 +563,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         });
 
         plotBelowButton.setText("Plot Below");
+        plotBelowButton.setEnabled(false);
         plotBelowButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 plotBelowButtonActionPerformed(evt);
@@ -569,6 +571,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         });
 
         overplotButton.setText("Overplot");
+        overplotButton.setEnabled(false);
         overplotButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 overplotButtonActionPerformed(evt);
@@ -587,6 +590,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         editButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/fileMag.png"))); // NOI18N
         editButton.setText("Edit");
         editButton.setToolTipText("Inspect this resource before plotting.  If an editor is available, this will enter the editor before plotting.");
+        editButton.setEnabled(false);
         editButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editButtonActionPerformed(evt);
@@ -1126,7 +1130,7 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
 
 /**
  * provide a means to get the selection.
- * @param listener 
+ * @return the selected bookmark  
  */
 public Bookmark getSelectedBookmark( ) {
     return model.getSelectedBookmark( jTree1.getModel(), jTree1.getSelectionPath() );
