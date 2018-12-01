@@ -135,7 +135,7 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
         //man.setPrefNode("tca");
         man.setVisible(true);
         Bookmark book= man.getSelectedBookmark();
-        if ( book!=null ) {
+        if ( book!=null && book instanceof Bookmark.Item ) {
             sel.setValue( ((Bookmark.Item)book).getUri() );
         }
     }
