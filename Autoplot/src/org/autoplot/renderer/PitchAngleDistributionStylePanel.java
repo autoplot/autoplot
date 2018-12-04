@@ -199,6 +199,9 @@ public class PitchAngleDistributionStylePanel extends javax.swing.JPanel impleme
     }
      
     private void updateGUI( Renderer renderer ) {
+        if ( renderer==null ) {
+            return; // when I was working on Kris' stuff for AGU 2018
+        }
         this.control= renderer.getControl();
         mirrorCB.setSelected( renderer.getBooleanControl( "mirror", false ) );
         drawPolarAxesCB.setSelected( renderer.getBooleanControl( "drawPolarAxes", false ) );
