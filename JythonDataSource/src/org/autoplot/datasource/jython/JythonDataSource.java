@@ -438,7 +438,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 }
             }
 
-            if ( label!=null && res instanceof MutablePropertyDataSet ) {
+            if ( label!=null && res instanceof MutablePropertyDataSet && !((MutablePropertyDataSet)res).isImmutable() ) {
                 if ( res.property( QDataSet.LABEL )==null ) {
                    ((MutablePropertyDataSet)res).putProperty( QDataSet.LABEL, label );
                 }
