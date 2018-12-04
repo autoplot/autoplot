@@ -5626,23 +5626,34 @@ APSplash.checkTime("init 240");
      * side of the application.
      * @param c null or the component to add
      */
-    public void setLeftPanel( JComponent c ) {
-        if ( leftPanel!=null ) tabbedPanelContainer.remove(leftPanel);
+    public void setLeftPanel( final JComponent c ) {
         if ( c==null ) throw new NullPointerException("use clearLeftPanel");
-        JScrollPane p= new JScrollPane();
-        p.setViewportView(c);
-        tabbedPanelContainer.add( p, BorderLayout.WEST );
-        leftPanel= p;
-        revalidate();
+        Runnable run= new Runnable() {
+            public void run() {
+                if ( leftPanel!=null ) tabbedPanelContainer.remove(leftPanel);
+                JScrollPane p= new JScrollPane();
+                p.setViewportView(c);
+                tabbedPanelContainer.add( p, BorderLayout.WEST );
+                leftPanel= p;
+                revalidate();
+            }
+        };
+        SwingUtilities.invokeLater(run);
     }
 
     /**
-     * remove any extra component added to the left of the tabs.
+     * remove any extra component added to the left of the tabs.  This calls invokeLater to make sure
+     * the event is on the event thread.
      */
     public void clearLeftPanel() {
-        if ( leftPanel!=null ) tabbedPanelContainer.remove(leftPanel);
-        leftPanel= null;
-        revalidate();
+        Runnable run= new Runnable() {
+            public void run() {
+                if ( leftPanel!=null ) tabbedPanelContainer.remove(leftPanel);
+                leftPanel= null;
+                revalidate();
+            }
+        };
+        SwingUtilities.invokeLater(run);
     }
     
     JComponent rightPanel= null;
@@ -5652,24 +5663,33 @@ APSplash.checkTime("init 240");
      * side of the application.
      * @param c  null or the component to add
      */
-    public void setRightPanel( JComponent c ) {
-        tabbedPanelContainer.getComponents();
-        if ( rightPanel!=null ) tabbedPanelContainer.remove(rightPanel);
+    public void setRightPanel( final JComponent c ) {
         if ( c==null ) throw new NullPointerException("use clearRightPanel");
-        JScrollPane p= new JScrollPane();
-        p.setViewportView(c);
-        tabbedPanelContainer.add( p, BorderLayout.EAST );
-        rightPanel= p;
-        revalidate();
+        Runnable run= new Runnable() {
+            public void run() {
+                if ( rightPanel!=null ) tabbedPanelContainer.remove(rightPanel);
+                JScrollPane p= new JScrollPane();
+                p.setViewportView(c);
+                tabbedPanelContainer.add( p, BorderLayout.EAST );
+                rightPanel= p;
+                revalidate();
+            }
+        };
+        SwingUtilities.invokeLater(run);
     }
 
     /**
      * remove any extra component added to the right of the tabs.
      */
     public void clearRightPanel() {
-        if ( rightPanel!=null ) tabbedPanelContainer.remove(rightPanel);
-        rightPanel= null;
-        revalidate();
+        Runnable run= new Runnable() {
+            public void run() {
+                if ( rightPanel!=null ) tabbedPanelContainer.remove(rightPanel);
+                rightPanel= null;
+                revalidate();
+            } 
+        };
+        SwingUtilities.invokeLater(run);
     }
     
     JComponent bottomPanel= null;
@@ -5679,24 +5699,33 @@ APSplash.checkTime("init 240");
      * status indicator
      * @param c  null or the component to add
      */
-    public void setBottomPanel( JComponent c ) {
-        tabbedPanelContainer.getComponents();
-        if ( bottomPanel!=null ) tabbedPanelContainer.remove(bottomPanel);
+    public void setBottomPanel( final JComponent c ) {
         if ( c==null ) throw new NullPointerException("use clearBottomPanel");
-        JScrollPane p= new JScrollPane();
-        p.setViewportView(c);
-        tabbedPanelContainer.add( p, BorderLayout.SOUTH );
-        bottomPanel= p;
-        revalidate();
+        Runnable run= new Runnable() {
+            public void run() {
+                if ( bottomPanel!=null ) tabbedPanelContainer.remove(bottomPanel);
+                JScrollPane p= new JScrollPane();
+                p.setViewportView(c);
+                tabbedPanelContainer.add( p, BorderLayout.SOUTH );
+                bottomPanel= p;
+                revalidate();
+            }
+        };
+        SwingUtilities.invokeLater(run);
     }
 
     /**
      * remove any extra component added below the tabs.
      */
     public void clearBottomPanel() {
-        if ( bottomPanel!=null ) tabbedPanelContainer.remove(bottomPanel);
-        bottomPanel= null;
-        revalidate();
+        Runnable run= new Runnable() {
+            public void run() {
+                if ( bottomPanel!=null ) tabbedPanelContainer.remove(bottomPanel);
+                bottomPanel= null;
+                revalidate();
+            }
+        };
+        SwingUtilities.invokeLater(run);
     }
     
     /**
