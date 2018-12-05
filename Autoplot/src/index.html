@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>IBEX data from CDAWeb, using strange font to explore where font metrics are mishandled.
+        <p><small>Bug 2067, where the colorbar label is left-justified but others are center-justified, is fixed.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,8 @@
         
         <p>Bugfixes (2018-12-01 r23095):</p>
         <ul>
+            <li>new code to add components to the front page could hang app because of event thread mishandling.
+            <li>rte_1025124270: JythonDataSource would attempt to attach a label to an immutable dataset, causing RTE.
             <li>2067: a multi-line colorbar label was not center-justified.  Thanks, Ivar!
             <li>rte_1659505011: improve feedback in the Bookmarks GUI, for example where you can "plot" a bookmarks folder.
             <li>rte_0577071170: improve feedback with Jython Data Source when a non-plottable variable unintentionally selected.  Thanks Kris!
@@ -91,6 +93,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>new lockDomainDivider axis property avoids jumping when the tick spacing is known to be correct.
             <li>plot element style properties dialog now has cancel which will revert to original settings.
         </ul>
        <p>Less recent features:</p>
