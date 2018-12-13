@@ -49,7 +49,7 @@ import org.autoplot.dom.DataSourceController;
 public class AxisPanel extends javax.swing.JPanel {
 
     private final Application dom;
-    private ApplicationController applicationController;
+    private final ApplicationController applicationController;
     private DatumRangeEditor xredit;
     private DatumRangeEditor yredit;
     private DatumRangeEditor zredit;
@@ -83,12 +83,7 @@ public class AxisPanel extends javax.swing.JPanel {
                         doPlotBindings();
                     }
                 };
-                if ( SwingUtilities.isEventDispatchThread() ) {
-                    run.run();
-                } else {
-                    SwingUtilities.invokeLater(run);
-                }
-                
+                SwingUtilities.invokeLater(run);
             }
         });
 
@@ -102,11 +97,7 @@ public class AxisPanel extends javax.swing.JPanel {
                         doPlotElementBindings();
                     }
                 };
-                if ( SwingUtilities.isEventDispatchThread() ) {
-                    run.run();
-                } else {
-                    SwingUtilities.invokeLater(run);
-                }
+                SwingUtilities.invokeLater(run);
             }
         });
             // there's a strange delay here on a mac.  We work around this be delaying construction on gui.
