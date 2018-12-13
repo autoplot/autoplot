@@ -733,6 +733,7 @@ public class PlotElementController extends DomNodeController {
 
             setDataSetInternal(fillDs);
         } catch ( RuntimeException ex ) {
+            logger.log(Level.FINE, "runtime exception caught: {0}", new Object[] { ex });
             if (getRenderer() != null) {
                 getRenderer().setDataSet(null);
                 getRenderer().setException(getRootCause(ex));
@@ -2536,10 +2537,11 @@ public class PlotElementController extends DomNodeController {
 
             QDataSet yds = (QDataSet) fillDs.property(QDataSet.DEPEND_1);
             if (yds == null) {
-                if ( fillDs.property(QDataSet.JOIN_0)!=null ) {
-                    JoinDataSet ds= new JoinDataSet(2);
+                if ( fillDs.property(QDataSet.JOIN_0)!=null && fillDs.length()>0 ) {
+                    QDataSet yds1= (QDataSet)fillDs.property(QDataSet.DEPEND_1,0);
+                    JoinDataSet ds= new JoinDataSet(yds1.rank()+1);
                     for ( int i=0; i<fillDs.length(); i++ ) {
-                        QDataSet yds1= (QDataSet)fillDs.property(QDataSet.DEPEND_1,i);
+                        yds1= (QDataSet)fillDs.property(QDataSet.DEPEND_1,i);
                         if ( yds1==null ) {
                             yds1= Ops.linspace( 0, fillDs.length(i,0)-1, fillDs.length(i,0) );
                         }
