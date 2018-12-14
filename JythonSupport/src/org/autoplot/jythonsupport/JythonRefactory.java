@@ -189,10 +189,12 @@ public class JythonRefactory {
                     writer.println();
                     if ( cl!=null ) {
                         if ( !p.equals( n+cl ) ) {
+                            logger.log(Level.FINER, "affected line {0}: {1}", new Object[]{reader.getLineNumber(), line});
                             affected= true;
                         }
                     } else {
                         if ( !p.equals( n ) ) {
+                            logger.log(Level.FINER, "affected line {0}: {1}", new Object[]{reader.getLineNumber(), line});
                             affected= true;
                         }
                     }
@@ -241,6 +243,7 @@ public class JythonRefactory {
                         }
                         writer.println();
                         if ( !p.equals(n) ) {
+                            logger.log(Level.FINER, "affected line {0}: {1}", new Object[]{reader.getLineNumber(), line});
                             affected= true;
                         }
                     } else {
@@ -263,6 +266,7 @@ public class JythonRefactory {
                                     line= line.replace( mehave, mewant );
                                     i= line.indexOf( skey, i+mewant.length() );
                                     if ( !mehave.equals(mewant ) ) {
+                                        logger.log(Level.FINER, "affected line {0}: {1}", new Object[]{reader.getLineNumber(), line});
                                         affected= true;
                                     }
                                 } else {
