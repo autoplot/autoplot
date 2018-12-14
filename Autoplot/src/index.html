@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Bug 2067, where the colorbar label is left-justified but others are center-justified, is fixed.
+        <p><small>Word for the day: <a href='https://en.wikipedia.org/wiki/Idempotence'>Idempotence</a>.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2018-12-01 r23095):</p>
         <ul>
+            <li>doUnitsCheck needs to support rank 2 y-tags in a bundle.
             <li>new code to add components to the front page could hang app because of event thread mishandling.
             <li>rte_1025124270: JythonDataSource would attempt to attach a label to an immutable dataset, causing RTE.
             <li>2067: a multi-line colorbar label was not center-justified.  Thanks, Ivar!
