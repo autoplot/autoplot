@@ -90,7 +90,7 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         
         JSONObject jo= new JSONObject();
         jo.put("HAPI","2.0");
-        jo.put("createdAt",TimeUtil.now().toString());
+        //jo.put("createdAt",TimeUtil.now().toString());
         jo.put("modificationDate", TimeUtil.now().toString());
         jo.put( "status", getHapiStatusObject() );
         
@@ -147,14 +147,17 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                 time.put("length", 24 );
                 time.put("name", "Time" );
                 time.put("type", "isotime" );
-                time.put("fill", (Object)null );
+                time.put("fill", JSONObject.NULL );
+                time.put("units", "UTC" );
                 parameters.put(i,time);
             } else {
                 JSONObject j1= new JSONObject();
                 j1.put("name", Ops.guessName(ds,"data"+i) );
                 j1.put("description", ds.property( QDataSet.TITLE ) );
-                if ( u!=null && u!=Units.dimensionless ) {
-                    j1.put("units", SemanticOps.getUnits(ds) );
+                if ( u==Units.dimensionless ) {
+                    j1.put("units", JSONObject.NULL );
+                } else {
+                    j1.put("units", u.toString() );
                 }
                 j1.put("type", "double" );
                 if ( ds.rank()>1 ) {
@@ -164,7 +167,7 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                 if ( f!=null ) {
                     j1.put("fill",f.toString()); //TODO: check that this is properly handled as Object.
                 } else {
-                    j1.put("fill","NaN"); 
+                    j1.put("fill",JSONObject.NULL ); 
                 }
                 if ( ds.rank()>=2 ) {
                     j1.put("bins", getBinsFor(ds) );
@@ -412,7 +415,11 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                         Units u= SemanticOps.getUnits(dep);
                         JSONObject jo= new JSONObject();
                         jo.put( "name", n );
-                        jo.put( "units", u.toString() );
+                        if ( u==Units.dimensionless ) {
+                            jo.put( "units", JSONObject.NULL );
+                        } else {
+                            jo.put( "units", u.toString() );
+                        }
                         JSONArray ranges= new JSONArray();
                         for ( int j=0; j<qube[i]; j++ ) {
                             JSONArray range= new JSONArray();
@@ -431,7 +438,11 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                     Units u= SemanticOps.getUnits(dep);
                     JSONObject jo= new JSONObject();
                     jo.put( "name", n );
-                    jo.put( "units", u.toString() );
+                    if ( u==Units.dimensionless ) {
+                        jo.put( "units", JSONObject.NULL );
+                    } else {
+                        jo.put( "units", u.toString() );
+                    }
                     JSONArray centers= new JSONArray();
                     for ( int j=0; j<qube[i]; j++ ) {
                         centers.put(j,dep.value(j));
@@ -525,12 +536,15 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                     } else {
                         tts[ids]= new DoubleTransferType();
                     }
-                    if ( ds.rank()==0 ) {
-                        nbytes+= tts[ids].sizeBytes();
-                    } else if ( ds.rank()==1 ) {
-                        nbytes+= tts[ids].sizeBytes()*ds.length();
-                    } else {
-                        throw new IllegalArgumentException("not supported!");
+                    switch (ds.rank()) {
+                        case 0:
+                            nbytes+= tts[ids].sizeBytes();
+                            break;
+                        case 1:
+                            nbytes+= tts[ids].sizeBytes()*ds.length();
+                            break;
+                        default:
+                            throw new IllegalArgumentException("not supported!");
                     }
                 }
 
