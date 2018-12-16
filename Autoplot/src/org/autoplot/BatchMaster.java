@@ -473,7 +473,7 @@ public class BatchMaster extends javax.swing.JPanel {
                 }
             }
         };
-        new Thread(run).start();
+        new Thread(run,"runBatch").start();
     }//GEN-LAST:event_goButtonActionPerformed
 
     private void param1ValuesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_param1ValuesMouseClicked
