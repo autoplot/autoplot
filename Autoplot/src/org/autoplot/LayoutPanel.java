@@ -1316,7 +1316,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         Object[] bindings= bindingListComponent.getSelectedValues();
         for ( Object o:bindings ) {
             BindingModel b= (BindingModel)o;
-            dom.getController().deleteBinding(b);
+            dom.getController().removeBinding(b);
         }
     }//GEN-LAST:event_deleteBindingsMenuItemActionPerformed
 
