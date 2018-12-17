@@ -28,6 +28,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.das2.system.RequestProcessor;
@@ -47,6 +48,7 @@ import org.autoplot.jythonsupport.DatasetCommand;
 import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.autoplot.jythonsupport.ui.ScriptPanelSupport;
+import org.python.core.PyDictionary;
 
 /**
  * Utilities for Jython functions, such as a standard way to initialize
@@ -237,7 +239,13 @@ public class JythonUtil {
      * @return JOptionPane.OK_OPTION or JOptionPane.CANCEL_OPTION if the user cancels.
      * @throws java.io.IOException
      */
-    public static int showScriptDialog( Component parent, Map<String,Object> env, File file, Map<String,String> fparams, boolean makeTool, final URI resourceUri ) throws IOException {
+    public static int showScriptDialog( 
+            Component parent, 
+            Map<String,Object> env, 
+            File file, 
+            Map<String,String> fparams, 
+            boolean makeTool, 
+            final URI resourceUri ) throws IOException {
         
         if ( !EventQueue.isDispatchThread() ) {
             System.err.println("*** called from off of event thread!!!");
@@ -334,7 +342,9 @@ public class JythonUtil {
      * @throws java.io.IOException
      * @deprecated use invokeScriptSoon with URI.
      */
-    public static int invokeScriptSoon( final URL url, final Application dom, 
+    public static int invokeScriptSoon( 
+            final URL url, 
+            final Application dom, 
             Map<String,String> params, 
             boolean askParams, boolean makeTool, 
             ProgressMonitor mon1) throws IOException {
@@ -354,7 +364,9 @@ public class JythonUtil {
      * @return JOptionPane.OK_OPTION of the script is invoked.
      * @throws java.io.IOException
      */
-    public static int invokeScriptSoon( final URI uri, final Application dom, 
+    public static int invokeScriptSoon( 
+            final URI uri, 
+            final Application dom, 
             Map<String,String> vars, 
             boolean askParams, boolean makeTool, 
             ProgressMonitor mon1) throws IOException {
@@ -376,7 +388,9 @@ public class JythonUtil {
      * @throws java.io.IOException
      * @deprecated use invokeScriptSoon with URI.
      */    
-    public static int invokeScriptSoon( final URL url, final Application dom, 
+    public static int invokeScriptSoon( 
+            final URL url, 
+            final Application dom, 
             Map<String,String> params, 
             boolean askParams, 
             final boolean makeTool, 
@@ -404,7 +418,9 @@ public class JythonUtil {
      * @return JOptionPane.OK_OPTION of the script is invoked.
      * @throws java.io.IOException
      */
-    public static int invokeScriptSoon( final URI uri, final Application dom, 
+    public static int invokeScriptSoon( 
+            final URI uri, 
+            final Application dom, 
             Map<String,String> params, 
             boolean askParams, 
             final boolean makeTool, 
@@ -433,7 +449,10 @@ public class JythonUtil {
      * @return JOptionPane.OK_OPTION of the script is invoked.
      * @throws java.io.IOException
      */
-    public static int invokeScriptSoon( final URI uri, final File file, final Application dom, 
+    public static int invokeScriptSoon( 
+            final URI uri, 
+            final File file, 
+            final Application dom, 
             Map<String,String> params, 
             boolean askParams, 
             final boolean makeTool, 
@@ -528,5 +547,69 @@ public class JythonUtil {
         }
         
         return response;
+    }
+    
+    /**
+     * Invoke the script on the current thread.
+     * @param uri the URI, providing pwd.
+     * @param file null or the file to use.
+     * @param dom the application 
+     * @param fparams parameters to pass into the script.
+     * @param mon feedback monitor for the thread.
+     * @throws IOException 
+     */
+    public static void invokeScript20181217( 
+            URI uri, 
+            File file, 
+            Application dom, 
+            Map<String,String> fparams, 
+            ProgressMonitor mon ) throws IOException {
+        
+        if ( mon==null ) mon= new NullProgressMonitor();
+
+        if ( file==null ) {    
+            if ( SwingUtilities.isEventDispatchThread() ) {
+                throw new IllegalArgumentException("invokeScript called from EventQueue");
+            }
+            file = DataSetURI.getFile( uri, new NullProgressMonitor() ); 
+        }
+        
+        ParametersFormPanel.FormData fd;
+          
+        PythonInterpreter interp = JythonUtil.createInterpreter(true, false, dom, mon );
+
+        ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
+        
+        Map<String,Object> env= new HashMap();
+        env.put("dom",dom );
+        URISplit split= URISplit.parse(uri);
+        env.put( "PWD", split.path );
+        
+        fd=  pfp.doVariables( env, file, fparams, null );
+
+        logger.log(Level.FINE, "invokeScriptSoon({0})", uri);
+        
+        for ( Map.Entry<String,String> p: fparams.entrySet() ) {
+            try {
+                fd.implement( interp, p.getKey(), p.getValue() );
+            } catch ( ParseException ex ) {
+                logger.log( Level.WARNING, null, ex );
+            }
+        }
+
+        interp.set( "dom", dom );
+        interp.set( "PWD", split.path ); 
+
+        try ( FileInputStream in = new FileInputStream(file) ) {
+
+            interp.execfile( JythonRefactory.fixImports(in), uri.toString());
+
+        } catch ( PyException ex ) {
+            throw ex;
+
+        } finally {
+            if ( !mon.isFinished() ) mon.finished();
+        } 
+        
     }
 }
