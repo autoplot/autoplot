@@ -163,15 +163,19 @@ public class StatePersistence {
         }
         
         if ( scheme.getId().equals( "1.08" ) && currentScheme.getId().equals("1.09") ) {
-            logger.warning("removing all bindings to scale to support old versions");
+            boolean removedBindings= false;
             Application app= (Application)state;
             List<BindingModel> newbms= new ArrayList( Arrays.asList( app.getBindings() ) );
             for ( int i=app.getBindings().length-1; i>=0; i-- ) {
                 if ( app.getBindings(i).getSrcProperty().equals("scale") ||app.getBindings(i).getDstProperty().equals("scale") )  {
                     newbms.remove(i);
+                    removedBindings= true;
                 }
             }
-            app.setBindings(newbms.toArray( new BindingModel[newbms.size()] ) );
+            if ( removedBindings ) {
+                logger.warning("removing all bindings to scale to support old versions");
+                app.setBindings(newbms.toArray( new BindingModel[newbms.size()] ) );
+            }
         }
         
         Element element = SerializeUtil.getDomElement( document, (DomNode)state, scheme, true );
