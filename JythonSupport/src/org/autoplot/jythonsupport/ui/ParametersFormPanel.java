@@ -482,14 +482,20 @@ public class ParametersFormPanel {
                     default:
                         {
                             String val;
-                            if ( params.get(vname)!=null ) {
-                                val= params.get(vname);
-                                if ( val.startsWith("'") ) val= val.substring(1);
-                                if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
+                            Object oval= params.get(vname);
+                            if ( oval!=null ) {
+                                if ( oval instanceof String ) {
+                                    val= (String)oval;
+                                    if ( val.startsWith("'") ) val= val.substring(1);
+                                    if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
+                                } else {
+                                    throw new IllegalArgumentException("param should be a string: "+vname);
+                                }
                             } else {
                                 val= String.valueOf( parm.deft );
                                 params.put( vname, val );
-                            }       if ( parm.enums!=null && parm.enums.size()>0 ) {
+                            }       
+                            if ( parm.enums!=null && parm.enums.size()>0 ) {
                                 if ( isBoolean( parm.enums ) ) {
                                     JCheckBox jcb= new JCheckBox( label );
                                     jcb.setSelected( val.equals("T") );
@@ -503,7 +509,6 @@ public class ParametersFormPanel {
                                 } else {
                                     JComboBox jcb= new JComboBox(parm.enums.toArray());
                                     jcb.setEditable(false);
-                                    Object oval;
                                     if ( parm.deft instanceof Long ) {
                                         oval = Long.valueOf(val);
                                     } else if ( parm.deft instanceof Integer ) {
@@ -541,7 +546,8 @@ public class ParametersFormPanel {
                                 
                                 tf.setText( val );
                                 ctf= tf;
-                            }       valuePanel.add( ctf );
+                            }       
+                            valuePanel.add( ctf );
                             break;
                         }
                 }
