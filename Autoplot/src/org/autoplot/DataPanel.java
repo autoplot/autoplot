@@ -44,8 +44,8 @@ public class DataPanel extends javax.swing.JPanel {
     private BindingGroup dataSourceFilterBindingGroup;
     private boolean dataSourceFilterBindingGroupIsBound= false;
 
-    private BindingGroup elementBindingGroup;
-    private boolean elementBindingGroupIsBound= false;
+    private BindingGroup plotElementBindingGroup;
+    private boolean plotElementBindingGroupIsBound= false;
     
     private PlotElement plotElement;// current focus
     
@@ -134,9 +134,9 @@ public class DataPanel extends javax.swing.JPanel {
             dataSourceFilterBindingGroup.bind();
             dataSourceFilterBindingGroupIsBound= true;
         }
-        if ( !elementBindingGroupIsBound ) {
-            elementBindingGroup.bind();
-            elementBindingGroupIsBound= true;
+        if ( !plotElementBindingGroupIsBound ) {
+            plotElementBindingGroup.bind();
+            plotElementBindingGroupIsBound= true;
         }
         super.paint(g); //To change body of generated methods, choose Tools | Templates.
     }
@@ -208,7 +208,7 @@ public class DataPanel extends javax.swing.JPanel {
 
     private synchronized void doPlotElementBindings() {
         BindingGroup bc = new BindingGroup();
-        if (elementBindingGroup != null) elementBindingGroup.unbind();
+        if (plotElementBindingGroup != null) plotElementBindingGroup.unbind();
         setAdjusting( true ); // suppress events
         if ( plotElement!=null ) {
             plotElement.getController().removePropertyChangeListener( PlotElementController.PROP_DATASET, contextListener );
@@ -244,8 +244,8 @@ public class DataPanel extends javax.swing.JPanel {
             bc.addBinding(Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, plotElement.getController(), BeanProperty.create("sliceAutoranges"), this.sliceAutorangesCB, BeanProperty.create("selected") ) );
         }
 
-        elementBindingGroup = bc;
-        elementBindingGroupIsBound= false;
+        plotElementBindingGroup = bc;
+        plotElementBindingGroupIsBound= false;
         
         setAdjusting( false );
         
