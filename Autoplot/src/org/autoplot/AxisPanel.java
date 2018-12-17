@@ -60,8 +60,8 @@ public class AxisPanel extends javax.swing.JPanel {
     private BindingGroup plotBindingGroup;
     private boolean plotBindingGroupIsBound= false;
     
-    private BindingGroup panelBindingGroup;    
-    private boolean panelBindingGroupIsBound= false;
+    private BindingGroup plotElementBindingGroup;    
+    private boolean plotElementBindingGroupIsBound= false;
     
     private String timeRangeBindingType= "none";
     
@@ -179,9 +179,9 @@ public class AxisPanel extends javax.swing.JPanel {
             plotBindingGroup.bind();
             plotBindingGroupIsBound= true;
         }
-        if ( !panelBindingGroupIsBound ) {
-            panelBindingGroup.bind();
-            panelBindingGroupIsBound= true;
+        if ( !plotElementBindingGroupIsBound ) {
+            plotElementBindingGroup.bind();
+            plotElementBindingGroupIsBound= true;
         }
         super.paint(g); //To change body of generated methods, choose Tools | Templates.
     }
@@ -364,15 +364,15 @@ public class AxisPanel extends javax.swing.JPanel {
     private void doPlotElementBindings() {
         BindingGroup bc = new BindingGroup();
         
-        if (panelBindingGroup != null) panelBindingGroup.unbind();
+        if (plotElementBindingGroup != null) plotElementBindingGroup.unbind();
 
         PlotElement p = applicationController.getPlotElement();
         
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("legendLabel"), legendTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, p, BeanProperty.create("displayLegend"), legendEnableCheckbox, BeanProperty.create("selected")));
         
-        panelBindingGroup = bc;
-        panelBindingGroupIsBound= false;
+        plotElementBindingGroup = bc;
+        plotElementBindingGroupIsBound= false;
         
         repaint();
 
