@@ -229,7 +229,7 @@ public class GuiSupport {
     }
     
     
-    private static Map<RenderType,PlotStylePanel.StylePanel> panels= new HashMap<>();
+    private static Map<RenderType,PlotStylePanel.StylePanel> panelCache= new HashMap<>();
             
     /**
      * return a GUI controller for the RenderType, using a cached instance if
@@ -238,10 +238,10 @@ public class GuiSupport {
      * @return 
      */
     public static PlotStylePanel.StylePanel getStylePanelMaybeCached( RenderType renderType ) { 
-        PlotStylePanel.StylePanel editorPanel= panels.get(renderType);
+        PlotStylePanel.StylePanel editorPanel= panelCache.get(renderType);
         if ( editorPanel==null ) {
             editorPanel= getStylePanel(renderType);
-            panels.put( renderType, editorPanel );
+            panelCache.put( renderType, editorPanel );
         }
         return editorPanel;
     }
