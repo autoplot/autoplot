@@ -10,6 +10,7 @@ import org.autoplot.APSplash;
 import java.awt.event.FocusEvent;
 import org.das2.components.DatumRangeEditor;
 import java.awt.BorderLayout;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
@@ -53,10 +54,15 @@ public class AxisPanel extends javax.swing.JPanel {
     private DatumRangeEditor xredit;
     private DatumRangeEditor yredit;
     private DatumRangeEditor zredit;
+
+    private Plot currentPlot; // the plot we are currently controlling, should be consistent with plotBindingGroup.
     
     private BindingGroup plotBindingGroup;
-    private Plot currentPlot; // the plot we are currently controlling, should be consistent with plotBindingGroup.
+    private boolean plotBindingGroupIsBound= false;
+    
     private BindingGroup panelBindingGroup;    
+    private boolean panelBindingGroupIsBound= false;
+    
     private String timeRangeBindingType= "none";
     
     private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.gui");
@@ -167,6 +173,19 @@ public class AxisPanel extends javax.swing.JPanel {
 
     }
 
+    @Override
+    public void paint(Graphics g) {
+        if ( !plotBindingGroupIsBound ) {
+            plotBindingGroup.bind();
+            plotBindingGroupIsBound= true;
+        }
+        if ( !panelBindingGroupIsBound ) {
+            panelBindingGroup.bind();
+            panelBindingGroupIsBound= true;
+        }
+        super.paint(g); //To change body of generated methods, choose Tools | Templates.
+    }
+
     private FocusListener createDatumRangeEditorListener( final DatumRangeEditor edit ) {
         return new FocusListener() {
             @Override
@@ -211,11 +230,13 @@ public class AxisPanel extends javax.swing.JPanel {
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("isotropic"), this.isotropicCheckBox, BeanProperty.create("selected")));
 
         plotBindingGroup = bc;
-        bc.bind();
+        plotBindingGroupIsBound= false;
 
         doCheckTimeRangeControllerEnable();
         p.getXaxis().addPropertyChangeListener( Axis.PROP_RANGE, timeRangeAxisControllerEnabler );
-        
+
+        repaint();
+
     }
     
     private class TimeAxisPropertyChangeListener implements PropertyChangeListener {
@@ -351,7 +372,10 @@ public class AxisPanel extends javax.swing.JPanel {
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, p, BeanProperty.create("displayLegend"), legendEnableCheckbox, BeanProperty.create("selected")));
         
         panelBindingGroup = bc;
-        bc.bind();
+        panelBindingGroupIsBound= false;
+        
+        repaint();
+
     }
 
 

@@ -7,6 +7,7 @@
 
 package org.autoplot;
 
+import java.awt.Graphics;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
@@ -39,7 +40,12 @@ public class DataPanel extends javax.swing.JPanel {
     private final AutoplotUI app;
     private final ApplicationController applicationController;
     private DataSourceFilter dsf; // current focus
+    
     private BindingGroup dataSourceFilterBindingGroup;
+    private boolean dataSourceFilterBindingGroupIsBound= false;
+
+    private BindingGroup elementBindingGroup;
+    private boolean elementBindingGroupIsBound= false;
     
     private PlotElement plotElement;// current focus
     
@@ -121,8 +127,20 @@ public class DataPanel extends javax.swing.JPanel {
         doPlotElementBindings();
         doDataSourceFilterBindings();
     }
-    
 
+    @Override
+    public void paint(Graphics g) {
+        if ( !dataSourceFilterBindingGroupIsBound ) {
+            dataSourceFilterBindingGroup.bind();
+            dataSourceFilterBindingGroupIsBound= true;
+        }
+        if ( !elementBindingGroupIsBound ) {
+            elementBindingGroup.bind();
+            elementBindingGroupIsBound= true;
+        }
+        super.paint(g); //To change body of generated methods, choose Tools | Templates.
+    }
+    
     protected boolean adjusting = false;
     /**
      * true indicates the component is in transition.
@@ -138,8 +156,6 @@ public class DataPanel extends javax.swing.JPanel {
         this.adjusting = adjusting;
         firePropertyChange(PROP_ADJUSTING, oldAdjusting, adjusting);
     }
-
-    private BindingGroup elementBindingGroup;
     
     /**
      * show the context after the slicing and operations for the user's reference.
@@ -229,7 +245,8 @@ public class DataPanel extends javax.swing.JPanel {
         }
 
         elementBindingGroup = bc;
-        bc.bind();
+        elementBindingGroupIsBound= false;
+        
         setAdjusting( false );
         
         if ( p!=null ) {
@@ -237,6 +254,8 @@ public class DataPanel extends javax.swing.JPanel {
         }
             
         updateProcessDataSetLabel();
+        
+        repaint();
 
     }
 
@@ -270,15 +289,13 @@ public class DataPanel extends javax.swing.JPanel {
         bc.addBinding(Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, newDsf, BeanProperty.create("filters"), this.dataSourceFiltersPanel, BeanProperty.create("filter")) );
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, newDsf, BeanProperty.create("uri"), this.dataSetSelector, BeanProperty.create("value")));
         bc.addBinding(Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, newDsf, BeanProperty.create("controller.dataSet"), this.dataSourceFiltersPanel, BeanProperty.create("dataSet")));
-        try {
-            bc.bind();
-        } catch ( RuntimeException e ) {
-            throw e;
-        }
+        
         dataSourceFilterBindingGroup = bc;
+        dataSourceFilterBindingGroupIsBound= false;
 
         dsf= newDsf;
 
+        repaint();
     }
 
     /** This method is called from within the constructor to
