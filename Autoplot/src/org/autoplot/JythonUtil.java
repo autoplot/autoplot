@@ -13,10 +13,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -421,16 +423,45 @@ public class JythonUtil {
     public static int invokeScriptSoon( 
             final URI uri, 
             final Application dom, 
-            Map<String,String> params, 
-            boolean askParams, 
+            final Map<String,String> params, 
+            final boolean askParams, 
             final boolean makeTool, 
             final JythonScriptPanel scriptPanel,
-            ProgressMonitor mon1) throws IOException {
+            final ProgressMonitor mon1) throws IOException {
+        
         if ( EventQueue.isDispatchThread() ) {
-            System.err.println("THIS IS THE EVENT THREAD!");
+            logger.warning("THIS IS THE EVENT THREAD, AND ATTEMPTS TO DOWNLOAD A FILE.");
         }
-        final File file = DataSetURI.getFile( uri, new NullProgressMonitor() ); //EVENT THREAD!!!!
-        return invokeScriptSoon( uri, file, dom, params, askParams, makeTool, scriptPanel, mon1 );
+        final File file = DataSetURI.getFile( uri, new NullProgressMonitor() ); 
+        
+        final ArrayList<Object> result= new ArrayList<>();
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    result.add( invokeScriptSoon( uri, file, dom, params, askParams, makeTool, scriptPanel, mon1 ) );
+                } catch (IOException ex) {
+                    result.add(ex);
+                }
+            }
+        };
+        
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            run.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(run);
+            } catch (InterruptedException | InvocationTargetException ex) {
+                result.add(ex);
+            }
+        }
+        if ( result.get(0) instanceof IOException ) {
+            throw (IOException)result.get(0);
+        } else if ( result.get(0) instanceof RuntimeException ) {
+            throw (RuntimeException)result.get(0);
+        } else {
+            return (Integer)result.get(0);
+        }
     }
         
     /**
