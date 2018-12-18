@@ -247,15 +247,15 @@ public class PlotStylePanel extends javax.swing.JPanel {
 
                 logger.log(Level.FINE, "doElementBindingsRunnable (bug1356)");
 
-                StylePanel editorPanel = GuiSupport.getStylePanel(element.getRenderType());
+                StylePanel editorPanel = GuiSupport.getStylePanelMaybeCached(element.getRenderType());
 
                 if (currentEditorPanel == null || (PlotStylePanel.this.currentElement != element) || (!(currentEditorPanel.getClass() == editorPanel.getClass()))) {
-                    editorPanel.doElementBindings(element);
-
                     if (currentEditorPanel != null) {
                         currentEditorPanel.releaseElementBindings();
                     }
+
                     currentEditorPanel = editorPanel;
+                    editorPanel.doElementBindings(element);
 
                     if (stylePanel.getComponentCount() == 1) {
                         stylePanel.remove(stylePanel.getComponent(0));
