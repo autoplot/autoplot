@@ -353,8 +353,9 @@ public class Test140 {
      * @throws IOException 
      */
     private static int doHistory( File f, int iid, Map<String,Exception> exceptions, Map<String,Integer> exceptionNumbers ) throws IOException {
-        try (BufferedReader read = new BufferedReader( new FileReader(f) )) {
+        try (BufferedReader read = new BufferedReader( new InputStreamReader( new FileInputStream(f), "UTF-8" ) )) {
             String s= read.readLine();
+            System.err.println(">> doHistory " +s);
             while ( s!=null ) {
                 int i= s.indexOf('#');
                 if ( i>-1 ) {
