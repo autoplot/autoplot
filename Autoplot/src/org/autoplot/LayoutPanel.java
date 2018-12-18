@@ -14,6 +14,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -91,6 +92,8 @@ public class LayoutPanel extends javax.swing.JPanel {
     private Application dom;
     private ApplicationModel applicationModel; // used for history.
     
+    private boolean selectionChanged= false;
+            
     /** Creates new form LayoutPanel */
     public LayoutPanel() {
         initComponents();
@@ -201,6 +204,15 @@ public class LayoutPanel extends javax.swing.JPanel {
         bindingListComponent.addMouseListener(popupTrigger);
 
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "layoutPanel");
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        if ( selectionChanged ) {
+            updateSelected();
+            selectionChanged= false;
+        }
+        super.paint(g);
     }
 
     private MouseListener createPopupTrigger() {
@@ -532,7 +544,8 @@ public class LayoutPanel extends javax.swing.JPanel {
                 public void run() {
                     logger.finer("enter plotListener");
                     plotElementListComponent.setSelectedIndices(iindices);
-                    updateSelected();
+                    selectionChanged= true;
+                    repaint();
                 }
             };
             if ( SwingUtilities.isEventDispatchThread() ) {
@@ -718,16 +731,19 @@ public class LayoutPanel extends javax.swing.JPanel {
         bindingListComponent.repaint();
     }
     
+    private static final ImageIcon blueIcon= new ImageIcon( LayoutPanel.class.getResource("/resources/blue.gif" ) );
+    private static final ImageIcon idleIcon= new ImageIcon( LayoutPanel.class.getResource("/org/autoplot/resources/idle-icon.png" ) );
+            
     ListCellRenderer dsfListCellRenderer= new DefaultListCellRenderer() {
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             JLabel l= (JLabel)super.getListCellRendererComponent( list, value, index, isSelected, cellHasFocus );
             DataSourceFilter dsf= (DataSourceFilter)value;
             if ( dsf.getController().getTsb()!=null ) {
-                l.setIcon( new ImageIcon( LayoutPanel.class.getResource("/resources/blue.gif" ) ) );
+                l.setIcon( blueIcon );
                 l.setToolTipText( "<html>"+dsf.getUri()+"<br>Data source provides Time Series Browsing");
             } else {
-                l.setIcon( new ImageIcon( LayoutPanel.class.getResource("/org/autoplot/resources/idle-icon.png" ) ) );
+                l.setIcon( idleIcon );
                 if ( dsf.getUri().length()==0 ) {
                     l.setToolTipText(null);
                 } else {
@@ -1323,7 +1339,8 @@ public class LayoutPanel extends javax.swing.JPanel {
     private void plotElementListComponentValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_plotElementListComponentValueChanged
         logger.log(Level.FINE, "panelListComponentValueChanged {0}", evt.getValueIsAdjusting());
         if ( !evt.getValueIsAdjusting() ) {
-            updateSelected();
+            selectionChanged= true;
+            repaint();
         }
     }//GEN-LAST:event_plotElementListComponentValueChanged
 
