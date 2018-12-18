@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Word for the day: <a href='https://en.wikipedia.org/wiki/Idempotence'>Idempotence</a>.
+        <p><small>Stress-testing with 60 spectrograms.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,7 +28,14 @@
         
         <p>Bugfixes (2018-12-15 r23106):</p>
         <ul>
-            <li>Corrections to HAPI export.
+            <li>correct where GUI was created off of the event thread, when script was run from the address bar.
+            <li>bug in extent prevented slices of  rbspa_int_ect-mageisLOW-L3_20160411_v8.1.0.cdf?FEDU from showing.
+            <li>2073: load TSB blue and grey icons once, since looking up the icon from the classpath can be slow.
+            <li>2073: cache plotElement controller GUIs, which were recreated as the focus moved around.
+            <li>2073: remove old "panel" name, which have been known for years as "plotElements"
+            <li>2073: avoid binding when the axis or data tabs are not visible, to support running scripts with app running.
+            <li>2045: add method for invoking a script from another script. 
+            <li>Corrections to HAPI export to match 2.0 spec.
             <li>doUnitsCheck needs to support rank 2 y-tags in a bundle.
             <li>new code to add components to the front page could hang app because of event thread mishandling.
             <li>rte_1025124270: JythonDataSource would attempt to attach a label to an immutable dataset, causing RTE.
@@ -44,6 +51,9 @@
             <li>"Open Local File" would only show files when "show all" was selected.  Thanks, Bob!
             <li>2063: "convertUnitsTo" didn't properly reset the DOM range, when it reset the implementing DasAxis range.  Thanks, Masafumi!
             <li>LICENSE.txt should be LGPL, not GPL.
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>scripting reset method didn't reset undo/redo operations, potentially causing object leaks.
             <li>2062: Run batch facility didn't properly set PWD, causing runtime exception.
             <li>2054: any NullPointerException when a leftover thread assumed the controller reference was still valid.
@@ -63,56 +73,14 @@
             <li>2051: rank 2 ytags was slow, when looking at a tiny slice in x.  Thanks, Masafumi!
             <li>2052: improve support for datumRange, URI, and URL parameters in Jython scripts, when creating GUIs.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>update to new certificate signatures for 2018-2019.  Thanks, Larry!
-            <li>NullPointerException when params was escaped.
-            <li>2049: setLayout(3,3) gets IDs backwards.  Revert this change which breaks many old scripts.
-            <li>Orbits' definition files can be read via an HTTP redirect now.  Thanks, Larry!
-            <li>NullPointerException would occur when type "Datum" was encountered, in a qstream Autoplot produced.
-            <li>rfe609: handle case where 1-point dataset would mess up the autoranging.  Thanks, Masafumi!
-            <li>invokeScriptSoon on the event thread, causing warning message and potentially hanging GUI during file download.
-            <li>rte_2055330411: "|reducex('1day')" would not parse properly.
-            <li>File->Reset resets to the data set selector.
-            <li>DataSources with parents (vap+internal:data_8,data_9,data_10) would get a progress bar not connected to any plot, which would grab the mouse focus during batch processing.
-            <li>trim of rank 3 join would add empty tables for each table.  Instead this should only join the non-empty ones.  Thanks, Masafumi!
-            <li>embed data in .vap option didn't check for ephemeris and events lists.
-            <li>HAPI properly handles when time is not in the list of parameters.  Thanks, Bob!
-            <li>SeriesRenderer properly looks at cadenceCheck again.  Thanks, Ivar!
-            <li>2043: use HAPI_DATA environment variable to set the location of the cache.  Don't request data outside of the startDate, stopDate range.  Thanks, Bob!
-            <li>allow dataPointRecorder's select method to be called on or off the event thread.
-            <li>2042: correction to the ticks code which would detect when new ticks were needed during pngwalk generation, sometimes failing.
-            <li>2042: correct code which would resize the canvas in scripts running in headful mode, which would occasionally fail.
-            <li>2042: remove old listeners which were preventing DasRows and DasColumns from garbage collection.
-            <li>tweaks to pdb (Python debugger) support, trying to improve its utility.
-            <li>some annotation position icons were missing.
-            <li>StackedHistogram (peaks-and-averages) renderer max values could go past the min of the next channel, creating ambiguity.
-            <li>rfe 643: check for dark background color in Jython editor for warnings, program counter, and usages.  
-            <li>findbugs NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE.
-            <li>When saving logger properties, logger inheritance was not considered, making an overly-explicit configuration.
-            <li>Jython dataset(o) now allows o to be a tuple, and background=None uses a transparent background, other minor changes to annotation command.
-            <li>when a stack trace is processed in Jython, to jump to the error, allow the stack trace to be deeper, to support Geopack file.
-        </ul>
         <p>Features:</p>
         <ul>
             <li>new lockDomainDivider axis property avoids jumping when the tick spacing is known to be correct.
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>plot element style properties dialog now has cancel which will revert to original settings.
         </ul>
-       <p>Less recent features:</p>
-       <ul>
-            <li>add method for replacing the navigation panel in PNGWalk.  Thanks, Ivar!
-            <li>Update to new CDF reader, where the source is available.
-            <li>HAPI data is displayed with the units in the label.
-            <li>658: add method for adding right and left panels to the GUI, to develop custom applications.  Thanks, Jon V!
-            <li>"add right-axis plot" which adds a plot at the same position but with a right-axis which is independent.  Thanks, Ivar!
-            <li>657: --noAskParams will prevent the script parameters / security verification from showing.  Thanks, Bob!
-            <li>write-pngwalk-from-events lists supports zero-width events, when using settings like "0%-1hr,100%+1hr"
-            <li>export to very old vap formats, like 2013, removed because they are clutter.
-            <li>support link(r2x,r2y,r2z) by flattening the three tables.
-            <li>catch http://.../hapi/data and make into HAPI URI.  Thanks, Bob!
-            <li>support for renderType="spectrogram>rebin=triScat"
-            <li>LoggerManager.readConfiguration can read any file now, not just that named by -Djava.util.logging.config.file=...
-       </ul>
         <p>Known issues:</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/?limit=1000">see Source Forge</a>
