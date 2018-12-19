@@ -36,6 +36,9 @@ import org.das2.qds.util.DataSetBuilder;
 import org.autoplot.jythonsupport.JythonOps;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.Util;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumUtil;
+import org.das2.datum.InconvertibleUnitsException;
 
 /**
  * Data source used mostly for demonstrations and quick modifications
@@ -107,7 +110,8 @@ public class InlineDataSource extends AbstractDataSource {
     }
 
     /**
-     * s formatted ds with only commas delineating datums.  If all elements are parseable as a
+     * s formatted ds with only commas delineating datums.  If all elements 
+     * are parseable as a
      * double, the result is a dimensionless array.  If parseable as
      * times, the result is a time array.  Otherwise the result is a
      * result has enumeration units for the ordinal values.
@@ -128,7 +132,12 @@ public class InlineDataSource extends AbstractDataSource {
         for (String ss21 : ss2) {
             try {
                 if (!isTime && !isEnum) {
-                    u.parse(ss21);
+                    try {
+                        u.parse(ss21);
+                    } catch ( InconvertibleUnitsException ex3 ) {
+                        Datum d= DatumUtil.lookupDatum(ss21);
+                        u= d.getUnits();
+                    }
                 }
             } catch (ParseException e) {
                 isTime= true;
@@ -136,7 +145,13 @@ public class InlineDataSource extends AbstractDataSource {
                     try {
                         tu.parse(ss21);
                     }catch (ParseException ex) {
-                        isEnum= true;
+                        try {
+                            Datum d= DatumUtil.lookupDatum(ss21);
+                            u= d.getUnits();
+                            isTime= false;
+                        } catch ( ParseException ex2 ) {
+                            isEnum= true;
+                        }
                     }
                 }
             }
@@ -154,6 +169,7 @@ public class InlineDataSource extends AbstractDataSource {
                     if ( j==0 ) result.putProperty( QDataSet.UNITS, tu );
                 } else {
                     result.putValue(j, u.parse(ss).value() );
+                    if ( j==0 && u!=Units.dimensionless ) result.putProperty( QDataSet.UNITS, u );
                 }
             }
         } catch ( ParseException ex ) {
