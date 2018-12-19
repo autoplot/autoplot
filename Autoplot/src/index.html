@@ -26,8 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-12-15 r23106):</p>
+        <p>Bugfixes (2018-12-19 r23124):</p>
         <ul>
+            <li>Orbits from rbspa-pp came from down server, which showed a bug where a second IOException would prevent redundant servers from filling in.
+            <li>DatumUtil.lookupDatum now handles strings without a space, like 45Kg, which often appear in vap+inline URIs.  Thanks, Ivar!
+            <li>test140 explicitly loads files with UTF-8 encoding, to work around a bug where new Jenkins server mis-reports the content-type.
             <li>correct where GUI was created off of the event thread, when script was run from the address bar.
             <li>bug in extent prevented slices of  rbspa_int_ect-mageisLOW-L3_20160411_v8.1.0.cdf?FEDU from showing.
             <li>2073: load TSB blue and grey icons once, since looking up the icon from the classpath can be slow.
@@ -35,7 +38,7 @@
             <li>2073: remove old "panel" name, which have been known for years as "plotElements"
             <li>2073: avoid binding when the axis or data tabs are not visible, to support running scripts with app running.
             <li>2045: add method for invoking a script from another script. 
-            <li>Corrections to HAPI export to match 2.0 spec.
+            <li>Corrections to HAPI export to match 2.0 spec.  Thanks, Bob!
             <li>doUnitsCheck needs to support rank 2 y-tags in a bundle.
             <li>new code to add components to the front page could hang app because of event thread mishandling.
             <li>rte_1025124270: JythonDataSource would attempt to attach a label to an immutable dataset, causing RTE.
