@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -73,15 +75,23 @@ public class WindowManager {
         final Preferences prefs= AutoplotSettings.settings().getPreferences(WindowManager.class);
         int grab= 4 * window.getFont().getSize(); // pixels so mouse operator has something to grab
         Dimension screenSize= java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        if ( prefs.getInt( "window."+name+".screenwidth", 0 )==screenSize.width ) {
-            int w= prefs.getInt( "window."+name+".width", -9999 );
-            int h= prefs.getInt( "window."+name+".height", -9999 );
+        Pattern p= Pattern.compile("(?<width>\\d+),(?<height>\\d+)");
+        String s= prefs.get( "window."+name+".screensize", "" );
+        Matcher m0= p.matcher(s);
+        if ( m0.matches() && Integer.parseInt( m0.group("width") )==screenSize.width ) {
+            String wh= prefs.get("window."+name+".size", "" );
+            Matcher m= p.matcher(wh);
+            int w= m.matches() ? Integer.parseInt( m.group("width") ) : -9999;
+            int h= m.matches() ? Integer.parseInt( m.group("height") ) : -9999;
             if ( w>10 && h>10 && w<screenSize.width && h<screenSize.height ) {
                 window.setSize( w, h );
             }   
             if ( parent!=null ) {
-                int x= prefs.getInt( "window."+name+".rlocationx", -9999 );
-                int y= prefs.getInt( "window."+name+".rlocationy", -9999 );        
+                String rxy= prefs.get( "window."+name+".rlocation", "" );
+                Pattern p2= Pattern.compile("(?<x>\\d+),(?<y>\\d+)");
+                Matcher m2= p2.matcher(rxy);
+                int x= m2.matches() ? Integer.parseInt( m2.group("x") ) : -9999;
+                int y= m2.matches() ? Integer.parseInt( m2.group("y") ) : -9999;
                 if ( x>-9999 && y>-9999 ) {
                     int newx= parent.getX()+x;
                     int newy= parent.getY()+y;
@@ -92,8 +102,11 @@ public class WindowManager {
                     window.setLocation( newx, newy );
                 }
             } else {
-                int x= prefs.getInt( "window."+name+".locationx", -9999 );
-                int y= prefs.getInt( "window."+name+".locationy", -9999 );
+                String xy= prefs.get( "window."+name+".location", "" );
+                Pattern p2= Pattern.compile("(?<x>\\d+),(?<y>\\d+)");
+                Matcher m2= p2.matcher(xy);
+                int x= m2.matches() ? Integer.parseInt( m2.group("x") ) : -9999;
+                int y= m2.matches() ? Integer.parseInt( m2.group("y") ) : -9999;
                 if ( x>-9999 && y>-9999 ) {
                     int newx= x;
                     int newy= y;
@@ -127,16 +140,16 @@ public class WindowManager {
         final Preferences prefs= AutoplotSettings.settings().getPreferences(WindowManager.class);
         logger.log( Level.FINE, "saving last location {0} {1} {2} {3}", new Object[]{x, y, h, w});
         // so that we know these settings are still valid.
-        prefs.putInt( "window."+name+".screenwidth", java.awt.Toolkit.getDefaultToolkit().getScreenSize().width ); 
+        Dimension d= java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        prefs.put( "window."+name+".screensize", String.format("%d,%d",d.width,d.height) );
         if ( c!=null ) {
-            prefs.putInt( "window."+name+".rlocationx", x-c.getX() );
-            prefs.putInt( "window."+name+".rlocationy", y-c.getY() );
+            prefs.put( "window."+name+".rlocation", String.format( "%d,%d", x-c.getX(), y-c.getY() ) );
+            prefs.put( "window."+name+".location", String.format( "%d,%d", x, y ) );
         } else {
-            prefs.putInt( "window."+name+".locationx", x );
-            prefs.putInt( "window."+name+".locationy", y );            
+            prefs.put( "window."+name+".rlocation", "0,0" );
+            prefs.put( "window."+name+".location", String.format( "%d,%d", x, y ) );
         }
-        prefs.putInt( "window."+name+".width", w );
-        prefs.putInt( "window."+name+".height", h );
+        prefs.put( "window."+name+".size", String.format( "%d,%d", w, h ) );
         
     }
 
