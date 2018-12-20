@@ -5,9 +5,15 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.NodeChangeListener;
+import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
+import org.autoplot.util.MigratePreference;
 import org.das2.util.filesystem.FileSystem;
 
 /**
@@ -85,6 +91,7 @@ public final class AutoplotSettings {
      */
     public Preferences getPreferences( Class c ) {
         String s= c.getPackage().getName();
+        Preferences p1= Preferences.userRoot().node("/"+s.replace('.','/'));
         switch (s) {
             case "org.autoplot.dom":
                 s= "org.virbo.autoplot.dom";
@@ -101,7 +108,9 @@ public final class AutoplotSettings {
             default:
                 break;
         }
-        return Preferences.userRoot().node("/"+s.replace('.','/'));
+        Preferences p2= Preferences.userRoot().node("/"+s.replace('.','/'));
+        return new MigratePreference(p2,p1);
+        
     }
     
     /**
