@@ -228,7 +228,7 @@ public class AppManager {
      * @param c 
      */
     public synchronized void addCloseCallback( Object app, String id, CloseCallback c ) {
-        Map<String,CloseCallback> appCallbacks= this.appCloseCallbacks.get(id);
+        Map<String,CloseCallback> appCallbacks= this.appCloseCallbacks.get(app);
         if ( appCallbacks==null ) {
             appCallbacks= new LinkedHashMap();
         }
