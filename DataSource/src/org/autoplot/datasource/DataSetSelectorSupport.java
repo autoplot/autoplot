@@ -65,7 +65,7 @@ public class DataSetSelectorSupport {
         }
         if ( initialSelection!=null ) {
             URISplit split= URISplit.parse(initialSelection);
-            if ( split.file!=null ) {
+            if ( split.file!=null && "vap".equals(split.ext) ) {
                 chooser.setSelectedFile( new File( split.file ));
             }
         }
