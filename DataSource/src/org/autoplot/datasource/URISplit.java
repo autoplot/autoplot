@@ -201,7 +201,7 @@ public class URISplit {
     public URI resourceUri;
     
     /**
-     * the resource uri up to the authority, e.g.  jbdc:mysql://192.168.0.203:3306
+     * the resource uri up to the authority, e.g. http://autoplot.org
      */
     public String authority;
     
@@ -216,12 +216,12 @@ public class URISplit {
     public String file;
     
     /**
-     * the file/resource extention, like ".cdf" or 
+     * the file/resource extention, like ".cdf" or ".dat".
      */
     public String ext;
     
     /**
-     * contains the parameters part, a ampersand-delimited set of parameters. For example, column=field2&rank2.
+     * contains the parameters part, a ampersand-delimited set of parameters. For example, column=field2&amp;rank2.
      */
     public String params;
 
