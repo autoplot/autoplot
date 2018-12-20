@@ -1002,7 +1002,15 @@ public final class AutoplotUI extends javax.swing.JFrame {
         fillInitialBookmarksMenu();
         APSplash.checkTime("init 53");
 
+        this.setName("autoplot");
         AppManager.getInstance().addApplication(this);
+        AppManager.getInstance().addCloseCallback( this, "recordPositionSize", new AppManager.CloseCallback() {
+            @Override
+            public boolean checkClose() {
+                WindowManager.getInstance().recordWindowSizePosition(AutoplotUI.this);
+                return true;
+            }
+        });
         this.addWindowListener( AppManager.getInstance().getWindowListener(this,new AbstractAction("close") {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1010,6 +1018,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 if ( AutoplotUI.this==ScriptContext.getViewWindow()  ) {
                     ScriptContext.close();
                 }
+                //TODO: remove the following prefs.
                 final Preferences prefs= AutoplotSettings.settings().getPreferences(ApplicationModel.class);
                 long x= AutoplotUI.this.getLocation().x;
                 long y= AutoplotUI.this.getLocation().y;
@@ -2064,6 +2073,7 @@ APSplash.checkTime("init 52.9");
             @Override
             public void actionPerformed( ActionEvent ev ) {
                 org.das2.util.LoggerManager.logGuiEvent(ev);
+                boolean isQuit= false;
                 if ( AppManager.getInstance().getApplicationCount()==1 ) {
                     int opt= JOptionPane.showConfirmDialog( AutoplotUI.this,
                             "Quit application?", "Quit Autoplot", JOptionPane.YES_NO_CANCEL_OPTION );
@@ -2071,7 +2081,7 @@ APSplash.checkTime("init 52.9");
                         case JOptionPane.YES_OPTION:
                             //normal route
                             if ( AppManager.getInstance().requestQuit() ) {
-                                
+                                isQuit= true;
                             } else {
                                 return;
                             }   break;
@@ -2084,7 +2094,9 @@ APSplash.checkTime("init 52.9");
                 }
                 AutoplotUI.this.dispose();
                 ScriptContext.close();
-                AppManager.getInstance().closeApplication(AutoplotUI.this);
+                if ( !isQuit ) {
+                    AppManager.getInstance().closeApplication(AutoplotUI.this);
+                }
             }
         });
 
@@ -2704,6 +2716,8 @@ APSplash.checkTime("init 52.9");
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
         resetFontMI = new javax.swing.JMenuItem();
+        addSizeMenu = new javax.swing.JMenu();
+        resetAppSize = new javax.swing.JMenuItem();
         jSeparator4 = new javax.swing.JPopupMenu.Separator();
         resetZoomMenu = new javax.swing.JMenu();
         resetZoomMenuItem = new javax.swing.JMenuItem();
@@ -2966,6 +2980,18 @@ APSplash.checkTime("init 52.9");
         textSizeMenu.add(resetFontMI);
 
         viewMenu.add(textSizeMenu);
+
+        addSizeMenu.setText("App Size");
+
+        resetAppSize.setText("Reset to default size");
+        resetAppSize.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetAppSizeActionPerformed(evt);
+            }
+        });
+        addSizeMenu.add(resetAppSize);
+
+        viewMenu.add(addSizeMenu);
         viewMenu.add(jSeparator4);
 
         resetZoomMenu.setText("Reset Zoom");
@@ -4222,6 +4248,10 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
         dia.setVisible(true);
     }//GEN-LAST:event_runBatchMenuItemActionPerformed
 
+    private void resetAppSizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetAppSizeActionPerformed
+        ScriptContext.setCanvasSize( 724, 656 ); // this is the arbitrary size of the app when its size is now saved.
+    }//GEN-LAST:event_resetAppSizeActionPerformed
+
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     @Override
     public void propertyChange( PropertyChangeEvent ev ) {
@@ -4842,15 +4872,16 @@ APSplash.checkTime("init -70");
 
                     app.createDropTargetListener( app.dataSetSelector );
 
-                    Preferences prefs= AutoplotSettings.settings().getPreferences( AutoplotUI.class );
-                    int posx= prefs.getInt( "locationx", app.getLocation().x );
-                    int posy= prefs.getInt( "locationy", app.getLocation().y );
-                    if ( posx!= app.getLocation().x || posy!=app.getLocation().y ) {
-                        boolean scncheck= java.awt.Toolkit.getDefaultToolkit().getScreenSize().width==prefs.getInt( "locationscreenwidth", 0 );
-                        if ( scncheck ) { // don't position if the screen size changes.
-                            app.setLocation( posx, posy );
-                        }
-                    }
+                    WindowManager.getInstance().recallWindowSizePosition(app);
+                    //Preferences prefs= AutoplotSettings.settings().getPreferences( AutoplotUI.class );
+                    //int posx= prefs.getInt( "locationx", app.getLocation().x );
+                    //int posy= prefs.getInt( "locationy", app.getLocation().y );
+                    //if ( posx!= app.getLocation().x || posy!=app.getLocation().y ) {
+                    //    boolean scncheck= java.awt.Toolkit.getDefaultToolkit().getScreenSize().width==prefs.getInt( "locationscreenwidth", 0 );
+                    //    if ( scncheck ) { // don't position if the screen size changes.
+                    //        app.setLocation( posx, posy );
+                    //    }
+                    //}
 APSplash.checkTime("init 200");
                     boolean addSingleInstanceListener= true;
                     if ( addSingleInstanceListener ) {
@@ -5275,6 +5306,7 @@ APSplash.checkTime("init 240");
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutAutoplotMenuItem;
     private javax.swing.JMenuItem aboutDas2MenuItem;
+    private javax.swing.JMenu addSizeMenu;
     private javax.swing.JMenuItem additionalOptionsMI;
     private javax.swing.ButtonGroup addressBarButtonGroup;
     private javax.swing.JMenu addressBarMenu;
@@ -5341,6 +5373,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenuItem reloadAllMenuItem;
     private javax.swing.JMenu renderingOptionsMenu;
     private javax.swing.JMenuItem replaceFileMenuItem;
+    private javax.swing.JMenuItem resetAppSize;
     private javax.swing.JMenuItem resetFontMI;
     private javax.swing.JMenuItem resetMemoryCachesMI;
     private javax.swing.JMenuItem resetXMenuItem;

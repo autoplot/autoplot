@@ -188,6 +188,21 @@
                 </MenuItem>
               </SubComponents>
             </Menu>
+            <Menu class="javax.swing.JMenu" name="addSizeMenu">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="App Size"/>
+              </Properties>
+              <SubComponents>
+                <MenuItem class="javax.swing.JMenuItem" name="resetAppSize">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Reset to default size"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="resetAppSizeActionPerformed"/>
+                  </Events>
+                </MenuItem>
+              </SubComponents>
+            </Menu>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator4">
             </MenuItem>
             <Menu class="javax.swing.JMenu" name="resetZoomMenu">
