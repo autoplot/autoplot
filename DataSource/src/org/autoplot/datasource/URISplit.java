@@ -179,37 +179,47 @@ public class URISplit {
     }
 
     /**
-     * scheme for Autoplot, if provided.  e.g.  vap+cdf.  If not provided,
-     * then "vap:" is implicit.
+     * scheme for Autoplot, if provided.  e.g.  vap+cdf.  
      */
     public String vapScheme;
+    
     /**
-     * scheme for resource, e.g. jdbc.mysql
+     * scheme for resource, e.g. "file" or "https"
      */
     public String scheme;
+    
     /**
      * the complete, modified surl.   file:///home/jbf/mydata.qds
      * this is the resource name, and doesn't contain the vapScheme.
      */
     public String surl;
+    
     /**
      * the resource that is handled by the DataSource.  This may be null if surl doesn't form a valid uri.
      * 
      */
     public URI resourceUri;
+    
     /**
      * the resource uri up to the authority, e.g.  jbdc:mysql://192.168.0.203:3306
      */
     public String authority;
+    
     /**
      * the resource uri including the path part.
      */
     public String path;
+    
     /**
      * contains the resource string up to the query part.
      */
     public String file;
+    
+    /**
+     * the file/resource extention, like ".cdf" or 
+     */
     public String ext;
+    
     /**
      * contains the parameters part, a ampersand-delimited set of parameters. For example, column=field2&rank2.
      */

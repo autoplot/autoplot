@@ -66,7 +66,7 @@ public class CompletionsServlet extends HttpServlet {
             }
         }
 
-        if ( split.scheme.startsWith("file:/") && !whiteListed ) {
+        if ( split.scheme.startsWith("file") && !whiteListed ) {
             throw new IllegalArgumentException("URI cannot be a local file: "+uri);
         }
         
