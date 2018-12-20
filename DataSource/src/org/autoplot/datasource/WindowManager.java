@@ -75,7 +75,7 @@ public class WindowManager {
         final Preferences prefs= AutoplotSettings.settings().getPreferences(WindowManager.class);
         int grab= 4 * window.getFont().getSize(); // pixels so mouse operator has something to grab
         Dimension screenSize= java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        Pattern p= Pattern.compile("(?<width>\\d+),(?<height>\\d+)");
+        Pattern p= Pattern.compile("(?<width>\\d+)x(?<height>\\d+)");
         String s= prefs.get( "window."+name+".screensize", "" );
         Matcher m0= p.matcher(s);
         if ( m0.matches() && Integer.parseInt( m0.group("width") )==screenSize.width ) {
@@ -141,7 +141,7 @@ public class WindowManager {
         logger.log( Level.FINE, "saving last location {0} {1} {2} {3}", new Object[]{x, y, h, w});
         // so that we know these settings are still valid.
         Dimension d= java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        prefs.put( "window."+name+".screensize", String.format("%d,%d",d.width,d.height) );
+        prefs.put( "window."+name+".screensize", String.format("%dx%d",d.width,d.height) );
         if ( c!=null ) {
             prefs.put( "window."+name+".rlocation", String.format( "%d,%d", x-c.getX(), y-c.getY() ) );
             prefs.put( "window."+name+".location", String.format( "%d,%d", x, y ) );
@@ -149,7 +149,7 @@ public class WindowManager {
             prefs.put( "window."+name+".rlocation", "0,0" );
             prefs.put( "window."+name+".location", String.format( "%d,%d", x, y ) );
         }
-        prefs.put( "window."+name+".size", String.format( "%d,%d", w, h ) );
+        prefs.put( "window."+name+".size", String.format( "%dx%d", w, h ) );
         
     }
 
