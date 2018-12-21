@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Run Batch tool used to investigate a bug with layout.
+        <p><small>A couple of bugs with the contours plot are corrected, better handling when no contours are visible.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2018-12-21 r23142):</p>
         <ul>
+            <li>2077: corrections to the contours plot.
             <li>2076: create pngwalk would show warning bubbles when print log level was OFF, because of typo in synchronize code.  Thanks, Masafumi!
             <li>2074: vap+inline: supports vap+inline:1.23Re,10.21;1.28Re,10.22;1.31Re,10.23; and has tests http://jfaden.net/jenkins/job/autoplot-test147/.
             <li>0498: Ok, OK, Okay...  Use just OK.  Thanks, Bob!
