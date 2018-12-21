@@ -26,9 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-12-19 r23124):</p>
+        <p>Bugfixes (2018-12-21 r23142):</p>
         <ul>
-            <li>0498: Ok, OK, Okay...  Use just OK.
+            <li>2076: create pngwalk would show warning bubbles when print log level was OFF, because of typo in synchronize code.  Thanks, Masafumi!
+            <li>2074: vap+inline: supports vap+inline:1.23Re,10.21;1.28Re,10.22;1.31Re,10.23; and has tests http://jfaden.net/jenkins/job/autoplot-test147/.
+            <li>0498: Ok, OK, Okay...  Use just OK.  Thanks, Bob!
             <li>Orbits from rbspa-pp came from down server, which showed a bug where a second IOException would prevent redundant servers from filling in.
             <li>DatumUtil.lookupDatum now handles strings without a space, like 45Kg, which often appear in vap+inline URIs.  Thanks, Ivar!
             <li>test140 explicitly loads files with UTF-8 encoding, to work around a bug where new Jenkins server mis-reports the content-type.
