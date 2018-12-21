@@ -577,7 +577,7 @@ public class Options extends DomNode {
         if ( !exclude.contains(PROP_OVERRENDERING) ) this.setOverRendering( that.isOverRendering() );
         if ( !exclude.contains(PROP_TEXTANTIALIAS) ) this.setTextAntiAlias( that.isTextAntiAlias() );
         if ( !exclude.contains(PROP_PRINTINGLOGLEVEL) ) this.setPrintingLogLevel( that.getPrintingLogLevel() );
-        if ( !exclude.contains(PROP_DISPLAYLOGLEVEL) ) this.setPrintingLogLevel( that.getDisplayLogLevel() );
+        if ( !exclude.contains(PROP_DISPLAYLOGLEVEL) ) this.setDisplayLogLevel( that.getDisplayLogLevel() );
         if ( !exclude.contains(PROP_DAY_OF_YEAR) ) this.setDayOfYear( that.isDayOfYear() );
     }
 
