@@ -83,6 +83,10 @@ public class ContourStylePanel extends javax.swing.JPanel implements PlotStylePa
     }
     
     private void updateGUI( Renderer renderer ) {
+        if ( renderer==null ) {
+            System.err.println("renderer was null");
+            return;
+        }
         this.control= renderer.getControl();
         levelsTextField.setText( renderer.getControl( ContoursRenderer.CONTROL_KEY_LEVELS, "0." ) );
         drawLabelsCheckBox.setSelected( renderer.getBooleanControl( ContoursRenderer.CONTROL_KEY_LABELS, false ) );
