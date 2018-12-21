@@ -725,6 +725,12 @@ public class PlotController extends DomNodeController {
         dasPlot1.getYAxis().addFocusListener(ac.focusAdapter);
         dasPlot1.addPropertyChangeListener(DasPlot.PROP_FOCUSRENDERER, ac.rendererFocusListener);
 
+        ac.bind( this.plot, Plot.PROP_ISOTROPIC, dasPlot1, DasPlot.PROP_ISOTROPIC );
+        ac.bind( this.plot, Plot.PROP_DISPLAYTITLE, dasPlot1, DasPlot.PROP_DISPLAYTITLE );
+        ac.bind( this.plot, Plot.PROP_DISPLAYLEGEND, dasPlot1, DasPlot.PROP_DISPLAYLEGEND );
+        ac.bind( this.plot, Plot.PROP_FONTSIZE, dasPlot1, DasPlot.PROP_FONTSIZE );        
+        
+        ac.bind(application.getOptions(), Options.PROP_LOGMESSAGETIMEOUTSEC, dasPlot1, DasPlot.PROP_LOG_TIMEOUT_SEC );
         ac.bind(application.getOptions(), Options.PROP_DRAWGRID, dasPlot1, "drawGrid");
         ac.bind(application.getOptions(), Options.PROP_DRAWMINORGRID, dasPlot1, "drawMinorGrid");
         ac.bind(application.getOptions(), Options.PROP_FLIPCOLORBARLABEL, this.plot.getZaxis().getController().dasAxis, "flipLabel");
@@ -733,7 +739,8 @@ public class PlotController extends DomNodeController {
         ac.bind(application.getOptions(), Options.PROP_TICKLEN, dasPlot1.getYAxis(), "tickLength");
         ac.bind(application.getOptions(), Options.PROP_TICKLEN, colorbar, "tickLength");
         ac.bind(application.getOptions(), Options.PROP_MULTILINETEXTALIGNMENT, dasPlot1, DasPlot.PROP_MULTILINETEXTALIGNMENT);
-
+        ac.bind(application.getOptions(), Options.PROP_PRINTINGLOGLEVEL, dasPlot1, DasPlot.PROP_PRINTINGLOGLEVEL );
+        ac.bind(application.getOptions(), Options.PROP_DISPLAYLOGLEVEL, dasPlot1, DasPlot.PROP_LOG_LEVEL );
         ac.bind(this.plot, Plot.PROP_LEGENDPOSITION, dasPlot1, DasPlot.PROP_LEGENDPOSITION );
         ac.bind(this.plot, Plot.PROP_DISPLAYLEGEND, dasPlot1, DasPlot.PROP_DISPLAYLEGEND );
 
@@ -1913,13 +1920,6 @@ public class PlotController extends DomNodeController {
         };
         this.plot.addPropertyChangeListener(plotListener);
         ac.bind( this.plot, Plot.PROP_CONTEXT, p, DasPlot.PROP_CONTEXT, plotContextConverter );
-        ac.bind( this.plot, Plot.PROP_ISOTROPIC, p, DasPlot.PROP_ISOTROPIC );
-        ac.bind( this.plot, Plot.PROP_DISPLAYTITLE, p, DasPlot.PROP_DISPLAYTITLE );
-        ac.bind( this.plot, Plot.PROP_DISPLAYLEGEND, p, DasPlot.PROP_DISPLAYLEGEND );
-        ac.bind( this.plot, Plot.PROP_FONTSIZE, p, DasPlot.PROP_FONTSIZE );
-        ac.bind( dom.options, Options.PROP_PRINTINGLOGLEVEL, p, DasPlot.PROP_PRINTINGLOGLEVEL );
-        ac.bind( dom.options, Options.PROP_DISPLAYLOGLEVEL, p, DasPlot.PROP_LOG_LEVEL );
-        ac.bind( dom.options, Options.PROP_LOGMESSAGETIMEOUTSEC, p, DasPlot.PROP_LOG_TIMEOUT_SEC );
         
     }
 
