@@ -412,6 +412,7 @@ public class Test140 {
         System.err.println("disable certificate checking");
         AutoplotUtil.disableCertificates();
         
+        System.err.println("home (prefs): " + System.getProperty("user.home") );
         System.err.println("autoplot_data: "+AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA));
         System.err.println("fscache: "+AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE));
         
