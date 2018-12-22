@@ -1,6 +1,7 @@
 
 package test.endtoend;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -141,6 +142,9 @@ public class Test140 {
             } else {
                 throw new IllegalArgumentException("a dataset from the vap was null: "+uri );
             }
+            ScriptContext.getDocumentModel().getOptions().setColor( Color.BLACK );
+            ScriptContext.getDocumentModel().getOptions().setBackground( Color.WHITE );
+            
         } else if ( uri.startsWith("script:") ) {
             System.err.println("skipping script");
         } else if ( uri.startsWith("bookmarks:") ) {
