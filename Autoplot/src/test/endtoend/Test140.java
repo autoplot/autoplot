@@ -142,8 +142,6 @@ public class Test140 {
             } else {
                 throw new IllegalArgumentException("a dataset from the vap was null: "+uri );
             }
-            ScriptContext.getDocumentModel().getOptions().setColor( Color.BLACK );
-            ScriptContext.getDocumentModel().getOptions().setBackground( Color.WHITE );
             
         } else if ( uri.startsWith("script:") ) {
             System.err.println("skipping script");
@@ -275,6 +273,8 @@ public class Test140 {
 
         if ( uri.endsWith(".vap") || uri.contains(".vap?timerange=") ) {
             reset();
+            ScriptContext.getDocumentModel().getOptions().setColor( Color.BLACK );
+            ScriptContext.getDocumentModel().getOptions().setBackground( Color.WHITE );
         }
         
         return result;
