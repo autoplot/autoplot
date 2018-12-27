@@ -28,6 +28,10 @@
         
         <p>Bugfixes (2018-12-21 r23142):</p>
         <ul>
+            <li>recent changes to Auralizer properties slowed things sufficiently that 44.1KHz couldn't keep up.
+            <li>AutoplotServlet build with Ant didn't work because file was not committed.
+            <li>2078: colons in aggregations would cause problem in "reject" method, because of improper URI handling.
+            <li>test140 needed to reset colors after each .vap is rendered, or non-vaps would have leftover color.
             <li>2077: corrections to the contours plot.
             <li>2076: create pngwalk would show warning bubbles when print log level was OFF, because of typo in synchronize code.  Thanks, Masafumi!
             <li>2074: vap+inline: supports vap+inline:1.23Re,10.21;1.28Re,10.22;1.31Re,10.23; and has tests http://jfaden.net/jenkins/job/autoplot-test147/.
@@ -82,6 +86,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>AudioSystem data source supports export, so data can be sent directly to the sound system.
+            <li>issue warnings when ports are used with SFTP, since this isn't supported.
+            <li>Auralizer has scale property which can be set to false.
             <li>WindowManager tracks the application size and position.
             <li>new lockDomainDivider axis property avoids jumping when the tick spacing is known to be correct.
         </ul>
