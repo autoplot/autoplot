@@ -1,0 +1,46 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.autoplot.asdatasource;
+
+import java.util.Map;
+import org.autoplot.datasource.DataSourceFormat;
+import org.autoplot.datasource.URISplit;
+import org.das2.graph.Auralizor;
+import org.das2.qds.QDataSet;
+import org.das2.util.monitor.ProgressMonitor;
+
+/**
+ *
+ * @author jbf
+ */
+public class AudioSystemDataSourceFormat implements DataSourceFormat {
+
+    
+    @Override
+    public void formatData(String uri, QDataSet data, ProgressMonitor mon) throws Exception {
+        Auralizor auralizor= new Auralizor(data);
+        
+        URISplit split= URISplit.parse(uri);
+        Map<String,String> params= URISplit.parseParams(split.params);
+            
+        boolean doscale= !"F".equals( params.get("scale") );
+        
+        auralizor.setScale(doscale);
+        
+        auralizor.playSound();
+    }
+
+    @Override
+    public boolean canFormat(QDataSet ds) {
+        return ds.rank()==1;
+    }
+
+    @Override
+    public String getDescription() {
+        return "stream data to audio system";
+    }
+    
+}
