@@ -188,7 +188,8 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
         URISplit split = URISplit.parse(surl);
 
-        String delegateFfile = fsm.getFileSystem().getRootURI().resolve(delegateFile).toString();
+        String encodedDelegateFile= delegateFile.replaceAll(":","%3A");
+        String delegateFfile = fsm.getFileSystem().getRootURI().resolve(URISplit.uriEncode(encodedDelegateFile)).toString();
         urlLen += delegateFfile.length();
         carotPos -= urlLen - delegateFfile.length();
         split.file = delegateFfile;
@@ -213,8 +214,9 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         delegatecc.surlpos = carotPos;
         delegatecc.context = cc.context;
         
+        String decodedDelegateFile= delegateFfile.replaceAll("%3A",":");
         //delegatecc.resource= new URL( delegateFfile );
-        delegatecc.resourceURI = DataSetURI.toUri(delegateFfile);
+        delegatecc.resourceURI = DataSetURI.toUri(decodedDelegateFile);
 
         return delegatecc;
     }
@@ -261,7 +263,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             throw new IllegalArgumentException( "unable to find any files in "+fsm );
         }
 
-        split.resourceUri= fsm.getFileSystem().getRootURI().resolve(file);
+        split.resourceUri= fsm.getFileSystem().getRootURI().resolve(file.replaceAll(":","%3A"));
         String scompUrl = DataSetURI.fromUri( split.resourceUri );
         if (split.params.length() > 0) {
             scompUrl += "?" + split.params;
