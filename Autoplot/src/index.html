@@ -32,15 +32,15 @@
             <li>AutoplotServlet build with Ant didn't work because file was not committed.
             <li>2078: colons in aggregations would cause problem in "reject" method, because of improper URI handling.
             <li>test140 needed to reset colors after each .vap is rendered, or non-vaps would have leftover color.
-            <li>2077: corrections to the contours plot.
+            <li>2077: corrections to the contours plot.  Thanks, Ivar!
             <li>2076: create pngwalk would show warning bubbles when print log level was OFF, because of typo in synchronize code.  Thanks, Masafumi!
-            <li>2074: vap+inline: supports vap+inline:1.23Re,10.21;1.28Re,10.22;1.31Re,10.23; and has tests http://jfaden.net/jenkins/job/autoplot-test147/.
+            <li>2074: vap+inline: supports vap+inline:1.23Re,10.21;1.28Re,10.22;1.31Re,10.23; and has tests http://jfaden.net/jenkins/job/autoplot-test147/.  Thanks, Ivar!
             <li>0498: Ok, OK, Okay...  Use just OK.  Thanks, Bob!
             <li>Orbits from rbspa-pp came from down server, which showed a bug where a second IOException would prevent redundant servers from filling in.
             <li>DatumUtil.lookupDatum now handles strings without a space, like 45Kg, which often appear in vap+inline URIs.  Thanks, Ivar!
             <li>test140 explicitly loads files with UTF-8 encoding, to work around a bug where new Jenkins server mis-reports the content-type.
             <li>correct where GUI was created off of the event thread, when script was run from the address bar.
-            <li>bug in extent prevented slices of  rbspa_int_ect-mageisLOW-L3_20160411_v8.1.0.cdf?FEDU from showing.
+            <li>bug in extent prevented slices of  rbspa_int_ect-mageisLOW-L3_20160411_v8.1.0.cdf?FEDU from showing.  Thanks, Seth!
             <li>2073: load TSB blue and grey icons once, since looking up the icon from the classpath can be slow.
             <li>2073: cache plotElement controller GUIs, which were recreated as the focus moved around.
             <li>2073: remove old "panel" name, which have been known for years as "plotElements"
