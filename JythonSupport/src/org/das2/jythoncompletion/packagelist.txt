@@ -1,4 +1,4 @@
-# wget -O packagelist.txt http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc2017/lastSuccessfulBuild/artifact/doc/package-list
+# wget -O packagelist.txt https://ci-pw.physics.uiowa.edu/job/autoplot-javadoc/lastSuccessfulBuild/artifact/doc/package-list
 ProGAL
 ProGAL.dataStructures
 ProGAL.geom2d
