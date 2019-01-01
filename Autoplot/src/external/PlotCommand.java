@@ -487,7 +487,7 @@ public class PlotCommand extends PyObject {
                         if ( doAuto==null ) {
                             doAuto= val.__findattr__( "autorange" );
                         }
-                        if ( doAuto!=null && doAuto!=Py.None ) {
+                        if ( doAuto!=null && doAuto!=Py.None && ds!=null ) {
                             PyObject range= ((PyMethod)doAuto).__call__(new PyQDataSetAdapter().adapt(ds));
                             QDataSet rangeds= (QDataSet) range.__tojava__(QDataSet.class);
                             plot.getXaxis().setRange( DataSetUtil.asDatumRange(rangeds.slice(0) ) );
