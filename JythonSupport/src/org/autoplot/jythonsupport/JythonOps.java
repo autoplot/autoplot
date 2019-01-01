@@ -272,7 +272,9 @@ public class JythonOps {
     public static DatumRange datumRange( PyObject arg0, Units context ) {
         DatumRange newRange= JythonOps.datumRange(arg0);
         if ( ! context.isConvertibleTo(newRange.getUnits()) ) {
-            newRange= DatumRange.newDatumRange( newRange.min().value(), newRange.max().value(), context );
+            if ( newRange.min().getUnits()==Units.dimensionless ) {
+                newRange= DatumRange.newDatumRange( newRange.min().value(), newRange.max().value(), context );
+            }
         } else if ( context!=newRange.getUnits() ) {
             newRange= new DatumRange( newRange.min().convertTo(context), newRange.max().convertTo(context) );
         }
