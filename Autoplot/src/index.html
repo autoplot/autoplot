@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Welcome Winter, and Happy Holidays to you!
+        <p><small>Using Autoplot PNGWalk to look at the snow forecast.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2018-12-27 r23156):</p>
+        <p>Bugfixes (2019-01-02 r23164):</p>
         <ul>
+            <li>asOrderOneUnits will prefer "2923 days" to "2.52550E14 microseconds" when the units are microseconds an arbitrary threshold was preventing this.
+            <li>don't convert units of string to datumRange if the range is incompatible with the context units, only if the range is dimensionless.
+            <li>update location for package list completions and example scripts to new Jenkins server.
             <li>recent changes to Auralizer properties slowed things sufficiently that 44.1KHz couldn't keep up.
             <li>AutoplotServlet build with Ant didn't work because file was not committed.
             <li>2078: colons in aggregations would cause problem in "reject" method, because of improper URI handling.
@@ -86,6 +89,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>introduce reduceSum, which is like total but skips invalid values.  Thanks, Ivar!
             <li>AudioSystem data source supports export, so data can be sent directly to the sound system.
             <li>issue warnings when ports are used with SFTP, since this isn't supported.
             <li>Auralizer has scale property which can be set to false.
