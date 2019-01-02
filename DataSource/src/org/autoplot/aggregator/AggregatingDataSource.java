@@ -411,6 +411,9 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 EnumerationUnits eu= new EnumerationUnits("default");
                 for ( String s: ss ) {
                     DatumRange dr= getFsm().getRangeFor(s);
+                    //if ( getFsm().hasField("x") ) {
+                    //    s= getFsm().getField( "x", s );
+                    //}
                     build.putValues( -1, DDataSet.wrap( new double[] { dr.min().doubleValue(u), dr.max().doubleValue(u), 0x80FF80, eu.createDatum(s).doubleValue(eu) } ), 4 );
                     build.nextRecord();
                 }
