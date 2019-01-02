@@ -70,7 +70,7 @@ public final class EventThreadResponseMonitor {
     public void start() {
         //new Thread( createRunnable(), "eventThreadResponseMonitor"  ).start();
         //new Thread( watchEventThreadRunnable(), "watchEventThread" ).start();
-        logger.info("Starting EventThreadResponseMonitor.");
+        logger.info("Starting EventThreadResponseMonitor, which should have a trivial effect on performance.");
         logger.log(Level.INFO, "Warnings will be written to {0}", new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "log" ));
         exec= new ScheduledThreadPoolExecutor(1);
         exec.scheduleAtFixedRate( maybeCreateEventThreadRunnable(), 4000, TEST_CLEAR_EVENT_QUEUE_PERIOD_MILLIS, TimeUnit.MILLISECONDS );
