@@ -191,7 +191,8 @@ public class WindowManager {
         final JDialog dia= new JDialog( p, Dialog.ModalityType.APPLICATION_MODAL );
         final String name;
         if ( title.startsWith("Run Script ") ) { //small kludge to hide user-created data from injection into user prefs.
-            String hash= String.format( "%09d", Math.abs( title.substring(11).hashCode() ) );
+            String hash= String.format( "%09d", title.substring(11).hashCode() );
+            if ( hash.startsWith("-") ) hash= "0"+hash.substring(1);
             name= "RunScript-"+hash;
         } else {
             name= title.replaceAll( "\\s","");
