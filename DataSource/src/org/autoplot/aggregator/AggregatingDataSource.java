@@ -827,7 +827,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 logger.log(Level.FINE, "loaded {0} {1}", new Object[] { result, describeRange(result) }  );
                 return result;
             }
+        } catch ( RuntimeException ex ) {
+            logger.fine("runtime exception thrown");
+            throw ex;
+            
         } catch ( Exception ex ) {
+            logger.fine("exception thrown");
             throw ex;
         }
 
