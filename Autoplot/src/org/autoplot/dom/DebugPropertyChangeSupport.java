@@ -25,7 +25,7 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
     String myBean;
     public long t= System.currentTimeMillis() - t0;
     
-    private final boolean debug= false;
+    private static final boolean DEBUG= false;
     
     List<String> propNames= new ArrayList();
     String[] propNamesArray= new String[0];
@@ -44,7 +44,7 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
             return;
         }
         super.addPropertyChangeListener(listener);
-        if ( debug && listener!=null ) {
+        if ( DEBUG && listener!=null ) {
             final String key= listener.toString();
             //if ( key.startsWith("scaleListener") ) {
             //    System.err.println("+++ add scaleListener");
@@ -68,7 +68,7 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
             return;
         }
         super.addPropertyChangeListener(propertyName, listener);
-        if ( debug && listener!=null ) {
+        if ( DEBUG && listener!=null ) {
             final String key= listener.toString()+ " " + propertyName;
             propNames.add( key );
             propNamesArray= propNames.toArray( new String[propNames.size()] );
@@ -84,7 +84,7 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
     @Override
     public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
         super.removePropertyChangeListener(listener);
-        if ( debug && listener!=null ) {
+        if ( DEBUG && listener!=null ) {
             final String key = listener.toString();            
             //if ( key.startsWith("scaleListener") ) {
             //    System.err.println("--- rm scaleListener");
@@ -94,25 +94,24 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
             sources.remove(key);
             birthMilli.remove(key);
         }
-        if ( debug ) printOldListeners();
+        if ( DEBUG ) printOldListeners();
     }
 
     @Override
     public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         super.removePropertyChangeListener(propertyName, listener);
         //TODO: possible bug: sometimes with TSBs listener is null.
-        if ( debug && listener!=null ) {
+        if ( DEBUG && listener!=null ) {
             final String key= listener.toString()+ " " + propertyName;
             propNames.remove( key );
             propNamesArray= propNames.toArray( new String[propNames.size()] );
             sources.remove( key );
             birthMilli.remove( key );
         }
-        if ( debug ) printOldListeners();
+        if ( DEBUG ) printOldListeners();
     }
 
     private void printOldListeners() {
-        return;
 //        long tnow= System.currentTimeMillis();
 //        for ( Entry<String,Long> e: birthMilli.entrySet() ) {
 //            if ( e.getValue()>0 && ( tnow-e.getValue() ) > 20000 ) {
@@ -156,7 +155,7 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
      * @return 
      */
     public synchronized String[] getPropNames() {
-        if ( debug==false ) {
+        if ( DEBUG==false ) {
             throw new IllegalArgumentException("debug must be turned on for getPropNames");
         }
         return propNames.toArray( new String[propNames.size()] );
