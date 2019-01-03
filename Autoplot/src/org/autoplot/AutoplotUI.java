@@ -50,18 +50,22 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilePermission;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
+import java.security.Permission;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -4593,11 +4597,163 @@ private void updateFrameTitle() {
         };
         return r;
     }
+//    
+//    private static void enterSandbox() {
+//        SecurityManager limitedSecurityManager = new SecurityManager() {
+//            @Override
+//            public ThreadGroup getThreadGroup() {
+//                return super.getThreadGroup(); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkSecurityAccess(String target) {
+//                super.checkSecurityAccess(target); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkSetFactory() {
+//                super.checkSetFactory(); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkPackageDefinition(String pkg) {
+//                super.checkPackageDefinition(pkg); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//
+//            @Override
+//            public void checkPrintJobAccess() {
+//                super.checkPrintJobAccess(); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkPropertyAccess(String key) {
+//                super.checkPropertyAccess(key); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkPropertiesAccess() {
+//                super.checkPropertiesAccess(); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkMulticast(InetAddress maddr) {
+//                super.checkMulticast(maddr); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkAccept(String host, int port) {
+//                super.checkAccept(host, port); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkListen(int port) {
+//                super.checkListen(port); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkConnect(String host, int port, Object context) {
+//                super.checkConnect(host, port, context); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkConnect(String host, int port) {
+//                super.checkConnect(host, port); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkDelete(String file) {
+//                super.checkDelete(file); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkWrite(String file) {
+//                super.checkWrite(file); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkWrite(FileDescriptor fd) {
+//                super.checkWrite(fd); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkRead(String file, Object context) {
+//                super.checkRead(file, context); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkRead(String file) {
+//                if ( !file.startsWith("/home/jbf/Linux/autoplot_data/") ) {
+//                    super.checkRead(file);
+//                } 
+//            }
+//
+//            @Override
+//            public void checkRead(FileDescriptor fd) {
+//                super.checkRead(fd); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkLink(String lib) {
+//                super.checkLink(lib); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkExec(String cmd) {
+//                super.checkExec(cmd); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkExit(int status) {
+//                super.checkExit(status); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkAccess(ThreadGroup g) {
+//                super.checkAccess(g); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkAccess(Thread t) {
+//                super.checkAccess(t); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkCreateClassLoader() {
+//                super.checkCreateClassLoader(); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkPermission(Permission perm, Object context) {
+//                super.checkPermission(perm, context); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public void checkPermission(Permission perm) {
+//                //super.checkPermission(perm); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            public Object getSecurityContext() {
+//                return super.getSecurityContext(); //To change body of generated methods, choose Tools | Templates.
+//            }
+//
+//            @Override
+//            protected Class[] getClassContext() {
+//                return super.getClassContext(); //To change body of generated methods, choose Tools | Templates.
+//            }
+//            
+//        };
+//        System.setSecurityManager(limitedSecurityManager);
+//    }
+    
     /**
      * @param args the command line arguments
      */
     public static void main( String args[] ) {
 
+        //enterSandbox();
+        
         //http://today.java.net/pub/a/today/2007/08/30/debugging-swing.html
         //http://today.java.net/today/2007/08/30/tracing.zip
         //Toolkit.getDefaultToolkit().getSystemEventQueue().push(new org.pushingpixels.tracing.TracingEventQueueJMX());
@@ -4689,6 +4845,7 @@ private void updateFrameTitle() {
         alm.addBooleanSwitchArgument( "nop", null, "nop", "no operation, to be a place holder for jnlp script.");
         alm.addBooleanSwitchArgument( "headless", null, "headless", "run in headless mode" );
         alm.addBooleanSwitchArgument( "noAskParams", null, "noAskParams", "don't ask for parameters when running a script");
+        //alm.addBooleanSwitchArgument( "sandbox", null, "sandbox", "enable sandbox, which limits which disks are used." );
         
        for ( int i=0; i<args.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
            if ( args[i].equals("-print") ) args[i]="--print";
@@ -4728,6 +4885,10 @@ private void updateFrameTitle() {
             }
         }
         alm.process(args);
+        
+        //if ( alm.getBooleanValue("sandbox") ) {
+        //    enterSandbox();
+        //}
         
         if ( alm.getBooleanValue("headless") ) {
             System.setProperty("java.awt.headless","true");
