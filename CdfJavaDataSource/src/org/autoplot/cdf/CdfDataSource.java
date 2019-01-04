@@ -878,7 +878,7 @@ public class CdfDataSource extends AbstractDataSource {
      */
     private QDataSet getDeltaPlusMinus( final CDFReader cdf, QDataSet ds, final String deltaPlus, final String constraints ) throws Exception {
         QDataSet delta= loadVariableAndDependents(cdf, (String)deltaPlus, constraints, cdf.recordVariance((String)deltaPlus)); //TODO: slice1
-        if ( delta.rank()>0 && delta.length()==1 && delta.length()!=ds.length() ) {
+        if ( delta.rank()>0 && delta.length()==1 && ( delta.length()!=ds.length() || ds.length()==1 ) ) {
             delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
         }
         if ( ds.rank()==2 && delta.length()==ds.length(0) ) {
