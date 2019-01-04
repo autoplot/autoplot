@@ -81,7 +81,7 @@ public class Test_101_Bug1511 implements Scenario {
             opList.clickOnItem( index, 1);
 
             Thread.sleep(500);
-            JButtonOperator OKbutton = new JButtonOperator(addOp, "Okay");
+            JButtonOperator OKbutton = new JButtonOperator(addOp, "OK");
 
             OKbutton.clickMouse();
             
@@ -90,7 +90,7 @@ public class Test_101_Bug1511 implements Scenario {
             
             
             DialogOperator editOp = new DialogOperator(new RegexComponentChooser("Edit Operations")) ;
-            JButtonOperator OKbutton2 = new JButtonOperator(editOp, "Okay");
+            JButtonOperator OKbutton2 = new JButtonOperator(editOp, "OK");
             OKbutton2.clickMouse();
             Thread.sleep(6000);
 

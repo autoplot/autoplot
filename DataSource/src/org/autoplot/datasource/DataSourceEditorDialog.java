@@ -267,7 +267,7 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
             okayButton.setText("Plot");
         } else {
             okayButton.setIcon(null);
-            okayButton.setText("Ok");
+            okayButton.setText("OK");
         }
         plotBelowButton.setVisible(b);
         overplotButton.setVisible(b);
