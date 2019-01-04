@@ -13,7 +13,7 @@ import org.das2.qds.QDataSet;
 import org.das2.util.monitor.ProgressMonitor;
 
 /**
- *
+ * "format" the data by streaming it out to the sound card.
  * @author jbf
  */
 public class AudioSystemDataSourceFormat implements DataSourceFormat {
@@ -21,6 +21,11 @@ public class AudioSystemDataSourceFormat implements DataSourceFormat {
     
     @Override
     public void formatData(String uri, QDataSet data, ProgressMonitor mon) throws Exception {
+        
+        if ( data==null ) {
+            throw new IllegalArgumentException( "data is null" );
+        }
+            
         Auralizor auralizor= new Auralizor(data);
         
         URISplit split= URISplit.parse(uri);
