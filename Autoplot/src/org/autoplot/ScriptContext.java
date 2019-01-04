@@ -871,8 +871,8 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      * @param label a label for the mouse module.
      * @param listener the PyFunction to call with new events.
      * @return the mouse module.  
-     * @see org.das2.event.MouseModule#setDragRenderer(org.das2.event.DragRenderer) 
-     * @see org.das2.event.BoxSelectionEvent for the methods of the event.
+     * @see org.das2.event.MouseModule#setDragRenderer(org.das2.event.DragRenderer) setDragRenderer to see how to set how feedback can be provided.
+     * @see org.das2.event.BoxSelectionEvent BoxSelectionEvent for the methods of the event.
      * 
      */
     public static MouseModule addMouseModule( Plot plot, String label, final PyFunction listener ) {
@@ -1832,8 +1832,8 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
     /**
      * make a single plot with so many plot elements.
      * @param nplotElement the number of plotElements on the one plot.
-     * @see #setLayout(int, int) 
-     * @see #addPlotElement(int) which will an another plotElement (an overplot) to the ith position.
+     * @see #setLayout(int, int) setLayout(int, int) which will create a grid of plots.
+     * @see #addPlotElement(int) addPlotElement(int) which will an another plotElement (an overplot) to the ith position.
      */
     public static void setLayoutOverplot( int nplotElement ) {
         if ( nplotElement<1 ) throw new IllegalArgumentException("must be one or more plots");
