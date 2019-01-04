@@ -26,8 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-01-02 r23164):</p>
+        <p>Bugfixes (2019-01-04 r23178):</p>
         <ul>
+            <li>ConvertPropertyValue 1 to Boolean.TRUE failed because the return statement was missing.  
+            <li>one-record epoch would fail to slice delta_plus[1,1].  Thanks, Jon!
+            <li>make all the reduceMax-type functions take a progress monitor.  Thanks, Ivar!
             <li>asOrderOneUnits will prefer "2923 days" to "2.52550E14 microseconds" when the units are microseconds an arbitrary threshold was preventing this.
             <li>don't convert units of string to datumRange if the range is incompatible with the context units, only if the range is dimensionless.
             <li>update location for package list completions and example scripts to new Jenkins server.
