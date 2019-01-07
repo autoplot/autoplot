@@ -457,6 +457,7 @@ cd temp-volatile-src
 $JAVAC  -target 1.7 -source 1.7 -d ../temp-volatile-classes external/FileSearchReplace.java
 cd ..
 ${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
+${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_1GB.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
 ${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_4GB.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
 ${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/index.html '#{tag}' $TAG '#{codebase}' $CODEBASE
 
