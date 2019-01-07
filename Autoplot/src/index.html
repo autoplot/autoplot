@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Using Autoplot PNGWalk to look at the snow forecast.
+        <p><small>Silhouette of Baobob trees made with where on image hue data.  The <a href="baobabs.jy">script</a>.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-01-04 r23178):</p>
+        <p>Bugfixes (2019-01-07 r23178):</p>
         <ul>
+            <li>findex non-monotonic check relaxed because it was slow.
+            <li>2087: butterworth might use integer datasets, causing rounding errors which would make things unstable.
             <li>ConvertPropertyValue 1 to Boolean.TRUE failed because the return statement was missing.  
             <li>one-record epoch would fail to slice delta_plus[1,1].  Thanks, Jon!
             <li>make all the reduceMax-type functions take a progress monitor.  Thanks, Ivar!

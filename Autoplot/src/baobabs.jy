@@ -1,0 +1,18 @@
+reset()
+
+ds= getDataSet(PWD+'baobab.jpg')
+plot( 1, ds, 
+         xpos='80%,90%', ypos='10%,30%', 
+         xdrawTickLabels=False, ydrawTickLabels=False )
+dom.plots[1].yaxis.visible=dom.plots[1].xaxis.visible=False
+from org.autoplot.imagedatasource import ImageDataSourceFormat
+hsv= ImageDataSourceFormat.fromRGBtoHSV( ds )
+
+hue= hsv[:,:,0]
+value=  hsv[:,:,2]
+
+r= where( hue.gt(150).and( hue.lt(250) ).and(value.gt(20) ) )
+
+ds= zeros( hsv.length(), hsv.length(0) )
+ds[r]= 1
+plot( 0, ds, colorTable='grayscale' )
