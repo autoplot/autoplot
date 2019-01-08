@@ -62,19 +62,21 @@ public class Test_052_FocusSwitching implements Scenario {
             menuBar.pushMenu("Options|Enable Feature|Data Panel", "|");
             
             ScriptContext.waitUntilIdle();            
+            Thread.sleep(1000);
+            
             new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("vap+cdf:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2000-01-09");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             
             Thread.sleep(1000);
             ScriptContext.waitUntilIdle(); // clickMouse doesn't block, never has...
             
-            Component data= new JTabbedPaneOperator( app.getTabs() ).selectPage("data");
-            //Ask Kenzie how to add filter via buttons.
-            
             Application dom = getDocumentModel();
             
             dom.getOptions().setDataVisible(true);
             
+            Component data= new JTabbedPaneOperator( app.getTabs() ).selectPage("data");
+            //Ask Kenzie how to add filter via buttons.
+                        
             // why must I do this?  I would think that waitUntilIdle would catch this.
             while ( dom.getPlotElements(0).getController().getDataSet()==null ) {
                 Thread.sleep(100);
