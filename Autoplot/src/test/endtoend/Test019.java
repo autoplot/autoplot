@@ -265,12 +265,12 @@ public class Test019 {
      * @throws IOException 
      */
     public static void testDeadFileSystemListing() throws FileNotFoundException, FileSystem.FileSystemOfflineException, UnknownHostException, IOException {
-        boolean makeIt= false;
+        File f= FileSystem.settings().getLocalCacheDir();
+        File f2= new File( f.toString()+"/http/www-pw.physics.uiowa.edu/~jbf/autoplot/test/019/20130912/");
+        boolean makeIt= ! f2.exists();
         if ( makeIt ) {
-            File f= FileSystem.settings().getLocalCacheDir();
-            File f2= new File( f.toString()+"/http/emfisis-soc.physics.uiowa.edu/~jbf/20130912/");
             f2.mkdirs();
-            f= new File( f.toString()+"/http/emfisis-soc.physics.uiowa.edu/~jbf/20130912/.listing.part");
+            f= new File( f.toString()+"/http/www-pw.physics.uiowa.edu/~jbf/autoplot/test/019/20130912/.listing.part");
             FileWriter w= new FileWriter(f);
             try {
                 w.append("test");
@@ -283,7 +283,7 @@ public class Test019 {
                 TestSupport.logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
-        FileSystem fs= FileSystem.create("http://emfisis-soc.physics.uiowa.edu/~jbf/20130912/");
+        FileSystem fs= FileSystem.create("http://www-pw.physics.uiowa.edu/~jbf/autoplot/test/019/20130912/");
         String[] ss= fs.listDirectory("/");
         FileObject fo= fs.getFileObject(ss[0]);
         System.err.println( fo.getSize() );
