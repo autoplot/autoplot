@@ -58,19 +58,23 @@ public class Test_052_FocusSwitching implements Scenario {
             
             JFrameOperator mainFrame = new JFrameOperator(app);
 
-            JMenuBarOperator menuBar = new JMenuBarOperator( mainFrame );
-            menuBar.pushMenu("Options|Enable Feature|Data Panel", "|");
+            Application dom = getDocumentModel();
+            
+            while ( dom.getOptions().isDataVisible()==false ) {
+                System.err.println("making it visible");
+                JMenuBarOperator menuBar = new JMenuBarOperator( mainFrame );
+                menuBar.pushMenu("Options|Enable Feature|Data Panel", "|");
+                Thread.sleep(1000);
+            }
             
             ScriptContext.waitUntilIdle();            
-            Thread.sleep(1000);
+            
             
             new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("vap+cdf:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2000-01-09");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             
             Thread.sleep(1000);
             ScriptContext.waitUntilIdle(); // clickMouse doesn't block, never has...
-            
-            Application dom = getDocumentModel();
             
             dom.getOptions().setDataVisible(true);
             
