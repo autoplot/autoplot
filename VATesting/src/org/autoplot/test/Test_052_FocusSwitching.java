@@ -73,6 +73,8 @@ public class Test_052_FocusSwitching implements Scenario {
             
             Application dom = getDocumentModel();
             
+            dom.getOptions().setDataVisible(true);
+            
             // why must I do this?  I would think that waitUntilIdle would catch this.
             while ( dom.getPlotElements(0).getController().getDataSet()==null ) {
                 Thread.sleep(100);
