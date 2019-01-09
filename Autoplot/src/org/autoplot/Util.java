@@ -354,40 +354,25 @@ public class Util {
 //    }
     
     /**
-     * this will add the Scheme font found in the /resources/ folder.
+     * this will add the Scheme and other named fonts found in the /resources/ folder.
      */
     public static void addFonts() {
         Class c= Util.class;
    
-        try ( InputStream in = c.getResourceAsStream("/resources/Roboto-Regular.ttf") ) {
-            if ( in!=null ) {
-                Font font = Font.createFont(Font.TRUETYPE_FONT, in );
-                GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-                ge.registerFont(font);
+        String[] ss= new String[] { "/resources/Roboto-Regular.ttf", 
+            "/resources/ArchitectsDaughter.ttf",
+            "/resources/xkcd-script.ttf",
+            "/resources/scheme_bk.otf" };
+        for ( String s: ss ) {
+            try ( InputStream in = c.getResourceAsStream(s) ) {
+                if ( in!=null ) {
+                    Font font = Font.createFont(Font.TRUETYPE_FONT, in );
+                    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+                    ge.registerFont(font);
+                }
+            } catch (FontFormatException | IOException ex) {
+                logger.log(Level.SEVERE, null, ex);
             }
-        } catch (FontFormatException | IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
         }
-
-        try ( InputStream in = c.getResourceAsStream("/resources/ArchitectsDaughter.ttf") ) {
-            if ( in!=null ) {
-                Font font = Font.createFont(Font.TRUETYPE_FONT, in );
-                GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-                ge.registerFont(font);
-            }
-        } catch (FontFormatException | IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
-
-        try ( InputStream in = c.getResourceAsStream("/resources/scheme_bk.otf") ) {
-            if ( in!=null ) {
-                Font font = Font.createFont(Font.TRUETYPE_FONT, in );
-                GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-                ge.registerFont(font);
-            }
-        } catch (FontFormatException | IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
-        
     }
 }
