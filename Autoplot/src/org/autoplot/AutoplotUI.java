@@ -5819,6 +5819,10 @@ APSplash.checkTime("init 240");
      * add the component (typically a JPanel) to the left
      * side of the application.
      * @param c null or the component to add
+     * @see ScriptContext#addTab(java.lang.String, javax.swing.JComponent) 
+     * @see #clearLeftPanel() 
+     * @see #setRightPanel(javax.swing.JComponent) 
+     * @see #setBottomPanel(javax.swing.JComponent) 
      */
     public void setLeftPanel( final JComponent c ) {
         if ( c==null ) throw new NullPointerException("use clearLeftPanel");
@@ -5838,6 +5842,7 @@ APSplash.checkTime("init 240");
     /**
      * remove any extra component added to the left of the tabs.  This calls invokeLater to make sure
      * the event is on the event thread.
+     * @see #setLeftPanel(javax.swing.JComponent) 
      */
     public void clearLeftPanel() {
         Runnable run= new Runnable() {
@@ -5856,6 +5861,7 @@ APSplash.checkTime("init 240");
      * add the component (typically a JPanel) to the right
      * side of the application.
      * @param c  null or the component to add
+     * @see #setLeftPanel(javax.swing.JComponent) 
      */
     public void setRightPanel( final JComponent c ) {
         if ( c==null ) throw new NullPointerException("use clearRightPanel");
@@ -5892,6 +5898,7 @@ APSplash.checkTime("init 240");
      * add the component (typically a JPanel) below the tabs and above the 
      * status indicator
      * @param c  null or the component to add
+     * @see #setLeftPanel(javax.swing.JComponent) 
      */
     public void setBottomPanel( final JComponent c ) {
         if ( c==null ) throw new NullPointerException("use clearBottomPanel");
