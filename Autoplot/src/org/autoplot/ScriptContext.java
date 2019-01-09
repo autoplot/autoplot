@@ -893,6 +893,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      * set the Autoplot status bar string.  Use the prefixes "busy:", "warning:"
      * and "error:" to set icons.
      * @param message
+     * @see #showMessageDialog(java.lang.String) 
      */
     public static void setStatus( String message ) {
         dom.getController().setStatus(message);
@@ -918,6 +919,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      * show a popup to the scientist, which they must acknowledge before this
      * returns.
      * @param message, possibly containing HTML.
+     * @see #setStatus(java.lang.String) 
      */
     public static void showMessageDialog( String message ) {
         JOptionPane.showMessageDialog( view, message );
@@ -928,6 +930,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      * label, with the component added within a scroll pane.
      * @param label the label for the component.
      * @param c the component to add.
+     * @see AutoplotUI#setLeftPanel(javax.swing.JComponent) setLeftPanel which adds to the GUI
      */
     public static void addTab( final String label, final JComponent c  ) {
         Runnable run= new Runnable() {
