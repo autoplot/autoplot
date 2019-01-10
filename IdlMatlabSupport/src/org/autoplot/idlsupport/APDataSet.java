@@ -156,13 +156,13 @@ public class APDataSet extends QDataSetBridge {
         DataSourceFactory f= DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor());
 
         List<String> problems= new ArrayList();
-        if ( f.reject( surl, problems, mon ) ) {
+        if ( f.reject( surl, problems, mon.getSubtaskMonitor("check reject") ) ) {
             throw new Exception("URI was rejected by the datasource: "+surl +" rejected by "+ f );
         }
 
         DataSource dsource = f.getDataSource(uri);
 
-        QDataSet result = dsource.getDataSet( mon);
+        QDataSet result = dsource.getDataSet( mon.getSubtaskMonitor("getDataSet") );
 
         if ( result==null ) {
             throw new Exception("getDataSet did not result in dataset: "+surl );
