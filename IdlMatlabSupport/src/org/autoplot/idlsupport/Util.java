@@ -88,7 +88,7 @@ public class Util {
      * return an array of the sources that can be discovered.
      * @return an array of the sources that can be discovered.
      */
-    public String[] getDiscoverySources() {
+    public static String[] getDiscoverySources() {
         DataSourceRegistry registry= DataSourceRegistry.getInstance();
         List<String> exts= registry.getSourceEditorExtensions();
         List<String> result= new ArrayList();
@@ -117,7 +117,7 @@ public class Util {
      * @return
      * @throws Exception 
      */
-    public String enterEditor( String uri ) throws Exception {
+    public static String enterEditor( String uri ) throws Exception {
         DataSourceEditorPanel p = (DataSourceEditorPanel) DataSourceEditorPanelUtil.getDataSourceEditorPanel( uri );
         if ( p.reject(uri) ) {
             System.err.printf("           (nope) %s: %s\n", uri, p);
