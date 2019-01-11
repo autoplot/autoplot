@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Silhouette of Baobob trees made with where on image hue data.  The <a href="baobabs.jy">script</a>.
+        <p><small>Verifying that the piano is in tune.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,6 +27,11 @@
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
         <p>Bugfixes (2019-01-07 r23178):</p>
+        <ul>
+            <li>ArrayDataSet can now take array of arrays as input, supporting Python NumPy to Autoplot bridge via jpype.
+            <li>monitor was reused in IDL bridge's APDataSet, causing warning about misuse of monitor.
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>findex non-monotonic check relaxed because it was slow.
             <li>2087: butterworth might use integer datasets, causing rounding errors which would make things unstable.
@@ -71,28 +76,10 @@
             <li>2063: "convertUnitsTo" didn't properly reset the DOM range, when it reset the implementing DasAxis range.  Thanks, Masafumi!
             <li>LICENSE.txt should be LGPL, not GPL.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>scripting reset method didn't reset undo/redo operations, potentially causing object leaks.
-            <li>2062: Run batch facility didn't properly set PWD, causing runtime exception.
-            <li>2054: any NullPointerException when a leftover thread assumed the controller reference was still valid.
-            <li>2058: reset needs to reset id number sequencing.
-            <li>don't allow URI parameters to be preceded or followed by spaces, improving support for cut-n-paste from emails.
-            <li>2025: corrections to initialization of HAPI dialog.
-            <li>2059: check for inconsistency when BINS_1 is used along with BUNDLE_1 imply differing units.
-            <li>timeranges like 'lastday+P1D/P1D' now work, to represent "tomorrow".  Before only "lastday-" was handled.
-            <li>2058: devel release showed bug where not resetting IDs would cause failure in "clone to new application" and pngwalk generation.  Thanks Ivar and Masafumi!
-            <li>next and previous scan button updating was calling the 2-D bounds code when it only needed a bounds on X, causing performance issues.  Thanks Masafumi!
-            <li>add recCount and recStart controls to CSV reader, so that create png events lists can be subsetted.  Thanks Masafumi!
-            <li>2056: tickleTimer would restart timer while its event was running, which for slow events can cause threads to build up, slowing or crashing machine.  Thanks, Masafumi!
-            <li>filenames with colons (data_2019-01-01T00:00.dat) would not allow relative reference launch.  Now colons past the eighth position are ignored.  Thanks, Chris!
-            <li>2053: timerange macro doesn't update as timerange changes.
-            <li>"delete plot" didn't check to see if there were columns which could be deleted.
-            <li>in DataPointRecorder's reset units, handle when nominal units are used in the table.  Thanks, Bill!
-            <li>2051: rank 2 ytags was slow, when looking at a tiny slice in x.  Thanks, Masafumi!
-            <li>2052: improve support for datumRange, URI, and URL parameters in Jython scripts, when creating GUIs.
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>add xkcd-script font.
             <li>introduce reduceSum which is like total but skips invalid values, and reduceMedian.  Thanks, Ivar!
@@ -101,10 +88,6 @@
             <li>Auralizer has scale property which can be set to false.
             <li>WindowManager tracks the application size and position.
             <li>new lockDomainDivider axis property avoids jumping when the tick spacing is known to be correct.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>plot element style properties dialog now has cancel which will revert to original settings.
         </ul>
         <p>Known issues:</p>
         <ul>
