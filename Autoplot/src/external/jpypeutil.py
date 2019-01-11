@@ -63,7 +63,7 @@ jpype= javaaddpath('http://autoplot.org/jnlp/devel/autoplot.jar')
     return jpype
 
 
-def npToQDataset( X, Y=None, Z=None ):
+def ndarray2qdataset( X, Y=None, Z=None ):
     import jpype
     if not jpype.isJVMStarted():
         raise Exception('Java is not running, use javaaddpath')
@@ -102,7 +102,7 @@ Z2 = mlab.bivariate_normal(X, Y, 1.5, 0.5, 1, 1)
 Z = 10.0 * (Z2 - Z1)
 from jpypeutil import *
 jpype= javaaddpath( 'https://ci-pw.physics.uiowa.edu/job/autoplot-release/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/autoplot.jar', jdwpPort=1141 )
-ds= npToQDataset( x, y, Z )
+ds= ndarray2qdataset( x, y, Z )
 org= jpype.JPackage('org')
 sc= org.autoplot.ScriptContext
 sc.formatDataSet( ds, '/tmp/cdffile.cdf' )
