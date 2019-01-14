@@ -705,6 +705,16 @@ public class PlotElementController extends DomNodeController {
                     pc.doPlotElementDefaultsUnitsChange(plotElement);
                 }
                 Object ocontext= fillDs.property(QDataSet.CONTEXT_0);
+                if ( ocontext!=null ) {
+                    Object altContext= fillDs.property( "CONTEXT_1" );
+                    if ( altContext!=null && altContext instanceof QDataSet ) {
+                        Units acu= (Units)(((QDataSet)altContext).property(QDataSet.UNITS));
+                        if ( acu!=null && UnitsUtil.isTimeLocation(acu) ) {
+                            ocontext= altContext;
+                        }
+                    }
+                }
+                
                 if ( ocontext!=null && !( ocontext instanceof QDataSet ) ) {
                     logger.warning("CONTEXT_0 is not a QDataSet");
                     ocontext= null;
