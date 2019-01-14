@@ -706,7 +706,7 @@ public class PlotElementController extends DomNodeController {
                 }
                 Object ocontext= fillDs.property(QDataSet.CONTEXT_0);
                 if ( ocontext!=null ) {
-                    Object altContext= fillDs.property( "CONTEXT_1" );
+                    Object altContext= fillDs.property( QDataSet.CONTEXT_1 );
                     if ( altContext!=null && altContext instanceof QDataSet ) {
                         Units acu= (Units)(((QDataSet)altContext).property(QDataSet.UNITS));
                         if ( acu!=null && UnitsUtil.isTimeLocation(acu) ) {
