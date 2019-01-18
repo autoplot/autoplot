@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.pdsppi;
 
@@ -45,7 +40,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * Class containing the logic for communicating with the PDS-PPI database.
  * @author jbf
  */
 public class PDSPPIDB {
@@ -58,7 +53,7 @@ public class PDSPPIDB {
     public static final String PDSPPI="https://pds-ppi.igpp.ucla.edu/";
     //public static final String PDSPPI="https://ppi.pds.nasa.gov";
     
-    List<String> ids= new ArrayList<String>(1100);
+    List<String> ids= new ArrayList<>(1100);
     
     public static PDSPPIDB getInstance() {
         return instance;
@@ -169,14 +164,8 @@ public class PDSPPIDB {
                 }
             }
             
-        } catch ( XPathExpressionException ex ) {
+        } catch ( XPathExpressionException | SAXException | ParserConfigurationException ex ) {
             throw new RuntimeException(ex);   
-            
-        } catch ( SAXException ex ) {
-            throw new RuntimeException(ex);   
-            
-        } catch ( ParserConfigurationException ex ) {
-            throw new RuntimeException(ex);
             
         } finally {
             if ( fin!=null ) fin.close();
@@ -241,18 +230,14 @@ public class PDSPPIDB {
      * @return null if the file appears to be XML, the first line otherwise.
      * @throws IOException 
      */
-    String checkXML( File f ) throws IOException {
-        BufferedReader read=null;
-        try {
-            read= new BufferedReader( new InputStreamReader( new FileInputStream(f) ) );
+    protected String checkXML( File f ) throws IOException {
+        try (BufferedReader read = new BufferedReader( new InputStreamReader( new FileInputStream(f) ) )) {
             String s= read.readLine();
             if ( s!=null && s.length() >= 6 && s.substring(0,6).equals("<?xml ") ) {
                 return null;
             } else {
                 return s;
             }
-        } finally {
-            if ( read!=null ) read.close();
         }
     }
     
