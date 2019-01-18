@@ -247,8 +247,18 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             try {
                 DatumRange timeRangeDatum= DatumRangeUtil.parseTimeRange(timeRange);
                 String[] names = fsm.getBestNamesFor(timeRangeDatum,new NullProgressMonitor());
-                if ( names.length>0 ) {
-                    file= names[0];
+                FileSystem fs= fsm.getFileSystem();
+                for (String name : names) {
+                    // look for a file which is not empty.
+                    if (fs.getFileObject(name).getSize() > 0) {
+                        file = name;
+                        break;
+                    }
+                }
+                if ( file==null ){
+                    if ( names.length>0 ) {
+                        file= names[0];
+                    }
                 }
             } catch (ParseException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
