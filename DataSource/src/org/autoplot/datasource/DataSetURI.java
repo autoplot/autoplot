@@ -1241,7 +1241,6 @@ public class DataSetURI {
                 loggerUrl.log(Level.FINE,"GET to get data {0}", url);
 
                 URLConnection urlc= url.openConnection();
-                urlc= HttpUtil.checkRedirect(urlc);
                 urlc.setRequestProperty("Accept-Encoding", "gzip"); // RFE
                 urlc.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() ); // Reiner describes hang at LANL
                 urlc.setReadTimeout( FileSystem.settings().getReadTimeoutMs() );
@@ -1250,6 +1249,7 @@ public class DataSetURI {
                     String encode = Base64.encodeBytes( userInfo.getBytes());
                     urlc.setRequestProperty("Authorization", "Basic " + encode);
                 }
+                urlc= HttpUtil.checkRedirect(urlc);
                 
                 in= urlc.getInputStream();
                 
