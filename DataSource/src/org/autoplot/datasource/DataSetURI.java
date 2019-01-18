@@ -63,6 +63,7 @@ import org.das2.util.filesystem.WebFileSystem;
 import org.autoplot.aggregator.AggregatingDataSourceFactory;
 import org.autoplot.aggregator.AggregatingDataSourceFormat;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.das2.datum.HttpUtil;
 import org.das2.qds.ops.Ops;
 import org.das2.util.Base64;
 import org.das2.util.filesystem.KeyChain;
@@ -1240,6 +1241,7 @@ public class DataSetURI {
                 loggerUrl.log(Level.FINE,"GET to get data {0}", url);
 
                 URLConnection urlc= url.openConnection();
+                urlc= HttpUtil.checkRedirect(urlc);
                 urlc.setRequestProperty("Accept-Encoding", "gzip"); // RFE
                 urlc.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() ); // Reiner describes hang at LANL
                 urlc.setReadTimeout( FileSystem.settings().getReadTimeoutMs() );
