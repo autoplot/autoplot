@@ -188,7 +188,7 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
         if ( cellName!=null ) {
             irow= (short) (Short.parseShort( cellName.substring(1) )- 1 );
         } else {
-            irow= 1;
+            irow= 0;
         }
 
         icell= icell0;
