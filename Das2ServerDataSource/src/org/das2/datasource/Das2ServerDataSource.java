@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.das2.datasource;
 
 import java.io.IOException;
@@ -38,7 +35,6 @@ import org.das2.client.DasServer;
 import org.das2.client.Key;
 import org.das2.datum.CacheTag;
 import org.das2.util.monitor.ProgressMonitor;
-import org.das2.qds.AbstractDataSet;
 import org.das2.dataset.DataSetAdapter;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.stream.MIME;
@@ -67,11 +63,13 @@ import org.das2.util.CredentialsManager;
  *
  * @author jbf
  */
-public class Das2ServerDataSource extends AbstractDataSource {
+public final class Das2ServerDataSource extends AbstractDataSource {
 
     private static final Map<String, String> keys = new HashMap();
 
     private Exception offlineException= null;
+    
+    private Logger loggerUrl= org.das2.util.LoggerManager.getLogger( "das2.url" );
     
     public Das2ServerDataSource(URI uri) throws ParseException {
         super(uri);
@@ -559,11 +557,16 @@ public class Das2ServerDataSource extends AbstractDataSource {
 
     }
     
-    //////////////////////////////////////////////////////////////////////////
-    // Get an input stream or don't.  Handles all the HTTP stuff stuch as 
-    // redirection and authentication if this is an http URL.  Would be okay
-    // to put special handling for other urls as well such as sftp.
-    
+    /**
+     * Get an input stream or don't.  Handles all the HTTP stuff stuch as 
+     * redirection and authentication if this is an http URL.  Would be okay
+     * to put special handling for other urls as well such as sftp.
+     * @param url
+     * @param sDataSetId used if the credentials dialog is needed.
+     * @return
+     * @throws IOException
+     * @throws DasException 
+     */
     private InputStream getInputStream(URL url, String sDataSetId) 
 		 throws IOException, DasException{
 		InputStream in = null;
@@ -574,6 +577,7 @@ public class Das2ServerDataSource extends AbstractDataSource {
 		CredentialsManager cm = CredentialsManager.getMannager();
 		
 		while(true){
+            loggerUrl.log(Level.FINE, "open {0}", url);
 			URLConnection conn = url.openConnection();
 			
 			if(sBasicHash != null)
