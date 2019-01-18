@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.pdsppi;
 
@@ -37,6 +32,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.WebFileSystem;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.datasource.DataSourceUtil;
+import org.das2.util.filesystem.HttpUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -102,8 +98,9 @@ public class PDSPPIFileSystem extends WebFileSystem {
         
         try {
             logger.log(Level.FINE, "listDirectory {0}", url);
-            
+            loggerUrl.log(Level.FINE,"GET to get data {0}", url);
             URLConnection connect= url.openConnection();
+            connect= HttpUtil.checkRedirect(connect);
             connect.connect();
             //if ( !connect.getContentType().equals("text/xml") ) {  //TODO: work with Todd to get response headers
             //    throw new IOException("bad request: "+url);
