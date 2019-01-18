@@ -27,7 +27,7 @@
               <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
               <Component id="goButton" min="-2" pref="87" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jButton1" min="-2" pref="69" max="-2" attributes="0"/>
+              <Component id="jButton1" min="-2" pref="94" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
