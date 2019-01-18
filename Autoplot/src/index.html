@@ -26,8 +26,15 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-01-17 r23218):</p>
+        <p>Bugfixes (2019-01-18 r23224):</p>
         <ul>
+            <li>code sites which open a URL connection should log the URL to das.url.
+            <li>das2stream units error with yValidMin would cause runtime error and prevent the streams use.
+            <li>pds-ppi handles redirects, and is now pointed at https site.
+            <li>2100: export to xls, then try to load the xls.
+            <li>when aggregation looks for a representative file, use the first one with non-zero length.
+            <li>2-D buckshotInterpolate rescales the data so that it is always order 1 (an assumption of ProGal library).
+            <li>SeriesRenderer red line indicating warning limit is now dashed so that data at the limit can be seen.
             <li>2096: connector when two slices are done, where CONTEXT_0 should be ignored and CONTEXT_1 should be used.
             <li>ArrayDataSet can now take array of arrays as input, supporting Python NumPy to Autoplot bridge via jpype.
             <li>monitor was reused in IDL bridge's APDataSet, causing warning about misuse of monitor.
