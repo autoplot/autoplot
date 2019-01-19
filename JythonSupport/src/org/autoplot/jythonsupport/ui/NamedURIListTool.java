@@ -247,8 +247,7 @@ public class NamedURIListTool extends JPanel {
                 } );
                 sub.add( name, BorderLayout.WEST );
             } else {
-                JButton subAdd= new JButton("");
-                subAdd.setIcon( new ImageIcon( FiltersChainPanel.class.getResource("/resources/add.png") ) );
+                JButton subAdd= new JButton( new ImageIcon( FiltersChainPanel.class.getResource("/resources/add.png") ) );
                 subAdd.setMaximumSize( limit );
                 subAdd.setPreferredSize( limit );            
                 subAdd.setToolTipText( "add new URI" );        
@@ -271,8 +270,7 @@ public class NamedURIListTool extends JPanel {
             }
         } else {
         
-           JButton subAdd= new JButton("");
-           subAdd.setIcon( new ImageIcon( FiltersChainPanel.class.getResource("/resources/add.png") ) );
+           JButton subAdd= new JButton( new ImageIcon( FiltersChainPanel.class.getResource("/resources/add.png") ) );
            subAdd.setMaximumSize( limit );
            subAdd.setPreferredSize( limit );            
            subAdd.setToolTipText( "add new URI" );        
@@ -297,8 +295,7 @@ public class NamedURIListTool extends JPanel {
         }
 
         if ( fi>=0 ) {
-            JButton subDelete= new JButton("");
-            subDelete.setIcon( new ImageIcon( FiltersChainPanel.class.getResource("/resources/subtract.png") ) );
+            JButton subDelete= new JButton( new ImageIcon( FiltersChainPanel.class.getResource("/resources/subtract.png") ) );
             subDelete.setMaximumSize( limit );
             subDelete.setPreferredSize( dim );
             
@@ -349,8 +346,19 @@ public class NamedURIListTool extends JPanel {
             dss.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    String newName= null;
+                    String currentName= null;
+                    if ( uris.get(fi).trim().length()==0 ) {
+                        newName= DataSourceUtil.guessNameFor( dss.getValue() );
+                        if ( isValidIdentifier(newName) ) { 
+                            currentName= ids.get( fi );
+                        }
+                    }
                     uris.set( fi,dss.getValue());
                     if (dataMashUp!=null ) dataMashUp.refresh();
+                    if ( currentName!=null && newName!=null ) {
+                        doVariableRename( fi, currentName, newName );
+                    }
                 }
             });
             dss.getEditor().addFocusListener(new FocusAdapter() {
@@ -378,7 +386,6 @@ public class NamedURIListTool extends JPanel {
     
     private void doVariableRename( int fi, String oldName, String newName ) {
         ids.set( fi, newName );
-        isAuto.set( fi,false );
         refresh();
         if ( dataMashUp!=null ) dataMashUp.rename( oldName, newName );
     }
