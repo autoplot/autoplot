@@ -402,22 +402,30 @@ public class NamedURIListTool extends JPanel {
         
         JPanel p= new JPanel();
         p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
-        JLabel c= new JLabel( "Parameter name (a name with no spaces, made of letters, numbers and underscores):" );
+        //JLabel c= new JLabel( "Parameter name (a name with no spaces, made of letters, numbers and underscores):" );
         
-        c.setAlignmentX( Component.LEFT_ALIGNMENT );
-        p.add( c );
+        //c.setAlignmentX( Component.LEFT_ALIGNMENT );
+        //p.add( c );
+
+        final JCheckBox cb= new JCheckBox("Manually set parameter name (a name with no spaces, made of letters, numbers and underscores):");
+        cb.setToolTipText("checked indicates variable name will be picked automatically");
+        cb.setSelected(!autoName);
+        p.add( cb );
         
-        int em=  c.getFont().getSize();
+        int em=  p.getFont().getSize();
         JPanel p1= new JPanel();
         p1.setLayout( new BoxLayout( p1, BoxLayout.X_AXIS ) );
-        JCheckBox cb= new JCheckBox("");
-        cb.setToolTipText("checked indicates variable name will be picked automatically");
-        cb.setSelected(autoName);
-        p1.add( cb );
-        JTextField tf= new JTextField(currentName);
+        final JTextField tf= new JTextField(currentName);
         tf.setMaximumSize( new Dimension( em*50, em*2 ) );
         tf.setPreferredSize( new Dimension( em*50, em*2 ) );
-        
+        tf.setEnabled( cb.isSelected() );
+        cb.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tf.setEnabled( cb.isSelected() ); 
+            }
+        });
+        p1.add( Box.createHorizontalStrut( 3*em ) );
         p1.add( tf );
         p1.add( Box.createGlue() );
         p1.setAlignmentX( Component.LEFT_ALIGNMENT );
@@ -436,12 +444,12 @@ public class NamedURIListTool extends JPanel {
         String title= edit!=null ? "Rename parameter and dataset editor" : "Rename parameter"; // this is so the position and size are remembered separately.
         while ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( scrollPane, p, title, JOptionPane.OK_CANCEL_OPTION ) ) {
             String newName= tf.getText();
-            if ( cb.isSelected() && edit!=null ) {
+            if ( !cb.isSelected() && edit!=null ) {
                 newName= DataSourceUtil.guessNameFor(edit.getURI());
             }
             if ( isValidIdentifier(newName) ) {
                 doVariableRename( fi, currentName, newName );
-                isAuto.set( fi, cb.isSelected() );
+                isAuto.set( fi, !cb.isSelected() );
                 if ( edit!=null ) {
                     uris.set( fi, edit.getURI() );
                 }
