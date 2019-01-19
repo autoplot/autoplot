@@ -439,7 +439,7 @@ public class NamedURIListTool extends JPanel {
             String uri= uris.get(fi);
             edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel( p, uri );
         } catch ( IllegalArgumentException ex ) {
-            logger.log(Level.SEVERE, "can''t get editor for #{0}", fi);
+            logger.log(Level.SEVERE, "can't get editor for #{0}", fi);
         }
         String title= edit!=null ? "Rename parameter and dataset editor" : "Rename parameter"; // this is so the position and size are remembered separately.
         while ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( scrollPane, p, title, JOptionPane.OK_CANCEL_OPTION ) ) {
