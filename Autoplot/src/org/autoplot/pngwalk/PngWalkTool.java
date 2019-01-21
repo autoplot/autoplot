@@ -1802,10 +1802,11 @@ public final class PngWalkTool extends javax.swing.JPanel {
     
     /**
      * returns the current selection, which may be a URL on a remote site, or null if no sequence has been selected.
-     * @return the current selection.
+     * @return the current selection or null if the sequence is not loaded or empty.
      */
     public String getSelectedFile() {
         if ( seq==null ) return null;
+        if ( seq.size()==0 ) return null;
         return DataSetURI.fromUri( seq.currentImage().getUri() );
     }
 
