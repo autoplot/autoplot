@@ -4,15 +4,18 @@ import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -22,6 +25,7 @@ import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.imagedatasource.ImageDataSource;
 
 /**
  * A class to manage an image for the PNGWalk tool. Handles downloading and
@@ -234,16 +238,39 @@ public class WalkImage  {
         }
     }
     
+        
+    public static BufferedImage rotateImage( BufferedImage img, int angle ) {
+        double sin = Math.abs(Math.sin(Math.toRadians(angle)));
+        double cos = Math.abs(Math.cos(Math.toRadians(angle)));
+
+        int w = img.getWidth(null), h = img.getHeight(null);
+
+        int neww = (int) Math.floor(w*cos + h*sin);
+        int newh = (int) Math.floor(h*cos + w*sin);
+
+        
+        BufferedImage bimg = new BufferedImage( neww, newh, img.getType() );
+        Graphics2D g = bimg.createGraphics();
+
+        g.translate((neww-w)/2, (newh-h)/2);
+        g.rotate(Math.toRadians(angle), w/2, h/2);
+        g.drawRenderedImage( img, null );
+        g.dispose();  
+        return bimg;
+    }
+    
     /**
      * return a file, that is never type=0.  This was a bug on Windows.
      * @param f
      * @return
      */
     public BufferedImage readImage( File f ) throws IllegalArgumentException, IOException  {
+        logger.entering( "WalkImage", "readImage" );
         try {
             BufferedImage lim= ImageIO.read( f );
             if ( lim==null ) { // Bob had pngs on his site that returned an html document decorating.
-                logger.info("fail to read image: "+f );
+                logger.log(Level.INFO, "fail to read image: {0}", f);
+                logger.exiting( "WalkImage", "readImage" );
                 return missingImage;
             }
             if ( lim.getType()==0 ) {
@@ -251,7 +278,21 @@ public class WalkImage  {
                 imNew.getGraphics().drawImage( lim, 0, 0, null );
                 lim= imNew;
             }
+            long t0= System.currentTimeMillis();
+            try ( FileInputStream in= new FileInputStream(f) ) {
+                Map<String,Object> meta= ImageDataSource.getJpegExifMetaData(in);
+                String orient= String.valueOf( meta.get("Orientation") );
+                if ( orient.startsWith("Right side, top" ) ) {                    
+                    lim= rotateImage( lim, 90 );
+                }
+
+            } catch ( Exception ex ) {
+                // just ignore, we don't really need this.
+            }
+            logger.log(Level.FINER, "check rotate (millis): {0}", System.currentTimeMillis()-t0);
+            logger.exiting( "WalkImage", "readImage" );
             return lim;
+            
         } catch ( IOException ex ) {
             return missingImage;
         }
