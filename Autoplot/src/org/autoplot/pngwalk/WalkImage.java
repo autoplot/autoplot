@@ -238,7 +238,13 @@ public class WalkImage  {
         }
     }
     
-        
+    /**
+     * rotate an image, unlike the rotate found in ImageDataSource, this will
+     * resize the image when the rotation is 90 degrees.
+     * @param img the image
+     * @param angle the angle to rotate clockwise, in degrees.
+     * @return the rotated image.
+     */
     public static BufferedImage rotateImage( BufferedImage img, int angle ) {
         double sin = Math.abs(Math.sin(Math.toRadians(angle)));
         double cos = Math.abs(Math.cos(Math.toRadians(angle)));
