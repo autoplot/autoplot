@@ -56,7 +56,7 @@ import org.w3c.dom.Node;
  *
  * @author jbf
  */
-class ImageDataSource extends AbstractDataSource {
+public class ImageDataSource extends AbstractDataSource {
 
     public static final int CHANNEL_HUE = 1;
     public static final int CHANNEL_SATURATION = 2;
@@ -126,6 +126,28 @@ class ImageDataSource extends AbstractDataSource {
         }
 
     }
+    
+    /**
+     * rotate the image.
+     * @param image
+     * @param drot rotate this many degrees clockwise
+     * @param dest the target BufferedImage or null if one should be created, the same size as the original, regardless of rotation.
+     * @return the created bufferedImage
+     */
+    public static BufferedImage rotateImage( BufferedImage image, double drot, BufferedImage dest ) {
+        int h= image.getHeight();
+        int w= image.getWidth();
+
+        AffineTransform at= AffineTransform.getTranslateInstance( w/2., h/2. );
+        at.concatenate( AffineTransform.getRotateInstance( Math.PI*drot/180 ) );
+        at.concatenate( AffineTransform.getTranslateInstance( -w/2., -h/2.) );
+
+        if (dest==null ) dest= new BufferedImage( w, h, image.getType() );
+        
+        ((Graphics2D)dest.getGraphics()).drawImage( image,at, null );
+        return dest;
+        
+    }
 
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
@@ -143,19 +165,10 @@ class ImageDataSource extends AbstractDataSource {
         String rot= getParam( "rotate", "0" );
         if ( !rot.equals("0") ) {
 
-            int h= image.getHeight();
-            int w= image.getWidth();
-
             double drot= Double.parseDouble(rot);
 
-            AffineTransform at= AffineTransform.getTranslateInstance( w/2., h/2. );
-            at.concatenate( AffineTransform.getRotateInstance( Math.PI*drot/180 ) );
-            at.concatenate( AffineTransform.getTranslateInstance( -w/2., -h/2.) );
-
-            BufferedImage dest= new BufferedImage( w, h, image.getType() );
-
-            ((Graphics2D)dest.getGraphics()).drawImage( image,at, null );
-
+            BufferedImage dest= rotateImage( image, drot, null );
+            
             image= dest;
         }
         
@@ -412,10 +425,22 @@ class ImageDataSource extends AbstractDataSource {
      * @throws Exception
      */
     public Map<String, Object> getJpegExifMetaData(ProgressMonitor mon) throws Exception {
-        InputStream in = DataSetURI.getInputStream(uri, mon);
+        try ( InputStream in= DataSetURI.getInputStream(uri, mon) ) {
+            return getJpegExifMetaData( in );
+        }
+    }
+    
+    /**
+     * read useful JPG metadata, such as the Orientation.  This also looks to see if GPS
+     * metadata is available.
+     * @param in inputStream from a jpeg source.
+     * @return
+     * @throws Exception 
+     */
+    public static Map<String, Object> getJpegExifMetaData(InputStream in) throws Exception {
         Metadata metadata = JpegMetadataReader.readMetadata(in);
-
-        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        
+        Map<String, Object> map = new LinkedHashMap<>();
 
         Directory exifDirectory;
 
