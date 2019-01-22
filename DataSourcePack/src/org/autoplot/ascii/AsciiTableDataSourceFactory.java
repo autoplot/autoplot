@@ -153,7 +153,8 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 case "units":
                 {
                     List<CompletionContext> result = new ArrayList<>();
-                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "nT", "units for the data"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "nT", "example units for the data"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "enum", "the data is nominal data, not numeric"));
                     return result;
                 }
                 case "fixedColumns":
