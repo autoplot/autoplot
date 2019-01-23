@@ -302,6 +302,7 @@ public class Expect {
 					log.fine("EOF when expecting " + list);
 					return RETV_EOF;
 				}
+                                log.log(Level.FINEST, "read bytes: {0}", n);
 				StringBuilder tmp = new StringBuilder();
 				for (int i = 0; i < n; i++) {
 					buffer.append((char) bytes.get(i));
