@@ -179,7 +179,7 @@ public class LogConsole extends javax.swing.JPanel {
         this.logTextArea.addMouseListener( new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if ( e.getButton()==MouseEvent.BUTTON1 && e.getClickCount()==2 ) {
+                if ( e.getButton()==MouseEvent.BUTTON1 && e.getClickCount()==2 && e.isShiftDown() ) {
                     int caret= logTextArea.viewToModel( new Point( e.getX(), e.getY() ) );
                     try {
                         String word= org.das2.jythoncompletion.Utilities.getWordAt( logTextArea, caret );
