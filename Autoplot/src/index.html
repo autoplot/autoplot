@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Fun with XKCD font.
+        <p><small>The crosshair digitizer is made to show auxiliary data found in PLANE_0, allowing more flexibility when scripting.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-01-19 r23235):</p>
+        <p>Bugfixes (2019-01-25 r23235):</p>
         <ul>
+            <li>URL in console was too easy to trigger, so now you need to hold shift while double-clicking.
+            <li>Crosshair digitizer "all planes report" checkbox hadn't been tested.  Now auxillary planes can be displayed.
             <li>synchronize( data, [timetags] ) will synchronize timetags to data's timetags, to ease use with the mashup tool.
             <li>log10 shows up property in the filter chain.
             <li>downloadResourceAsTempFile also checks for redirects.
@@ -89,6 +91,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>beginnings of new das2stream reader which will read directly to QDataSet, instead of via old data model, which is buggy.
+            <li>PngWalkTool checks EXIF metadata for rotation cues, so that pngwalk tool works for family photos.
+            <li>experimental "expect" code included, which should be useful for writing scripts which control IDL.
             <li>mashup-tool automatically names new variables based on the URI.
         </ul>
         <p>Less recent features:</p>
