@@ -64,6 +64,7 @@ import javax.swing.ComponentInputMap;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.InputMap;
+import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -1843,7 +1844,56 @@ public class GuiSupport {
         } catch (UnsupportedFlavorException | IOException ex) {
             Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }    
+    }  
+    
+    public static void pasteClipboardPlotElementsIntoPlot( Component app, ApplicationController controller, Plot targetPlot ) throws HeadlessException {
+        try {
+            Clipboard clpbrd= Toolkit.getDefaultToolkit().getSystemClipboard();
+            String s;
+            if ( clpbrd.isDataFlavorAvailable(DataFlavor.stringFlavor) ) {
+                s= (String) clpbrd.getData(DataFlavor.stringFlavor);
+                if ( !s.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<vap") ) {
+                    JOptionPane.showMessageDialog(app,"Use \"Edit Plot\"->\"Copy Plot to Clipboard\"");
+                    return;
+                }
+            } else {
+                JOptionPane.showMessageDialog(app,"Use \"Edit Plot\"->\"Copy Plot to Clipboard\"");
+                return;
+            }
+            
+            Application state= (Application)StatePersistence.restoreState(new ByteArrayInputStream(s.getBytes()));
+            
+            PlotElement[] pes= state.getPlotElements();
+            
+            JPanel panel= new JPanel();
+            panel.setLayout( new BoxLayout(panel,BoxLayout.Y_AXIS) );
+            JCheckBox[] cbs= new JCheckBox[pes.length];
+            for ( int i=0; i<pes.length; i++ ) {
+                //javax.swing.Icon icon=null;
+                //PlotElement originalPlotElement= (PlotElement) controller.getElementById( pes[i].getId() );
+                //if ( false && originalPlotElement!=null ) {
+                //    icon= originalPlotElement.getController().getRenderer().getListIcon();
+                //    cbs[i]= new JCheckBox( icon, true); 
+                //} else {
+                cbs[i]= new JCheckBox( pes[i].getRenderType().toString(), true); 
+                //}
+                panel.add( cbs[i] );
+            }
+            if ( JOptionPane.showConfirmDialog( null, panel, "Add Plot Elements", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                for ( int i=0; i<pes.length; i++ ) {
+                    if ( cbs[i].isSelected() ) {
+                        PlotElement peNew= controller.addPlotElement( targetPlot, null, null );
+                        peNew.syncTo( pes[i], Arrays.asList("id","plotId") );
+                    }
+                }
+            }
+            
+        } catch (UnsupportedFlavorException | IOException ex) {
+            Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }  
+    
+    
     /**
      * Add items to the plot context menu, such as properties and add plot.
      * @param controller
