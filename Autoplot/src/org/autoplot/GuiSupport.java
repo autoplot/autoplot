@@ -1771,7 +1771,16 @@ public class GuiSupport {
         plotController.setExpertMenuItems( expertMenuItemsList.toArray(new JMenuItem[expertMenuItemsList.size()] )  );
 
     }
-
+    
+    /**
+     * replace the plot with the plot stored in the clip board.  This plot
+     * in the clipboard is simply a one-plot .vap file.  
+     * 
+     * @param app component parent for dialogs.
+     * @param controller the application controller where we 
+     * @param newP the plotElements are added to this plot 
+     * @throws HeadlessException 
+     */
     public static void pasteClipboardIntoPlot( Component app, ApplicationController controller, Plot newP ) throws HeadlessException {
         try {
             Clipboard clpbrd= Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -1846,7 +1855,17 @@ public class GuiSupport {
         }
     }  
     
-    public static void pasteClipboardPlotElementsIntoPlot( Component app, ApplicationController controller, Plot targetPlot ) throws HeadlessException {
+    /**
+     * allow plot elements from the clipboard single-plot .vap into the target plot.
+     * This will just insert new plot elements which point at the same data source.
+     * This was added to make it easier to add reference lines (Fce, Fuh) to
+     * spectrograms of each B-field component.
+     * @param app component parent for dialogs.
+     * @param controller the application controller where we 
+     * @param targetPlot the plotElements are added to this plot 
+     * @throws HeadlessException 
+     */
+    public static void pasteClipboardPlotElementsIntoPlot( Component app, ApplicationController controller, Plot targetPlot )  {
         try {
             Clipboard clpbrd= Toolkit.getDefaultToolkit().getSystemClipboard();
             String s;
@@ -1879,7 +1898,7 @@ public class GuiSupport {
                 //}
                 panel.add( cbs[i] );
             }
-            if ( JOptionPane.showConfirmDialog( null, panel, "Add Plot Elements", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+            if ( JOptionPane.showConfirmDialog( app, panel, "Add Plot Elements", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                 for ( int i=0; i<pes.length; i++ ) {
                     if ( cbs[i].isSelected() ) {
                         PlotElement peNew= controller.addPlotElement( targetPlot, null, null );
