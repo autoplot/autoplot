@@ -165,8 +165,11 @@ public class APDataSet extends QDataSetBridge {
         QDataSet result = dsource.getDataSet( mon.getSubtaskMonitor("getDataSet") );
 
         if ( result==null ) {
+            mon.finished();
             throw new Exception("getDataSet did not result in dataset: "+surl );
         }
+        
+        mon.finished();
         return result;
     }
 
