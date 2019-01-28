@@ -552,6 +552,14 @@ public class ApplicationController extends DomNodeController implements RunLater
         } );
         editPlotMenu.add(item);
         
+        item= new JMenuItem( new AbstractAction("Insert Plot Elements from Clipboard Plot") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GuiSupport.pasteClipboardPlotElementsIntoPlot( editPlotMenu, ApplicationController.this, domPlot );
+            }
+        } );
+        editPlotMenu.add(item);
+        
         item = new JMenuItem(new AbstractAction("Remove Bindings") {
             @Override
             public void actionPerformed(ActionEvent e) {
