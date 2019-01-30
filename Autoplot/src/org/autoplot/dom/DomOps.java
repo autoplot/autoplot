@@ -309,7 +309,8 @@ public class DomOps {
      * @param dom 
      */
     public static void fixLayout( Application dom ) {
-        
+        Logger logger= LoggerManager.getLogger("autoplot.dom.layout");
+                
         Canvas canvas= dom.getCanvases(0);
 
         double emToPixels= java.awt.Font.decode(dom.getCanvases(0).font).getSize();
@@ -373,12 +374,12 @@ public class DomOps {
             double MaxDownJ;
             for ( Plot plotj : plots ) {
                 String title= plotj.getTitle();
-                MaxUpJEm= plotj.isDisplayTitle() ? lineCount(title) : 0.;
-                if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
+                MaxUpJEm= plotj.isDisplayTitle() ? Math.max( 2, lineCount(title) ) : 0.;
+                //if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
                 MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
-                Rectangle plot= plotj.getController().getDasPlot().getBounds();
-                Rectangle axis= plotj.getXaxis().getController().getDasAxis().getBounds();
-                MaxDownJ= ( ( axis.getY() + axis.getHeight() ) - ( plot.getY() + plot.getHeight() ) + emToPixels );
+                //Rectangle plot= plotj.getController().getDasPlot().getBounds();
+                //Rectangle axis= plotj.getXaxis().getController().getDasAxis().getBounds();
+                MaxDownJ= ( 2 + lineCount( plotj.getXaxis().getLabel() ) ) * emToPixels;
                 MaxDown[i]= Math.max( MaxDown[i], MaxDownJ );
             }
         }
@@ -402,8 +403,17 @@ public class DomOps {
         double[] normalPlotHeight= new double[ nrow ];
 
         double height= dom.getCanvases(0).getMarginRow().getController().getDasRow().getHeight();
-        for ( int i=0; i<nrow; i++ ) {
-             normalPlotHeight[i]= ( newPlotHeight[i] + MaxUp[i] + MaxDown[i] ) / height;
+        
+        double marginHeightPixels= 
+                ( dom.getCanvases(0).getMarginRow().getController().getDasRow().getEmMinimum() -
+                dom.getCanvases(0).getMarginRow().getController().getDasRow().getEmMaximum() ) * emToPixels ;
+        
+        if ( nrow==1 ) {
+            normalPlotHeight[0]= ( newPlotHeight[0] + MaxUp[0] + MaxDown[0] ) / ( height + marginHeightPixels );
+        } else {
+            for ( int i=0; i<nrow; i++ ) {
+                 normalPlotHeight[i]= ( newPlotHeight[i] + MaxUp[i] + MaxDown[i] ) / ( height + marginHeightPixels );
+            }
         }
 
         double position=0;
@@ -414,7 +424,7 @@ public class DomOps {
             position+= normalPlotHeight[i];
             String newBottom= String.format( Locale.US, "%.2f%%%+.1fem", 100*position, -1 * MaxDown[i] * pixelsToEm );
             rows[i].setBottom( newBottom );
-
+            logger.log(Level.FINE, "row {0}: {1},{2}", new Object[]{i, newTop, newBottom});
         }
 
 
