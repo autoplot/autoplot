@@ -288,6 +288,16 @@ public class DomOps {
     }
     
     /**
+     * play with new canvas layout.  This started as a Jython Script, but it's faster to implement here.
+     * See http://autoplot.org/developer.autolayout#Algorithm
+     * @param dom
+     */
+    public static void newCanvasLayout( Application dom ) {
+        fixLayout( dom );
+        
+    }
+
+    /**
      * New layout mechanism which fixes a number of shortcomings of the old layout mechanism, 
      * newCanvasLayout.  This one:<ul>
      * <li> Removes extra whitespace
@@ -299,16 +309,6 @@ public class DomOps {
      * @param dom 
      */
     public static void fixLayout( Application dom ) {
-        newCanvasLayout( dom );
-        
-    }
-
-    /**
-     * play with new canvas layout.  This started as a Jython Script, but it's faster to implement here.
-     * See http://autoplot.org/developer.autolayout#Algorithm
-     * @param dom
-     */
-    public static void newCanvasLayout( Application dom ) {
         
         Canvas canvas= dom.getCanvases(0);
 
@@ -354,13 +354,13 @@ public class DomOps {
             }
         });
         
-        double totalPlotHeight= 0;
+        double totalPlotHeightPixels= 0;
         for ( int i=0; i<nrow; i++ ) {           
            List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
 
            if ( plots.size()>0 ) {
                DasRow dasRow= rows[i].getController().dasRow;
-               totalPlotHeight= totalPlotHeight + dasRow.getHeight();
+               totalPlotHeightPixels= totalPlotHeightPixels + dasRow.getHeight();
            }
         }
         
@@ -386,24 +386,24 @@ public class DomOps {
         double [] relativePlotHeight= new double[ nrow ];
         for ( int i=0; i<nrow; i++ ) {
             DasRow dasRow= rows[i].getController().dasRow;
-            relativePlotHeight[i]= 1.0 * dasRow.getHeight() / totalPlotHeight;
+            relativePlotHeight[i]= 1.0 * dasRow.getHeight() / totalPlotHeightPixels;
         }
 
-        double newPlotTotalHeight= canvas.height;
+        double newPlotTotalHeightPixels= canvas.height;
         for ( int i=0; i<nrow; i++ ) {
-            newPlotTotalHeight = newPlotTotalHeight - MaxUp[i] - MaxDown[i];
+            newPlotTotalHeightPixels = newPlotTotalHeightPixels - MaxUp[i] - MaxDown[i];
         }
 
-        double [] PlotHeight= new double[ nrow ];
+        double [] newPlotHeight= new double[ nrow ];
         for ( int i=0; i<nrow; i++ ) {
-            PlotHeight[i]= newPlotTotalHeight * relativePlotHeight[i];
+            newPlotHeight[i]= newPlotTotalHeightPixels * relativePlotHeight[i];
         }
 
         double[] normalPlotHeight= new double[ nrow ];
 
         double height= dom.getCanvases(0).getMarginRow().getController().getDasRow().getHeight();
         for ( int i=0; i<nrow; i++ ) {
-             normalPlotHeight[i]= ( PlotHeight[i] + MaxUp[i] + MaxDown[i] ) / height;
+             normalPlotHeight[i]= ( newPlotHeight[i] + MaxUp[i] + MaxDown[i] ) / height;
         }
 
         double position=0;
