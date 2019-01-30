@@ -343,6 +343,7 @@ public class EditorTextPane extends JEditorPane {
             var= EditorAnnotationsSupport.getSymbolAt(this, this.getCaretPosition() );
         }
         support.clearAnnotations();
+        setSelectionEnd( getSelectionStart() ); // clear the selection.
         List<SimpleNode> usages= JythonUtil.showUsage( script,var );
         for ( SimpleNode n: usages ) {
             support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+var.length(), EditorAnnotationsSupport.ANNO_USAGE, var, null );
