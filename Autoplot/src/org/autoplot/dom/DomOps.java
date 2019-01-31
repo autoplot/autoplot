@@ -368,6 +368,12 @@ public class DomOps {
         double [] MaxUp= new double[ nrow ];
         double [] MaxDown= new double[ nrow ];
 
+        double[] emHeight= new double[ nrow ];
+        for ( int i=0; i<nrow; i++ ) {
+            DasRow dasRow= rows[i].getController().dasRow;
+            emHeight[i]= ( dasRow.getEmMaximum() - dasRow.getEmMinimum() );
+        }// I know there's some check we can do with this to preserve 1-em high plots.
+        
         for ( int i=0; i<nrow; i++ ) {
             List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
             double MaxUpJEm;
@@ -379,7 +385,9 @@ public class DomOps {
                 MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
                 //Rectangle plot= plotj.getController().getDasPlot().getBounds();
                 //Rectangle axis= plotj.getXaxis().getController().getDasAxis().getBounds();
-                MaxDownJ= ( 2 + lineCount( plotj.getXaxis().getLabel() ) ) * emToPixels;
+                //MaxDownJ= plot.height - axis.height;
+                int tcaCount= plotj.getXaxis().controller.dasAxis.getTickLines();
+                MaxDownJ= ( tcaCount + lineCount( plotj.getXaxis().getLabel() ) ) * emToPixels;
                 MaxDown[i]= Math.max( MaxDown[i], MaxDownJ );
             }
         }
@@ -389,7 +397,7 @@ public class DomOps {
             DasRow dasRow= rows[i].getController().dasRow;
             relativePlotHeight[i]= 1.0 * dasRow.getHeight() / totalPlotHeightPixels;
         }
-
+        
         double newPlotTotalHeightPixels= canvas.height;
         for ( int i=0; i<nrow; i++ ) {
             newPlotTotalHeightPixels = newPlotTotalHeightPixels - MaxUp[i] - MaxDown[i];
