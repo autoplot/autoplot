@@ -302,11 +302,12 @@ public class DomOps {
      * newCanvasLayout.  This one:<ul>
      * <li> Removes extra whitespace
      * <li> Preserves relative size weights.
-     * <li> Preserves em heights, to support components which should not be rescaled.
+     * <li> Preserves em heights, to support components which should not be rescaled. (Not yet supported.)
      * <li> Preserves space taken by strange objects, to support future canvas components.
-     * <li> Renormalizes the margin row, so it is nice.
+     * <li> Renormalizes the margin row, so it is nice. (Not yet supported.  This should consider font size, where large fonts don't need so much space.)
      * </ul>
-     * @param dom 
+     * This should also be idempotent, where calling this a second time should have no effect.
+     * @param dom an application state, with controller nodes. TODO: remove dependence on controller nodes.
      */
     public static void fixLayout( Application dom ) {
         Logger logger= LoggerManager.getLogger("autoplot.dom.layout");
@@ -368,27 +369,25 @@ public class DomOps {
         double [] MaxUp= new double[ nrow ];
         double [] MaxDown= new double[ nrow ];
 
-        double[] emHeight= new double[ nrow ];
-        for ( int i=0; i<nrow; i++ ) {
-            DasRow dasRow= rows[i].getController().dasRow;
-            emHeight[i]= ( dasRow.getEmMaximum() - dasRow.getEmMinimum() );
-        }// I know there's some check we can do with this to preserve 1-em high plots.
+//        double[] emHeight= new double[ nrow ];
+//        for ( int i=0; i<nrow; i++ ) {
+//            DasRow dasRow= rows[i].getController().dasRow;
+//            emHeight[i]= ( dasRow.getEmMaximum() - dasRow.getEmMinimum() );
+//        }// I know there's some check we can do with this to preserve 1-em high plots.
         
         for ( int i=0; i<nrow; i++ ) {
             List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
             double MaxUpJEm;
-            double MaxDownJ;
+            double MaxDownPx;
             for ( Plot plotj : plots ) {
                 String title= plotj.getTitle();
                 MaxUpJEm= plotj.isDisplayTitle() ? Math.max( 2, lineCount(title) ) : 0.;
                 //if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
                 MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
-                //Rectangle plot= plotj.getController().getDasPlot().getBounds();
-                //Rectangle axis= plotj.getXaxis().getController().getDasAxis().getBounds();
-                //MaxDownJ= plot.height - axis.height;
-                int tcaCount= plotj.getXaxis().controller.dasAxis.getTickLines();
-                MaxDownJ= ( tcaCount + lineCount( plotj.getXaxis().getLabel() ) ) * emToPixels;
-                MaxDown[i]= Math.max( MaxDown[i], MaxDownJ );
+                Rectangle plot= plotj.getController().getDasPlot().getBounds();
+                Rectangle axis= plotj.getXaxis().getController().getDasAxis().getBounds();
+                MaxDownPx= ( ( axis.getY() + axis.getHeight() ) - ( plot.getY() + plot.getHeight() ) + 1 * emToPixels );
+                MaxDown[i]= Math.max( MaxDown[i], MaxDownPx );
             }
         }
 
