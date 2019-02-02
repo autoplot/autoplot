@@ -47,7 +47,7 @@ public class AnnotationCommand extends PyObject {
             + " <tr><td> background     </td><td> background color\n</td></tr>"
             + " <tr><td> foreground     </td><td> foreground color\n</td></tr>"
             + " <tr><td> fontSize     </td><td> size relative to parent (1.2em) or in pts (8pt)\n</td></tr>"
-            + " <tr><td> borderType     </td><td> draw a border around the annotation text<br>none,rectangle,roundedRectangle<br>.</td></tr>"
+            + " <tr><td> borderType     </td><td> draw a border around the annotation text<br>none,rectangle,rounded_rectangle<br>.</td></tr>"
             + " <tr><td> anchorBorderType </td><td> draw a border around the anchor box.</td></tr>"
             + " <tr><td> anchorPosition </td><td>One of NE,NW,SE,SW,<br>N,E,W,S,<br>outsideN,outsideNNW</td></tr>"
             + " <tr><td> anchorOffset </td><td>position relative to the anchor, like '1em,1em'</td></tr>"
