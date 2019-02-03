@@ -205,22 +205,23 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         useUrl.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                resetTextUrlPanel( useUrl );
+                resetTextUrlPanel( useUrl.isSelected() );
             }
         });
         
-        resetTextUrlPanel( useUrl );
+        resetTextUrlPanel( useUrl.isSelected() );
         
     }
     
-    private void resetTextUrlPanel( JRadioButton useUrl ) {
+    private void resetTextUrlPanel( boolean useUrl ) {
         textUrlPanel.removeAll();
-        if ( useUrl.isSelected() ) {
+        if ( useUrl ) {
             textUrlPanel.add( urlPanel );
         } else {
             textUrlPanel.add( textField );
         }
         textUrlPanel.validate();
+        textUrlPanel.repaint();
     }
     
     /**
@@ -263,6 +264,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         urlTextField = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         scaleCB = new javax.swing.JComboBox<>();
+        typeButtonGroup = new javax.swing.ButtonGroup();
         jLabel2 = new javax.swing.JLabel();
         anchorPositionPanel = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
@@ -281,7 +283,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         jLabel13 = new javax.swing.JLabel();
         anchorOffsetTF = new javax.swing.JComboBox<>();
         pointAtCheckBox = new javax.swing.JCheckBox();
-        jRadioButton1 = new javax.swing.JRadioButton();
+        annotationTextButton = new javax.swing.JRadioButton();
         useUrl = new javax.swing.JRadioButton();
         textUrlPanel = new javax.swing.JPanel();
         pointAtPanel = new javax.swing.JPanel();
@@ -519,15 +521,27 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         anchorOffsetTF.setEditable(true);
         anchorOffsetTF.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0em,0em", "1em,1em", "10px,10px", " " }));
 
-        pointAtCheckBox.setSelected(false);
         pointAtCheckBox.setText("Point At:");
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, pointAtPanel, org.jdesktop.beansbinding.ELProperty.create("${visible}"), pointAtCheckBox, org.jdesktop.beansbinding.BeanProperty.create("selected"));
         bindingGroup.addBinding(binding);
 
-        jRadioButton1.setText("Annotation Text:");
+        typeButtonGroup.add(annotationTextButton);
+        annotationTextButton.setSelected(true);
+        annotationTextButton.setText("Annotation Text:");
+        annotationTextButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                annotationTextButtonActionPerformed(evt);
+            }
+        });
 
+        typeButtonGroup.add(useUrl);
         useUrl.setText("Image URL:");
+        useUrl.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                useUrlActionPerformed(evt);
+            }
+        });
 
         textUrlPanel.setLayout(new java.awt.BorderLayout());
 
@@ -577,7 +591,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
                         .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(textUrlPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jRadioButton1)
+                        .addComponent(annotationTextButton)
                         .addGap(18, 18, 18)
                         .addComponent(useUrl)
                         .addGap(0, 0, Short.MAX_VALUE))
@@ -605,15 +619,15 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
                                 .addComponent(pointAtPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(anchorToPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 731, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(6, 6, 6)
+                .addComponent(anchorToPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 731, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jRadioButton1)
+                    .addComponent(annotationTextButton)
                     .addComponent(useUrl))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(textUrlPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -659,6 +673,14 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_canvasAnchorTypeButtonActionPerformed
 
+    private void annotationTextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_annotationTextButtonActionPerformed
+        resetTextUrlPanel( useUrl.isSelected() );
+    }//GEN-LAST:event_annotationTextButtonActionPerformed
+
+    private void useUrlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useUrlActionPerformed
+        resetTextUrlPanel( useUrl.isSelected() );
+    }//GEN-LAST:event_useUrlActionPerformed
+
     public static void main( String[] args ) {
         AnnotationEditorPanel p= new AnnotationEditorPanel();
         Annotation a= new Annotation();
@@ -670,6 +692,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> anchorOffsetTF;
     private javax.swing.JPanel anchorPositionPanel;
     private javax.swing.JPanel anchorToPanel;
+    private javax.swing.JRadioButton annotationTextButton;
     private javax.swing.JPanel backgroundColorPanel;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JRadioButton canvasAnchorTypeButton;
@@ -696,7 +719,6 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JPanel plotControlPanel;
     private javax.swing.JComboBox<String> plotIdComboBox;
     private javax.swing.JCheckBox pointAtCheckBox;
@@ -708,6 +730,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     private javax.swing.JPanel textColorPanel;
     private javax.swing.JTextField textField;
     private javax.swing.JPanel textUrlPanel;
+    private javax.swing.ButtonGroup typeButtonGroup;
     private javax.swing.JPanel urlPanel;
     private javax.swing.JTextField urlTextField;
     private javax.swing.JRadioButton useUrl;
