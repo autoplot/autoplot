@@ -8,6 +8,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -61,14 +62,50 @@ public class BindingSupport {
         }
     }
 
+    /**
+     * converter for objects which have a toString/parse pair.  This works for:
+     * <ul>
+     * <li>DatumRange
+     * <li>Datum
+     * <li>Color
+     * </ul>
+     * The convertForward method captures the class of the object.
+     */
     public static final Converter toStringConverter= new Converter() {
+        
+        Class c= null;
+        Object instance;
+        
         @Override
         public Object convertForward(Object value) {
-            return value.toString();
+            instance= value;
+            if ( c==null ) {
+                c= instance.getClass();
+            }
+            if ( c==java.awt.Color.class ) {
+                return org.das2.util.ColorUtil.nameForColor((java.awt.Color)value);
+            } else {
+                return value.toString();
+            }
         }
 
         @Override
         public Object convertReverse(Object value) {
+            if ( c.isAssignableFrom( org.das2.datum.Datum.class ) ) {
+                try {
+                    return org.das2.datum.DatumUtil.parse((String)value);
+                } catch (ParseException ex) {
+                    return instance;
+                }
+            } else if ( c.isAssignableFrom( org.das2.datum.DatumRange.class ) ) {
+                try {
+                    return org.das2.datum.DatumRangeUtil.parseTimeRange((String)value);
+                } catch (ParseException ex) {
+                    return instance;
+                }
+            } else if ( c.isAssignableFrom( java.awt.Color.class ) ) {
+                return org.das2.util.ColorUtil.decodeColor((String)value);
+            }
             return value.toString();
         }
     };
