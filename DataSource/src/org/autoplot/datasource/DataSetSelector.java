@@ -1329,7 +1329,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     }
 
     private void showFileSystemCompletions(final String surl, final int carotpos) {
-        if ( carotpos>= surl.length() ) {
+        if ( carotpos> surl.length() ) {
             throw new StringIndexOutOfBoundsException("index out of bounds: "+carotpos+" in \"" +surl + "\"" );
         }
         logger.log(Level.FINE, "entering showFileSystemCompletions({0},{1})", new Object[]{surl, carotpos});
