@@ -175,6 +175,7 @@ import org.das2.qds.filters.FiltersChainPanel;
 import org.autoplot.jythonsupport.ui.DataMashUp;
 import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.layout.LayoutConstants;
+import org.autoplot.state.StatePersistence;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -188,6 +189,36 @@ import org.xml.sax.SAXException;
 public final class AutoplotUI extends javax.swing.JFrame {
     private static final String TAB_SCRIPT = "script";
     private static final String TAB_CONSOLE = "console";
+
+    private static Thread getShutdownHook( final ApplicationModel model ) {
+        Runnable run= new Runnable() {
+            public void run() {
+                logger.fine("shutting down");
+                if ( DasApplication.getDefaultApplication().isHeadless() ) {
+                    return;
+                }
+                File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "log/" );
+                if ( !f2.exists() ) {
+                    boolean ok= f2.mkdirs();
+                    if ( !ok ) {
+                        logger.log(Level.WARNING, "unable to create folder {0}", f2);
+                    }
+                }
+                File f= new File( f2, "last.vap" );
+                f.setReadable( false, false );
+                f.setReadable( true, true );
+                f.setWritable( false, false );
+                f.setWritable( true, true );
+                //f.setWritable( true, true );
+                try {
+                    StatePersistence.saveState( f, model.createState(true), "");
+                } catch (IOException ex) {
+                    logger.log(Level.WARNING, "error while writing  {0}", f2);
+                }
+            }
+        };
+        return new Thread( run, "apshutdown" );
+    }
 
     final String TAB_TOOLTIP_CANVAS = "<html>Canvas tab contains the plot and plot elements.<br>Click on plot elements to select.<br>%s</html>";
     final String TAB_TOOLTIP_AXES = "<html>Adjust selected plot axes.<br>%s<html>";
@@ -4969,6 +5000,9 @@ private void updateFrameTitle() {
             model.getDocumentModel().getOptions().setLogConsoleVisible(true);
         }
 
+        logger.fine("add shutdown hook");
+        Runtime.getRuntime().addShutdownHook(getShutdownHook(model));
+                
         if ( !headless && alm.getBooleanValue("nativeLAF")) {
             logger.fine("nativeLAF");
             try {
