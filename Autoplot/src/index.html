@@ -26,8 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-02-02 r23269):</p>
+        <p>Bugfixes (2019-02-06 r23276):</p>
         <ul>
+            <li>annotation position SSE's icon was incorrect.
+            <li>BindingSupport's unused toString Converter was not properly implemented, and would only go one way (toString, not parse).
+            <li>annotation editor dialog url/text toggle did not toggle back properly.
             <li>Corrections to "fix layout" action.  Thanks, Jon N. and Bill and others who have pointed out this bug over the years!
             <li>URL in console was too easy to trigger, so now you need to hold shift while double-clicking.
             <li>add "insert plot elements from clipboard" action, menu item was not added to make the feature available.
@@ -93,6 +96,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add special filesystem support for Github, so files stored on GitHub can be used directly.
+            <li>add low-level shutdown hook so that hung process' vap can be recovered.
             <li>625: GrannyTextRenderer supports !(color;red) and !(painter;id) in strings.  
             <li>gamma function added, though for now data must be positive.
             <li>add "insert plot elements from clipboard" action.  Thanks, Kris!
