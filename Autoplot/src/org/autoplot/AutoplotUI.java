@@ -205,13 +205,13 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     }
                 }
                 File f= new File( f2, "last.vap" );
-                f.setReadable( false, false );
-                f.setReadable( true, true );
-                f.setWritable( false, false );
-                f.setWritable( true, true );
                 //f.setWritable( true, true );
                 try {
                     StatePersistence.saveState( f, model.createState(true), "");
+                    f.setReadable( false, false );
+                    f.setReadable( true, true );
+                    f.setWritable( false, false );
+                    f.setWritable( true, true );
                 } catch (IOException ex) {
                     logger.log(Level.WARNING, "error while writing  {0}", f2);
                 }
