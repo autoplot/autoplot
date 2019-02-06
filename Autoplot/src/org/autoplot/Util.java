@@ -337,6 +337,12 @@ public class Util {
     }
     
 
+    /**
+     * this will be replaced in Java 8.
+     * @param c
+     * @param delim
+     * @return 
+     */
     public static String strjoin(Collection<String> c, String delim) {
         StringBuilder result = new StringBuilder();
         for (String s : c) {
