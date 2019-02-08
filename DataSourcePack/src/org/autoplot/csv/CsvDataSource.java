@@ -102,7 +102,7 @@ public class CsvDataSource extends AbstractDataSource {
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
-        InputStream in = DataSetURI.getInputStream(uri, mon);
+        InputStream in = DataSetURI.getInputStream(uri, mon.getSubtaskMonitor("load input stream"));
         
         //char delimiter= TableOps.getDelim(thein);
         
