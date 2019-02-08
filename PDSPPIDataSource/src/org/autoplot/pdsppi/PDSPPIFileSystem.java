@@ -14,7 +14,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -63,8 +65,9 @@ public class PDSPPIFileSystem extends WebFileSystem {
     private String root= PDSPPIDB.PDSPPI+"ditdos/view?id=pds:/";
     
     @Override
-    protected void downloadFile(String filename, File f, File partfile, ProgressMonitor monitor) throws IOException {
+    protected Map<String,String> downloadFile(String filename, File f, File partfile, ProgressMonitor monitor) throws IOException {
         logger.log(Level.WARNING, "download file {0}", filename);
+        return Collections.EMPTY_MAP;
     }
 
     @Override
