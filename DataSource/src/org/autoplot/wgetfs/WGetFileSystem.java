@@ -12,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -113,7 +114,7 @@ public class WGetFileSystem extends WebFileSystem {
     }
     
     @Override
-    protected void downloadFile(String filename, File f, File partfile, ProgressMonitor monitor) throws IOException {
+    protected Map<String,String> downloadFile(String filename, File f, File partfile, ProgressMonitor monitor) throws IOException {
         String[] cmd;
         if ( WGetFileSystemFactory.useCurl ) {
             cmd= new String[] { WGetFileSystemFactory.exe, "-o", partfile.toString(), getRootURL().toString() + filename };
@@ -160,6 +161,7 @@ public class WGetFileSystem extends WebFileSystem {
             logger.log(Level.WARNING, "unable to rename file {0} to {1}", new Object[]{partfile, f});
         }
         
+        return Collections.EMPTY_MAP;
     }
 
     @Override
