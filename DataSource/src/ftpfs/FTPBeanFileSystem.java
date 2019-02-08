@@ -43,9 +43,11 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.datum.TimeUtil;
@@ -567,11 +569,11 @@ public class FTPBeanFileSystem extends WebFileSystem {
     }
 
     @Override
-    protected void downloadFile( String filename, File targetFile, final File partFile, final ProgressMonitor mon) throws java.io.IOException {
+    protected Map<String,String> downloadFile( String filename, File targetFile, final File partFile, final ProgressMonitor mon) throws java.io.IOException {
 
         Lock lock= getDownloadLock( filename, targetFile, mon );
 
-        if ( lock==null ) return;
+        if ( lock==null ) return Collections.EMPTY_MAP;
 
         logger.log(Level.FINE, "ftpfs downloadFile({0})", filename);
         
@@ -680,7 +682,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     if ( !partFile.delete() ) {
                         throw new IllegalArgumentException("unable to delete "+partFile );
                     }
-                    return;
+                    return Collections.EMPTY_MAP;
                 }
             }
             
@@ -706,6 +708,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
             mon.finished();
             lock.unlock();
         }
+        return Collections.EMPTY_MAP;
         
     }
 
