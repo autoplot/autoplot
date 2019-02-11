@@ -31,7 +31,7 @@ import org.python.parser.ast.exprType;
  */
 public class SimplifyScriptSupport {
     
-    private static final Logger logger= LoggerManager.getLogger("jython");
+    private static final Logger logger= LoggerManager.getLogger("jython.simplify");
         
     private static final String GETDATASET_CODE= 
         "def getDataSet( uri, timerange='', monitor='' ):\n" +
@@ -96,6 +96,7 @@ public class SimplifyScriptSupport {
          variableNames.add("dataset");
          variableNames.add("URI");
          variableNames.add("URL");
+         variableNames.add("PWD");
          
          try {
              Module n=null;
