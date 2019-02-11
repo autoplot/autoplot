@@ -80,6 +80,7 @@ public class WindowManager {
         Matcher m0= p.matcher(s);
         if ( m0.matches() && Integer.parseInt( m0.group("width") )==screenSize.width ) {
             String wh= prefs.get("window."+name+".size", "" );
+            logger.log(Level.FINER, "window.{0}.size={1}", new Object[]{name, wh});
             Matcher m= p.matcher(wh);
             int w= m.matches() ? Integer.parseInt( m.group("width") ) : -9999;
             int h= m.matches() ? Integer.parseInt( m.group("height") ) : -9999;
@@ -88,6 +89,7 @@ public class WindowManager {
             }   
             if ( parent!=null ) {
                 String rxy= prefs.get( "window."+name+".rlocation", "" );
+                logger.log(Level.FINER, "window.{0}.rlocation={1}", new Object[]{name, rxy});
                 Pattern p2= Pattern.compile("(?<x>\\d+),(?<y>\\d+)");
                 Matcher m2= p2.matcher(rxy);
                 int x= m2.matches() ? Integer.parseInt( m2.group("x") ) : -9999;
@@ -103,6 +105,7 @@ public class WindowManager {
                 }
             } else {
                 String xy= prefs.get( "window."+name+".location", "" );
+                logger.log(Level.FINER, "window.{0}.location={1}", new Object[]{name, xy});
                 Pattern p2= Pattern.compile("(?<x>\\d+),(?<y>\\d+)");
                 Matcher m2= p2.matcher(xy);
                 int x= m2.matches() ? Integer.parseInt( m2.group("x") ) : -9999;
