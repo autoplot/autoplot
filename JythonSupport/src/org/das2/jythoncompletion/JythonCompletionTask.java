@@ -51,8 +51,6 @@ import org.python.util.PythonInterpreter;
 import org.autoplot.jythonsupport.JythonOps;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
-import org.das2.jythoncompletion.ui.CompletionImpl;
-import org.das2.jythoncompletion.ui.CompletionResultSetImpl;
 
 /**
  * Completions for Jython code.  The completion task is created with the
@@ -176,7 +174,7 @@ public class JythonCompletionTask implements CompletionTask {
         logger.fine("queryMethods");
         PythonInterpreter interp;
 
-        interp = getInterpreter();
+            interp = getInterpreter();
 
         String eval;
         if ( JythonCompletionProvider.getInstance().settings().isSafeCompletions() ) {
