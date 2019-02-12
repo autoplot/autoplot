@@ -26,6 +26,9 @@ public class JavadocLookup {
             instance.setLinkForJavaSignature("java","http://docs.oracle.com/javase/8/docs/api/");
             instance.setLinkForJavaSignature("org/w3c/dom","http://docs.oracle.com/javase/8/docs/api/");
             instance.setLinkForJavaSignature("org/xml/sax","http://docs.oracle.com/javase/8/docs/api/");
+            instance.setLinkForJavaSignature("org/jdesktop","http://docs.oracle.com/javase/8/docs/api/");
+            instance.setLinkForJavaSignature("org/apache/commons/math3", "http://commons.apache.org/proper/commons-math/javadocs/api-3.6/" );
+            instance.setLinkForJavaSignature("org/apache/commons/math", "http://commons.apache.org/proper/commons-math/javadocs/api-2.0/" );
             instance.setLinkForJavaSignature("gov/nasa/gsfc/spdf/cdfj","https://cdaweb.sci.gsfc.nasa.gov/~nand/cdfj/docs/" );
             instance.setLinkForJavaSignature("org", JythonCompletionProvider.getInstance().settings.getDocHome() );
         }
@@ -67,6 +70,12 @@ public class JavadocLookup {
                 //link = JythonCompletionProvider.getInstance().settings().getDocHome() + signature;
     }
     
+    /**
+     * add the location of the javadocs for the given path.  The path should
+     * be / separated, not period separated.
+     * @param signatureStart
+     * @param link 
+     */
     public void setLinkForJavaSignature( String signatureStart, String link ) {
         lookups.put( signatureStart+"/", link );
     }
