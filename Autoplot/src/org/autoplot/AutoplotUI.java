@@ -840,7 +840,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     org.das2.util.LoggerManager.logGuiEvent(ev);                    
                     String s= dataSetSelector.getValue();
                     int i= dataSetSelector.getEditor().getCaretPosition();
-                    if ( i==0 || s.substring(i-1).contains("/") ) {
+                    if ( i==0 || i<s.length() || s.substring(i-1).contains("/") ) {
                             dataSetSelector.showCompletions();
                         return;
                     }
