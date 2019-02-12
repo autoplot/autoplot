@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Bugs introduced in a refactoring of the series renderer more than a year ago are found in histogram mode.
+        <p><small>Histogram mode is corrected from a botched refactoring of the series renderer more than a year ago, and new experimental axis lineThick property used.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,13 @@
         
         <p>Bugfixes (2019-02-09 r23287):</p>
         <ul>
+            <li>2105: Github support checks for tree/master and blob/master references, and corrects them to support cut-n-paste from browser.
+            <li>rte 0195003323: catch the runtime error when the units are not compatible in data reduction branch.
+            <li>2076: command-line version of createPngWalk would loose the property which would suppress the message bubbles.
+            <li>2109: Do a GCD check for small datasets when calculating cadence, after seeing cadence of 1.21 for IndexGenDataSet.
+            <li>browse trigger for .jy does filesystem completions when the carot is before the ".jy"
+            <li>2110: rank 2 bundle of x,y,z data works again with typical spectrogram renderings.
+            <li>PWD wasn't sent into code for Jython completions, causing RTE which would prevent completions from working.
             <li>2109: series plot in "stairsteps" mode had cases where fill region didn't match line plot.  Thanks, Chris!
             <li>2105: Github support didn't cache properly, so ETags are now supported.
             <li>annotation position SSE's icon was incorrect.
@@ -98,6 +105,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>lineThickness property allows plot bounds and axes to be thickened.
+            <li>removeIndeces function removes a set of indeces from data (not just inserting fill).
             <li>add special filesystem support for Github, so files stored on GitHub can be used directly.
             <li>add low-level shutdown hook so that hung process' vap can be recovered, see autoplot_data/logs/last.vap.
             <li>625: GrannyTextRenderer supports !(color;red) and !(painter;id) in strings.  
