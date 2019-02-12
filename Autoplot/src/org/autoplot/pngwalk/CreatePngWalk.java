@@ -227,6 +227,11 @@ public class CreatePngWalk {
          */
         public String outputFormat = "png";
         
+        /**
+         * also write a .vap file
+         */
+        public boolean writeVap= true;
+        
         @Override
         public String toString() {
             return String.format( "outputFolder=%s\ntimeRange=%s\nrescalex=%s\nautorange=%s\nversion=%s\nproduct=%s\ntimeFormat=%s\ncreateThumbs=%s\nupdate=%s\n",
@@ -276,6 +281,7 @@ public class CreatePngWalk {
      * @throws InterruptedException 
      */
     public static int doBatch( String[] times, Application readOnlyDom, Params params, ProgressMonitor mon ) throws IOException, InterruptedException {
+    
         final ArrayList<String> pngFilenameArrayThumbs= new ArrayList();
         final ArrayList<String> pngFilenameArrayBig= new ArrayList();
         final ArrayList<String> timeLabels= new ArrayList();
@@ -364,8 +370,6 @@ public class CreatePngWalk {
                 dom2.syncTo( dom, java.util.Arrays.asList("id") ); // work around bug where someone resets the margin column http://jfaden.net:8080/hudson/job/autoplot-test033/5786/artifact/
                 dom2.getOptions().syncToAll( readOnlyDom.getOptions(), new ArrayList() ); // 1165 grid overlay
 
-                mon.setProgressMessage("write " + params.product + ".vap");
-                logger.log(Level.FINE, "write {0}.vap", params.product);
             } else {
                 dom2= readOnlyDom;
                 w0= dom2.getCanvases(0).getWidth();
@@ -384,7 +388,11 @@ public class CreatePngWalk {
             }
 
             // Write out the vap file to product.vap
-            StatePersistence.saveState(new java.io.File( outputFolder, params.product + ".vap"), dom2, "");
+            if ( params.writeVap ) {
+                mon.setProgressMessage("write " + params.product + ".vap");
+                logger.log(Level.FINE, "write {0}.vap", params.product);
+                StatePersistence.saveState(new java.io.File( outputFolder, params.product + ".vap"), dom2, "");
+            }
 
             String vap= new java.io.File( outputFolder, params.product + ".vap").toString();
             StringBuilder build= new StringBuilder();
@@ -1005,6 +1013,9 @@ public class CreatePngWalk {
         }
 
         Application dom= (Application) StatePersistence.restoreState(new File(vap));
+        if ( vap.contains(params.outputFolder) ) {
+            params.writeVap= false;
+        }
         
         int status= doIt( dom, params );
         
