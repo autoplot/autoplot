@@ -207,6 +207,24 @@ public class Options extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_TICKLEN, oldTicklen, ticklen);
     }
     
+    protected String lineThickness = "1px";
+
+    public static final String PROP_LINE_THICKNESS = "lineThickness";
+
+    public String getLineThickness() {
+        return lineThickness;
+    }
+
+    /**
+     * lineThickness is the thickness of axes and ticks.
+     * @param lineThickness 
+     */
+    public void setLineThickness(String lineThickness) {
+        String oldLineThickness = this.lineThickness;
+        this.lineThickness = lineThickness;
+        propertyChangeSupport.firePropertyChange(PROP_LINE_THICKNESS, oldLineThickness, lineThickness);
+    }
+
     /**
      * for multiline labels, the alignment, where 0 is left, 0.5 is center, and 1.0 is right.
      */
@@ -608,6 +626,7 @@ public class Options extends DomNode {
         if ( !exclude.contains(PROP_USE_TIME_RANGE_EDITOR) ) this.setUseTimeRangeEditor(that.isUseTimeRangeEditor());
         if ( !exclude.contains(PROP_FLIPCOLORBARLABEL) ) this.setFlipColorbarLabel(that.isFlipColorbarLabel());
         if ( !exclude.contains(PROP_TICKLEN) ) this.setTicklen( that.getTicklen() );
+        if ( !exclude.contains(PROP_LINE_THICKNESS) ) this.setLineThickness( that.getLineThickness() );
         if ( !exclude.contains(PROP_SCANENABLED) ) this.setScanEnabled( that.isScanEnabled() );
     }
 
@@ -641,6 +660,8 @@ public class Options extends DomNode {
         if (!b) result.add(new PropertyChangeDiff(PROP_FLIPCOLORBARLABEL, that.isFlipColorbarLabel(), this.isFlipColorbarLabel() ));
         b = that.getTicklen().equals(this.getTicklen() );
         if (!b) result.add(new PropertyChangeDiff(PROP_TICKLEN, that.getTicklen(), this.getTicklen()));
+        b = that.getLineThickness().equals(this.getLineThickness() );
+        if (!b) result.add(new PropertyChangeDiff(PROP_LINE_THICKNESS, that.getLineThickness(), this.getLineThickness()));
         b = that.isScanEnabled()== this.isScanEnabled();
         if (!b) result.add(new PropertyChangeDiff(PROP_SCANENABLED, that.isScanEnabled(), this.isScanEnabled() ));
         return result;
@@ -657,6 +678,7 @@ public class Options extends DomNode {
         that.setUseTimeRangeEditor( this.isUseTimeRangeEditor() );
         that.setFlipColorbarLabel( this.isFlipColorbarLabel() );
         that.setTicklen( this.getTicklen() );
+        that.setLineThickness( this.getLineThickness() );
         that.setScanEnabled( this.isScanEnabled() );
         return that;
     }
