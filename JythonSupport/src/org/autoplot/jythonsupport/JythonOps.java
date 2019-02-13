@@ -346,11 +346,42 @@ public class JythonOps {
      * @param path the path to add, which should be a jar file, possibly contained within a zip on an http site.
      * @param mon monitor for the download.
      * @return the name of the folder or jar file added.
-     * @see https://sourceforge.net/p/autoplot/feature-requests/584/, which shows 
+     * @see https://sourceforge.net/p/autoplot/feature-requests/584/, which shows example use.
+     * @throws IOException
+     * @throws URISyntaxException 
+     */    
+    public static String addToSearchPath( PyList syspath, String path, ProgressMonitor mon ) throws IOException, URISyntaxException {
+        return addToSearchPath( syspath, path, null, mon );
+    }
+    
+    /**
+     * download the resource, unpack it, and add it to the search path.  Note
+     * such scripts will not work with Webstart releases!
+     *
+     * Here is an example use:
+     * <blockquote><pre><small>{@code
+     *import sys
+     *addToSearchPath( sys.path, 'http://www-us.apache.org/dist//commons/math/binaries/commons-math3-3.6.1-bin.zip/commons-math3-3.6.1/commons-math3-3.6.1.jar', monitor )
+     *from org.apache.commons.math3.distribution import BetaDistribution
+     *beta= BetaDistribution(2,5)
+     *
+     *xx= linspace(0,1.0,100)
+     *yy= zeros(100)
+     *for i in indgen(100):
+     *    yy[i]= beta.density(xx[i].value())
+     *#yy= map( xx, beta.density )
+     *plot( xx, yy )
+     *}</small></pre></blockquote>
+     * @param syspath the list of folders to search, should be sys.path.
+     * @param path the path to add, which should be a jar file, possibly contained within a zip on an http site.
+     * @param docPath the path containing javadocs, useful programmatically for completions.
+     * @param mon monitor for the download.
+     * @return the name of the folder or jar file added.
+     * @see https://sourceforge.net/p/autoplot/feature-requests/584/, which shows example use.
      * @throws IOException
      * @throws URISyntaxException 
      */
-    public static String addToSearchPath( PyList syspath, String path, ProgressMonitor mon ) throws IOException, URISyntaxException {
+    public static String addToSearchPath( PyList syspath, String path, String docPath, ProgressMonitor mon ) throws IOException, URISyntaxException {
         if ( System.getProperty("javawebstart.version")!=null ) {
             logger.warning("Jython addToSearchPath will probably fail because this is not supported with Webstart.");
         }
