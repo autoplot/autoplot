@@ -901,18 +901,23 @@ public class PlotController extends DomNodeController {
     private Axis resolveSettings( Axis a1, Axis a2 ) {
         Axis result;
         if ( !a1.isAutoRange() && a2.isAutoRange() ) {
+            logger.log(Level.FINER, "resolveSettings axis a1 ({0}) is not autorange", new Object[]{a1.range.getUnits()});
             return a2;
         } else if ( !a2.isAutoRange() && a1.isAutoRange() ) {
+            logger.log(Level.FINER, "resolveSettings axis a2 ({0}) is not autorange", new Object[]{a2.range.getUnits()});
             return a1;
         }
         result = new Axis();
         result.range = DatumRangeUtil.union( a1.range, a2.range );
+        logger.log(Level.FINER, "resolveSettings range {0} {1} -> {2}", new Object[]{a1.range, a2.range, result.range });
         if ( a1.log==a2.log ) {
             result.log= a1.log;
         } else {
             result.log= result.range.min().doubleValue(result.range.getUnits()) > 0;
         }
         result.autoRange= a1.autoRange && a2.isAutoRange();
+        logger.log(Level.FINER, "resolveSettings range {0} {1} -> {2}", new Object[]{a1.range, a2.range, result.range });
+        
         return result;
     }
     
