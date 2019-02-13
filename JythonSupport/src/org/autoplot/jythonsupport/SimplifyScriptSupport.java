@@ -252,7 +252,7 @@ public class SimplifyScriptSupport {
                  } else {
                      if ( acceptLine>-1 ) {
                          int thisLine= (o).beginLine;
-                         for ( int i=acceptLine; i<thisLine; i++ ) {
+                         for ( int i=acceptLine; i<=thisLine; i++ ) {
                              appendToResult(result,ss[i-1]).append("\n");
                          }
                          appendToResult(result,"\n");
