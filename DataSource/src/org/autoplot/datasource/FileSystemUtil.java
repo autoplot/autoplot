@@ -22,7 +22,6 @@ import java.net.UnknownHostException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
-import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.FileUtil;
@@ -89,19 +88,16 @@ public class FileSystemUtil {
      *
      * @param suri URI, such as http://server.org/data/asciitable.dat
      * @return true of the resource exists and can be downloaded.
+     * @throws org.das2.util.filesystem.FileSystem.FileSystemOfflineException
+     * @throws java.net.UnknownHostException
+     * @throws java.net.URISyntaxException
      */
     public static boolean resourceExists( String suri ) throws FileSystemOfflineException, UnknownHostException, URISyntaxException {
         URISplit split= URISplit.parse(suri);
         try {
             FileSystem fs= FileSystem.create( DataSetURI.toUri( split.path ) );
-            if ( fs.getFileObject(split.file.substring(split.path.length())).exists() ) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch ( IllegalArgumentException ex ) {
-            return false;
-        } catch ( FileNotFoundException ex ) {
+            return fs.getFileObject(split.file.substring(split.path.length())).exists();
+        } catch ( IllegalArgumentException | FileNotFoundException ex ) {
             return false;
         }
     }
@@ -112,7 +108,9 @@ public class FileSystemUtil {
      *
      * @param suri URI, such as http://server.org/data/asciitable.dat
      * @param mon progress monitor
-     * @return
+     * @return the file
+     * @throws org.das2.util.filesystem.FileSystem.FileSystemOfflineException
+     * @throws java.net.URISyntaxException
      */
     public static File doDownload(String suri,ProgressMonitor mon) throws FileSystemOfflineException, IOException, URISyntaxException  {
         URISplit split= URISplit.parse(suri);
@@ -124,8 +122,10 @@ public class FileSystemUtil {
     /**
      * returns true if the resource is already in a local cache.
      * @param suri the URI containing a file resource.
-     * @return
+     * @return true if the resource is already in a local cache.
      * @throws org.das2.util.filesystem.FileSystem.FileSystemOfflineException
+     * @throws java.net.UnknownHostException
+     * @throws java.io.FileNotFoundException
      */
     public static boolean resourceIsLocal(String suri) throws FileSystemOfflineException, UnknownHostException, FileNotFoundException {
         URISplit split= URISplit.parse(suri);
@@ -135,7 +135,7 @@ public class FileSystemUtil {
 
     /**
      * returns true if the string identifies a file resource (not a folder).
-     * @param suri
+     * @param suri return resource URI, such as "http://autoplot.org/data/autoplot.cdf"
      * @return true if the resource is a file.
      * @throws org.das2.util.filesystem.FileSystem.FileSystemOfflineException
      * @throws UnknownHostException
@@ -145,11 +145,7 @@ public class FileSystemUtil {
     protected static boolean resourceIsFile(String suri) throws FileSystemOfflineException, UnknownHostException, URISyntaxException, FileNotFoundException {
         URISplit split= URISplit.parse(suri);
         FileSystem fs= FileSystem.create( DataSetURI.toUri( split.path ) );
-        if ( fs.getFileObject(split.file.substring(split.path.length())).isData() ) {
-            return true;
-        } else {
-            return false;
-        }
+        return fs.getFileObject(split.file.substring(split.path.length())).isData();
     }
 
     /**
