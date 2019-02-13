@@ -17,26 +17,26 @@ import org.das2.qds.QDataSet;
 import org.das2.util.monitor.NullProgressMonitor;
 
 /**
- * experiment to see
+ * experiment to see if auralization is useful with log messages.  This will make
+ * one of two sounds when HEAD or GET is found within the log message.
  * @author jbf
  */
 public class AuralizationHandler extends Handler {
 
-    QDataSet ds;
     Map<Pattern,QDataSet> sounds;
     
     public AuralizationHandler() throws Exception {
-        try {
-            
-            sounds= new LinkedHashMap<>();
-            sounds.put( Pattern.compile("HEAD.*"), 
-                    new WavDataSource2( new URI("file:///home/jbf/fun/sounds/dinkq.wav") ).getDataSet(new NullProgressMonitor() ) );
-            sounds.put( Pattern.compile("GET.*"), 
-                    new WavDataSource2( new URI("file:///home/jbf/fun/sounds/ding2.wav") ).getDataSet(new NullProgressMonitor() ) );
+        sounds= new LinkedHashMap<>();
            
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(AuralizationHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    }
+    
+    /**
+     * auralize the sound when the pattern is encountered.
+     * @param p the pattern, for example Pattern.compile("HEAD.*")
+     * @param s the sound, for example getDataSet("http://jfaden.net/~jbf/autoplot/data/wav/dinkq.wav")
+     */
+    public void addSound( Pattern p, QDataSet s ) {
+        sounds.put( p, s );
     }
     
     
