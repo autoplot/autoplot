@@ -30,7 +30,11 @@ public class JavadocLookup {
             instance.setLinkForJavaSignature("org/apache/commons/math3", "http://commons.apache.org/proper/commons-math/javadocs/api-3.6/" );
             instance.setLinkForJavaSignature("org/apache/commons/math", "http://commons.apache.org/proper/commons-math/javadocs/api-2.0/" );
             instance.setLinkForJavaSignature("gov/nasa/gsfc/spdf/cdfj","https://cdaweb.sci.gsfc.nasa.gov/~nand/cdfj/docs/" );
-            instance.setLinkForJavaSignature("org", JythonCompletionProvider.getInstance().settings.getDocHome() );
+            instance.setLinkForJavaSignature("org/autoplot", JythonCompletionProvider.getInstance().settings.getDocHome() );
+            instance.setLinkForJavaSignature("org/das2", JythonCompletionProvider.getInstance().settings.getDocHome() );
+            instance.setLinkForJavaSignature("com/matio", JythonCompletionProvider.getInstance().settings.getDocHome() );
+            instance.setLinkForJavaSignature("ProGAL", JythonCompletionProvider.getInstance().settings.getDocHome() );
+            instance.setLinkForJavaSignature("external", JythonCompletionProvider.getInstance().settings.getDocHome() );
         }
         return instance;
     }
@@ -73,8 +77,8 @@ public class JavadocLookup {
     /**
      * add the location of the javadocs for the given path.  The path should
      * be / separated, not period separated.
-     * @param signatureStart
-     * @param link 
+     * @param signatureStart e.g. "gov/nasa/gsfc/spdf/cdfj"
+     * @param link e.g. "https://cdaweb.sci.gsfc.nasa.gov/~nand/cdfj/docs/"
      */
     public void setLinkForJavaSignature( String signatureStart, String link ) {
         lookups.put( signatureStart+"/", link );
