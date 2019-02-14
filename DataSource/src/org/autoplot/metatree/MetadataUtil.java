@@ -216,7 +216,7 @@ public class MetadataUtil {
     /**
      * converts IDL and Fortran-style specs (F7.2) to Java/C style (%7.2f), or
      * returns null when this cannot be done.
-     * @param spec C or fortran style format
+     * @param spec Java or Fortran style format
      * @return null if no conversion can be made, or Java style
      * @see String#format(java.lang.String, java.lang.Object...) 
      */
