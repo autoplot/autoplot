@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.autoplot.datasource.LogNames;
 import org.das2.qds.DataSetOps;
@@ -209,6 +210,31 @@ public class MetadataUtil {
             return new SpaseMetadataModel();
         } else {
             return null;
+        }
+    }
+    
+    /**
+     * converts IDL and Fortran-style specs (F7.2) to Java/C style (%7.2f), or
+     * returns null when this cannot be done.
+     * @param spec C or fortran style format
+     * @return null if no conversion can be made, or Java style
+     * @see String#format(java.lang.String, java.lang.Object...) 
+     */
+    public static String normalizeFormatSpecifier( String spec ) {
+        Pattern p= Pattern.compile("([FDEGI])((\\d+)(\\.(\\d+)))");
+        Pattern j= Pattern.compile("\\%(\\d+)(\\.(\\d+))([fdox])");
+        if ( j.matcher(spec).matches() ) {
+            return spec;
+        } else {
+            Matcher pm= p.matcher(spec);
+            if ( !pm.matches() ) {
+                return null;
+            } else {
+                char c= pm.group(1).charAt(0);
+                if ( c=='G' ) c= 'E';
+                if ( c=='D' ) c= 'F';
+                return "%"+pm.group(2)+Character.toLowerCase(c);
+            }
         }
     }
 }
