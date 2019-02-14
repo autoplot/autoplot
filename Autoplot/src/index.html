@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>All Sorts candy used to draw plot symbols.  See https://github.com/autoplot/dev/screen/20190214/rend.jy.
+        <p><small>Images of All Sorts candy used to draw plot symbols.  See https://github.com/autoplot/dev/screen/20190214/rend.jy.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,14 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-02-09 r23287):</p>
+        <p>Bugfixes (2019-02-14 r23287):</p>
         <ul>
+            <li>rte_1613985001: thread sloppiness for reset resulted in RTE when plot was removed. (Local copy makes this code safe.)
+            <li>2115: correction to inferBins and LanlNearestNeighbor when CADENCE is set artifically high to disable cadence checks.
+            <li>2114: improvements to NetCDF to support GOES files, including labels and units.
+            <li>rte_2038937185: vapfile:... was loaded on the event thread, which could lock up the app.
+            <li>javadoc table now has "org.autoplot" and "org.das2" instead of just org, so that new documentation can be installed.
+            <li>1687: jython completions had a case where a three-line command would loose its last line in refactoring to provide completions.
             <li>2105: Github support checks for tree/master and blob/master references, and corrects them to support cut-n-paste from browser.
             <li>rte 0195003323: catch the runtime error when the units are not compatible in data reduction branch.
             <li>2076: command-line version of createPngWalk would loose the property which would suppress the message bubbles.
@@ -105,6 +111,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>introduce AuralizationHandler which makes sounds when HEAD and GET log messages are encountered.
             <li>lineThickness property allows plot bounds and axes to be thickened.
             <li>removeIndeces function removes a set of indeces from data (not just inserting fill).
             <li>add special filesystem support for Github, so files stored on GitHub can be used directly.
