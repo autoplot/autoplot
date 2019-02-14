@@ -41,7 +41,8 @@ import ucar.nc2.dataset.NetcdfDataset;
 public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
     private String vapScheme;
-
+    Map<String,String> allParameterInfo;
+    
     /**
      * Creates new form HDF5DataSourceEditorPanel
      */
@@ -253,7 +254,8 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
     private void parameterTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTreeValueChanged
         TreePath tp= evt.getPath();
         parameter= String.valueOf(tp.getPathComponent(1));
-        String longName= parameters.get(parameter);
+//        String longName= parameters.get(parameter);
+        String longName= "<html>"+ parameters.get(parameter) + "<br><em>" + allParameterInfo.get(parameter) + "</em>";
         parameterInfoLabel.setText( longName );
 
         String dims= longName.substring(parameter.length());
@@ -414,6 +416,8 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             vars= (List<Variable>)dataset.getVariables();
             dataset.close();
             
+            allParameterInfo= new LinkedHashMap<>(vars.size());
+                    
             for (Variable v : vars) {
                 if ( v.getDimensions().isEmpty() ) continue;
                 if ( v instanceof Structure ) {
@@ -462,6 +466,11 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     parameters.put( v.getName(), description.toString() );
                     
                 }
+                
+                StringBuilder info= new StringBuilder();
+                info.append(v.getDescription());
+                
+                allParameterInfo.put( v.getName(), info.toString() );
             }
 
             //String label= "Select Parameter (%d parameters):";
