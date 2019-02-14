@@ -24,6 +24,7 @@ import org.das2.qds.QDataSet;
 import org.autoplot.datasource.MetadataModel;
 import org.das2.qds.ops.Ops;
 import org.autoplot.metatree.IstpMetadataModel;
+import org.autoplot.metatree.MetadataUtil;
 import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;
 import ucar.ma2.Range;
@@ -309,9 +310,51 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 
                 properties.put( QDataSet.UNITS, u );
                 properties.put( QDataSet.MONOTONIC, Boolean.TRUE );
+            } else {
+                properties.put( QDataSet.UNITS, Units.lookupUnits(unitsString) );
             }
+            
+        }
+        
+        // GEOS files have a number of standard-looking metadata attributes, however I can't identify the name of the standard.
+        // See https://satdat.ngdc.noaa.gov/sem/goes/data/avg/2010/05/goes13/netcdf/g13_magneto_1m_20100501_20100531.nc?BX_1&x=time_tag
+        Object o;
+
+        o= attributes.get("description");
+        if ( o!=null && o instanceof String ) {
+            properties.put( QDataSet.DESCRIPTION, (String)o );
+        }
+        
+        o= attributes.get("long_label");
+        if ( o!=null && o instanceof String ) {
+            properties.put( QDataSet.TITLE, (String)o );
         }
 
+        o= attributes.get("short_label");
+        if ( o!=null && o instanceof String ) {
+            properties.put( QDataSet.LABEL, (String)o );
+        }
+        
+        o= attributes.get("lin_log");
+        if ( o!=null && ( o.equals("lin") || o.equals("log") ) ) {
+            properties.put( QDataSet.SCALE_TYPE, o.equals("lin") ? "linear" : (String)o );
+        }
+        
+        o= attributes.get("nominal_min");
+        if ( o!=null && o instanceof String ) {
+            properties.put( QDataSet.TYPICAL_MIN, Double.parseDouble( (String)o ) );
+        }
+
+        o= attributes.get("nominal_max");
+        if ( o!=null && o instanceof String ) {
+            properties.put( QDataSet.TYPICAL_MAX, Double.parseDouble( (String)o ) );
+        }
+
+        o= attributes.get("format");
+        if ( o!=null && o instanceof String ) {
+            properties.put( QDataSet.FORMAT, MetadataUtil.normalizeFormatSpecifier( (String)o ) );
+        }
+        
         if ( data==null ) {
             if ( cdata==null ) {
                 throw new RuntimeException("Either data or cdata should be defined at this point");
@@ -362,6 +405,16 @@ public class NetCdfVarDataSet extends AbstractDataSet {
             properties.put( QDataSet.FILL_VALUE, fill );
         }
 
+        o= attributes.get("missing_value");
+        if ( o!=null ) {
+            if ( a.getElementType()==float.class ) {
+                properties.put( QDataSet.FILL_VALUE, Float.parseFloat((String)o) );
+            } else if ( a.getElementType()==double.class ) {
+                properties.put( QDataSet.FILL_VALUE, Double.parseDouble((String)o) );
+            } else {
+                properties.put( QDataSet.FILL_VALUE, Long.parseLong((String)o) );
+            }
+        }
 
         if ( ( mm!=null && mm instanceof IstpMetadataModel ) ||  attributes.containsKey("VAR_TYPE") || attributes.containsKey("DEPEND_0") ) { // LANL want to create HDF5 files with ISTP metadata
             logger.log(Level.FINE, "variable '{0}' has VAR_TYPE or DEPEND_0 attribute, use ISTP metadata", v.getName());
