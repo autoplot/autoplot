@@ -921,32 +921,38 @@ public final class AutoplotUI extends javax.swing.JFrame {
             @Override
             public void actionPerformed( ActionEvent ev ) { // TODO: underimplemented
                 org.das2.util.LoggerManager.logGuiEvent(ev);
-                String vapfile= dataSetSelector.getValue().substring(8);
+                final String vapfile= dataSetSelector.getValue().substring(8);
                 URISplit split= URISplit.parse(vapfile);
                 if ( !( vapfile.endsWith(".xml") ) && ( split.params==null || split.params.length()==0 ) ) {
                     DataSetSelector source= (DataSetSelector)ev.getSource();
                     source.showFileSystemCompletions( false, true, "[^\\s]+\\.jy" );
                 } else {
-                    applicationModel.addRecent(dataSetSelector.getValue());
-                    InputStream in=null;
-                    try {
-                        if ( vapfile.startsWith("http:") || vapfile.startsWith("https:") ) {
-                            in= new URL(vapfile).openStream();
-                        } else {
-                            in = DataSetURI.getInputStream( DataSetURI.toUri( vapfile ), new NullProgressMonitor() );
+                    Runnable run= new Runnable() {
+                        @Override
+                        public void run() {
+                            applicationModel.addRecent(dataSetSelector.getValue());
+                            InputStream in=null;
+                            try {
+                                if ( vapfile.startsWith("http:") || vapfile.startsWith("https:") ) {
+                                    in= new URL(vapfile).openStream();
+                                } else {
+                                    in = DataSetURI.getInputStream( DataSetURI.toUri( vapfile ), new NullProgressMonitor() );
+                                }
+                                applicationModel.doOpenVap( in, null );
+                            } catch ( IOException ex ) {
+                                JOptionPane.showMessageDialog( AutoplotUI.this, "Unable to load: \n"+vapfile+"\n"+ex );
+                            } finally {
+                                try {
+                                    if ( in!=null ) in.close();
+                                } catch ( IOException ex2 ) {
+                                    logger.log(Level.WARNING,null,ex2);
+                                }
+                            }
+                            dom.getController().setFocusUri(ApplicationController.VALUE_BLUR_FOCUS);
                         }
-                        applicationModel.doOpenVap( in, null );
-                    } catch ( IOException ex ) {
-                        JOptionPane.showMessageDialog( AutoplotUI.this, "Unable to load: \n"+vapfile+"\n"+ex );
-                    } finally {
-                        try {
-                            if ( in!=null ) in.close();
-                        } catch ( IOException ex2 ) {
-                            logger.log(Level.WARNING,null,ex2);
-                        }
-                    }
+                    };
+                    RequestProcessor.invokeLater(run);
                 }
-                dom.getController().setFocusUri(ApplicationController.VALUE_BLUR_FOCUS);
             }
         });
         
