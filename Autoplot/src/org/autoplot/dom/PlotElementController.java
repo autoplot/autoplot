@@ -74,6 +74,7 @@ import org.autoplot.AutoplotUtil;
 import static org.autoplot.AutoplotUtil.SERIES_SIZE_LIMIT;
 import org.autoplot.ExportDataPanel;
 import org.autoplot.RenderTypeUtil;
+import org.autoplot.ScriptContext;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.layout.LayoutConstants;
@@ -630,18 +631,20 @@ public class PlotElementController extends DomNodeController {
 
     private boolean rendererAcceptsData(QDataSet fillDs) {
         if ( getRenderer() instanceof SpectrogramRenderer ) {
-            if ( fillDs.rank()==3 ) {
-                QDataSet dep0= (QDataSet) fillDs.property( QDataSet.DEPEND_0 );  // only support das2 tabledataset scheme.
-                if ( dep0!=null ) return false;
-                return rendererAcceptsData( DataSetOps.slice0(fillDs,0) );
-            } else if ( fillDs.rank()==2 ) { // && !SemanticOps.isBundle(fillDs) ) {
-                return true;
-            } else {
-                if ( fillDs.property(QDataSet.PLANE_0)!=null ) {
+            switch (fillDs.rank()) {
+                case 3:
+                    QDataSet dep0= (QDataSet) fillDs.property( QDataSet.DEPEND_0 );  // only support das2 tabledataset scheme.
+                    if ( dep0!=null ) return false;
+                    return rendererAcceptsData( DataSetOps.slice0(fillDs,0) );
+                case 2:
+                    // && !SemanticOps.isBundle(fillDs) ) {
                     return true;
-                } else {
-                    return false;
-                }
+                default:
+                    if ( fillDs.property(QDataSet.PLANE_0)!=null ) {
+                        return true;
+                    } else {
+                        return false;
+                    }
             }
         } else if ( getRenderer() instanceof SeriesRenderer) {
             switch (fillDs.rank()) {
@@ -2317,14 +2320,12 @@ public class PlotElementController extends DomNodeController {
 
             AutoRangeUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds, yprops, ignoreDsProps );
             logger.log(Level.FINE, "ydesc.range={0}", ydesc.range);
-
+            
             peleCopy.getPlotDefaults().getZaxis().setRange(desc.range);
             peleCopy.getPlotDefaults().getZaxis().setLog(desc.log);
 
             logger.log(Level.FINE, "xaxis.isAutoRange={0}", peleCopy.getPlotDefaults().getXaxis().isAutoRange());
-            if ( !peleCopy.getPlotDefaults().getXaxis().isAutoRange() ) {
-                logger.fine("20121015: I was thinking autorange would always be true");
-            }
+
             peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
             peleCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
             peleCopy.getPlotDefaults().getYaxis().setLog(ydesc.log);
