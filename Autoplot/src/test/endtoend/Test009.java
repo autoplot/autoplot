@@ -126,6 +126,7 @@ public class Test009 {
         writePng("test009_013.png");
         ScriptContext.plot(DataSetOps.trim(rank2Rand, 0, 100000));
         writePng("test009_014.png");
+        
         QDataSet x = Ops.randomn(-12345, 1000);
         QDataSet y = Ops.randomn(-12344, 1000);
         ScriptContext.plot(x, y, Ops.sqrt(Ops.add(Ops.pow(x, 2), Ops.pow(y, 2))));
@@ -144,6 +145,7 @@ public class Test009 {
         for (int i = 50; i < 60; i++) {
             ((WritableDataSet) y).putValue(i, -1e31);
         }
+        
         ScriptContext.plot(x, y);
         ScriptContext.setRenderStyle("fillToZero");
         ScriptContext.setCanvasSize(800, 600);
