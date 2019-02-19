@@ -374,7 +374,7 @@ public class CompletionSupport {
                 }
             } else if ( tokens.get(0).kind==PythonGrammarConstants.IMPORT ) {
                 if ( completable==null || completable.equals(".") ) completable="";
-                if ( tokens.get(myTokenIndex-1).image.equals(".") ) myTokenIndex= myTokenIndex-1;
+                if ( myTokenIndex>0 && tokens.get(myTokenIndex-1).image.equals(".") ) myTokenIndex= myTokenIndex-1;
                 result= new CompletionContext( CompletionContext.PACKAGE_NAME, join(tokens,1,myTokenIndex), completable );
                 
             } else if ( tokens.get(myTokenIndex).kind==PythonGrammarConstants.DOT && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.NAME ) {

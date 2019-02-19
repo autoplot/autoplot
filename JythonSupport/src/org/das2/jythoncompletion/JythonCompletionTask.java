@@ -462,6 +462,10 @@ public class JythonCompletionTask implements CompletionTask {
         HashSet<String> results= new HashSet();       
         int count=0;
         
+        if ( cc.completable.equals("import") ) {
+            if ( rs!=null ) rs.addItem(new DefaultCompletionItem( " ", 0, " ", "space", null ));
+            return 1;
+        }
         if ( !cc.contextString.equals( cc.completable ) ) { // something to work with
             String eval = "import " + cc.contextString + "\n" +
                     "targetComponents = '" + cc.contextString + "'.split('.')\n" +
