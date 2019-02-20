@@ -669,6 +669,14 @@ public class PyQDataSet extends PyJavaInstance {
                         throw ex1;
                     }
                 }
+            } else if ( that.rank()==1 && SemanticOps.isRank1Bundle(that) ) {
+                logger.fine( "getitem with rank 1 bundle of indices" );
+                QDataSet sds= rods;
+                for ( int i=0; i<that.length(); i++ ) {
+                    sds= sds.slice( (int)that.value(i) );
+                }
+                return new PyQDataSet( sds );
+                
             } else if ( that.rank()==0 ) {
                 QDataSet sds= rods.slice( (int)that.value() ); //TODO: why is this not the writable dataset, or a copy of it?
                 return new PyQDataSet( sds );
@@ -743,7 +751,14 @@ public class PyQDataSet extends PyJavaInstance {
             QDataSet that = (QDataSet) o;
 
             if (ds.rank() > 1) {
-                iter = new IndexListDataSetIterator(that);
+                if ( SemanticOps.isRank1Bundle(that) ) {
+                    for ( int k=0; k<that.length(); k++ ) {
+                        QubeDataSetIterator.DimensionIteratorFactory fit = new QubeDataSetIterator.IndexListIteratorFactory(that.slice(k));
+                        ((QubeDataSetIterator) iter).setIndexIteratorFactory(k, fit);
+                    }
+                } else {
+                    iter = new IndexListDataSetIterator(that);
+                }
             } else {
                 QubeDataSetIterator.DimensionIteratorFactory fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
                 ((QubeDataSetIterator) iter).setIndexIteratorFactory(0, fit);
@@ -894,7 +909,11 @@ public class PyQDataSet extends PyJavaInstance {
 						fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
 					} else { 
 						QDataSet that = coerce_ds(a);
-						fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
+                        if ( that.rank()==0 ) {
+                            fit = new QubeDataSetIterator.SingletonIteratorFactory((int)that.value());
+                        } else {
+                            fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
+                        }
 					}
 
 					((QubeDataSetIterator) iter).setIndexIteratorFactory(i, fit);
