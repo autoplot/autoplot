@@ -29,8 +29,8 @@
         <p>Bugfixes (2019-02-15 r23318):</p>
         <ul>
             <li>rte_1613985001: thread sloppiness for reset resulted in RTE when plot was removed. (Local copy makes this code safe.)
-            <li>2115: correction to inferBins and LanlNearestNeighbor when CADENCE is set artifically high to disable cadence checks.
-            <li>2114: improvements to NetCDF to support GOES files, including labels and units.
+            <li>2115: correction to inferBins and LanlNearestNeighbor when CADENCE is set artifically high to disable cadence checks.  Thanks, Kris!
+            <li>2114: improvements to NetCDF to support GOES files, including labels and units.  Thanks, Allison!
             <li>rte_2038937185: vapfile:... was loaded on the event thread, which could lock up the app.
             <li>javadoc table now has "org.autoplot" and "org.das2" instead of just org, so that new documentation can be installed.
             <li>1687: jython completions had a case where a three-line command would loose its last line in refactoring to provide completions.
