@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Images of All Sorts candy used to draw plot symbols.  See https://github.com/autoplot/dev/screen/20190214/rend.jy.
+        <p><small>Script uses decorator to draw graph paper showing data coordinates for debugging <a href='https://sourceforge.net/p/autoplot/bugs/2109/'>2109</a>.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-02-15 r23318):</p>
+        <p>Bugfixes (2019-02-20 r23335):</p>
         <ul>
+            <li>PitchAngleDistribution renderer handles where data needs to transposed, newer autorange code was never tested.
+            <li>2116:  jython indexing bug where get and put don't both allow for list-of-indeces
+            <li>rte_0000000000_20190219_072309: runtime error when completions for "import<C>"
+            <li>rank0 access of LongDataSetLongReadAccess didn't account for offset.
             <li>rte_1613985001: thread sloppiness for reset resulted in RTE when plot was removed. (Local copy makes this code safe.)
             <li>2115: correction to inferBins and LanlNearestNeighbor when CADENCE is set artifically high to disable cadence checks.  Thanks, Kris!
             <li>2114: improvements to NetCDF to support GOES files, including labels and units.  Thanks, Allison!
@@ -111,6 +115,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add LongWriteAccess, so that longs can be used to write TT2000 data without roundoff errors.
+            <li>add intarr, replicate(int), and replicate(short)
             <li>introduce AuralizationHandler which makes sounds when HEAD and GET log messages are encountered.
             <li>lineThickness property allows plot bounds and axes to be thickened.
             <li>removeIndeces function removes a set of indeces from data (not just inserting fill).
