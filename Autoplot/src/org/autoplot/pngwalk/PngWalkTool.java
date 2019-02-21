@@ -2384,6 +2384,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
             Chunk lineChunk= new Chunk("________________________________"+
                             "_________________________________", lightGreyFont );
             
+            logger.log(Level.FINE, "writeToPdf {0} {1} pages", new Object[]{f.getName(), this.seq.size()});
+            
             for ( int i= 0; i<this.seq.size(); i++ ) {
                 monitor.setTaskProgress(i);
                 PdfContentByte cb = writer.getDirectContent();
@@ -2401,6 +2403,10 @@ public final class PngWalkTool extends javax.swing.JPanel {
                         }
                         im= this.seq.imageAt(i).getImage();
                     }
+                    logger.log(Level.FINER, "Page {0} of {1} image {2}x{3}", new Object[]{ imageNumber, this.seq.size(), im.getHeight(), im.getWidth()});
+                    //if ( im.getHeight()>800 ) {
+                    //    im= ImageUtil.getScaledInstance( im, 800, 800 * 600, true );
+                    //}
                     ImageIO.write(im, "png", baos);
                     Image pdfImage= com.itextpdf.text.Image.getInstance(baos.toByteArray() );
                     int w= (int)(7.5*72);
@@ -2454,6 +2460,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     } else {
                         caption= ""; 
                     }
+                    logger.log(Level.FINER, "caption: {0}", caption);
                     
                     p= new Paragraph();
                     p.add( caption );
