@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-02-20 r23335):</p>
+        <p>Bugfixes (2019-02-21 r23343):</p>
         <ul>
+            <li>rte_1955990895: index out-of-bounds because display data assumed there was no depend0.
             <li>PitchAngleDistribution renderer handles where data needs to transposed, newer autorange code was never tested.
             <li>2116:  jython indexing bug where get and put don't both allow for list-of-indeces.  Thanks, Ivar!
             <li>rte_0000000000_20190219_072309: runtime error when completions for "import&lt;C&gt;"
@@ -116,7 +117,7 @@
         <p>Features:</p>
         <ul>
             <li>add LongWriteAccess, so that longs can be used to write TT2000 data without roundoff errors.
-            <li>add intarr, replicate(int), and replicate(short)
+            <li>666: add bytarr, shortarr, intarr, replicate(int), and replicate(short)
             <li>introduce AuralizationHandler which makes sounds when HEAD and GET log messages are encountered.
             <li>lineThickness property allows plot bounds and axes to be thickened.
             <li>removeIndeces function removes a set of indeces from data (not just inserting fill).
