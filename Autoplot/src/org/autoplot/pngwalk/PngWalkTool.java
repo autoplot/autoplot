@@ -2280,7 +2280,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
             }
         }
         
-        boolean writeInSitu= this.seq.getQCFolder().relativize(f.toURI() ).toString().trim().length()==0;
+        
+        boolean writeInSitu= base.relativize(f.toURI() ).toString().trim().length()==0;
                     
         try {
             for ( int i= 0; i<this.seq.size(); i++ ) {
@@ -2319,21 +2320,28 @@ public final class PngWalkTool extends javax.swing.JPanel {
         }
         
         try {
-            URL url= new URL("http://autoplot.org/data/tools/makeTutorialHtml.jy");
+            URL url= new URL("https://raw.githubusercontent.com/autoplot/scripts/master/makeTutorialHtml.jy");
+            File nf= DataSetURI.downloadResourceAsTempFile(url,new NullProgressMonitor());
             final ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(this),"write HTML");
             Map<String,String> params= new HashMap<>();
             params.put("dir",base.toString());
             params.put("qconly","T");
-            params.put("outdir",f.toString());
+            String sd= f.toString();
+            if ( !sd.endsWith("/") && !sd.endsWith("\\") ) {
+                sd= sd+"/";
+            }
+            params.put("outdir",sd);
             params.put("name",""); //TODO: what should this be?
             params.put("summary",summary);
             try {
-                JythonUtil.invokeScriptSoon(url,null,params,false,false,mon);
+                JythonUtil.invokeScriptSoon(nf.toURI(),null,params,false,false,mon);
             } catch (IOException ex) {
                 Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch ( MalformedURLException ex ) {
             throw new IllegalArgumentException(ex);
+        } catch (IOException ex) {
+            Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
