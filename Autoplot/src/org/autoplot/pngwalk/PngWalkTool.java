@@ -2249,6 +2249,13 @@ public final class PngWalkTool extends javax.swing.JPanel {
     }
     
     
+    /**
+     * 
+     * @param monitor
+     * @param f the output folder.
+     * @param summary summary title for each slide.
+     * @throws FileNotFoundException 
+     */
     private void writeToHtmlImmediately( ProgressMonitor monitor, File f, String summary ) throws FileNotFoundException {
             
         monitor.setTaskSize( this.seq.size() );
@@ -2264,6 +2271,12 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 base= new URI( this.seq.getTemplate().substring(0,splitIndex) );
             } catch (URISyntaxException ex) {
                 throw new RuntimeException(ex);
+            }
+        }
+        
+        if ( !f.exists() ) {
+            if ( !f.mkdirs() ) {
+                logger.log(Level.WARNING, "unable to create folder: {0}", f);
             }
         }
         
@@ -2656,6 +2669,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 
             };
             
+            logger.log(Level.FINE, "writing to {0}", f);
             AnimatedGifDemo.saveAnimate( f, images, delays );
             
         } catch (IOException ex) {
