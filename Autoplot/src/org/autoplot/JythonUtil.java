@@ -455,10 +455,13 @@ public class JythonUtil {
                 result.add(ex);
             }
         }
-        if ( result.get(0) instanceof IOException ) {
-            throw (IOException)result.get(0);
-        } else if ( result.get(0) instanceof RuntimeException ) {
-            throw (RuntimeException)result.get(0);
+        Object result0= result.get(0);
+        if ( result0 instanceof IOException ) {
+            throw (IOException)result0;
+        } else if ( result0 instanceof RuntimeException ) {
+            throw (RuntimeException)result0;
+        } else if ( result0 instanceof Exception ) {
+            throw new RuntimeException((Exception)result0);
         } else {
             return (Integer)result.get(0);
         }
