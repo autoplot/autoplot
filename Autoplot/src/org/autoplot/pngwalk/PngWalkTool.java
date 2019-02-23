@@ -2320,12 +2320,12 @@ public final class PngWalkTool extends javax.swing.JPanel {
         }
         
         try {
-            URL url= new URL("https://raw.githubusercontent.com/autoplot/scripts/master/makeTutorialHtml.jy");
-            File nf= DataSetURI.downloadResourceAsTempFile(url,new NullProgressMonitor());
+            URL url= new URL("https://github.com/autoplot/scripts/makeTutorialHtml.jy");
+            File nf= DataSetURI.getFile(url,new NullProgressMonitor()); // Note GitHub filesystem.
             final ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(this),"write HTML");
             Map<String,String> params= new HashMap<>();
-            params.put("dir",base.toString());
-            params.put("qconly","T");
+            params.put("dir",base.toString()+"/");
+            params.put("qconly", this.seq.getQCFilter().equals("") ? "F" : "T" );
             String sd= f.toString();
             if ( !sd.endsWith("/") && !sd.endsWith("\\") ) {
                 sd= sd+"/";
