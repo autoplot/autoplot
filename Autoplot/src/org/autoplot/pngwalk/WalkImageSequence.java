@@ -554,6 +554,20 @@ public class WalkImageSequence implements PropertyChangeListener  {
             rebuildSequence();
         }
     }
+    
+    /**
+     * returns the current QC filter, where "" means no filter, otherwise 
+     * the characters indicate:
+     * <ul>
+     * <li>o okay are shown
+     * <li>p problem are shown
+     * <li>i ignore are shown
+     * </ul>
+     * @return the filter, for example "" or "op" for okay and problem.
+     */
+    public String getQCFilter() {
+        return this.qcFilter;
+    }
 
     /**
      * return the active subrange of the sequence.  This is the portion of the pngwalk being used.
