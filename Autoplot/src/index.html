@@ -28,6 +28,10 @@
         
         <p>Bugfixes (2019-02-21 r23343):</p>
         <ul>
+            <li>2105: allow direct access of GitHub files, or other sites when the parent http folder listing results in error 400.
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>rte_1955990895: index out-of-bounds because display data assumed there was no depend0.
             <li>PitchAngleDistribution renderer handles where data needs to transposed, newer autorange code was never tested.
             <li>2116:  jython indexing bug where get and put don't both allow for list-of-indeces.  Thanks, Ivar!
@@ -69,52 +73,11 @@
             <li>ArrayDataSet can now take array of arrays as input, supporting Python NumPy to Autoplot bridge via jpype.
             <li>monitor was reused in IDL bridge's APDataSet, causing warning about misuse of monitor.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>findex non-monotonic check relaxed because it was slow.
-            <li>2087: butterworth might use integer datasets, causing rounding errors which would make things unstable.
-            <li>ConvertPropertyValue 1 to Boolean.TRUE failed because the return statement was missing.  
-            <li>one-record epoch would fail to slice delta_plus[1,1].  Thanks, Jon N!
-            <li>make all the reduceMax-type functions take a progress monitor.  Thanks, Ivar!
-            <li>asOrderOneUnits will prefer "2923 days" to "2.52550E14 microseconds" when the units are microseconds an arbitrary threshold was preventing this.
-            <li>don't convert units of string to datumRange if the range is incompatible with the context units, only if the range is dimensionless.
-            <li>update location for package list completions and example scripts to new Jenkins server.
-            <li>recent changes to Auralizer properties slowed things sufficiently that 44.1KHz couldn't keep up.
-            <li>AutoplotServlet build with Ant didn't work because file was not committed.
-            <li>2078: colons in aggregations would cause problem in "reject" method, because of improper URI handling.
-            <li>test140 needed to reset colors after each .vap is rendered, or non-vaps would have leftover color.
-            <li>2077: corrections to the contours plot.  Thanks, Ivar!
-            <li>2076: create pngwalk would show warning bubbles when print log level was OFF, because of typo in synchronize code.  Thanks, Masafumi!
-            <li>2074: vap+inline: supports vap+inline:1.23Re,10.21;1.28Re,10.22;1.31Re,10.23; and has tests http://jfaden.net/jenkins/job/autoplot-test147/.  Thanks, Ivar!
-            <li>0498: Ok, OK, Okay...  Use just OK.  Thanks, Bob!
-            <li>Orbits from rbspa-pp came from down server, which showed a bug where a second IOException would prevent redundant servers from filling in.
-            <li>DatumUtil.lookupDatum now handles strings without a space, like 45Kg, which often appear in vap+inline URIs.  Thanks, Ivar!
-            <li>test140 explicitly loads files with UTF-8 encoding, to work around a bug where new Jenkins server mis-reports the content-type.
-            <li>correct where GUI was created off of the event thread, when script was run from the address bar.
-            <li>bug in extent prevented slices of  rbspa_int_ect-mageisLOW-L3_20160411_v8.1.0.cdf?FEDU from showing.  Thanks, Seth!
-            <li>2073: load TSB blue and grey icons once, since looking up the icon from the classpath can be slow.
-            <li>2073: cache plotElement controller GUIs, which were recreated as the focus moved around.
-            <li>2073: remove old "panel" name, which have been known for years as "plotElements"
-            <li>2073: avoid binding when the axis or data tabs are not visible, to support running scripts with app running.
-            <li>2045: add method for invoking a script from another script. 
-            <li>Corrections to HAPI export to match 2.0 spec.  Thanks, Bob!
-            <li>doUnitsCheck needs to support rank 2 y-tags in a bundle.
-            <li>new code to add components to the front page could hang app because of event thread mishandling.
-            <li>rte_1025124270: JythonDataSource would attempt to attach a label to an immutable dataset, causing RTE.
-            <li>2067: a multi-line colorbar label was not center-justified.  Thanks, Ivar!
-            <li>rte_1659505011: improve feedback in the Bookmarks GUI, for example where you can "plot" a bookmarks folder.
-            <li>rte_0577071170: improve feedback with Jython Data Source when a non-plottable variable unintentionally selected.  Thanks Kris!
-            <li>2054: object leaks which occur as the GUI follows focus are corrected.
-            <li>2066: check for negative font metrics getDescent, which would cause the axis ticks to clip.
-            <li>inspect button to look for .vap files works again.
-            <li>"run batch" cancel button cancels the sub-task.
-            <li>"Add additional ticks from" GUI now opens the editor with just "ok" button, not the "plot" button.  Thanks, Bob!
-            <li>2064: MMS mms1_edi_vdrift_gse_srvy_l2[:,1]&x=mms1_edi_t_delta_plus_srvy_l2&y=mms1_edi_e_dsl_srvy_l2[:,1] works properly now, where reform flag was incorrectly set.  Thanks, sritam!
-            <li>"Open Local File" would only show files when "show all" was selected.  Thanks, Bob!
-            <li>2063: "convertUnitsTo" didn't properly reset the DOM range, when it reset the implementing DasAxis range.  Thanks, Masafumi!
-            <li>LICENSE.txt should be LGPL, not GPL.
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>improve html version of pngwalk export to write separate pages.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>add LongWriteAccess, so that longs can be used to write TT2000 data without roundoff errors.
             <li>666: add bytarr, shortarr, intarr, replicate(int), and replicate(short)
@@ -130,16 +93,6 @@
             <li>PngWalkTool checks EXIF metadata for rotation cues, so that pngwalk tool works for family photos.
             <li>experimental "expect" code included, which should be useful for writing scripts which control IDL.
             <li>mashup-tool automatically names new variables based on the URI.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>add xkcd-script font.
-            <li>introduce reduceSum which is like total but skips invalid values, and reduceMedian.  Thanks, Ivar!
-            <li>AudioSystem data source supports export, so data can be sent directly to the sound system.
-            <li>issue warnings when ports are used with SFTP, since this isn't supported.
-            <li>Auralizer has scale property which can be set to false.
-            <li>WindowManager tracks the application size and position.
-            <li>new lockDomainDivider axis property avoids jumping when the tick spacing is known to be correct.
         </ul>
         <p>Known issues:</p>
         <ul>
