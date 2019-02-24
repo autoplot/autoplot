@@ -490,6 +490,7 @@ public class DataSourceUtil {
         String yyyyjjj= "(?<!\\d)(19|20)\\d{2}\\d{3}(?!\\d)";
         String yyyymm= "(?<!\\d)(19|20)\\d{2}\\d{2}(?!\\d)";
         String yyyy_mm_dd= "(?<!\\d)(19|20)\\d{2}([\\-_/])\\d{2}\\2\\d{2}(?!\\d)";
+        String yyyy_mm= "(?<!\\d)(19|20)\\d{2}([\\-_/])\\d{2}(?!\\d)";
         String yyyy_jjj= "(?<!\\d)(19|20)\\d{2}([\\-_/])\\d{3}(?!\\d)";
         String yyyymmdd_HH= "(?<!\\d)(19|20)(\\d{6})(\\D)\\d{2}(?!\\d)"; //"(\\d{8})"; 20140204T15
         String yyyymmdd_HHMM= "(?<!\\d)(19|20)(\\d{6})(\\D)\\d{2}\\d{2}(?!\\d)"; //"(\\d{8})"; 20140204T1515
@@ -499,7 +500,7 @@ public class DataSourceUtil {
         String version= "([Vv])\\d{2}";                // $v
         String vsep= "([Vv])(\\d+\\.\\d+(\\.\\d+)+)";  // $(v,sep)
 
-        String[] abs= new String[] { yyyymmdd_HHMM, yyyymmdd_HH, yyyy_mm_dd, yyyy_jjj, yyyymmdd, yyyyjjj, yyyymm };
+        String[] abs= new String[] { yyyymmdd_HHMM, yyyymmdd_HH, yyyy_mm_dd, yyyy_jjj, yyyymmdd, yyyyjjj, yyyymm, yyyy_mm };
 
         String timeRange=null;
         for ( String ab : abs ) {
@@ -518,9 +519,9 @@ public class DataSourceUtil {
         int hour= TimeUtil.HOUR;
         int minute= TimeUtil.MINUTE;
 
-        List<String> search= new ArrayList( Arrays.asList( yyyymmdd_HHMM, yyyymmdd_HH, yyyy_jjj, yyyymmdd, yyyyjjj, yyyymm, yyyy_mm_dd, yyyy ) );
-        List<String> replac= new ArrayList( Arrays.asList( "\\$Y\\$m\\$d$3\\$H\\$M", "\\$Y\\$m\\$d$3\\$H", "\\$Y$2\\$j", "\\$Y\\$m\\$d","\\$Y\\$j","\\$Y\\$m", "\\$Y$2\\$m$2\\$d","/\\$Y/" ) );
-        List<Integer> resol= new ArrayList( Arrays.asList( minute, hour, day, day, day, month, day, year ) );
+        List<String> search= new ArrayList( Arrays.asList( yyyymmdd_HHMM, yyyymmdd_HH, yyyy_jjj, yyyymmdd, yyyyjjj, yyyymm, yyyy_mm_dd, yyyy_mm, yyyy ) );
+        List<String> replac= new ArrayList( Arrays.asList( "\\$Y\\$m\\$d$3\\$H\\$M", "\\$Y\\$m\\$d$3\\$H", "\\$Y$2\\$j", "\\$Y\\$m\\$d","\\$Y\\$j","\\$Y\\$m", "\\$Y$2\\$m$2\\$d", "\\$Y$2\\$m", "/\\$Y/" ) );
+        List<Integer> resol= new ArrayList( Arrays.asList( minute, hour, day, day, day, month, day, month, year ) );
         
         // it looks like to have $Y$m01 resolution, we would need to have a flag to only accept the aggregation if the more general one is not needed for other files.
         
