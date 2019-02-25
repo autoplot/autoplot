@@ -816,6 +816,9 @@ public class JythonCompletionTask implements CompletionTask {
         } else if ( method.equals("File") && s.startsWith("/") ) {
             DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
             task.query(arg0);
+        } else if ( method.equals("'resourceURI'") ) {
+            DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
+            task.query(arg0);
         } else if ( s.startsWith("/") ) {
             DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
             task.query(arg0);

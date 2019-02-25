@@ -399,11 +399,13 @@ public class CompletionSupport {
             } else if ( myTokenIndex>1 && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.DOT && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.RPAREN ) {
                 String contextString= exprBeforeDot(tokens, myTokenIndex-1);
                 return new CompletionContext( CompletionContext.METHOD_NAME, contextString, tokens.get(myTokenIndex).image );
-            } else if ( tokens.get(myTokenIndex).kind==PythonGrammarConstants.SINGLE_STRING
+            } else if ( tokens.get(myTokenIndex).kind==PythonGrammarConstants.SINGLE_STRING  // some completions provided for strings.
                     ||  tokens.get(myTokenIndex).kind==PythonGrammarConstants.SINGLE_STRING2 ) {
                 if ( myTokenIndex>1 && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.NAME ) {
                     return new CompletionContext( CompletionContext.STRING_LITERAL_ARGUMENT, tokens.get(myTokenIndex-2).image, tokens.get(myTokenIndex).image );
                 } else if ( myTokenIndex>1 && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.PRINT ) { 
+                    return new CompletionContext( CompletionContext.STRING_LITERAL_ARGUMENT, tokens.get(myTokenIndex-2).image, tokens.get(myTokenIndex).image );
+                } else if ( myTokenIndex>1 && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.SINGLE_STRING && tokens.get(myTokenIndex-2).image.equals("'resourceURI'") ) { // getParam
                     return new CompletionContext( CompletionContext.STRING_LITERAL_ARGUMENT, tokens.get(myTokenIndex-2).image, tokens.get(myTokenIndex).image );
                 } else {
                     return null;
