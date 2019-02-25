@@ -362,7 +362,7 @@ public class ClickDigitizer {
     /**
      * select the datapoint that is near the click position, based on the annoTypeChar
      * @param p
-     * @return
+     * @return -1 if no selection is obvious, or the index in the digitized points dataset.
      * @throws IOException
      * @throws ParseException 
      */
