@@ -78,6 +78,7 @@ import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.layout.LayoutConstants;
 import org.autoplot.renderer.AnnotationEditorPanel;
 import org.autoplot.util.RunLaterListener;
+import org.das2.graph.DasLabelAxis;
 import org.das2.system.DefaultMonitorFactory;
 import org.das2.system.DefaultMonitorFactory.MonitorEntry;
 
@@ -2094,12 +2095,13 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         try {
             
+            // reset removes all annotations
             List<Annotation> annos= Arrays.asList( application.getAnnotations() );
             for ( Annotation anno : annos ) {
                 application.controller.deleteAnnotation(anno);
             }
             
-            // set the focus to the last one remaining.
+            // set the focus to the last plot remaining.
             application.controller.setPlot(application.getPlots(0));
             List<PlotElement> peles= application.controller.getPlotElementsFor(plot);
             if ( peles.size()>0 ) {
@@ -2117,6 +2119,20 @@ public class ApplicationController extends DomNodeController implements RunLater
             if ( p0.getXaxis()==null )  throw new NullPointerException("p0.getXaxis() is null");
             if ( p0.getXaxis().getController()==null )  throw new NullPointerException("p0.getXaxis().getController() is null");
             if ( p0.getXaxis().getController().getDasAxis()==null )  throw new NullPointerException("p0.getXaxis().getController().getDasAxis() is null");
+            if ( p0.getController().getDasPlot().getXAxis() != p0.getXaxis().getController().getDasAxis() ) {
+                DasAxis rmme= p0.getController().getDasPlot().getXAxis();
+                application.getCanvases(0).controller.getDasCanvas().remove(rmme);
+                DasAxis oldAxis= p0.xaxis.controller.getDasAxis();
+                application.getCanvases(0).controller.getDasCanvas().add( oldAxis, oldAxis.getRow(), oldAxis.getColumn() );
+                p0.getController().getDasPlot().setXAxis(oldAxis);
+            }
+            if ( p0.getController().getDasPlot().getYAxis() != p0.getYaxis().getController().getDasAxis() ) {
+                DasAxis rmme= p0.getController().getDasPlot().getYAxis();
+                application.getCanvases(0).controller.getDasCanvas().remove(rmme);
+                DasAxis oldAxis= p0.yaxis.controller.getDasAxis();
+                application.getCanvases(0).controller.getDasCanvas().add( oldAxis, oldAxis.getRow(), oldAxis.getColumn() );
+                p0.getController().getDasPlot().setYAxis(oldAxis);
+            }
             p0.getXaxis().getController().getDasAxis().setTcaFunction(null);
             p0.getXaxis().getController().getDasAxis().setReference("");
             p0.getYaxis().getController().getDasAxis().setReference("");
