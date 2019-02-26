@@ -166,6 +166,7 @@
             <li>2017-12-03: correct check for localhost.
             <li>2018-02-13: add message to error message for info response.  Update version declarations to HAPI 2.0.
             <li>2018-10-23: correct invalid id response, thanks Bob's verifier.
+            <li>2019-02-26: correction to where two spectrograms could be served (specBins.2).
         </ul>
         </small>
     </body>

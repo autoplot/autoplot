@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
@@ -222,18 +223,29 @@ public class Util {
     
     /**
      * return a new JSONObject for the info request, with the subset of parameters.
-     * @param jo
+     * @param jo the root node of the info response.
      * @param parameters comma-delimited list of parameters.
-     * @return
+     * @return the new JSONObject, with special tag __indexmap__ showing which columns are to be included in a data response.
      * @throws JSONException 
      */
     public static JSONObject subsetParams( JSONObject jo, String parameters ) throws JSONException {
         jo= new JSONObject( jo.toString() );
         String[] pps= parameters.split(",");
-        Map<String,Integer> map= new HashMap();
+        Map<String,Integer> map= new HashMap();  // map from name to index in dataset.
+        Map<String,Integer> iMap= new HashMap(); // map from name to position in csv.
         JSONArray jsonParameters= jo.getJSONArray("parameters");
+        int index=0;
         for ( int i=0; i<jsonParameters.length(); i++ ) {
-            map.put( jsonParameters.getJSONObject(i).getString("name"), i ); // really--should name/id are two names for the same thing...
+            map.put( jsonParameters.getJSONObject(i).getString("name"), i ); 
+            iMap.put( jsonParameters.getJSONObject(i).getString("name"), index );
+            int len=1;
+            if ( jsonParameters.getJSONObject(i).has("size") ) {
+                JSONArray jarray1= jsonParameters.getJSONObject(i).getJSONArray("size");
+                for ( int k=0; k<jarray1.length(); k++ ) {
+                    len*= jarray1.getInt(k);
+                }
+            }
+            index+= len;
         }
         JSONArray newParameters= new JSONArray();
         int[] indexMap= new int[pps.length];
@@ -244,7 +256,7 @@ public class Util {
             if ( i==null ) {
                 throw new IllegalArgumentException("bad parameter: "+pps[ip]);
             }
-            indexMap[ip]= i;
+            indexMap[ip]= iMap.get(pps[ip]);
             if ( i==0 ) {
                 hasTime= true;
             }
@@ -283,7 +295,7 @@ public class Util {
                     indexMap1[c]= indexMap[k];
                     c++;
                 } else {
-                    for ( int l=0; l<lengths[k]; l++ ) { //TODO: there's a bug here if there is anything after the spectrogram, but I'm hungry for turkey...
+                    for ( int l=0; l<lengths[k]; l++ ) { 
                         indexMap1[c]= indexMap[k]+l;
                         c++;
                     }
