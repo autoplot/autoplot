@@ -391,8 +391,8 @@ public class DataServlet extends HttpServlet {
             return null;
         }
         JSONObject o= HapiServerSupport.readJSON(configFile);
-        if ( o.has("uri") ) {
-            String suri= o.getString("uri");
+        if ( o.has("x_uri") ) {
+            String suri= o.getString("x_uri");
             RecordIterator dsiter= new RecordIterator( suri, dr, allowStream ); 
             return dsiter;
         } else {

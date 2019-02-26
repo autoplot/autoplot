@@ -94,7 +94,7 @@ public class Util {
      * This directory should contain catalog.json, capabilities.json and a 
      * subdirectory "info" which contains files with the name &lt;ID&gt;.json,
      * each containing the info response.  Note these should also contain a
-     * tag "uri" which is the Autoplot URI that serves this data.
+     * tag "x_uri" which is the Autoplot URI that serves this data.
      */
     public static final String HAPI_SERVER_HOME_PROPERTY = "HAPI_SERVER_HOME";
 

@@ -191,7 +191,7 @@ public class CsvDataFormatter implements DataFormatter {
 "        \"message\": \"OK request successful\"\n" +
 "    },\n" +
 "    \"stopDate\": \"2017-08-23T16:00:00.000Z\",\n" +
-"    \"uri\": \"file:/home/jbf/public_html/1wire/data/$Y/$m/$d/0B000800408DD710.$Y$m$d.d2s\"\n" +
+"    \"x_uri\": \"file:/home/jbf/public_html/1wire/data/$Y/$m/$d/0B000800408DD710.$Y$m$d.d2s\"\n" +
 "}");
         CsvDataFormatter m= new CsvDataFormatter();
         QDataSet rec= m.initializeReader( info, "2017-08-22T22:22:03.000Z,7.318E01");
