@@ -43,7 +43,8 @@ import org.das2.qds.ops.Ops;
 import org.das2.util.filesystem.FileSystem;
 
 /**
- *
+ * Servlet for data responses.  
+ * @see https://github.com/hapi-server/data-specification/blob/master/hapi-2.0.0/HAPI-data-access-spec-2.0.0.md#data
  * @author jbf
  */
 @WebServlet(urlPatterns = {"/DataServlet"})

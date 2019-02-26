@@ -1,16 +1,9 @@
 package org.autoplot.hapiserver;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -24,7 +17,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- *
+ * Servlet for the dataset catalog.  
+ * @see https://github.com/hapi-server/data-specification/blob/master/hapi-2.0.0/HAPI-data-access-spec-2.0.0.md#catalog
  * @author jbf
  */
 public class CatalogServlet extends HttpServlet {
@@ -40,7 +34,7 @@ public class CatalogServlet extends HttpServlet {
     public static JSONObject getCatalog() throws JSONException, IOException {
         JSONObject jo= new JSONObject();
         jo.put("HAPI",Util.hapiVersion());
-        jo.put("x-deployedAt", deployedAt );
+        jo.put("x_deployedAt", deployedAt );
         JSONArray catalog= HapiServerSupport.getCatalog();
         jo.put("catalog",catalog);
                 
