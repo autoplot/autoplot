@@ -794,7 +794,7 @@ public class GuiSupport {
                 };
 
                 // https://sourceforge.net/tracker/?func=detail&aid=3557440&group_id=199733&atid=970682
-                new Thread(run).start(); // allow reset when all the request processor threads are full.  TODO: I'm not sure why this appeared to be the case.
+                new Thread(run).start(); 
                 
             }
         };
