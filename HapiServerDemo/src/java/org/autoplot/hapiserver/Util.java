@@ -322,7 +322,7 @@ public class Util {
         jsonParameters= newParameters;
         jo.put( "parameters", jsonParameters );        
 
-        jo.put( "__indexmap__", indexMap );
+        jo.put( "x_indexmap", indexMap );
         return jo;
     }
 

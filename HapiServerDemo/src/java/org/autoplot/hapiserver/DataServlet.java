@@ -211,7 +211,7 @@ public class DataServlet extends HttpServlet {
             
             if ( !parameters.equals("") ) {
                 jo= Util.subsetParams( jo0, parameters );
-                indexMap= (int[])jo.get("__indexmap__");
+                indexMap= (int[])jo.get("x_indexmap");
                 if ( dsiter!=null ) {
                     dsiter.resortFields( indexMap );
                 }
