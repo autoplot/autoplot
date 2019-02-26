@@ -16,6 +16,7 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 import org.das2.qds.DataSetUtil;
 import org.json.JSONArray;
@@ -46,6 +47,17 @@ public class Util {
             return String.format( Locale.US, "%.1f",dt/3600000.)+" hours";
         } else {
             return String.format( Locale.US, "%.1f",dt/86400000.)+" days";
+        }
+    }
+    
+    /**
+     * if HAPI_HOME has not been set, then set it.
+     * @param context 
+     */
+    public static void maybeInitialize( ServletContext context ) {
+        if ( HAPI_HOME==null ) {
+            String s= context.getInitParameter(HAPI_SERVER_HOME_PROPERTY);
+            setHapiHome( new File( s ) );
         }
     }
     

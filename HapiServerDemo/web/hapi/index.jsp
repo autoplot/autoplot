@@ -25,6 +25,7 @@
 
         <br>Run HAPI server <a href="http://tsds.org/verify-hapi/?url=http://jfaden.net/HapiServerDemo/hapi">verifier</a>.
         <%
+            Util.maybeInitialize( getServletContext() );
             if ( Util.getHapiHome()==null ) {
                 String HAPI_SERVER_HOME= getServletContext().getInitParameter("HAPI_SERVER_HOME");
                 Util.setHapiHome( new File( HAPI_SERVER_HOME ) );
