@@ -121,38 +121,41 @@ public class JythonCompletionTask implements CompletionTask {
     /**
      * perform the completions query.
      * @param cc
-     * @param arg0
+     * @param resultSet
      * @return the count
      */
-    public int doQuery( CompletionContext cc, CompletionResultSet arg0 ) {
+    public int doQuery( CompletionContext cc, CompletionResultSet resultSet ) {
         int c=0;
         try {
             switch (cc.contextType) {
                 case CompletionContext.MODULE_NAME:
-                    c= queryModules(cc, arg0);
+                    c= queryModules(cc, resultSet);
                     break;
                 case CompletionContext.PACKAGE_NAME:
-                    c= queryPackages(cc, arg0);
+                    c= queryPackages(cc, resultSet);
                     break;
                 case CompletionContext.DEFAULT_NAME:
-                    c= queryNames(cc, arg0);
+                    c= queryNames(cc, resultSet);
                     break;
                 case CompletionContext.METHOD_NAME:
-                    c= queryMethods(cc, arg0);
+                    c= queryMethods(cc, resultSet);
                     break;
                 case CompletionContext.STRING_LITERAL_ARGUMENT:
-                    c= queryStringLiteralArgument(cc, arg0);
+                    c= queryStringLiteralArgument(cc, resultSet);
                     break;
                 case CompletionContext.COMMAND_ARGUMENT:
-                    c= queryCommandArgument(cc, arg0);
-                    c+= queryNames(cc, arg0);
+                    c= queryCommandArgument(cc, resultSet);
+                    c+= queryNames(cc, resultSet);
+                    break;
+                case CompletionContext.CLASS_METHOD_NAME:
+                    c= queryClassMethods( cc, resultSet );
                     break;
                 default:
                     break;
             }
         } catch ( BadLocationException ex ) {
             logger.log( Level.WARNING, null, ex );
-            if ( arg0!=null ) arg0.addItem( new MessageCompletionItem( ex.getMessage() ) );
+            if ( resultSet!=null ) resultSet.addItem( new MessageCompletionItem( ex.getMessage() ) );
         } finally {
             
         }
@@ -170,6 +173,24 @@ public class JythonCompletionTask implements CompletionTask {
         return new PyReflectedFunctionPeeker(mpeek.getReflectedFunction()).getArgsCount();
     }
 
+    private int queryClassMethods(CompletionContext cc, CompletionResultSet rs) {
+        int count= 0;
+        Class c= cc.getContextObjectClass();
+        Method[] mm= c.getDeclaredMethods();
+        for ( Method m: mm ){
+            if ( m.getName().startsWith(cc.completable) ) {
+                String signature = methodSignature(m);
+                String args = methodArgs(m);
+                String ss= m.getName();
+                String label= ss + args;
+                String link = getLinkForJavaSignature(signature);
+                rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
+                count++;
+            }
+        }
+        return count;
+    }
+    
     private int queryMethods(CompletionContext cc, CompletionResultSet rs) throws BadLocationException {
         logger.fine("queryMethods");
         PythonInterpreter interp;
@@ -1270,4 +1291,5 @@ public class JythonCompletionTask implements CompletionTask {
     private static String getLinkForJavaSignature(String signature) {
         return JavadocLookup.getInstance().getLinkForJavaSignature(signature);
     }
+
 }
