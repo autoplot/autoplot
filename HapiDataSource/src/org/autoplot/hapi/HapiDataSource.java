@@ -1745,7 +1745,7 @@ public final class HapiDataSource extends AbstractDataSource {
                     pds[i].description= ""; // when a value cannot be parsed, but it is not identified.
                 }
 
-                if ( jsonObjecti.has("label") ) {
+                if ( jsonObjecti.has("label") ) { // The verifier code incorrectly marks "label" as not allowed, but I believe it is.
                     Object olabel= jsonObjecti.get("label");
                     if ( olabel instanceof String ) {
                         pds[i].label= (String)olabel;
