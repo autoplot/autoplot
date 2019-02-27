@@ -1,6 +1,7 @@
 
 package org.das2.jythoncompletion;
 
+import java.awt.Graphics2D;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
@@ -50,6 +52,31 @@ public class CompletionSupport {
         return ipos1<ipos2;
     }
     
+    /**
+     * is the carot within a subclass of an identifiable Java class?
+     * TODO: this is a proof-of-concept kludge right now, where it just looks for g.*
+     * @param editor
+     * @return null or the CompletionContext for this.
+     * @throws javax.swing.text.BadLocationException
+     */
+    public static CompletionContext checkJavaSubClass( JTextComponent editor ) throws BadLocationException {
+        // get the AST, check that we are in a routine which is a subclass (e.g. Painter), and get the Java types from it.
+        int pos= editor.getCaretPosition();
+        int i0= Utilities.getRowStart( editor, pos );
+        //int i2= Utilities.getRowEnd( editor, pos );
+        
+        String line= editor.getText( i0, pos-i0 );
+        Pattern p= Pattern.compile("\\s*(g)\\.([a-zA-Z]*)");
+        Matcher m= p.matcher(line);
+        if ( m.matches() ) {
+            CompletionContext result= new CompletionContext( CompletionContext.CLASS_METHOD_NAME, m.group(1), m.group(2) );
+            result.setContextObjectClass( Graphics2D.class );
+            return result;
+        }
+        
+        return null;
+    }
+    
     public static CompletionContext getCompletionContext( JTextComponent editor ) throws BadLocationException {
         int pos= editor.getCaretPosition();
         int i0= Utilities.getRowStart( editor, pos );
@@ -60,10 +87,17 @@ public class CompletionSupport {
         
         if ( i1==i2 ) return new CompletionContext( CompletionContext.DEFAULT_NAME, null, "" );
         
+        CompletionContext result;
+        
+        result= checkJavaSubClass( editor );
+        if ( result!=null ) {
+            return result;
+        }
+               
         if ( i0>0 ) {
             int im1= Utilities.getRowStart( editor, i0-1 );
             String prevLine= editor.getText( im1, i0-im1-1 );
-            if ( isContinuation( prevLine, line ) ) {
+            if ( isContinuation( prevLine, line ) ) { // rfe363: what about second continuation line? 
                 line= prevLine + " " + line; // space is because the newline was removed.
                 i0= im1;
             }
@@ -75,7 +109,9 @@ public class CompletionSupport {
         i1= i1- i0;
         i0= 0;
         
-        return getCompletionContext( line, pos, i0, i1, i2 );
+        result= getCompletionContext( line, pos, i0, i1, i2 );
+        
+        return result;
     }
     
     /**
