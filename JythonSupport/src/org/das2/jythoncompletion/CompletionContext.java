@@ -8,6 +8,7 @@ package org.das2.jythoncompletion;
  */
 public class CompletionContext {
     public static final String METHOD_NAME= "method";
+    public static final String CLASS_METHOD_NAME= "classMethod"; // g.<C> where g is a graphics context
     public static final String ATTRIBUTE_NAME= "attr";
     public static final String PACKAGE_NAME= "package";
     public static final String MODULE_NAME= "module";
@@ -44,6 +45,11 @@ public class CompletionContext {
     public String completable;
     
     /**
+     * if non-null, this is the class of the object which we are completing.
+     */
+    private Class contextObjectClass;
+    
+    /**
      * 
      * @param contextType
      * @param contextString
@@ -54,7 +60,19 @@ public class CompletionContext {
         this.contextString= contextString;
         this.completable= completable;
     }
+    
+    public void setContextObjectClass( Class claz ) {
+        this.contextObjectClass= claz;
+    }
 
+    /**
+     * return null or the class for the context.
+     * @return 
+     */
+    public Class getContextObjectClass() {
+        return this.contextObjectClass;
+    }
+    
     @Override
     public String toString() {
         String scontextString= this.contextString==null ? "(nocontext)" : this.contextString;
