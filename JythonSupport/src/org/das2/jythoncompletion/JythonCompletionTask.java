@@ -176,17 +176,20 @@ public class JythonCompletionTask implements CompletionTask {
     private int queryClassMethods(CompletionContext cc, CompletionResultSet rs) {
         int count= 0;
         Class c= cc.getContextObjectClass();
-        Method[] mm= c.getDeclaredMethods();
-        for ( Method m: mm ){
-            if ( m.getName().startsWith(cc.completable) ) {
-                String signature = methodSignature(m);
-                String args = methodArgs(m);
-                String ss= m.getName();
-                String label= ss + args;
-                String link = getLinkForJavaSignature(signature);
-                rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
-                count++;
+        while ( c!=null && c!=Object.class ) {
+            Method[] mm= c.getDeclaredMethods();
+            for ( Method m: mm ){
+                if ( m.getName().startsWith(cc.completable) ) {
+                    String signature = methodSignature(m);
+                    String args = methodArgs(m);
+                    String ss= m.getName();
+                    String label= ss + args;
+                    String link = getLinkForJavaSignature(signature);
+                    rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
+                    count++;
+                }
             }
+            c= c.getSuperclass();
         }
         return count;
     }
