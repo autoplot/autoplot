@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>52 Years of Lemur Data Available Online <a href="https://lemur.duke.edu/2019-data-release/">here</a>.
+        <p><small>Ivar pointed out a bug with script indexing. 
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-02-21 r23343):</p>
+        <p>Bugfixes (2019-02-28 r23369):</p>
         <ul>
+            <li>export to 2-channel wave with scale=T would clip because the shift was incorrect.
+            <li>0292: support $Y/$m/mms1_fgm_srvy_l2_$Y$m$d in automatic aggregation suggestions.
             <li>2105: allow direct access of GitHub files, or other sites when the parent http folder listing results in error 400.
         </ul>
         <p>Older Bugfixes:</p>
@@ -75,6 +77,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>new class completions on "g.&lt;C&gt;" (a kludge) to support graphics in scripts.  
+            <li>reset will check for strange axes, supporting where a script has replaces the yaxis with a DasLabelAxis.
             <li>improve html version of pngwalk export to write separate pages.
         </ul>
         <p>Less recent features:</p>
