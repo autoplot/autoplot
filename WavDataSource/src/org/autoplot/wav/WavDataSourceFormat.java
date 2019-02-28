@@ -206,10 +206,9 @@ public class WavDataSourceFormat implements DataSourceFormat {
         boolean doscale= !"F".equals( params.get("scale") );
         boolean timetags= "T".equals("timetags");
         
-        QDataSet extent= Ops.extent(data);
+        int channels= data.length(0);
         int dep0Len = 0;
         int typeSize = BufferDataSet.byteCount(type);
-        int channels= data.length(0);
         int recSize = typeSize * channels;
         int size = data.length() * recSize;
 
@@ -221,35 +220,40 @@ public class WavDataSourceFormat implements DataSourceFormat {
                 data.length(), data.length(0), 1, 1,
                 result, type);
 
-        QubeDataSetIterator it = new QubeDataSetIterator(data);
-
-        double shift= 0; // shift is essentially the D/C part.
         boolean unsigned= type.startsWith("u");
         long typeOrdinals= (int)Math.pow(2,8*typeSize);
-        int limit= (int)( typeOrdinals / ( unsigned ? 1 : 2 ) );
-        if ( extent.value(1)>limit ) {
-            if ( ( extent.value(1)-extent.value(0) ) < typeOrdinals ) {
-                if ( extent.value(0)>0 ) {
-                    shift= typeOrdinals / 2;
-                } else {
-                    shift= ( extent.value(1)+extent.value(0) ) / 2;
-                }
-            } else {
-                if ( !doscale ) throw new IllegalArgumentException("data extent is too great: "+extent);
-            }
-        }
+        
+        double[] shift= new double[channels];
         
         double scale= 1.0;
-        if ( doscale ) {
-            shift= 0; // TODO: this is inconsistent with other branches.
-            if ( ( extent.value(1)-extent.value(0) )>0 ) {
-                scale= ( typeOrdinals - 1 ) / ( extent.value(1)-extent.value(0) );
-            }
+        for ( int ich=0; ich<channels; ich++ ) {
+            shift[ich]= 0.;
         }
         
+        if ( doscale ) {
+            // remove the D/C component from each channel.
+            for ( int ich=0; ich<channels; ich++ ) {
+                QDataSet channelData= Ops.slice1( data, ich );
+                QDataSet extent= Ops.extentSimple(channelData,null);
+                double mean = ( extent.value(0) + extent.value(1) ) / 2;
+                if ( unsigned ) {
+                    double targetMean= typeOrdinals / 2;
+                    shift[ich]= ( targetMean - mean );
+                } else {
+                    shift[ich]= -mean;
+                }
+                double scale1= ( typeOrdinals - 1 ) / ( extent.value(1)-extent.value(0) );
+                scale= ich==0 ? scale1 : Math.min( scale, scale1 );
+            }
+        }
+
+        QubeDataSetIterator it = new QubeDataSetIterator(data);
+        
+        int ich= 0;
         while (it.hasNext()) {
             it.next();
-            it.putValue( ddata,  scale * ( it.getValue(data)-shift ) );
+            it.putValue( ddata,  scale * ( it.getValue(data) + shift[ich] ) );
+            ich= ( ich + 1 ) % channels;
         }
 
         return result;
