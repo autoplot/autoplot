@@ -823,7 +823,11 @@ public class AutoplotUtil {
                 ds= SemanticOps.trim( ds, null, plot.getYaxis().getRange() );
                 if ( ds.length()==0 ) break;
                 PlotElement pcopy1= (PlotElement)pe.copy(); // TODO: something ain't right below...
-                PlotElementController.doAutoranging(pcopy1, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
+                PlotElementController.doAutoranging(
+                        pcopy1, 
+                        Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), 
+                        ds, 
+                        true ); // :) cast to Object!
                 if ( range==null ) {
                     range= pcopy1.getPlotDefaults().getXaxis().getRange();
                 } else {
