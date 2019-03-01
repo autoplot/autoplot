@@ -26,11 +26,14 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-02-28 r23369):</p>
+        <p>Bugfixes (2019-03-01 r23369):</p>
         <ul>
-            <li>export to 2-channel wave with scale=T would clip because the shift was incorrect.
-            <li>0292: support $Y/$m/mms1_fgm_srvy_l2_$Y$m$d in automatic aggregation suggestions.
-            <li>2105: allow direct access of GitHub files, or other sites when the parent http folder listing results in error 400.
+            <li>rte_1199189909: reset zoom on image would result in runtime error.  Thanks, Bob!
+            <li>2111: Series renderer dataset reduction branch doesn't support sloppy units (rte_0195003323). Thanks, Kris!
+            <li>2122: Autoplot appears off-screen on some windows configurations.  Thanks, Scott!
+            <li>export to 2-channel wave with scale=T would clip because the shift was incorrect.  Thanks, Larry!
+            <li>0292: support $Y/$m/mms1_fgm_srvy_l2_$Y$m$d in automatic aggregation suggestions.  Thanks, Kris!
+            <li>2105: allow direct access of GitHub files, or other sites when the parent http folder listing results in error 400.  Thanks, Bob!
         </ul>
         <p>Older Bugfixes:</p>
         <ul>
@@ -78,7 +81,7 @@
         <p>Features:</p>
         <ul>
             <li>new class completions on "g.&lt;C&gt;" (a kludge) to support graphics in scripts.  
-            <li>reset will check for strange axes, supporting where a script has replaces the yaxis with a DasLabelAxis.
+            <li>reset will check for strange axes, supporting where a script has replaces the yaxis with a DasLabelAxis.  Thanks, Chris!
             <li>improve html version of pngwalk export to write separate pages.
         </ul>
         <p>Less recent features:</p>
