@@ -7,6 +7,9 @@ import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.lang.reflect.InvocationTargetException;
@@ -63,6 +66,19 @@ public class WindowManager {
         return showConfirmDialog( parent, omessage, title, optionType );
     }
             
+    private boolean isOnScreen( Rectangle pos, int grab ) {
+        GraphicsEnvironment ge=GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] gs=ge.getScreenDevices();
+        for ( GraphicsDevice gd: gs ) {
+            Rectangle bounds= gd.getDefaultConfiguration().getBounds();
+            Rectangle intersect= pos.intersection(bounds);
+            if ( intersect.height>grab && intersect.width>grab ) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     /**
      * call this before the window.
      * @param window the window.
@@ -77,8 +93,9 @@ public class WindowManager {
         Dimension screenSize= java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         Pattern p= Pattern.compile("(?<width>\\d+)x(?<height>\\d+)");
         String s= prefs.get( "window."+name+".screensize", "" );
+        logger.log(Level.FINE, "found for window.{0}.screensize: {1} currentSize: {2}x{3}", new Object[]{name, s, screenSize.width, screenSize.height });
         Matcher m0= p.matcher(s);
-        if ( m0.matches() && Integer.parseInt( m0.group("width") )==screenSize.width ) {
+        if ( m0.matches() && Integer.parseInt( m0.group("width") )==screenSize.width && Integer.parseInt( m0.group("height") )==screenSize.height ) {
             String wh= prefs.get("window."+name+".size", "" );
             logger.log(Level.FINER, "window.{0}.size={1}", new Object[]{name, wh});
             Matcher m= p.matcher(wh);
@@ -101,7 +118,9 @@ public class WindowManager {
                     if ( newy<0 ) newy= 0;
                     if ( newx>screenSize.width-grab ) newx= screenSize.width-grab;
                     if ( newy>screenSize.height-grab ) newy= screenSize.height-grab;
-                    window.setLocation( newx, newy );
+                    if ( isOnScreen( new Rectangle(newx,newy,window.getWidth(),window.getWidth()), grab ) ) {
+                        window.setLocation( newx, newy );
+                    }
                 }
             } else {
                 String xy= prefs.get( "window."+name+".location", "" );
@@ -117,7 +136,9 @@ public class WindowManager {
                     if ( newy<0 ) newy= 0;
                     if ( newx>screenSize.width-grab ) newx= screenSize.width-grab;
                     if ( newy>screenSize.height-grab ) newy= screenSize.height-h;
-                    window.setLocation( newx, newy );
+                    if ( isOnScreen( new Rectangle(newx,newy,window.getWidth(),window.getWidth()), grab ) ) {
+                        window.setLocation( newx, newy );
+                    }
                 }
             }
         }
