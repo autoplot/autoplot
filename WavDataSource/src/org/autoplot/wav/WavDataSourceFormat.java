@@ -116,7 +116,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
      * @return 
      */
     private ByteBuffer formatRank2Waveform(QDataSet data, ProgressMonitor mon, Map<String, String> params) {
-
+        logger.entering("WavDataSourceFormat", "formatRank2Waveform" );
         String type = params.get("type");
         boolean doscale= !"F".equals( params.get("scale") );
         
@@ -143,8 +143,12 @@ public class WavDataSourceFormat implements DataSourceFormat {
             }
         }
         
+        logger.finer("montonic check complete" );
         
-        QDataSet extent= Ops.extent(data);
+        QDataSet extent= Ops.extentSimple(data,null);
+        
+        logger.finer("extent check complete" );
+        
         int dep0Len = 0; //(dep0 == null ? 0 : 1);
         int typeSize = BufferDataSet.byteCount(type);
         int recSize = typeSize * (dep0Len + 1);
@@ -182,6 +186,8 @@ public class WavDataSourceFormat implements DataSourceFormat {
             }
         }
 
+        logger.finer("calculate scale and shift complete" );
+        
         QubeDataSetIterator it = new QubeDataSetIterator(data);
         QubeDataSetIterator it2= new QubeDataSetIterator(ddata);
         while (it.hasNext()) {
@@ -190,6 +196,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
             it2.putValue( ddata, scale * ( it.getValue(data)-shift ) );
         }
 
+        logger.exiting("WavDataSourceFormat", "formatRank2Waveform" );
         return result;
     }
 
