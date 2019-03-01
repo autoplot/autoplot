@@ -68,6 +68,9 @@ public class SimplifyScriptSupport {
      * @return the python program with lengthy calls removed.
      */
      public static String simplifyScriptToCompletions( String script ) throws PySyntaxError {
+         
+         if ( script.trim().length()==0 ) return script;
+         
          String[] ss= script.split("\n");
          
          int lastLine= ss.length;
