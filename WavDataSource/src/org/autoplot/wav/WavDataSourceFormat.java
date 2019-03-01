@@ -208,7 +208,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
      * @return
      */
     private ByteBuffer formatRank2(QDataSet data, ProgressMonitor mon, Map<String, String> params) {
-
+        logger.entering("WavDataSourceFormat", "formatRank2" );
         String type = params.get("type");
         boolean doscale= !"F".equals( params.get("scale") );
         boolean timetags= "T".equals("timetags");
@@ -251,6 +251,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
                 }
                 double scale1= ( typeOrdinals - 1 ) / ( extent.value(1)-extent.value(0) );
                 scale= ich==0 ? scale1 : Math.min( scale, scale1 );
+                logger.log(Level.FINER, "scale for channel {0} complete", ich);
             }
         }
 
@@ -263,6 +264,8 @@ public class WavDataSourceFormat implements DataSourceFormat {
             ich= ( ich + 1 ) % channels;
         }
 
+        logger.exiting("WavDataSourceFormat", "formatRank2" );
+        
         return result;
     }
 
