@@ -14,7 +14,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -170,6 +172,27 @@ public class WalkImage  {
         this.dr= dr;
     }
 
+    /**
+     * contain logic which will wait for the image to load.
+     * @return the image, or missingImage.
+     */
+    public BufferedImage waitForImage() {
+        BufferedImage localImage= getImage();
+        while ( localImage==null ) {
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(WalkImage.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            localImage= getImage();
+        }
+        return localImage;
+    }
+    
+    /**
+     * return the image, or the missing image should the image be missing.
+     * @return 
+     */
     public BufferedImage getImage() {
         if (status == Status.MISSING) {
             return missingImage;
