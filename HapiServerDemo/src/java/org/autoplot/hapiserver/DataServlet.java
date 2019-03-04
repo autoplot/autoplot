@@ -423,7 +423,7 @@ public class DataServlet extends HttpServlet {
             freader= new FileReader(dataFile);
         }
         
-        logger.fine( "reading cache csv file: "+dataFile+" "  );
+        logger.log(Level.FINE, "reading cache csv file: {0} ", dataFile);
         
         //TODO: handle parameters and format=binary, think about JSON
         int[] pmap=null;
@@ -466,9 +466,9 @@ public class DataServlet extends HttpServlet {
         
         if ( out instanceof IdleClockOutputStream ) {
             String s=  ((IdleClockOutputStream)out).getStatsOneLine();
-            logger.fine( "done reading cache csv file ("+timer+"ms, "+s +"): "+dataFile );
+            logger.log(Level.FINE, "done reading cache csv file ({0}ms, {1}): {2}", new Object[]{timer, s, dataFile});
         } else {
-            logger.fine( "done reading cache csv file ("+timer+"ms): "+dataFile );
+            logger.log(Level.FINE, "done reading cache csv file ({0}ms): {1}", new Object[]{timer, dataFile});
         }
     }
     
