@@ -12,6 +12,7 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.datum.format.DatumFormatter;
 import org.das2.datum.format.EnumerationDatumFormatter;
+import org.das2.datum.format.FormatStringFormatter;
 import org.das2.datum.format.TimeDatumFormatter;
 import org.das2.qds.DDataSet;
 import org.das2.util.NumberFormatUtil;
@@ -36,6 +37,23 @@ public class CsvDataFormatter implements DataFormatter {
     boolean[] quotes;
     Units[] units;
     
+    /**
+     * @see AsciiTableDataSourceFormat#getDataFormatter
+     * @param df format, such as %.2f or %d
+     * @param u the units to fall back on.
+     * @return the DatumFormatter.
+     */
+    private DatumFormatter getDataFormatter( String df, Units u ) {
+        try {
+            if ( !df.contains("%") ) df= "%"+df;
+            //TODO: would be nice if we could verify formatter.  I had %f5.2 instead of %5.2f and it wasn't telling me.
+            return new FormatStringFormatter( df, false );
+        } catch ( RuntimeException ex ) {
+            logger.log( Level.SEVERE, ex.getMessage(), ex);
+            return u.getDatumFormatterFactory().defaultFormatter();
+        }
+    }
+    
     @Override
     public void initialize( JSONObject info, OutputStream out, QDataSet record) {
         unitsFormatter= new boolean[record.length()];
@@ -55,14 +73,13 @@ public class CsvDataFormatter implements DataFormatter {
                 datumFormatter[i]= new EnumerationDatumFormatter();
                 quotes[i]= true;
             } else {
+                String dfs= (String)field.property(QDataSet.FORMAT);
+                if ( dfs!=null && dfs.trim().length()>0 ) {
+                    datumFormatter[i]= getDataFormatter( dfs, u );
+                } else {
+                    datumFormatter[i]= u.getDatumFormatterFactory().defaultFormatter();
+                }
                 unitsFormatter[i]= false;
-                final DecimalFormat format= NumberFormatUtil.getDecimalFormat( "0.###E00;-#");
-                datumFormatter[i]= new DatumFormatter() {
-                    @Override
-                    public String format(Datum datum) {
-                        return format.format( datum.doubleValue(datum.getUnits()) );
-                    }
-                };
                 quotes[i]= false;
             }
         }
