@@ -867,14 +867,14 @@ public final class HapiDataSource extends AbstractDataSource {
             xds= ds;
         }
         
-        if ( timeStampLocation.equals("BEGIN") || timeStampLocation.equals("END" ) ) {
+        if ( timeStampLocation.equalsIgnoreCase("BEGIN") || timeStampLocation.equalsIgnoreCase("END" ) ) {
             if ( cadence==null ) {
                 cadence= DataSetUtil.asDatum( DataSetUtil.guessCadenceNew( xds, null ) );
             }
             if ( cadence!=null ) {
-                if ( timeStampLocation.equals("BEGIN") ) {
+                if ( timeStampLocation.equalsIgnoreCase("BEGIN") ) {
                     xds= Ops.add( xds, cadence.divide(2) );
-                } else if ( timeStampLocation.equals("END") ) {
+                } else if ( timeStampLocation.equalsIgnoreCase("END") ) {
                     xds= Ops.subtract( xds, cadence.divide(2) );
                 } 
             } else {
