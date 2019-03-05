@@ -104,7 +104,7 @@ public class CsvDataFormatter implements DataFormatter {
             if ( fieldDatum.isFill() ) {
                 out.write( String.valueOf( field.value() ).getBytes() );
             } else {
-                out.write( datumFormatter[i].format( fieldDatum ).getBytes() );
+                out.write( datumFormatter[i].format( fieldDatum, units[i] ).getBytes() );
             }
             if ( quotes[i] ) out.write('"');
             if ( i<n-1 ) out.write(',');
