@@ -169,6 +169,7 @@
             <li>2018-10-23: correct invalid id response, thanks Bob's verifier.
             <li>2019-02-26: correction to where two spectrograms could be served (specBins.2).
             <li>2019-02-26: corrections prompted by HapiVerifier, such as x-deployedAt should be x_deployedAt.
+            <li>2019-03-05: make csv output more readable by checking for FORMAT property.
         </ul>
         </small>
     </body>
