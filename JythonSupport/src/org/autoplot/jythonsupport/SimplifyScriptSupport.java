@@ -39,11 +39,16 @@ public class SimplifyScriptSupport {
         "    return dataset(0)\n\n";
     
     public static String removeSideEffects( String script ) {
-         Module n= (Module)org.python.core.parser.parse( script, "exec" );
          String[] ss= script.split("\n");
+         String lastLine= ss[ss.length-1].trim();
+         if ( lastLine.endsWith(":") ) {
+             ss= Arrays.copyOf(ss,ss.length-1);
+             script= JythonUtil.join( ss, "\n" );
+         }
+         Module n= (Module)org.python.core.parser.parse( script, "exec" );
          HashSet variableNames= new HashSet();
-         int lastLine= ss.length;
-         return simplifyScriptToGetCompletions( ss, n.body, variableNames, 1, lastLine, 0 );
+         int ilastLine= ss.length;
+         return simplifyScriptToGetCompletions( ss, n.body, variableNames, 1, ilastLine, 0 );
     }
     
     /**
