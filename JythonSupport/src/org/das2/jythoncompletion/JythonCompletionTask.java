@@ -294,7 +294,7 @@ public class JythonCompletionTask implements CompletionTask {
                     }
                 } else if ( lcontext instanceof PyJavaPackage ) {
                     if (po instanceof PyJavaClass) {
-                        Class dc = new PyJavaClassPeeker((PyJavaClass)po).getProxyClass();
+                        Class dc = getJavaClass((PyJavaClass)po);
                         if ( dc.getConstructors().length>0 ) {
                             Constructor constructor= dc.getConstructors()[0];
                             signature= constructorSignature( constructor );
@@ -1005,6 +1005,16 @@ public class JythonCompletionTask implements CompletionTask {
         m.appendTail(out);
         return out.toString();
     }
+
+    /**
+     * get the python signature for the function.  I can't figure out how to get defaults for the named keyword parameters.
+     * @param pf the function
+     * @return String like "docDemo8( arg )"
+     */
+    private static String getPyJavaClassSignature( PyJavaClass pf ) {
+        Class javaClass= getJavaClass(pf);
+        return javaClass.getCanonicalName().replaceAll("\\.","/");
+    }
     
     /**
      * get the python signature for the function.  I can't figure out how to get defaults for the named keyword parameters.
@@ -1192,8 +1202,7 @@ public class JythonCompletionTask implements CompletionTask {
                         case "javaclass":
                         case "javainnerclass":
                             label = ss;
-                            PyJavaClassPeeker peek= new PyJavaClassPeeker((PyJavaClass)po);
-                            Class jclass= peek.getProxyClass();
+                            Class jclass= getJavaClass((PyJavaClass)po);
                             String n= jclass.getCanonicalName();
                             allStatic= true;
                             Method[] mm= jclass.getMethods();
@@ -1266,6 +1275,8 @@ public class JythonCompletionTask implements CompletionTask {
                         link= "http://autoplot.org/developer.scripting#DOM";
                     } else if (signature != null) {
                         link= getLinkForJavaSignature(signature);
+                    } else if ( po instanceof PyJavaClass ) {
+                        link= getLinkForJavaSignature( getPyJavaClassSignature( (PyJavaClass)po ) );
                     }
                     if ( po instanceof PyString ) {
                         result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label+" -> "+po+"", link) );
@@ -1282,6 +1293,18 @@ public class JythonCompletionTask implements CompletionTask {
         
         logger.log( Level.FINE, "getLocalsCompletions found {0} completions", new Object[]{ result.size() } );
         return result;
+    }
+
+    /**
+     * return the Java class for the PyJavaClass.  The implementation may change
+     * with Jython2.7.
+     * @param po the PyJavaClass wrapper.
+     * @return the Java class.
+     */
+    private static Class getJavaClass(PyJavaClass po) {
+        PyJavaClassPeeker peek= new PyJavaClassPeeker(po);
+        Class jclass= peek.getProxyClass();
+        return jclass;
     }
 
     /**
