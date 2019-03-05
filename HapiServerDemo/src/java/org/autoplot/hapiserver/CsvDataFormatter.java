@@ -63,12 +63,13 @@ public class CsvDataFormatter implements DataFormatter {
         for ( int i=0; i<record.length(); i++ ) {
             QDataSet field= record.slice(i);
             Units u= (Units)field.property(QDataSet.UNITS);
+            if ( u==null ) u= Units.dimensionless;
             units[i]= u;
-            if (  u!=null && UnitsUtil.isTimeLocation(u) ) {
+            if ( UnitsUtil.isTimeLocation(u) ) {
                 unitsFormatter[i]= true;
                 datumFormatter[i]= TimeDatumFormatter.DEFAULT;
                 quotes[i]= false;
-            } else if ( u!=null && UnitsUtil.isNominalMeasurement(u) ) {
+            } else if ( UnitsUtil.isNominalMeasurement(u) ) {
                 unitsFormatter[i]= true;
                 datumFormatter[i]= new EnumerationDatumFormatter();
                 quotes[i]= true;
