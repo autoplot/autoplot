@@ -686,11 +686,11 @@ public class JythonCompletionTask implements CompletionTask {
         if ( eolnCarot>0 ) {
             int startLastLine= Utilities.getRowStart(editor, eolnCarot-1 );
             String lastLine= editor.getText( startLastLine, eolnCarot-startLastLine );
-            Matcher m= Pattern.compile("(\\s*)(\\S+).*").matcher(lastLine.trim());
+            Matcher m= Pattern.compile("(\\s*)(\\S+).*(\\s)*").matcher(lastLine);
             if ( m.matches() ) {
                 int i= m.group(1).length();
                 String indent= lastLine.substring(0,i);
-                eval= eval + indent + "\t" + "__dummy__=1\n";
+                eval= eval + indent + "__dummy__=1\n";
             }
         }
         
