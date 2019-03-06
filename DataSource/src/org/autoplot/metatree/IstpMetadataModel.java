@@ -346,7 +346,7 @@ public class IstpMetadataModel extends MetadataModel {
             
         }
 
-        Units units;
+        Units units=null;
         String sunits= "";
         if (attrs.containsKey("UNITS")) {
             sunits = String.valueOf( attrs.get("UNITS") );
@@ -383,10 +383,24 @@ public class IstpMetadataModel extends MetadataModel {
             sunits= LatexToGranny.latexToGranny(sunits);
         }
         
-        try {
-            units = Units.lookupUnits(DataSourceUtil.unquote(sunits));
-        } catch (IllegalArgumentException e) {
-            units = Units.dimensionless;
+        String siConversion= (String)attrs.get("SI_conversion");
+        if ( siConversion!=null ) {
+            if ( siConversion.endsWith("seconds") ) {
+                int i= siConversion.indexOf(">");
+                double d= Double.parseDouble( siConversion.substring(0,i) );
+                if ( d==1e-9 ) {
+                    units= Units.cdfTT2000;
+                    sunits= units.toString();
+                }
+            }
+        }
+        
+        if ( units==null ) {
+            try {
+                units = Units.lookupUnits(DataSourceUtil.unquote(sunits));
+            } catch (IllegalArgumentException e) {
+                units = Units.dimensionless;
+            }
         }
 
         // we need to distinguish between ms and epoch times.
