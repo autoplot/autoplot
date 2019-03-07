@@ -17,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
+import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.das2.system.RequestProcessor;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -50,6 +52,7 @@ import org.autoplot.jythonsupport.DatasetCommand;
 import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.autoplot.jythonsupport.ui.ScriptPanelSupport;
+import org.das2.util.FileUtil;
 import org.python.core.PyDictionary;
 
 /**
@@ -432,7 +435,16 @@ public class JythonUtil {
         if ( EventQueue.isDispatchThread() ) {
             logger.warning("THIS IS THE EVENT THREAD, AND ATTEMPTS TO DOWNLOAD A FILE.");
         }
+        
         final File file = DataSetURI.getFile( uri, new NullProgressMonitor() ); 
+        final String s= FileUtil.readFileToString(file);
+        
+        final File lastVersionDir= Paths.get( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "scripts" ).toFile();
+        final File lastVersionFile= Paths.get( lastVersionDir.toString(), "" + s.hashCode() + ".jy" ).toFile();
+        
+        if ( FileUtil.fileCompare( file, lastVersionFile ) ) {
+            System.err.println("ITS SAFE");
+        }
         
         final ArrayList<Object> result= new ArrayList<>();
         Runnable run= new Runnable() {
@@ -555,6 +567,17 @@ public class JythonUtil {
                             scriptPanel.setRunningScript(file);
                         }
                         try ( FileInputStream in = new FileInputStream(file) ) {
+                            
+                            final String s= FileUtil.readFileToString(file);
+                            final File lastVersionDir= Paths.get( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "scripts" ).toFile();
+                            if ( !lastVersionDir.exists() ) {
+                                if ( !lastVersionDir.mkdirs() ) {
+                                    logger.warning("unable to mkdir "+lastVersionDir);
+                                }
+                            }
+                            final File lastVersionFile= Paths.get( lastVersionDir.toString(), "" + s.hashCode() + ".jy" ).toFile();        
+                            
+                            FileUtil.fileCopy( file, lastVersionFile );
                             
                             interp.execfile( JythonRefactory.fixImports(in), uri.toString());
                             
