@@ -1167,7 +1167,7 @@ public class CdfUtil {
                             if ( maxRec==0 ) {
                                 warn.add("data contains no records" );
                             } else {
-                                warn.add("depend0 length is inconsistent with length ("+(maxRec)+")" );
+                                warn.add("depend0 length ("+xDependVariable+"["+xMaxRec+"]) is inconsistent with length ("+(maxRec)+")" );
                             }
                             //TODO: warnings are incorrect for Themis data.
                         }
@@ -1199,7 +1199,7 @@ public class CdfUtil {
             }
             String desc = svar;
             if (xDependVariable != null) {
-                desc += "(" + xDependVariable;
+                desc += "[" + xDependVariable;
                 if ( ( xMaxRec>0 || !isMaster ) && xMaxRec==maxRec ) { // small kludge for CDAWeb, where we expect masters to be empty.
                     desc+= "=" + (xMaxRec);
                 }
@@ -1214,10 +1214,10 @@ public class CdfUtil {
                 } else if ( rank>1 ) {
                     desc += ","+DataSourceUtil.strjoin( dims, ",");
                 }
-                desc += ")";
+                desc += "]";
             }
             if (deep) {
-                StringBuilder descbuf = new StringBuilder("<html><b>" + desc + "</b><br>");
+                StringBuilder descbuf = new StringBuilder("<html><b>" + desc + "</b><br><br>");
 
                 int itype= -1;
                 try { 
@@ -1226,28 +1226,32 @@ public class CdfUtil {
                 } catch ( CDFException ex ) {}
                 
                 String recDesc= ""+ CdfUtil.getStringDataType( itype );
-                if ( dims!=null ) {
+                if ( dims!=null && dims.length>0 ) {
                     recDesc= recDesc+"["+ DataSourceUtil.strjoin( dims, ",") + "]";
                 }
-                if (maxRec != xMaxRec)
+
+                if (scatDesc != null) {
+                    descbuf.append("").append(scatDesc).append("<br><br>");
+                }
+                if (svarNotes !=null ) {
+                    descbuf.append("<p><small>").append(svarNotes).append("</small></p><br>");
+                }
+                
+                if (maxRec != xMaxRec) {
                     if ( isVirtual ) {
                         descbuf.append("").append("(virtual function ").append(vdescr).append( ")<br>");
                     } else {
                         descbuf.append("").append( recCount ).append(" records of ").append(recDesc).append("<br>");
                     }
-                if (scatDesc != null)
-                    descbuf.append("").append(scatDesc).append("<br>");
-                if (svarNotes !=null ) {
-                    descbuf.append("<br><p><small>").append(svarNotes).append("</small></p>");
+                } else {
+                    descbuf.append("").append( recCount ).append(" records of ").append(recDesc).append("<br>");
                 }
-                
-                descbuf.append("<br><br><small>CDF data type is ").append(CdfUtil.getStringDataType(varType)).append("</small>");
                         
                 for ( String s: warn ) {
                     if ( s.startsWith("NOTE") ) {
-                        descbuf.append("<br>").append(s);
+                        descbuf.append(s);
                     } else {
-                        descbuf.append("<br>WARNING: ").append(s);
+                        descbuf.append("WARNING: ").append(s);
                     }
                 }
 
