@@ -13,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -53,7 +54,6 @@ import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.autoplot.jythonsupport.ui.ScriptPanelSupport;
 import org.das2.util.FileUtil;
-import org.python.core.PyDictionary;
 
 /**
  * Utilities for Jython functions, such as a standard way to initialize
@@ -572,10 +572,16 @@ public class JythonUtil {
                             final File lastVersionDir= Paths.get( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "scripts" ).toFile();
                             if ( !lastVersionDir.exists() ) {
                                 if ( !lastVersionDir.mkdirs() ) {
-                                    logger.warning("unable to mkdir "+lastVersionDir);
+                                    logger.log(Level.WARNING, "unable to mkdir {0}", lastVersionDir);
+                                } else {
+                                    File readme= new File(lastVersionDir,"README.txt");
+                                    try ( PrintStream out= new PrintStream(readme) ) {
+                                        out.print("Files here have been okayed to run and can be run again without a warning.  See http://autoplot.org/1310\n");
+                                    }
                                 }
                             }
-                            final File lastVersionFile= Paths.get( lastVersionDir.toString(), "" + s.hashCode() + ".jy" ).toFile();        
+                            
+                            final File lastVersionFile= Paths.get( lastVersionDir.toString(), String.format( "%12d.jy", Math.abs(s.hashCode()) ) ).toFile();        
                             
                             FileUtil.fileCopy( file, lastVersionFile );
                             
