@@ -230,6 +230,25 @@ public class JythonUtil {
     
     private static boolean isScriptOkayed( String filename, String contents ) {
         String okayedContents= okayed.get(filename);
+        if ( okayedContents==null ) {
+            final File lastVersionDir= Paths.get( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "scripts" ).toFile();
+            final File lastVersionFile= Paths.get( lastVersionDir.toString(), String.format( "%010d.jy", Math.abs(filename.hashCode()) ).trim() ).toFile();        
+            if ( lastVersionFile.exists() ) {
+                try {
+                    String lastVersionContents= FileUtil.readFileToString(lastVersionFile);
+                    if ( lastVersionContents.equals(contents) ) {
+                        logger.log(Level.FINE, "matches file previously okayed: {0}", lastVersionFile);
+                        return true;
+                    } else {
+                        logger.log(Level.FINE, "does not match file previously run: {0}", lastVersionFile);
+                    }
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+            } else {
+                logger.log(Level.FINE, "not been run before: {0}", lastVersionFile);
+            }
+        }
         return contents.equals( okayedContents  );
     }
             
@@ -440,7 +459,7 @@ public class JythonUtil {
         final String s= FileUtil.readFileToString(file);
         
         final File lastVersionDir= Paths.get( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "scripts" ).toFile();
-        final File lastVersionFile= Paths.get( lastVersionDir.toString(), "" + s.hashCode() + ".jy" ).toFile();
+        final File lastVersionFile= Paths.get( lastVersionDir.toString(), String.format( "%010d.jy", Math.abs(file.toString().hashCode()) ).trim() ).toFile();        
         
         if ( FileUtil.fileCompare( file, lastVersionFile ) ) {
             System.err.println("ITS SAFE");
@@ -568,7 +587,6 @@ public class JythonUtil {
                         }
                         try ( FileInputStream in = new FileInputStream(file) ) {
                             
-                            final String s= FileUtil.readFileToString(file);
                             final File lastVersionDir= Paths.get( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "scripts" ).toFile();
                             if ( !lastVersionDir.exists() ) {
                                 if ( !lastVersionDir.mkdirs() ) {
@@ -581,7 +599,7 @@ public class JythonUtil {
                                 }
                             }
                             
-                            final File lastVersionFile= Paths.get( lastVersionDir.toString(), String.format( "%010d.jy", Math.abs(s.hashCode()) ).trim() ).toFile();        
+                            final File lastVersionFile= Paths.get( lastVersionDir.toString(), String.format( "%010d.jy", Math.abs(file.toString().hashCode()) ).trim() ).toFile();        
                             
                             FileUtil.fileCopy( file, lastVersionFile );
                             
