@@ -581,7 +581,7 @@ public class JythonUtil {
                                 }
                             }
                             
-                            final File lastVersionFile= Paths.get( lastVersionDir.toString(), String.format( "%12d.jy", Math.abs(s.hashCode()) ) ).toFile();        
+                            final File lastVersionFile= Paths.get( lastVersionDir.toString(), String.format( "%010d.jy", Math.abs(s.hashCode()) ).trim() ).toFile();        
                             
                             FileUtil.fileCopy( file, lastVersionFile );
                             
