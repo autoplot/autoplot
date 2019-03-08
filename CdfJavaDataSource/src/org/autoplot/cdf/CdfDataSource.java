@@ -5,6 +5,7 @@
 
 package org.autoplot.cdf;
 
+import gov.nasa.gsfc.spdf.cdfj.AttributeEntry;
 import gov.nasa.gsfc.spdf.cdfj.CDFException;
 import java.beans.PropertyChangeEvent;
 import java.util.logging.Level;
@@ -56,6 +57,8 @@ import org.autoplot.datasource.MetadataModel;
 import org.autoplot.datasource.ReferenceCache;
 import org.das2.qds.ops.Ops;
 import org.autoplot.metatree.MetadataUtil;
+import org.das2.qds.DataSetIterator;
+import org.das2.qds.QubeDataSetIterator;
 
 /**
  * CDF data source based on Nand Lal's pure-Java
@@ -319,6 +322,18 @@ public class CdfDataSource extends AbstractDataSource {
             if ( svariable==null ) {
                 throw new IllegalArgumentException("CDF URI needs an argument");
             }
+
+            long numRec,numRecDepend0=-1;
+            try {
+                Vector depend0namev= (Vector)cdf.getAttribute(svariable,"DEPEND_0");
+                if ( depend0namev.size()==1 ) {
+                    String n= depend0namev.get(0).toString();
+                    numRecDepend0= cdf.getNumberOfValues(n);
+                } 
+                numRec= cdf.getNumberOfValues(svariable);
+            } catch ( CDFException ex ) {
+                throw new Exception("CDFException "+ex.getMessage());
+            }
             
             String interpMeta = (String) map.get(PARAM_INTERPMETA);
             if (!"no".equals(interpMeta)) {
@@ -332,12 +347,6 @@ public class CdfDataSource extends AbstractDataSource {
                 List<String> ss= Arrays.asList( cdf.getVariableNames() );
                 if ( !ss.contains(svariable) ) {
                     throw new IllegalArgumentException("No Such Variable: "+svariable);
-                }
-                long numRec;
-                try {
-                    numRec= cdf.getNumberOfValues(svariable);
-                } catch ( CDFException ex ) {
-                    throw new Exception("CDFException "+ex.getMessage());
                 }
 
                 int[] dimensions = cdf.getDimensions(svariable);
@@ -379,6 +388,24 @@ public class CdfDataSource extends AbstractDataSource {
 
             // Now call the other getDataSet...
             QDataSet result= getDataSet(mon,attributes);
+            
+            if ( numRec<numRecDepend0 ) {
+                BufferDataSet resultExt= ((BufferDataSet)result);
+                resultExt.grow( (int)numRecDepend0 );
+                int[] size= Ops.size(result);
+                int recLen= 1 * DataSetUtil.product(size) / size[0] * BufferDataSet.byteCount( resultExt.getType() ); 
+                BufferDataSet fillRecs= BufferDataSet.create( resultExt.rank(), resultExt.getType(), (int)( numRecDepend0-numRec ), size );
+                fillRecs.putProperty(QDataSet.UNITS,result.property(QDataSet.UNITS));
+                double fill= ((Number)resultExt.property(QDataSet.FILL_VALUE)).doubleValue(); // TODO: float vs double will cause noise.
+                DataSetIterator it= new QubeDataSetIterator(fillRecs);
+                while ( it.hasNext() ) {
+                    it.next();
+                    it.putValue(fillRecs,fill);
+                }
+                resultExt.append( fillRecs );
+                logger.warning("assuming virtual records because data is shorter than DEPEND_0");
+                result= resultExt;
+            }
             
             if ( rcent!=null ) rcent.finished(result);
             return result;
