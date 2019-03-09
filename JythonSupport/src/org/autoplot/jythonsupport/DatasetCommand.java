@@ -45,6 +45,8 @@ public class DatasetCommand extends PyObject {
             + "<tr><td>validMin validMax</td><td>range of valid values for the data.</td></tr>\n"
             + "<tr><td>typicalMin typicalMax</td><td>typical range dataset, used for suggesting axis ranges.</td></tr>\n"
             + "<tr><td>scaleType</td><td>'log' or 'linear'</td></tr>\n"
+            + "<tr><td>format</td><td>format specifier, like %d or %.2f</td></tr>\n"
+            + "<tr><td>cadence</td><td>nominal cadence, like 60s or 100Hz.  Note this goes with the independent parameter (timetags).</td></tr>\n"
             + "</table></html>");
 
     private static QDataSet datasetValue( PyObject arg0 ) {
@@ -95,13 +97,13 @@ public class DatasetCommand extends PyObject {
         FunctionSupport fs= new FunctionSupport( "dataset", 
             new String[] { "ds", "ds1", "ds2", "ds3", 
             "title", "label", "name",
-            "units", 
+            "units", "format", "cadence", 
             "fillValue", "validMin", "validMax", "typicalMin", "typicalMax",
             "scaleType",
         },
         new PyObject[] { Py.None, Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None,
-            Py.None, 
+            Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None, Py.None, Py.None,
             Py.None,
         } );
@@ -161,6 +163,7 @@ public class DatasetCommand extends PyObject {
                 case "title":
                 case "label":
                 case "name":
+                case "format":
                     result= Ops.putProperty( result, kw.toUpperCase(), sval );
                     break;
                 case "units":
@@ -187,6 +190,9 @@ public class DatasetCommand extends PyObject {
                     break;
                 case "scaleType":
                     result= Ops.putProperty( result, QDataSet.SCALE_TYPE, sval );
+                    break;
+                case "cadence":
+                    result= Ops.putProperty( result, QDataSet.CADENCE, sval );
                     break;
                 default:
                     throw new IllegalArgumentException("bad keyword");
