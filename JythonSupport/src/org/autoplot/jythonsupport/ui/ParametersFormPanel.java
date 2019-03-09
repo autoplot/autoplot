@@ -50,7 +50,7 @@ import org.autoplot.jythonsupport.JythonUtil.Param;
 import static org.autoplot.jythonsupport.ui.Util.getParams;
 
 /**
- *
+ * GUI component for controlling script parameters.  
  * @author jbf
  */
 public class ParametersFormPanel {
@@ -146,13 +146,14 @@ public class ParametersFormPanel {
             }
             
             logger.log(Level.WARNING, "unable to find variable ''{0}''", param);
-        }        
+        }
     }
     
     /**
-     * extract the data from the form into params.
-     * @param fd
-     * @param params 
+     * extract the data from the form into params. Note, strings and URIs are 
+     * quoted, not sure why.
+     * @param fd form data containing GUI references
+     * @param params map to contain the settings for each parameter, reading from the GUI.
      */
     public static void resetVariables( FormData fd, Map<String,String> params ) {
         
@@ -265,6 +266,7 @@ public class ParametersFormPanel {
      * @param src the script loaded into a string.
      * @param params map containing any settings for the variables.
      * @param zparamsPanel JPanel to populate with the GUI items. (Can be null.)
+     * @see org.autoplot.jythonsupport.ui.Util#getParams(java.util.Map, java.lang.String, java.util.Map, org.das2.util.monitor.ProgressMonitor) 
      * @return the FormData from the initial view, since some clients will not show a GUI when there are no parameters.
      */
     public FormData doVariables( final Map<String,Object> env, final String src, Map<String,String> params, final JPanel zparamsPanel ) {
