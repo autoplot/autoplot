@@ -323,6 +323,12 @@ public class CdfDataSource extends AbstractDataSource {
                 throw new IllegalArgumentException("CDF URI needs an argument");
             }
 
+            int i = svariable.indexOf("[");
+            if (i != -1) {
+                constraint = svariable.substring(i);
+                svariable = svariable.substring(0, i);
+            }
+                
             long numRec,numRecDepend0=-1;
             try {
                 Vector depend0namev= (Vector)cdf.getAttribute(svariable,"DEPEND_0");
@@ -338,11 +344,6 @@ public class CdfDataSource extends AbstractDataSource {
             String interpMeta = (String) map.get(PARAM_INTERPMETA);
             if (!"no".equals(interpMeta)) {
                 //Variable variable;
-                int i = svariable.indexOf("[");
-                if (i != -1) {
-                    constraint = svariable.substring(i);
-                    svariable = svariable.substring(0, i);
-                }
                 
                 List<String> ss= Arrays.asList( cdf.getVariableNames() );
                 if ( !ss.contains(svariable) ) {
