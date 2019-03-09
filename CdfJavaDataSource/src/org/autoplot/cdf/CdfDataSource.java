@@ -326,7 +326,7 @@ public class CdfDataSource extends AbstractDataSource {
             long numRec,numRecDepend0=-1;
             try {
                 Vector depend0namev= (Vector)cdf.getAttribute(svariable,"DEPEND_0");
-                if ( depend0namev.size()==1 ) {
+                if ( depend0namev!=null && depend0namev.size()==1 ) {
                     String n= depend0namev.get(0).toString();
                     numRecDepend0= cdf.getNumberOfValues(n);
                 } 
