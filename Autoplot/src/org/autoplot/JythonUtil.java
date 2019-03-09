@@ -456,14 +456,6 @@ public class JythonUtil {
         }
         
         final File file = DataSetURI.getFile( uri, new NullProgressMonitor() ); 
-        final String s= FileUtil.readFileToString(file);
-        
-        final File lastVersionDir= Paths.get( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "scripts" ).toFile();
-        final File lastVersionFile= Paths.get( lastVersionDir.toString(), String.format( "%010d.jy", Math.abs(file.toString().hashCode()) ).trim() ).toFile();        
-        
-        if ( FileUtil.fileCompare( file, lastVersionFile ) ) {
-            System.err.println("ITS SAFE");
-        }
         
         final ArrayList<Object> result= new ArrayList<>();
         Runnable run= new Runnable() {
