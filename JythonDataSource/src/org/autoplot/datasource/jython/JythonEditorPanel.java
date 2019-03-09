@@ -1,18 +1,8 @@
-/*
- * JythonEditorPanel.java
- *
- * Created on Jul 14, 2009, 10:44:41 AM
- */
 
 package org.autoplot.datasource.jython;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -32,39 +22,28 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.text.BadLocationException;
-import org.das2.datum.DatumRangeUtil;
 import org.das2.jythoncompletion.nbadapt.Utilities;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.PyException;
-import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.LogNames;
-import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
+import org.autoplot.jythonsupport.ui.ParametersFormPanel;
+import org.autoplot.jythonsupport.ui.ParametersFormPanel.FormData;
 import org.autoplot.jythonsupport.ui.ScriptPanelSupport;
-import org.autoplot.jythonsupport.ui.Util;
+import org.das2.util.FileUtil;
 
 /**
  * Editor for vap+jyds uris.  These URIs offer a couple of challenges,
@@ -82,10 +61,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     File file;
     URI resourceUri;
     boolean hasVariables= false;
-    List<JComponent> tflist;
-    List<String> paramsList;
-    List<String> deftsList;
-    List<Character> typesList; 
+    ParametersFormPanel parametersFormPanel;
 
     /** Creates new form JythonEditorPanel */
     public JythonEditorPanel() {
@@ -329,276 +305,21 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
      */
     private boolean doVariables( File f, Map<String,String> params ) throws PyException {
 
-        Map<String,JythonUtil.Param> parms;
-
         boolean hasVars= false;
-        tflist= new ArrayList();
-        paramsList= new ArrayList();
-        deftsList= new ArrayList();
-        typesList= new ArrayList();
         
         try {
-            parms= JythonDataSourceFactory.getParams( f.toURI(), params, new NullProgressMonitor() );
 
-            paramsPanel.add( new JLabel("<html>This script has the following input parameters.  Buttons on the right show default values.<br><br></html>") );
-
-            for ( Entry<String,JythonUtil.Param> e: parms.entrySet() ) {
-                //String s= e.getKey();
-                JythonUtil.Param parm= e.getValue();
-                
-                String vname= parm.name;                
-                String label;
-
-                JComponent ctf;
-
-                boolean isBool= parm.enums!=null && isBoolean( parm.enums );
-
-                String colon= isBool ? "" : ":";
-
-                if ( parm.doc==null ) {
-                    label= vname+ colon;
-                } else {
-                    String doc= parm.doc;
-                    if ( doc.startsWith("'") ) doc= doc.substring(1,doc.length()-1);// pop off the quotes
-                    if ( !parm.label.equals(parm.name) ) {
-                        doc= doc + " ("+parm.label+" inside the script)";
-                    }
-                    label= "<html>" + parm.name + ", <i>" + doc + "</i>"+colon+"</html>";
-                }      
-                
-                if ( !isBool ) {
-                    JPanel labelPanel= new JPanel();
-                    labelPanel.setLayout( new BoxLayout( labelPanel, BoxLayout.X_AXIS ) );
-                    JLabel l= new JLabel( label );
-                    labelPanel.add( getSpacer() );
-                    labelPanel.add( l );
-                    labelPanel.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-                    paramsPanel.add( labelPanel );
-                } else {
-                    paramsPanel.add( Box.createVerticalStrut(paramsPanel.getFont().getSize()/2 ) ); //TODO: other code that writes the GUI needs this too.
-                }
-
-                JPanel valuePanel= new JPanel(  );
-                valuePanel.setLayout( new BoxLayout( valuePanel, BoxLayout.X_AXIS ) );
-                if ( !isBool ) valuePanel.add( getSpacer() );
-
-                if ( parm.type=='R' ) { // ResourceURI
-                    final DataSetSelector sel= new DataSetSelector();
-                    sel.setPlotItButtonVisible(false);
-                    sel.setEnableDataSource(false);
-                    sel.setSuggestFiles(true);
-                    sel.setSuggestFsAgg(true);
-                    String val;
-                    URISplit split= URISplit.parse((String)parm.deft);
-                    if ( split.ext!=null ) {
-                        sel.setAcceptPattern(".*\\"+split.ext);
-                    }
-                    if (params.get(vname)!=null ) {
-                        val= params.get(vname);
-                        if ( val.startsWith("'") ) val= val.substring(1);
-                        if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
-                    } else {
-                        val= String.valueOf( parm.deft );
-                        params.put( vname, val );
-                    }
-                    sel.setRecent( DataSetSelector.getDefaultRecent() );
-                    sel.setValue( val );
-                    
-                    valuePanel.add( getSpacer(7) );  // kludge.  Set on Jeremy's home Ubuntu
-                    valuePanel.add( sel );
-                    sel.setMaximumSize( new Dimension(Integer.MAX_VALUE,100) );
-                    sel.setValue( val );
-                    valuePanel.add( getSpacer(10) ); // put a little space in after the selector as well.
-                            
-                    ctf= sel;
-                    
-                } else if ( parm.type=='U' ) {
-                    final DataSetSelector sel= new DataSetSelector();
-                    sel.setPlotItButtonVisible(false);
-                    JythonUtil.Param timerange= parms.get("timerange");
-                    if ( timerange!=null ) {
-                        try {
-                            sel.setTimeRange( DatumRangeUtil.parseTimeRange(String.valueOf(timerange.deft)) );
-                        } catch ( ParseException ex ) {
-                            logger.log(Level.WARNING, "unable to parse as time range: {0}", timerange.deft);
-                        }
-                    }
-                    String val;
-                    if (params.get(vname)!=null ) {
-                        val= params.get(vname);
-                        if ( val.startsWith("'") ) val= val.substring(1);
-                        if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
-                    } else {
-                        val= String.valueOf( parm.deft );
-                        params.put( vname, val );
-                    }
-                    if ( timerange!=null ) {
-                        String blurVal= DataSetURI.blurTsbUri(val);
-                        if ( blurVal!=null ) {
-                            val= blurVal;
-                            logger.finer("blurring URI because timerange is used.");
-                        }
-                    }
-                    sel.setRecent( DataSetSelector.getDefaultRecent() );
-                    sel.setMaximumSize( new Dimension(Integer.MAX_VALUE,100) );
-                    sel.setValue( val );
-                    
-                    valuePanel.add( getSpacer(7) );  // kludge.  Set on Jeremy's home Ubuntu
-                    valuePanel.add( sel );
-                    sel.setValue( val );
-                    valuePanel.add( getSpacer(10) ); // put a little space in after the selector as well.
-                            
-                    ctf= sel;
-                    
-                } else if ( parm.type=='T' ) {
-                    String val;
-                    if ( params.get(vname)!=null ) {
-                        val= params.get(vname);
-                        if ( val.startsWith("'") ) val= val.substring(1);
-                        if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
-                    } else {
-                        val= String.valueOf( parm.deft );
-                        params.put( vname, val );
-                    }
-                    final JTextField tf= new JTextField();
-                    Dimension x= tf.getPreferredSize();
-                    x.width= Integer.MAX_VALUE;
-                    tf.setMaximumSize(x);
-                    tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-
-                    tf.setText( val );
-                    ctf= tf;
-                    
-                    Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/autoplot/datasource/calendar.png"));
-                    JButton button= new JButton( fileIcon );
-                    button.addActionListener( new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            org.das2.util.LoggerManager.logGuiEvent(e);
-                            TimeRangeTool tt= new TimeRangeTool();
-                            tt.setSelectedRange(tf.getText());
-                            int r= JOptionPane.showConfirmDialog( paramsPanel, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
-                            if ( r==JOptionPane.OK_OPTION) {
-                                tf.setText(tt.getSelectedRange());
-                            }
-                        }
-                    });
-                    button.setToolTipText("Time Range Tool");
-                    valuePanel.add( ctf );
-                    button.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-                    valuePanel.add( button );
-                    
-                } else {
-                    String val;
-                    if ( params.get(vname)!=null ) {
-                        val= params.get(vname);
-                        if ( val.startsWith("'") ) val= val.substring(1);
-                        if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
-                    } else {
-                        val= String.valueOf( parm.deft );
-                    }
-                    if ( parm.enums!=null && parm.enums.size()>0 ) {
-                        if ( isBoolean( parm.enums ) ) {
-                            JCheckBox jcb= new JCheckBox( label );
-                            jcb.setSelected( val.equals("T") );
-                            ctf= jcb;
-                            jcb.addActionListener( new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    org.das2.util.LoggerManager.logGuiEvent(e);
-                                    redoVariables();
-                                }
-                            });
-                        } else {
-                            JComboBox jcb= new JComboBox(parm.enums.toArray());
-                            jcb.setEditable(false);
-                            Object oval;
-                            if ( parm.deft instanceof Long ) {
-                                oval = Long.valueOf(val);
-                            } else if ( parm.deft instanceof Integer ) {
-                                oval = Integer.valueOf(val);
-                            } else if ( parm.deft instanceof Double ) {
-                                oval = Double.valueOf(val);
-                            } else if ( parm.deft instanceof Float ) {
-                                oval = Float.valueOf(val);
-                            } else {
-                                oval = val;
-                            }
-                            jcb.setSelectedItem(oval);
-                            jcb.addItemListener( new ItemListener() {
-                                @Override
-                                public void itemStateChanged(ItemEvent e) {
-                                    redoVariables();
-                                }
-                            });
-                            
-                            ctf= jcb;
-                            Dimension x= ctf.getPreferredSize();
-                            x.width= Integer.MAX_VALUE;
-                            ctf.setMaximumSize(x);
-                            ctf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-                        }
-                    } else {
-                        JTextField tf= new JTextField();
-                        Dimension x= tf.getPreferredSize();
-                        x.width= Integer.MAX_VALUE;
-                        tf.setMaximumSize(x);
-                        tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-
-                        tf.setText( val );
-                        ctf= tf;
-                    }
-                    
-                    valuePanel.add( ctf );
-                }
-
-                boolean shortLabel= ( parm.type=='R' || String.valueOf(parm.deft).length()>22 ) ;
-                final String fdeft= shortLabel ? "default" : String.valueOf(parm.deft);
-                final String fvalue= String.valueOf(parm.deft);
-                final JComponent ftf= ctf;
-                JButton defaultButton= new JButton( new AbstractAction( fdeft ) {
-                    @Override
-                    public void actionPerformed( ActionEvent e ) {
-                        if ( ftf instanceof DataSetSelector ) {
-                            ((DataSetSelector)ftf).setValue(fvalue);
-                        } else if ( ftf instanceof JComboBox ) {
-                            JComboBox jcb= ((JComboBox)ftf);
-                            for ( int i=0; i<jcb.getItemCount(); i++ ) {
-                                if ( fvalue.equals( jcb.getItemAt(i).toString() ) ) {
-                                    jcb.setSelectedIndex(i);
-                                }
-                            }
-                        } else if ( ftf instanceof JCheckBox ) {
-                            ((JCheckBox)ftf).setSelected( fvalue.equals("T") );
-                        } else {
-                            ((JTextField)ftf).setText(fvalue);
-                        }
-                    }
-                });
-                defaultButton.setToolTipText( shortLabel ? String.valueOf(parm.deft) : "Click to reset to default" );
-                valuePanel.add( defaultButton );
-                valuePanel.add( getSpacer() );
-                valuePanel.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-
-                paramsPanel.add( valuePanel );
-                tflist.add(ctf);
-
-                paramsList.add( parm.name );
-                deftsList.add( String.valueOf( parm.deft ) );
-                typesList.add( parm.type );
-
-            }
-                
-            hasVars= parms.size()>0;
-
-            if ( !hasVars ) {
-                paramsPanel.add( new JLabel("<html><i>no input parameters</i></html>") );
-            }
-
-            paramsPanel.add( Box.createVerticalStrut(paramsPanel.getFont().getSize()*2 ) );
+            String src= FileUtil.readFileToString(f);
             
-            paramsPanel.revalidate();
+            ParametersFormPanel p= new ParametersFormPanel();
+            
+            //paramsPanel.add( new JLabel("<html>This script has the following input parameters.  Buttons on the right show default values.<br><br></html>") );
 
+            FormData fd= p.doVariables( src, params, paramsPanel );
+            
+            hasVars= fd.count>0;
+            parametersFormPanel= p;
+            
         } catch (IOException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
@@ -619,70 +340,17 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             int j= param.startsWith("<html>") ? 6 : 0;
             params.put( "arg_0", param.substring(j,i).trim() );
         }
-        for ( int j=0; j<paramsList.size(); j++ ) {
-            String name= paramsList.get(j);
-            JComponent jc= tflist.get(j);
-            String value;
-            if ( jc instanceof JTextField ) {
-                value= ((JTextField)jc).getText();
-            } else if ( jc instanceof DataSetSelector ) {
-                value= ((DataSetSelector)jc).getValue();
-                if ( params.get("timerange")!=null ) {
-                    String blurredValue= DataSetURI.blurTsbUri(value);
-                    if ( blurredValue!=null ) { // if the value URI was not a TSB.
-                        value= blurredValue;
-                    }
-                }
-            } else if ( jc instanceof JComboBox ) {
-                value= String.valueOf( ((JComboBox)jc).getSelectedItem() );
-            } else if ( jc instanceof JCheckBox ) {
-                value= ((JCheckBox)jc).isSelected() ? "T" : "F";
-            } else {
-                throw new IllegalArgumentException("the code needs attention: component for "+name+" not supported ");
-            }
-            
-            String deft= deftsList.get(j);
-            char type= typesList.get(j);
-
-            if ( name.equals( JythonDataSource.PARAM_TIMERANGE ) || ! value.equals(deft) || params.containsKey(name) ) {
-                if ( type=='A' ) {
-                    value= value.replaceAll("\'", "");
-                    //The value is escaped when the URI is formatted, so there's no reason to enquote it here.
-                    //boolean containsSpaces= value.contains(" ");
-                    //if ( containsSpaces && !( value.startsWith("'") && value.endsWith("'") ) ) {
-                    //    value=  "'" + value + "'";
-                    //}
-                    params.put( name, value );
-                } else if ( type=='R' ) {
-                    URISplit ruriSplit= URISplit.parse(value);
-                    if ( !params.containsKey(JythonDataSource.PARAM_SCRIPT) ) {
-                        params.put( JythonDataSource.PARAM_SCRIPT, split.resourceUri.toString() );
-                        params.put( JythonDataSource.PARAM_RESOURCE_URI, ruriSplit.resourceUri.toString() );
-                    }
-                    split.resourceUri= ruriSplit.resourceUri;
-                    split.scheme= ruriSplit.scheme;
-                    split.authority= ruriSplit.authority;
-                    split.path= ruriSplit.path;
-                    split.file= ruriSplit.file;
-                    if ( split.vapScheme==null ) split.vapScheme= "vap+jyds";
-                    params.put( JythonDataSource.PARAM_RESOURCE_URI, split.file  );
-                } else {
-                    params.put( name, value );
-                }
-            } else if ( type=='R' && value.equals(deft) && ( split.resourceUri==null || !split.resourceUri.toString().equals(deft) ) ) {
-                URISplit ruriSplit= URISplit.parse(value); //TODO: consider removing script=param.
-                if (params.get( JythonDataSource.PARAM_SCRIPT )==null ) {
-                    params.put( JythonDataSource.PARAM_SCRIPT, split.resourceUri.toString() );
-                    params.put( JythonDataSource.PARAM_RESOURCE_URI, ruriSplit.resourceUri.toString() );
-                }
-                split.resourceUri= ruriSplit.resourceUri;
-                split.scheme= ruriSplit.scheme;
-                split.authority= ruriSplit.authority;
-                split.path= ruriSplit.path;
-                split.file= ruriSplit.file;
-                if ( split.vapScheme==null ) split.vapScheme= "vap+jyds"; // DANGER--this ought-not to be hard coded, but this is all I can do for now...
-            }
+        
+        FormData formData= parametersFormPanel.getFormData();
+        ParametersFormPanel.resetVariables( formData, params );
+        
+        String resourceURI= params.get("resourceURI");
+        if ( resourceURI!=null ) {
+            if ( resourceURI.startsWith("'") ) resourceURI= resourceURI.substring(1);
+            if ( resourceURI.endsWith("'") ) resourceURI= resourceURI.substring(0,resourceURI.length()-1);
+            params.put( "resourceURI", resourceURI );
         }
+        
         return params;
         
     }
@@ -837,6 +505,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         
         if ( split.resourceUri!=null && params.get(JythonDataSource.PARAM_RESOURCE_URI)!=null ) {
             try {
+                params.put( JythonDataSource.PARAM_SCRIPT, split.resourceUri.toString() );
                 split.resourceUri= new URI( params.remove(JythonDataSource.PARAM_RESOURCE_URI) );
                 split.file= split.resourceUri.toString();
                 split.vapScheme="vap+jyds";
