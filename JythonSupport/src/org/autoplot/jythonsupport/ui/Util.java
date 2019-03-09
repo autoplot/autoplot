@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.jythonsupport.ui;
 
 import java.io.File;
@@ -15,13 +12,12 @@ import java.util.Map;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
-import org.python.util.PythonInterpreter;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.jythonsupport.JythonUtil;
 
 /**
- *
+ * utility methods, for example getting parameters from a script.
  * @author jbf
  */
 public class Util {
@@ -83,6 +79,7 @@ public class Util {
      * @param mon
      * @return list of parameters.
      * @throws IOException 
+     * @see org.autoplot.jythonsupport.ui.ParametersFormPanel#doVariables(java.util.Map, java.lang.String, java.util.Map, javax.swing.JPanel) 
      */
     public static Map<String,JythonUtil.Param> getParams( Map<String,Object> env, String src, Map<String,String> params, ProgressMonitor mon ) throws IOException {
         logger.finer("enter getParams");
