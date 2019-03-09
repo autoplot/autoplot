@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-03-08 r23405):</p>
+        <p>Bugfixes (2019-03-09 r23417):</p>
         <ul>
+            <li>1762: two different codes were used to create GUIs for jy and jyds scripts, this is finally fixed, correcting a problem with .jyds layout as well.
             <li>check for infinite min or max required that they both be infinite, now both must be finite.
             <li>2127: support CDF variables with trailing virtual fill records, when fill was never written.  Improvements to the editor.
             <li>1310: experiment with code to check that a script has been run before.
@@ -84,6 +85,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>format and cadence added to dataset command.
             <li>rfe670: DEPEND_2 can now be rank 3.  collapse, slice1, and trim are supported.
             <li>new class completions on "g.&lt;C&gt;" (a kludge) to support graphics in scripts.  
             <li>reset will check for strange axes, supporting where a script has replaces the yaxis with a DasLabelAxis.  Thanks, Chris!
