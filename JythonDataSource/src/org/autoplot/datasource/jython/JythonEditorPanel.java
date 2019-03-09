@@ -297,8 +297,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     }
     
     /**
-     * See org.autoplot.jythonsupport.ui.Util.createForm
-     * See org.autoplot.jythonsupport.ui.Util.doVariables which is a copy.
+     * create a GUI from the params and the script.
      * @param f
      * @param params
      * @return 
@@ -505,7 +504,9 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         
         if ( split.resourceUri!=null && params.get(JythonDataSource.PARAM_RESOURCE_URI)!=null ) {
             try {
-                params.put( JythonDataSource.PARAM_SCRIPT, split.resourceUri.toString() );
+                String script= params.get( JythonDataSource.PARAM_SCRIPT );
+                if ( script==null ) script= split.resourceUri.toString();
+                params.put( JythonDataSource.PARAM_SCRIPT, script );
                 split.resourceUri= new URI( params.remove(JythonDataSource.PARAM_RESOURCE_URI) );
                 split.file= split.resourceUri.toString();
                 split.vapScheme="vap+jyds";

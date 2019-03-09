@@ -352,47 +352,6 @@ public class ParametersFormPanel {
                 if ( !isBool ) valuePanel.add( getSpacer() );
 
                 switch (parm.type) {
-                    case 'R':
-                        {
-                            String val= params.get(vname);
-                            if ( val!=null ) {
-                                if ( val.startsWith("'") ) val= val.substring(1);
-                                if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
-                            } else {
-                                val= String.valueOf( parm.deft );
-                                params.put( vname, val );
-                            }       final String fval= val;
-                            final DataSetSelector sel= new DataSetSelector();
-                            sel.setHidePlayButton(true);
-                            sel.setSuggestFiles(true);
-                            final JTextField tf= new JTextField();
-                            Dimension x= tf.getPreferredSize();
-                            x.width= Integer.MAX_VALUE;
-                            tf.setMaximumSize(x);
-                            tf.setUI( tf.getUI() ); // kludge to maybe avoid deadlock.
-                            Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/autoplot/datasource/jython/file2.png"));
-                            JButton filesButton= new JButton( fileIcon );
-                            filesButton.addActionListener( new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    JFileChooser c= new JFileChooser();
-                                    URISplit split2= URISplit.parse(fval);
-                                    if ( split2.scheme.equals("file") ) {
-                                        c.setSelectedFile( new File( split2.file.substring(7)) );
-                                    }
-                                    int r= c.showOpenDialog( paramsPanel );
-                                    if ( r==JFileChooser.APPROVE_OPTION) {
-                                        tf.setText("file://"+c.getSelectedFile().toString());
-                                    }
-                                }
-                            });     tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-                            tf.setText( val );
-                            ctf= tf;
-                            valuePanel.add( ctf );
-                            filesButton.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-                            valuePanel.add( filesButton );
-                            break;
-                        }
                     case 'U':
                         {
                             final DataSetSelector sel= new DataSetSelector();
@@ -414,6 +373,7 @@ public class ParametersFormPanel {
                             ctf= sel;
                             break;
                         }
+                    case 'R':
                     case 'L':
                         {
                             final DataSetSelector sel= new DataSetSelector();
