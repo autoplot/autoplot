@@ -284,6 +284,7 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
         }
         if ( f==-1 ) throw new IllegalArgumentException("bad state ..");
         dom2.getDataSourceFilters(f).setUri(newUri);
+        dataSetSelector.setValue(newUri);
         Runnable run= new Runnable() {
             @Override
             public void run() {
@@ -317,6 +318,8 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
                 for ( DataSourceFilter dsf: dsfs ) {
                     dsf.getController().update();
                 }
+                String newUri= dom.getController().getDataSourceFilter().getUri();
+                dataSetSelector.setValue(newUri);
             }
         };
         
