@@ -28,7 +28,7 @@
         
         <p>Bugfixes (2019-03-12 r23423):</p>
         <ul>
-            <li>2129: runtime error in branch of StackedHistogram renderer is now caught.
+            <li>2129: stacked histogram runtime error when there is no data and we are zoomed in.
             <li>2130: aggregate dialog doesn't replace the dataSetSelector address, which is confusing.
             <li>1762: two different codes were used to create GUIs for jy and jyds scripts, this is finally fixed, correcting a problem with .jyds layout as well.
             <li>check for infinite min or max required that they both be infinite, now both must be finite.
