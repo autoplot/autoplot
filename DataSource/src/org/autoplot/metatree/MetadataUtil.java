@@ -219,6 +219,7 @@ public class MetadataUtil {
      * @param spec Java or Fortran style format
      * @return null if no conversion can be made, or Java style
      * @see String#format(java.lang.String, java.lang.Object...) 
+     * @see org.das2.qds.util.AsciiParser#getRegexForFormat(java.lang.String) 
      */
     public static String normalizeFormatSpecifier( String spec ) {
         Pattern p= Pattern.compile("([FDEGI])((\\d+)(\\.(\\d+)))");
