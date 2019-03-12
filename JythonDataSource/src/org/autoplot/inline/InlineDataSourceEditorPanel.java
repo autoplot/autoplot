@@ -390,7 +390,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         int rank= tm.getColumnCount()>1 ? 2 : 1;
         tm= toTableModel(sb.toString(), rank );
         setColumnLabels();
-        table.setModel( tm );
+        table.setModel(tm );
     }//GEN-LAST:event_deleteSelectedButtonActionPerformed
 
     private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
@@ -405,7 +405,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     private void initializeScheme() {
         switch ( schemeComboBox.getSelectedIndex() ) {
             case 0:
-                tm= toTableModel( new String[0] );
+                tm= toTableModel( 0, 1 );
                 directionsLabel.setText("<html><i>Enter a list of times or points</i></html>");
                 scheme= SCHEME_EVENT_LIST;
                 tm.setColumnIdentifiers( new String[] { "x" } );
@@ -425,7 +425,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             default:
                 throw new IllegalArgumentException("whoops");
         }
-        table.setModel( tm );
+        table.setModel(tm );
     }
     
     private void schemeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_schemeComboBoxActionPerformed
@@ -526,7 +526,11 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     private static DefaultTableModel toTableModel( final String s, int rank) {
         final String[] ss= s.split(";");
         if ( rank==1 ) {
-            return toTableModel( s.split(",") );
+            if ( s.trim().length()==0 ) {
+                return toTableModel(0,1);
+            } else {
+                return toTableModel( s.split(",") );
+            }
         }
         final int nc= ss[0].split(",").length;
         
@@ -744,7 +748,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 StringBuilder s= new StringBuilder( "vap+inline:" );
                 if ( scheme.equals(SCHEME_EVENT_LIST_COLORS) ) {
                     for ( int i=0; i<tm.getRowCount(); i++ ) {
-                        String str= String.format( "%s/%s", tm.getValueAt(i,0), tm.getValueAt(i,1) );
+                        String str= String.format("%s/%s", tm.getValueAt(i,0), tm.getValueAt(i,1) );
                         try {
                             DatumRange drtr= DatumRangeUtil.parseTimeRange(str);
                             str= drtr.toString().replaceAll(" ","+");
@@ -752,9 +756,9 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                             // do nothing, just use the old format, which will fail and reject.
                         }
                         if ( i==0 ) {
-                            s.append( String.format( "ds=createEvent('%s',%s,'%s')", str, tm.getValueAt(i,2), tm.getValueAt(i,3) ) );
+                            s.append(String.format("ds=createEvent('%s',%s,'%s')", str, tm.getValueAt(i,2), tm.getValueAt(i,3) ) );
                         } else {
-                            s.append( String.format( "&ds=createEvent(ds,'%s',%s,'%s')", str, tm.getValueAt(i,2), tm.getValueAt(i,3) ) );
+                            s.append(String.format("&ds=createEvent(ds,'%s',%s,'%s')", str, tm.getValueAt(i,2), tm.getValueAt(i,3) ) );
                         }
                     }
                     s.append("&ds");
