@@ -4537,7 +4537,7 @@ private void updateFrameTitle() {
                 } else {
                         msg= String.format(
                         "<html>Autoplot is already running. Autoplot can use this address in a new window, <br>"
-                        + "or replace the current plot with the new URI, possibly entering the editor <br>"
+                        + "or replace the current plot with the new URI, possibly entering the editor, <br>"
                         + "or always enter the editor to inspect before plotting.<br>"
                         + "View in new window, replace, or add plot, using<br>%s?", ssuri );
                 }
@@ -6015,6 +6015,11 @@ APSplash.checkTime("init 240");
             }
         }
         dataSetSelector.setExpertMode(expert);
+        if ( expert ) {
+            addDataFromMenu.setText("Add Plot From");
+        } else {
+            addDataFromMenu.setText("Load Plot From");
+        }
         
         final boolean fexpert= expert;
         SwingUtilities.invokeLater(new Runnable() {
