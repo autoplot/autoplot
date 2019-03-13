@@ -26,7 +26,7 @@
                   <Component id="dataSetLabel" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="editComponentPanel" min="-2" max="-2" attributes="0"/>
+              <Component id="editComponentButton" min="-2" max="-2" attributes="0"/>
           </Group>
           <Component id="filtersChainPanel" alignment="1" pref="400" max="32767" attributes="0"/>
       </Group>
@@ -37,7 +37,7 @@
               <Component id="dataSetLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="editComponentPanel" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="editComponentButton" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Group type="103" alignment="1" groupAlignment="3" attributes="0">
                       <Component id="operationsLabel" alignment="3" min="-2" max="-2" attributes="1"/>
                       <Component id="operatorsComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -72,7 +72,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="operatorsComboBoxActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="editComponentPanel">
+    <Component class="javax.swing.JButton" name="editComponentButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/org/autoplot/resources/pipeMag2.png"/>
@@ -80,10 +80,10 @@
         <Property name="toolTipText" type="java.lang.String" value="Open filters editor"/>
       </Properties>
       <BindingProperties>
-        <BindingProperty name="enabled" source="Form" sourcePath="${enabled}" target="editComponentPanel" targetPath="enabled" updateStrategy="0" immediately="false"/>
+        <BindingProperty name="enabled" source="Form" sourcePath="${enabled}" target="editComponentButton" targetPath="enabled" updateStrategy="0" immediately="false"/>
       </BindingProperties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editComponentPanelActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editComponentButtonActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="operationsLabel">

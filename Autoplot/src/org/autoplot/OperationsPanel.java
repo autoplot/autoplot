@@ -357,7 +357,7 @@ public class OperationsPanel extends javax.swing.JPanel {
 
         filtersChainPanel = new org.das2.qds.filters.FiltersChainPanel();
         operatorsComboBox = new org.autoplot.datasource.RecentComboBox();
-        editComponentPanel = new javax.swing.JButton();
+        editComponentButton = new javax.swing.JButton();
         operationsLabel = new javax.swing.JLabel();
         dataSetLabel = new javax.swing.JLabel();
 
@@ -384,15 +384,15 @@ public class OperationsPanel extends javax.swing.JPanel {
             }
         });
 
-        editComponentPanel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/resources/pipeMag2.png"))); // NOI18N
-        editComponentPanel.setToolTipText("Open filters editor");
+        editComponentButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/resources/pipeMag2.png"))); // NOI18N
+        editComponentButton.setToolTipText("Open filters editor");
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), editComponentPanel, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), editComponentButton, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
-        editComponentPanel.addActionListener(new java.awt.event.ActionListener() {
+        editComponentButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editComponentPanelActionPerformed(evt);
+                editComponentButtonActionPerformed(evt);
             }
         });
 
@@ -421,7 +421,7 @@ public class OperationsPanel extends javax.swing.JPanel {
                         .addComponent(operatorsComboBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(dataSetLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(editComponentPanel))
+                .addComponent(editComponentButton))
             .addComponent(filtersChainPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -430,7 +430,7 @@ public class OperationsPanel extends javax.swing.JPanel {
                 .addComponent(dataSetLabel)
                 .addGap(5, 5, 5)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(editComponentPanel)
+                    .addComponent(editComponentButton)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(operationsLabel)
                         .addComponent(operatorsComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -467,7 +467,7 @@ public class OperationsPanel extends javax.swing.JPanel {
         }        
     }
     
-    private void editComponentPanelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editComponentPanelActionPerformed
+    private void editComponentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editComponentButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
 
         JPanel panel= new JPanel(new BorderLayout());
@@ -496,7 +496,7 @@ public class OperationsPanel extends javax.swing.JPanel {
             //componentChanged();
             operatorsComboBox.addToRecent( newFilter );
         }
-    }//GEN-LAST:event_editComponentPanelActionPerformed
+    }//GEN-LAST:event_editComponentButtonActionPerformed
 
     private void operatorsComboBoxFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_operatorsComboBoxFocusLost
         doEnter();
@@ -659,11 +659,13 @@ public class OperationsPanel extends javax.swing.JPanel {
      */
     public void setExpertMode( boolean expert ) {
         this.operatorsTextField.setEditable(expert);
+        this.editComponentButton.setEnabled(expert);
+        this.filtersChainPanel.setExpertMode(expert);
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel dataSetLabel;
-    private javax.swing.JButton editComponentPanel;
+    private javax.swing.JButton editComponentButton;
     private org.das2.qds.filters.FiltersChainPanel filtersChainPanel;
     private javax.swing.JLabel operationsLabel;
     private org.autoplot.datasource.RecentComboBox operatorsComboBox;
