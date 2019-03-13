@@ -108,6 +108,10 @@ public class DataPanel extends javax.swing.JPanel {
     protected void setExpertMode( boolean expert ) {
         plotElementFiltersPanel.setExpertMode(expert);
         dataSourceFiltersPanel.setExpertMode(expert);
+        dataSetSelector.setEnabled(expert);
+        dataSourceFiltersPanel.setEnabled(expert);
+        additionalOperationsCheckBox.setEnabled(expert);
+        doSuppressReset.setEnabled(expert);
     }
 
     /**
