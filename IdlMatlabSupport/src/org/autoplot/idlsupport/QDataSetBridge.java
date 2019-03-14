@@ -721,9 +721,6 @@ public abstract class QDataSetBridge {
      * @return
      */
     public Object values(String name) {
-        if ( debug ) {
-            System.err.println("reading values for dataset " + name );
-        }
         QDataSet ds1 = datasets.get(name);
         if ( ds1==null ) {
             throw new IllegalArgumentException("No datasets with the name: "+name);
@@ -732,6 +729,9 @@ public abstract class QDataSetBridge {
         UnitsConverter uc= maybeGetConverter(ds1);
         
         if ( ds1 instanceof FDataSet || ds1 instanceof FloatDataSet ) {
+            if ( debug ) {
+                System.err.println("reading values as 4-byte floats: " + name );
+            }
             switch (ds1.rank()) {
                 case 1:
                 {
@@ -761,6 +761,9 @@ public abstract class QDataSetBridge {
                     throw new IllegalArgumentException("rank limit");
             }
         } else if ( ds1 instanceof LongDataSet && uc==UnitsConverter.IDENTITY ) { // Special support for CDF TT2000
+            if ( debug ) {
+                System.err.println("reading values as 64-bit longs: " + name );
+            }            
             switch (ds1.rank()) {
                 case 1:
                 {
@@ -790,6 +793,9 @@ public abstract class QDataSetBridge {
                     throw new IllegalArgumentException("rank limit");
             }
         } else {
+            if ( debug ) {
+                System.err.println("reading values as 8-byte doubles: " + name );
+            }
             switch (ds1.rank()) {
                 case 1:
                 {
