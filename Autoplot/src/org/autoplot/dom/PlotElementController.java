@@ -97,6 +97,10 @@ import org.das2.event.DataRangeSelectionListener;
 import org.das2.event.HorizontalDragRangeSelectorMouseModule;
 import org.das2.graph.BoundsRenderer;
 import org.das2.graph.PolarPlotRenderer;
+import org.jdesktop.beansbinding.AutoBinding;
+import org.jdesktop.beansbinding.BeanProperty;
+import org.jdesktop.beansbinding.BindingGroup;
+import org.jdesktop.beansbinding.Bindings;
 
 /**
  * PlotElementController manages the PlotElement, for example resolving the datasource and loading the dataset.
@@ -126,6 +130,8 @@ public class PlotElementController extends DomNodeController {
 
     final private Application dom;
     private PlotElement plotElement;
+    private PlotElement parentPlotElement;
+    
     private DataSourceFilter dsf; // This is the one we are listening to.
     /**
      * switch over between fine and course points.
@@ -301,23 +307,60 @@ public class PlotElementController extends DomNodeController {
         }
     }
 
-    
-    
-    
+    PropertyChangeListener parentComponentListener= new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            if ( evt.getSource()==parentPlotElement ) {                
+                String s= (String)evt.getNewValue();
+                String component= plotElement.component;
+                String[] components= component.split("\\|",-2);
+                String[] ss= s.split("\\|",-2);
+                if ( components.length<ss.length ) {
+                    return; // transitional state
+                }
+                System.arraycopy(ss, 0, components, 0, ss.length);
+                StringBuilder sb= new StringBuilder(components[0]);
+                for ( int i=1; i<ss.length; i++ ) {
+                    sb.append("|");
+                    sb.append(ss[i]);
+                }
+                for ( int i=ss.length; i<components.length; i++ ) {
+                    sb.append("|");
+                    sb.append(components[i]);
+                }
+                plotElement.setComponent(sb.toString());
+            } else if ( evt.getSource()==plotElement ) {
+                String t= (String)evt.getNewValue();
+                String component= (String)t;
+                String[] components= component.split("\\|",-2);
+                String[] ss= parentPlotElement.component.split("\\|",-2);
+                StringBuilder sb= new StringBuilder();
+                for ( int i=1; i<ss.length; i++ ) {
+                    sb.append("|");
+                    sb.append(components[i]);
+                }
+                parentPlotElement.setComponent(sb.toString());
+            }
+        }
+    };
+            
     PropertyChangeListener parentElementListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            return;
-//            String pid= plotElement.getParent();
-//            if ( pid.trim().length()==0 ) {
-//                return; // TODO: remove listener
-//            }
-//            PlotElement ppe=(PlotElement)dom.controller.getElementById(pid);
-//            System.err.println( String.format( "addParentComponentListener( %s, %s);", ppe, plotElement ) );
-//            if ( ppe!=null ) {
-//                addParentComponentListener( ppe, plotElement);
-//            }
-            
+            if ( parentPlotElement!=null ) {
+                parentPlotElement.removePropertyChangeListener( "component", parentComponentListener );
+                plotElement.removePropertyChangeListener( "component", parentComponentListener );
+            }
+            String pid= plotElement.getParent();
+            if ( pid.trim().length()==0 ) {
+                return;
+            }
+            PlotElement ppe=(PlotElement)dom.controller.getElementById(pid);
+            if ( ppe!=null ) {
+                parentPlotElement= ppe;
+                parentPlotElement.addPropertyChangeListener( "component", parentComponentListener );
+                plotElement.addPropertyChangeListener( "component", parentComponentListener );
+            }
         }  
     };
             
@@ -1618,7 +1661,7 @@ public class PlotElementController extends DomNodeController {
                                 } else {
                                     s= s+"|unbundle('ch_"+i+"')";
                                 }
-                                addParentComponentListener(plotElement,ele);
+                                //addParentComponentListener(plotElement,ele);
                                 label1= llabels[i];
                             }
                         }
