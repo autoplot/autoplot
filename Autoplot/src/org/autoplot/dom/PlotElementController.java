@@ -149,6 +149,7 @@ public class PlotElementController extends DomNodeController {
         plotElement.addPropertyChangeListener(PlotElement.PROP_RENDERTYPE, plotElementListener);
         plotElement.addPropertyChangeListener(PlotElement.PROP_DATASOURCEFILTERID, plotElementListener);
         plotElement.addPropertyChangeListener(PlotElement.PROP_COMPONENT, plotElementListener);
+        plotElement.addPropertyChangeListener(PlotElement.PROP_PARENT, parentElementListener );
         plotElement.getStyle().addPropertyChangeListener(styleListener);
     }
 
@@ -159,6 +160,7 @@ public class PlotElementController extends DomNodeController {
         plotElement.removePropertyChangeListener(PlotElement.PROP_RENDERTYPE, plotElementListener);
         plotElement.removePropertyChangeListener(PlotElement.PROP_DATASOURCEFILTERID, plotElementListener);
         plotElement.removePropertyChangeListener(PlotElement.PROP_COMPONENT, plotElementListener);
+        plotElement.removePropertyChangeListener(PlotElement.PROP_PARENT, plotElementListener);
         plotElement.getStyle().removePropertyChangeListener(styleListener);
         PlotElement parent= getParentPlotElement();
         if ( parent!=null ) {
@@ -299,6 +301,26 @@ public class PlotElementController extends DomNodeController {
         }
     }
 
+    
+    
+    
+    PropertyChangeListener parentElementListener= new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            return;
+//            String pid= plotElement.getParent();
+//            if ( pid.trim().length()==0 ) {
+//                return; // TODO: remove listener
+//            }
+//            PlotElement ppe=(PlotElement)dom.controller.getElementById(pid);
+//            System.err.println( String.format( "addParentComponentListener( %s, %s);", ppe, plotElement ) );
+//            if ( ppe!=null ) {
+//                addParentComponentListener( ppe, plotElement);
+//            }
+            
+        }  
+    };
+            
     PropertyChangeListener plotElementListener = new PropertyChangeListener() {
 
         @Override
