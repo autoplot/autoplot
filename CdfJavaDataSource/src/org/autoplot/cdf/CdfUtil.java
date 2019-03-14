@@ -1231,7 +1231,7 @@ public class CdfUtil {
                 }
 
                 if (scatDesc != null) {
-                    descbuf.append("").append(scatDesc).append("<br><br>");
+                    descbuf.append(scatDesc).append("<br><br>");
                 }
                 if (svarNotes !=null ) {
                     descbuf.append("<p><small>").append(svarNotes).append("</small></p><br>");
@@ -1239,12 +1239,20 @@ public class CdfUtil {
                 
                 if (maxRec != xMaxRec) {
                     if ( isVirtual ) {
-                        descbuf.append("").append("(virtual function ").append(vdescr).append( ")<br>");
+                        descbuf.append("(virtual function ").append(vdescr).append( ")<br>");
                     } else {
-                        descbuf.append("").append( recCount ).append(" records of ").append(recDesc).append("<br>");
+                        if ( isMaster ) {
+                            descbuf.append("records of ").append(recDesc).append("<br>");
+                        } else {
+                            descbuf.append( recCount ).append(" records of ").append(recDesc).append("<br>");
+                        }
                     }
                 } else {
-                    descbuf.append("").append( recCount ).append(" records of ").append(recDesc).append("<br>");
+                    if ( isMaster ) {
+                        descbuf.append("records of ").append(recDesc).append("<br>");
+                    } else {
+                        descbuf.append( recCount ).append(" records of ").append(recDesc).append("<br>");
+                    }
                 }
                         
                 for ( String s: warn ) {
