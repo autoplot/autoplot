@@ -172,6 +172,18 @@ public class DataPanel extends javax.swing.JPanel {
         }
     };
 
+    /**
+     * if there are filters, then make sure the dialog is shown.
+     */
+    private final transient PropertyChangeListener filtersListener= new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            if ( dsf.getFilters().trim().length()>0 ) {
+                DataPanel.this.additionalOperationsCheckBox.setSelected(true);
+            }
+        }
+    };
+    
     private final transient PropertyChangeListener fillDataSetListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
@@ -269,6 +281,7 @@ public class DataPanel extends javax.swing.JPanel {
 
         if ( dsf!=null ) {
             dsf.getController().removePropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillDataSetListener );
+            dsf.removePropertyChangeListener( DataSourceFilter.PROP_FILTERS, filtersListener );
         }
         
         final DataSourceFilter newDsf = applicationController.getDataSourceFilter();
@@ -283,6 +296,8 @@ public class DataPanel extends javax.swing.JPanel {
         //dataSetLabel.setText( ds==null ? "(no dataset)" : ds.toString() );
         
         newDsf.getController().addPropertyChangeListener( DataSourceController.PROP_FILLDATASET, fillDataSetListener );
+        newDsf.addPropertyChangeListener( DataSourceFilter.PROP_FILTERS, filtersListener );
+        additionalOperationsCheckBox.setSelected( newDsf.getFilters().trim().length()>0 );
         
         dataSourceFiltersPanel.setFilter( newDsf.getFilters() );
         dataSourceFiltersPanel.setDataSet( newDsf.getController().getDataSet() );
@@ -348,7 +363,12 @@ public class DataPanel extends javax.swing.JPanel {
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, additionalOperationsCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), dataSourceFiltersPanel, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
+        additionalOperationsCheckBox.setSelected(false);
         additionalOperationsCheckBox.setText("Apply additional operations immediately after data is loaded");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, dataSourceFiltersPanel, org.jdesktop.beansbinding.ELProperty.create("${visible}"), additionalOperationsCheckBox, org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        bindingGroup.addBinding(binding);
+
         additionalOperationsCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 additionalOperationsCheckBoxActionPerformed(evt);
@@ -375,7 +395,7 @@ public class DataPanel extends javax.swing.JPanel {
                         .add(12, 12, 12)
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(dataSourceFiltersPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .add(dataSourceFiltersPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -389,7 +409,7 @@ public class DataPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(dataSourceFiltersPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 73, Short.MAX_VALUE)
+                .add(dataSourceFiltersPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -475,6 +495,9 @@ public class DataPanel extends javax.swing.JPanel {
     private void additionalOperationsCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_additionalOperationsCheckBoxActionPerformed
         dataSourceFiltersPanel.setVisible( additionalOperationsCheckBox.isSelected() );
         jLabel2.setVisible( additionalOperationsCheckBox.isSelected() );
+        if ( !additionalOperationsCheckBox.isSelected() ) {
+            dsf.setFilters("");
+        }
     }//GEN-LAST:event_additionalOperationsCheckBoxActionPerformed
 
 //    /**

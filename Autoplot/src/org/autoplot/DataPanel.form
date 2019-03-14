@@ -74,7 +74,7 @@
                               <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="jLabel2" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="dataSourceFiltersPanel" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="dataSourceFiltersPanel" alignment="0" pref="0" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -94,7 +94,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="dataSourceFiltersPanel" pref="73" max="32767" attributes="0"/>
+                      <Component id="dataSourceFiltersPanel" pref="0" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -126,8 +126,12 @@
             </Component>
             <Component class="javax.swing.JCheckBox" name="additionalOperationsCheckBox">
               <Properties>
+                <Property name="selected" type="boolean" value="false"/>
                 <Property name="text" type="java.lang.String" value="Apply additional operations immediately after data is loaded"/>
               </Properties>
+              <BindingProperties>
+                <BindingProperty name="selected" source="dataSourceFiltersPanel" sourcePath="${visible}" target="additionalOperationsCheckBox" targetPath="selected" updateStrategy="0" immediately="false"/>
+              </BindingProperties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="additionalOperationsCheckBoxActionPerformed"/>
               </Events>
