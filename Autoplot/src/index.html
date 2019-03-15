@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Binary Data Source used to look at 250KHz .wav file of mouse vocalizations. 
+        <p><small>Parameters GUI-creating code is updated for the .jyds source, so that it using the same code as the space-efficient .jy version.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-03-13 r23431):</p>
+        <p>Bugfixes (2019-03-15 r23440):</p>
         <ul>
+            <li>2132: aggregation with local files on Windows corrected when $Y/$m/$Y$m$d.cdf is used with network drive.  Thanks, Seth!
+            <li>2131: cdf editor does not say "0 records of CDF_FLOAT" when the CDAWeb source is used.
+            <li>2131: datasource filters GUI is turned on whenever it is used.  Thanks, Kris!
+            <li>2131: reimplement where parent plotElement's component change implies that this child should change its component.
             <li>2126: review BASIC mode, where new components were added without considering this constraint.
             <li>2129: stacked histogram runtime error when there is no data and we are zoomed in.
             <li>2130: aggregate dialog doesn't replace the dataSetSelector address, which is confusing.
