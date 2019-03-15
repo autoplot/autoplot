@@ -8,6 +8,7 @@
  */
 package org.autoplot.aggregator;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import org.das2.datum.DatumRangeUtil;
 import java.util.logging.Level;
@@ -32,6 +33,7 @@ import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.DefaultTimeSeriesBrowse;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.das2.util.filesystem.LocalFileSystem;
 
 /**
  * ftp://cdaweb.gsfc.nasa.gov/pub/data/noaa/noaa14/$Y/noaa14_meped1min_sem_$Y$m$d_v01.cdf?timerange=2000-01-01
@@ -189,7 +191,12 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         URISplit split = URISplit.parse(surl);
 
         String encodedDelegateFile= delegateFile.replaceAll(":","%3A");
-        String delegateFfile = fsm.getFileSystem().getRootURI().resolve(URISplit.uriEncode(encodedDelegateFile)).toString();
+        String delegateFfile;
+        if ( fsm.getFileSystem() instanceof LocalFileSystem ) {
+            delegateFfile= new File( ((LocalFileSystem)fsm.getFileSystem()).getLocalRoot(), URISplit.uriEncode(encodedDelegateFile) ).toString();
+        } else {
+            delegateFfile= fsm.getFileSystem().getRootURI().resolve(URISplit.uriEncode(encodedDelegateFile)).toString();
+        }
         urlLen += delegateFfile.length();
         carotPos -= urlLen - delegateFfile.length();
         split.file = delegateFfile;
