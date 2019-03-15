@@ -672,6 +672,9 @@ public class DataSetURI {
                 suri = suri.replaceAll("\\]", "%5D");
                 suri = suri.replaceAll("\\^", "%5E");
             }
+            if ( suri.startsWith("\\") ) {
+                return new File(suri).toURI();
+            }
             return new URI(suri); //bug 3055130 okay
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
