@@ -777,11 +777,7 @@ public class CreatePngWalk {
 
                 String url;
                 if (!mon.isCancelled()) {
-                    if (params.outputFolder.charAt(1) == ':') {
-                        url = "file:/" + params.outputFolder;
-                    } else {
-                        url = "file:" + params.outputFolder;
-                    }
+                    url = new File( params.outputFolder ).toURI().toString();
 
                     if ( ScriptContext.getViewWindow() != null && params.outputFormat.equals("png" ) ) {
                         logger.log(Level.FINE, "version=\"{0}\"", String.valueOf(params.version));
