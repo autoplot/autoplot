@@ -280,7 +280,11 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             throw new IllegalArgumentException( "unable to find any files in "+fsm );
         }
 
-        split.resourceUri= fsm.getFileSystem().getRootURI().resolve(file.replaceAll(":","%3A"));
+        if ( fsm.getFileSystem() instanceof LocalFileSystem ) {
+            split.resourceUri= fsm.getFileSystem().getFileObject(file).getFile().toURI();
+        } else {
+            split.resourceUri= fsm.getFileSystem().getRootURI().resolve(file.replaceAll(":","%3A"));
+        }
         String scompUrl = DataSetURI.fromUri( split.resourceUri );
         if (split.params.length() > 0) {
             scompUrl += "?" + split.params;
