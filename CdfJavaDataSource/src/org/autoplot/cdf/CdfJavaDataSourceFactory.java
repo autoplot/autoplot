@@ -54,7 +54,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_NAME) ) {
-            
+            logger.log(Level.FINE, "getCompletions {0}", cc.resourceURI);
             File cdfFile= DataSetURI.getFile( cc.resourceURI, mon );
             String fileName= cdfFile.toString();
             //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
