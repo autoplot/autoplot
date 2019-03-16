@@ -30,6 +30,7 @@ import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.datasource.DataSetURI;
 import org.das2.util.filesystem.FileSystemUtil;
+import org.das2.util.filesystem.LocalFileSystem;
 
 /**
  *
@@ -141,7 +142,7 @@ public class WalkUtil {
             DatumRange dr2=null;
             if ( fsm!=null ) dr2= fsm.getRangeFor(ss[i]);
             if ( dr==null || dr2==null || dr.contains(dr2) ) {
-                if ( false && fs.getFileObject(ss[i]).isLocal() ) {
+                if ( fs instanceof LocalFileSystem ) {
                     File f= fs.getFileObject(ss[i]).getFile();
                     result.add( f.toURI() );
                 } else {
