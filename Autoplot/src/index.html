@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Parameters GUI-creating code is updated for the .jyds source, so that it using the same code as the space-efficient .jy version.
+        <p><small>"applyIndex" command is available in the operations area, and can be used to include or exclude channels.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,7 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-03-15 r23440):</p>
+        <p>Bugfixes (2019-03-20 r23453):</p>
         <ul>
             <li>2132: aggregation with local files on Windows corrected when $Y/$m/$Y$m$d.cdf is used with network drive.  Thanks, Seth!
             <li>2131: cdf editor does not say "0 records of CDF_FLOAT" when the CDAWeb source is used.
@@ -92,6 +92,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>array dataset properties can be explored in metadata tab, providing access to file list.
+            <li>applyIndex is added to the list of filters, and now supports any index, and SubsetDataSet provides tool for resolving strings.
             <li>nLargest function finds the M largest elements as an O(N log M) operation.
             <li>format and cadence added to dataset command.
             <li>rfe670: DEPEND_2 can now be rank 3.  collapse, slice1, and trim are supported.
