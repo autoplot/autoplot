@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>"applyIndex" command is available in the operations area, and can be used to include or exclude channels.  Happy Spring!
+        <p><small>"putProperty" filter used to make negative parts of spectrogram transparent.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,12 +26,13 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-03-20 r23453):</p>
+        <p>Bugfixes (2019-03-21 r23465):</p>
         <ul>
+            <li>2036: monitors should be centered above the context which created them.
             <li>2132: aggregation with local files on Windows corrected when $Y/$m/$Y$m$d.cdf is used with network drive.  Thanks, Seth!
             <li>2131: cdf editor does not say "0 records of CDF_FLOAT" when the CDAWeb source is used.
             <li>2131: datasource filters GUI is turned on whenever it is used.  Thanks, Kris!
-            <li>2131: reimplement where parent plotElement's component change implies that this child should change its component.
+            <li>2131: re-implement where parent plotElement's component change implies that this child should change its component.
             <li>2126: review BASIC mode, where new components were added without considering this constraint.
             <li>2129: stacked histogram runtime error when there is no data and we are zoomed in.
             <li>2130: aggregate dialog doesn't replace the dataSetSelector address, which is confusing.
@@ -92,7 +93,7 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>array dataset properties can be explored in metadata tab, providing access to file list.
+            <li>array dataset properties can be explored in metadata tab, providing access to file list.  Thanks, Jon!
             <li>671: applyIndex is added to the list of filters, and now supports any index, and SubsetDataSet provides tool for resolving strings.
             <li>nLargest function finds the M largest elements as an O(N log M) operation.
             <li>format and cadence added to dataset command.
