@@ -3,7 +3,6 @@ package org.autoplot.datasource;
 
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -15,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -247,7 +247,8 @@ public final class TimeRangeTool extends javax.swing.JPanel {
     }
 
     private String[] getSpacecraft() {
-        String[] ss= new String[] { "rbspa-pp", "rbspb-pp", "crres", "cassini", "cassini.perikrone.120min", "cassini.perikrone.40min", "marsx", "junoPJ", "junoEqx" };
+        Map<String,String> scs= Orbits.getSpacecraftIdExamples();
+        String[] ss= scs.keySet().toArray( new String[scs.size()] );
         int n= ss.length;
         String[] result= new String[ n + extraSpacecraft.length ];
         System.arraycopy(ss, 0, result, 0, n);
