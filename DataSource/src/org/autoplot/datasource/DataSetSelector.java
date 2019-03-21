@@ -280,17 +280,31 @@ public class DataSetSelector extends javax.swing.JPanel {
     private ProgressMonitor getMonitor(String label, String desc) {
         if (monitorFactory == null) {
             ProgressMonitor mon= DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(label, desc);
-//            if ( mon instanceof DasProgressPanel ) {  //TODO: make sure the progress bar is in the same window.
-//                Window w= SwingUtilities.getWindowAncestor(((DasProgressPanel)mon).getComponent());
-//                if ( w instanceof JFrame ) {
-//                    w.setLocationRelativeTo(this);
-//                }
-//            }
             return mon;
         } else {
             return monitorFactory.getMonitor(label, desc);
         }
     }
+    
+    private ProgressMonitor getMonitor(String label, String desc, Window window ) {
+        if (monitorFactory == null) {
+            ProgressMonitor mon= DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(label, desc);
+            if ( mon instanceof DasProgressPanel ) {
+                Component c= ((DasProgressPanel)mon).getComponent();
+                Window w= SwingUtilities.getWindowAncestor( c );
+                w.setLocationRelativeTo( window );
+            }
+            return mon;
+        } else {
+            ProgressMonitor mon= monitorFactory.getMonitor(label, desc);
+            if ( mon instanceof DasProgressPanel ) {
+                Component c= ((DasProgressPanel)mon).getComponent();
+                Window w= SwingUtilities.getWindowAncestor( c );
+                w.setLocationRelativeTo( window );
+            }
+            return mon;
+        }
+    }    
 
     public void setMonitorFactory(MonitorFactory factory) {
         this.monitorFactory = factory;
@@ -874,7 +888,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                     
                     boolean proceed;
                     try {
-                        proceed = fedit.prepare(surl, window, getMonitor("download file", "downloading file and preparing editor"));
+                        ProgressMonitor mon= getMonitor("download file", "downloading file and preparing editor",window);
+                        proceed = fedit.prepare(surl, window, mon );
                         if ( !proceed ) return;
                     } catch ( java.io.InterruptedIOException ex ) {
                         setMessage( "download cancelled" );  //TODO: check FTP
@@ -1103,8 +1118,9 @@ public class DataSetSelector extends javax.swing.JPanel {
             completionsRunnable = null;
         }
 
-        completionsMonitor = getMonitor();
-        completionsMonitor.setLabel("getting completions");
+        Window w= SwingUtilities.getWindowAncestor(this);
+        completionsMonitor = getMonitor("completions","getting completions",w);
+        //completionsMonitor.setLabel("getting completions");
 
         completionsRunnable= run;
 
