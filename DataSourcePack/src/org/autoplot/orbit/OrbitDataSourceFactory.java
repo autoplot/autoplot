@@ -1,13 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.orbit;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,7 +18,7 @@ import org.das2.datum.Orbits;
 
 /**
  * Orbit data sources added for demonstration purposes, but it will also be useful for showing
- * reference orbits.  An example URI is "vap+orbit:rbspa-pp&timerange=2004"
+ * reference orbits.  An example URI is "vap+orbit:rbspa-pp&timerange=2014"
  * @author jbf
  */
 public class OrbitDataSourceFactory extends AbstractDataSourceFactory {
