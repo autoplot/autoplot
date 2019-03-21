@@ -6,6 +6,7 @@ package org.autoplot.orbit;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DefaultTimeSeriesBrowse;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.das2.datum.Orbits;
 
 /**
  * Orbit data sources added for demonstration purposes, but it will also be useful for showing
@@ -34,13 +36,9 @@ public class OrbitDataSourceFactory extends AbstractDataSourceFactory {
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
             
-            List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
-            
-            Map<String,String> names= new LinkedHashMap();
-            names.put( "rbspa-pp",  "RBSP-A (Van Allen Probe A)" );
-            names.put( "rbspb-pp",  "RBSP-B (Van Allen Probe B)" );
-            names.put( "crres",     "CRRES" );
-            names.put( "cassini",   "Cassini Spacecraft" );
+            List<CompletionContext> ccresult= new ArrayList<>();
+                        
+            Map<String,String> names= Orbits.getSpacecraftIdExamples();
             for ( Entry<String,String> n : names.entrySet() ) {
                 CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, 
                         n.getKey(), this, "arg_0", n.getValue(), null, true );
@@ -49,6 +47,13 @@ public class OrbitDataSourceFactory extends AbstractDataSourceFactory {
             CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "timerange=", "timerange to plot" );
             ccresult.add(cc1);
             return ccresult;
+        } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
+            String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
+            if ( paramName.equals("timerange") ) {
+                return Arrays.asList( new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<timerange>") );
+            } else {
+                return super.getCompletions(cc, mon);
+            }
         } else {
             return super.getCompletions(cc, mon); 
         }
