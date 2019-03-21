@@ -292,7 +292,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             if ( mon instanceof DasProgressPanel ) {
                 Component c= ((DasProgressPanel)mon).getComponent();
                 Window w= SwingUtilities.getWindowAncestor( c );
-                w.setLocationRelativeTo( window );
+                if ( w!=null ) w.setLocationRelativeTo( window );
             }
             return mon;
         } else {
@@ -300,7 +300,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             if ( mon instanceof DasProgressPanel ) {
                 Component c= ((DasProgressPanel)mon).getComponent();
                 Window w= SwingUtilities.getWindowAncestor( c );
-                w.setLocationRelativeTo( window );
+                if ( w!=null ) w.setLocationRelativeTo( window );
             }
             return mon;
         }
