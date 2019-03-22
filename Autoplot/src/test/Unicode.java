@@ -14,10 +14,10 @@ import java.io.UnsupportedEncodingException;
  */
 public class Unicode {
     public static void main(String[] args) throws UnsupportedEncodingException {
-        System.err.println("/Spaß/");
-        for ( byte c : "/Spaß/".getBytes("UTF-8") ) {
-            System.err.println( c );
-        }
+        //System.err.println("/Spaß/");
+        //for ( byte c : "/Spaß/".getBytes("UTF-8") ) {
+        //    System.err.println( c );
+        //}
         String[] ff= new File("/home/jbf/public_html/i18n/").list();
         System.err.println("ls /home/jbf/public_html/i18n/");
         for ( String f: ff ) { 
