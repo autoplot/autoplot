@@ -601,7 +601,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             }
         }
         
-
+        LongReadAccess lra= dep0==null ? null : dep0.capability( LongReadAccess.class );
         DatumFormatter cf0= tf;
         Units u0 = null;
         if (dep0 != null) {
@@ -624,7 +624,13 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             if ( mon.isCancelled() ) break;
             if (dep0 != null) {
                 assert u0!=null;
-                out.print("" + cf0.format( u0.createDatum(dep0.value(i)) ) + delim );
+                Datum t;
+                if ( lra==null ) {
+                    t= u0.createDatum( dep0.value(i) );
+                } else {
+                    t= u0.createDatum( lra.lvalue(i) );
+                }
+                out.print("" + cf0.format( t,u0 ) + delim );                                
             }
 
             int j;
@@ -738,6 +744,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             df= getDataFormatter(format, u );
         }
 
+        LongReadAccess lra= dep0==null ? null : dep0.capability( LongReadAccess.class );
         DatumFormatter cf0= dep0==null ? null : ( UnitsUtil.isTimeLocation(u0) ? tf : df );
         DatumFormatter cf1= UnitsUtil.isTimeLocation(u) ? tf : df;
 
@@ -748,7 +755,13 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 assert dep0!=null;
                 assert cf0!=null;
                 assert u0!=null;
-                out.print("" + cf0.format( u0.createDatum(dep0.value(i)),u0 ) + delim );
+                Datum t;
+                if ( lra==null ) {
+                    t= u0.createDatum( dep0.value(i) );
+                } else {
+                    t= u0.createDatum( lra.lvalue(i) );
+                }
+                out.print("" + cf0.format( t,u0 ) + delim );                
             }
 
             int j;
