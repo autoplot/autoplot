@@ -147,10 +147,9 @@
                 <StringItem index="2" value="Second"/>
                 <StringItem index="3" value="Millisecond"/>
                 <StringItem index="4" value="Microsecond"/>
-                <StringItem index="5" value=" "/>
+                <StringItem index="5" value="Nanosecond"/>
               </StringArray>
             </Property>
-            <Property name="selectedIndex" type="int" value="3"/>
           </Properties>
           <BindingProperties>
             <BindingProperty name="enabled" source="explicitFormatSpecPanel" sourcePath="${enabled}" target="timesFormatTF" targetPath="enabled" updateStrategy="0" immediately="false"/>

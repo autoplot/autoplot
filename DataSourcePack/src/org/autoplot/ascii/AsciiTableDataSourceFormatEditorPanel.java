@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /*
  * AsciiTableDataSourceFormatEditorPanel.java
@@ -82,8 +78,7 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, explicitFormatSpecPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), numberFormatSpecifierTF, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
-        timesFormatTF.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Day", "Minute", "Second", "Millisecond", "Microsecond", " " }));
-        timesFormatTF.setSelectedIndex(3);
+        timesFormatTF.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Day", "Minute", "Second", "Millisecond", "Microsecond", "Nanosecond" }));
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, explicitFormatSpecPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), timesFormatTF, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
