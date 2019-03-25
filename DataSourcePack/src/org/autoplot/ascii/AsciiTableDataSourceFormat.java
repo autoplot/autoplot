@@ -35,6 +35,7 @@ import org.das2.qds.BundleDataSet;
 import org.das2.qds.DDataSet;
 import org.das2.qds.DataSetOps;
 import org.das2.qds.DataSetUtil;
+import org.das2.qds.LongReadAccess;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.ops.Ops;
 
@@ -130,6 +131,15 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                     //timeFormatter =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S.%{milli}Z");
                 } else if (ft.startsWith("microsec")) {
                     final TimeParser tp= TimeParser.create("$Y-$m-$dT$H:$M:$S.$(subsec,places=6)");
+                    timeFormatter= new DatumFormatter() {
+                        @Override
+                        public String format(Datum datum) {
+                            return tp.format(datum);
+                        }
+                    };
+                    //timeFormatter =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S.%{milli}%{micro}Z");
+                } else if (ft.startsWith("nanosec")) {
+                    final TimeParser tp= TimeParser.create("$Y-$m-$dT$H:$M:$S.$(subsec,places=9)");
                     timeFormatter= new DatumFormatter() {
                         @Override
                         public String format(Datum datum) {
@@ -925,6 +935,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             df= getDataFormatter(format, u );
         }
 
+        LongReadAccess lra= dep0==null ? null : dep0.capability( LongReadAccess.class );
         DatumFormatter cf0= dep0==null ? null : ( UnitsUtil.isTimeLocation(u0) ? tf : df );
         DatumFormatter cf1= UnitsUtil.isTimeLocation(u) ? tf : df;
         for (int i = 0; i < data.length(); i++ ) {
@@ -934,7 +945,13 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             if (dep0 != null) {
                 assert cf0!=null;
                 assert u0!=null;
-                out.print("" + cf0.format( u0.createDatum(dep0.value(i)),dep0units ) + delim );
+                Datum t;
+                if ( lra==null ) {
+                    t= u0.createDatum( dep0.value(i) );
+                } else {
+                    t= u0.createDatum( lra.lvalue(i) );
+                }
+                out.print("" + cf0.format( t,dep0units ) + delim );
             }
 
             out.print( cf1.format(u.createDatum(data.value(i)), u) );
