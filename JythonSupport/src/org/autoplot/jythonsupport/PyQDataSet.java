@@ -587,9 +587,14 @@ public class PyQDataSet extends PyJavaInstance {
                 
                 Map<String,Object> bundleProps= new HashMap();
                 
+                QDataSet[] lists= new QDataSet[slices.__len__()];
+                boolean allLists= true;
                 QubeDataSetIterator iter = new QubeDataSetIterator(rods);
                 for (int i = 0; i < slices.__len__(); i++) {
                     PyObject a = slices.__getitem__(i);
+                    if ( ! ( a instanceof PyQDataSet ) && !( a instanceof PyInteger || a instanceof PyFloat ) ) {
+                        allLists= false;
+                    }
                     QubeDataSetIterator.DimensionIteratorFactory fit;
                     if (a instanceof PySlice) {
                         PySlice slice = (PySlice) a;
@@ -607,7 +612,7 @@ public class PyQDataSet extends PyJavaInstance {
                         } else {
                             fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
                         }
-                        
+                        lists[i]= ((PyQDataSet)a).rods;
                     } else if (a.isNumberType()) {
                         int idx = ((Number) getNumber( a )).intValue();
                         fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
@@ -617,22 +622,31 @@ public class PyQDataSet extends PyJavaInstance {
                                 DataSetUtil.sliceProperties( bds, idx, bundleProps );
                             }
                         }
+                        lists[i]= DataSetUtil.asDataSet( idx );
                     } else {
                         QDataSet that = coerce_ds(a);
                         fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
+                        lists[i]= DataSetUtil.asDataSet( that );
                     }
 
                     iter.setIndexIteratorFactory(i, fit);
                 }
+                
+                ArrayDataSet result;
+                if ( allLists ) {
+                    result= getItemAllLists( lists );
+                    
+                } else {
 
-                DDataSet result= iter.createEmptyDs();
+                    result= iter.createEmptyDs();
 
-                QubeDataSetIterator resultIter = new QubeDataSetIterator(result);
-                while (iter.hasNext()) {
-                    iter.next();
-                    double d = iter.getValue(rods);
-                    resultIter.next();
-                    resultIter.putValue(result, d);
+                    QubeDataSetIterator resultIter = new QubeDataSetIterator(result);
+                    while (iter.hasNext()) {
+                        iter.next();
+                        double d = iter.getValue(rods);
+                        resultIter.next();
+                        resultIter.putValue(result, d);
+                    }
                 }
                 
                 DataSetUtil.copyDimensionProperties( rods, result );
@@ -764,7 +778,7 @@ public class PyQDataSet extends PyJavaInstance {
                 ((QubeDataSetIterator) iter).setIndexIteratorFactory(0, fit);
             }
 
-        } else {
+        } else { // arg0.isSequenceType
             PySequence slices = (PySequence) arg0;
             QDataSet[] lists= new QDataSet[slices.__len__()];
             boolean allLists= true;
@@ -1234,6 +1248,88 @@ public class PyQDataSet extends PyJavaInstance {
     @Override
     public boolean isNumberType() {
         return this.rods.rank()==0;
+    }
+
+    /**
+     * handle special case where rank 1 datasets are used to index a rank N array.
+     * @param lists datasets of rank 0 or rank 1
+     * @return the array extracted.
+     */
+    private ArrayDataSet getItemAllLists( QDataSet[] lists ) {
+                
+        QDataSet[] ll= new QDataSet[2];
+        ll[0]= lists[0];
+        for ( int i=1; i<lists.length; i++) {
+            ll[1]= lists[i];
+            CoerceUtil.coerce( ll[0], ll[1], false, ll );
+            lists[0]= ll[0];
+            lists[i]= ll[1];
+        }
+
+        ArrayDataSet result= ArrayDataSet.createRank1( ArrayDataSet.guessBackingStore(rods), lists[0].length() );
+
+        if ( lists[0].rank()==0 ) { // all datasets in lists[] will have the same rank.
+            switch (rods.rank()) {
+                case 1:
+                    result.putValue( rods.value( (int)lists[0].value() ) );
+                    break;
+                case 2:
+                    result.putValue( rods.value( (int)lists[0].value(), (int)lists[1].value() ) );
+                    break;
+                case 3:
+                    result.putValue( rods.value( 
+                        (int)lists[0].value(),
+                        (int)lists[1].value(),
+                        (int)lists[2].value() ) );
+                    break;
+                case 4:
+                    result.putValue( rods.value( 
+                        (int)lists[0].value(),
+                        (int)lists[1].value(),
+                        (int)lists[2].value(),
+                        (int)lists[3].value() ) );
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            int n= lists[0].length();
+            switch (rods.rank()) {
+                case 1:
+                    for ( int i=0;i<n;i++ ) {
+                        result.putValue( i, rods.value( (int)lists[0].value(i) ) );
+                    }   
+                    break;
+                case 2:
+                    for ( int i=0;i<n;i++ ) {
+                        result.putValue( i, rods.value( (int)lists[0].value(i), (int)lists[1].value(i) ) );
+                    }   
+                    break;
+                case 3:
+                    for ( int i=0;i<n;i++ ) {
+                        result.putValue( i,
+                            rods.value( 
+                                (int)lists[0].value(i),
+                                (int)lists[1].value(i),
+                                (int)lists[2].value(i) ) );
+                    }   
+                    break;
+                case 4:
+                    for ( int i=0;i<n;i++ ) {
+                        result.putValue( i,
+                            rods.value( 
+                                (int)lists[0].value(i),
+                                (int)lists[1].value(i),
+                                (int)lists[2].value(i),
+                                (int)lists[3].value(i) ) );
+                    }   
+                    break;
+                default:
+                    break;
+            }
+        }
+        return result;
+        
     }
 
 }
