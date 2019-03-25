@@ -23,6 +23,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import org.das2.CancelledOperationException;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.Datum;
@@ -52,6 +53,7 @@ import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.Caching;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.autoplot.datasource.capability.Updating;
+import org.das2.components.DasProgressPanel;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.AutoHistogram;
 
@@ -2219,12 +2221,16 @@ public class DataSourceController extends DomNodeController {
             }
         }
 
+        ProgressMonitor result;
         if (p != null) {
-            return dom.controller.getMonitorFactory().getMonitor(p, label, description);
+            result= dom.controller.getMonitorFactory().getMonitor(p, label, description);
         } else {
-            return dom.controller.getMonitorFactory().getMonitor(label, description);
+            result= dom.controller.getMonitorFactory().getMonitor(label, description);
         }
-
+        
+        DasProgressPanel.maybeCenter( result, p );
+        
+        return result;
     }
 
     private void setStatus(String string) {
