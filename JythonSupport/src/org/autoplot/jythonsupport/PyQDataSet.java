@@ -806,89 +806,7 @@ public class PyQDataSet extends PyJavaInstance {
             }
             if ( allLists ) {
                 QDataSet val= coerceDsInternal(  arg1 );
-                
-                QDataSet[] ll= new QDataSet[2];
-                ll[0]= lists[0];
-                for ( int i=1; i<slices.__len__(); i++) {
-                    ll[1]= lists[i];
-                    CoerceUtil.coerce( ll[0], ll[1], false, ll );
-                    lists[0]= ll[0];
-                    lists[i]= ll[1];
-                }
-                for ( int i=1; i<slices.__len__(); i++) {  //TODO: check for SVN-generated repeat code
-                    ll[1]= lists[i];
-                    CoerceUtil.coerce( ll[0], ll[1], false, ll );
-                    lists[0]= ll[0];
-                    lists[i]= ll[1];
-                }
-                CoerceUtil.coerce( ll[0], val, false, ll );
-                val= ll[1];
-                QubeDataSetIterator it = new QubeDataSetIterator( val );
-                
-                if ( lists[0].rank()==0 ) { // all datasets in lists[] will have the same rank.
-                    switch (ds.rank()) {
-                        case 1:
-                            it.next();
-                            ds.putValue( (int)lists[0].value(), it.getValue(val));
-                            break;
-                        case 2:
-                            it.next();
-                            ds.putValue( (int)lists[0].value(),
-                                    (int)lists[1].value(), it.getValue(val));
-                            break;
-                        case 3:
-                            it.next();
-                            ds.putValue( (int)lists[0].value(),
-                                    (int)lists[1].value(),
-                                    (int)lists[2].value(), it.getValue(val));
-                            break;
-                        case 4:
-                            it.next();
-                            ds.putValue( (int)lists[0].value(),
-                                    (int)lists[1].value(),
-                                    (int)lists[2].value(),
-                                    (int)lists[3].value(), it.getValue(val));
-                            break;
-                        default:
-                            break;
-                    }
-                } else {
-                    int n= lists[0].length();
-                    switch (ds.rank()) {
-                        case 1:
-                            for ( int i=0;i<n;i++ ) {
-                                it.next();
-                                ds.putValue( (int)lists[0].value(i), it.getValue(val));
-                            }   
-                            break;
-                        case 2:
-                            for ( int i=0;i<n;i++ ) {
-                                it.next();
-                                ds.putValue( (int)lists[0].value(i),
-                                        (int)lists[1].value(i), it.getValue(val));
-                            }   
-                            break;
-                        case 3:
-                            for ( int i=0;i<n;i++ ) {
-                                it.next();
-                                ds.putValue( (int)lists[0].value(i),
-                                        (int)lists[1].value(i),
-                                        (int)lists[2].value(i), it.getValue(val));
-                            }   
-                            break;
-                        case 4:
-                            for ( int i=0;i<n;i++ ) {
-                                it.next();
-                                ds.putValue( (int)lists[0].value(i),
-                                        (int)lists[1].value(i),
-                                        (int)lists[2].value(i),
-                                        (int)lists[3].value(i), it.getValue(val));
-                            }   
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                setItemAllLists( lists, val );
                 if ( units==null ) { // see repeat code below.  Return requires repetition.
                     logger.fine("resetting units based on values assigned");
                     Units u= SemanticOps.getUnits(val);
@@ -1250,6 +1168,93 @@ public class PyQDataSet extends PyJavaInstance {
         return this.rods.rank()==0;
     }
 
+    /**
+     * handle special case where rank 1 datasets are used to index a rank N array.
+     * @param lists datasets of rank 0 or rank 1
+     * @param val the value (or values) to assign.
+     * @return the array extracted.
+     */
+    private void setItemAllLists( QDataSet[] lists, QDataSet val ) {
+                
+        QDataSet[] ll= new QDataSet[2];
+        ll[0]= lists[0];
+        for ( int i=1; i<lists.length; i++) {
+            ll[1]= lists[i];
+            CoerceUtil.coerce( ll[0], ll[1], false, ll );
+            lists[0]= ll[0];
+            lists[i]= ll[1];
+        }
+        CoerceUtil.coerce( ll[0], val, false, ll );
+        val= ll[1];
+        QubeDataSetIterator it = new QubeDataSetIterator( val );
+
+        if ( lists[0].rank()==0 ) { // all datasets in lists[] will have the same rank.
+            switch (ds.rank()) {
+                case 1:
+                    it.next();
+                    ds.putValue( (int)lists[0].value(), it.getValue(val));
+                    break;
+                case 2:
+                    it.next();
+                    ds.putValue( (int)lists[0].value(),
+                            (int)lists[1].value(), it.getValue(val));
+                    break;
+                case 3:
+                    it.next();
+                    ds.putValue( (int)lists[0].value(),
+                            (int)lists[1].value(),
+                            (int)lists[2].value(), it.getValue(val));
+                    break;
+                case 4:
+                    it.next();
+                    ds.putValue( (int)lists[0].value(),
+                            (int)lists[1].value(),
+                            (int)lists[2].value(),
+                            (int)lists[3].value(), it.getValue(val));
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            int n= lists[0].length();
+            switch (ds.rank()) {
+                case 1:
+                    for ( int i=0;i<n;i++ ) {
+                        it.next();
+                        ds.putValue( (int)lists[0].value(i), it.getValue(val));
+                    }   
+                    break;
+                case 2:
+                    for ( int i=0;i<n;i++ ) {
+                        it.next();
+                        ds.putValue( (int)lists[0].value(i),
+                                (int)lists[1].value(i), it.getValue(val));
+                    }   
+                    break;
+                case 3:
+                    for ( int i=0;i<n;i++ ) {
+                        it.next();
+                        ds.putValue( (int)lists[0].value(i),
+                                (int)lists[1].value(i),
+                                (int)lists[2].value(i), it.getValue(val));
+                    }   
+                    break;
+                case 4:
+                    for ( int i=0;i<n;i++ ) {
+                        it.next();
+                        ds.putValue( (int)lists[0].value(i),
+                                (int)lists[1].value(i),
+                                (int)lists[2].value(i),
+                                (int)lists[3].value(i), it.getValue(val));
+                    }   
+                    break;
+                default:
+                    break;
+            }
+        }
+        
+    }
+    
     /**
      * handle special case where rank 1 datasets are used to index a rank N array.
      * @param lists datasets of rank 0 or rank 1
