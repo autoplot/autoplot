@@ -278,30 +278,18 @@ public class DataSetSelector extends javax.swing.JPanel {
     }
 
     private ProgressMonitor getMonitor(String label, String desc) {
-        if (monitorFactory == null) {
-            ProgressMonitor mon= DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(label, desc);
-            return mon;
-        } else {
-            return monitorFactory.getMonitor(label, desc);
-        }
+        Window window= SwingUtilities.getWindowAncestor( this );
+        return getMonitor( label, desc, window );
     }
     
     private ProgressMonitor getMonitor(String label, String desc, Window window ) {
         if (monitorFactory == null) {
             ProgressMonitor mon= DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(label, desc);
-            if ( mon instanceof DasProgressPanel ) {
-                Component c= ((DasProgressPanel)mon).getComponent();
-                Window w= SwingUtilities.getWindowAncestor( c );
-                if ( w!=null ) w.setLocationRelativeTo( window );
-            }
+            DasProgressPanel.maybeCenter( mon, window );
             return mon;
         } else {
             ProgressMonitor mon= monitorFactory.getMonitor(label, desc);
-            if ( mon instanceof DasProgressPanel ) {
-                Component c= ((DasProgressPanel)mon).getComponent();
-                Window w= SwingUtilities.getWindowAncestor( c );
-                if ( w!=null ) w.setLocationRelativeTo( window );
-            }
+            DasProgressPanel.maybeCenter( mon, window );
             return mon;
         }
     }    
@@ -430,7 +418,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                         setMessage("error: URI cannot be formed from \""+surl+"\"");
                         return;
                     }
-                    DataSourceFactory f = DataSetURI.getDataSourceFactory(uri, getMonitor());
+                    DataSourceFactory f = DataSetURI.getDataSourceFactory(uri, getMonitor( "get factory", "get factory" ) );
                     if (f == null) {
                         SourceTypesBrowser browser= new SourceTypesBrowser();
                         URI resourceURI= DataSetURI.getResourceURI(surl);
@@ -481,7 +469,11 @@ public class DataSetSelector extends javax.swing.JPanel {
                     if ( tsbProblem.length()>0 ) logger.warning(tsbProblem);
                     
                     setMessage("busy: checking to see if uri looks acceptable");
-                    ProgressMonitor mon= getMonitor();
+                    
+                    Window w= SwingUtilities.getWindowAncestor(this);
+                    ProgressMonitor mon= getMonitor( "check URI", "check if URI is acceptable", w );
+                    
+                    //TODO: line up with parent.
                     List<String> problems= new ArrayList();
                     if (f.reject(surl, problems,mon)) { // This is the often-seen code that replaces the timerange in a URI. +#+#+
                         if ( tsb!=null ) {
