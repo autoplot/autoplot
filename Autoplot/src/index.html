@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>"putProperty" filter used to make negative parts of spectrogram transparent.
+        <p><small>More index types are supported, for example where the rank 2 value is used to select indices from rank 3 rgb image.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,6 +27,13 @@
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
         <p>Bugfixes (2019-03-21 r23465):</p>
+        <ul>
+            <li>2133: detect LongReadAccess when CDF_TT2000 is used for timetags, so that CDF timetags can be formatted to ASCII with full resolution.  Thanks, Eric!
+            <li>2036: keep track of the parent of the monitor used for centering, after seeing that the hidden monitor would position properly when it becomes visible.
+            <li>1629: getItem with index lists (ds[ idx0, idx1, 0 ]) works now.  Thanks, Ivar!
+            <li>2134: support rank 2 indeces, see https://github.com/autoplot/dev/blob/master/bugs/2134/
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>2036: monitors should be centered above the context which created them.
             <li>2132: aggregation with local files on Windows corrected when $Y/$m/$Y$m$d.cdf is used with network drive.  Thanks, Seth!
@@ -48,50 +55,10 @@
             <li>0292: support $Y/$m/mms1_fgm_srvy_l2_$Y$m$d in automatic aggregation suggestions.  Thanks, Kris!
             <li>2105: allow direct access of GitHub files, or other sites when the parent http folder listing results in error 400.  Thanks, Bob!
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>rte_1955990895: index out-of-bounds because display data assumed there was no depend0.
-            <li>PitchAngleDistribution renderer handles where data needs to transposed, newer autorange code was never tested.
-            <li>2116:  jython indexing bug where get and put don't both allow for list-of-indeces.  Thanks, Ivar!
-            <li>rte_0000000000_20190219_072309: runtime error when completions for "import&lt;C&gt;"
-            <li>rank0 access of LongDataSetLongReadAccess didn't account for offset.
-            <li>rte_1613985001: thread sloppiness for reset resulted in RTE when plot was removed. (Local copy makes this code safe.)
-            <li>2115: correction to inferBins and LanlNearestNeighbor when CADENCE is set artifically high to disable cadence checks.  Thanks, Kris!
-            <li>2114: improvements to NetCDF to support GOES files, including labels and units.  Thanks, Allison!
-            <li>rte_2038937185: vapfile:... was loaded on the event thread, which could lock up the app.
-            <li>javadoc table now has "org.autoplot" and "org.das2" instead of just org, so that new documentation can be installed.
-            <li>1687: jython completions had a case where a three-line command would loose its last line in refactoring to provide completions.
-            <li>2105: Github support checks for tree/master and blob/master references, and corrects them to support cut-n-paste from browser.
-            <li>rte 0195003323: catch the runtime error when the units are not compatible in data reduction branch.
-            <li>2076: command-line version of createPngWalk would loose the property which would suppress the message bubbles.
-            <li>2109: Do a GCD check for small datasets when calculating cadence, after seeing cadence of 1.21 for IndexGenDataSet.
-            <li>browse trigger for .jy does filesystem completions when the carot is before the ".jy"
-            <li>2110: rank 2 bundle of x,y,z data works again with typical spectrogram renderings.
-            <li>PWD wasn't sent into code for Jython completions, causing RTE which would prevent completions from working.
-            <li>2109: series plot in "stairsteps" mode had cases where fill region didn't match line plot.  Thanks, Chris!
-            <li>2105: Github support didn't cache properly, so ETags are now supported.
-            <li>annotation position SSE's icon was incorrect.
-            <li>BindingSupport's unused toString Converter was not properly implemented, and would only go one way (toString, not parse).
-            <li>annotation editor dialog url/text toggle did not toggle back properly.
-            <li>Corrections to "fix layout" action.  Thanks, Jon N. and Bill and others who have pointed out this bug over the years!
-            <li>URL in console was too easy to trigger, so now you need to hold shift while double-clicking.
-            <li>add "insert plot elements from clipboard" action, menu item was not added to make the feature available.
-            <li>Crosshair digitizer "all planes report" checkbox hadn't been tested.  Now auxillary planes can be displayed.
-            <li>synchronize( data, [timetags] ) will synchronize timetags to data's timetags, to ease use with the mashup tool.
-            <li>log10 shows up property in the filter chain.
-            <li>downloadResourceAsTempFile also checks for redirects.
-            <li>code sites which open a URL connection should log the URL to das.url.
-            <li>das2stream units error with yValidMin would cause runtime error and prevent the streams use.
-            <li>pds-ppi handles redirects, and is now pointed at https site.
-            <li>2100: export to xls, then try to load the xls.
-            <li>when aggregation looks for a representative file, use the first one with non-zero length.
-            <li>2-D buckshotInterpolate rescales the data so that it is always order 1 (an assumption of ProGal library).
-            <li>SeriesRenderer red line indicating warning limit is now dashed so that data at the limit can be seen.
-            <li>2096: connector when two slices are done, where CONTEXT_0 should be ignored and CONTEXT_1 should be used.
-            <li>ArrayDataSet can now take array of arrays as input, supporting Python NumPy to Autoplot bridge via jpype.
-            <li>monitor was reused in IDL bridge's APDataSet, causing warning about misuse of monitor.
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>array dataset properties can be explored in metadata tab, providing access to file list.  Thanks, Jon!
             <li>671: applyIndex is added to the list of filters, and now supports any index, and SubsetDataSet provides tool for resolving strings.
@@ -101,23 +68,6 @@
             <li>new class completions on "g.&lt;C&gt;" (a kludge) to support graphics in scripts.  
             <li>reset will check for strange axes, supporting where a script has replaces the yaxis with a DasLabelAxis.  Thanks, Chris!
             <li>improve html version of pngwalk export to write separate pages.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>add LongWriteAccess, so that longs can be used to write TT2000 data without roundoff errors.
-            <li>666: add bytarr, shortarr, intarr, replicate(int), and replicate(short)
-            <li>introduce AuralizationHandler which makes sounds when HEAD and GET log messages are encountered.
-            <li>lineThickness property allows plot bounds and axes to be thickened.
-            <li>removeIndeces function removes a set of indeces from data (not just inserting fill).
-            <li>add special filesystem support for Github, so files stored on GitHub can be used directly.
-            <li>add low-level shutdown hook so that hung process' vap can be recovered, see autoplot_data/logs/last.vap.
-            <li>625: GrannyTextRenderer supports !(color;red) and !(painter;id) in strings.  
-            <li>gamma function added, though for now data must be positive.
-            <li>add "insert plot elements from clipboard" action.  Thanks, Kris!
-            <li>beginnings of new das2stream reader which will read directly to QDataSet, instead of via old data model, which is buggy.
-            <li>PngWalkTool checks EXIF metadata for rotation cues, so that pngwalk tool works for family photos.
-            <li>experimental "expect" code included, which should be useful for writing scripts which control IDL.
-            <li>mashup-tool automatically names new variables based on the URI.
         </ul>
         <p>Known issues:</p>
         <ul>
