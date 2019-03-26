@@ -1427,7 +1427,7 @@ public class PlotController extends DomNodeController {
         if ( pe.style==null ) {
             throw new NullPointerException("Style pe.style is null"); // bug 1419: I think I see this on the server
         }
-        this.dom.controller.bind( pe.style, PlotElementStyle.PROP_COLORTABLE, this.plot, Plot.PROP_COLORTABLE );
+        this.dom.controller.bind( this.plot, Plot.PROP_COLORTABLE, pe.style, PlotElementStyle.PROP_COLORTABLE );
     }
 
     /**
