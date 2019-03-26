@@ -589,13 +589,14 @@ public class PyQDataSet extends PyJavaInstance {
                 
                 QDataSet[] lists= new QDataSet[slices.__len__()];
                 boolean allLists= true;
+                boolean betterBeAllLists= false;
                 QubeDataSetIterator iter = new QubeDataSetIterator(rods);
                 for (int i = 0; i < slices.__len__(); i++) {
                     PyObject a = slices.__getitem__(i);
                     if ( ! ( a instanceof PyQDataSet ) && !( a instanceof PyInteger || a instanceof PyFloat ) ) {
                         allLists= false;
                     }
-                    QubeDataSetIterator.DimensionIteratorFactory fit;
+                    QubeDataSetIterator.DimensionIteratorFactory fit= null;
                     if (a instanceof PySlice) {
                         PySlice slice = (PySlice) a;
                         Number start = (Number) getNumber(slice.start); // TODO: for the 0th index and step=1, native trim can be used.
@@ -609,8 +610,10 @@ public class PyQDataSet extends PyJavaInstance {
                         if ( that.rank()==0 ) {
                             int idx = (int)(that.value());
                             fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
-                        } else {
+                        } else if ( that.rank()==1 ) {
                             fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
+                        } else {
+                            betterBeAllLists= true;
                         }
                         lists[i]= ((PyQDataSet)a).rods;
                     } else if (a.isNumberType()) {
@@ -629,7 +632,11 @@ public class PyQDataSet extends PyJavaInstance {
                         lists[i]= DataSetUtil.asDataSet( that );
                     }
 
-                    iter.setIndexIteratorFactory(i, fit);
+                    if ( fit!=null ) iter.setIndexIteratorFactory(i, fit);
+                }
+                
+                if ( betterBeAllLists && !allLists ) {
+                    throw new IllegalArgumentException("index error, because all indeces must be lists.");
                 }
                 
                 ArrayDataSet result;
@@ -694,6 +701,11 @@ public class PyQDataSet extends PyJavaInstance {
             } else if ( that.rank()==0 ) {
                 QDataSet sds= rods.slice( (int)that.value() ); //TODO: why is this not the writable dataset, or a copy of it?
                 return new PyQDataSet( sds );
+                
+            } else if ( that.rank()>1 ) {
+                WritableDataSet result= getItemAllLists( new QDataSet[] { that } );
+                DataSetUtil.copyDimensionProperties( rods, result );
+                return new PyQDataSet(result);
                 
             } else {
                 QubeDataSetIterator.DimensionIteratorFactory fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
@@ -1276,8 +1288,10 @@ public class PyQDataSet extends PyJavaInstance {
         ArrayDataSet result;
         if ( lists[0].rank()==0 ) {
             result= ArrayDataSet.createRank0( ArrayDataSet.guessBackingStore(rods) );
-        } else {
+        } else if ( lists[0].rank()==1 ) {
             result= ArrayDataSet.createRank1( ArrayDataSet.guessBackingStore(rods), lists[0].length() );
+        } else {
+            result= ArrayDataSet.create( ArrayDataSet.guessBackingStore(rods), DataSetUtil.qubeDims( lists[0] ) );
         }
 
         if ( lists[0].rank()==0 ) { // all datasets in lists[] will have the same rank.
@@ -1304,7 +1318,7 @@ public class PyQDataSet extends PyJavaInstance {
                 default:
                     break;
             }
-        } else {
+        } else if ( lists[0].rank()==1 ) {
             int n= lists[0].length();
             switch (rods.rank()) {
                 case 1:
@@ -1337,6 +1351,47 @@ public class PyQDataSet extends PyJavaInstance {
                     }   
                     break;
                 default:
+                    break;
+            }
+        } else {
+            QubeDataSetIterator iter= new QubeDataSetIterator( result );
+            switch ( rods.rank() ) {
+                case 1:
+                    while ( iter.hasNext() ) {
+                        iter.next();
+                        double d= rods.value( (int)iter.getValue(lists[0]) );
+                        iter.putValue( result, d );
+                    }
+                    break;
+                case 2:
+                    while ( iter.hasNext() ) {
+                        iter.next();
+                        double d= rods.value( 
+                                (int)iter.getValue(lists[0]), 
+                                (int)iter.getValue(lists[1]) );
+                        iter.putValue( result, d );
+                    }
+                    break;
+                case 3:
+                    while ( iter.hasNext() ) {
+                        iter.next();
+                        double d= rods.value( 
+                                (int)iter.getValue(lists[0]), 
+                                (int)iter.getValue(lists[1]),
+                                (int)iter.getValue(lists[2]) );
+                        iter.putValue( result, d );
+                    }
+                    break;
+                case 4:
+                    while ( iter.hasNext() ) {
+                        iter.next();
+                        double d= rods.value( 
+                                (int)iter.getValue(lists[0]), 
+                                (int)iter.getValue(lists[1]),
+                                (int)iter.getValue(lists[2]), 
+                                (int)iter.getValue(lists[3]) );
+                        iter.putValue( result, d );
+                    }
                     break;
             }
         }
