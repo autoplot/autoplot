@@ -641,6 +641,7 @@ public class PyQDataSet extends PyJavaInstance {
                 
                 ArrayDataSet result;
                 if ( allLists ) {
+                    lists = checkIndexBundle( lists );
                     result= getItemAllLists( lists );
                     
                 } else {
@@ -818,6 +819,7 @@ public class PyQDataSet extends PyJavaInstance {
             }
             if ( allLists ) {
                 QDataSet val= coerceDsInternal(  arg1 );
+                lists = checkIndexBundle(lists);
                 setItemAllLists( lists, val );
                 if ( units==null ) { // see repeat code below.  Return requires repetition.
                     logger.fine("resetting units based on values assigned");
@@ -909,6 +911,34 @@ public class PyQDataSet extends PyJavaInstance {
             }
         }
                 
+    }
+
+    /**
+     * the output of the where command of a rank N dataset is a rank 2 dataset
+     * idx[M,N] where M cases where the condition was true.  This means that
+     * the first dataset might be a bundle of indeces, and here we break them
+     * out to N datasets.
+     * @see https://github.com/autoplot/dev/blob/master/bugs/2134/indexWithRank2_case5.jy
+     * @param lists
+     * @return 
+     */
+    private QDataSet[] checkIndexBundle(QDataSet[] lists) {
+        if ( lists.length<ds.rank() ) {
+            if ( lists[0].rank()==2 && SemanticOps.isLegacyBundle(lists[0]) ) { // output of "where" command
+                logger.log(Level.FINER, "bundle of indices found: {0}", lists[0]);
+                QDataSet[] newLists= new QDataSet[lists[0].length(0)+lists.length-1];
+                for ( int j=0; j<lists[0].length(0); j++ ) {
+                    newLists[j]= Ops.unbundle(lists[0],j);
+                }
+                int ick=1;
+                for ( int j=lists[0].length(0); j<newLists.length; j++ ) {
+                    newLists[j]= lists[ ick ];
+                    ick++;
+                }
+                lists= newLists;
+            }
+        }
+        return lists;
     }
     
     /**
