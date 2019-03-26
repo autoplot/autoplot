@@ -359,7 +359,7 @@ public class ImageDataSource extends AbstractDataSource {
         }
         
         if ( channel!=null ) {
-            if ( channel.equals("greyscale") ) {
+            if ( channel.equals("greyscale") || channel.equals("value") ) {
                 result.putProperty( QDataSet.RENDER_TYPE, "spectrogram>colorTable=black_white");
             } else if ( channel.equals("red") ) {
                 result.putProperty( QDataSet.RENDER_TYPE, "spectrogram>colorTable=black_red");
