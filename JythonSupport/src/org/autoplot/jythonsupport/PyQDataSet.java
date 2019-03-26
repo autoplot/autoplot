@@ -1228,7 +1228,7 @@ public class PyQDataSet extends PyJavaInstance {
                 default:
                     break;
             }
-        } else {
+        } else if ( lists[0].rank()==1 ) {
             int n= lists[0].length();
             switch (ds.rank()) {
                 case 1:
@@ -1263,6 +1263,49 @@ public class PyQDataSet extends PyJavaInstance {
                     }   
                     break;
                 default:
+                    break;
+            }
+        } else {
+            QubeDataSetIterator iter= new QubeDataSetIterator(lists[0]);
+            switch ( rods.rank() ) {
+                case 1:
+                    while ( it.hasNext() ) {
+                        it.next();
+                        iter.next();
+                        double d= it.getValue(val); 
+                        ds.putValue( (int)iter.getValue( lists[0] ), d );
+                    }
+                    break;
+                case 2:
+                    while ( it.hasNext() ) {
+                        it.next();
+                        iter.next();
+                        double d= it.getValue(val);  
+                        ds.putValue( (int)iter.getValue( lists[0] ), (int)iter.getValue( lists[1] ), d );
+                    }
+                    break;
+                case 3:
+                    while ( it.hasNext() ) {
+                        it.next();
+                        iter.next();
+                        double d= it.getValue(val);  
+                        ds.putValue( 
+                                (int)iter.getValue( lists[0] ), 
+                                (int)iter.getValue( lists[1] ), 
+                                (int)iter.getValue( lists[2] ), d );
+                    }
+                    break;
+                case 4:
+                    while ( it.hasNext() ) {
+                        it.next();
+                        iter.next();
+                        double d= it.getValue(val);  
+                        ds.putValue( 
+                                (int)iter.getValue(lists[0]), 
+                                (int)iter.getValue(lists[1]),
+                                (int)iter.getValue(lists[2]), 
+                                (int)iter.getValue(lists[3]), d );
+                    }
                     break;
             }
         }
