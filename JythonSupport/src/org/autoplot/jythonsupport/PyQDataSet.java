@@ -1196,18 +1196,19 @@ public class PyQDataSet extends PyJavaInstance {
                     break;
                 case 2:
                     it.next();
-                    ds.putValue( (int)lists[0].value(),
-                            (int)lists[1].value(), it.getValue(val));
+                    ds.putValue( (int)lists[0].value(), (int)lists[1].value(), it.getValue(val));
                     break;
                 case 3:
                     it.next();
-                    ds.putValue( (int)lists[0].value(),
+                    ds.putValue( 
+                            (int)lists[0].value(),
                             (int)lists[1].value(),
                             (int)lists[2].value(), it.getValue(val));
                     break;
                 case 4:
                     it.next();
-                    ds.putValue( (int)lists[0].value(),
+                    ds.putValue( 
+                            (int)lists[0].value(),
                             (int)lists[1].value(),
                             (int)lists[2].value(),
                             (int)lists[3].value(), it.getValue(val));
@@ -1227,14 +1228,14 @@ public class PyQDataSet extends PyJavaInstance {
                 case 2:
                     for ( int i=0;i<n;i++ ) {
                         it.next();
-                        ds.putValue( (int)lists[0].value(i),
-                                (int)lists[1].value(i), it.getValue(val));
+                        ds.putValue( (int)lists[0].value(i), (int)lists[1].value(i), it.getValue(val));
                     }   
                     break;
                 case 3:
                     for ( int i=0;i<n;i++ ) {
                         it.next();
-                        ds.putValue( (int)lists[0].value(i),
+                        ds.putValue( 
+                                (int)lists[0].value(i),
                                 (int)lists[1].value(i),
                                 (int)lists[2].value(i), it.getValue(val));
                     }   
@@ -1242,7 +1243,8 @@ public class PyQDataSet extends PyJavaInstance {
                 case 4:
                     for ( int i=0;i<n;i++ ) {
                         it.next();
-                        ds.putValue( (int)lists[0].value(i),
+                        ds.putValue( 
+                                (int)lists[0].value(i),
                                 (int)lists[1].value(i),
                                 (int)lists[2].value(i),
                                 (int)lists[3].value(i), it.getValue(val));
@@ -1271,7 +1273,12 @@ public class PyQDataSet extends PyJavaInstance {
             lists[i]= ll[1];
         }
 
-        ArrayDataSet result= ArrayDataSet.createRank1( ArrayDataSet.guessBackingStore(rods), lists[0].length() );
+        ArrayDataSet result;
+        if ( lists[0].rank()==0 ) {
+            result= ArrayDataSet.createRank0( ArrayDataSet.guessBackingStore(rods) );
+        } else {
+            result= ArrayDataSet.createRank1( ArrayDataSet.guessBackingStore(rods), lists[0].length() );
+        }
 
         if ( lists[0].rank()==0 ) { // all datasets in lists[] will have the same rank.
             switch (rods.rank()) {
