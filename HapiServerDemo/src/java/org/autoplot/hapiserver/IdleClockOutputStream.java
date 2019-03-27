@@ -79,7 +79,12 @@ public class IdleClockOutputStream extends OutputStream {
      * @return  the bits per second.
      */
     public long getBitsPerSecond() {
-        return this.totalBytes * 8 * 1000 / ( this.t0-this.birthMilli );
+        long d= ( this.t0-this.birthMilli );
+        if ( d==0 ) {
+            return 9999999;
+        } else {
+            return this.totalBytes * 8 * 1000 / d;
+        }
     }
     
     /**

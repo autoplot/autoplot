@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.Writer;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
@@ -403,8 +404,7 @@ public class DataServlet extends HttpServlet {
 
     /**
      * we have the csv pre-calculated, so just read from it.
-     * Note the output stream is closed here!
-     * @param out the output stream accepting data
+     * @param out the output stream accepting data.  This will not be closed.
      * @param dataFile file to send, which if ends in .gz, uncompress it, 
      * @param dr the range to which the data should be trimmed.
      * @param parameters if non-empty, then return just these parameters of the cached data.
@@ -431,16 +431,18 @@ public class DataServlet extends HttpServlet {
             pmap= indexMap;
         }
         
+        int nrec=0;
         int nf= -1;
         try {
             try ( BufferedReader reader= new BufferedReader( freader ); 
-                  BufferedWriter writer= new BufferedWriter( new OutputStreamWriter(out) ) ) {
+                  BufferedWriter writer= new BufferedWriter( new NoCloseOutputStreamWriter(out) ) ) {
                 String line= reader.readLine();
                 while ( line!=null ) {
                     int i= line.indexOf(",");
                     try {
                         Datum t= TimeUtil.create(line.substring(0,i));
                         if ( dr.contains(t) ) {
+                            nrec++;
                             if ( pmap==null ) {
                                 writer.write(line);
                             } else {
@@ -458,9 +460,11 @@ public class DataServlet extends HttpServlet {
                     }
                     line= reader.readLine();
                 }
+                logger.log(Level.FINER, "sent {0} records from {1}", new Object[]{nrec, dataFile});
             }
         } finally {
             freader.close();
+            out.flush();
         }
         long timer= System.currentTimeMillis()-t0;
         
