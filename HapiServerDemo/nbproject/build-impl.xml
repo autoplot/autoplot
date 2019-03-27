@@ -1074,7 +1074,7 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.json-2011-01-27-gitrelease.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.jython-lib-2.2.1.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.jython.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${file.reference.cdfj-20170223.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.cdfj.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.metadata-extractor-2.6.4.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.dasCoreUtil.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.dasCoreDatum.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
@@ -1096,7 +1096,7 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.json-2011-01-27-gitrelease.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.jython-lib-2.2.1.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.jython.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copyfiles files="${file.reference.cdfj-20170223.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${file.reference.cdfj.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.metadata-extractor-2.6.4.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.dasCoreUtil.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.dasCoreDatum.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
