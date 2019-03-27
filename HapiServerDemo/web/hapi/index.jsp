@@ -170,6 +170,7 @@
             <li>2019-02-26: correction to where two spectrograms could be served (specBins.2).
             <li>2019-02-26: corrections prompted by HapiVerifier, such as x-deployedAt should be x_deployedAt.
             <li>2019-03-05: make csv output more readable by checking for FORMAT property and using standard formatters.
+            <li>2019-03-27: correct bug with file handling when cache files are used and multiple days are requested.
         </ul>
         </small>
     </body>
