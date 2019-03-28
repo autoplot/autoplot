@@ -46,6 +46,7 @@ import org.das2.datum.UnitsUtil;
 import org.das2.qds.SemanticOps;
 import org.das2.system.DefaultMonitorFactory;
 import org.das2.system.MonitorFactory;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.xml.sax.SAXException;
 
@@ -419,6 +420,8 @@ public class Test140 {
         System.err.println("home (prefs): " + System.getProperty("user.home") );
         System.err.println("autoplot_data: "+AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA));
         System.err.println("fscache: "+AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE));
+        System.err.println("reading logger configuration from System.getProperty(\"java.util.logging.config.file\"): " + System.getProperty("java.util.logging.config.file") );
+        LoggerManager.readConfiguration();
         
         if ( args.length==0 ) {
             //args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140.txt", "http://www.sarahandjeremy.net/~jbf/temperatures2012.xml" };
