@@ -512,7 +512,7 @@ public class AutoRangeUtil {
                 // TODO: support just typicalMin or typicalMax...
                 typical = new AutoRangeDescriptor();
                 typical.range = new DatumRange(typicalMin.doubleValue(), typicalMax.doubleValue(), u);
-                logger.log(Level.FINER, "use typical range: {0}", typical.range);
+                logger1.log(Level.FINER, "use typical range: {0}", typical.range);
                 typical.log = isLog;
             }
         }
@@ -539,7 +539,7 @@ public class AutoRangeUtil {
             }
             result.robustMin = result.range.min().doubleValue(result.range.getUnits());
             result.robustMax = result.range.max().doubleValue(result.range.getUnits());
-            logger.log(Level.FINER, "result of join autorange: {0}", result.range );
+            logger1.log(Level.FINER, "result of join autorange: {0}", result.range );
             logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", ds);
             return result;
         }
@@ -633,7 +633,7 @@ public class AutoRangeUtil {
                     dd[1] = dd[1] / 100; // work around 2009 bug where DatumRanges cannot contain -1e31.
                 }
             } catch (IllegalArgumentException ex) {
-                logger.log(Level.WARNING, ex.getMessage(), ex);
+                logger1.log(Level.WARNING, ex.getMessage(), ex);
                 if (UnitsUtil.isTimeLocation(u)) {
                     dd = new double[]{0, Units.days.createDatum(1).doubleValue(u.getOffsetUnits())};
                 } else {
@@ -762,7 +762,7 @@ public class AutoRangeUtil {
             result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
         }
         
-        logger.log(Level.FINE, "result.range at this point is {0}", result.range);
+        logger1.log(Level.FINE, "result.range at this point is {0}", result.range);
         
         result.log = isLog;
         // interpret properties, looking for hints about scale type and ranges.
