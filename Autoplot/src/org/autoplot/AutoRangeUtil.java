@@ -777,6 +777,7 @@ public class AutoRangeUtil {
             if ( UnitsUtil.isTimeLocation(u) ) uu= u;
             if (UnitsUtil.isIntervalOrRatioMeasurement(uu)) {
                 Datum ftmin = uu.createDatum(tmin == null ? -1 * Double.MAX_VALUE : tmin);
+                logger1.log(Level.FINER, "isLog={0} ftmin={1}", new Object[]{isLog, ftmin});
                 if (isLog && tmin != null && tmin.doubleValue() <= 0) {
                     //                tmin= new Double( result.range.min().doubleValue(result.range.getUnits()) );
                     //                if ( tmin.doubleValue()<0 ) {
@@ -893,6 +894,7 @@ public class AutoRangeUtil {
             } else if (UnitsUtil.isTimeLocation(u)) {
                 if (result.range.min().doubleValue(Units.us2000) > -6.311348E15) {
                     //TODO: Julian has yr1800 limit.
+                    logger1.log(Level.FINER, "entering domain divider bit: {0}", result.range);
                     if (result.range.width().value() == 0.0) {
                         result.range = new DatumRange(result.range.min(), result.range.min().add(Units.seconds.createDatum(1)));
                     } else {
