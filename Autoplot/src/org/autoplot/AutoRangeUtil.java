@@ -777,7 +777,7 @@ public class AutoRangeUtil {
             if ( UnitsUtil.isTimeLocation(u) ) uu= u;
             if (UnitsUtil.isIntervalOrRatioMeasurement(uu)) {
                 Datum ftmin = uu.createDatum(tmin == null ? -1 * Double.MAX_VALUE : tmin);
-                logger1.log(Level.FINER, "isLog={0} ftmin={1}", new Object[]{isLog, ftmin});
+                logger1.log(Level.FINER, "isLog={0} ftmin={1} tmin={2} tmax={3} uu={4}", new Object[]{isLog, ftmin, tmin, tmax, uu});
                 if (isLog && tmin != null && tmin.doubleValue() <= 0) {
                     //                tmin= new Double( result.range.min().doubleValue(result.range.getUnits()) );
                     //                if ( tmin.doubleValue()<0 ) {
