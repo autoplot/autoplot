@@ -512,6 +512,7 @@ public class AutoRangeUtil {
                 // TODO: support just typicalMin or typicalMax...
                 typical = new AutoRangeDescriptor();
                 typical.range = new DatumRange(typicalMin.doubleValue(), typicalMax.doubleValue(), u);
+                logger.log(Level.FINER, "use typical range: {0}", typical.range);
                 typical.log = isLog;
             }
         }
@@ -538,6 +539,7 @@ public class AutoRangeUtil {
             }
             result.robustMin = result.range.min().doubleValue(result.range.getUnits());
             result.robustMax = result.range.max().doubleValue(result.range.getUnits());
+            logger.log(Level.FINER, "result of join autorange: {0}", result.range );
             logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", ds);
             return result;
         }
@@ -759,6 +761,9 @@ public class AutoRangeUtil {
             }
             result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
         }
+        
+        logger.log(Level.FINE, "result.range at this point is {0}", result.range);
+        
         result.log = isLog;
         // interpret properties, looking for hints about scale type and ranges.
         if (properties != null) {
@@ -855,7 +860,7 @@ public class AutoRangeUtil {
                         // just use the metadata settings.
                         logger1.fine("using TYPICAL_MIN, TYPICAL_MAX from metadata");
                         logger1.log(Level.FINE, "autorange {0} -> {1} (exit1)", new Object[]{ds, result.range});
-                        logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", ds);
+                        logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", result.range );
                         return result; // DANGER--EXIT POINT
                     } else {
                         logger1.log(Level.FINE, "TYPICAL_MIN={0} and TYPICAL_MAX={1} from metadata rejected because it clipped or squished the data {2}", new Object[]{tmin.toString(), tmax.toString(), result.range});
@@ -919,7 +924,7 @@ public class AutoRangeUtil {
                     double overlap = DatumRangeUtil.normalizeLog(result.range, typical.range.max()) - DatumRangeUtil.normalizeLog(result.range, typical.range.min());
                     if (overlap > 0.01 && overlap < 100) {
                         logger1.log(Level.FINE, "autorange {0} -> {1} (exit2)", new Object[]{ds, result.range});
-                        logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", ds);
+                        logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", result.range );
                         return typical;
                     }
                 }
@@ -929,7 +934,7 @@ public class AutoRangeUtil {
                         double overlap = DatumRangeUtil.normalize(result.range, typical.range.max()) - DatumRangeUtil.normalize(result.range, typical.range.min());
                         if (overlap > 0.01 && overlap < 100) {
                             logger1.log(Level.FINE, "autorange {0} -> {1} (exit3)", new Object[]{ds, result.range});
-                            logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", ds);
+                            logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", result.range );
                             return typical;
                         }
                     }
@@ -937,7 +942,7 @@ public class AutoRangeUtil {
             }
         }
         logger1.log(Level.FINE, "autorange {0} -> {1}", new Object[]{ds, result.range});
-        logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", ds);
+        logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", result.range );
         return result;
     }
     
