@@ -854,6 +854,7 @@ public class AutoRangeUtil {
                         result.range = range;
                         // just use the metadata settings.
                         logger1.fine("using TYPICAL_MIN, TYPICAL_MAX from metadata");
+                        logger1.log(Level.FINE, "autorange {0} -> {1} (exit1)", new Object[]{ds, result.range});
                         logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", ds);
                         return result; // DANGER--EXIT POINT
                     } else {
@@ -909,7 +910,6 @@ public class AutoRangeUtil {
         } else {
             result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
         }
-        logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", ds);
         if (typical != null) {
             if (result.log && typical.log) {
                 if (typical.range.min().doubleValue(typical.range.getUnits()) <= 0) {
@@ -918,6 +918,8 @@ public class AutoRangeUtil {
                 if (result.range.intersects(typical.range)) {
                     double overlap = DatumRangeUtil.normalizeLog(result.range, typical.range.max()) - DatumRangeUtil.normalizeLog(result.range, typical.range.min());
                     if (overlap > 0.01 && overlap < 100) {
+                        logger1.log(Level.FINE, "autorange {0} -> {1} (exit2)", new Object[]{ds, result.range});
+                        logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", ds);
                         return typical;
                     }
                 }
@@ -926,12 +928,16 @@ public class AutoRangeUtil {
                     if (result.range.intersects(typical.range)) {
                         double overlap = DatumRangeUtil.normalize(result.range, typical.range.max()) - DatumRangeUtil.normalize(result.range, typical.range.min());
                         if (overlap > 0.01 && overlap < 100) {
+                            logger1.log(Level.FINE, "autorange {0} -> {1} (exit3)", new Object[]{ds, result.range});
+                            logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", ds);
                             return typical;
                         }
                     }
                 }
             }
         }
+        logger1.log(Level.FINE, "autorange {0} -> {1}", new Object[]{ds, result.range});
+        logger1.exiting("org.autoplot.AutoRangeUtil", "autoRange", ds);
         return result;
     }
     
