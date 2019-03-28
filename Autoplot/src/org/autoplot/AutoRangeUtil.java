@@ -773,6 +773,7 @@ public class AutoRangeUtil {
             if (uu == null) {
                 uu = Units.dimensionless;
             }
+            logger1.log(Level.FINER, "from properties: typical: {0} {1} {2}", new Object[]{tmin, tmax, uu});
             if ( UnitsUtil.isTimeLocation(u) ) uu= u;
             if (UnitsUtil.isIntervalOrRatioMeasurement(uu)) {
                 Datum ftmin = uu.createDatum(tmin == null ? -1 * Double.MAX_VALUE : tmin);
@@ -783,6 +784,7 @@ public class AutoRangeUtil {
                     //                }
                 }
                 DatumRange range = getRange(tmin, tmax, uu);
+                logger1.log(Level.FINER, "getRange from typical: {0}", new Object[]{range});
                 // see if the typical extent is consistent with extent seen.  If the
                 // typical extent won't hide the data's structure, then use it.
                 if (tmin != null && tmax != null) {
@@ -849,6 +851,7 @@ public class AutoRangeUtil {
                             logger1.fine("adjusting TYPICAL_MAX from metadata, multiply by 2.0");
                         }
                     }
+                    logger1.log(Level.FINER, "possible range 854: {0}", range);
                     if (d2 - d1 > 0.1 // the stats range occupies 10% of the typical range
                      && d2 > 0.0 // and the stats max is greater than the typical range min()
                      && d2 < 1.14 // and the top isn't clipping data badly  //TODO: we really need to be more robust about this.  hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ION_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109 was failing because a small number of points was messing this up.
@@ -903,6 +906,7 @@ public class AutoRangeUtil {
                         result.range = new DatumRange(div.rangeContaining(result.range.min()).min(), div.rangeContaining(result.range.max()).max());
                     }
                 }
+                logger1.log(Level.FINER, "range at 909: {0}", result.range);
             } else {
                 result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
                 if (result.robustMin < result.robustMax) {
@@ -911,11 +915,14 @@ public class AutoRangeUtil {
                 if (result.robustMin == 0 && result.robustMax == 0) {
                     result.range = DatumRange.newDatumRange(-0.1, 1.0, u);
                 }
+                logger1.log(Level.FINER, "range at 918: {0}", result.range);
             }
         } else {
             result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
+            logger1.log(Level.FINER, "range based on robustMin and robustMax: {0}", result.range);
         }
         if (typical != null) {
+            logger1.finer("checking typical");
             if (result.log && typical.log) {
                 if (typical.range.min().doubleValue(typical.range.getUnits()) <= 0) {
                     typical.range = new DatumRange(result.range.min(), typical.range.max());
