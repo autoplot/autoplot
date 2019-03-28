@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-03-21 r23465):</p>
+        <p>Bugfixes (2019-03-28 r23501):</p>
         <ul>
+            <li>2103: tick layout is done using floats, so that pdf output has uniform ticks.
+            <li>1678: bind with the plot colorbar the source so that the new plotElements have to comply.
             <li>2133: detect LongReadAccess when CDF_TT2000 is used for timetags, so that CDF timetags can be formatted to ASCII with full resolution.  Thanks, Eric!
             <li>2036: keep track of the parent of the monitor used for centering, after seeing that the hidden monitor would position properly when it becomes visible.
             <li>1629: getItem with index lists (ds[ idx0, idx1, 0 ]) works now.  Thanks, Ivar!
@@ -57,6 +59,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add menu item for cassini.perikrone.24hr orbit list.
+            <li>2133: export CDF_TT2000 to ASCII to nanosecond resolution.
         </ul>
         <p>Less recent features:</p>
         <ul>
