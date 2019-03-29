@@ -762,7 +762,7 @@ public class AutoRangeUtil {
             result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
         }
         
-        logger1.log(Level.FINE, "result.range at this point is {0}", result.range);
+        logger1.log(Level.FINE, "result.range at this point is {0} {1} {2}", new Object[] { result.range, result.range.getUnits(), result.robustMin } );
         
         result.log = isLog;
         // interpret properties, looking for hints about scale type and ranges.
@@ -773,7 +773,7 @@ public class AutoRangeUtil {
             if (uu == null) {
                 uu = Units.dimensionless;
             }
-            logger1.log(Level.FINER, "from properties: typical: {0} {1} {2}", new Object[]{tmin, tmax, uu});
+            logger1.log(Level.FINER, "from properties: typical: {0} {1} \"{2}\"", new Object[]{tmin, tmax, uu});
             if ( UnitsUtil.isTimeLocation(u) ) uu= u;
             if (UnitsUtil.isIntervalOrRatioMeasurement(uu)) {
                 Datum ftmin = uu.createDatum(tmin == null ? -1 * Double.MAX_VALUE : tmin);
@@ -784,11 +784,11 @@ public class AutoRangeUtil {
                     tmin = tmax.doubleValue() / 10000.0; // this used to happen in IstpMetadataModel
                     //                }
                 }
-                DatumRange range = getRange(tmin, tmax, uu);
-                logger1.log(Level.FINER, "getRange from typical: {0}", new Object[]{range});
                 // see if the typical extent is consistent with extent seen.  If the
                 // typical extent won't hide the data's structure, then use it.
                 if (tmin != null && tmax != null) {
+                    DatumRange range = getRange(tmin, tmax, uu);
+                    logger1.log(Level.FINER, "getRange from typical: {0}", new Object[]{range});
                     double d1;
                     double d2;
                     if (result.log) {
@@ -883,6 +883,7 @@ public class AutoRangeUtil {
                 }
                 Datum min = u.createDatum(result.robustMin);
                 Datum max = u.createDatum(result.robustMax);
+                logger1.log(Level.FINER, "domain divider at 866: {0} {1}", new Object[]{min, max});
                 DomainDivider div = DomainDividerUtil.getDomainDivider(min, max, true);
                 while (div.boundaryCount(min, max) > 40) {
                     div = div.coarserDivider(false);
