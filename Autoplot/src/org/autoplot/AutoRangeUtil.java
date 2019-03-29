@@ -928,7 +928,16 @@ public class AutoRangeUtil {
                                 Datum da=tu.createDatum(43823.0);
                                 DomainDivider domainDivider= DomainDividerUtil.getDomainDivider(da,da);
                                 DatumRange r= domainDivider.rangeContaining(da);
-                                logger.log(Level.FINER, "{0} \"{1}\" {2} \"{3}\" {4}", new Object[]{r, r.getUnits(), da, da.getUnits(), Ops.convertUnitsTo(da.subtract(r.min()),Units.nanoseconds)});
+                                logger.log(Level.FINER, ">>> {0} \"{1}\" {2} \"{3}\" {4} {5}", new Object[]{
+                                    r, 
+                                    r.getUnits(), 
+                                    da.doubleValue(da.getUnits()), 
+                                    da.getUnits(), 
+                                    Ops.convertUnitsTo(da.subtract(r.min()),Units.nanoseconds),
+                                    da.subtract(result.range.min())
+                                }
+                                );
+                                
                             } catch (ParseException ex) {
                                 Logger.getLogger(AutoRangeUtil.class.getName()).log(Level.SEVERE, null, ex);
                             }
