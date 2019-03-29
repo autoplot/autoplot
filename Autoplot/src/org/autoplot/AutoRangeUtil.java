@@ -920,6 +920,7 @@ public class AutoRangeUtil {
                         }
                         DatumRange rmin= div.rangeContaining(result.range.min());
                         logger1.log(Level.FINER, "range.max-rmin: {0}", rmin.max().subtract(result.range.min()));
+                        logger1.log(Level.FINER, "div.rangeContaining units: {0}", rmin.getUnits());
                         DatumRange rmax= div.rangeContaining(result.range.max());
                         //Datum teplison= result.range.width().divide(10000);
                         //DatumRange rmin= div.rangeContaining(result.range.min().add(teplison));
