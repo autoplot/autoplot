@@ -5,6 +5,7 @@
  */
 package org.autoplot;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -921,6 +922,16 @@ public class AutoRangeUtil {
                                     resultmin.getUnits()} );
                         if ( result.range.contains( DatumUtil.parseValid("2006-01-01T00:30") ) ) {
                             logger1.log(Level.FINER,"here's that interesting case");
+                            Units tu;
+                            try {
+                                tu = Units.lookupTimeUnits("hr since 2001-01-01T00:00:00Z");
+                                Datum da=tu.createDatum(43823.0);
+                                DomainDivider domainDivider= DomainDividerUtil.getDomainDivider(da,da);
+                                DatumRange r= domainDivider.rangeContaining(da);
+                                logger.log(Level.FINER, "{0} \"{1}\" {2} \"{3}\" {4}", new Object[]{r, r.getUnits(), da, da.getUnits(), Ops.convertUnitsTo(da.subtract(r.min()),Units.nanoseconds)});
+                            } catch (ParseException ex) {
+                                Logger.getLogger(AutoRangeUtil.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                         }
                         DatumRange rmin= div.rangeContaining(result.range.min());
                         logger1.log(Level.FINER, "range.max-rmin: {0}", rmin.max().subtract(result.range.min()));
