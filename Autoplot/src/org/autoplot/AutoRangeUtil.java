@@ -914,7 +914,11 @@ public class AutoRangeUtil {
                         }
                         logger1.log(Level.FINER, "domainDivider selected: {0} {1}", new Object[] { div, result.range.getUnits() } );
                         Datum resultmin= result.range.min();
-                        logger1.log(Level.FINER, "result.range.min(): {0} {1}", new Object[]{resultmin.doubleValue( resultmin.getUnits() ), resultmin.getUnits()});
+                        
+                        logger1.log(Level.FINER, "result.range.min(): {0} {1}", 
+                                new Object[]{ 
+                                    String.format( "%20f", resultmin.doubleValue( resultmin.getUnits() ) ), 
+                                    resultmin.getUnits()} );
                         if ( result.range.contains( DatumUtil.parseValid("2006-01-01T00:30") ) ) {
                             logger1.log(Level.FINER,"here's that interesting case");
                         }
