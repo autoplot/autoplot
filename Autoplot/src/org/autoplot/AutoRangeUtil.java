@@ -13,6 +13,7 @@ import static org.autoplot.AutoplotUtil.DS_LENGTH_LIMIT;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.DatumUtil;
 import org.das2.datum.DomainDivider;
 import org.das2.datum.DomainDividerUtil;
 import org.das2.datum.InconvertibleUnitsException;
@@ -906,7 +907,16 @@ public class AutoRangeUtil {
                         while (div.boundaryCount(result.range.min(), result.range.max()) < 20) {
                             div = div.finerDivider(true);
                         }
-                        result.range = new DatumRange(div.rangeContaining(result.range.min()).min(), div.rangeContaining(result.range.max()).max());
+                        if ( result.range.contains( DatumUtil.parseValid("2006-01-01T00:30") ) ) {
+                            logger1.log(Level.FINER,"here's that interesting case");
+                        }
+                        DatumRange rmin= div.rangeContaining(result.range.min());
+                        DatumRange rmax= div.rangeContaining(result.range.max());
+                        logger1.log(Level.FINER, "domainDivider selected: {0} {1}", new Object[] { div, result.range.getUnits() } );
+                        logger1.log(Level.FINER, "min: {0}, range containing min: {1}", new Object[]{result.range.min(), rmin});
+                        logger1.log(Level.FINER, "max: {0}, range containing max: {1}", new Object[]{result.range.max(), rmax});
+                        result.range = new DatumRange( rmin.min(), rmax.max() );
+                        
                     }
                 }
                 logger1.log(Level.FINER, "range at 909: {0}", result.range);
