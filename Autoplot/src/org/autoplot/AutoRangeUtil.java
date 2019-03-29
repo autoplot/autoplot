@@ -892,9 +892,11 @@ public class AutoRangeUtil {
                 while (div.boundaryCount(min, max) < 20) {
                     div = div.finerDivider(true);
                 }
-                Datum teplison= result.range.width().divide(10000);
-                DatumRange rmin= div.rangeContaining(result.range.min().add(teplison));
-                DatumRange rmax= div.rangeContaining(result.range.max().subtract(teplison));
+                //Datum teplison= result.range.width().divide(10000);
+                //DatumRange rmin= div.rangeContaining(result.range.min().add(teplison));
+                //DatumRange rmax= div.rangeContaining(result.range.max().subtract(teplison));
+                DatumRange rmin= div.rangeContaining(result.range.min());
+                DatumRange rmax= div.rangeContaining(result.range.max());
                 result.range = new DatumRange( rmin.min(), rmax.max() );
             } else if (UnitsUtil.isTimeLocation(u)) {
                 if (result.range.min().doubleValue(Units.us2000) > -6.311348E15) {
@@ -913,9 +915,11 @@ public class AutoRangeUtil {
                         if ( result.range.contains( DatumUtil.parseValid("2006-01-01T00:30") ) ) {
                             logger1.log(Level.FINER,"here's that interesting case");
                         }
-                        Datum teplison= result.range.width().divide(10000);
-                        DatumRange rmin= div.rangeContaining(result.range.min().add(teplison));
-                        DatumRange rmax= div.rangeContaining(result.range.max().subtract(teplison));
+                        DatumRange rmin= div.rangeContaining(result.range.min());
+                        DatumRange rmax= div.rangeContaining(result.range.max());
+                        //Datum teplison= result.range.width().divide(10000);
+                        //DatumRange rmin= div.rangeContaining(result.range.min().add(teplison));
+                        //DatumRange rmax= div.rangeContaining(result.range.max().subtract(teplison));
                         logger1.log(Level.FINER, "domainDivider selected: {0} {1}", new Object[] { div, result.range.getUnits() } );
                         logger1.log(Level.FINER, "min: {0}, range containing min: {1}", new Object[]{result.range.min(), rmin});
                         logger1.log(Level.FINER, "max: {0}, range containing max: {1}", new Object[]{result.range.max(), rmax});
