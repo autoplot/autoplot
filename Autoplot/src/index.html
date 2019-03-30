@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>More index types are supported, for example where the rank 2 value is used to select indices from rank 3 rgb image.
+        <p><small>Metadata tab provides a list of files used in an aggregation.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-03-28 r23501):</p>
+        <p>Bugfixes (2019-03-29 r23514):</p>
         <ul>
+            <li>2136: when initial load results in "no data" still support TSB.
             <li>2103: tick layout is done using floats, so that pdf output has uniform ticks.
             <li>1678: bind with the plot colorbar the source so that the new plotElements have to comply.
             <li>2133: detect LongReadAccess when CDF_TT2000 is used for timetags, so that CDF timetags can be formatted to ASCII with full resolution.  Thanks, Eric!
@@ -59,6 +60,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>24hr-at-perikrone events lists for Cassini.
             <li>add menu item for cassini.perikrone.24hr orbit list.
             <li>2133: export CDF_TT2000 to ASCII to nanosecond resolution.
         </ul>
