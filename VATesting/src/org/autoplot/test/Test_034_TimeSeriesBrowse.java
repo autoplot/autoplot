@@ -49,7 +49,7 @@ public class Test_034_TimeSeriesBrowse implements Scenario {
             JFrameOperator mainFrame = new JFrameOperator(app);
             ScriptContext.waitUntilIdle();
 
-            new JTextFieldOperator(app.getDataSetSelector().getEditor()).setText("http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109"); 
+            new JTextFieldOperator(app.getDataSetSelector().getEditor()).setText("https://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109"); 
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             
             final DasAxis xaxis = ScriptContext.getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
