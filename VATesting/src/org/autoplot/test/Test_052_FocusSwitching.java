@@ -70,7 +70,7 @@ public class Test_052_FocusSwitching implements Scenario {
             ScriptContext.waitUntilIdle();            
             
             
-            new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("vap+cdf:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2000-01-09");
+            new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("vap+cdf:https://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2000-01-09");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             
             Thread.sleep(1000);
