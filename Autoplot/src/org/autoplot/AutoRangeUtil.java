@@ -896,8 +896,8 @@ public class AutoRangeUtil {
                 //Datum teplison= result.range.width().divide(10000);
                 //DatumRange rmin= div.rangeContaining(result.range.min().add(teplison));
                 //DatumRange rmax= div.rangeContaining(result.range.max().subtract(teplison));
-                DatumRange rmin= div.rangeContaining(result.range.min());
-                DatumRange rmax= div.rangeContaining(result.range.max());
+                DatumRange rmin= div.rangeContaining(min);
+                DatumRange rmax= div.rangeContaining(max);
                 result.range = new DatumRange( rmin.min(), rmax.max() );
             } else if (UnitsUtil.isTimeLocation(u)) {
                 if (result.range.min().doubleValue(Units.us2000) > -6.311348E15) {
