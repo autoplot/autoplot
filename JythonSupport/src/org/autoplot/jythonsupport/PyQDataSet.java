@@ -923,7 +923,7 @@ public class PyQDataSet extends PyJavaInstance {
      * @return 
      */
     private QDataSet[] checkIndexBundle(QDataSet[] lists) {
-        if ( lists.length<ds.rank() ) {
+        if ( lists.length<rods.rank() ) {
             if ( lists[0].rank()==2 && SemanticOps.isLegacyBundle(lists[0]) ) { // output of "where" command
                 logger.log(Level.FINER, "bundle of indices found: {0}", lists[0]);
                 QDataSet[] newLists= new QDataSet[lists[0].length(0)+lists.length-1];
