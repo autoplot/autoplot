@@ -436,7 +436,9 @@ public class DataSourceController extends DomNodeController {
                             logger.fine("connect to timerange (bug2136)");
                             int bindingCount= dom.controller.findBindings( dom, Application.PROP_TIMERANGE ).size();
                             if ( !valueWasAdjusting && ( bindingCount==1 || dom.timeRange.intersects( p.xaxis.getRange() ) ) ) {
-                                dom.setTimeRange( p.xaxis.getRange() );
+                                if ( !dom.timeRange.intersects( p.xaxis.getRange() ) ) {
+                                    dom.setTimeRange( p.xaxis.getRange() );
+                                }
                                 dom.controller.bind( dom, Application.PROP_TIMERANGE, p.xaxis, Axis.PROP_RANGE );
                                 dom.controller.unbind(  dom, Application.PROP_TIMERANGE, p, Plot.PROP_CONTEXT );
                             }
