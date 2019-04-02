@@ -22,6 +22,7 @@ import org.das2.qds.ops.Ops;
  * These should reflect a subset of those functions, with the IDL implementations at
  * http://spdf.gsfc.nasa.gov/CDAWlib.html
  * see ftp://cdaweb.gsfc.nasa.gov/pub/CDAWlib/unix/CDAWlib.tar.gz, routine read_myCDF.pro
+ * @see https://cdaweb.gsfc.nasa.gov/pub/software/cdawlib/source/virtual_funcs.pro
  * @author jbf
  */
 public class CdfVirtualVars {
@@ -34,8 +35,8 @@ public class CdfVirtualVars {
      * @param function the function name, which is case insensitive.  See code isSupported for list of function names.
      * @param args list of QDataSets that are the arguments to the function
      * @param mon monitor for the function
-     * @see isSupported
-     * @return
+     * @see #isSupported(java.lang.String) 
+     * @return the computed variable.
      */
     public static QDataSet execute( Map<String,Object> metadata, String function, List<QDataSet> args, ProgressMonitor mon ) throws IllegalArgumentException {
         logger.log(Level.FINE, "implement virtual variable \"{0}\"", function);
@@ -203,7 +204,9 @@ public class CdfVirtualVars {
     }
 
     /**
-     * see virtual_funcs.pro function calc_p
+     * @see https://cdaweb.gsfc.nasa.gov/pub/software/cdawlib/source/virtual_funcs.pro around "FUNCTION calc_p"
+     * @param args list of datasets: [ V_GSE_p, np ]
+     * @return result which is 1.6726e-6 *np[i]*V_GSE_p[0,i]^2.0
      */
     protected static QDataSet calcP( List<QDataSet> args ) {
         QDataSet coefficient= DataSetUtil.asDataSet( 1.6726e-6 );
