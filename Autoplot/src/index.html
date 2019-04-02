@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Metadata tab provides a list of files used in an aggregation.
+        <p><small>Autoplot's print heads needed cleaning.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,9 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-03-29 r23514):</p>
+        <p>Bugfixes (2019-04-02 r23521):</p>
         <ul>
-            <li>2136: when initial load results in "no data" still support TSB.
+            <li>1629: NullPointerException in code which would verify Jython index.  Thanks, Darrelle!
+            <li>2136: when initial load results in "no data" still support TSB.  Thanks, Baptiste and Chris!
+            <li>orbits file would use old http, not https locations.
             <li>2103: tick layout is done using floats, so that pdf output has uniform ticks.
             <li>1678: bind with the plot colorbar the source so that the new plotElements have to comply.
             <li>2133: detect LongReadAccess when CDF_TT2000 is used for timetags, so that CDF timetags can be formatted to ASCII with full resolution.  Thanks, Eric!
