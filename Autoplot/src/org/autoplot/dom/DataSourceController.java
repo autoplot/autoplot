@@ -228,6 +228,7 @@ public class DataSourceController extends DomNodeController {
      *
      * @param i the dimension to slice
      * @return the number of slice indeces.
+     * @deprecated this is leftover from an ancient version of the code.
      */
     public int getMaxSliceIndex(int i) {
         if (getDataSet() == null) {
