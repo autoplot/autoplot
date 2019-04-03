@@ -686,13 +686,14 @@
               <Properties>
                 <Property name="editable" type="boolean" value="true"/>
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                  <StringArray count="6">
+                  <StringArray count="7">
                     <StringItem index="0" value="seconds since 2010-01-01T00:00"/>
                     <StringItem index="1" value="nanoseconds since 2000-01-01T12:00"/>
-                    <StringItem index="2" value="seconds"/>
-                    <StringItem index="3" value="hr"/>
-                    <StringItem index="4" value="mjd"/>
-                    <StringItem index="5" value=" "/>
+                    <StringItem index="2" value="days since 1999-12-31T00:00"/>
+                    <StringItem index="3" value="seconds"/>
+                    <StringItem index="4" value="hr"/>
+                    <StringItem index="5" value="mjd"/>
+                    <StringItem index="6" value=" "/>
                   </StringArray>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="units used to interpret the x tags (depends on)"/>
