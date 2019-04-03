@@ -55,6 +55,8 @@ public class Test_022_ContextOverview implements Scenario {
             Application dom= getDocumentModel();
             
             dom.getOptions().setAutolayout(false);
+            waitUntilIdle();
+            sleep(1000);
             
             AutoplotUI app = (AutoplotUI) getViewWindow();
             JFrameOperator mainFrame = new JFrameOperator(app);
