@@ -1818,7 +1818,7 @@ public class GuiSupport {
                 }
                 nameMap.put( stateDsf.getId(), newDsf.getId() );
             }
-            for ( int i=0; i<state.getDataSourceFilters().length; i++ ) {
+            for ( int i=0; i<state.getDataSourceFilters().length; i++ ) { //implement vap+internal stuff, which are the remaining ones.
                 DataSourceFilter stateDsf= state.getDataSourceFilters(i);
                 if ( stateDsf!=null ) {
                     String uri= stateDsf.getUri();
