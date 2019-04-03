@@ -733,6 +733,8 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 whereCB.setSelected(false);
             }
             
+            updateMetadata();
+            
         } catch (IOException ex) {
             DasExceptionHandler.handle( ex );
             logger.log(Level.SEVERE, ex.getMessage(), ex);
