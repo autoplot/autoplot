@@ -63,6 +63,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "units=", "units of the data"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "ordinal=fpe,fuh", "set of ordinals that appear in this column"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "fixedColumns=", "use the fixed columns parser"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "columnCount=", "only use records with this many columns") );
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "rank2=", "read in more than one column to create a rank 2 dataset."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "bundle=", "read in more than one column to create a rank 2 bundle dataset."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "depend1Labels=", "label each of the columns, bundling different data together in rank 2 dataset"));
@@ -113,6 +114,9 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 }
                 case "recCount":
                     return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "limit number of records to parse."));
+                case "columnCount":
+                    return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "number of columns to expect"));
+                    
                 case "rank2":
                 {
                     List<CompletionContext> result = new ArrayList<>();

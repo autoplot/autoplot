@@ -602,7 +602,9 @@ public class AsciiTableDataSource extends AbstractDataSource {
             } else if (delim == null) {
                 AsciiParser.DelimParser p = parser.guessSkipAndDelimParser(file.toString());
                 if ( p == null) {
-                    throw new IllegalArgumentException("no records found in "+file);
+                    String cc= params.get("columnCount");
+                    columnCount= ( cc==null ) ? 2 : Integer.parseInt(cc);
+                    p= parser.getDelimParser( columnCount, "\\s+" );
                 }
                 columnCount = p.fieldCount();
                 delim = p.getDelim();
@@ -1003,9 +1005,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
         if (o!=null ) {
             String sunits = o;
             EnumerationUnits u = EnumerationUnits.create("default");
-            String[] ss= sunits.split(",");
-            for ( String s : ss ) {
-                u.createDatum(s);
+            if ( sunits.trim().length()>0 ) {
+                String[] ss= sunits.split(",");
+                for ( String s : ss ) {
+                    u.createDatum(s);
+                }
             }
             if (column != null) {
                 int icol = parser.getFieldIndex(column);
