@@ -18,6 +18,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.BufferedWriter;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 /**
@@ -81,7 +82,7 @@ public class Test026 {
         doTest(id, test, ref, 0., false);
     }
 
-    private static Set<Integer> usedIds= new HashSet<>();
+    private static LinkedHashMap<Integer,String> usedIds= new LinkedHashMap<>();
     
     /**
      * 
@@ -93,8 +94,11 @@ public class Test026 {
      */
     private static void doTest(int id, String test, String ref, double diffMicros, boolean secondChance) throws Exception {
 
-        if ( usedIds.contains(id) ) throw new IllegalArgumentException("id "+id+" used twice, test code needs attention");
-        usedIds.add(id);
+        String previousUsedId= usedIds.get(id);
+        if ( previousUsedId!=null && !previousUsedId.equals(test) ) {
+            throw new IllegalArgumentException("id "+id+" used twice, test code needs attention");
+        }
+        usedIds.put(id,test);
         
         DatumRange dr = parseTimeRange(test);
         DatumRange drref = parseTimeRange(ref);
