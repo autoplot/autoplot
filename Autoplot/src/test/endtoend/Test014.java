@@ -18,6 +18,9 @@ import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 import org.autoplot.jythonsupport.Util;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumUtil;
+import org.das2.qds.SemanticOps;
 
 
 /**
@@ -50,12 +53,12 @@ public class Test014 {
 
         
         final QDataSet cadence= DataSetUtil.guessCadenceNew( dep0, ds );
-        
+
         
         t= (System.currentTimeMillis()-t0)/1000.;
         System.err.printf( "Guess cadence in %9.3f seconds (%s): %s\n", t, label, uri );
         String type= cadence==null ? null : (String) cadence.property(QDataSet.SCALE_TYPE);
-        System.err.printf( "cadence= %s (scale type=%s): \n", String.valueOf(cadence), type  );
+        System.err.printf( "cadence= %s (scale type=%s) (units=%s): \n", String.valueOf(cadence), type, SemanticOps.getUnits(cadence) );
 
         QDataSet diff;
         if ( ds.rank()==1 && dep0.rank()==1 ) { // ftp://virbo.org/tmp/poes_n17_20041228.cdf?P1_90[0:300] has every other value=fill.
@@ -125,6 +128,15 @@ public class Test014 {
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
         try {
 
+            System.err.println("== datum formatting experiments ==");
+            Datum d= DatumUtil.parse("150.00 ms");
+            System.err.println("as millisecond unit: "+ d);
+            d= Units.nanoseconds.createDatum(1.50e8);
+            System.err.println("as nanoseconds unit: "+ d);
+            System.err.println("with asOrderOneUnits call: "+ DatumUtil.asOrderOneUnits(d));
+            System.err.println("== done, datum formatting experiments, thanks ==");
+            
+            
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
