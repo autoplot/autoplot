@@ -1448,22 +1448,26 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
             update();
             checkHeaders();
 
-            whereParamList.setModel( new DefaultComboBoxModel( columns.values().toArray() ) );
-            String where= getParam( params, "where" );
-            if ( where!=null && where.length()>0 ) {
-                whereCB.setSelected(true);
-                int i= where.indexOf(".");
-                if ( i>-1 ) {
-                    whereParamList.setSelectedItem(where.substring(0,i)); 
-                    int i0= where.indexOf("(");
-                    int i1= where.indexOf(")",i0);
-                    whereOp.setSelectedItem(where.substring(i,i0));
-                    whereValueCB.setSelectedItem( where.substring(i0+1,i1).replaceAll("\\+"," "));
+            if ( columns!=null ) {
+                whereParamList.setModel( new DefaultComboBoxModel( columns.values().toArray() ) );
+                String where= getParam( params, "where" );
+                if ( where!=null && where.length()>0 ) {
+                    whereCB.setSelected(true);
+                    int i= where.indexOf(".");
+                    if ( i>-1 ) {
+                        whereParamList.setSelectedItem(where.substring(0,i)); 
+                        int i0= where.indexOf("(");
+                        int i1= where.indexOf(")",i0);
+                        whereOp.setSelectedItem(where.substring(i,i0));
+                        whereValueCB.setSelectedItem( where.substring(i0+1,i1).replaceAll("\\+"," "));
+                    }
+                } else {
+                    whereCB.setSelected(false);
                 }
             } else {
+                whereParamList.setModel( new DefaultComboBoxModel( new String[] { "not available" } ) );
                 whereCB.setSelected(false);
             }
-            
             initializing= false;
 
         } catch (IOException ex) {
@@ -1705,8 +1709,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
         try {
             AsciiParser.DelimParser p = parser.guessSkipAndDelimParser(file.toString());
             if ( p == null) {
-                //               throw new IllegalArgumentException("no records found");
-                return;
+                p= new AsciiParser().getDelimParser( 2, "\\s+" );
             }
             
             model.setRecParser(p);
