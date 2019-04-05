@@ -58,7 +58,8 @@ public class Test014 {
         t= (System.currentTimeMillis()-t0)/1000.;
         System.err.printf( "Guess cadence in %9.3f seconds (%s): %s\n", t, label, uri );
         String type= cadence==null ? null : (String) cadence.property(QDataSet.SCALE_TYPE);
-        System.err.printf( "cadence= %s (scale type=%s) (units=%s): \n", String.valueOf(cadence), type, SemanticOps.getUnits(cadence) );
+        String sunits= cadence==null ? null : String.valueOf( SemanticOps.getUnits(cadence) );
+        System.err.printf( "cadence= %s (scale type=%s) (units=%s): \n", String.valueOf(cadence), type, sunits );
 
         QDataSet diff;
         if ( ds.rank()==1 && dep0.rank()==1 ) { // ftp://virbo.org/tmp/poes_n17_20041228.cdf?P1_90[0:300] has every other value=fill.
