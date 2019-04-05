@@ -245,7 +245,7 @@ public class Test140 {
         if ( isPublic ) {
             writeToPng( name1 );
         } else {
-            writeToPng( "/home/jbf/ct/hudson/privateArtifacts/"+name1 );
+            writeToPng( "/home/jbf/ct/hudson/private/test/"+name1 );
             int width= getApplicationModel().getDocumentModel().getController().getCanvas().getWidth();
             int height= getApplicationModel().getDocumentModel().getController().getCanvas().getHeight();
             BufferedImage image = getApplicationModel().getDocumentModel().getController().getCanvas().getController().getDasCanvas().getImage( width, height );
