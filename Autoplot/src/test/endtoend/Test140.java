@@ -267,7 +267,7 @@ public class Test140 {
             System.err.printf( "Read in %9.3f seconds (%s): %s\n", tsec, label, uri );
             System.err.printf( "Plot in %9.3f seconds (%s): %s\n", psec, label, uri );
         } else {
-            System.err.printf( "wrote to file: %s\n", "/home/jbf/ct/hudson/privateArtifacts/"+name1  );
+            System.err.printf( "wrote to file: %s\n", "/home/jbf/ct/hudson/private/test/"+name1  );
             System.err.printf( "Read in %9.3f seconds (%s): %s\n", tsec, label, "(uri is not public)" );
             System.err.printf( "Plot in %9.3f seconds (%s): %s\n", psec, label, "(uri is not public)" );            
         }
