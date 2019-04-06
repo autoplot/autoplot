@@ -1048,10 +1048,11 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
     private static void maybeMakeParent( String filename ) throws IOException {
         filename= getLocalFilename(filename);
         File file= new File(filename);
-        if ( file.getParentFile()!=null ) { // relative filenames are okay.
-            if ( !file.getParentFile().exists() ) {
-                if ( !file.getParentFile().mkdirs() ) {
-                    throw new IOException( "unable to mkdir "+filename );
+        File parentFile= file.getParentFile();
+        if ( parentFile!=null ) { // relative filenames are okay.
+            if ( !parentFile.exists() ) {
+                if ( !parentFile.mkdirs() ) {
+                    throw new IOException( "unable to mkdir: "+file.getParentFile() );
                 }
             }
         }
