@@ -132,12 +132,12 @@ mkdir temp-volatile-classes
 echo "pwd=" `pwd`
 if [ "" = "$AUTOPLOT_STABLE_DIR" ]; then 
    echo "copy jar file classes using wget -q..."
-   echo ${WGET} -q -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable-2017/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/AutoplotStable.jar 
-   ${WGET} -q -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable-2017/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/AutoplotStable.jar # 2>&1 | head -100
-   echo ${WGET} -q -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable-2017/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/AutoplotStable.jar.pack.gz 
-   ${WGET} -q -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable-2017/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/AutoplotStable.jar.pack.gz # 2>&1 | head -100
+   echo ${WGET} --no-check-certificate -q -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable-2017/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/AutoplotStable.jar 
+   ${WGET} --no-check-certificate -q -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable-2017/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/AutoplotStable.jar # 2>&1 | head -100
+   echo ${WGET} --no-check-certificate -q -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable-2017/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/AutoplotStable.jar.pack.gz 
+   ${WGET} --no-check-certificate -q -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable-2017/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/AutoplotStable.jar.pack.gz # 2>&1 | head -100
    if [ $? -ne 0 ]; then
-      echo "wget fails: $WGET -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable-2017/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/AutoplotStable.jar"
+      echo "wget fails: $WGET wget --no-check-certificate -q -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable-2017/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/AutoplotStable.jar"
       exit -1
    fi
 else
