@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.autoplot.aggregator.AggregatingDataSourceEditorPanel;
+import org.autoplot.aggregator.AggregatingDataSourceFactory;
 
 /**
  * Utilities for URLs.
@@ -73,7 +74,8 @@ public class DataSourceEditorPanelUtil {
                 if (edit != null) {
                     result.setDelegateEditorPanel(edit);
                     try {
-                        if ( edit.reject(suri) ) { // contracts say that reject should be called before getPanel.
+                        String delegateUri = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(surl, new NullProgressMonitor() );
+                        if ( edit.reject(delegateUri) ) { // contracts say that reject should be called before getPanel.
                             logger.log( Level.WARNING, null, "delegate editor rejects URI, ignoring: " +suri );   
                         }
                     } catch (Exception ex) {

@@ -235,7 +235,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
      * @throws java.io.IOException
      * @throws IllegalArgumentException if it is not able to find any data files.
      */
-    protected static String getDelegateDataSourceFactoryUri(String suri, ProgressMonitor mon) throws IOException, IllegalArgumentException {
+    public static String getDelegateDataSourceFactoryUri(String suri, ProgressMonitor mon) throws IOException, IllegalArgumentException {
 
         URISplit split= URISplit.parse(suri);
 
