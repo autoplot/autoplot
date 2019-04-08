@@ -40,7 +40,6 @@ import org.das2.qds.SemanticOps;
 import org.das2.qds.TrimStrideWrapper;
 import org.das2.qds.WritableDataSet;
 import org.das2.qds.ops.CoerceUtil;
-import org.das2.qds.util.DataSetBuilder;
 
 /**
  * PyQDataSet wraps a QDataSet to provide Python operator overloading and
@@ -61,7 +60,7 @@ public class PyQDataSet extends PyJavaInstance {
     Units units; // indicates if the units have been set.
     int serialNumber;
     
-    private static AtomicInteger _seq= new AtomicInteger(1000);
+    private static final AtomicInteger _seq= new AtomicInteger(1000);
 
     /**
      * Note getDataSet will always provide a writable dataset.
@@ -607,13 +606,17 @@ public class PyQDataSet extends PyJavaInstance {
                     } else if ( a instanceof PyQDataSet ) {
                         Object o2 = a.__tojava__(QDataSet.class);
                         QDataSet that = (QDataSet) o2;
-                        if ( that.rank()==0 ) {
-                            int idx = (int)(that.value());
-                            fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
-                        } else if ( that.rank()==1 ) {
-                            fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
-                        } else {
-                            betterBeAllLists= true;
+                        switch (that.rank()) {
+                            case 0:
+                                int idx = (int)(that.value());
+                                fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
+                                break;
+                            case 1:
+                                fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
+                                break;
+                            default:
+                                betterBeAllLists= true;
+                                break;
                         }
                         lists[i]= ((PyQDataSet)a).rods;
                     } else if (a.isNumberType()) {
@@ -905,7 +908,7 @@ public class PyQDataSet extends PyJavaInstance {
                 if ( iter.hasNext() ) {
                     throw new IllegalArgumentException("assigned dataset has too few elements");
                 } else {
-                    logger.info("dataset assignment looks suspect, where there is an extra element which was not assigned: "+iter );
+                    logger.log(Level.INFO, "dataset assignment looks suspect, where there is an extra element which was not assigned: {0}", iter);
                 }
                 
             }
@@ -1230,114 +1233,115 @@ public class PyQDataSet extends PyJavaInstance {
         val= ll[1];
         QubeDataSetIterator it = new QubeDataSetIterator( val );
 
-        if ( lists[0].rank()==0 ) { // all datasets in lists[] will have the same rank.
-            switch (ds.rank()) {
-                case 1:
-                    it.next();
-                    ds.putValue( (int)lists[0].value(), it.getValue(val));
-                    break;
-                case 2:
-                    it.next();
-                    ds.putValue( (int)lists[0].value(), (int)lists[1].value(), it.getValue(val));
-                    break;
-                case 3:
-                    it.next();
-                    ds.putValue( 
+        switch (lists[0].rank()) {  // all datasets in lists[] will have the same rank.
+            case 0:
+                switch (ds.rank()) {
+                    case 1:
+                        it.next();
+                        ds.putValue( (int)lists[0].value(), it.getValue(val));
+                        break;
+                    case 2:
+                        it.next();
+                        ds.putValue( (int)lists[0].value(), (int)lists[1].value(), it.getValue(val));
+                        break;
+                    case 3: 
+                        it.next();
+                        ds.putValue(
                             (int)lists[0].value(),
                             (int)lists[1].value(),
                             (int)lists[2].value(), it.getValue(val));
-                    break;
-                case 4:
-                    it.next();
-                    ds.putValue( 
+                        break;
+                    case 4:
+                        it.next();
+                        ds.putValue( 
                             (int)lists[0].value(),
                             (int)lists[1].value(),
                             (int)lists[2].value(),
                             (int)lists[3].value(), it.getValue(val));
-                    break;
-                default:
-                    break;
-            }
-        } else if ( lists[0].rank()==1 ) {
-            int n= lists[0].length();
-            switch (ds.rank()) {
-                case 1:
-                    for ( int i=0;i<n;i++ ) {
-                        it.next();
-                        ds.putValue( (int)lists[0].value(i), it.getValue(val));
-                    }   
-                    break;
-                case 2:
-                    for ( int i=0;i<n;i++ ) {
-                        it.next();
-                        ds.putValue( (int)lists[0].value(i), (int)lists[1].value(i), it.getValue(val));
-                    }   
-                    break;
-                case 3:
-                    for ( int i=0;i<n;i++ ) {
-                        it.next();
-                        ds.putValue( 
+                        break;
+                    default:
+                        break;
+                }   break;
+            case 1:
+                int n= lists[0].length();
+                switch (ds.rank()) {
+                    case 1:
+                        for ( int i=0;i<n;i++ ) {
+                            it.next();
+                            ds.putValue( (int)lists[0].value(i), it.getValue(val));
+                        }
+                        break;
+                    case 2:
+                        for ( int i=0;i<n;i++ ) {
+                            it.next();
+                            ds.putValue( (int)lists[0].value(i), (int)lists[1].value(i), it.getValue(val));
+                        }
+                        break;
+                    case 3:
+                        for ( int i=0;i<n;i++ ) {
+                            it.next();
+                            ds.putValue( 
                                 (int)lists[0].value(i),
                                 (int)lists[1].value(i),
                                 (int)lists[2].value(i), it.getValue(val));
-                    }   
-                    break;
-                case 4:
-                    for ( int i=0;i<n;i++ ) {
-                        it.next();
-                        ds.putValue( 
+                        }
+                        break;
+                    case 4:
+                        for ( int i=0;i<n;i++ ) {
+                            it.next();
+                            ds.putValue( 
                                 (int)lists[0].value(i),
                                 (int)lists[1].value(i),
                                 (int)lists[2].value(i),
                                 (int)lists[3].value(i), it.getValue(val));
-                    }   
-                    break;
-                default:
-                    break;
-            }
-        } else {
-            QubeDataSetIterator iter= new QubeDataSetIterator(lists[0]);
-            switch ( rods.rank() ) {
-                case 1:
-                    while ( it.hasNext() ) {
-                        it.next();
-                        iter.next();
-                        double d= it.getValue(val); 
-                        ds.putValue( (int)iter.getValue( lists[0] ), d );
-                    }
-                    break;
-                case 2:
-                    while ( it.hasNext() ) {
-                        it.next();
-                        iter.next();
-                        double d= it.getValue(val);  
-                        ds.putValue( (int)iter.getValue( lists[0] ), (int)iter.getValue( lists[1] ), d );
-                    }
-                    break;
-                case 3:
-                    while ( it.hasNext() ) {
-                        it.next();
-                        iter.next();
-                        double d= it.getValue(val);  
-                        ds.putValue( 
-                                (int)iter.getValue( lists[0] ), 
+                        }
+                        break;
+                    default:
+                        break;
+                }   break;
+            default:
+                QubeDataSetIterator iter= new QubeDataSetIterator(lists[0]);
+                switch ( rods.rank() ) {
+                    case 1:
+                        while ( it.hasNext() ) {
+                            it.next();
+                            iter.next();
+                            double d= it.getValue(val);
+                            ds.putValue( (int)iter.getValue( lists[0] ), d );
+                        }
+                        break;
+                    case 2:
+                        while ( it.hasNext() ) {
+                            it.next();
+                            iter.next();
+                            double d= it.getValue(val);
+                            ds.putValue( (int)iter.getValue( lists[0] ), (int)iter.getValue( lists[1] ), d );
+                        }
+                        break;
+                    case 3:
+                        while ( it.hasNext() ) {
+                            it.next();
+                            iter.next();
+                            double d= it.getValue(val);
+                            ds.putValue(
+                                (int)iter.getValue( lists[0] ),
                                 (int)iter.getValue( lists[1] ), 
                                 (int)iter.getValue( lists[2] ), d );
-                    }
-                    break;
-                case 4:
-                    while ( it.hasNext() ) {
-                        it.next();
-                        iter.next();
-                        double d= it.getValue(val);  
-                        ds.putValue( 
+                        }
+                        break;
+                    case 4:
+                        while ( it.hasNext() ) {
+                            it.next();
+                            iter.next();
+                            double d= it.getValue(val);
+                            ds.putValue(
                                 (int)iter.getValue(lists[0]), 
                                 (int)iter.getValue(lists[1]),
                                 (int)iter.getValue(lists[2]), 
                                 (int)iter.getValue(lists[3]), d );
-                    }
-                    break;
-            }
+                        }
+                        break;
+                }   break;
         }
         
     }
@@ -1359,114 +1363,119 @@ public class PyQDataSet extends PyJavaInstance {
         }
 
         ArrayDataSet result;
-        if ( lists[0].rank()==0 ) {
-            result= ArrayDataSet.createRank0( ArrayDataSet.guessBackingStore(rods) );
-        } else if ( lists[0].rank()==1 ) {
-            result= ArrayDataSet.createRank1( ArrayDataSet.guessBackingStore(rods), lists[0].length() );
-        } else {
-            result= ArrayDataSet.create( ArrayDataSet.guessBackingStore(rods), DataSetUtil.qubeDims( lists[0] ) );
+        switch (lists[0].rank()) {
+            case 0:
+                result= ArrayDataSet.createRank0( ArrayDataSet.guessBackingStore(rods) );
+                break;
+            case 1:
+                result= ArrayDataSet.createRank1( ArrayDataSet.guessBackingStore(rods), lists[0].length() );
+                break;
+            default:
+                result= ArrayDataSet.create( ArrayDataSet.guessBackingStore(rods), DataSetUtil.qubeDims( lists[0] ) );
+                break;
         }
 
-        if ( lists[0].rank()==0 ) { // all datasets in lists[] will have the same rank.
-            switch (rods.rank()) {
-                case 1:
-                    result.putValue( rods.value( (int)lists[0].value() ) );
-                    break;
-                case 2:
-                    result.putValue( rods.value( (int)lists[0].value(), (int)lists[1].value() ) );
-                    break;
-                case 3:
-                    result.putValue( rods.value( 
-                        (int)lists[0].value(),
-                        (int)lists[1].value(),
-                        (int)lists[2].value() ) );
-                    break;
-                case 4:
-                    result.putValue( rods.value( 
-                        (int)lists[0].value(),
-                        (int)lists[1].value(),
-                        (int)lists[2].value(),
-                        (int)lists[3].value() ) );
-                    break;
-                default:
-                    break;
-            }
-        } else if ( lists[0].rank()==1 ) {
-            int n= lists[0].length();
-            switch (rods.rank()) {
-                case 1:
-                    for ( int i=0;i<n;i++ ) {
-                        result.putValue( i, rods.value( (int)lists[0].value(i) ) );
-                    }   
-                    break;
-                case 2:
-                    for ( int i=0;i<n;i++ ) {
-                        result.putValue( i, rods.value( (int)lists[0].value(i), (int)lists[1].value(i) ) );
-                    }   
-                    break;
-                case 3:
-                    for ( int i=0;i<n;i++ ) {
-                        result.putValue( i,
-                            rods.value( 
-                                (int)lists[0].value(i),
-                                (int)lists[1].value(i),
-                                (int)lists[2].value(i) ) );
-                    }   
-                    break;
-                case 4:
-                    for ( int i=0;i<n;i++ ) {
-                        result.putValue( i,
-                            rods.value( 
-                                (int)lists[0].value(i),
-                                (int)lists[1].value(i),
-                                (int)lists[2].value(i),
-                                (int)lists[3].value(i) ) );
-                    }   
-                    break;
-                default:
-                    break;
-            }
-        } else {
-            QubeDataSetIterator iter= new QubeDataSetIterator( result );
-            switch ( rods.rank() ) {
-                case 1:
-                    while ( iter.hasNext() ) {
-                        iter.next();
-                        double d= rods.value( (int)iter.getValue(lists[0]) );
-                        iter.putValue( result, d );
-                    }
-                    break;
-                case 2:
-                    while ( iter.hasNext() ) {
-                        iter.next();
-                        double d= rods.value( 
-                                (int)iter.getValue(lists[0]), 
+        switch (lists[0].rank()) { // all datasets in lists[] will have the same rank.
+            case 0:
+                switch (rods.rank()) {
+                    case 1:
+                        result.putValue( rods.value( (int)lists[0].value() ) );
+                        break;
+                    case 2:
+                        result.putValue( rods.value( (int)lists[0].value(), (int)lists[1].value() ) );
+                        break;
+                    case 3:
+                        result.putValue( rods.value(
+                            (int)lists[0].value(),
+                            (int)lists[1].value(),
+                            (int)lists[2].value() ) );
+                        break;
+                    case 4:
+                        result.putValue( rods.value(
+                            (int)lists[0].value(),
+                            (int)lists[1].value(),
+                            (int)lists[2].value(),
+                            (int)lists[3].value() ) );
+                        break;
+                    default:
+                        break;
+                }   break;
+            case 1:
+                int n= lists[0].length();
+                switch (rods.rank()) {
+                    case 1:
+                        for ( int i=0;i<n;i++ ) {
+                            result.putValue( i, rods.value( (int)lists[0].value(i) ) );
+                        }
+                        break;
+                    case 2:
+                        for ( int i=0;i<n;i++ ) {
+                            result.putValue( i, rods.value( (int)lists[0].value(i), (int)lists[1].value(i) ) );
+                        }
+                        break;
+                    case 3:
+                        for ( int i=0;i<n;i++ ) {
+                            result.putValue( i,
+                                rods.value(
+                                    (int)lists[0].value(i),
+                                    (int)lists[1].value(i),
+                                    (int)lists[2].value(i) ) );
+                        }
+                        break;
+                    case 4:
+                        for ( int i=0;i<n;i++ ) {
+                            result.putValue( i,
+                                rods.value(
+                                    (int)lists[0].value(i),
+                                    (int)lists[1].value(i),
+                                    (int)lists[2].value(i),
+                                    (int)lists[3].value(i) ) );
+                        }
+                        break;
+                    default:
+                        break;
+                }   break;
+            default:
+                QubeDataSetIterator iter= new QubeDataSetIterator( result );
+                switch ( rods.rank() ) {
+                    case 1:
+                        while ( iter.hasNext() ) {
+                            iter.next();
+                            double d= rods.value( (int)iter.getValue(lists[0]) );
+                            iter.putValue( result, d );
+                        }
+                        break;
+                    case 2:
+                        while ( iter.hasNext() ) {
+                            iter.next(); 
+                            double d= rods.value(
+                                (int)iter.getValue(lists[0]),
                                 (int)iter.getValue(lists[1]) );
-                        iter.putValue( result, d );
-                    }
-                    break;
-                case 3:
-                    while ( iter.hasNext() ) {
-                        iter.next();
-                        double d= rods.value( 
+                            iter.putValue( result, d );
+                        }
+                        break;
+                    case 3:
+                        while ( iter.hasNext() ) {
+                            iter.next();
+                            double d= rods.value(
                                 (int)iter.getValue(lists[0]), 
                                 (int)iter.getValue(lists[1]),
                                 (int)iter.getValue(lists[2]) );
-                        iter.putValue( result, d );
-                    }
-                    break;
-                case 4:
-                    while ( iter.hasNext() ) {
-                        iter.next();
-                        double d= rods.value( 
+                            iter.putValue( result, d );
+                        }
+                        break;
+                    case 4:
+                        while ( iter.hasNext() ) {
+                            iter.next();
+                            double d= rods.value(
                                 (int)iter.getValue(lists[0]), 
                                 (int)iter.getValue(lists[1]),
                                 (int)iter.getValue(lists[2]), 
                                 (int)iter.getValue(lists[3]) );
-                        iter.putValue( result, d );
-                    }
-                    break;
-            }
+                            iter.putValue( result, d );
+                        }
+                        break;
+                }   break;
         }
         return result;
         
