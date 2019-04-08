@@ -390,7 +390,7 @@ public class CdfDataSource extends AbstractDataSource {
             // Now call the other getDataSet...
             QDataSet result= getDataSet(mon,attributes);
             
-            if ( numRec<numRecDepend0 ) {
+            if ( numRec>0 && numRec<numRecDepend0 && result instanceof BufferDataSet && result.length()<numRecDepend0 ) { // 2127: when data has fewer records than its DEPEND_0, then these should be fill.
                 BufferDataSet resultExt= ((BufferDataSet)result);
                 resultExt.grow( (int)numRecDepend0 );
                 int[] size= Ops.size(result);
