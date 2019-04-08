@@ -26,8 +26,13 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-04-02 r23521):</p>
+        <p>Bugfixes (2019-04-08 r23545):</p>
         <ul>
+            <li>2138: when using X,Y,Z feature of CDF editor, Y metadata shown initially, not the Z data.
+            <li>2127: code which appended virtual records on CDF variables which were too short didn't consider virtual variables.  Thanks, Andrei!
+            <li>0875: old branch was using aggregated URI in getDataSourceEditorPanel, causing bogus hit to remote servers.
+            <li>fall back to two columns when column count cannot be guessed with ASCII files, so that the editor shows the file instead of nothing.
+            <li>2137: support for decimal years.
             <li>1629: NullPointerException in code which would verify Jython index.  Thanks, Darrelle!
             <li>2136: when initial load results in "no data" still support TSB.  Thanks, Baptiste and Chris!
             <li>orbits file would use old http, not https locations.
@@ -62,6 +67,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>For JSON "Rich" ASCII files, throw unrecognized tags into USER_PROPERTIES.
+            <li>ASCII parser has new columnCount switch, where the column count can be asserted.
+            <li>Units.decimalYear added.
             <li>24hr-at-perikrone events lists for Cassini.
             <li>add menu item for cassini.perikrone.24hr orbit list.
             <li>2133: export CDF_TT2000 to ASCII to nanosecond resolution.
