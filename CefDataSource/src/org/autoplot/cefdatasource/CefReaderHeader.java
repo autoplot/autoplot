@@ -49,10 +49,10 @@ public class CefReaderHeader {
         int[] sizes;
         int recType;
         int[] cefFieldPos;  // start, end inclusive
-        Map<String, Object> entries = new LinkedHashMap<String, Object>();
+        Map<String, Object> entries = new LinkedHashMap<>();
     }
 
-    private final byte eol = 10;
+    private static final byte EOL = 10;
 
     private boolean cefReadHeadRec(ReadableByteChannel c, Record record) throws IOException {
 
@@ -79,7 +79,7 @@ public class CefReaderHeader {
                 }
                 //c.read(b1);
                 sbuf.append((char) buf[0]);
-                if (buf[0] == eol) {
+                if (buf[0] == EOL) {
                     break;
                 }
             }
