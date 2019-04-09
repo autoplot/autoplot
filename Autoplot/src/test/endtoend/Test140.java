@@ -143,6 +143,7 @@ public class Test140 {
             } else {
                 throw new IllegalArgumentException("a dataset from the vap was null: "+uri );
             }
+            psec= (System.currentTimeMillis()-t0)/1000.;
             
         } else if ( uri.startsWith("script:") ) {
             System.err.println("skipping script");
