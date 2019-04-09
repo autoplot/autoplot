@@ -1,16 +1,11 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.cefdatasource;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,7 +51,7 @@ public class CefReaderHeader {
         Map<String, Object> entries = new LinkedHashMap<String, Object>();
     }
     
-    private byte eol = 10;
+    private final byte eol = 10;
 
     private boolean cefReadHeadRec(ReadableByteChannel c, Record record) throws IOException {
 
@@ -247,42 +242,40 @@ public class CefReaderHeader {
                                 throw new IllegalArgumentException("Global entry not allowed multiple values per entry : " + gName);
                             }
 
-                            if (key.equals("END_META")) {
-                                state = State.TOP;
-                                if (!kv.val[0].equals(gName)) {
-                                    throw new IllegalArgumentException("END_VARIABLE expected " + gName + "  got " + kv.val[0]);
-                                }
-                                //gStru.entries = elements;
-
-                                cef.nglobal = cef.nglobal + 1;
-                                if (gStru.valueType.equals("CHAR")) {
-                                    cef.globals.put(gName, gStru);
-                                } else {
-                                    cef.globals.put(gName, gStru);
-                                }
-                            } else if (key.equals("VALUE_TYPE")) {
-
-                                //*** WARNING: In theory CEF allows a different VALUE_TYPE for each entry
-                                //*** this is a 'feature' from CDF but I can't think of a situation where
-                                //*** it is useful. This feature is not currently supported by this
-                                //*** software and so we just assign a type based on the last specification
-                                //*** of the VALUE_TYPE.
-
-                                gStru.valueType = value[0];
-
-                            } else if (key.equals("ENTRY")) {
-                                //*** if this is the second entry then must be multi entry global ***
-                                if (eCount == 0) {
-                                    //elements = new ArrayList();
-                                }
-                                //elements.add(value[0]);
-
-                                eCount = eCount + 1;
-
-                            } else {
-                                throw new IllegalArgumentException("Unsupported global key " + key);
-
+                    switch (key) {
+                        case "END_META":
+                            state = State.TOP;
+                            if (!kv.val[0].equals(gName)) {
+                                throw new IllegalArgumentException("END_VARIABLE expected " + gName + "  got " + kv.val[0]);
                             }
+                            //gStru.entries = elements;
+                            cef.nglobal = cef.nglobal + 1;
+                            if (gStru.valueType.equals("CHAR")) {
+                                cef.globals.put(gName, gStru);
+                            } else {
+                                cef.globals.put(gName, gStru);
+                            }
+                            break;
+                        case "VALUE_TYPE":
+                            //*** WARNING: In theory CEF allows a different VALUE_TYPE for each entry
+                            //*** this is a 'feature' from CDF but I can't think of a situation where
+                            //*** it is useful. This feature is not currently supported by this
+                            //*** software and so we just assign a type based on the last specification
+                            //*** of the VALUE_TYPE.
+                            
+                            gStru.valueType = value[0];
+                            break;
+                        case "ENTRY":
+                            //*** if this is the second entry then must be multi entry global ***
+                            if (eCount == 0) {
+                                //elements = new ArrayList();
+                            }
+                            //elements.add(value[0]);
+                            eCount = eCount + 1;
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Unsupported global key " + key);
+                    }
                         }
                         break;
 
@@ -321,39 +314,40 @@ public class CefReaderHeader {
 
                             } else {
 
-                                if (key.equals("DATA")) {
-                                    pStru.entries.put(key, value);
-                                    pStru.recType = 0;   //*** Flag non-record varying data
-                                //********************************
-                                //;At the moment we just add non-record varying data as string array
-                                //;we should really check SIZES and VALUE_TYPE and reform and retype
-                                //;data as we do for the real data fields. Something for the next release?
-                                //********************************
-                                } else if (key.equals("SIZES")) {
-                                    logger.log( Level.FINER, "{0}={1}", new Object[]{key, Arrays.toString(value)});
-                                    if (value.length > 1) {
-                                        String[] rev = new String[value.length];
-                                        for (int k = 0; k < value.length; k++) {
-                                            rev[k] = value[value.length - k - 1];
-                                        }
-                                        value= rev;
-                                    }
-                                    pStru.entries.put(key, value);
-                                    
-                                    int[] isizes= new int[value.length];
-                                    for ( int i=0; i<value.length; i++ ) {
-                                        isizes[i]= Integer.parseInt(value[i]);
-                                    }
-                                    pStru.sizes= isizes;
-
-                                } else {
-
-                                    pStru.entries.put(key, value[0]);
-
+                                switch (key) {
+                                    case "DATA":
+                                        pStru.entries.put(key, value);
+                                        pStru.recType = 0;   //*** Flag non-record varying data
+                                        //********************************
+                                        //;At the moment we just add non-record varying data as string array
+                                        //;we should really check SIZES and VALUE_TYPE and reform and retype
+                                        //;data as we do for the real data fields. Something for the next release?
+                                        //********************************
+                                        break;
+                                    case "SIZES":
+                                        logger.log( Level.FINER, "{0}={1}", new Object[]{key, Arrays.toString(value)});
+                                        if (value.length > 1) {
+                                            String[] rev = new String[value.length];
+                                            for (int k = 0; k < value.length; k++) {
+                                                rev[k] = value[value.length - k - 1];
+                                            }
+                                            value= rev;
+                                        }   pStru.entries.put(key, value);
+                                        int[] isizes= new int[value.length];
+                                        for ( int i=0; i<value.length; i++ ) {
+                                            isizes[i]= Integer.parseInt(value[i]);
+                                        }   pStru.sizes= isizes;
+                                        break;
+                                    default:
+                                        pStru.entries.put(key, value[0]);
+                                        break;
                                 }
 
                             }
                         } // case PARAM
+                    default: {
+                        logger.warning("bad state, check code");
+                    }
                         break;
                 } // switch
             } else {
