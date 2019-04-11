@@ -18,7 +18,7 @@ class MyPCL( java.beans.PropertyChangeListener ):
 cb.addPropertyChangeListener( MyPCL() )  #TODO: there's a jython way to do this
 
 class MyRend( Renderer ):
-  def render( self, g, xAxis, yAxis, mon ):
+  def render( self, g, xAxis, yAxis, mon=None ):
      ds= self.getDataSet()
      if ( ds.rank()!=2 or ds.length(0)!=4 ):
         self.getParent().postException( self, IllegalArgumentException( "dataset is not ds[n,4]" ) )

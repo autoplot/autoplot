@@ -7,7 +7,7 @@ from org.das2.graph import Renderer
 from math import cos, sin
 from java.awt.geom import Line2D
 class MyRenderer( Renderer ):
-    def render( self, g, xAxis, yAxis, mon ):
+    def render( self, g, xAxis, yAxis, mon=None ):
          g.setColor( Color.GRAY )
          orx= xAxis.transform( Units.dimensionless.createDatum( 0.0 ) )
          ory= yAxis.transform( Units.dimensionless.createDatum( 0.0 ) )
