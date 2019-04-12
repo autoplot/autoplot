@@ -151,6 +151,21 @@ public final class Das2ServerDataSource extends AbstractDataSource {
     List<String> tcaDesc;
     Map dsdfParams = null;
 
+    /**
+     * attempt to unbundle the name, return null if the data set is not found.
+     * @param ds
+     * @param item
+     * @return 
+     */
+    private static QDataSet tryUnbundle( QDataSet ds, String item ) {
+        try {
+            QDataSet ds1= Ops.unbundle( ds, item );
+            return ds1;
+        } catch ( IllegalArgumentException ex ) {
+            return null;
+        }
+    }
+    
     @Override
     public synchronized QDataSet getDataSet(final ProgressMonitor mon) throws Exception {
         //http://www-pw.physics.uiowa.edu/das/das2Server
@@ -272,6 +287,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
 
                 final Map map = new LinkedHashMap();
 
+                
                 DataSetStreamHandler handler = new DataSetStreamHandler(new HashMap(), mon) {
                     @Override
                     public void streamDescriptor(StreamDescriptor sd) throws StreamException {
@@ -399,8 +415,8 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             }
 
         } else {
-            DataSetStreamHandler handler = new DataSetStreamHandler(new HashMap(), mon) {
-
+            
+            org.das2.client.QDataSetStreamHandler handler= new org.das2.client.QDataSetStreamHandler() {
                 @Override
                 public void streamDescriptor(StreamDescriptor sd) throws StreamException {
                     super.streamDescriptor(sd);
@@ -438,38 +454,39 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             if (!mon.isFinished()) {
                 mon.finished(); // I don't believe the das2stream reader calls finished.
             }
-            DataSet ds = handler.getDataSet();
+            
+            QDataSet ds = handler.getDataSet();
 
             if (ds == null) {
                 return null;
             }
 
-            if (ds.getXLength() == 0) {
+            if (ds.length() == 0) {
                 throw new RuntimeException("empty dataset returned");
             }
 
-            MutablePropertyDataSet result;
+            QDataSet result;
             if (item == null || item.equals("")) {
-                result = DataSetAdapter.create(ds); //TODO: danger if it has TCA planes, it will return bundle.  Probably not what we want.
+                result = ds; 
             } else {
-                DataSet das2ds;
-                das2ds = ds.getPlanarView(item);
+                QDataSet das2ds;
+                das2ds = tryUnbundle(ds,item);
                 //TODO: there's a bug where item=x shows where the 0th item label is always used.
                 if (das2ds == null) {
                     if (item.contains(",")) {
                         BundleDataSet bds = null;
                         String[] ss = item.split(",");
                         for (String s : ss) {
-                            das2ds = ds.getPlanarView(s);
+                            das2ds = tryUnbundle(ds,s);
                             if (das2ds == null) {
                                 int iitem = Integer.parseInt(s);
                                 if (iitem == 0) {
-                                    das2ds = ds.getPlanarView("");
+                                    das2ds = tryUnbundle( ds,"");//TODO: check on this
                                 } else {
-                                    das2ds = ds.getPlanarView("plane_" + iitem);
+                                    das2ds = tryUnbundle(ds, "plane_" + iitem );
                                 }
                             }
-                            QDataSet bds1 = DataSetAdapter.create(das2ds);
+                            QDataSet bds1 = das2ds;
                             bds = (BundleDataSet) Ops.bundle(bds, bds1);
                         }
                         result = bds;
@@ -477,28 +494,29 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                         try {
                             int iitem = Integer.parseInt(item);
                             if (iitem == 0) {
-                                das2ds = ds.getPlanarView("");
+                                das2ds = tryUnbundle( ds, "" ); //TODO: check on this
                             } else {
-                                das2ds = ds.getPlanarView("plane_" + iitem);
+                                das2ds = tryUnbundle( ds, "plane_" + iitem);
                             }
                             if (das2ds == null) {
-                                String[] ss = ds.getPlaneIds();
-                                das2ds = ds.getPlanarView(ss[iitem]);
+                                das2ds = Ops.unbundle( ds, iitem );
                             }
                             if (das2ds == null) {
                                 throw new IllegalArgumentException("no such plane, looking for " + item);
                             }
-                            result = DataSetAdapter.create(das2ds); // fragile                
+                            result = das2ds;
                         } catch (NumberFormatException ex) {
                             throw new IllegalArgumentException("unable to find component \"" + item + "\"");
                         }
                     }
                 } else {
-                    result = DataSetAdapter.create(das2ds); // fragile
+                    result = das2ds;
                 }
             }
 
             if (tcaDesc != null && tcaDesc.size() > 0) {
+                MutablePropertyDataSet mpds;
+                mpds= Ops.maybeCopy(result);
                 if (item == null || item.equals("") || item.equals("0")) {
                     QDataSet bds = (QDataSet) result.property(QDataSet.BUNDLE_1);
                     if (bds != null && bds instanceof BundleDescriptor) {
@@ -507,13 +525,14 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                             bds1.putProperty(QDataSet.LABEL, i, tcaDesc.get(i));
                         }
                     } else {
-                        result.putProperty(QDataSet.LABEL, tcaDesc.get(0));
+                        mpds.putProperty(QDataSet.LABEL, tcaDesc.get(0));
                     }
                 } else {
                     if (!item.contains(",")) {
-                        result.putProperty(QDataSet.LABEL, tcaDesc.get(Integer.parseInt(item)));
+                        mpds.putProperty(QDataSet.LABEL, tcaDesc.get(Integer.parseInt(item)));
                     }
                 }
+                result= mpds;
             }
             result1 = result;
 
