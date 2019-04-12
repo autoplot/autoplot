@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Selecting a box on the right highlites the points in the time series on the left.  Here's <a href="https://github.com/autoplot/dev/blob/master/bugs/2138/dataPainter.jy">the script</a>.
+        <p><small>Internal API changes will allow for a correction when interpolating spectrograms, where the log/lin zaxis is not considered when combining numbers.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,11 @@
         
         <p>Bugfixes (2019-04-09 r23554):</p>
         <ul>
+            <li>rebinner API now passes information about the Z axis so interpolation can be fixed.
+            <li>"polar" render type corrects units.
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>findbugs suggestions.
             <li>2138: when using X,Y,Z feature of CDF editor, Y metadata shown initially, not the Z data.
             <li>2127: code which appended virtual records on CDF variables which were too short didn't consider virtual variables.  Thanks, Andrei!
@@ -44,29 +49,15 @@
             <li>1629: getItem with index lists (ds[ idx0, idx1, 0 ]) works now.  Thanks, Ivar!
             <li>2134: support rank 2 indeces, see https://github.com/autoplot/dev/blob/master/bugs/2134/
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>2036: monitors should be centered above the context which created them.
-            <li>2132: aggregation with local files on Windows corrected when $Y/$m/$Y$m$d.cdf is used with network drive.  Thanks, Seth!
-            <li>2131: cdf editor does not say "0 records of CDF_FLOAT" when the CDAWeb source is used.
-            <li>2131: datasource filters GUI is turned on whenever it is used.  Thanks, Kris!
-            <li>2131: re-implement where parent plotElement's component change implies that this child should change its component.
-            <li>2126: review BASIC mode, where new components were added without considering this constraint.
-            <li>2129: stacked histogram runtime error when there is no data and we are zoomed in.
-            <li>2130: aggregate dialog doesn't replace the dataSetSelector address, which is confusing.
-            <li>1762: two different codes were used to create GUIs for jy and jyds scripts, this is finally fixed, correcting a problem with .jyds layout as well.
-            <li>check for infinite min or max required that they both be infinite, now both must be finite.
-            <li>2127: support CDF variables with trailing virtual fill records, when fill was never written.  Improvements to the editor.
-            <li>1310: experiment with code to check that a script has been run before.
-            <li>1687: support documentation at completion "tp=TimePars&lt;C&gt;"
-            <li>rte_1199189909: reset zoom on image would result in runtime error.  Thanks, Bob!
-            <li>2111: Series renderer dataset reduction branch doesn't support sloppy units (rte_0195003323). Thanks, Kris!
-            <li>2122: Autoplot appears off-screen on some windows configurations.  Thanks, Scott!
-            <li>export to 2-channel wave with scale=T would clip because the shift was incorrect.  Thanks, Larry!
-            <li>0292: support $Y/$m/mms1_fgm_srvy_l2_$Y$m$d in automatic aggregation suggestions.  Thanks, Kris!
-            <li>2105: allow direct access of GitHub files, or other sites when the parent http folder listing results in error 400.  Thanks, Bob!
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>support U. Iowa GitLabs site with GitHubFileSystem.
+            <li>polar renderer supports x,y,z color scatter plot.
+            <li>das2streams support x,y,z scatter.  Clean up strange names in the das2stream parser.
+            <li>Renderer.render now takes Graphics2D object, instead of Graphics.
+            <li>API changes like removing monitor from render call will make scripting easier.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>For JSON "Rich" ASCII files, throw unrecognized tags into USER_PROPERTIES.
             <li>ASCII parser has new columnCount switch, where the column count can be asserted.
@@ -74,17 +65,6 @@
             <li>24hr-at-perikrone events lists for Cassini.
             <li>add menu item for cassini.perikrone.24hr orbit list.
             <li>2133: export CDF_TT2000 to ASCII to nanosecond resolution.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>array dataset properties can be explored in metadata tab, providing access to file list.  Thanks, Jon!
-            <li>671: applyIndex is added to the list of filters, and now supports any index, and SubsetDataSet provides tool for resolving strings.
-            <li>nLargest function finds the M largest elements as an O(N log M) operation.
-            <li>format and cadence added to dataset command.
-            <li>rfe670: DEPEND_2 can now be rank 3.  collapse, slice1, and trim are supported.
-            <li>new class completions on "g.&lt;C&gt;" (a kludge) to support graphics in scripts.  
-            <li>reset will check for strange axes, supporting where a script has replaces the yaxis with a DasLabelAxis.  Thanks, Chris!
-            <li>improve html version of pngwalk export to write separate pages.
         </ul>
         <p>Known issues:</p>
         <ul>
