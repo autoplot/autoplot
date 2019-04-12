@@ -49,6 +49,7 @@ import java.net.URI;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 import org.das2.dataset.DataSet;
 import org.das2.qds.QDataSet;
@@ -61,6 +62,7 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.HtmlResponseIOException;
 import org.autoplot.datasource.URISplit;
+import org.das2.qds.ops.Ops;
 import org.das2.qstream.QDataSetStreamHandler;
 
 /**
@@ -129,11 +131,9 @@ public class Das2StreamDataSource extends AbstractDataSource {
 
         } else {
             try {
-                HashMap<String,String> props = new HashMap<>();
-                props.put("file", DataSetURI.fromUri(uri) );
-
-                DataSetStreamHandler handler = new DataSetStreamHandler(props, mon);
-
+                
+                org.das2.client.QDataSetStreamHandler handler = new org.das2.client.QDataSetStreamHandler();
+                
                 try {
                     StreamTool.readStream(channel, handler);
                 } catch ( NullPointerException ex ) {
@@ -148,12 +148,12 @@ public class Das2StreamDataSource extends AbstractDataSource {
 
                 in.close();
 
-                DataSet r= handler.getDataSet();
-                if ( r!=null ) {
-                    return DataSetAdapter.create(handler.getDataSet());
-                } else {
-                    return null;
-                }
+                QDataSet r= handler.getDataSet();
+                Map<String,Object> userProps= new HashMap<>();
+                userProps.put( "file", uri );
+                r= Ops.putProperty( r, QDataSet.USER_PROPERTIES, userProps );
+                return r;
+                
             } catch ( StreamException se ) {
                  if ( se.toString().contains( "Expecting stream descriptor header" ) ) {
                     int i= se.toString().indexOf("beginning \n'");
