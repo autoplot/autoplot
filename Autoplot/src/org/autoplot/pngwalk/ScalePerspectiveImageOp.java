@@ -107,7 +107,7 @@ public class ScalePerspectiveImageOp implements BufferedImageOp {
 
     @Override
     public BufferedImage filter(BufferedImage src, BufferedImage dest) {
-
+        logger.entering("ScalePerspectiveImageOp", "filter");
         if ( dest!=null && dest.getWidth()==nw && dest.getHeight()==nh ) {
             logger.fine("recycling old image");
         } else {
@@ -214,7 +214,7 @@ public class ScalePerspectiveImageOp implements BufferedImageOp {
                 }
             }
         }
-
+        logger.exiting("ScalePerspectiveImageOp", "filter");
         return dest;
     }
 
