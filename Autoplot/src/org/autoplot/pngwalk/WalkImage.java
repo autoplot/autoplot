@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeListener;
@@ -14,9 +13,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +25,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.imagedatasource.ImageDataSource;
+import org.imgscalr.Scalr;
 
 /**
  * A class to manage an image for the PNGWalk tool. Handles downloading and
@@ -231,9 +229,9 @@ public class WalkImage  {
     /**
      * returns the thumbnail if available, or if waitOk is true then it computes it.  Otherwise PngWalkView.loadingImage
      * is returned.
-     * @param w
-     * @param h
-     * @param waitOk
+     * @param w width in pixels of the thumbnail image 
+     * @param h height in pixels of the thumbnail image 
+     * @param waitOk if true, block execution until image is ready. Otherwise a loading image might be returned.
      * @return image or  PngWalkView.loadingImage
      */
     public synchronized BufferedImage getThumbnail( int w, int h, boolean waitOk ) {
@@ -250,8 +248,18 @@ public class WalkImage  {
                 if ( theThumb==null ) {
                     return PngWalkView.loadingImage;
                 } else {
-                    BufferedImageOp resizeOp = new ScalePerspectiveImageOp(theThumb.getWidth(), theThumb.getHeight(), 0, 0, w, h, 0, 1, 1, 0, false);
-                    sizeThumb = resizeOp.filter(theThumb, null);
+                    long t0= System.currentTimeMillis();
+                    sizeThumb= Scalr.resize( theThumb, w>h? w : h );
+                    long method1time= System.currentTimeMillis()-t0;
+                    if ( method1time<20 ) { // when things are fast go ahead and use the old method.
+                        t0= System.currentTimeMillis();
+                        BufferedImageOp resizeOp = new ScalePerspectiveImageOp(theThumb.getWidth(), theThumb.getHeight(), 0, 0, w, h, 0, 1, 1, 0, false);
+                        sizeThumb = resizeOp.filter(theThumb, null);
+                        long method2time= System.currentTimeMillis()-t0;
+                        logger.log(Level.FINE, "method1: {0} method2: {1} {2} {3}", new Object[]{method1time, method2time, theThumb.getWidth(), sizeThumb.getWidth() });
+                    } else {
+                        logger.log(Level.FINE, "imgscalr used to resize: {0}", new Object[]{method1time});
+                    }
                     sizeThumbWidth= w;
                     return sizeThumb;
                 }
@@ -302,11 +310,14 @@ public class WalkImage  {
                 logger.exiting( "WalkImage", "readImage" );
                 return missingImage;
             }
-            if ( lim.getType()==0 ) {
+            logger.log(Level.FINER, "image has been read {0}x{1}", new Object[]{lim.getWidth(), lim.getHeight()});
+            if ( lim.getType()==0 ) { //TYPE_CUSTOM. TODO: when does this happen?
                 BufferedImage imNew= new BufferedImage( lim.getWidth(), lim.getHeight(), BufferedImage.TYPE_INT_ARGB );
                 imNew.getGraphics().drawImage( lim, 0, 0, null );
                 lim= imNew;
+                logger.log(Level.FINER, "image converted to ARGB");
             }
+            
             long t0= System.currentTimeMillis();
             try ( FileInputStream in= new FileInputStream(f) ) {
                 Map<String,Object> meta= ImageDataSource.getJpegExifMetaData(in);
