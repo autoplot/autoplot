@@ -256,7 +256,7 @@ public class WalkImage  {
                         BufferedImageOp resizeOp = new ScalePerspectiveImageOp(theThumb.getWidth(), theThumb.getHeight(), 0, 0, w, h, 0, 1, 1, 0, false);
                         sizeThumb = resizeOp.filter(theThumb, null);
                         long method2time= System.currentTimeMillis()-t0;
-                        logger.log(Level.FINE, "method1: {0} method2: {1} {2} {3}", new Object[]{method1time, method2time, theThumb.getWidth(), sizeThumb.getWidth() });
+                        logger.log(Level.FINE, "method1: {0}ms method2: {1}ms {2} {3}", new Object[]{method1time, method2time, theThumb.getWidth(), sizeThumb.getWidth() });
                     } else {
                         logger.log(Level.FINE, "imgscalr used to resize: {0}", new Object[]{method1time});
                     }
