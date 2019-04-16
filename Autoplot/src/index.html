@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2019-04-09 r23554):</p>
         <ul>
+            <li>2143: HAPI client respects dataset time boundaries when caching is enabled.
             <li>rebinner API now passes information about the Z axis so interpolation can be fixed.
             <li>"polar" render type corrects units.
         </ul>
@@ -51,6 +52,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>imgscalr library added, which will provide faster thumbnails.
+            <li>polarToCartesian function and filter added.
             <li>support U. Iowa GitLabs site with GitHubFileSystem.
             <li>polar renderer supports x,y,z color scatter plot.
             <li>new code reads Das2Streams directly into QDataSet.
