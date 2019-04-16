@@ -454,9 +454,10 @@ public final class HapiDataSource extends AbstractDataSource {
     }
     
     /** 
-     * TODO: this needs to use HAPI_DATA to locate the directory.
      * See https://sourceforge.net/p/autoplot/bugs/2043/
-     * 
+     * @param url url used to locate position in cache.
+     * @param pp parameters 
+     * @param xx time used to id the file.
      */
     private static void writeToCachedDataFinish(URL url, ParamDescription[] pp, Datum xx ) throws IOException {
         logger.log(Level.FINE, "writeToCachedDataFinish: {0}", xx);
@@ -802,6 +803,7 @@ public final class HapiDataSource extends AbstractDataSource {
                     Datum minMidnight= TimeUtil.prevMidnight( tr.min() );
                     Datum maxMidnight= TimeUtil.nextMidnight( tr.max() );
                     tr= new DatumRange( minMidnight, maxMidnight );
+                    tr= tr.intersection( startStopDate );
                     Datum midnight= TimeUtil.prevMidnight( tr.min() );
                     DatumRange currentDay= new DatumRange( midnight, TimeUtil.next( TimeUtil.DAY, midnight) );
                     QDataSet dsall= null;
@@ -816,8 +818,9 @@ public final class HapiDataSource extends AbstractDataSource {
                         ProgressMonitor mon1= nday==1 ? monitor : monitor.getSubtaskMonitor( 10*iday, 10*(iday+1), "read "+currentDay );
                         QDataSet ds1;
                         try {
+                            DatumRange oneDaysRange= currentDay.intersection( startStopDate );
                             ds1 = getDataSetViaCsv(totalFields, mon1, url, pds, 
-                                    currentDay, nparam, nfields, getParam( "cache", "" ) );
+                                    oneDaysRange, nparam, nfields, getParam( "cache", "" ) );
                             if ( ds1.length()>0 ) {
                                 dsall= Ops.append( dsall, ds1 );
                             }
@@ -903,7 +906,7 @@ public final class HapiDataSource extends AbstractDataSource {
     }
     
     public static QDataSet getDataSetViaCsv(int totalFields, ProgressMonitor monitor, 
-            URL url, ParamDescription[] pds, DatumRange tr, 
+            URL url, ParamDescription[] pds, DatumRange tr,
             int nparam, int[] nfields, String useCacheUriParam ) throws IllegalArgumentException, Exception, IOException {
         
         DataSetBuilder builder= new DataSetBuilder(2,100,totalFields);
@@ -912,19 +915,6 @@ public final class HapiDataSource extends AbstractDataSource {
         long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
         
         boolean useCache= useCache(useCacheUriParam);
-        
-        if ( useCache ) { // round out data request to day boundaries.
-            Datum minMidnight= TimeUtil.prevMidnight( tr.min() );
-            Datum maxMidnight= TimeUtil.nextMidnight( tr.max() );
-            tr= new DatumRange( minMidnight, maxMidnight );
-            URISplit split= URISplit.parse(url.toURI());
-            Map<String,String> params= URISplit.parseParams(split.params);
-            params.put("time.min",minMidnight.toString());
-            params.put("time.max",maxMidnight.toString());
-            split.params= URISplit.formatParams(params);
-            String surl= URISplit.format(split);
-            url= new URL(surl);
-        }
         
         AbstractLineReader cacheReader;
         if ( useCache ) { // this branch posts the request, expecting that the server may respond with 304, indicating the cache should be used.
@@ -1500,6 +1490,7 @@ public final class HapiDataSource extends AbstractDataSource {
      * @param parameters the parameters to load, from ParameterDescription.name
      * @param timeRange the span to cover.  This should be from midnight-to-midnight.
      * @param offline if true, we are offline and anything available should be used.
+     * @param lastModified 
      * @return null or the reader to use.
      * @see HapiServer#cacheAgeLimitMillis()
      * @see #getCacheFiles which has copied code.  TODO: fix this.
