@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -557,10 +558,21 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
     private org.autoplot.jythonsupport.ui.EditorTextPane textArea;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * returns the editor
+     * @return the editor
+     */
     public EditorTextPane getEditorPanel() {
         return textArea;
     }
     
+    /**
+     * returns the JScrollPane containing the editor so that special applications can control what's visible.
+     * @return the JScrollPane containing the editor
+     */
+    public JScrollPane getScrollPane() {
+        return jScrollPane2;
+    }
     
     protected String filename = null;
 
@@ -585,6 +597,10 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
         return dirty;
     }
 
+    /**
+     * set the flag indicating the script has been modified.
+     * @param dirty 
+     */
     public void setDirty(boolean dirty) {
         boolean oldDirty = this.dirty;
         this.dirty = dirty;
