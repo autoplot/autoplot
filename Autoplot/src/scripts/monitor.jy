@@ -2,6 +2,8 @@
 # This is a demo of the monitor object which is available to users to
 # provide feedback in scripts.  
 
+import java.lang.Thread
+
 monitor.setTaskSize(100)
 
 monitor.started()
