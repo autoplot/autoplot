@@ -5,7 +5,7 @@
 # selected in the digitizer tab using decorators.
 
 from org.das2.components import DataPointRecorderNew
-from org.virbo.dataset import SemanticOps
+from org.das2.qds import SemanticOps
 from org.das2.dataset import DataSetUpdateListener
 from org.das2.graph import SpectrogramRenderer
 from org.das2.graph import Painter
@@ -62,7 +62,7 @@ from org.das2.event import HorizontalDragRangeRenderer
 #mm= BoxSelectorMouseModule( pp, pp.getXAxis(), pp.getYAxis(), None, HorizontalDragRangeRenderer(pp), 'events digitizer' )
 mm= BoxSelectorMouseModule.create( pp, 'events digitizer' )
 
-from org.virbo.dataset import DataSetUtil
+from org.das2.qds import DataSetUtil
 
 def boxSelected(event):
     xr= event.getXRange()
@@ -80,7 +80,7 @@ def boxSelected(event):
     mp.put( "y", y )
     dpr.addDataPoint( xr.min(), xr.max(), mp )
     
-mm.BoxSelected=boxSelected
+mm.boxSelected=boxSelected
 
 pp.dasMouseInputAdapter.primaryModule= mm
 

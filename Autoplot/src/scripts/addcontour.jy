@@ -3,7 +3,7 @@
 
 from org.das2.graph import ContoursRenderer, SpectrogramRenderer
 from org.das2.event import ArrowDragRenderer, DragRenderer,MouseBoxEvent
-from org.virbo.autoplot import RenderType
+from org.autoplot import RenderType
 reset()
 
 plot( 'vap+inline:ripples(100,100)' )

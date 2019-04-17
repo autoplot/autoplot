@@ -1,6 +1,6 @@
 # demonstrates how das2 findRendererAt locates the renderer at each pixel position.
-dom= getDocumentModel()
 
+app= getApplication()
 canvas= dom.controller.canvas
 w= canvas.width
 h= canvas.height
@@ -11,10 +11,18 @@ dasPlot= dom.controller.plot.controller.dasPlot
 
 rendAt= zeros( w, h )
 
+monitor.setTaskSize(w)
+monitor.started()
+
 for i in range(w):
-   print i, w
+   monitor.setTaskProgress(i)
+   if monitor.cancelled: break
    for j in range(h):
       rendAt[i,h-j-1]= dasPlot.findRendererAt(i,j)
 
-formatDataSet( rendAt, 'file:///tmp/rendAt.qds?binary=1' )
+n= newApplication('rendAt')
+setApplication(n)
+plot( rendAt )
+setApplication(app)
+
 

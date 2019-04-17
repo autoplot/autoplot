@@ -1,4 +1,4 @@
-from org.virbo.dataset import DataSetOps
+from org.das2.qds import DataSetOps
 
 ds= getDataSet( 'http://autoplot.org/data/2010_061_17_41_40.txt?rank2=field6-field8' )
 

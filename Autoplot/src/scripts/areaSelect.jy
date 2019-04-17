@@ -24,7 +24,7 @@ def boxSelected( event ):
    dpr.addDataPoint( event.getXRange().min(), event.getYRange().min(), x )
    setStatus('range added to digitizer tab: '+event.getXRange().toString() + ' ' + event.getYRange().toString() )
 
-mm.BoxSelected=boxSelected
+mm.boxSelected=boxSelected
 
 plot.getDasMouseInputAdapter().setPrimaryModule(mm)
 

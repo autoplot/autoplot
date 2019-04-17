@@ -5,7 +5,7 @@ from javax.xml.xpath import XPathExpressionException
 from javax.xml.xpath import XPathFactory
 from javax.xml.xpath import XPathConstants
 from org.xml.sax import InputSource
-from org.virbo.dataset import DDataSet
+from org.das2.qds import DDataSet
 
 from java.io import File
 from java.io import FileInputStream

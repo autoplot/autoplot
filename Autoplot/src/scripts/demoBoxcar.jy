@@ -2,8 +2,8 @@
 # it passes the data without filtering at the ends.
 # This shows how arbitary Java code can be called from Jython.
 
-from org.virbo.dsutil.BinAverage import boxcar
+from org.das2.qds.util.BinAverage import boxcar
 
-ds= getDataSet('http://cdaweb.gsfc.nasa.gov/data/genesis/gim/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf?Proton_Density' )
+ds= getDataSet('https://cdaweb.gsfc.nasa.gov/data/genesis/gim/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf?Proton_Density' )
 plot( boxcar( ds, 51 ) )
 

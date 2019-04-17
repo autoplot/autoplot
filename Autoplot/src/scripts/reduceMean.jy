@@ -1,6 +1,6 @@
 # demo reduceMean, which averages all the elements in a dimension.
 
-ds= getDataSet('http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/2000/po_h0_hyd_20000110_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX')
+ds= getDataSet('http://cdaweb.gsfc.nasa.gov/pub/data/polar/hydra/hyd_h0/2000/po_h0_hyd_20000110_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX')
 ds.putProperty( QDataSet.VALID_MIN, 0. )
 ds1= reduceMean( ds, 1 )
 plot(ds1)

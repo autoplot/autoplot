@@ -3,7 +3,6 @@
 # an events bar, with the dataset specifying the color and location:
 # BUNDLE_1=Time,Duration,Color,Event
 
-from org.virbo.dsutil import DataSetBuilder
 from org.das2.datum import EnumerationUnits
 
 ds= createEvent( None,datumRange('2003-05-10T05:00/PT100S'),0xFF0000,'test EFA')

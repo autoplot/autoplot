@@ -1,7 +1,8 @@
 # label: Make Stack Plot 
-# title:break apart current plot by adding plots and moving plot elements
+# title: break apart current plot by adding plots and moving plot elements
+# This demonstrates how additional functionality can be added to Autoplot.
 
-from org.virbo.autoplot.layout import LayoutConstants
+from org.autoplot.layout import LayoutConstants
 p= dom.controller.plot
 pp= dom.controller.getPlotElementsFor(p)
 
@@ -25,6 +26,6 @@ for pp1 in pp:
       if ( i!=n-1 ): plot.title=''
    i=i+1
 
-from org.virbo.autoplot.dom import DomOps
+from org.autoplot.dom import DomOps
 DomOps.newCanvasLayout( dom )
 

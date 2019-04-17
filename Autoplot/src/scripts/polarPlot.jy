@@ -21,8 +21,8 @@ myRend= MyRenderer()
 theplot.removeRenderer( theplot.getRenderer(0) )
 theplot.addRenderer( myRend )
 
-from org.virbo.dsops.Ops import cos as dscos
-from org.virbo.dsops.Ops import sin as dssin
+from org.das2.qds.ops.Ops import cos as dscos
+from org.das2.qds.ops.Ops import sin as dssin
 
 angle= linspace( 0, 360, 360 ) * PI / 180
 radius= dscos( angle*5 )

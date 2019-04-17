@@ -1,6 +1,6 @@
 #label: Aggregate All    # Note Autoplot gives it the same name when created.
 # This old script looks through all the URIs and makes aggregations from the URIs, and
-# this functionality is now part of Autoplot in org.virbo.autoplot.dom.DomOps.aggregateAll.
+# this functionality is now part of Autoplot in org.autoplot.dom.DomOps.aggregateAll.
 
 from java.util.regex import Pattern
 from java.lang import String

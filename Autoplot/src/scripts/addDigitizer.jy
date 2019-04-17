@@ -24,7 +24,7 @@ def boxSelected(event):
     map.put( "dy", event.getYRange().width() )
     dpr.addDataPoint( x, y, map )
     
-mm.BoxSelected=boxSelected
+mm.boxSelected=boxSelected
 
 dasPlot.dasMouseInputAdapter.primaryModule= mm
 

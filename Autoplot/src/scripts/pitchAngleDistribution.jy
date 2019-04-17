@@ -1,3 +1,6 @@
+# Autoplot is capable of displaying "Pitch Angle Distributions" if the data
+# is in a specific form.
+
 dist= zeros( 18, 30 )
 en= linspace( 10,2000, 30 )
 an= linspace( 5, 175, 18 )
@@ -9,6 +12,6 @@ dist.putProperty( QDataSet.RENDER_TYPE, 'pitchAngleDistribution' )
 
 for i in range(len(an)):
    for j in range(len(en)):
-       dist[i,j]= -1 * log( coerce( en[j] ) ) 
+       dist[i,j]= -1 * log( en[j] ) 
 
-plot( dist )
+plot( dist, isotropic=True )

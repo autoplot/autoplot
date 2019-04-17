@@ -1,4 +1,12 @@
-# demo reformatting with a script
+# demo reformatting with a script.  This can be built up to loop over files,
+# for example, or used with Tools->Run Batch
 
-ds= getDataSet('http://www.autoplot.org/data/image/Capture_00158.jpg?channel=value')
-formatDataSet( ds, 'vap+bin:file://home/jbf/foo.bin' )
+f= getParam( 'infile', URI('http://autoplot.org/data/image/Capture_00158.jpg?channel=value'), 'data to read' )
+ds= getDataSet(f.toString())
+
+p= f.path
+i= p.rindex('/')
+
+outn= '/tmp/autoplot/' + p[i+1:] + '.bin'
+print outn
+formatDataSet( ds, outn )

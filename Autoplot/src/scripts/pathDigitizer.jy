@@ -79,7 +79,7 @@ class MyUpdateListener( DataSetUpdateListener ):
 dpr.addDataSetUpdateListener( MyUpdateListener() )
 dom.canvases[0].controller.dasCanvas.addTopDecorator(updatesPainter)
 
-from org.virbo.dataset import DataSetUtil
+from org.das2.qds import DataSetUtil
 
 def boxSelected(event):
     x= event.getFinishX()

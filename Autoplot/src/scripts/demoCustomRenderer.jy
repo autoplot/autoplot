@@ -2,7 +2,7 @@
 # with each record: [x,y,rad,color]
 # Note, the plan is to redo how custom renderers are done, so this may change.
 
-from org.virbo.dataset import SemanticOps
+from org.das2.qds import SemanticOps
 from org.das2.graph import Renderer
 
 import java 
@@ -20,6 +20,7 @@ cb.addPropertyChangeListener( MyPCL() )  #TODO: there's a jython way to do this
 class MyRend( Renderer ):
   def render( self, g, xAxis, yAxis, mon=None ):
      ds= self.getDataSet()
+     if ds==None: return
      if ( ds.rank()!=2 or ds.length(0)!=4 ):
         self.getParent().postException( self, IllegalArgumentException( "dataset is not ds[n,4]" ) )
         return
@@ -40,14 +41,6 @@ class MyRend( Renderer ):
         x2= xAxis.transform( xds.value(i)+rds.value(i), xu ) - x
         g.fillOval( int(x-x2/2),int(y-x2/2),int(x2/2),int(x2/2) )
 
-dom.plots[0].controller.dasPlot.removeRenderers()
-
 ds= randn( 1000,4 )
 
-r= MyRend()
-r.setDataSet(ds)
-
-dom.plots[0].controller.dasPlot.addRenderer( r )
-dom.plots[0].xaxis.range= DatumRangeUtil.parseDatumRange('-5 to 5')
-dom.plots[0].yaxis.range= DatumRangeUtil.parseDatumRange('-5 to 5')
-dom.plots[0].zaxis.range= DatumRangeUtil.parseDatumRange('0 to 3')
+plot( ds, renderer=MyRend(), xrange='-5 to 5', yrange='-5 to 5', zrange='0 to 3' )

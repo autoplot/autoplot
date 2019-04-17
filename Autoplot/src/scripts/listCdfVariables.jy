@@ -1,6 +1,6 @@
-file= 'http://cdaweb.sci.gsfc.nasa.gov/sp_phys/data/noaa/noaa08/1985/noaa08_meped1min_sem_19851014_v01.cdf?'
+file= 'https://cdaweb.sci.gsfc.nasa.gov/sp_phys/data/noaa/noaa08/1985/noaa08_meped1min_sem_19851014_v01.cdf?'
 
-from org.virbo.datasource import DataSetURI
+from org.autoplot.datasource import DataSetURI
 completions = DataSetURI.getCompletions( file, len(file), monitor );
 
 for i in completions:

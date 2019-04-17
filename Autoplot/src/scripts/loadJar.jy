@@ -1,12 +1,9 @@
-# This demonstrates that additional jars can be loaded at runtime.  I was surprised
-# when this worked, and I think there are security restrictions on the loaded jar.
+# This demonstrates that additional jars can be loaded at runtime.  
+# There are security restrictions on the loaded jar, and this cannot be 
+# used with webstart.
 
-from org.virbo.datasource import DataSourceRegistry
+import sys
+addToSearchPath(sys.path,'http://autoplot.org/data/build/lib/Hello.jar',monitor)
 
-reg= DataSourceRegistry.getInstance()
-
-myurl= URL( 'http://autoplot.org/data/build/lib/WavDataSource.jar' )
-
-reg.registerDataSourceJar('qqq', myurl)
-
-load( 'vap+qqq:http://autoplot.org/data/trainMono.wav' )
+import Hello
+Hello.main(['There'])

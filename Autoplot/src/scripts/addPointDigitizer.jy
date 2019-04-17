@@ -8,7 +8,7 @@
 typ= getParam( 'typ', 'Click', 'Digitizer Type', ['Click','Key'] )
 
 from org.das2.components import DataPointRecorder
-from org.virbo.dataset import SemanticOps
+from org.das2.qds import SemanticOps
 from org.das2.dataset import DataSetUpdateListener
 from org.das2.graph import SpectrogramRenderer
 import java.util.HashMap

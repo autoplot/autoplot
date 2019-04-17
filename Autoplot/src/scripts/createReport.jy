@@ -1,6 +1,7 @@
 # show how iText library can be used to write a report.  
 # See https://coderanch.com/how-to/javadoc/itext-2.1.7/
-# This still needs work, for example, it would be nice to let itext add a rectange to the text so we don't have to position it manually.
+# This still needs work, for example, it would be nice to let itext add 
+# a rectangle to the text so we don't have to position it manually.
 
 from com.itextpdf.text import Document,Rectangle,Paragraph
 from com.itextpdf.awt import PdfGraphics2D

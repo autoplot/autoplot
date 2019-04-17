@@ -15,7 +15,7 @@ def boxSelected(event):
     tmin= event.getXRange().min().doubleValue( u )
     tmax= event.getXRange().max().doubleValue( u )
 
-    from org.virbo.dataset import DataSetUtil, DataSetOps
+    from org.das2.qds import DataSetUtil, DataSetOps
 
     imin= DataSetUtil.closest( dep0, tmin, -1 )
     imax= DataSetUtil.closest( dep0, tmax, imin )
@@ -29,7 +29,7 @@ def boxSelected(event):
 plot= dom.plots[0].controller.dasPlot
 from org.das2.event import BoxSelectorMouseModule
 mm= BoxSelectorMouseModule.create( plot, 'Auralize' )
-mm.BoxSelected=boxSelected
+mm.boxSelected=boxSelected
 plot.dasMouseInputAdapter.primaryModule=mm
 
 showMessageDialog("Drag a box to play the sound")
