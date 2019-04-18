@@ -93,6 +93,8 @@ public class Das2StreamDataSource extends AbstractDataSource {
 
         String ext= split.vapScheme;
         
+        boolean useOldD2sParser= "T".equals( getParam( "useOldD2sParser", "T") );
+        
         if ( ext.equals("vap+qds") || ext.equals("vap+qdst") ) {
             try {
                 QDataSetStreamHandler h= new QDataSetStreamHandler();
@@ -128,7 +130,33 @@ public class Das2StreamDataSource extends AbstractDataSource {
                 }
                 throw se;
             }
+        } else if ( useOldD2sParser ) {
+            
+            HashMap<String,String> props = new HashMap<>();
+            props.put("file", DataSetURI.fromUri(uri) );
 
+            DataSetStreamHandler handler = new DataSetStreamHandler(props, mon);
+            try {
+                StreamTool.readStream(channel, handler);
+            } catch ( NullPointerException ex ) {
+                if ( "Linux".equals(System.getProperty("os.name")) ) {                        
+                    File ff= new File("/tmp/badd2s.d2s");
+                    File infile= DataSetURI.getFile(uri,new NullProgressMonitor());
+                    FileUtil.fileCopy(infile,ff);
+                    logger.warning("bad stream written to /tmp/badd2s.d2s.  Note the data source was reading the stream directly.");
+                }
+                throw ex;
+            }
+
+            in.close();
+
+            DataSet r= handler.getDataSet();
+            if ( r!=null ) {
+                return DataSetAdapter.create(handler.getDataSet());
+            } else {
+                return null;
+            }
+                
         } else {
             try {
                 
