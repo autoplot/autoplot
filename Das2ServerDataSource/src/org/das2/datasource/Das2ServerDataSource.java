@@ -381,6 +381,8 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             techContact = "\nTechnical Contact: " + techContact;
         }
 
+        boolean useOldDas2SteamParser= true;
+        
         if (qds) {
 
             try {
@@ -413,7 +415,104 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                     throw new StreamException(ex.getMessage() + "\ndataset request was\n" + url2 + techContact);
                 }
             }
+        } else if ( useOldDas2SteamParser ) {
+            DataSetStreamHandler handler = new DataSetStreamHandler(new HashMap(), mon) {
+                @Override
+                public void streamDescriptor(StreamDescriptor sd) throws StreamException {
+                    super.streamDescriptor(sd);
+                    if (mon.getTaskSize() != -1) { // progress messages are on the stream.
+                        mpin.setEnableProgressPosition(false);
+                    }
+                }
+            };
 
+            try {
+                StreamTool.readStream(channel, handler);
+            } catch (StreamException ex) {
+                mon.finished();
+                Throwable cause = ex.getCause();
+                if (ex.getCause() != null && (ex.getCause() instanceof java.io.InterruptedIOException)) {
+                    logger.log(Level.INFO, ex.getMessage(), ex);
+                    if (ex.getMessage().contains("Operation cancelled")) { // TODO: nasty getMessage...
+                        throw new CancelledOperationException(techContact);
+                    } else {
+                        throw (java.io.InterruptedIOException) ex.getCause();
+                    }
+                } else if (cause != null && (cause instanceof org.das2.dataset.NoDataInIntervalException)) {
+                    throw (org.das2.dataset.NoDataInIntervalException) ex.getCause();
+                } else if (ex.getMessage().contains("Empty response from reader")) {
+                    throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage() + " " + techContact);
+                } else if (ex.getMessage().contains("No data found")) {
+                    throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage());
+                } else {
+                    ex = new StreamException(ex.getMessage() + "\ndataset request was \n" + url2 + " " + techContact);
+                    logger.log(Level.INFO, ex.getMessage(), ex);
+                    throw ex;
+                }
+            }
+            
+            DataSet ds = handler.getDataSet();
+
+            if (ds == null) {
+                return null;
+            }
+
+            if (ds.getXLength() == 0) {
+                throw new RuntimeException("empty dataset returned");
+            }
+
+            MutablePropertyDataSet result;
+            if (item == null || item.equals("")) {
+                result = DataSetAdapter.create(ds); //TODO: danger if it has TCA planes, it will return bundle.  Probably not what we want.
+            } else {
+                DataSet das2ds;
+                das2ds = ds.getPlanarView(item);
+                //TODO: there's a bug where item=x shows where the 0th item label is always used.
+                if (das2ds == null) {
+                    if (item.contains(",")) {
+                        BundleDataSet bds = null;
+                        String[] ss = item.split(",");
+                        for (String s : ss) {
+                            das2ds = ds.getPlanarView(s);
+                            if (das2ds == null) {
+                                int iitem = Integer.parseInt(s);
+                                if (iitem == 0) {
+                                    das2ds = ds.getPlanarView("");
+                                } else {
+                                    das2ds = ds.getPlanarView("plane_" + iitem);
+                                }
+                            }
+                            QDataSet bds1 = DataSetAdapter.create(das2ds);
+                            bds = (BundleDataSet) Ops.bundle(bds, bds1);
+                        }
+                        result = bds;
+                    } else {
+                        try {
+                            int iitem = Integer.parseInt(item);
+                            if (iitem == 0) {
+                                das2ds = ds.getPlanarView("");
+                            } else {
+                                das2ds = ds.getPlanarView("plane_" + iitem);
+                            }
+                            if (das2ds == null) {
+                                String[] ss = ds.getPlaneIds();
+                                das2ds = ds.getPlanarView(ss[iitem]);
+                            }
+                            if (das2ds == null) {
+                                throw new IllegalArgumentException("no such plane, looking for " + item);
+                            }
+                            result = DataSetAdapter.create(das2ds); // fragile                
+                        } catch (NumberFormatException ex) {
+                            throw new IllegalArgumentException("unable to find component \"" + item + "\"");
+                        }
+                    }
+                } else {
+                    result = DataSetAdapter.create(das2ds); // fragile
+                }
+            }
+            
+            result1= result;
+            
         } else {
             
             org.das2.client.QDataSetStreamHandler handler= new org.das2.client.QDataSetStreamHandler() {
