@@ -511,6 +511,27 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                 }
             }
             
+            if (tcaDesc != null && tcaDesc.size() > 0) {
+                MutablePropertyDataSet mpds;
+                mpds= Ops.maybeCopy(result);
+                if (item == null || item.equals("") || item.equals("0")) {
+                    QDataSet bds = (QDataSet) result.property(QDataSet.BUNDLE_1);
+                    if (bds != null && bds instanceof BundleDescriptor) {
+                        BundleDescriptor bds1 = (BundleDescriptor) bds;
+                        for (int i = 0; i < bds1.length(); i++) {
+                            bds1.putProperty(QDataSet.LABEL, i, tcaDesc.get(i));
+                        }
+                    } else {
+                        mpds.putProperty(QDataSet.LABEL, tcaDesc.get(0));
+                    }
+                } else {
+                    if (!item.contains(",")) {
+                        mpds.putProperty(QDataSet.LABEL, tcaDesc.get(Integer.parseInt(item)));
+                    }
+                }
+                result= mpds;
+            }            
+            
             result1= result;
             
         } else {
