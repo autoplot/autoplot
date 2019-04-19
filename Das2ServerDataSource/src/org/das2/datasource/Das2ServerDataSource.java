@@ -381,7 +381,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             techContact = "\nTechnical Contact: " + techContact;
         }
 
-        boolean useOldDas2SteamParser= true;
+        boolean useOldDas2SteamParser= getParam( "useOldD2sParser", "F" ).equals("T");
         
         if (qds) {
 
