@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-04-09 r23554):</p>
+        <p>Bugfixes (2019-04-19 r23584):</p>
         <ul>
+            <li>clean up old script examples in https://svn.code.sf.net/p/autoplot/code/autoplot/trunk/Autoplot/src/scripts/
             <li>2143: HAPI client respects dataset time boundaries when caching is enabled.
             <li>rebinner API now passes information about the Z axis so interpolation can be fixed.
             <li>"polar" render type corrects units.
@@ -52,6 +53,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Das2Streams are now read directly into QDataSet.
+            <li>DataSetBuilder can accept fields from DatumVector, for performance.
             <li>imgscalr library added, which will provide faster thumbnails.
             <li>polarToCartesian function and filter added.
             <li>support U. Iowa GitLabs site with GitHubFileSystem.
