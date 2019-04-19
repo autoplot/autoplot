@@ -1100,6 +1100,7 @@ public class ScriptPanelSupport {
                     panel.setContext( JythonScriptPanel.CONTEXT_APPLICATION );
                 }
 
+                this.model.addRecent( file.toString() );
             }
 
         } catch (IOException iOException) {
