@@ -545,6 +545,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                     }
                 }
             };
+            handler.setMonitor(mon);
 
             try {
                 StreamTool.readStream(channel, handler);
