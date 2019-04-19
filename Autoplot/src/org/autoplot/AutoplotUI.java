@@ -208,12 +208,12 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 //f.setWritable( true, true );
                 try {
                     StatePersistence.saveState( f, model.createState(true), "");
-                    f.setReadable( false, false );
-                    f.setReadable( true, true );
-                    f.setWritable( false, false );
-                    f.setWritable( true, true );
+                    if ( !f.setReadable( false, false ) ) logger.info("setReadable failed");
+                    if ( !f.setReadable( true, true ) ) logger.info("setReadable failed");
+                    if ( !f.setWritable( false, false ) ) logger.info("setWritable failed");
+                    if ( !f.setWritable( true, true ) ) logger.info("setWritable failed");
                 } catch (IOException ex) {
-                    logger.log(Level.WARNING, "error while writing  {0}", f2);
+                    logger.log(Level.WARNING, "error while writing  {0}: {1}", new Object[] { f2, ex.toString() } );
                 }
             }
         };
@@ -758,7 +758,6 @@ public final class AutoplotUI extends javax.swing.JFrame {
             public void actionPerformed( final ActionEvent ev ) { 
                 org.das2.util.LoggerManager.logGuiEvent(ev);                
                 final String value= dataSetSelector.getValue();
-                Pattern p= Pattern.compile("(http.*/hapi)(/data\\?id=(.*))?");
                 URISplit split= URISplit.parse(value);
                 if ( split.file.endsWith("/data") ) {
                     split.file= split.file.substring(0,split.file.length()-5);
@@ -787,7 +786,6 @@ public final class AutoplotUI extends javax.swing.JFrame {
             public void actionPerformed( final ActionEvent ev ) {
                 org.das2.util.LoggerManager.logGuiEvent(ev);                
                 final String value= dataSetSelector.getValue();
-                Pattern p= Pattern.compile("(http.*/hapi)(/data\\?id=(.*))?");
                 URISplit split= URISplit.parse(value);
                 if ( split.file.endsWith("/data") ) {
                     split.file= split.file.substring(0,split.file.length()-5);
