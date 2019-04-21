@@ -672,7 +672,7 @@ public final class HapiDataSource extends AbstractDataSource {
         
         return result;
     }
-    
+            
     @Override
     public synchronized QDataSet getDataSet(ProgressMonitor monitor) throws Exception {
         URI server = this.resourceURI;
@@ -754,7 +754,7 @@ public final class HapiDataSource extends AbstractDataSource {
         try {
             startStopDate= DatumRangeUtil.parseTimeRange( info.getString("startDate") + "/"+info.getString("stopDate") );
             if ( tr.intersects( startStopDate ) ) {
-                tr= tr.intersection( startStopDate );
+                tr= DatumRangeUtil.sloppyIntersection( tr, startStopDate );
             } else {
                 if ( tr.max().lt(startStopDate.min() ) ) {
                     throw new NoDataInIntervalException("data begins after this time range");
@@ -803,7 +803,7 @@ public final class HapiDataSource extends AbstractDataSource {
                     Datum minMidnight= TimeUtil.prevMidnight( tr.min() );
                     Datum maxMidnight= TimeUtil.nextMidnight( tr.max() );
                     tr= new DatumRange( minMidnight, maxMidnight );
-                    tr= tr.intersection( startStopDate );
+                    tr= DatumRangeUtil.sloppyIntersection( tr, startStopDate );
                     Datum midnight= TimeUtil.prevMidnight( tr.min() );
                     DatumRange currentDay= new DatumRange( midnight, TimeUtil.next( TimeUtil.DAY, midnight) );
                     QDataSet dsall= null;
@@ -818,11 +818,13 @@ public final class HapiDataSource extends AbstractDataSource {
                         ProgressMonitor mon1= nday==1 ? monitor : monitor.getSubtaskMonitor( 10*iday, 10*(iday+1), "read "+currentDay );
                         QDataSet ds1;
                         try {
-                            DatumRange oneDaysRange= currentDay.intersection( startStopDate );
-                            ds1 = getDataSetViaCsv(totalFields, mon1, url, pds, 
-                                    oneDaysRange, nparam, nfields, getParam( "cache", "" ) );
-                            if ( ds1.length()>0 ) {
-                                dsall= Ops.append( dsall, ds1 );
+                            DatumRange oneDaysRange= DatumRangeUtil.sloppyIntersection( currentDay, startStopDate );
+                            if ( oneDaysRange.width().value()>0 ) {
+                                ds1 = getDataSetViaCsv(totalFields, mon1, url, pds, 
+                                        oneDaysRange, nparam, nfields, getParam( "cache", "" ) );
+                                if ( ds1.length()>0 ) {
+                                    dsall= Ops.append( dsall, ds1 );
+                                }
                             }
                         } catch ( NoDataInIntervalException ex ) {
                             if ( ! FileSystem.settings().isOffline() ) {
