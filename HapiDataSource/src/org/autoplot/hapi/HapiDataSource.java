@@ -935,6 +935,21 @@ public final class HapiDataSource extends AbstractDataSource {
         return useCache;
     }
     
+    /**
+     * read the interval using CSV.
+     * @param totalFields
+     * @param monitor
+     * @param url
+     * @param pds
+     * @param tr
+     * @param nparam
+     * @param nfields
+     * @param useCacheUriParam
+     * @return
+     * @throws IllegalArgumentException
+     * @throws Exception
+     * @throws IOException 
+     */
     public static QDataSet getDataSetViaCsv(int totalFields, ProgressMonitor monitor, 
             URL url, ParamDescription[] pds, DatumRange tr,
             int nparam, int[] nfields, String useCacheUriParam ) throws IllegalArgumentException, Exception, IOException {
@@ -1165,6 +1180,21 @@ public final class HapiDataSource extends AbstractDataSource {
         };        
     }
     
+    /**
+     * read the interval using binary.
+     * @param totalFields
+     * @param monitor
+     * @param url
+     * @param pds
+     * @param tr
+     * @param nparam
+     * @param nfields
+     * @param useCacheUriParam
+     * @return
+     * @throws IllegalArgumentException
+     * @throws Exception
+     * @throws IOException 
+     */
     public static QDataSet getDataSetViaBinary(int totalFields, ProgressMonitor monitor, URL url, 
             ParamDescription[] pds, DatumRange tr, 
             int nparam, int[] nfields, String useCacheUriParam ) throws IllegalArgumentException, Exception, IOException {
@@ -1174,26 +1204,13 @@ public final class HapiDataSource extends AbstractDataSource {
         monitor.setTaskProgress(20);
         long t0 = System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
         
-        boolean useCache= false && useCache(useCacheUriParam);
-        
-        if ( useCache ) { // round out data request to day boundaries.
-            Datum minMidnight= TimeUtil.prevMidnight( tr.min() );
-            Datum maxMidnight= TimeUtil.nextMidnight( tr.max() );
-            tr= new DatumRange( minMidnight, maxMidnight );
-            URISplit split= URISplit.parse(url.toURI());
-            Map<String,String> params= URISplit.parseParams(split.params);
-            params.put("time.min",minMidnight.toString());
-            params.put("time.max",maxMidnight.toString());
-            split.params= URISplit.formatParams(params);
-            String surl= URISplit.format(split);
-            url= new URL(surl);
-        }
-        
-        AbstractLineReader cacheReader;
-        if ( useCache ) { // this branch posts the request, expecting that the server may respond with 304, indicating the cache should be used.
+        boolean cacheIsEnabled= useCache(useCacheUriParam);
+                
+        AbstractBinaryRecordReader cacheReader;
+        if ( cacheIsEnabled ) { // this branch posts the request, expecting that the server may respond with 304, indicating the cache should be used.
             String[] parameters= new String[pds.length];
             for ( int i=0; i<pds.length; i++ ) parameters[i]= pds[i].name;
-            cacheReader= getCacheReader(url, parameters, tr, FileSystem.settings().isOffline(), 0L );
+            cacheReader= null; getCacheReader(url, parameters, tr, FileSystem.settings().isOffline(), 0L );
             if ( cacheReader!=null ) {
                 logger.fine("reading from cache");
             }
@@ -1227,6 +1244,8 @@ public final class HapiDataSource extends AbstractDataSource {
 
         boolean gzip =  cacheReader==null ? "gzip".equals( httpConnect.getContentEncoding() ) : false;
 
+        boolean writeDataToCache= cacheIsEnabled && cacheReader==null;
+        
         int recordLengthBytes = 0;
         TransferType[] tts = new TransferType[pds.length];
 
@@ -1250,16 +1269,14 @@ public final class HapiDataSource extends AbstractDataSource {
         totalFields= DataSetUtil.sum(nfields);
         double[] result = new double[totalFields];
 
-        try (InputStream in = gzip ? new GZIPInputStream(httpConnect.getInputStream()) : httpConnect.getInputStream()) {
+        try ( AbstractBinaryRecordReader in = ( cacheReader!=null ? cacheReader :  
+                new InputStreamBinaryRecordReader( gzip ? new GZIPInputStream(httpConnect.getInputStream()) : httpConnect.getInputStream() ) ) ) {
             ByteBuffer buf = TransferType.allocate( recordLengthBytes,ByteOrder.LITTLE_ENDIAN );
-            byte[] bytes = buf.array();
-            int bytesRead = in.read(bytes);
+            int bytesRead = in.readRecord(buf);
+            
             while (bytesRead != -1) {
-                while ( bytesRead<recordLengthBytes ) {
-                    int b= in.read( bytes, bytesRead, recordLengthBytes-bytesRead );
-                    if ( b==-1 ) throw new InterruptedIOException("expected "+recordLengthBytes+" bytes to complete a record" );
-                    bytesRead+= b;
-                }
+                
+                buf.flip();
                 int ifield = 0;
                 for (int i = 0; i < pds.length; i++) {
                     for (int j = 0; j < nfields[i]; j++) {
@@ -1281,6 +1298,23 @@ public final class HapiDataSource extends AbstractDataSource {
                     double d = DatumRangeUtil.normalize(tr, xx);
                     monitor.setTaskProgress(20 + (int) (75 * d));
                 }
+                
+                                // if a cache file is opened for the previous day, then close the file for the day, gzipping it.
+                if ( writeDataToCache ) {
+                    // TODO: finish writing records.
+                }
+
+                if ( !currentDay.contains(xx) ) {
+                    logger.info("something's gone wrong, perhaps out-of-order timetags.");
+                    completeDay= false;
+                }
+                
+                if ( writeDataToCache ) {
+                    if ( completeDay ) {
+                        // TODO: finish writing records.
+                    }
+                }
+                
                 builder.putValue(-1, ifield, xx);
                 ifield++;
                 for (int i = 1; i < nparam; i++) {  // nparam is number of parameters, which may have multiple fields.
@@ -1293,7 +1327,8 @@ public final class HapiDataSource extends AbstractDataSource {
                 builder.nextRecord();
 
                 buf.flip();
-                bytesRead = in.read(bytes);
+                bytesRead = in.readRecord(buf);
+                
             }
 
         } catch (IOException e) {
