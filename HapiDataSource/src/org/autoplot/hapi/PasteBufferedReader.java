@@ -34,7 +34,12 @@ public class PasteBufferedReader implements AbstractLineReader {
     boolean monotonicKludge= true;
     String greatestValue= null;
     
-    public void setMonotinicKludge( boolean t ) {
+    /**
+     * set the reader to make the stream monotonically increasing in time,
+     * dropping records which are non-monotonic.
+     * @param t 
+     */
+    public void setMonotonicKludge( boolean t ) {
         this.monotonicKludge= t;
     }
     
