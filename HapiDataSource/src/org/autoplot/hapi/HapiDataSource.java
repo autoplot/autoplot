@@ -22,6 +22,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.FileChannel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -122,7 +123,7 @@ public final class HapiDataSource extends AbstractDataSource {
             @Override
             public void reset() {
                 logger.fine("reset cache");
-                HapiDataSource.cache.clear();
+                HapiDataSource.csvCache.clear();
             }
             
         });
@@ -341,20 +342,29 @@ public final class HapiDataSource extends AbstractDataSource {
         return result;
     }
     
-    private static final Map<String,ArrayList<String>> cache= new ConcurrentHashMap<>();
+    private static final Map<String,ArrayList<ByteBuffer>> binaryCache= new ConcurrentHashMap<>();
+   
+    private static final Map<String,ArrayList<String>> csvCache= new ConcurrentHashMap<>();
     
     /**
      * print the cache stats.
      * @see https://sourceforge.net/p/autoplot/bugs/1996/
      */
     public static void printCacheStats() {
-        if ( cache==null || cache.isEmpty() ) {
+        if ( csvCache==null || csvCache.isEmpty() ) {
             System.err.println( "(cache is empty)" );
         } else {
-            for ( Entry<String,ArrayList<String>> s: cache.entrySet() ) {
+            for ( Entry<String,ArrayList<String>> s: csvCache.entrySet() ) {
                 System.err.println( "" + s.getKey() +": "+s.getValue().size()+" records");
             }
         }
+        if ( binaryCache==null || binaryCache.isEmpty() ) {
+            System.err.println( "(cache is empty)" );
+        } else {
+            for ( Entry<String,ArrayList<ByteBuffer>> s: binaryCache.entrySet() ) {
+                System.err.println( "" + s.getKey() +": "+s.getValue().size()+" records");
+            }
+        }        
     }
     
     /**
@@ -393,8 +403,86 @@ public final class HapiDataSource extends AbstractDataSource {
         return hapiCache;
 
     }
+    
+    private static void writeToBinaryCachedData(URL url, ParamDescription[] pp, Datum xx, ByteBuffer buf ) throws IOException {
+        
+        StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + url.getPath() );
+        if ( url.getQuery()!=null ) {
+            String[] querys= url.getQuery().split("\\&");
+            Pattern p= Pattern.compile("id=(.+)");
+            for ( String q : querys ) {
+                Matcher m= p.matcher(q);
+                if ( m.matches() ) {
+                    ub.append("/").append(m.group(1));
+                    break;
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("query must be specified, implementation error");
+        }
+                
+        String hapiCache= getHapiCache();
+        
+        TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d" );
+        
+        String sxx= tp.format(xx);
+                
+        String u= ub.toString();
+        Datum t0= lastRecordFound.get( u + "/" + sxx );
+        if ( t0==null ) {
+            String f= hapiCache + u + "/" + sxx + "." + pp[0].name + ".binary";
+            File ff= new File(f);
+            if ( ff.exists() ) {
+                BufferedReader read= new BufferedReader(new FileReader(ff));
+                String line= read.readLine();
+                String lastLine= null;
+                while ( line!=null ) {
+                    lastLine= line;
+                    line= read.readLine();
+                }
+                if ( lastLine!=null ) {
+                    try {
+                        t0= Units.us2000.parse(lastLine);
+                        lastRecordFound.put( u + "/" + sxx,t0);
+                    } catch (ParseException ex) {
+                        t0= null;
+                    }
+                } else {
+                    t0= null;
+                }
+            }
+        }
+        if ( t0!=null && t0.ge(xx) ) {
+            logger.log(Level.FINE, "clear all cached files for {0}", sxx);
+            for (ParamDescription pp1 : pp) {
+                String f = hapiCache + u + "/" + sxx + "." + pp1.name + ".csv";
+                File ff= new File(f);
+                if ( ff.exists() ) {
+                    if ( !ff.delete() ) logger.log(Level.INFO, "unable to delete file: {0}", ff);
+                }
+            }
+        }
+        
+        for (ParamDescription pp1 : pp) {
+            String f = u + "/" + sxx + "." + pp1.name + ".csv" + "." + Thread.currentThread().getId();
+            logger.log(Level.FINER, "cache.get({0})", f);
+            ArrayList<ByteBuffer> sparam= binaryCache.get(f);
+            if ( sparam==null ) {
+                sparam= new ArrayList<>();
+                binaryCache.put(f,sparam);
+                logger.log(Level.FINE, "cache.put({0},ArrayList({1}))", new Object[]{f, sparam.size()});
+            }
+            
+            sparam.add( buf );
+            
+        }
+        
+        lastRecordFound.put( u + "/" + sxx,xx);
+        
+    }
+    
      
-    private static void writeToCachedData(URL url, ParamDescription[] pp, Datum xx, String[] ss) throws IOException {
+    private static void writeToCsvCachedData(URL url, ParamDescription[] pp, Datum xx, String[] ss) throws IOException {
         
         StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + url.getPath() );
         if ( url.getQuery()!=null ) {
@@ -457,10 +545,10 @@ public final class HapiDataSource extends AbstractDataSource {
         for (ParamDescription pp1 : pp) {
             String f = u + "/" + sxx + "." + pp1.name + ".csv" + "." + Thread.currentThread().getId();
             logger.log(Level.FINER, "cache.get({0})", f);
-            ArrayList<String> sparam= cache.get(f);
+            ArrayList<String> sparam= csvCache.get(f);
             if ( sparam==null ) {
                 sparam= new ArrayList<>();
-                cache.put(f,sparam);
+                csvCache.put(f,sparam);
                 logger.log(Level.FINE, "cache.put({0},ArrayList({1}))", new Object[]{f, sparam.size()});
             }
             
@@ -486,7 +574,74 @@ public final class HapiDataSource extends AbstractDataSource {
      * @param pp parameters 
      * @param xx time used to id the file.
      */
-    private static void writeToCachedDataFinish(URL url, ParamDescription[] pp, Datum xx ) throws IOException {
+    private static void writeToBinaryCachedDataFinish(URL url, ParamDescription[] pp, Datum xx ) throws IOException {
+        
+        if ( true ) {
+            throw new IllegalArgumentException("verify me");
+        } else {
+        
+        logger.log(Level.FINE, "writeToBinaryCachedDataFinish: {0}", xx);
+
+        StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + url.getPath() );
+        if ( url.getQuery()!=null ) { // get the id from the url
+            String[] querys= url.getQuery().split("\\&");
+            Pattern p= Pattern.compile("id=(.+)");
+            for ( String q : querys ) {
+                Matcher m= p.matcher(q);
+                if ( m.matches() ) {
+                    ub.append("/").append(m.group(1));
+                    break;
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("query must be specified, implementation error");
+        }
+        
+        String hapiCache= getHapiCache();
+        
+        String format= "binary";
+
+        long currentTimeMillis= pp[0].modifiedDateMillis;
+        TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d" );
+        String sxx= tp.format(xx);
+        String u= ub.toString();
+        for (ParamDescription pp1 : pp) {
+            String f = u + "/" + sxx + "." + pp1.name + "." + format + "."+ Thread.currentThread().getId();
+            logger.log(Level.FINE, "remove from cache: {0}", f);
+            ArrayList<ByteBuffer> sparam= binaryCache.remove(f);
+            File ff= new File( hapiCache + u + "/" + sxx + "." + pp1.name + "." + format +".gz");
+            if ( !ff.getParentFile().exists() ) {
+                if ( !ff.getParentFile().mkdirs() ) {
+                    throw new IOException("unable to mkdirs "+ff.getParent() );
+                }
+            }
+            File ffTemp= new File( hapiCache + u + "/" + sxx + "." + pp1.name + "."+ format + ".gz."+Thread.currentThread().getId() );
+            //int line=0;
+            
+            ArrayList<ByteBuffer> data= binaryCache.remove(f);
+            
+            try ( FileChannel ffTempChannel= new FileOutputStream(ffTemp).getChannel() ) {
+                for ( ByteBuffer buf: data ) {
+                    ffTempChannel.write(buf);
+                }
+            }
+                        
+            synchronized ( HapiDataSource.class ) {
+                ffTemp.renameTo(ff);
+                if ( currentTimeMillis>0 ) ff.setLastModified(currentTimeMillis);
+            }
+        }
+        }
+    }
+
+    
+    /** 
+     * See https://sourceforge.net/p/autoplot/bugs/2043/
+     * @param url url used to locate position in cache.
+     * @param pp parameters 
+     * @param xx time used to id the file.
+     */
+    private static void writeToCsvCachedDataFinish(URL url, ParamDescription[] pp, Datum xx ) throws IOException {
         logger.log(Level.FINE, "writeToCachedDataFinish: {0}", xx);
 
         StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + url.getPath() );
@@ -506,21 +661,23 @@ public final class HapiDataSource extends AbstractDataSource {
         
         String hapiCache= getHapiCache();
         
+        String format= "csv";
+
         long currentTimeMillis= pp[0].modifiedDateMillis;
         TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d" );
         String sxx= tp.format(xx);
         String u= ub.toString();
         for (ParamDescription pp1 : pp) {
-            String f = u + "/" + sxx + "." + pp1.name + ".csv" + "."+ Thread.currentThread().getId();
+            String f = u + "/" + sxx + "." + pp1.name + "." + format + "."+ Thread.currentThread().getId();
             logger.log(Level.FINE, "remove from cache: {0}", f);
-            ArrayList<String> sparam= cache.remove(f);
-            File ff= new File( hapiCache + u + "/" + sxx + "." + pp1.name + ".csv" +".gz");
+            ArrayList<String> sparam= csvCache.remove(f);
+            File ff= new File( hapiCache + u + "/" + sxx + "." + pp1.name + "." + format +".gz");
             if ( !ff.getParentFile().exists() ) {
                 if ( !ff.getParentFile().mkdirs() ) {
                     throw new IOException("unable to mkdirs "+ff.getParent() );
                 }
             }
-            File ffTemp= new File( hapiCache + u + "/" + sxx + "." + pp1.name + ".csv"+".gz."+Thread.currentThread().getId() );
+            File ffTemp= new File( hapiCache + u + "/" + sxx + "." + pp1.name + "."+ format + ".gz."+Thread.currentThread().getId() );
             //int line=0;
             try (final BufferedWriter w = new BufferedWriter( new OutputStreamWriter( new GZIPOutputStream( new FileOutputStream(ff) ) ) ) ) {
                 if ( sparam!=null ) {
@@ -1007,8 +1164,11 @@ public final class HapiDataSource extends AbstractDataSource {
         
         try ( AbstractLineReader in= ( cacheReader!=null ? cacheReader :
                 new SingleFileBufferedReader( new BufferedReader( new InputStreamReader( gzip ? new GZIPInputStream( httpConnect.getInputStream() ) : httpConnect.getInputStream() ) ) ) ) ) {
+            
             String line= in.readLine();
+            
             while ( line!=null ) {
+                
                 linenumber++;
                 String[] ss= lineSplit(line);
                 if ( ss.length!=totalFields ) {
@@ -1047,7 +1207,7 @@ public final class HapiDataSource extends AbstractDataSource {
                     if ( !currentDay.contains(xx) && tr.intersects(currentDay) && completeDay ) {
                         // https://sourceforge.net/p/autoplot/bugs/1968/ HAPI caching must not cache after "modificationDate" or partial days remain in cache
                         if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
-                            writeToCachedDataFinish( url, pds, currentDay.middle() );
+                            writeToCsvCachedDataFinish(url, pds, currentDay.middle() );
                         } else {
                             logger.fine("data after modification date is not cached.");
                         }
@@ -1059,7 +1219,7 @@ public final class HapiDataSource extends AbstractDataSource {
                         if ( !currentDay.contains(xx) && tr.intersects(currentDay ) ) {
                             if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
                                 // put empty file which is placeholder.
-                                writeToCachedDataFinish( url, pds, currentDay.middle() ); 
+                                writeToCsvCachedDataFinish(url, pds, currentDay.middle() ); 
                             }
                         }
                     }
@@ -1073,7 +1233,7 @@ public final class HapiDataSource extends AbstractDataSource {
                 if ( writeDataToCache ) {
                     if ( completeDay ) {
                         if ( pds[0].modifiedDateMillis==0 || xx.doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
-                            writeToCachedData( url, pds, xx, ss );
+                            writeToCsvCachedData( url, pds, xx, ss );
                         }
                     }
                 }
@@ -1104,7 +1264,7 @@ public final class HapiDataSource extends AbstractDataSource {
                 while ( completeDay && tr.intersects(currentDay) ) {
                     if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
                         // put empty file which is placeholder.
-                        writeToCachedDataFinish( url, pds, currentDay.middle() ); 
+                        writeToCsvCachedDataFinish(url, pds, currentDay.middle() ); 
                     }
                     currentDay= currentDay.next();
                     completeDay= tr.contains(currentDay);
@@ -1268,13 +1428,21 @@ public final class HapiDataSource extends AbstractDataSource {
 
         totalFields= DataSetUtil.sum(nfields);
         double[] result = new double[totalFields];
-
+        
+        int recordnumber=0;
+        int timeWarningCount= 3; // limit the number of times a time warning is issued.
+        
         try ( AbstractBinaryRecordReader in = ( cacheReader!=null ? cacheReader :  
                 new InputStreamBinaryRecordReader( gzip ? new GZIPInputStream(httpConnect.getInputStream()) : httpConnect.getInputStream() ) ) ) {
+            
             ByteBuffer buf = TransferType.allocate( recordLengthBytes,ByteOrder.LITTLE_ENDIAN );
+            
             int bytesRead = in.readRecord(buf);
             
             while (bytesRead != -1) {
+                
+                recordnumber++;
+                logger.log(Level.FINER, "read record number {0}", recordnumber);
                 
                 buf.flip();
                 int ifield = 0;
@@ -1291,17 +1459,47 @@ public final class HapiDataSource extends AbstractDataSource {
                 // copy the data from double array into the builder.
                 ifield= 0;
                 Datum xx;
-                xx = pds[0].units.createDatum(result[0]);
-                if (System.currentTimeMillis() - t0 > 100) {
-                    monitor.setProgressMessage("reading " + xx);
-                    t0 = System.currentTimeMillis();
-                    double d = DatumRangeUtil.normalize(tr, xx);
-                    monitor.setTaskProgress(20 + (int) (75 * d));
+                try {
+                    xx = pds[0].units.createDatum(result[0]);
+                    if (System.currentTimeMillis() - t0 > 100) {
+                        monitor.setProgressMessage("reading " + xx);
+                        t0 = System.currentTimeMillis();
+                        double d = DatumRangeUtil.normalize(tr, xx);
+                        monitor.setTaskProgress(20 + (int) (75 * d));
+                        if ( monitor.isCancelled() ) 
+                            throw new CancelledOperationException("cancel was pressed");
+                    }
+                } catch ( RuntimeException ex ) {
+                    if ( timeWarningCount>0 ) {
+                        logger.log(Level.INFO, "malformed time: {0}", result[0] );
+                        timeWarningCount--;
+                    }
+                    buf.flip();
+                    bytesRead = in.readRecord(buf);
+                    continue;
                 }
-                
                                 // if a cache file is opened for the previous day, then close the file for the day, gzipping it.
                 if ( writeDataToCache ) {
-                    // TODO: finish writing records.
+                    if ( !currentDay.contains(xx) && tr.intersects(currentDay) && completeDay ) {
+                        // https://sourceforge.net/p/autoplot/bugs/1968/ HAPI caching must not cache after "modificationDate" or partial days remain in cache
+                        if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
+                            writeToBinaryCachedDataFinish(url, pds, currentDay.middle() );
+                        } else {
+                            logger.fine("data after modification date is not cached.");
+                        }
+                    }
+                    
+                    while ( !currentDay.contains(xx) && tr.intersects(currentDay ) ) { // find the new current day, writing empty files for any missing days.
+                        currentDay= currentDay.next();
+                        completeDay= tr.contains(currentDay);
+                        if ( !currentDay.contains(xx) && tr.intersects(currentDay ) ) {
+                            if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
+                                // put empty file which is placeholder.
+                                writeToBinaryCachedDataFinish(url, pds, currentDay.middle() ); 
+                            }
+                        }
+                    }
+
                 }
 
                 if ( !currentDay.contains(xx) ) {
