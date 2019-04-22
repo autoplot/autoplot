@@ -10,5 +10,4 @@ import java.io.IOException;
  */
 public interface AbstractLineReader extends Closeable {
     public String readLine() throws IOException;
-    public void close() throws IOException;
 }
