@@ -358,8 +358,9 @@ public final class HapiDataSource extends AbstractDataSource {
     }
     
     /**
-     * return the location of the cache for HAPI data.
-     * @return 
+     * return the local folder of the cache for HAPI data.  This will end with
+     * a slash.
+     * @return the local folder of the cache for HAPI data.
      */
     public static String getHapiCache() {
         String hapiCache= System.getProperty("HAPI_DATA");
@@ -943,10 +944,10 @@ public final class HapiDataSource extends AbstractDataSource {
         monitor.setTaskProgress(20);
         long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
         
-        boolean useCache= useCache(useCacheUriParam);
+        boolean cacheIsEnabled= useCache(useCacheUriParam);
         
         AbstractLineReader cacheReader;
-        if ( useCache ) { // this branch posts the request, expecting that the server may respond with 304, indicating the cache should be used.
+        if ( cacheIsEnabled ) { // this branch posts the request, expecting that the server may respond with 304, indicating the cache should be used.
             String[] parameters= new String[pds.length];
             for ( int i=0; i<pds.length; i++ ) parameters[i]= pds[i].name;
             cacheReader= getCacheReader(url, parameters, tr, FileSystem.settings().isOffline(), 0L );
@@ -983,7 +984,12 @@ public final class HapiDataSource extends AbstractDataSource {
 
         logger.log(Level.FINER, "parse {0}", cacheReader);
         boolean gzip= cacheReader==null ? "gzip".equals( httpConnect.getContentEncoding() ) : false;
+        
+        boolean writeDataToCache= cacheIsEnabled && cacheReader==null;
+        
         int linenumber=0;
+        int timeWarningCount= 3; // limit the number of times a time warning is issued.
+        
         try ( AbstractLineReader in= ( cacheReader!=null ? cacheReader :
                 new SingleFileBufferedReader( new BufferedReader( new InputStreamReader( gzip ? new GZIPInputStream( httpConnect.getInputStream() ) : httpConnect.getInputStream() ) ) ) ) ) {
             String line= in.readLine();
@@ -1013,38 +1019,44 @@ public final class HapiDataSource extends AbstractDataSource {
                             throw new CancelledOperationException("cancel was pressed");
                     }
                 } catch ( ParseException ex ) {
+                    if ( timeWarningCount>0 ) {
+                        logger.log(Level.INFO, "malformed time: {0}", ss[ifield]);
+                        timeWarningCount--;
+                    }
                     line= in.readLine();
                     continue;
                 }
                 
-                // "close" the current file, gzipping it.
-                if ( cacheReader==null && useCache && !currentDay.contains(xx) && tr.intersects(currentDay) && completeDay ) {
-                    // https://sourceforge.net/p/autoplot/bugs/1968/ HAPI caching must not cache after "modificationDate" or partial days remain in cache
-                    if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
-                        writeToCachedDataFinish( url, pds, currentDay.middle() );
-                    } else {
-                        logger.fine("data after modification date is not cached.");
-                    }
-                }
-                
-                while ( !currentDay.contains(xx) && tr.intersects(currentDay ) ) {
-                    currentDay= currentDay.next();
-                    completeDay= tr.contains(currentDay);
-                    if ( cacheReader==null && useCache && !currentDay.contains(xx) && tr.intersects(currentDay ) ) {
+                // if a cache file is opened for the previous day, then close the file for the day, gzipping it.
+                if ( writeDataToCache ) {
+                    if ( !currentDay.contains(xx) && tr.intersects(currentDay) && completeDay ) {
+                        // https://sourceforge.net/p/autoplot/bugs/1968/ HAPI caching must not cache after "modificationDate" or partial days remain in cache
                         if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
-                            // put empty file which is placeholder.
-                            writeToCachedDataFinish( url, pds, currentDay.middle() ); 
+                            writeToCachedDataFinish( url, pds, currentDay.middle() );
+                        } else {
+                            logger.fine("data after modification date is not cached.");
+                        }
+                    }
+                    
+                    while ( !currentDay.contains(xx) && tr.intersects(currentDay ) ) { // find the new current day, writing empty files for any missing days.
+                        currentDay= currentDay.next();
+                        completeDay= tr.contains(currentDay);
+                        if ( !currentDay.contains(xx) && tr.intersects(currentDay ) ) {
+                            if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
+                                // put empty file which is placeholder.
+                                writeToCachedDataFinish( url, pds, currentDay.middle() ); 
+                            }
                         }
                     }
                 }
                 
                 if ( !currentDay.contains(xx) ) {
-                    logger.fine("something's gone wrong, perhaps out-of-order timetags.");
+                    logger.info("something's gone wrong, perhaps out-of-order timetags.");
                     completeDay= false;
                 }
                 
-                if ( completeDay ) {
-                    if ( cacheReader==null && useCache ) {
+                if ( writeDataToCache ) {
+                    if ( completeDay ) {
                         if ( pds[0].modifiedDateMillis==0 || xx.doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
                             writeToCachedData( url, pds, xx, ss );
                         }
@@ -1072,16 +1084,18 @@ public final class HapiDataSource extends AbstractDataSource {
                 builder.nextRecord();
                 line= in.readLine();
             }
-            while ( completeDay && tr.intersects(currentDay) ) {
-                if ( cacheReader==null && useCache ) {
+            
+            if ( writeDataToCache ) {
+                while ( completeDay && tr.intersects(currentDay) ) {
                     if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
                         // put empty file which is placeholder.
                         writeToCachedDataFinish( url, pds, currentDay.middle() ); 
                     }
+                    currentDay= currentDay.next();
+                    completeDay= tr.contains(currentDay);
                 }
-                currentDay= currentDay.next();
-                completeDay= tr.contains(currentDay);
             }
+            
         } catch ( IOException e ) {
             logger.log( Level.WARNING, e.getMessage(), e );
             monitor.finished();
@@ -1408,11 +1422,15 @@ public final class HapiDataSource extends AbstractDataSource {
         return ss;
     }
     
+    /**
+     * return the folder containing data for this id.
+     * @param url
+     * @param id
+     * @return 
+     */
     public static File cacheFolder( URL url, String id ) {
-        String cache= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
-        if ( cache.endsWith("/") ) cache= cache.substring(0,cache.length()-1);
-        
-        String dsroot= cache + "/hapi/" + url.getProtocol() + "/" + url.getHost() + "/" + url.getPath() + "/" + id; 
+        String cache= getHapiCache();
+        String dsroot= cache + "hapi/" + url.getProtocol() + "/" + url.getHost() + "/" + url.getPath() + "/" + id; 
         return new File( dsroot );
     }
     
@@ -1427,7 +1445,7 @@ public final class HapiDataSource extends AbstractDataSource {
      * @return 
      */
     public static LinkedHashMap<String,DatumRange> getCacheFiles( URL url, String id, String[] parameters, DatumRange timeRange ) {
-        String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
+        String s= getHapiCache();
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
         String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
         u= u + "/data/" + id;        
@@ -1525,7 +1543,7 @@ public final class HapiDataSource extends AbstractDataSource {
      * @see #getCacheFiles which has copied code.  TODO: fix this.
      */
     public static AbstractLineReader getCacheReader( URL url, String[] parameters, DatumRange timeRange, boolean offline, long lastModified) {
-        String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
+        String s= getHapiCache();
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
         StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + "/" + url.getPath() );
         if ( url.getQuery()!=null ) {
@@ -1556,7 +1574,7 @@ public final class HapiDataSource extends AbstractDataSource {
         
         String u= ub.toString();
         
-        if ( ! new File( s + "/hapi/"+ u  ).exists() ) {
+        if ( ! new File( s + "/" + u  ).exists() ) {
             return null;
         }
         
@@ -1565,10 +1583,10 @@ public final class HapiDataSource extends AbstractDataSource {
                 DatumRange tr= trs.get(i);
                 for ( int j=0; j<parameters.length; j++ ) {
                     String parameter= parameters[j];
-                    FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" + s + "/hapi/"+ u ), "$Y/$m/$Y$m$d." + parameter + ".csv");
+                    FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" + s + "/"+ u ), "$Y/$m/$Y$m$d." + parameter + ".csv");
                     File[] ff= fsm.getFilesFor(tr);
                     if ( ff.length==0 ) {
-                        FileStorageModel fsmgz = FileStorageModel.create(FileSystem.create( "file:" + s + "/hapi/"+ u ), "$Y/$m/$Y$m$d." + parameter + ".csv.gz");
+                        FileStorageModel fsmgz = FileStorageModel.create(FileSystem.create( "file:" + s + "/"+ u ), "$Y/$m/$Y$m$d." + parameter + ".csv.gz");
                         ff= fsmgz.getFilesFor(tr);
                     }
                     if ( ff.length>1 ) {
