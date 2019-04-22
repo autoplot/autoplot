@@ -17,6 +17,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
@@ -236,6 +237,31 @@ public final class HapiDataSource extends AbstractDataSource {
         if ( id.equals("") ) throw new IllegalArgumentException("missing id");
         id = URLDecoder.decode(id,"UTF-8");
         return HapiServer.getInfo(server.toURL(), id);
+    }
+
+    /**
+     * reformat the URL with the new timerange.
+     * @param url the URL containing time.min and time.max parameters.
+     * @param tr the new timerange
+     * @return the URL with time.min and time.max replaced.
+     */
+    private static URL replaceTimeRangeURL(URL url, DatumRange tr) {
+        try {
+            URISplit split= URISplit.parse(url.toURI());
+            Map<String,String> params= URISplit.parseParams(split.params);
+            String smin= tr.min().toString();
+            String smax= tr.max().toString();
+            if ( smin.endsWith("00:00:00.000Z") ) smin= smin.substring(0,smin.length()-14) + "T00:00Z";
+            if ( smax.endsWith("00:00:00.000Z") ) smax= smax.substring(0,smax.length()-14) + "T00:00Z";
+            params.put("time.min",smin);
+            params.put("time.max",smax);
+            split.params= URISplit.formatParams(params);
+            String surl= URISplit.format(split);
+            url= new URL(surl);
+            return url;
+        } catch (URISyntaxException | MalformedURLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
     
     public static class ParamDescription {
@@ -820,7 +846,8 @@ public final class HapiDataSource extends AbstractDataSource {
                         try {
                             DatumRange oneDaysRange= DatumRangeUtil.sloppyIntersection( currentDay, startStopDate );
                             if ( oneDaysRange.width().value()>0 ) {
-                                ds1 = getDataSetViaCsv(totalFields, mon1, url, pds, 
+                                URL url1= replaceTimeRangeURL(url,oneDaysRange);
+                                ds1 = getDataSetViaCsv(totalFields, mon1, url1, pds, 
                                         oneDaysRange, nparam, nfields, getParam( "cache", "" ) );
                                 if ( ds1.length()>0 ) {
                                     dsall= Ops.append( dsall, ds1 );
