@@ -1135,7 +1135,7 @@ public final class HapiDataSource extends AbstractDataSource {
         if ( cacheIsEnabled ) { // this branch posts the request, expecting that the server may respond with 304, indicating the cache should be used.
             String[] parameters= new String[pds.length];
             for ( int i=0; i<pds.length; i++ ) parameters[i]= pds[i].name;
-            cacheReader= getCacheReader(url, parameters, tr, FileSystem.settings().isOffline(), 0L );
+            cacheReader= getCsvCacheReader(url, parameters, tr, FileSystem.settings().isOffline(), 0L );
             if ( cacheReader!=null ) {
                 logger.fine("reading from cache");
             }
@@ -1383,7 +1383,7 @@ public final class HapiDataSource extends AbstractDataSource {
         if ( cacheIsEnabled ) { // this branch posts the request, expecting that the server may respond with 304, indicating the cache should be used.
             String[] parameters= new String[pds.length];
             for ( int i=0; i<pds.length; i++ ) parameters[i]= pds[i].name;
-            cacheReader= null; getCacheReader(url, parameters, tr, FileSystem.settings().isOffline(), 0L );
+            cacheReader= null; getCsvCacheReader(url, parameters, tr, FileSystem.settings().isOffline(), 0L );
             if ( cacheReader!=null ) {
                 logger.fine("reading from cache");
             }
@@ -1709,10 +1709,10 @@ public final class HapiDataSource extends AbstractDataSource {
      * @param id identifier for the dataset on the server.
      * @param parameters
      * @param timeRange
-     * @see #getCacheReader(java.net.URL, java.lang.String[], org.das2.datum.DatumRange, boolean, long) 
+     * @see #getCsvCacheReader(java.net.URL, java.lang.String[], org.das2.datum.DatumRange, boolean, long) 
      * @return 
      */
-    public static LinkedHashMap<String,DatumRange> getCacheFiles( URL url, String id, String[] parameters, DatumRange timeRange ) {
+    protected static LinkedHashMap<String,DatumRange> getCsvCacheFiles( URL url, String id, String[] parameters, DatumRange timeRange ) {
         String s= getHapiCache();
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
         String u= url.getProtocol() + "/" + url.getHost() + url.getPath();
@@ -1741,7 +1741,7 @@ public final class HapiDataSource extends AbstractDataSource {
   
     }
     
-    private static AbstractLineReader calculateCacheReader( File[][] files ) {
+    private static AbstractLineReader calculateCsvCacheReader( File[][] files ) {
         
         ConcatenateBufferedReader cacheReader= new ConcatenateBufferedReader();
         for ( int i=0; i<files.length; i++ ) {
@@ -1773,7 +1773,7 @@ public final class HapiDataSource extends AbstractDataSource {
      * @return null or the cache reader.
      * @throws IOException 
      */
-    public static AbstractLineReader maybeGetCacheReader( URL url, File[][] files, long lastModified) throws IOException {
+    private static AbstractLineReader maybeGetCsvCacheReader( URL url, File[][] files, long lastModified) throws IOException {
         HttpURLConnection httpConnect;
         if ( FileSystem.settings().isOffline() ) {
             return null;
@@ -1791,7 +1791,7 @@ public final class HapiDataSource extends AbstractDataSource {
         }
         if ( httpConnect.getResponseCode()==304 ) {
             logger.fine("using cache files because server says nothing has changed (304)");
-            return calculateCacheReader( files );
+            return calculateCsvCacheReader( files );
         }
         boolean gzip= "gzip".equals( httpConnect.getContentEncoding() );
         return new SingleFileBufferedReader( new BufferedReader( 
@@ -1808,9 +1808,9 @@ public final class HapiDataSource extends AbstractDataSource {
      * @param lastModified 
      * @return null or the reader to use.
      * @see HapiServer#cacheAgeLimitMillis()
-     * @see #getCacheFiles which has copied code.  TODO: fix this.
+     * @see #getCsvCacheFiles which has copied code.  TODO: fix this.
      */
-    public static AbstractLineReader getCacheReader( URL url, String[] parameters, DatumRange timeRange, boolean offline, long lastModified) {
+    private static AbstractLineReader getCsvCacheReader( URL url, String[] parameters, DatumRange timeRange, boolean offline, long lastModified) {
         String s= getHapiCache();
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
         StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + "/" + url.getPath() );
@@ -1949,13 +1949,13 @@ public final class HapiDataSource extends AbstractDataSource {
         }
         
         try {
-            result= maybeGetCacheReader( url, files, timeStamp );
+            result= maybeGetCsvCacheReader( url, files, timeStamp );
             if ( result!=null ) return result;
         } catch ( IOException ex ) {
             logger.log( Level.WARNING, null, ex );
         }
             
-        AbstractLineReader cacheReader= calculateCacheReader( files );
+        AbstractLineReader cacheReader= calculateCsvCacheReader( files );
         return cacheReader;
                 
     }

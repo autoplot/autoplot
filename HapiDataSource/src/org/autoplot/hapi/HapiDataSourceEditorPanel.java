@@ -659,7 +659,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 JOptionPane.showMessageDialog(this,"id doesn't provide range");
                 return;
             }
-            ff = HapiDataSource.getCacheFiles( this.currentServer, this.currentId, params, tr );
+            ff = HapiDataSource.getCsvCacheFiles( this.currentServer, this.currentId, params, tr );
         } catch ( ParseException ex ) {
             JOptionPane.showMessageDialog( this, "Unable to parse timerange: "+str);
             return;
