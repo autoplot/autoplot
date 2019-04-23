@@ -1383,7 +1383,7 @@ public final class HapiDataSource extends AbstractDataSource {
         if ( cacheIsEnabled ) { // this branch posts the request, expecting that the server may respond with 304, indicating the cache should be used.
             String[] parameters= new String[pds.length];
             for ( int i=0; i<pds.length; i++ ) parameters[i]= pds[i].name;
-            cacheReader= null; //getCsvCacheReader(url, parameters, tr, FileSystem.settings().isOffline(), 0L );
+            cacheReader= getBinaryCacheReader( url, parameters, tr, FileSystem.settings().isOffline(), 0L );
             if ( cacheReader!=null ) {
                 logger.fine("reading from cache");
             }
@@ -1765,6 +1765,27 @@ public final class HapiDataSource extends AbstractDataSource {
         return cacheReader;
     }
     
+    private static AbstractBinaryRecordReader calculateBinaryCacheReader( File[][] files ) {
+        
+        ConcatenateBinaryRecordReader cacheReader= new ConcatenateBinaryRecordReader();
+        for ( int i=0; i<files.length; i++ ) {
+            boolean haveAllForDay= true;
+            if ( haveAllForDay ) {
+                PasteBinaryRecordReader r1= new PasteBinaryRecordReader();
+                for ( int j=0; j<files[i].length; j++ ) {
+                    File oneDayOneParam= files[i][j];
+                    try {
+                        r1.pasteBufferedReader( new SingleFileBinaryReader( oneDayOneParam ) );
+                    } catch (FileNotFoundException ex) {
+                        Logger.getLogger(HapiDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                cacheReader.concatenateReader(r1);                
+            }   
+        }
+        return cacheReader;
+    }
+    
     /**
      * make a connection to the server, expecting that the server might send back a 
      * 304 indicating the cache files should be used.
@@ -1901,6 +1922,142 @@ public final class HapiDataSource extends AbstractDataSource {
                 
     }
 
+    /**
+     * make a connection to the server, expecting that the server might send back a 
+     * 304 indicating the cache files should be used.
+     * @param url HAPI data request URL
+     * @param files corresponding files within cache.
+     * @param lastModified non-zero to indicate time stamp of the oldest file found locally.
+     * @return null or the cache reader.
+     * @throws IOException 
+     */
+    private static AbstractBinaryRecordReader maybeGetBinaryCacheReader( URL url, File[][] files, long lastModified) throws IOException {
+        HttpURLConnection httpConnect;
+        if ( FileSystem.settings().isOffline() ) {
+            return null;
+            //throw new FileSystem.FileSystemOfflineException("file system is offline");
+        } else {
+            loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );            
+            httpConnect= (HttpURLConnection)url.openConnection();
+            httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
+            httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
+            httpConnect.setRequestProperty( "Accept-Encoding", "gzip" );
+            String s= new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z").format(new Date(lastModified));
+            httpConnect.setRequestProperty( "If-Modified-Since", s );
+            httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect);
+            httpConnect.connect();
+        }
+        if ( httpConnect.getResponseCode()==304 ) {
+            logger.fine("using cache files because server says nothing has changed (304)");
+            return calculateBinaryCacheReader( files );
+        }
+        boolean gzip= "gzip".equals( httpConnect.getContentEncoding() );
+        return new InputStreamBinaryRecordReader( gzip ? new GZIPInputStream( httpConnect.getInputStream() ) : httpConnect.getInputStream() );
+    }
+
+    /**
+     * See if it's possible to create a Reader based on the contents of the HAPI
+     * cache.  null is returned when cached files cannot be used.
+     * @param url URL data request URL, where the time range parameters are ignored.
+     * @param parameters the parameters to load, from ParameterDescription.name
+     * @param timeRange the span to cover.  This should be from midnight-to-midnight.
+     * @param offline if true, we are offline and anything available should be used.
+     * @param lastModified 
+     * @return null or the reader to use.
+     * @see HapiServer#cacheAgeLimitMillis()
+     * @see #getCacheFiles which has copied code.  TODO: fix this.
+     */
+    private static AbstractBinaryRecordReader getBinaryCacheReader( URL url, String[] parameters, DatumRange timeRange, boolean offline, long lastModified) {
+        String s= getHapiCache();
+        if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
+        StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + "/" + url.getPath() );
+        if ( url.getQuery()!=null ) {
+            String[] querys= url.getQuery().split("\\&");
+            Pattern p= Pattern.compile("id=(.+)");
+            for ( String q : querys ) {
+                Matcher m= p.matcher(q);
+                if ( m.matches() ) {
+                    ub.append("/").append(m.group(1));
+                    break;
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("query must be specified, implementation error");
+        }
+        
+        
+        DatumRange aday= TimeUtil.dayContaining(timeRange.min());
+        List<DatumRange> trs= DatumRangeUtil.generateList( timeRange, aday );
+        
+        // which granules are available for all parameters?
+        boolean[][] hits= new boolean[trs.size()][parameters.length];
+        File[][] files= new File[trs.size()][parameters.length];
+        
+        boolean staleCacheFiles;
+        
+        String u= ub.toString();
+        
+        if ( ! new File( s + "/" + u  ).exists() ) {
+            return null;
+        }
+        
+        try {
+            FileSystem fs= FileSystem.create( "file:" + s + "/"+ u );
+            staleCacheFiles= getCacheFilesWithTime( trs, parameters, fs, "binary", hits, files, offline, lastModified );
+        } catch ( IOException | IllegalArgumentException ex) {
+            logger.log(Level.FINE, "exception in cache", ex );
+            return null;
+        }
+                
+        if ( staleCacheFiles && !offline ) {
+            logger.fine("old cache files found, but new data is available and accessible");
+            return null;
+        }
+    
+        boolean haveSomething= false;
+        boolean haveAll= true;
+        for ( int i=0; i<trs.size(); i++ ) {
+            for ( int j=0; j<parameters.length; j++ ) {
+                if ( hits[i][j]==false ) {
+                    haveAll= false;
+                }
+            }
+            if ( haveAll ) {
+                haveSomething= true;
+            }
+        }
+        
+        if ( !haveAll ) {
+            checkMissingRange(trs, hits, timeRange);
+        }
+        
+        if ( !offline && !haveAll ) {
+            logger.fine("some cache files missing, but we are on-line and should retrieve all of them");
+            return null;
+        }
+        
+        if ( !haveSomething ) {
+            logger.fine("no cached data found");
+            return null;
+        }
+        
+        AbstractBinaryRecordReader result;
+        
+        long timeStamp= getEarliestTimeStamp(files);
+        
+        try {
+            result= maybeGetBinaryCacheReader( url, files, timeStamp );
+            if ( result!=null ) return result;
+        } catch ( IOException ex ) {
+            logger.log( Level.WARNING, null, ex );
+        }
+            
+        AbstractBinaryRecordReader cacheReader= calculateBinaryCacheReader( files );
+        return cacheReader;
+                
+    }
+    
+    
     private static void checkMissingRange(List<DatumRange> trs, boolean[][] hits, DatumRange timeRange) throws IllegalArgumentException {
         DatumRange missingRange=null;
         for ( int i=0; i<trs.size(); i++ ) {

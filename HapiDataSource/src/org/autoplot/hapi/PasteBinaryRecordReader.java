@@ -1,0 +1,60 @@
+
+package org.autoplot.hapi;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * paste several BufferedReaders together to appear as 
+ * one BufferedReader.
+ * @author jbf
+ */
+public class PasteBinaryRecordReader implements AbstractBinaryRecordReader {
+
+    List<AbstractBinaryRecordReader> readers;
+    
+    public PasteBinaryRecordReader() {
+        readers= new ArrayList<>();
+    }
+    
+    public void pasteBufferedReader( AbstractBinaryRecordReader r ) {
+        readers.add(r);
+    }
+    
+    
+    boolean monotonicKludge= true;
+    String greatestValue= null;
+    
+    /**
+     * set the reader to make the stream monotonically increasing in time,
+     * dropping records which are non-monotonic.
+     * @param t 
+     */
+    public void setMonotonicKludge( boolean t ) {
+        this.monotonicKludge= t;
+    }
+    
+    @Override
+    public int readRecord(ByteBuffer buf) throws IOException {
+        StringBuilder b= new StringBuilder();
+        boolean done= true;
+        int col=0;
+        boolean skipNonMono= false;
+        int i=0;
+        for ( AbstractBinaryRecordReader r: readers ) {
+            int i1= r.readRecord(buf);
+            i+= i1;
+        }
+        return i;
+    }
+
+    @Override
+    public void close() throws IOException {
+        for ( AbstractBinaryRecordReader r: readers ) {
+            r.close();
+        }
+    }
+        
+}

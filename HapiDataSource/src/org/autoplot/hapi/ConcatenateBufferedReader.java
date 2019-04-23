@@ -25,6 +25,11 @@ public class ConcatenateBufferedReader implements AbstractLineReader {
         currentReader= 0;
     }
     
+    /**
+     * add the reader to the readers, so that this reader will be used after the
+     * others are used.
+     * @param r 
+     */    
     public void concatenateBufferedReader( AbstractLineReader r ) {
         readers.add(r);
     }
