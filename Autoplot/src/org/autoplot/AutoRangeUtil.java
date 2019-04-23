@@ -56,9 +56,9 @@ public class AutoRangeUtil {
      * also considers delta_plus, delta_minus properties.
      * TODO: /home/jbf/ct/autoplot/script/study/rfe445_speed/verifyExtentSimpleRange.jy showed that this was 25% slower than extent.
      * TODO: this is almost 800% slower than study445FastRange (above), which shows DataSetIterator is slow.
-     * 
+     * Note: DS_LENGTH_LIMIT limits the total number of points considered.
      * @param ds rank N dataset
-     * @return double[min,max].
+     * @return two-element double, containing min then max.
      */
     private static double[] simpleRange(QDataSet ds) {
         QDataSet max = ds;
@@ -90,20 +90,44 @@ public class AutoRangeUtil {
         QDataSet wmin = DataSetUtil.weightsDataSet(min);
         QDataSet wmax = DataSetUtil.weightsDataSet(max);
         QDataSet wds= DataSetUtil.weightsDataSet(ds);
-        QubeDataSetIterator it = new QubeDataSetIterator(ds);
+        
         double[] result = new double[]{Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY};
-        int i = 0;
+        
+        if ( ds.rank()==1 ) {
+            int n0= Math.min( ds.length(), DS_LENGTH_LIMIT);
+            for ( int i=0; i<n0; i++ ) {
+                if ( wds.value(i)==0. ) continue;
+                double maxv= max.value(i);
+                if ( wmin.value(i)>0. ) result[0] = Math.min(result[0], min.value(i) );
+                if ( wmax.value(i)>0. ) result[1] = Math.max(result[1], maxv );
+            }
+        } else if ( ds.rank()==2 ) {
+            int n0= ds.length();
+            if ( n0>0 ) n0= Math.min( n0, DS_LENGTH_LIMIT/ds.length(0) ) ; // approx
+            for ( int i=0; i<n0; i++ ) {
+                int n1= ds.length(i);
+                for ( int j=0; j<n1; j++ ) {
+                    if ( wds.value(i,j)==0 ) continue;
+                    double maxv= max.value(i,j);
+                    if ( wmin.value(i,j)>0 ) result[0] = Math.min(result[0], min.value(i,j) );
+                    if ( wmax.value(i,j)>0 ) result[1] = Math.max(result[1], maxv );
+                }
+            }
+        } else {
+            QubeDataSetIterator it = new QubeDataSetIterator(ds);
+            int i = 0;
 
-        while (i < DS_LENGTH_LIMIT && it.hasNext()) {
-            it.next();
-            i++;
-            if ( it.getValue(wds)==0 ) continue;
-            double maxv= it.getValue(max);
-            if ( Double.isInfinite( maxv ) ) continue;
-            if (it.getValue(wmin) > 0.)
-                result[0] = Math.min(result[0], it.getValue(min));
-            if (it.getValue(wmax) > 0.)
-                result[1] = Math.max(result[1], maxv );
+            while (i < DS_LENGTH_LIMIT && it.hasNext()) {
+                it.next();
+                i++;
+                if ( it.getValue(wds)==0 ) continue;
+                double maxv= it.getValue(max);
+                if ( Double.isInfinite( maxv ) ) continue;
+                if (it.getValue(wmin) > 0.)
+                    result[0] = Math.min(result[0], it.getValue(min));
+                if (it.getValue(wmax) > 0.)
+                    result[1] = Math.max(result[1], maxv );
+            }
         }
 
         if (result[0] == Double.POSITIVE_INFINITY) {  // no valid data!
