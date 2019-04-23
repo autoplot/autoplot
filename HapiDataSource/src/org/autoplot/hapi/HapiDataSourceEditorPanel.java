@@ -648,6 +648,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         String[] params= getParameters(true).split(",");
         Map<String,DatumRange> ff;
         String str= (String)timeRangeComboBox.getSelectedItem();
+        String format= binaryCB.isSelected() ? "binary" : "csv";
+        
         try {
             DatumRange tr;
             if ( str==null ) {
@@ -659,7 +661,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 JOptionPane.showMessageDialog(this,"id doesn't provide range");
                 return;
             }
-            ff = HapiDataSource.getCsvCacheFiles( this.currentServer, this.currentId, params, tr );
+            ff = HapiDataSource.getCacheFiles( this.currentServer, this.currentId, params, tr, format );
+            
         } catch ( ParseException ex ) {
             JOptionPane.showMessageDialog( this, "Unable to parse timerange: "+str);
             return;

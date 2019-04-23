@@ -1712,7 +1712,7 @@ public final class HapiDataSource extends AbstractDataSource {
      * @see #getCsvCacheReader(java.net.URL, java.lang.String[], org.das2.datum.DatumRange, boolean, long) 
      * @return 
      */
-    protected static LinkedHashMap<String,DatumRange> getCsvCacheFiles( URL url, String id, String[] parameters, DatumRange timeRange ) {
+    protected static LinkedHashMap<String,DatumRange> getCacheFiles( URL url, String id, String[] parameters, DatumRange timeRange, String format ) {
         String s= getHapiCache();
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
         String u= url.getProtocol() + "/" + url.getHost() + url.getPath();
@@ -1723,7 +1723,7 @@ public final class HapiDataSource extends AbstractDataSource {
         try {
             for (String parameter : parameters) {
                 String theFile= s + "/"+ u ;
-                FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" +theFile ), "$Y/$m/$Y$m$d." + parameter + ".csv.gz");
+                FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" +theFile ), "$Y/$m/$Y$m$d." + parameter + "."+format+".gz");
                 String[] ff= fsm.getNamesFor(null);
                 for (String ff1 : ff) {
                     DatumRange tr1= fsm.getRangeFor(ff1);
@@ -1808,7 +1808,7 @@ public final class HapiDataSource extends AbstractDataSource {
      * @param lastModified 
      * @return null or the reader to use.
      * @see HapiServer#cacheAgeLimitMillis()
-     * @see #getCsvCacheFiles which has copied code.  TODO: fix this.
+     * @see #getCacheFiles which has copied code.  TODO: fix this.
      */
     private static AbstractLineReader getCsvCacheReader( URL url, String[] parameters, DatumRange timeRange, boolean offline, long lastModified) {
         String s= getHapiCache();
