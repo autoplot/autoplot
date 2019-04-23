@@ -101,18 +101,6 @@ public class AutoRangeUtil {
                 if ( wmin.value(i)>0. ) result[0] = Math.min(result[0], min.value(i) );
                 if ( wmax.value(i)>0. ) result[1] = Math.max(result[1], maxv );
             }
-        } else if ( ds.rank()==2 ) {
-            int n0= ds.length();
-            if ( n0>0 ) n0= Math.min( n0, DS_LENGTH_LIMIT/ds.length(0) ) ; // approx
-            for ( int i=0; i<n0; i++ ) {
-                int n1= ds.length(i);
-                for ( int j=0; j<n1; j++ ) {
-                    if ( wds.value(i,j)==0 ) continue;
-                    double maxv= max.value(i,j);
-                    if ( wmin.value(i,j)>0 ) result[0] = Math.min(result[0], min.value(i,j) );
-                    if ( wmax.value(i,j)>0 ) result[1] = Math.max(result[1], maxv );
-                }
-            }
         } else {
             QubeDataSetIterator it = new QubeDataSetIterator(ds);
             int i = 0;
