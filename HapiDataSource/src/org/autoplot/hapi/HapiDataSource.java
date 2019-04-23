@@ -1692,13 +1692,13 @@ public final class HapiDataSource extends AbstractDataSource {
     
     /**
      * return the folder containing data for this id.
-     * @param url
-     * @param id
-     * @return 
+     * @param url the hapi URL, such as http://jfaden.net/HapiServerDemo/hapi
+     * @param id the ID, such as "Iowa City Conditions"
+     * @return the folder containing the cache.
      */
     public static File cacheFolder( URL url, String id ) {
         String cache= getHapiCache();
-        String dsroot= cache + "hapi/" + url.getProtocol() + "/" + url.getHost() + "/" + url.getPath() + "/" + id; 
+        String dsroot= cache + "/" + url.getProtocol() + "/" + url.getHost() + "/" + url.getPath() + "/" + id.replaceAll(" ","+"); 
         return new File( dsroot );
     }
     
@@ -1715,14 +1715,14 @@ public final class HapiDataSource extends AbstractDataSource {
     public static LinkedHashMap<String,DatumRange> getCacheFiles( URL url, String id, String[] parameters, DatumRange timeRange ) {
         String s= getHapiCache();
         if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
-        String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
-        u= u + "/data/" + id;        
+        String u= url.getProtocol() + "/" + url.getHost() + url.getPath();
+        u= u + "/data/" + id.replaceAll(" ","+");        
                 
         LinkedHashMap<String,DatumRange> result= new LinkedHashMap<>();
          
         try {
             for (String parameter : parameters) {
-                String theFile= s + "/hapi/"+ u ;
+                String theFile= s + "/"+ u ;
                 FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" +theFile ), "$Y/$m/$Y$m$d." + parameter + ".csv.gz");
                 String[] ff= fsm.getNamesFor(null);
                 for (String ff1 : ff) {
