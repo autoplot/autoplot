@@ -87,27 +87,24 @@ public class AutoRangeUtil {
             }
         }
 
-        //QDataSet wmin = DataSetUtil.weightsDataSet(min);
-        //QDataSet wmax = DataSetUtil.weightsDataSet(max);
-        //QDataSet wds= DataSetUtil.weightsDataSet(ds);
-        //QubeDataSetIterator it = new QubeDataSetIterator(ds);
+        QDataSet wmin = DataSetUtil.weightsDataSet(min);
+        QDataSet wmax = DataSetUtil.weightsDataSet(max);
+        QDataSet wds= DataSetUtil.weightsDataSet(ds);
+        QubeDataSetIterator it = new QubeDataSetIterator(ds);
         double[] result = new double[]{Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY};
-        //int i = 0;
+        int i = 0;
 
-//        while (i < DS_LENGTH_LIMIT && it.hasNext()) {
-//            it.next();
-//            i++;
-//            if ( it.getValue(wds)==0 ) continue;
-//            double maxv= it.getValue(max);
-//            if ( Double.isInfinite( maxv ) ) continue;
-//            if (it.getValue(wmin) > 0.)
-//                result[0] = Math.min(result[0], it.getValue(min));
-//            if (it.getValue(wmax) > 0.)
-//                result[1] = Math.max(result[1], maxv );
-//        }
-        QDataSet extent= Ops.extent(ds);
-        result[0]= extent.value(0);
-        result[1]= extent.value(1);
+        while (i < DS_LENGTH_LIMIT && it.hasNext()) {
+            it.next();
+            i++;
+            if ( it.getValue(wds)==0 ) continue;
+            double maxv= it.getValue(max);
+            if ( Double.isInfinite( maxv ) ) continue;
+            if (it.getValue(wmin) > 0.)
+                result[0] = Math.min(result[0], it.getValue(min));
+            if (it.getValue(wmax) > 0.)
+                result[1] = Math.max(result[1], maxv );
+        }
 
         if (result[0] == Double.POSITIVE_INFINITY) {  // no valid data!
             if (UnitsUtil.isTimeLocation(u)) {
