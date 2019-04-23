@@ -1872,22 +1872,7 @@ public final class HapiDataSource extends AbstractDataSource {
         }
         
         if ( !haveAll ) {
-            DatumRange missingRange=null;
-            for ( int i=0; i<trs.size(); i++ ) {
-                for ( int j=0; j<parameters.length; j++ ) {
-                    if ( hits[i][j]==false ) {
-                        if ( missingRange==null ) {
-                            missingRange= trs.get(i);
-                        } else {
-                            missingRange= DatumRangeUtil.union( missingRange, trs.get(i) );
-                        }
-                    }
-                }
-            }
-            System.err.println("missingRange="+missingRange );
-            if ( missingRange!=null && missingRange.min().equals(timeRange.min()) || missingRange.max().equals(timeRange.max()) ) {
-                System.err.println("candidate for new partial cache, only "+missingRange+" needs to be loaded.");
-            }
+            checkMissingRange(trs, hits, timeRange);
         }
         
         if ( !offline && !haveAll ) {
@@ -1902,15 +1887,7 @@ public final class HapiDataSource extends AbstractDataSource {
         
         AbstractLineReader result;
         
-        // digest all this into a single timestamp.  
-        // For each day, what is the oldest any of the granules was created?
-        // For each interval, what was the oldest of any granule?
-        long timeStamp= Long.MAX_VALUE;
-        for ( int i=0; i<trs.size(); i++ ) {
-            for ( int j=0; j<parameters.length; j++ ) {
-                timeStamp= Math.min( timeStamp, files[i][j].lastModified() );
-            }
-        }
+        long timeStamp= getEarliestTimeStamp(files);
         
         try {
             result= maybeGetCsvCacheReader( url, files, timeStamp );
@@ -1924,6 +1901,38 @@ public final class HapiDataSource extends AbstractDataSource {
                 
     }
 
+    private static void checkMissingRange(List<DatumRange> trs, boolean[][] hits, DatumRange timeRange) throws IllegalArgumentException {
+        DatumRange missingRange=null;
+        for ( int i=0; i<trs.size(); i++ ) {
+            for ( int j=0; j<hits[i].length; j++ ) {
+                if ( hits[i][j]==false ) {
+                    if ( missingRange==null ) {
+                        missingRange= trs.get(i);
+                    } else {
+                        missingRange= DatumRangeUtil.union( missingRange, trs.get(i) );
+                    }
+                }
+            }
+        }
+        System.err.println("missingRange="+missingRange );
+        if ( missingRange!=null && missingRange.min().equals(timeRange.min()) || missingRange.max().equals(timeRange.max()) ) {
+            System.err.println("candidate for new partial cache, only "+missingRange+" needs to be loaded.");
+        }
+    }
+
+    private static long getEarliestTimeStamp( File[][] files ) {
+        // digest all this into a single timestamp.  
+        // For each day, what is the oldest any of the granules was created?
+        // For each interval, what was the oldest of any granule?
+        long timeStamp= Long.MAX_VALUE;
+        for (File[] files1 : files) {
+            for (File file1 : files1 ) {
+                timeStamp = Math.min(timeStamp, file1.lastModified());
+            }
+        }
+        return timeStamp;
+    }
+    
     private static boolean getCacheFilesWithTime(List<DatumRange> trs, String[] parameters, FileSystem fs, String format, boolean[][] hits, File[][] files, boolean offline, long lastModified) throws IOException, IllegalArgumentException {
         boolean staleCacheFiles;
         long timeNow= System.currentTimeMillis();
