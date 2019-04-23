@@ -1383,7 +1383,7 @@ public final class HapiDataSource extends AbstractDataSource {
         if ( cacheIsEnabled ) { // this branch posts the request, expecting that the server may respond with 304, indicating the cache should be used.
             String[] parameters= new String[pds.length];
             for ( int i=0; i<pds.length; i++ ) parameters[i]= pds[i].name;
-            cacheReader= null; getCsvCacheReader(url, parameters, tr, FileSystem.settings().isOffline(), 0L );
+            cacheReader= null; //getCsvCacheReader(url, parameters, tr, FileSystem.settings().isOffline(), 0L );
             if ( cacheReader!=null ) {
                 logger.fine("reading from cache");
             }
@@ -1709,6 +1709,7 @@ public final class HapiDataSource extends AbstractDataSource {
      * @param id identifier for the dataset on the server.
      * @param parameters
      * @param timeRange
+     * @param format
      * @see #getCsvCacheReader(java.net.URL, java.lang.String[], org.das2.datum.DatumRange, boolean, long) 
      * @return 
      */
@@ -1832,13 +1833,11 @@ public final class HapiDataSource extends AbstractDataSource {
         DatumRange aday= TimeUtil.dayContaining(timeRange.min());
         List<DatumRange> trs= DatumRangeUtil.generateList( timeRange, aday );
         
-        long timeNow= System.currentTimeMillis();
-        
         // which granules are available for all parameters?
         boolean[][] hits= new boolean[trs.size()][parameters.length];
         File[][] files= new File[trs.size()][parameters.length];
         
-        boolean staleCacheFiles= false;
+        boolean staleCacheFiles;
         
         String u= ub.toString();
         
@@ -1847,43 +1846,8 @@ public final class HapiDataSource extends AbstractDataSource {
         }
         
         try {
-            for ( int i=0; i<trs.size(); i++ ) {
-                DatumRange tr= trs.get(i);
-                for ( int j=0; j<parameters.length; j++ ) {
-                    String parameter= parameters[j];
-                    FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" + s + "/"+ u ), "$Y/$m/$Y$m$d." + parameter + ".csv");
-                    File[] ff= fsm.getFilesFor(tr);
-                    if ( ff.length==0 ) {
-                        FileStorageModel fsmgz = FileStorageModel.create(FileSystem.create( "file:" + s + "/"+ u ), "$Y/$m/$Y$m$d." + parameter + ".csv.gz");
-                        ff= fsmgz.getFilesFor(tr);
-                    }
-                    if ( ff.length>1 ) {
-                        throw new IllegalArgumentException("implementation error, should get just one file per day.");
-                    } else if ( ff.length==0 ) {
-                        hits[i][j]= false;
-                    } else {
-                        File f= ff[0];
-                        long ageMillis= timeNow - f.lastModified();
-                        boolean isStale= ( ageMillis > HapiServer.cacheAgeLimitMillis() );
-                        if ( lastModified>0 ) {
-                            isStale= f.lastModified() < lastModified; // Note FAT32 only has 4sec resolution, which could cause problems.
-                            if ( !isStale ) {
-                                logger.fine("server lastModified indicates the cache file can be used");
-                            } else {
-                                logger.fine("server lastModified indicates the cache file should be updated");
-                            }
-                        }
-                        if ( offline || !isStale ) {
-                            hits[i][j]= true;
-                            files[i][j]= f;
-                        } else {
-                            logger.log(Level.FINE, "cached file is too old to use: {0}", f);
-                            hits[i][j]= false;
-                            staleCacheFiles= true;
-                        }
-                    }
-                }
-            }
+            FileSystem fs= FileSystem.create( "file:" + s + "/"+ u );
+            staleCacheFiles= getCacheFilesWithTime( trs, parameters, fs, "csv", hits, files, offline, lastModified );
         } catch ( IOException | IllegalArgumentException ex) {
             logger.log(Level.FINE, "exception in cache", ex );
             return null;
@@ -1958,6 +1922,50 @@ public final class HapiDataSource extends AbstractDataSource {
         AbstractLineReader cacheReader= calculateCsvCacheReader( files );
         return cacheReader;
                 
+    }
+
+    private static boolean getCacheFilesWithTime(List<DatumRange> trs, String[] parameters, FileSystem fs, String format, boolean[][] hits, File[][] files, boolean offline, long lastModified) throws IOException, IllegalArgumentException {
+        boolean staleCacheFiles;
+        long timeNow= System.currentTimeMillis();
+        staleCacheFiles= false;
+        for ( int i=0; i<trs.size(); i++ ) {
+            DatumRange tr= trs.get(i);
+            for ( int j=0; j<parameters.length; j++ ) {
+                String parameter= parameters[j];
+                FileStorageModel fsm = FileStorageModel.create( fs, "$Y/$m/$Y$m$d." + parameter + "." + format );
+                File[] ff= fsm.getFilesFor(tr);
+                if ( ff.length==0 ) {
+                    FileStorageModel fsmgz = FileStorageModel.create( fs, "$Y/$m/$Y$m$d." + parameter + "."+format+".gz");
+                    ff= fsmgz.getFilesFor(tr);
+                }
+                if ( ff.length>1 ) {
+                    throw new IllegalArgumentException("implementation error, should get just one file per day.");
+                } else if ( ff.length==0 ) {
+                    hits[i][j]= false;
+                } else {
+                    File f= ff[0];
+                    long ageMillis= timeNow - f.lastModified();
+                    boolean isStale= ( ageMillis > HapiServer.cacheAgeLimitMillis() );
+                    if ( lastModified>0 ) {
+                        isStale= f.lastModified() < lastModified; // Note FAT32 only has 4sec resolution, which could cause problems.
+                        if ( !isStale ) {
+                            logger.fine("server lastModified indicates the cache file can be used");
+                        } else {
+                            logger.fine("server lastModified indicates the cache file should be updated");
+                        }
+                    }
+                    if ( offline || !isStale ) {
+                        hits[i][j]= true;
+                        files[i][j]= f;
+                    } else {
+                        logger.log(Level.FINE, "cached file is too old to use: {0}", f);
+                        hits[i][j]= false;
+                        staleCacheFiles= true;
+                    }
+                }
+            }
+        }
+        return staleCacheFiles;
     }
     
     public static ParamDescription[] getParameterDescriptions(JSONObject doc) throws IllegalArgumentException, ParseException, JSONException {
