@@ -17,6 +17,9 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -69,6 +72,32 @@ public class DataServlet extends HttpServlet {
         }
         if ( v==null ) throw new IllegalArgumentException("required parameter "+name+" is needed");
         return v;
+    }
+    
+    /**
+     * parse RFC 822, RFC 850, and asctime format.
+     * @return the time in milliseconds since 1970-01-01T00:00Z.
+     */
+    private static long parseTime(String str) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat( "EEE, dd MMM yyyy HH:mm:ss z");
+        Date result;
+        try {
+            result= dateFormat.parse(str);
+        } catch ( ParseException ex ) {
+            dateFormat = new SimpleDateFormat( "EEE MMM dd HH:mm:ss yyyy" );
+            try {
+                result= dateFormat.parse(str);
+            } catch ( ParseException ex2 ) {
+                dateFormat = new SimpleDateFormat( "E, dd-MMM-yyyy HH:mm:ss z" );
+                try {
+                    result= dateFormat.parse(str);
+                } catch ( ParseException ex3 ) {
+                    Datum d= Units.ms1970.parse(str);
+                    return (long)d.doubleValue(Units.ms1970);
+                }
+            }
+        }
+        return result.getTime();
     }
     
     /**
@@ -190,6 +219,32 @@ public class DataServlet extends HttpServlet {
                 }
             } catch ( Exception ex ) {
                 throw new IllegalArgumentException("Exception thrown by data read", ex);
+            }
+        }
+        
+        if ( dataFiles!=null ) {
+            // implement if-modified-since logic, where a 302 can be used instead of expensive data response.
+            request.getHeaderNames();
+            String ifModifiedSince= request.getHeader("If-Modified-Since");
+            if ( ifModifiedSince!=null ) {
+                try {
+                    long ms1970= parseTime(ifModifiedSince);
+                    boolean can304= true;
+                    for ( File f: dataFiles ) {
+                        if ( f.lastModified()-ms1970 > 0 ) {
+                            logger.log(Level.FINER, "file is newer than ifModifiedSince header: {0}", f);
+                            can304= false;
+                        }
+                    }
+                    if ( can304 ) {
+                        response.setStatus(304);
+                        out.close();
+                        return;
+                    }
+                } catch ( ParseException ex ) {
+                    response.setHeader("X-WARNING-IF-MODIFIED-SINCE", "date cannot be parsed.");
+                }
+
             }
         }
         
