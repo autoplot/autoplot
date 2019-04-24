@@ -228,10 +228,10 @@ public class DataServlet extends HttpServlet {
             String ifModifiedSince= request.getHeader("If-Modified-Since");
             if ( ifModifiedSince!=null ) {
                 try {
-                    long ms1970= parseTime(ifModifiedSince);
+                    long requestIfModifiedSinceMs1970= parseTime(ifModifiedSince);
                     boolean can304= true;
                     for ( File f: dataFiles ) {
-                        if ( f.lastModified()-ms1970 > 0 ) {
+                        if ( f.lastModified()-requestIfModifiedSinceMs1970 > 0 ) {
                             logger.log(Level.FINER, "file is newer than ifModifiedSince header: {0}", f);
                             can304= false;
                         }
