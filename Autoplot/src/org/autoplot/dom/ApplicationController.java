@@ -268,6 +268,32 @@ public class ApplicationController extends DomNodeController implements RunLater
                 fireActionEvent(new ActionEvent(evt.getSource(), eventId.incrementAndGet(), evt.getPropertyName()));
             }
 
+            if ( evt.getPropertyName().equals("id") ) {
+                String newV= (String)evt.getNewValue();
+                if ( newV.length()>0 ) {
+                    List<String> ids= new ArrayList<>();
+                    ids.add( ApplicationController.this.getApplication().getId() );
+                    for ( DomNode n: ApplicationController.this.getApplication().getAnnotations() ) ids.add( n.getId() );
+                    for ( DomNode n: ApplicationController.this.getApplication().getCanvases() ) ids.add( n.getId() );
+                    for ( DomNode n: ApplicationController.this.getApplication().getCanvases(0).getColumns() ) ids.add( n.getId() );
+                    for ( DomNode n: ApplicationController.this.getApplication().getCanvases(0).getRows() ) ids.add( n.getId() );
+                    ids.add( ApplicationController.this.getApplication().getCanvases(0).getMarginColumn().getId() );
+                    ids.add( ApplicationController.this.getApplication().getCanvases(0).getMarginRow().getId() );
+                    for ( DomNode n: ApplicationController.this.getApplication().getDataSourceFilters() ) ids.add( n.getId() );
+                    for ( DomNode n: ApplicationController.this.getApplication().getPlotElements() ) ids.add( n.getId() );
+                    for ( DomNode n: ApplicationController.this.getApplication().getPlots() ) ids.add( n.getId() );
+                    int count=0;
+                    for ( String s: ids ) {
+                        if ( s.equals(newV) ) {
+                            count++;
+                        }
+                    }
+                    if ( count>1 ) {
+                        System.err.println("duplicate ID, count: "+count + " id: "+newV );
+                    }
+                }
+            }
+            
             DomNodeController c;
             Object oldValue = evt.getOldValue();
             if (oldValue != null) {
