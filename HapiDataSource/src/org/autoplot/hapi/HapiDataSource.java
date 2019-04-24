@@ -1146,7 +1146,6 @@ public final class HapiDataSource extends AbstractDataSource {
             cacheReader= null;
         }
         
-        loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );
         HttpURLConnection httpConnect;
         if ( cacheReader==null ) {
             if ( FileSystem.settings().isOffline() ) {
@@ -1160,6 +1159,7 @@ public final class HapiDataSource extends AbstractDataSource {
                 httpConnect.setRequestProperty( "Accept-Encoding", "gzip" );
                 httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect);
                 httpConnect.connect();
+                loggerUrl.log(Level.FINE, "--> {0} {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
             }
         } else {
             httpConnect= null;
@@ -1409,7 +1409,6 @@ public final class HapiDataSource extends AbstractDataSource {
             cacheReader= null;
         }        
                 
-        loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );
         HttpURLConnection httpConnect;
         if ( cacheReader==null ) {
             if ( FileSystem.settings().isOffline() ) {
@@ -1423,6 +1422,7 @@ public final class HapiDataSource extends AbstractDataSource {
                 httpConnect.setRequestProperty( "Accept-Encoding", "gzip" );
                 httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect);
                 httpConnect.connect();
+                loggerUrl.log(Level.FINE, "--> {0} {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
             }
         } else {
             httpConnect= null;
@@ -1630,6 +1630,7 @@ public final class HapiDataSource extends AbstractDataSource {
         httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
         httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
         httpConnect= (HttpURLConnection) HttpUtil.checkRedirect(httpConnect);
+        loggerUrl.log(Level.FINE, "--> {0} {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( httpConnect.getInputStream() ) ) ) {
             String line= in.readLine();
             lineNum++;
@@ -1836,6 +1837,7 @@ public final class HapiDataSource extends AbstractDataSource {
             httpConnect.setRequestProperty( "If-Modified-Since", s );
             httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect);
             httpConnect.connect();
+            loggerUrl.log(Level.FINE, "--> {0} {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
         }
         if ( httpConnect.getResponseCode()==304 ) {
             logger.fine("using cache files because server says nothing has changed (304)");
@@ -1972,6 +1974,7 @@ public final class HapiDataSource extends AbstractDataSource {
             httpConnect.setRequestProperty( "If-Modified-Since", s );
             httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect);
             httpConnect.connect();
+            loggerUrl.log(Level.FINE, "--> {0} {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
         }
         if ( httpConnect.getResponseCode()==304 ) {
             logger.fine("using cache files because server says nothing has changed (304)");
