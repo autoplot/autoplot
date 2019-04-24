@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -478,6 +479,24 @@ public class HapiServer {
                 line= in.readLine();
             }
         } catch ( IOException ex ) {
+            if ( urlc instanceof HttpURLConnection ) {
+                StringBuilder builder2= new StringBuilder();
+                try ( BufferedReader in2= new BufferedReader( new InputStreamReader( ((HttpURLConnection)urlc).getErrorStream() ) ) ) {
+                    String line= in2.readLine();
+                    while ( line!=null ) {
+                        builder2.append(line);
+                        builder2.append("\n");
+                        line= in2.readLine();
+                    }
+                    String s2= builder2.toString().trim();
+                    if ( type.equals("json") && s2.length()>0 && s2.charAt(0)=='{' ) {
+                        logger.warning("incorrect error code returned, content is JSON");
+                        return s2;
+                    }
+                } catch ( IOException ex2 ) {
+                    logger.log( Level.FINE, ex2.getMessage(), ex2 );
+                }
+            }
             logger.log( Level.FINE, ex.getMessage(), ex );
             lock.lock();
             try {
