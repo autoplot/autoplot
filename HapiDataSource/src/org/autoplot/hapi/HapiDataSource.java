@@ -96,6 +96,9 @@ public final class HapiDataSource extends AbstractDataSource {
      */
     protected static final Logger loggerUrl= org.das2.util.LoggerManager.getLogger( "das2.url" );
     
+    private static String WARNING_TIME_MALFORMED= "time malformed";
+    private static String WARNING_TIME_ORDER= "time out-of-order";
+    
     TimeSeriesBrowse tsb;
     
     public HapiDataSource(URI uri) {
@@ -1173,7 +1176,8 @@ public final class HapiDataSource extends AbstractDataSource {
         boolean writeDataToCache= cacheIsEnabled && cacheReader==null;
         
         int linenumber=0;
-        int timeWarningCount= 3; // limit the number of times a time warning is issued.
+
+        Map<String,Integer> warnings= new LinkedHashMap<>();
         
         try ( AbstractLineReader in= ( cacheReader!=null ? cacheReader :
                 new SingleFileBufferedReader( new BufferedReader( new InputStreamReader( gzip ? new GZIPInputStream( httpConnect.getInputStream() ) : httpConnect.getInputStream() ) ) ) ) ) {
@@ -1207,9 +1211,11 @@ public final class HapiDataSource extends AbstractDataSource {
                             throw new CancelledOperationException("cancel was pressed");
                     }
                 } catch ( ParseException ex ) {
-                    if ( timeWarningCount>0 ) {
+                    if ( !warnings.containsKey( WARNING_TIME_MALFORMED ) ) {
                         logger.log(Level.INFO, "malformed time: {0}", ss[ifield]);
-                        timeWarningCount--;
+                        warnings.put( WARNING_TIME_MALFORMED, 1 );
+                    } else {
+                        warnings.put( WARNING_TIME_MALFORMED, warnings.get( WARNING_TIME_MALFORMED ) + 1 );
                     }
                     line= in.readLine();
                     continue;
@@ -1239,7 +1245,12 @@ public final class HapiDataSource extends AbstractDataSource {
                 }
                 
                 if ( !currentDay.contains(xx) ) {
-                    logger.info("something's gone wrong, perhaps out-of-order timetags.");
+                    if ( !warnings.containsKey( WARNING_TIME_ORDER ) ) {
+                        logger.log(Level.INFO, "something's gone wrong, perhaps out-of-order timetags: {0}", xx);
+                        warnings.put( WARNING_TIME_ORDER, 1 );
+                    } else {
+                        warnings.put( WARNING_TIME_ORDER, warnings.get( WARNING_TIME_ORDER ) + 1 );
+                    }
                     completeDay= false;
                 }
                 
@@ -1300,6 +1311,13 @@ public final class HapiDataSource extends AbstractDataSource {
             throw e;
         } finally {
             if ( httpConnect!=null ) httpConnect.disconnect();
+        }
+        
+        if ( !warnings.isEmpty() ) {
+            logger.warning("Warnings encountered:");
+            for ( Entry<String,Integer> e: warnings.entrySet() ) {
+                logger.log(Level.WARNING, " {0} ({1} times)", new Object[]{e.getKey(), e.getValue()});
+            }
         }
         
         logger.log(Level.FINER, "done parsing {0}", cacheReader);
@@ -1443,7 +1461,8 @@ public final class HapiDataSource extends AbstractDataSource {
         double[] result = new double[totalFields];
         
         int recordnumber=0;
-        int timeWarningCount= 3; // limit the number of times a time warning is issued.
+        
+        Map<String,Integer> warnings= new LinkedHashMap<>();
         
         try ( AbstractBinaryRecordReader in = ( cacheReader!=null ? cacheReader :  
                 new InputStreamBinaryRecordReader( gzip ? new GZIPInputStream(httpConnect.getInputStream()) : httpConnect.getInputStream() ) ) ) {
@@ -1483,9 +1502,11 @@ public final class HapiDataSource extends AbstractDataSource {
                             throw new CancelledOperationException("cancel was pressed");
                     }
                 } catch ( RuntimeException ex ) {
-                    if ( timeWarningCount>0 ) {
-                        logger.log(Level.INFO, "malformed time: {0}", result[0] );
-                        timeWarningCount--;
+                    if ( !warnings.containsKey( WARNING_TIME_MALFORMED ) ) {
+                        logger.log(Level.INFO, "malformed time");
+                        warnings.put( WARNING_TIME_MALFORMED, 1 );
+                    } else {
+                        warnings.put( WARNING_TIME_MALFORMED, warnings.get( WARNING_TIME_MALFORMED ) + 1 );
                     }
                     buf.flip();
                     bytesRead = in.readRecord(buf);
@@ -1516,7 +1537,12 @@ public final class HapiDataSource extends AbstractDataSource {
                 }
 
                 if ( !currentDay.contains(xx) ) {
-                    logger.info("something's gone wrong, perhaps out-of-order timetags.");
+                    if ( !warnings.containsKey( WARNING_TIME_ORDER ) ) {
+                        logger.log(Level.INFO, "something's gone wrong, perhaps out-of-order timetags: {0}", xx);
+                        warnings.put( WARNING_TIME_ORDER, 1 );
+                    } else {
+                        warnings.put( WARNING_TIME_ORDER, warnings.get( WARNING_TIME_ORDER ) + 1 );
+                    }
                     completeDay= false;
                 }
                 
