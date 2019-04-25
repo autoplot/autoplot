@@ -139,7 +139,6 @@ public class FitsDataSource extends AbstractDataSource {
     }
 
     private MutablePropertyDataSet adaptColumn( final FitsColumn fc, final int len0 ) {
-        fc.getDataType();
         
         final int rank= fc.getRepeat()==1 ? 1 : 2;
         final int len1= fc.getRepeat();
