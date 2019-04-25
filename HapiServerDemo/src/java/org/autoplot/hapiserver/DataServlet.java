@@ -216,16 +216,20 @@ public class DataServlet extends HttpServlet {
                             throw new IllegalArgumentException("bad id: "+id+", does not exist: "+dataFile );
                         }
                     }
+                } else {
+                    logger.log(Level.FINER, "have dsiter {0} ms.", System.currentTimeMillis()-t0);
                 }
             } catch ( Exception ex ) {
                 throw new IllegalArgumentException("Exception thrown by data read", ex);
             }
         }
         
+        logger.log(Level.FINE, "dataFiles: {0}", dataFiles);
+        
         if ( dataFiles!=null ) {
             // implement if-modified-since logic, where a 302 can be used instead of expensive data response.
-            request.getHeaderNames();
             String ifModifiedSince= request.getHeader("If-Modified-Since");
+            logger.log(Level.FINE, "If-Modified-Since: {0}", ifModifiedSince);
             if ( ifModifiedSince!=null ) {
                 try {
                     long requestIfModifiedSinceMs1970= parseTime(ifModifiedSince);
