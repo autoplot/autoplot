@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Internal API changes will allow for a correction when interpolating spectrograms, where the log/lin zaxis is not considered when combining numbers.
+        <p><small>Morel mushroom found in the garden.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,9 @@
         
         <p>Bugfixes (2019-04-19 r23584):</p>
         <ul>
+            <li>2145: avoid infinite loop in Events List when there are no events in the next intervals.
+            <li>corrections to other bugs with the HAPI client when caching was turned on.
+            <li>performance improvements with new Das2Stream reader, along minor bugs pointed out by Jenkins tests.
             <li>clean up old script examples in https://svn.code.sf.net/p/autoplot/code/autoplot/trunk/Autoplot/src/scripts/
             <li>2143: HAPI client respects dataset time boundaries when caching is enabled.
             <li>rebinner API now passes information about the Z axis so interpolation can be fixed.
@@ -53,6 +56,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Autoplot-based HAPI Server supports If-Modified-Since header.
+            <li>handle rank 1 with optimized loop in simpleRange.
+            <li>HAPI data source now caches binary transactions.
             <li>Das2Streams are now read directly into QDataSet.
             <li>DataSetBuilder can accept fields from DatumVector, for performance.
             <li>imgscalr library added, which will provide faster thumbnails.
