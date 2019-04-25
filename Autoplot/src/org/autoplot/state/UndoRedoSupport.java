@@ -604,7 +604,7 @@ public class UndoRedoSupport {
      * states held, when redos can be done.
      * @return the current depth.
      */
-    public int getDepth() {
+    public synchronized int getDepth() {
         return stateStackPos;
     }
 
