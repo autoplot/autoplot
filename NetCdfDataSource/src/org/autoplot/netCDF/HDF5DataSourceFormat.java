@@ -253,8 +253,8 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
             for ( Variable v : oldfile.getVariables() ) {
                 //logger.log(Level.FINER, "ncfile.findVariable({0})", v.getName());
                 //Variable newVariable= ncfile.findVariable(v.getName());
-                logger.log(Level.FINER, "v.getShape()" );
-                v.getShape();
+                //logger.log(Level.FINER, "v.getShape()" );
+                //v.getShape();
                 logger.log(Level.FINER, "v.read()" );
                 Array a= v.read();
                 logger.log(Level.FINE, "a={0}", a);
