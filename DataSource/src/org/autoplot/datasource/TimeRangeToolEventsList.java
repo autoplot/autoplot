@@ -538,14 +538,14 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         tsb.setTimeRange( range );
         ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(TimeRangeToolEventsList.this),"Loading Events File...");
         try {
-            QDataSet currentDataSet1= dss.getDataSet(mon);
+            QDataSet currentDataSet1= dss.getDataSet(mon.getSubtaskMonitor("Load Data"));
             currentDataSet1= makeCanonical(currentDataSet1);
             //TODO: someone is going to want to trim to this range.  QDataSet rr= Ops.trim()
             currentDataSet= SemanticOps.trim( currentDataSet1, range, null );
         } catch ( Exception ex ) {
             currentDataSet= null;
         } finally {
-            if ( !mon.isFinished() ) mon.finished();
+            mon.finished();
             fillList();
             final int i;
             if ( dir==-1 ) {
@@ -559,8 +559,10 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             Runnable run= new Runnable() {
                 public void run() {
                     if ( i>0 ) {
-                        jTable1.getSelectionModel().setSelectionInterval(i,i);
-                        jTable1.setEnabled(true);
+                        if ( currentDataSet!=null && currentDataSet.length()>0 ) {
+                            jTable1.getSelectionModel().setSelectionInterval(i,i);
+                            jTable1.setEnabled(true);
+                        }
                     }
                     timeRangeTF.setText( range.toString() );
                 }
