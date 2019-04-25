@@ -38,10 +38,6 @@ public class PasteBinaryRecordReader implements AbstractBinaryRecordReader {
     
     @Override
     public int readRecord(ByteBuffer buf) throws IOException {
-        StringBuilder b= new StringBuilder();
-        boolean done= true;
-        int col=0;
-        boolean skipNonMono= false;
         int i=0;
         for ( AbstractBinaryRecordReader r: readers ) {
             int i1= r.readRecord(buf);
