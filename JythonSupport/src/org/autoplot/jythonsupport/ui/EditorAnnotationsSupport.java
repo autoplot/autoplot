@@ -245,7 +245,6 @@ public class EditorAnnotationsSupport {
         final String text= ltext;
         
         Element root = editorPanel.getDocument().getDefaultRootElement();
-        root.getElementCount();
         if ( line>root.getElementCount()+1 ) {
             System.err.println("*** can't annotate line: "+lline );
             return;

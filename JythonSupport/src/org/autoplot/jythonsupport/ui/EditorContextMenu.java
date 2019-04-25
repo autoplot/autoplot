@@ -552,7 +552,6 @@ public class EditorContextMenu {
                         String java= JythonToJavaConverter.convert(doThis);
                         JEditorPane a= new JEditorPane();
                         DefaultSyntaxKit.initKit();
-                        SyntaxStyles.getInstance().getStyle(TokenType.DELIMITER).isDrawTabs();
                         a.setContentType("text/java");
                         a.setText(java);
                         JDialog d= new JDialog();

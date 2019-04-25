@@ -191,8 +191,6 @@ public class EditorTextPane extends JEditorPane {
                 doLayout(); // kludge for DefaultSyntaxKit
                 DefaultSyntaxKit.initKit();
                 
-                SyntaxStyles.getInstance().getStyle(TokenType.DELIMITER).isDrawTabs();
-
                 JPopupMenu oldPopup= EditorTextPane.this.getComponentPopupMenu();
                 EditorTextPane.this.setContentType("text/python");
 
@@ -302,7 +300,6 @@ public class EditorTextPane extends JEditorPane {
                         deft.setColorString("0x000000");
                     }
                 }
-                SyntaxStyles.getInstance().getStyle(TokenType.DELIMITER).isDrawTabs();
                 a.setContentType("text/python");
                 d= new JDialog();
                 d.setTitle("Completions Peek Editor");
