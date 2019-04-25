@@ -240,6 +240,7 @@ public class DataServlet extends HttpServlet {
                             can304= false;
                         }
                     }
+                    logger.log(Level.FINE, "If-Modified-Since allows 304 response: {0}", can304);
                     if ( can304 ) {
                         response.setStatus(304);
                         out.close();
