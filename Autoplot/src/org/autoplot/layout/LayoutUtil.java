@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.das2.graph.DasAnnotation;
+import org.das2.graph.DasAxis;
 
 /**
  * utility methods for adjusting canvas layout.
@@ -101,6 +102,8 @@ public class LayoutUtil {
 
         count++;
         
+        boolean tcaAreComing= false;
+        
         for (DasCanvasComponent cc : canvas.getCanvasComponents()) {
 
             Rectangle bounds;
@@ -133,6 +136,10 @@ public class LayoutUtil {
                 if ( bounds.height>0 ) {
                     currentBoundsYMin = Math.min(currentBoundsYMin, bounds.y);
                     currentBoundsYMax = Math.max(currentBoundsYMax, bounds.y + bounds.height);
+                }
+                
+                if ( cc instanceof DasAxis && ((DasAxis)cc).isDrawTca() && !((DasAxis)cc).isTcaLoaded() ) {
+                    tcaAreComing= true; // anticipate that TCA will be coming.
                 }
             }
         }
@@ -167,7 +174,12 @@ public class LayoutUtil {
 
         old = marginRow.getDMinimum();
         needYmin = old - currentBoundsYMin;
-
+        
+        if ( needYmin< -7*em && tcaAreComing ) { // seven (or so) lines of tca might be coming, and this is why there's a big gap.
+            logger.fine("anticipate that TCA data will be loaded, changing xaxis height.");
+            needYmin= 0;
+        }
+        
         old = marginRow.getDMaximum();
         needYmax = currentBoundsYMax - old;
 
