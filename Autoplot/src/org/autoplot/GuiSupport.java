@@ -1751,6 +1751,7 @@ public class GuiSupport {
                     l.setAlignmentX(0.f);
                     p1.add(l);
                     JComboBox cb= new JComboBox(uu);
+                    cb.setSelectedItem(u);
                     cb.setAlignmentX(0.f);
                     p1.add(cb);
                     if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( p,
