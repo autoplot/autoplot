@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-04-19 r23584):</p>
+        <p>Bugfixes (2019-04-27 r23627):</p>
         <ul>
+            <li>doDataSetReduce of SeriesRenderer now reduces to 1/2 pixel, so that "1px" sized black dots appear black.
+            <li>performance improvements to the HugeScatterRenderer.
             <li>2145: avoid infinite loop in Events List when there are no events in the next intervals.
             <li>corrections to other bugs with the HAPI client when caching was turned on.
             <li>performance improvements with new Das2Stream reader, along minor bugs pointed out by Jenkins tests.
@@ -56,6 +58,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>sftp support uses java property user.name to get the username by default, so two people can share .vaps with different .ssh keys.
+            <li>ImageVectorDataSetRenderer renamed to HugeScatterRebinner.
             <li>Autoplot-based HAPI Server supports If-Modified-Since header.
             <li>handle rank 1 with optimized loop in simpleRange.
             <li>HAPI data source now caches binary transactions.
