@@ -28,6 +28,8 @@
         
         <p>Bugfixes (2019-04-27 r23627):</p>
         <ul>
+            <li>2147: data reduction with series renderer and small pixels would result in washed-out image.
+            <li>2146: autolayout incorrectly reclaims room for TCAs, adding noise to vap loading.
             <li>doDataSetReduce of SeriesRenderer now reduces to 1/2 pixel, so that "1px" sized black dots appear black.
             <li>performance improvements to the HugeScatterRenderer.
             <li>2145: avoid infinite loop in Events List when there are no events in the next intervals.
