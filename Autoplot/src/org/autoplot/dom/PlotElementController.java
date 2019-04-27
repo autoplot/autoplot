@@ -52,7 +52,7 @@ import org.das2.graph.DasPlot;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.DigitalRenderer;
 import org.das2.graph.EventsRenderer;
-import org.das2.graph.ImageVectorDataSetRenderer;
+import org.das2.graph.HugeScatterRenderer;
 import org.das2.graph.PitchAngleDistributionRenderer;
 import org.das2.graph.PsymConnector;
 import org.das2.graph.RGBImageRenderer;
@@ -722,7 +722,7 @@ public class PlotElementController extends DomNodeController {
                 default:
                     return false;
             }
-        } else if ( getRenderer() instanceof ImageVectorDataSetRenderer ) {
+        } else if ( getRenderer() instanceof HugeScatterRenderer ) {
             switch (fillDs.rank()) {
                 case 1:
                     return true;
@@ -1917,8 +1917,8 @@ public class PlotElementController extends DomNodeController {
             bindToSeriesRenderer((SeriesRenderer) renderer);
         } else if (renderer instanceof SpectrogramRenderer) {
             bindToSpectrogramRenderer((SpectrogramRenderer) renderer);
-        } else if (renderer instanceof ImageVectorDataSetRenderer) {
-            bindToImageVectorDataSetRenderer((ImageVectorDataSetRenderer) renderer);
+        } else if (renderer instanceof HugeScatterRenderer) {
+            bindToImageVectorDataSetRenderer((HugeScatterRenderer) renderer);
         } else if (renderer instanceof EventsRenderer ) {
             bindToEventsRenderer((EventsRenderer)renderer);
         } else if (renderer instanceof DigitalRenderer ) {
@@ -3251,7 +3251,7 @@ public class PlotElementController extends DomNodeController {
 
     }
 
-    public void bindToImageVectorDataSetRenderer(ImageVectorDataSetRenderer renderer) {
+    public void bindToImageVectorDataSetRenderer(HugeScatterRenderer renderer) {
         ApplicationController ac = this.dom.controller;
         ac.bind(plotElement.style, "color", renderer, "color");
     }

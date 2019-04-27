@@ -104,7 +104,7 @@ import org.das2.graph.DasRow;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.DigitalRenderer;
 import org.das2.graph.EventsRenderer;
-import org.das2.graph.ImageVectorDataSetRenderer;
+import org.das2.graph.HugeScatterRenderer;
 import org.das2.graph.PitchAngleDistributionRenderer;
 import org.das2.graph.PsymConnector;
 import org.das2.graph.RGBImageRenderer;
@@ -1312,10 +1312,10 @@ public class AutoplotUtil {
             result.setRebinner( nn );
             return result;
         } else if (renderType == RenderType.hugeScatter) {
-            if (recyclable != null && recyclable instanceof ImageVectorDataSetRenderer) {
+            if (recyclable != null && recyclable instanceof HugeScatterRenderer) {
                 return recyclable;
             } else {
-                ImageVectorDataSetRenderer result = new ImageVectorDataSetRenderer(null);
+                HugeScatterRenderer result = new HugeScatterRenderer(null);
                 result.setEnvelope(1); 
                 result.setDataSetLoader(null);
                 return result;
