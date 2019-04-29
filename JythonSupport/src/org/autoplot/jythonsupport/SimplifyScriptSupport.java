@@ -234,7 +234,7 @@ public class SimplifyScriptSupport {
                             lastLine1= stmts[istatement+1].beginLine-1;
                          }
                          if ( iff.orelse[0].beginLine==0 ) {
-                            appendToResult( result, ss[beginLine+1] + " # huphup" ); 
+                            appendToResult( result, ss[beginLine+1] + "\n    pass # huphup else" ); 
                          } else {
                             beginLine= iff.orelse[0].beginLine;
                          }
@@ -243,7 +243,7 @@ public class SimplifyScriptSupport {
                             appendToResult( result,ss[iff.orelse[0].beginLine-2] ); 
                          }
                          result.append("\n");
-                         appendToResult( result,ss2);
+                         //appendToResult( result,ss2);
                      }
                  }
                  currentLine= lastLine1;
