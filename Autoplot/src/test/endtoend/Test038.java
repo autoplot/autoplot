@@ -80,7 +80,7 @@ public class Test038 {
             String script= JythonUtil.readScript( new FileReader(file) );
             String scrip= org.autoplot.jythonsupport.JythonUtil.simplifyScriptToGetParams(script,true);
             File f= new File(file);
-            String fout= "./test038_"+f.getName();
+            String fout= "./test038_params_"+f.getName();
             try (FileWriter fw = new FileWriter(fout)) {
                 fw.append(scrip);
             }
