@@ -4,7 +4,9 @@
  */
 package test.endtoend;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -40,11 +42,8 @@ public class Test038 {
             String scrip= org.autoplot.jythonsupport.JythonUtil.simplifyScriptToGetParams(script,true);
             File f= new File(file);
             String fout= "./test038_"+f.getName();
-            FileWriter fw= new FileWriter(fout);
-            try {
+            try (FileWriter fw = new FileWriter(fout)) {
                 fw.append(scrip);
-            } finally {
-                fw.close();
             }
             List<Param> parms= org.autoplot.jythonsupport.JythonUtil.getGetParams( script );
             for ( Param p: parms ) {
@@ -56,6 +55,28 @@ public class Test038 {
             System.err.println( String.format( "failed within %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
         }
 
+    }
+    
+    /**
+     * this allows us to make a list of tests with an external file.
+     * @param f 
+     */
+    public static void doTestMany( String f ) {
+        System.err.println("Reading tests from file: "+f);
+        try ( BufferedReader in= new BufferedReader( new FileReader(f) ) ) {
+            String s= in.readLine();
+            int i=s.indexOf("#");
+            if ( i>0 ) s= s.substring(0,i);
+            s= s.trim();
+            String[] ss= s.split(" ",-2);
+            if ( ss.length==2 ) {
+                doTestGetParams( ss[0], ss[1] );
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Test038.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Test038.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     /**
@@ -73,6 +94,7 @@ public class Test038 {
         doTestGetParams("005","/home/jbf/ct/hudson/script/test038/demoParms2.jy");
         doTestGetParams("006","/home/jbf/ct/hudson/script/test038/fce_A.jyds");
         doTestGetParams("007","/home/jbf/ct/hudson/script/test038/fce_A_2.jyds");
+        doTestMany("/home/jbf/ct/hudson/script/test038/test038.txt");
     }
     
     public static void main( String[] args ) throws IOException {
