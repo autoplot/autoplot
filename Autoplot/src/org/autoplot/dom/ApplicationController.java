@@ -2340,8 +2340,11 @@ public class ApplicationController extends DomNodeController implements RunLater
                                     if (!okay) {
                                         p.removeRenderer(rr1);
                                     }
-                                    rr1.setTopDecorator(null);                                    
+                                    rr1.setBottomDecorator(null);
+                                    rr1.setTopDecorator(null);    
                                 }
+                                p.setBottomDecorator(null);
+                                p.setTopDecorator(null);
                                 p.getXAxis().setTickV(null);
                                 p.getYAxis().setTickV(null);
                             }
