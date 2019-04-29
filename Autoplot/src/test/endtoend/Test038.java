@@ -17,6 +17,8 @@ import org.das2.util.LoggerManager;
 import org.python.util.PythonInterpreter;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.JythonUtil.Param;
+import org.autoplot.jythonsupport.SimplifyScriptSupport;
+import org.python.core.PyException;
 
 /**
  * Test of Jython features.
@@ -33,7 +35,44 @@ public class Test038 {
      * @param file
      * @throws Exception 
      */
-    private static void doTestGetParams( String testId, String file ) {
+    private static void doTests( String testId, String file ) {
+        doTestsGetParams(testId,file);
+        doTestsGetCompletions(testId,file);
+    }
+    
+    /**
+     * this goes through the entire script, refactoring to make a similar 
+     * script which can be used to complete on variable names and function
+     * calls.
+     * @param testId
+     * @param file 
+     */
+    private static void doTestsGetCompletions( String testId, String file ) {
+        long t0= System.currentTimeMillis();
+        System.err.println("== test "+testId+": "+ file + " ==" );
+        
+        try {
+            String script= JythonUtil.readScript( new FileReader(file) );
+            String scrip= SimplifyScriptSupport.simplifyScriptToCompletions(script);
+
+            File f= new File(file);
+            String fout= "./test038_completions_"+f.getName();
+            try (FileWriter fw = new FileWriter(fout)) {
+                fw.append(scrip);
+            }
+            List<Param> parms= org.autoplot.jythonsupport.JythonUtil.getGetParams( script );
+            for ( Param p: parms ) {
+                System.err.println(p);
+            }
+            System.err.println( String.format( "read params in %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
+        } catch ( Exception ex ) {
+            ex.printStackTrace();
+            System.err.println( String.format( "failed within %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
+        }
+
+    }
+    
+    private static void doTestsGetParams( String testId, String file ) {
         long t0= System.currentTimeMillis();
         System.err.println("== test "+testId+": "+ file + " ==" );
         
@@ -50,7 +89,7 @@ public class Test038 {
                 System.err.println(p);
             }
             System.err.println( String.format( "read params in %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
-        } catch ( Exception ex ) {
+        } catch ( IOException | PyException ex ) {
             ex.printStackTrace();
             System.err.println( String.format( "failed within %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
         }
@@ -70,7 +109,7 @@ public class Test038 {
             s= s.trim();
             String[] ss= s.split(" ",-2);
             if ( ss.length==2 ) {
-                doTestGetParams( ss[0], ss[1] );
+                doTests( ss[0], ss[1] );
             }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Test038.class.getName()).log(Level.SEVERE, null, ex);
@@ -84,16 +123,16 @@ public class Test038 {
      * script can be executed quickly.
      */
     public static void testGetParams() {
-        doTestGetParams("009","/home/jbf/ct/hudson/script/test038/jydsCommentBug.jyds");  // Chris has a newline before the closing ).
-        doTestGetParams("008","/home/jbf/ct/hudson/script/test038/jedi_l3_valid_tofxe_events.jyds");
-        doTestGetParams("000","/home/jbf/ct/hudson/script/test038/trivial.jy");
-        doTestGetParams("001","/home/jbf/ct/hudson/script/test038/demoParms0.jy");
-        doTestGetParams("002","/home/jbf/ct/hudson/script/test038/demoParms1.jy");
-        doTestGetParams("003","/home/jbf/ct/hudson/script/test038/demoParms.jy");
-        doTestGetParams("004","/home/jbf/ct/hudson/script/test038/rbsp/emfisis/background_removal_wfr.jyds");
-        doTestGetParams("005","/home/jbf/ct/hudson/script/test038/demoParms2.jy");
-        doTestGetParams("006","/home/jbf/ct/hudson/script/test038/fce_A.jyds");
-        doTestGetParams("007","/home/jbf/ct/hudson/script/test038/fce_A_2.jyds");
+        doTests("009","/home/jbf/ct/hudson/script/test038/jydsCommentBug.jyds");  // Chris has a newline before the closing ).
+        doTests("008","/home/jbf/ct/hudson/script/test038/jedi_l3_valid_tofxe_events.jyds");
+        doTests("000","/home/jbf/ct/hudson/script/test038/trivial.jy");
+        doTests("001","/home/jbf/ct/hudson/script/test038/demoParms0.jy");
+        doTests("002","/home/jbf/ct/hudson/script/test038/demoParms1.jy");
+        doTests("003","/home/jbf/ct/hudson/script/test038/demoParms.jy");
+        doTests("004","/home/jbf/ct/hudson/script/test038/rbsp/emfisis/background_removal_wfr.jyds");
+        doTests("005","/home/jbf/ct/hudson/script/test038/demoParms2.jy");
+        doTests("006","/home/jbf/ct/hudson/script/test038/fce_A.jyds");
+        doTests("007","/home/jbf/ct/hudson/script/test038/fce_A_2.jyds");
         doTestMany("/home/jbf/ct/hudson/script/test038/test038.txt");
     }
     
