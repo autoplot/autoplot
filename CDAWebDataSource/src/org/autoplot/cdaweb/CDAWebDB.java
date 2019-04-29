@@ -328,13 +328,20 @@ public class CDAWebDB {
             mon.setTaskSize( set.getLength() );
             mon.started();
             
-            String[] result= new String[ set.getLength() ];
+            // 2019-04-29 suddenly getting dumplicate entries from 
+            // https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/THA_L2_ESA/orig_data/20190405T000000Z,20190406T000000Z
+            // See http://jfaden.net/jenkins/job/autoplot-test142.
+            
+            ArrayList<String> r= new ArrayList<>();
             for ( int i=0; i<set.getLength(); i++ ) {
                 if ( mon.isCancelled() ) throw new CancelledOperationException("cancel during parse");
                 mon.setTaskProgress(i);
                 Node item= set.item(i);
-                result[i]= xp.evaluate("Name/text()",item) + "|"+ xp.evaluate("StartTime/text()",item)+ "|" + xp.evaluate("EndTime/text()",item );
+                String s= xp.evaluate("Name/text()",item) + "|"+ xp.evaluate("StartTime/text()",item)+ "|" + xp.evaluate("EndTime/text()",item );
+                if ( !r.contains(s) ) r.add(s);
             }
+            
+            String[] result= r.toArray( new String[ r.size() ] );
             
             return result;
 
