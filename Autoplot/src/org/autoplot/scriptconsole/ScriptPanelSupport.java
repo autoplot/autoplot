@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.HeadlessException;
+import java.awt.event.KeyEvent;
 import java.beans.ExceptionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -726,7 +727,12 @@ public class ScriptPanelSupport {
 
                     clearAnnotations();
             
-                    selector.maybePlot(mode);
+                    if ( ( mode & KeyEvent.ALT_MASK ) == KeyEvent.ALT_MASK
+                            || ( mode & KeyEvent.SHIFT_MASK )== KeyEvent.SHIFT_MASK ) {
+                        selector.maybePlot(KeyEvent.ALT_MASK); //TODO: no editor panel!
+                    } else {
+                        selector.maybePlot(false);
+                    }
 
                     if ( updateSurl ) {
                         panel.setFilename(file.toString());
