@@ -439,33 +439,42 @@ public class JythonUtil {
 
         File src = DataSetURI.getFile( uri, new NullProgressMonitor());
         reader = new LineNumberReader( new BufferedReader( new FileReader(src)) );
-        
         try {
-
-            String vnarg= "\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*"; // any variable name  VERIFIED
-
-            Pattern assign= Pattern.compile( vnarg+"=.*" );
-
-            InteractiveInterpreter interp= createInterpreter(true);
-
-            String line= reader.readLine();
-            while ( line!=null ) {
-                Matcher m= assign.matcher(line);
-                if ( m.matches() ) {
-                    String vname= m.group(1);
-                    try {
-                        PyObject po= interp.eval(vname);
-                        errs.add( "" + reader.getLineNumber() + ": "+ vname + "=" + po.__repr__() );
-                    } catch ( PyException ex ) {
-                        // this is what we want
-                    }
-                }
-                line= reader.readLine();
-            }
-
-        } finally {
+            return pythonLint( reader, errs );
+        } finally { 
             reader.close();
         }
+    }    
+    
+    /**
+     * check the script that it doesn't redefine symbol names like "str"
+     * @param reader, which will be not be closed here.
+     * @param errs an empty list where the errors can be logged.
+     * @return true if an err is suspected.
+     * @throws java.io.IOException
+     */    
+    public static boolean pythonLint( LineNumberReader reader, List<String> errs ) throws IOException {
+        String vnarg= "\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*"; // any variable name  VERIFIED
+
+        Pattern assign= Pattern.compile( vnarg+"=.*" );
+
+        InteractiveInterpreter interp= createInterpreter(true);
+
+        String line= reader.readLine();
+        while ( line!=null ) {
+            Matcher m= assign.matcher(line);
+            if ( m.matches() ) {
+                String vname= m.group(1);
+                try {
+                    PyObject po= interp.eval(vname);
+                    errs.add( "" + reader.getLineNumber() + ": "+ vname + "=" + po.__repr__() );
+                } catch ( PyException ex ) {
+                    // this is what we want
+                }
+            }
+            line= reader.readLine();
+        }
+
         return errs.size()>0;
 
 
