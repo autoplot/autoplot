@@ -16,6 +16,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -338,6 +339,10 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         } else {
             int j= param.startsWith("<html>") ? 6 : 0;
             params.put( "arg_0", param.substring(j,i).trim() );
+        }
+        
+        if ( parametersFormPanel==null ) {
+            return Collections.emptyMap();
         }
         
         FormData formData= parametersFormPanel.getFormData();
