@@ -19,7 +19,9 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.ClosedWatchServiceException;
@@ -622,6 +624,43 @@ public class ScriptPanelSupport {
     }
 
     /**
+     * clear the annotations and replace lint-type annotations.
+     */
+    private void clearAnnotations() {
+        annotationsSupport.clearAnnotations();
+                    
+        List<String> errs= new ArrayList();
+        try {
+            boolean lintWarning;
+            if ( file==null ) {
+                String text = panel.getEditorPanel().getText();
+                try ( LineNumberReader r= new LineNumberReader( new BufferedReader( new StringReader(text) ) ) ) {
+                    lintWarning= org.autoplot.jythonsupport.JythonUtil.pythonLint( r, errs);
+                }
+            } else {
+                lintWarning= org.autoplot.jythonsupport.JythonUtil.pythonLint( file.toURI(), errs);
+            }
+            
+            if ( lintWarning ) {
+                EditorAnnotationsSupport esa= panel.getEditorPanel().getEditorAnnotationsSupport();
+                for ( String s: errs ) {
+                    String[] ss= s.split(":",2);
+                    try {
+                        String doc= ss[1];
+                        doc= doc.replaceAll("<", "&lt;");
+                        doc= doc.replaceAll(">", "&gt;");
+                        esa.annotateLine(Integer.parseInt(ss[0]), EditorAnnotationsSupport.ANNO_WARNING, "Variable name is already used before execution: " + doc + "<br>Consider using a different name");
+                    } catch (BadLocationException ex) {
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
+                    }
+                }
+            }   
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
      * Execute the script.  For context data source, this means putting the URI in the data set selector and telling it to plot.
      * "mode" controls how the script is run, for example by bringing up the parameters GUI first, or by tracing execution.
      * The bit array is:<ul>
@@ -685,7 +724,8 @@ public class ScriptPanelSupport {
                         selector.setValue("vap+jyds:"+file.toURI().toString());
                     }
 
-                    annotationsSupport.clearAnnotations();
+                    clearAnnotations();
+            
                     selector.maybePlot(mode);
 
                     if ( updateSurl ) {
@@ -726,7 +766,9 @@ public class ScriptPanelSupport {
                                 setInterruptible( interp );
                                 ts= Py.getThreadState();
                                 boolean dirty0 = panel.isDirty();
-                                annotationsSupport.clearAnnotations();
+                                
+                                clearAnnotations();
+            
                                 panel.setDirty(dirty0);
                                 if ( ( ( mode & Event.CTRL_MASK ) == Event.CTRL_MASK ) ) { // trace
                                     String text = panel.getEditorPanel().getText();
@@ -745,7 +787,7 @@ public class ScriptPanelSupport {
                                             i1= text.length();
                                         }
                                         try {
-                                            annotationsSupport.clearAnnotations();
+                                            clearAnnotations();
                                             annotationsSupport.annotateChars( i0, i1, "programCounter", "pc", interp );
                                             interp.exec(JythonRefactory.fixImports(s));
                                         } catch (PyException ex) {
@@ -755,7 +797,7 @@ public class ScriptPanelSupport {
                                         offset += 1;
                                         System.err.println(s);
                                     }
-                                    annotationsSupport.clearAnnotations();
+                                    clearAnnotations();
                                 } else if ( ( ( mode & Event.SHIFT_MASK ) == Event.SHIFT_MASK ) || ( ( mode & Event.ALT_MASK ) == Event.ALT_MASK ) ) {
                                     JPanel p= new JPanel();
                                     Map<String,String> vars= new HashMap();
