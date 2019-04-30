@@ -2561,8 +2561,16 @@ public final class PngWalkTool extends javax.swing.JPanel {
                             public void actionPerformed(ActionEvent e) {
                                 AutoplotUtil.openBrowser(f.toURI().toString());
                             }
-                        });  
+                        } ); 
                         panel.add( b );
+                        JButton b2= new JButton("Copy filename to clipboard");
+                        b2.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                GuiSupport.setClipboard( f.toURI().toString() );
+                            }
+                        }); 
+                        panel.add( b2 );
                         JOptionPane.showMessageDialog( PngWalkTool.this,panel );
                     } catch (FileNotFoundException ex) {
                         logger.log(Level.SEVERE, null, ex);
@@ -2729,6 +2737,14 @@ public final class PngWalkTool extends javax.swing.JPanel {
                             }
                         });   
                         panel.add( b );
+                        JButton b2= new JButton("Copy filename to clipboard");
+                        b2.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                GuiSupport.setClipboard( f.toURI().toString() );
+                            }
+                        });      
+                         panel.add( b2 );
                         JOptionPane.showMessageDialog( PngWalkTool.this,panel );
                     } catch (FileNotFoundException ex) {
                         Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
