@@ -1,8 +1,11 @@
-#resourceURI= getParam( 'resourceURI', 'http://autoplot.org/data/C1_CP_EDI_EGD__$Y$m$d_V03.cef', 'example file to load' )
-resourceURI= getParam( 'resourceURI', 'C1_CP_EDI_EGD__$Y$m$d_$(enum,values=A|B).cef', 'example file to load' )
+resourceURI= getParam( 'resourceURI', 'http://autoplot.org/data/C1_CP_EDI_EGD__$Y$m$d_V03.cef', 'example file to load', 
+    [ 'data_$Y_$(m)_$(d;delta=7;phasestart=2019-05-05).qds', 
+      'http://autoplot.org/data/C1_CP_EDI_EGD__$Y$m$d_V03.cef', 
+      'C1_CP_EDI_EGD__$Y$m$d_$(enum,values=A|B).cef' ] )
+
 timerange= getParam( 'timerange', '2005-02-12/2005-02-19', 'timerange to load' )
 
-generate= getParam( 'generate', 'F', 'Generation doesn''t list remote folders', ['T','F'] )
+generate= getParam( 'generate', 'T', 'Generation doesn''t list remote folders', ['T','F'] )
 
 if ( len(timerange.split(' '))==10 ):  # make it easier to use Jon V.'s document "uri_template_test_cases.txt"
    trs= timerange.split(' ')   
