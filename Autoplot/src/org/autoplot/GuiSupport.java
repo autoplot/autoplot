@@ -184,8 +184,19 @@ public class GuiSupport {
         }
     }
 
+    /**
+     * copy the current URI to the system clipboard.
+     */
     public void doCopyDataSetURL() {
-        StringSelection stringSelection = new StringSelection( DataSetURI.toUri(parent.dataSetSelector.getValue()).toString() );
+        setClipboard( DataSetURI.toUri(parent.dataSetSelector.getValue()).toString() );
+    }
+    
+    /**
+     * set the system clipboard (cut-n-paste mouse buffer).
+     * @param s 
+     */
+    public static void setClipboard( String s ) {
+        StringSelection stringSelection = new StringSelection( s );
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(stringSelection, new ClipboardOwner() {
             @Override
