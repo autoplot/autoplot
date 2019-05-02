@@ -8,6 +8,7 @@ package org.autoplot.servlet;
 import org.autoplot.JythonUtil;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -125,7 +126,14 @@ public class SecureScriptServlet extends HttpServlet {
             }
 
             String file= getServletContext().getRealPath( scriptFile );
-
+            
+            InputStream ins;
+            if ( file==null ) {
+                ins= getServletContext().getResourceAsStream( scriptFile );
+            } else {
+                ins= new FileInputStream(file);
+            }
+            
             PythonInterpreter interp = JythonUtil.createInterpreter( true, true );
 
             interp.setOut( out );
@@ -145,22 +153,14 @@ public class SecureScriptServlet extends HttpServlet {
             }
             setParams( m, interp );
 
-            interp.execfile( new FileInputStream(file) );
+            try {
+                interp.execfile( ins );
+            } finally {
+                ins.close();
+            }
             
-        } catch ( RuntimeException ex ) {
+        } catch ( RuntimeException | ServletException | IOException ex ) {
             
-            out.append("<pre>\n");
-            ex.printStackTrace(out);
-            out.append("</pre>\n");
-            ex.printStackTrace();
-            throw ex;
-        } catch ( ServletException ex ) {
-            out.append("<pre>\n");
-            ex.printStackTrace(out);
-            out.append("</pre>\n");
-            ex.printStackTrace();
-            throw ex;
-        } catch ( IOException ex ) {
             out.append("<pre>\n");
             ex.printStackTrace(out);
             out.append("</pre>\n");
