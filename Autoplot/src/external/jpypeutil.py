@@ -1,4 +1,4 @@
-# run these commands to start the JVM and load autoplot.jar
+# Do not use this.  See http://github.com/autoplot/python/
 
 import urllib2
 
