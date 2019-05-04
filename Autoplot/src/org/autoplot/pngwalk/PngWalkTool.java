@@ -2409,6 +2409,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
             
             for ( int i= 0; i<this.seq.size(); i++ ) {
                 monitor.setTaskProgress(i);
+                if ( monitor.isCancelled() ) {
+                    break;
+                }
                 PdfContentByte cb = writer.getDirectContent();
 
                 cb.saveState();
@@ -2544,6 +2547,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         String fname= prefs.get( "writeToPdf", "/tmp/pngwalk.pdf" );
         
         choose.setSelectedFile( new File(fname) );
+        choose.setFileFilter( GuiSupport.getFileNameExtensionFilter("pdf files", "pdf" ));
         if ( choose.showSaveDialog(PngWalkTool.this)==JFileChooser.APPROVE_OPTION ) {
             final File f= choose.getSelectedFile();
             prefs.put( "writeToPdf", f.toString() );
