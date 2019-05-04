@@ -1079,7 +1079,13 @@ public class GuiSupport {
         }
     }
 
-    private static FileFilter getFileNameExtensionFilter(final String description, final String ext) {
+    /**
+     * get simple filter based on extension.
+     * @param description descriptions, like "png image file"
+     * @param ext file extension, like ".png"
+     * @return 
+     */
+    public static FileFilter getFileNameExtensionFilter(final String description, final String ext) {
         return new FileFilter() {
             @Override
             public boolean accept(File f) {
