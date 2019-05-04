@@ -1080,10 +1080,10 @@ public class GuiSupport {
     }
 
     /**
-     * get simple filter based on extension.
+     * get simple filter based on extension for use with JFileChooser.
      * @param description descriptions, like "png image file"
      * @param ext file extension, like ".png"
-     * @return 
+     * @return the FileFilter 
      */
     public static FileFilter getFileNameExtensionFilter(final String description, final String ext) {
         return new FileFilter() {
