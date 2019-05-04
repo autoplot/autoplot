@@ -392,8 +392,6 @@ public class AutoplotDataServer {
 
     public static void main(String[] args) throws Exception {
 
-        System.err.println("org.autoplot.AutoplotDataServer 20160309 (Autoplot version " + APSplash.getVersion() + ")" );
-
         ArgumentList alm = new ArgumentList("AutoplotDataServer");
         alm.addOptionalSwitchArgument("uri", "u", "uri", "", "URI to plot");
         alm.addOptionalSwitchArgument("format", "f", "format", "", "output format qds, d2s (default=d2s if no filename) which support streaming, or xls bin dat hapi-info hapi-csv hapi-binary");
@@ -404,11 +402,18 @@ public class AutoplotDataServer {
         alm.addBooleanSwitchArgument( "nostream", "", "nostream","disable streaming, as with Bill's dataset which is X and Y table");
         alm.addBooleanSwitchArgument( "ascii", "a", "ascii", "request that ascii streams be sent instead of binary.");
         alm.addBooleanSwitchArgument( "noexit", "z", "noexit", "don't exit after running, for use with scripts." );
+        alm.addBooleanSwitchArgument( "quiet", "q", "quiet", "don't print anything besides warning messages to stderr." );
         alm.addBooleanSwitchArgument( "enableResponseMonitor", null, "enableResponseMonitor", "monitor the event thread for long unresponsive pauses");        
 
         alm.requireOneOf(new String[]{"uri"});
         alm.process(args);
 
+        if ( alm.getBooleanValue("q") ) {
+            // don't print anything.
+        } else {
+            System.err.println("org.autoplot.AutoplotDataServer 20160309 (Autoplot version " + APSplash.getVersion() + ")" );
+        }
+        
         alm.logPrefsSettings( logger );
 
         String suri = alm.getValue("uri");
