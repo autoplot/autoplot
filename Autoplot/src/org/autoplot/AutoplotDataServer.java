@@ -408,7 +408,7 @@ public class AutoplotDataServer {
         alm.requireOneOf(new String[]{"uri"});
         alm.process(args);
 
-        if ( alm.getBooleanValue("q") ) {
+        if ( alm.getBooleanValue("quiet") ) {
             // don't print anything.
         } else {
             System.err.println("org.autoplot.AutoplotDataServer 20160309 (Autoplot version " + APSplash.getVersion() + ")" );
