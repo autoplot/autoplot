@@ -205,8 +205,8 @@ public class LabelConverter extends Converter {
                                     try {
                                         // convert to orbit datum range for the same time.
                                         DatumRange drtest= o.getDatumRange(s);
-                                        if ( Math.abs( DatumRangeUtil.normalize( tr, drtest.min() ) ) < 0.001 &&
-                                             Math.abs( DatumRangeUtil.normalize( tr, drtest.max() ) - 1.0 ) < 0.001 ) {
+                                        if ( Math.abs( DatumRangeUtil.normalize( tr, drtest.min() ) ) < 0.05 &&
+                                             Math.abs( DatumRangeUtil.normalize( tr, drtest.max() ) - 1.0 ) < 0.05 ) {
                                             tr= DatumRangeUtil.parseTimeRange("orbit:"+context+":"+s);
                                         }
                                     } catch (ParseException ex) {
