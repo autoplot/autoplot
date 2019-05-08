@@ -877,6 +877,22 @@ public class PyQDataSet extends PyJavaInstance {
             if ( u!=Units.dimensionless ) this.ds.putProperty(QDataSet.UNITS,u);
             units= u;
         }
+        
+        // figure out what the fill value will be.
+        Number fill= (Number)val.property(QDataSet.FILL_VALUE);
+        if ( fill!=null ) {
+            if ( this.ds.property(QDataSet.FILL_VALUE)!=null ) {
+                fill= (Number)this.ds.property(QDataSet.FILL_VALUE);
+            }
+        } else {
+            fill= (Number)this.ds.property(QDataSet.FILL_VALUE);
+        }
+        
+        boolean resultHasFill= false;
+        if ( fill==null ) {
+            fill= -1e38;
+        }
+        double dfill= fill.doubleValue();
 
         UnitsConverter uc;
         try {
@@ -887,21 +903,37 @@ public class PyQDataSet extends PyJavaInstance {
                 
         // see org.das2.qds.ops.CoerceUtil, make version that makes iterators.
         if ( val.rank()==0 ) {
-            double d = uc.convert(val.value());
-            while (iter.hasNext()) {
-                iter.next();
-                iter.putValue(ds, d);
+            if ( Ops.valid(val).value()==0 ) {
+                while (iter.hasNext()) {
+                    iter.next();
+                    iter.putValue(ds, dfill );
+                    resultHasFill= true;
+                }
+            } else {
+                double d = uc.convert(val.value());
+                while (iter.hasNext()) {
+                    iter.next();
+                    iter.putValue(ds, d);
+                }
             }
         } else if ( val.rank()!=iter.rank() ) {
             throw new IllegalArgumentException("not supported, couldn't reconcile ranks in set[" + val + "]=" + iter );
         } else {
+            QDataSet wds= DataSetUtil.weightsDataSet(val);
             QubeDataSetIterator it = new QubeDataSetIterator(val);
             while (it.hasNext()) {
                 it.next();
-                double d = uc.convert(it.getValue(val));
                 if ( !iter.hasNext() ) throw new IllegalArgumentException("assigned dataset has too many elements");
                 iter.next();
-                iter.putValue(ds, d);
+                double w = it.getValue(wds);
+                if ( w==0 ) {
+                    double d = dfill;
+                    iter.putValue(ds, d);
+                    resultHasFill= true;
+                } else {
+                    double d = uc.convert(it.getValue(val));
+                    iter.putValue(ds, d);
+                }
             }
             if ( iter.hasNext() ) {
                 iter.next();
@@ -911,6 +943,14 @@ public class PyQDataSet extends PyJavaInstance {
                     logger.log(Level.INFO, "dataset assignment looks suspect, where there is an extra element which was not assigned: {0}", iter);
                 }
                 
+            }
+        }
+        
+        if ( resultHasFill ) {
+            Number tfill= (Number)this.ds.property(QDataSet.FILL_VALUE);
+            if ( tfill==null ) {
+                logger.fine("add FILL_VALUE to dataset");
+                this.ds.putProperty( QDataSet.FILL_VALUE, fill );
             }
         }
                 
