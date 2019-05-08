@@ -1,6 +1,8 @@
 
 package org.autoplot.dom;
 
+import java.text.ParseException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -10,8 +12,8 @@ import java.util.regex.Pattern;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.OrbitDatumRange;
+import org.das2.datum.Orbits;
 import org.das2.datum.TimeParser;
-import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
@@ -178,28 +180,64 @@ public class LabelConverter extends Converter {
                 String insert= ( tr==null ? "(no timerange)" : tr.toString() );
                 Matcher m= pop.matcher(title);
                 if ( m.matches() ) {
-                    String control= m.group(2);
-                    if ( control.equals(",NOORBIT") ) {
-                        if ( tr!=null ) {
-                            if ( tr instanceof OrbitDatumRange ) {
-                                insert= DatumRangeUtil.formatTimeRange(tr,false) + " (Orbit "+((OrbitDatumRange)tr).getOrbit()+")";
+                    String control= m.group(2).trim();
+                    String[] ss=null;
+                    Map<String,String> controls= new HashMap<>();
+                    if ( control.length()>0 ) {
+                        char delim= control.charAt(0);
+                        ss= control.substring(1).split( "\\"+delim );
+                        for ( String s: ss ) {
+                            int i= s.indexOf("=");
+                            if ( i==-1 ) {
+                                controls.put(s,"");
                             } else {
-                                insert= DatumRangeUtil.formatTimeRange(tr,false);
+                                controls.put(s.substring(0,i),s.substring(i+1));
                             }
-                        }                        
-                    } else if ( control.startsWith(",FORMAT=") ) {
-                        String format= control.substring(8);
-                        if ( format.equals("$o") || format.equals("%o") ) {
-                            if ( tr instanceof OrbitDatumRange ) {
-                                insert= ((OrbitDatumRange)tr).getOrbit();
-                            } else {
-                                insert= "???";
-                            }
-                        } else {
-                            TimeParser tp= TimeParser.create(format);
+                        }
+                    }
+                    if ( controls.size()>0 ) {
+                        if ( controls.containsKey("CONTEXT") ) {
+                            String context= controls.get("CONTEXT");
+                            if ( context!=null ) { // the context can be an orbit file or orbit identifier.
+                                Orbits o= Orbits.getOrbitsFor(context);
+                                String s= o.getOrbit(tr.middle());
+                                if ( s!=null ) {
+                                    try {
+                                        // convert to orbit datum range for the same time.
+                                        DatumRange drtest= o.getDatumRange(s);
+                                        if ( Math.abs( DatumRangeUtil.normalize( tr, drtest.min() ) ) < 0.001 &&
+                                             Math.abs( DatumRangeUtil.normalize( tr, drtest.max() ) - 1.0 ) < 0.001 ) {
+                                            tr= DatumRangeUtil.parseTimeRange("orbit:"+context+":"+s);
+                                        }
+                                    } catch (ParseException ex) {
+                                        logger.log(Level.SEVERE, null, ex);
+                                    }
+
+                                }
+                            }                            
+                        }
+                        if ( controls.containsKey("NOORBIT") ) {
                             if ( tr!=null ) {
-                                insert= tp.format(tr);
-                            }                        
+                                if ( tr instanceof OrbitDatumRange ) {
+                                    insert= DatumRangeUtil.formatTimeRange(tr,false) + " (Orbit "+((OrbitDatumRange)tr).getOrbit()+")";
+                                } else {
+                                    insert= DatumRangeUtil.formatTimeRange(tr,false);
+                                }
+                            }                            
+                        } else if ( controls.containsKey("FORMAT") ) {
+                            String format= controls.get("FORMAT");
+                            if ( format.equals("$o") || format.equals("%o") ) {
+                                if ( tr instanceof OrbitDatumRange ) {
+                                    insert= ((OrbitDatumRange)tr).getOrbit();
+                                } else {
+                                    insert= "???";
+                                }
+                            } else {
+                                TimeParser tp= TimeParser.create(format);
+                                if ( tr!=null ) {
+                                    insert= tp.format(tr);
+                                }                        
+                            }
                         }
                     }
                 }
