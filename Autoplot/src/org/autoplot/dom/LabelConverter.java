@@ -181,10 +181,10 @@ public class LabelConverter extends Converter {
                 Matcher m= pop.matcher(title);
                 if ( m.matches() ) {
                     String control= m.group(2).trim();
-                    String[] ss=null;
                     Map<String,String> controls= new HashMap<>();
                     if ( control.length()>0 ) {
                         char delim= control.charAt(0);
+                        String[] ss;
                         ss= control.substring(1).split( "\\"+delim );
                         for ( String s: ss ) {
                             int i= s.indexOf("=");
@@ -196,7 +196,7 @@ public class LabelConverter extends Converter {
                         }
                     }
                     if ( controls.size()>0 ) {
-                        if ( controls.containsKey("CONTEXT") ) {
+                        if ( controls.containsKey("CONTEXT") && tr!=null ) {
                             String context= controls.get("CONTEXT");
                             if ( context!=null ) { // the context can be an orbit file or orbit identifier.
                                 Orbits o= Orbits.getOrbitsFor(context);
