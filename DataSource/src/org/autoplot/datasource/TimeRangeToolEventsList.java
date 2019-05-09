@@ -34,6 +34,8 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.das2.datum.OrbitDatumRange;
+import org.das2.datum.Orbits;
 import org.das2.qds.ops.Ops;
 
 /**
@@ -92,6 +94,24 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
     public DataSetSelector getDataSetSelector() {
         return this.currentDataSetSelector;
     }
+
+    /**
+     * return true if the URI is an orbits file which is understood by the das2 datum package.
+     * @param uri an Autoplot URI
+     * @return true if it is an orbits file.
+     */
+    private static boolean isOrbitsFile( String uri ) {
+        if ( uri.contains("?") ) {
+            return false;
+        } else {
+            try {
+                Orbits.getOrbitsFor(uri);                
+                return true;
+            } catch ( IllegalArgumentException ex ) {
+                return false;
+            }
+        }
+    }
     
     /**
      * return the ith range in the current list.
@@ -102,7 +122,24 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         QDataSet ds1= currentDataSet.slice(i).trim(0,2); // it's a shame this doesn't get the units right...
         Units tu= (Units)((QDataSet)currentDataSet.property(QDataSet.BUNDLE_1)).property(QDataSet.UNITS,0);
         if ( ds1.value(0)<ds1.value(1) ) {
-            return DatumRange.newDatumRange( ds1.value(0), ds1.value(1), tu );
+            String uri= this.currentDataSetSelector.getValue();
+            boolean useOrbits= isOrbitsFile(uri);
+            if ( useOrbits ) {
+                Orbits orbits= Orbits.getOrbitsFor( uri );
+                String sorbit= orbits.getOrbit( tu.createDatum( ds1.value(0) + ( ds1.value(1)-ds1.value(0) ) / 2 ) );
+                if ( sorbit==null ) {
+                    return DatumRange.newDatumRange( ds1.value(0), ds1.value(1), tu );
+                } else {
+                    try {
+                        return new OrbitDatumRange( uri, sorbit );
+                    } catch (ParseException ex) {
+                        logger.log(Level.WARNING, "failed to create OrbitDatumRange for {0}", sorbit);
+                        return DatumRange.newDatumRange( ds1.value(0), ds1.value(1), tu );
+                    }
+                }
+            } else {
+                return DatumRange.newDatumRange( ds1.value(0), ds1.value(1), tu );
+            }
         } else {
             logger.log(Level.INFO, "start and stop times are out-of-order at index {0}", i);
             return DatumRange.newDatumRange( ds1.value(1), ds1.value(0), tu );
@@ -141,7 +178,12 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             QDataSet bds= (QDataSet) currentDataSet.property(QDataSet.BUNDLE_1);
             Units eu= (Units) bds.property(QDataSet.UNITS,3);
             for ( int i=0; i<currentDataSet.length(); i++ ) {
-                tm.setValueAt( getRange(i).toString(), i+offset, 0 );
+                DatumRange r= getRange(i);
+                if ( r instanceof OrbitDatumRange ) {
+                    Units u= r.getUnits();
+                    r= DatumRange.newDatumRange( r.min().doubleValue(u), r.max().doubleValue(u), u );
+                }
+                tm.setValueAt( r.toString(), i+offset, 0 );
                 String s= eu.createDatum( currentDataSet.slice(i).value(3) ).toString();    
                 tm.setValueAt( s, i+offset, 1 );
             }
