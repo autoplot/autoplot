@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>histogram2d performance check handles 20000000 points interactively.
+        <p><small>Das2Stream x,y,z type is now supported.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-05-04 r23657):</p>
+        <p>Bugfixes (2019-05-09 r23657):</p>
         <ul>
+            <li>%{TIMERANGE} macro can convert back to orbit number.
+            <li>2154: support assignment of fill to dataset, where fill is copied or translated to the dataset's fill value.
+            <li>bug with new --quiet switch with AutoplotDataServer corrected.
+            <li>1670: check for weight=0 with value=NaN, some codes assumed weight*value was valid.
             <li>2148: shift-execute correctly brings up the parameters dialog in the script editor.
             <li>2148: .jy scripts now get lint to check for common mistakes, before just .jyds scripts did.
             <li>check for duplicate entries in CDAWeb file-finding service.  This is a bug they will fix as well.
