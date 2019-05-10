@@ -880,11 +880,11 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 
         l = dataSetLabel( data, "data" );
         buf.append( delim ).append( l);
+        
         u= (Units) data.property(QDataSet.UNITS);
         if ( u==null ) u= Units.dimensionless;
 
         if (  !"rich".equals( head ) ) {
-            maybeOutputProperty(out, data, QDataSet.TITLE);
             if ( u!=Units.dimensionless ) maybeOutputProperty( out, data, QDataSet.UNITS );
         }
         
