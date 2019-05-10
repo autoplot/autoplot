@@ -28,17 +28,18 @@
         
         <p>Bugfixes (2019-05-09 r23657):</p>
         <ul>
-            <li>%{TIMERANGE} macro can convert back to orbit number.
-            <li>2154: support assignment of fill to dataset, where fill is copied or translated to the dataset's fill value.
-            <li>bug with new --quiet switch with AutoplotDataServer corrected.
-            <li>1670: check for weight=0 with value=NaN, some codes assumed weight*value was valid.
+            <li>2133: bug in Datum.Long to TimeStruct, where leap seconds were handled incorrectly, was corrected.  Thanks, Darrell!
+            <li>%{TIMERANGE} macro can convert back to orbit number.  Thanks, Ivar!
+            <li>2154: support assignment of fill to dataset, where fill is copied or translated to the dataset's fill value.  Thanks, Ivar!
+            <li>bug with new --quiet switch with AutoplotDataServer corrected.  
+            <li>1670: check for weight=0 with value=NaN, some codes assumed weight*value was valid.  Thanks, Ivar!
             <li>2148: shift-execute correctly brings up the parameters dialog in the script editor.
             <li>2148: .jy scripts now get lint to check for common mistakes, before just .jyds scripts did.
             <li>check for duplicate entries in CDAWeb file-finding service.  This is a bug they will fix as well.
             <li>2140: top and bottom painters are automatically antialiased and have their own graphics context to protect other parts of the plot.
             <li>2140: add support for DasPlot top and bottom decorators.
             <li>2147: data reduction with series renderer and small pixels would result in washed-out image.
-            <li>2146: autolayout incorrectly reclaims room for TCAs, adding noise to vap loading.
+            <li>2146: autolayout incorrectly reclaims room for TCAs, adding noise to vap loading.  Thanks, Kris!
             <li>doDataSetReduce of SeriesRenderer now reduces to 1/2 pixel, so that "1px" sized black dots appear black.
             <li>performance improvements to the HugeScatterRenderer.
             <li>2145: avoid infinite loop in Events List when there are no events in the next intervals.
@@ -70,7 +71,7 @@
         <p>Features:</p>
         <ul>
             <li>PngWalkTool's write to animated gif and write to pdf file now have a button to copy the output filename.
-            <li>AutoplotDataServer has -q option to quiet informational messages on stderr.
+            <li>AutoplotDataServer has -q option to quiet informational messages on stderr.  Thanks, Bob!
             <li>file download now logs transfer rates to das2.filesystem.wfs at FINER.
             <li>sftp support uses java property user.name to get the username by default, so two people can share .vaps with different .ssh keys.
             <li>ImageVectorDataSetRenderer renamed to HugeScatterRebinner.
@@ -81,6 +82,7 @@
             <li>DataSetBuilder can accept fields from DatumVector, for performance.
             <li>imgscalr library added, which will provide faster thumbnails.
             <li>polarToCartesian function and filter added.
+            <li>support Radio and Plasma Wave Group's GitLabs site with GitHubFileSystem.
             <li>support U. Iowa GitLabs site with GitHubFileSystem.
             <li>polar renderer supports x,y,z color scatter plot.
             <li>new code reads Das2Streams directly into QDataSet.
