@@ -366,7 +366,7 @@ public class JythonCompletionTask implements CompletionTask {
                             label = ss;
                         }
                     }
-                } else if ( lcontext instanceof PyObject ) {
+                } else {
                     //PyObject o= context.__dir__();
                     label= ss;
                     signature= null;
@@ -394,17 +394,6 @@ public class JythonCompletionTask implements CompletionTask {
                         }
                     }
                     //String link = "http://docs.python.org/library/"; //TODO: this could probably be done
-                } else {
-                    if (po instanceof PyReflectedFunction) {
-                        label = ss + "() STATIC JAVA";
-                    } else if (po.isCallable()) {
-                        label = ss + "() " + (lcontext instanceof PyJavaInstance ? "JAVA" : "");
-                        PyMethod m = (PyMethod) po;
-                        //Method jm = getJavaMethod(m, 0);
-                        signature = methodSignature(getJavaMethod(m, 0));
-                    } else {
-                        logger.fine("");
-                    }
                 }
                 if ( notAlreadyAdded ) {
                     if ( signature!=null && signature.startsWith("inline:") ) {
