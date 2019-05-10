@@ -570,14 +570,8 @@ public class ScriptPanelSupport {
                 if ( traceback.tb_frame==null ) { // this happens with invokeLater and Java exception
                     PyObject o= ex.value;
                     if ( o!=null ) {
-                        if ( o instanceof PyObject ) {
-                            // error popup should follow.
-                        } else {
-                            Exception e= (Exception)o.__tojava__(Exception.class);
-                            if ( e!=null ) {
-                                annotateError(e);
-                            }
-                        }
+                        //findbugs pointed out the absurd code I had here.
+                        logger.info("when does 574 happen?");
                     }
                     otraceback= traceback.tb_next;
                 } else { // typical
