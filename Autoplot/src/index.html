@@ -28,6 +28,8 @@
         
         <p>Bugfixes (2019-05-09 r23657):</p>
         <ul>
+            <li>2155: automatically set digitizer "sorted" property so that pixel locations don't clobber each other.
+            <li>TITLE property was printed twice in ASCII export.
             <li>2133: bug in Datum.Long to TimeStruct, where leap seconds were handled incorrectly, was corrected.  Thanks, Darrell!
             <li>%{TIMERANGE} macro can convert back to orbit number.  Thanks, Ivar!
             <li>2154: support assignment of fill to dataset, where fill is copied or translated to the dataset's fill value.  Thanks, Ivar!
@@ -70,6 +72,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>678: add mad function!  Thanks, Ivar.
             <li>PngWalkTool's write to animated gif and write to pdf file now have a button to copy the output filename.
             <li>AutoplotDataServer has -q option to quiet informational messages on stderr.  Thanks, Bob!
             <li>file download now logs transfer rates to das2.filesystem.wfs at FINER.
