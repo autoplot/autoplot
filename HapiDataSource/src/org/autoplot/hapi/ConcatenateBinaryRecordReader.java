@@ -3,6 +3,7 @@ package org.autoplot.hapi;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,6 +21,7 @@ public class ConcatenateBinaryRecordReader implements AbstractBinaryRecordReader
      * @param r 
      */
     public void concatenateReader( AbstractBinaryRecordReader r ) {
+        readers= new ArrayList<>();
         readers.add(r);
     }
     
