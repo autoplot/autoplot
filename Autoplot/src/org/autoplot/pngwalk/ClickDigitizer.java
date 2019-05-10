@@ -208,6 +208,9 @@ public class ClickDigitizer {
                     
                     if ( viewer!=null ) {
                         view.seq.setStatus(  "Plot Coordinates: " + xx + ", "+ yy );
+                        if ( UnitsUtil.isTimeLocation( SemanticOps.getUnits(xx) ) ) {
+                            viewer.digitizer.setSorted(true);
+                        }
                         if ( release==false && viewer.digitizer!=null && viewer.digitizerRecording ) {
                             try {
                                 viewer.digitizer.addDataPoint( DataSetUtil.asDatum(xx), DataSetUtil.asDatum(yy), meta );
@@ -243,6 +246,7 @@ public class ClickDigitizer {
                 view.seq.setStatus( "Pixel Coordinates: " + xx + ", "+ yy );                
                 if ( release==false && viewer.digitizer!=null ) {
                     try {
+                        viewer.digitizer.setSorted(false);
                         viewer.digitizer.addDataPoint( xx, yy, meta );
                         //viewer.digitizer.addDataPoint( xx, yy );
                     } catch ( RuntimeException ex ) { // units conversion
