@@ -72,15 +72,13 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             return name;
         }
         
-        if ( name==null ) {
-            name = (String) dep0.property(QDataSet.NAME);
-            while ( seman.containsKey(name) ) {
-                QDataSet ds1= seman.get(name);
-                if ( ds1!=null ) {
-                    name= name + "_1";
-                } else {
-                    break;
-                }
+        name = (String) dep0.property(QDataSet.NAME);
+        while ( seman.containsKey(name) ) {
+            QDataSet ds1= seman.get(name);
+            if ( ds1!=null ) {
+                name= name + "_1";
+            } else {
+                break;
             }
         }
         
@@ -276,7 +274,9 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                     CdfDataSource.cdfCacheReset();
                     File tempFile= File.createTempFile( "deleteme",".cdf");
                     if ( !ffile.renameTo( tempFile) ) {
-                        ffile.delete();
+                        if ( !ffile.delete() ) {
+                            logger.log(Level.WARNING, "file {0} cannot be deleted", ffile );
+                        }
                         logger.log(Level.WARNING, "file {0} cannot be renamed", ffile);
                     } 
                     write( ffile.toString() );
