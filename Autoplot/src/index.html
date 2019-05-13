@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Das2Stream x,y,z type is now supported.
+        <p><small>PngWalk Tool Digitizer correctly handles plots and images without X axis.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,7 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-05-09 r23657):</p>
+        <p>Bugfixes (2019-05-13 r23677):</p>
         <ul>
             <li>2155: automatically set digitizer "sorted" property so that pixel locations don't clobber each other.
             <li>TITLE property was printed twice in ASCII export.
@@ -72,6 +72,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>redo the GUI for the display data dialog, so you can see and control the yclipping.  Thanks, Ivar!
             <li>678: add mad function!  Thanks, Ivar.
             <li>PngWalkTool's write to animated gif and write to pdf file now have a button to copy the output filename.
             <li>AutoplotDataServer has -q option to quiet informational messages on stderr.  Thanks, Bob!
