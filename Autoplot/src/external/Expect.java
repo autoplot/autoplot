@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.util.LoggerManager;
 
 
 /**
@@ -43,14 +44,10 @@ import java.util.regex.Pattern;
  */
 public class Expect {
 
-    static final Logger log = Logger.getLogger( "expect" );
-    
-	/**Logging is turned off by default.*/
-	static {
-		log.setLevel(Level.OFF);
-	}
-	
-	private OutputStream output;
+    static final Logger log = LoggerManager.getLogger( "expect" );
+    //static final Logger log = Logger.getLogger( "expect" );
+    	
+	private final OutputStream output;
 	private Pipe.SourceChannel inputChannel;
 	
 	private Selector selector;
@@ -170,7 +167,7 @@ public class Expect {
 	 */
 	public void send(byte[] toWrite) {
 		//System.out.println("sending: " + bytesToPrintableString(toWrite));
-		log.info("sending: " + bytesToPrintableString(toWrite));
+		log.log(Level.INFO, "sending: {0}", bytesToPrintableString(toWrite));
 		try {
 			output.write(toWrite);
 			output.flush();
@@ -217,20 +214,19 @@ public class Expect {
 	 * If the array contains other objects, they will be converted by
 	 * {@link #toString()} and then used as literal strings.
 	 * 
-	 * @param patterns
+     * @param timeout timeout in seconds
+	 * @param patterns array of String regex, Pattern, or Object where toString() is called.
 	 * @return
 	 */
 	public int expect(int timeout, Object... patterns) {
-		ArrayList<Pattern> list = new ArrayList<Pattern>();
+		ArrayList<Pattern> list = new ArrayList<>();
 		for (Object o : patterns) {
 			if (o instanceof String)
 				list.add(Pattern.compile(Pattern.quote((String) o))); // requires 1.5 and up
 			else if (o instanceof Pattern)
 				list.add((Pattern) o);
 			else{
-				log.warning("Object " + o.toString() + " (class: "
-						+ o.getClass().getName() + ") is neither a String nor "
-						+ "a java.util.regex.Pattern, using as a literal String");
+				log.log(Level.WARNING, "Object {0} (class: {1}) is neither a String nor a java.util.regex.Pattern, using as a literal String", new Object[]{o.toString(), o.getClass().getName()});
 				list.add(Pattern.compile(Pattern.quote(o.toString())));
 			}
 		}
@@ -254,7 +250,7 @@ public class Expect {
 	 *         timeout
 	 */
 	public int expect(int timeout, List<Pattern> list) {
-		log.fine("Expecting " + list);
+		log.log(Level.FINE, "Expecting {0}", list);
 		
 		clearGlobalVariables();
 		long endTime = System.currentTimeMillis() + (long)timeout * 1000;
@@ -264,8 +260,7 @@ public class Expect {
 			int n;
 			while (true) {
 				for (int i = 0; i < list.size(); i++) {
-					log.finer("trying to match " + list.get(i)
-							+ " against buffer \"" + buffer + "\"");
+					log.log(Level.FINER, "trying to match {0} against buffer \"{1}\"", new Object[]{list.get(i), buffer});
 					Matcher m = list.get(i).matcher(buffer);
 					if (m.find()) {
 						log.finer("success!");
@@ -282,24 +277,24 @@ public class Expect {
 				if (restart_timeout_upon_receive)
 					waitTime = timeout * 1000;
 				if (waitTime <= 0) {
-					log.fine("Timeout when expecting " + list);
+					log.log(Level.FINE, "Timeout when expecting {0}", list);
 					return RETV_TIMEOUT;
 				}
 				//System.out.println("waiting for "+waitTime);
 
 				selector.select(waitTime);
 				//System.out.println(selector.selectedKeys().size());
-				if (selector.selectedKeys().size() == 0) {
+				if (selector.selectedKeys().isEmpty()) {
 					//System.err.println("timeout!");
 					//break;	//we can directly "break" here
-					log.fine("Timeout when expecting " + list);
+					log.log(Level.FINE, "Timeout when expecting {0}", list);
 					return RETV_TIMEOUT;
 				}
 				selector.selectedKeys().clear();
 				if ((n = inputChannel.read(bytes)) == -1) {
 					//System.err.println("EOF!");
 					//break;
-					log.fine("EOF when expecting " + list);
+					log.log(Level.FINE, "EOF when expecting {0}", list);
 					return RETV_EOF;
 				}
                                 log.log(Level.FINEST, "read bytes: {0}", n);
@@ -308,7 +303,7 @@ public class Expect {
 					buffer.append((char) bytes.get(i));
 					tmp.append(byteToPrintableString(bytes.get(i)));
 				}
-				log.fine("Obtained following from InputStream: " + tmp);
+				log.log(Level.FINE, "Obtained following from InputStream: {0}", tmp);
 				bytes.clear();
 				
 				//System.out.println(buffer);
@@ -343,13 +338,19 @@ public class Expect {
 		return retv;
 	}
 	/**Convenience method, same as calling {@link #expectEOF(int)
-	 * expectEOF(default_timeout)}*/
+	 * expectEOF(default_timeout)}
+     * @return same as return value of {@link #expect(int, List)}
+     */
 	public int expectEOF() {
 		return expectEOF(default_timeout);
 	}
 	
 	/**
 	 * Throws checked exceptions when expectEOF was not successful.
+     * @param timeout timeout in seconds
+     * @return same as return value of {@link #expect(int, List)}
+     * @throws external.Expect.TimeoutException
+     * @throws java.io.IOException
 	 */
 	public int expectEOFOrThrow(int timeout) throws TimeoutException,
 			IOException {
@@ -360,8 +361,13 @@ public class Expect {
 			throw thrownIOE;
 		return retv;
 	}
-	/**Convenience method, same as calling {@link #expectEOF(int)
-	 * expectEOF(default_timeout)}*/
+	/**
+     * Convenience method, same as calling {@link #expectEOF(int)
+	 * expectEOF(default_timeout)}
+     * @return same as return value of {@link #expect(int, List)}
+     * @throws IOException
+     * @throws TimeoutException
+     */
 	public int expectEOFOrThrow() throws TimeoutException, IOException {
 		return expectEOFOrThrow(default_timeout);
 	}
@@ -403,7 +409,12 @@ public class Expect {
 		}
 	}
 	/**Convenience method, same as calling {@link #expectOrThrow(int, Object...)
-	 * expectOrThrow(default_timeout, patterns)}*/
+	 * expectOrThrow(default_timeout, patterns) }
+     * @param patterns
+     * @return same as {@link #expect(int, Object...) expect(timeout, patterns)}
+     * @throws external.Expect.TimeoutException
+     * @throws external.Expect.EOFException
+     * @throws java.io.IOException*/
 	public int expectOrThrow(Object... patterns) throws TimeoutException,
 			EOFException, IOException {
 		return expectOrThrow(default_timeout, patterns);
@@ -508,6 +519,7 @@ public class Expect {
 	 * <pre>
 	 * {@code
 	 * 	synchronized(Expect.duplicatedTo) {...}
+     * }
 	 * </pre>
 	 * @param duplicatedTo
 	 *            call with null if you want to turn off
