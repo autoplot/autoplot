@@ -1273,6 +1273,12 @@ public class PyQDataSet extends PyJavaInstance {
             lists[0]= ll[0];
             lists[i]= ll[1];
         }
+        for ( int i=1; i<lists.length; i++) {
+            ll[1]= lists[i];
+            CoerceUtil.coerce( ll[0], ll[1], false, ll );
+            lists[0]= ll[0];
+            lists[i]= ll[1];
+        }
         CoerceUtil.coerce( ll[0], val, false, ll );
         val= ll[1];
         QubeDataSetIterator it = new QubeDataSetIterator( val );
