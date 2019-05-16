@@ -962,7 +962,7 @@ public class BatchMaster extends javax.swing.JPanel {
             Map<String,org.autoplot.jythonsupport.JythonUtil.Param> parms= Util.getParams( env, script, params, new NullProgressMonitor() );
 
             InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false );
-            interp.exec(JythonRefactory.fixImports("import autoplot")); 
+            interp.exec(JythonRefactory.fixImports("import autoplot2017")); 
             
             ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
             pfp.doVariables( env, scriptFile, params, null );
