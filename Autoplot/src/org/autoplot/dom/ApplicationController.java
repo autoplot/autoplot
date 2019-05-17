@@ -2162,7 +2162,10 @@ public class ApplicationController extends DomNodeController implements RunLater
             p0.getXaxis().getController().getDasAxis().setTcaFunction(null);
             p0.getXaxis().getController().getDasAxis().setReference("");
             p0.getYaxis().getController().getDasAxis().setReference("");
-
+            p0.getXaxis().setTickValues("");
+            p0.getYaxis().setTickValues("");
+            p0.getZaxis().setTickValues("");
+            
             for ( int i=application.getPlotElements().length-1; i>0; i-- ) {
                 deletePlotElement( application.getPlotElements(i) ); //may delete dsf and plots as well.
             }
