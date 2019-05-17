@@ -266,12 +266,12 @@ public class Axis extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_FLIPPED, oldFlipped, flipped);
     }
 
-    private String ticks="";
+    private String tickValues="";
 
-    public static final String PROP_TICKS = "ticks";
+    public static final String PROP_TICKVALUES = "tickValues";
 
-    public String getTicks() {
-        return ticks;
+    public String getTickValues() {
+        return tickValues;
     }
 
     /**
@@ -279,15 +279,15 @@ public class Axis extends DomNode {
      * examples of accepted settings:<table>
      * <tr><td></td><td>empty string is legacy behavior</td></tr>
      * <tr><td>0,45,90,135,180</td><td>explicit tick positions, in axis units</td></tr>
-     * <tr><td>+45</td><td>spacing between ticks, parsed with the axis offset units.</td></tr>
-     * <tr><td>+30s</td><td>30 seconds spacing between ticks</td></tr>
+     * <tr><td>+45</td><td>spacing between tickValues, parsed with the axis offset units.</td></tr>
+     * <tr><td>+30s</td><td>30 seconds spacing between tickValues</td></tr>
      * </table>
      * @param ticks 
      */
-    public void setTicks(String ticks) {
-        String oldTicks = this.ticks;
-        this.ticks = ticks;
-        propertyChangeSupport.firePropertyChange(PROP_TICKS, oldTicks, ticks);
+    public void setTickValues(String ticks) {
+        String oldTicks = this.tickValues;
+        this.tickValues = ticks;
+        propertyChangeSupport.firePropertyChange(PROP_TICKVALUES, oldTicks, ticks);
     }
 
 
