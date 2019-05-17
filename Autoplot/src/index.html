@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>PngWalk Tool Digitizer correctly handles plots and images without X axis.
+        <p><small>X Axis' new "tickValues" property used to nicely locate ticks in angles space.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-05-13 r23677):</p>
+        <p>Bugfixes (2019-05-17 r23691):</p>
         <ul>
+            <li>URI_Template's phasestart modifier was never implemented.  Thanks, Bob!
+            <li>2158: setItemAllLists( rank0, rank0, rank1) now reconciles the three properly.  Thanks, Bill!
             <li>2155: automatically set digitizer "sorted" property so that pixel locations don't clobber each other.
             <li>TITLE property was printed twice in ASCII export.
             <li>2133: bug in Datum.Long to TimeStruct, where leap seconds were handled incorrectly, was corrected.  Thanks, Darrell!
@@ -72,6 +74,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Axis nodes have "tickValues" property which allows tick spacing and location to be specified manually.
+            <li>Expect utility included now to support driving other applications including IDL.
             <li>redo the GUI for the display data dialog, so you can see and control the yclipping.  Thanks, Ivar!
             <li>678: add mad function!  Thanks, Ivar.
             <li>PngWalkTool's write to animated gif and write to pdf file now have a button to copy the output filename.
