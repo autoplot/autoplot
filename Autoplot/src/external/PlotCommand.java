@@ -515,14 +515,11 @@ public class PlotCommand extends PyObject {
                 } else if ( kw.equals("ydrawTickLabels") ) {
                     plot.getYaxis().setDrawTickLabels( booleanValue(val) );
                 } else if ( kw.equals("xtickValues") ) {
-                    QDataSet vv= JythonOps.dataset(val,plot.getXaxis().getRange().getUnits());
-                    plot.getXaxis().getController().getDasAxis().setTickV( new TickVDescriptor(vv) );
+                    plot.getXaxis().setTickValues(sval);
                 } else if ( kw.equals("ytickValues") ) {
-                    QDataSet vv= JythonOps.dataset(val,plot.getYaxis().getRange().getUnits());
-                    plot.getYaxis().getController().getDasAxis().setTickV( new TickVDescriptor(vv) );
+                    plot.getYaxis().setTickValues(sval);
                 } else if ( kw.equals("ztickValues") ) {
-                    QDataSet vv= JythonOps.dataset(val,plot.getZaxis().getRange().getUnits());
-                    plot.getZaxis().getController().getDasAxis().setTickV( new TickVDescriptor(vv) );
+                    plot.getZaxis().setTickValues(sval);
                 } else if ( kw.equals("xautoRangeHints") ) {
                     plot.getXaxis().setAutoRangeHints( sval );
                 } else if ( kw.equals("yautoRangeHints") ) {
