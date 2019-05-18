@@ -327,6 +327,7 @@ public class Axis extends DomNode {
             if ( !exclude.contains( PROP_AUTORANGEHINTS ) ) this.setAutoRangeHints(that.getAutoRangeHints());
             if ( !exclude.contains( PROP_AUTOLABEL ) ) this.setAutoLabel(that.isAutoLabel());
             if ( !exclude.contains( PROP_DRAWTICKLABELS ) ) this.setDrawTickLabels(that.isDrawTickLabels());
+            if ( !exclude.contains( PROP_TICKVALUES ) ) this.setTickValues(that.getTickValues());
             if ( !exclude.contains( PROP_VISIBLE ) ) this.setVisible(that.isVisible());
         }
     }
@@ -369,6 +370,8 @@ public class Axis extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff( PROP_AUTOLABEL, that.autoLabel , this.autoLabel ) );
         b=  that.drawTickLabels==this.drawTickLabels;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_DRAWTICKLABELS, that.drawTickLabels, this.drawTickLabels ) );
+        b=  that.tickValues.equals(this.tickValues);
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_TICKVALUES, that.tickValues, this.tickValues ) );
         b=  that.visible==this.visible;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_VISIBLE, that.visible, this.visible ) );
 

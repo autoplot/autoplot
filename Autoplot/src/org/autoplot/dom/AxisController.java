@@ -374,6 +374,7 @@ public class AxisController extends DomNodeController {
         if ( !exclude.contains( Axis.PROP_AUTOLABEL ) ) axis.setAutoLabel(that.isAutoLabel());
         if ( !exclude.contains( Axis.PROP_AUTORANGEHINTS ) ) axis.setAutoRangeHints(that.getAutoRangeHints());
         if ( !exclude.contains( Axis.PROP_DRAWTICKLABELS ) ) axis.setDrawTickLabels( that.isDrawTickLabels() );
+        if ( !exclude.contains( Axis.PROP_TICKVALUES ) ) axis.setTickValues( that.getTickValues() );
         if ( !exclude.contains( Axis.PROP_VISIBLE ) ) axis.setVisible( that.isVisible() );
         if ( lock!=null ) lock.unlock();
     }
