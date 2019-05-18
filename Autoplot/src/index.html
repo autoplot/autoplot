@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>X Axis' new "tickValues" property used to nicely locate ticks in angles space.
+        <p><small>X Axis' new "tickValues" property, here set to "+30", is used to nicely locate ticks in angles space.  See <a href='https://sourceforge.net/p/autoplot/feature-requests/469/'>ticket 469</a>.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,10 +26,14 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-05-17 r23693):</p>
+        <p>Bugfixes (2019-05-18 r23695):</p>
         <ul>
+            <li>2155: display data on bundle of X,Y,Z didn't clip on Y.
             <li>URI_Template's phasestart modifier was never implemented.  Thanks, Bob!
             <li>2158: setItemAllLists( rank0, rank0, rank1) now reconciles the three properly.  Thanks, Bill!
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>2155: automatically set digitizer "sorted" property so that pixel locations don't clobber each other.
             <li>TITLE property was printed twice in ASCII export.
             <li>2133: bug in Datum.Long to TimeStruct, where leap seconds were handled incorrectly, was corrected.  Thanks, Darrell!
@@ -54,31 +58,16 @@
             <li>rebinner API now passes information about the Z axis so interpolation can be fixed.
             <li>"polar" render type corrects units.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>findbugs suggestions.
-            <li>2138: when using X,Y,Z feature of CDF editor, Y metadata shown initially, not the Z data.
-            <li>2127: code which appended virtual records on CDF variables which were too short didn't consider virtual variables.  Thanks, Andrei!
-            <li>0875: old branch was using aggregated URI in getDataSourceEditorPanel, causing bogus hit to remote servers.
-            <li>fall back to two columns when column count cannot be guessed with ASCII files, so that the editor shows the file instead of nothing.
-            <li>2137: support for decimal years.
-            <li>1629: NullPointerException in code which would verify Jython index.  Thanks, Darrelle!
-            <li>2136: when initial load results in "no data" still support TSB.  Thanks, Baptiste and Chris!
-            <li>orbits file would use old http, not https locations.
-            <li>2103: tick layout is done using floats, so that pdf output has uniform ticks.
-            <li>1678: bind with the plot colorbar the source so that the new plotElements have to comply.
-            <li>2133: detect LongReadAccess when CDF_TT2000 is used for timetags, so that CDF timetags can be formatted to ASCII with full resolution.  Thanks, Eric!
-            <li>2036: keep track of the parent of the monitor used for centering, after seeing that the hidden monitor would position properly when it becomes visible.
-            <li>1629: getItem with index lists (ds[ idx0, idx1, 0 ]) works now.  Thanks, Ivar!
-            <li>2134: support rank 2 indeces, see https://github.com/autoplot/dev/blob/master/bugs/2134/
-        </ul>
         <p>Features:</p>
         <ul>
-            <li>Axis nodes have "tickValues" property which allows tick spacing and location to be specified manually.
-            <li>Expect utility included now to support driving other applications including IDL.
-            <li>redo the GUI for the display data dialog, so you can see and control the yclipping.  Thanks, Ivar!
-            <li>678: add mad function!  Thanks, Ivar.
-            <li>PngWalkTool's write to animated gif and write to pdf file now have a button to copy the output filename.
+            <li>rfe469: Axis nodes have "tickValues" property which allows tick spacing and location to be specified manually.
+            <li>rfe680: Expect utility included now to support driving other applications like FTP and IDL.
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
+            <li>rfe677: redo the GUI for the display data dialog, so you can see and control the yclipping.  Thanks, Ivar!
+            <li>rfe678: add mad function!  Thanks, Ivar.
+            <li>PngWalkTool's write to animated gif and write to pdf file now have a button to copy the output filename to the clipboard.
             <li>AutoplotDataServer has -q option to quiet informational messages on stderr.  Thanks, Bob!
             <li>file download now logs transfer rates to das2.filesystem.wfs at FINER.
             <li>sftp support uses java property user.name to get the username by default, so two people can share .vaps with different .ssh keys.
@@ -97,15 +86,6 @@
             <li>das2streams support x,y,z scatter.  Clean up strange names in the das2stream parser.
             <li>Renderer.render now takes Graphics2D object, instead of Graphics.
             <li>API changes like removing monitor from render call will make scripting easier.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>For JSON "Rich" ASCII files, throw unrecognized tags into USER_PROPERTIES.
-            <li>ASCII parser has new columnCount switch, where the column count can be asserted.
-            <li>Units.decimalYear added.
-            <li>24hr-at-perikrone events lists for Cassini.
-            <li>add menu item for cassini.perikrone.24hr orbit list.
-            <li>2133: export CDF_TT2000 to ASCII to nanosecond resolution.
         </ul>
         <p>Known issues:</p>
         <ul>
