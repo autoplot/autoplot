@@ -192,7 +192,8 @@ public final class Das2ServerDataSource extends AbstractDataSource {
         otherParams.remove("timerange");
         otherParams.remove("_res");      // =0.0 means use native resolution
         otherParams.remove("intrinsic"); // =true means use native resolution
-
+        otherParams.remove("useOldD2sParser");
+        
         String item = (String) otherParams.remove("item");
         String interval = (String) otherParams.remove("interval");
         String key1 = (String) otherParams.remove("key");
