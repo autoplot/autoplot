@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>X Axis' new "tickValues" property, here set to "+30", is used to nicely locate ticks in angles space.  See <a href='https://sourceforge.net/p/autoplot/feature-requests/469/'>ticket 469</a>.
+        <p><small>Fun with indexing</a>.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,9 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-05-18 r23695):</p>
+        <p>Bugfixes (2019-05-22 r23700):</p>
         <ul>
-            <li>rfe677: display data on bundle of X,Y,Z didn't clip on Y.
+            <li>2159: new das2stream reader reads in many 1-record joined data, wasting memory.  Thanks, Darrelle!
+            <li>rfe677: display data on bundle of X,Y,Z didn't clip on Y.  Thanks, Ivar!
             <li>URI_Template's phasestart modifier was never implemented.  Thanks, Bob!
             <li>2158: setItemAllLists( rank0, rank0, rank1) now reconciles the three properly.  Thanks, Bill!
         </ul>
