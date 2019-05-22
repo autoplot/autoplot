@@ -1133,10 +1133,10 @@ public final class HapiDataSource extends AbstractDataSource {
                         break;
                     }
                 }
+                cacheLocation= ub.toString();
+            } else {
+                throw new IllegalArgumentException("query must be specified, implementation error");
             }
-            cacheLocation= ub.toString();
-        } else {
-            throw new IllegalArgumentException("query must be specified, implementation error");
         }
         
         try ( AbstractLineReader in= ( cacheReader!=null ? cacheReader :
