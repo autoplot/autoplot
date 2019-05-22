@@ -175,7 +175,7 @@ public class ParametersFormPanel {
             String deft= fd.deftsList.get(j);
             char type= fd.typesList.get(j);
 
-            if ( !value.equals(deft) || params.containsKey(name) ) {
+            if ( !value.equals(deft) || params.containsKey(name) || name.equals("timerange") ) {
                 switch (type) {
                     case 'A':
                         value= value.replaceAll("\'", "");
@@ -416,7 +416,8 @@ public class ParametersFormPanel {
                             } else {
                                 val= String.valueOf( parm.deft );
                                 params.put( vname, val );
-                            }       final JTextField tf= new JTextField();
+                            }       
+                            final JTextField tf= new JTextField();
                             Dimension x= tf.getPreferredSize();
                             x.width= Integer.MAX_VALUE;
                             tf.setMaximumSize(x);
@@ -435,7 +436,8 @@ public class ParametersFormPanel {
                                         tf.setText(tt.getSelectedRange());
                                     }
                                 }
-                            });     button.setToolTipText("Time Range Tool");
+                            });     
+                            button.setToolTipText("Time Range Tool");
                             valuePanel.add( ctf );
                             button.setAlignmentX( JComponent.LEFT_ALIGNMENT );
                             valuePanel.add( button );
