@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Fun with indexing</a>.
+        <p><small>Script demos how multiple script editors can be started.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,8 @@
         
         <p>Bugfixes (2019-05-22 r23700):</p>
         <ul>
+            <li>polar plot would result in NullPointerException if Z is not available for rank 1 X,Y,Z
+            <li>2160: jyds script default timerange would reject.
             <li>2159: new das2stream reader reads in many 1-record joined data, wasting memory.  Thanks, Darrelle!
             <li>rfe677: display data on bundle of X,Y,Z didn't clip on Y.  Thanks, Ivar!
             <li>URI_Template's phasestart modifier was never implemented.  Thanks, Bob!
@@ -61,6 +63,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>toTimeDataSet reconciles the rank, allowing rank 0 and rank 1 inputs for the time components.
             <li>rfe469: Axis nodes have "tickValues" property which allows tick spacing and location to be specified manually.
             <li>rfe680: Expect utility included now to support driving other applications like FTP and IDL.
         </ul>
