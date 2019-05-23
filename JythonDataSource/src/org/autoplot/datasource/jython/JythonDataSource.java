@@ -307,7 +307,11 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                         InputStream in = new FileInputStream( jythonScript );
                         try {
                             in= JythonRefactory.fixImports(in);
+                            
+                            logger.log(Level.FINE, "executing script {0}", jythonScript.getName());
                             interp.execfile(in,jythonScript.getName());
+                            logger.log(Level.FINE, "done executing script {0}", jythonScript.getName());
+                            
                         } catch ( PyException ex ) {
                             if ( ex.toString().contains("checkForComodification") ) {
                                 in.close();
