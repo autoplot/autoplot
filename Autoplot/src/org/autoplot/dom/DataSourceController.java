@@ -1817,7 +1817,11 @@ public class DataSourceController extends DomNodeController {
                         }
                     }
                     //https://sourceforge.net/p/autoplot/bugs/1559/ Let's trim it...
+                    int count= result.length();
                     result= DataSourceUtil.trimScatterToTimeRange( result, ltsb.getTimeRange() );
+                    if ( result.length()==0 && count>0 ) {
+                        logger.warning("trimScatterToTimeRange removes all points!");
+                    }
                 }
 
                 setDataSetInternal(result, props, dom.controller.isValueAdjusting());
