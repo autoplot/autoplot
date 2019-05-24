@@ -271,6 +271,7 @@ for i in \
   AutoplotHelp \
   IdlMatlabSupport \
   AudioSystemDataSource \
+  DataSourcePack \
   $plugins \
   Autoplot; do
     if [ -d ../${i}/javahelp/ ]; then
