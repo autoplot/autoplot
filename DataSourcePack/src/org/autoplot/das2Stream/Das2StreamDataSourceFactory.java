@@ -84,8 +84,9 @@ public class Das2StreamDataSourceFactory implements DataSourceFactory {
                         e.getKey(), this, "arg_0",
                         e.getValue(), null, true ) );
                 }
+            } else {
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME,"useOldD2sParser=") );
             }
-            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME,"useOldD2sParser=") );
         } else if ( cc.context==cc.CONTEXT_PARAMETER_VALUE ) {
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE,"T") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE,"F") );
