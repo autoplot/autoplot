@@ -26,8 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-05-22 r23700):</p>
+        <p>Bugfixes (2019-05-25 r23712):</p>
         <ul>
+            <li>rfe681: support download of http://radiojove.org/archive/data/1556842548UT190501173508_HNRAO_1.spd.  Thanks, Masafumi!
+            <li>2159: new das2stream reader dropped the last record in test137 at U. Iowa.
+            <li>2159: new das2stream reader would use DataSetBuilder, which would in some cases return a DDataSet where only 10% was utilized, causing memory problems.
             <li>polar plot would result in NullPointerException if Z is not available for rank 1 X,Y,Z
             <li>2160: jyds script default timerange would reject.
             <li>2159: new das2stream reader reads in many 1-record joined data, wasting memory.  Thanks, Darrelle!
