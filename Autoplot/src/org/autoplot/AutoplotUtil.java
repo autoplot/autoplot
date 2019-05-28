@@ -141,6 +141,7 @@ import org.autoplot.datasource.ReferenceCache;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
 import org.autoplot.datasource.capability.Caching;
+import org.autoplot.dom.BindingModel;
 import org.autoplot.dom.PlotController;
 import org.das2.graph.BoundsRenderer;
 import org.das2.graph.PolarPlotRenderer;
@@ -766,13 +767,35 @@ public class AutoplotUtil {
         Plot plot= dom.getController().getPlot();
         return resetZoomY( dom, plot );
     }
-    
+
+    /**
+     * @param dom
+     * @param plot
+     * @return 
+     * @see PlotController#resetZoom(boolean, boolean, boolean) 
+     */
     public static boolean resetZoomY( Application dom, Plot plot ) {
         boolean result= true;
         Axis axis= plot.getYaxis();
 
         List<PlotElement> pes= DomUtil.getPlotElementsFor( dom, plot );
 
+        boolean alsoBindings= true; // See https://sourceforge.net/p/autoplot/bugs/2149/
+        if ( alsoBindings ) {
+            List<BindingModel> plots= DomUtil.findBindings( dom, plot.getYaxis(), Axis.PROP_RANGE );
+            for ( BindingModel b : plots ) {
+                Plot other;
+                if ( b.getDstId().equals( plot.getYaxis().getId() ) ) {
+                    Axis oa= (Axis)DomUtil.getElementById( dom, b.getSrcId() );
+                    other= (Plot)DomUtil.getPlotForAxis( dom, oa );
+                } else {
+                    Axis oa= (Axis)DomUtil.getElementById( dom, b.getDstId() );
+                    other= (Plot)DomUtil.getPlotForAxis( dom, oa );
+                }
+                pes.addAll( DomUtil.getPlotElementsFor( dom, other ) );
+            }
+        }
+        
         DatumRange range= null;
         for ( PlotElement pe: pes ) {
             if ( pe.isActive()==false ) continue;
@@ -809,12 +832,34 @@ public class AutoplotUtil {
         return resetZoomX( dom, plot );
     } 
     
+    /**
+     * @see PlotController#resetZoom(boolean, boolean, boolean) 
+     * @param dom
+     * @param plot
+     * @return 
+     */
     public static boolean resetZoomX( Application dom, Plot plot ) {
         boolean result= true;
         Axis axis= plot.getXaxis();
 
         List<PlotElement> pes= DomUtil.getPlotElementsFor( dom, plot );
 
+        boolean alsoBindings= true; // See https://sourceforge.net/p/autoplot/bugs/2149/
+        if ( alsoBindings ) {
+            List<BindingModel> plots= DomUtil.findBindings( dom, plot.getXaxis(), Axis.PROP_RANGE );
+            for ( BindingModel b : plots ) {
+                Plot other;
+                if ( b.getDstId().equals( plot.getXaxis().getId() ) ) {
+                    Axis oa= (Axis)DomUtil.getElementById( dom, b.getSrcId() );
+                    other= (Plot)DomUtil.getPlotForAxis( dom, oa );
+                } else {
+                    Axis oa= (Axis)DomUtil.getElementById( dom, b.getDstId() );
+                    other= (Plot)DomUtil.getPlotForAxis( dom, oa );
+                }
+                pes.addAll( DomUtil.getPlotElementsFor( dom, other ) );
+            }
+        }
+                
         DatumRange range= null;
         for ( PlotElement pe: pes ) {
             if ( pe.isActive()==false ) continue;
@@ -846,13 +891,35 @@ public class AutoplotUtil {
         return resetZoomZ( dom, plot );
     }
 
+    /**
+     * @see PlotController#resetZoom(boolean, boolean, boolean) 
+     * @param dom
+     * @param plot
+     * @return 
+     */
     public static boolean resetZoomZ( Application dom, Plot plot ) {
 
         boolean result= true;
         Axis axis= plot.getZaxis();
 
         List<PlotElement> pes= DomUtil.getPlotElementsFor( dom, plot );
-
+        
+        boolean alsoBindings= true; // See https://sourceforge.net/p/autoplot/bugs/2149/
+        if ( alsoBindings ) {
+            List<BindingModel> plots= DomUtil.findBindings( dom, plot.getZaxis(), Axis.PROP_RANGE );
+            for ( BindingModel b : plots ) {
+                Plot other;
+                if ( b.getDstId().equals( plot.getZaxis().getId() ) ) {
+                    Axis oa= (Axis)DomUtil.getElementById( dom, b.getSrcId() );
+                    other= (Plot)DomUtil.getPlotForAxis( dom, oa );
+                } else {
+                    Axis oa= (Axis)DomUtil.getElementById( dom, b.getDstId() );
+                    other= (Plot)DomUtil.getPlotForAxis( dom, oa );
+                }
+                pes.addAll( DomUtil.getPlotElementsFor( dom, other ) );
+            }
+        }
+        
         DatumRange range= null;
         for ( PlotElement pe: pes ) {
             if ( pe.isActive()==false ) continue;

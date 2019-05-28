@@ -1094,6 +1094,9 @@ public class PlotController extends DomNodeController {
      * @param x reset zoom in the x dimension.
      * @param y reset zoom in the y dimension.
      * @param z reset zoom in the z dimension.
+     * @see AutoplotUtil#resetZoomX(org.autoplot.dom.Application, org.autoplot.dom.Plot) 
+     * @see AutoplotUtil#resetZoomY(org.autoplot.dom.Application, org.autoplot.dom.Plot) 
+     * @see AutoplotUtil#resetZoomZ(org.autoplot.dom.Application, org.autoplot.dom.Plot) 
      */
     public void resetZoom(boolean x, boolean y, boolean z) {
         List<PlotElement> elements = dom.controller.getPlotElementsFor(plot);
@@ -1106,6 +1109,46 @@ public class PlotController extends DomNodeController {
 //        for ( PlotElement p: elements ) {
 //            System.err.println( p  +  " y= " + p.getPlotDefaults().getYaxis().getRange() );
 //        }
+
+        boolean alsoBindings= false; // See https://sourceforge.net/p/autoplot/bugs/2149/
+        if ( alsoBindings ) {
+            List<BindingModel> plots= DomUtil.findBindings( dom, plot.getXaxis(), Axis.PROP_RANGE );
+            for ( BindingModel b : plots ) {
+                Plot other;
+                if ( b.getDstId().equals( plot.getXaxis().getId() ) ) {
+                    Axis oa= (Axis)DomUtil.getElementById( dom, b.getSrcId() );
+                    other= (Plot)DomUtil.getPlotForAxis( dom, oa );
+                } else {
+                    Axis oa= (Axis)DomUtil.getElementById( dom, b.getDstId() );
+                    other= (Plot)DomUtil.getPlotForAxis( dom, oa );
+                }
+                elements.addAll( DomUtil.getPlotElementsFor( dom, other ) );
+            }
+            plots= DomUtil.findBindings( dom, plot.getYaxis(), Axis.PROP_RANGE );
+            for ( BindingModel b : plots ) {
+                Plot other;
+                if ( b.getDstId().equals( plot.getYaxis().getId() ) ) {
+                    Axis oa= (Axis)DomUtil.getElementById( dom, b.getSrcId() );
+                    other= (Plot)DomUtil.getPlotForAxis( dom, oa );
+                } else {
+                    Axis oa= (Axis)DomUtil.getElementById( dom, b.getDstId() );
+                    other= (Plot)DomUtil.getPlotForAxis( dom, oa );
+                }
+                elements.addAll( DomUtil.getPlotElementsFor( dom, other ) );
+            }
+            plots= DomUtil.findBindings( dom, plot.getZaxis(), Axis.PROP_RANGE );
+            for ( BindingModel b : plots ) {
+                Plot other;
+                if ( b.getDstId().equals( plot.getZaxis().getId() ) ) {
+                    Axis oa= (Axis)DomUtil.getElementById( dom, b.getSrcId() );
+                    other= (Plot)DomUtil.getPlotForAxis( dom, oa );
+                } else {
+                    Axis oa= (Axis)DomUtil.getElementById( dom, b.getDstId() );
+                    other= (Plot)DomUtil.getPlotForAxis( dom, oa );
+                }
+                elements.addAll( DomUtil.getPlotElementsFor( dom, other ) );
+            }
+        }
 
         boolean warnedAboutUnits= false;
         for (PlotElement p : elements) {

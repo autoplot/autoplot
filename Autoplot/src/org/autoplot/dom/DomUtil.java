@@ -434,6 +434,25 @@ public class DomUtil {
     }
     
     /**
+     * return null or the plot using the axis.
+     * @param app the application
+     * @param oa the axis
+     * @return null or the plot using the axis
+     */
+    public static Plot getPlotForAxis( Application app, Axis oa ) {
+        for ( Plot p: app.getPlots() ) {
+            if ( p.getXaxis()==oa ) {
+                return p;
+            } else if ( p.getYaxis()==oa ) {
+                return p;
+            } else if ( p.getZaxis()==oa ) {
+                return p;                
+            }
+        }
+        return null;
+    }
+    
+    /**
      * find the nodes matching this regex.
      * @param root the node to start at.
      * @param regex the regular expression.
