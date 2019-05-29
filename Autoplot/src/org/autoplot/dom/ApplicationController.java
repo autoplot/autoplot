@@ -366,6 +366,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
     }
     
+    private Plot currentFocusPlot= null;
+    
     // listen for focus changes and update the focus plot and plotElement.
     FocusAdapter focusAdapter = new FocusAdapter() {
         @Override
@@ -427,7 +429,10 @@ public class ApplicationController extends DomNodeController implements RunLater
                     }
                 }
             } else {
-                setStatus("" + domPlot + " selected");
+                if ( domPlot!=currentFocusPlot ) {
+                    setStatus("" + domPlot + " selected");
+                    currentFocusPlot= domPlot;
+                }
                 fp= null;
             }
 
