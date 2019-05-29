@@ -400,8 +400,14 @@ public class CdfDataSource extends AbstractDataSource {
                 int[] size= Ops.size(result);
                 BufferDataSet fillRecs= BufferDataSet.create( resultExt.rank(), resultExt.getType(), (int)( numRecDepend0-numRec ), size );
                 fillRecs.putProperty(QDataSet.UNITS,result.property(QDataSet.UNITS));
-                Number nfill= ((Number)resultExt.property(QDataSet.FILL_VALUE));
-                double fill= nfill!=null ? nfill.doubleValue() : Double.NaN; // TODO: float vs double will cause noise.
+                Number nfill= (Number)resultExt.property(QDataSet.FILL_VALUE);
+                double fill;
+                if ( nfill==null ) {
+                    logger.log(Level.WARNING, "required fill value is missing: {0}", svariable);
+                    fill= Double.NaN;
+                } else {
+                    fill= ((Number)resultExt.property(QDataSet.FILL_VALUE)).doubleValue(); // TODO: float vs double will cause noise.
+                }
                 DataSetIterator it= new QubeDataSetIterator(fillRecs);
                 while ( it.hasNext() ) {
                     it.next();
