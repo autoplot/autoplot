@@ -390,14 +390,18 @@ public class CdfDataSource extends AbstractDataSource {
             // Now call the other getDataSet...
             QDataSet result= getDataSet(mon,attributes);
             
-            if ( numRec>0 && numRec<numRecDepend0 && result instanceof BufferDataSet && result.length()<numRecDepend0 ) { // 2127: when data has fewer records than its DEPEND_0, then these should be fill.
+            // 2127: when data has fewer records than its DEPEND_0, then these should be fill.
+            if ( numRec>0 && numRec<numRecDepend0 
+                    && result instanceof BufferDataSet 
+                    && result.length()<numRecDepend0 
+                    && constraint==null ) { //TODO: constraint could be [0:nrec] and it should do the same thing.
                 BufferDataSet resultExt= ((BufferDataSet)result);
                 resultExt.grow( (int)numRecDepend0 );
                 int[] size= Ops.size(result);
-                int recLen= 1 * DataSetUtil.product(size) / size[0] * BufferDataSet.byteCount( resultExt.getType() ); 
                 BufferDataSet fillRecs= BufferDataSet.create( resultExt.rank(), resultExt.getType(), (int)( numRecDepend0-numRec ), size );
                 fillRecs.putProperty(QDataSet.UNITS,result.property(QDataSet.UNITS));
-                double fill= ((Number)resultExt.property(QDataSet.FILL_VALUE)).doubleValue(); // TODO: float vs double will cause noise.
+                Number nfill= ((Number)resultExt.property(QDataSet.FILL_VALUE));
+                double fill= nfill!=null ? nfill.doubleValue() : Double.NaN; // TODO: float vs double will cause noise.
                 DataSetIterator it= new QubeDataSetIterator(fillRecs);
                 while ( it.hasNext() ) {
                     it.next();
@@ -1364,8 +1368,13 @@ public class CdfDataSource extends AbstractDataSource {
                         
                         if ( idep==0 ) { //TODO: check for spareness property.  
                             if ( cdf.getNumberOfValues(svariable)==1 && depDs.length()>1 ) {
+                                logger.fine("it looks like the variable should repeat to match DEPEND_0");
                                 MutablePropertyDataSet nresult;
-                                nresult= new ReplicateDataSet( result.slice(0), depDs.length() );
+                                if ( result.rank()>1 ) {
+                                    nresult= new ReplicateDataSet( result.slice(0), depDs.length() );
+                                } else {
+                                    nresult= new ReplicateDataSet( result, depDs.length() );
+                                }
                                 result= nresult;
                             }
                         }
