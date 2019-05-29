@@ -3850,7 +3850,6 @@ private void editDomMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//G
 private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_statusLabelMouseClicked
     //statusLabel.setText("");
     statusLabel.setIcon(IDLE_ICON);
-    statusTextField.setText("");
 }//GEN-LAST:event_statusLabelMouseClicked
 
 private void inspectVapFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inspectVapFileMenuItemActionPerformed
