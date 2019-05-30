@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>This artifact from automated testing, this one of histogram codes.
+        <p><small>The contours renderer supports the "+1." notation indicating ticks every unit.  Before you would have to indicate the absolute location, which is not always possible.  See <a href="https://github.com/autoplot/dev/blob/master/bugs/20190529/contourPlotDemo.jy">contourPlotDemo.jy</a>
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,14 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-05-28 r23714):</p>
+        <p>Bugfixes (2019-05-30 r23723):</p>
+        <ul>
+            <li>Propagate USER_PROPERTIES through FFTPower so that Juno waveforms don't show extraneous %{USER_PROPERTIES} in title.
+            <li>2127: .../mms1_feeps_srvy_l3_electron_20180928000000_v6.0.1.cdf?intensity_energy_bins[0] showed there was an issue.  Thanks, Allison!
+            <li>2164: mouse module (e.g. box zoom) feedback is restored.  Thanks, Masafumi!
+            <li>2149: experiments with autorange considering bindings.
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>rfe678: mad function replaced with meanAverageDeviation, since median average deviation is also used for "mad."
             <li>rfe681: support download of http://radiojove.org/archive/data/1556842548UT190501173508_HNRAO_1.spd.  Thanks, Masafumi!
@@ -39,61 +46,17 @@
             <li>URI_Template's phasestart modifier was never implemented.  Thanks, Bob!
             <li>2158: setItemAllLists( rank0, rank0, rank1) now reconciles the three properly.  Thanks, Bill!
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>2155: automatically set digitizer "sorted" property so that pixel locations don't clobber each other.
-            <li>TITLE property was printed twice in ASCII export.
-            <li>2133: bug in Datum.Long to TimeStruct, where leap seconds were handled incorrectly, was corrected.  Thanks, Darrell!
-            <li>%{TIMERANGE} macro can convert back to orbit number.  Thanks, Ivar!
-            <li>2154: support assignment of fill to dataset, where fill is copied or translated to the dataset's fill value.  Thanks, Ivar!
-            <li>bug with new --quiet switch with AutoplotDataServer corrected.  
-            <li>1670: check for weight=0 with value=NaN, some codes assumed weight*value was valid.  Thanks, Ivar!
-            <li>2148: shift-execute correctly brings up the parameters dialog in the script editor.
-            <li>2148: .jy scripts now get lint to check for common mistakes, before just .jyds scripts did.
-            <li>check for duplicate entries in CDAWeb file-finding service.  This is a bug they will fix as well.
-            <li>2140: top and bottom painters are automatically antialiased and have their own graphics context to protect other parts of the plot.
-            <li>2140: add support for DasPlot top and bottom decorators.
-            <li>2147: data reduction with series renderer and small pixels would result in washed-out image.
-            <li>2146: autolayout incorrectly reclaims room for TCAs, adding noise to vap loading.  Thanks, Kris!
-            <li>doDataSetReduce of SeriesRenderer now reduces to 1/2 pixel, so that "1px" sized black dots appear black.
-            <li>performance improvements to the HugeScatterRenderer.
-            <li>2145: avoid infinite loop in Events List when there are no events in the next intervals.
-            <li>corrections to other bugs with the HAPI client when caching was turned on.
-            <li>performance improvements with new Das2Stream reader, along minor bugs pointed out by Jenkins tests.
-            <li>clean up old script examples in https://svn.code.sf.net/p/autoplot/code/autoplot/trunk/Autoplot/src/scripts/
-            <li>2143: HAPI client respects dataset time boundaries when caching is enabled.
-            <li>rebinner API now passes information about the Z axis so interpolation can be fixed.
-            <li>"polar" render type corrects units.
-        </ul>
         <p>Features:</p>
         <ul>
-            <li>toTimeDataSet reconciles the rank, allowing rank 0 and rank 1 inputs for the time components.
-            <li>rfe469: Axis nodes have "tickValues" property which allows tick spacing and location to be specified manually.
-            <li>rfe680: Expect utility included now to support driving other applications like FTP and IDL.
+            <li>rfe469: Contours renderer now supports +20m notation, to match axis,  where a contour is drawn every 20 units.
+            <li>UByteDataSet has extra "collectString" method so strings can be extracted efficiently.
         </ul>
         <p>Less recent features:</p>
         <ul>
-            <li>rfe677: redo the GUI for the display data dialog, so you can see and control the yclipping.  Thanks, Ivar!
-            <li>rfe678: add mad function!  Thanks, Ivar.
-            <li>PngWalkTool's write to animated gif and write to pdf file now have a button to copy the output filename to the clipboard.
-            <li>AutoplotDataServer has -q option to quiet informational messages on stderr.  Thanks, Bob!
-            <li>file download now logs transfer rates to das2.filesystem.wfs at FINER.
-            <li>sftp support uses java property user.name to get the username by default, so two people can share .vaps with different .ssh keys.
-            <li>ImageVectorDataSetRenderer renamed to HugeScatterRebinner.
-            <li>Autoplot-based HAPI Server supports If-Modified-Since header.
-            <li>handle rank 1 with optimized loop in simpleRange.
-            <li>HAPI data source now caches binary transactions.
-            <li>Das2Streams are now read directly into QDataSet.
-            <li>DataSetBuilder can accept fields from DatumVector, for performance.
-            <li>imgscalr library added, which will provide faster thumbnails.
-            <li>polarToCartesian function and filter added.
-            <li>support Radio and Plasma Wave Group's GitLabs site with GitHubFileSystem.
-            <li>support U. Iowa GitLabs site with GitHubFileSystem.
-            <li>polar renderer supports x,y,z color scatter plot.
-            <li>new code reads Das2Streams directly into QDataSet.
-            <li>das2streams support x,y,z scatter.  Clean up strange names in the das2stream parser.
-            <li>Renderer.render now takes Graphics2D object, instead of Graphics.
-            <li>API changes like removing monitor from render call will make scripting easier.
+            <li>rfe681: http://radiojove.org/archive/data/1556842548UT190501173508_HNRAO_1.spd now loads despite 403 when the content is read.
+            <li>toTimeDataSet reconciles the rank, allowing rank 0 and rank 1 inputs for the time components.
+            <li>rfe469: Axis nodes have "tickValues" property which allows tick spacing and location to be specified manually.
+            <li>rfe680: Expect utility included now to support driving other applications like FTP and IDL.
         </ul>
         <p>Known issues:</p>
         <ul>
