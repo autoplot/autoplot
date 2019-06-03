@@ -2021,6 +2021,7 @@ public class PlotController extends DomNodeController {
         a.setNextAction( "scan", null );
         expertMenuItems= null;
         this.pdListen= null;
+        this.titleConverter= null;
     }
     
     /** 
