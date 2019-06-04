@@ -82,6 +82,8 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
         referenceValuePanel.add(refedit);
 
         validate();
+                
+        AutoplotHelpSystem.getHelpSystem().registerHelpID(this, PlotStylePanel.STYLEPANEL_HELP_ID );
 
     }
 
@@ -124,8 +126,6 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
         repaint();
         
         elementBindingContext= bc;
-
-        AutoplotHelpSystem.getHelpSystem().registerHelpID(this, PlotStylePanel.STYLEPANEL_HELP_ID );
 
     }
     
