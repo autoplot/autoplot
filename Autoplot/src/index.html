@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The contours renderer supports the "+1." notation requesting ticks every unit.  Before you would have to indicate the absolute location, which is not always possible.  See <a href="https://github.com/autoplot/dev/blob/master/bugs/20190529/contourPlotDemo.jy">contourPlotDemo.jy</a>
+        <p><small>Annual study of memory leaks yielded some nice results.  <a href="https://github.com/autoplot/dev/blob/master/bugs/2054/stressTestForLeaks.jy"> Here</a> is code for testing.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-05-30 r23723):</p>
+        <p>Bugfixes (2019-06-04 r23734):</p>
         <ul>
+            <li>round of memory leaks testing.  See 
+            <li>rte 1625162004: runtime error because of units during transition
+            <li>contours renderer was painting the off-screen labels, degrading performance.
             <li>Propagate USER_PROPERTIES through FFTPower so that Juno waveforms don't show extraneous %{USER_PROPERTIES} in title.
             <li>2127: .../mms1_feeps_srvy_l3_electron_20180928000000_v6.0.1.cdf?intensity_energy_bins[0] showed there was an issue.  Thanks, Allison!
             <li>2164: mouse module (e.g. box zoom) feedback is restored.  Thanks, Masafumi!
@@ -48,7 +51,8 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>rfe469: Contours renderer now supports +20m notation, to match axis,  where a contour is drawn every 20 units.
+            <li>total function now checks for high-rank DEPEND_2, for when the metadata is constant and can be preserved.  Thanks, Jon N!
+            <li>rfe469: Contours renderer now supports +20m notation, to match axis, where a contour is drawn every 20 units.
             <li>UByteDataSet has extra "collectString" method so strings can be extracted efficiently.
         </ul>
         <p>Less recent features:</p>
