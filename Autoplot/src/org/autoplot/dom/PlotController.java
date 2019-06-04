@@ -1995,6 +1995,10 @@ public class PlotController extends DomNodeController {
         ac.unbind(dom.options, Options.PROP_TICKLEN, p.getXAxis(), "tickLength");
         ac.unbind(dom.options, Options.PROP_TICKLEN, p.getYAxis(), "tickLength");
         ac.unbind(dom.options, Options.PROP_TICKLEN, this.dasColorBar, "tickLength");
+        ac.unbind(dom.options, Options.PROP_LINE_THICKNESS, p.getXAxis(), DasAxis.PROP_LINETHICKNESS );
+        ac.unbind(dom.options, Options.PROP_LINE_THICKNESS, p.getYAxis(), DasAxis.PROP_LINETHICKNESS );
+        ac.unbind(dom.options, Options.PROP_LINE_THICKNESS, this.dasColorBar, DasAxis.PROP_LINETHICKNESS );
+        ac.unbind(dom.options, Options.PROP_LINE_THICKNESS, p, DasAxis.PROP_LINETHICKNESS );
         ac.unbind( dom.options, Options.PROP_MULTILINETEXTALIGNMENT, p, DasPlot.PROP_MULTILINETEXTALIGNMENT );
         ac.unbind( dom.options, Options.PROP_PRINTINGLOGLEVEL, p, DasPlot.PROP_PRINTINGLOGLEVEL );
         ac.unbind( dom.options, Options.PROP_DISPLAYLOGLEVEL, p, DasPlot.PROP_LOG_LEVEL );
