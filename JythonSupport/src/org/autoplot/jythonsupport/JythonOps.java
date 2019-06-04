@@ -392,7 +392,7 @@ public class JythonOps {
             String ss= path.replace("://", "/");
             destDir= new File( destDir, ss );
             org.das2.util.filesystem.FileSystemUtil.unzipFile( jarFile, destDir);
-            syspath.append( new PyString(destDir.toString()) );
+            syspath.insert( 0, new PyString(destDir.toString()) );
             return destDir.toString();
         } else {
             throw new IllegalArgumentException("only jar files can be added.");
