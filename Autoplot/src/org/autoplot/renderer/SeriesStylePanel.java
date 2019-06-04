@@ -92,7 +92,6 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
             elementBindingContext.unbind();
             elementBindingContext= null;
         }
-        AutoplotHelpSystem.getHelpSystem().unregisterHelpID( this, PlotStylePanel.STYLEPANEL_HELP_ID );
     }
 
     public synchronized void doElementBindings( final PlotElement element) {

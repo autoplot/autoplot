@@ -87,7 +87,7 @@ public class ColorScatterStylePanel extends javax.swing.JPanel implements PlotSt
         referenceValuePanel.add(refedit);
 
         validate();
-
+        AutoplotHelpSystem.getHelpSystem().registerHelpID(this, PlotStylePanel.STYLEPANEL_HELP_ID );
     }
 
     public void releaseElementBindings() {
@@ -95,7 +95,6 @@ public class ColorScatterStylePanel extends javax.swing.JPanel implements PlotSt
             elementBindingContext.unbind();
             elementBindingContext= null;
         }
-        AutoplotHelpSystem.getHelpSystem().unregisterHelpID(this, PlotStylePanel.STYLEPANEL_HELP_ID );
     }
 
     public synchronized void doElementBindings(PlotElement element) {
@@ -128,8 +127,6 @@ public class ColorScatterStylePanel extends javax.swing.JPanel implements PlotSt
         repaint();
         
         elementBindingContext= bc;
-
-        AutoplotHelpSystem.getHelpSystem().registerHelpID(this, PlotStylePanel.STYLEPANEL_HELP_ID );
 
     }
     

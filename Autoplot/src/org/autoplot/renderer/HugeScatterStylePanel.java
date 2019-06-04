@@ -37,7 +37,8 @@ public class HugeScatterStylePanel extends javax.swing.JPanel implements PlotSty
         colorPanel.add(colorEditor.getSmallEditor(), BorderLayout.CENTER);
 
         validate();
-
+        
+        AutoplotHelpSystem.getHelpSystem().registerHelpID(this, PlotStylePanel.STYLEPANEL_HELP_ID );
     }
 
     public void releaseElementBindings() {
@@ -45,7 +46,6 @@ public class HugeScatterStylePanel extends javax.swing.JPanel implements PlotSty
             elementBindingContext.unbind();
             elementBindingContext= null;
         }
-        AutoplotHelpSystem.getHelpSystem().registerHelpID(this, PlotStylePanel.STYLEPANEL_HELP_ID );
     }
 
     public synchronized void doElementBindings(PlotElement element) {
@@ -60,8 +60,6 @@ public class HugeScatterStylePanel extends javax.swing.JPanel implements PlotSty
         repaint();
         
         elementBindingContext= bc;
-
-        AutoplotHelpSystem.getHelpSystem().registerHelpID(this, PlotStylePanel.STYLEPANEL_HELP_ID );
 
     }
 

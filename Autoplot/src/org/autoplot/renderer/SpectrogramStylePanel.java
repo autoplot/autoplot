@@ -37,7 +37,8 @@ public class SpectrogramStylePanel extends javax.swing.JPanel implements PlotSty
         rebinPanel.add(rebin.getCustomEditor(), BorderLayout.CENTER);
 
         validate();
-
+        
+        AutoplotHelpSystem.getHelpSystem().registerHelpID( this, PlotStylePanel.STYLEPANEL_HELP_ID );
     }    
 
     public void releaseElementBindings() {
@@ -45,7 +46,6 @@ public class SpectrogramStylePanel extends javax.swing.JPanel implements PlotSty
             elementBindingContext.unbind();
             elementBindingContext=null;
         }
-        AutoplotHelpSystem.getHelpSystem().unregisterHelpID( this, PlotStylePanel.STYLEPANEL_HELP_ID );
     }
 
     public synchronized void doElementBindings(PlotElement element) {
@@ -61,8 +61,6 @@ public class SpectrogramStylePanel extends javax.swing.JPanel implements PlotSty
         repaint();
         
         elementBindingContext= bc;
-
-        AutoplotHelpSystem.getHelpSystem().registerHelpID(this,  PlotStylePanel.STYLEPANEL_HELP_ID );
 
     }
 
