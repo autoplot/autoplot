@@ -2,7 +2,6 @@
 package org.autoplot.jythonsupport.ui;
 
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import org.das2.components.propertyeditor.PropertyEditor;
@@ -551,9 +550,40 @@ public class EditorContextMenu {
                     try {
                         String java= JythonToJavaConverter.convert(doThis);
                         JEditorPane a= new JEditorPane();
+                        a.setBackground( editor.getBackground() );
+                        a.setForeground( editor.getForeground() );                        
                         DefaultSyntaxKit.initKit();
                         a.setContentType("text/java");
                         a.setText(java);
+                        JDialog d= new JDialog();
+                        a.setMinimumSize( new Dimension(400,400) );
+                        a.setPreferredSize( new Dimension(400,400) );
+                        d.getContentPane().add(new JScrollPane(a));
+                        d.pack();
+                        d.setVisible(true);
+                    } catch ( Exception ex ) {
+                        JOptionPane.showMessageDialog( menu, ex.toString() );
+                    }
+                }                
+            });
+            developerMenu.add(mi);
+
+            mi= new JMenuItem( new AbstractAction("Convert Java To Jython") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);       
+                    String doThis= editor.getSelectedText();
+                    if ( doThis==null || doThis.length()==0 ) {
+                        doThis= editor.getText();
+                    }
+                    try {
+                        String jython= JythonToJavaConverter.convertReverse(doThis);
+                        JEditorPane a= new JEditorPane();
+                        a.setBackground( editor.getBackground() );
+                        a.setForeground( editor.getForeground() );
+                        DefaultSyntaxKit.initKit();
+                        a.setContentType("text/python");
+                        a.setText(jython);
                         JDialog d= new JDialog();
                         a.setMinimumSize( new Dimension(400,400) );
                         a.setPreferredSize( new Dimension(400,400) );
