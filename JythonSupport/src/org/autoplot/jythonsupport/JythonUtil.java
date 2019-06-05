@@ -732,8 +732,8 @@ public class JythonUtil {
             isNumber= false;
         }
 
-        if ( sval.length()>0 && !isNumber && !sval.equals("True") && !sval.equals("False") ) {
-            if ( !( sval.startsWith("'") && sval.endsWith("'") ) ) {
+        if ( !isNumber && !sval.equals("True") && !sval.equals("False") ) {
+            if ( sval.length()==0 || !( sval.startsWith("'") && sval.endsWith("'") ) ) {
                 sval= String.format( "'%s'", sval );
             }
         }
