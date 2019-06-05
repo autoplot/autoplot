@@ -268,10 +268,11 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     String s= e.getKey();
                     if (!s.equals("arg_0") && !s.equals("script") ) {
                         String sval= e.getValue();
-                        
-                        sval= JythonUtil.maybeQuoteString( sval );
-                        logger.log(Level.FINE, "autoplot.params[''{0}'']={1}", new Object[]{s, sval});
-                        interp.exec("autoplot.params['" + s + "']=" + sval);
+                        if ( sval.length()>0 ) {
+                            sval= JythonUtil.maybeQuoteString( sval );
+                            logger.log(Level.FINE, "autoplot.params[''{0}'']={1}", new Object[]{s, sval});
+                            interp.exec("autoplot.params['" + s + "']=" + sval);
+                        }
                     }
                 }
                 
