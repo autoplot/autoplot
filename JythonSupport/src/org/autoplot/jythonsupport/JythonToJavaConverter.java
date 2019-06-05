@@ -4,9 +4,16 @@ package org.autoplot.jythonsupport;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.autoplot.datasource.DataSetURI;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.parser.SimpleNode;
 import org.python.parser.ast.*;
@@ -18,6 +25,59 @@ import org.python.parser.ast.*;
  * @author jbf
  */
 public class JythonToJavaConverter {
+
+    private static final Logger logger= LoggerManager.getLogger("jython");
+    
+    private static Map<String,String> packages= null;
+    
+    public synchronized static String guessPackage( String clas ) {
+        if ( packages==null ) {
+            try {
+                Map lpackages=new HashMap<>();
+                BufferedReader r = new BufferedReader( new InputStreamReader(
+                    JythonToJavaConverter.class.getResourceAsStream("/importLookup.jy") ) );
+                String l;
+                Pattern p= Pattern.compile("from (.*) import (.*)");
+                while ( (l= r.readLine() )!=null ) {
+                    if ( l.length()==0 ) continue;
+                    if ( l.charAt(0)=='#' ) continue;
+                    Matcher m= p.matcher(l);
+                    if ( m.matches() ) {
+                        lpackages.put( m.group(2),m.group(1) );
+                    } else {
+                        logger.log(Level.INFO, "does not match pattern: {0}", l);
+                    }       
+                }
+                packages= lpackages;
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+        return packages.get(clas);
+    }
+    
+    /**
+     * The goal is to take Java snippets and turn them into Jython code.
+     * @param doThis
+     * @return 
+     */
+    public static String convertReverse(String doThis) {
+        String[] ss= doThis.split("\n");
+        StringBuilder b= new StringBuilder();
+        Pattern assignPattern= Pattern.compile("([A-Z]\\S*)(\\s+)(\\S*)(\\s*=.*)");
+        for ( String s: ss ) {
+            s= s.trim();
+            if ( s.endsWith(";") ) s= s.substring(0,s.length()-1);
+            s= s.replaceAll("//","#");
+            s= s.replaceAll(" new ", "" );
+            Matcher m= assignPattern.matcher(s);
+            if ( m.matches() ) {
+                s= m.group(3)+m.group(4);
+            }
+            b.append(s).append("\n");
+        }
+        return b.toString();
+    }
 
     private static class MyVisitorBase<R> extends VisitorBase {
 
