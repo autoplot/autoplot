@@ -175,6 +175,25 @@ public class Annotation extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_POINTATY, oldPointAtY, pointAtY);
     }
     
+    private String pointAtOffset="";
+
+    public static final String PROP_POINTATOFFSET = "pointAtOffset";
+
+    /**
+     * return the offset from the thing we point at, if any.  For example, "1em"
+     * means back off 1em from the target.
+     * @return 
+     */
+    public String getPointAtOffset() {
+        return pointAtOffset;
+    }
+
+    public void setPointAtOffset(String pointAtOffset) {
+        String oldPointAtOffset = this.pointAtOffset;
+        this.pointAtOffset = pointAtOffset;
+        propertyChangeSupport.firePropertyChange(PROP_POINTATOFFSET, oldPointAtOffset, pointAtOffset);
+    }
+
     private boolean showArrow = false;
 
     public static final String PROP_SHOWARROW = "showArrow";
@@ -362,6 +381,7 @@ public class Annotation extends DomNode {
         if ( !exclude.contains( PROP_YRANGE ) ) this.setYrange( that.getYrange() );
         if ( !exclude.contains( PROP_POINTATX ) ) this.setPointAtX( that.getPointAtX() );
         if ( !exclude.contains( PROP_POINTATY ) ) this.setPointAtY( that.getPointAtY() );
+        if ( !exclude.contains( PROP_POINTATOFFSET ) ) this.setPointAtOffset( that.getPointAtOffset() );
         if ( !exclude.contains( PROP_SHOWARROW ) ) this.setShowArrow( that.isShowArrow() );
         if ( !exclude.contains( PROP_OVERRIDECOLORS ) ) this.setOverrideColors(that.isOverrideColors() );
         if ( !exclude.contains( PROP_TEXTCOLOR ) ) this.setTextColor(that.getTextColor() );
@@ -413,6 +433,8 @@ public class Annotation extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff( PROP_POINTATX, that.pointAtX, this.pointAtX ) );
         b=  that.pointAtY.equals(this.pointAtY) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_POINTATY, that.pointAtY, this.pointAtY ) );
+        b=  that.pointAtOffset.equals(this.pointAtOffset) ;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_POINTATOFFSET, that.pointAtOffset, this.pointAtOffset ) );
         b=  that.showArrow==this.showArrow;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_SHOWARROW, that.showArrow, this.showArrow ) );
         b=  that.textColor.equals(this.textColor) ;
