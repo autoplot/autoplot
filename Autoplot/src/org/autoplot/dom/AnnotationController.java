@@ -116,6 +116,7 @@ public class AnnotationController extends DomNodeController {
         ac.bind( annotation, "yrange", p, "yrange" );
         ac.bind( annotation, "pointAtX", p, "pointAtX" );
         ac.bind( annotation, "pointAtY", p, "pointAtY" );
+        ac.bind( annotation, Annotation.PROP_POINTATOFFSET, p, DasAnnotation.PROP_POINTATOFFSET );
         ac.bind( annotation, "showArrow", p, "showArrow" );
         ac.bind( annotation, "overrideColors", p, "overrideColors" );
         ac.bind( annotation, "textColor", p, "textColor" );
