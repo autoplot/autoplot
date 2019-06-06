@@ -28,6 +28,8 @@
         
         <p>Bugfixes (2019-06-06 r23745):</p>
         <ul>
+            <li>paste plots from clipboard was too restrictive in validity test.  Thanks, Kris!
+            <li>correct runtime error when DasAnnotation couldn't load image file.
             <li>"convert Jython to Java" didn't set the popup background color.
             <li>2166: ".../foo.jyds?param=" fixed, where empty parameters are treated the same as missing parameters, using default values.
             <li>round of memory leaks testing.  See https://github.com/autoplot/dev/blob/master/bugs/2054/stressTestForLeaks.jy
