@@ -278,8 +278,8 @@ public class AxisController extends DomNodeController {
         ac.bind(axis, "flipped", dasAxis, "flipped");
         ac.bind(axis, "visible", dasAxis, "visible" );
         ac.bind(axis, "opposite", dasAxis, "orientation", getOppositeConverter(axis,dasAxis) );
-        ac.bind(axis, "tickValues", dasAxis, "tickValues" );
-        
+        ac.bind(axis, Axis.PROP_TICKVALUES, dasAxis, DasAxis.PROP_TICKVALUES );
+        ac.bind(axis, Axis.PROP_REFERENCE, dasAxis, DasAxis.PROP_REFERENCE );
         //if ( this.axis.getId().equals("xaxis_2") ) {
         //    System.err.println("here2 bind xaxis_2="+this.axis+ "@"+ this.axis.hashCode() + "dasColumn=@"+dasAxis.getColumn().hashCode()+" dasAxis="+ dasAxis.getDasName() + "@" + dasAxis.hashCode() );
         //}

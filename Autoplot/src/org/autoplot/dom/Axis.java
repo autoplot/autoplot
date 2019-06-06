@@ -95,6 +95,26 @@ public class Axis extends DomNode {
         this.log = log;
         propertyChangeSupport.firePropertyChange(PROP_LOG, oldLog, log);
     }
+    
+    private String reference = "";
+
+    public static final String PROP_REFERENCE = "reference";
+
+    public String getReference() {
+        return reference;
+    }
+
+    /**
+     * draw an optional reference line at the location.  Valid entries
+     * can be parsed into a Datum, using the units of the axis.
+     * @param reference 
+     */
+    public void setReference(String reference) {
+        String oldReference = this.reference;
+        this.reference = reference.trim();
+        propertyChangeSupport.firePropertyChange(PROP_REFERENCE, oldReference, reference);
+    }
+    
     protected String label = "";
     /**
      * concise label for the axis.
@@ -328,6 +348,7 @@ public class Axis extends DomNode {
             if ( !exclude.contains( PROP_AUTOLABEL ) ) this.setAutoLabel(that.isAutoLabel());
             if ( !exclude.contains( PROP_DRAWTICKLABELS ) ) this.setDrawTickLabels(that.isDrawTickLabels());
             if ( !exclude.contains( PROP_TICKVALUES ) ) this.setTickValues(that.getTickValues());
+            if ( !exclude.contains( PROP_REFERENCE ) ) this.setReference(that.getReference());            
             if ( !exclude.contains( PROP_VISIBLE ) ) this.setVisible(that.isVisible());
         }
     }
@@ -372,6 +393,8 @@ public class Axis extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff( PROP_DRAWTICKLABELS, that.drawTickLabels, this.drawTickLabels ) );
         b=  that.tickValues.equals(this.tickValues);
         if ( !b ) result.add(new PropertyChangeDiff( PROP_TICKVALUES, that.tickValues, this.tickValues ) );
+        b=  that.reference.equals(this.reference);
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_REFERENCE, that.reference, this.reference ) );
         b=  that.visible==this.visible;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_VISIBLE, that.visible, this.visible ) );
 
