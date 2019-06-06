@@ -1889,16 +1889,22 @@ public class GuiSupport {
             String s;
             if ( clpbrd.isDataFlavorAvailable(DataFlavor.stringFlavor) ) {
                 s= (String) clpbrd.getData(DataFlavor.stringFlavor);
-                if ( !s.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<vap") ) {
-                    JOptionPane.showMessageDialog(app,"Use \"Edit Plot\"->\"Copy Plot to Clipboard\"");
+                if ( !s.startsWith("<?xml") ) {
+                    JOptionPane.showMessageDialog(app,"<html>Use \"Edit Plot\"->\"Copy Plot to Clipboard\"<br>(Pasted content should be XML.)");
                     return;
                 }
             } else {
-                JOptionPane.showMessageDialog(app,"Use \"Edit Plot\"->\"Copy Plot to Clipboard\"");
+                JOptionPane.showMessageDialog(app,"<html>Use \"Edit Plot\"->\"Copy Plot to Clipboard\"<br>(Content should be a string.)");
                 return;
             }
             
-            Application state= (Application)StatePersistence.restoreState(new ByteArrayInputStream(s.getBytes()));
+            Application state;
+            try {
+                state= (Application)StatePersistence.restoreState(new ByteArrayInputStream(s.getBytes()));
+            } catch ( IllegalArgumentException ex ) {
+                JOptionPane.showMessageDialog(app,"<html>Use \"Edit Plot\"->\"Copy Plot to Clipboard\"<br>("+ex.getMessage()+")" );
+                return;
+            }
             
             PlotElement[] pes= state.getPlotElements();
             
