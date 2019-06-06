@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Annual study of memory leaks yielded some nice results.  <a href="https://github.com/autoplot/dev/blob/master/bugs/2054/stressTestForLeaks.jy"> Here</a> is code for testing.
+        <p><small>Perennial study of memory leaks yielded some nice results.  <a href="https://github.com/autoplot/dev/blob/master/bugs/2054/stressTestForLeaks.jy"> Here</a> is code for testing.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,8 @@
         
         <p>Bugfixes (2019-06-04 r23734):</p>
         <ul>
+            <li>"convert Jython to Java" didn't set the popup background color.
+            <li>2166: ".../foo.jyds?param=" fixed, where empty parameters are treated the same as missing parameters, using default values.
             <li>round of memory leaks testing.  See 
             <li>rte 1625162004: runtime error because of units during transition
             <li>contours renderer was painting the off-screen labels, degrading performance.
@@ -51,6 +53,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Useful DasAxis reference property is now bound to the DOM.
+            <li>annotations now have "pointAtOffset" so you can back off the arrow head.
+            <li>experimental "convert Java to Jython" option in editor under developer, to assist me when testing Java fragments.
             <li>total function now checks for high-rank DEPEND_2, for when the metadata is constant and can be preserved.  Thanks, Jon N!
             <li>rfe469: Contours renderer now supports +20m notation, to match axis, where a contour is drawn every 20 units.
             <li>UByteDataSet has extra "collectString" method so strings can be extracted efficiently.
