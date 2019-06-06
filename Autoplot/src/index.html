@@ -26,11 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-06-04 r23734):</p>
+        <p>Bugfixes (2019-06-06 r23745):</p>
         <ul>
             <li>"convert Jython to Java" didn't set the popup background color.
             <li>2166: ".../foo.jyds?param=" fixed, where empty parameters are treated the same as missing parameters, using default values.
-            <li>round of memory leaks testing.  See 
+            <li>round of memory leaks testing.  See https://github.com/autoplot/dev/blob/master/bugs/2054/stressTestForLeaks.jy
             <li>rte 1625162004: runtime error because of units during transition
             <li>contours renderer was painting the off-screen labels, degrading performance.
             <li>Propagate USER_PROPERTIES through FFTPower so that Juno waveforms don't show extraneous %{USER_PROPERTIES} in title.
