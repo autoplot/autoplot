@@ -2102,7 +2102,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * plotElements, plots and data sources.
      */
     public void reset() {
-        logger.fine("Resetting application...");
+        logger.entering("ApplicationController", "reset");
         setStatus("resetting...");
 
         DomLock lock= mutatorLock();
@@ -2122,7 +2122,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         lock.lock("Reset");
         Lock canvasLock = getCanvas().controller.getDasCanvas().mutatorLock();
         canvasLock.lock();
-        logger.fine("got locks to reset application...");
+        logger.finer("got locks to reset application...");
 
         try {
             
@@ -2384,8 +2384,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         if ( !DomUtil.validateDom(application, problems ) ) {
             logger.warning( problems.toString() );
         }
-        logger.fine("done..");
-
+        logger.exiting("ApplicationController", "reset");
         setStatus("ready");
 
     }
