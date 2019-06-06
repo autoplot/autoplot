@@ -546,7 +546,7 @@ public class StatePersistence {
      * @param in, an input stream that starts with the xml.  This will be left open.  
      * @return the Application object.
      * @throws IOException
-     * @see #restoreState(java.io.InputStream, java.util.LinkedHashMap) which has macros like "PWD"
+     * @see #restoreState(java.io.InputStream, java.util.LinkedHashMap) see restoreState which has macros like "PWD"
      */
     public static Object restoreState( InputStream in )  throws IOException {
         PushbackInputStream pbin= new PushbackInputStream(in,10);
@@ -589,6 +589,9 @@ public class StatePersistence {
                     } else {
                         throw new IllegalArgumentException("exception report doesn't have vap node");
                     }
+                } else if ( !root.getNodeName().equals("vap") ) {
+                    throw new IllegalArgumentException("content should be a .vap file, an xml file with vap for the root node.");
+                    
                 }
                 
                 domVersion= root.getAttribute("domVersion");
