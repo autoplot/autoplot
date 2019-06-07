@@ -71,7 +71,7 @@ if ( generate=='T' ):
                  print '<tr><td></td><td>Search limited to 10000 results.</td></tr>'
                  break
           dr= dr.next()
-else:
+elif ( generate=='F' ):
     from org.das2.fsm import FileStorageModel
     from org.das2.util.filesystem import FileSystem
     i= FileStorageModel.splitIndex( resourceURI )
@@ -102,6 +102,8 @@ else:
        count= count+1
        print '</tr>'
     print '</table>'
+else:
+    raise Exception('generate must be T or F')
 
 if ( count==0 ):
    print '(none found)'
