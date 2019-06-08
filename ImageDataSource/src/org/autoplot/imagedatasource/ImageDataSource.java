@@ -279,11 +279,15 @@ public class ImageDataSource extends AbstractDataSource {
             Units xunits= transform[0].getUnits();
             QDataSet xx;
             if ( transform.length==5 && transform[4].equals(Datum.create(1)) ) {
+                transform[0]= transform[0].log10();
+                transform[2]= transform[2].log10();
                 xx= Ops.findgen(result.length());
-                xx= Ops.subtract( xx, Math.log10( transform[1].value() ) );
-                double s= (transform[2].divide(transform[0]).doubleValue(Units.dimensionless)/transform[3].subtract(transform[1]).value() );
+                xx= Ops.subtract( xx, transform[1] );
+                double s= (transform[2].subtract(transform[0]).doubleValue(xunits.getOffsetUnits())/transform[3].subtract(transform[1]).value() );
                 xx= Ops.multiply( xx, s );
-                xx= Ops.pow( Ops.add( Ops.putProperty( xx, QDataSet.UNITS, xunits.getOffsetUnits() ), transform[0] ), 10 );
+                xx= Ops.add( Ops.putProperty( xx, QDataSet.UNITS, xunits.getOffsetUnits() ), transform[0] );
+                xx= Ops.pow( 10, xx );
+                ((MutablePropertyDataSet)xx).putProperty( QDataSet.SCALE_TYPE, "log" );
             } else {
                 xx= Ops.findgen(result.length());
                 xx= Ops.subtract( xx, transform[1] );

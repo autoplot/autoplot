@@ -57,9 +57,11 @@ public class ImageDataSourceFactory implements DataSourceFactory {
                     break;
                 case "xaxis":
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "[valmin,pixmin,valmax,pixmax]", "add labels for each bin"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "[valmin,pixmin,valmax,pixmax,log]", "add labels for each bin"));
                     break;
                 case "yaxis":
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "[valmin,pixmin,valmax,pixmax]", "add labels for each bin"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "[valmin,pixmin,valmax,pixmax,log]", "add labels for each bin"));
                     break;
                 case "plotInfo":
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "0", "read the rich png metadata to get axes") );
