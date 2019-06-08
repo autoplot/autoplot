@@ -277,10 +277,20 @@ public class ImageDataSource extends AbstractDataSource {
             if ( transform[1].getUnits()!=Units.dimensionless ) throw new IllegalArgumentException("xaxis second and last components must be dimensionless.");
             if ( transform[3].subtract(transform[1]).value()< 0 ) throw new IllegalArgumentException("xaxis=[datamin,pixmin,datamax,pixmax] pixmin must be less than pixmax value"); 
             Units xunits= transform[0].getUnits();
-            QDataSet xx= Ops.findgen(result.length());
-            xx= Ops.subtract( xx, transform[1] );
-            xx= Ops.multiply( xx, (transform[2].subtract(transform[0]).doubleValue(xunits.getOffsetUnits())/transform[3].subtract(transform[1]).value() ) );
-            xx= Ops.add( Ops.putProperty( xx, QDataSet.UNITS, xunits.getOffsetUnits() ), transform[0] );
+            QDataSet xx;
+            if ( transform.length==5 && transform[4].equals(Datum.create(1)) ) {
+                xx= Ops.findgen(result.length());
+                xx= Ops.subtract( xx, Math.log10( transform[1].value() ) );
+                double s= (transform[2].divide(transform[0]).doubleValue(Units.dimensionless)/transform[3].subtract(transform[1]).value() );
+                xx= Ops.multiply( xx, s );
+                xx= Ops.pow( Ops.add( Ops.putProperty( xx, QDataSet.UNITS, xunits.getOffsetUnits() ), transform[0] ), 10 );
+            } else {
+                xx= Ops.findgen(result.length());
+                xx= Ops.subtract( xx, transform[1] );
+                double s= (transform[2].subtract(transform[0]).doubleValue(xunits.getOffsetUnits())/transform[3].subtract(transform[1]).value() );
+                xx= Ops.multiply( xx, s );
+                xx= Ops.add( Ops.putProperty( xx, QDataSet.UNITS, xunits.getOffsetUnits() ), transform[0] );
+            }
             if ( UnitsUtil.isIntervalMeasurement(xunits) ) {
                 ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MIN,transform[0].doubleValue(xunits) );
                 ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MAX,transform[2].doubleValue(xunits) );
@@ -296,10 +306,24 @@ public class ImageDataSource extends AbstractDataSource {
             if ( transform[1].getUnits()!=Units.dimensionless ) throw new IllegalArgumentException("yaxis second and last components must be dimensionless.");
             if ( transform[3].subtract(transform[1]).value()< 0 ) throw new IllegalArgumentException("yaxis=[datamin,pixmin,datamax,pixmax] pixmin must be less than pixmax value"); 
             Units yunits= transform[0].getUnits();
-            QDataSet yy= Ops.findgen(result.length(0));
-            yy= Ops.subtract( yy, transform[1] );
-            yy= Ops.multiply( yy, (transform[2].subtract(transform[0]).doubleValue(yunits.getOffsetUnits())/transform[3].subtract(transform[1]).value() ) );
-            yy= Ops.add( Ops.putProperty( yy, QDataSet.UNITS, yunits.getOffsetUnits() ), transform[0] );
+            QDataSet yy;
+            if ( transform.length==5 && transform[4].equals(Datum.create(1)) ) {
+                yy= Ops.findgen(result.length(0));
+                transform[0]= transform[0].log10();
+                transform[2]= transform[2].log10();
+                yy= Ops.subtract( yy, transform[1] );
+                double s= (transform[2].subtract(transform[0]).doubleValue(yunits.getOffsetUnits())/transform[3].subtract(transform[1]).value() );
+                yy= Ops.multiply( yy, s );
+                yy= Ops.add( Ops.putProperty( yy, QDataSet.UNITS, yunits.getOffsetUnits() ), transform[0] );
+                yy= Ops.pow( 10, yy );
+                ((MutablePropertyDataSet)yy).putProperty( QDataSet.SCALE_TYPE, "log" );
+            } else {
+                yy= Ops.findgen(result.length(0));
+                yy= Ops.subtract( yy, transform[1] );
+                double s= (transform[2].subtract(transform[0]).doubleValue(yunits.getOffsetUnits())/transform[3].subtract(transform[1]).value() );
+                yy= Ops.multiply( yy, s );
+                yy= Ops.add( Ops.putProperty( yy, QDataSet.UNITS, yunits.getOffsetUnits() ), transform[0] );
+            }
             if ( UnitsUtil.isIntervalMeasurement(yunits) ) {
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MIN,transform[0].doubleValue(yunits) );
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MAX,transform[2].doubleValue(yunits) );
@@ -408,10 +432,18 @@ public class ImageDataSource extends AbstractDataSource {
         String[] ss= s.split(",");
         Datum[] result= new Datum[ss.length];
         for ( int i=0; i<result.length; i++ ) {
-            try {
-                result[i]= DatumUtil.parse(ss[i]);
-            } catch ( ParseException ex ) {
-                throw new IllegalArgumentException("unable to parse: "+ss[i]);
+            if ( i<4 ) {
+                try {
+                    result[i]= DatumUtil.parse(ss[i]);
+                } catch ( ParseException ex ) {
+                    throw new IllegalArgumentException("unable to parse: "+ss[i]);
+                }
+            } else {
+                if ( ss[i].toLowerCase().equals("log") ) {
+                    result[i]= Datum.create(1);
+                } else {
+                    result[i]= Datum.create(0);
+                }
             }
         }
         return result;
