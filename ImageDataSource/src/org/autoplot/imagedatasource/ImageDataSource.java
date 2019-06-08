@@ -18,6 +18,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
+import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
@@ -203,7 +204,26 @@ public class ImageDataSource extends AbstractDataSource {
             image= dest;
         }
         
-    
+//        String transparent= getParam( "transparent", "0" ) ;
+//        if ( !transparent.equals("0") ) {
+//            int itransparent= Integer.parseInt(transparent);
+//            if ( itransparent<0 || itransparent>100 ) throw new IllegalArgumentException("transparent must be between 1 and 100");
+//            BufferedImage dest= new BufferedImage( image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB );
+//
+//            int alpha = ( itransparent * 255 / 100 ) << 24;
+//            int w= image.getWidth();
+//            int h= image.getHeight();
+//            for ( int i=0; i<w; i++ ) {
+//                for ( int j=0; j<h; j++ ) {
+//                    int c= image.getRGB( i,j );
+//                    dest.setRGB( i, j, alpha | ( c & 0xFFFFFF ) );
+//                }
+//            }
+//            logger.warning("ImageDataSet doesn't support transparency");
+//            image= dest;
+//        }
+//    
+//    
         String channel = params.get("channel");
 
         Color c = null;
