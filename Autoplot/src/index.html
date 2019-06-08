@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Perennial study of memory leaks yielded some nice results.  <a href="https://github.com/autoplot/dev/blob/master/bugs/2054/stressTestForLeaks.jy"> Here</a> is code for testing.
+        <p><small>Images support log y axis.  Whale song spectra from https://patternradio.withgoogle.com.  Happy World Oceans Day!
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,7 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-06-06 r23745):</p>
+        <p>Bugfixes (2019-06-08 r23752):</p>
         <ul>
             <li>paste plots from clipboard was too restrictive in validity test.  Thanks, Kris!
             <li>correct runtime error when DasAnnotation couldn't load image file.
@@ -55,6 +55,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>PNG Image reader supports yaxis=[70,119,3200,588,log] for unplotting log axes.
+            <li>phasestart parameter in URI templates properly implemented, and can be used to look at for example Sunday images.
             <li>Useful DasAxis reference property is now bound to the DOM.
             <li>annotations now have "pointAtOffset" so you can back off the arrow head.
             <li>experimental "convert Java to Jython" option in editor under developer, to assist me when testing Java fragments.
