@@ -508,7 +508,13 @@ public class NamedURIListTool extends JPanel {
         for ( int i=0; i<this.uris.size(); i++ ) {
             String uri= this.uris.get(i);
             if ( uri.trim().length()>0 ) {
-                b.append( this.ids.get(i) ).append( "=" ).append( "getDataSet('").append( this.uris.get(i) ).append("')&");
+                String s= this.uris.get(i);
+                if ( s.contains("'") ) {
+                    logger.info("removing single quotes from URI, hope that doesn't break anything.");
+                    b.append( this.ids.get(i) ).append( "=" ).append( "getDataSet('").append( s.replaceAll("'","") ).append("\')&");
+                } else {
+                    b.append( this.ids.get(i) ).append( "=" ).append( "getDataSet('").append( s ).append("')&");
+                }
             }
         }
         return b.toString();
