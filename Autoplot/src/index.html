@@ -27,7 +27,10 @@
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
         <p>Bugfixes (2019-06-10 r23752):</p>
-        <ul>
+        <ul>    
+            <li>corrections to code which calculates minor ticks given a set of major ticks.
+            <li>Submit feedback failed on Java 12 because of xml serialization, which no longer accepts null values.
+            <li>rte_0786587992: automatically remove single quotes from URIs, which prevent vap+jyds URIs from working in the mash up tool.
             <li>2171: new code in DasProgressMonitor was incorrect and could hang.
             <li>paste plots from clipboard was too restrictive in validity test.  Thanks, Kris!
             <li>correct runtime error when DasAnnotation couldn't load image file.
@@ -56,6 +59,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add log10() method for Datum, used in tick calculations.
             <li>PNG Image reader supports yaxis=[70,119,3200,588,log] for unplotting log axes.
             <li>phasestart parameter in URI templates properly implemented, and can be used to look at for example Sunday images.
             <li>Useful DasAxis reference property is now bound to the DOM.
