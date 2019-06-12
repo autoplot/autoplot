@@ -646,6 +646,18 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     }
     
     /**
+     * return the data contained, and empty string if no value or null is found.
+     */
+    private static String getStringData( Map<String,Object> data, String name ) {
+        Object o= data.get(name);
+        if ( o==null ) {
+            return "";
+        } else {
+            return String.valueOf(o);
+        }
+    }
+    
+    /**
      * data is a map containing the keys:<ul>
      * <li>USER_ID, user id
      * <li>EMAIL, email
@@ -690,24 +702,24 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             e.appendChild(user);
 
             Element userN= doc.createElement("userName");
-            userN.appendChild( doc.createTextNode((String)data.get(USER_ID)) );
+            userN.appendChild( doc.createTextNode( getStringData( data, USER_ID ) ) );
             e.appendChild(userN);
 
             Element mail= doc.createElement("email");
-            mail.appendChild( doc.createTextNode((String)data.get(EMAIL)) );
+            mail.appendChild( doc.createTextNode( getStringData( data, EMAIL ) ) );
             e.appendChild(mail);
 
             Element focus= doc.createElement("focusUri");
-            focus.appendChild( doc.createTextNode((String)data.get(FOCUS_URI)) );
+            focus.appendChild( doc.createTextNode( getStringData( data, FOCUS_URI) ) );
             e.appendChild(focus);
 
             Element ele;
             ele= doc.createElement("pendingFocusUri");
-            ele.appendChild( doc.createTextNode((String)data.get(PENDING_FOCUS_URI)) );
+            ele.appendChild( doc.createTextNode( getStringData( data, PENDING_FOCUS_URI ) ) );
             e.appendChild(ele);
 
             ele= doc.createElement("appCount");
-            ele.appendChild( doc.createTextNode( String.valueOf( data.get(APP_COUNT)) ) );
+            ele.appendChild( doc.createTextNode( getStringData( data, APP_COUNT ) ) );
             e.appendChild(ele);
             
             formatException( doc, e, t );
