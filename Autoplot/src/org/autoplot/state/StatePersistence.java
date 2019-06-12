@@ -546,6 +546,7 @@ public class StatePersistence {
      * @param in, an input stream that starts with the xml.  This will be left open.  
      * @return the Application object.
      * @throws IOException
+     * @throws IllegalArgumentException if the stream is not a .vap.
      * @see #restoreState(java.io.InputStream, java.util.LinkedHashMap) see restoreState which has macros like "PWD"
      */
     public static Object restoreState( InputStream in )  throws IOException {
