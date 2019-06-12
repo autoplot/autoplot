@@ -143,6 +143,7 @@ import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.renderer.BoundsStylePanel;
 import org.autoplot.renderer.InternalStylePanel;
 import org.xml.sax.SAXException;
@@ -1790,8 +1791,12 @@ public class GuiSupport {
 
     }
     
+    private static boolean isStringVap( String s ) {
+        return s.startsWith("<?xml");
+    }
+            
     /**
-     * replace the plot with the plot stored in the clip board.  This plot
+     * replace the plot with the plot stored in the clipboard.  This plot
      * in the clipboard is simply a one-plot .vap file.  
      * 
      * @param app component parent for dialogs.
@@ -1799,14 +1804,14 @@ public class GuiSupport {
      * @param newP the plotElements are added to this plot 
      * @throws HeadlessException 
      */
-    public static void pasteClipboardIntoPlot( Component app, ApplicationController controller, Plot newP ) throws HeadlessException {
+    public static void pasteClipboardIntoPlot( final Component app, final ApplicationController controller, final Plot newP ) throws HeadlessException {
         try {
             Clipboard clpbrd= Toolkit.getDefaultToolkit().getSystemClipboard();
-            String s;
+            final String s;
             if ( clpbrd.isDataFlavorAvailable(DataFlavor.stringFlavor) ) {
                 s= (String) clpbrd.getData(DataFlavor.stringFlavor);
-                if ( !s.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<vap") ) {
-                    JOptionPane.showMessageDialog(app,"Use \"Edit Plot\"->\"Copy Plot to Clipboard\"");
+                if ( !isStringVap(s) ) {
+                    JOptionPane.showMessageDialog(app,"Use \"Edit Plot\"->\"Copy Plot to Clipboard\"<br>(Pasted content should be XML.)");
                     return;
                 }
             } else {
@@ -1814,12 +1819,47 @@ public class GuiSupport {
                 return;
             }
             
+            Runnable run= new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        pasteClipboardIntoPlotImmediately( app, controller, newP, s );
+                    } catch (HeadlessException | IOException ex) {
+                        Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            };
+            
+            SwingUtilities.invokeLater(run);
+
+        } catch (UnsupportedFlavorException | IOException ex) {
+            Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }  
+
+    private static void pasteClipboardIntoPlotImmediately( Component app, ApplicationController controller, Plot newP, String s ) throws HeadlessException, IOException {
+        Application state;
+        try {
+            state = (Application)StatePersistence.restoreState(new ByteArrayInputStream(s.getBytes()));
+        } catch ( IllegalArgumentException ex ) {
+            JOptionPane.showMessageDialog(app,"Use \"Edit Plot\"->\"Copy Plot to Clipboard\"<br>(Pasted content is not XML containing a plot.)");
+            return;
+        }
+        
+        Object lockObject= "pasteClipboard";
+        
+        controller.registerPendingChange( app, lockObject );
+        DomLock lock= controller.mutatorLock();
+        
+        try {
+            lock.lock("pasting plot");
+            controller.performingChange( app, lockObject );
+
             List<PlotElement> pes= controller.getPlotElementsFor(newP);
             for ( PlotElement pe: pes ) {
                 controller.deletePlotElement(pe);
             }
-            
-            Application state= (Application)StatePersistence.restoreState(new ByteArrayInputStream(s.getBytes()));
+
             Plot p= state.getPlots(0);
             newP.syncTo(p,Arrays.asList("id","rowId","columnId") );
             Map<String,String> nameMap= new HashMap<>();
@@ -1866,13 +1906,12 @@ public class GuiSupport {
                 pe.setPlotDefaults( pe1.getPlotDefaults() );
 
             }
-
-
-        } catch (UnsupportedFlavorException | IOException ex) {
-            Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            controller.changePerformed( app, lockObject );
+            lock.unlock();
         }
-    }  
-    
+    }
+        
     /**
      * allow plot elements from the clipboard single-plot .vap into the target plot.
      * This will just insert new plot elements which point at the same data source.
@@ -1889,7 +1928,7 @@ public class GuiSupport {
             String s;
             if ( clpbrd.isDataFlavorAvailable(DataFlavor.stringFlavor) ) {
                 s= (String) clpbrd.getData(DataFlavor.stringFlavor);
-                if ( !s.startsWith("<?xml") ) {
+                if ( !isStringVap(s) ) {
                     JOptionPane.showMessageDialog(app,"<html>Use \"Edit Plot\"->\"Copy Plot to Clipboard\"<br>(Pasted content should be XML.)");
                     return;
                 }
