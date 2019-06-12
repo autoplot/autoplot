@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Images support log y axis.  Whale song spectra from https://patternradio.withgoogle.com.  Happy World Oceans Day!
+        <p><small>Exploring a bug in paste plot from clipboard.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,7 +27,9 @@
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
         <p>Bugfixes (2019-06-12 r23758):</p>
-        <ul>    
+        <ul>
+            <li>copy/paste plot problems fixed.  
+            <li>foreground/background color properties added to the canvas node, so that scientist's preferences can be preserved.
             <li>corrections to code which calculates minor ticks given a set of major ticks.
             <li>Submit feedback failed on Java 12 because of xml serialization, which no longer accepts null values.
             <li>rte_0786587992: automatically remove single quotes from URIs, which prevent vap+jyds URIs from working in the mash up tool.
