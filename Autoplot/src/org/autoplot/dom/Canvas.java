@@ -5,6 +5,7 @@
 
 package org.autoplot.dom;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -188,6 +189,35 @@ public class Canvas extends DomNode {
         this.marginColumn = marginColumn;
         propertyChangeSupport.firePropertyChange(PROP_MARGINCOLUMN, oldMarginColumn, marginColumn);
     }
+
+    private Color foreground = Color.BLACK;
+
+    public static final String PROP_FOREGROUND = "foreground";
+
+    public Color getForeground() {
+        return foreground;
+    }
+
+    public void setForeground(Color foreground) {
+        Color oldForeground = this.foreground;
+        this.foreground = foreground;
+        propertyChangeSupport.firePropertyChange(PROP_FOREGROUND, oldForeground, foreground);
+    }
+
+    private Color background = Color.WHITE;
+
+    public static final String PROP_BACKGROUND = "background";
+
+    public Color getBackground() {
+        return background;
+    }
+
+    public void setBackground(Color background) {
+        Color oldBackground = this.background;
+        this.background = background;
+        propertyChangeSupport.firePropertyChange(PROP_BACKGROUND, oldBackground, background);
+    }
+        
 
     public CanvasController getController() {
         return controller;

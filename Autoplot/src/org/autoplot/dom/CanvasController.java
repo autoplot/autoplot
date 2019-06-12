@@ -38,6 +38,7 @@ import org.das2.graph.SelectionUtil;
 import org.das2.util.LoggerManager;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.layout.LayoutConstants;
+import org.das2.graph.DasAxis;
 
 /**
  * Controller for canvases.
@@ -48,7 +49,7 @@ public class CanvasController extends DomNodeController {
     protected static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.dom.canvas" );
     
     DasCanvas dasCanvas;
-    private final Application application;
+    private final Application dom;
     private final Canvas canvas;
     private final Timer repaintSoonTimer;
     
@@ -59,7 +60,7 @@ public class CanvasController extends DomNodeController {
         
     public CanvasController(Application dom, Canvas canvas) {
         super(canvas);
-        this.application = dom;
+        this.dom = dom;
         this.canvas = canvas;
         canvas.controller = this;
         repaintSoonTimer= new Timer(100, new ActionListener() {
@@ -77,9 +78,9 @@ public class CanvasController extends DomNodeController {
             }
         } );
         setSizeTimer.setRepeats(false);
-    
+        
     }
-
+    
     /**
      * support legacy column property of canvas
      * @param column
@@ -119,7 +120,7 @@ public class CanvasController extends DomNodeController {
         assert (dasCanvas != null);
         this.dasCanvas = canvas;
 
-        ApplicationController ac = application.controller;
+        ApplicationController ac = dom.controller;
 
         dasCanvas.addComponentListener(new ComponentListener() {
             @Override
@@ -168,8 +169,10 @@ public class CanvasController extends DomNodeController {
                 }
             }
         });
-        ac.bind(this.canvas, Canvas.PROP_FITTED, dasCanvas, "fitted");
-        ac.bind(this.canvas, Canvas.PROP_FONT, dasCanvas, DasCanvas.PROP_BASEFONT, DomUtil.STRING_TO_FONT);  //TODO: bind this to the dasCanvas.
+        ac.bind( this.canvas, Canvas.PROP_FITTED, dasCanvas, "fitted");
+        ac.bind( this.canvas, Canvas.PROP_FONT, dasCanvas, DasCanvas.PROP_BASEFONT, DomUtil.STRING_TO_FONT);  //TODO: bind this to the dasCanvas.
+        ac.bind( this.canvas, Canvas.PROP_BACKGROUND, dasCanvas, "background" );
+        ac.bind( this.canvas, Canvas.PROP_FOREGROUND, dasCanvas, "foreground" );
 
     }
     
@@ -441,7 +444,7 @@ public class CanvasController extends DomNodeController {
      * remove the gaps and overlaps of the plots attached to the marginRow.
      */
     void removeGaps() {
-        removeGapsAndOverlaps( this.application, getRowsWithMarginParent(), null, true);
+        removeGapsAndOverlaps( this.dom, getRowsWithMarginParent(), null, true);
         repaintSoon();
     }
 
@@ -478,7 +481,7 @@ public class CanvasController extends DomNodeController {
             if (d.size() > 0) {
                 row.syncTo(trow, Arrays.asList("id")); // kludge to get around bug where das2 essentially vetos the top
             }
-            removeGapsAndOverlaps( this.application, rows, row, true );
+            removeGapsAndOverlaps( this.dom, rows, row, true );
         } finally {
             lock.unlock();
         }
@@ -532,7 +535,7 @@ public class CanvasController extends DomNodeController {
             row.setParent(canvas.getMarginRow().getId());
             new RowController(row).createDasPeer(this.canvas, canvas.getMarginRow().getController().getDasRow());
 
-            this.application.getController().assignId(row);
+            this.dom.getController().assignId(row);
             if (trow != null) {
                 insertGapFor(row, trow, position);
             }
@@ -551,7 +554,7 @@ public class CanvasController extends DomNodeController {
 
             canvas.setRows(rows.toArray(new Row[rows.size()]));
 
-            this.application.getController().assignId(row);
+            this.dom.getController().assignId(row);
         } finally {
             lock.unlock();
         }
@@ -594,7 +597,7 @@ public class CanvasController extends DomNodeController {
 
             canvas.setColumns(columns.toArray(new Column[columns.size()]));
 
-            this.application.getController().assignId(column);
+            this.dom.getController().assignId(column);
         } finally {
             lock.unlock();
         }
@@ -620,8 +623,8 @@ public class CanvasController extends DomNodeController {
      */
     public List<Row> addRows(int count, Object dir ) {
         Row trow;
-        if (application.getController().getPlot() != null) {
-            trow = getRowFor(application.getController().getPlot());
+        if (dom.getController().getPlot() != null) {
+            trow = getRowFor(dom.getController().getPlot());
         } else {
             trow = canvas.getRows(canvas.getRows().length - 1);
         }
@@ -655,7 +658,7 @@ public class CanvasController extends DomNodeController {
                 column.setParent(canvas.getMarginRow().getId());
 
                 new ColumnController(column).createDasPeer(this.canvas, canvas.getMarginColumn().getController().getDasColumn());
-                this.application.getController().assignId(column);
+                this.dom.getController().assignId(column);
                 result.add(column);
 
                 int lpm = 1000 * i / count;
@@ -882,7 +885,7 @@ public class CanvasController extends DomNodeController {
     }
 
     ApplicationController getApplicationController() {
-        return this.application.getController();
+        return this.dom.getController();
     }
 
     @Override
@@ -915,13 +918,13 @@ public class CanvasController extends DomNodeController {
             column.setParent("");
             new ColumnController(column).createDasPeer(this.canvas, null );
 
-            this.application.getController().assignId(column);
+            this.dom.getController().assignId(column);
 
             List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
             columns.add(column);
             canvas.setColumns(columns.toArray(new Column[columns.size()]));
 
-            this.application.getController().assignId(column);
+            this.dom.getController().assignId(column);
             column.setLeft(ss[0]);
             column.setRight(ss[1]);
             
@@ -958,13 +961,13 @@ public class CanvasController extends DomNodeController {
             row.setParent("");
             new RowController(row).createDasPeer(this.canvas, null );
 
-            this.application.getController().assignId(row);
+            this.dom.getController().assignId(row);
 
             List<Row> rows = new ArrayList<Row>(Arrays.asList(canvas.getRows()));
             rows.add(row);
             canvas.setRows(rows.toArray(new Row[rows.size()]));
 
-            this.application.getController().assignId(row);
+            this.dom.getController().assignId(row);
             row.setTop(ss[0]);
             row.setBottom(ss[1]);
             
