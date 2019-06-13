@@ -1837,6 +1837,15 @@ public class GuiSupport {
         }
     }  
 
+    /**
+     * make the plot Plot newP reflect the state in String s.
+     * @param app
+     * @param controller
+     * @param newP
+     * @param s
+     * @throws HeadlessException
+     * @throws IOException 
+     */
     private static void pasteClipboardIntoPlotImmediately( Component app, ApplicationController controller, Plot newP, String s ) throws HeadlessException, IOException {
         Application state;
         try {
@@ -1897,7 +1906,15 @@ public class GuiSupport {
                 DataSourceFilter dsf1= 
                         (DataSourceFilter) DomUtil.getElementById( theApp,nameMap.get(pe1.getDataSourceFilterId()) );
                 Plot plot1= (Plot) DomUtil.getElementById( theApp, nameMap.get(pe1.getPlotId()) );
-                PlotElement pe= controller.addPlotElement( plot1, dsf1 );
+                List<PlotElement> recyclePes= controller.getPlotElementsFor(plot1);
+                PlotElement pe;
+                if ( i<recyclePes.size() ) {
+                    pe= recyclePes.get(i);
+                    pe.setDataSourceFilterId( dsf1.getId() );
+                    pe.setPlotId( plot1.getId() );
+                } else {
+                    pe= controller.addPlotElement( plot1, dsf1 );
+                }
                 pe.syncTo( pe1, Arrays.asList( "id", "plotId", "dataSourceFilterId") );
                 if ( i==0 ) {
                     plot1.setAutoBinding(true); // kludge
