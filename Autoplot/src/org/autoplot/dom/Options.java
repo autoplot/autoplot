@@ -610,6 +610,7 @@ public class Options extends DomNode {
      * will provide a usable display.  These include the colors and the fonts,
      * and the timeRange editor mode, flip colorbar label, the ticklen, and last
      * scanEnabled.  
+     * @see https://sourceforge.net/p/autoplot/bugs/2175/
      * @param n the node
      * @param exclude the properties to exclude.
      */
