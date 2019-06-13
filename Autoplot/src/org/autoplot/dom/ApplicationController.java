@@ -3187,11 +3187,34 @@ public class ApplicationController extends DomNodeController implements RunLater
         propertyChangeSupport.firePropertyChange(PROP_DATASOURCEFILTER, oldDataSourceFilter, dataSourceFilter);
     }
 
+    // See https://sourceforge.net/p/autoplot/bugs/2175/
+//    private final PropertyChangeListener optionsListener= new PropertyChangeListener() {
+//        @Override
+//        public void propertyChange(PropertyChangeEvent evt) {
+//            switch (evt.getPropertyName()) {
+//                case Options.PROP_BACKGROUND:
+//                    application.canvases.get(0).setBackground( (Color)evt.getNewValue() );
+//                    break;
+//                case Options.PROP_FOREGROUND:
+//                    application.canvases.get(0).setForeground((Color)evt.getNewValue() );
+//                    break;
+//                case Options.PROP_CANVASFONT:
+//                    application.canvases.get(0).setFont( (String)evt.getNewValue() );
+//                    break;
+//                default:
+//                    break;
+//            }
+//        }
+//    };
+            
     private void bindTo(DasCanvas canvas) {
         ApplicationController ac = this;
         ac.bind(application.options, "background", canvas, "background" );
         ac.bind(application.options, "foreground", canvas, "foreground" );
         ac.bind(application.options, "canvasFont", canvas, "baseFont", DomUtil.STRING_TO_FONT );
+        //this.application.options.addPropertyChangeListener( Options.PROP_BACKGROUND, optionsListener );
+        //this.application.options.addPropertyChangeListener( Options.PROP_FOREGROUND, optionsListener );
+        //this.application.options.addPropertyChangeListener( Options.PROP_CANVASFONT, optionsListener );        
     }
 
     /**
