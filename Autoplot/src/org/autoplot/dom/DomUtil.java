@@ -893,6 +893,10 @@ public class DomUtil {
             }
         }
         for ( DataSourceFilter dsf: application.getDataSourceFilters() ) {
+            if ( dsf==null ) {
+                logger.finer("found dsf that is null, which is done sometimes to mark as done.  Ignoring.");
+                continue;
+            }
             String uri= dsf.getUri();
             if ( uri.startsWith("vap+internal:") ) {
                 String[] ss=  uri.substring(13).split(",");
