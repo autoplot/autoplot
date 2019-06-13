@@ -17,6 +17,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -146,6 +147,7 @@ import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.renderer.BoundsStylePanel;
 import org.autoplot.renderer.InternalStylePanel;
+import org.autoplot.util.GraphicsUtil;
 import org.xml.sax.SAXException;
 
 /**
@@ -1965,25 +1967,72 @@ public class GuiSupport {
             PlotElement[] pes= state.getPlotElements();
             
             JPanel panel= new JPanel();
-            panel.setLayout( new BoxLayout(panel,BoxLayout.Y_AXIS) );
+            //panel.setLayout( new BoxLayout(panel,BoxLayout.Y_AXIS) );
             JCheckBox[] cbs= new JCheckBox[pes.length];
+            GridLayout gl= new GridLayout( pes.length, 2 );
+            panel.setLayout(gl);
             for ( int i=0; i<pes.length; i++ ) {
-                //javax.swing.Icon icon=null;
-                //PlotElement originalPlotElement= (PlotElement) controller.getElementById( pes[i].getId() );
-                //if ( false && originalPlotElement!=null ) {
-                //    icon= originalPlotElement.getController().getRenderer().getListIcon();
-                //    cbs[i]= new JCheckBox( icon, true); 
-                //} else {
-                cbs[i]= new JCheckBox( pes[i].getRenderType().toString(), true); 
-                //}
+                javax.swing.Icon icon= GraphicsUtil.guessIconFor(pes[i]);
+                cbs[i]= new JCheckBox( "", true);
                 panel.add( cbs[i] );
+                
+                if ( icon!=null ) {
+                    JLabel x= new JLabel(pes[i].getRenderType().toString() ) ;
+                    x.setIcon(icon);
+                    panel.add( x ); 
+                } else {
+                    panel.add( new JLabel(pes[i].getRenderType().toString() ) ); 
+                }
+                
             }
             if ( JOptionPane.showConfirmDialog( app, panel, "Add Plot Elements", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-                for ( int i=0; i<pes.length; i++ ) {
-                    if ( cbs[i].isSelected() ) {
-                        PlotElement peNew= controller.addPlotElement( targetPlot, null, null );
-                        peNew.syncTo( pes[i], Arrays.asList("id","plotId") );
+                Object lockObject= "addPlotElements";
+        
+                controller.registerPendingChange( app, lockObject );
+                DomLock lock= controller.mutatorLock();
+        
+                try {
+                    lock.lock("pasting plot elements");
+                    controller.performingChange( app, lockObject ); 
+                    
+                    Map<String,String> nameMap= new HashMap<>();
+            
+                    for ( int i=0; i<state.getDataSourceFilters().length; i++ ) {
+                        DataSourceFilter stateDsf= state.getDataSourceFilters(i);
+                        List<PlotElement> pes1= DomUtil.getPlotElementsFor( state, stateDsf );
+                        boolean inUse= false;
+                        for ( PlotElement pe1: pes1 ) {
+                            for ( int j=0; j<pes.length; j++ ) {
+                                if ( pes[j]==pe1 ) {
+                                    if ( cbs[j].isSelected() ) {
+                                        inUse=true;
+                                    }
+                                }
+                            }
+                        }
+                        if ( inUse ) {
+                            DataSourceFilter newDsf= controller.addDataSourceFilter();
+                        
+                            if ( stateDsf.getUri().startsWith("vap+internal:") ) {
+                                //unresolved.add(stateDsf);
+                            } else {
+                                newDsf.syncTo(stateDsf,Collections.singletonList("id"));   
+                                state.setDataSourceFilters(i,null); // mark as done
+                            }
+                            nameMap.put( stateDsf.getId(), newDsf.getId() );
+                        }
                     }
+                    //TODO: vap+internal:data_1,data_2
+                    for ( int i=0; i<pes.length; i++ ) {
+                        if ( cbs[i].isSelected() ) {
+                            PlotElement peNew= controller.addPlotElement( targetPlot, null, null );
+                            peNew.syncTo( pes[i], Arrays.asList("id","plotId","dataSourceFilterId") );
+                            peNew.setDataSourceFilterId( nameMap.get(pes[i].getDataSourceFilterId()));
+                        }
+                    }
+                } finally {
+                    controller.changePerformed( app, lockObject );
+                    lock.unlock();
                 }
             }
             
