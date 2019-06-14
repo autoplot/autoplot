@@ -171,8 +171,6 @@ public class CanvasController extends DomNodeController {
         });
         ac.bind( this.canvas, Canvas.PROP_FITTED, dasCanvas, "fitted");
         ac.bind( this.canvas, Canvas.PROP_FONT, dasCanvas, DasCanvas.PROP_BASEFONT, DomUtil.STRING_TO_FONT);  //TODO: bind this to the dasCanvas.
-        ac.bind( this.canvas, Canvas.PROP_BACKGROUND, dasCanvas, "background" );
-        ac.bind( this.canvas, Canvas.PROP_FOREGROUND, dasCanvas, "foreground" );
 
     }
     
