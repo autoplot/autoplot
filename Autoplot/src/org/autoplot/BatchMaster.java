@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
@@ -171,16 +172,18 @@ public class BatchMaster extends javax.swing.JPanel {
         });
         
         dataSetSelector1.setPromptText("Enter the name of a Jython script");
-        dataSetSelector1.setRecent( Collections.singletonList("http://autoplot.org/data/script/examples/parameters.jy") );
+        //dataSetSelector1.setRecent( Collections.singletonList() );
         
+        List<String> recentUris= new ArrayList<>(20);
+        recentUris.add( "http://autoplot.org/data/script/examples/parameters.jy" );
         if ( dom.getController()!=null ) { // support testing.
-            Map<String,String> recentJy= dom.getController().getApplicationModel().getRecent("*.jy",20);
-            List<String> recentUris= new ArrayList<>(recentJy.size());
+            Pattern p= Pattern.compile(".*\\.jy(\\?.*)?");
+            Map<String,String> recentJy= dom.getController().getApplicationModel().getRecent(p,20);
             for ( Entry<String,String> recentItem : recentJy.entrySet() ) {
                 recentUris.add( recentItem.getKey() );
             }
-            dataSetSelector1.setRecent( recentUris );
         }
+        dataSetSelector1.setRecent( recentUris );
         
         jScrollPane3.getVerticalScrollBar().setUnitIncrement(jScrollPane3.getFont().getSize());
         jScrollPane1.getVerticalScrollBar().setUnitIncrement(jScrollPane1.getFont().getSize());
