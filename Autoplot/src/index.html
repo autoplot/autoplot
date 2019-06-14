@@ -26,11 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-06-13 r23770):</p>
+        <p>Bugfixes (2019-06-14 r23775):</p>
         <ul>
+            <li>2065: recent .jy URIs with the parameters are now used for the recent URIs list in the "Run Batch" tool.
             <li>1980: copy/paste plot problems fixed.  
             <li>PropertyEditor listenForExternalChanges now recurses through all the beans, supporting the Autoplot DOM.
-            <li>foreground/background color properties added to the canvas node, so that scientist's preferences can be preserved.
             <li>corrections to code which calculates minor ticks given a set of major ticks.
             <li>Submit feedback failed on Java 12 because of xml serialization, which no longer accepts null values.
             <li>rte_0786587992: automatically remove single quotes from URIs, which prevent vap+jyds URIs from working in the mash up tool.
