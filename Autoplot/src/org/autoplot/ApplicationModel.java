@@ -795,12 +795,30 @@ public class ApplicationModel {
     /** 
      * return a list of items matching filter, in a LinkedHashMap.  Note
      * the map is a LinkedHashMap, which preserves the order, and the
-     * last element is the more recently used.
-     * @param filter String like "*.jy"
+     * last element is the more recently used.  If the entry appears to be a 
+     * file, 
+     * @param filter String like "*.jy", (a glob, not a regex);
      * @param limit maximum number of items to return
      * @return LinkedHashMap, ordered by time, mapping URI to time.
      */
     public Map<String,String> getRecent( String filter, final int limit ) {
+        
+        Pattern p= org.das2.util.filesystem.Glob.getPattern(filter);
+        
+        return getRecent( p, limit );
+        
+    }
+    
+    /** 
+     * return a list of items matching filter, in a LinkedHashMap.  Note
+     * the map is a LinkedHashMap, which preserves the order, and the
+     * last element is the more recently used.  If the entry appears to be a 
+     * file, 
+     * @param p a pattern which must be matched.
+     * @param limit maximum number of items to return
+     * @return LinkedHashMap, ordered by time, mapping URI to time.
+     */
+    public Map<String,String> getRecent( Pattern p, final int limit ) {
         File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/" );
         if ( !f2.exists() ) {
             boolean ok= f2.mkdirs();
@@ -811,8 +829,6 @@ public class ApplicationModel {
         
         // always tack on the URI to history.dat file
         final File f3 = new File( f2, "history.txt");
-        
-        Pattern p= org.das2.util.filesystem.Glob.getPattern(filter);
         
         LinkedHashMap<String,String> result= new LinkedHashMap<String, String>() {
             @Override
