@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-06-14 r23775):</p>
+        <p>Bugfixes (2019-06-15 r23779):</p>
         <ul>
+            <li>reset axis units to now allows reset to data units as well, so that 'inconvertible units' can be addressed.
+            <li>2174: run batch doesn't store the name of the script for convenience.
             <li>2065: recent .jy URIs with the parameters are now used for the recent URIs list in the "Run Batch" tool.
             <li>1980: copy/paste plot problems fixed.  
             <li>PropertyEditor listenForExternalChanges now recurses through all the beans, supporting the Autoplot DOM.
@@ -62,6 +64,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>LookupAxis is compiled in now.
             <li>add log10() method for Datum, used in tick calculations.
             <li>PNG Image reader supports yaxis=[70,119,3200,588,log] for unplotting log axes.
             <li>phasestart parameter in URI templates properly implemented, and can be used to look at for example Sunday images.
