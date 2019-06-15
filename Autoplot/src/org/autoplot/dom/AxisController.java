@@ -219,7 +219,7 @@ public class AxisController extends DomNodeController {
     }
     
     /**
-     * reset the axis units to a new unit which is convertable.
+     * reset the axis units to a new unit which is convertible.
      * @param nu 
      */
     public void resetAxisUnits( Units nu ) {
@@ -228,6 +228,16 @@ public class AxisController extends DomNodeController {
         dasAxis.resetRange(newRange);
         axis.setRange(newRange);
     }
+    
+    /**
+     * reset the axis range, without the units check.
+     * @param newRange
+     */
+    public void resetAxisRange( DatumRange newRange ) {
+        dasAxis.resetRange(newRange);
+        axis.setRange(newRange);
+    }
+    
 
     private Converter getOppositeConverter( Axis axis, final DasAxis dasAxis ) {
         return new Converter() {
