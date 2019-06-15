@@ -1754,7 +1754,25 @@ public class GuiSupport {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
                 Units u= dasAxis.getUnits();
                 Units[] uu= u.getConvertibleUnits();
-
+                List<Units> uus= new ArrayList<>( Arrays.asList(uu) );
+                
+                // offer to change to a unit which is convertible to the data.
+                List<PlotElement> pes= DomUtil.getPlotElementsFor( controller.getApplication(), plot );
+                for ( PlotElement pe : pes ) {
+                    Units u1;
+                    if ( dasAxis.isHorizontal() ) {
+                        u1= pe.getPlotDefaults().getXaxis().getRange().getUnits();
+                    } else if ( dasPlot.getYAxis()==dasAxis ) {
+                        u1= pe.getPlotDefaults().getYaxis().getRange().getUnits();
+                    } else {
+                        u1= pe.getPlotDefaults().getZaxis().getRange().getUnits();
+                    }
+                    if ( !uus.contains(u1) && !u1.equals(u) 
+                            && UnitsUtil.isIntervalOrRatioMeasurement(u1) ) uus.add(u1);
+                }
+                
+                uu= uus.toArray(new Units[uus.size()]);
+                
                 Component p= (JFrame)SwingUtilities.getWindowAncestor( controller.getDasCanvas().getParent());
                 
                 if ( uu.length<1 ) {
@@ -1778,7 +1796,13 @@ public class GuiSupport {
                                 p1,
                                 "Reset axis units", JOptionPane.OK_CANCEL_OPTION ) ) {
                         Units nu= (Units)cb.getSelectedItem();
-                        axis.getController().resetAxisUnits(nu);
+                        if ( nu.isConvertibleTo(u) ) {
+                            axis.getController().resetAxisUnits(nu);
+                        } else {
+                            DatumRange oldRange= dasAxis.getDatumRange();
+                            DatumRange newRange= new DatumRange( oldRange.min().value(), oldRange.max().value(), nu );
+                            axis.getController().resetAxisRange(newRange);
+                        }
                     }
                 }
             }            
