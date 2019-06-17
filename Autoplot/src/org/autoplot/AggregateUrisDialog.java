@@ -292,6 +292,7 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
                 DataSourceFilter[] dsfs= dom.getDataSourceFilters();
                 for ( DataSourceFilter dsf: dsfs ) {
                     dsf.getController().update();
+                    dom.getController().getApplicationModel().addRecent( dsf.getUri() );
                 }
             }
         };
@@ -317,9 +318,11 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
                 DataSourceFilter[] dsfs= dom.getDataSourceFilters();
                 for ( DataSourceFilter dsf: dsfs ) {
                     dsf.getController().update();
+                    dom.getController().getApplicationModel().addRecent( dsf.getUri() );
                 }
                 String newUri= dom.getController().getDataSourceFilter().getUri();
                 dataSetSelector.setValue(newUri);
+                
             }
         };
         
