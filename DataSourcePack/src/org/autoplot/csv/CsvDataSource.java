@@ -33,7 +33,6 @@ import org.autoplot.html.AsciiTableStreamer;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumUtil;
 import org.das2.datum.InconvertibleUnitsException;
-import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.AsciiParser;
 import org.das2.qds.util.DataSetBuilder;
@@ -204,9 +203,14 @@ public class CsvDataSource extends AbstractDataSource {
 
         boolean needToCheckHeader= true; // check to see if the first line of data was mistaken for a header
         
+        logger.log(Level.FINE, "reading csv data from input stream: {0}", uri);
+        
         while ( reader.readRecord() ) {
             line++;
-            mon.setProgressMessage("read line "+line);
+            if ( line % 100 == 0 ) {
+                logger.log(Level.FINER, "read line {0}", line);
+                mon.setProgressMessage("read line "+line);
+            }
             if ( columnUnits==null ) {
                 boolean foundColumnNumbers= false;
                 columnUnits= new Units[reader.getColumnCount()];
@@ -316,6 +320,7 @@ public class CsvDataSource extends AbstractDataSource {
             }
 
             if ( needToCheckHeader && columnUnits!=null ) {
+                logger.finer("check headers");
                 boolean yepItsData= true;
                 double[] cbs= new double[columnUnits.length];
                 for ( int icol= 0; icol<columnUnits.length; icol++ ) {
@@ -327,6 +332,7 @@ public class CsvDataSource extends AbstractDataSource {
                         }
                         Units u1= columnUnits[icol];
                         if ( columnHeaders.length<=icol ) {
+                            logger.log(Level.FINER, "too few column headers {0}<={1}", new Object[]{columnHeaders.length, icol});
                             yepItsData= false;
                             continue;
                         }
@@ -342,6 +348,7 @@ public class CsvDataSource extends AbstractDataSource {
                             }
                         }
                     } catch ( ParseException ex ) {
+                        logger.log(Level.FINER, "parse exception at icol={0}", icol);
                         yepItsData= false;
                     }
                 }
@@ -365,6 +372,7 @@ public class CsvDataSource extends AbstractDataSource {
                     }
                 }
                 needToCheckHeader= false;
+                logger.finer("done check headers");
             }
                 
             if ( columnUnits!=null && builder.getLength()<irecCount ) {
@@ -386,6 +394,7 @@ public class CsvDataSource extends AbstractDataSource {
         }
 
         reader.close();
+        logger.log(Level.FINE, "finished reading csv data.");
         
         mon.finished();
 
