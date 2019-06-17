@@ -7,6 +7,7 @@ package org.autoplot.tca;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.autoplot.ScriptContext;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -48,6 +49,9 @@ public class UriTcaSource extends AbstractQFunction {
     QDataSet initialError;
 
     static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.tca.uritcasource" );
+    
+    // cache the example input so we only attempt read once.
+    private MutablePropertyDataSet exampleInput=null;
 
     public UriTcaSource( String uri ) throws Exception {
         logger.log(Level.FINE, "new tca source: {0}", uri);
@@ -94,7 +98,20 @@ public class UriTcaSource extends AbstractQFunction {
 
             QDataSet dep0= SemanticOps.xtagsDataSet(ds);
             if ( !DataSetUtil.isMonotonicAndIncreasing(dep0) ) {
-                ds= Ops.ensureMonotonicAndIncreasingWithFill(ds);
+                logger.warning("TCA contains data which is not monotonically increasing");
+                if ( dep0.value(0)>dep0.value(dep0.length()-1) ) {
+                    ds= Ops.copy( Ops.reverse(ds) );
+                    dep0= SemanticOps.xtagsDataSet(ds);
+                    if ( !DataSetUtil.isMonotonicAndIncreasing(dep0) ) {
+                        logger.warning("reversed TCA dataset still contains non-monotonic tags");
+                        ds= Ops.ensureMonotonicAndIncreasingWithFill(ds);
+                    } else {
+                        logger.info("reversing TCA dataset makes tags monotonically increasing.");
+                    }
+                } else {
+                    logger.warning("removing non-monotonically increasing tags of TCA dataset.");
+                    ds= Ops.ensureMonotonicAndIncreasingWithFill(ds);
+                }
             }
 
             tlim= DataSetUtil.guessCadenceNew( SemanticOps.xtagsDataSet(ds), ds );
@@ -256,7 +273,7 @@ public class UriTcaSource extends AbstractQFunction {
             
             QDataSet dep0= SemanticOps.xtagsDataSet(ds);
             QDataSet d0= parm.slice(0);
-
+            
             QDataSet findex;
             if ( dep0.length()==1 ) {
                 findex= Ops.dataset(0);
@@ -376,6 +393,10 @@ public class UriTcaSource extends AbstractQFunction {
     @Override
     public synchronized QDataSet exampleInput() {
 
+        if ( exampleInput!=null ) {
+            return exampleInput;
+        }
+        
         Datum t0;
         Units tu;
         String label;
@@ -388,6 +409,23 @@ public class UriTcaSource extends AbstractQFunction {
             t0= this.tsb.getTimeRange().min();
             tu= t0.getUnits();
             label= "Time";
+            if ( needToRead ) { // we need to verify that this TSB will return time for its independent parameter
+                try {
+                    doRead();
+                    QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
+                    if ( dep0!=null ) {
+                        t0= DataSetUtil.asDatum( dep0.slice(0) );
+                        tu= t0.getUnits();
+                        label= "???";
+                    }
+                } catch (Exception ex) {
+                    if ( ex instanceof RuntimeException ) {
+                       throw (RuntimeException)ex;
+                    } else {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
         } else {
             try {
                 if ( needToRead ) {
@@ -420,6 +458,8 @@ public class UriTcaSource extends AbstractQFunction {
         inputDescriptor.putProperty( QDataSet.CADENCE, DataSetUtil.asDataSet( Units.seconds.createDatum(1)) ) ;
         ret.putProperty(QDataSet.BUNDLE_0,inputDescriptor);
 
+        this.exampleInput= ret;
+        
         return ret;
         
     }
