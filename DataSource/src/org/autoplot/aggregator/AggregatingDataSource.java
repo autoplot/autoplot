@@ -638,7 +638,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
                                         result= BufferDataSet.maybeCopy(ds1);
                                     } else {
                                         result = BufferDataSet.copy(ds1);
-                                        ((BufferDataSet)result).grow(result.length()*ss.length*11/10);  //110%
+                                        int newSize= result.length()*ss.length;
+                                        if ( newSize<Integer.MAX_VALUE/2 ) { 
+                                            ((BufferDataSet)result).grow((int)(newSize*11./10));  //110%
+                                        } else {
+                                            ((BufferDataSet)result).grow(newSize);
+                                        }
                                     }
                                     //result= checkBoundaries( dr1, result );
                                     //result= checkSort(result);
@@ -647,7 +652,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
                                         result= ArrayDataSet.maybeCopy(ds1);
                                     } else {
                                         result = ArrayDataSet.copy(ds1);
-                                        ((ArrayDataSet)result).grow(result.length()*ss.length*11/10);  //110%
+                                        int newSize= result.length()*ss.length;
+                                        if ( newSize<Integer.MAX_VALUE/2) {
+                                            ((ArrayDataSet)result).grow((int)(newSize*11./10));  //110%
+                                        } else {
+                                            ((ArrayDataSet)result).grow(newSize);
+                                        }
                                     }
                                     //result= checkBoundaries( dr1, result );
                                     //result= checkSort(result);
@@ -714,7 +724,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         //TODO: combine metadata.  We don't have a way of doing this.
                         //this.metadata= null;
                         //this.metadataModel= null;
-                        cacheRange1 = new DatumRange(cacheRange1.min(), dr1.max());
+                        if ( cacheRange1==null ) {
+                            logger.info("something happened where cacheRange1 wasn't calculated earlier.");
+                            cacheRange1= dr1;
+                        } else {
+                            cacheRange1 = new DatumRange(cacheRange1.min(), dr1.max());
+                        }
                     }
                 } catch ( Exception ex ) {
                     if ( doThrow ) {
