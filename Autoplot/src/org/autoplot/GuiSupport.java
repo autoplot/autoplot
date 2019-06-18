@@ -2234,6 +2234,7 @@ public class GuiSupport {
             public void actionPerformed(ActionEvent e) {
                 Plot p= controller.addPlot( domPlot, null );
                 PlotElement pe= controller.addPlotElement( p, null );
+                logger.log(Level.FINE, "created new plotElement: {0}", pe);
                 p.getYaxis().setOpposite( true );
                 controller.bind( domPlot.getXaxis(), Axis.PROP_RANGE, p.getXaxis(), Axis.PROP_RANGE  );
             }
