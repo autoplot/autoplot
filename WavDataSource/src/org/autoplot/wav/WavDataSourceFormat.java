@@ -211,7 +211,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
         logger.entering("WavDataSourceFormat", "formatRank2" );
         String type = params.get("type");
         boolean doscale= !"F".equals( params.get("scale") );
-        boolean timetags= "T".equals("timetags");
+        //boolean timetags= "T".equals("timetags");
         
         int channels= data.length(0);
         int dep0Len = 0;
