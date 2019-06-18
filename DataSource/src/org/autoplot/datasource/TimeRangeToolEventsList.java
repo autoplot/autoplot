@@ -104,12 +104,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         if ( uri.contains("?") ) {
             return false;
         } else {
-            try {
-                Orbits.getOrbitsFor(uri);                
-                return true;
-            } catch ( IllegalArgumentException ex ) {
-                return false;
-            }
+            return Orbits.isOrbitsFile(uri);
         }
     }
     
@@ -619,6 +614,9 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             public void run() {
                 ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(TimeRangeToolEventsList.this),"Loading Events File...");
                 try {
+                    if ( isOrbitsFile(uri)) { // we'l read it twice but at least it's on the same thread.
+                        logger.fine("range events will be treated as orbits range events");
+                    }
                     TimeRangeToolEventsList.this.tsb= null;
                     DataSource dsource = DataSetURI.getDataSource(uri);
                     dss= dsource;
