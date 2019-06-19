@@ -65,6 +65,7 @@ public class JythonToJavaConverter {
         String[] ss= doThis.split("\n");
         StringBuilder b= new StringBuilder();
         Pattern assignPattern= Pattern.compile("([A-Z]\\S*)(\\s+)(\\S*)(\\s*=.*)");
+        Pattern importPattern1= Pattern.compile("import ([a-z\\.]*)\\.([A-Z][a-z]*)");
         for ( String s: ss ) {
             s= s.trim();
             if ( s.endsWith(";") ) s= s.substring(0,s.length()-1);
@@ -73,6 +74,11 @@ public class JythonToJavaConverter {
             Matcher m= assignPattern.matcher(s);
             if ( m.matches() ) {
                 s= m.group(3)+m.group(4);
+            } else {
+                m= importPattern1.matcher(s);
+                if ( m.matches() ) {
+                    s= "from "+m.group(1)+" import "+m.group(2);
+                }
             }
             b.append(s).append("\n");
         }
