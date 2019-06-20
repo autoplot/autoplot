@@ -509,7 +509,10 @@ public class Util {
 
 
     /**
-     * returns an array of the files in the local or remote filesystem pointed to by surl.
+     * returns an array of the files in the local or remote filesystem pointed to by suri.  The files are returned
+     * without the path, and directories are marked with a trailing slash character.  Windows a forward 
+     * slash is still used, even though a back slash is more conventional.  When the suri ends in slash, all 
+     * entries in the directory are listed, and when it ends in a file glob, all matching files are returned.
      *
      * <p><blockquote><pre>
      * print listDirectory( 'http://autoplot.org/data/pngwalk/' )
@@ -517,15 +520,15 @@ public class Util {
      * print listDirectory( 'http://autoplot.org/data/pngwalk/*.png' )
      *  --> 'product_20080101.png', 'product_20080102.png', ...
      * </pre></blockquote><p>
-     * @param surl local or web directory.
+     * @param suri local or web directory.
      * @return an array of the files pointed to by surl.
      * @throws java.net.MalformedURLException
      * @throws java.net.URISyntaxException when surl is not well formed.
      * @throws java.io.IOException when listing cannot be done
      */
-    public static String[] listDirectory(String surl) throws IOException, URISyntaxException {
-        logger.log(Level.FINE, "listDirectory(\"{0}\")", surl);
-        String[] ss = FileSystem.splitUrl(surl);
+    public static String[] listDirectory(String suri) throws IOException, URISyntaxException {
+        logger.log(Level.FINE, "listDirectory(\"{0}\")", suri);
+        String[] ss = FileSystem.splitUrl(suri);
         FileSystem fs = FileSystem.create( DataSetURI.toUri(ss[2]));
         String glob = ss[3].substring(ss[2].length());
         String[] result;
