@@ -76,6 +76,7 @@ public class JythonToJavaConverter {
             if ( s.endsWith(";") ) s= s.substring(0,s.length()-1);
             s= s.replaceAll("//","#");
             s= s.replaceAll(" new ", "" );
+            s= s.replaceAll("null","None");
             Matcher m= assignPattern.matcher(s);
             if ( m.matches() ) {
                 s= m.group(3)+m.group(4);
