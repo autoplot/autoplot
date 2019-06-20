@@ -65,8 +65,13 @@ public class JythonToJavaConverter {
         String[] ss= doThis.split("\n");
         StringBuilder b= new StringBuilder();
         Pattern assignPattern= Pattern.compile("([A-Z]\\S*)(\\s+)(\\S*)(\\s*=.*)");
-        Pattern importPattern1= Pattern.compile("import ([a-z\\.]*)\\.([A-Z][a-z]*)");
+        Pattern importPattern1= Pattern.compile("import ([a-z\\.]*)\\.([A-Za-z\\*]*)");
+        int indentLevel= 0;
+        String indent="";
+        int lineNumber= 0;
         for ( String s: ss ) {
+            logger.log(Level.FINER, "line {0}: {1}", new Object[]{lineNumber, s});
+            lineNumber++;
             s= s.trim();
             if ( s.endsWith(";") ) s= s.substring(0,s.length()-1);
             s= s.replaceAll("//","#");
@@ -80,7 +85,20 @@ public class JythonToJavaConverter {
                     s= "from "+m.group(1)+" import "+m.group(2);
                 }
             }
-            b.append(s).append("\n");
+            if ( s.contains("{") ) {
+                indentLevel= Math.min( 16, indentLevel+4 );
+                s= s.replace("{",":");
+            } 
+            if ( s.contains("}") ) {
+                indentLevel= Math.max( 0, indentLevel-4 );
+                s= s.replace("}","");
+            } 
+            b.append(indent).append(s).append("\n");
+            logger.log(Level.FINER, "out  {0}: {1}", new Object[]{lineNumber, s});
+            
+            if ( indentLevel!=indent.length()) {
+                indent= "                ".substring(0,indentLevel);
+            }
         }
         return b.toString();
     }
