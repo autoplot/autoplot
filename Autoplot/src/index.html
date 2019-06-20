@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Paste plot from clipboard is corrected.  Here a <a href='https://github.com/autoplot/dev/blob/master/demos/20190529/readUsgsDem.jyds'>script</a> for reading DEM files from the USGS is plotted under North American rivers file.
+        <p><small>Autoplot <a href="https://github.com/autoplot/dev/blob/master/demos/20190619/drawAngle.jy">script</a> draws an angle, which can be exported as pdf and imported into posters.
             </small></p>            
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2019-06-18 r23793):</p>
         <ul>
+            <li>1960: NetCDF/HDF5 reader reads global attributes into metadata.
             <li>vap+wdc works again, after discovering that new code assumed there was an extension.
         </ul>
         <p>Older Bugfixes:</p>
