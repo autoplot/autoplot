@@ -28,6 +28,10 @@
         
         <p>Bugfixes (2019-06-18 r23793):</p>
         <ul>
+            <li>vap+wdc works again, after discovering that new code assumed there was an extension.
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>2180: cache failures to read orbits so that we don't keep trying.
             <li>2181: runtime error caused by integer overflow in aggregation of many records.
             <li>2178: old add plot, vap file works again, so you can pick datasets from another vap file.
@@ -52,20 +56,10 @@
             <li>2164: mouse module (e.g. box zoom) feedback is restored.  Thanks, Masafumi!
             <li>2149: experiments with autorange considering bindings.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>rfe678: mad function replaced with meanAverageDeviation, since median average deviation is also used for "mad."
-            <li>rfe681: support download of http://radiojove.org/archive/data/1556842548UT190501173508_HNRAO_1.spd.  Thanks, Masafumi!
-            <li>2159: new das2stream reader dropped the last record in test137 at U. Iowa.
-            <li>2159: new das2stream reader would use DataSetBuilder, which would in some cases return a DDataSet where only 10% was utilized, causing memory problems.
-            <li>polar plot would result in NullPointerException if Z is not available for rank 1 X,Y,Z
-            <li>2160: jyds script default timerange would reject.
-            <li>2159: new das2stream reader reads in many 1-record joined data, wasting memory.  Thanks, Darrelle!
-            <li>rfe677: display data on bundle of X,Y,Z didn't clip on Y.  Thanks, Ivar!
-            <li>URI_Template's phasestart modifier was never implemented.  Thanks, Bob!
-            <li>2158: setItemAllLists( rank0, rank0, rank1) now reconciles the three properly.  Thanks, Bill!
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>Ephemeris tags can be monotonically decreasing.
             <li>2177: LookupAxis is compiled in now.
@@ -78,13 +72,6 @@
             <li>total function now checks for high-rank DEPEND_2, for when the metadata is constant and can be preserved.  Thanks, Jon N!
             <li>rfe469: Contours renderer now supports +20m notation, to match axis, where a contour is drawn every 20 units.
             <li>UByteDataSet has extra "collectString" method so strings can be extracted efficiently.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>rfe681: http://radiojove.org/archive/data/1556842548UT190501173508_HNRAO_1.spd now loads despite 403 when the content is read.
-            <li>toTimeDataSet reconciles the rank, allowing rank 0 and rank 1 inputs for the time components.
-            <li>rfe469: Axis nodes have "tickValues" property which allows tick spacing and location to be specified manually.
-            <li>rfe680: Expect utility included now to support driving other applications like FTP and IDL.
         </ul>
         <p>Known issues:</p>
         <ul>
