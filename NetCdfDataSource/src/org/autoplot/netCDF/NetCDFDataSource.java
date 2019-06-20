@@ -55,6 +55,8 @@ public class NetCDFDataSource extends AbstractDataSource {
         
     private Variable variable;
     
+    private Map<String,Object> globalAttributes;
+    
     /**
      * if non-null, the variable to use for the where filter.
      */
@@ -183,7 +185,11 @@ public class NetCDFDataSource extends AbstractDataSource {
                 result= Ops.putProperty( result, QDataSet.FILL_VALUE, fillValue );
             }
             
+            Map<String,Object> metadata= new LinkedHashMap<>();
+            metadata.put( "GlobalAttributes", globalAttributes );
             
+            result= Ops.putProperty( result, QDataSet.METADATA, metadata );
+
             logger.finer("ncfile.close()");
             ncfile.close();
             
@@ -253,7 +259,20 @@ public class NetCDFDataSource extends AbstractDataSource {
 
             logger.log(Level.FINER, "dataset.getVariables()" );
             List<Variable> variables= (List<Variable>)dataset.getVariables();
-
+            
+            List<Attribute> globalAttributes= dataset.getGlobalAttributes();
+            
+            Map<String,Object> metadata= new LinkedHashMap<>();
+            
+            for ( Attribute a: globalAttributes ) {
+                if ( a.isArray() ) {
+                    metadata.put( a.getName(), a.getValues() );
+                } else {
+                    metadata.put( a.getName(), a.getStringValue() );
+                }
+            }
+            this.globalAttributes= metadata;
+            
             if ( svariable==null ) {
                 for (Variable v : variables) {
                     if ( !v.getDimension(0).getName().equals(v.getName()) ) { // search for dependent variable
@@ -378,6 +397,10 @@ public class NetCDFDataSource extends AbstractDataSource {
                 }
             }
 
+            if ( globalAttributes!=null ) {
+                result.put( "GlobalAttributes", globalAttributes );
+            }
+            
             try {
                 if ( ncfile!=null ) {
                     logger.finer("ncfile.close()");
