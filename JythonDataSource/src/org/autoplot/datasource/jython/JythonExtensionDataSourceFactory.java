@@ -49,14 +49,17 @@ public class JythonExtensionDataSourceFactory extends AbstractDataSourceFactory 
             default:
                 throw new IllegalArgumentException("resource extension is not supported: "+split.ext);
         }
-        String alt= System.getProperty("jydsExtension_"+split.ext.substring(1),"");
-        logger.log(Level.FINER, "check for alternate system property jydsExtension_{0}", new Object[]{split.ext.substring(1)});
+        
+        String ext= scheme.substring(4);
+        
+        String alt;
+        alt= System.getProperty("jydsExtension_"+ext,"");
         
         if ( alt.length()>0 ) {
-            logger.log(Level.FINE, "system property jydsExtension_{0}={1}", new Object[]{split.ext.substring(1), alt});
+            logger.log(Level.FINE, "system property jydsExtension_{0}={1}", new Object[]{ ext, alt});
             script= alt;
         } else {
-            logger.log(Level.FINER, "System.getProperty(\"jydsExtension_{0}\",\"\") returns \"\"", new Object[]{split.ext.substring(1), script});
+            logger.log(Level.FINER, "System.getProperty(\"jydsExtension_{0}\",\"\") returns \"\"", new Object[]{ ext });
         }
         
         logger.log(Level.FINE, "Using script {0}", script);
