@@ -429,6 +429,13 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 if ( istpProps.containsKey(QDataSet.TYPICAL_MAX) ) istpProps.put( QDataSet.TYPICAL_MAX, uc.convert( (Number)istpProps.get(QDataSet.TYPICAL_MAX ) ) );
                 istpProps.put(QDataSet.UNITS,Units.us2000);
             }
+            if ( istpProps.containsKey(QDataSet.RENDER_TYPE) ) {
+                String s= (String)istpProps.get(QDataSet.RENDER_TYPE);
+                if ( s.equals("image") ) {
+                    logger.fine("removing DISPLAY_TYPE=image because it's incorrect");
+                    istpProps.remove(QDataSet.RENDER_TYPE);
+                }
+            }
             properties.putAll(istpProps);
 
             for ( int ir=0; ir<a.getRank(); ir++ ) {
