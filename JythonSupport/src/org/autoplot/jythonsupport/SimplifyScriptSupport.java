@@ -426,7 +426,7 @@ public class SimplifyScriptSupport {
          "str,", "int,", "long,", "float,", "datum,", "datumRange,", "dataset,",
          "findgen,", "dindgen,", "ones,", "zeros,", 
          "linspace,", "dblarr,", "fltarr,", 
-         "ripples,", 
+         "ripples,", "split,", 
          "color,", "colorFromString,"  };
      
      private static final Set<String> okaySet= new HashSet<>();
