@@ -8,9 +8,9 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Autoplot <a href="https://github.com/autoplot/dev/blob/master/demos/20190619/drawAngle.jy">script</a> draws an angle, which can be exported as pdf and imported into posters.
+        <p><small>Failed attempt to remove the sand from sand dollar image using Autoplot.  Happy Summer!
             </small></p>            
-        <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
+        <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.  Data can then 
            be additionally processed with other operations like smooth and FFT, and Jython scripting provides a capable programming environment.
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-06-18 r23793):</p>
+        <p>Bugfixes (2019-06-21 r23803):</p>
         <ul>
+            <li>Gold Mission CDF file requests image for display type, and this should be ignored.
             <li>1960: NetCDF/HDF5 reader reads global attributes into metadata.
             <li>vap+wdc works again, after discovering that new code assumed there was an extension.
         </ul>
@@ -59,6 +60,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>NetCDF global attributes are available in the metadata.
         </ul>
         <p>Less recent features:</p>
         <ul>
