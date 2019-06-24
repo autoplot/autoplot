@@ -796,6 +796,7 @@ public class DataSetURI {
      * @param mon progress monitor
      * @return the File
      * @throws java.io.IOException
+     * @see #getFile(java.lang.String, boolean, org.das2.util.monitor.ProgressMonitor) 
      */
     public static File getFile(URL url, ProgressMonitor mon) throws IOException {
 
@@ -903,6 +904,7 @@ public class DataSetURI {
      * @param mon progress monitor
      * @return a local copy of the file.
      * @throws java.io.IOException
+     * @see #getFile(java.net.URL, org.das2.util.monitor.ProgressMonitor) 
      */
     public static File getFile( String suri, boolean allowHtml, ProgressMonitor mon) throws IOException {
         URISplit split = URISplit.parse( suri );
