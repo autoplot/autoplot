@@ -28,6 +28,7 @@ import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.URISplit;
 import static org.autoplot.netCDF.NetCDFDataSourceFactory.checkMatlab;
 import ucar.ma2.DataType;
+import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Structure;
@@ -445,7 +446,10 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     
                 } else {
                 
-                    boolean isFormattedTime= v.getDataType()==DataType.CHAR && v.getRank()==2 && v.getShape(1)>=14 && v.getShape(1)<=30;
+                    boolean isFormattedTime= v.getDataType()==DataType.CHAR && v.getRank()==2 && v.getShape(1)>=14;
+                    if ( isFormattedTime ) {
+                        logger.log(Level.FINE, "detected formatted time: {0}", v.getName());
+                    }
                     if ( !isFormattedTime && !v.getDataType().isNumeric() ) continue;
                     StringBuilder description= new StringBuilder( v.getName()+"[" );
                     for ( int k=0; k<v.getDimensions().size(); k++ ) {
@@ -462,7 +466,16 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                         }
                     }
                     description.append("]");
-
+                    
+                    // begin small kludge for CDAWeb.
+                    List<Attribute> as= v.getAttributes();
+                    for ( Attribute a: as ) {
+                        if ( a.getName().equals("CATDESC") ) {
+                            description.append("<br>").append(a.getStringValue());
+                        }
+                    }
+                    // end small kludge for CDAWeb.
+                    
                     parameters.put( v.getName(), description.toString() );
                     
                 }
