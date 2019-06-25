@@ -80,6 +80,7 @@ public class Test002 {
             "024 file:///home/jbf/ct/hudson/vap/demos/eventsBarForAvailability3.vap",
             "025 file:///home/jbf/ct/hudson/vap/seth/mageis_rank2_labels.vap",
             // This was removed: "027 file:///home/jbf/ct/hudson/vap/demoBug.1946.vap",
+            "028 vap+inline:x=[10,20,30,40,50,60,70,80,90]&y=[1,5,2,4,2,5,2,3,2]&x,y&RENDER_TYPE=stairSteps>fillColor=silver",
             //This fails when user tomcat6 tries to run it.  disable for now.
             //"026 file:///home/jbf/ct/hudson/vap/rbsp/efwComponents.vap", // not getting units...
         };
