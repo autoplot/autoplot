@@ -79,7 +79,7 @@ public class Test002 {
             "023 file:///home/jbf/ct/hudson/vap/seth/multiScheme.vap",
             "024 file:///home/jbf/ct/hudson/vap/demos/eventsBarForAvailability3.vap",
             "025 file:///home/jbf/ct/hudson/vap/seth/mageis_rank2_labels.vap",
-            "027 file:///home/jbf/ct/hudson/vap/demoBug.1946.vap",
+            // This was removed: "027 file:///home/jbf/ct/hudson/vap/demoBug.1946.vap",
             //This fails when user tomcat6 tries to run it.  disable for now.
             //"026 file:///home/jbf/ct/hudson/vap/rbsp/efwComponents.vap", // not getting units...
         };
