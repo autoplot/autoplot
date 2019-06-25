@@ -39,7 +39,7 @@ public class LayoutUtil {
         if (ALLOW_EXCESS_SPACE && c.getMaximum() == norm && excess >= 0 && excess < 4) return false;
         if (Math.abs(c.getEmMaximum() - em) < 0.1 && Math.abs(norm - c.getMaximum()) < 0.001) return false;
         if ( Math.abs(em)>100 ) {
-            logger.log(Level.SEVERE, "autolayout failure: {0}", em);
+            logger.log(Level.SEVERE, "autolayout failure: {0}em", em);
         }
         c.setMax(norm,em,pt); // dampen by splitting the difference https://sourceforge.net/p/autoplot/bugs/1022/
         logger.log(Level.FINE, "reset maximum: {0}", c);
@@ -62,7 +62,7 @@ public class LayoutUtil {
         if (Math.abs(c.getEmMinimum() - em) < 0.1 && Math.abs(norm - c.getMinimum()) < 0.001) return false;
 
         if ( Math.abs(em)>100 ) {
-            logger.log(Level.SEVERE, "autolayout failure: {0}", em);
+            logger.log(Level.SEVERE, "autolayout failure: {0}em", em);
         }
         c.setMin(norm,em,pt);
         logger.log(Level.FINE, "reset minimum: {0}", c);
