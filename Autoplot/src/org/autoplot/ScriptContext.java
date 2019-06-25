@@ -1749,10 +1749,11 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
     }
     
     /**
-     * load a vap and return the dom.
+     * load a vap from a file and return the dom.
      * @param filename .vap file
      * @return Application
      * @throws java.io.IOException
+     * @see #saveVap(org.autoplot.dom.Application, java.lang.String) 
      */
     public static Application loadVap( String filename ) throws IOException {
         try {
@@ -1763,6 +1764,17 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
+    }
+    
+    /**
+     * save the application dom to a file.
+     * @param dom the application state
+     * @param filename the file.
+     * @throws IOException 
+     * @see #loadVap(java.lang.String) 
+     */
+    public static void saveVap( Application dom, String filename ) throws IOException {
+        StatePersistence.saveState( new File(filename), dom );
     }
     
     /**
