@@ -2025,6 +2025,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     /**
      * delete the dsf and any parents that deleting it leaves orphaned. (??? maybe they should be called children...)
      * @param dsf
+     * @see DomUtil#deleteDataSourceFilter(org.autoplot.dom.Application, org.autoplot.dom.DataSourceFilter) 
      */
     public synchronized void deleteDataSourceFilter(DataSourceFilter dsf) {
         if (!application.dataSourceFilters.contains(dsf)) {

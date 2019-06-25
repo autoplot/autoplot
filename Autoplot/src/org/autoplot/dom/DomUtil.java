@@ -542,6 +542,59 @@ public class DomUtil {
         }
         return -1;
     }
+        
+    /**
+     * delete the data source filter.
+     * @param application
+     * @param dsf the data source filter to remove.
+     * @see org.autoplot.dom.ApplicationController#deleteDataSourceFilter(org.autoplot.dom.DataSourceFilter) 
+     */
+    public static void deleteDataSourceFilter( Application application, DataSourceFilter dsf ) {
+        if (!application.dataSourceFilters.contains(dsf)) {
+            logger.fine("dsf wasn't part of the application");
+            return;
+        }
+        if (application.dataSourceFilters.size() < 2) {
+            throw new IllegalArgumentException("last plot cannot be deleted");
+        }
+        
+        List<DomNode> plotElements = dataSourceUsages( application, dsf.id );
+        if (plotElements.size() > 0) {
+            throw new IllegalArgumentException("application plot elements use dsf");
+        }
+
+        for ( DataSourceFilter dsf1: application.getDataSourceFilters() ) {
+            String uri= dsf1.getUri();
+            if ( uri.startsWith("vap+internal:") ) {
+                if ( uri.contains(dsf.id) ) {
+                    throw new IllegalArgumentException("dsf is used as parent of "+dsf1.getId() );
+                }
+            }
+        }
+        
+        ArrayList<DataSourceFilter> alsoRemove= new ArrayList<>();
+        
+        // look for orphaned parents
+        if ( dsf.getUri().startsWith("vap+internal:") ) {
+            List<DataSourceFilter> parents= getParentsFor(application, dsf.getUri() );
+            for (DataSourceFilter pdf : parents) {
+                if ( pdf==null ) continue;
+                String dsfId = pdf.getId();
+                List<DomNode> usages = DomUtil.dataSourceUsages(application, dsfId);
+                usages.remove(dsf);
+                if (usages.isEmpty()) {
+                    alsoRemove.add(pdf);
+                }
+            }
+        }
+
+        List<DataSourceFilter> dsfs = new ArrayList<>(Arrays.asList(application.getDataSourceFilters()));
+        dsfs.remove(dsf);
+        dsfs.removeAll(alsoRemove);
+
+        application.setDataSourceFilters(dsfs.toArray(new DataSourceFilter[dsfs.size()]));
+
+    }
 
     /**
      * list the differences in two arrays of the same type of object.
@@ -750,7 +803,10 @@ public class DomUtil {
     }
     
     /**
-     * return the parent DataSourceFilters for uris like vap+internal:data_1
+     * return the parent DataSourceFilters for uris like vap+internal:data_1,data_2
+     * Note this was the only way to combine 
+     * data before the "Data Mashup Tool" was introduced, and the Mashup tool
+     * is probably a better way to do this.
      * @param dom the dom
      * @param uri the uri, like vap+internal:data_1,data_2
      * @return the DataSourceFilters
