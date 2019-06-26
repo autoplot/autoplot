@@ -2,7 +2,6 @@
 package org.autoplot;
 
 import java.awt.Font;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,7 +28,7 @@ public class AutoplotServer {
         
     public static void main(String[] args) throws Exception {
           
-        System.err.println("org.autoplot.AutoplotServer 20180515");
+        System.err.println("org.autoplot.AutoplotServer 20180726");
 
         Util.addFonts();
         
