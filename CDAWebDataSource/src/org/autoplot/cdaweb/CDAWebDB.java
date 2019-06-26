@@ -77,7 +77,8 @@ public class CDAWebDB {
     }
 
     public static final String dbloc= CDAWeb + "pub/catalogs/all.xml";
-
+    //public static final String dbloc= "https://cdaweb.sci.gsfc.nasa.gov/%7Ecgladney/all.xml";
+    
     //private String version;
     private Document document; // should consume ~ 2 MB
     private Map<String,String> ids;  // serviceproviderId,Id
@@ -825,8 +826,7 @@ public class CDAWebDB {
                         String name= attrs.getNamedItem("serviceprovider_ID").getTextContent();
                         String url= getURL(name,node);
                         if ( url!=null && 
-                                ( url.startsWith( CDAWeb + "istp_public/data/" ) ||
-                                url.startsWith( CDAWeb + "sp_phys/data/" ) ||
+                                ( url.startsWith( CDAWeb ) ||
                                 url.startsWith("ftp://cdaweb.gsfc.nasa.gov" ) ) && !url.startsWith("/tower3/private" ) ) {
                             String filenaming= getFilenaming(node);
                             String s=attrs.getNamedItem("serviceprovider_ID").getTextContent();
