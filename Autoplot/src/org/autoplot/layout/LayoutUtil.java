@@ -9,7 +9,9 @@ import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasRow;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import org.das2.graph.DasAnnotation;
 import org.das2.graph.DasAxis;
@@ -48,11 +50,11 @@ public class LayoutUtil {
 
     /**
      *
-     * @param c
+     * @param c c the row or column to adjust
      * @param need
-     * @param norm
-     * @param em
-     * @param pt
+     * @param norm proposed new normal position
+     * @param em proposed new em offset
+     * @param pt proposed new point offset
      * @return return true if it was changed
      */
     private static boolean maybeSetMinimum(final DasDevicePosition c, double need, double norm, double em, int pt) {
@@ -60,7 +62,6 @@ public class LayoutUtil {
         double excess = c.getEmMinimum() - em;
         if (ALLOW_EXCESS_SPACE && c.getMinimum() == norm && excess >= 0 && excess < 4) return false;
         if (Math.abs(c.getEmMinimum() - em) < 0.1 && Math.abs(norm - c.getMinimum()) < 0.001) return false;
-
         if ( Math.abs(em)>100 ) {
             logger.log(Level.SEVERE, "autolayout failure: {0}em", em);
         }
@@ -69,6 +70,9 @@ public class LayoutUtil {
         return true;
     }
 
+    /**
+     * just for debugging, this keeps track by identifying interactions.
+     */
     private static int count=0;
     
     /**
@@ -116,6 +120,7 @@ public class LayoutUtil {
                 logger.log(Level.FINER, "here cc= {0}", cc);
                             
                 bounds = cc.getBounds();
+                logger.log(Level.FINER, "considering for x position (count={0}): {1} {2}", new Object[]{count, cc.getDasName(), bounds});
                 
                 if ( bounds.width>0 ) {
                     logger.finest( String.format( "%d %d %d %s", count, bounds.x, bounds.width, cc.toString() ) );
@@ -133,6 +138,7 @@ public class LayoutUtil {
             if ( cc.isVisible() && ( cc.getRow() == marginRow ||  cc.getRow().getParentDevicePosition()==marginRow 
                     || ( cc.getRow().getParentDevicePosition()!=null && cc.getRow().getParentDevicePosition().getParentDevicePosition() == marginRow ) ) ) {
                 bounds = cc.getBounds();
+                logger.log(Level.FINER, "considering for y position (count={0}): {1} {2}", new Object[]{count, cc.getDasName(), bounds});
                 if ( bounds.height>0 ) {
                     currentBoundsYMin = Math.min(currentBoundsYMin, bounds.y);
                     currentBoundsYMax = Math.max(currentBoundsYMax, bounds.y + bounds.height);
@@ -161,28 +167,32 @@ public class LayoutUtil {
             logger.fine("invalid bounds returned, returning.");
             return;
         }
-        int old;
 
+        if ( currentBoundsYMin>canvas.getHeight()/2 ) {
+            logger.fine("transitional state where currentBoundsYMin is large.");
+            return;
+        }
+        
         // these are the additional pixels needed in each direction.
         int needXmin, needXmax, needYmin, needYmax;
 
-        old = marginColumn.getDMinimum();
-        needXmin = old - currentBoundsXMin;
+        int oldxmin = marginColumn.getDMinimum();
+        needXmin = oldxmin - currentBoundsXMin;
 
-        old = marginColumn.getDMaximum();
-        needXmax = currentBoundsXMax - old;
+        int oldxmax = marginColumn.getDMaximum();
+        needXmax = currentBoundsXMax - oldxmax;
 
-        old = marginRow.getDMinimum();
-        needYmin = old - currentBoundsYMin;
+        int oldymin = marginRow.getDMinimum();
+        needYmin = oldymin - currentBoundsYMin;
         
+        int oldymax = marginRow.getDMaximum();
+        needYmax = currentBoundsYMax - oldymax;
+
         if ( needYmin< -7*em && tcaAreComing ) { // seven (or so) lines of tca might be coming, and this is why there's a big gap.
             logger.fine("anticipate that TCA data will be loaded, changing xaxis height.");
             needYmin= 0;
         }
-        
-        old = marginRow.getDMaximum();
-        needYmax = currentBoundsYMax - old;
-
+                
         if ( needXmax<-120 ) {
             logger.log(Level.FINE, "needXmax: {0}", needXmax);
             marginColumn.getParent().resizeAllComponents();
@@ -197,17 +207,95 @@ public class LayoutUtil {
         
         logger.log( Level.FINE, "needYmin: {0} needYmax: {1}", new Object[]{needYmin, needYmax});
        
+        if ( needYmin<-700 ) {
+            System.err.println("here-700");
+            return;
+        }
+        
         changed = changed | maybeSetMinimum(marginColumn, needXmin, 0, needXmin / em + MARGIN_LEFT_RIGHT_EM, 0);
         changed = changed | maybeSetMaximum(marginColumn, needXmax, 1.0, -needXmax / em - MARGIN_LEFT_RIGHT_EM, 0);
         changed = changed | maybeSetMinimum(marginRow, needYmin, 0, needYmin / em, 0);
         changed = changed | maybeSetMaximum(marginRow, needYmax, 1.0, -needYmax / em, 0);
         
+        if ( false && changed ) {
+            List<DasRow> rows= new ArrayList<>();
+                   
+            for (DasCanvasComponent cc : canvas.getCanvasComponents()) {
+
+                if ( cc instanceof DasAnnotation ) continue; // there's a set of components we want to ignore because it's easy to mess up.
+                       
+                if ( cc.isVisible() && ( cc.getColumn() == marginColumn || cc.getColumn().getParentDevicePosition() == marginColumn
+                    || ( cc.getColumn().getParentDevicePosition()!=null && cc.getColumn().getParentDevicePosition().getParentDevicePosition() == marginColumn ) ) ) {
+               
+                   rows.add( cc.getRow() );
+               
+                }
+               
+            }
+            if ( true ) {
+                normalizeRows( em, marginRow, rows );
+            }
+           
+        }
+               
         if (changed) {
             marginColumn.getParent().resizeAllComponents();
         }
         
         logger.log(Level.FINER, "exit autolayout, changed={0}", changed);
 
+    }
+
+    /**
+     * preserve pixel locations of the rows, with corrections to the marginRow.
+     * @param canvas
+     */    
+    public static void normalizeRows( org.autoplot.dom.Canvas canvas ) {
+        List<DasRow> rows= new ArrayList<>();
+
+        DasCanvas dasCanvas= canvas.getController().getDasCanvas();
+        DasColumn marginColumn= canvas.getMarginColumn().getController().getDasColumn();
+        DasRow marginRow= canvas.getMarginRow().getController().getDasRow();
+
+        for (DasCanvasComponent cc : dasCanvas.getCanvasComponents()) {
+
+            if ( cc instanceof DasAnnotation ) continue; // there's a set of components we want to ignore because it's easy to mess up.
+
+            if ( cc.isVisible() && ( cc.getColumn() == marginColumn || cc.getColumn().getParentDevicePosition() == marginColumn
+                || ( cc.getColumn().getParentDevicePosition()!=null && cc.getColumn().getParentDevicePosition().getParentDevicePosition() == marginColumn ) ) ) {
+
+               rows.add( cc.getRow() );
+
+            }
+
+        }
+
+        normalizeRows( 0, marginRow, rows );
+
+    }
+    
+    /**
+     * preserve pixel locations of the rows, with corrections to the marginRow.
+     * @param em
+     * @param marginRow
+     * @param rows 
+     */
+    public static void normalizeRows( double em, DasRow marginRow, List<DasRow> rows ) {
+        Map<DasRow,int[]> dposs= new HashMap<>();
+        for ( DasRow r: rows ) {
+            if ( r.getParentDevicePosition()==marginRow ) {
+                int[] dpos= new int[] { r.getDMinimum(), r.getDMaximum() };
+                dposs.put( r, dpos );
+            }
+        }
+        marginRow.setMin(  .0,  2., 0 );
+        marginRow.setMax( 1.0, -3., 0 );
+        for ( DasRow r: rows ) {
+            if ( r.getParentDevicePosition()==marginRow ) {
+                int[] dpos= dposs.get( r );
+                r.setDPosition( dpos[0], dpos[1] );
+            }
+        }
     }
 
     /**
