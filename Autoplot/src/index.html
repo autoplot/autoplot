@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Line thickness option "Permanent Marker" font and used with <a href='https://github.com/autoplot/dev/blob/master/demos/20190626/screen20190626.vap'>inline</a> dataset.
+        <p><small>Line thickness option and "Permanent Marker" font and used with <a href='https://github.com/autoplot/dev/blob/master/demos/20190626/screen20190626.vap'>inline</a> dataset.
             </small></p>            
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,7 +28,12 @@
         
         <p>Bugfixes (2019-06-21 r23803):</p>
         <ul>
-            <li>Gold Mission CDF file requests image for display type, and this should be ignored.
+            <li>rte_0195003323: avoid runtime errors on event thread when when enumeration units get into the wrong place.
+            <li>finally clip the legend and message bubbles to within the plot boundaries.  This has been bugging me for a while.
+            <li>loosen constraints on CDAWeb reader for all.xml, in anticipation of website changes CDAWeb will be making.
+            <li>autolayout code has sanity check on ymin, where a bug in AutoplotServer when the vap size in pixels is changed.
+            <li>Work towards making Gold timetags available (Autoplot offers them now but there's still an issue with the NetCDF library).
+            <li>Gold Mission CDF file requests "image" for display type, and this should be ignored.
             <li>1960: NetCDF/HDF5 reader reads global attributes into metadata.
             <li>vap+wdc works again, after discovering that new code assumed there was an extension.
         </ul>
@@ -60,6 +65,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>DomUtil gets deleteDataSource operation, to support operations on .vap files.
+            <li>Scripting gets saveVap to work like loadVap, allowing Jython scripts to operate on .vap files.
             <li>NetCDF global attributes are available in the metadata.
         </ul>
         <p>Less recent features:</p>
