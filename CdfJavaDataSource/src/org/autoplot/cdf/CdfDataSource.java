@@ -439,6 +439,8 @@ public class CdfDataSource extends AbstractDataSource {
     public QDataSet getDataSet( ProgressMonitor mon, Map<String,Object> attr1 ) throws Exception {
 
         String lsurl= uri.toString();
+        logger.entering( "CdfDataSource", "getDataSet", new Object[] { lsurl } );
+        
         MutablePropertyDataSet cached;
         synchronized ( dslock ) {
             cached= dsCache.get(lsurl);
@@ -691,6 +693,8 @@ public class CdfDataSource extends AbstractDataSource {
 
         result.makeImmutable(); // this may cause problems with scripts that assume data is mutable.        
         if ( !mon.isFinished() ) mon.finished();  
+        
+        logger.exiting( "CdfDataSource", "getDataSet" );
         
         return result;
 
