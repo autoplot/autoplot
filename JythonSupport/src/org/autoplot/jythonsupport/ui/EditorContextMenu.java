@@ -423,6 +423,8 @@ public class EditorContextMenu {
 
             fragmentsMenu.add( createInsertMenuItem( "try-except", "try:\n  fil=downloadResourceAsTempFile(URL('http://autoplot.org/data/nofile.dat'),monitor)\nexcept java.io.IOException,ex:\n  print 'file not found'\n" ) );
 
+            fragmentsMenu.add( createInsertMenuItem( "except-traceback", "try:\n  fil=downloadResourceAsTempFile(URL('http://autoplot.org/data/nofile.dat'),monitor)\nexcept:\n  import traceback\n  traceback.print_exc()\n" ) );
+
             fragmentsMenu.add( createInsertMenuItem( "raise exception", "if ( ds.length()==0 ):\n  raise Exception('Dataset is empty')") );
 
             fragmentsMenu.add( createInsertMenuItem( "raise NoDataInIntervalException", "from org.das2.dataset import NoDataInIntervalException\nraise NoDataInIntervalException('no files found')") );
