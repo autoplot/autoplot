@@ -583,7 +583,8 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
             String[] ss = FileSystem.splitUrl(url.toString());
 
-
+            boolean isgz= false;
+            
             url= getRootURL();
             String userInfo= null;
             boolean done= false;
@@ -644,7 +645,13 @@ public class FTPBeanFileSystem extends WebFileSystem {
                             return true;
                         }
                     };
-                    bean.getBinaryFile(ss[3].substring(ss[2].length()), partFile.toString(), observer);
+                    try {
+                        bean.getBinaryFile(ss[3].substring(ss[2].length()), partFile.toString(), observer);
+                    } catch ( FtpException ex ) {
+                        bean.getBinaryFile(ss[3].substring(ss[2].length())+".gz", partFile.toString(), observer);
+                        FileSystemUtil.gunzip( partFile, targetFile );
+                        isgz= true;
+                    }
                     bean.close();
                     done= true;
                     
@@ -676,6 +683,10 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 }
             }
 
+            if ( isgz ) {
+                return Collections.EMPTY_MAP;
+            }
+            
             if ( targetFile.length()==partFile.length() ) {
                 if ( OsUtil.contentEquals(targetFile, partFile ) ) {
                     logger.fine("another thread must have downloaded file.");
