@@ -853,6 +853,11 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             addVariableAttributeEntry( name,"CATDESC", CDFDataType.CHAR, title);
         }
         
+        String description = (String) ds.property(QDataSet.DESCRIPTION);
+        if (description != null && description.length()>0 ) {
+            addVariableAttributeEntry( name,"VAR_NOTES", CDFDataType.CHAR, description);
+        }
+        
         Number vmax= (Number) ds.property( QDataSet.VALID_MAX );
         Number vmin= (Number) ds.property( QDataSet.VALID_MIN );
         if ( vmax!=null || vmin !=null ) {
