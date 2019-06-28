@@ -28,6 +28,8 @@
         
         <p>Bugfixes (2019-06-21 r23803):</p>
         <ul>
+            <li>2182: DESCRIPTION metadata is loaded from CDF files, propagated, and formatted properly.  Metadata tab displays DESCRIPTION properly.
+            <li>ftp filesystem supports .gz files (though they are still not cached properly).
             <li>rte_0195003323: avoid runtime errors on event thread when when enumeration units get into the wrong place.
             <li>finally clip the legend and message bubbles to within the plot boundaries.  This has been bugging me for a while.
             <li>loosen constraints on CDAWeb reader for all.xml, in anticipation of website changes CDAWeb will be making.
@@ -65,6 +67,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add access to Orbit renderer's tickLabeller property.
             <li>DomUtil gets deleteDataSource operation, to support operations on .vap files.
             <li>Scripting gets saveVap to work like loadVap, allowing Jython scripts to operate on .vap files.
             <li>NetCDF global attributes are available in the metadata.
