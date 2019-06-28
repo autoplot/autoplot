@@ -147,6 +147,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
 
     DatumRange timeRange;
     Datum resolution;
+    String interval;
     String dsParams;
     List<String> tcaDesc;
     Map dsdfParams = null;
@@ -195,7 +196,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
         otherParams.remove("useOldD2sParser");
         
         String item = (String) otherParams.remove("item");
-        String interval = (String) otherParams.remove("interval");
+        interval = (String) otherParams.remove("interval");
         String key1 = (String) otherParams.remove("key");
 
         dsParams = (String) URISplit.formatParams(otherParams);
@@ -248,18 +249,14 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             // resolution.
 
             double dsec;
-            if (resolution == null) {
-                dsec = Double.parseDouble(interval);
-            } else {
-                dsec = resolution.doubleValue(Units.seconds);
+            dsec = Double.parseDouble(interval);
+
+            double finterval = dsec;
+            if (finterval < 0.001) {
+                finterval = 0.001;
             }
 
-            int iinterval = (int) dsec;
-            if (iinterval < 1) {
-                iinterval = 1;
-            }
-
-            params2.put("interval", URLEncoder.encode(String.valueOf(iinterval), "US-ASCII"));
+            params2.put("interval", URLEncoder.encode(String.valueOf(finterval), "US-ASCII"));
             params2.remove("resolution");
         } else {
             logger.finer("dataset is not a TCA, interval parameter is null");
@@ -839,6 +836,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             @Override
             public void setTimeResolution(Datum d) {
                 logger.log(Level.FINE, "setTimeResolution to {0}", d);
+                
                 resolution = d;
             }
 
