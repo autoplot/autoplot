@@ -594,6 +594,8 @@ public class CdfDataSource extends AbstractDataSource {
             result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
             result.putProperty(QDataSet.LABEL, istpProps.get(QDataSet.LABEL)  );
             result.putProperty(QDataSet.TITLE, istpProps.get(QDataSet.TITLE)  );
+            result.putProperty(QDataSet.DESCRIPTION, istpProps.get(QDataSet.DESCRIPTION) );
+            
             String renderType= (String)istpProps.get(QDataSet.RENDER_TYPE);
             if ( renderType!=null && renderType.equals( "time_series" ) ) {
                 // kludge for rbsp-a_WFR-waveform_emfisis-L2_20120831_v1.2.1.cdf.  This is actually a waveform.
