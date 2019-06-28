@@ -317,6 +317,11 @@ public class IstpMetadataModel extends MetadataModel {
 
         if ( title.trim().length()>0 ) properties.put( QDataSet.TITLE, title.trim() );
         
+        s= (String)attrs.get("VAR_NOTES");
+        if ( s!=null ) {
+            properties.put( QDataSet.DESCRIPTION, s );
+        }
+        
         if (attrs.containsKey("DISPLAY_TYPE")) {
             String type = (String) attrs.get("DISPLAY_TYPE");
             int i= type.indexOf('>');
