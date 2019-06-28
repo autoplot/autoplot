@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Line thickness option and "Permanent Marker" font and used with an inline dataset.  <a href='https://github.com/autoplot/dev/blob/master/demos/20190626/screen20190626.vap'>Here's</a> the vap, if you have the <a href='https://fonts.google.com/specimen/Permanent+Marker'>font</a> installed.
+        <p><small>Colors along a curve.
             </small></p>            
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-06-21 r23803):</p>
+        <p>Bugfixes (2019-06-28 r23831):</p>
         <ul>
+            <li>Masafumi needed to load TCA data from a das2server at 1ms resolution.
             <li>2182: DESCRIPTION metadata is loaded from CDF files, propagated, and formatted properly.  Metadata tab displays DESCRIPTION properly.
             <li>ftp filesystem supports .gz files (though they are still not cached properly).
             <li>rte_0195003323: avoid runtime errors on event thread when when enumeration units get into the wrong place.
