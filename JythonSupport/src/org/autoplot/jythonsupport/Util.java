@@ -18,9 +18,14 @@ import java.nio.channels.WritableByteChannel;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import java.util.logging.Level;
@@ -48,6 +53,9 @@ import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
+import org.python.core.Py;
+import org.python.core.PyFunction;
+import org.python.core.PyObject;
 
 /**
  * Utilities for Jython scripts in both the datasource and application contexts.
@@ -373,6 +381,79 @@ public class Util {
         } else {
             return result;
         }
+    }
+    
+    /**
+     * run the python jobs in parallel.
+     * @param job a python function which takes one argument
+     * @param argument list of arguments to invoke.
+     * @return list of results for each call of the function.
+     */
+    public static List<Object> runInParallel( final PyFunction job, final List<Object> argument ) throws Exception {
+        System.err.println(job);
+        
+        final List<Callable<Object>> callables= new ArrayList<>(argument.size());
+        final List<Object> result= new ArrayList<>(argument.size());
+        final List<Exception> exceptions= new ArrayList<>(argument.size());
+        
+        int i=0;
+        for ( Object o: argument ) {
+            final int I= i;
+            result.add( I, null );
+            exceptions.add( I,null );
+            callables.add( I, new Callable() {
+                @Override
+                public Object call() throws Exception {
+                    Object result1= job.__call__( Py.java2py(argument.get(I)) );
+                    result.set( I, result1 );
+                    return result1;
+                }
+            } );
+            
+            i++;
+        }
+
+        for ( i=0; i<argument.size(); i++ ) {
+            final int I= i;
+            RequestProcessor.invokeLater( new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        callables.get(I).call();
+                    } catch (Exception ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                        exceptions.set( I, ex );
+                    }
+                }
+            }, callables.get(I) );
+        }
+                    
+//        ExecutorService executor= Executors.newFixedThreadPool(8);
+//        List<Callable<Object>> tasks= callables;
+//        List<Future> futures= executor.invokeAll(tasks);
+        
+        while ( true ) {
+            boolean allDone= true;
+            for ( i=0; i<result.size(); i++ ) {
+                //Future f= futures.get(i);
+                //if ( !f.isDone() && !f.isCancelled() ) {
+                if ( result.get(i)==null ) {
+                    if ( exceptions.get(i)==null ) {
+                        allDone= false;
+                    }
+                }   
+                //}
+            }
+            if ( allDone ) break;
+        }
+        
+        for ( i=0; i<result.size(); i++ ) {
+            if ( exceptions.get(i)!=null ) {
+                throw exceptions.get(i);
+            }
+        }
+        
+        return result;
     }
             
     /**
