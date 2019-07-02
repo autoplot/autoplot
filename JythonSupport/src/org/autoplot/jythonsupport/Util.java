@@ -53,6 +53,7 @@ import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
+import org.das2.util.monitor.CancelledOperationException;
 import org.python.core.Py;
 import org.python.core.PyFunction;
 import org.python.core.PyObject;
@@ -387,21 +388,29 @@ public class Util {
      * run the python jobs in parallel.
      * @param job a python function which takes one argument
      * @param argument list of arguments to invoke.
+     * @param mon monitor for the group of processes
      * @return list of results for each call of the function.
+     * @throws java.lang.Exception if any of the jobs throw an exception.
      */
-    public static List<Object> runInParallel( final PyFunction job, final List<Object> argument ) throws Exception {
-        System.err.println(job);
+    public static List<Object> runInParallel( 
+            final PyFunction job, 
+            final List<Object> argument, 
+            ProgressMonitor mon ) throws Exception {
+        
+        if ( mon==null ) mon= new NullProgressMonitor();
         
         final List<Callable<Object>> callables= new ArrayList<>(argument.size());
         final List<Object> result= new ArrayList<>(argument.size());
         final List<Exception> exceptions= new ArrayList<>(argument.size());
         
-        int i=0;
-        for ( Object o: argument ) {
+        mon.setTaskSize( argument.size()*100 );
+        mon.started();
+        
+        for ( int i=0; i<argument.size(); i++ ) {
             final int I= i;
             result.add( I, null );
             exceptions.add( I,null );
-            callables.add( I, new Callable() {
+            callables.add( I, new Callable<Object>() {
                 @Override
                 public Object call() throws Exception {
                     Object result1= job.__call__( Py.java2py(argument.get(I)) );
@@ -409,45 +418,31 @@ public class Util {
                     return result1;
                 }
             } );
-            
-            i++;
-        }
-
-        for ( i=0; i<argument.size(); i++ ) {
-            final int I= i;
-            RequestProcessor.invokeLater( new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        callables.get(I).call();
-                    } catch (Exception ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                        exceptions.set( I, ex );
-                    }
-                }
-            }, callables.get(I) );
         }
                     
-//        ExecutorService executor= Executors.newFixedThreadPool(8);
-//        List<Callable<Object>> tasks= callables;
-//        List<Future> futures= executor.invokeAll(tasks);
+        ExecutorService executor= Executors.newCachedThreadPool();
+        List<Callable<Object>> tasks= callables;
+        List<Future<Object>> futures= executor.invokeAll(tasks);
         
-        while ( true ) {
+        int pendingJobs;
+        do {
+            pendingJobs= 0;
             boolean allDone= true;
-            for ( i=0; i<result.size(); i++ ) {
-                //Future f= futures.get(i);
-                //if ( !f.isDone() && !f.isCancelled() ) {
-                if ( result.get(i)==null ) {
-                    if ( exceptions.get(i)==null ) {
-                        allDone= false;
-                    }
-                }   
-                //}
+            for ( int i=0; i<result.size(); i++ ) {
+                Future f= futures.get(i);
+                if ( !f.isDone() && !f.isCancelled() ) {
+                    pendingJobs++;
+                }
             }
+            mon.setTaskProgress( (argument.size()-pendingJobs)*100 );
             if ( allDone ) break;
+        } while ( pendingJobs>0 && !mon.isCancelled() );
+        
+        if ( mon.isCancelled() ) {
+            throw new CancelledOperationException( "parallel task cancelled");
         }
         
-        for ( i=0; i<result.size(); i++ ) {
+        for ( int i=0; i<result.size(); i++ ) {
             if ( exceptions.get(i)!=null ) {
                 throw exceptions.get(i);
             }
