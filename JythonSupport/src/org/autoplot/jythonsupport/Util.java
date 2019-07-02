@@ -396,7 +396,7 @@ public class Util {
             final PyFunction job, 
             final List<Object> argument, 
             ProgressMonitor mon ) throws Exception {
-        
+        logger.entering("org.autoplot.jythonsupport.Util", "runInParallel");
         if ( mon==null ) mon= new NullProgressMonitor();
         
         final List<Callable<Object>> callables= new ArrayList<>(argument.size());
@@ -413,9 +413,14 @@ public class Util {
             callables.add( I, new Callable<Object>() {
                 @Override
                 public Object call() throws Exception {
-                    Object result1= job.__call__( Py.java2py(argument.get(I)) );
-                    result.set( I, result1 );
-                    return result1;
+                    try {
+                        Object result1= job.__call__( Py.java2py(argument.get(I)) );
+                        result.set( I, result1 );
+                        return result1;
+                    } catch ( Exception e ) {
+                        exceptions.set( I, e );
+                        return null;
+                    }
                 }
             } );
         }
@@ -442,12 +447,16 @@ public class Util {
             throw new CancelledOperationException( "parallel task cancelled");
         }
         
+        mon.finished();
+        
         for ( int i=0; i<result.size(); i++ ) {
             if ( exceptions.get(i)!=null ) {
+                logger.log( Level.WARNING, exceptions.get(i).getMessage(), exceptions.get(i) );
+                logger.throwing( "org.autoplot.jythonsupport.Util", "runInParallel", exceptions.get(i) );
                 throw exceptions.get(i);
             }
         }
-        
+        logger.exiting("org.autoplot.jythonsupport.Util", "runInParallel");
         return result;
     }
             
