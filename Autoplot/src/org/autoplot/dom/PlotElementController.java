@@ -713,6 +713,8 @@ public class PlotElementController extends DomNodeController {
             }
         } else if ( getRenderer() instanceof SeriesRenderer) {
             switch (fillDs.rank()) {
+                case 0:
+                    return true;
                 case 1:
                     return true;
                 case 2:
