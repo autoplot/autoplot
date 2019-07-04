@@ -74,7 +74,6 @@ import org.autoplot.AutoplotUtil;
 import static org.autoplot.AutoplotUtil.SERIES_SIZE_LIMIT;
 import org.autoplot.ExportDataPanel;
 import org.autoplot.RenderTypeUtil;
-import org.autoplot.ScriptContext;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.layout.LayoutConstants;
@@ -97,10 +96,6 @@ import org.das2.event.DataRangeSelectionListener;
 import org.das2.event.HorizontalDragRangeSelectorMouseModule;
 import org.das2.graph.BoundsRenderer;
 import org.das2.graph.PolarPlotRenderer;
-import org.jdesktop.beansbinding.AutoBinding;
-import org.jdesktop.beansbinding.BeanProperty;
-import org.jdesktop.beansbinding.BindingGroup;
-import org.jdesktop.beansbinding.Bindings;
 
 /**
  * PlotElementController manages the PlotElement, for example resolving the datasource and loading the dataset.
