@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Colors along a curve.  Here's the <a href='https://github.com/autoplot/dev/blob/master/demos/2019/20190625/demoRend.jy'>script</a>.
+        <p><small>Happy Fourth of July!  Here's the <a href="https://github.com/autoplot/dev/blob/master/screen/20190704/flag4th.jy">script</a>  Flag image from http://www.researchhistory.org/wp-content/uploads/2011/05/american-flag.jpg.
             </small></p>            
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,9 +28,10 @@
         
         <p>Bugfixes (2019-06-28 r23831):</p>
         <ul>
+            <li>2184: bug with plot(1,...) when (1) is moved to plot above.  Thanks, Kristoff!
             <li>Masafumi needed to load TCA data from a das2server at 1ms resolution.
             <li>2182: DESCRIPTION metadata is loaded from CDF files, propagated, and formatted properly.  Metadata tab displays DESCRIPTION properly.
-            <li>ftp filesystem supports .gz files (though they are still not cached properly).
+            <li>ftp filesystem supports .gz files (though they are still not cached properly).  Thanks, Bob!
             <li>rte_0195003323: avoid runtime errors on event thread when when enumeration units get into the wrong place.
             <li>finally clip the legend and message bubbles to within the plot boundaries.  This has been bugging me for a while.
             <li>loosen constraints on CDAWeb reader for all.xml, in anticipation of website changes CDAWeb will be making.
@@ -68,8 +69,10 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>add ellipse function.
-            <li>add access to Orbit renderer's tickLabeller property.
+            <li>rfe685: seriesRenderer now supports rank 0 data with a horizontal line at the value on the Y-axis.
+            <li>New Jython "runInParallel" simplifies parallel processing of Jython function.
+            <li>add ellipse function to more accurately model Jupiter surface for Juno graphics.  Thanks, Masafumi!
+            <li>add access to Orbit renderer's tickLabeller property.  (documented as bug 2183).
             <li>DomUtil gets deleteDataSource operation, to support operations on .vap files.
             <li>Scripting gets saveVap to work like loadVap, allowing Jython scripts to operate on .vap files.
             <li>NetCDF global attributes are available in the metadata.
