@@ -254,10 +254,11 @@ for i in $( find orbits -type f ); do               # copy in orbits files
    cp $i ../temp-volatile-classes/$i
 done
 
-if [ -f  /home/jbf/project/autoplot/fonts/scheme_bk.otf ]; then
-   cp /home/jbf/project/autoplot/fonts/scheme_bk.otf ../temp-volatile-classes/resources
-   echo "scheme_bk.otf is a proprietary font which is not licensed for use outside of Autoplot." > ../temp-volatile-classes/resources/fonts.license.txt
-fi
+echo "copy scheme_bk font from /home/jbf/project/autoplot..."
+//if [ -f  /home/jbf/project/autoplot/fonts/scheme_bk.otf ]; then
+//   cp /home/jbf/project/autoplot/fonts/scheme_bk.otf ../temp-volatile-classes/resources
+//   echo "scheme_bk.otf is a proprietary font which is not licensed for use outside of Autoplot." > ../temp-volatile-classes/resources/fonts.license.txt
+//fi
 
 cd ..
 echo "pwd=" `pwd`
