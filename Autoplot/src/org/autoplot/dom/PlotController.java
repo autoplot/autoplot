@@ -825,6 +825,7 @@ public class PlotController extends DomNodeController {
     private PropertyChangeListener plotListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            if ( titleConverter==null ) return;
             dasPlot.setTitle( (String)titleConverter.convertForward(plot.getTitle()) );
         }
     };
@@ -1296,6 +1297,7 @@ public class PlotController extends DomNodeController {
                 return;
             }
             QDataSet ds1;
+            if ( titleConverter==null ) return;
             if ( titleConverter.plotElement!=null ) {
                 ds1= titleConverter.plotElement.getController().getDataSet();
             } else {
