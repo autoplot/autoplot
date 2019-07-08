@@ -850,11 +850,23 @@ public class AutoplotUtil {
             for ( BindingModel b : plots ) {
                 Plot other;
                 if ( b.getDstId().equals( plot.getXaxis().getId() ) ) {
-                    Axis oa= (Axis)DomUtil.getElementById( dom, b.getSrcId() );
-                    other= (Plot)DomUtil.getPlotForAxis( dom, oa );
+                    Object oo= DomUtil.getElementById( dom, b.getSrcId() );
+                    if ( oo instanceof Axis ) {
+                        Axis oa= (Axis)DomUtil.getElementById( dom, b.getSrcId() );
+                        other= (Plot)DomUtil.getPlotForAxis( dom, oa );
+                    } else {
+                        // TODO: look for bindings through Application.timeRange.
+                        continue;
+                    }
                 } else {
-                    Axis oa= (Axis)DomUtil.getElementById( dom, b.getDstId() );
-                    other= (Plot)DomUtil.getPlotForAxis( dom, oa );
+                    Object oo= DomUtil.getElementById( dom, b.getDstId() );
+                    if ( oo instanceof Axis ) {
+                        Axis oa= (Axis)oo;
+                        other= (Plot)DomUtil.getPlotForAxis( dom, oa );
+                    } else {
+                        // TODO: look for bindings through Application.timeRange.
+                        continue;
+                    }
                 }
                 pes.addAll( DomUtil.getPlotElementsFor( dom, other ) );
             }
