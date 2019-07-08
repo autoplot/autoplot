@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Happy Fourth of July!  Here's the <a href="https://github.com/autoplot/dev/blob/master/screen/20190704/flag4th.jy">script</a>.  Flag image from http://www.researchhistory.org/wp-content/uploads/2011/05/american-flag.jpg.
+        <p><small>CDF "var_notes" now shows up in QDataSet result's DESCRIPTION property, and exporting to CDF will copy this property into the generated CDF file.
             </small></p>            
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-06-28 r23831):</p>
+        <p>Bugfixes (2019-07-08 r23850):</p>
         <ul>
+            <li>2185: when a joined zero-length dataset is encountered temporarily catch the error so that other functionality is still accessible.  Thanks, Firdevs!
+            <li>rte_1223982323 corrected, where code assumed binding was to another axis, when it could be dom.timeRange.  Thanks, lehanson!
             <li>2184: bug with plot(1,...) when (1) is moved to plot above.  Thanks, Kristoff!
             <li>Masafumi needed to load TCA data from a das2server at 1ms resolution.
             <li>2182: DESCRIPTION metadata is loaded from CDF files, propagated, and formatted properly.  Metadata tab displays DESCRIPTION properly.
