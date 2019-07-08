@@ -37,6 +37,7 @@ import org.das2.util.monitor.AlertNullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUtil;
+import org.autoplot.ScriptContext;
 import org.autoplot.util.RunLaterListener;
 import org.das2.qds.ArrayDataSet;
 import org.das2.qds.DataSetOps;
@@ -634,8 +635,10 @@ public class DataSourceController extends DomNodeController {
             if ( ds.rank()<=QDataSet.MAX_RANK && DataSetUtil.totalLength(ds) < 200000 && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(ds)) ) {
                 setStatus("busy: do statistics on the data...");
                 try {
-                    setHistogram(new AutoHistogram().doit(ds, null));
-                } catch ( IllegalArgumentException ex ) {
+                    if ( DataSetUtil.totalLength(ds)>0 ) {
+                        setHistogram(new AutoHistogram().doit(ds, null));
+                    }
+                } catch ( RuntimeException ex ) {
                     logger.warning("runtime error during histogram usually means invalid data in data set.");
                     setHistogram(null);
                 }
