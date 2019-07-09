@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>CDF "var_notes" now shows up in QDataSet result's DESCRIPTION property, and exporting to CDF will copy this property into the generated CDF file.
+        <p><small>The trim1 operator now supports rank 2 DEPEND_1, where the DEPEND_1 records change for each record.  Here's a <a href='https://github.com/autoplot/dev/blob/master/demos/20190709/changingCadenceTrim.jy'>script</a> which demos.
             </small></p>            
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-07-08 r23850):</p>
+        <p>Bugfixes (2019-07-09 r23857):</p>
         <ul>
+            <li>2187: support trim(1,'2Hz','4Hz') with rank 2 depend 1.
             <li>2185: when a joined zero-length dataset is encountered temporarily catch the error so that other functionality is still accessible.  Thanks, Firdevs!
             <li>2149: rte_1223982323 corrected, where code assumed binding was to another axis, when it could be dom.timeRange.  Thanks, lehanson!
             <li>2184: bug with plot(1,...) when (1) is moved to plot above.  Thanks, Kristoff!
