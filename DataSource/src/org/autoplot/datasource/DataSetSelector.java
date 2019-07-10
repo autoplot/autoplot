@@ -1513,6 +1513,11 @@ public class DataSetSelector extends javax.swing.JPanel {
                 String context= (String) dataSetSelector.getEditor().getItem();
                 //String context = (String) dataSetSelector.getSelectedItem();  // This is repeated code.  See browseButtonActionPerformed.
                 if ( context==null ) context= "";
+                Component c= dataSetSelector.getEditor().getEditorComponent();
+                if ( c instanceof JTextField ) { // which it is...
+                    int i= ((JTextField)c).getCaretPosition();
+                    context= context.substring(0,i);
+                }
 
                 // hooks for browsing, such as "vap+internal"
                 for (String browseTriggerRegex : browseTriggers.keySet()) {
