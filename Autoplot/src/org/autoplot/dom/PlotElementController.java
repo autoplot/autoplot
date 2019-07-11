@@ -1313,7 +1313,7 @@ public class PlotElementController extends DomNodeController {
         List<Integer> qube= new ArrayList(); // we remove elements from this one.
         int[] a= DataSetUtil.qubeDims(fillDs);
         if ( a==null ) {
-            throw new IllegalArgumentException("expected fillDs to be a qube");
+            return "|slice0(" + fillDs.length()/2+")";
         }
         for ( int i=0; i<rank; i++ ) {
             qube.add(a[i]);
