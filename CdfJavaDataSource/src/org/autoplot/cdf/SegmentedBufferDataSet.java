@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.cdf;
 
@@ -15,8 +11,9 @@ import org.das2.qds.QDataSet;
  * look like one long dataset.
  * Each dataset must have the same qube.  This is for efficiency.
  *
- * limitations:
- *   doesn't check DEPEND_1 when checking qube.
+ * limitations:<ul>
+ *  <li> doesn't check DEPEND_1 when checking qube.
+ * </ul>
  * @author jbf
  */
 public class SegmentedBufferDataSet extends AbstractDataSet {
