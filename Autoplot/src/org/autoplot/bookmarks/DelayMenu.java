@@ -6,6 +6,7 @@
 package org.autoplot.bookmarks;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,6 +35,104 @@ public class DelayMenu extends JMenu {
 
     private static boolean oldLogic= false;
 
+    /**
+     * calculate a menu from the bookmarks, where when a bookmark is selected, an ActionEvent
+     * is fired with the actionCommand equal to the URI.  This was introduced to support
+     * invoking one of a set of scripts.
+     * 
+     * @param menu
+     * @param bookmarks
+     * @param a 
+     */
+    public static void calculateMenu( JMenu menu, final List<Bookmark> bookmarks, final ActionListener a ) {
+
+        List<Bookmark> content= bookmarks;
+        for ( int i=0; i<content.size(); i++ ) {
+            final Bookmark book= content.get(i);
+
+            if (book instanceof Bookmark.Item) {
+                String title= book.getTitle();
+                if ( title.length()>MAX_TITLE_LEN ) title= title.substring(0,MAX_TITLE_LEN)+"...";
+
+                if ( book.isHidden() ) {
+
+                } else {
+                    JMenuItem mi = new JMenuItem(new AbstractAction(title) {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            org.das2.util.LoggerManager.logGuiEvent(e);                        
+                            ActionEvent ne= new ActionEvent(e.getSource(),e.getID(),((Bookmark.Item) book).getUri() );
+                            a.actionPerformed( ne );
+                        }
+                    });
+                    mi.setToolTipText( ((Bookmark.Item) book).getUri() );
+                    if (book.getIcon() != null) {
+                        mi.setIcon(AutoplotUtil.scaleIcon(book.getIcon(), -1, 16));
+                    }       
+                    menu.add(mi); //TODO: this should not happen off the event thread.  Instead we should keep a separate model that is used to populate the GUI.
+                }
+
+            } else {
+
+                Bookmark.Folder folder = (Bookmark.Folder) book;
+                String title= book.getTitle();
+                if ( title.length()>MAX_TITLE_LEN ) title= title.substring(0,MAX_TITLE_LEN)+"...";
+
+                String tooltip;
+                Icon icon;
+                if ( folder.getRemoteUrl()!=null ) {
+                    if ( folder.getRemoteStatus()== Bookmark.Folder.REMOTE_STATUS_SUCCESSFUL ) {
+                        //title= title + " " + Bookmark.MSG_REMOTE;
+                        tooltip= Bookmark.TOOLTIP_REMOTE;
+                        icon=null;
+                    } else if ( folder.getRemoteStatus()== Bookmark.Folder.REMOTE_STATUS_NOT_LOADED  ) {
+                        //title= title + " " + Bookmark.MSG_NOT_LOADED; // we use this now that we add bookmarks in stages
+                        tooltip= Bookmark.TOOLTIP_NOT_LOADED;
+                        icon= AutoplotUI.BUSY_OPAQUE_ICON;
+                    } else if ( folder.getRemoteStatus()== Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL  ) {
+                        //title= title + " " + Bookmark.MSG_NO_REMOTE;
+                        tooltip= Bookmark.TOOLTIP_NO_REMOTE + "<br>" + folder.getRemoteStatusMsg();
+                        icon= AutoplotUI.WARNING_ICON;
+                    } else {
+                        throw new IllegalArgumentException("internal error...");
+                    }
+                } else {
+                    tooltip= "";
+                    icon=null;
+                }
+
+                if ( folder.isHidden() ) {
+
+                } else {
+                    String titl= title.trim();
+                    if ( titl.length()>MAX_LABEL_LEN ) {
+                        titl= titl.substring( 0,MAX_LABEL_LEN-(TRIM_TAIL_LEN+3) ) + "..."+ titl.substring( titl.length()-TRIM_TAIL_LEN,titl.length() );
+                    }
+                    final JMenu subMenu = new JMenu( titl );
+                    calculateMenu( subMenu, folder.getBookmarks(), a );
+                    
+                    subMenu.setIcon(icon);
+
+                    if ( tooltip.contains("%{URL}") ) {
+                        tooltip= tooltip.replace("%{URL}",folder.getRemoteUrl());
+                    }
+
+                    if ( folder.getRemoteUrl()!=null ) {
+                        if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
+                            String ttext=  "<html><i>"+ title + "<br>" + book.getDescription()+"</i>";
+                            subMenu.setToolTipText( ttext + "<br>" + tooltip );
+                        } else {
+                            if ( tooltip.length()>0 ) subMenu.setToolTipText( "<html>"+tooltip );
+                        }
+                    }
+
+                    menu.add( subMenu );
+
+                }
+            }
+        }
+ 
+    }
 
     /**
      * create the menu for this depth of the tree.
