@@ -5,7 +5,6 @@
  */
 package org.autoplot.scriptconsole;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import org.autoplot.jythonsupport.ui.EditorContextMenu;
 import java.awt.Font;
@@ -23,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
+import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
@@ -71,7 +71,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     static final int CONTEXT_APPLICATION = 0;
     private int context = 0;
     File runningScript= null; // the script being run.
-
+    EditorContextMenu menu;
+            
     /**
      * true if the current file contains tabs.
      */
@@ -270,6 +271,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         });
 
         menu.setDataSetSelector(selector);
+        
+        this.menu= menu;
 
         JythonCompletionProvider.getInstance().addPropertyChangeListener( JythonCompletionProvider.PROP_MESSAGE, new PropertyChangeListener() {
             @Override
@@ -633,6 +636,14 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
      */
     public EditorAnnotationsSupport getAnnotationsSupport() {
         return support.annotationsSupport;
+    }
+    
+    /**
+     * add the menu to the editor context menu.
+     * @param menu 
+     */
+    public void addMenu( JMenu menu ) {
+        this.menu.addMenu(menu);
     }
     
     /**
