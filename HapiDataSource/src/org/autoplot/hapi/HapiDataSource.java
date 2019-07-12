@@ -423,22 +423,23 @@ public final class HapiDataSource extends AbstractDataSource {
             String f= hapiCache + u + "/" + sxx + "." + pp[0].name + "." + format;
             File ff= new File(f);
             if ( ff.exists() ) {
-                BufferedReader read= new BufferedReader(new FileReader(ff));
-                String line= read.readLine();
-                String lastLine= null;
-                while ( line!=null ) {
-                    lastLine= line;
-                    line= read.readLine();
-                }
-                if ( lastLine!=null ) {
-                    try {
-                        t0= Units.us2000.parse(lastLine);
-                        lastRecordFound.put( u + "/" + sxx,t0);
-                    } catch (ParseException ex) {
+                try ( BufferedReader read= new BufferedReader(new FileReader(ff)) ) {
+                    String line= read.readLine();
+                    String lastLine= null;
+                    while ( line!=null ) {
+                        lastLine= line;
+                        line= read.readLine();
+                    }
+                    if ( lastLine!=null ) {
+                        try {
+                            t0= Units.us2000.parse(lastLine);
+                            lastRecordFound.put( u + "/" + sxx,t0);
+                        } catch (ParseException ex) {
+                            t0= null;
+                        }
+                    } else {
                         t0= null;
                     }
-                } else {
-                    t0= null;
                 }
             }
         }
@@ -490,22 +491,23 @@ public final class HapiDataSource extends AbstractDataSource {
             String f= hapiCache + u + "/" + sxx + "." + pp[0].name + ".csv";
             File ff= new File(f);
             if ( ff.exists() ) {
-                BufferedReader read= new BufferedReader(new FileReader(ff));
-                String line= read.readLine();
-                String lastLine= null;
-                while ( line!=null ) {
-                    lastLine= line;
-                    line= read.readLine();
-                }
-                if ( lastLine!=null ) {
-                    try {
-                        t0= Units.us2000.parse(lastLine);
-                        lastRecordFound.put( u + "/" + sxx,t0);
-                    } catch (ParseException ex) {
+                try ( BufferedReader read= new BufferedReader(new FileReader(ff)) ) {
+                    String line= read.readLine();
+                    String lastLine= null;
+                    while ( line!=null ) {
+                        lastLine= line;
+                        line= read.readLine();
+                    }
+                    if ( lastLine!=null ) {
+                        try {
+                            t0= Units.us2000.parse(lastLine);
+                            lastRecordFound.put( u + "/" + sxx,t0);
+                        } catch (ParseException ex) {
+                            t0= null;
+                        }
+                    } else {
                         t0= null;
                     }
-                } else {
-                    t0= null;
                 }
             }
         }
