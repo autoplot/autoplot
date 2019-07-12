@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The trim1 operator now supports rank 2 DEPEND_1, where the DEPEND_1 records change for each record.  Here's a <a href='https://github.com/autoplot/dev/blob/master/demos/20190709/changingCadenceTrim.jy'>script</a> which demos.
+        <p><small>CDF Editor shows documentation for CDF variables, and here we load data where the quality is marked as good.
             </small></p>            
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2019-07-10 r23861):</p>
         <ul>
+            <li>30 findbugs warnings fixed.
             <li>file:///home/jbf/auto&lt;C&gt;plot.vap returns all files starting with "auto", not the file browser for .vap files.
             <li>2187: support trim(1,'2Hz','4Hz') with rank 2 depend 1.  Thanks, Kristoff!
             <li>2185: when a joined zero-length dataset is encountered temporarily catch the error so that other functionality is still accessible.  Thanks, Firdevs!
@@ -73,6 +74,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>allow custom actions to be added to the Jython editor, so to support git experiments.
             <li>rfe685: seriesRenderer now supports rank 0 data with a horizontal line at the value on the Y-axis.
             <li>New Jython "runInParallel" simplifies parallel processing of Jython function.
             <li>add ellipse function to more accurately model Jupiter surface for Juno graphics.  Thanks, Masafumi!
