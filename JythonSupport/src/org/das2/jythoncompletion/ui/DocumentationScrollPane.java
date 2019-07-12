@@ -598,6 +598,8 @@ public class DocumentationScrollPane extends JScrollPane {
                 case ACTION_JAVADOC_OPEN_SOURCE:
                     goToSource();
                     break;
+                default:
+                    logger.log(Level.INFO, "unsupported action: {0}", action);
             }
 
         }

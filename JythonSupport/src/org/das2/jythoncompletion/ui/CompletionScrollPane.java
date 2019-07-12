@@ -52,6 +52,7 @@ import java.awt.event.MouseListener;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -66,6 +67,7 @@ import javax.swing.text.Keymap;
 import javax.swing.text.EditorKit;
 //import org.netbeans.editor.ext.ExtKit;
 import org.das2.jythoncompletion.support.CompletionItem;
+import org.das2.util.LoggerManager;
 
 
 /**
@@ -77,6 +79,8 @@ import org.das2.jythoncompletion.support.CompletionItem;
 */
 
 public class CompletionScrollPane extends JScrollPane {
+    
+    private static final Logger logger= LoggerManager.getLogger("jython.editor");
     
     private static final String ESCAPE = "escape"; //NOI18N
     private static final String COMPLETION_UP = "completion-up"; //NOI18N
@@ -276,14 +280,16 @@ public class CompletionScrollPane extends JScrollPane {
                     view.pageUp();
                     break;
                 case ACTION_COMPLETION_PGDN:
-                        view.pageDown();
+                    view.pageDown();
                     break;
                 case ACTION_COMPLETION_BEGIN:
-                        view.begin();
+                    view.begin();
                     break;
                 case ACTION_COMPLETION_END:
-                        view.end();
+                    view.end();
                     break;
+                default:
+                    logger.log(Level.INFO, "unsupported action: {0}", action);
             }
         }
     }
