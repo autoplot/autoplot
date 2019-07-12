@@ -34,19 +34,20 @@ public class JythonToJavaConverter {
         if ( packages==null ) {
             try {
                 Map lpackages=new HashMap<>();
-                BufferedReader r = new BufferedReader( new InputStreamReader(
-                    JythonToJavaConverter.class.getResourceAsStream("/importLookup.jy") ) );
-                String l;
-                Pattern p= Pattern.compile("from (.*) import (.*)");
-                while ( (l= r.readLine() )!=null ) {
-                    if ( l.length()==0 ) continue;
-                    if ( l.charAt(0)=='#' ) continue;
-                    Matcher m= p.matcher(l);
-                    if ( m.matches() ) {
-                        lpackages.put( m.group(2),m.group(1) );
-                    } else {
-                        logger.log(Level.INFO, "does not match pattern: {0}", l);
-                    }       
+                try ( BufferedReader r = new BufferedReader( new InputStreamReader(
+                    JythonToJavaConverter.class.getResourceAsStream("/importLookup.jy") ) ) ) {
+                    String l;
+                    Pattern p= Pattern.compile("from (.*) import (.*)");
+                    while ( (l= r.readLine() )!=null ) {
+                        if ( l.length()==0 ) continue;
+                        if ( l.charAt(0)=='#' ) continue;
+                        Matcher m= p.matcher(l);
+                        if ( m.matches() ) {
+                            lpackages.put( m.group(2),m.group(1) );
+                        } else {
+                            logger.log(Level.INFO, "does not match pattern: {0}", l);
+                        }       
+                    }
                 }
                 packages= lpackages;
             } catch (IOException ex) {
