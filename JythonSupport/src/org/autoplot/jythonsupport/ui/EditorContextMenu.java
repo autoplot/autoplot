@@ -128,6 +128,14 @@ public class EditorContextMenu {
 
     }
     
+    /**
+     * add the menu or menuitem to the actions menu.
+     * @param menuitem
+     */
+    public void addMenuItem( JMenuItem menuitem ) {
+        actionsMenu.add(menuitem);
+    }
+    
     private void doRebuildJumpToMenu() {
         final JMenu tree= new JMenu("Jump To");
 
@@ -609,7 +617,7 @@ public class EditorContextMenu {
             mi.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_F12, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ) ); 
             
             developerMenu.add(mi);
-            
+                        
             mi= new JMenuItem( new AbstractAction("Plot") {
                 @Override
                 public void actionPerformed(ActionEvent e) {

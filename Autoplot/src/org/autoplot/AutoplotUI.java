@@ -62,6 +62,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
@@ -1495,6 +1496,7 @@ APSplash.checkTime("init 270");
                 @Override
                 public void run() {
                     scriptPanel= new JythonScriptPanel( AutoplotUI.this, fdataSetSelector);
+                    addEditorCustomActions(scriptPanel);
                     jythonScriptPanel.add(scriptPanel,BorderLayout.CENTER);
                     scriptPanelMenuItem.setSelected(true);
                     ExceptionHandler h= model.getExceptionHandler();
@@ -3741,7 +3743,8 @@ private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
     applicationModel.getDocumentModel().getOptions().setScriptVisible(scriptPanelMenuItem.isSelected());
     if (scriptPanelMenuItem.isSelected() && jythonScriptPanel == null) {
         jythonScriptPanel= new JPanel( new BorderLayout() );
-        scriptPanel = new JythonScriptPanel( AutoplotUI.this, this.dataSetSelector);
+        scriptPanel = new JythonScriptPanel( AutoplotUI.this, this.dataSetSelector);        
+        addEditorCustomActions( scriptPanel );
         jythonScriptPanel.add(scriptPanel, BorderLayout.CENTER );
         tabs.insertTab(TAB_SCRIPT, null, jythonScriptPanel,
                 String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP), 4);
@@ -6321,4 +6324,49 @@ APSplash.checkTime("init 240");
 //    public javax.swing.JTextField getStatusTextField() {
 //        return statusTextField;
 //    }
+
+    private void addEditorCustomActions(final JythonScriptPanel scriptPanel) {
+        File f= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "bookmarks" );
+        f= new File( f.toString(), "editor.xml" );
+        if ( f.exists() ) {
+            try {
+                List<Bookmark> bs= Bookmark.parseBookmarks(f.toURI().toURL());
+                JMenu j= new JMenu("Custom Actions");
+                DelayMenu.calculateMenu( j, bs, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            String cmd= e.getActionCommand();
+                            File f= new File( new URI( URISplit.parse(cmd).file ) );
+                            Map<String,Object> env= new HashMap<>();
+                            Map<String,String> fparams= new HashMap<>();
+                            if ( scriptPanel.getFilename()!=null ) {
+                                fparams.put("script",scriptPanel.getFilename());
+                            }
+                            env.put( "editor", scriptPanel.getEditorPanel() );
+                            JythonUtil.showScriptDialog( scriptPanel,
+                                    env,
+                                    f,
+                                    fparams,
+                                    false,
+                                    null );
+                        } catch (IOException|URISyntaxException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                    }
+                });
+                for ( Component c: j.getMenuComponents() ) {
+                    if ( c instanceof JMenuItem ) {
+                        scriptPanel.addMenuItem((JMenuItem)c);
+                    }
+                }
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException | SAXException | BookmarksException ex) {
+                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+
+    }
 }
