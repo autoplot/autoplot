@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
@@ -639,11 +640,11 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
     }
     
     /**
-     * add the menu to the editor context menu.
+     * add the menu or menu item to the editor context menu.
      * @param menu 
      */
-    public void addMenu( JMenu menu ) {
-        this.menu.addMenu(menu);
+    public void addMenuItem( JMenuItem menu ) {
+        this.menu.addMenuItem(menu);
     }
     
     /**
