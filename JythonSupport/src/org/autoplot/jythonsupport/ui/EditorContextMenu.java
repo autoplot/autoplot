@@ -13,13 +13,8 @@ import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.List;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -36,25 +31,18 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
-import javax.swing.text.EditorKit;
 import javax.swing.text.Element;
 import jsyntaxpane.DefaultSyntaxKit;
-import static jsyntaxpane.DefaultSyntaxKit.CONFIG_SELECTION;
 import jsyntaxpane.SyntaxStyle;
 import jsyntaxpane.SyntaxStyles;
-import jsyntaxpane.TokenType;
 import jsyntaxpane.actions.ActionUtils;
 import jsyntaxpane.actions.IndentAction;
-import org.autoplot.datasource.AutoplotSettings;
 import org.das2.jythoncompletion.CompletionSettings;
 import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.util.LoggerManager;
-import org.python.parser.SimpleNode;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
-import org.autoplot.jythonsupport.JythonUtil;
-import org.das2.dataset.DataSetUtil;
 import static org.das2.jythoncompletion.JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
 
@@ -145,17 +133,20 @@ public class EditorContextMenu {
             tree.add( new JMenuItem( new AbstractAction( ss[i] ) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if ( fs.equals("top") ) {
-                        editor.setCaretPosition(0);
-                    } else if ( fs.equals("bottom") ) {
-                        editor.setCaretPosition(editor.getDocument().getLength()-1);
-                    } else {
-                       int i= fs.indexOf(":");
-                       if ( i>-1 ) {
-                           int line= Integer.parseInt(fs.substring(0,i));
-                           Element ee= editor.getDocument().getDefaultRootElement().getElement(line-1);
-                           editor.setCaretPosition(ee.getStartOffset());
-                       }
+                    switch (fs) {
+                        case "top":
+                            editor.setCaretPosition(0);
+                            break;
+                        case "bottom":
+                            editor.setCaretPosition(editor.getDocument().getLength()-1);
+                            break;
+                        default:
+                            int i= fs.indexOf(":");
+                            if ( i>-1 ) {
+                                int line= Integer.parseInt(fs.substring(0,i));
+                                Element ee= editor.getDocument().getDefaultRootElement().getElement(line-1);
+                                editor.setCaretPosition(ee.getStartOffset());
+                            }    break;
                     }
                 }
 
