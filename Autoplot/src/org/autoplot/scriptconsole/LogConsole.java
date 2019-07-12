@@ -119,7 +119,9 @@ public class LogConsole extends javax.swing.JPanel {
                 File syntaxPropertiesFile= new File( config, "jsyntaxpane.properties" );
                 logger.log(Level.FINE, "Resetting editor colors using {0}", syntaxPropertiesFile );
                 if ( syntaxPropertiesFile.exists() ) {
-                    p.load( new FileInputStream( syntaxPropertiesFile  ) );
+                    try ( FileInputStream in = new FileInputStream( syntaxPropertiesFile ) ) {
+                        p.load( in );
+                    }
                 }
             } catch (FileNotFoundException ex) {
                 logger.log(Level.SEVERE, null, ex);
