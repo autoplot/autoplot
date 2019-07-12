@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -48,7 +49,6 @@ import static jsyntaxpane.DefaultSyntaxKit.CONFIG_SELECTION;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.SyntaxStyle;
 import jsyntaxpane.SyntaxStyles;
-import jsyntaxpane.TokenType;
 import jsyntaxpane.actions.ActionUtils;
 import jsyntaxpane.actions.IndentAction;
 import org.autoplot.datasource.AutoplotSettings;
@@ -72,6 +72,7 @@ import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.PyQDataSet;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
 import org.das2.qstream.StreamException;
+import org.python.core.PySyntaxError;
 
 /**
  * Special editor for Jython scripts, adding undo and redo actions, bigger/smaller
@@ -202,7 +203,9 @@ public class EditorTextPane extends JEditorPane {
                     try {
                         File syntaxPropertiesFile= new File( config, "jsyntaxpane.properties" );
                         logger.log(Level.FINE, "Resetting editor colors using {0}", syntaxPropertiesFile );
-                        p.load( new FileInputStream( syntaxPropertiesFile ) );
+                        try ( FileInputStream ins= new FileInputStream( syntaxPropertiesFile ) ) {
+                            p.load( ins );
+                        }
                     } catch (FileNotFoundException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     } catch (IOException ex) {
@@ -280,7 +283,9 @@ public class EditorTextPane extends JEditorPane {
                     try {
                         File syntaxPropertiesFile= new File( config, "jsyntaxpane.properties" );
                         logger.log(Level.FINE, "Resetting editor colors using {0}", syntaxPropertiesFile );
-                        p.load( new FileInputStream( syntaxPropertiesFile ) );
+                        try ( FileInputStream in = new FileInputStream( syntaxPropertiesFile ) ) {
+                            p.load( in );
+                        }
                     } catch (FileNotFoundException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     } catch (IOException ex) {
@@ -313,8 +318,8 @@ public class EditorTextPane extends JEditorPane {
             }
             a.setText(scriptPrime);
             d.setVisible(true);
-        } catch ( Exception ex ) {
-            ex.printStackTrace();
+        } catch ( NumberFormatException | PySyntaxError ex ) {
+            logger.log( Level.WARNING, ex.getMessage(), ex );
             JOptionPane.showMessageDialog( this, ex.toString() );
         }
     }    
@@ -471,7 +476,7 @@ public class EditorTextPane extends JEditorPane {
                 JOptionPane.showMessageDialog(this,"Selected item is not a dataset");
             }
 
-        } catch ( Exception e  ) {
+        } catch ( HeadlessException e  ) {
             JOptionPane.showMessageDialog(this,"Selected item caused exception: " + e.toString() );
         }        
     }
