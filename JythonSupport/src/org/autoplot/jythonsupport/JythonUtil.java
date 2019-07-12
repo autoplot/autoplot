@@ -258,7 +258,7 @@ public class JythonUtil {
         if ( JythonUtil.class.getResource("/pylisting.txt")==null ) {
             throw new IllegalArgumentException("unable to find pylisting.txt in application, which is needed to install Jython codes.");
         } else {
-            logger.log(Level.FINE, "unpacking jython codes in {0}", JythonUtil.class.getResourceAsStream("/pylisting.txt"));
+            logger.log(Level.FINE, "unpacking jython codes in {0}", JythonUtil.class.getResource("/pylisting.txt"));
             
             try ( BufferedReader r= new BufferedReader( new InputStreamReader( JythonUtil.class.getResourceAsStream("/pylisting.txt") ) ) ) {
                 String s= r.readLine();
@@ -317,7 +317,7 @@ public class JythonUtil {
         if ( JythonUtil.class.getResource("/pylistingapp2017.txt")==null ) {
             logger.log( Level.FINE, "unable to find pylistingapp2017.txt in application, assuming this is not the Autoplot client application.");
         } else {
-            logger.log(Level.FINE, "unpacking jython codes in {0}", JythonUtil.class.getResourceAsStream("/pylistingapp2017.txt"));
+            logger.log(Level.FINE, "unpacking jython codes in {0}", JythonUtil.class.getResource("/pylistingapp2017.txt"));
             
             try ( BufferedReader r= new BufferedReader( new InputStreamReader( JythonUtil.class.getResourceAsStream("/pylistingapp2017.txt") ) ) ) {
                 String s= r.readLine();
