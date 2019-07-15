@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>CDF Editor shows documentation for CDF variables, and here we load data where the quality is marked as good.
+        <p><small>Jython script is used to create a QDataSet to verify handling of non-qube data.
             </small></p>            
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,10 @@
         
         <p>Bugfixes (2019-07-12 r23890):</p>
         <ul>
+            <li>continue round of findbugs cleanup.
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>30 findbugs warnings fixed.
             <li>file:///home/jbf/auto&lt;C&gt;plot.vap returns all files starting with "auto", not the file browser for .vap files.
             <li>2187: support trim(1,'2Hz','4Hz') with rank 2 depend 1.  Thanks, Kristoff!
@@ -46,33 +50,11 @@
             <li>1960: NetCDF/HDF5 reader reads global attributes into metadata.
             <li>vap+wdc works again, after discovering that new code assumed there was an extension.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>2180: cache failures to read orbits so that we don't keep trying.
-            <li>2181: runtime error caused by integer overflow in aggregation of many records.
-            <li>2178: old add plot, vap file works again, so you can pick datasets from another vap file.
-            <li>reset axis units to now allows reset to data units as well, so that 'inconvertible units' can be addressed.
-            <li>2174: run batch doesn't store the name of the script for convenience.
-            <li>2065: recent .jy URIs with the parameters are now used for the recent URIs list in the "Run Batch" tool.
-            <li>1980: copy/paste plot problems fixed.  
-            <li>PropertyEditor listenForExternalChanges now recurses through all the beans, supporting the Autoplot DOM.
-            <li>corrections to code which calculates minor ticks given a set of major ticks.
-            <li>Submit feedback failed on Java 12 because of xml serialization, which no longer accepts null values.
-            <li>rte_0786587992: automatically remove single quotes from URIs, which prevent vap+jyds URIs from working in the mash up tool.
-            <li>2171: new code in DasProgressMonitor was incorrect and could hang.
-            <li>paste plots from clipboard was too restrictive in validity test.  Thanks, Kris!
-            <li>correct runtime error when DasAnnotation couldn't load image file.
-            <li>"convert Jython to Java" didn't set the popup background color.
-            <li>2166: ".../foo.jyds?param=" fixed, where empty parameters are treated the same as missing parameters, using default values.
-            <li>round of memory leaks testing.  See https://github.com/autoplot/dev/blob/master/bugs/2054/stressTestForLeaks.jy
-            <li>rte 1625162004: runtime error because of units during transition
-            <li>contours renderer was painting the off-screen labels, degrading performance.
-            <li>Propagate USER_PROPERTIES through FFTPower so that Juno waveforms don't show extraneous %{USER_PROPERTIES} in title.
-            <li>2127: .../mms1_feeps_srvy_l3_electron_20180928000000_v6.0.1.cdf?intensity_energy_bins[0] showed there was an issue.  Thanks, Allison!
-            <li>2164: mouse module (e.g. box zoom) feedback is restored.  Thanks, Masafumi!
-            <li>2149: experiments with autorange considering bindings.
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>report the cadence in frequency as well as a period for timetags.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>allow custom actions to be added to the Jython editor, so to support git experiments.
             <li>rfe685: seriesRenderer now supports rank 0 data with a horizontal line at the value on the Y-axis.
@@ -82,20 +64,6 @@
             <li>DomUtil gets deleteDataSource operation, to support operations on .vap files.
             <li>Scripting gets saveVap to work like loadVap, allowing Jython scripts to operate on .vap files.
             <li>NetCDF global attributes are available in the metadata.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>Ephemeris tags can be monotonically decreasing.
-            <li>2177: LookupAxis is compiled in now.
-            <li>add log10() method for Datum, used in tick calculations.
-            <li>PNG Image reader supports yaxis=[70,119,3200,588,log] for unplotting log axes.
-            <li>phasestart parameter in URI templates properly implemented, and can be used to look at for example Sunday images.
-            <li>Useful DasAxis reference property is now bound to the DOM.
-            <li>annotations now have "pointAtOffset" so you can back off the arrow head.
-            <li>experimental "convert Java to Jython" option in editor under developer, to assist me when testing Java fragments.
-            <li>total function now checks for high-rank DEPEND_2, for when the metadata is constant and can be preserved.  Thanks, Jon N!
-            <li>rfe469: Contours renderer now supports +20m notation, to match axis, where a contour is drawn every 20 units.
-            <li>UByteDataSet has extra "collectString" method so strings can be extracted efficiently.
         </ul>
         <p>Known issues:</p>
         <ul>
