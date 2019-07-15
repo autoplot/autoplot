@@ -69,7 +69,7 @@ public class Utilities {
      * or null if no identifier was found
      * 
      * from NETBEANS/libsrc/org/netbeans/editor/Utilities.java
-
+     * @throws javax.swing.text.BadLocationException
      */
     public static int[] getIdentifierBlock(JTextComponent c, int offset)
     throws BadLocationException {
@@ -91,7 +91,7 @@ public class Utilities {
                     } else {
                         return null;
                     }
-                } else if ((id != null) && (id.length() != 0)  && (CharSequenceUtilities.indexOf(id, '.') != -1)){ //NOI18N
+                } else if ( (id.length() != 0)  && (CharSequenceUtilities.indexOf(id, '.') != -1)){ //NOI18N
                     int index = offset - idStart;
                     int begin = CharSequenceUtilities.lastIndexOf(id.subSequence(0, index), '.');
                     begin = (begin == -1) ? 0 : begin + 1; //first index after the dot, if exists
