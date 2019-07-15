@@ -235,17 +235,17 @@ public final class ExportDataBundle extends javax.swing.JPanel {
     
     public void refresh() {
         updateDataSet();
-        QDataSet bundle= getDataSet();
-        if ( bundle==null ) {
+        QDataSet lbundle= getDataSet();
+        if ( lbundle==null ) {
             DefaultTableModel n= new DefaultTableModel(1,1);
             n.setValueAt( "No Data", 0, 0 );
             jTable1.setModel( n );
-            exportDataFormatPanel1.setDataSet(bundle);
+            exportDataFormatPanel1.setDataSet(null);
             exportDataFormatPanel1.setEnabled(true);
             
         } else {
-            QDataSetTableModel tm= new QDataSetTableModel(bundle);
-            exportDataFormatPanel1.setDataSet(bundle);
+            QDataSetTableModel tm= new QDataSetTableModel(lbundle);
+            exportDataFormatPanel1.setDataSet(lbundle);
             exportDataFormatPanel1.setEnabled(true);
             jTable1.setModel(tm);
             jTable1.getTableHeader().addMouseListener( tm.getTableHeaderMouseListener(jTable1) );
