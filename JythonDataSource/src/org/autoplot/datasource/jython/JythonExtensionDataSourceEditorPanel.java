@@ -2,7 +2,6 @@
 package org.autoplot.datasource.jython;
 
 import java.awt.Window;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
@@ -18,13 +17,11 @@ import org.das2.util.monitor.ProgressMonitor;
  */
 public class JythonExtensionDataSourceEditorPanel implements DataSourceEditorPanel {
 
-    String script;
     JythonEditorPanel edit;
     String uri;
     
     @Override
     public boolean reject(String uri) throws Exception {
-        script= JythonExtensionDataSourceFactory.getScriptForResource( DataSetURI.getURI(uri) );
         edit= new JythonEditorPanel();
         String jydsUri= JythonExtensionDataSourceFactory.getJydsUri( DataSetURI.getURI(uri) );
         return edit.reject(jydsUri);
