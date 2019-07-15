@@ -23,19 +23,6 @@ public class PasteBinaryRecordReader implements AbstractBinaryRecordReader {
         readers.add(r);
     }
     
-    
-    boolean monotonicKludge= true;
-    String greatestValue= null;
-    
-    /**
-     * set the reader to make the stream monotonically increasing in time,
-     * dropping records which are non-monotonic.
-     * @param t 
-     */
-    public void setMonotonicKludge( boolean t ) {
-        this.monotonicKludge= t;
-    }
-    
     @Override
     public int readRecord(ByteBuffer buf) throws IOException {
         int i=0;
