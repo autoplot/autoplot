@@ -166,9 +166,7 @@ public class Das2StreamDataSourceFormat implements DataSourceFormat {
 		int nFracSec = getFracSeconds(url);
 		String sVersion = getVersion(url);
 
-		FileOutputStream fo = null;
-		try{
-			fo = new FileOutputStream(new File(split.resourceUri));
+		try(FileOutputStream fo = new FileOutputStream(new File(split.resourceUri))) {
 			QdsToD2sStream writer;
 			if(binary){
 				writer = new QdsToD2sStream(sVersion);
@@ -178,13 +176,8 @@ public class Das2StreamDataSourceFormat implements DataSourceFormat {
 			}
 
 			if(!writer.write(data, fo)){
-				throw new StreamException("Dataset is rank 3 or otherwise incompatiable "
+				throw new StreamException("Dataset is rank 3 or otherwise incompatible "
 					+ "with the das2 stream format");
-			}
-		}
-		finally{
-			if(fo != null){
-				fo.close();
 			}
 		}
 	}
