@@ -42,6 +42,8 @@ import org.autoplot.datasource.MetadataModel;
 import org.das2.qds.util.AutoHistogram;
 import org.das2.qds.util.PropertiesTreeModel;
 import org.autoplot.metatree.NameValueTreeModel;
+import org.das2.datum.Datum;
+import org.das2.datum.Units;
 
 /**
  * MetadataPanel shows statistics and metadata for the dataset, such as units and fill values.
@@ -496,10 +498,12 @@ public class MetadataPanel extends javax.swing.JPanel {
             }
 
             if (cadence != null) {
-                //Datum d = DatumUtil.asOrderOneUnits(DataSetUtil.asDatum(cadence));
-                //Units u = d.getUnits();
-                //map.put("Cadence", format(d.doubleValue(u)) + " " + u);
-                map.put("Cadence", cadence );
+                Datum d = DatumUtil.asOrderOneUnits(DataSetUtil.asDatum(cadence));
+                Units u = d.getUnits();
+                map.put("Cadence", d );
+                if ( u.isConvertibleTo(Units.seconds) ) {
+                    map.put("Frequency (1/Cadence)",DatumUtil.asOrderOneUnits(Datum.create(1).divide(d)));
+                }
             } else {
                 map.put("Cadence", "null");
             }
