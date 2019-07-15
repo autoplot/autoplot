@@ -2081,9 +2081,11 @@ public final class HapiDataSource extends AbstractDataSource {
                 }
             }
         }
-        System.err.println("missingRange="+missingRange );
-        if ( missingRange!=null && missingRange.min().equals(timeRange.min()) || missingRange.max().equals(timeRange.max()) ) {
-            System.err.println("candidate for new partial cache, only "+missingRange+" needs to be loaded.");
+        logger.log(Level.FINE, "missingRange={0}", missingRange);
+        if ( missingRange!=null ) {
+            if ( missingRange.min().equals(timeRange.min()) || missingRange.max().equals(timeRange.max()) ) {
+                logger.log(Level.FINE, "candidate for new partial cache, only {0} needs to be loaded.", missingRange);
+            }
         }
     }
 
