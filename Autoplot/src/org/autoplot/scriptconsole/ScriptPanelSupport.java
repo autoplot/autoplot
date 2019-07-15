@@ -932,6 +932,13 @@ public class ScriptPanelSupport {
         boolean returnFlag= false;
         
         /**
+         * PDB has just returned from a routine, so don't close the debugging session.
+         */
+        public boolean getReturnFlag() {
+            return this.returnFlag;
+        }
+        
+        /**
          * standard mode output.
          */
         private final Object STATE_OPEN="OPEN";
