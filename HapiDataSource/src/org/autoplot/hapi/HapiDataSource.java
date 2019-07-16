@@ -400,7 +400,9 @@ public final class HapiDataSource extends AbstractDataSource {
         }
         if ( HapiServer.useCache() ) {
             if ( !new File(hapiCache).exists() ) {
-                new File(hapiCache).mkdirs();
+                if ( !new File(hapiCache).mkdirs() ) {
+                    logger.log(Level.WARNING, "unable to mkdir directories {0}", hapiCache);
+                }
             }
         }
         return hapiCache;
@@ -599,8 +601,14 @@ public final class HapiDataSource extends AbstractDataSource {
             for (ParamDescription pp1 : pp) {
                 File ffTemp= new File( hapiCache + u + "/" + sxx + "." + pp1.name + "."+ format + "."+Thread.currentThread().getId() );
                 File ff= new File( hapiCache + u + "/" + sxx + "." + pp1.name + "." + format +"");
-                ffTemp.renameTo(ff);
-                if ( currentTimeMillis>0 ) ff.setLastModified(currentTimeMillis);
+                if ( !ffTemp.renameTo(ff) ) {
+                    logger.log(Level.WARNING, "rename to {0} failed", ff);
+                }
+                if ( currentTimeMillis>0 ) {
+                    if ( !ff.setLastModified(currentTimeMillis) ) {
+                        logger.log(Level.WARNING, "setLastModified for {0} failed", ff);
+                    }
+                }
             }
         }
     }
@@ -649,8 +657,14 @@ public final class HapiDataSource extends AbstractDataSource {
             for (ParamDescription pp1 : pp) {
                 File ff= new File( hapiCache + u + "/" + sxx + "." + pp1.name + "." + format +".gz");
                 File ffTemp= new File( hapiCache + u + "/" + sxx + "." + pp1.name + "."+ format + ".gz."+Thread.currentThread().getId() );
-                ffTemp.renameTo(ff);
-                if ( currentTimeMillis>0 ) ff.setLastModified(currentTimeMillis);
+                if ( !ffTemp.renameTo(ff) ) {
+                    logger.log(Level.WARNING, "renameTo {0} failed", ff);
+                }
+                if ( currentTimeMillis>0 ) {
+                    if ( !ff.setLastModified(currentTimeMillis) ) {
+                        logger.log(Level.WARNING, "setLastModified for {0} failed", ff);
+                    }
+                }
             }
         }
         
