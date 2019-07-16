@@ -3,8 +3,6 @@
  *
  * Created on May 4, 2007, 6:27 AM
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
  */
 package org.autoplot.datasource;
 
