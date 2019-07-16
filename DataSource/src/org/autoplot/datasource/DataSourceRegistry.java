@@ -34,14 +34,15 @@ import java.util.logging.Logger;
 import org.autoplot.aggregator.AggregatingDataSourceFactory;
 
 /**
- *
+ * The DataSourceRegistry keeps the map from extension (like .cdf) to 
+ * the handler for .cdf files.  
  * @author jbf
  */
 public class DataSourceRegistry {
 
     private static final Logger logger= Logger.getLogger("apdss.uri");
 
-    private static DataSourceRegistry instance;
+    private static volatile DataSourceRegistry instance;
 
     HashMap<String,Object> dataSourcesByExt;
     HashMap<String,Object> dataSourcesByMime;
@@ -52,12 +53,12 @@ public class DataSourceRegistry {
 
     /** Creates a new instance of DataSourceRegistry */
     private DataSourceRegistry() {
-        dataSourcesByExt = new HashMap<String,Object>();
-        dataSourcesByMime = new HashMap<String,Object>();
-        dataSourceFormatByExt= new HashMap<String,Object>();
-        dataSourceEditorByExt= new HashMap<String,Object>();
-        dataSourceFormatEditorByExt= new HashMap<String,Object>();
-        extToDescription= new HashMap<String,String>();
+        dataSourcesByExt = new HashMap<>();
+        dataSourcesByMime = new HashMap<>();
+        dataSourceFormatByExt= new HashMap<>();
+        dataSourceEditorByExt= new HashMap<>();
+        dataSourceFormatEditorByExt= new HashMap<>();
+        extToDescription= new HashMap<>();
     }
 
     /**
@@ -65,10 +66,16 @@ public class DataSourceRegistry {
      * @return the single instance of this class.
      */
     public static DataSourceRegistry getInstance() {
-        if (instance == null) {
-            instance = new DataSourceRegistry();
+        DataSourceRegistry _instance = DataSourceRegistry.instance;
+        if (_instance == null) {
+            synchronized (DataSourceRegistry.class) {
+                _instance = DataSourceRegistry.instance;
+                if ( _instance==null ) {
+                    DataSourceRegistry.instance = _instance = new DataSourceRegistry();
+                }
+            }
         }
-        return instance;
+        return _instance;
     }
 
     /**
@@ -82,7 +89,7 @@ public class DataSourceRegistry {
             Constructor constructor = clas.getDeclaredConstructor(new Class[]{});
             Object result = constructor.newInstance(new Object[]{});
             return result;
-        } catch ( Exception e ) {
+        } catch ( ClassNotFoundException | IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException e ) {
             logger.log( Level.SEVERE, e.getMessage(), e );
             return null;
         }
@@ -92,7 +99,7 @@ public class DataSourceRegistry {
      * @return a list of registered extensions.
      */
     public List<String> getFormatterExtensions() {
-        List<String> result= new ArrayList<String>();
+        List<String> result= new ArrayList<>();
         for ( Object k: dataSourceFormatByExt.keySet() ) {
             result.add( (String)k );
         }
@@ -105,7 +112,7 @@ public class DataSourceRegistry {
      * @return a list of registered extensions. 
      */
     public List<String> getSourceExtensions() {
-        List<String> result= new ArrayList<String>();
+        List<String> result= new ArrayList<>();
         for ( Object k: dataSourcesByExt.keySet() ) {
             result.add( (String)k );
         }
@@ -117,7 +124,7 @@ public class DataSourceRegistry {
      * @return a list of registered extensions.
      */
     public List<String> getSourceEditorExtensions() {
-        List<String> result= new ArrayList<String>();
+        List<String> result= new ArrayList<>();
         for ( Object k: dataSourceEditorByExt.keySet() ) {
             result.add( (String)k );
         }
@@ -144,54 +151,48 @@ public class DataSourceRegistry {
             }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-                String s = reader.readLine();
-                while (s != null) {
-                    if (s.trim().length() > 0) {
-                        List<String> extensions = null;
-                        List<String> mimeTypes = null;
-                        String factoryClassName = s;
-                        try {
-                            Class c = Class.forName(factoryClassName);
-                            DataSourceFactory f = (DataSourceFactory) c.newInstance();
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                    String s = reader.readLine();
+                    while (s != null) {
+                        if (s.trim().length() > 0) {
+                            List<String> extensions = null;
+                            List<String> mimeTypes = null;
+                            String factoryClassName = s;
                             try {
-                                Method m = c.getMethod("extensions", new Class[0]);
-                                extensions = (List<String>) m.invoke(f, new Object[0]);
-                            } catch (NoSuchMethodException ex) {
-                            } catch (InvocationTargetException ex) {
+                                Class c = Class.forName(factoryClassName);
+                                DataSourceFactory f = (DataSourceFactory) c.newInstance();
+                                try {
+                                    Method m = c.getMethod("extensions", new Class[0]);
+                                    extensions = (List<String>) m.invoke(f, new Object[0]);
+                                } catch (NoSuchMethodException ex) {
+                                } catch (InvocationTargetException ex) {
+                                    logger.log( Level.SEVERE, ex.getMessage(), ex );
+                                }
+                                try {
+                                    Method m = c.getMethod("mimeTypes", new Class[0]);
+                                    mimeTypes = (List<String>) m.invoke(f, new Object[0]);
+                                } catch (NoSuchMethodException | InvocationTargetException ex) {
+                                    logger.log( Level.SEVERE, ex.getMessage(), ex );
+                                }
+                            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
                                 logger.log( Level.SEVERE, ex.getMessage(), ex );
                             }
-                            try {
-                                Method m = c.getMethod("mimeTypes", new Class[0]);
-                                mimeTypes = (List<String>) m.invoke(f, new Object[0]);
-                            } catch (NoSuchMethodException ex) {
-                                logger.log( Level.SEVERE, ex.getMessage(), ex );
-                            } catch (InvocationTargetException ex) {
-                                logger.log( Level.SEVERE, ex.getMessage(), ex );
+                            
+                            if (extensions != null) {
+                                for (String e : extensions) {
+                                    registry.registerExtension(factoryClassName, e, null);
+                                }
                             }
-                        } catch (ClassNotFoundException ex) {
-                            logger.log( Level.SEVERE, ex.getMessage(), ex );
-                        } catch (InstantiationException ex) {
-                            logger.log( Level.SEVERE, ex.getMessage(), ex );
-                        } catch (IllegalAccessException ex) {
-                            logger.log( Level.SEVERE, ex.getMessage(), ex );
-                        }
-
-                        if (extensions != null) {
-                            for (String e : extensions) {
-                                registry.registerExtension(factoryClassName, e, null);
+                            
+                            if (mimeTypes != null) {
+                                for (String m : mimeTypes) {
+                                    registry.registerMimeType(factoryClassName, m);
+                                }
                             }
                         }
-
-                        if (mimeTypes != null) {
-                            for (String m : mimeTypes) {
-                                registry.registerMimeType(factoryClassName, m);
-                            }
-                        }
+                        s = reader.readLine();
                     }
-                    s = reader.readLine();
                 }
-                reader.close();
             }
         } catch (IOException e) {
             logger.log( Level.SEVERE, e.getMessage(), e );
@@ -208,19 +209,19 @@ public class DataSourceRegistry {
         Map<String,String> result= new LinkedHashMap();
         while (urls.hasNext()) {
             URL url = urls.next();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-            String s = reader.readLine();
-            while (s != null) {
-                s = s.trim();
-                if (s.length() > 0) {
-                    String[] ss = s.split("\\s");
-                    for (int i = 1; i < ss.length; i++) {
-                        result.put( ss[i], ss[0] );
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                String s = reader.readLine();
+                while (s != null) {
+                    s = s.trim();
+                    if (s.length() > 0) {
+                        String[] ss = s.split("\\s");
+                        for (int i = 1; i < ss.length; i++) {
+                            result.put( ss[i], ss[0] );
+                        }
                     }
+                    s = reader.readLine();
                 }
-                s = reader.readLine();
             }
-            reader.close();
         }
         return result;
 
@@ -242,26 +243,26 @@ public class DataSourceRegistry {
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
                 logger.log(Level.FINE, "loading {0}", url);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-                String s = reader.readLine();
-                while (s != null) {
-                    s = s.trim();
-                    if (s.length() > 0) {
-                        String[] ss = s.split("\\s");
-                        for (int i = 1; i < ss.length; i++) {
-                            if ( ss[i].contains(".") ) {
-                                logger.warning("META-INF/org.autoplot.datasource.DataSourceFactory.extensions contains extension that contains period: ");
-                                logger.warning( ss[0] + " " + ss[i] + " in " + url);
-                                logger.warning("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
-                                logger.warning("");
-                                throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                    String s = reader.readLine();
+                    while (s != null) {
+                        s = s.trim();
+                        if (s.length() > 0) {
+                            String[] ss = s.split("\\s");
+                            for (int i = 1; i < ss.length; i++) {
+                                if ( ss[i].contains(".") ) {
+                                    logger.warning("META-INF/org.autoplot.datasource.DataSourceFactory.extensions contains extension that contains period: ");
+                                    logger.log(Level.WARNING, "{0} {1} in {2}", new Object[]{ss[0], ss[i], url});
+                                    logger.warning("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
+                                    logger.warning("");
+                                    throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
+                                }
+                                registry.registerExtension(ss[0], ss[i], null);
                             }
-                            registry.registerExtension(ss[0], ss[i], null);
                         }
+                        s = reader.readLine();
                     }
-                    s = reader.readLine();
                 }
-                reader.close();
             }
 
 
@@ -273,19 +274,19 @@ public class DataSourceRegistry {
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
                 logger.log(Level.FINE, "loading {0}", url);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-                String s = reader.readLine();
-                while (s != null) {
-                    s = s.trim();
-                    if (s.length() > 0) {
-                        String[] ss = s.split("\\s");
-                        for (int i = 1; i < ss.length; i++) {
-                            registry.registerMimeType(ss[0], ss[i]);
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                    String s = reader.readLine();
+                    while (s != null) {
+                        s = s.trim();
+                        if (s.length() > 0) {
+                            String[] ss = s.split("\\s");
+                            for (int i = 1; i < ss.length; i++) {
+                                registry.registerMimeType(ss[0], ss[i]);
+                            }
                         }
+                        s = reader.readLine();
                     }
-                    s = reader.readLine();
                 }
-                reader.close();
             }
 
 
@@ -297,26 +298,26 @@ public class DataSourceRegistry {
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
                 logger.log(Level.FINE, "loading {0}", url);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-                String s = reader.readLine();
-                while (s != null) {
-                    s = s.trim();
-                    if (s.length() > 0) {
-                        String[] ss = s.split("\\s");
-                        for (int i = 1; i < ss.length; i++) {
-                            if ( ss[i].contains(".") ) {
-                                logger.warning("META-INF/org.autoplot.datasource.DataSourceFormat.extensions contains extension that contains period: ");
-                                logger.warning( ss[0] + " " + ss[i] + " in " + url);
-                                logger.warning("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
-                                logger.warning("");
-                                throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                    String s = reader.readLine();
+                    while (s != null) {
+                        s = s.trim();
+                        if (s.length() > 0) {
+                            String[] ss = s.split("\\s");
+                            for (int i = 1; i < ss.length; i++) {
+                                if ( ss[i].contains(".") ) {
+                                    logger.warning("META-INF/org.autoplot.datasource.DataSourceFormat.extensions contains extension that contains period: ");
+                                    logger.log(Level.WARNING, "{0} {1} in {2}", new Object[]{ss[0], ss[i], url});
+                                    logger.warning("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
+                                    logger.warning("");
+                                    throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
+                                }
+                                registry.registerFormatter(ss[0], ss[i]);
                             }
-                            registry.registerFormatter(ss[0], ss[i]);
                         }
+                        s = reader.readLine();
                     }
-                    s = reader.readLine();
                 }
-                reader.close();
             }
 
 
@@ -328,26 +329,26 @@ public class DataSourceRegistry {
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
                 logger.log(Level.FINE, "loading {0}", url);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-                String s = reader.readLine();
-                while (s != null) {
-                    s = s.trim();
-                    if (s.length() > 0) {
-                        String[] ss = s.split("\\s");
-                        for (int i = 1; i < ss.length; i++) {
-                            if ( ss[i].contains(".") ) {
-                                logger.warning("META-INF/org.autoplot.datasource.DataSourceEditorPanel.extensions contains extension that contains period: ");
-                                logger.log(Level.WARNING, "{0} {1} in {2}", new Object[]{ss[0], ss[i], url});
-                                logger.warning("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
-                                logger.warning("");
-                                throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                    String s = reader.readLine();
+                    while (s != null) {
+                        s = s.trim();
+                        if (s.length() > 0) {
+                            String[] ss = s.split("\\s");
+                            for (int i = 1; i < ss.length; i++) {
+                                if ( ss[i].contains(".") ) {
+                                    logger.warning("META-INF/org.autoplot.datasource.DataSourceEditorPanel.extensions contains extension that contains period: ");
+                                    logger.log(Level.WARNING, "{0} {1} in {2}", new Object[]{ss[0], ss[i], url});
+                                    logger.warning("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
+                                    logger.warning("");
+                                    throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
+                                }
+                                registry.registerEditor(ss[0], ss[i]);
                             }
-                            registry.registerEditor(ss[0], ss[i]);
                         }
+                        s = reader.readLine();
                     }
-                    s = reader.readLine();
                 }
-                reader.close();
             }
 
             if (loader == null) {
@@ -358,26 +359,26 @@ public class DataSourceRegistry {
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
                 logger.log(Level.FINE, "loading {0}", url);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-                String s = reader.readLine();
-                while (s != null) {
-                    s = s.trim();
-                    if (s.length() > 0) {
-                        String[] ss = s.split("\\s");
-                        for (int i = 1; i < ss.length; i++) {
-                            if ( ss[i].contains(".") ) {
-                                logger.warning("META-INF/org.autoplot.datasource.DataSourceFormatEditorPanel.extensions contains extension that contains period: ");
-                                logger.log(Level.WARNING, "{0} {1} in {2}", new Object[]{ss[0], ss[i], url});
-                                logger.warning("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
-                                logger.warning("");
-                                throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                    String s = reader.readLine();
+                    while (s != null) {
+                        s = s.trim();
+                        if (s.length() > 0) {
+                            String[] ss = s.split("\\s");
+                            for (int i = 1; i < ss.length; i++) {
+                                if ( ss[i].contains(".") ) {
+                                    logger.warning("META-INF/org.autoplot.datasource.DataSourceFormatEditorPanel.extensions contains extension that contains period: ");
+                                    logger.log(Level.WARNING, "{0} {1} in {2}", new Object[]{ss[0], ss[i], url});
+                                    logger.warning("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
+                                    logger.warning("");
+                                    throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
+                                }
+                                registry.registerFormatEditor(ss[0], ss[i]);
                             }
-                            registry.registerFormatEditor(ss[0], ss[i]);
                         }
+                        s = reader.readLine();
                     }
-                    s = reader.readLine();
                 }
-                reader.close();
             }
         } catch (IOException e) {
             logger.log( Level.SEVERE, e.getMessage(), e );
@@ -421,17 +422,7 @@ public class DataSourceRegistry {
                 } else {
                     this.dataSourcesByExt.put( getExtension(ent.getKey()), clas.getConstructor().newInstance() );
                 }
-            } catch ( ClassNotFoundException ex ) {
-                throw new IllegalArgumentException(ex);
-            } catch ( NoSuchMethodException ex ) {
-                throw new IllegalArgumentException(ex);
-            } catch (InstantiationException ex) {
-                throw new IllegalArgumentException( ex);
-            } catch (IllegalAccessException ex) {
-                throw new IllegalArgumentException(ex);
-            } catch (IllegalArgumentException ex) {
-                throw new IllegalArgumentException(ex);
-            } catch (InvocationTargetException ex) {
+            } catch ( ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex ) {
                 throw new IllegalArgumentException(ex);
             }
 
@@ -593,25 +584,17 @@ public class DataSourceRegistry {
                 dataSourcesByExt.put( extension, result ); // always use the same factory object.
             } catch (ClassNotFoundException ex) {
                 throw new RuntimeException(ex);
-            } catch (NoSuchMethodException ex) {
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException ex) {
                 throw new RuntimeException(ex);
-            } catch (InstantiationException ex) {
-                throw new RuntimeException(ex);
-            } catch (IllegalAccessException ex) {
-                throw new RuntimeException(ex);
-            } catch ( NoClassDefFoundError ex ) {
+            } catch ( NoClassDefFoundError | UnsatisfiedLinkError ex ) {
                 if ( extension.equals(".cdfn") || extension.equals(".cdf") ) {
                     result= useJavaCdfForNative(extension,ex);
                 } else {
                     throw new RuntimeException(ex);
                 }
-            } catch ( UnsatisfiedLinkError ex ) { // kludge in support to fall back to Java reader if the C-based one is not found.
-                if ( extension.equals(".cdfn") || extension.equals(".cdf") ) {
-                    result= useJavaCdfForNative(extension,ex);
-                } else {
-                    throw new RuntimeException(ex);
-                }
-            } catch (Exception ex) {
+            }
+            // kludge in support to fall back to Java reader if the C-based one is not found.
+             catch ( IllegalArgumentException | SecurityException | InvocationTargetException ex) {
                 throw new RuntimeException(ex);
             }
         } else {
@@ -675,7 +658,7 @@ public class DataSourceRegistry {
                     logger.log(Level.WARNING, "constructor of incorrect type for {0}, extension {1}", new Object[]{o, extension});
                     return null;
                 }
-            } catch (Exception ex) {
+            } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
                 throw new RuntimeException(ex);
             }
         } else {
@@ -699,15 +682,7 @@ public class DataSourceRegistry {
                 Constructor constructor = clas.getDeclaredConstructor(new Class[]{});
                 result = (DataSourceFactory) constructor.newInstance(new Object[]{});
                 dataSourcesByMime.put( mime.toLowerCase(), result );
-            } catch (ClassNotFoundException ex) {
-                throw new RuntimeException(ex);
-            } catch (NoSuchMethodException ex) {
-                throw new RuntimeException(ex);
-            } catch (InstantiationException ex) {
-                throw new RuntimeException(ex);
-            } catch (IllegalAccessException ex) {
-                throw new RuntimeException(ex);
-            } catch (Exception ex) {
+            } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | SecurityException | InvocationTargetException ex) {
                 throw new RuntimeException(ex);
             }
         } else {
@@ -791,7 +766,7 @@ public class DataSourceRegistry {
     
     /**
      * return a description of the data source, if available.
-     * TODO: in the export data gui, there's a bunch of these coded by hand.
+     * TODO: in the export data GUI, there's a bunch of these coded by hand.
      * @param vapext
      * @return
      */
@@ -834,11 +809,7 @@ public class DataSourceRegistry {
     public boolean hasParamOrder( String vapScheme) {
         if ( vapScheme.startsWith("vap+inline:") ) {
             return true;
-        } else if ( vapScheme.startsWith("vap+internal:") ) {
-            return true;
-        } else {
-            return false;
-        }
+        } else return vapScheme.startsWith("vap+internal:");
     }
 
     /**
