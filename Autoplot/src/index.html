@@ -26,9 +26,13 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-07-12 r23890):</p>
+        <p>Bugfixes (2019-07-16 r23915):</p>
         <ul>
+            <li>2188: makeCanonical corrects double-slashes (//) fixing the bug.
+            <li>2189: corrections to clipping in DasPlot, a bug seen with scrollbars on Linux.  Thanks, Ivar!!
+            <li>remove class DatumRangeUtilOld, which is not used.
             <li>continue round of findbugs cleanup.
+            <li>rte_1076158178: avoid runtime error when zero-length dataset is added to the DataPointRecorder.
         </ul>
         <p>Older Bugfixes:</p>
         <ul>
