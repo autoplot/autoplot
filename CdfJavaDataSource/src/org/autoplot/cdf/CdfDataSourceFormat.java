@@ -73,12 +73,17 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         }
         
         name = (String) dep0.property(QDataSet.NAME);
-        while ( seman.containsKey(name) ) {
-            QDataSet ds1= seman.get(name);
-            if ( ds1!=null ) {
-                name= name + "_1";
-            } else {
-                break;
+        if ( seman.containsKey(name) ) {
+            int i= 1;
+            while ( seman.containsKey(name) ) {
+                if ( i==1 ) {
+                    name= name + "_1";
+                } else if (i<10) {
+                    i=i+1;
+                    name= String.format( "%s_%d", new Object[] { name.substring(0,name.length()-2), i } );
+                } else {
+                    throw new IllegalArgumentException("unable to create name for "+name);
+                }
             }
         }
         
