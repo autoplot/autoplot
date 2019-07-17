@@ -450,6 +450,8 @@ public class UndoRedoSupport {
         Application state = applicationModel.createState(false);
         BufferedImage thumb= applicationModel.getThumbnail(50);
         int oldDepth;
+        int newDepth;
+        
         synchronized (this) {
             StateStackElement elephant;
 
@@ -484,9 +486,9 @@ public class UndoRedoSupport {
                 stateStack.removeLast();
             }
             stateStackPos++;
-
+            newDepth= stateStackPos;
             removeOldStates();
-        }
+        } // synchronized(this)
 
         if ( saveStateDepth>0 ) {
             long t0= System.currentTimeMillis();
@@ -509,7 +511,7 @@ public class UndoRedoSupport {
         }
 
 
-        propertyChangeSupport.firePropertyChange(PROP_DEPTH, oldDepth, stateStackPos);
+        propertyChangeSupport.firePropertyChange(PROP_DEPTH, oldDepth, newDepth);
 
     }
 
@@ -517,7 +519,7 @@ public class UndoRedoSupport {
      * get the longer description for the action, intended to be used for the tooltip.
      * @return a human-readable description
      */
-    public String getUndoDescription() {
+    public synchronized String getUndoDescription() {
         if (stateStackPos > 1) {
             return stateStack.get(stateStackPos - 1).docString;
         } else {
@@ -529,7 +531,7 @@ public class UndoRedoSupport {
      * doesn't exist.
      * @return the level
      */
-    public String getUndoLabel() {
+    public synchronized String getUndoLabel() {
         if (stateStackPos > 1) {
             return "Undo " + stateStack.get(stateStackPos - 1).deltaDesc;
         } else {
@@ -541,7 +543,7 @@ public class UndoRedoSupport {
      * get the longer description for the action, intended to be used for the tooltip.
      * @return
      */
-    public String getRedoDescription() {
+    public synchronized String getRedoDescription() {
         if (stateStackPos < stateStack.size()) {
             return stateStack.get(stateStackPos).docString;
         } else {
@@ -554,7 +556,7 @@ public class UndoRedoSupport {
      * doesn't exist.
      * @return 
      */
-    public String getRedoLabel() {
+    public synchronized String getRedoLabel() {
         if (stateStackPos < stateStack.size()) {
             return "Redo " + stateStack.get(stateStackPos).deltaDesc;
         } else {
@@ -567,10 +569,13 @@ public class UndoRedoSupport {
      * reset the history, for example after a vap file is loaded.
      */
     public void resetHistory() {
-        int oldDepth= stateStackPos;
-        stateStack = new LinkedList<StateStackElement>();
-        stateStackPos = 0;
-        propertyChangeSupport.firePropertyChange( PROP_DEPTH, oldDepth, stateStackPos );
+        int oldDepth;
+        synchronized (this) {
+            oldDepth= stateStackPos;
+            stateStack = new LinkedList<>();
+            stateStackPos = 0;
+        }
+        propertyChangeSupport.firePropertyChange( PROP_DEPTH, oldDepth, 0 );
     }
     
     /**
