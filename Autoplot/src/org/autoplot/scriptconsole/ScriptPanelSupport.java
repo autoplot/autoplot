@@ -1105,8 +1105,8 @@ public class ScriptPanelSupport {
 
             @Override
             public boolean accept(File f) {
-                if ( f.toString()==null ) return false; //file.toString sometimes returns null on Windows.
-                return (f.isDirectory() || f.toString().endsWith(".jy") || f.toString().endsWith(".py") || f.toString().endsWith(".jyds"));
+                String name= f.getName();
+                return (f.isDirectory() || name.endsWith(".jy") || name.endsWith(".py") || name.endsWith(".jyds"));
             }
 
             @Override
