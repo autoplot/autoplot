@@ -77,7 +77,9 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         
         if ( !hapiDir.exists() ) {
             logger.log(Level.FINE, "mkdir {0}", hapiDir);
-            hapiDir.mkdirs();
+            if ( !hapiDir.mkdirs() ) {
+                throw new IOException("failed to mkdirs: "+hapiDir);
+            }
         }
         
         String id= params.get("id");

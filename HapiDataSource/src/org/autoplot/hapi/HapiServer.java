@@ -411,7 +411,9 @@ public class HapiServer {
         String su= hapiCache + u;
         File f= new File(su);
         if ( f.exists() ) {
-            f.delete();
+            if ( !f.delete() ) {
+                throw new IOException("unable to delete file " + f );
+            }
         }
         if ( !f.getParentFile().exists() ) {
             if ( !f.getParentFile().mkdirs() ) {
