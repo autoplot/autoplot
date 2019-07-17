@@ -62,6 +62,10 @@ public class PyQDataSet extends PyJavaInstance {
     
     private static final AtomicInteger _seq= new AtomicInteger(1000);
 
+    public PyQDataSet( ) {
+        throw new IllegalArgumentException("no-arg constructor is not supported");
+    }
+    
     /**
      * Note getDataSet will always provide a writable dataset.
      * @param ds 

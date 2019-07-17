@@ -26,6 +26,13 @@ public class PyDatum extends PyJavaInstance {
 
     Datum datum;
     
+    /**
+     * findbugs says that because PyJavaInstance is externalizable, then there needs to be a no-arg constructor.
+     */
+    public PyDatum() {
+        throw new IllegalArgumentException("no-arg constructor is not supported");
+    }
+    
     public PyDatum( Datum d ) {
         super(d);
         this.datum= d;
