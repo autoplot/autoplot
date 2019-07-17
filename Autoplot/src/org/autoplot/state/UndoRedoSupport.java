@@ -640,7 +640,7 @@ public class UndoRedoSupport {
      * @param pos
      * @return
      */
-    public StateStackElement peekAt( int pos ) {
+    public synchronized StateStackElement peekAt( int pos ) {
         return stateStack.get(pos);
     }
 
@@ -650,18 +650,26 @@ public class UndoRedoSupport {
      * @return
      */
     public String getLongUndoDescription( int i ) {
-        //if (  stateStack.get(i).deltaDesc.matches("(\\d+) changes") ) {
-            List<Diff> diffss = stateStack.get(i).state.diffs(stateStack.get(i-1).state);
-            diffss= removeTimeRangeBindings( stateStack.get(i-1).state, diffss );
-            StringBuilder docBuf= new StringBuilder();
-            for ( int j=0; j<diffss.size(); j++ ) {
-                Diff s= diffss.get(j);
-                if ( s.getDescription().contains("plotDefaults" ) ) continue;
-                if ( j>0 ) docBuf.append(";\n");
-                docBuf.append(s.getDescription());
+        
+        StateStackElement e1;
+        StateStackElement e0;
                 
-            }
-            return docBuf.toString();
-        //}
+        synchronized (this) {
+            e1= stateStack.get(i);
+            e0= stateStack.get(i-1);
+        }
+        
+        List<Diff> diffss = e1.state.diffs(e0.state);
+        diffss= removeTimeRangeBindings( e0.state, diffss );
+        StringBuilder docBuf= new StringBuilder();
+        for ( int j=0; j<diffss.size(); j++ ) {
+            Diff s= diffss.get(j);
+            if ( s.getDescription().contains("plotDefaults" ) ) continue;
+            if ( j>0 ) docBuf.append(";\n");
+            docBuf.append(s.getDescription());
+
+        }
+        return docBuf.toString();
+
     }
 }
