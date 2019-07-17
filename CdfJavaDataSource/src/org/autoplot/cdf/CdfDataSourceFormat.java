@@ -75,16 +75,10 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         name = (String) dep0.property(QDataSet.NAME);
         if ( seman.containsKey(name) ) {
             int i= 1;
-            while ( seman.containsKey(name) ) {
-                if ( i==1 ) {
-                    name= name + "_1";
-                } else if (i<10) {
-                    i=i+1;
-                    name= String.format( "%s_%d", new Object[] { name.substring(0,name.length()-2), i } );
-                } else {
-                    throw new IllegalArgumentException("unable to create name for "+name);
-                }
+            while ( seman.containsKey(name+"_"+i) ) {
+                i=i+1;
             }
+            name= name + "_"+ i;
         }
         
         Units units = (Units) dep0.property(QDataSet.UNITS);
