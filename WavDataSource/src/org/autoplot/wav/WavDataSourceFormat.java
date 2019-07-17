@@ -81,9 +81,9 @@ public class WavDataSourceFormat implements DataSourceFormat {
         if ( extent.value(1)>limit ) {
             if ( ( extent.value(1)-extent.value(0) ) < typeOrdinals ) {
                 if ( extent.value(0)>0 ) {
-                    shift= typeOrdinals / 2;
+                    shift= typeOrdinals / 2.;
                 } else {
-                    shift= ( extent.value(1)+extent.value(0) ) / 2;
+                    shift= ( extent.value(1)+extent.value(0) ) / 2.;
                 }
             } else {
                 if ( !doscale ) throw new IllegalArgumentException("data extent is too great: "+extent);
@@ -92,7 +92,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
 
         double scale= 1.0;
         if ( doscale ) {
-            shift= ( extent.value(1)+extent.value(0) ) / 2;
+            shift= ( extent.value(1)+extent.value(0) ) / 2.;
             if ( ( extent.value(1)-extent.value(0) )>0 ) {
                 scale= ( typeOrdinals - 1 ) / ( extent.value(1)-extent.value(0) );
             }
@@ -169,9 +169,9 @@ public class WavDataSourceFormat implements DataSourceFormat {
         if ( extent.value(1)>limit ) {
             if ( ( extent.value(1)-extent.value(0) ) < typeOrdinals ) {
                 if ( extent.value(0)>0 ) {
-                    shift= typeOrdinals / 2;
+                    shift= typeOrdinals / 2.;
                 } else {
-                    shift= ( extent.value(1)+extent.value(0) ) / 2;
+                    shift= ( extent.value(1)+extent.value(0) ) / 2.;
                 }
             } else {
                 if ( !doscale ) throw new IllegalArgumentException("data extent is too great: "+extent);
@@ -180,7 +180,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
 
         double scale= 1.0;
         if ( doscale ) {
-            shift= ( extent.value(1)+extent.value(0) ) / 2;
+            shift= ( extent.value(1)+extent.value(0) ) / 2.;
             if ( ( extent.value(1)-extent.value(0) )>0 ) {
                 scale= ( typeOrdinals - 1 ) / ( extent.value(1)-extent.value(0) );
             }
@@ -242,9 +242,9 @@ public class WavDataSourceFormat implements DataSourceFormat {
             for ( int ich=0; ich<channels; ich++ ) {
                 QDataSet channelData= Ops.slice1( data, ich );
                 QDataSet extent= Ops.extentSimple(channelData,null);
-                double mean = ( extent.value(0) + extent.value(1) ) / 2;
+                double mean = ( extent.value(0) + extent.value(1) ) / 2.;
                 if ( unsigned ) {
-                    double targetMean= typeOrdinals / 2;
+                    double targetMean= typeOrdinals / 2.;
                     shift[ich]= ( targetMean - mean );
                 } else {
                     shift[ich]= -mean;
