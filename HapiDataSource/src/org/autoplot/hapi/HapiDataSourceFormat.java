@@ -217,7 +217,9 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         String ext= format.equals("binary") ? ".binary" : ".csv";
         File dataFile= new File( new File( hapiDir, "data" ), id+ ext );
         if ( !dataFile.getParentFile().exists() ) {
-            dataFile.getParentFile().mkdirs();
+            if ( !dataFile.getParentFile().mkdirs() ) {
+                throw new IOException("unable to mkdir: "+dataFile.getParentFile() );
+            }
         }
 
         if ( format.equals("binary") ) {
