@@ -565,7 +565,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
      * </ul>
      * @return the filter, for example "" or "op" for okay and problem.
      */
-    public String getQCFilter() {
+    public synchronized String getQCFilter() {
         return this.qcFilter;
     }
 
