@@ -106,7 +106,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                 Map<String,String> result= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, 4 );
                 //cdf.close();
                 
-                List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
+                List<CompletionContext> ccresult= new ArrayList<>();
                 for ( Entry<String,String> ent:result.entrySet() ) {
                     String key= ent.getKey();
                     CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, key, this, null, key, ent.getValue(), true  );
@@ -127,26 +127,39 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                         new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "T", "use DEPEND data for labels" ),
                         new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "F", "normal behavior uses LABL_PTR (default)" ) );
             } else if ( parmname.equals("where") ) {
-                String file= CompletionContext.get( CompletionContext.CONTEXT_FILE, cc );
-                
-                File cdfFile= DataSetURI.getFile( DataSetURI.getURL(file), mon );
-                DataSetURI.checkLength(cdfFile);
 
-                String fileName= cdfFile.toString();
-                
-                CDFReader cdf;
-                cdf = org.autoplot.cdf.CdfDataSource.getCdfFile(fileName);
+                List<CompletionContext> ccresult= new ArrayList<>();
+                if ( cc.completable.contains(".") ) {
+                    int i= cc.completable.lastIndexOf(".");
+                    String s= cc.completable.substring(0,i);
+                    if ( s.length()>0 ) {
+                        ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, s + ".eq(0)" ) ) ;
+                        ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, s + ".ne(0)" ) ) ;
+                        ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, s + ".gt(0)" ) ) ;
+                        ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, s + ".lt(0)" ) ) ;
+                        ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, s + ".within(0+to+10)" ) ) ;
+                    }
+                } else {
+                    String file= CompletionContext.get( CompletionContext.CONTEXT_FILE, cc );
+                    
+                    File cdfFile= DataSetURI.getFile( DataSetURI.getURL(file), mon );
+                    DataSetURI.checkLength(cdfFile);
 
-                Map<String,String> result= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, 2 );
-                                
-                List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
-                for ( Map.Entry<String,String> e:result.entrySet() ) {
-                    String key= e.getKey();
-                    CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, key+".eq(0)", this, null, key+".eq(0)", e.getValue(), true  );
-                    ccresult.add(cc1);
+                    String fileName= cdfFile.toString();
+                
+                    CDFReader cdf;
+                    cdf = org.autoplot.cdf.CdfDataSource.getCdfFile(fileName);
+
+                    Map<String,String> result= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, 2 );
+                    
+                    for ( Map.Entry<String,String> e:result.entrySet() ) {
+                        String key= e.getKey();
+                        CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, key+".eq(0)", this, null, key+".eq(0)", e.getValue(), true  );
+                        ccresult.add(cc1);
+                    }
+                    
                 }
                 return ccresult;
-                
                 
             } else {
                 return Collections.emptyList();
