@@ -184,8 +184,8 @@ public class ScriptPanelSupport {
         return new FileFilter() {
             @Override
             public boolean accept(File f) {
-                if ( f.toString()==null ) return false;
                 String name= f.getName();
+                if ( name==null ) return false;
                 return (f.isDirectory() || name.endsWith(".jy") || name.endsWith(".py") || name.endsWith(".jyds"));
             }
             @Override
