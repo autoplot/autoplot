@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Jython script is used to create a QDataSet to verify handling of non-qube data.
+        <p><small>Images from the GOLD mission are available at <a href="https://cdaweb.gsfc.nasa.gov/pub/data/gold/level1d/">CDAWeb</a>, and can be viewed with Autoplot's PNGWalk Tool.
             </small></p>            
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,13 +26,14 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-07-16 r23915):</p>
+        <p>Bugfixes (2019-07-19 r23940):</p>
         <ul>
+            <li>rte 1858002116: check for null from "where" list in NetCDF, HDF and CDF dialogs.  Thanks WRF!
+            <li>continue round of <a href='https://ci-pw.physics.uiowa.edu/job/autoplot-findbugs/findbugs'>FindBugs</a> cleanup. (Yay, below 100!)
             <li>2188: makeCanonical corrects double-slashes (//) fixing the bug.
             <li>2189: corrections to clipping in DasPlot, a bug seen with scrollbars on Linux.  Thanks, Ivar!!
             <li>remove class DatumRangeUtilOld, which is not used.
-            <li>continue round of findbugs cleanup.
-            <li>rte_1076158178: avoid runtime error when zero-length dataset is added to the DataPointRecorder.
+            <li>rte_1076158178: avoid runtime error when zero-length dataset is added to the DataPointRecorder.  Thanks, Darrelle!
         </ul>
         <p>Older Bugfixes:</p>
         <ul>
