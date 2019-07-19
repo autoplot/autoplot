@@ -829,7 +829,13 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             } 
 
             if ( whereCB.isSelected() ) {
-                lparams.put( "where", String.format( "%s%s(%s)", whereParamList.getSelectedItem(), whereOp.getSelectedItem(), whereTF.getText().replaceAll(" ","+") ) );
+               if ( whereParamList.getSelectedItem()!=null ) {
+                    lparams.put( "where", String.format( "%s%s(%s)", whereParamList.getSelectedItem(), whereOp.getSelectedItem(), whereTF.getText().replaceAll(" ","+") ) );
+                } else {
+                    lparams.remove("where");
+                }
+            } else {
+                lparams.remove("where");
             }
         }
 
