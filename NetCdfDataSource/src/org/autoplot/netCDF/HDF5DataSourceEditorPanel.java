@@ -619,7 +619,11 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         }
             
         if ( whereCB.isSelected() ) {
-            params.put( "where", String.format( "%s%s(%s)", whereParamList.getSelectedItem(), whereOp.getSelectedItem(), whereTF.getText().replaceAll(" ","+") ) );
+            if ( whereParamList.getSelectedItem()!=null ) {
+                params.put( "where", String.format( "%s%s(%s)", whereParamList.getSelectedItem(), whereOp.getSelectedItem(), whereTF.getText().replaceAll(" ","+") ) );
+            } else {
+                params.remove("where");
+            }
         } else {
             params.remove("where");
         }
