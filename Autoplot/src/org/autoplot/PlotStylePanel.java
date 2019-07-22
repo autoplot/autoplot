@@ -50,7 +50,7 @@ import org.autoplot.dom.PlotElementStyle;
  *
  * @author jbf
  */
-public class PlotStylePanel extends javax.swing.JPanel {
+public final class PlotStylePanel extends javax.swing.JPanel {
 
     private static final Logger logger = LoggerManager.getLogger("autoplot.gui");
 
@@ -97,7 +97,17 @@ public class PlotStylePanel extends javax.swing.JPanel {
         this.dom.getController().addPropertyChangeListener(ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                doElementBindings();
+                if ( SwingUtilities.isEventDispatchThread() ) {
+                    doElementBindings();
+                } else {
+                    Runnable run= new Runnable() {
+                        @Override
+                        public void run() {
+                            doElementBindings();
+                        }
+                    };
+                    SwingUtilities.invokeLater(run);
+                }
             }
         });
 
@@ -105,40 +115,42 @@ public class PlotStylePanel extends javax.swing.JPanel {
 
         validate();
 
-        Runnable run = new Runnable() {
-            @Override
-            public String toString() {
-                return "initPlotStyleBindings";
+        doOptionsBindings();
+        doElementBindings();
+
+        String ff = dom.getController().getCanvas().getFont();
+        fontLabel.setText(ff);
+        //guiFontLabel.setText( parent.getFont().toString());
+
+        DasCanvas c = dom.getController().getDasCanvas();
+        int index = 3; // custom
+        for (int i = 0; i < fores.length; i++) {
+            if (fores[i].equals(c.getForeground()) && backs[i].equals(c.getBackground())) {
+                index = i;
             }
-
-            @Override
-            public void run() {
-                doOptionsBindings();
-                doElementBindings();
-
-                String ff = dom.getController().getCanvas().getFont();
-                fontLabel.setText(ff);
-                //guiFontLabel.setText( parent.getFont().toString());
-
-                DasCanvas c = dom.getController().getDasCanvas();
-                int index = 3; // custom
-                for (int i = 0; i < fores.length; i++) {
-                    if (fores[i].equals(c.getForeground()) && backs[i].equals(c.getBackground())) {
-                        index = i;
-                    }
-                }
-                foreBackColorsList.setSelectedIndex(index);
-            }
-        };
-        //SwingUtilities.invokeLater(run);
-        run.run();
+        }
+        foreBackColorsList.setSelectedIndex(index);
+        
         AutoplotHelpSystem.getHelpSystem().registerHelpID(plotPanel, "stylePanel");
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "stylePanel");
         initializing = false;
 
     }
 
-    private synchronized void doOptionsBindings() {
+    /**
+     * to avoid use of synchronized blocks, methods must be called from the
+     * event thread.  This verifies that the thread is the event thread.
+     * @param caller the name of the calling code, which will appear in the name.
+     */
+    private static void assertEventThread( String caller ) {
+        if ( !SwingUtilities.isEventDispatchThread() ) {
+            throw new IllegalArgumentException( caller + " must be called from the event thread.");
+        }
+    }
+    
+    private void doOptionsBindings() {
+        assertEventThread("doOptionsBindings");
+        
         BindingGroup bc = new BindingGroup();
         Binding b;
 
@@ -205,14 +217,24 @@ public class PlotStylePanel extends javax.swing.JPanel {
         updateSize();
     }
 
-    private transient PropertyChangeListener renderTypeListener = new PropertyChangeListener() {
+    private final transient PropertyChangeListener renderTypeListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent ev) {
-            doElementBindings();
+            if ( SwingUtilities.isEventDispatchThread() ) {
+                doElementBindings();
+            } else {
+                Runnable run= new Runnable() {
+                    @Override
+                    public void run() {
+                        doElementBindings();
+                    }
+                };
+                SwingUtilities.invokeLater(run);
+            }
         }
     };
 
-    private transient PropertyChangeListener colorListener = new PropertyChangeListener() {
+    private final transient PropertyChangeListener colorListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if (checkColors()) {
@@ -221,8 +243,8 @@ public class PlotStylePanel extends javax.swing.JPanel {
         }
     };
 
-    private synchronized void doElementBindings() {
-
+    private void doElementBindings() {
+        assertEventThread("doElementBindings");
         if (currentElement != null) {
             currentElement.getStyle().removePropertyChangeListener(PlotElementStyle.PROP_COLOR, colorListener);
             currentElement.removePropertyChangeListener(PlotElement.PROP_RENDERTYPE, renderTypeListener); // remove it if it's there already
