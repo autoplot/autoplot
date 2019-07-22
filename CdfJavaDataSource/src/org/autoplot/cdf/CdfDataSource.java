@@ -673,19 +673,21 @@ public class CdfDataSource extends AbstractDataSource {
         result.putProperty( QDataSet.METADATA, attr1 );
         result.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
 
-        if ( attributes!=null && "waveform".equals( attributes.get("DISPLAY_TYPE") ) ) {
-            QDataSet dep1=   (QDataSet) result.property( QDataSet.DEPEND_1 );
-            if ( dep1!=null ) {
-                Units dep1units= SemanticOps.getUnits(dep1);
-                if ( Units.ns!=dep1units ) {
-                    ArrayDataSet dep1_= ArrayDataSet.copy(dep1);
-                    dep1_.putProperty( QDataSet.VALID_MIN, null );
-                    dep1_.putProperty( QDataSet.VALID_MAX, null );
-                    dep1_.putProperty( QDataSet.FILL_VALUE, null );
-                    while ( dep1_.rank()>0 ) dep1_= (ArrayDataSet) Ops.reduceMax( dep1_, 0 );
-                    if ( dep1_.value()>1e6 ) {
-                        logger.log(Level.WARNING, "offset units do not appear to be in {0}, using ns", dep1units);
-                        ((MutablePropertyDataSet)dep1).putProperty(QDataSet.UNITS,Units.ns);
+        synchronized (this) {
+            if ( attributes!=null && "waveform".equals( attributes.get("DISPLAY_TYPE") ) ) {
+                QDataSet dep1=   (QDataSet) result.property( QDataSet.DEPEND_1 );
+                if ( dep1!=null ) {
+                    Units dep1units= SemanticOps.getUnits(dep1);
+                    if ( Units.ns!=dep1units ) {
+                        ArrayDataSet dep1_= ArrayDataSet.copy(dep1);
+                        dep1_.putProperty( QDataSet.VALID_MIN, null );
+                        dep1_.putProperty( QDataSet.VALID_MAX, null );
+                        dep1_.putProperty( QDataSet.FILL_VALUE, null );
+                        while ( dep1_.rank()>0 ) dep1_= (ArrayDataSet) Ops.reduceMax( dep1_, 0 );
+                        if ( dep1_.value()>1e6 ) {
+                            logger.log(Level.WARNING, "offset units do not appear to be in {0}, using ns", dep1units);
+                            ((MutablePropertyDataSet)dep1).putProperty(QDataSet.UNITS,Units.ns);
+                        }
                     }
                 }
             }
