@@ -7,6 +7,7 @@
 
 package org.autoplot;
 
+import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -118,13 +119,24 @@ public class DataPanel extends javax.swing.JPanel {
      * encourage making local copies for thread safety.
      * @return the current plotElement.
      */
-    private synchronized PlotElement getElement() {
+    private PlotElement getElement() {
         return plotElement;
     }
-        
+
+    /**
+     * to avoid use of synchronized blocks, methods must be called from the
+     * event thread.  This verifies that the thread is the event thread.
+     * @param caller 
+     */
+    private static void assertEventThread( String caller ) {
+        if ( !SwingUtilities.isEventDispatchThread() ) {
+            throw new IllegalArgumentException( caller + " must be called from the event thread.");
+        }
+    }
 
     /**
      * bind to the data source and plot plotElement.
+     * This must be called on the event thread.
      */
     protected final void doBindings() {
         logger.fine("doBindings");
@@ -222,7 +234,9 @@ public class DataPanel extends javax.swing.JPanel {
         }
     }
 
-    private synchronized void doPlotElementBindings() {
+    private void doPlotElementBindings() {
+        assertEventThread("doPlotElementBindings");
+
         BindingGroup bc = new BindingGroup();
         if (plotElementBindingGroup != null) plotElementBindingGroup.unbind();
         setAdjusting( true ); // suppress events
@@ -275,8 +289,13 @@ public class DataPanel extends javax.swing.JPanel {
 
     }
 
-    private synchronized void doDataSourceFilterBindings() {
-
+    /**
+     * this should be called on the event thread.
+     */
+    private void doDataSourceFilterBindings() {
+        
+        assertEventThread("doDataSourceFilterBindings");
+        
         if (dataSourceFilterBindingGroup != null) dataSourceFilterBindingGroup.unbind();
 
         if ( dsf!=null ) {

@@ -126,7 +126,6 @@
             </Component>
             <Component class="javax.swing.JCheckBox" name="additionalOperationsCheckBox">
               <Properties>
-                <Property name="selected" type="boolean" value="false"/>
                 <Property name="text" type="java.lang.String" value="Apply additional operations immediately after data is loaded"/>
               </Properties>
               <BindingProperties>
