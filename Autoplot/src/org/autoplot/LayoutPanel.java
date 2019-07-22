@@ -206,6 +206,17 @@ public class LayoutPanel extends javax.swing.JPanel {
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "layoutPanel");
     }
 
+    /**
+     * to avoid use of synchronized blocks, methods must be called from the
+     * event thread.  This verifies that the thread is the event thread.
+     * @param caller the name of the calling code, which will appear in the name.
+     */
+    private static void assertEventThread( String caller ) {
+        if ( !SwingUtilities.isEventDispatchThread() ) {
+            throw new IllegalArgumentException( caller + " must be called from the event thread.");
+        }
+    }
+    
     @Override
     public void paint(Graphics g) {
         if ( selectionChanged ) {
@@ -340,10 +351,8 @@ public class LayoutPanel extends javax.swing.JPanel {
             }
         };
 
-
-
-
-    private synchronized void createPopupMenus() {
+    private void createPopupMenus() {
+        assertEventThread("createPopupMenus");
         contextMenus = new HashMap<>();
 
         JMenuItem item;
