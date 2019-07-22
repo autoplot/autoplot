@@ -1349,7 +1349,7 @@ public class PlotController extends DomNodeController {
         addPlotElement(p,true);
     }
 
-    synchronized List<Integer> indecesOfPlotElements( ) {
+    private List<Integer> indecesOfPlotElements( ) {
         List<Integer> indeces= new ArrayList<>(dom.plotElements.size());
         for ( int i=0; i<dom.plotElements.size(); i++ ) {
             if ( dom.getPlotElements(i).getPlotId().equals(this.plot.getId()) ) {
@@ -1359,7 +1359,7 @@ public class PlotController extends DomNodeController {
         return indeces;
     }
 
-    synchronized void moveToStackBottom( PlotElement p ) {
+    private void moveToStackBottom( PlotElement p ) {
         final DomLock lock= dom.getController().mutatorLock();
         lock.lock("Move to Stack Bottom");
         try {
@@ -1426,7 +1426,7 @@ public class PlotController extends DomNodeController {
      * This does not affect the View (das2), only the model!
      * @param p
      */
-    synchronized void moveToStackTop( PlotElement p ) {
+    void moveToStackTop( PlotElement p ) {
         final DomLock lock= dom.getController().mutatorLock();
         lock.lock("Move to Stack Top");
         try {
@@ -1480,67 +1480,74 @@ public class PlotController extends DomNodeController {
      * @param p
      * @param reset if true then reset the render type.
      */
-    synchronized void addPlotElement(PlotElement p,boolean reset) {
+    protected void addPlotElement(PlotElement p,boolean reset) {
+        DomLock lock= changesSupport.mutatorLock();
+        lock.lock("addPlotElement");
         
-        if ( p==null ) throw new NullPointerException("PlotElement p is null"); // bug 1419: I think I see this on the server
-        
-        Renderer rr= p.controller.getRenderer();
+        try {
+            if ( p==null ) throw new NullPointerException("PlotElement p is null"); // bug 1419: I think I see this on the server
 
-        if ( rr instanceof SpectrogramRenderer ) {
-            ((SpectrogramRenderer)rr).setColorBar( getDasColorBar() );
-        } else if ( rr instanceof SeriesRenderer ) {
-            ((SeriesRenderer)rr).setColorBar( getDasColorBar() );
-        }
+            Renderer rr= p.controller.getRenderer();
 
-        bindPEToColorbar( p );
-
-        boolean toTop= rr!=null && !( rr instanceof SpectrogramRenderer );
-        if ( rr!=null ) {
-            if ( !toTop ) { // kludge to put on the bottom
-                dasPlot.addRenderer(0,rr);
-            } else {
-                dasPlot.addRenderer(rr);
+            if ( rr instanceof SpectrogramRenderer ) {
+                ((SpectrogramRenderer)rr).setColorBar( getDasColorBar() );
+            } else if ( rr instanceof SeriesRenderer ) {
+                ((SeriesRenderer)rr).setColorBar( getDasColorBar() );
             }
-        }
-        RenderType rt = p.getRenderType();
-        //p.setPlotId(plot.getId());
-        p.plotId= plot.getId();
-        if ( reset ) p.controller.doResetRenderType(rt);
 
-        if ( !dom.controller.isValueAdjusting() ) {
-            doPlotElementDefaultsChange(p);
-        } else {
-            boolean isFirst= false;
-            for ( PlotElement pete: this.dom.getPlotElements() ) {
-                if ( pete.plotId.equals(this.plot.id ) ) {
-                    if ( pete==p ) {
-                        isFirst=true;
-                    }
-                    break;
+            bindPEToColorbar( p );
+
+            boolean toTop= rr!=null && !( rr instanceof SpectrogramRenderer );
+            if ( rr!=null ) {
+                if ( !toTop ) { // kludge to put on the bottom
+                    dasPlot.addRenderer(0,rr);
+                } else {
+                    dasPlot.addRenderer(rr);
                 }
             }
-            
-            //TODO: there's a copy of this code in doPlotElementDefaultsChange
-            if ( this.plotElement!=null && isFirst ) {
-                this.plotElement.getController().removePropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
-            }
-            if ( isFirst ) {
-                this.plotElement= p;
-                // this used to happen in doPlotElementDefaultsChange
-                p.getController().addPropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
-            }
-        }
-        if ( !pdListen.contains(p) ) {
-            p.addPropertyChangeListener( PlotElement.PROP_PLOT_DEFAULTS, plotDefaultsListener );
-            p.addPropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener );
-            pdListen.add(p);
-        }
-        p.setPlotId(plot.getId());
-        checkRenderType();
+            RenderType rt = p.getRenderType();
+            //p.setPlotId(plot.getId());
+            p.plotId= plot.getId();
+            if ( reset ) p.controller.doResetRenderType(rt);
 
-        if ( rr!=null && toTop ) {
-            moveToStackTop(p);
+            if ( !dom.controller.isValueAdjusting() ) {
+                doPlotElementDefaultsChange(p);
+            } else {
+                boolean isFirst= false;
+                for ( PlotElement pete: this.dom.getPlotElements() ) {
+                    if ( pete.plotId.equals(this.plot.id ) ) {
+                        if ( pete==p ) {
+                            isFirst=true;
+                        }
+                        break;
+                    }
+                }
+
+                //TODO: there's a copy of this code in doPlotElementDefaultsChange
+                if ( this.plotElement!=null && isFirst ) {
+                    this.plotElement.getController().removePropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
+                }
+                if ( isFirst ) {
+                    this.plotElement= p;
+                    // this used to happen in doPlotElementDefaultsChange
+                    p.getController().addPropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
+                }
+            }
+            if ( !pdListen.contains(p) ) {
+                p.addPropertyChangeListener( PlotElement.PROP_PLOT_DEFAULTS, plotDefaultsListener );
+                p.addPropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener );
+                pdListen.add(p);
+            }
+            p.setPlotId(plot.getId());
+            checkRenderType();
+
+            if ( rr!=null && toTop ) {
+                moveToStackTop(p);
+            }
+        } finally {
+            lock.unlock();
         }
+        
 
 //        DasPlot pl= p.controller.getDasPlot();
 //        if ( pl!=null ) {
@@ -1604,23 +1611,29 @@ public class PlotController extends DomNodeController {
      * remove the plot element from this plot: remove renderer, remove bindings, etc.
      * @param p
      */
-    synchronized void removePlotElement(PlotElement p) {
-        Renderer rr= p.controller.getRenderer();
-        // setPlotId re-enters this code, so we need to rem
-        if ( rr!=null && dasPlot.containsRenderer(rr) ) dasPlot.removeRenderer(rr);
-        if ( rr instanceof SpectrogramRenderer ) {
-            ((SpectrogramRenderer)rr).setColorBar(null);
-        } else if ( rr instanceof SeriesRenderer ) {
-            ((SeriesRenderer)rr).setColorBar(null);
-        }
+    protected void removePlotElement(PlotElement p) {
+        DomLock lock= changesSupport.mutatorLock();
+        lock.lock("removePlotElement");
+        try {
+            Renderer rr= p.controller.getRenderer();
+            // setPlotId re-enters this code, so we need to rem
+            if ( rr!=null && dasPlot.containsRenderer(rr) ) dasPlot.removeRenderer(rr);
+            if ( rr instanceof SpectrogramRenderer ) {
+                ((SpectrogramRenderer)rr).setColorBar(null);
+            } else if ( rr instanceof SeriesRenderer ) {
+                ((SeriesRenderer)rr).setColorBar(null);
+            }
 
-        doPlotElementDefaultsChange(null);
-        p.removePropertyChangeListener( PlotElement.PROP_PLOT_DEFAULTS, plotDefaultsListener );
-        p.removePropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener );
-        removeBindingsPEToColorbar(p);
-        pdListen.remove(p);
-        if ( !p.getPlotId().equals("") ) p.setPlotId("");
-        checkRenderType();
+            doPlotElementDefaultsChange(null);
+            p.removePropertyChangeListener( PlotElement.PROP_PLOT_DEFAULTS, plotDefaultsListener );
+            p.removePropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener );
+            removeBindingsPEToColorbar(p);
+            pdListen.remove(p);
+            if ( !p.getPlotId().equals("") ) p.setPlotId("");
+            checkRenderType();
+        } finally {
+            lock.unlock();
+        }
     }
 
 //    private static String getCommonPart( String wordA, String wordB ) {
@@ -1950,7 +1963,7 @@ public class PlotController extends DomNodeController {
         p.getDasMouseInputAdapter().releaseAll();
     }
 
-    private synchronized void bindTo(DasPlot p) {
+    private void bindTo(DasPlot p) {
         ApplicationController ac= dom.controller;
         titleConverter= new LabelConverter( dom, plot, null, null, null );
         ac.bind( this.plot, Plot.PROP_TITLE, p, DasPlot.PROP_TITLE, titleConverter );
