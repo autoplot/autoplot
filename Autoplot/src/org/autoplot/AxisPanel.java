@@ -173,6 +173,17 @@ public class AxisPanel extends javax.swing.JPanel {
 
     }
 
+    /**
+     * to avoid use of synchronized blocks, methods must be called from the
+     * event thread.  This verifies that the thread is the event thread.
+     * @param caller 
+     */
+    private static void assertEventThread( String caller ) {
+        if ( !SwingUtilities.isEventDispatchThread() ) {
+            throw new IllegalArgumentException( caller + " must be called from the event thread.");
+        }
+    }
+    
     @Override
     public void paint(Graphics g) {
         if ( !plotBindingGroupIsBound ) {
@@ -199,12 +210,10 @@ public class AxisPanel extends javax.swing.JPanel {
     }
 
     private void doPlotBindings() {
-
+        
+        assertEventThread("doPlotBindings");
+        
         BindingGroup bc = new BindingGroup();
-
-        if ( !SwingUtilities.isEventDispatchThread() ) {
-            System.err.println("here not event thread");
-        }
         
         Plot p = applicationController.getPlot();
         
@@ -362,6 +371,8 @@ public class AxisPanel extends javax.swing.JPanel {
     }
     
     private void doPlotElementBindings() {
+        
+        assertEventThread("doPlotElementBindings");
         BindingGroup bc = new BindingGroup();
         
         if (plotElementBindingGroup != null) plotElementBindingGroup.unbind();
