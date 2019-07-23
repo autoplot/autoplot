@@ -4450,7 +4450,9 @@ private void updateFrameTitle() {
                    if ( argv[i].equals("-open") ) argv[i]="--open";
                 }
 
-                alm.process(argv);
+                if ( !alm.process(argv) ) {
+                    System.exit( alm.getExitCode() );
+                }
 
                 final JFrame frame = (JFrame) ScriptContext.getViewWindow();
                 if ( frame!=null ) {
@@ -4921,7 +4923,10 @@ private void updateFrameTitle() {
                 break;
             }
         }
-        alm.process(args);
+        
+        if ( !alm.process(args) ) {
+            System.exit( alm.getExitCode() );
+        }
         
         //if ( alm.getBooleanValue("sandbox") ) {
         //    enterSandbox();

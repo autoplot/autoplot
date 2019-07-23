@@ -50,7 +50,10 @@ public class AutoplotServer {
         
         alm.requireOneOf( new String[] { "uri", "vap" } );
         
-        alm.process(args);
+        if ( !alm.process(args) ) {
+            System.exit( alm.getExitCode() );
+        }
+        
         logger.log(Level.FINE, "process command line options");
 
         String suri = alm.getValue("uri");

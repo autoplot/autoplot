@@ -50,7 +50,9 @@ public class DemoPngWalk {
         alm.addBooleanSwitchArgument("nativeLAF", "n", "nativeLAF", "use the system look and feel");
         alm.addOptionalPositionArgument(0, "template",  "file:/tmp/pngwalk/product_$Y$m$d.png", "initial template to use.");
         
-        alm.process(args);
+        if ( !alm.process(args) ) {
+            System.exit( alm.getExitCode() );
+        }
         
         if (alm.getBooleanValue("nativeLAF")) {
             try {

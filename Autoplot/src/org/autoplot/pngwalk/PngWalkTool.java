@@ -209,7 +209,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
         alm.addOptionalPositionArgument(0, "template",  output, "initial template to use.");
         alm.addOptionalSwitchArgument( "template", "t", "template", output, "initial template to use." );
 
-        alm.process(args);
+        if ( !alm.process(args) ) {
+            System.exit( alm.getExitCode() );
+        }
 
         if (alm.getBooleanValue("nativeLAF")) {
             logger.fine("nativeLAF");

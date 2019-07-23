@@ -406,7 +406,9 @@ public class AutoplotDataServer {
         alm.addBooleanSwitchArgument( "enableResponseMonitor", null, "enableResponseMonitor", "monitor the event thread for long unresponsive pauses");        
 
         alm.requireOneOf(new String[]{"uri"});
-        alm.process(args);
+        if ( !alm.process(args) ) {
+            System.exit( alm.getExitCode() );
+        }
 
         if ( alm.getBooleanValue("quiet") ) {
             // don't print anything.

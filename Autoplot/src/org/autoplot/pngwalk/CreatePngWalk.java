@@ -936,7 +936,10 @@ public class CreatePngWalk {
         alm.addBooleanSwitchArgument( "autorangeFlags", null, "autorangeFlags", "only autorange axes with autorange=true");
         alm.addBooleanSwitchArgument( "update", null, "update", "only calculate missing images");
         alm.addBooleanSwitchArgument( "testException", null, "testException", "throw a runtime exception to test exit code");
-        alm.process(args);
+        
+        if ( !alm.process(args) ) {
+            System.exit( alm.getExitCode() );
+        }
 
         if ( alm.getBooleanValue("testException") ) {
             throw new RuntimeException("--textException on command line, throwing exception");
