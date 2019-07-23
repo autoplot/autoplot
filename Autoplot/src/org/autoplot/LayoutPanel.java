@@ -1375,7 +1375,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                 d2[0]= d1[0] + ( d2[0]-d1[0] ) * 1.25;
                 r.setBottom( DasDevicePosition.formatFormatStr(d2) );
             } catch ( ParseException ex ) {
-                logger.info("ParseException ignored");
+                logger.log(Level.INFO, "ParseException ignored: {0}", ex);
             }
         }
 
@@ -1408,7 +1408,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                 emMaxTop= Math.max( emMaxTop, d2[1] );
                 n= n+1;
             } catch ( ParseException ex ) {
-                logger.info("ParseException ignored");
+                logger.log(Level.INFO, "ParseException ignored: {0}", ex);
             }
         }
 
@@ -1423,7 +1423,9 @@ public class LayoutPanel extends javax.swing.JPanel {
                 d1[1]= emMaxTop;
                 r.setBottom( DasDevicePosition.formatFormatStr(d2) );
                 r.setTop( DasDevicePosition.formatFormatStr(d1) );
-            } catch ( ParseException ex ) {}
+            } catch ( ParseException ex ) {
+                logger.log(Level.INFO, "ParseException ignored: {0}", ex);
+            }
         }
 
         if ( dom.getOptions().isAutolayout() ) org.autoplot.dom.DomOps.newCanvasLayout(dom);
@@ -1447,7 +1449,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                 d2[0]= d1[0] + ( d2[0]-d1[0] ) * 0.80;
                 r.setBottom( DasDevicePosition.formatFormatStr(d2) );
             } catch ( ParseException ex ) {
-                logger.info("ParseException ignored");
+                logger.log(Level.INFO, "ParseException ignored: {0}", ex);
             }
         }
 
@@ -1532,7 +1534,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                 d2[2]= 0;
                 r.setBottom( DasDevicePosition.formatFormatStr(d2) );
             } catch ( ParseException ex ) {
-                logger.info("ParseException ignored");
+                logger.log(Level.INFO, "ParseException ignored: {0}", ex);
             }
         }
 
