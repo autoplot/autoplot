@@ -781,7 +781,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
                         byte[] array= baos.toByteArray();
 
-                        String image64= Base64.encodeBytes(array);
+                        String image64= Base64.getEncoder().encodeToString(array);
 
                         Element screen= doc.createElement("screenshot");
                         screen.setAttribute( "mimetype", "image/png" );

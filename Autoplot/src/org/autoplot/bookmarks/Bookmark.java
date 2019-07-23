@@ -700,11 +700,11 @@ public abstract class Bookmark {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ImageIO.write( image, "png", out );
         out.size();
-        return Base64.encodeBytes(out.toByteArray());
+        return Base64.getEncoder().encodeToString(out.toByteArray());
     }
 
     private static BufferedImage decodeImage(String data) throws IOException {
-        byte[] bd = Base64.decode(data);
+        byte[] bd = Base64.getDecoder().decode(data);
         return ImageIO.read(new ByteArrayInputStream(bd));
     }
 

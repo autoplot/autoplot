@@ -1251,7 +1251,7 @@ public class DataSetURI {
                 urlc.setReadTimeout( FileSystem.settings().getReadTimeoutMs() );
                 urlc.setAllowUserInteraction(false);
                 if ( userInfo != null) {
-                    String encode = Base64.encodeBytes( userInfo.getBytes());
+                    String encode = Base64.getEncoder().encodeToString( userInfo.getBytes());
                     urlc.setRequestProperty("Authorization", "Basic " + encode);
                 }
                 urlc= HttpUtil.checkRedirect(urlc);
