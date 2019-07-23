@@ -183,10 +183,10 @@ public class AddSampListener {
                                 String s1= file.getAbsolutePath();
                                 File nnfile;
                                 if ( n!=null ) {
-                                    int i1= s1.lastIndexOf("/");
+                                    int i1= s1.lastIndexOf('/');
                                     nnfile= new File( s1.substring(0,i1) +"/"+ n );
                                 } else {
-                                    int i1= s1.lastIndexOf("@");
+                                    int i1= s1.lastIndexOf('@');
                                     nnfile= new File( s1.substring(0,i1) );
                                 }
                                 if ( !file.renameTo( nnfile ) ) {
