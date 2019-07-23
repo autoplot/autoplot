@@ -1821,8 +1821,8 @@ public class DataSetURI {
                 if ( stimeRange!=null ) {
                     timeRange= DatumRangeUtil.parseTimeRange(stimeRange);
                 }
-            } catch ( Exception e ) {
-                
+            } catch ( ParseException e ) {
+                logger.log(Level.WARNING, "parse exception: {0}", e);
             }
             
             int ip= surlDir.indexOf("$Y");
