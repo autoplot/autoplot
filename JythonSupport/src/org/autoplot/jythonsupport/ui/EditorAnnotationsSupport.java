@@ -364,10 +364,10 @@ public class EditorAnnotationsSupport {
                 SimpleMarker mark;
                 Object highlightInfo=null;
                 
-                if ( name.equals(ANNO_WARNING) ) {
-                    mark= new SimpleMarker( lightBackground ? Color.YELLOW : new Color(160,150,0) );
+                if ( name.equals(ANNO_WARNING) ) {    
+                    mark= new SimpleMarker( lightBackground ? Color.YELLOW : new Color(80,80,0) );
                 } else if ( name.equals(ANNO_USAGE) ) {
-                    mark= new SimpleMarker( lightBackground ? Color.YELLOW.brighter() : new Color(180,170,0) );
+                    mark= new SimpleMarker( lightBackground ? Color.YELLOW.brighter() : new Color(100,100,0) );
                 } else if ( name.equals(ANNO_ERROR) ) {
                     mark= new SimpleMarker( lightBackground ? Color.PINK : new Color(120,80,80));
                 } else if ( name.equals(ANNO_PROGRAM_COUNTER) ){
