@@ -4293,41 +4293,16 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
         ScriptContext.setCanvasSize( 724, 656 ); // this is the arbitrary size of the app when its size is now saved.
     }//GEN-LAST:event_resetAppSizeActionPerformed
 
+    
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     @Override
     public void propertyChange( PropertyChangeEvent ev ) {
         switch (ev.getPropertyName()) {
-            case Options.PROP_LAYOUTVISIBLE:
-                if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
-                    if ( layoutPanel == null ) {
-                        layoutPanel = new LayoutPanel();
-                        layoutPanel.setApplication(dom);
-                        layoutPanel.setApplicationModel(applicationModel);                        
-                    }
-                    int idx= tabs.indexOfTab("style");
-                    if ( idx==-1 ) idx=  tabs.getTabCount();
-                    JScrollPane jsp = new JScrollPane();
-                    jsp.setViewportView(layoutPanel);
-                    tabs.insertTab("layout", null, jsp,
-                            String.format( TAB_TOOLTIP_LAYOUT, TABS_TOOLTIP ), idx+1 );
-                } else {
-                    if ( layoutPanel!=null ) tabs.remove(layoutPanel.getParent().getParent());
-                }
+            case Options.PROP_LAYOUTVISIBLE: 
+                makeLayoutVisible((Boolean)ev.getNewValue());
                 break;
-            case Options.PROP_DATAVISIBLE:
-                if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
-                    if ( dataPanel == null ) {
-                        dataPanel = new DataPanel( AutoplotUI.this );
-                    }
-                    int idx= tabs.indexOfTab("metadata");
-                    if ( idx==-1 ) idx=  tabs.getTabCount();
-                    JScrollPane jsp = new JScrollPane();
-                    jsp.setViewportView(dataPanel);
-                    tabs.insertTab("data", null, jsp,
-                            String.format( TAB_TOOLTIP_DATA, TABS_TOOLTIP ), idx );
-                } else {
-                    if ( dataPanel!=null ) tabs.remove(dataPanel.getParent().getParent());
-                }
+            case Options.PROP_DATAVISIBLE: 
+                makeDataVisible((Boolean)ev.getNewValue());
                 break;
             case Options.PROP_USE_TIME_RANGE_EDITOR:
                 if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
@@ -4341,6 +4316,77 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
         }
     }
 };
+
+private void makeDataVisible( final boolean newValue ) {
+    Runnable run= new Runnable() {
+        public void run() {
+            makeDataVisibleImmediately(newValue);
+        }
+    };
+    if ( SwingUtilities.isEventDispatchThread() ) {
+        run.run();
+    } else {
+        try {
+            SwingUtilities.invokeAndWait(run);
+        } catch (InterruptedException | InvocationTargetException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+    }
+}
+
+private void makeDataVisibleImmediately( boolean newValue ) {
+    if ( !SwingUtilities.isEventDispatchThread() ) {
+        throw new IllegalArgumentException("should be run on the event thread");
+    }
+    if ( Boolean.TRUE.equals(newValue) ) {
+        if ( dataPanel == null ) {
+            dataPanel = new DataPanel( AutoplotUI.this );
+        }
+        int idx= tabs.indexOfTab("metadata");
+        if ( idx==-1 ) idx=  tabs.getTabCount();
+        JScrollPane jsp = new JScrollPane();
+        jsp.setViewportView(dataPanel);
+        tabs.insertTab("data", null, jsp,
+                String.format( TAB_TOOLTIP_DATA, TABS_TOOLTIP ), idx );
+    } else {
+        if ( dataPanel!=null ) tabs.remove(dataPanel.getParent().getParent());
+    }      
+}
+
+private void makeLayoutVisible( final boolean newValue ) {
+    Runnable run= new Runnable() {
+        public void run() {
+            makeLayoutVisibleImmediately(newValue);
+        }
+    };
+    if ( SwingUtilities.isEventDispatchThread() ) {
+        run.run();
+    } else {
+        try {
+            SwingUtilities.invokeAndWait(run);
+        } catch (InterruptedException | InvocationTargetException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+    }
+}
+
+private void makeLayoutVisibleImmediately( boolean newValue ) {
+    if ( Boolean.TRUE.equals(newValue) ) {
+        if ( layoutPanel == null ) {
+            layoutPanel = new LayoutPanel();
+            layoutPanel.setApplication(dom);
+            layoutPanel.setApplicationModel(applicationModel);                        
+        }
+        int idx= tabs.indexOfTab("style");
+        if ( idx==-1 ) idx=  tabs.getTabCount();
+        JScrollPane jsp = new JScrollPane();
+        jsp.setViewportView(layoutPanel);
+        tabs.insertTab("layout", null, jsp,
+                String.format( TAB_TOOLTIP_LAYOUT, TABS_TOOLTIP ), idx+1 );
+    } else {
+        if ( layoutPanel!=null ) tabs.remove(layoutPanel.getParent().getParent());
+    }    
+}
 
 /**
  * return the processID (pid), or the fallback if the pid cannot be found.
