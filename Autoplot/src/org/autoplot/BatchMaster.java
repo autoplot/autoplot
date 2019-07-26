@@ -736,22 +736,39 @@ public class BatchMaster extends javax.swing.JPanel {
             try (PrintWriter out = new PrintWriter(f)) {
                 JSONArray params= results.getJSONArray("params");
                 JSONArray resultsArray= results.getJSONArray("results");
+                
+                if ( resultsArray.length()==0 ) {
+                    logger.warning("no records in results");
+                    return;
+                }
+                
+                JSONObject jo= resultsArray.getJSONObject(0);
+                
                 StringBuilder record= new StringBuilder();
                 for ( int j=0; j<params.length(); j++ ) {
                     if ( j>0 ) record.append(",");
                     record.append(params.get(j));
                 }
-                record.append(",").append("result");
+                record.append(",").append("executionTime(ms)");
+                boolean hasOutputFile= jo.has("writeFile");
+                if ( hasOutputFile ) {
+                    record.append(",").append("writeFile");
+                }
+                record.append(",").append("exception");
+                
                 out.println(record.toString());
                 for ( int i=0; i<resultsArray.length(); i++ ) {
-                    JSONObject jo= resultsArray.getJSONObject(i);
+                    jo= resultsArray.getJSONObject(i);
                     record= new StringBuilder();
                     for ( int j=0; j<params.length(); j++ ) {
                         if ( j>0 ) record.append(",");
                         record.append( jo.get(params.getString(j)) );
                     }
-                    record.append(",");
-                    record.append(jo.get("result"));
+                    record.append(",").append(jo.get("executionTime"));
+                    if ( hasOutputFile ) {
+                        record.append(",").append(jo.get("writeFile"));
+                    }
+                    record.append(",").append(jo.get("result"));
                     out.println( record.toString() );
                 }
             }
@@ -1085,7 +1102,14 @@ public class BatchMaster extends javax.swing.JPanel {
         return build.toString();
     }
     
-    private void doWrite( String f1, String f2 ) throws IOException {
+    /**
+     * write the current canvas to a file.
+     * @param f1
+     * @param f2
+     * @return the name of the file used.
+     * @throws IOException 
+     */
+    private String doWrite( String f1, String f2 ) throws IOException {
         if ( writeCheckBox.isSelected() ) {
             String template= writeFilenameCB.getSelectedItem().toString();
             String[] ss= template.split("\\$x",-2);
@@ -1105,6 +1129,9 @@ public class BatchMaster extends javax.swing.JPanel {
             } else if ( s.endsWith(".pdf") ) {
                 ScriptContext.writeToPdf(s);
             } 
+            return s;
+        } else {
+            return null;
         }
     }
     
@@ -1120,8 +1147,8 @@ public class BatchMaster extends javax.swing.JPanel {
         Icon okay= new ImageIcon(BatchMaster.class.getResource("/resources/blue.gif"));
         Icon prob= new ImageIcon(BatchMaster.class.getResource("/resources/red.gif"));    
         
-        List<JLabel> jobs=null;
-        Component textField= null;
+        List<JLabel> jobs;
+        
         {
             String[] ff1= param1Values.getText().split("\n");
             JPanel p= new JPanel();
@@ -1251,12 +1278,15 @@ public class BatchMaster extends javax.swing.JPanel {
                     runResults.put(paramName,f1);
                     
                     if ( param2NameCB.getSelectedItem().toString().trim().length()==0 ) {
+                        long t0= System.currentTimeMillis();
                         try {
                             interp.execfile( JythonRefactory.fixImports(new FileInputStream(scriptFile)), scriptFile.getName() );
+                            runResults.put("executionTime", System.currentTimeMillis()-t0);
                             if ( writeCheckBox.isSelected() ) {
-                                doWrite( f1, "" );
+                                runResults.put( "writeFile", doWrite( f1, "" ) );
                             }
                         } catch ( Exception ex ) {
+                            runResults.put("executionTime", System.currentTimeMillis()-t0);                            
                             String msg= ex.toString();
                             runResults.put("result",msg);
                             jobs.get(i1).setIcon(prob);
@@ -1272,17 +1302,20 @@ public class BatchMaster extends javax.swing.JPanel {
                         String problemMessage= null;
                         for ( String f2: ff2 ) {
                             if ( f2.trim().length()==0 ) continue;
+                            long t0= System.currentTimeMillis();
                             try {
                                 paramName= param2NameCB.getSelectedItem().toString();
                                 runResults.put(paramName,f2);
                                 setParam( interp, parms.get(paramName), paramName, f2 );
                                 interp.execfile(  JythonRefactory.fixImports(new FileInputStream(scriptFile)), scriptFile.getName() );
+                                runResults.put("executionTime", System.currentTimeMillis()-t0);
                                 i2=i2+f2.length()+1;
                                 if ( writeCheckBox.isSelected() ) {
-                                    doWrite( f1,f2 );
+                                    runResults.put( "writeFile", doWrite( f1,f2 ) );
                                 }
                                 runResults.put("result","");
                             } catch ( IOException | JSONException | RuntimeException ex ) {
+                                runResults.put("executionTime", System.currentTimeMillis()-t0);
                                 String msg= ex.toString();
                                 runResults.put("result",msg);
                                 jobs.get(i1).setIcon(prob);
