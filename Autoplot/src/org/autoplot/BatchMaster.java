@@ -719,6 +719,7 @@ public class BatchMaster extends javax.swing.JPanel {
                 public void run() {
                     try {
                         exportResults( f );
+                        JOptionPane.showMessageDialog( BatchMaster.this, "data saved to "+f );
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog( BatchMaster.this, "Unable to save file. "+ex.getMessage() );
                     }
@@ -745,8 +746,9 @@ public class BatchMaster extends javax.swing.JPanel {
                 JSONObject jo= resultsArray.getJSONObject(0);
                 
                 StringBuilder record= new StringBuilder();
+                record.append("jobNumber");
                 for ( int j=0; j<params.length(); j++ ) {
-                    if ( j>0 ) record.append(",");
+                    record.append(",");
                     record.append(params.get(j));
                 }
                 record.append(",").append("executionTime(ms)");
@@ -760,8 +762,9 @@ public class BatchMaster extends javax.swing.JPanel {
                 for ( int i=0; i<resultsArray.length(); i++ ) {
                     jo= resultsArray.getJSONObject(i);
                     record= new StringBuilder();
+                    record.append(i);
                     for ( int j=0; j<params.length(); j++ ) {
-                        if ( j>0 ) record.append(",");
+                        record.append(",");
                         record.append( jo.get(params.getString(j)) );
                     }
                     record.append(",").append(jo.get("executionTime"));
