@@ -89,7 +89,7 @@ public final class AutoplotSettings {
      * @param c the class requesting preferences.
      * @return the preferences object this class should use.
      */
-    public Preferences getPreferences( Class c ) {
+    public static Preferences getPreferences( Class c ) {
         String s= c.getPackage().getName();
         Preferences p1= Preferences.userRoot().node("/"+s.replace('.','/'));
         switch (s) {
