@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -69,6 +70,7 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.util.FileUtil;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -86,6 +88,8 @@ public class BatchMaster extends javax.swing.JPanel {
     
     private static final String STATE_READY= "ready";
     private static final String STATE_LOADING= "loading";
+    
+    JSONObject results=null;
     
     /**
      * Creates new form BatchMaster
@@ -244,6 +248,7 @@ public class BatchMaster extends javax.swing.JPanel {
         fileMenu = new javax.swing.JMenu();
         OpenMenuItem = new javax.swing.JMenuItem();
         SaveAsMenuItem = new javax.swing.JMenuItem();
+        exportResultsMenuItem = new javax.swing.JMenuItem();
         goButton = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         param1Values = new javax.swing.JTextArea();
@@ -348,6 +353,14 @@ public class BatchMaster extends javax.swing.JPanel {
             }
         });
         fileMenu.add(SaveAsMenuItem);
+
+        exportResultsMenuItem.setText("Export Results...");
+        exportResultsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportResultsMenuItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(exportResultsMenuItem);
 
         menuBar.add(fileMenu);
 
@@ -685,6 +698,68 @@ public class BatchMaster extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_SaveAsMenuItemActionPerformed
 
+    private void exportResultsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportResultsMenuItemActionPerformed
+        JFileChooser chooser= new JFileChooser();
+        chooser.setFileFilter( new FileNameExtensionFilter( "CSV Files", "csv") );
+        chooser.setDialogType( JFileChooser.OPEN_DIALOG );
+        Preferences prefs= Preferences.userNodeForPackage( BatchMaster.class );
+        String s= prefs.get("export",null);
+        if ( s!=null ) {
+            chooser.setSelectedFile(new File(s));
+        }
+        if ( JFileChooser.APPROVE_OPTION==chooser.showOpenDialog( this ) ) {
+            File ff= chooser.getSelectedFile();
+            if ( !ff.getName().endsWith(".csv") ) {
+                ff= new File( ff.getAbsolutePath()+".csv");
+            }
+            final File f= ff;
+            
+            prefs.put("export", f.toString() );
+            Runnable run= new Runnable() {
+                public void run() {
+                    try {
+                        exportResults( f );
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog( BatchMaster.this, "Unable to save file. "+ex.getMessage() );
+                    }
+                }
+            };
+            new Thread(run).start();
+        }
+    }//GEN-LAST:event_exportResultsMenuItemActionPerformed
+
+    private void exportResults( File f ) throws IOException {
+        try {
+            if ( results==null ) {
+                return;
+            }
+            try (PrintWriter out = new PrintWriter(f)) {
+                JSONArray params= results.getJSONArray("params");
+                JSONArray resultsArray= results.getJSONArray("results");
+                StringBuilder record= new StringBuilder();
+                for ( int j=0; j<params.length(); j++ ) {
+                    if ( j>0 ) record.append(",");
+                    record.append(params.get(j));
+                }
+                record.append(",").append("result");
+                out.println(record.toString());
+                for ( int i=0; i<resultsArray.length(); i++ ) {
+                    JSONObject jo= resultsArray.getJSONObject(i);
+                    record= new StringBuilder();
+                    for ( int j=0; j<params.length(); j++ ) {
+                        if ( j>0 ) record.append(",");
+                        record.append( jo.get(params.getString(j)) );
+                    }
+                    record.append(",");
+                    record.append(jo.get("result"));
+                    out.println( record.toString() );
+                }
+            }
+        } catch (JSONException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+    }
+    
     private void loadFile( File f ) throws IOException, JSONException {
         String src= FileUtil.readFileToString(f);
         JSONObject jo= new JSONObject(src);
@@ -1129,9 +1204,26 @@ public class BatchMaster extends javax.swing.JPanel {
                 }
             }
             
+            JSONObject jo= new JSONObject();
+            JSONArray ja= new JSONArray();
+            
+            jo.put( "results", ja );
+             
+            String param1= param1NameCB.getSelectedItem().toString().trim();
+            String param2= param2NameCB.getSelectedItem().toString().trim();
+            
+            JSONArray paramsJson= new JSONArray();
+            paramsJson.put(0,param1);
+            if ( param2.length()>0 ) {
+                paramsJson.put(1,param2);
+            }
+            jo.put("params", paramsJson );
+            
             monitor.setTaskSize( ff1.length );
+            int icount=0;
             int i1=0;
             for ( String f1 : ff1 ) {
+                JSONObject runResults= new JSONObject();
                 try {
                     monitor.setProgressMessage(f1);
                     if ( monitor.isCancelled() ) {
@@ -1156,41 +1248,72 @@ public class BatchMaster extends javax.swing.JPanel {
                         }
                     }
                     setParam( interp, parms.get(paramName), paramName, f1 );
+                    runResults.put(paramName,f1);
                     
                     if ( param2NameCB.getSelectedItem().toString().trim().length()==0 ) {
-                        interp.execfile( JythonRefactory.fixImports(new FileInputStream(scriptFile)), scriptFile.getName() );
-                        if ( writeCheckBox.isSelected() ) {
-                            doWrite( f1, "" );
+                        try {
+                            interp.execfile( JythonRefactory.fixImports(new FileInputStream(scriptFile)), scriptFile.getName() );
+                            if ( writeCheckBox.isSelected() ) {
+                                doWrite( f1, "" );
+                            }
+                        } catch ( Exception ex ) {
+                            String msg= ex.toString();
+                            runResults.put("result",msg);
+                            jobs.get(i1).setIcon(prob);
+                            jobs.get(i1).setToolTipText(ex.toString());
                         }
-                        jobs.get(i1).setIcon(okay);
+                        JSONObject copy = new JSONObject(runResults, JSONObject.getNames(runResults));
+                        ja.put( icount, copy );
+                        icount++;                        
+                        
                     } else {
                         String[] ff2= param2Values.getText().split("\n");
                         int i2=0;
+                        String problemMessage= null;
                         for ( String f2: ff2 ) {
                             if ( f2.trim().length()==0 ) continue;
-                            paramName= param2NameCB.getSelectedItem().toString();
-                            setParam( interp, parms.get(paramName), paramName, f2 );
-                            interp.execfile(  JythonRefactory.fixImports(new FileInputStream(scriptFile)), scriptFile.getName() );
-                            i2=i2+f2.length()+1;
-                            if ( writeCheckBox.isSelected() ) {
-                                doWrite( f1,f2 );
+                            try {
+                                paramName= param2NameCB.getSelectedItem().toString();
+                                runResults.put(paramName,f2);
+                                setParam( interp, parms.get(paramName), paramName, f2 );
+                                interp.execfile(  JythonRefactory.fixImports(new FileInputStream(scriptFile)), scriptFile.getName() );
+                                i2=i2+f2.length()+1;
+                                if ( writeCheckBox.isSelected() ) {
+                                    doWrite( f1,f2 );
+                                }
+                                runResults.put("result","");
+                            } catch ( IOException | JSONException | RuntimeException ex ) {
+                                String msg= ex.toString();
+                                runResults.put("result",msg);
+                                jobs.get(i1).setIcon(prob);
+                                jobs.get(i1).setToolTipText(ex.toString());
+                                problemMessage= msg;
                             }
+                            JSONObject copy = new JSONObject(runResults, JSONObject.getNames(runResults));
+                            ja.put( icount, copy );
+                            icount++;
                         }
-                        jobs.get(i1).setIcon(okay);
+                        if ( problemMessage==null ) {
+                            jobs.get(i1).setIcon(okay);
+                            jobs.get(i1).setToolTipText(null);
+                        }
                     }
-                    
-                } catch (IOException ex) {
-                    Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
-                    jobs.get(i1).setIcon(prob);
-                    jobs.get(i1).setToolTipText(ex.toString());
-                } catch ( Exception ex ) {
+                } catch (IOException | IllegalArgumentException | JSONException ex) {
                     Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
                     jobs.get(i1).setIcon(prob);
                     jobs.get(i1).setToolTipText(ex.toString());
                 }
                 i1=i1+1;
             }
+            
+            jo.put( "results", ja );
+            results= jo;
+            
+        } catch (JSONException ex) {
+            logger.log(Level.SEVERE, null, ex);
+            
         } finally {
+            
             messageLabel.setText("Jobs are complete, click above to edit.");
             monitor.finished();
             goButton.setEnabled(true);
@@ -1215,6 +1338,7 @@ public class BatchMaster extends javax.swing.JPanel {
     private javax.swing.JMenuItem SaveAsMenuItem;
     private javax.swing.JButton cancelButton;
     private org.autoplot.datasource.DataSetSelector dataSetSelector1;
+    private javax.swing.JMenuItem exportResultsMenuItem;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JButton generateButton1;
     private javax.swing.JButton generateButton2;
