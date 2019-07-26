@@ -4283,6 +4283,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
     private void runBatchMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runBatchMenuItemActionPerformed
         BatchMaster mmm= new BatchMaster(dom);
         JDialog dia= new JDialog( this, "Run Batch" );
+        dia.setJMenuBar( mmm.getMenuBar() );
         dia.setContentPane(mmm);
         dia.pack();
         dia.setLocationRelativeTo(this);
