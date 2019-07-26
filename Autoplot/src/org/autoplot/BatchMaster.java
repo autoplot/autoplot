@@ -14,18 +14,19 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -36,16 +37,17 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.autoplot.bookmarks.Bookmark;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.jythonsupport.JythonRefactory;
@@ -66,6 +68,9 @@ import org.das2.datum.Units;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
+import org.das2.util.FileUtil;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Tool for running batches, generating inputs for jython scripts.
@@ -77,14 +82,20 @@ public class BatchMaster extends javax.swing.JPanel {
     
     private Application dom;
     
+    private Object state; 
+    
+    private static final String STATE_READY= "ready";
+    private static final String STATE_LOADING= "loading";
+    
     /**
-     * Creates new form MiracleMashMachine
+     * Creates new form BatchMaster
      * @param dom
      */
     public BatchMaster( final Application dom ) {
         initComponents();
         generateButton1.setEnabled(false);
         this.dom= dom;
+        this.state= STATE_READY;
         
         /**
          * register the browse trigger to the same action, because we always browse.
@@ -93,6 +104,7 @@ public class BatchMaster extends javax.swing.JPanel {
             @Override
             public void actionPerformed( ActionEvent ev ) {
                 org.das2.util.LoggerManager.logGuiEvent(ev);                    
+                state= STATE_LOADING;
                 String s= dataSetSelector1.getValue();
                 Map<String,String> args;
                 try {
@@ -115,6 +127,8 @@ public class BatchMaster extends javax.swing.JPanel {
                     }
                 } catch ( IOException ex ) { 
                     throw new RuntimeException(ex);
+                } finally {
+                    state= STATE_READY;
                 }
             }
         });
@@ -122,7 +136,8 @@ public class BatchMaster extends javax.swing.JPanel {
         dataSetSelector1.registerActionTrigger( "(.*)\\.jy(\\?.*)?", new AbstractAction( "Review Script" ) {
             @Override
             public void actionPerformed( ActionEvent ev ) {
-                org.das2.util.LoggerManager.logGuiEvent(ev);                    
+                org.das2.util.LoggerManager.logGuiEvent(ev); 
+                state= STATE_LOADING;                  
                 try {
                     String scriptName= dataSetSelector1.getValue();
                     URISplit split= URISplit.parse(scriptName);
@@ -167,6 +182,8 @@ public class BatchMaster extends javax.swing.JPanel {
                     
                 } catch (IOException ex) {
                     Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    state= STATE_READY;
                 }
             }
         });
@@ -188,6 +205,17 @@ public class BatchMaster extends javax.swing.JPanel {
         jScrollPane3.getVerticalScrollBar().setUnitIncrement(jScrollPane3.getFont().getSize());
         jScrollPane1.getVerticalScrollBar().setUnitIncrement(jScrollPane1.getFont().getSize());
         
+        
+    }
+    
+    /**
+     * get the menu bar, which is typically added to the JDialog which will 
+     * contain this component.
+     * 
+     * @return the menu bar.
+     */
+    public JMenuBar getMenuBar() {
+        return menuBar;
     }
 
     /**
@@ -212,6 +240,10 @@ public class BatchMaster extends javax.swing.JPanel {
         jLabel3 = new javax.swing.JLabel();
         jPopupMenu2 = new javax.swing.JPopupMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
+        menuBar = new javax.swing.JMenuBar();
+        fileMenu = new javax.swing.JMenu();
+        OpenMenuItem = new javax.swing.JMenuItem();
+        SaveAsMenuItem = new javax.swing.JMenuItem();
         goButton = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         param1Values = new javax.swing.JTextArea();
@@ -298,6 +330,26 @@ public class BatchMaster extends javax.swing.JPanel {
             }
         });
         jPopupMenu2.add(jMenuItem2);
+
+        fileMenu.setText("File");
+
+        OpenMenuItem.setText("Open batch file...");
+        OpenMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                OpenMenuItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(OpenMenuItem);
+
+        SaveAsMenuItem.setText("Save As...");
+        SaveAsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SaveAsMenuItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(SaveAsMenuItem);
+
+        menuBar.add(fileMenu);
 
         goButton.setText("Go!");
         goButton.addActionListener(new java.awt.event.ActionListener() {
@@ -578,6 +630,98 @@ public class BatchMaster extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_param2NameCBItemStateChanged
 
+    private void OpenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OpenMenuItemActionPerformed
+        JFileChooser chooser= new JFileChooser();
+        chooser.setFileFilter( new FileNameExtensionFilter( "Batch Parameters", "batch") );
+        chooser.setDialogType( JFileChooser.OPEN_DIALOG );
+        Preferences prefs= Preferences.userNodeForPackage( BatchMaster.class );
+        String s= prefs.get("batch",null);
+        if ( s!=null ) {
+            chooser.setSelectedFile(new File(s));
+        }
+        if ( JFileChooser.APPROVE_OPTION==chooser.showOpenDialog( this ) ) {
+            final File f= chooser.getSelectedFile();
+            prefs.put("batch", f.toString() );
+            Runnable run= new Runnable() {
+                public void run() {
+                    try {
+                        loadFile( f );
+                    } catch (IOException|JSONException ex) {
+                        JOptionPane.showMessageDialog( BatchMaster.this, "Unable to open file. "+ex.getMessage() );
+                    }
+                }
+            };
+            new Thread(run).start();
+        }
+    }//GEN-LAST:event_OpenMenuItemActionPerformed
+
+    private void SaveAsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveAsMenuItemActionPerformed
+        JFileChooser chooser= new JFileChooser();
+        chooser.setFileFilter( new FileNameExtensionFilter( "Batch Parameters", "batch") );
+        chooser.setDialogType( JFileChooser.OPEN_DIALOG );
+        Preferences prefs= Preferences.userNodeForPackage( BatchMaster.class );
+        String s= prefs.get("batch",null);
+        if ( s!=null ) {
+            chooser.setSelectedFile(new File(s));
+        }
+        if ( JFileChooser.APPROVE_OPTION==chooser.showOpenDialog( this ) ) {
+            File ff= chooser.getSelectedFile();
+            if ( !ff.getName().endsWith(".batch") ) {
+                ff= new File( ff.getAbsolutePath()+".batch");
+            }
+            final File f= ff;
+            
+            prefs.put("batch", f.toString() );
+            Runnable run= new Runnable() {
+                public void run() {
+                    try {
+                        saveFile( f );
+                    } catch (IOException|JSONException ex) {
+                        JOptionPane.showMessageDialog( BatchMaster.this, "Unable to save file. "+ex.getMessage() );
+                    }
+                }
+            };
+            new Thread(run).start();
+        }
+    }//GEN-LAST:event_SaveAsMenuItemActionPerformed
+
+    private void loadFile( File f ) throws IOException, JSONException {
+        String src= FileUtil.readFileToString(f);
+        JSONObject jo= new JSONObject(src);
+        final Map<String,String> params= new HashMap();
+        params.put( "script", jo.getString("script") );
+        params.put( "param1", jo.getString("param1"));
+        params.put( "param2", jo.getString("param2"));
+        params.put( "param1Values", jo.getString("param1Values"));
+        params.put( "param2Values", jo.getString("param2Values"));                
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                BatchMaster.this.param1NameCB.setSelectedItem(params.get("param1"));
+                BatchMaster.this.param2NameCB.setSelectedItem(params.get("param2"));
+                BatchMaster.this.param1Values.setText(params.get("param1Values"));
+                BatchMaster.this.param2Values.setText(params.get("param2Values"));                
+            }
+        };
+        try {
+            SwingUtilities.invokeAndWait(run);
+        } catch (InterruptedException | InvocationTargetException ex) {
+            Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void saveFile( File f ) throws IOException, JSONException {
+        JSONObject jo= new JSONObject();
+        jo.put( "script", this.dataSetSelector1.getValue() );
+        jo.put( "param1", this.param1NameCB.getSelectedItem().toString() );
+        jo.put( "param2", this.param2NameCB.getSelectedItem().toString() );
+        jo.put( "param1Values", this.param1Values.getText() );
+        jo.put( "param2Values", this.param2Values.getText() );
+        String src= jo.toString(4);
+        FileUtil.writeStringToFile(f,src);
+    }
+    
+    
     private void doGenerate( JComboBox cb, JTextArea ta ) {
         if ( cb.getSelectedItem()==null ) return;
         String p= cb.getSelectedItem().toString();
@@ -1058,6 +1202,7 @@ public class BatchMaster extends javax.swing.JPanel {
         dia.setResizable(true);
         BatchMaster mmm= new BatchMaster(new Application());
         dia.setContentPane( mmm );
+        dia.setJMenuBar( mmm.getMenuBar() );
         mmm.param1NameCB.setSelectedItem("ie");
         mmm.dataSetSelector1.setValue("/home/jbf/ct/autoplot/script/demos/paramTypes.jy");
         mmm.param1Values.setText("1\n2\n3\n");
@@ -1066,8 +1211,11 @@ public class BatchMaster extends javax.swing.JPanel {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem OpenMenuItem;
+    private javax.swing.JMenuItem SaveAsMenuItem;
     private javax.swing.JButton cancelButton;
     private org.autoplot.datasource.DataSetSelector dataSetSelector1;
+    private javax.swing.JMenu fileMenu;
     private javax.swing.JButton generateButton1;
     private javax.swing.JButton generateButton2;
     private javax.swing.JButton goButton;
@@ -1083,6 +1231,7 @@ public class BatchMaster extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JMenuItem loadUriMenuItem;
+    private javax.swing.JMenuBar menuBar;
     private javax.swing.JLabel messageLabel;
     private javax.swing.JComboBox<String> param1NameCB;
     private javax.swing.JTextArea param1Values;
