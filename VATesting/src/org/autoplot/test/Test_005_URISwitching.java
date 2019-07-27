@@ -52,13 +52,13 @@ public class Test_005_URISwitching implements Scenario {
             DataSetSelector dss= app.getDataSetSelector();
             new JTextFieldOperator( dss.getEditor() ).setText("http://autoplot.org/data/hsi_qlimg_5050601_001.fits");
             new JButtonOperator( dss.getGoButton() ).clickMouse();
-            ScriptContext.sleep(100);
+            Util.waitUntilBusy(500,app.getDom());
             
             writeToPng( "Test_005_URISwitching.demo012.png" );
             
             new JTextFieldOperator( dss.getEditor() ).setText("ftp://spdf.gsfc.nasa.gov/pub/data/omni/low_res_omni/omni2_1963.dat?column=field17");
             new JButtonOperator( dss.getGoButton() ).clickMouse();
-            ScriptContext.sleep(100);
+            Util.waitUntilBusy(500,app.getDom());
             
             writeToPng( "Test_005_URISwitching.demo007.png" );
             

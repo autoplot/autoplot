@@ -32,18 +32,6 @@ public class Test_022_ContextOverview implements Scenario {
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
     
-    private void waitUntilBusy() {
-        logger.fine("waiting for some pending changes");
-        Application dom= getDocumentModel();
-        while ( !dom.getController().isPendingChanges() ) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Test_022_ContextOverview.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
-    
     @Override
     public int runIt(Object o) {
 
@@ -68,7 +56,7 @@ public class Test_022_ContextOverview implements Scenario {
                     new ComponentChooser[] { new RegexComponentChooser("Bookmarks"),
                     new RegexComponentChooser("Demos"), new RegexComponentChooser("Demo 5: .*") } );
 
-            waitUntilBusy();
+            Util.waitUntilBusy(2000,app.getDom());
             waitUntilIdle();
 
             DatumRange range0= dom.getPlots(0).getXaxis().getRange();

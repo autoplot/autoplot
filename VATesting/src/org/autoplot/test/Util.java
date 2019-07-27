@@ -18,6 +18,7 @@ import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.operators.JPopupMenuOperator;
 import org.netbeans.jemmy.operators.JTabbedPaneOperator;
 import org.autoplot.AutoplotUI;
+import org.autoplot.dom.Application;
 import util.RegexComponentChooser;
 
 /**
@@ -78,4 +79,24 @@ public class Util {
             System.err.println( "handlers: " + h.getClass().toString() + " " + h.getLevel() + " " + h.getFormatter().getClass().toString() );
         }
     }
+    
+    /**
+     * wait until dom.controller.pendingChanges becomes true.
+     * @param timeout timeout in milliseconds.
+     * @param dom the application.
+     */
+    public static void waitUntilBusy(int timeout, Application dom ) {
+        logger.fine("waiting for some pending changes");
+        long t0= System.currentTimeMillis();
+        while ( !dom.getController().isPendingChanges() ) {
+            if ( System.currentTimeMillis()-t0 > timeout ) {
+                break;
+            }
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+    }    
 }
