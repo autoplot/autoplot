@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Test100 fixed after being broken by findbugs fixes.
+        <p><small>SeriesRenderer errorBarType=SHADE could be used to highlite a region.
             </small></p>            
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,8 @@
         
         <p>Bugfixes (2019-07-24 r23958):</p>
         <ul>
+            <li>2194: handle case where StreamDescriptor no longer recognizes a packet because the id has been recycled, dropping a record.
+            <li>QStream toAscii would use formatter which didn't support doubles with large negative exponents, showing "0"...
             <li>das2server TCA (ephemeris) URIs now load based on needed resolution. 
             <li>findbugs fixes, where difficult thread warning IS2_INCONSISTENT_SYNC is resolved.
             <li>"Check URI" monitor wasn't centered on the application.
@@ -61,8 +63,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe545: "Run Batch" tool has menubar for loading and saving parameter lists, and export results to CSV.
+            <li>rfe689: Das2 series renderer now had ErrorBarType=SHADE using a shaded region to show error interval.
             <li>Base64 class replaced with Java 8 version, to get ready for the Java 8 upgrade.
-            <li>Das2 series renderer now has ErrorBarType, which can be BAR or SERIF_BAR, and soon SHADE.
+            <li>rfe689: Das2 series renderer now has ErrorBarType, which can be BAR or SERIF_BAR, and soon SHADE.
             <li>report the cadence in frequency as well as a period for timetags.
         </ul>
         <p>Less recent features:</p>
