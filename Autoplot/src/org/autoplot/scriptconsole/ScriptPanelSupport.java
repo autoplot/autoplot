@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.ClosedWatchServiceException;
@@ -132,32 +133,32 @@ public class ScriptPanelSupport {
 
     }
 
-    /**
-     * @return true if the source was displayed.
-     * @throws java.awt.HeadlessException
-     * @throws java.lang.NullPointerException
-     */
-    private boolean maybeDisplayDataSourceScript() throws HeadlessException, NullPointerException {
+    private boolean canDisplayDataSourceScript( String sfile ) {
         URISplit split;
+        if (sfile == null) {
+            return false;
+        }
+        split = URISplit.parse(sfile);
+        if (!( URISplit.implicitVapScheme(split).endsWith("jyds") ) ) {
+            return false;
+        }
+        if (panel.isDirty()) {
+            logger.fine("editor is dirty, not showing script.");
+            return false;
+        }
+
+        if ( this.panel.getRunningScript()!=null ) {
+            logger.fine("editor is busy running a script.");
+            return false;
+        }
+
+        return true;
+
+    }
+    
+    private boolean scriptIsAlreadyShowing( String sfile ) {
         try {
-            String sfile = applicationController.getFocusUri();
-            if (sfile == null) {
-                return false;
-            }
-            split = URISplit.parse(sfile);
-            if (!( URISplit.implicitVapScheme(split).endsWith("jyds") ) ) {
-                return false;
-            }
-            if (panel.isDirty()) {
-                logger.fine("editor is dirty, not showing script.");
-                return false;
-            }
-            
-            if ( this.panel.getRunningScript()!=null ) {
-                logger.fine("editor is busy running a script.");
-                return false;
-            }
-            
+            URISplit split=  URISplit.parse(sfile);
             if ( split.params!=null ) {
                 Map<String,String> params= URISplit.parseParams(split.params);
                 if ( params.containsKey("script") ) {
@@ -189,8 +190,53 @@ public class ScriptPanelSupport {
                     }
                 }
             }
+        } catch (URISyntaxException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+    
+    /**
+     * @return true if the source is displayed.
+     * @throws java.awt.HeadlessException
+     * @throws java.lang.NullPointerException
+     */
+    private boolean maybeDisplayDataSourceScript() throws HeadlessException, NullPointerException {
+        
+        try {
+            final String fsfile=  applicationController.getFocusUri();
+            
+            if ( canDisplayDataSourceScript( fsfile )==false ) {
+                return false;
+            }
+            
+            if ( scriptIsAlreadyShowing( fsfile )==true ) {
+                return true;
+            }
             
             //TODO: why can't we have a DasProgressPanel on any component?
+            Runnable swrun= new Runnable() {
+                public void run() {
+                    try {
+                        panel.getEditorPanel().getEditorKit();
+                        MutableAttributeSet att= new SimpleAttributeSet();
+                        StyleConstants.setItalic( att, true);
+                        panel.getEditorPanel().getDocument().remove( 0, panel.getEditorPanel().getDocument().getLength() );
+                        panel.getEditorPanel().getDocument().insertString( 0, "loading "+fsfile, att );
+                    } catch ( BadLocationException ex ) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+            };
+            if ( SwingUtilities.isEventDispatchThread() ) {
+                swrun.run(); 
+            } else {
+                try {
+                    SwingUtilities.invokeAndWait(swrun);
+                } catch (InterruptedException | InvocationTargetException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+            }
             Runnable run= new Runnable() {
                 public void run() {
                     try {
@@ -203,21 +249,9 @@ public class ScriptPanelSupport {
                     }
                 }
             };
-            try {
-                panel.getEditorPanel().getEditorKit();
-                MutableAttributeSet att= new SimpleAttributeSet();
-                StyleConstants.setItalic( att, true);
-                panel.getEditorPanel().getDocument().remove( 0, panel.getEditorPanel().getDocument().getLength() );
-                panel.getEditorPanel().getDocument().insertString( 0, "loading "+fsfile, att );
-            } catch ( BadLocationException ex ) {
-                
-            }
             new Thread( run, "load script thread" ).start();
             
         } catch (NullPointerException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            return false;
-        } catch (URISyntaxException ex ) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             return false;
         }
