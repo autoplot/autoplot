@@ -199,9 +199,8 @@ public class ScriptPanelSupport {
     /**
      * @return true if the source is displayed.
      * @throws java.awt.HeadlessException
-     * @throws java.lang.NullPointerException
      */
-    private boolean maybeDisplayDataSourceScript() throws HeadlessException, NullPointerException {
+    private boolean maybeDisplayDataSourceScript() throws HeadlessException {
         
         try {
             final String fsfile=  applicationController.getFocusUri();
@@ -216,6 +215,7 @@ public class ScriptPanelSupport {
             
             //TODO: why can't we have a DasProgressPanel on any component?
             Runnable swrun= new Runnable() {
+                @Override
                 public void run() {
                     try {
                         panel.getEditorPanel().getEditorKit();
@@ -238,6 +238,7 @@ public class ScriptPanelSupport {
                 }
             }
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     try {
                         file = DataSetURI.getFile( fsfile, new NullProgressMonitor() );
@@ -293,7 +294,7 @@ public class ScriptPanelSupport {
             } else {
                 chooser.setSelectedFile(file);
             }
-            Preferences prefs = AutoplotSettings.settings().getPreferences(ScriptPanelSupport.class);
+            Preferences prefs = AutoplotSettings.getPreferences(ScriptPanelSupport.class);
             String openFile= prefs.get(PREFERENCE_OPEN_FILE, "");
             if ( !openFile.equals("") && !FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), new File(openFile) )  ) {
                 File dir= new File(openFile).getParentFile();
@@ -301,7 +302,7 @@ public class ScriptPanelSupport {
             }
         }
         if ( file==null ) {
-            Preferences prefs = AutoplotSettings.settings().getPreferences(ScriptPanelSupport.class);
+            Preferences prefs = AutoplotSettings.getPreferences(ScriptPanelSupport.class);
             String openFile = prefs.get(PREFERENCE_OPEN_FILE, "");
             if ( !openFile.equals("") ) {
                 chooser.setCurrentDirectory( new File(openFile).getParentFile() );
@@ -363,6 +364,7 @@ public class ScriptPanelSupport {
             
             final File ffile= file;
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     try {
                         logger.fine("pausing before restarting watcher");
@@ -624,19 +626,25 @@ public class ScriptPanelSupport {
             //System.err.println("line="+line);
             
             if ( line<0 ) {
-                logger.warning("no trace information available for error "+ex.getMessage());
+                logger.log(Level.WARNING, "no trace information available for error {0}", ex.getMessage());
                 line=0;
             }
             final int fline= line;
             final JEditorPane textArea= panel.getEditorPanel();
-            SwingUtilities.invokeLater( new Runnable() { public void run() {
-                Element element= textArea.getDocument().getDefaultRootElement().getElement(Math.max(0,fline-5)); // 5 lines of context.
-                if ( element!=null ) textArea.setCaretPosition(element.getStartOffset()); 
-                SwingUtilities.invokeLater( new Runnable() { public void run() {
-                    Element element= textArea.getDocument().getDefaultRootElement().getElement(fline); // 5 lines of context.
+            SwingUtilities.invokeLater( new Runnable() { 
+                @Override
+                public void run() {
+                    Element element= textArea.getDocument().getDefaultRootElement().getElement(Math.max(0,fline-5)); // 5 lines of context.
                     if ( element!=null ) textArea.setCaretPosition(element.getStartOffset()); 
-                } } );
-            } } );
+                    SwingUtilities.invokeLater( new Runnable() { 
+                        @Override
+                        public void run() {
+                            Element element= textArea.getDocument().getDefaultRootElement().getElement(fline); // 5 lines of context.
+                            if ( element!=null ) textArea.setCaretPosition(element.getStartOffset()); 
+                        } 
+                    } );
+                } 
+            } );
         }
     }
 
@@ -967,6 +975,7 @@ public class ScriptPanelSupport {
         
         /**
          * PDB has just returned from a routine, so don't close the debugging session.
+         * @return 
          */
         public boolean getReturnFlag() {
             return this.returnFlag;
@@ -1174,7 +1183,7 @@ public class ScriptPanelSupport {
                 panel.setFilename(file.toString());
                 restartWatcher(file);
                 
-                Preferences prefs = AutoplotSettings.settings().getPreferences(ScriptPanelSupport.class);
+                Preferences prefs = AutoplotSettings.getPreferences(ScriptPanelSupport.class);
                 prefs.put(PREFERENCE_OPEN_FILE, file.toString() );
                 
                 if ( file.toString().endsWith(".jyds") ) {
@@ -1333,7 +1342,7 @@ public class ScriptPanelSupport {
                 }
             }
 
-            Preferences prefs = AutoplotSettings.settings().getPreferences(ScriptPanelSupport.class);
+            Preferences prefs = AutoplotSettings.getPreferences(ScriptPanelSupport.class);
             String openFile = prefs.get(PREFERENCE_OPEN_FILE, "");
 
             JFileChooser chooser = new JFileChooser();
