@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -80,7 +81,7 @@ import org.json.JSONObject;
  */
 public class BatchMaster extends javax.swing.JPanel {
 
-    private final Logger logger= LoggerManager.getLogger("jython.batchmaster");
+    private static final Logger logger= LoggerManager.getLogger("jython.batchmaster");
     
     private Application dom;
     
@@ -89,7 +90,9 @@ public class BatchMaster extends javax.swing.JPanel {
     private static final String STATE_READY= "ready";
     private static final String STATE_LOADING= "loading";
     
-    JSONObject results=null;
+    private JSONObject results=null;
+    private JSONObject resultsPending=null;
+    private File resultsFile=null;
     
     /**
      * Creates new form BatchMaster
@@ -249,6 +252,8 @@ public class BatchMaster extends javax.swing.JPanel {
         OpenMenuItem = new javax.swing.JMenuItem();
         SaveAsMenuItem = new javax.swing.JMenuItem();
         exportResultsMenuItem = new javax.swing.JMenuItem();
+        helpMenu = new javax.swing.JMenu();
+        showHelpMenuItem = new javax.swing.JMenuItem();
         goButton = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         param1Values = new javax.swing.JTextArea();
@@ -363,6 +368,18 @@ public class BatchMaster extends javax.swing.JPanel {
         fileMenu.add(exportResultsMenuItem);
 
         menuBar.add(fileMenu);
+
+        helpMenu.setText("Help");
+
+        showHelpMenuItem.setText("Show Help Manual in Browser");
+        showHelpMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showHelpMenuItemActionPerformed(evt);
+            }
+        });
+        helpMenu.add(showHelpMenuItem);
+
+        menuBar.add(helpMenu);
 
         goButton.setText("Go!");
         goButton.addActionListener(new java.awt.event.ActionListener() {
@@ -707,21 +724,30 @@ public class BatchMaster extends javax.swing.JPanel {
         if ( s!=null ) {
             chooser.setSelectedFile(new File(s));
         }
-        if ( JFileChooser.APPROVE_OPTION==chooser.showOpenDialog( this ) ) {
+        if ( JFileChooser.APPROVE_OPTION==chooser.showSaveDialog( this ) ) {
             File ff= chooser.getSelectedFile();
             if ( !ff.getName().endsWith(".csv") ) {
                 ff= new File( ff.getAbsolutePath()+".csv");
             }
             final File f= ff;
+            resultsFile= f;
             
+            if ( results==null ) {
+                String msg= "Output will be written to "+f+".pending and moved after the run.";
+                JOptionPane.showMessageDialog( BatchMaster.this, msg );
+                return;
+            }
             prefs.put("export", f.toString() );
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     try {
                         exportResults( f );
                         JOptionPane.showMessageDialog( BatchMaster.this, "data saved to "+f );
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog( BatchMaster.this, "Unable to save file. "+ex.getMessage() );
+                    } catch (JSONException ex) {
+                        JOptionPane.showMessageDialog( BatchMaster.this, "Unable to save file because of JSON exception "+ex.getMessage() );
                     }
                 }
             };
@@ -729,55 +755,15 @@ public class BatchMaster extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_exportResultsMenuItemActionPerformed
 
-    private void exportResults( File f ) throws IOException {
-        try {
-            if ( results==null ) {
-                return;
-            }
-            try (PrintWriter out = new PrintWriter(f)) {
-                JSONArray params= results.getJSONArray("params");
-                JSONArray resultsArray= results.getJSONArray("results");
-                
-                if ( resultsArray.length()==0 ) {
-                    logger.warning("no records in results");
-                    return;
-                }
-                
-                JSONObject jo= resultsArray.getJSONObject(0);
-                
-                StringBuilder record= new StringBuilder();
-                record.append("jobNumber");
-                for ( int j=0; j<params.length(); j++ ) {
-                    record.append(",");
-                    record.append(params.get(j));
-                }
-                record.append(",").append("executionTime(ms)");
-                boolean hasOutputFile= jo.has("writeFile");
-                if ( hasOutputFile ) {
-                    record.append(",").append("writeFile");
-                }
-                record.append(",").append("exception");
-                
-                out.println(record.toString());
-                for ( int i=0; i<resultsArray.length(); i++ ) {
-                    jo= resultsArray.getJSONObject(i);
-                    record= new StringBuilder();
-                    record.append(i);
-                    for ( int j=0; j<params.length(); j++ ) {
-                        record.append(",");
-                        record.append( jo.get(params.getString(j)) );
-                    }
-                    record.append(",").append(jo.get("executionTime"));
-                    if ( hasOutputFile ) {
-                        record.append(",").append(jo.get("writeFile"));
-                    }
-                    record.append(",").append(jo.get("result"));
-                    out.println( record.toString() );
-                }
-            }
-        } catch (JSONException ex) {
-            logger.log(Level.SEVERE, null, ex);
+    private void showHelpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showHelpMenuItemActionPerformed
+        AutoplotUtil.openBrowser("http://autoplot.org/batch");
+    }//GEN-LAST:event_showHelpMenuItemActionPerformed
+
+    private void exportResults( File f ) throws IOException, JSONException {
+        if ( results==null ) {
+            return;
         }
+        exportResultsPending( f, results, results.getJSONArray("results"), 0 );
     }
     
     private void loadFile( File f ) throws IOException, JSONException {
@@ -1252,6 +1238,8 @@ public class BatchMaster extends javax.swing.JPanel {
             monitor.setTaskSize( ff1.length );
             int icount=0;
             int i1=0;
+            int exportResultsWritten=0;
+            
             for ( String f1 : ff1 ) {
                 JSONObject runResults= new JSONObject();
                 try {
@@ -1340,6 +1328,15 @@ public class BatchMaster extends javax.swing.JPanel {
                     jobs.get(i1).setToolTipText(ex.toString());
                 }
                 i1=i1+1;
+                
+                if ( resultsFile!=null ) {
+                    File pendingResultsFile= new File( resultsFile.getAbsolutePath()+".pending" );
+                    exportResultsPending( pendingResultsFile, jo, ja, exportResultsWritten );
+                    exportResultsWritten= icount;
+                }
+                
+                JSONObject pendingResults= new JSONObject( jo.toString() );
+                pendingResults.put( "results", new JSONArray( ja.toString() ) );
             }
             
             jo.put( "results", ja );
@@ -1379,6 +1376,7 @@ public class BatchMaster extends javax.swing.JPanel {
     private javax.swing.JButton generateButton1;
     private javax.swing.JButton generateButton2;
     private javax.swing.JButton goButton;
+    private javax.swing.JMenu helpMenu;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -1397,6 +1395,7 @@ public class BatchMaster extends javax.swing.JPanel {
     private javax.swing.JTextArea param1Values;
     private javax.swing.JComboBox<String> param2NameCB;
     private javax.swing.JTextArea param2Values;
+    private javax.swing.JMenuItem showHelpMenuItem;
     private javax.swing.JComboBox<String> timeFormatComboBox;
     private javax.swing.JComboBox<String> timeRangeComboBox;
     private javax.swing.JPanel timeRangesPanel;
@@ -1404,4 +1403,59 @@ public class BatchMaster extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> writeFilenameCB;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
+
+    private static void exportResultsPending( File pendingFile, JSONObject results, JSONArray resultsArray, int recordsWrittenAlready ) throws FileNotFoundException, IOException {
+        
+        boolean header= recordsWrittenAlready==0;
+        
+        try (PrintWriter out = new PrintWriter( new FileWriter( pendingFile, true ) ) ) {
+            
+            if ( resultsArray.length()==0 ) {
+                logger.warning("no records in results");
+                return;
+            }
+
+            JSONObject jo= resultsArray.getJSONObject(0);
+            boolean hasOutputFile= jo.has("writeFile");
+            JSONArray params= results.getJSONArray("params");
+
+            StringBuilder record;
+                
+            if ( header ) {
+                record= new StringBuilder();
+                record.append("jobNumber");
+
+                for ( int j=0; j<params.length(); j++ ) {
+                    record.append(",");
+                    record.append(params.get(j));
+                }
+                record.append(",").append("executionTime(ms)");
+                if ( hasOutputFile ) {
+                    record.append(",").append("writeFile");
+                }
+                record.append(",").append("exception");
+
+                out.println(record.toString());
+
+            }
+            
+            for ( int i=recordsWrittenAlready; i<resultsArray.length(); i++ ) {
+                jo= resultsArray.getJSONObject(i);
+                record= new StringBuilder();
+                record.append(i);
+                for ( int j=0; j<params.length(); j++ ) {
+                    record.append(",");
+                    record.append( jo.get(params.getString(j)) );
+                }
+                record.append(",").append(jo.get("executionTime"));
+                if ( hasOutputFile ) {
+                    record.append(",").append(jo.get("writeFile"));
+                }
+                record.append(",").append(jo.get("result"));
+                out.println( record.toString() );
+            }
+        } catch (JSONException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+    }
 }
