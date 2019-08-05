@@ -18,6 +18,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
@@ -502,7 +503,11 @@ public class MetadataPanel extends javax.swing.JPanel {
                 Units u = d.getUnits();
                 map.put("Cadence", d );
                 if ( u.isConvertibleTo(Units.seconds) ) {
-                    map.put("Frequency (1/Cadence)",DatumUtil.asOrderOneUnits(Datum.create(1).divide(d)));
+                    try {
+                        map.put("Frequency (1/Cadence)",DatumUtil.asOrderOneUnits(Datum.create(1).divide(d)));
+                    } catch ( IllegalArgumentException ex ) {
+                        logger.log(Level.FINE,"inverse datum cannot be calculated.",ex);
+                    }
                 }
             } else {
                 map.put("Cadence", "null");
