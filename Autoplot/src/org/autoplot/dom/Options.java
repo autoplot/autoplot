@@ -14,7 +14,7 @@ import org.autoplot.MouseModuleType;
  * Bean for holding AP configuration options.  Note there are a few AutoplotUI prefs here that shouldn't be.
  * @author jbf
  */
-public class Options extends DomNode {
+public final class Options extends DomNode {
 
     public static final String PROP_COLOR = "color";
     public static final String PROP_FILLCOLOR = "fillColor";
@@ -664,6 +664,12 @@ public class Options extends DomNode {
         return result;
     }
 
+    protected OptionsPrefsController controller=null;
+    
+    public OptionsPrefsController getController() {
+        return this.controller;
+    }
+    
     @Override
     public DomNode copy() {
         Options that= new Options();

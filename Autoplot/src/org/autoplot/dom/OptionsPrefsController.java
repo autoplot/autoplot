@@ -2,8 +2,6 @@
 package org.autoplot.dom;
 
 import java.awt.Color;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -11,78 +9,43 @@ import java.util.prefs.Preferences;
 import org.das2.util.LoggerManager;
 import org.autoplot.MouseModuleType;
 import org.autoplot.datasource.AutoplotSettings;
-import org.autoplot.util.TickleTimer;
 
 /**
  * listen to an Options class and keep prefs up to date.
  * @author jbf
  */
-public class OptionsPrefsController {
+public final class OptionsPrefsController {
 
     Preferences prefs;
     Options options;
 
     private static final Logger logger= LoggerManager.getLogger( "autoplot.dom" );
 
-    TickleTimer flushTimer= new TickleTimer( 300, new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-            LoggerManager.logPropertyChangeEvent(evt,"flushTimer");  
-            try {
-                prefs.flush();
-            } catch (BackingStoreException ex) {
-                logger.log(Level.FINE, ex.getMessage(), ex);
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ex1) {
-
-                }                    
-                try {
-                    prefs.flush();
-                } catch (BackingStoreException ex1) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex1);
-                }
-            }
+    public void copyOptionsToPersistentPreferences() {
+        prefs.put( Options.PROP_BACKGROUND, DomUtil.encodeColor(options.getBackground()) );
+        prefs.put( Options.PROP_FOREGROUND, DomUtil.encodeColor(options.getForeground()) );
+        prefs.put( Options.PROP_COLOR, DomUtil.encodeColor( options.getColor() ) );
+        prefs.put( Options.PROP_FILLCOLOR, DomUtil.encodeColor( options.getFillColor() ) );
+        prefs.put( Options.PROP_CANVASFONT, options.getCanvasFont() );
+        prefs.put( Options.PROP_LINE_THICKNESS, options.getLineThickness() );
+        prefs.putBoolean( Options.PROP_FLIPCOLORBARLABEL, options.isFlipColorbarLabel() );
+        prefs.putBoolean( Options.PROP_DRAWGRID, options.isDrawGrid() );
+        prefs.putBoolean( Options.PROP_DRAWMINORGRID, options.isDrawMinorGrid() );
+        try {
+            prefs.flush();
+        } catch (BackingStoreException ex) {
+            logger.log(Level.SEVERE, null, ex);
         }
-    });
-
-    PropertyChangeListener listener= new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-            LoggerManager.logPropertyChangeEvent(evt,"listener");  
-            if ( evt.getPropertyName().equals("id") ) return;
-            if ( evt.getNewValue() instanceof String ) {
-                prefs.put( evt.getPropertyName(),(String) evt.getNewValue());
-            } else if ( evt.getNewValue() instanceof Boolean ) {
-                prefs.putBoolean( evt.getPropertyName(), (Boolean)evt.getNewValue() );
-            } else if ( evt.getNewValue() instanceof Color ) {
-                prefs.put( evt.getPropertyName(), DomUtil.encodeColor((Color)evt.getNewValue() ) );
-            } else if ( evt.getNewValue() instanceof Enum ) {
-                prefs.put( evt.getPropertyName(), evt.getNewValue().toString() );
-            } else if ( evt.getNewValue() instanceof Level ) {
-                prefs.put( evt.getPropertyName(), evt.getNewValue().toString() );
-            } else if ( evt.getNewValue() instanceof Integer ) {
-                prefs.putInt(evt.getPropertyName(), (Integer)evt.getNewValue() );
-            } else if ( evt.getNewValue() instanceof Double ) {
-                prefs.putDouble(evt.getPropertyName(), (Double)evt.getNewValue() );
-            } else if ( evt.getNewValue() instanceof Float ) {
-                prefs.putFloat(evt.getPropertyName(), (Float)evt.getNewValue() );
-            } else {
-                throw new RuntimeException("unsupported property type needs to be implemented: "+evt.getPropertyName() + "  " + evt.getNewValue().getClass() );
-            }
-            logger.log( Level.FINE, "options node change requires flush: {0}={1}", new Object[] { evt.getPropertyName(), evt.getNewValue().toString()} );
-            flushTimer.tickle();
-        }
-    };
-
+    }
+    
     /**
      * create a new controller with preferences for the options class.
      * @param options
      */
     public OptionsPrefsController( Options options ) {
-        prefs = AutoplotSettings.settings().getPreferences(options.getClass());
+        prefs = AutoplotSettings.getPreferences(options.getClass());
         this.options= options;
-        options.addPropertyChangeListener( listener );
+        options.controller= this;
     }
 
     public void loadPreferencesWithEvents( ) {
