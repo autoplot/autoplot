@@ -2252,7 +2252,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             application.getPlotElements(0).getStyle().setId("style_0");
             application.getPlotElements(0).getStyle().setFillColor( Color.decode("#404040") );
             
-            application.getOptions().getController().loadPreferences();
+            application.getOptions().getController().loadPreferencesWithEvents();
             application.getPlotElements(0).getStyle().setColor( application.getOptions().getColor() );
             if ( !application.getCanvases(0).getController().getDasCanvas().getBackground().equals( application.getOptions().getBackground() ) ) { // I think they are bound, so this really isn't necessary.
                 application.getCanvases(0).getController().getDasCanvas().setBackground( application.getOptions().getBackground() );
