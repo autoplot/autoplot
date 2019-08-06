@@ -2792,6 +2792,7 @@ APSplash.checkTime("init 52.9");
         autoLabellingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         autoLayoutCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         additionalOptionsMI = new javax.swing.JMenuItem();
+        saveOptionsMenuItem = new javax.swing.JMenuItem();
         bookmarksMenu = new javax.swing.JMenu();
         toolsMenu = new javax.swing.JMenu();
         cacheMenu = new javax.swing.JMenu();
@@ -3254,6 +3255,15 @@ APSplash.checkTime("init 52.9");
             }
         });
         optionsMenu.add(additionalOptionsMI);
+
+        saveOptionsMenuItem.setText("Save Options");
+        saveOptionsMenuItem.setToolTipText("Save options for future sessions.");
+        saveOptionsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveOptionsMenuItemActionPerformed(evt);
+            }
+        });
+        optionsMenu.add(saveOptionsMenuItem);
 
         jMenuBar1.add(optionsMenu);
 
@@ -4293,6 +4303,10 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
     private void resetAppSizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetAppSizeActionPerformed
         ScriptContext.setCanvasSize( 724, 656 ); // this is the arbitrary size of the app when its size is now saved.
     }//GEN-LAST:event_resetAppSizeActionPerformed
+
+    private void saveOptionsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveOptionsMenuItemActionPerformed
+        dom.getOptions().getController().copyOptionsToPersistentPreferences();
+    }//GEN-LAST:event_saveOptionsMenuItemActionPerformed
 
     
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
@@ -5635,6 +5649,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenu resetZoomMenu;
     private javax.swing.JMenuItem resetZoomMenuItem;
     private javax.swing.JMenuItem runBatchMenuItem;
+    private javax.swing.JMenuItem saveOptionsMenuItem;
     private javax.swing.JCheckBoxMenuItem scriptPanelMenuItem;
     private javax.swing.JMenuItem searchToolTipsMenuItem;
     private javax.swing.JCheckBoxMenuItem serverCheckBoxMenuItem;
