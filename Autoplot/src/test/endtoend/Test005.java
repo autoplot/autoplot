@@ -85,7 +85,7 @@ public class Test005 {
             plot("http://autoplot.org/data/autoplot.xml");
             writeToPng("test005_demo6.png");
             xxx("demo6");
-            String omniSrc= "ftp://spdf.gsfc.nasa.gov/pub/data/omni/low_res_omni/";
+            String omniSrc= "https://cdaweb.gsfc.nasa.gov/pub/data/omni/low_res_omni/";
             //String omniSrc= "file:/home/jbf/ct/hudson/data.backup/dat/";
             plot( omniSrc + "/omni2_1963.dat");
             writeToPng("test005_demo7.png");
