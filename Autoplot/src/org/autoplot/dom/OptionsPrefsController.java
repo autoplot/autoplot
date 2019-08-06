@@ -62,11 +62,11 @@ public class OptionsPrefsController {
             } else if ( evt.getNewValue() instanceof Level ) {
                 prefs.put( evt.getPropertyName(), evt.getNewValue().toString() );
             } else if ( evt.getNewValue() instanceof Integer ) {
-                prefs.putInt(evt.getPropertyName(), ((Integer)evt.getNewValue()).intValue() );
+                prefs.putInt(evt.getPropertyName(), (Integer)evt.getNewValue() );
             } else if ( evt.getNewValue() instanceof Double ) {
-                prefs.putDouble(evt.getPropertyName(), ((Double)evt.getNewValue()).doubleValue() );
+                prefs.putDouble(evt.getPropertyName(), (Double)evt.getNewValue() );
             } else if ( evt.getNewValue() instanceof Float ) {
-                prefs.putFloat(evt.getPropertyName(), ((Float)evt.getNewValue()).floatValue() );
+                prefs.putFloat(evt.getPropertyName(), (Float)evt.getNewValue() );
             } else {
                 throw new RuntimeException("unsupported property type needs to be implemented: "+evt.getPropertyName() + "  " + evt.getNewValue().getClass() );
             }
