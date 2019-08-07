@@ -1244,10 +1244,10 @@ public class BatchMaster extends javax.swing.JPanel {
             for ( String f1 : ff1 ) {
                 JSONObject runResults= new JSONObject();
                 try {
-                    monitor.setProgressMessage(f1);
                     if ( monitor.isCancelled() ) {
                         break;
                     }
+                    monitor.setProgressMessage(f1);
                     monitor.setTaskProgress(monitor.getTaskProgress()+1);
                     jobs.get(i1).setIcon(working);
                     if ( f1.trim().length()==0 ) continue;
