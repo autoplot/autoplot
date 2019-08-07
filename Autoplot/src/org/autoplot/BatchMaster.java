@@ -77,6 +77,7 @@ import org.json.JSONObject;
 
 /**
  * Tool for running batches, generating inputs for jython scripts.
+ * @see https://sourceforge.net/p/autoplot/feature-requests/545/
  * @author jbf
  */
 public class BatchMaster extends javax.swing.JPanel {
@@ -1293,6 +1294,9 @@ public class BatchMaster extends javax.swing.JPanel {
                         String problemMessage= null;
                         for ( String f2: ff2 ) {
                             if ( f2.trim().length()==0 ) continue;
+                            if ( monitor.isCancelled() ) {
+                                break;
+                            }
                             long t0= System.currentTimeMillis();
                             try {
                                 paramName= param2NameCB.getSelectedItem().toString();
