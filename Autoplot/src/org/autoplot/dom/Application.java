@@ -145,7 +145,7 @@ public class Application extends DomNode {
     public ApplicationController getController() {
         return controller;
     }
-    /*** end properties *****************************/
+    
     protected Options options = new Options();
 
     public Options getOptions() {
@@ -155,7 +155,7 @@ public class Application extends DomNode {
     public void setOptions(Options options) {
         this.options = options;
     }
-
+    
     protected DatumRange timeRange = DEFAULT_TIME_RANGE;
     /**
      * all time axes should hang off of this.

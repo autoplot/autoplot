@@ -170,6 +170,9 @@ public class ApplicationController extends DomNodeController implements RunLater
         int i= appIdNum.getAndIncrement();
         application.setId("app_"+i);
         application.getOptions().setId("options_"+i);
+        if ( application.getOptions().getController()==null ) {
+            logger.log(Level.FINE, "adding controller {0}", new OptionsPrefsController(application.getOptions()));
+        }
 
         application.addPropertyChangeListener(domListener);
         for ( DomNode n: application.childNodes() ) {
@@ -3233,12 +3236,13 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         try {
 
-            if ( !exclude.contains("options") ) application.getOptions().syncTo(that.getOptions(),
+            if ( !exclude.contains("options") ) {
+                application.getOptions().syncTo(that.getOptions(),
                     Arrays.asList(Options.PROP_OVERRENDERING,
                     Options.PROP_LOGCONSOLEVISIBLE,
                     Options.PROP_SCRIPTVISIBLE,
                     Options.PROP_SERVERENABLED));
-
+            }
 
             Map<String,String> nameMap= new HashMap<String,String>() {
                 @Override

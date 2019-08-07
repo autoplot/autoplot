@@ -26,7 +26,7 @@ public final class Options extends DomNode {
     public static final String VALUE_AUTORANGE_TYPE_RELUCTANT="reluctant";
 
     public Options() {
-
+        logger.fine("creating new Options node");
     }
 
     protected boolean scriptVisible = false;
