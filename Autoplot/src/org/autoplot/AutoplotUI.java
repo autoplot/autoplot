@@ -5111,6 +5111,7 @@ private void updateFrameTitle() {
                     APSplash.showSplash();
                 }
 APSplash.checkTime("init -100");
+                //TODO: it's strange that there are two places where this code is called.
                 OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
                 opc.loadPreferences();
 
