@@ -171,7 +171,9 @@ public class ApplicationController extends DomNodeController implements RunLater
         application.setId("app_"+i);
         application.getOptions().setId("options_"+i);
         if ( application.getOptions().getController()==null ) {
-            logger.log(Level.FINE, "adding controller {0}", new OptionsPrefsController(application.getOptions()));
+            OptionsPrefsController opc= new OptionsPrefsController(application.getOptions());
+            logger.log(Level.FINE, "adding controller {0}", opc );
+            opc.loadPreferencesWithEvents();
         }
 
         application.addPropertyChangeListener(domListener);

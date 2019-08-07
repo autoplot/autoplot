@@ -5113,7 +5113,7 @@ private void updateFrameTitle() {
 APSplash.checkTime("init -100");
                 //TODO: it's strange that there are two places where this code is called.
                 OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
-                opc.loadPreferences();
+                opc.loadPreferencesWithEvents();
 
                 if ( !alm.getBooleanValue("autoLayout") ) { // Chris had a vap that autolayout was mucking with.
                    logger.fine("set autoLayout");

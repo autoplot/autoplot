@@ -664,10 +664,21 @@ public final class Options extends DomNode {
         return result;
     }
 
-    protected OptionsPrefsController controller=null;
+    private OptionsPrefsController controller=null;
     
     public OptionsPrefsController getController() {
         return this.controller;
+    }
+    
+    /**
+     * set the controller for this node.  This can only be called once.
+     * @param controller 
+     */
+    protected void setController( OptionsPrefsController controller ) {
+        if ( this.controller!=null ) {
+            throw new IllegalArgumentException("controller has already been set");
+        }
+        this.controller= controller;
     }
     
     @Override

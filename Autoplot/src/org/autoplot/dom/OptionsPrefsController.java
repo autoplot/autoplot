@@ -45,9 +45,14 @@ public final class OptionsPrefsController {
     public OptionsPrefsController( Options options ) {
         prefs = AutoplotSettings.getPreferences(options.getClass());
         this.options= options;
-        options.controller= this;
+        options.setController( this );
     }
 
+    /**
+     * load the preferences which persist between sessions into dom.options, 
+     * firing events as they are set. 
+     * @see #loadPreferences() loadPreferences which does not fire events.
+     */
     public void loadPreferencesWithEvents( ) {
         options.setAutolabelling ( prefs.getBoolean(Options.PROP_AUTOLABELLING, options.autolabelling) );
         options.setAutolayout ( prefs.getBoolean(Options.PROP_AUTOLAYOUT, options.autolayout) );
