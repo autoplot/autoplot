@@ -96,7 +96,6 @@ public class ApplicationController extends DomNodeController implements RunLater
     DasRow outerRow;
     DasColumn outerColumn;
     LayoutListener layoutListener;
-    boolean headless;
     
     /**
      * binding contexts store each set of bindings as a group.  For example, 
@@ -171,7 +170,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         application.setId("app_"+i);
         application.getOptions().setId("options_"+i);
         if ( application.getOptions().getController()==null ) {
-            OptionsPrefsController opc= new OptionsPrefsController(application.getOptions());
+            OptionsPrefsController opc= new OptionsPrefsController( application, application.getOptions());
             logger.log(Level.FINE, "adding controller {0}", opc );
             opc.loadPreferencesWithEvents();
         }
@@ -3304,7 +3303,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @return true if running in headless environment
      */
     public boolean isHeadless() {
-        return headless;
+        return model.isHeadless();
     }
 
     /**
