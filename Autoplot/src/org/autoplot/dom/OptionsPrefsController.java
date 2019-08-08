@@ -11,7 +11,8 @@ import org.autoplot.MouseModuleType;
 import org.autoplot.datasource.AutoplotSettings;
 
 /**
- * listen to an Options class and keep prefs up to date.
+ * listen to an Options class and manage storage and retrieval from persistent
+ * storage.
  * @author jbf
  */
 public final class OptionsPrefsController {
@@ -22,6 +23,7 @@ public final class OptionsPrefsController {
     private static final Logger logger= LoggerManager.getLogger( "autoplot.dom" );
 
     public void copyOptionsToPersistentPreferences() {
+        logger.fine("copy options to persistent preferences storage.");
         prefs.put( Options.PROP_BACKGROUND, DomUtil.encodeColor(options.getBackground()) );
         prefs.put( Options.PROP_FOREGROUND, DomUtil.encodeColor(options.getForeground()) );
         prefs.put( Options.PROP_COLOR, DomUtil.encodeColor( options.getColor() ) );
@@ -40,20 +42,40 @@ public final class OptionsPrefsController {
     
     /**
      * create a new controller with preferences for the options class.
-     * @param options
+     * @param dom the application.
+     * @param options the options node of that application.
      */
-    public OptionsPrefsController( Options options ) {
+    public OptionsPrefsController( Application dom, Options options) {
         prefs = AutoplotSettings.getPreferences(options.getClass());
         this.options= options;
+        this.loadPersistentPreferences=  dom.controller.model.isAppliction() && !dom.controller.model.isHeadless();        
         options.setController( this );
+    }
+    
+    private boolean loadPersistentPreferences;
+
+    public static final String PROP_LOADPERSISTENTPREFERENCES = "loadPersistentPreferences";
+
+    public boolean isLoadPersistentPreferences() {
+        return loadPersistentPreferences;
+    }
+
+    public void setLoadPersistentPreferences(boolean loadPersistentPreferences) {
+        this.loadPersistentPreferences = loadPersistentPreferences;
     }
 
     /**
      * load the preferences which persist between sessions into dom.options, 
-     * firing events as they are set. 
+     * firing events as they are set.  Note for headless mode and non-application
+     * modes, this has no effect.
      * @see #loadPreferences() loadPreferences which does not fire events.
      */
     public void loadPreferencesWithEvents( ) {
+        if ( !loadPersistentPreferences ) {
+            logger.fine("persistent preferences are disabled");
+            return;
+        }
+        logger.fine("loading preferences into dom.options (and firing events).");
         options.setAutolabelling ( prefs.getBoolean(Options.PROP_AUTOLABELLING, options.autolabelling) );
         options.setAutolayout ( prefs.getBoolean(Options.PROP_AUTOLAYOUT, options.autolayout) );
         options.setAutoranging ( prefs.getBoolean(Options.PROP_AUTORANGING, options.autoranging) );
@@ -103,6 +125,11 @@ public final class OptionsPrefsController {
     }
 
     public void loadPreferences() {
+        if ( !loadPersistentPreferences ) {
+            logger.fine("persistent preferences are disabled");
+            return;
+        }        
+        logger.fine("loading preferences into dom.options");
         options.autolabelling = prefs.getBoolean(Options.PROP_AUTOLABELLING, options.autolabelling);
         options.autolayout = prefs.getBoolean(Options.PROP_AUTOLAYOUT, options.autolayout);
         options.autoranging = prefs.getBoolean(Options.PROP_AUTORANGING, options.autoranging);
