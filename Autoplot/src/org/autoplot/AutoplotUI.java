@@ -4364,7 +4364,13 @@ private void makeDataVisibleImmediately( boolean newValue ) {
         tabs.insertTab("data", null, jsp,
                 String.format( TAB_TOOLTIP_DATA, TABS_TOOLTIP ), idx );
     } else {
-        if ( dataPanel!=null ) tabs.remove(dataPanel.getParent().getParent());
+        if ( dataPanel!=null ) {
+            Component dataPanelComponent= dataPanel.getParent();
+            if ( dataPanelComponent!=null ) dataPanelComponent= dataPanelComponent.getParent();
+            if ( dataPanelComponent!=null ) {
+                tabs.remove(dataPanel.getParent().getParent());
+            }
+        }
     }      
 }
 
