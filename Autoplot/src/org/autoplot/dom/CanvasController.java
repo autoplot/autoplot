@@ -154,7 +154,7 @@ public class CanvasController extends DomNodeController {
             public void propertyChange(PropertyChangeEvent evt) {
                 LoggerManager.logPropertyChangeEvent(evt);  
                 setSizeTimer.restart();
-                if ( "true".equals( System.getProperty("java.awt.headless","false") ) ) {
+                if ( dom.controller.model.isHeadless() ) {
                     setDasCanvasSize();
                 }
             }
@@ -164,7 +164,7 @@ public class CanvasController extends DomNodeController {
             public void propertyChange(PropertyChangeEvent evt) {
                 LoggerManager.logPropertyChangeEvent(evt);  
                 setSizeTimer.restart();
-                if ( "true".equals( System.getProperty("java.awt.headless","false") ) ) {
+                if ( dom.controller.model.isHeadless() ) {
                     setDasCanvasSize();
                 }
             }
