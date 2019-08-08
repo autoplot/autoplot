@@ -109,7 +109,7 @@ public final class AutoplotSettings {
                 break;
         }
         Preferences p2= Preferences.userRoot().node("/"+s.replace('.','/'));
-        return new MigratePreference(p2,p1);
+        return new MigratePreference(p1,p2); // use org.autoplot before org.virbo.
         
     }
     
