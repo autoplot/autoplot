@@ -195,7 +195,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         Runnable run= new Runnable() {
             public void run() {
                 logger.fine("shutting down");
-                if ( DasApplication.getDefaultApplication().isHeadless() ) {
+                if ( model.isHeadless() ) {
                     return;
                 }
                 File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "log/" );
@@ -5112,7 +5112,7 @@ private void updateFrameTitle() {
                 }
 APSplash.checkTime("init -100");
                 //TODO: it's strange that there are two places where this code is called.
-                OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
+                OptionsPrefsController opc= new OptionsPrefsController( model.dom, model.dom.getOptions() );
                 opc.loadPreferencesWithEvents();
 
                 if ( !alm.getBooleanValue("autoLayout") ) { // Chris had a vap that autolayout was mucking with.
