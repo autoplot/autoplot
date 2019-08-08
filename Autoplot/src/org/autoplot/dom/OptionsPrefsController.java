@@ -48,7 +48,7 @@ public final class OptionsPrefsController {
     public OptionsPrefsController( Application dom, Options options) {
         prefs = AutoplotSettings.getPreferences(options.getClass());
         this.options= options;
-        this.loadPersistentPreferences=  dom.controller.model.isAppliction() && !dom.controller.model.isHeadless();        
+        this.loadPersistentPreferences=  dom.controller.model.isApplication() && !dom.controller.model.isHeadless();        
         options.setController( this );
     }
     

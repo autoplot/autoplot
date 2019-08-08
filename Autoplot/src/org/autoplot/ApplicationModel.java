@@ -116,7 +116,7 @@ public final class ApplicationModel {
      * return true if this is running as an application.
      * @return true if this is running as an application.
      */
-    public boolean isAppliction() {
+    public boolean isApplication() {
         return ScriptContext.getViewWindow()!=null;
     }
     
