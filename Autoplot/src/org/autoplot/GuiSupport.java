@@ -834,7 +834,7 @@ public class GuiSupport {
                 p.translate( 20,20 );
                 view.setLocation( p );
                 view.setVisible(true);
-                OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
+                OptionsPrefsController opc= new OptionsPrefsController( model.dom, model.dom.getOptions() );
                 opc.loadPreferencesWithEvents();
                 view.setMessage("ready");
                 AutoplotUI.checkStatusLoop(view);
@@ -872,7 +872,7 @@ public class GuiSupport {
                 p.translate( 20,20 );
                 view.setLocation( p );
                 view.setVisible(true);
-                OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
+                OptionsPrefsController opc= new OptionsPrefsController( model.dom, model.dom.getOptions() );
                 opc.loadPreferencesWithEvents();
                 view.setMessage("ready");
                 AutoplotUI.checkStatusLoop(view);
