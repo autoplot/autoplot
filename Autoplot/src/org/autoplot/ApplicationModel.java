@@ -91,7 +91,7 @@ import org.autoplot.datasource.Version;
  * of Autoplot, and represents the most simple application.
  * @author jbf
  */
-public class ApplicationModel {
+public final class ApplicationModel {
 
     DasApplication application;
     DasCanvas canvas;
@@ -110,6 +110,22 @@ public class ApplicationModel {
      */
     public boolean isApplet() {
         return this.applet;
+    }
+    
+    /**
+     * return true if this is running as an application.
+     * @return true if this is running as an application.
+     */
+    public boolean isAppliction() {
+        return ScriptContext.getViewWindow()!=null;
+    }
+    
+    /**
+     * return true if the application is headless.
+     * @return true if the application is headless.
+     */
+    public boolean isHeadless() {
+        return "true".equals(DasApplication.getProperty("java.awt.headless","false"));
     }
     
     private String prompt = "autoplot> ";
@@ -211,7 +227,7 @@ public class ApplicationModel {
         DataSetURI.init();
         dom = new Application();
 
-        if ( DasApplication.getDefaultApplication().isHeadless() ) {
+        if ( isHeadless() ) {
             logger.fine("history.txt is not being recorded in headless mode");
             dontRecordHistory= true;
         }
@@ -1131,7 +1147,7 @@ public class ApplicationModel {
         if ( this.resizeRequestListener!=null ) {
             resizeRequestListener.resize(width, height );
         } else {
-            if ( !DasApplication.getDefaultApplication().isHeadless() ) {
+            if ( !isHeadless() ) {
                 Window w=SwingUtilities.getWindowAncestor( this.canvas );
                 // assume it is fitted for now.  This is a gross over simplification, not considering scroll panes, etc.
                 if ( w!=null ) {
