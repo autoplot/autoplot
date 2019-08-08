@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import org.autoplot.ApplicationModel;
 import org.das2.util.LoggerManager;
 import org.autoplot.MouseModuleType;
 import org.autoplot.datasource.AutoplotSettings;
@@ -42,13 +43,13 @@ public final class OptionsPrefsController {
     
     /**
      * create a new controller with preferences for the options class.
-     * @param dom the application.
+     * @param model the application model
      * @param options the options node of that application.
      */
-    public OptionsPrefsController( Application dom, Options options) {
+    public OptionsPrefsController( ApplicationModel model, Options options) {
         prefs = AutoplotSettings.getPreferences(options.getClass());
         this.options= options;
-        this.loadPersistentPreferences=  dom.controller.model.isApplication() && !dom.controller.model.isHeadless();        
+        this.loadPersistentPreferences= !model.isHeadless();        
         options.setController( this );
     }
     
