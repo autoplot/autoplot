@@ -50,6 +50,17 @@ public final class PropertiesFilePreferences extends AbstractPreferences {
     public PropertiesFilePreferences(final File dir) {
         this(null, dir, "");
     }
+        
+    /**
+     * Constructor with directory. This is constructing the "root" node.
+     * 
+     * @param dir
+     *            Directory where the preferences are stored.
+     * @param propFileName the properties file name where the properties will be stored.
+     */
+    public PropertiesFilePreferences(final File dir, String propFileName ) {
+        this(null, dir, "", propFileName );
+    }
 
     /**
      * Constructor with parent node and directory.
@@ -60,9 +71,14 @@ public final class PropertiesFilePreferences extends AbstractPreferences {
      *            Directory where the preferences are stored.
      */
     public PropertiesFilePreferences(final PropertiesFilePreferences parent, final File dir) {
-        this(parent, dir, dir.getName());
+        this(parent, dir, dir.getName(),FILENAME);
     }
-
+    
+    private PropertiesFilePreferences(final PropertiesFilePreferences parent, final File dir,
+            final String name ) {
+        this(parent, dir, name, FILENAME);
+    }
+    
     /**
      * Constructor with parent node and directory.
      * 
@@ -74,10 +90,10 @@ public final class PropertiesFilePreferences extends AbstractPreferences {
      *            Name of the node.
      */
     private PropertiesFilePreferences(final PropertiesFilePreferences parent, final File dir,
-            final String name) {
+            final String name, final String propertiesFileName) {
         super(parent, name);
         this.dir = dir;
-        this.file = new PropertiesFile(new File(dir, FILENAME));
+        this.file = new PropertiesFile(new File(dir, propertiesFileName));
         this.removed = false;
     }
 
@@ -119,7 +135,8 @@ public final class PropertiesFilePreferences extends AbstractPreferences {
                 dir.delete();
             } else {
                 final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                final String[] comments = new String[] { "DO NOT EDIT!",
+                final String[] comments = new String[] { "Do not edit, as this is a copy of properties during migration.",
+                    "See https://sourceforge.net/p/autoplot/bugs/2175/",
                         "Created by " + this.getClass().getName(), sdf.format(new Date()) };
                 mkdirIfNecessary();
                 file.save(comments, true);

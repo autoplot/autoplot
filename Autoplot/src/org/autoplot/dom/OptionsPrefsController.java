@@ -2,6 +2,7 @@
 package org.autoplot.dom;
 
 import java.awt.Color;
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -10,6 +11,8 @@ import org.autoplot.ApplicationModel;
 import org.das2.util.LoggerManager;
 import org.autoplot.MouseModuleType;
 import org.autoplot.datasource.AutoplotSettings;
+import org.autoplot.util.MigratePreference;
+import org.fuin.utils4j.PropertiesFilePreferences;
 
 /**
  * listen to an Options class and manage storage and retrieval from persistent
@@ -47,7 +50,11 @@ public final class OptionsPrefsController {
      * @param options the options node of that application.
      */
     public OptionsPrefsController( ApplicationModel model, Options options) {
-        prefs = AutoplotSettings.getPreferences(options.getClass());
+        String f= AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA );
+        File config= new File( f, "config" );
+        Preferences p1= new PropertiesFilePreferences( config, "options.properties" );
+        Preferences p2= AutoplotSettings.getPreferences(options.getClass());
+        prefs = new MigratePreference(p2,p1);
         this.options= options;
         this.loadPersistentPreferences= !model.isHeadless();        
         options.setController( this );
@@ -109,6 +116,7 @@ public final class OptionsPrefsController {
         options.setSpecialEffects ( prefs.getBoolean(Options.PROP_SPECIALEFFECTS, options.specialEffects) );
         options.setTextAntiAlias ( prefs.getBoolean(Options.PROP_TEXTANTIALIAS, options.textAntiAlias) );
         options.setDayOfYear( prefs.getBoolean(Options.PROP_DAY_OF_YEAR,options.dayOfYear) );
+
         options.setNearestNeighbor( prefs.getBoolean(Options.PROP_NEARESTNEIGHBOR,options.nearestNeighbor) );
         try {
             options.setMouseModule( MouseModuleType.valueOf( prefs.get(Options.PROP_MOUSEMODULE, options.mouseModule.toString() ) ) );
