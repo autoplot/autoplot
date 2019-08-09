@@ -1753,7 +1753,7 @@ public class AutoplotUtil {
         buffy.append( "<h2>Open Source Components:</h2>");
         buffy.append( "Autoplot uses many open-source components, such as: <br>");
         buffy.append( "jsyntaxpane, Jython, Netbeans (Jython completion), OpenDAP, CDF, FITS, NetCDF, " 
-                + "POI HSSF (Excel), Batik (SVG), iText (PDF), JSON, JavaCSV, JPG Metadata Extractor, Imgscalr, JDiskHog, and Das2.");        
+                + "POI HSSF (Excel), Batik (SVG), iText (PDF), JSON, JavaCSV, JPG Metadata Extractor, Imgscalr, utils4j, JDiskHog, and Das2.");        
 
         buffy.append("<h2>Runtime Information:</h2>");
 
