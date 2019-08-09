@@ -870,8 +870,6 @@ public class GuiSupport {
                 p.translate( 20,20 );
                 view.setLocation( p );
                 view.setVisible(true);
-                OptionsPrefsController opc= new OptionsPrefsController( model, model.dom.getOptions() );
-                opc.loadPreferencesWithEvents();
                 view.setMessage("ready");
                 AutoplotUI.checkStatusLoop(view);
                 Canvas size= parent.applicationModel.dom.getCanvases(0);
