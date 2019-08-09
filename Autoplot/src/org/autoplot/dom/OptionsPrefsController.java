@@ -26,6 +26,12 @@ public final class OptionsPrefsController {
 
     private static final Logger logger= LoggerManager.getLogger( "autoplot.dom" );
 
+    /**
+     * write the current options out to persistent preferences, so that they will
+     * be used next session.  Note the persistent preferences is a Java Preference
+     * stored in ~/.java/... but it is being migrated to
+     * ~/autoplot_data/config/options.preferences.
+     */
     public void copyOptionsToPersistentPreferences() {
         logger.fine("copy options to persistent preferences storage.");
         prefs.put( Options.PROP_BACKGROUND, DomUtil.encodeColor(options.getBackground()) );
@@ -37,6 +43,32 @@ public final class OptionsPrefsController {
         prefs.putBoolean( Options.PROP_FLIPCOLORBARLABEL, options.isFlipColorbarLabel() );
         prefs.putBoolean( Options.PROP_DRAWGRID, options.isDrawGrid() );
         prefs.putBoolean( Options.PROP_DRAWMINORGRID, options.isDrawMinorGrid() );
+        
+        prefs.putBoolean( Options.PROP_OVERRENDERING, options.isOverRendering() );
+        prefs.putBoolean( Options.PROP_SCRIPTVISIBLE, options.isScriptVisible() );
+        prefs.putBoolean( Options.PROP_LOGCONSOLEVISIBLE, options.isLogConsoleVisible() );
+        prefs.putBoolean( Options.PROP_DATAVISIBLE, options.isDataVisible() );
+        prefs.putBoolean( Options.PROP_LAYOUTVISIBLE, options.isLayoutVisible() );
+        // note this is never saved... options.setServerEnabled ( prefs.getBoolean(Options.PROP_SERVERENABLED, options.serverEnabled) );
+        prefs.putBoolean( Options.PROP_SPECIALEFFECTS, options.isSpecialEffects() );
+        prefs.putBoolean( Options.PROP_TEXTANTIALIAS, options.isTextAntiAlias() );
+        prefs.putBoolean( Options.PROP_DAY_OF_YEAR, options.isDayOfYear() );
+
+        prefs.putBoolean( Options.PROP_NEARESTNEIGHBOR, options.isNearestNeighbor() );
+        try {
+            prefs.put( Options.PROP_MOUSEMODULE, options.mouseModule.toString() );
+        } catch ( IllegalArgumentException ex ) {
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
+        }
+        prefs.putBoolean( Options.PROP_FLIPCOLORBARLABEL, options.isFlipColorbarLabel() );
+        prefs.put( Options.PROP_TICKLEN, options.getTicklen() );
+        prefs.put( Options.PROP_LINE_THICKNESS, options.getLineThickness() );
+        prefs.putFloat( Options.PROP_MULTILINETEXTALIGNMENT, options.getMultiLineTextAlignment() );
+        prefs.put( Options.PROP_PRINTINGTAG, options.getPrintingTag() );
+        prefs.put(Options.PROP_PRINTINGLOGLEVEL, options.getPrintingLogLevel().toString() );
+        prefs.put(Options.PROP_DISPLAYLOGLEVEL, options.getDisplayLogLevel().toString() );
+        prefs.putInt( Options.PROP_LOGMESSAGETIMEOUTSEC, options.getLogMessageTimeoutSec() );
+        
         try {
             prefs.flush();
         } catch (BackingStoreException ex) {
