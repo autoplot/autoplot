@@ -38,7 +38,6 @@ import java.net.URLClassLoader;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
-import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
@@ -48,12 +47,6 @@ import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
-
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.PBEParameterSpec;
 
 /**
  * Common utility methods for use in Java applications and libraries.
@@ -399,112 +392,6 @@ public final class Utils4J {
 		}
 	}
 
-	/**
-	 * Creates a cipher for encryption or decryption.
-	 * 
-	 * @param algorithm
-	 *            PBE algorithm like "PBEWithMD5AndDES" or
-	 *            "PBEWithMD5AndTripleDES".
-	 * @param mode
-	 *            Encyrption or decyrption.
-	 * @param password
-	 *            Password.
-	 * @param salt
-	 *            Salt usable with algorithm.
-	 * @param count
-	 *            Iterations.
-	 * 
-	 * @return Ready initialized cipher.
-	 * 
-	 * @throws GeneralSecurityException
-	 *             Error creating the cipher.
-	 */
-	private static Cipher createCipher(final String algorithm, final int mode,
-			final char[] password, final byte[] salt, final int count)
-			throws GeneralSecurityException {
-
-		final SecretKeyFactory keyFactory = SecretKeyFactory
-				.getInstance(algorithm);
-		final PBEKeySpec keySpec = new PBEKeySpec(password);
-		final SecretKey key = keyFactory.generateSecret(keySpec);
-		final Cipher cipher = Cipher.getInstance(algorithm);
-		final PBEParameterSpec params = new PBEParameterSpec(salt, count);
-		cipher.init(mode, key, params);
-		return cipher;
-
-	}
-
-	/**
-	 * Encrypts some data based on a password.
-	 * 
-	 * @param algorithm
-	 *            PBE algorithm like "PBEWithMD5AndDES" or
-	 *            "PBEWithMD5AndTripleDES" - Cannot be <code>null</code>.
-	 * @param data
-	 *            Data to encrypt - Cannot be <code>null</code>.
-	 * @param password
-	 *            Password - Cannot be <code>null</code>.
-	 * @param salt
-	 *            Salt usable with algorithm - Cannot be <code>null</code>.
-	 * @param count
-	 *            Iterations.
-	 * 
-	 * @return Encrypted data.
-	 */
-	public static byte[] encryptPasswordBased(final String algorithm,
-			final byte[] data, final char[] password, final byte[] salt,
-			final int count) {
-
-		checkNotNull("algorithm", algorithm);
-		checkNotNull("data", data);
-		checkNotNull("password", password);
-		checkNotNull("salt", salt);
-
-		try {
-			final Cipher cipher = createCipher(algorithm, Cipher.ENCRYPT_MODE,
-					password, salt, count);
-			return cipher.doFinal(data);
-		} catch (final Exception ex) {
-			throw new RuntimeException(
-					"Error encrypting the password!", ex);
-		}
-	}
-
-	/**
-	 * Decrypts some data based on a password.
-	 * 
-	 * @param algorithm
-	 *            PBE algorithm like "PBEWithMD5AndDES" or
-	 *            "PBEWithMD5AndTripleDES" - Cannot be <code>null</code>.
-	 * @param encryptedData
-	 *            Data to decrypt - Cannot be <code>null</code>.
-	 * @param password
-	 *            Password - Cannot be <code>null</code>.
-	 * @param salt
-	 *            Salt usable with algorithm - Cannot be <code>null</code>.
-	 * @param count
-	 *            Iterations.
-	 * 
-	 * @return Encrypted data.
-	 */
-	public static byte[] decryptPasswordBased(final String algorithm,
-			final byte[] encryptedData, final char[] password,
-			final byte[] salt, final int count) {
-
-		checkNotNull("algorithm", algorithm);
-		checkNotNull("encryptedData", encryptedData);
-		checkNotNull("password", password);
-		checkNotNull("salt", salt);
-
-		try {
-			final Cipher cipher = createCipher(algorithm, Cipher.DECRYPT_MODE,
-					password, salt, count);
-			return cipher.doFinal(encryptedData);
-		} catch (final Exception ex) {
-			throw new RuntimeException(
-					"Error decrypting the password!", ex);
-		}
-	}
 
 	/**
 	 * Creates an URL based on a directory a relative path and a filename.
