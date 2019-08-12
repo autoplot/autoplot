@@ -2397,6 +2397,19 @@ APSplash.checkTime("init 52.9");
     }
 
     /**
+     * reset to the size in defaults.
+     */
+    public void resizeForDefaultCanvasSize() {
+        int width= dom.getOptions().getWidth();
+        int height= dom.getOptions().getHeight();
+        logger.log(Level.FINE, "resize canvas to {0}x{1}", new Object[]{width, height});
+        resizeForCanvasSize( width,height );
+        width= dom.getCanvases(0).getWidth();
+        height= dom.getCanvases(0).getHeight();
+        logger.log(Level.FINE, "final size of canvas: {0}x{1}", new Object[]{width, height});           
+    }
+    
+    /**
      * resize the outer GUI attempting to get a fitted canvas size.  This fixes the
      * problem where a loaded vap doesn't appear as it does when it was saved because
      * the canvas is resized.

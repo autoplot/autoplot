@@ -807,13 +807,7 @@ public class GuiSupport {
                         Runnable run2= new Runnable() {
                             @Override
                             public void run() {
-                                int width= parent.dom.getOptions().getWidth();
-                                int height= parent.dom.getOptions().getHeight();
-                                logger.log(Level.FINE, "resize canvas to {0}x{1}", new Object[]{width, height});
-                                parent.resizeForCanvasSize( width,height );
-                                width= parent.dom.getCanvases(0).getWidth();
-                                height= parent.dom.getCanvases(0).getHeight();
-                                logger.log(Level.FINE, "final size of canvas: {0}x{1}", new Object[]{width, height});                                
+                                parent.resizeForDefaultCanvasSize();
                             }
                         };
                         SwingUtilities.invokeLater(run2);
