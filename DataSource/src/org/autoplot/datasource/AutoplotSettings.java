@@ -5,19 +5,16 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.NodeChangeListener;
-import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 import org.autoplot.util.MigratePreference;
 import org.das2.util.filesystem.FileSystem;
 
 /**
- * Autoplot's settings are stored in Java preferences.
+ * Autoplot's settings, stored in Java preferences, include
+ * things like the last folder opened.  Also this code handles
+ * property resolution like ${HOME}/autoplot_data.
  * @author jbf
  */
 public final class AutoplotSettings {
