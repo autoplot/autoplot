@@ -72,7 +72,6 @@ public final class Options extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_DATAVISIBLE, oldDataVisible, dataVisible);
     }
 
-
     /**
      * true when the layout tab is visible.
      */
@@ -115,6 +114,42 @@ public final class Options extends DomNode {
         String oldCanvasFont = this.canvasFont;
         this.canvasFont = canvasFont;
         propertyChangeSupport.firePropertyChange(PROP_CANVASFONT, oldCanvasFont, canvasFont);
+    }
+
+    protected int width = 640;
+
+    public static final String PROP_WIDTH = "width";
+
+    public int getWidth() {
+        return width;
+    }
+
+    /**
+     * set the initial width of the canvases in pixels
+     * @param width 
+     */
+    public void setWidth(int width) {
+        int oldWidth = this.width;
+        this.width = width;
+        propertyChangeSupport.firePropertyChange(PROP_WIDTH, oldWidth, width);
+    }
+
+    protected int height = 480;
+
+    public static final String PROP_HEIGHT = "height";
+
+    public int getHeight() {
+        return height;
+    }
+
+    /**
+     * set the initial height of the canvases in pixels
+     * @param height 
+     */
+    public void setHeight(int height) {
+        int oldHeight = this.height;
+        this.height = height;
+        propertyChangeSupport.firePropertyChange(PROP_HEIGHT, oldHeight, height);
     }
 
     protected Color foreground = Color.black;
