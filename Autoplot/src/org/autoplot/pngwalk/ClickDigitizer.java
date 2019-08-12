@@ -208,7 +208,7 @@ public class ClickDigitizer {
                     
                     if ( viewer!=null ) {
                         view.seq.setStatus(  "Plot Coordinates: " + xx + ", "+ yy );
-                        if ( UnitsUtil.isTimeLocation( SemanticOps.getUnits(xx) ) ) {
+                        if ( viewer.digitizer!=null && UnitsUtil.isTimeLocation( SemanticOps.getUnits(xx) ) ) {
                             viewer.digitizer.setSorted(true);
                         }
                         if ( release==false && viewer.digitizer!=null && viewer.digitizerRecording ) {
