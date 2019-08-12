@@ -2243,7 +2243,8 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
 
             c.setFitted(true);
-
+            application.getCanvases(0).setWidth( application.options.getWidth() );
+            application.getCanvases(0).setHeight( application.options.getHeight() );
             application.getDataSourceFilters(0).syncTo( new DataSourceFilter(), Collections.singletonList(DomNode.PROP_ID) );
             application.getDataSourceFilters(0).getController().setDataSetInternal(null,null,true);
             application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
