@@ -39,6 +39,8 @@ public final class OptionsPrefsController {
         prefs.put( Options.PROP_COLOR, DomUtil.encodeColor( options.getColor() ) );
         prefs.put( Options.PROP_FILLCOLOR, DomUtil.encodeColor( options.getFillColor() ) );
         prefs.put( Options.PROP_CANVASFONT, options.getCanvasFont() );
+        prefs.putInt(Options.PROP_WIDTH, options.getWidth() );
+        prefs.putInt(Options.PROP_HEIGHT, options.getHeight());
         prefs.put( Options.PROP_LINE_THICKNESS, options.getLineThickness() );
         prefs.putBoolean( Options.PROP_FLIPCOLORBARLABEL, options.isFlipColorbarLabel() );
         prefs.putBoolean( Options.PROP_DRAWGRID, options.isDrawGrid() );
@@ -84,6 +86,7 @@ public final class OptionsPrefsController {
     public OptionsPrefsController( ApplicationModel model, Options options) {
         String f= AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA );
         File config= new File( f, "config" );
+        //transition from Java-prefs (which is opaque to most scientists) to autoplot_data/config area.  This should be removed by Oct 2019.
         Preferences p1= new PropertiesFilePreferences( config, "options.properties" );
         Preferences p2= AutoplotSettings.getPreferences(options.getClass());
         prefs = new MigratePreference(p2,p1);
@@ -133,6 +136,8 @@ public final class OptionsPrefsController {
         }
         options.setBackground ( Color.decode(prefs.get(Options.PROP_BACKGROUND, DomUtil.encodeColor(options.background))) );
         options.setCanvasFont ( prefs.get(Options.PROP_CANVASFONT, options.canvasFont) );
+        options.setWidth ( prefs.getInt(Options.PROP_WIDTH, options.getWidth() ) );
+        options.setHeight ( prefs.getInt(Options.PROP_HEIGHT, options.getHeight() ) );
         options.setColor ( Color.decode(prefs.get(Options.PROP_COLOR, DomUtil.encodeColor(options.color))) );
         options.setDrawAntiAlias ( prefs.getBoolean(Options.PROP_DRAWANTIALIAS, options.drawAntiAlias) );
         options.setDrawGrid ( prefs.getBoolean(Options.PROP_DRAWGRID, options.drawGrid) );
@@ -188,6 +193,8 @@ public final class OptionsPrefsController {
         }
         options.background = Color.decode(prefs.get(Options.PROP_BACKGROUND, DomUtil.encodeColor(options.background)));
         options.canvasFont = prefs.get(Options.PROP_CANVASFONT, options.canvasFont);
+        options.width= prefs.getInt(Options.PROP_WIDTH, options.getWidth() );
+        options.height= prefs.getInt(Options.PROP_HEIGHT, options.getHeight() );
         options.color = Color.decode(prefs.get(Options.PROP_COLOR, DomUtil.encodeColor(options.color)));
         options.drawAntiAlias = prefs.getBoolean(Options.PROP_DRAWANTIALIAS, options.drawAntiAlias);
         options.drawGrid = prefs.getBoolean(Options.PROP_DRAWGRID, options.drawGrid);
