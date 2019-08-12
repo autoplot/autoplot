@@ -37,7 +37,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -543,7 +542,7 @@ public final class ApplicationModel {
 
         } else {
 
-            Preferences prefs = AutoplotSettings.settings().getPreferences(ApplicationModel.class);
+            Preferences prefs = AutoplotSettings.getPreferences(ApplicationModel.class);
             String srecent = prefs.get(PREF_RECENT,"");
 
             if (srecent.equals("") || !srecent.startsWith("<")) {
@@ -585,7 +584,7 @@ public final class ApplicationModel {
      * @return the bookmarks of the legacy user.
      */
     public List<Bookmark> getLegacyBookmarks() {
-        Preferences prefs = AutoplotSettings.settings().getPreferences(ApplicationModel.class);
+        Preferences prefs = AutoplotSettings.getPreferences(ApplicationModel.class);
         String sbookmark = prefs.get("bookmarks", "");
 
         if (sbookmark.equals("") || !sbookmark.startsWith("<")) {
@@ -1106,7 +1105,7 @@ public final class ApplicationModel {
         if ( !f.exists() ) throw new IllegalArgumentException("no such file: "+f);
         if ( f.length()==0 ) throw new IllegalArgumentException("zero-length file: "+f);
 
-        Preferences prefs= AutoplotSettings.settings().getPreferences( AutoplotSettings.class);
+        Preferences prefs= AutoplotSettings.getPreferences( AutoplotSettings.class);
         prefs.put( AutoplotSettings.PREF_LAST_OPEN_VAP_FILE, f.getAbsolutePath() );
         prefs.put( AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, f.getParent() );        
         
