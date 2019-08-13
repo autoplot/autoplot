@@ -2095,10 +2095,7 @@ public class GuiSupport {
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
                 PropertyEditor pp = new PropertyEditor(domPlot);
-                JDialog d= pp.getDialog(plot.getCanvas());
-                WindowManager.getInstance().recallWindowSizePosition(d);
-                d.setVisible(true);
-                WindowManager.getInstance().recordWindowSizePosition(d);
+                pp.showDialog(plot.getCanvas());
             }
         });
         plot.getDasMouseInputAdapter().addMenuItem(mi);
@@ -2110,10 +2107,7 @@ public class GuiSupport {
                 org.das2.util.LoggerManager.logGuiEvent(e);
                 PlotElement p = controller.getPlotElement();
                 PropertyEditor pp = new PropertyEditor(p);
-                JDialog d= pp.getDialog(plot.getCanvas());
-                WindowManager.getInstance().recallWindowSizePosition(d);
-                d.setVisible(true);
-                WindowManager.getInstance().recordWindowSizePosition(d);
+                pp.showDialog(plot.getCanvas());
             }
         } );
         plot.getDasMouseInputAdapter().addMenuItem( mi );
@@ -2130,7 +2124,7 @@ public class GuiSupport {
                 editorPanel.doElementBindings(p);
                 if ( JOptionPane.CANCEL_OPTION==AutoplotUtil.showConfirmDialog( app, editorPanel, p.getRenderType() + " Style", JOptionPane.OK_CANCEL_OPTION ) ) {
                     p.syncTo(oldP);
-                };
+                }
             }
         });
         plotController.setPlotElementPropsMenuItem(panelPropsMenuItem);        
