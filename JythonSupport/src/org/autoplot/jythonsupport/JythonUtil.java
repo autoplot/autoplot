@@ -1407,6 +1407,32 @@ public class JythonUtil {
 
         return result;
     }
+    
+    /**
+     * return a Java Map for a Python dictionary.
+     * @param pd
+     * @return 
+     */
+    public static Map pyDictionaryToMap( PyDictionary pd ) {
+        Map<Object,Object> m= new LinkedHashMap<>();
+        for ( Object k: pd.keys() ) {
+            PyObject o= pd.get( (PyObject)k );
+            if ( o instanceof PyString ) {
+                m.put( String.valueOf(k), o.toString() );
+            } else if ( o instanceof PyQDataSet ) {
+                m.put( String.valueOf(k), ((PyQDataSet)o).ds );
+            } else if ( o instanceof PyDatum ) {
+                m.put( String.valueOf(k), ((PyDatum)o).datum );
+            } else if ( o instanceof PyFloat ) {
+                m.put( String.valueOf(k), Py.tojava( (PyObject)o, "java.lang.Double" ) );
+            } else if ( o instanceof PyDictionary ) {
+                m.put( String.valueOf(k), pyDictionaryToMap( (PyDictionary)o ) );
+            } else {
+                logger.log(Level.INFO, "dropping type where conversion is not implemented: {0}", o);
+            }
+        }
+        return m;
+    }
      
     /**
      * scrape script for local variables, looking for assignments.  The reader is closed
