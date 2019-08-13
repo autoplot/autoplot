@@ -63,6 +63,7 @@ import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
+import org.python.core.PyTuple;
 
 /**
  * Utilities to support Jython scripting.
@@ -1415,8 +1416,9 @@ public class JythonUtil {
      */
     public static Map pyDictionaryToMap( PyDictionary pd ) {
         Map<Object,Object> m= new LinkedHashMap<>();
-        for ( Object k: pd.keys() ) {
-            PyObject o= pd.get( (PyObject)k );
+        for ( Object tt: pd.items() ) {
+            String k= ((PyTuple)tt).get(0).toString();
+            Object o= ((PyTuple)tt).get(1);
             if ( o instanceof PyString ) {
                 m.put( String.valueOf(k), o.toString() );
             } else if ( o instanceof PyQDataSet ) {
@@ -1428,8 +1430,9 @@ public class JythonUtil {
             } else if ( o instanceof PyDictionary ) {
                 m.put( String.valueOf(k), pyDictionaryToMap( (PyDictionary)o ) );
             } else {
-                logger.log(Level.INFO, "dropping type where conversion is not implemented: {0}", o);
-            }
+                logger.log(Level.INFO, "assuming Java type where conversion is not implemented: {0}", o);
+                m.put( String.valueOf(k), o );
+            } 
         }
         return m;
     }
