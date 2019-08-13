@@ -5,6 +5,7 @@
 
 package org.autoplot.jythonsupport;
 
+import java.util.Map;
 import java.util.logging.Logger;
 import org.python.core.Py;
 import org.python.core.PyObject;
@@ -14,6 +15,7 @@ import org.autoplot.jythonsupport.JythonOps;
 import org.autoplot.jythonsupport.PyQDataSet;
 import org.das2.datum.Units;
 import org.das2.qds.ops.Ops;
+import org.python.core.PyDictionary;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
 import org.python.core.PyJavaInstance;
@@ -100,12 +102,14 @@ public class DatasetCommand extends PyObject {
             "units", "format", "cadence", 
             "fillValue", "validMin", "validMax", "typicalMin", "typicalMax",
             "scaleType",
+            "renderType", "bins1", "bins0", "cacheTag", "userProperties",
         },
         new PyObject[] { Py.None, Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None, Py.None, Py.None,
             Py.None,
+            Py.None, Py.None, Py.None, Py.None, Py.None,
         } );
         
         fs.args( args, keywords );
@@ -160,6 +164,7 @@ public class DatasetCommand extends PyObject {
 
             String sval= (String) val.__str__().__tojava__(String.class);
             switch ( kw ) {
+                case "description":
                 case "title":
                 case "label":
                 case "name":
@@ -168,9 +173,9 @@ public class DatasetCommand extends PyObject {
                     break;
                 case "units":
                     if ( val.__tojava__(Units.class)!= Py.NoConversion ) {
-                        result= Ops.putProperty( result, kw.toUpperCase(), val.__tojava__(Units.class)  );
+                        result= Ops.putProperty( result, QDataSet.UNITS, val.__tojava__(Units.class)  );
                     } else {
-                        result= Ops.putProperty( result, kw.toUpperCase(), sval );
+                        result= Ops.putProperty( result, QDataSet.UNITS, sval );
                     }
                     break;
                 case "validMin":
@@ -193,6 +198,26 @@ public class DatasetCommand extends PyObject {
                     break;
                 case "cadence":
                     result= Ops.putProperty( result, QDataSet.CADENCE, sval );
+                    break;
+                case "renderType":
+                    result= Ops.putProperty( result, QDataSet.RENDER_TYPE, sval );
+                    break;
+                case "bins1":
+                    result= Ops.putProperty( result, QDataSet.BINS_1, sval );
+                    break;
+                case "bins0":
+                    result= Ops.putProperty( result, QDataSet.BINS_0, sval );
+                    break;
+                case "cacheTag": // 2019-02-03 @ 1s
+                    result= Ops.putProperty( result, QDataSet.CACHE_TAG, sval );
+                    break;
+                case "userProperties": 
+                    if ( val instanceof PyDictionary ) {
+                        Map m= JythonUtil.pyDictionaryToMap((PyDictionary)val);
+                        result= Ops.putProperty( result, QDataSet.USER_PROPERTIES, m );
+                    } else {
+                        result= Ops.putProperty( result, QDataSet.USER_PROPERTIES, val );
+                    }
                     break;
                 default:
                     throw new IllegalArgumentException("bad keyword");
