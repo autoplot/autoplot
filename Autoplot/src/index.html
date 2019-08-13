@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Data from NetCDF file.
+        <p><small>Water in the backyard pool is still leaking.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2019-08-09 r24008):</p>
         <ul>
+            <li>2175: File&rarr;Reset now resets to default size as well.
             <li>rte_1569838156: catch IllegalArgumentException when Units.min is encountered.
             <li>rte 0726091791: reference setting on zaxis (colorbar) would result in NullPointerException.
             <li>org.autoplot preference should be used before org.virbo.autoplot copy.
@@ -67,6 +68,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add more properties to dataset command, like renderType, bins1, bins0, and userProperties.
             <li>2175: start migrating prefs to config/options.properties.
             <li>rfe545: "Run Batch" tool has help page and outputs the results as the batch is run.
             <li>rfe545: "Run Batch" tool has menubar for loading and saving parameter lists, and export results to CSV.
