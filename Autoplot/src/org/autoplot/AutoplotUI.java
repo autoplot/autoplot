@@ -4318,6 +4318,8 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
     }//GEN-LAST:event_resetAppSizeActionPerformed
 
     private void saveOptionsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveOptionsMenuItemActionPerformed
+        dom.getOptions().setWidth( dom.getCanvases(0).getWidth() );
+        dom.getOptions().setHeight( dom.getCanvases(0).getHeight() );
         dom.getOptions().getController().copyOptionsToPersistentPreferences();
     }//GEN-LAST:event_saveOptionsMenuItemActionPerformed
 
@@ -5333,6 +5335,14 @@ APSplash.checkTime("init 240");
                 if ( app!=null ) {
                     checkStatusLoop(app);
                 }
+                
+//                Runnable resetRun= new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        app.resizeForDefaultCanvasSize();
+//                    }
+//                };
+//                SwingUtilities.invokeLater(resetRun);
                 
                 if ( !headless && finitialURL!=null) {
                     if ( app!=null ) {
