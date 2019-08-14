@@ -49,7 +49,13 @@ public class Test_100_Demo1423 {
         
         ScriptContext.waitUntilIdle();
         
+        ScriptContext.setStatus("waiting 12 more seconds.");
         ScriptContext.sleep(12000);
+        ScriptContext.setStatus("done waiting 12 seconds.");
+        
+        ScriptContext.setStatus("waiting another 5 seconds.");
+        ScriptContext.sleep(5000);
+        ScriptContext.setStatus("done waiting 5 seconds.");
         
         ScriptContext.waitUntilIdle();
         
