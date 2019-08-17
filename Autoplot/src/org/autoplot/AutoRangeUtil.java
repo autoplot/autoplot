@@ -98,6 +98,7 @@ public class AutoRangeUtil {
             for ( int i=0; i<n0; i++ ) {
                 if ( wds.value(i)==0. ) continue;
                 double maxv= max.value(i);
+                if ( Double.isInfinite( maxv ) ) continue;
                 if ( wmin.value(i)>0. ) result[0] = Math.min(result[0], min.value(i) );
                 if ( wmax.value(i)>0. ) result[1] = Math.max(result[1], maxv );
             }
