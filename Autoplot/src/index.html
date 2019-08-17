@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Water in the garden pool is still leaking.
+        <p><small>TenPercentEdgeCosine window used instead of default Hann window in fftPower process.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-08-13 r24034):</p>
+        <p>Bugfixes (2019-08-17 r24041):</p>
         <ul>
+            <li>bug in rfe445, where Masafumi pointed out that data which once ranged now has a runtime error because of Infs.  Thanks, Masafumi!
+            <li>icon for OutsideS fixed.  It was still a copy of another position.
             <li>2189: corrections to clipping introduced mistake when outside legend label was used.  Thanks, Kristoff!
             <li>2195: mislocated property editor popups corrected.
             <li>rte 921689851: runtime error when click on pngwalk when digitizer has not been started.  Thanks, Kris!
