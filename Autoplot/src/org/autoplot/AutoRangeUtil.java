@@ -56,11 +56,14 @@ public class AutoRangeUtil {
      * also considers delta_plus, delta_minus properties.
      * TODO: /home/jbf/ct/autoplot/script/study/rfe445_speed/verifyExtentSimpleRange.jy showed that this was 25% slower than extent.
      * TODO: this is almost 800% slower than study445FastRange (above), which shows DataSetIterator is slow.
+     * @see Ops#extent(org.das2.qds.QDataSet) 
      * Note: DS_LENGTH_LIMIT limits the total number of points considered.
      * @param ds rank N dataset
-     * @return two-element double, containing min then max.
+     * @return two-element double, containing min and max.
      */
     private static double[] simpleRange(QDataSet ds) {
+        logger.entering("org.autoplot.AutoRangeUtil", "simpleRange", ds);
+        
         QDataSet max = ds;
         QDataSet min = ds;
         Units u = (Units) ds.property(QDataSet.UNITS);
@@ -128,6 +131,7 @@ public class AutoRangeUtil {
                 result[1] = 1.;
             }
         }
+        logger.exiting("org.autoplot.AutoRangeUtil", "simpleRange");
         return result;
     }
 
