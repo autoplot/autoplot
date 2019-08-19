@@ -1277,6 +1277,8 @@ public class BatchMaster extends javax.swing.JPanel {
                             if ( writeCheckBox.isSelected() ) {
                                 runResults.put( "writeFile", doWrite( f1, "" ) );
                             }
+                            jobs.get(i1).setIcon(okay);
+                            jobs.get(i1).setToolTipText(null);
                         } catch ( Exception ex ) {
                             runResults.put("executionTime", System.currentTimeMillis()-t0);                            
                             String msg= ex.toString();
