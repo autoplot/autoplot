@@ -4,13 +4,19 @@
  */
 package org.autoplot.idlsupport;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import org.autoplot.datasource.AutoplotSettings;
 import org.das2.qds.buffer.FloatDataSet;
 import org.das2.qds.buffer.LongDataSet;
 import org.das2.datum.LoggerManager;
@@ -1347,5 +1353,31 @@ public abstract class QDataSetBridge {
      */
     public void clearMemory() {
         datasets.clear();
+    }
+    
+    /**
+     * load the configuration from autoplot_data/config/logging.properties
+     */
+    public void readLogConfiguration() {
+        // read in the file $HOME/autoplot_data/config/logging.properties, if it exists.
+        File f1= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "config" );
+        File f2= new File( f1, "logging.properties" );
+        if ( f2.exists() ) {
+            if ( !f2.canRead() ) logger.log(Level.WARNING, "Unable to read {0}", f2);
+            InputStream in=null;
+            try {
+                logger.log(Level.FINE, "Reading {0}", f2);
+                in= new FileInputStream(f2);
+                LogManager.getLogManager().readConfiguration(in);
+            } catch ( IOException ex ) {
+                logger.log(Level.WARNING, "IOException during read of {0}", f2);
+            } finally {
+                try {
+                    if ( in!=null ) in.close();
+                } catch ( IOException ex ) {
+                    logger.log(Level.WARNING, "IOException during close of {0}", f2);
+                }
+            }                
+        }
     }
 }
