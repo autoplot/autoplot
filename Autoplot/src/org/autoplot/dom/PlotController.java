@@ -46,6 +46,7 @@ import org.autoplot.AutoplotUtil;
 import org.autoplot.MouseModuleType;
 import org.autoplot.RenderType;
 import org.autoplot.RenderTypeUtil;
+import org.autoplot.ScriptContext;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
@@ -355,6 +356,7 @@ public class PlotController extends DomNodeController {
      * @param ds the dataset to find next or previous focus.
      */
     private void updateNextPrevious( final DatumRange dr0, QDataSet ds ) {
+
         logger.log(Level.FINE, "updateRadius: {0}", dr0);
         if ( ds!=null && SemanticOps.isBundle(ds) ) {
             logger.log(Level.FINE, "unbundling: {0}", ds);
@@ -366,108 +368,10 @@ public class PlotController extends DomNodeController {
             }
             ds= Ops.link( xds, ds );
         }
-                        
-        DatumRange dr= dr0;
-        int count; // limits the number of steps we can take.
-        int STEP_LIMIT=10000;
-        if ( ds!=null &&  ds.rank()>0 && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(ds) ) ) {
-            try {
-                QDataSet bounds;
-                QDataSet xtags= SemanticOps.xtagsDataSet(ds);
-                if ( xtags!=null ) {
-                    bounds= SemanticOps.bounds(xtags).slice(1);
-                } else {
-                    bounds= SemanticOps.bounds(ds).slice(0);
-                }
-                if ( !validBounds(bounds) || !SemanticOps.getUnits(bounds).isConvertibleTo(dr.getUnits() ) || !DataSetUtil.asDatumRange(bounds).contains(dr) ) {
-                    dr= dr.next();
-                } else {
-                    DatumRange limit= DataSetUtil.asDatumRange(bounds);
-                    if ( !DatumRangeUtil.isAcceptable(limit,false) ) {
-                        throw new IllegalArgumentException("limit is not acceptable"); // see 10 lines down
-                    }
-                    limit= DatumRangeUtil.union( limit, dr0 );
-                    dr= dr.next();
-                    count= 0;
-                    while ( dr.intersects(limit) ) {
-                        count++;
-                        if ( count>STEP_LIMIT ) {
-                            logger.warning("step limit in nextprev https://sourceforge.net/p/autoplot/bugs/1209/");
-                            dr= dr0.next();
-                            break;
-                        }
-                        QDataSet ds1= SemanticOps.trim( ds, dr, null);
-                        if ( ds1==null || ds1.length()==0 ) {
-                            dr= dr.next();
-                        } else {
-                            //QDataSet box= SemanticOps.bounds(ds1);
-                            //Datum min= DataSetUtil.asDatum( box.slice(0).slice(0) );
-                            //dr= DatumRangeUtil.union( min, min.add(dr.width()) );
-                            //dr= DatumRangeUtil.rescale( dr, -0.05, 0.95 );
-                            logger.log(Level.FINE, "found next data after {0} steps", count);
-                            break;
-                        }
-                    }
-                }
-            } catch ( InconvertibleUnitsException ex ) {
-                logger.log(Level.FINE, ex.getMessage() );
-                dr= dr.next();
-            } catch ( IllegalArgumentException ex ) {
-                logger.log(Level.FINE, ex.getMessage() );
-                dr= dr.next();
-            }
-        } else {
-            dr= dr.next();
-        }
-        scanNextRange= dr;
         
-        dr= dr0;
-        if ( ds!=null &&  ds.rank()>0 ) {
-            try {
-                QDataSet bounds= SemanticOps.bounds(ds).slice(0);
-                if ( !validBounds(bounds) || !SemanticOps.getUnits(bounds).isConvertibleTo(dr.getUnits() ) || !DataSetUtil.asDatumRange(bounds).contains(dr) ) {
-                    dr= dr.previous();
-                } else {
-                    DatumRange limit= DataSetUtil.asDatumRange(bounds);
-                    if ( !DatumRangeUtil.isAcceptable(limit,false) ) {
-                        throw new IllegalArgumentException("limit is not acceptable"); // see 10 lines down
-                    }
-                    limit= DatumRangeUtil.union( limit, dr0 );
-                    dr= dr.previous();
-                    count= 0;
-                    while ( dr.intersects(limit) ) {
-                        count++;
-                        if ( count>STEP_LIMIT ) {
-                            logger.warning("step limit in nextprev https://sourceforge.net/p/autoplot/bugs/1209/");
-                            dr= dr0.previous();
-                            break;
-                        }
-                        QDataSet ds1= SemanticOps.trim( ds, dr, null);
-                        if ( ds1==null || ds1.length()==0 ) {
-                            dr= dr.previous();
-                        } else {
-                            //There's a bug with this where scan is the previous instead of step, and this makes scan quite different than step, since it's non-integer
-
-                            //QDataSet box= SemanticOps.bounds(ds1);
-                            //Datum max= DataSetUtil.asDatum( box.slice(0).slice(1) );
-                            //dr= DatumRangeUtil.union( max.subtract(dr.width()), max );
-                            //dr= DatumRangeUtil.rescale( dr, 0.05, 1.05 );
-                            logger.log(Level.FINE, "found previous data after {0} steps", count);
-                            break;
-                        }
-                    }
-                }
-            } catch ( InconvertibleUnitsException ex ) {
-                logger.log(Level.FINE, ex.getMessage() );
-                dr= dr.previous();
-            } catch ( IllegalArgumentException ex ) {
-                logger.log(Level.FINE, ex.getMessage() );
-                dr= dr.previous();
-            }
-        } else {
-            dr= dr.previous();
-        }
-        scanPrevRange= dr;
+        scanNextRange= DataSetUtil.getNextInterval(ds, dr0);
+        
+        scanPrevRange= DataSetUtil.getPreviousInterval(ds, dr0);
         
         Runnable run= new Runnable() {
             @Override
