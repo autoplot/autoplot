@@ -26,9 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-08-17 r24041):</p>
+        <p>Bugfixes (2019-08-21 r24046):</p>
         <ul>
-            <li>bug in rfe445, where Masafumi pointed out that data which once ranged now has a runtime error because of Infs.  Thanks, Masafumi!
+            <li>1359: refactor scan next/scan previous code to allow for testing.
+            <li>bug in rfe445, where Masafumi pointed out that data which once ranged now has a runtime error because of Inf's.  Thanks, Masafumi!
             <li>icon for OutsideS fixed.  It was still a copy of another position.
             <li>2189: corrections to clipping introduced mistake when outside legend label was used.  Thanks, Kristoff!
             <li>2195: mislocated property editor popups corrected.
@@ -74,6 +75,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>IDL/Python/Matlab interface now has convenient method for loading logger settings.
             <li>add more properties to dataset command, like renderType, bins1, bins0, and userProperties.
             <li>2175: start migrating prefs to config/options.properties.
             <li>rfe545: "Run Batch" tool has help page and outputs the results as the batch is run.
