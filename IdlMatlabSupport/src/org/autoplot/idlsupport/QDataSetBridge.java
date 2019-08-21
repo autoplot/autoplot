@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -1381,6 +1382,17 @@ public abstract class QDataSetBridge {
         }
     }
     
+    public void dumpStack() {
+        Map<Thread,StackTraceElement[]> mm= Thread.getAllStackTraces();
+        for ( Entry<Thread,StackTraceElement[]> t: mm.entrySet() ) {
+            System.err.println("Thread: "+t.getKey().getName());
+            for ( StackTraceElement st: t.getValue() ) {
+                System.err.println("    "+st.toString() );
+            }
+            System.err.println("");
+        }
+    }
+    
     /**
      * desperate method for debugging where JPype/Python would hang, in hopes that
      * this might show where it's hanging.
@@ -1395,7 +1407,7 @@ public abstract class QDataSetBridge {
                 } catch (InterruptedException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
-                new Exception("dumpAllThreads").printStackTrace();
+                dumpStack();
             }
         };
         new Thread(run).start();
