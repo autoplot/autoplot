@@ -1380,4 +1380,24 @@ public abstract class QDataSetBridge {
             }                
         }
     }
+    
+    /**
+     * desperate method for debugging where JPype/Python would hang, in hopes that
+     * this might show where it's hanging.
+     * @param n number of seconds.
+     */
+    public void dumpStackInNSeconds( final double n ) {
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep( (int)( n * 1000 ) );
+                } catch (InterruptedException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+                new Exception("dumpAllThreads").printStackTrace();
+            }
+        };
+        new Thread(run).start();
+    }
 }
