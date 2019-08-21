@@ -1,9 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.dom;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import org.das2.datum.DatumRange;
@@ -90,6 +88,20 @@ public class Plot extends DomNode {
         String oldFontSize = this.fontSize;
         this.fontSize = fontSize;
         propertyChangeSupport.firePropertyChange(PROP_FONTSIZE, oldFontSize, fontSize);
+    }
+    
+    private Color background = new Color( 0, 0, 0, 0 );
+
+    public static final String PROP_BACKGROUND = "background";
+
+    public Color getBackground() {
+        return background;
+    }
+
+    public void setBackground(Color background) {
+        Color oldBackground = this.background;
+        this.background = background;
+        propertyChangeSupport.firePropertyChange(PROP_BACKGROUND, oldBackground, background);
     }
     
     /**
@@ -317,11 +329,12 @@ public class Plot extends DomNode {
         if (!exclude.contains(PROP_FONTSIZE) ) this.setFontSize(that.getFontSize());
         if (!exclude.contains(PROP_DISPLAYLEGEND)) this.setDisplayLegend(that.isDisplayLegend());
         if (!exclude.contains(PROP_DISPLAYTITLE)) this.setDisplayTitle(that.isDisplayTitle());
+        if (!exclude.contains(PROP_BACKGROUND)) this.setBackground(that.getBackground());
     }
 
     @Override
     public List<DomNode> childNodes() {
-        ArrayList<DomNode> result = new ArrayList<DomNode>();
+        ArrayList<DomNode> result = new ArrayList<>();
         result.add(xaxis);
         result.add(yaxis);
         result.add(zaxis);
@@ -370,6 +383,8 @@ public class Plot extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff( PROP_FONTSIZE, that.fontSize , this.fontSize ) );        
         b= that.displayTitle==this.displayTitle;
         if (!b) result.add(new PropertyChangeDiff(PROP_DISPLAYTITLE, that.displayTitle, this.displayTitle ));
+        b= that.background.equals(this.background);
+        if (!b) result.add(new PropertyChangeDiff(PROP_BACKGROUND, that.background, this.background ));
         result.addAll(DomUtil.childDiffs( PROP_XAXIS, this.getXaxis().diffs(that.getXaxis())));
         result.addAll(DomUtil.childDiffs( PROP_YAXIS, this.getYaxis().diffs(that.getYaxis())));
         result.addAll(DomUtil.childDiffs( PROP_ZAXIS, this.getZaxis().diffs(that.getZaxis())));
