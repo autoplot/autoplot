@@ -208,8 +208,12 @@ public class RecentComboBox extends JComboBox {
             }
         }
         
-        if ( !recentFileTemp.renameTo(recentFile) ) {
-            logger.log(Level.WARNING, "unable to overwrite file {0}", recentFile);
+        if ( !recentFile.delete() ) {
+            logger.log(Level.WARNING, "unable to delete recent file {0}", recentFile);
+        } else {
+            if ( !recentFileTemp.renameTo(recentFile) ) {
+                logger.log(Level.WARNING, "unable to overwrite file {0}", recentFile);
+            }
         }
     }
 
