@@ -208,7 +208,7 @@ public class RecentComboBox extends JComboBox {
             }
         }
         
-        if ( !recentFile.delete() ) {
+        if ( recentFile.exists() && !recentFile.delete() ) {
             logger.log(Level.WARNING, "unable to delete recent file {0}", recentFile);
         } else {
             if ( !recentFileTemp.renameTo(recentFile) ) {
