@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Slices filter used to look at Cluster/CIS data from a CEF file.
+        <p><small>Operations history is fixed on Windows.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,6 +27,10 @@
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
         <p>Bugfixes (2019-08-21 r24046):</p>
+        <ul>
+            <li>2197: code to record recent times and operations would fail on Windows.  Thanks, George!
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>1359: refactor scan next/scan previous code to allow for testing.
             <li>bug in rfe445, where Masafumi pointed out that data which once ranged now has a runtime error because of Inf's.  Thanks, Masafumi!
@@ -53,27 +57,10 @@
             <li>remove class DatumRangeUtilOld, which is not used.
             <li>rte_1076158178: avoid runtime error when zero-length dataset is added to the DataPointRecorder.  Thanks, Darrelle!
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>30 findbugs warnings fixed.
-            <li>file:///home/jbf/auto&lt;C&gt;plot.vap returns all files starting with "auto", not the file browser for .vap files.
-            <li>2187: support trim(1,'2Hz','4Hz') with rank 2 depend 1.  Thanks, Kristoff!
-            <li>2185: when a joined zero-length dataset is encountered temporarily catch the error so that other functionality is still accessible.  Thanks, Firdevs!
-            <li>2149: rte_1223982323 corrected, where code assumed binding was to another axis, when it could be dom.timeRange.  Thanks, lehanson!
-            <li>2184: bug with plot(1,...) when (1) is moved to plot above.  Thanks, Kristoff!
-            <li>Masafumi needed to load TCA data from a das2server at 1ms resolution.
-            <li>2182: DESCRIPTION metadata is loaded from CDF files, propagated, and formatted properly.  Metadata tab displays DESCRIPTION properly.
-            <li>ftp filesystem supports .gz files (though they are still not cached properly).  Thanks, Bob!
-            <li>rte_0195003323: avoid runtime errors on event thread when when enumeration units get into the wrong place.
-            <li>finally clip the legend and message bubbles to within the plot boundaries.  This has been bugging me for a while.
-            <li>loosen constraints on CDAWeb reader for all.xml, in anticipation of website changes CDAWeb will be making.
-            <li>autolayout code has sanity check on ymin, where a bug in AutoplotServer when the vap size in pixels is changed.
-            <li>Work towards making Gold timetags available (Autoplot offers them now but there's still an issue with the NetCDF library).
-            <li>Gold Mission CDF file requests "image" for display type, and this should be ignored.
-            <li>1960: NetCDF/HDF5 reader reads global attributes into metadata.
-            <li>vap+wdc works again, after discovering that new code assumed there was an extension.
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>IDL/Python/Matlab interface now has convenient method for loading logger settings.
             <li>add more properties to dataset command, like renderType, bins1, bins0, and userProperties.
@@ -84,17 +71,6 @@
             <li>Base64 class replaced with Java 8 version, to get ready for the Java 8 upgrade.
             <li>rfe689: Das2 series renderer now has ErrorBarType, which can be BAR or SERIF_BAR, and soon SHADE.
             <li>report the cadence in frequency as well as a period for timetags.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>allow custom actions to be added to the Jython editor, so to support git experiments.
-            <li>rfe685: seriesRenderer now supports rank 0 data with a horizontal line at the value on the Y-axis.
-            <li>New Jython "runInParallel" simplifies parallel processing of Jython function.
-            <li>add ellipse function to more accurately model Jupiter surface for Juno graphics.  Thanks, Masafumi!
-            <li>add access to Orbit renderer's tickLabeller property.  (documented as bug 2183).
-            <li>DomUtil gets deleteDataSource operation, to support operations on .vap files.
-            <li>Scripting gets saveVap to work like loadVap, allowing Jython scripts to operate on .vap files.
-            <li>NetCDF global attributes are available in the metadata.
         </ul>
         <p>Known issues:</p>
         <ul>
