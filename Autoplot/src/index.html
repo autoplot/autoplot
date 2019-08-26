@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Operations history is fixed on Windows.
+        <p><small>binAverage2d filter is now available in operations.  Before, you could only use it in scripts.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-08-21 r24046):</p>
+        <p>Bugfixes (2019-08-26 r24064):</p>
         <ul>
+            <li>2196: XKCD font now embeds properly within PDF files.
+            <li>flatten now checks for PLANE_0 as well as DEPEND_0, to return X,Y,Z scatter data.
             <li>2198: remove unnecessary call to GUI code in HTTPFileSystem code, which would cause hang on Mac/SciPy/JPype.
             <li>2197: code to record recent times and operations would fail on Windows.  Thanks, George!
         </ul>
@@ -60,6 +62,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>binAverage2d filter added for doing 2-D histograms of x,y,z buckshot scatter data.
         </ul>
         <p>Less recent features:</p>
         <ul>
