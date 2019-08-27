@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-08-26 r24064):</p>
+        <p>Bugfixes (2019-08-27 r24068):</p>
         <ul>
+            <li>add GUI for smooth1 filter.
+            <li>record operations set by the FiltersChainPanel into recent history.
             <li>2196: XKCD font now embeds properly within PDF files.
             <li>flatten now checks for PLANE_0 as well as DEPEND_0, to return X,Y,Z scatter data.
             <li>2198: remove unnecessary call to GUI code in HTTPFileSystem code, which would cause hang on Mac/SciPy/JPype.
@@ -62,6 +64,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add binMeanAverageDeviation to calculate the deviations in each bin for binAverage2d
             <li>binAverage2d filter added for doing 2-D histograms of x,y,z buckshot scatter data.
         </ul>
         <p>Less recent features:</p>
