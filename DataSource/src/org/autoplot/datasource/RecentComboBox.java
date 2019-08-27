@@ -216,12 +216,22 @@ public class RecentComboBox extends JComboBox {
             }
         }
     }
-
+    
     /**
-     * add the item to the list of recent entries.  
+     * add the item to the list of recent entries.  This will reload the
+     * recent file, probably firing events.
      * @param s the item
      */
     public void addToRecent( final String s ) {
+        addToRecent(s,true);
+    }
+    
+    /**
+     * add the item to the list of recent entries.  
+     * @param s the item
+     * @param reload if true then reload the file.
+     */
+    public void addToRecent( final String s, final boolean reload ) {
         logger.log(Level.FINE, "addToRecent({0})", s);
         if ( verifier!=null ) {
             if ( !verifier.verify(s) ) {
@@ -245,7 +255,7 @@ public class RecentComboBox extends JComboBox {
                     }
                 }
                 saveRecent(items);
-                loadRecent();        
+                if ( reload ) loadRecent();        
             }
         };
         if ( SwingUtilities.isEventDispatchThread() ) {

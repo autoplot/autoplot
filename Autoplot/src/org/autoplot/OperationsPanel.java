@@ -60,7 +60,9 @@ public class OperationsPanel extends javax.swing.JPanel {
         filtersChainPanel.addPropertyChangeListener( FiltersChainPanel.PROP_FILTER, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                setFilter(filtersChainPanel.getFilter());
+                String filter= filtersChainPanel.getFilter();
+                setFilter(filter);
+                operatorsComboBox.addToRecent( filter, false );
             }
         });
         operatorsTextField.addActionListener( new ActionListener() {
