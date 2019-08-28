@@ -2318,7 +2318,6 @@ public class ApplicationController extends DomNodeController implements RunLater
                     c.getController().dasCanvas.setSize( application.options.getWidth(), application.options.getHeight() );   
                     c.setWidth( application.options.getWidth() );
                     c.setHeight( application.options.getHeight() );
-                    System.err.println("*** 2321: "+c.controller.getDasCanvas().getSize()+" "+c.controller.getDasCanvas().getFont() );
                     DasCanvasComponent[] dccs= c.controller.getDasCanvas().getCanvasComponents();
                     for (DasCanvasComponent dcc : dccs) {
                         if (dcc instanceof DasPlot) {
