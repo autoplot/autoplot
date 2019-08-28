@@ -800,7 +800,7 @@ public class GuiSupport {
                         parent.undoRedoSupport.resetHistory();
                         parent.applicationModel.setVapFile(null);
                         parent.stateSupport.close();
-                        parent.tickleTimer.tickle();
+                        parent.tickleTimer.tickle("resetWindow801");
                         if ( parent.isExpertMode() ) {
                             parent.setEditorCard(AutoplotUI.CARD_DATA_SET_SELECTOR);
                         }
