@@ -2314,9 +2314,11 @@ public class ApplicationController extends DomNodeController implements RunLater
                 public void run() {
                     //go ahead and check for leftover das2 plots and renderers that might have been left from a bug.  rfe3324592
                     Canvas c= getCanvas();
-                    c.setWidth( application.options.getWidth() );
-                    c.setHeight( application.options.getHeight() );                    
+                    c.setFont( application.options.canvasFont );
                     c.getController().dasCanvas.setSize( application.options.getWidth(), application.options.getHeight() );   
+                    c.setWidth( application.options.getWidth() );
+                    c.setHeight( application.options.getHeight() );
+                    System.err.println("*** 2321: "+c.controller.getDasCanvas().getSize()+" "+c.controller.getDasCanvas().getFont() );
                     DasCanvasComponent[] dccs= c.controller.getDasCanvas().getCanvasComponents();
                     for (DasCanvasComponent dcc : dccs) {
                         if (dcc instanceof DasPlot) {
