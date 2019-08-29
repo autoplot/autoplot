@@ -12,7 +12,7 @@ import org.das2.qstream.SerializeDelegate;
 
 /**
  * Format the color as RGB or ARGB, like so: #000000.
- * This can be parsed using ColorUtil.decodeColor, do names like "burntSienna" 
+ * This can be parsed using ColorUtil.decodeColor, names like "burntSienna" 
  * can be used in vaps as well.
  * @author jbf
  */
