@@ -27,6 +27,7 @@ public class ColorSerializeDelegate implements SerializeDelegate {
             return "#" + Integer.toHexString(color.getRGB());
         } else {
             return "#" + Integer.toHexString(color.getRGB() & 0xFFFFFF);
+            //return "#" + Integer.toHexString( color.getAlpha() ) + Integer.toHexString(color.getRGB() & 0xFFFFFF);
         }
         //return ColorUtil.encodeColor((Color)o);
     }
