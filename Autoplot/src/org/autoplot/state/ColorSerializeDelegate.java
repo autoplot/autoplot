@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.state;
 
@@ -21,21 +17,17 @@ public class ColorSerializeDelegate implements SerializeDelegate {
     public ColorSerializeDelegate() {
     }
 
+    @Override
     public String format(Object o) {
-        Color color= (Color)o;
-        if ( color.getAlpha()<255 ) {
-            return "#" + Integer.toHexString(color.getRGB());
-        } else {
-            return "#" + Integer.toHexString(color.getRGB() & 0xFFFFFF);
-            //return "#" + Integer.toHexString( color.getAlpha() ) + Integer.toHexString(color.getRGB() & 0xFFFFFF);
-        }
-        //return ColorUtil.encodeColor((Color)o);
+        return ColorUtil.encodeColor((Color)o);
     }
 
+    @Override
     public Object parse(String typeId, String s) throws ParseException {
         return ColorUtil.decodeColor(s);
     }
 
+    @Override
     public String typeId(Class clas) {
         return "color";
     }
