@@ -910,6 +910,31 @@ public class CdfUtil {
     }
 
     /**
+     * This is cdf.getDimensions( variableName ), but then check varies
+     * to see if varies[0] is false (for rvariables)
+     * @param variableName
+     * @return the dimensions for each record.
+     */
+    private static int[] getDimensions( CDFReader cdf, String variableName ) throws CDFException.ReaderError {
+        int[] dims= cdf.getDimensions( variableName );
+        if ( cdf.isTypeR(variableName) ) {
+            boolean[] dimVary= cdf.getVarys(variableName);
+            int lastVary=-1;
+            for ( int iv=dimVary.length-1; iv>=1; iv-- ) {
+                if ( dimVary[iv] ) {
+                    lastVary= iv;
+                    break;
+                }
+            }
+            int[] newDims= Arrays.copyOfRange( dims, 1, lastVary+1 );
+            return newDims;
+            
+        } else {
+            return dims;
+        }
+    }
+    
+    /**
      * factor out common code that gets the properties for each dimension.
      * @param cdf
      * @param var
@@ -923,7 +948,7 @@ public class CdfUtil {
         DepDesc result= new DepDesc();
 
         result.nrec=-1;
-        
+   
         try {
             if ( hasAttribute( cdf, svar, "DEPEND_"+dim ) ) {  // check for metadata for DEPEND_1
                 Object att= getAttribute( cdf, svar, "DEPEND_"+dim );
@@ -937,7 +962,7 @@ public class CdfUtil {
                     } else {
                         result.nrec = cdf.getNumberOfValues( result.dep );
                         if (result.nrec == 1) {
-                            result.nrec = cdf.getDimensions( result.dep )[0];
+                            result.nrec = getDimensions( cdf, svar)[0];
                         }
                     }
                     if ( dims.length>(dim-2) && (result.nrec)!=dims[dim-1] ) {
@@ -1097,12 +1122,8 @@ public class CdfUtil {
                 }
                 maxRec = cdf.getNumberOfValues(svar); 
                 recCount= maxRec;
-                dims = cdf.getDimensions(svar);
-                boolean[] dimVary= cdf.getVarys(svar);
-                // cdf java Nand
-                if ( dimVary.length>0 && dimVary[0]==false ) {
-                    dims= new int[0];
-                }
+                dims = getDimensions(cdf, svar);
+
                 if (dims == null) {
                     rank = 1;
                 } else {
