@@ -561,7 +561,7 @@ public class CdfUtil {
         } else {
             dims = dimSizes.length;
         }
-
+//https://cdaweb.gsfc.nasa.gov/pub/data/wind/3dp/3dp_k0/2019/wi_k0_3dp_20190110_v01.cdf?e_flux_energy   See CdfUtil.getDimensions which tries to do the same thing.
           if ( getEffectiveRank(dimVaries) != dimSizes.length ) { // vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/lep/2011/ge_k0_lep_20111016_v01.cdf?V0
             int[] dimSizes1= new int[ cdf.getEffectiveRank(svariable) ];
             boolean[] varies= cdf.getVarys(svariable);
@@ -657,7 +657,11 @@ public class CdfUtil {
         
         if ( stype.equals("string") ) {
             result = readStringData(svariable, recInterval, cdf, recCount, qube );
-            return result;
+            if ( recCount==-1 && result.rank()==2 ) {
+                return (MutablePropertyDataSet)result.slice(0);
+            } else {
+                return result;
+            }
         }
 
         if ( buf.length>1 ) {
@@ -912,22 +916,34 @@ public class CdfUtil {
     /**
      * This is cdf.getDimensions( variableName ), but then check varies
      * to see if varies[0] is false (for rvariables)
+     * @param cdf
      * @param variableName
      * @return the dimensions for each record.
      */
-    private static int[] getDimensions( CDFReader cdf, String variableName ) throws CDFException.ReaderError {
+    public static int[] getDimensions( CDFReader cdf, String variableName ) throws CDFException.ReaderError {
         int[] dims= cdf.getDimensions( variableName );
         if ( cdf.isTypeR(variableName) ) {
+            // R variables return the dimension for the zeroth index as well, unlike Z variables.
             boolean[] dimVary= cdf.getVarys(variableName);
+            int shift= dimVary.length>0 ? ( dimVary[0]==true ? 0 : 1 ) : 0 ;
             int lastVary=-1;
-            for ( int iv=dimVary.length-1; iv>=1; iv-- ) {
+            for ( int iv=dimVary.length-1; iv>=shift; iv-- ) {
                 if ( dimVary[iv] ) {
                     lastVary= iv;
                     break;
                 }
             }
-            int[] newDims= Arrays.copyOfRange( dims, 1, lastVary+1 );
-            return newDims;
+            if ( lastVary>-1 ) {
+                if ( shift==0 ) {
+                    int[] newDims= Arrays.copyOfRange( dims, 0, lastVary+1 );
+                    return newDims;
+                } else {
+                    int[] newDims= Arrays.copyOfRange( dims, 1, lastVary+1 );
+                    return newDims;
+                }
+            } else {
+                return new int[0];
+            }
             
         } else {
             return dims;

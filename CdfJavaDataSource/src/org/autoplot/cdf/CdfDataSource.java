@@ -1092,7 +1092,7 @@ public class CdfDataSource extends AbstractDataSource {
             }
         }
 
-        int[] dimensions = cdf.getDimensions(svariable);
+        int[] dimensions = CdfUtil.getDimensions( cdf, svariable );
         long[] ndimensions= new long[ dimensions.length+1 ];
         ndimensions[0]= numRec;
         for ( int i=0; i<dimensions.length; i++ ) ndimensions[i+1]= dimensions[i];
@@ -1143,7 +1143,7 @@ public class CdfDataSource extends AbstractDataSource {
         }
         
         if (reform) {
-            //result = CdfUtil.wrapCdfHyperDataHacked(variable, 0, -1, 1); //TODO: this doesn't handle strings properly.
+            //result = CdfUtil.wrapCdfHyperDataHacked(variable, 0, -1, 1); //TODO: this doesn't handle strings properly.    
             result = CdfUtil.loadVariable(cdf,svariable, 0, -1, 1, slice1, new NullProgressMonitor() );
         } else {
             
@@ -1449,7 +1449,11 @@ public class CdfDataSource extends AbstractDataSource {
 
                         if ( slice1<0 ) {                            
                             QDataSet bundleDs= lablDs;
-                            result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );
+                            if ( reform && result.rank()<=idep ) { // kludge/code-to-be-generalized for https://cdaweb.gsfc.nasa.gov/pub/data/wind/3dp/3dp_k0/2019/wi_k0_3dp_20190110_v01.cdf?elect_flux
+                                result.putProperty( "BUNDLE_"+(idep-1), DataSetUtil.toBundleDs(bundleDs) );
+                            } else {
+                                result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );
+                            }
                         } else {
                             if ( idep==1 ) {
                                 // continue
