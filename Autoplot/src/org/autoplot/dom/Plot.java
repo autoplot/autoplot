@@ -90,19 +90,24 @@ public class Plot extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_FONTSIZE, oldFontSize, fontSize);
     }
     
-//    private Color background = new Color( 0, 0, 0, 0 );
-//
-//    public static final String PROP_BACKGROUND = "background";
-//
-//    public Color getBackground() {
-//        return background;
-//    }
-//
-//    public void setBackground(Color background) {
-//        Color oldBackground = this.background;
-//        this.background = background;
-//        propertyChangeSupport.firePropertyChange(PROP_BACKGROUND, oldBackground, background);
-//    }
+    private Color background = new Color( 0, 0, 0, 0 );
+
+    public static final String PROP_BACKGROUND = "background";
+
+    public Color getBackground() {
+        return background;
+    }
+
+    /**
+     * set the background color for the plot.  This is normally transparent, so
+     * the canvas color is used, and can be reset with Color(0,0,0,0).
+     * @param background 
+     */
+    public void setBackground(Color background) {
+        Color oldBackground = this.background;
+        this.background = background;
+        propertyChangeSupport.firePropertyChange(PROP_BACKGROUND, oldBackground, background);
+    }
     
     /**
      * do display the title.  Turning this off has the same effect as setting the title to ""
@@ -329,7 +334,7 @@ public class Plot extends DomNode {
         if (!exclude.contains(PROP_FONTSIZE) ) this.setFontSize(that.getFontSize());
         if (!exclude.contains(PROP_DISPLAYLEGEND)) this.setDisplayLegend(that.isDisplayLegend());
         if (!exclude.contains(PROP_DISPLAYTITLE)) this.setDisplayTitle(that.isDisplayTitle());
-        //if (!exclude.contains(PROP_BACKGROUND)) this.setBackground(that.getBackground());
+        if (!exclude.contains(PROP_BACKGROUND)) this.setBackground(that.getBackground());
     }
 
     @Override
@@ -383,8 +388,8 @@ public class Plot extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff( PROP_FONTSIZE, that.fontSize , this.fontSize ) );        
         b= that.displayTitle==this.displayTitle;
         if (!b) result.add(new PropertyChangeDiff(PROP_DISPLAYTITLE, that.displayTitle, this.displayTitle ));
-        //b= that.background.equals(this.background);
-        //if (!b) result.add(new PropertyChangeDiff(PROP_BACKGROUND, that.background, this.background ));
+        b= that.background.equals(this.background);
+        if (!b) result.add(new PropertyChangeDiff(PROP_BACKGROUND, that.background, this.background ));
         result.addAll(DomUtil.childDiffs( PROP_XAXIS, this.getXaxis().diffs(that.getXaxis())));
         result.addAll(DomUtil.childDiffs( PROP_YAXIS, this.getYaxis().diffs(that.getYaxis())));
         result.addAll(DomUtil.childDiffs( PROP_ZAXIS, this.getZaxis().diffs(that.getZaxis())));
