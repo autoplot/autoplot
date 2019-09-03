@@ -93,6 +93,7 @@ public class LayoutUtil {
         logger.fine( "enter autolayout" );
         
         double em = marginColumn.getEmSize();
+        logger.log(Level.FINE, "autolayout em size: {0}", em);
 
         int currentBoundsXMin = 90000;
         int currentBoundsXMax = -90000;
