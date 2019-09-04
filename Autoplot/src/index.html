@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>binAverage2d filter is now available in operations.  Before, you could only use it in scripts.
+        <p><small>ARGB colors are properly encoded in vap files, and color names are now used when possible.  See <a href="https://github.com/autoplot/dev/blob/master/bugs/sf/2200/demoSaveColors.vap">demoSaveColors.vap</a>.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-08-31 r24080):</p>
+        <p>Bugfixes (2019-09-04 r24083):</p>
         <ul>
+            <li>2200: correction to encoding of ARGB colors.
             <li>2201: rte_1268372737: CDF rvariables from Wind mission cannot load.  Thanks, xfxy!
             <li>2200: support 100% transparent black in vap files.
             <li>add GUI for smooth1 filter.
