@@ -55,6 +55,7 @@ import org.autoplot.datasource.capability.Caching;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.autoplot.datasource.capability.Updating;
 import org.das2.components.DasProgressPanel;
+import org.das2.qds.DataSetAnnotations;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.AutoHistogram;
 
@@ -1245,13 +1246,17 @@ public class DataSourceController extends DomNodeController {
         if (xds.length() < 2) {
             return;
         }
-
         RankZeroDataSet cadence = DataSetUtil.guessCadenceNew(xds, fillDs);
-        if (cadence != null && "log".equals(cadence.property(QDataSet.SCALE_TYPE))) {
-            xds.putProperty(QDataSet.SCALE_TYPE, "log");
-        }
-        if (cadence != null) {
-            xds.putProperty(QDataSet.CADENCE, cadence);
+        if ( xds.isImmutable() ) {
+            logger.fine("MutablePropertyDataSet has been made immutable, adding cadence annotation instead.");
+            DataSetAnnotations.getInstance().putAnnotation( xds, DataSetAnnotations.ANNOTATION_CADENCE, cadence );
+        } else {
+            if (cadence != null && "log".equals(cadence.property(QDataSet.SCALE_TYPE))) {
+                xds.putProperty(QDataSet.SCALE_TYPE, "log");
+            }
+            if (cadence != null) {
+                xds.putProperty(QDataSet.CADENCE, cadence);
+            }
         }
     }
 
