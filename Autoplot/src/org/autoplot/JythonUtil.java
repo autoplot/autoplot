@@ -23,6 +23,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Box;
@@ -490,6 +491,57 @@ public class JythonUtil {
         }
     }
         
+    /**
+     * Do a search for the number of places where JythonUtil.createInterpreter
+     * is called and it should be clear that there's a need for one code that
+     * does this.  There probably is one such code, but I can't find it right 
+     * now.
+     * @param environ
+     * @param file
+     * @throws IOException 
+     * @see #runScript(org.autoplot.ApplicationModel, java.lang.String, java.lang.String[], java.lang.String) 
+     *  which doesn't allow for control of the environ (and arbitrary parameters).
+     */
+    public static void invokeScriptNow( Map<String,Object> environ, File file ) throws IOException, PyException {
+        
+        ProgressMonitor mon= (ProgressMonitor)environ.get( "monitor" );
+        if ( mon==null ) {
+            logger.log(Level.FINE, "creating NullProgressMonitor to run {0}", file);
+            mon= new NullProgressMonitor();
+        }
+                
+        PythonInterpreter interp = JythonUtil.createInterpreter(true, false, (Application)environ.get("dom"), mon );
+        for ( Entry<String,Object> e: environ.entrySet() ) {
+            interp.set( e.getKey(), e.getValue() );
+        }
+                        
+        try ( FileInputStream in = new FileInputStream(file) ) {
+
+            final File lastVersionDir= Paths.get( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "scripts" ).toFile();
+            if ( !lastVersionDir.exists() ) {
+                if ( !lastVersionDir.mkdirs() ) {
+                    logger.log(Level.WARNING, "unable to mkdir {0}", lastVersionDir);
+                } else {
+                    File readme= new File(lastVersionDir,"README.txt");
+                    try ( PrintStream out= new PrintStream(readme) ) {
+                        out.print("Files here have been okayed to run and can be run again without a warning.  See http://autoplot.org/1310\n");
+                    }
+                }
+            }
+
+            final File lastVersionFile= Paths.get( lastVersionDir.toString(), String.format( "%010d.jy", Math.abs((long)file.toString().hashCode()) ).trim() ).toFile();        
+
+            FileUtil.fileCopy( file, lastVersionFile );
+
+            interp.execfile( JythonRefactory.fixImports(in), file.toString() );
+
+        } catch ( PyException ex ) {
+            throw ex;
+        } finally {
+            if ( !mon.isFinished() ) mon.finished();
+        } 
+    }
+    
     /**
      * invoke the python script on another thread.  Script parameters can be passed in, and the user can be 
      * provided a dialog to set the parameters.  Note this will return before the script is actually

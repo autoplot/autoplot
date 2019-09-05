@@ -6436,17 +6436,10 @@ APSplash.checkTime("init 240");
                             String cmd= e.getActionCommand();
                             File f= new File( new URI( URISplit.parse(cmd).file ) );
                             Map<String,Object> env= new HashMap<>();
-                            Map<String,String> fparams= new HashMap<>();
-                            if ( scriptPanel.getFilename()!=null ) {
-                                fparams.put("script",scriptPanel.getFilename());
-                            }
                             env.put( "editor", scriptPanel.getEditorPanel() );
-                            JythonUtil.showScriptDialog( scriptPanel,
-                                    env,
-                                    f,
-                                    fparams,
-                                    false,
-                                    null );
+                            env.put( "scriptPanel", scriptPanel );
+                            env.put( "script", scriptPanel.getFilename() );
+                            JythonUtil.invokeScriptNow( env, f );
                         } catch (IOException|URISyntaxException ex) {
                             logger.log(Level.SEVERE, null, ex);
                         }
