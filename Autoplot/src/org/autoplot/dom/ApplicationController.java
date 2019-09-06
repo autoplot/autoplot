@@ -827,9 +827,11 @@ public class ApplicationController extends DomNodeController implements RunLater
         Canvas lcanvas = new Canvas();
         DasCanvas dasCanvas = new DasCanvas(lcanvas.getWidth(),lcanvas.getHeight());
         dasCanvas.setScaleFonts(false);
-
+        
         assignId( lcanvas );
 
+        dasCanvas.setName( "das_"+lcanvas.getId() );        
+        
         new CanvasController(application, lcanvas).setDasCanvas(dasCanvas);
 
         new RowController( lcanvas.getMarginRow() ).createDasPeer( lcanvas, null );
