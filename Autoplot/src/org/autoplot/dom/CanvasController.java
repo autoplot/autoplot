@@ -506,7 +506,7 @@ public class CanvasController extends DomNodeController {
         DomLock lock = changesSupport.mutatorLock();
         lock.lock( "Insert Gap For");
         try {
-            List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
+            List<Column> columns = new ArrayList<>(Arrays.asList(canvas.getColumns()));
 
             int ipos;
             if (position == LayoutConstants.BELOW) {
@@ -548,7 +548,7 @@ public class CanvasController extends DomNodeController {
                 insertGapFor(row, trow, position);
             }
 
-            List<Row> rows = new ArrayList<Row>(Arrays.asList(canvas.getRows()));
+            List<Row> rows = new ArrayList<>(Arrays.asList(canvas.getRows()));
 
             int ipos = rows.size();
             if (trow != null) {
@@ -591,7 +591,7 @@ public class CanvasController extends DomNodeController {
                 insertGapFor(column, tcolumn, position);
             }
 
-            List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
+            List<Column> columns = new ArrayList<>(Arrays.asList(canvas.getColumns()));
 
             int ipos = columns.size();
             if (tcolumn != null) {
@@ -658,7 +658,7 @@ public class CanvasController extends DomNodeController {
         lock.lock( "Add Columns");
         try {
 
-            List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
+            List<Column> columns = new ArrayList<>(Arrays.asList(canvas.getColumns()));
 
             for (int i = 0; i < count; i++) {
                 final Column column = new Column();
@@ -928,7 +928,7 @@ public class CanvasController extends DomNodeController {
 
             this.dom.getController().assignId(column);
 
-            List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
+            List<Column> columns = new ArrayList<>(Arrays.asList(canvas.getColumns()));
             columns.add(column);
             canvas.setColumns(columns.toArray(new Column[columns.size()]));
 
@@ -971,7 +971,7 @@ public class CanvasController extends DomNodeController {
 
             this.dom.getController().assignId(row);
 
-            List<Row> rows = new ArrayList<Row>(Arrays.asList(canvas.getRows()));
+            List<Row> rows = new ArrayList<>(Arrays.asList(canvas.getRows()));
             rows.add(row);
             canvas.setRows(rows.toArray(new Row[rows.size()]));
 
