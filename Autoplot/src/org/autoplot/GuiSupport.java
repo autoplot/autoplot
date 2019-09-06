@@ -796,6 +796,7 @@ public class GuiSupport {
                 Runnable run= new Runnable() {
                     @Override
                     public void run() {
+                        parent.resizeForCanvasSize(parent.dom.getOptions().getWidth(), parent.dom.getOptions().getHeight()); 
                         parent.dom.getController().reset();
                         parent.undoRedoSupport.resetHistory();
                         parent.applicationModel.setVapFile(null);
