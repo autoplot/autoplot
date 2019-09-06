@@ -50,23 +50,19 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FilePermission;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
-import java.security.Permission;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -193,6 +189,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
 
     private static Thread getShutdownHook( final ApplicationModel model ) {
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 logger.fine("shutting down");
                 if ( model.isHeadless() ) {
@@ -717,6 +714,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     newValue= "vap+hapi:";
                 }
                 Runnable run= new Runnable() {
+                    @Override
                     public void run() {
                         dataSetSelector.setValue(newValue);
                         dataSetSelector.maybePlot( ev.getModifiers() );
@@ -773,6 +771,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 split.params= URISplit.formatParams(params);
                 final String newValue= URISplit.format(split);
                 Runnable run= new Runnable() {
+                    @Override
                     public void run() {
                         dataSetSelector.setValue(newValue);
                         dataSetSelector.maybePlot( ev.getModifiers() );
@@ -801,6 +800,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 split.params= URISplit.formatParams(params);
                 final String newValue= URISplit.format(split);
                 Runnable run= new Runnable() {
+                    @Override
                     public void run() {
                         dataSetSelector.setValue(newValue);
                         dataSetSelector.maybePlot( ev.getModifiers() );
@@ -3909,12 +3909,10 @@ private void createPngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt
                 CreatePngWalk.doIt( applicationModel.dom, null );
             } catch ( IOException ex ) {
                 logger.log( Level.SEVERE, ex.getMessage(), ex );
-                ex.printStackTrace();
                 setStatus( AutoplotUI.ERROR_ICON,"Unable to create PNG Walk: " + ex.getMessage() );
                 applicationModel.showMessage( "<html>Unable to create PNG Walk:<br>"+ex.getMessage(), "PNG Walk Error", JOptionPane.WARNING_MESSAGE );
             } catch ( ParseException | InterruptedException ex) {
                 logger.log( Level.SEVERE, ex.getMessage(), ex );
-                ex.printStackTrace();
                 throw new RuntimeException(ex);
                 // this mimics the jython behavior
             }
@@ -4025,27 +4023,33 @@ private void canvasSizeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
         firePropertyChange(PROP_EDITORCARD, oldEditorCard, editorCard);
     }
 
-public void switchToEditorCard( String selector ) {
-    //String old= timeRangeEditor.isCardSelected() ? CARD_TIME_RANGE_SELECTOR : CARD_DATA_SET_SELECTOR;
-    //if ( old.equals(selector) ) {
-    //    return;
-    //}
-    logger.log(Level.FINE, "switch to selector: {0}", selector);
-    ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, selector );
-    if ( CARD_TIME_RANGE_SELECTOR.equals(selector) ) {
-        uriTimeRangeToggleButton1.setPosition( 0 );
-        dataSetSelector.setCardSelectedNoEventKludge(false);
-        timeRangeEditor.setCardSelected(true);
-    } else if ( CARD_DATA_SET_SELECTOR.equals(selector) ) {
-        uriTimeRangeToggleButton1.setPosition( 1 );
-        timeRangeEditor.setCardSelectedNoEventKludge(false);
-        dataSetSelector.setCardSelected(true);
-    } else {
-        throw new IllegalArgumentException("huh card?");
+    public void switchToEditorCard( String selector ) {
+        //String old= timeRangeEditor.isCardSelected() ? CARD_TIME_RANGE_SELECTOR : CARD_DATA_SET_SELECTOR;
+        //if ( old.equals(selector) ) {
+        //    return;
+        //}
+        logger.log(Level.FINE, "switch to selector: {0}", selector);
+        if ( selector==null ) {
+            throw new IllegalArgumentException("null passed in for selector");
+        }
+        ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, selector );
+        switch (selector) {
+            case CARD_TIME_RANGE_SELECTOR:
+                uriTimeRangeToggleButton1.setPosition( 0 );
+                dataSetSelector.setCardSelectedNoEventKludge(false);
+                timeRangeEditor.setCardSelected(true);
+                break;
+            case CARD_DATA_SET_SELECTOR:
+                uriTimeRangeToggleButton1.setPosition( 1 );
+                timeRangeEditor.setCardSelectedNoEventKludge(false);
+                dataSetSelector.setCardSelected(true);
+                break;
+            default:
+                throw new IllegalArgumentException("huh card?");
+        }
+        uriTimeRangeToggleButton1.setPosition( CARD_TIME_RANGE_SELECTOR.equals(selector) ? 1 : 0 );
+        dom.getOptions().setUseTimeRangeEditor(CARD_TIME_RANGE_SELECTOR.equals(selector));
     }
-    uriTimeRangeToggleButton1.setPosition( CARD_TIME_RANGE_SELECTOR.equals(selector) ? 1 : 0 );
-    dom.getOptions().setUseTimeRangeEditor(CARD_TIME_RANGE_SELECTOR.equals(selector));
-}
 
 private void dataSetSelectorMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorMenuItemActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
@@ -4348,6 +4352,7 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
 
 private void makeDataVisible( final boolean newValue ) {
     Runnable run= new Runnable() {
+        @Override
         public void run() {
             makeDataVisibleImmediately(newValue);
         }
@@ -4390,6 +4395,7 @@ private void makeDataVisibleImmediately( boolean newValue ) {
 
 private void makeLayoutVisible( final boolean newValue ) {
     Runnable run= new Runnable() {
+        @Override
         public void run() {
             makeLayoutVisibleImmediately(newValue);
         }
@@ -4948,14 +4954,14 @@ private void updateFrameTitle() {
         alm.addOptionalSwitchArgument("port", "p", "port", "-1", "enable scripting via this port (deprecated, use server instead)");
         alm.addBooleanSwitchArgument("scriptPanel", null, "scriptPanel", "enable script panel");
         alm.addBooleanSwitchArgument("logConsole", "l", "logConsole", "enable log console");
-        alm.addOptionalSwitchArgument("nativeLAF", "n", "nativeLAF", alm.TRUE, "use the system look and feel (T or F)");
+        alm.addOptionalSwitchArgument("nativeLAF", "n", "nativeLAF", ArgumentList.TRUE, "use the system look and feel (T or F)");
         alm.addOptionalSwitchArgument("open", "o", "open", null, "open this URI (to support javaws)");
         alm.addOptionalSwitchArgument("print", null, "print", "", "print this URI (to support javaws)");
         alm.addOptionalSwitchArgument("script", "s", "script", "", "run this script after starting.  " +
                 "Arguments following are " +
                 "passed into the script as sys.argv");
         alm.addOptionalSwitchArgument("testPngFilename", null, "testPngFilename", "", "write canvas to this png file after script is run" );
-        alm.addOptionalSwitchArgument("autoLayout",null,"autoLayout",alm.TRUE,"turn on/off initial autolayout setting");
+        alm.addOptionalSwitchArgument("autoLayout",null,"autoLayout",ArgumentList.TRUE,"turn on/off initial autolayout setting");
         alm.addOptionalSwitchArgument("mode","m","mode","expert","start in basic (browse,reduced) mode or expert mode" );
         //alm.addOptionalSwitchArgument("exit", null, "exit", "0", "exit after running script" );
         alm.addBooleanSwitchArgument( "eventThreadMonitor", null, "eventThreadMonitor", "monitor the event thread for long unresponsive pauses (deprecated, use enableResponseMonitor)");
@@ -5963,6 +5969,7 @@ APSplash.checkTime("init 240");
     public void setLeftPanel( final JComponent c ) {
         if ( c==null ) throw new NullPointerException("use clearLeftPanel");
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 if ( leftPanel!=null ) tabbedPanelContainer.remove(leftPanel);
                 JScrollPane p= new JScrollPane();
@@ -5982,6 +5989,7 @@ APSplash.checkTime("init 240");
      */
     public void clearLeftPanel() {
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 if ( leftPanel!=null ) tabbedPanelContainer.remove(leftPanel);
                 leftPanel= null;
@@ -6002,6 +6010,7 @@ APSplash.checkTime("init 240");
     public void setRightPanel( final JComponent c ) {
         if ( c==null ) throw new NullPointerException("use clearRightPanel");
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 if ( rightPanel!=null ) tabbedPanelContainer.remove(rightPanel);
                 JScrollPane p= new JScrollPane();
@@ -6019,6 +6028,7 @@ APSplash.checkTime("init 240");
      */
     public void clearRightPanel() {
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 if ( rightPanel!=null ) tabbedPanelContainer.remove(rightPanel);
                 rightPanel= null;
@@ -6039,6 +6049,7 @@ APSplash.checkTime("init 240");
     public void setBottomPanel( final JComponent c ) {
         if ( c==null ) throw new NullPointerException("use clearBottomPanel");
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 if ( bottomPanel!=null ) tabbedPanelContainer.remove(bottomPanel);
                 JScrollPane p= new JScrollPane();
@@ -6056,6 +6067,7 @@ APSplash.checkTime("init 240");
      */
     public void clearBottomPanel() {
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 if ( bottomPanel!=null ) tabbedPanelContainer.remove(bottomPanel);
                 bottomPanel= null;
@@ -6285,6 +6297,7 @@ APSplash.checkTime("init 240");
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     Runnable run= new Runnable() {
+                        @Override
                         public void run() {
                             getDataSetSelector().setValue(script);
                         }
