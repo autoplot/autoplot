@@ -38,7 +38,6 @@ import org.das2.graph.SelectionUtil;
 import org.das2.util.LoggerManager;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.layout.LayoutConstants;
-import org.das2.graph.DasAxis;
 
 /**
  * Controller for canvases.
@@ -52,7 +51,7 @@ public class CanvasController extends DomNodeController {
     private final Application dom;
     private final Canvas canvas;
     private final Timer repaintSoonTimer;
-    
+            
     /**
      * the setSizeTimer makes sure that the canvas preferred size is set on the event thread.
      */
@@ -70,7 +69,7 @@ public class CanvasController extends DomNodeController {
             }
         });
         repaintSoonTimer.setRepeats(false);
-        
+       
         setSizeTimer= new Timer( 100,  new ActionListener() {
             @Override
             public void actionPerformed( ActionEvent e ) {
@@ -108,12 +107,29 @@ public class CanvasController extends DomNodeController {
      * on the event thread.
      */
     private void setDasCanvasSize() {
-        int w= Math.min( 4000, CanvasController.this.canvas.getWidth());
-        int h= Math.min( 4000, CanvasController.this.canvas.getHeight());
+        int w= Math.min( 4000, dasCanvas.getWidth());
+        int h= Math.min( 4000, dasCanvas.getHeight());
         Dimension d= new Dimension( w,h );
         logger.log(Level.FINER, "setDasCanvasSize {0}", d);
         dasCanvas.setPreferredSize( d );
-        dasCanvas.setSize( d );
+    }
+    
+    /**
+     * set the height and width in one atomic operation.
+     * @param height
+     * @param width 
+     */
+    public void setDimensions( int width, int height ) {
+        int oldWidth= canvas.width;
+        int oldHeight= canvas.height;
+        canvas.width= width;
+        canvas.height= height;
+        if ( oldWidth!=width ) {
+            canvas.propertyChangeSupport.firePropertyChange(Canvas.PROP_WIDTH, oldWidth, width);
+        }
+        if ( oldHeight!=height ) {
+            canvas.propertyChangeSupport.firePropertyChange(Canvas.PROP_HEIGHT, oldHeight, height);
+        }
     }
     
     protected void setDasCanvas(final DasCanvas canvas) {
@@ -131,12 +147,7 @@ public class CanvasController extends DomNodeController {
                 int w= dasCanvas.getWidth();
                 int h= dasCanvas.getHeight();
                 logger.log(Level.FINER, "got componentResize {0}x{1}", new Object[]{w, h});
-                if (CanvasController.this.canvas.getWidth() != w) {
-                    CanvasController.this.canvas.setWidth(w);
-                }
-                if (CanvasController.this.canvas.getHeight() != h) {
-                    CanvasController.this.canvas.setHeight(h);
-                }
+                setDimensions(w,h);  
             }
             @Override
             public void componentMoved(ComponentEvent e) {
