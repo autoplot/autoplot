@@ -1156,7 +1156,10 @@ public final class ApplicationModel {
                 }
             }
         
-            canvas.setSize(new Dimension(width, height));
+            Dimension d= new Dimension(width, height);
+            canvas.setSize(d);
+            canvas.setPreferredSize(d);
+            dom.getCanvases(0).getController().setDimensions(width, height);
         }
     }
     
