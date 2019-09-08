@@ -2,6 +2,7 @@
 package org.autoplot.dom;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.beans.IndexedPropertyDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -1304,4 +1305,20 @@ public class DomUtil {
         return jython.toArray( new String[jython.size()] );
     }
 
+    /**
+     * print a one-line representation of the layout, showing canvas dimensions,
+     * font size, margin row and column, and the first row.
+     * @param c
+     * @return 
+     */
+    public static String layoutToString( Canvas c ) {
+        Row arow= c.getRows(0);
+        return String.format( "\u2610 %dx%d %dpt %s %s %s",
+                c.width,
+                c.height,
+                Font.decode(c.font).getSize(), 
+                "||" + c.marginColumn.getLeft()+","+c.marginColumn.getRight(), 
+                "=" + c.marginRow.getTop()+","+c.marginRow.getBottom(), 
+                "=" + arow.getTop() + "," + arow.getBottom() );
+    }
 }
