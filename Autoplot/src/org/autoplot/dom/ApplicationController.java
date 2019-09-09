@@ -3244,6 +3244,10 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             if ( !exclude.contains("canvases") ) syncSupport.syncToCanvases(that.getCanvases(),nameMap);
 
+            System.err.println( DomUtil.layoutToString(canvas) ); //TODO 2202
+            
+            // is the canvas size and font set at this time?
+
             if ( !exclude.contains("plots") ) syncSupport.syncToPlots( that.getPlots(),nameMap );
 
             if ( !exclude.contains("dataSourceFilters") ) syncSupport.syncToDataSourceFilters(that.getDataSourceFilters(), nameMap);
