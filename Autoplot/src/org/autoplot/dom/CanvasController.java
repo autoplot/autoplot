@@ -112,6 +112,7 @@ public class CanvasController extends DomNodeController {
         Dimension d= new Dimension( w,h );
         logger.log(Level.FINER, "setDasCanvasSize {0}", d);
         dasCanvas.setPreferredSize( d );
+        dasCanvas.setSize( d );
     }
     
     /**
