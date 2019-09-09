@@ -108,7 +108,7 @@ public class CanvasController extends DomNodeController {
      * on the event thread.
      */
     private void setDasCanvasSize() {
-        int w= Math.min( 4000, canvas.getWidth()); // TODO: here check with 24087 version
+        int w= Math.min( 4000, canvas.getWidth()); 
         int h= Math.min( 4000, canvas.getHeight());
         Dimension d= new Dimension( w,h );
         logger.log(Level.FINER, "setDasCanvasSize {0}", d);
