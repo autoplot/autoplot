@@ -926,11 +926,26 @@ public class DataSetSelector extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * add a listener for escape key press, which will setVisible(false) and
+     * clear the dialog.
+     * @param dialog 
+     */
+    public static void addCancelEscapeKey( final JDialog dialog ) {
+        // add escape key listener to mean cancel.
+        dialog.getRootPane().registerKeyboardAction( new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dialog.setVisible(false);
+            }
+        }, KeyStroke.getKeyStroke( KeyEvent.VK_ESCAPE, 0 ), JComponent.WHEN_IN_FOCUSED_WINDOW );        
+    }
+    
     private Runnable getURIReviewDialog( final String fsurl, final DataSourceEditorPanel fedit, final List<String> problems ) {
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                DataSourceEditorDialog dialog;
+                final DataSourceEditorDialog dialog;
                 Window window= SwingUtilities.getWindowAncestor(DataSetSelector.this); 
                 String title = "Editing URI " + fsurl;
                 if (window instanceof Frame) {
@@ -950,6 +965,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                 }
 
                 pendingChanges.put( PENDING_EDIT, DataSetSelector.this );
+                
+                addCancelEscapeKey(dialog);
                 
                 WindowManager.getInstance().showModalDialog(dialog);
                 
