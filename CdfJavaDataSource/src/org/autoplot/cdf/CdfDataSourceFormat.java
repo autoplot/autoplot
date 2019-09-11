@@ -268,8 +268,11 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                     if ( !ffile.renameTo( tempFile) ) {
                         if ( !ffile.delete() ) {
                             logger.log(Level.WARNING, "file {0} cannot be deleted", ffile );
+                        } else {
+                            if ( ffile.exists() ) {
+                                logger.log(Level.WARNING, "file {0} cannot be renamed", ffile);
+                            }
                         }
-                        logger.log(Level.WARNING, "file {0} cannot be renamed", ffile);
                     } 
                     write( cdf, ffile.toString() );
                     if ( tempFile.exists() && !tempFile.delete() ) {
