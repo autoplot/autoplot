@@ -145,8 +145,8 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
         Map<String,Dimension> dim= new HashMap<>();
         Map<String,Dimension[]> dimss= new HashMap<>();
         
-        String name1= getParam( "arg_0", null );
-
+        String name1= getParam( "arg_0", getParam( "name", null ) );
+        
         if ( name1!=null ) {
             names.put(data,name1);
         }
@@ -224,7 +224,7 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
                     }
                 }
             } else {
-  
+                //TODO: append under-implemented
             }
         }
         
