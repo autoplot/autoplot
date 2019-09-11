@@ -4,7 +4,6 @@ package org.autoplot.netCDF;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,13 +30,12 @@ import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
-import ucar.nc2.Group;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.NetcdfFileWriteable;
 import ucar.nc2.Variable;
 
 /**
- * Format HDF5 files using the NetCDF library.  These files do not work with Matlab.
+ * Format HDF5 files using the NetCDF library.  These files do not work with Matlab, and this needs to be explored more.
  * 
  * @author jbf
  */
@@ -77,18 +75,19 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
         if ( units!=null && UnitsUtil.isTimeLocation(units)) {
             return DataType.DOUBLE;
         } else {
-            if ( suggest.equals("double") ) {
-                return DataType.DOUBLE;
-            } else if ( suggest.equals("float") ) {
-                return DataType.FLOAT;
-            } else if ( suggest.equals("long") ) {
-                return DataType.LONG;
-            } else if ( suggest.equals("int") ) {
-                return DataType.INT;
-            } else if ( suggest.equals("short") ) {
-                return DataType.SHORT;
-            } else {
-                return DataType.DOUBLE;
+            switch (suggest) {
+                case "double":
+                    return DataType.DOUBLE;
+                case "float":
+                    return DataType.FLOAT;
+                case "long":
+                    return DataType.LONG;
+                case "int":
+                    return DataType.INT;
+                case "short":
+                    return DataType.SHORT;
+                default:
+                    return DataType.DOUBLE;
             }
         }
 
@@ -143,8 +142,8 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
         NetcdfFile oldfile;
         
         List<Dimension> dims= new ArrayList();  //TODO: rank2 DEPEND_1.
-        Map<String,Dimension> dim= new HashMap<String, Dimension>();
-        Map<String,Dimension[]> dimss= new HashMap<String, Dimension[]>();
+        Map<String,Dimension> dim= new HashMap<>();
+        Map<String,Dimension[]> dimss= new HashMap<>();
         
         String name1= getParam( "arg_0", null );
 
@@ -244,23 +243,16 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
         defineVariableOne( ncfile, data, typeSuggest, dims.toArray(new Dimension[dims.size()]) );      
         
         // unfortunately it looks like I can't have both files open at once.  
-        Map<String,Array> dataStore= new LinkedHashMap<String, Array>();
+        Map<String,Array> dataStore= new LinkedHashMap<>();
         
         if ( append ) {
             assert oldfile!=null;
-            //ncfile.create();
             logger.log(Level.FINER,"oldFile.getVariables()");
             for ( Variable v : oldfile.getVariables() ) {
-                //logger.log(Level.FINER, "ncfile.findVariable({0})", v.getName());
-                //Variable newVariable= ncfile.findVariable(v.getName());
-                //logger.log(Level.FINER, "v.getShape()" );
-                //v.getShape();
                 logger.log(Level.FINER, "v.read()" );
                 Array a= v.read();
                 logger.log(Level.FINE, "a={0}", a);
                 dataStore.put( v.getName(), a );
-                //logger.log(Level.FINER, "ncfile.write({0},a)", v.getName());
-                //ncfile.write( v.getName(), a );
             }
             
             oldfile.close();
