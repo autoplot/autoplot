@@ -108,7 +108,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="whereParamList" pref="209" max="32767" attributes="0"/>
+                              <Component id="whereParamList" pref="0" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="whereOp" min="-2" pref="84" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -122,17 +122,22 @@
                                       <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Component id="subsetComboBox" min="-2" pref="160" max="-2" attributes="0"/>
-                                          <Component id="showAllVarTypeCB" alignment="0" min="-2" max="-2" attributes="0"/>
                                           <Group type="102" alignment="0" attributes="0">
-                                              <Component id="noInterpMeta" min="-2" max="-2" attributes="0"/>
+                                              <Group type="103" groupAlignment="0" attributes="0">
+                                                  <Component id="noInterpMeta" alignment="0" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="showAllVarTypeCB" alignment="0" min="-2" max="-2" attributes="0"/>
+                                              </Group>
                                               <EmptySpace max="-2" attributes="0"/>
-                                              <Component id="noDep" min="-2" max="-2" attributes="0"/>
+                                              <Group type="103" groupAlignment="0" attributes="0">
+                                                  <Component id="filterComboBox" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="noDep" min="-2" max="-2" attributes="0"/>
+                                              </Group>
                                           </Group>
                                       </Group>
                                   </Group>
                                   <Component id="whereCB" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace min="0" pref="147" max="32767" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -158,7 +163,10 @@
                                   <Component id="noDep" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Component id="showAllVarTypeCB" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="showAllVarTypeCB" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="filterComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -258,6 +266,11 @@
                         <BindingProperty name="enabled" source="whereCB" sourcePath="${selected}" target="whereTF" targetPath="enabled" updateStrategy="0" immediately="false"/>
                       </BindingProperties>
                     </Component>
+                    <Component class="org.autoplot.datasource.RecentComboBox" name="filterComboBox">
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filterComboBoxActionPerformed"/>
+                      </Events>
+                    </Component>
                   </SubComponents>
                 </Container>
                 <Container class="javax.swing.JTabbedPane" name="jTabbedPane1">
@@ -305,7 +318,7 @@
                       <Layout>
                         <DimensionLayout dim="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="xCheckBox" pref="319" max="32767" attributes="0"/>
+                              <Component id="xCheckBox" pref="340" max="32767" attributes="0"/>
                               <Component id="jScrollPane4" alignment="0" max="32767" attributes="0"/>
                           </Group>
                         </DimensionLayout>
@@ -357,7 +370,7 @@
                       <Layout>
                         <DimensionLayout dim="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="yCheckBox" pref="319" max="32767" attributes="0"/>
+                              <Component id="yCheckBox" pref="340" max="32767" attributes="0"/>
                               <Component id="jScrollPane5" alignment="0" max="32767" attributes="0"/>
                           </Group>
                         </DimensionLayout>

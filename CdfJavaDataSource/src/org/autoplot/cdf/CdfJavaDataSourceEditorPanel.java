@@ -87,6 +87,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         whereParamList = new javax.swing.JComboBox();
         whereOp = new javax.swing.JComboBox();
         whereTF = new javax.swing.JTextField();
+        filterComboBox = new org.autoplot.datasource.RecentComboBox();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         parameterTree = new javax.swing.JTree();
@@ -158,13 +159,19 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, whereCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), whereTF, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
+        filterComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                filterComboBoxActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(whereParamList, 0, 209, Short.MAX_VALUE)
+                .add(whereParamList, 0, 1, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(whereOp, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 84, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -177,13 +184,16 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                         .add(12, 12, 12)
                         .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(subsetComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 160, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(showAllVarTypeCB)
                             .add(jPanel3Layout.createSequentialGroup()
-                                .add(noInterpMeta)
+                                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(noInterpMeta)
+                                    .add(showAllVarTypeCB))
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(noDep))))
+                                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(filterComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .add(noDep)))))
                     .add(whereCB))
-                .add(0, 147, Short.MAX_VALUE))
+                .add(0, 0, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -205,7 +215,9 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                     .add(noInterpMeta)
                     .add(noDep))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(showAllVarTypeCB)
+                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(showAllVarTypeCB)
+                    .add(filterComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -245,7 +257,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(xCheckBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+            .add(xCheckBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
             .add(jScrollPane4)
         );
         jPanel2Layout.setVerticalGroup(
@@ -272,7 +284,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(yCheckBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+            .add(yCheckBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
             .add(jScrollPane5)
         );
         jPanel4Layout.setVerticalGroup(
@@ -331,6 +343,30 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void showAllVarTypeCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showAllVarTypeCBActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+        setURI( getURI() );
+    }//GEN-LAST:event_showAllVarTypeCBActionPerformed
+
+    private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
+        int tab= jTabbedPane1.getSelectedIndex();
+        updateMetadata(tab);
+    }//GEN-LAST:event_jTabbedPane1StateChanged
+
+    private void parameterTree2ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTree2ValueChanged
+        yCheckBox.setSelected(true);
+        TreePath tp= evt.getPath();
+        if ( isValidCDF ) {
+            yparameter= String.valueOf(tp.getPathComponent(1));
+            String longName= yparameterInfo.get(yparameter);
+            paramInfo.setText( longName );
+        }
+    }//GEN-LAST:event_parameterTree2ValueChanged
+
+    private void xCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xCheckBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_xCheckBoxActionPerformed
+
     private void parameterTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTree1ValueChanged
         xCheckBox.setSelected(true);
         TreePath tp= evt.getPath();
@@ -349,30 +385,15 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         }
     }//GEN-LAST:event_parameterTreeValueChanged
 
-    private void showAllVarTypeCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showAllVarTypeCBActionPerformed
-        org.das2.util.LoggerManager.logGuiEvent(evt);
-        setURI( getURI() );
-    }//GEN-LAST:event_showAllVarTypeCBActionPerformed
+    private void filterComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterComboBoxActionPerformed
+        updateTree();
+    }//GEN-LAST:event_filterComboBoxActionPerformed
 
-    private void parameterTree2ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTree2ValueChanged
-        yCheckBox.setSelected(true);
-        TreePath tp= evt.getPath();
-        if ( isValidCDF ) {
-            yparameter= String.valueOf(tp.getPathComponent(1));
-            String longName= yparameterInfo.get(yparameter);
-            paramInfo.setText( longName );
-        }
-    }//GEN-LAST:event_parameterTree2ValueChanged
-
-    private void xCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xCheckBoxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_xCheckBoxActionPerformed
-
-    private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
-        int tab= jTabbedPane1.getSelectedIndex();
-        updateMetadata(tab);
-    }//GEN-LAST:event_jTabbedPane1StateChanged
-
+    private void updateTree() {
+        String param = getParam();
+        fillTree( this.parameterTree, parameterDescriptions, cdf, param, "" );
+    }
+    
     private void updateMetadata() {
        updateMetadata(0);
     }
@@ -402,6 +423,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private org.autoplot.datasource.RecentComboBox filterComboBox;
     private javax.swing.JLabel interpretMetadataLabel;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
@@ -542,6 +564,15 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         return true;
     }
 
+    public static String getKeyForFile( String filename ) {
+        int j=filename.indexOf("19");
+        if ( j==-1 ) j= filename.indexOf("20");
+        if ( j==-1 ) j= filename.length();
+        while ( j>0 && filename.charAt(j-1)=='_' )  j=j-1;
+        String key= filename.substring(0,j);
+        return key;
+    }
+    
     @Override
     public void setURI(String url) {
         URISplit split= URISplit.parse(url);
@@ -557,7 +588,11 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             DataSetURI.checkLength(cdfFile);
             
             String fileName= cdfFile.toString();
-
+            
+            String key= getKeyForFile( split.file.substring(split.path.length()) );
+            filterComboBox.setPreferenceNode("cdf_"+key);
+            filterComboBox.setToolTipText("Filter parameters");
+            
             logger.log(Level.FINE, "opening cdf file {0}", fileName);
             if ( cdf==null && cdfException==null ) {
                 try {
@@ -750,6 +785,22 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         
     }
 
+    /**
+     * return the name of the selected parameter, or null.
+     * @return 
+     */
+    private String getParam() {
+        TreePath treePath= parameterTree.getSelectionPath();
+        String p;
+        if ( treePath==null ) {
+            return null;
+        } else {
+            p= String.valueOf( treePath.getPathComponent(1) );
+            p= p.replaceAll("=", "%3D");
+        }
+        return p;
+    }
+    
     @Override
     public String getURI() {
         
@@ -849,16 +900,30 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         
     }
 
+    /**
+     * fill the parameter tree using metadata.
+     * @param parameterTree the tree which will contain the parameter list.
+     * @param mm the metadata
+     * @param cdf the cdf file.
+     * @param param null or the name of the parameter which should be selected.
+     * @param slice1 null or the slice selection (X,Y,Z of BGSM, for example).
+     */
     private void fillTree( JTree parameterTree, Map<String,String> mm, gov.nasa.gsfc.spdf.cdfj.CDFReader cdf, String param, String slice1 ) {
 
         DefaultMutableTreeNode root= new DefaultMutableTreeNode("");
 
         List<TreePath> expand=new ArrayList(mm.size());
         
+        String filter= filterComboBox.getText().trim();
+        
         TreePath selection=null;
         for ( Entry<String,String> e: mm.entrySet() ) {
 
-           try {
+            if ( filter.length()>0 && !e.getKey().contains(filter) ) {
+                continue;
+            }
+            
+            try {
                 Object oattr= cdf.getAttribute( e.getKey(), "LABL_PTR_1");
                 String lablPtr1=null;
                 if ( oattr!=null && oattr instanceof List ) {
