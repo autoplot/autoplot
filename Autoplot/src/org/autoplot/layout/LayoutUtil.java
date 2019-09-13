@@ -209,7 +209,7 @@ public class LayoutUtil {
         logger.log( Level.FINE, "needYmin: {0} needYmax: {1}", new Object[]{needYmin, needYmax});
        
         if ( needYmin<-700 ) {
-            System.err.println("here-700");
+            logger.fine("needYmin is less than -700, returning.");
             return;
         }
         
