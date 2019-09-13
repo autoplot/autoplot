@@ -540,6 +540,11 @@ public final class AggregatingDataSource extends AbstractDataSource {
                    
                     logger.log(Level.FINER, "  read: {0}", new Object[]{ ds1 } );
                     
+                    //https://sourceforge.net/p/autoplot/bugs/2206/
+                    //logger.fine("ask for a garbage collection to get rid of junk");
+                    //System.gc();
+                    //logger.fine("done ask for a garbage collection to get rid of junk");
+                    
                     if ( ds1==null ) {
                         logger.warning("delegate returned null");
                         ds1 = delegateDataSource.getDataSet(mon1);
