@@ -773,6 +773,14 @@ public final class AggregatingDataSource extends AbstractDataSource {
             Map<String,Object> userProps= new HashMap();
             userProps.put( "files", ss );
 
+            if ( cacheRange1!=null ) {
+                DatumRange u= DatumRangeUtil.union( cacheRange1, lviewRange );
+                if ( !cacheRange1.contains(u) ) {
+                    logger.fine("missing files before or after requested span detected");
+                    cacheRange1= u;
+                }
+            }
+            
             if ( altResult!=null ) {
                 DataSetUtil.validate( altResult, new ArrayList<String>() );
             
