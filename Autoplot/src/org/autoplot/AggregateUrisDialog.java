@@ -13,13 +13,17 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.DataSourceFilter;
@@ -100,6 +104,15 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
         } );
         cancel.setIcon(AutoplotUtil.cancelIcon());
         
+        dialog.getRootPane().registerKeyboardAction( new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);        
+                dialog.setVisible(false);
+                dialog.dispose();
+            }
+        }, KeyStroke.getKeyStroke( KeyEvent.VK_ESCAPE, 0 ), JComponent.WHEN_IN_FOCUSED_WINDOW );       
+
         JButton help= new JButton("Help");
         help.setAction( new AbstractAction("Help") {
             @Override
