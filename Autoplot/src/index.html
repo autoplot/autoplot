@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>ARGB colors are properly encoded in vap files, and color names are now used when possible.  See <a href="https://github.com/autoplot/dev/blob/master/bugs/sf/2200/demoSaveColors.vap">demoSaveColors.vap</a>.
+        <p><small>Out-of-tune key on piano is seen in spectrogram.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-09-09 r24097):</p>
+        <p>Bugfixes (2019-09-14 r24111):</p>
         <ul>
+            <li>aggregation would reload unnecessarily when files were missing at the end of the range requested.
+            <li>2205: corrections to Windows file handling with recent files.
             <li>2202: flakiness with resetting the canvas size upon reset.
             <li>2200: correction to encoding of ARGB colors.
             <li>2201: rte_1268372737: CDF rvariables from Wind mission cannot load.  Thanks, xfxy!
@@ -68,6 +70,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>693: CDF dialog now allows filtering parameter names.
+            <li>escape keypress will exit data source editor dialogs, dispose after window closings.
             <li>Plots now have background color property, which is 100% transparent black by default.
             <li>add binMeanAverageDeviation to calculate the deviations in each bin for binAverage2d
             <li>binAverage2d filter added for doing 2-D histograms of x,y,z buckshot scatter data.
