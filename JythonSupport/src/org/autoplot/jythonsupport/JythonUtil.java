@@ -1234,7 +1234,7 @@ public class JythonUtil {
         setParams( interp, params );
         
         try {
-            prog= JythonRefactory.fixImports(prog);
+            prog= JythonRefactory.fixImports(prog,"<J>");
         } catch (IOException ex) {
             Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, null, ex);
         }

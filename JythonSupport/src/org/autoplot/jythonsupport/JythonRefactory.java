@@ -45,9 +45,31 @@ public class JythonRefactory {
 //        return fileout;
 //    }
     
+    /**
+     * 
+     * @param s the script
+     * @return the script with new names.
+     * @throws IOException 
+     */
     public static String fixImports( String s ) throws IOException {
         InputStream fin= new ByteArrayInputStream( s.getBytes(Charset.forName("US-ASCII")) );
-        InputStream out= fixImports( fin );
+        InputStream out= fixImports( fin, "<memory>" );
+        ByteArrayOutputStream baos= new ByteArrayOutputStream(s.length()*110/100);
+        DataSourceUtil.transfer( out, baos );
+        String result= baos.toString("US-ASCII");
+        return result;
+    }
+
+    /**
+     * 
+     * @param s the script
+     * @param name name for the script, e.g. the filename.
+     * @return the script with new names.
+     * @throws IOException 
+     */
+    public static String fixImports( String s, String name ) throws IOException {
+        InputStream fin= new ByteArrayInputStream( s.getBytes(Charset.forName("US-ASCII")) );
+        InputStream out= fixImports( fin,name );
         ByteArrayOutputStream baos= new ByteArrayOutputStream(s.length()*110/100);
         DataSourceUtil.transfer( out, baos );
         String result= baos.toString("US-ASCII");
@@ -297,9 +319,9 @@ public class JythonRefactory {
             line= reader.readLine(); 
         }
         if (affected) {
-            logger.log(Level.WARNING, "{2} fixImports in {0}ms, affected={1}.  Code contains imports with old (\"virbo\") names.", new Object[] { name, System.currentTimeMillis()-t0, affected } );
+            logger.log(Level.WARNING, "{2} fixImports in {0}ms, affected={1}.  Code contains imports with old (\"virbo\") names.", new Object[] { System.currentTimeMillis()-t0, affected, name } );
         } else {
-            logger.log(Level.FINE, "{2} fixImports in {0}ms, affected={1}", new Object[] { name, System.currentTimeMillis()-t0, affected } );
+            logger.log(Level.FINE, "{2} fixImports in {0}ms, affected={1}", new Object[] { System.currentTimeMillis()-t0, affected, name } );
         }
         return new ByteArrayInputStream( baos.toByteArray() );
     }
@@ -315,7 +337,7 @@ public class JythonRefactory {
         //URL url = new URL("http://jfaden.net/~jbf/autoplot/rfe/528/orgImport.jy");
         URL url = new URL("http://emfisis.physics.uiowa.edu/team/jyds/filterParm.jyds");
         //URL url= new URL("file:/home/jbf/ct/hudson/script/test037/3577243.jy");
-        InputStream in= fixImports( url.openStream() );
+        InputStream in= fixImports( url.openStream(),"main" );
         BufferedReader r= new BufferedReader(new InputStreamReader(in));
         String line;
         while ( (line= r.readLine())!=null ) {
