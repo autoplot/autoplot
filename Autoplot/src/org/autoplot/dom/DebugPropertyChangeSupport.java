@@ -132,6 +132,10 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
             super.firePropertyChange(event); 
         } catch ( ConcurrentModificationException ex ) {
             ex.printStackTrace(); // bug1962
+        } catch ( NullPointerException ex ) {
+            RuntimeException ex1= new NullPointerException( "NullPointerException with propertyName "+event.getPropertyName()+ ", new value=" + event.getNewValue()+".");
+            ex1.initCause(ex);
+            throw ex1;
         }
     }
 
