@@ -307,7 +307,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     } else {
                         InputStream in = new FileInputStream( jythonScript );
                         try {
-                            in= JythonRefactory.fixImports(in);
+                            in= JythonRefactory.fixImports(in,jythonScript.getName());
                             
                             logger.log(Level.FINE, "executing script {0}", jythonScript.getName());
                             interp.execfile(in,jythonScript.getName());
@@ -319,7 +319,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                                 in = new FileInputStream( jythonScript );
                                 logger.warning("avoiding second strange concurrent modification bug that occurs within Jython on the server.  Run the whole thing again.");
                                 Thread.sleep(200);
-                                in= JythonRefactory.fixImports(in);
+                                in= JythonRefactory.fixImports(in,jythonScript.getName());
                                 interp.execfile(in,jythonScript.getName());
                             } else {
                                 throw ex; // This exception is caught again 6 lines down
