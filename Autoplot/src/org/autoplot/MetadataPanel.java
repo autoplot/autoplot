@@ -499,15 +499,19 @@ public class MetadataPanel extends javax.swing.JPanel {
             }
 
             if (cadence != null) {
-                Datum d = DatumUtil.asOrderOneUnits(DataSetUtil.asDatum(cadence));
-                Units u = d.getUnits();
-                map.put("Cadence", d );
-                if ( u.isConvertibleTo(Units.seconds) ) {
-                    try {
-                        map.put("Frequency (1/Cadence)",DatumUtil.asOrderOneUnits(Datum.create(1).divide(d)));
-                    } catch ( IllegalArgumentException ex ) {
-                        logger.log(Level.FINE,"inverse datum cannot be calculated.",ex);
+                if ( cadence.rank()==0 ) {
+                    Datum d = DatumUtil.asOrderOneUnits(DataSetUtil.asDatum(cadence));
+                    Units u = d.getUnits();
+                    map.put("Cadence", d );
+                    if ( u.isConvertibleTo(Units.seconds) ) {
+                        try {
+                            map.put("Frequency (1/Cadence)",DatumUtil.asOrderOneUnits(Datum.create(1).divide(d)));
+                        } catch ( IllegalArgumentException ex ) {
+                            logger.log(Level.FINE,"inverse datum cannot be calculated.",ex);
+                        }
                     }
+                } else {
+                    map.put( "Cadence", cadence );
                 }
             } else {
                 map.put("Cadence", "null");
