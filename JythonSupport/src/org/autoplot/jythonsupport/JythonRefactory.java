@@ -133,8 +133,22 @@ public class JythonRefactory {
      * @param in the input stream containing Jython code.
      * @return new stream, approximately the same length and same number of lines.
      * @throws IOException 
+     * @deprecated 
      */
     public static InputStream fixImports( InputStream in ) throws IOException {
+        return fixImports( in, "<?>");
+    }
+    
+    /**
+     * read in the stream, replacing import statements with new packages.
+     * This also fixes the old BoxSelected procedure name, which should have
+     * been boxSelected on day 1.
+     * @param in the input stream containing Jython code.
+     * @param name string identifier for the code (e.g. the filename).
+     * @return new stream, approximately the same length and same number of lines.
+     * @throws IOException 
+     */
+    public static InputStream fixImports( InputStream in, String name ) throws IOException {
         long t0= System.currentTimeMillis();
         
         boolean affected= false;
@@ -189,12 +203,12 @@ public class JythonRefactory {
                     writer.println();
                     if ( cl!=null ) {
                         if ( !p.equals( n+cl ) ) {
-                            logger.log(Level.FINER, "affected line {0}: {1}", new Object[]{reader.getLineNumber(), line});
+                            logger.log(Level.FINER, "affected line {0} of {2}: {1}", new Object[]{ reader.getLineNumber(), line, name});
                             affected= true;
                         }
                     } else {
                         if ( !p.equals( n ) ) {
-                            logger.log(Level.FINER, "affected line {0}: {1}", new Object[]{reader.getLineNumber(), line});
+                            logger.log(Level.FINER, "affected line {0} of {2}: {1}", new Object[]{ reader.getLineNumber(), line, name });
                             affected= true;
                         }
                     }
@@ -243,7 +257,7 @@ public class JythonRefactory {
                         }
                         writer.println();
                         if ( !p.equals(n) ) {
-                            logger.log(Level.FINER, "affected line {0}: {1}", new Object[]{reader.getLineNumber(), line});
+                            logger.log(Level.FINER, "affected line {0} of {2}: {1}", new Object[]{reader.getLineNumber(), line, name});
                             affected= true;
                         }
                     } else {
@@ -266,7 +280,7 @@ public class JythonRefactory {
                                     line= line.replace( mehave, mewant );
                                     i= line.indexOf( skey, i+mewant.length() );
                                     if ( !mehave.equals(mewant ) ) {
-                                        logger.log(Level.FINER, "affected line {0}: {1}", new Object[]{reader.getLineNumber(), line});
+                                        logger.log(Level.FINER, "affected line {0} of {2}: {1}", new Object[]{reader.getLineNumber(), line, name});
                                         affected= true;
                                     }
                                 } else {
@@ -283,9 +297,9 @@ public class JythonRefactory {
             line= reader.readLine(); 
         }
         if (affected) {
-            logger.log(Level.WARNING, "fixImports in {0}ms, affected={1}.  Code contains imports with old (\"virbo\") names.", new Object[] { System.currentTimeMillis()-t0, affected } );
+            logger.log(Level.WARNING, "{2} fixImports in {0}ms, affected={1}.  Code contains imports with old (\"virbo\") names.", new Object[] { name, System.currentTimeMillis()-t0, affected } );
         } else {
-            logger.log(Level.FINE, "fixImports in {0}ms, affected={1}", new Object[] { System.currentTimeMillis()-t0, affected } );
+            logger.log(Level.FINE, "{2} fixImports in {0}ms, affected={1}", new Object[] { name, System.currentTimeMillis()-t0, affected } );
         }
         return new ByteArrayInputStream( baos.toByteArray() );
     }
