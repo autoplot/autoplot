@@ -67,7 +67,7 @@ public class RunScriptPanel extends javax.swing.JPanel {
                 InteractiveInterpreter interp = JythonUtil.createInterpreter(true, false);
                 interp.set("dom", model.getDocumentModel());
                 interp.set("monitor", mon);
-                interp.exec( JythonRefactory.fixImports(buf.toString()) );
+                interp.exec( JythonRefactory.fixImports(buf.toString(),ff.getName())  );
             } else {
                 throw new IllegalArgumentException("file was empty: "+ff );
             }

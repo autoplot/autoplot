@@ -177,7 +177,7 @@ public class JythonUtil {
         if ( name==null ) {
             interp.execfile(JythonRefactory.fixImports(in));
         } else {
-            interp.execfile(JythonRefactory.fixImports(in),name);
+            interp.execfile(JythonRefactory.fixImports(in,name),name);
         }
 
     }
@@ -533,7 +533,7 @@ public class JythonUtil {
 
             FileUtil.fileCopy( file, lastVersionFile );
 
-            interp.execfile( JythonRefactory.fixImports(in), file.toString() );
+            interp.execfile( JythonRefactory.fixImports(in,file.getName()), file.toString() );
 
         } catch ( PyException ex ) {
             throw ex;
@@ -647,7 +647,7 @@ public class JythonUtil {
                             
                             FileUtil.fileCopy( file, lastVersionFile );
                             
-                            interp.execfile( JythonRefactory.fixImports(in), uri.toString());
+                            interp.execfile( JythonRefactory.fixImports(in,file.getName()), uri.toString());
                             
                         } catch ( PyException ex ) {
                             if ( scriptPanel!=null ) {
@@ -727,7 +727,7 @@ public class JythonUtil {
 
         try ( FileInputStream in = new FileInputStream(file) ) {
 
-            interp.execfile( JythonRefactory.fixImports(in), uri.toString());
+            interp.execfile( JythonRefactory.fixImports(in,file.getName()), uri.toString());
 
         } catch ( PyException ex ) {
             throw ex;

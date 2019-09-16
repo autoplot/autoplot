@@ -1272,7 +1272,7 @@ public class BatchMaster extends javax.swing.JPanel {
                     if ( param2NameCB.getSelectedItem().toString().trim().length()==0 ) {
                         long t0= System.currentTimeMillis();
                         try {
-                            interp.execfile( JythonRefactory.fixImports(new FileInputStream(scriptFile)), scriptFile.getName() );
+                            interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile),scriptFile.getName()), scriptFile.getName() );
                             runResults.put("executionTime", System.currentTimeMillis()-t0);
                             if ( writeCheckBox.isSelected() ) {
                                 runResults.put( "writeFile", doWrite( f1, "" ) );
