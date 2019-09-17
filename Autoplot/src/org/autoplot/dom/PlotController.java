@@ -370,8 +370,19 @@ public class PlotController extends DomNodeController {
         }
         
         scanNextRange= DataSetUtil.getNextInterval(ds, dr0);
-        
         scanPrevRange= DataSetUtil.getPreviousInterval(ds, dr0);
+        
+        double rescaleFactor;
+        rescaleFactor= scanNextRange.width().divide(dr0.width()).value();
+        if ( rescaleFactor<0.1 || rescaleFactor>10 ) {
+            logger.log(Level.WARNING, "scan next fails to find acceptable range: {0} -> {1} rescaleFactor={2}", new Object[]{dr0, scanNextRange, rescaleFactor});
+            scanNextRange= dr0.next();
+        }
+        rescaleFactor= scanPrevRange.width().divide(dr0.width()).value();
+        if ( rescaleFactor<0.1 || rescaleFactor>10 ) {
+            logger.log(Level.WARNING, "scan prev fails to find acceptable range: {0} -> {1} rescaleFactor={2}", new Object[]{dr0, scanPrevRange, rescaleFactor});
+            scanPrevRange= dr0.previous();
+        }
         
         Runnable run= new Runnable() {
             @Override
