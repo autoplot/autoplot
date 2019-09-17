@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Out-of-tune key on piano is seen in spectrogram.
+        <p><small>2-D Histogram filter is demonstrated.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,8 @@
         
         <p>Bugfixes (2019-09-14 r24111):</p>
         <ul>
+            <li>1359: limit difference in size of next and previous intervals to 10 times or 1/10th the size of the current interval. 
+            <li>373978553: add more diagnostic info to try and figure out strange RTE.
             <li>aggregation would reload unnecessarily when files were missing at the end of the range requested.
             <li>2205: corrections to Windows file handling with recent files.
             <li>2202: flakiness with resetting the canvas size upon reset.
@@ -70,6 +72,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Jython fix imports reports the name of the routine with the old name.
             <li>693: CDF dialog now allows filtering parameter names.
             <li>escape keypress will exit data source editor dialogs, dispose after window closings.
             <li>Plots now have background color property, which is 100% transparent black by default.
