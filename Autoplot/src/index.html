@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>2-D Histogram filter is demonstrated.
+        <p><small>The code to locate the slice popup must consider multiple displays which change and might be scaled on Windows.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,12 @@
         
         <p>Bugfixes (2019-09-14 r24111):</p>
         <ul>
+            <li>0356: add additionalClip property to SeriesRenderer, which will clip the lines which go far outside axis bounds (to -inf for example).
+            <li>2122: new logic to decide if a slice popup is visible.
+            <li>don't print the layout string which was in there for debugging.  Thanks, Jon N!
+            <li>Auralizer code would call expensive closestIndex routine unnecessarily.
+            <li>2209: unbundle filter flips to 'Bx'.
+            <li>2208: new das2stream reader returns BIN_PLUS where old would return two channels.
             <li>1359: limit difference in size of next and previous intervals to 10 times or 1/10th the size of the current interval. 
             <li>373978553: add more diagnostic info to try and figure out strange RTE.
             <li>aggregation would reload unnecessarily when files were missing at the end of the range requested.
@@ -72,9 +78,12 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>693: CDF editor has sort alpha checkbox.
+            <li>693: CDF editor filter is regular expression and case insensitive.
+            <li>AutoplotServer supports relative URIs.
             <li>Jython fix imports reports the name of the routine with the old name.
             <li>693: CDF dialog now allows filtering parameter names.
-            <li>escape keypress will exit data source editor dialogs, dispose after window closings.
+            <li>694: escape keypress will exit data source editor dialogs, dispose after window closings.
             <li>Plots now have background color property, which is 100% transparent black by default.
             <li>add binMeanAverageDeviation to calculate the deviations in each bin for binAverage2d
             <li>binAverage2d filter added for doing 2-D histograms of x,y,z buckshot scatter data.
