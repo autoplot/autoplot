@@ -122,10 +122,12 @@ public class AutoplotServer {
         if ( !vap.equals("") ) {
             logger.log(Level.FINE, "about to load the vap {0}", vap);
 
+            vap= URISplit.makeAbsolute( System.getProperty("user.dir"), vap );
+            
             if ( timeRange.length()>0 ) {
                 vap= URISplit.putParam( vap, "timerange", timeRange );
             }
-                        
+
             Application readOnlyDom= loadVap(vap); // read again to get options.
             load(vap);
             //dom.syncTo( readOnlyDom );
@@ -185,6 +187,8 @@ public class AutoplotServer {
             dom.getController().getCanvas().setHeight(height);
             DasCanvas c = dom.getController().getCanvas().getController().getDasCanvas();
             c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
+            
+            suri= URISplit.makeAbsolute( System.getProperty("user.dir"), suri );
             
             logger.log(Level.FINE, "plot uri {0}", suri);
             
