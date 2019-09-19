@@ -267,6 +267,9 @@
                       </BindingProperties>
                     </Component>
                     <Component class="org.autoplot.datasource.RecentComboBox" name="filterComboBox">
+                      <Properties>
+                        <Property name="toolTipText" type="java.lang.String" value="Pattern to match in variables names.  If this is a valid regular expression, it will be used as such, otherwise the variables containing the string are used."/>
+                      </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filterComboBoxActionPerformed"/>
                       </Events>

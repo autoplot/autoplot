@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -159,6 +160,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, whereCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), whereTF, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
+        filterComboBox.setToolTipText("Pattern to match in variables names.  If this is a valid regular expression, it will be used as such, otherwise the variables containing the string are used.");
         filterComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filterComboBoxActionPerformed(evt);
@@ -915,11 +917,20 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         List<TreePath> expand=new ArrayList(mm.size());
         
         String filter= filterComboBox.getText().trim();
+        Pattern filterPattern= null;
+        
+        if ( filter.length()>0 ) {
+            try {
+                filterPattern= Pattern.compile(filter,Pattern.CASE_INSENSITIVE);    
+            } catch ( PatternSyntaxException ex ) {
+                filterPattern= Pattern.compile( Pattern.quote(filter), Pattern.CASE_INSENSITIVE );
+            }
+        }
         
         TreePath selection=null;
         for ( Entry<String,String> e: mm.entrySet() ) {
 
-            if ( filter.length()>0 && !e.getKey().contains(filter) ) {
+            if ( filterPattern!=null && !filterPattern.matcher( e.getKey() ).find() ) {
                 continue;
             }
             
