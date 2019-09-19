@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -89,6 +90,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         whereOp = new javax.swing.JComboBox();
         whereTF = new javax.swing.JTextField();
         filterComboBox = new org.autoplot.datasource.RecentComboBox();
+        sortAlphaCheckBox = new javax.swing.JCheckBox();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         parameterTree = new javax.swing.JTree();
@@ -167,13 +169,21 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             }
         });
 
+        sortAlphaCheckBox.setText("sort alpha");
+        sortAlphaCheckBox.setToolTipText("Sort the names alphabetically.");
+        sortAlphaCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sortAlphaCheckBoxActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(whereParamList, 0, 1, Short.MAX_VALUE)
+                .add(whereParamList, 0, 83, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(whereOp, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 84, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -181,6 +191,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             .add(jPanel3Layout.createSequentialGroup()
                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jLabel4)
+                    .add(whereCB)
                     .add(interpretMetadataLabel)
                     .add(jPanel3Layout.createSequentialGroup()
                         .add(12, 12, 12)
@@ -193,8 +204,8 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                     .add(filterComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .add(noDep)))))
-                    .add(whereCB))
+                                    .add(noDep)))
+                            .add(sortAlphaCheckBox))))
                 .add(0, 0, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -210,7 +221,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                     .add(whereParamList, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(whereOp, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(whereTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .add(18, 18, 18)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(interpretMetadataLabel)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
@@ -220,7 +231,8 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(showAllVarTypeCB)
                     .add(filterComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(sortAlphaCheckBox))
         );
 
         jSplitPane1.setRightComponent(jPanel3);
@@ -259,7 +271,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(xCheckBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
+            .add(xCheckBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE)
             .add(jScrollPane4)
         );
         jPanel2Layout.setVerticalGroup(
@@ -267,7 +279,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             .add(jPanel2Layout.createSequentialGroup()
                 .add(xCheckBox)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE))
+                .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("X", jPanel2);
@@ -286,7 +298,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(yCheckBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
+            .add(yCheckBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE)
             .add(jScrollPane5)
         );
         jPanel4Layout.setVerticalGroup(
@@ -294,7 +306,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             .add(jPanel4Layout.createSequentialGroup()
                 .add(yCheckBox)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE))
+                .add(jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Y", jPanel4);
@@ -320,14 +332,14 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 599, Short.MAX_VALUE)
+                .add(jSplitPane2)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 436, Short.MAX_VALUE)
+                .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 495, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -335,11 +347,11 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 706, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 511, Short.MAX_VALUE)
         );
 
         bindingGroup.bind();
@@ -390,6 +402,10 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     private void filterComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterComboBoxActionPerformed
         updateTree();
     }//GEN-LAST:event_filterComboBoxActionPerformed
+
+    private void sortAlphaCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortAlphaCheckBoxActionPerformed
+        updateTree();
+    }//GEN-LAST:event_sortAlphaCheckBoxActionPerformed
 
     private void updateTree() {
         String param = getParam();
@@ -446,6 +462,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     private javax.swing.JTree parameterTree1;
     private javax.swing.JTree parameterTree2;
     private javax.swing.JCheckBox showAllVarTypeCB;
+    private javax.swing.JCheckBox sortAlphaCheckBox;
     private javax.swing.JComboBox subsetComboBox;
     private javax.swing.JCheckBox whereCB;
     private javax.swing.JComboBox whereOp;
@@ -927,6 +944,13 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             }
         }
         
+        boolean sortAlpha= sortAlphaCheckBox.isSelected();
+        if ( sortAlpha ) {
+            Map<String,String> sortedMM= new TreeMap<>();
+            sortedMM.putAll(mm);
+            mm= sortedMM;
+        }
+            
         TreePath selection=null;
         for ( Entry<String,String> e: mm.entrySet() ) {
 
