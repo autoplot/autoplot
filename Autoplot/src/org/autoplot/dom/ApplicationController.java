@@ -3244,7 +3244,9 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             if ( !exclude.contains("canvases") ) syncSupport.syncToCanvases(that.getCanvases(),nameMap);
 
-            System.err.println( DomUtil.layoutToString(canvas) ); //TODO 2202
+            if ( logger.isLoggable(Level.FINE) ) {
+                logger.log(Level.FINE, "layout: {0}", DomUtil.layoutToString(canvas)); //TODO 2202
+            }
             
             // is the canvas size and font set at this time?
 
