@@ -917,7 +917,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         List<TreePath> expand=new ArrayList(mm.size());
         
         String filter= filterComboBox.getText().trim();
-        Pattern filterPattern= null;
+        Pattern filterPattern= null; 
         
         if ( filter.length()>0 ) {
             try {
