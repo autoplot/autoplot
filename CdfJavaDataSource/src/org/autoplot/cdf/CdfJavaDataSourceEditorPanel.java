@@ -409,7 +409,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
     private void updateTree() {
         String param = getParam();
-        fillTree( this.parameterTree, parameterDescriptions, cdf, param, "" );
+        fillTree( this.parameterTree, parameterInfo, cdf, param, "" );
     }
     
     private void updateMetadata() {
@@ -697,7 +697,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 }
             }
             
-            fillTree( this.parameterTree, parameterDescriptions, cdf, param, slice1 );
+            fillTree( this.parameterTree, parameterInfo, cdf, param, slice1 );
             
             Map<String,String> parameterDescriptions2= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, QDataSet.MAX_RANK, false, false );
             String xparam= lparams.remove("depend0");
@@ -928,7 +928,9 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
      * @param slice1 null or the slice selection (X,Y,Z of BGSM, for example).
      */
     private void fillTree( JTree parameterTree, Map<String,String> mm, gov.nasa.gsfc.spdf.cdfj.CDFReader cdf, String param, String slice1 ) {
-
+        
+        logger.entering( "CdfJavaDataSourceEditorPanel", "fillTree" );
+        
         DefaultMutableTreeNode root= new DefaultMutableTreeNode("");
 
         List<TreePath> expand=new ArrayList(mm.size());
@@ -954,8 +956,13 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         TreePath selection=null;
         for ( Entry<String,String> e: mm.entrySet() ) {
 
-            if ( filterPattern!=null && !filterPattern.matcher( e.getKey() ).find() ) {
-                continue;
+            if ( filterPattern!=null ) {
+                if ( filterPattern.matcher( e.getKey() ).find() || 
+                        filterPattern.matcher( e.getValue() ).find() ) {
+                    logger.log(Level.FINER, "found pattern for {0}", e.getKey());
+                } else {
+                    continue;
+                }
             }
             
             try {
@@ -1038,7 +1045,8 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         for ( TreePath tp: expand ) {
             parameterTree.expandPath(tp);
         }
-
+        logger.exiting("CdfJavaDataSourceEditorPanel", "fillTree" );
+        
     }
 
 }
