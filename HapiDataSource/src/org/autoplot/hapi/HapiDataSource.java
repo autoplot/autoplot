@@ -858,6 +858,8 @@ public final class HapiDataSource extends AbstractDataSource {
             pp= URLDecoder.decode(pp,"UTF-8");
         }
         JSONObject info= getInfo();
+        info= HapiUtil.resolveRefs(info);
+        
         monitor.setProgressMessage("got info");
         monitor.setTaskProgress(20);
         
