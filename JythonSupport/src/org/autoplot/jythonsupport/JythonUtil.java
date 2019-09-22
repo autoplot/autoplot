@@ -1199,7 +1199,7 @@ public class JythonUtil {
       * 
       * @param env any values which may be defined already, such as "dom" and "monitor"
       * @param script any jython script.
-      * @param params user-specified values.
+      * @param params user-specified values or null.
       * @return a list of parameters.
       * @throws PyException 
       */
@@ -1231,7 +1231,9 @@ public class JythonUtil {
             }
         }
         
-        setParams( interp, params );
+        if ( params!=null ) {
+            setParams( interp, params );
+        }
         
         try {
             prog= JythonRefactory.fixImports(prog,"<J>");
