@@ -501,6 +501,7 @@ public class JythonUtil {
         public String name;
         public String label; // the label for the variable used in the script
         public Object deft;
+        public Object value; // the value if available, null means not present.
         public String doc;
         public List<Object> enums;  // the allowed values
         /**
@@ -1231,7 +1232,7 @@ public class JythonUtil {
             }
         }
         
-        if ( params!=null ) {
+        if ( params!=null ) { // I don't think this has ever worked (jbf,20190923)
             setParams( interp, params );
         }
         
@@ -1278,7 +1279,8 @@ public class JythonUtil {
                 }
                 p.enums= enums;                
             }
-
+            p.value= params==null ? null : params.get(p.name);
+            
             if ( p.name.equals("resourceUri") ) {
                 p.name= "resourceURI"; //  I will regret allowing for this sloppiness...
             }
@@ -1286,24 +1288,30 @@ public class JythonUtil {
                 case "resourceURI":
                     p.type= 'R';
                     p.deft= p.deft.toString();
+                    if ( p.value!=null ) p.value= p.value.toString();
                     break;
                 case "timerange":
                     p.type= 'T';
                     p.deft= p.deft.toString();
+                    if ( p.value!=null ) p.value= p.value.toString();
                     break;
                 default:
                     if ( p.deft instanceof String ) {
                         p.type= 'A';
                         p.deft= p.deft.toString();
+                        if ( p.value!=null ) p.value= p.value.toString();
                     } else if ( p.deft instanceof PyString ) {
                         p.type= 'A';
                         p.deft= p.deft.toString();
+                        if ( p.value!=null ) p.value= p.value.toString();
                     } else if ( p.deft instanceof PyInteger ) { //TODO: Consider if int types should be preserved.
                         p.type= 'F';
                         p.deft= ((PyInteger)p.deft).__tojava__(int.class);
+                        if ( p.value!=null ) p.value= Integer.parseInt(p.value.toString());
                     } else if ( p.deft instanceof PyFloat ) {
                         p.type= 'F';
                         p.deft= ((PyFloat)p.deft).__tojava__(double.class);
+                        if ( p.value!=null ) p.value= Double.parseDouble(p.value.toString());
                     } else if ( p.deft instanceof PyJavaInstance ) {
                         Object pp=  ((PyJavaInstance)p.deft).__tojava__( URI.class );
                         if ( pp==Py.NoConversion ) {
@@ -1320,7 +1328,7 @@ public class JythonUtil {
                                 }
                             } else {
                                 p.type= 'D';
-                                p.deft= pp;
+                                p.deft= pp;                                
                             }
                         } else {
                             p.type= 'U';
