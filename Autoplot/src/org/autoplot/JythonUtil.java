@@ -134,9 +134,22 @@ public class JythonUtil {
      * @throws IOException
      */
     protected static void runScript( ApplicationModel model, InputStream in, String name, String[] argv, String pwd ) throws IOException {
+        runScript( model.getDocumentModel(), in, name, argv, pwd );
+    }
+    
+    /**
+     * Run the script in the input stream.
+     * @param dom provides the dom to the environment.
+     * @param in stream containing script. This will be left open.
+     * @param name the name of the file for human reference, or null.
+     * @param argv parameters passed into the script, each should be name=value.
+     * @param pwd the present working directory, if available.  Note this is a String because pwd can be a remote folder.
+     * @throws IOException
+     */
+    public static void runScript( Application dom, InputStream in, String name, String[] argv, String pwd ) throws IOException {    
         if ( argv==null ) argv= new String[] {""};
         PySystemState.initialize( PySystemState.getBaseProperties(), null, argv ); // legacy support sys.argv. now we use getParam
-        PythonInterpreter interp = JythonUtil.createInterpreter(true, false, model.getDocumentModel(), new NullProgressMonitor() );
+        PythonInterpreter interp = JythonUtil.createInterpreter(true, false, dom, new NullProgressMonitor() );
         if ( pwd!=null ) {
             pwd= URISplit.format( URISplit.parse(pwd) ); // sanity check against injections
             interp.exec("PWD='"+pwd+"'");// JythonRefactory okay
