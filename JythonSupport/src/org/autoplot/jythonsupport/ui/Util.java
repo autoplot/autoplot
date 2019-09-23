@@ -75,7 +75,7 @@ public class Util {
      * get the parameters for the script.
      * @param env null, or a script context that can contain values such as dom and PWD.
      * @param src the script, all in one string.
-     * @param params default values for the parameters.
+     * @param params null or default values for the parameters.
      * @param mon
      * @return list of parameters.
      * @throws IOException 
