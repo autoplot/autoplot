@@ -296,7 +296,12 @@ public class HapiServer {
             logger.warning("HAPI network call on event thread");
         }
         URL url;
-        url= HapiServer.createURL(server, HapiSpec.INFO_URL, Collections.singletonMap(HapiSpec.URL_PARAM_ID, id ) );
+        Map<String,String> params= new HashMap<>();
+        params.put( HapiSpec.URL_PARAM_ID, id );
+        if ( server.toString().contains("http://hapi-server.org/servers/TestDataRef/hapi") ) {
+            params.put( "resolve_references","false");
+        }
+        url= HapiServer.createURL(server, HapiSpec.INFO_URL, params );
         logger.log(Level.FINE, "getInfo {0}", url.toString());
         String s= readFromURL(url, "json");
         JSONObject o= new JSONObject(s);
