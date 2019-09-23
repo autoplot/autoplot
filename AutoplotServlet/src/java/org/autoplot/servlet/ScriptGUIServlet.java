@@ -137,7 +137,10 @@ public class ScriptGUIServlet extends HttpServlet {
                     if ( p.enums!=null ) {
                         if ( p.enums.size()==2 && p.enums.contains("T") && p.enums.contains("F") ) {
                             if ( "T".equals(p.value) ) {
-                                out.println("<input type='checkbox' name='"+p.name+"' selected>"+p.name + ", " + p.doc);
+                                out.println("<input type='checkbox' name='"+p.name+"' checked>"+p.name + ", " + p.doc);
+                            } else if ( "on".equals(p.value) ) {
+                                out.println("<input type='checkbox' name='"+p.name+"' checked>"+p.name + ", " + p.doc);
+                                sparams= sparams.replace(p.name+"=on", p.name+"=T");
                             } else {
                                 out.println("<input type='checkbox' name='"+p.name+"'>"+p.name + ", " + p.doc);
                             }
