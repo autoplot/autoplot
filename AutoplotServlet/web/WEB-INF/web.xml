@@ -47,6 +47,10 @@
         <servlet-name>DataServlet</servlet-name>
         <servlet-class>org.autoplot.servlet.DataServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ScriptGUIServlet</servlet-name>
+        <servlet-class>org.autoplot.servlet.ScriptGUIServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>SimpleServlet</servlet-name>
         <url-pattern>/SimpleServlet</url-pattern>
@@ -86,6 +90,10 @@
     <servlet-mapping>
         <servlet-name>DataServlet</servlet-name>
         <url-pattern>/DataServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ScriptGUIServlet</servlet-name>
+        <url-pattern>/ScriptGUIServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
