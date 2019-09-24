@@ -19,6 +19,16 @@ public final class HapiUtil {
     public static final String KEY_DEFINITIONS= "definitions";
     public static final String KEY_PARAMETERS= "parameters";
     public static final String KEY_REF= "$ref";
+    public static final String KEY_PARAMETER= "parameter";
+    public static final String KEY_BINS= "bins";
+    public static final String KEY_RANGES= "ranges";
+    public static final String KEY_CENTERS= "centers";
+    public static final String KEY_LENGTH= "length";
+    public static final String KEY_SIZE= "size";
+    public static final String KEY_LABEL= "label";
+    public static final String KEY_FILL = "fill";
+    public static final String KEY_UNITS = "units";
+    public static final String KEY_TYPE = "type";
     
     private static void resolveRefRecursive( JSONObject definitions, JSONObject param ) throws JSONException {
         Iterator keys= param.keys();

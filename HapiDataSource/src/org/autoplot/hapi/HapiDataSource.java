@@ -208,8 +208,8 @@ public final class HapiDataSource extends AbstractDataSource {
             }
         }
 
-        if ( binsObject.has("units") ) {
-            Object uo= binsObject.get("units");
+        if ( binsObject.has(HapiUtil.KEY_UNITS) ) {
+            Object uo= binsObject.get(HapiUtil.KEY_UNITS);
             if ( uo instanceof String ) {
                 String sunits= (String)uo;
                 Units u= Units.lookupUnits(sunits);
@@ -877,6 +877,11 @@ public final class HapiDataSource extends AbstractDataSource {
         monitor.setTaskProgress(20);
         
         ParamDescription[] pds= getParameterDescriptions(info);
+        
+        System.err.println("*****");
+        System.err.println(pds[3]);
+        System.err.println(pds[3].depend[0]);
+        System.err.println(pds[3].dependName[0]);
         
         DatumRange tr; // TSB = DatumRangeUtil.parseTimeRange(timeRange);
         tr= tsb.getTimeRange();
@@ -2202,8 +2207,8 @@ public final class HapiDataSource extends AbstractDataSource {
             pds[i].modifiedDateMillis= modificationDate;
             
             String type;
-            if ( jsonObjecti.has("type") ) {
-                type= jsonObjecti.getString("type");
+            if ( jsonObjecti.has(HapiUtil.KEY_TYPE) ) {
+                type= jsonObjecti.getString(HapiUtil.KEY_TYPE);
                 if ( type==null ) type="";
             } else {
                 type= "";
@@ -2226,8 +2231,8 @@ public final class HapiDataSource extends AbstractDataSource {
                 
             } else {
                 pds[i].type= type;
-                if ( jsonObjecti.has("units") ) {
-                    Object ou= jsonObjecti.get("units");
+                if ( jsonObjecti.has(HapiUtil.KEY_UNITS) ) {
+                    Object ou= jsonObjecti.get(HapiUtil.KEY_UNITS);
                     if ( ou instanceof String ) {
                         String sunits= (String)ou;
                         pds[i].units= Units.lookupUnits(sunits);
@@ -2245,8 +2250,8 @@ public final class HapiDataSource extends AbstractDataSource {
                     pds[i].units= EnumerationUnits.create(name);
                 }
                 
-                if ( jsonObjecti.has("fill") ) {
-                    String sfill= jsonObjecti.getString("fill");
+                if ( jsonObjecti.has(HapiUtil.KEY_FILL) ) {
+                    String sfill= jsonObjecti.getString(HapiUtil.KEY_FILL);
                     if ( sfill!=null && !sfill.equals("null") ) {
                         if ( type.equals("string") ) {
                             pds[i].fillValue= ((EnumerationUnits)pds[i].units).createDatum( sfill ).doubleValue( pds[i].units );
@@ -2266,8 +2271,8 @@ public final class HapiDataSource extends AbstractDataSource {
                     pds[i].description= ""; // when a value cannot be parsed, but it is not identified.
                 }
 
-                if ( jsonObjecti.has("label") ) { // The verifier code incorrectly marks "label" as not allowed, but I believe it is.
-                    Object olabel= jsonObjecti.get("label");
+                if ( jsonObjecti.has( HapiUtil.KEY_LABEL ) ) { // The verifier code incorrectly marks "label" as not allowed, but I believe it is.
+                    Object olabel= jsonObjecti.get( HapiUtil.KEY_LABEL );
                     if ( olabel instanceof String ) {
                         pds[i].label= (String)olabel;
                     }
@@ -2276,12 +2281,12 @@ public final class HapiDataSource extends AbstractDataSource {
                     pds[i].label= name;
                 }
                 
-                if ( jsonObjecti.has("length") ) {
-                    pds[i].length= jsonObjecti.getInt("length");
+                if ( jsonObjecti.has( HapiUtil.KEY_LENGTH ) ) {
+                    pds[i].length= jsonObjecti.getInt( HapiUtil.KEY_LENGTH );
                 }
 
-                if ( jsonObjecti.has("size") ) {
-                    Object o= jsonObjecti.get("size");
+                if ( jsonObjecti.has( HapiUtil.KEY_SIZE ) ) {
+                    Object o= jsonObjecti.get( HapiUtil.KEY_SIZE );
                     if ( !(o instanceof JSONArray) ) {
                         if ( o.getClass()==Integer.class ) {
                             pds[i].size= new int[] { ((Integer)o) };
@@ -2304,25 +2309,37 @@ public final class HapiDataSource extends AbstractDataSource {
                         }
                         pds[i].nFields= nFields;
                     }
-                    if ( jsonObjecti.has("bins") ) {
-                        o= jsonObjecti.get("bins");
+                    if ( jsonObjecti.has( HapiUtil.KEY_BINS ) ) {
+                        o= jsonObjecti.get( HapiUtil.KEY_BINS );
                         if ( o instanceof JSONArray ) {
                             JSONArray ja= (JSONArray)o;
                             pds[i].depend= new QDataSet[ja.length()];
                             pds[i].dependName= new String[ja.length()];
                             for ( int j=0; j<ja.length(); j++ ) {
                                 JSONObject bins= ja.getJSONObject(j);
-                                if ( bins.has("parameter") ) {  // deprecated, see binsParameter below.  TODO: revisit this.
+                                if ( bins.has( HapiUtil.KEY_PARAMETER ) ) {  // deprecated, see binsParameter below.  TODO: revisit this.
                                     int n= pds[i].nFields;
                                     pds[i].depend[j]= Ops.findgen(n);
-                                    pds[i].dependName[j]= bins.getString("parameter");
-                                } else if ( bins.has("ranges") ) {
-                                    QDataSet dep= getJSONBins(ja.getJSONObject(j));
-                                    pds[i].depend[j]= dep;
-                                    pds[i].renderType= QDataSet.VALUE_RENDER_TYPE_NNSPECTROGRAM;
-                                } else if ( bins.has("centers") ) {
-                                    QDataSet dep= getJSONBins(ja.getJSONObject(j));
-                                    pds[i].depend[j]= dep;
+                                    pds[i].dependName[j]= bins.getString( HapiUtil.KEY_PARAMETER );
+                                } else if ( bins.has( HapiUtil.KEY_RANGES ) ) {
+                                    // rfe696: support time-varying DEPEND_1
+                                    Object o1= bins.get( HapiUtil.KEY_RANGES );
+                                    if ( o1 instanceof String ) {
+                                        pds[i].dependName[j]= (String)o1;
+                                    } else {
+                                        QDataSet dep= getJSONBins(ja.getJSONObject(j));
+                                        pds[i].depend[j]= dep;
+                                    }
+                                    pds[i].renderType= QDataSet.VALUE_RENDER_TYPE_NNSPECTROGRAM;                                    
+                                } else if ( bins.has( HapiUtil.KEY_CENTERS ) ) {
+                                    // rfe696: support time-varying DEPEND_1
+                                    Object o1= bins.get( HapiUtil.KEY_CENTERS );
+                                    if ( o1 instanceof String ) {
+                                        pds[i].dependName[j]= (String)o1;
+                                    } else {
+                                        QDataSet dep= getJSONBins(ja.getJSONObject(j));
+                                        pds[i].depend[j]= dep;
+                                    }
                                 } else {
                                     int n= pds[i].size[j];
                                     pds[i].depend[j]= Ops.findgen(n);
@@ -2333,10 +2350,10 @@ public final class HapiDataSource extends AbstractDataSource {
                             JSONObject bins= jsonObjecti.getJSONObject("bins"); 
                             if ( pds[i].depend==null ) pds[i].depend= new QDataSet[1];
                             if ( pds[i].dependName==null ) pds[i].dependName= new String[1];
-                            if ( bins.has("parameter") ) { // this will be implemented later.
+                            if ( bins.has( HapiUtil.KEY_PARAMETER ) ) { // this will be implemented later.
                                 int n= DataSetUtil.product(pds[i].size);
                                 pds[i].depend[0]= Ops.findgen(n);
-                                pds[i].dependName[0]= bins.getString("parameter");
+                                pds[i].dependName[0]= bins.getString( HapiUtil.KEY_PARAMETER );
                             } else if ( bins.has("values") ) {
                                 QDataSet dep1= getJSONBins(bins);
                                 pds[i].depend[0]= dep1;
