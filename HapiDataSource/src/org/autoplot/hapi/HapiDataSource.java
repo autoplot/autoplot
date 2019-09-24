@@ -96,8 +96,8 @@ public final class HapiDataSource extends AbstractDataSource {
      */
     protected static final Logger loggerUrl= org.das2.util.LoggerManager.getLogger( "das2.url" );
     
-    private static String WARNING_TIME_MALFORMED= "time malformed";
-    private static String WARNING_TIME_ORDER= "time out-of-order";
+    private static final String WARNING_TIME_MALFORMED= "time malformed";
+    private static final String WARNING_TIME_ORDER= "time out-of-order";
     
     TimeSeriesBrowse tsb;
     
@@ -842,6 +842,21 @@ public final class HapiDataSource extends AbstractDataSource {
         
         return result;
     }
+    
+    /**
+     * return the index of the parameter name.
+     * @param pds
+     * @param name
+     * @return 
+     */
+    private static int indexOfParameter( ParamDescription[] pds, String name ) {
+        for ( int i=0; i<pds.length; i++ ) {
+            if ( pds[i].name.equals(name) ) {
+                return i;
+            }
+        }
+        return -1;
+    }
             
     @Override
     public synchronized QDataSet getDataSet(ProgressMonitor monitor) throws Exception {
@@ -878,11 +893,6 @@ public final class HapiDataSource extends AbstractDataSource {
         
         ParamDescription[] pds= getParameterDescriptions(info);
         
-        System.err.println("*****");
-        System.err.println(pds[3]);
-        System.err.println(pds[3].depend[0]);
-        System.err.println(pds[3].dependName[0]);
-        
         DatumRange tr; // TSB = DatumRangeUtil.parseTimeRange(timeRange);
         tr= tsb.getTimeRange();
         
@@ -916,14 +926,38 @@ public final class HapiDataSource extends AbstractDataSource {
                 pp= parametersArray.getJSONObject(0).getString("name") + ","+ pp;
                 pps= pp.split(",");
             }
-            nparam= pps.length;
+            
             ParamDescription[] subsetPds= new ParamDescription[pps.length];
             for ( int ip=0; ip<pps.length; ip++ ) {
                 int i= map.get(pps[ip]);
                 subsetPds[ip]= pds[i];
             }
+            if ( subsetPds.length==2 && subsetPds[1].size.length>0 ) {
+                // Oooh, it's a spectrogram.  Maybe it has time-varying DEPEND_1.
+                String dependName= subsetPds[1].dependName[0];
+                if ( dependName!=null ) {
+                    
+                    ParamDescription[] subsetPds1= new ParamDescription[3];
+                    for ( int k=0; k<2; k++ ) {
+                        subsetPds1[k]= subsetPds[k];
+                    }
+                    int k= indexOfParameter( pds, dependName );
+                    if ( k==-1 ) {
+                        logger.warning("unable to find parameter: "+dependName );
+                    } else {
+                        subsetPds1[2]= pds[k];
+                        subsetPds= subsetPds1;
+                        pp= pp+","+dependName;
+                    }
+                    
+                }
+            }
+            
             //TODO: the parameters must also be sorted by position in stream.
             pds= subsetPds;   
+
+            nparam= pds.length;            
+
         }
         
         // 2043: trim the request to startDate/stopDate.  TODO: caching needs to consider this as well.
@@ -2321,6 +2355,15 @@ public final class HapiDataSource extends AbstractDataSource {
                                     int n= pds[i].nFields;
                                     pds[i].depend[j]= Ops.findgen(n);
                                     pds[i].dependName[j]= bins.getString( HapiUtil.KEY_PARAMETER );
+                                } else if ( bins.has( HapiUtil.KEY_CENTERS ) ) {
+                                    // rfe696: support time-varying DEPEND_1
+                                    Object o1= bins.get( HapiUtil.KEY_CENTERS );
+                                    if ( o1 instanceof String ) {
+                                        pds[i].dependName[j]= (String)o1;
+                                    } else {
+                                        QDataSet dep= getJSONBins(ja.getJSONObject(j));
+                                        pds[i].depend[j]= dep;
+                                    }
                                 } else if ( bins.has( HapiUtil.KEY_RANGES ) ) {
                                     // rfe696: support time-varying DEPEND_1
                                     Object o1= bins.get( HapiUtil.KEY_RANGES );
@@ -2331,15 +2374,6 @@ public final class HapiDataSource extends AbstractDataSource {
                                         pds[i].depend[j]= dep;
                                     }
                                     pds[i].renderType= QDataSet.VALUE_RENDER_TYPE_NNSPECTROGRAM;                                    
-                                } else if ( bins.has( HapiUtil.KEY_CENTERS ) ) {
-                                    // rfe696: support time-varying DEPEND_1
-                                    Object o1= bins.get( HapiUtil.KEY_CENTERS );
-                                    if ( o1 instanceof String ) {
-                                        pds[i].dependName[j]= (String)o1;
-                                    } else {
-                                        QDataSet dep= getJSONBins(ja.getJSONObject(j));
-                                        pds[i].depend[j]= dep;
-                                    }
                                 } else {
                                     int n= pds[i].size[j];
                                     pds[i].depend[j]= Ops.findgen(n);
