@@ -133,21 +133,34 @@ public final class HapiDataSource extends AbstractDataSource {
     }
 
     private static QDataSet getJSONBins( JSONObject binsObject ) throws JSONException {
+        boolean foundTimeVarying= false;
         JSONArray bins=null;
         if ( binsObject.has("values") ) {
             logger.fine("using deprecated bins");
             bins= binsObject.getJSONArray("values");
         } else if ( binsObject.has("centers") ) {
-            bins= binsObject.getJSONArray("centers");
+            bins= binsObject.optJSONArray("centers");
+            if ( bins==null ) {
+                logger.info("time-varying centers are not supported, yet");
+                foundTimeVarying= true;
+            }
         }
         
         JSONArray ranges= null;
         if ( binsObject.has("ranges") ) {
-            ranges= binsObject.getJSONArray("ranges");
+            ranges= binsObject.optJSONArray("ranges");
+            if ( ranges==null ) {
+                logger.info("time-varying ranges are not supported, yet");
+                foundTimeVarying= true;
+            }
         }
         
         int len;
         if ( ranges==null && bins==null ) {
+            if ( foundTimeVarying ) {
+                logger.info("time-varying detected, not supported yet");
+                return null;
+            }
             throw new IllegalArgumentException("ranges or centers must be specified");
         } else {
             len= ranges==null ? bins.length() : ranges.length();
@@ -2179,7 +2192,7 @@ public final class HapiDataSource extends AbstractDataSource {
             final JSONObject jsonObjecti = parameters.getJSONObject(i);
             
             String name= jsonObjecti.getString("name"); // the name of one of the parameters.
-            
+            logger.log(Level.FINER, "unpacking {0}", name);
             if ( name==null ) {
                 name="name"+i;
                 logger.log(Level.WARNING, "name not found for {0}th parameter", i );
