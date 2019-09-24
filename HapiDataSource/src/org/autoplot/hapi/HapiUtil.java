@@ -2,6 +2,8 @@
 package org.autoplot.hapi;
 
 import java.util.Iterator;
+import java.util.logging.Logger;
+import org.das2.util.LoggerManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,6 +13,8 @@ import org.json.JSONObject;
  * @author jbf
  */
 public final class HapiUtil {
+    
+    private static final Logger logger= LoggerManager.getLogger("apdss.hapi");
     
     public static final String KEY_DEFINITIONS= "definitions";
     public static final String KEY_PARAMETERS= "parameters";
@@ -39,6 +43,35 @@ public final class HapiUtil {
                 } else {
                     resolveRefRecursive( definitions, maybeRef );
                 }
+            } else if ( o instanceof JSONArray ) {
+                JSONArray ja= (JSONArray)o;
+                for ( int i=0; i<ja.length(); i++ ) {
+                    Object o1= ja.get(i);
+                    if ( o1 instanceof JSONObject ) {
+                        JSONObject maybeRef= (JSONObject)o1;
+                        if ( maybeRef.has(KEY_REF) ) {
+                            String theRef= maybeRef.getString(KEY_REF);
+                            if ( theRef.startsWith("#/definitions/") ) {
+                                String theDefinitionsRef= theRef.substring(14);
+                                if ( definitions.has(theDefinitionsRef) ) {
+                                    Object deref= definitions.get(theDefinitionsRef);
+                                    param.put( k, deref );
+                                } else {
+                                    throw new IllegalArgumentException("reference not found within definitions: "+theRef);
+                                }
+                            } else {
+                                throw new IllegalArgumentException("references may only be to nodes within definitions: "+theRef);
+                            }
+                        } else {
+                            resolveRefRecursive( definitions, maybeRef );
+                        }
+                    } else if ( o1 instanceof JSONArray ) {
+                        logger.fine("not resolving array of array, but this is easy to do with a small refactoring");
+                    } else {
+                        logger.fine("not resolving array of things.");
+                    }
+                }
+                    
             }
         }
     }
