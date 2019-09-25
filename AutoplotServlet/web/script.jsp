@@ -46,7 +46,7 @@
 response.setContentType("text/plain");
 out = response.getOutputStream();
 
-for i in listDirectory('http://www.autoplot.org/data/*.cdf'):
+for i in listDirectory('http://autoplot.org/data/*.cdf'):
   out.println(i);
 out.close();
         </textarea>
