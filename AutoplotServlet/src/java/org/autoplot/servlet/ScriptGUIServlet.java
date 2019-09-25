@@ -74,6 +74,8 @@ public class ScriptGUIServlet extends HttpServlet {
             script= "https://github.com/autoplot/dev/blob/master/demos/2019/20190726/demoParams.jy";
         }
         
+        String scriptURI= script;
+        
         URISplit split= URISplit.parse(script);
         String pwd= split.path;
         String name= split.file.substring(split.path.length());
@@ -124,21 +126,23 @@ public class ScriptGUIServlet extends HttpServlet {
                 out.println("<!DOCTYPE html>");
                 out.println("<html>");
                 out.println("<head>");
-                out.println("<title>Servlet ScriptGUIServlet</title>");            
+                out.println("<title>"+name+"</title>");            
                 out.println("</head>");
                 out.println("<body>");
                 out.println("<h1>Servlet ScriptGUIServlet at " + request.getContextPath() + "</h1>");
+                out.println("Running script <a href="+scriptURI+">"+scriptURI+"</a>");
                 out.println("<table><tr>");
                 out.println("<td>");
                 out.println("<form action='ScriptGUIServlet'>");
                 for ( Entry<String,Param> pe: parms.entrySet() ) {
                     Param p= pe.getValue();
+                    Object currentValue= p.value == null ? p.deft : p.value;
                     out.println(""+p.name +", <em>" + p.doc +"</em><br>");
                     if ( p.enums!=null ) {
                         if ( p.enums.size()==2 && p.enums.contains("T") && p.enums.contains("F") ) {
-                            if ( "T".equals(p.value) ) {
+                            if ( "T".equals(currentValue) ) {
                                 out.println("<input type='checkbox' name='"+p.name+"' checked>"+p.name + ", " + p.doc);
-                            } else if ( "on".equals(p.value) ) {
+                            } else if ( "on".equals(currentValue) ) {
                                 out.println("<input type='checkbox' name='"+p.name+"' checked>"+p.name + ", " + p.doc);
                                 sparams= sparams.replace(p.name+"=on", p.name+"=T");
                             } else {
@@ -147,7 +151,7 @@ public class ScriptGUIServlet extends HttpServlet {
                         } else {
                             out.println("<select name='"+p.name+"'>");
                             for ( Object s: p.enums ) {
-                                if ( s.equals(p.value) ) {
+                                if ( s.equals(currentValue) ) {
                                     out.println("<option value='"+s+"' selected>"+s+"</input>");
                                 } else {
                                     out.println("<option value='"+s+"'>"+s+"</input>");
