@@ -32,11 +32,15 @@
             questions.
         </p>
 
-        <p>The <a href="script.jsp">"ScriptServlet"</a> allows Python scripts to be sent and interpreted to produce graphics or to access
+        <p>The <a href="script.jsp">"ScriptServlet"</a> allows Jython scripts to be sent and interpreted to produce graphics or to access
             Autoplot internals.  Obviously this introduces security concerns, and access is limited by the "allowhosts" file found
             by default in /tmp/autoplotservlet.  Also, scripts are logged in this location as well.
         </p>
         
+        <p>The <a href="/ScriptGUIServlet">"ScriptGUIServlet"</a> demonstrates how a Jython script can be automatically converted to a web
+            application, automatically creating a form and showing the result.
+        </p>
+
         <p>The <a href="URI_Templates.jsp">"URI_Templates"</a> allows how an Autoplot script can be used to implement a service, here demonstrating
             Autoplot's implementation of the URI templates (http://tsds.org/uri_templates).
         </p>
