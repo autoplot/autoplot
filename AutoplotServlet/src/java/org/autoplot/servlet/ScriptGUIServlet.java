@@ -85,8 +85,11 @@ public class ScriptGUIServlet extends HttpServlet {
         
         if ( request.getParameter("img")!=null ) {
             // now run the script
+            System.err.println( "dom: "+ ScriptContext.getDocumentModel() );
+            System.err.println( "dom options: "+ ScriptContext.getDocumentModel().getOptions() );
+            
             ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
-
+            
             PythonInterpreter interp = JythonUtil.createInterpreter( true, true );
             interp.set("java",null);
             interp.set("org",null);
