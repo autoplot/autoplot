@@ -298,9 +298,12 @@ public class HapiServer {
         URL url;
         Map<String,String> params= new HashMap<>();
         params.put( HapiSpec.URL_PARAM_ID, id );
+        
+        // https://sourceforge.net/p/autoplot/feature-requests/696/
         if ( server.toString().contains("http://hapi-server.org/servers/TestDataRef/hapi") ) {
             params.put( "resolve_references","false");
         }
+        
         url= HapiServer.createURL(server, HapiSpec.INFO_URL, params );
         logger.log(Level.FINE, "getInfo {0}", url.toString());
         String s= readFromURL(url, "json");
@@ -396,9 +399,13 @@ public class HapiServer {
         String hapiCache= HapiDataSource.getHapiCache();
         
         String u= url.getProtocol() + "/" + url.getHost() + "/" + url.getPath();
-        if ( url.getQuery()!=null ) {
+        String q= url.getQuery();
+        if ( q!=null ) {
+            if ( q.contains("resolve_references=false&") ) {
+                q= q.replace("resolve_references=false&","");
+            }
             Pattern p= Pattern.compile("id=(.+)");
-            Matcher m= p.matcher(url.getQuery());
+            Matcher m= p.matcher(q);
             if ( m.matches() ) {
                 u= u + "/" + m.group(1);
                 if ( type.length()>0 ) {
