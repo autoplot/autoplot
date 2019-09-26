@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import static org.autoplot.dom.CanvasController.resizeLogger;
 
 /**
  * The state of the canvas which is the area on which plots are drawn.
@@ -43,6 +45,7 @@ public class Canvas extends DomNode {
      * @param height 
      */
     public void setHeight(int height) {
+        resizeLogger.log(Level.FINE, "setHeight({0})", height);
         int oldHeight = this.height;
         this.height = height;
         propertyChangeSupport.firePropertyChange(PROP_HEIGHT, oldHeight, height);
@@ -59,6 +62,7 @@ public class Canvas extends DomNode {
     * @param width 
     */
     public void setWidth(int width) {
+        resizeLogger.log(Level.FINE, "setWidth({0})", width);
         int oldWidth = this.width;
         this.width = width;
         propertyChangeSupport.firePropertyChange(PROP_WIDTH, oldWidth, width);
@@ -70,6 +74,7 @@ public class Canvas extends DomNode {
      * @param height the canvas height in pixels.
      */
     public void setSize( int width, int height ) {
+        resizeLogger.log(Level.FINE, "setSize({0},{1})", new Object[]{width, height});
         int oldWidth= this.width;
         int oldHeight= this.height;
         if ( this.controller!=null ) {
@@ -119,7 +124,7 @@ public class Canvas extends DomNode {
     }
 
     public static final String PROP_ROWS = "rows";
-    protected List<Row> rows = new LinkedList<Row>();
+    protected List<Row> rows = new LinkedList<>();
 
     public Row[] getRows() {
         return rows.toArray(new Row[rows.size()]);
@@ -142,7 +147,7 @@ public class Canvas extends DomNode {
     }
 
     public static final String PROP_COLUMNS = "columns";
-    protected List<Column> columns = new LinkedList<Column>();
+    protected List<Column> columns = new LinkedList<>();
 
     public Column[] getColumns() {
         return columns.toArray(new Column[columns.size()]);
