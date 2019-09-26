@@ -314,76 +314,77 @@ public class MatFileReader
             {
                 raFile.close();
             }
-//            if ( buf != null && bufferWeakRef != null && policy == MEMORY_MAPPED_FILE )
-//            {
-//                try
-//                {
-//                    clean(buf);
-//                }
-//                catch ( Exception e )
-//                {
-//                    int GC_TIMEOUT_MS = 1000;
-//                    buf = null;
-//                    long start = System.currentTimeMillis();
-//                    while (bufferWeakRef.get() != null) 
-//                    {
-//                        if (System.currentTimeMillis() - start > GC_TIMEOUT_MS)
-//                        {
-//                            break; //a hell cannot be unmapped - hopefully GC will
-//                                   //do it's job later
-//                        }
-//                        System.gc();
-//                        Thread.yield();
-//                    }
-//                }
-//            }
+            if ( buf != null && bufferWeakRef != null && policy == MEMORY_MAPPED_FILE )
+            {
+                try
+                {
+                    clean(buf);
+                }
+                catch ( Exception e )
+                {
+                    int GC_TIMEOUT_MS = 1000;
+                    buf = null;
+                    long start = System.currentTimeMillis();
+                    while (bufferWeakRef.get() != null) 
+                    {
+                        if (System.currentTimeMillis() - start > GC_TIMEOUT_MS)
+                        {
+                            break; //a hell cannot be unmapped - hopefully GC will
+                                   //do it's job later
+                        }
+                        System.gc();
+                        Thread.yield();
+                    }
+                }
+            }
         }
         
     }
     
-//    /**
-//     * Workaround taken from bug <a
-//     * href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4724038">#4724038</a>
-//     * to release the memory mapped byte buffer.
-//     * <p>
-//     * Little quote from SUN: <i>This is highly inadvisable, to put it mildly.
-//     * It is exceedingly dangerous to forcibly unmap a mapped byte buffer that's
-//     * visible to Java code. Doing so risks both the security and stability of
-//     * the system</i>
-//     * <p>
-//     * Since the memory byte buffer used to map the file is not exposed to the
-//     * outside world, maybe it's save to use it without being cursed by the SUN.
-//     * Since there is no other solution this will do (don't trust voodoo GC
-//     * invocation)
-//     * 
-//     * @param buffer
-//     *            the buffer to be unmapped
-//     * @throws Exception
-//     *             all kind of evil stuff
-//     */
-//    private void clean(final Object buffer) throws Exception
-//    {
-//        AccessController.doPrivileged(new PrivilegedAction<Object>()
-//        {
-//            public Object run()
-//            {
-//                try
-//                {
-//                    Method getCleanerMethod = buffer.getClass().getMethod(
-//                            "cleaner", new Class[0]);
-//                    getCleanerMethod.setAccessible(true);
-//                    sun.misc.Cleaner cleaner = (sun.misc.Cleaner) getCleanerMethod
-//                            .invoke(buffer, new Object[0]);
-//                    cleaner.clean();
-//                }
-//                catch (Exception e)
-//                {
-//                    e.printStackTrace();
-//                }
-//                return null;
-//            }
-//        });
-//    }       
+    /**
+     * Workaround taken from bug <a
+     * href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4724038">#4724038</a>
+     * to release the memory mapped byte buffer.
+     * <p>
+     * Little quote from SUN: <i>This is highly inadvisable, to put it mildly.
+     * It is exceedingly dangerous to forcibly unmap a mapped byte buffer that's
+     * visible to Java code. Doing so risks both the security and stability of
+     * the system</i>
+     * <p>
+     * Since the memory byte buffer used to map the file is not exposed to the
+     * outside world, maybe it's save to use it without being cursed by the SUN.
+     * Since there is no other solution this will do (don't trust voodoo GC
+     * invocation)
+     * 
+     * @param buffer
+     *            the buffer to be unmapped
+     * @throws Exception
+     *             all kind of evil stuff
+     */
+    private void clean(final Object buffer) throws Exception
+    {
+        AccessController.doPrivileged(new PrivilegedAction<Object>()
+        {
+            public Object run()
+            {
+                try
+                {
+                    
+                    //Method getCleanerMethod = buffer.getClass().getMethod(
+                    //        "cleaner", new Class[0]);
+                    //getCleanerMethod.setAccessible(true);
+                    //sun.misc.Cleaner cleaner = (sun.misc.Cleaner) getCleanerMethod
+                    //        .invoke(buffer, new Object[0]);
+                    //cleaner.clean();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });
+    }       
     
     
     
@@ -850,25 +851,31 @@ public class MatFileReader
                 
                 if ( contentTag.type == MatDataTypes.miMATRIX )
                 {
-                    // should return UInt8
-                    MLUInt8 content = (MLUInt8) readMatrix( buf, false );
+                    MLArray _content= readMatrix( buf, false );
                     
-                    // de-serialize object
-                    ObjectInputStream ois = new ObjectInputStream( 
-                            new ByteBufferInputStream( content.getRealByteBuffer(), 
-                                                       content.getRealByteBuffer().limit()  ) );
-                    try
-                    {
-                        Object  o = ois.readObject();                
-                        mlArray = new MLJavaObject( arrName, className, o );
-                    }
-                    catch (Exception e) 
-                    {
-                        throw new IOException( e );
-                    }
-                    finally
-                    {
-                        ois.close();
+                    if ( _content instanceof MLUInt8 ) {
+                        // should return UInt8
+                        MLUInt8 content = (MLUInt8) readMatrix( buf, false );
+                        
+                        // de-serialize object
+                        ObjectInputStream ois = new ObjectInputStream( 
+                                new ByteBufferInputStream( content.getRealByteBuffer(), 
+                                                           content.getRealByteBuffer().limit()  ) );
+                        try
+                        {
+                            Object  o = ois.readObject();                
+                            mlArray = new MLJavaObject( arrName, className, o );
+                        }
+                        catch (Exception e) 
+                        {
+                            throw new IOException( e );
+                        }
+                        finally
+                        {
+                            ois.close();
+                        }
+                    } else {
+                        mlArray= _content;
                     }
                 }
                 else
