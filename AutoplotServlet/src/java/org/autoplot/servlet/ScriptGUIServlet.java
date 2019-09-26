@@ -1,21 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.servlet;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.StringBufferInputStream;
-import java.io.StringReader;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,7 +30,8 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.python.util.PythonInterpreter;
 
 /**
- *
+ * Run a script on the server side, and produce a client-side GUI for the 
+ * getParam calls.
  * @author jbf
  */
 public class ScriptGUIServlet extends HttpServlet {
