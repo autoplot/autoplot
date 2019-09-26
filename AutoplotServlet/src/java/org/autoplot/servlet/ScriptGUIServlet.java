@@ -145,6 +145,8 @@ public class ScriptGUIServlet extends HttpServlet {
             
             script= JythonRefactory.fixImports(script);
             
+            ScriptContext.setApplicationModel(model); // why must I do this???
+            
             JythonUtil.runScript( dom, 
                     new ByteArrayInputStream(script.getBytes("UTF-8")), 
                     name, 
