@@ -38,7 +38,6 @@ import org.das2.graph.SelectionUtil;
 import org.das2.util.LoggerManager;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.layout.LayoutConstants;
-import org.das2.graph.DasAxis;
 
 /**
  * Controller for canvases.
@@ -47,6 +46,7 @@ import org.das2.graph.DasAxis;
 public class CanvasController extends DomNodeController {
 
     protected static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.dom.canvas" );
+    protected static final Logger resizeLogger= org.das2.util.LoggerManager.getLogger( "autoplot.dom.canvas.resize" );
     
     DasCanvas dasCanvas;
     private final Application dom;
@@ -111,7 +111,7 @@ public class CanvasController extends DomNodeController {
         int w= Math.min( 4000, canvas.getWidth()); 
         int h= Math.min( 4000, canvas.getHeight());
         Dimension d= new Dimension( w,h );
-        logger.log(Level.FINER, "setDasCanvasSize {0}", d);
+        resizeLogger.log(Level.FINER, "setDasCanvasSize {0}", d);
         dasCanvas.setPreferredSize( d );
         dasCanvas.setSize( d );
     }
@@ -122,6 +122,7 @@ public class CanvasController extends DomNodeController {
      * @param width 
      */
     public void setDimensions( int width, int height ) {
+        resizeLogger.log(Level.FINE, "setDimensions({0},{1})", new Object[]{width, height});
         int oldWidth= canvas.width;
         int oldHeight= canvas.height;
         canvas.width= width;
@@ -143,6 +144,9 @@ public class CanvasController extends DomNodeController {
         dasCanvas.addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
+                if ( CanvasController.this.dom.getController().isValueAdjusting() ) {
+                    return;
+                }
                 if ( setSizeTimer.isRunning() ) {
                     return;
                 }
