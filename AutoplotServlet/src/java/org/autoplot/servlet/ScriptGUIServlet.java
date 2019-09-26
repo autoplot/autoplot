@@ -121,7 +121,6 @@ public class ScriptGUIServlet extends HttpServlet {
             Map<String,Param> parms= Util.getParams( null, script, ssparams, new NullProgressMonitor() );
         
             try (PrintWriter out = response.getWriter()) {
-                /* TODO output your page here. You may use following sample code. */
                 out.println("<!DOCTYPE html>");
                 out.println("<html>");
                 out.println("<head>");
@@ -129,9 +128,9 @@ public class ScriptGUIServlet extends HttpServlet {
                 out.println("</head>");
                 out.println("<body>");
                 out.println("<h1>Servlet ScriptGUIServlet at " + request.getContextPath() + "</h1>");
-                out.println("Running script <a href="+scriptURI+">"+scriptURI+"</a>");
+                out.println("Running script <a href="+scriptURI+">"+scriptFile+"</a>");
                 out.println("<table><tr>");
-                out.println("<td>");
+                out.println("<td valign='top'>");
                 out.println("<form action='ScriptGUIServlet'>");
                 for ( Entry<String,Param> pe: parms.entrySet() ) {
                     Param p= pe.getValue();
@@ -170,7 +169,7 @@ public class ScriptGUIServlet extends HttpServlet {
                 out.println("<input type='submit' value='Submit'>");
                 out.println("</form>");
                 out.println( "</td>");
-                out.println( "<td>");
+                out.println( "<td valign='top'>");
                 out.println( "<img src='ScriptGUIServlet?img=1"+sparams+"' alt='image'>" );
                 out.println( "</td>");
                 out.println( "</tr>");
