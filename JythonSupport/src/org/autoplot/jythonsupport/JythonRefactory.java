@@ -46,7 +46,9 @@ public class JythonRefactory {
 //    }
     
     /**
-     * 
+     * Convert old names to modern names, for example "org.virbo.autoplot" to
+     * "org.autoplot".  Autoplot became its own project early on, but the code
+     * was slow to update.
      * @param s the script
      * @return the script with new names.
      * @throws IOException 
@@ -61,7 +63,9 @@ public class JythonRefactory {
     }
 
     /**
-     * 
+     * Convert old names to modern names, for example "org.virbo.autoplot" to
+     * "org.autoplot".  Autoplot became its own project early on, but the code
+     * was slow to update.
      * @param s the script
      * @param name name for the script, e.g. the filename.
      * @return the script with new names.
