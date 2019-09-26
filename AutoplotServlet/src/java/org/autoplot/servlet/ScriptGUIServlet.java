@@ -110,9 +110,12 @@ public class ScriptGUIServlet extends HttpServlet {
             ScriptContext._setOutputStream( los2 ); 
             
             script= JythonRefactory.fixImports(script);
-            interp.exec(script);
             
-            JythonUtil.runScript( ScriptContext.getDocumentModel(), new ByteArrayInputStream(script.getBytes("UTF-8")), name, aaparams, pwd );
+            JythonUtil.runScript( ScriptContext.getDocumentModel(), 
+                    new ByteArrayInputStream(script.getBytes("UTF-8")), 
+                    name, 
+                    aaparams, 
+                    pwd );
             
             try (OutputStream out = response.getOutputStream()) {
                 ScriptContext.writeToPng(out);
