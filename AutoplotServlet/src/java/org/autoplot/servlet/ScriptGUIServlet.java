@@ -1,6 +1,7 @@
 
 package org.autoplot.servlet;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,14 +19,22 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.autoplot.ApplicationModel;
 import org.autoplot.JythonUtil;
 import org.autoplot.ScriptContext;
+import static org.autoplot.ScriptContext.waitUntilIdle;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.dom.Application;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.JythonUtil.Param;
 import org.autoplot.jythonsupport.ui.Util;
+import org.autoplot.scriptconsole.DumpRteExceptionHandler;
+import org.autoplot.scriptconsole.ExitExceptionHandler;
 import org.autoplot.scriptconsole.LoggingOutputStream;
+import org.das2.graph.DasCanvas;
+import org.das2.util.DasPNGConstants;
+import org.das2.util.DasPNGEncoder;
 import org.das2.util.FileUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.util.PythonInterpreter;
@@ -36,6 +46,31 @@ import org.python.util.PythonInterpreter;
  */
 public class ScriptGUIServlet extends HttpServlet {
 
+    /**
+     * write out the current canvas to stdout.  This is introduced to support servers.
+     * TODO: this has issues with the size.  See writeToPng(filename).
+     * @param dom
+     * @param out the OutputStream accepting the data, which is not closed.
+     * @throws java.io.IOException
+     */
+    public static void writeToPng( Application dom, OutputStream out) throws IOException {
+        waitUntilIdle();
+
+        DasCanvas c = dom.getController().getApplicationModel().getCanvas();
+        int width= dom.getCanvases(0).getWidth();
+        int height= dom.getCanvases(0).getHeight();
+
+        BufferedImage image = c.getImage(width,height);
+
+        DasPNGEncoder encoder = new DasPNGEncoder();
+        encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
+        encoder.addText(DasPNGConstants.KEYWORD_SOFTWARE, "Autoplot" );
+        encoder.addText(DasPNGConstants.KEYWORD_PLOT_INFO, c.getImageMetadata() );        
+
+        encoder.write( image, out);
+
+    }
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -78,16 +113,22 @@ public class ScriptGUIServlet extends HttpServlet {
         
         if ( request.getParameter("img")!=null ) {
             // now run the script
-            System.err.println( "dom: "+ ScriptContext.getDocumentModel() );
-            System.err.println( "dom options: "+ ScriptContext.getDocumentModel().getOptions() );
             
-            ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
+            ApplicationModel model = new ApplicationModel();
+            model.setExceptionHandler( new DumpRteExceptionHandler() );
+            model.addDasPeersToAppAndWait();
+            Application dom= model.getDocumentModel();
+            
+            System.err.println( "dom: "+ dom );
+            System.err.println( "dom options: "+ dom.getOptions() );
+            
+            dom.getOptions().setAutolayout(false);
             
             PythonInterpreter interp = JythonUtil.createInterpreter( true, true );
             interp.set("java",null);
             interp.set("org",null);
             interp.set("getFile",null);
-            interp.set("dom",ScriptContext.getDocumentModel());
+            interp.set("dom",dom);
             interp.set("downloadResourceAsTempFile",null);
 
             LoggingOutputStream los1= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO );
@@ -100,21 +141,22 @@ public class ScriptGUIServlet extends HttpServlet {
             
             //TODO: this limits to one user!
             LoggingOutputStream los2= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO ); 
-            ScriptContext._setOutputStream( los2 ); 
+            //ScriptContext._setOutputStream( los2 ); 
             
             script= JythonRefactory.fixImports(script);
             
-            JythonUtil.runScript( ScriptContext.getDocumentModel(), 
+            JythonUtil.runScript( dom, 
                     new ByteArrayInputStream(script.getBytes("UTF-8")), 
                     name, 
                     aaparams, 
                     pwd );
             
             try (OutputStream out = response.getOutputStream()) {
-                ScriptContext.writeToPng(out);
+                writeToPng(dom,out);
                 try { los1.close(); } catch ( IOException ex ) {}
                 try { los2.close(); } catch ( IOException ex ) {}
             }
+            
         } else {
             response.setContentType("text/html;charset=UTF-8");
         
