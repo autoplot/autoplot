@@ -1195,7 +1195,10 @@ public final class ApplicationModel {
         if ( DomUtil.structureChanges( this.dom, state ) ) {
             this.dom.getController().reset();
         }
-
+        
+        int correctHeight= state.getCanvases(0).getHeight();
+        int correctWidth= state.getCanvases(0).getWidth();
+        
         if ( this.resizeRequestListener!=null ) {
             double scale= resizeRequestListener.resize( state.getCanvases(0).getWidth(), state.getCanvases(0).getHeight() );
             Font f= Font.decode( state.getCanvases(0).getFont() );
@@ -1221,6 +1224,11 @@ public final class ApplicationModel {
             if ( resetx || resety|| resetz ) {
                 p.getController().resetZoom(resetx, resety, resetz);
             }
+        }
+                
+        if ( dom.getCanvases(0).getHeight()!=correctHeight || 
+                 dom.getCanvases(0).getWidth()!=correctWidth  ){
+            logger.warning("vap has been loaded but dimensions are not correct.");
         }
 
     }
