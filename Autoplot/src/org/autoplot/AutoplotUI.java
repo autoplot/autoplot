@@ -279,6 +279,8 @@ public final class AutoplotUI extends javax.swing.JFrame {
     };
     
     private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.gui");
+    private static final Logger resizeLogger= Logger.getLogger("autoplot.dom.canvas.resize");
+    
     private JythonScriptPanel scriptPanel;
     private DataPanel dataPanel;
     private LayoutPanel layoutPanel;
@@ -1083,23 +1085,23 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 //if ( w<430 && h>800 ) {
                 //    System.err.println("here stop dimensions");
                 //}
-                resizeLogger.log(Level.FINE, "componentResized {0,number,#}x{1,number,#}", 
+                resizeLogger.log(Level.FINER, "componentResized {0,number,#}x{1,number,#}", 
                         new Object[]{AutoplotUI.this.getWidth(), AutoplotUI.this.getHeight()});
             }
 
             @Override
             public void componentMoved(ComponentEvent e) {
-                resizeLogger.fine("componentMoved");
+                resizeLogger.finest("componentMoved");
             }
 
             @Override
             public void componentShown(ComponentEvent e) {
-                resizeLogger.fine("componentShown");
+                resizeLogger.finer("componentShown");
             }
 
             @Override
             public void componentHidden(ComponentEvent e) {
-                resizeLogger.fine("componentHidden");
+                resizeLogger.finer("componentHidden");
             }
             
         });
@@ -2443,6 +2445,9 @@ APSplash.checkTime("init 52.9");
         logger.log(Level.FINE, "final size of canvas: {0,number,#}x{1,number,#}", new Object[]{width, height});           
     }
     
+    int windowExtraWidth= 0; 
+    int windowExtraHeight= 0; 
+    
     /**
      * resize the outer GUI attempting to get a fitted canvas size.  This fixes the
      * problem where a loaded vap doesn't appear as it does when it was saved because
@@ -2453,7 +2458,7 @@ APSplash.checkTime("init 52.9");
      * @return nominal scale factor
      */
     public double resizeForCanvasSize( int w, int h ) {
-        Logger resizeLogger= Logger.getLogger("autoplot.dom.canvas.resize");
+        
         resizeLogger.log(Level.FINE, "resizeForCanvasSize({0,number,#},{1,number,#})", new Object[]{w, h});
         Component parentToAdjust;
         if ( SwingUtilities.isDescendingFrom( applicationModel.getCanvas(), this ) ) {
@@ -2461,7 +2466,9 @@ APSplash.checkTime("init 52.9");
         } else {
             parentToAdjust= SwingUtilities.getWindowAncestor(applicationModel.getCanvas());
         }
+        boolean fitted= this.applicationModel.dom.getCanvases(0).isFitted();
         Dimension dout= parentToAdjust.getSize();
+        resizeLogger.log(Level.FINER, "old parentToAdjust.getSize: {0,number,#}x{1,number,#}", new Object[]{dout.width, dout.height});
         Dimension din= this.applicationModel.getCanvas().getSize();
         Dimension desiredAppSize= new Dimension();
 
@@ -2471,7 +2478,7 @@ APSplash.checkTime("init 52.9");
         
         boolean maximize= false;
         
-        if ( this.applicationModel.dom.getCanvases(0).isFitted() ) {
+        if ( fitted ) {
             int maximizedPixelGain= 0; // the number of pixels gained by maximizing.  Windows doesn't draw borders when window is maximized.
             String osName= System.getProperty("os.name");
             if ( osName.startsWith("Windows") ) { // TODO: figure out how to measure this.
@@ -2479,8 +2486,10 @@ APSplash.checkTime("init 52.9");
             } else if ( osName.startsWith("Linux") ) {
                 maximizedPixelGain= 10;
             } 
-            desiredAppSize.width= w + ( dout.width - din.width );
-            desiredAppSize.height= h + ( dout.height - din.height );
+                        
+            resizeLogger.log(Level.FINER, "windowExtraWidth={0} windowExtraHeight={1}", new Object[] { windowExtraWidth, windowExtraHeight } );
+            desiredAppSize.width= w + windowExtraWidth ;
+            desiredAppSize.height= h + windowExtraHeight;
             
             if ( w > screenSize.getWidth() - maximizedPixelGain && 
                     w < screenSize.getWidth() ) {
@@ -2503,11 +2512,13 @@ APSplash.checkTime("init 52.9");
         } else if ( maximize ) {
             if ( parentToAdjust instanceof JFrame ) {
                 ((JFrame)parentToAdjust).setExtendedState( JFrame.MAXIMIZED_BOTH );
+                resizeLogger.log(Level.FINER, "resizeForCanvasSize parentToAdjust maximized");
                 setStatus("Window maximized to approximate original size");
             } else {
                 this.applicationModel.dom.getCanvases(0).setFitted(false);
                 this.applicationModel.dom.getCanvases(0).setHeight(h);
                 this.applicationModel.dom.getCanvases(0).setWidth(w);
+                resizeLogger.log(Level.FINER, "resizeForCanvasSize resets canvas fitted=false {0,number,#}x{1,number,#}", new Object[]{ w, h } );
             }
             
         } else if ( desiredAppSize.width>screenSize.getWidth() || desiredAppSize.height>screenSize.getHeight() ) {
@@ -2531,16 +2542,21 @@ APSplash.checkTime("init 52.9");
                     scale= (double)nw/w;
                     //Font newFont= f.deriveFont( f.getSize2D() * scale );
                     //this.applicationModel.dom.getCanvases(0).setFont(newFont.toString());
-                    parentToAdjust.setSize( nw + ( dout.width - din.width ), nh + ( dout.height - din.height ) );
+                    int newW=  nw + ( dout.width - din.width );
+                    int newH=  nh + ( dout.height - din.height );
+                    parentToAdjust.setSize( newW, newH );
+                    resizeLogger.log(Level.FINE, "resizeForCanvasSize parentToAdjust.setSize (scaling): {0,number,#}x{1,number,#}", new Object[]{ newW, newH });
 
                 } else if ( i==1 ) { // scrollbars option.
                     this.applicationModel.dom.getCanvases(0).setFitted(false);
                     this.applicationModel.dom.getCanvases(0).setHeight(h);
                     this.applicationModel.dom.getCanvases(0).setWidth(w);
+                    resizeLogger.log(Level.FINE, "resizeForCanvasSize (scrollbars) {0,number,#}x{1,number,#}", new Object[]{ w, h });
+                    
                 }
             }
         } else {
-            // there's actually a new bug here, at least on Linux you can't resize to > one screen...
+            resizeLogger.log(Level.FINE, "resizeForCanvasSize parentToAdjust.setSize  {0,number,#}x{1,number,#}", new Object[]{ desiredAppSize.width, desiredAppSize.height });
             parentToAdjust.setSize( desiredAppSize.width, desiredAppSize.height );
             if ( parentToAdjust.getSize().getWidth()!=desiredAppSize.width ) {
                 this.applicationModel.dom.getCanvases(0).setFitted(false);
@@ -2548,13 +2564,30 @@ APSplash.checkTime("init 52.9");
             }
             this.applicationModel.dom.getCanvases(0).setHeight(h);
             this.applicationModel.dom.getCanvases(0).setWidth(w);
+            resizeLogger.log(Level.FINE, "resizeForCanvasSize set canvas size to  {0,number,#}x{1,number,#}", new Object[]{ w, h });
         }
         if ( oldFitted==true && this.applicationModel.dom.getCanvases(0).isFitted()==false ) {
             setStatus("warning: canvas is no longer fitted, see options->plot style->canvas size");
         }
 
+        resizeLogger.log(Level.FINE, "resizeForCanvasSize exiting, scale={0}", scale);
+        
         return scale;
     }
+
+    @Override
+    public void setSize(int width, int height) {
+        resizeLogger.log(Level.FINE, "AutoplotUI.setSize({0},{1})", new Object[]{width, height});
+        super.setSize(width, height);
+    }
+
+    @Override
+    public void setSize(Dimension d) {
+        resizeLogger.log(Level.FINE, "AutoplotUI.setSize({0})", d);
+        super.setSize(d); 
+    }
+    
+    
 
     /**
      * set the status message, with "busy:" or "warning:" prefix.
@@ -5470,6 +5503,9 @@ APSplash.checkTime("init 240");
                     } else {
                         app.currentIcon = IDLE_ICON;
                         app.currentIconTooltip = null;
+                        app.windowExtraHeight= app.getHeight() - app.dom.getCanvases(0).getHeight();
+                        app.windowExtraWidth= app.getWidth() - app.dom.getCanvases(0).getWidth();
+                        resizeLogger.log(Level.FINER, "reset windowExtraWidth and windowExtraHeight to {0},{1}", new Object[]{app.windowExtraWidth, app.windowExtraHeight});
                     }
                 }
                 app.dom.getController().setPendingChangeCount( changes.size() );
