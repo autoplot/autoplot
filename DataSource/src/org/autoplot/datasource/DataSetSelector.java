@@ -936,6 +936,11 @@ public class DataSetSelector extends javax.swing.JPanel {
         dialog.getRootPane().registerKeyboardAction( new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                Component focus= dialog.getFocusOwner();
+                if ( focus!=null && focus instanceof JTextField ) {
+                    logger.finer("ignore escape pressed within a JTextField");
+                    return;
+                }
                 dialog.setVisible(false);
                 dialog.dispose(); 
             }
