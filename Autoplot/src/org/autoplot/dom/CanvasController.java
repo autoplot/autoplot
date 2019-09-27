@@ -122,7 +122,7 @@ public class CanvasController extends DomNodeController {
      * @param width 
      */
     public void setDimensions( int width, int height ) {
-        resizeLogger.log(Level.FINE, "setDimensions({0,number,#}},{1,number,#}})", new Object[]{width, height});
+        resizeLogger.log(Level.FINE, "setDimensions({0,number,#},{1,number,#})", new Object[]{width, height});
         int oldWidth= canvas.width;
         int oldHeight= canvas.height;
         canvas.width= width;
