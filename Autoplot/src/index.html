@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New CDF editor droplist allows searching metadata for strings like "Omnidirectional."  Happy Autumn!
+        <p><small>Histogram of Poisson distribution.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-09-23 r24144):</p>
+        <p>Bugfixes (2019-09-23 r24176):</p>
+        <ul>
+            <li>2202: screen size of loaded .vap is often incorrect.
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>0356: add additionalClip property to SeriesRenderer, which will clip the lines which go far outside axis bounds (to -inf for example).
             <li>2122: new logic to decide if a slice popup is visible.
@@ -49,34 +53,13 @@
             <li>2198: remove unnecessary call to GUI code in HTTPFileSystem code, which would cause hang on Mac/SciPy/JPype.
             <li>2197: code to record recent times and operations would fail on Windows.  Thanks, George!
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>1359: refactor scan next/scan previous code to allow for testing.
-            <li>bug in rfe445, where Masafumi pointed out that data which once ranged now has a runtime error because of Inf's.  Thanks, Masafumi!
-            <li>icon for OutsideS fixed.  It was still a copy of another position.
-            <li>2189: corrections to clipping introduced mistake when outside legend label was used.  Thanks, Kristoff!
-            <li>2195: mislocated property editor popups corrected.
-            <li>rte 921689851: runtime error when click on pngwalk when digitizer has not been started.  Thanks, Kris!
-            <li>2193: vap files from GitHub locations work now.
-            <li>2175: File&rarr;Reset now resets to default size as well.
-            <li>rte_1569838156: catch IllegalArgumentException when Units.min is encountered.
-            <li>rte 0726091791: reference setting on zaxis (colorbar) would result in NullPointerException.
-            <li>org.autoplot preference should be used before org.virbo.autoplot copy.
-            <li>2175: loading .vap shouldn't change the scientist's color and font preferences after reset.
-            <li>2194: handle case where StreamDescriptor no longer recognizes a packet because the id has been recycled, dropping a record.
-            <li>QStream toAscii would use formatter which didn't support doubles with large negative exponents, showing "0"...
-            <li>das2server TCA (ephemeris) URIs now load based on needed resolution. 
-            <li>findbugs fixes, where difficult thread warning IS2_INCONSISTENT_SYNC is resolved.
-            <li>"Check URI" monitor wasn't centered on the application.
-            <li>error bar thickness should be the same as the line thickness.
-            <li>rte 1858002116: check for null from "where" list in NetCDF, HDF and CDF dialogs.  Thanks WRF!
-            <li>continue round of <a href='https://ci-pw.physics.uiowa.edu/job/autoplot-findbugs/findbugs'>FindBugs</a> cleanup. (Yay, below 100!)
-            <li>2188: makeCanonical corrects double-slashes (//) fixing the bug.
-            <li>2189: corrections to clipping in DasPlot, a bug seen with scrollbars on Linux.  Thanks, Ivar!!
-            <li>remove class DatumRangeUtilOld, which is not used.
-            <li>rte_1076158178: avoid runtime error when zero-length dataset is added to the DataPointRecorder.  Thanks, Darrelle!
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>696: support for HAPI 3.0 references.
+            <li>IFFT takes Real and Complex spectra to make a waveform.
+            <li>ScriptGUIServlet allows script to be run, creating web GUI for parameters and displaying the output.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>696: initial support for HAPI info responses with references and time-varying DEPEND_1.
             <li>693: CDF editor has sort alpha checkbox.
@@ -88,18 +71,6 @@
             <li>Plots now have background color property, which is 100% transparent black by default.
             <li>add binMeanAverageDeviation to calculate the deviations in each bin for binAverage2d
             <li>binAverage2d filter added for doing 2-D histograms of x,y,z buckshot scatter data.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>IDL/Python/Matlab interface now has convenient method for loading logger settings.
-            <li>add more properties to dataset command, like renderType, bins1, bins0, and userProperties.
-            <li>2175: start migrating prefs to config/options.properties.
-            <li>rfe545: "Run Batch" tool has help page and outputs the results as the batch is run.
-            <li>rfe545: "Run Batch" tool has menubar for loading and saving parameter lists, and export results to CSV.
-            <li>rfe689: Das2 series renderer now had ErrorBarType=SHADE using a shaded region to show error interval.
-            <li>Base64 class replaced with Java 8 version, to get ready for the Java 8 upgrade.
-            <li>rfe689: Das2 series renderer now has ErrorBarType, which can be BAR or SERIF_BAR, and soon SHADE.
-            <li>report the cadence in frequency as well as a period for timetags.
         </ul>
         <p>Known issues:</p>
         <ul>
