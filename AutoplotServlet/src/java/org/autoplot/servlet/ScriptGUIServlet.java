@@ -102,6 +102,10 @@ public class ScriptGUIServlet extends HttpServlet {
             script= "https://github.com/autoplot/dev/blob/master/demos/2019/20190726/demoParams.jy";
         }
         
+        if ( !script.startsWith("https://github.com/autoplot/dev/") ) {
+            throw new IllegalArgumentException("script must come from https://github.com/autoplot/dev/");
+        }
+        
         String scriptURI= script;
         
         URISplit split= URISplit.parse(script);
