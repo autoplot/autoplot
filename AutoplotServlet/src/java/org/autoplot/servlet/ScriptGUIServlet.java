@@ -114,6 +114,8 @@ public class ScriptGUIServlet extends HttpServlet {
         if ( request.getParameter("img")!=null ) {
             // now run the script
             
+            org.autoplot.Util.addFonts();
+                    
             ApplicationModel model = new ApplicationModel();
             model.setExceptionHandler( new DumpRteExceptionHandler() );
             model.addDasPeersToAppAndWait();
