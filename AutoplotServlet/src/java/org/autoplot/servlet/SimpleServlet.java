@@ -74,8 +74,7 @@ import org.das2.qds.ops.Ops;
  * to tweak layout when automatic settings are not satisfactory.
  * 
  * Some known instances:<ul>
- * <li>http://autoplot.org/plot/
- * <li>http://jfaden.net:8180/AutoplotServlet/
+ * <li>http://jfaden.net/AutoplotServlet/
  * </ul>
  * 
  * @author jbf
@@ -83,7 +82,7 @@ import org.das2.qds.ops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
-    public static final String version= "v20190923.1024";
+    public static final String version= "v20190927.1237";
 
     static FileHandler handler;
 
