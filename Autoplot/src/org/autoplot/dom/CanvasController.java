@@ -122,7 +122,7 @@ public class CanvasController extends DomNodeController {
      * @param width 
      */
     public void setDimensions( int width, int height ) {
-        resizeLogger.log(Level.FINE, "setDimensions({0},{1})", new Object[]{width, height});
+        resizeLogger.log(Level.FINE, "setDimensions({0,number,#}},{1,number,#}})", new Object[]{width, height});
         int oldWidth= canvas.width;
         int oldHeight= canvas.height;
         canvas.width= width;
@@ -145,9 +145,11 @@ public class CanvasController extends DomNodeController {
             @Override
             public void componentResized(ComponentEvent e) {
                 if ( CanvasController.this.dom.getController().isValueAdjusting() ) {
+                    resizeLogger.fine("no already adjusting, ignoring");
                     return;
                 }
                 if ( setSizeTimer.isRunning() ) {
+                    resizeLogger.fine("setSizeTimer is running, ignoring");
                     return;
                 }
                 int w= dasCanvas.getWidth();

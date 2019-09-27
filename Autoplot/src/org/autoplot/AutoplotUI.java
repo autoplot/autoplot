@@ -40,10 +40,14 @@ import java.awt.dnd.DropTargetListener;
 import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -1068,6 +1072,37 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 prefs.putInt( "locationscreenwidth", java.awt.Toolkit.getDefaultToolkit().getScreenSize().width );
             }
         }) );
+        
+        final Logger resizeLogger= LoggerManager.getLogger("autoplot.dom.canvas.resize");
+        
+        this.addComponentListener( new ComponentListener() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                int w= AutoplotUI.this.getWidth();
+                int h= AutoplotUI.this.getHeight();
+                //if ( w<430 && h>800 ) {
+                //    System.err.println("here stop dimensions");
+                //}
+                resizeLogger.log(Level.FINE, "componentResized {0,number,#}x{1,number,#}", 
+                        new Object[]{AutoplotUI.this.getWidth(), AutoplotUI.this.getHeight()});
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                resizeLogger.fine("componentMoved");
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+                resizeLogger.fine("componentShown");
+            }
+
+            @Override
+            public void componentHidden(ComponentEvent e) {
+                resizeLogger.fine("componentHidden");
+            }
+            
+        });
         
         applicationModel.addPropertyChangeListener( ApplicationModel.PROP_VAPFILE, new PropertyChangeListener() {
             @Override
@@ -2401,11 +2436,11 @@ APSplash.checkTime("init 52.9");
     public void resizeForDefaultCanvasSize() {
         int width= dom.getOptions().getWidth();
         int height= dom.getOptions().getHeight();
-        logger.log(Level.FINE, "resize canvas to {0}x{1}", new Object[]{width, height});
+        logger.log(Level.FINE, "resize canvas to {0,number,#}x{1,number,#}", new Object[]{width, height});
         resizeForCanvasSize( width,height );
         width= dom.getCanvases(0).getWidth();
         height= dom.getCanvases(0).getHeight();
-        logger.log(Level.FINE, "final size of canvas: {0}x{1}", new Object[]{width, height});           
+        logger.log(Level.FINE, "final size of canvas: {0,number,#}x{1,number,#}", new Object[]{width, height});           
     }
     
     /**
@@ -2418,7 +2453,8 @@ APSplash.checkTime("init 52.9");
      * @return nominal scale factor
      */
     public double resizeForCanvasSize( int w, int h ) {
-        
+        Logger resizeLogger= Logger.getLogger("autoplot.dom.canvas.resize");
+        resizeLogger.log(Level.FINE, "resizeForCanvasSize({0,number,#},{1,number,#})", new Object[]{w, h});
         Component parentToAdjust;
         if ( SwingUtilities.isDescendingFrom( applicationModel.getCanvas(), this ) ) {
             parentToAdjust= this;

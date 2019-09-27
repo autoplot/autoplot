@@ -51,7 +51,6 @@ import org.python.core.PyJavaInstance;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.DataSourceFilter;
 import org.autoplot.scriptconsole.ExitExceptionHandler;
-import org.das2.qds.ArrayDataSet;
 import org.das2.dataset.DataSetAdapter;
 import org.das2.datum.InconvertibleUnitsException;
 import org.das2.event.BoxRenderer;
@@ -77,7 +76,6 @@ import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.URISplit;
 import org.das2.graph.DasColorBar;
-import static org.das2.graph.DasColorBar.Type.makeColorTable;
 import org.das2.qds.DataSetOps;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.MutablePropertyDataSet;
@@ -97,7 +95,8 @@ import org.das2.util.filesystem.FileSystem;
 public class ScriptContext extends PyJavaInstance {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.script");
-
+    private static final Logger resizeLogger= Logger.getLogger("autoplot.dom.canvas.resize");
+    
     private static ApplicationModel model = null;
     private static Application dom= null;
 
@@ -299,6 +298,7 @@ public class ScriptContext extends PyJavaInstance {
         result.setResizeRequestListener( new ResizeRequestListener() {
             @Override
             public double resize(int width, int height) {
+                resizeLogger.log(Level.FINE, "resize1 ({0},{1})", new Object[]{width,height});
                 if ( p!=null ) {
                     Dimension windowDimension= p.getSize();
                     Dimension canvasDimension= model.canvas.getSize();        
@@ -368,6 +368,7 @@ public class ScriptContext extends PyJavaInstance {
             result.setResizeRequestListener( new ResizeRequestListener() {
                 @Override
                 public double resize(int width, int height) {
+                    resizeLogger.log(Level.FINE, "resize2 ({0},{1})", new Object[]{width,height});
                     if ( j!=null ) {
                         Dimension windowDimension= j.getSize();
                         Dimension canvasDimension= model.canvas.getSize();        

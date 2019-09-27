@@ -45,7 +45,7 @@ public class Canvas extends DomNode {
      * @param height 
      */
     public void setHeight(int height) {
-        resizeLogger.log(Level.FINE, "setHeight({0})", height);
+        resizeLogger.log(Level.FINE, "setHeight({0,number,#}})", height);
         int oldHeight = this.height;
         this.height = height;
         propertyChangeSupport.firePropertyChange(PROP_HEIGHT, oldHeight, height);
@@ -62,7 +62,7 @@ public class Canvas extends DomNode {
     * @param width 
     */
     public void setWidth(int width) {
-        resizeLogger.log(Level.FINE, "setWidth({0})", width);
+        resizeLogger.log(Level.FINE, "setWidth({0,number,#})", width);
         int oldWidth = this.width;
         this.width = width;
         propertyChangeSupport.firePropertyChange(PROP_WIDTH, oldWidth, width);
@@ -74,7 +74,7 @@ public class Canvas extends DomNode {
      * @param height the canvas height in pixels.
      */
     public void setSize( int width, int height ) {
-        resizeLogger.log(Level.FINE, "setSize({0},{1})", new Object[]{width, height});
+        resizeLogger.log(Level.FINE, "setSize({0,number,#}},{1,number,#}})", new Object[]{width, height});
         int oldWidth= this.width;
         int oldHeight= this.height;
         if ( this.controller!=null ) {
