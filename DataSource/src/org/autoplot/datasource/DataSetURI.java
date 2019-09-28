@@ -84,7 +84,6 @@ public class DataSetURI {
 
     private static final Logger logger = LoggerManager.getLogger("apdss.uri");
 
-
     static {
         logger.fine("load class DataSetURI");
         DataSourceRegistry registry = DataSourceRegistry.getInstance();
@@ -627,6 +626,8 @@ public class DataSetURI {
      * @throws IOException 
      */
     public static InputStream getInputStream(URI uri, ProgressMonitor mon) throws IOException {
+        logger.entering("DataSetURI", "getInputStream", uri );
+        
         URISplit split = URISplit.parse( uri );
         FileSystem fs;
         fs = FileSystem.create( DataSetURI.toUri(split.path) );
@@ -637,7 +638,9 @@ public class DataSetURI {
         if (!fo.isLocal()) {
             logger.log(Level.FINE, "getInputStream(URI): downloading file {0} from {1}{2}", new Object[] { fo.getNameExt(), fs.getRootURI(), filename } );
         }
-        return fo.getInputStream(mon);
+        InputStream result= fo.getInputStream(mon);
+        logger.exiting("DataSetURI", "getInputStream" );
+        return result;
 
     }
 
