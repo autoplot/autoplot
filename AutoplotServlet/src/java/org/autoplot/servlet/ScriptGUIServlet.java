@@ -178,7 +178,7 @@ public class ScriptGUIServlet extends HttpServlet {
                 out.println("</head>");
                 out.println("<body>");
                 out.println("<h1>Servlet ScriptGUIServlet at " + request.getContextPath() + "</h1>");
-                out.println("Running script <a href="+scriptURI+">"+scriptFile+"</a>");
+                out.println("Running script <a href="+scriptURI+">"+scriptURI+"</a>");
                 out.println("<table><tr>");
                 out.println("<td valign='top'>");
                 out.println("<form action='ScriptGUIServlet'>");
