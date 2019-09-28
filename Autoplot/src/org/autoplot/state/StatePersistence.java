@@ -501,13 +501,7 @@ public class StatePersistence {
                     Class c;
                     try {
                         c = DomUtil.getPropertyType(state, node);
-                    } catch (IllegalAccessException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                        continue;
-                    } catch (IllegalArgumentException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                        continue;
-                    } catch (InvocationTargetException ex) {
+                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                         logger.log(Level.SEVERE, ex.getMessage(), ex);
                         continue;
                     }
@@ -524,11 +518,7 @@ public class StatePersistence {
                         val = sd.parse(sd.typeId(c), sval);
                         //                    prop.setValue(state, val);
                         DomUtil.setPropertyValue(state, node, val);
-                    } catch (IllegalAccessException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    } catch (IllegalArgumentException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    } catch (InvocationTargetException ex) {
+                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                         logger.log(Level.SEVERE, ex.getMessage(), ex);
                     } catch (ParseException ex) {
                         IOException ioex= new IOException( ex.getMessage() );
@@ -551,8 +541,9 @@ public class StatePersistence {
      */
     public static Object restoreState( InputStream in )  throws IOException {
         PushbackInputStream pbin= new PushbackInputStream(in,10);
-
-        if ( pbin.available()<5 ) {
+        int available= pbin.available();
+        logger.log(Level.FINER, "available bytes in stream: {0}", available);
+        if ( available<5 ) {
             throw new IllegalArgumentException("expected to find file that contained at least 5 characters");
         } else {
             byte[] five= new byte[5];
