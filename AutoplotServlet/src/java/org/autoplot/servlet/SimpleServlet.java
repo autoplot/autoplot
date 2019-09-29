@@ -78,7 +78,7 @@ import org.das2.qds.ops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
-    public static final String version= "v20190929.0729";
+    public static final String version= "v20190929.0819";
 
     static FileHandler handler;
 
