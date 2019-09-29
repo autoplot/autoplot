@@ -131,7 +131,7 @@ public class AnnotationCommand extends PyObject {
                 "text", "textColor", "background", "foreground",
                 "anchorPosition", "anchorOffset", "anchorType", "borderType", "anchorBorderType",
                 "fontSize",
-                "pointAtX", "pointAtY", "pointAt", 
+                "pointAtX", "pointAtY", "pointAt", "pointAtOffset",
                 "xrange", "yrange", "plotId",
                 "rowId", "columnId"
         },
@@ -139,7 +139,7 @@ public class AnnotationCommand extends PyObject {
             Py.None, Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None, Py.None, Py.None,
             Py.None,
-            Py.None, Py.None, Py.None,
+            Py.None, Py.None, Py.None, Py.None, 
             Py.None, Py.None, Py.None,
             Py.None, Py.None,
         } );
@@ -244,6 +244,9 @@ public class AnnotationCommand extends PyObject {
                             annotation.setPointAtY(Ops.datum(ss[1]));
                             annotation.setShowArrow(true);
                         }
+                        break;
+                    case "pointAtOffset":
+                        annotation.setPointAtOffset(sval);
                         break;
                     case "plotId":
                         annotation.setPlotId(sval);
