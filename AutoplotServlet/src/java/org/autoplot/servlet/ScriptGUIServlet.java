@@ -30,7 +30,6 @@ import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.JythonUtil.Param;
 import org.autoplot.jythonsupport.ui.Util;
 import org.autoplot.scriptconsole.DumpRteExceptionHandler;
-import org.autoplot.scriptconsole.ExitExceptionHandler;
 import org.autoplot.scriptconsole.LoggingOutputStream;
 import org.das2.graph.DasCanvas;
 import org.das2.util.DasPNGConstants;
@@ -216,6 +215,7 @@ public class ScriptGUIServlet extends HttpServlet {
                 if ( parms.isEmpty() ) {
                     out.println("script has no parameters.");
                 }
+                out.println("<input type='hidden' name='script' value='"+scriptURI+"'>");
                 out.println("<input type='submit' value='Submit'>");
                 out.println("</form>");
                 out.println( "</td>");

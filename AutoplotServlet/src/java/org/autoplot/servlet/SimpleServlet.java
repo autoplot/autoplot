@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.servlet;
 
 import org.autoplot.RenderType;
@@ -61,7 +58,6 @@ import org.autoplot.datasource.DataSetSelectorSupport;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
-import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
@@ -82,7 +78,7 @@ import org.das2.qds.ops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
-    public static final String version= "v20190927.1237";
+    public static final String version= "v20190929.0729";
 
     static FileHandler handler;
 
