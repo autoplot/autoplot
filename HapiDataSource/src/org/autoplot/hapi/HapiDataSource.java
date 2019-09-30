@@ -2415,6 +2415,23 @@ public final class HapiDataSource extends AbstractDataSource {
         }
         return pds;
     }
+    
+    /**
+     * copy label and units from the ParamDescription to the QDataSet.
+     * @param mpds the dataset
+     * @param pds1 the parameter description
+     * @return the data, possibly a copy, with the metadata.
+     */
+    private MutablePropertyDataSet copyProperties( QDataSet mpds, ParamDescription pds1 ) {
+        MutablePropertyDataSet ds= Ops.putProperty( mpds, QDataSet.NAME, Ops.safeName(pds1.name) );
+        ds= Ops.putProperty( ds, QDataSet.LABEL, pds1.label );
+        ds= Ops.putProperty( ds, QDataSet.TITLE, pds1.description );
+        ds= Ops.putProperty( ds, QDataSet.UNITS, pds1.units );
+        if ( pds1.hasFill ) {
+            ds= Ops.putProperty( ds, QDataSet.FILL_VALUE, pds1.fillValue );
+        }
+        return ds;
+    }
 
     /**
      * Reform bundle into typical QDataSet schemes.  For example, a rank 2 bundle 
@@ -2433,29 +2450,14 @@ public final class HapiDataSource extends AbstractDataSource {
         if ( ds.length(0)==2 ) {
             ds= Ops.copy( Ops.slice1( ds, 1 ) );
             ds= Ops.putProperty( ds, QDataSet.DEPEND_0, depend0 );
-            ds= Ops.putProperty( ds, QDataSet.NAME, Ops.safeName(pds[1].name) );
-            ds= Ops.putProperty( ds, QDataSet.LABEL, pds[1].label );
-            ds= Ops.putProperty( ds, QDataSet.TITLE, pds[1].description );
-            ds= Ops.putProperty( ds, QDataSet.UNITS, pds[1].units );
-            if ( pds[1].hasFill ) {
-                ds= Ops.putProperty( ds, QDataSet.FILL_VALUE, pds[1].fillValue );
-            }
+            ds= copyProperties( ds, pds[1] );
         } else if ( pds.length==2 ) {
             ds= Ops.copy( Ops.trim1( ds, 1, ds.length(0) ) );
             if ( pds[1].size.length>1 ) {
                 ds= Ops.reform( ds, ds.length(), pds[1].size );
             }
             ds= Ops.putProperty( ds, QDataSet.DEPEND_0, depend0 );
-            ds= Ops.putProperty( ds, QDataSet.NAME, Ops.safeName(pds[1].name) );
-            ds= Ops.putProperty( ds, QDataSet.LABEL, pds[1].label );
-            ds= Ops.putProperty( ds, QDataSet.TITLE, pds[1].description );
-            ds= Ops.putProperty( ds, QDataSet.UNITS, pds[1].units );
-            if ( pds[1].hasFill ) {
-                ds= Ops.putProperty( ds, QDataSet.FILL_VALUE, pds[1].fillValue );
-            }
-            //if ( pds[1].depend1!=null ) {
-            //    ds= Ops.putProperty( ds, QDataSet.DEPEND_1, pds[1].depend1 );
-            //}
+            ds= copyProperties( ds, pds[1] );
             if ( pds[1].depend!=null ) {
                 for ( int j=0; j<pds[1].size.length; j++ ) {
                     ds= Ops.putProperty( ds, "DEPEND_"+(j+1), pds[1].depend[j] );
@@ -2521,10 +2523,11 @@ public final class HapiDataSource extends AbstractDataSource {
             }
             
             int start= 1;
-            WritableDataSet wds= Ops.copy( Ops.trim1( ds, start, start+length1 ) );
+            MutablePropertyDataSet wds= Ops.copy( Ops.trim1( ds, start, start+length1 ) );
             start= start+length1;
             wds.putProperty( QDataSet.DEPEND_0, depend0 );
             wds.putProperty( QDataSet.BUNDLE_1, sdsbs[1].getDataSet() );
+            wds= copyProperties( wds, pds[1] );
             
             for ( int i=1; i<pds.length; i++ ) { // only works for rank2!!!
                 if ( pds[i].dependName!=null ) {
@@ -2537,9 +2540,10 @@ public final class HapiDataSource extends AbstractDataSource {
                                 }
                             }
                             if ( k<pds.length ) {
-                                WritableDataSet depds= Ops.copy( Ops.trim1( ds, start, start+length1 ) );
+                                MutablePropertyDataSet depds= Ops.copy( Ops.trim1( ds, start, start+length1 ) );
                                 depds.putProperty( QDataSet.DEPEND_0, depend0 );
                                 depds.putProperty( QDataSet.BUNDLE_1, sdsbs[k].getDataSet() );    
+                                depds= copyProperties( depds, pds[k] );
                                 start= start+length1;
                                 wds.putProperty( "DEPEND_"+i, depds );
                             }
