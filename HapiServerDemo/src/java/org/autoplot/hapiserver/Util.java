@@ -311,12 +311,12 @@ public class Util {
                         indexMap1[c]= indexMap[k]+l;
                         c++;
                     }
-                    if ( k<lengths.length-1 ) {
-                        throw new IllegalArgumentException("not properly implemented");
-                    }
                 }
             }
             indexMap= indexMap1;
+        }
+        if ( indexMap[indexMap.length-1]==0 ) {
+            throw new IllegalArgumentException("last index of index map wasn't set--server implementation error");
         }
 
         jsonParameters= newParameters;
