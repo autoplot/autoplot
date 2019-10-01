@@ -39,7 +39,7 @@
         </j2se>
 
         <jar href="AutoplotVolatile.jar" />
-        <jar href="AutoplotStable.20181101.jar" />
+        <jar href="AutoplotStable.20191001.jar" />
 
         <property name="jnlp.packEnabled" value="true"/>
 
