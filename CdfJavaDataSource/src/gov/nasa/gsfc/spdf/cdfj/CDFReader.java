@@ -14,6 +14,9 @@ public class CDFReader extends GenericReader {
     CDFVector vector;
     public CDFReader() {
     }
+    
+    public static String version= "20191001";
+    
     /**
      * Constructs a reader for the given CDF file.
      */
