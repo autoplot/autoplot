@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Histogram of Poisson distribution.
+        <p><small>Bug which got into the production branch, where vap load sometimes is not correctly sized, is fixed.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-09-23 r24176):</p>
+        <p>Bugfixes (2019-10-01 r24191):</p>
         <ul>
+            <li>2206: CDF library initialization sped up, noticeable when there are many variables.
             <li>2193: handle redirects, put in code for github.com to get vaps from github rawusercontent website.
             <li>2202: screen size of loaded .vap is often incorrect.
         </ul>
@@ -56,6 +57,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add pointAtOffset to annotation command
             <li>696: support for HAPI 3.0 references.
             <li>IFFT takes Real and Complex spectra to make a waveform.
             <li>ScriptGUIServlet allows script to be run, creating web GUI for parameters and displaying the output.
