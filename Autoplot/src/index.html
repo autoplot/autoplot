@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2019-10-01 r24191):</p>
         <ul>
+            <li>2206: reduce=T supported in aggregation, before high rank datasets were not reduced.
             <li>2206: CDF library initialization sped up, noticeable when there are many variables.
             <li>2193: handle redirects, put in code for github.com to get vaps from github rawusercontent website.
             <li>2202: screen size of loaded .vap is often incorrect.
@@ -57,6 +58,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>DDataSet gets addValues(qds) so that high-rank datasets can be accumulated quickly.
+            <li>new signature for JNLP release.
             <li>add pointAtOffset to annotation command
             <li>696: support for HAPI 3.0 references.
             <li>IFFT takes Real and Complex spectra to make a waveform.
