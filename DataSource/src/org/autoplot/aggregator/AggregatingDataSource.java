@@ -645,7 +645,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                                         result = BufferDataSet.copy(ds1);
                                         int newSize= result.length()*ss.length;
                                         if ( newSize<Integer.MAX_VALUE/2 ) { 
-                                            ((BufferDataSet)result).grow((int)(newSize*11./10));  //110%
+                                            ((BufferDataSet)result).grow((int)(newSize*1.10));  //110%
                                         } else {
                                             ((BufferDataSet)result).grow(newSize);
                                         }
@@ -659,7 +659,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                                         result = ArrayDataSet.copy(ds1);
                                         int newSize= result.length()*ss.length;
                                         if ( newSize<Integer.MAX_VALUE/2) {
-                                            ((ArrayDataSet)result).grow((int)(newSize*11./10));  //110%
+                                            ((ArrayDataSet)result).grow((int)(newSize*1.10));  //110%
                                         } else {
                                             ((ArrayDataSet)result).grow(newSize);
                                         }
