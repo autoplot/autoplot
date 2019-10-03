@@ -590,7 +590,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         }
                     }
 
-                    if ( reduce && ds1.rank()<3 && SemanticOps.isTimeSeries(ds1) ) {
+                    if ( reduce && SemanticOps.isTimeSeries(ds1) ) {
                         QDataSet dep0= (QDataSet) ds1.property(QDataSet.DEPEND_0);
                         if ( dep0!=null ) {
                             if ( DataSetUtil.isMonotonic(dep0) ) {
@@ -601,8 +601,10 @@ public final class AggregatingDataSource extends AbstractDataSource {
                                 imax= imax+1;
                                 if ( imin>0 || imax<ds1.length() ) {
                                     ds1= ds1.trim(imin,imax);
-                                }
-                                logger.log(Level.FINER, "dataset trimmed to {0}", ds1);
+                                    logger.log(Level.FINER, "dataset trimmed to {0}", ds1);
+                                } else {
+                                    logger.log(Level.FINER, "dataset not trimmed" );
+                                }   
                             }
                             logger.fine("reducing resolution to save memory");
                             mon1.setProgressMessage("reducing resolution");
