@@ -831,6 +831,9 @@ public class ScriptPanelSupport {
                                         try {
                                             clearAnnotations();
                                             annotationsSupport.annotateChars( i0, i1, "programCounter", "pc", interp );
+                                            
+                                            logger.finest("add Netbeans breakpoint here to debug jython code line-by-line without GDB");
+                                            
                                             interp.exec(JythonRefactory.fixImports(s));
                                         } catch (PyException ex) {
                                             throw ex;
@@ -908,7 +911,7 @@ public class ScriptPanelSupport {
                                             }
                                         } else {
                                             try (InputStream in = new ByteArrayInputStream( code.getBytes() )) {
-                                                interp.execfile(JythonRefactory.fixImports(in),file.getName());
+                                                interp.execfile(JythonRefactory.fixImports(in,file.getName()),file.getName());
                                             }
                                         }
                                     } else {
