@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Bug which got into the production branch, where vap load sometimes is not correctly sized, is fixed.
+        <p><small>HAPI 3.0 will support time-varying ytags.  Bottom panel is same data from CDAWeb.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-10-01 r24191):</p>
+        <p>Bugfixes (2019-10-04 r24191):</p>
         <ul>
+            <li>2202: reset method needs to resize Autoplot GUI as well to support scripts.
             <li>2206: reduce=T supported in aggregation, before high rank datasets were not reduced.
             <li>2206: CDF library initialization sped up, noticeable when there are many variables.
             <li>2193: handle redirects, put in code for github.com to get vaps from github rawusercontent website.
