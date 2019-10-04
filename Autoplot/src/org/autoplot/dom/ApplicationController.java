@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -68,6 +69,7 @@ import org.jdesktop.beansbinding.Bindings;
 import org.jdesktop.beansbinding.Converter;
 import org.jdesktop.beansbinding.Property;
 import org.autoplot.ApplicationModel;
+import org.autoplot.AutoplotUI;
 import org.autoplot.AutoplotUtil;
 import org.autoplot.ColumnColumnConnectorMouseModule;
 import org.autoplot.GuiSupport;
@@ -2132,6 +2134,13 @@ public class ApplicationController extends DomNodeController implements RunLater
         logger.finer("got locks to reset application...");
 
         try {
+            
+            { // this is probably midguided.  For instance, if the canvas is torn off then this won't work.
+                Window w= SwingUtilities.getWindowAncestor( application.getCanvases(0).getController().getDasCanvas() );
+                if ( w instanceof AutoplotUI ) {
+                    ((AutoplotUI)w).resizeForCanvasSize( application.getOptions().getWidth(), application.getOptions().getHeight()); 
+                }
+            }
             
             // reset removes all annotations
             List<Annotation> annos= Arrays.asList( application.getAnnotations() );
