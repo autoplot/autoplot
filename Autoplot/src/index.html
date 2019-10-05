@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2019-10-04 r24191):</p>
         <ul>
+            <li>2212: New Das2Stream parser did not handle Voyager peaks-and-averages properly.
             <li>2202: reset method needs to resize Autoplot GUI as well to support scripts.
             <li>2206: reduce=T supported in aggregation, before high rank datasets were not reduced.
             <li>2206: CDF library initialization sped up, noticeable when there are many variables.
@@ -59,6 +60,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>BinaryDataSource editor now shows the bytes of the first record.
             <li>DDataSet gets addValues(qds) so that high-rank datasets can be accumulated quickly.
             <li>new signature for JNLP release.
             <li>add pointAtOffset to annotation command
