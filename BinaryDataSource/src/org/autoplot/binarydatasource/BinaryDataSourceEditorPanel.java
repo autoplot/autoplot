@@ -70,6 +70,10 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
         jTable2.getTableHeader().setReorderingAllowed(false);
         jTable3.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jTable3.getTableHeader().setReorderingAllowed(false);
+        for ( int i=0; i<jTable2.getColumnCount(); i++ ) {
+            jTable2.getColumnModel().getColumn(i).setPreferredWidth( jTable2.getFont().getSize() * 3 );
+            jTable2.getColumnModel().getColumn(i).setHeaderValue( "b"+i );
+        }
 
     }
 
@@ -263,7 +267,7 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
         Map<String,String> newParams= new LinkedHashMap<>();
         String byteOffset= params.get("byteOffset");
         if ( byteOffset!=null ) newParams.put( "byteOffset", byteOffset );
-        newParams.put( "byteLength", "40" );
+        newParams.put( "byteLength", "100" );
         split.params= URISplit.formatParams(newParams);
         if ( split.params!=null && split.params.length()==0 ) split.params= null;
         String suriBytes= URISplit.format(split);
@@ -277,7 +281,7 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
 
             @Override
             public int getColumnCount() {
-                return 30;
+                return Math.min(120,ds2.length());
             }
 
             @Override
@@ -294,6 +298,7 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
         int n=jTable2.getColumnModel().getColumnCount();
         for ( int i=0; i<n; i++ ) {
             jTable2.getColumnModel().getColumn(i).setPreferredWidth( jTable2.getFont().getSize() * 3 );
+            jTable2.getColumnModel().getColumn(i).setHeaderValue( "b"+i );
         }
 
     }
