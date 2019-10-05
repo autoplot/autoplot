@@ -8,7 +8,6 @@
 package org.autoplot.binarydatasource;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -30,25 +29,15 @@ import java.lang.Short; // because of Short object in this package.
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.InputMap;
 import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 import javax.swing.text.BadLocationException;
 import org.das2.util.filesystem.FileSystem;
 import org.autoplot.datasource.URISplit;
-import org.das2.qds.buffer.UByteDataSet;
-import org.das2.qds.ops.Ops;
 
 /**
  *
@@ -77,8 +66,10 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
                 }
             }
         });
-
-        jTable1.getTableHeader().setReorderingAllowed(false);
+        jTable2.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jTable2.getTableHeader().setReorderingAllowed(false);
+        jTable3.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jTable3.getTableHeader().setReorderingAllowed(false);
 
     }
 
@@ -97,9 +88,7 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
         setByteOffsetMenuItem = new javax.swing.JMenuItem();
         setRecOffsetMenuItem = new javax.swing.JMenuItem();
         setDep0Offset = new javax.swing.JMenuItem();
-        jSplitPane1 = new javax.swing.JSplitPane();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jSplitPane2 = new javax.swing.JSplitPane();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
@@ -108,6 +97,8 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
         infoLabel = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jTable3 = new javax.swing.JTable();
 
         setByteOffsetMenuItem.setText("Set Byte Offset");
         setByteOffsetMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -137,23 +128,9 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
 
         setPreferredSize(new java.awt.Dimension(800, 600));
 
-        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        jScrollPane2.setViewportView(jTable1);
-
-        jSplitPane1.setBottomComponent(jScrollPane2);
+        jScrollPane3.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
         jTable2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -207,7 +184,7 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane3)
+            .add(jScrollPane3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
                 .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 241, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -216,87 +193,110 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
                         .add(jButton1)
                         .add(0, 0, Short.MAX_VALUE))
                     .add(infoLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE))
+                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
+            .add(jPanel1Layout.createSequentialGroup()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(jButton1)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(infoLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .add(jScrollPane1))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 38, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(infoLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .add(12, 12, 12))
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .add(12, 12, 12)
+                .add(jScrollPane3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 68, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
-        jSplitPane1.setLeftComponent(jPanel1);
+        jSplitPane2.setLeftComponent(jPanel1);
+
+        jScrollPane4.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+        jTable3.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane4.setViewportView(jTable3);
+
+        jSplitPane2.setRightComponent(jScrollPane4);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jSplitPane1)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(jSplitPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 723, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(0, 0, Short.MAX_VALUE))
+            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
-            String suri1 = getURI();
-            DataSource dss = DataSetURI.getDataSource(suri1);
-            QDataSet ds= dss.getDataSet( new NullProgressMonitor() );
-            TableModel model= new QDataSetTableModel(ds);
-            this.jTable1.setModel(model);
-            URISplit split = URISplit.parse(suri1);
-            Map<String,String> params= paramsTextArea1.getParams();
-            Map<String,String> newParams= new LinkedHashMap<>();
-            String byteOffset= params.get("byteOffset");
-            if ( byteOffset!=null ) newParams.put( "byteOffset", byteOffset );
-            newParams.put( "byteLength", "40" );
-            split.params= URISplit.formatParams(newParams);
-            if ( split.params!=null && split.params.length()==0 ) split.params= null;
-            String suriBytes= URISplit.format(split);
-            DataSource dss2 = DataSetURI.getDataSource(suriBytes);
-            final QDataSet ds2= dss2.getDataSet( new NullProgressMonitor() );
-            TableModel model2= new AbstractTableModel() {
-                @Override
-                public int getRowCount() {
-                    return 1;
-                }
-
-                @Override
-                public int getColumnCount() {
-                    return 30;
-                }
-
-                @Override
-                public Object getValueAt(int rowIndex, int columnIndex) {
-                    int v= (int)ds2.value(columnIndex);
-                    if ( v>=32 && v<=125 ) {
-                        return Character.toString((char)v);
-                    } else {
-                        return String.format( "%2X", v );
-                    }
-                }
-            };
-            this.jTable2.setModel(model2);                    
-
+            update();
         } catch (Exception ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void update() throws Exception {
+        String suri1 = getURI();
+        DataSource dss = DataSetURI.getDataSource(suri1);
+        QDataSet ds= dss.getDataSet( new NullProgressMonitor() );
+        TableModel model= new QDataSetTableModel(ds);
+        this.jTable3.setModel(model);
+        URISplit split = URISplit.parse(suri1);
+        Map<String,String> params= paramsTextArea1.getParams();
+        Map<String,String> newParams= new LinkedHashMap<>();
+        String byteOffset= params.get("byteOffset");
+        if ( byteOffset!=null ) newParams.put( "byteOffset", byteOffset );
+        newParams.put( "byteLength", "40" );
+        split.params= URISplit.formatParams(newParams);
+        if ( split.params!=null && split.params.length()==0 ) split.params= null;
+        String suriBytes= URISplit.format(split);
+        DataSource dss2 = DataSetURI.getDataSource(suriBytes);
+        final QDataSet ds2= dss2.getDataSet( new NullProgressMonitor() );
+        TableModel model2= new AbstractTableModel() {
+            @Override
+            public int getRowCount() {
+                return 1;
+            }
+
+            @Override
+            public int getColumnCount() {
+                return 30;
+            }
+
+            @Override
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                int v= (int)ds2.value(columnIndex);
+                if ( v>=32 && v<=125 ) {
+                    return Character.toString((char)v);
+                } else {
+                    return String.format( "%2X", v );
+                }
+            }
+        };
+        this.jTable2.setModel(model2);                    
+        int n=jTable2.getColumnModel().getColumnCount();
+        for ( int i=0; i<n; i++ ) {
+            jTable2.getColumnModel().getColumn(i).setPreferredWidth( jTable2.getFont().getSize() * 3 );
+        }
+
+    }
     private void jTable2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable2MouseClicked
         jPopupMenu1.show( (Component)evt.getSource(), evt.getX(), evt.getY() );
     }//GEN-LAST:event_jTable2MouseClicked
@@ -389,11 +389,11 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
     public javax.swing.JPanel jPanel1;
     public javax.swing.JPopupMenu jPopupMenu1;
     public javax.swing.JScrollPane jScrollPane1;
-    public javax.swing.JScrollPane jScrollPane2;
     public javax.swing.JScrollPane jScrollPane3;
-    public javax.swing.JSplitPane jSplitPane1;
-    public javax.swing.JTable jTable1;
+    public javax.swing.JScrollPane jScrollPane4;
+    public javax.swing.JSplitPane jSplitPane2;
     public javax.swing.JTable jTable2;
+    public javax.swing.JTable jTable3;
     public org.autoplot.datasource.ui.ParamsTextArea paramsTextArea1;
     public javax.swing.JMenuItem setByteOffsetMenuItem;
     public javax.swing.JMenuItem setDep0Offset;
