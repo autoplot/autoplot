@@ -1056,6 +1056,7 @@ public class PlotElementController extends DomNodeController {
                         try {
                             QDataSet fillDs2 = fillDs;
                             if ( comp.length()>0 ) fillDs2= processDataSet( comp, fillDs2 );
+                            if ( fillDs2==null ) throw new NullPointerException("operations result in null: "+comp);
                             String s= resolveRenderType( fillDs2 );
                             int i= s.indexOf('>');
                             RenderType renderType= RenderType.valueOf(s.substring(0,i));
