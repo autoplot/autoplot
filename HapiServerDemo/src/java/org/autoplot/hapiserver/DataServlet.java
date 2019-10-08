@@ -200,7 +200,7 @@ public class DataServlet extends HttpServlet {
         
         if ( dataFiles==null ) {
             try {
-                logger.log(Level.FINER, "data files is null at {0} ms.", System.currentTimeMillis()-t0);
+               logger.log(Level.FINER, "data files is null at {0} ms.", System.currentTimeMillis()-t0);
                 dsiter= checkAutoplotSource( id, dr, allowStream );
                 logger.log(Level.FINER, "done checkAutoplotSource at {0} ms.", System.currentTimeMillis()-t0);
                 if ( dsiter==null ) {
@@ -213,7 +213,7 @@ public class DataServlet extends HttpServlet {
                             logger.log(Level.FINER, "noStream demo shows without streaming" );
                             dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/0B000800408DD710.$Y$m$d.d2s", dr, false ); // allow Autoplot to select
                         } else {
-                            throw new IllegalArgumentException("bad id: "+id+", does not exist: "+dataFile );
+                            throw new IllegalArgumentException("bad id: "+id+", data file does not exist: "+dataFile );
                         }
                     }
                 } else {

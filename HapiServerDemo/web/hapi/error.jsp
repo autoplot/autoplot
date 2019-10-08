@@ -2,7 +2,12 @@
 
 Message:
 <%=exception.getMessage()%>
-
+<%
+    if ( exception.getCause()!=null ) {
+        out.println( "Caused by: " );
+        out.println( exception.getCause().getMessage() ); 
+    }
+%>
 StackTrace:
 <%
 	StringWriter stringWriter = new StringWriter();
