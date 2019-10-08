@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>HAPI 3.0 will support time-varying ytags.  Bottom panel is same data from CDAWeb.
+        <p><small>Cloud cover.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-10-04 r24191):</p>
+        <p>Bugfixes (2019-10-08 r24222):</p>
         <ul>
+            <li>mute messages at command line startup about the Help system, which is not used anyway.
+            <li>BIN_MAX and BIN_MIN are correlative properties, and slice1 should slice them.
+            <li>odd bug where .vap files wouldn't load from GitHubFileSystem during testing resolved by loading into memory.
             <li>2212: New Das2Stream parser did not handle Voyager peaks-and-averages properly.
             <li>2202: reset method needs to resize Autoplot GUI as well to support scripts.
             <li>2206: reduce=T supported in aggregation, before high rank datasets were not reduced.
