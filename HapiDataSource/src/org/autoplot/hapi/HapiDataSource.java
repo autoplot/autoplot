@@ -8,11 +8,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.InterruptedIOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -51,7 +48,6 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystemUtil;
-import org.das2.util.filesystem.HtmlUtil;
 import org.das2.util.filesystem.HttpUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -65,14 +61,12 @@ import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.das2.qds.SparseDataSetBuilder;
-import org.das2.qds.WritableDataSet;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DefaultTimeSeriesBrowse;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.Caching;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
-import org.das2.datum.DatumUtil;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.fsm.FileStorageModel;
@@ -80,7 +74,6 @@ import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
 import org.das2.qstream.TransferType;
 import org.das2.util.filesystem.FileSystem;
-import org.das2.util.filesystem.FileSystemSettings;
 import org.das2.util.monitor.CancelledOperationException;
 
 /**
@@ -2351,11 +2344,7 @@ public final class HapiDataSource extends AbstractDataSource {
                             pds[i].dependName= new String[ja.length()];
                             for ( int j=0; j<ja.length(); j++ ) {
                                 JSONObject bins= ja.getJSONObject(j);
-                                if ( bins.has( HapiUtil.KEY_PARAMETER ) ) {  // deprecated, see binsParameter below.  TODO: revisit this.
-                                    int n= pds[i].nFields;
-                                    pds[i].depend[j]= Ops.findgen(n);
-                                    pds[i].dependName[j]= bins.getString( HapiUtil.KEY_PARAMETER );
-                                } else if ( bins.has( HapiUtil.KEY_CENTERS ) ) {
+                                if ( bins.has( HapiUtil.KEY_CENTERS ) ) {
                                     // rfe696: support time-varying DEPEND_1
                                     Object o1= bins.get( HapiUtil.KEY_CENTERS );
                                     if ( o1 instanceof String ) {
@@ -2374,6 +2363,11 @@ public final class HapiDataSource extends AbstractDataSource {
                                         pds[i].depend[j]= dep;
                                     }
                                     pds[i].renderType= QDataSet.VALUE_RENDER_TYPE_NNSPECTROGRAM;                                    
+                                } else if ( bins.has( HapiUtil.KEY_PARAMETER ) ) {  // deprecated, see binsParameter below.  TODO: revisit this.
+                                    logger.info("parameter found within bins, which is deprecated.");
+                                    int n= pds[i].nFields;
+                                    pds[i].depend[j]= Ops.findgen(n);
+                                    pds[i].dependName[j]= bins.getString( HapiUtil.KEY_PARAMETER );
                                 } else {
                                     int n= pds[i].size[j];
                                     pds[i].depend[j]= Ops.findgen(n);
