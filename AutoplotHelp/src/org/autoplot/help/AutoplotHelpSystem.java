@@ -58,14 +58,14 @@ public class AutoplotHelpSystem {
             hsurl= getClass().getResource("/helpfiles/autoplotHelp.hs");
             mainHS = new HelpSet(null, hsurl);
         } catch ( Exception ex ) {
-            log.warning("Error loading helpset " + "/helpfiles/autoplotHelp.hs" );
+            log.fine("Error loading helpset " + "/helpfiles/autoplotHelp.hs" );
         }
         // Now find and merge any additional helpsets that are present
         Enumeration<URL> hsurls=null;
         try {
             hsurls = getClass().getClassLoader().getResources("META-INF/helpsets.txt");
         } catch (IOException ex) {
-            log.warning(ex.toString());
+            log.fine(ex.toString());
         }
 
         while( hsurls!=null && hsurls.hasMoreElements()) {
@@ -92,18 +92,18 @@ public class AutoplotHelpSystem {
                             }
                             mainHS.add(new HelpSet(null, hsurl1));
                         } catch ( MalformedURLException | HelpSetException ex ) {
-                            log.log(Level.WARNING, "Error loading helpset {0}", hsurl1);
+                            log.log(Level.FINE, "Error loading helpset {0}", hsurl1);
                         }
                     }
                     spec= read.readLine();
                 }
             } catch ( IOException ex ) {
-                log.warning(ex.toString());
+                log.fine(ex.toString());
             } finally {  // make sure stream is closed
                 try {
                     if (read != null) read.close();
                 } catch(IOException ex) {
-                    log.warning(ex.toString());
+                    log.fine(ex.toString());
                 }
             }
 
