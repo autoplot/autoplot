@@ -1226,8 +1226,13 @@ public class BatchMaster extends javax.swing.JPanel {
             
             jo.put( "results", ja );
              
-            String param1= param1NameCB.getSelectedItem().toString().trim();
-            String param2= param2NameCB.getSelectedItem().toString().trim();
+            
+            String param1= param1NameCB.getSelectedItem()!=null ? 
+                    param1NameCB.getSelectedItem().toString().trim() :
+                    "";
+            String param2= param2NameCB.getSelectedItem()!=null ?
+                    param2NameCB.getSelectedItem().toString().trim() :
+                    "";
             
             JSONArray paramsJson= new JSONArray();
             paramsJson.put(0,param1);
@@ -1249,8 +1254,13 @@ public class BatchMaster extends javax.swing.JPanel {
                     }
                     monitor.setProgressMessage(f1);
                     monitor.setTaskProgress(monitor.getTaskProgress()+1);
+
+                    if ( f1.trim().length()==0 ) {
+                        i1++;
+                        continue;
+                    }
+
                     jobs.get(i1).setIcon(working);
-                    if ( f1.trim().length()==0 ) continue;
                     //interp.set( "monitor", monitor.getSubtaskMonitor(f1) );
                     interp.set( "monitor", new NullProgressMonitor() {
                         @Override
@@ -1279,7 +1289,7 @@ public class BatchMaster extends javax.swing.JPanel {
                             }
                             jobs.get(i1).setIcon(okay);
                             jobs.get(i1).setToolTipText(null);
-                        } catch ( Exception ex ) {
+                        } catch ( IOException | JSONException ex ) {
                             runResults.put("executionTime", System.currentTimeMillis()-t0);                            
                             String msg= ex.toString();
                             runResults.put("result",msg);
