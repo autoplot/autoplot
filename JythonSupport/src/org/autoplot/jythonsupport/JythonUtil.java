@@ -378,7 +378,7 @@ public class JythonUtil {
         String vers= "";
         
         // This is the version that Autoplot would like to find, and should be found within the Java class path.
-        double currentVersion= 1.60;  //rfe320 improved getParam support.
+        double currentVersion= 1.90;  //rfe320 improved getParam support.
                 
         if ( ff4.exists() ) {
             try ( BufferedReader r= new BufferedReader( new FileReader( ff4 ) ) ) {
@@ -504,6 +504,14 @@ public class JythonUtil {
         public Object value; // the value if available, null means not present.
         public String doc;
         public List<Object> enums;  // the allowed values
+
+        /**
+         * constraints for the value, such as:<ul>
+         * <li>'labels':['RBSP-A','RBSP-B'] labels for each enum.
+         * </ul>
+         */
+        public Map<Object,Object> constraints;
+        
         /**
          * The parameter type:<ul>
          * <li>T (TimeRange), 
@@ -517,6 +525,7 @@ public class JythonUtil {
          * </ul>
          */
         public char type;
+        
         @Override
         public String toString() {
             return name+"="+deft;
@@ -783,6 +792,33 @@ public class JythonUtil {
         }
     }
 
+    /**
+     * return true if the call is a setScriptTitle or setScriptDescription call.
+     * setScriptTitle( 'Batch Master Demo' )
+     * @param o
+     * @param variableNames
+     * @return 
+     */
+    private static boolean isSetScriptCall( stmtType o, HashSet<String> variableNames ) {
+        if ( o instanceof org.python.parser.ast.Expr ) {
+            org.python.parser.ast.Expr expr= (org.python.parser.ast.Expr)o;
+            if ( expr.value instanceof Call ) {
+                Call c= ((Call)expr.value);
+                if ( c.func instanceof Name ) {
+                    Name n= (Name)c.func;
+                    if ( n.id.equals("setScriptTitle") 
+                            || n.id.equals("setScriptDescription") 
+                            || n.id.equals("setScriptLabel" )
+                            || n.id.equals("setScriptIcon" )) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            return false;
+        }
+        return false;
+    }
      
      /**
       * return true if we can include this in the script without a huge performance penalty.
@@ -967,6 +1003,14 @@ public class JythonUtil {
                              currentLine= acceptLine;
                          }
                      }
+                 } else if ( isSetScriptCall( o, variableNames ) ) {
+                     if ( acceptLine<0 ) {
+                         acceptLine= (o).beginLine;
+                         for ( int i=currentLine+1; i<acceptLine; i++ ) {
+                             result.append("\n");
+                             currentLine= acceptLine;
+                         }
+                     }
                  } else {
                      if ( acceptLine>-1 ) {
                          int thisLine= (o).beginLine;
@@ -1063,7 +1107,12 @@ public class JythonUtil {
              String line= ss[i];
              int ich= line.indexOf('#');
              if ( ich>-1 ) line= line.substring(0,ich);
-             if ( line.contains("getParam") ) lastLine= i+1;
+             if ( line.contains("getParam") ) {
+                 lastLine= i+1;
+             } else if ( line.contains("setScriptTitle") ) {
+                 lastLine= i+1;
+             }
+             
          }
          
          if ( lastLine==-1 ) {
@@ -1109,7 +1158,7 @@ public class JythonUtil {
       * @throws PySyntaxError 
       */
      public static List<Param> getGetParams( Reader reader ) throws IOException, PySyntaxError {
-        return getGetParams( readScript(reader) );
+        return getGetParams( null, readScript(reader),new HashMap<String, String>() );
      }
      
      /**
@@ -1261,7 +1310,8 @@ public class JythonUtil {
         
         List<Param> result= new ArrayList();
         for ( int i=0; i<sort.__len__(); i++ ) {
-            PyList oo= (PyList) interp.eval( "autoplot._paramMap['"+(String)sort.get(i)+"']" );
+            String theParamName= (String)sort.get(i);
+            PyList oo= (PyList) interp.eval( "autoplot._paramMap['"+theParamName+"']" );
             if ( altWhy ) {
                  oo= (PyList) interp.eval( "_paramMap['"+(String)sort.get(i)+"']" );
             }
@@ -1278,6 +1328,28 @@ public class JythonUtil {
                     enums.add(j,pyList.get(j));
                 }
                 p.enums= enums;                
+            } else if ( oo.__getitem__(3) instanceof PyDictionary ) {
+                PyDictionary pyDict= ((PyDictionary)oo.__getitem__(3));
+                PyObject enumsObject= pyDict.pop( new PyString("enum") );
+                Map<Object,Object> constraints= new HashMap<>();
+                if ( enumsObject!=null && enumsObject instanceof PyList ) {
+                    PyList enumsList= (PyList)enumsObject;
+                    List<Object> enums= new ArrayList(enumsList.size());
+                    for ( int j=0; j<enumsList.size(); j++ ) {
+                        enums.add(j,enumsList.get(j));
+                    }
+                    p.enums= enums;
+                    PyObject labelsObject= pyDict.pop( new PyString("labels") );
+                    if ( labelsObject!=null && labelsObject instanceof PyList ) {
+                        PyList labelsList= (PyList)labelsObject;
+                        List<Object> labels= new ArrayList(labelsList.size());
+                        for ( int j=0; j<labelsList.size(); j++ ) {
+                            labels.add(j,labelsList.get(j));
+                        }
+                        constraints.put( "labels", labels );
+                    }
+                }
+                p.constraints= constraints;
             }
             p.value= params==null ? null : params.get(p.name);
             
