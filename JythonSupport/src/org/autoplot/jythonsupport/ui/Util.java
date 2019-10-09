@@ -64,7 +64,7 @@ public class Util {
      * @throws IOException 
      */
     protected static Map<String,JythonUtil.Param> getParams( String src, ProgressMonitor mon ) throws IOException {
-        return getParams( src, new HashMap(), mon );
+        return getParams( null, src, new HashMap(), mon );
     }
     
     protected static Map<String,JythonUtil.Param> getParams( String src, Map<String,String> params, ProgressMonitor mon ) throws IOException {
