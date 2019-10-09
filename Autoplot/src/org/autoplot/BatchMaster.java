@@ -1100,6 +1100,8 @@ public class BatchMaster extends javax.swing.JPanel {
      * @throws IOException 
      */
     private String doWrite( String f1, String f2 ) throws IOException {
+        f1= f1.replaceAll("/", "_");
+        f2= f2.replaceAll("/", "_");
         if ( writeCheckBox.isSelected() ) {
             String template= writeFilenameCB.getSelectedItem().toString();
             String[] ss= template.split("\\$x",-2);
@@ -1338,7 +1340,7 @@ public class BatchMaster extends javax.swing.JPanel {
                             jobs.get(i1).setToolTipText(null);
                         }
                     }
-                } catch (IOException | IllegalArgumentException | JSONException ex) {
+                } catch (IOException | RuntimeException | JSONException ex) {
                     Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
                     jobs.get(i1).setIcon(prob);
                     jobs.get(i1).setToolTipText(ex.toString());
