@@ -5,98 +5,105 @@
  */
 package org.autoplot;
 
+import java.awt.AWTPermission;
 import java.io.FileDescriptor;
 import java.net.InetAddress;
 import java.security.Permission;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.autoplot.datasource.AutoplotSettings;
+import org.das2.util.LoggerManager;
 
 /**
  *
  * @author jbf
  */
 public class Sandbox {
+
+    private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.security");        
     
     public static SecurityManager getSandboxManager() {
+        
         SecurityManager limitedSecurityManager = new SecurityManager() {
             @Override
             public ThreadGroup getThreadGroup() {
-                return super.getThreadGroup(); //To change body of generated methods, choose Tools | Templates.
+                return super.getThreadGroup(); 
             }
 
             @Override
             public void checkSecurityAccess(String target) {
-                super.checkSecurityAccess(target); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkSecurityAccess(target)");
             }
 
             @Override
             public void checkSetFactory() {
-                super.checkSetFactory(); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkSetFactory()");
             }
 
             @Override
             public void checkPackageDefinition(String pkg) {
-                super.checkPackageDefinition(pkg); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkPackageDefinition(pkg)");
             }
 
 
             @Override
             public void checkPrintJobAccess() {
-                super.checkPrintJobAccess(); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkPrintJobAccess" );
             }
 
             @Override
             public void checkPropertyAccess(String key) {
-                super.checkPropertyAccess(key); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkPropertyAccess" );
             }
 
             @Override
             public void checkPropertiesAccess() {
-                super.checkPropertiesAccess(); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkPropertiesAccess()");
             }
 
             @Override
             public void checkMulticast(InetAddress maddr) {
-                super.checkMulticast(maddr); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkMulticast(maddr)");
             }
 
             @Override
             public void checkAccept(String host, int port) {
-                super.checkAccept(host, port); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkAccept(host, port)"); 
             }
 
             @Override
             public void checkListen(int port) {
-                super.checkListen(port); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkListen(port)");
             }
 
             @Override
             public void checkConnect(String host, int port, Object context) {
-                super.checkConnect(host, port, context); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkConnect(host, port, context)");
             }
 
             @Override
             public void checkConnect(String host, int port) {
-                super.checkConnect(host, port); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkConnect(host, port)");
             }
 
             @Override
             public void checkDelete(String file) {
-                super.checkDelete(file); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkDelete(file)");
             }
 
             @Override
             public void checkWrite(String file) {
-                super.checkWrite(file); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkWrite(file)");
             }
 
             @Override
             public void checkWrite(FileDescriptor fd) {
-                super.checkWrite(fd); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkWrite(fd)");
             }
 
             @Override
             public void checkRead(String file, Object context) {
-                super.checkRead(file, context); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkRead(file, context)");
             }
 
             @Override
@@ -109,57 +116,61 @@ public class Sandbox {
 
             @Override
             public void checkRead(FileDescriptor fd) {
-                super.checkRead(fd); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkRead(fd)");
             }
 
             @Override
             public void checkLink(String lib) {
-                super.checkLink(lib); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkLink(lib)");
             }
 
             @Override
             public void checkExec(String cmd) {
-                super.checkExec(cmd); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkExec(cmd)");
             }
 
             @Override
             public void checkExit(int status) {
-                super.checkExit(status); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkExit(status)");
             }
 
             @Override
             public void checkAccess(ThreadGroup g) {
-                super.checkAccess(g); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkAccess(g)");
             }
 
             @Override
             public void checkAccess(Thread t) {
-                super.checkAccess(t); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkAccess(t)");
             }
 
             @Override
             public void checkCreateClassLoader() {
-                super.checkCreateClassLoader(); //To change body of generated methods, choose Tools | Templates.
+                logger.fine( "checkCreateClassLoader()");
             }
 
             @Override
             public void checkPermission(Permission perm, Object context) {
-                super.checkPermission(perm, context); //To change body of generated methods, choose Tools | Templates.
+                logger.log(Level.FINE, "checkPermission( {0}, {1})", new Object[]{perm, context}); //super.checkPermission(perm); 
             }
 
             @Override
             public void checkPermission(Permission perm) {
-                //super.checkPermission(perm); //To change body of generated methods, choose Tools | Templates.
+                if ( perm instanceof AWTPermission ) {
+                    logger.log(Level.FINER, "checkPermission( {0} )", new Object[]{perm});
+                } else {
+                    logger.log(Level.FINE, "checkPermission( {0} )", new Object[]{perm}); 
+                }
             }
 
             @Override
             public Object getSecurityContext() {
-                return super.getSecurityContext(); //To change body of generated methods, choose Tools | Templates.
+                return super.getSecurityContext(); 
             }
 
             @Override
             protected Class[] getClassContext() {
-                return super.getClassContext(); //To change body of generated methods, choose Tools | Templates.
+                return super.getClassContext(); 
             }
             
         };
