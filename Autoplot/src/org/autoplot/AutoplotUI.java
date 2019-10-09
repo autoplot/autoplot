@@ -4898,7 +4898,7 @@ private void updateFrameTitle() {
         alm.addBooleanSwitchArgument( "nop", null, "nop", "no operation, to be a place holder for jnlp script.");
         alm.addBooleanSwitchArgument( "headless", null, "headless", "run in headless mode" );
         alm.addBooleanSwitchArgument( "noAskParams", null, "noAskParams", "don't ask for parameters when running a script");
-        //alm.addBooleanSwitchArgument( "sandbox", null, "sandbox", "enable sandbox, which limits which disks are used." );
+        alm.addBooleanSwitchArgument( "sandbox", null, "sandbox", "enable sandbox, which limits which disks are used." );
         alm.addBooleanSwitchArgument( "version", null, "version", "print the version" );
         
        for ( int i=0; i<args.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
@@ -4956,9 +4956,10 @@ private void updateFrameTitle() {
             return;
         }
         
-        //if ( alm.getBooleanValue("sandbox") ) {
-        //    Sandbox.enterSandbox();
-        //}
+        if ( alm.getBooleanValue("sandbox") ) {
+            logger.warning("sandbox does not add any restrictions, currently.");
+            Sandbox.enterSandbox();
+        }
         
         if ( alm.getBooleanValue("headless") ) {
             System.setProperty("java.awt.headless","true");
