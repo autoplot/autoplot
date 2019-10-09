@@ -167,6 +167,10 @@ public class ParametersFormPanel {
                 value= ((DataSetSelector)jc).getValue();
             } else if ( jc instanceof JComboBox ) {
                 value= String.valueOf( ((JComboBox)jc).getSelectedItem() );
+                int i= value.indexOf(':');
+                if ( i>-1 ) {
+                    value= value.substring(0,i).trim();
+                }
             } else if ( jc instanceof JCheckBox ) {
                 value= ((JCheckBox)jc).isSelected() ? "T" : "F";
             } else {
@@ -471,7 +475,18 @@ public class ParametersFormPanel {
                                     });
                                     ctf= jcb;
                                 } else {
-                                    JComboBox jcb= new JComboBox(parm.enums.toArray());
+                                    Object[] labels= parm.enums.toArray();
+                                    if ( parm.constraints!=null && parm.constraints.containsKey("labels") ) {
+                                        Object olabels= parm.constraints.get("labels");
+                                        if ( olabels instanceof List ) {
+                                            List labelsList= (List)olabels;
+                                            labels= new String[parm.enums.size()];
+                                            for ( int i=0; i<parm.enums.size(); i++ ) {
+                                                labels[i]= parm.enums.get(i)+": "+labelsList.get(i);
+                                            }
+                                        }
+                                    }
+                                    JComboBox jcb= new JComboBox(labels);
                                     jcb.setEditable(false);
                                     if ( parm.deft instanceof Long ) {
                                         oval = Long.valueOf(val);
@@ -484,8 +499,13 @@ public class ParametersFormPanel {
                                     } else {
                                         oval = val;
                                     }
-                                    jcb.setSelectedItem(oval);
-                                    if ( !jcb.getSelectedItem().equals(oval) ) {
+                                    int index= parm.enums.indexOf(oval);
+                                    if ( index>-1 ) {
+                                        jcb.setSelectedIndex(index);
+                                    } else {
+                                        jcb.setSelectedItem(oval);
+                                    }
+                                    if ( !jcb.getSelectedItem().toString().startsWith(oval.toString()) ) {
                                         logger.fine("uh-oh.");
                                     }
                                     ctf= jcb;
@@ -528,8 +548,15 @@ public class ParametersFormPanel {
                         } else if ( ftf instanceof JComboBox ) {
                             JComboBox jcb= ((JComboBox)ftf);
                             for ( int i=0; i<jcb.getItemCount(); i++ ) {
-                                if ( fvalue.equals( jcb.getItemAt(i).toString() ) ) {
-                                    jcb.setSelectedIndex(i);
+                                String item= jcb.getItemAt(i).toString();
+                                if ( item.contains(":") ) {
+                                    if ( item.startsWith( fvalue + ":" ) ) {
+                                        jcb.setSelectedIndex(i);
+                                    }
+                                } else {
+                                    if ( fvalue.equals( jcb.getItemAt(i).toString() ) ) {
+                                        jcb.setSelectedIndex(i);
+                                    }
                                 }
                             }
                         } else if ( ftf instanceof JCheckBox ) {
