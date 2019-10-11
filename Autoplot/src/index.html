@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Cloud cover.
+        <p><small>New Das2Stream reader works for peaks-n-averages again.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,13 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-10-08 r24222):</p>
+        <p>Bugfixes (2019-10-11 r24235):</p>
         <ul>
+            <li>2212: New Das2Stream parser did not handle Voyager peaks-and-averages properly, with data coming from cache.
+            <li>dataset command now parses "2014-01-09 00:00 to 01:00" as datum range, not datum with enumeration units.
+            <li>1659: double-call on monitor when cancel was pressed in "Run Batch"
+            <li>Run Batch tool replaces "/" in output names with "_" so that filenames don't break.  Thanks, Connor!
+            <li>dataset(datumRange) could not be used with createEvent, because it was mistaken for a 2-element array.  Thanks, Kristoff!
             <li>mute messages at command line startup about the Help system, which is not used anyway.
             <li>BIN_MAX and BIN_MIN are correlative properties, and slice1 should slice them.
             <li>odd bug where .vap files wouldn't load from GitHubFileSystem during testing resolved by loading into memory.
@@ -63,6 +68,11 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>New JNLP signature for Oct 2019-September 2020.
+            <li>Jython scripts can now have labels on enumerated values, like { 'values':['A','B'], labels:['RBSP-A','RBSP-B'] }
+            <li>future proofing scripting commands setScriptTitle, setScriptDescription, which will be used to improve GUI.
+            <li>command line option --version.
+            <li>introduce --sandbox switch which starts a very permissive sandbox.
             <li>BinaryDataSource editor now shows the bytes of the first record.
             <li>DDataSet gets addValues(qds) so that high-rank datasets can be accumulated quickly.
             <li>new signature for JNLP release.
