@@ -1366,7 +1366,7 @@ public class BatchMaster extends javax.swing.JPanel {
         } finally {
             
             messageLabel.setText("Jobs are complete, click above to edit.");
-            monitor.finished();
+            if ( !monitor.isFinished() ) monitor.finished();
             goButton.setEnabled(true);
         }
     }
