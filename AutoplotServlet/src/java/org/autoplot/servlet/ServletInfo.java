@@ -20,7 +20,6 @@ import org.autoplot.AutoplotUtil;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.Options;
 import org.das2.util.AboutUtil;
-import static org.autoplot.servlet.SimpleServlet.version;
 
 /**
  *
@@ -102,7 +101,7 @@ public class ServletInfo extends HttpServlet {
             out.println("<br>printingTag: "+dom.getOptions().getPrintingTag());
             
             out.println("<h2>Servlet Info</h2>");
-            out.println("servlet version: "+version+"<br>");
+            out.println("servlet version: "+ServletUtil.version+"<br>");
             out.println("servlet uptime: "+getDurationForHumans(getAgeMillis())+"<br>");
             if ( isHostPrivileged ) {
                 out.println("<br>user.name: "+ System.getProperty("user.name") + "\n"); // TODO: security concerns

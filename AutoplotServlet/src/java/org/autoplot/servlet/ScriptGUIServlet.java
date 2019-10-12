@@ -45,6 +45,8 @@ import org.python.util.PythonInterpreter;
  */
 public class ScriptGUIServlet extends HttpServlet {
 
+    static final Logger logger= Logger.getLogger("autoplot.servlet.scriptgui");
+    
     /**
      * write out the current canvas to stdout.  This is introduced to support servers.
      * TODO: this has issues with the size.  See writeToPng(filename).
@@ -124,8 +126,8 @@ public class ScriptGUIServlet extends HttpServlet {
             model.addDasPeersToAppAndWait();
             Application dom= model.getDocumentModel();
             
-            System.err.println( "dom: "+ dom );
-            System.err.println( "dom options: "+ dom.getOptions() );
+            logger.log(Level.FINE, "dom: {0}", dom);
+            logger.log(Level.FINE, "dom options: {0}", dom.getOptions());
             
             dom.getOptions().setAutolayout(false);
             

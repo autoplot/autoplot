@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.servlet;
 
 import java.io.BufferedReader;
@@ -14,7 +11,6 @@ import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -31,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.URISplit;
-import static org.autoplot.servlet.SimpleServlet.version;
 import org.das2.util.FileUtil;
 
 /**
@@ -41,6 +36,7 @@ import org.das2.util.FileUtil;
 public class ServletUtil {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet");
+    public static final String version = "v20191012.1146";
     
     public static int getIntParameter(HttpServletRequest request, String name, int dval) {
         String s = request.getParameter(name);
