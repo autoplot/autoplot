@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New Das2Stream reader works for peaks-n-averages again.
+        <p><small>Study of download speed bug can see a daily spike.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,9 @@
         
         <p>Bugfixes (2019-10-11 r24235):</p>
         <ul>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>2212: New Das2Stream parser did not handle Voyager peaks-and-averages properly, with data coming from cache.
             <li>dataset command now parses "2014-01-09 00:00 to 01:00" as datum range, not datum with enumeration units.
             <li>1659: double-call on monitor when cancel was pressed in "Run Batch"
@@ -43,30 +46,11 @@
             <li>2193: handle redirects, put in code for github.com to get vaps from github rawusercontent website.
             <li>2202: screen size of loaded .vap is often incorrect.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>0356: add additionalClip property to SeriesRenderer, which will clip the lines which go far outside axis bounds (to -inf for example).
-            <li>2122: new logic to decide if a slice popup is visible.
-            <li>don't print the layout string which was in there for debugging.  Thanks, Jon N!
-            <li>Auralizer code would call expensive closestIndex routine unnecessarily.
-            <li>2209: unbundle filter flips to 'Bx'.
-            <li>2208: new das2stream reader returns BIN_PLUS where old would return two channels.
-            <li>1359: limit difference in size of next and previous intervals to 10 times or 1/10th the size of the current interval. 
-            <li>373978553: add more diagnostic info to try and figure out strange RTE.
-            <li>aggregation would reload unnecessarily when files were missing at the end of the range requested.
-            <li>2205: corrections to Windows file handling with recent files.
-            <li>2202: flakiness with resetting the canvas size upon reset.
-            <li>2200: correction to encoding of ARGB colors.
-            <li>2201: rte_1268372737: CDF rvariables from Wind mission cannot load.  Thanks, xfxy!
-            <li>2200: support 100% transparent black in vap files.
-            <li>add GUI for smooth1 filter.
-            <li>record operations set by the FiltersChainPanel into recent history.
-            <li>2196: XKCD font now embeds properly within PDF files.
-            <li>flatten now checks for PLANE_0 as well as DEPEND_0, to return X,Y,Z scatter data.
-            <li>2198: remove unnecessary call to GUI code in HTTPFileSystem code, which would cause hang on Mac/SciPy/JPype.
-            <li>2197: code to record recent times and operations would fail on Windows.  Thanks, George!
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>add button on popup slicers to write to PDF.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>New JNLP signature for Oct 2019-September 2020.
             <li>Jython scripts can now have labels on enumerated values, like { 'values':['A','B'], labels:['RBSP-A','RBSP-B'] }
@@ -80,19 +64,6 @@
             <li>696: support for HAPI 3.0 references.
             <li>IFFT takes Real and Complex spectra to make a waveform.
             <li>ScriptGUIServlet allows script to be run, creating web GUI for parameters and displaying the output.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>696: initial support for HAPI info responses with references and time-varying DEPEND_1.
-            <li>693: CDF editor has sort alpha checkbox.
-            <li>693: CDF editor filter is regular expression and case insensitive.
-            <li>AutoplotServer supports relative URIs.
-            <li>Jython fix imports reports the name of the routine with the old name.
-            <li>693: CDF dialog now allows filtering parameter names.
-            <li>694: escape keypress will exit data source editor dialogs, dispose after window closings.
-            <li>Plots now have background color property, which is 100% transparent black by default.
-            <li>add binMeanAverageDeviation to calculate the deviations in each bin for binAverage2d
-            <li>binAverage2d filter added for doing 2-D histograms of x,y,z buckshot scatter data.
         </ul>
         <p>Known issues:</p>
         <ul>
