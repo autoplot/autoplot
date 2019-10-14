@@ -36,7 +36,6 @@ import org.das2.util.FileUtil;
 public class ServletUtil {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet");
-    public static final String version = "v20191012.1146";
     
     public static int getIntParameter(HttpServletRequest request, String name, int dval) {
         String s = request.getParameter(name);
@@ -72,11 +71,9 @@ public class ServletUtil {
         File sd= getServletHome();
         File ff= new File( sd, "ids.txt" );
         if ( !ff.exists() ) {
-            try {
-                BufferedWriter w= new BufferedWriter( new FileWriter( ff ) );
+            try (BufferedWriter w = new BufferedWriter( new FileWriter( ff ) )) {
                 w.write("# map from regex to local reference.  See http://autoplot.org/servlet_guide.");
                 w.newLine();
-                w.close();
             } catch ( IOException ex ) {
                 throw ex;
             }
@@ -88,7 +85,7 @@ public class ServletUtil {
         if ( idMap==null || idMapFreshNow>idMapFresh ) {
             synchronized ( ServletUtil.class ) {
                 if ( idMap==null || idMapFreshNow>idMapFresh ) { 
-                    Map<String,String> idMapLocal= new LinkedHashMap<String, String>();
+                    Map<String,String> idMapLocal= new LinkedHashMap<>();
                     try {
                         BufferedReader r= new BufferedReader( new FileReader( ff ) );
                         String s= r.readLine();
@@ -253,7 +250,7 @@ public class ServletUtil {
         // To support load balancing, insert the actual host that resolved the request
         String host= java.net.InetAddress.getLocalHost().getCanonicalHostName();
         response.setHeader( "X-Served-By", host );
-        response.setHeader( "X-Server-Version", version );
+        response.setHeader("X-Server-Version", ServletInfo.version);
         if ( suri!=null ) {
             response.setHeader( "X-Autoplot-URI", suri );
         }

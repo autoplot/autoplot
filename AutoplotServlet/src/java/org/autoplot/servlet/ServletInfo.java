@@ -28,6 +28,7 @@ import org.das2.util.AboutUtil;
 public class ServletInfo extends HttpServlet {
 
     private static long birthMilli= System.currentTimeMillis();
+    public static final String version = "v20191012.1146";
     
     public static long getAgeMillis() {
         return System.currentTimeMillis() - birthMilli;
@@ -101,7 +102,7 @@ public class ServletInfo extends HttpServlet {
             out.println("<br>printingTag: "+dom.getOptions().getPrintingTag());
             
             out.println("<h2>Servlet Info</h2>");
-            out.println("servlet version: "+ServletUtil.version+"<br>");
+            out.println("servlet version: "+version+"<br>");
             out.println("servlet uptime: "+getDurationForHumans(getAgeMillis())+"<br>");
             if ( isHostPrivileged ) {
                 out.println("<br>user.name: "+ System.getProperty("user.name") + "\n"); // TODO: security concerns

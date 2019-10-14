@@ -72,7 +72,7 @@
         </p>
         
         <hr>
-        <small><%= SimpleServlet.version %></small>
+        <small><%= ServletInfo.version %></small>
         <small><%= AboutUtil.getJenkinsURL() %></small>
         <small>up: <%= ServletInfo.getDurationForHumans(ServletInfo.getAgeMillis()) %></small>
     </body>

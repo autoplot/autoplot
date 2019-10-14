@@ -151,7 +151,7 @@ public class SimpleServlet extends HttpServlet {
 
         //logger.setLevel(Level.FINE);
         
-        logger.finer(ServletUtil.version);
+        logger.finer(ServletInfo.version);
 
         logger.fine("=======================");
 
@@ -237,7 +237,7 @@ public class SimpleServlet extends HttpServlet {
             // To support load balancing, insert the actual host that resolved the request
             String host= java.net.InetAddress.getLocalHost().getCanonicalHostName();
             response.setHeader( "X-Served-By", host );
-            response.setHeader("X-Server-Version", ServletUtil.version);
+            response.setHeader("X-Server-Version", ServletInfo.version);
             if ( suri!=null ) {
                 response.setHeader( "X-Autoplot-URI", suri );
             }
@@ -323,7 +323,7 @@ public class SimpleServlet extends HttpServlet {
                     s = s + "hapiServerCache="+ System.getProperty( "hapiServerCache" ) + "<br>";
                     s = s + "cdawebHttps=" + System.getProperty( "cdawebHttps" ) + "<br>";
                     s = s + "enableReferenceCache=" + System.getProperty( "enableReferenceCache" ) + "<br>";
-                    s = s + "<br><br>servlet version="+ServletUtil.version+"<br>";
+                    s = s + "<br><br>servlet version="+ServletInfo.version+"<br>";
                     s = s + "</html>";
                     out.write(s.getBytes());
                 }
@@ -663,7 +663,7 @@ public class SimpleServlet extends HttpServlet {
                     public void paint(Graphics2D g) {
                         g.setFont( ffont );
                         g.setColor( Color.BLUE );
-                        g.drawString(""+fstamp+" "+ fhost + " " + TimeUtil.now().toString() + " version: "+ServletUtil.version, 0, 10 );
+                        g.drawString(""+fstamp+" "+ fhost + " " + TimeUtil.now().toString() + " version: "+ServletInfo.version, 0, 10 );
                     }
                 });
             }
