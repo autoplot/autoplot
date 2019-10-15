@@ -48,7 +48,7 @@ public class Test019 {
         ff= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2008-003" ) );
         if ( ff.length==1 ) System.err.println(ff[0]); else throw new IllegalStateException("no files found");
 
-        uri= "http://demo:demo@www-pw.physics.uiowa.edu/~jbf/data/restrict/";
+        uri= "https://demo:demo@www-pw.physics.uiowa.edu/~jbf/data/restrict/";
         fsm= FileStorageModel.create(FileSystem.create( new URI( uri ) ),
                "data_$Y_$m_$d_v$v.qds" );
         ff= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2010-03-02" ) );
@@ -79,7 +79,7 @@ public class Test019 {
     }
 
     public static void testFSMVersioning() throws Exception {
-        String uri= "http://sarahandjeremy.net/~jbf/autoplot/tests/test019_fsm/vers/";
+        String uri= "https://jfaden.net/~jbf/autoplot/tests/test019_fsm/vers/";
         FileStorageModel fsm;
         String[] ss;
         fsm= FileStorageModel.create(FileSystem.create( new URI( uri ) ),
@@ -249,7 +249,7 @@ public class Test019 {
     }
     
     public static void testFileSystemListing() throws FileNotFoundException, FileSystem.FileSystemOfflineException, UnknownHostException, IOException {
-        FileSystem fs= FileSystem.create("http://emfisis-soc.physics.uiowa.edu/~jbf/20130912/");
+        FileSystem fs= FileSystem.create("https://emfisis-soc.physics.uiowa.edu/~jbf/20130912/");
         String[] ss= fs.listDirectory("/");
         FileObject fo= fs.getFileObject(ss[0]);
         System.err.println( fo.getSize() );
