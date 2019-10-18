@@ -48,7 +48,7 @@ public class Test019 {
         ff= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2008-003" ) );
         if ( ff.length==1 ) System.err.println(ff[0]); else throw new IllegalStateException("no files found");
 
-        uri= "https://demo:demo@www-pw.physics.uiowa.edu/~jbf/data/restrict/";
+        uri= "http://demo:demo@www-pw.physics.uiowa.edu/~jbf/data/restrict/";
         fsm= FileStorageModel.create(FileSystem.create( new URI( uri ) ),
                "data_$Y_$m_$d_v$v.qds" );
         ff= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2010-03-02" ) );
