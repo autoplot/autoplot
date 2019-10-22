@@ -553,7 +553,15 @@ public class CdfDataSource extends AbstractDataSource {
         if ( w!=null && w.length()>0 ) {
             int ieq= w.indexOf(".");
             String sparm= w.substring(0,ieq);
-            QDataSet parm= loadVariableAndDependents(cdf, sparm, constraint, false);
+            String constraint1;
+            int k = sparm.indexOf("[");
+            if (k != -1) {
+                constraint1 = sparm.substring(k);
+                sparm = sparm.substring(0, k);
+            } else {
+                constraint1 = constraint;
+            }  
+            QDataSet parm= loadVariableAndDependents(cdf, sparm, constraint1, false);
             if ( parm.length()==1 && parm.rank()==2 && result.rank()>1 && result.length()>1 ) {
                 parm= Ops.replicate( parm.slice(0), result.length() ); // reform rte_1731551069
             }
