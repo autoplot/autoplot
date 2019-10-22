@@ -1330,7 +1330,14 @@ public class JythonUtil {
                 p.enums= enums;                
             } else if ( oo.__getitem__(3) instanceof PyDictionary ) {
                 PyDictionary pyDict= ((PyDictionary)oo.__getitem__(3));
-                PyObject enumsObject= pyDict.pop( new PyString("enum") );
+                PyObject enumsObject;
+                if ( pyDict.has_key(new PyString("enum")) ) {
+                    enumsObject= pyDict.pop( new PyString("enum") );
+                } else if ( pyDict.has_key(new PyString("values")) ) {
+                    enumsObject= pyDict.pop( new PyString("values") );
+                } else {
+                    enumsObject= null;
+                }
                 Map<Object,Object> constraints= new HashMap<>();
                 if ( enumsObject!=null && enumsObject instanceof PyList ) {
                     PyList enumsList= (PyList)enumsObject;
