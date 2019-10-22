@@ -1273,6 +1273,16 @@ public class CdfUtil {
                 if (svarNotes !=null ) {
                     descbuf.append("<p><small>").append(svarNotes).append("</small></p><br>");
                 }
+                Vector variablePurpose= cdf.getAttributeEntries(svar,"VARIABLE_PURPOSE");
+                if ( variablePurpose.size()>0 ) {
+                    AttributeEntry e= (AttributeEntry)variablePurpose.get(0);
+                    StringBuilder s= new StringBuilder( String.valueOf(e.getValue()) );
+                    for ( int i1=1; i1<variablePurpose.size(); i1++ ) {
+                        e= (AttributeEntry)variablePurpose.get(i1);
+                        s.append(",").append(e.getValue());
+                    }
+                    descbuf.append("<p><small>VARIABLE_PURPOSE: ").append(s).append("</small></p><br>");
+                }
                 
                 if (maxRec != xMaxRec) {
                     if ( isVirtual ) {
