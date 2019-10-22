@@ -155,7 +155,17 @@ public class NetCDFDataSource extends AbstractDataSource {
             
             String w= (String)getParam(PARAM_WHERE,"" );
             if ( w!=null && w.length()>0 ) {
-                NetCdfVarDataSet whereParm= NetCdfVarDataSet.create( whereVariable, constraint, ncfile, new NullProgressMonitor() );
+                int ieq= w.indexOf(".");
+                String sparm= w.substring(0,ieq);
+                String constraint1;
+                int k = sparm.indexOf("[");
+                if (k != -1) {
+                    constraint1 = sparm.substring(k);
+                    sparm = sparm.substring(0, k);
+                } else {
+                    constraint1 = constraint;
+                }  
+                NetCdfVarDataSet whereParm= NetCdfVarDataSet.create( whereVariable, constraint1, ncfile, new NullProgressMonitor() );
                 result = doWhereFilter( w, whereParm, DataSetOps.makePropertiesMutable(result) );
             }
 
@@ -303,6 +313,10 @@ public class NetCDFDataSource extends AbstractDataSource {
                 int i= swhereVariable.lastIndexOf("(");
                 i= swhereVariable.lastIndexOf(".",i);
                 String swv= swhereVariable.substring(0,i);
+                i= swv.indexOf("[");
+                if ( i>-1 ) {
+                    swv= swv.substring(0,i);
+                }
                 for (Variable v : variables) {
                     if ( v instanceof Structure ) {
                         for ( Variable v2: ((Structure) v).getVariables() ) {
