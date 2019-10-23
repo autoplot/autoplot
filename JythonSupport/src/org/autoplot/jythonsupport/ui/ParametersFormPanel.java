@@ -27,7 +27,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -43,11 +42,13 @@ import org.python.core.PyDictionary;
 import org.python.util.PythonInterpreter;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.TimeRangeTool;
-import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.JythonUtil.Param;
 import static org.autoplot.jythonsupport.ui.Util.getParams;
+import org.das2.util.ColorUtil;
+import java.awt.Color;
+import javax.swing.JColorChooser;
 
 /**
  * GUI component for controlling script parameters.  
@@ -109,34 +110,39 @@ public class ParametersFormPanel {
             for ( int i=0; i<paramsList.size(); i++ ) {
                 if ( paramsList.get(i).equals(param) ) {
                     Object deft= deftObjectList.get(i);
-                    if ( typesList.get(i).equals('T') && value.length()>1 && value.charAt(0)!='\'' && value.charAt(value.length()-1)!='\'' ) {
+                    Character type= typesList.get(i);
+                    if ( type.equals('T') && value.length()>1 && value.charAt(0)!='\'' && value.charAt(value.length()-1)!='\'' ) {
                         paramsDictionary.__setitem__( param, Py.java2py( value ) );
-                    } else if ( typesList.get(i).equals('D') ) {
+                    } else if (type.equals('D') ) {
                         paramsDictionary.__setitem__( param, Py.java2py( ((Datum)deft).getUnits().parse(value) ) );
-                    } else if ( typesList.get(i).equals('S') ) {
+                    } else if ( type.equals('S') ) {
                         paramsDictionary.__setitem__( param, Py.java2py( DatumRangeUtil.parseDatumRange(value,(DatumRange)deft ) ) );
-                    } else if ( typesList.get(i).equals('U') ) {
+                    } else if ( type.equals('U') ) {
                         try {
                             paramsDictionary.__setitem__( param, Py.java2py( new java.net.URI( value ) ) );
                         } catch (URISyntaxException ex) {
                             throw new ParseException( "URI is not formed properly",0);
                         }
-                    } else if ( typesList.get(i).equals('L') ) {
+                    } else if ( type.equals('L') ) {
                         try {
                             paramsDictionary.__setitem__( param, Py.java2py( new java.net.URL( value ) ) );
                         } catch (MalformedURLException ex) {
                             logger.log(Level.SEVERE, null, ex);
                         }
-                    } else if ( typesList.get(i).equals('A') ) {
+                    } else if ( type.equals('A') ) {
                         value= org.autoplot.jythonsupport.Util.popString(value);
                         paramsDictionary.__setitem__( param, Py.java2py( value ) );
-                    } else if ( typesList.get(i).equals('R') ) {
+                    } else if ( type.equals('R') ) {
                         value= org.autoplot.jythonsupport.Util.popString(value);
                         try {                        
                             paramsDictionary.__setitem__( param, Py.java2py( new URI(value) ) );
                         } catch (URISyntaxException ex) {
                             logger.log(Level.SEVERE, null, ex);
                         }
+                    } else if ( type.equals('C') ) {
+                        value= org.autoplot.jythonsupport.Util.popString(value);
+                        paramsDictionary.__setitem__( param, Py.java2py( ColorUtil.decodeColor(value) ) );
+
                     } else {
                         interp.exec( String.format("params['%s']=%s", param, value ) ); // TODO: nasty/clever code handles float vs int.
                     }
@@ -447,6 +453,103 @@ public class ParametersFormPanel {
                             valuePanel.add( button );
                             break;
                         }
+                    case 'C':
+                        {
+                            String val;
+                            if ( params.get(vname)!=null ) {
+                                val= params.get(vname);
+                                if ( val.startsWith("'") ) val= val.substring(1);
+                                if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
+                            } else {
+                                val= ColorUtil.encodeColor( (Color)parm.deft );
+                                params.put( vname, val );
+                            }       
+                            final JComponent fjcf;
+                            if ( parm.enums!=null && parm.enums.size()>0 ) {
+                                Object[] labels= parm.enums.toArray();
+                                if ( parm.constraints!=null && parm.constraints.containsKey("labels") ) {
+                                    Object olabels= parm.constraints.get("labels");
+                                    if ( olabels instanceof List ) {
+                                        List labelsList= (List)olabels;
+                                        labels= new String[parm.enums.size()];
+                                        for ( int i=0; i<parm.enums.size(); i++ ) {
+                                            labels[i]= parm.enums.get(i)+": "+labelsList.get(i);
+                                        }
+                                    }
+                                }
+                                for ( int i=0; i<labels.length; i++ ) {
+                                    labels[i]= ColorUtil.encodeColor( (Color)labels[i] );
+                                }
+                                JComboBox jcb= new JComboBox(labels);
+                                jcb.setEditable(false);
+                                int index= parm.enums.indexOf(ColorUtil.decodeColor(val));
+                                if ( index>-1 ) {
+                                    jcb.setSelectedIndex(index);
+                                } else {
+                                    jcb.setSelectedItem(val);
+                                }
+                                if ( !jcb.getSelectedItem().toString().startsWith( val ) ) {
+                                    logger.fine("uh-oh.");
+                                }
+                                ctf= jcb;
+                                jcb.addActionListener( new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        redoVariables( env, src, ParametersFormPanel.this.params, zparamsPanel );
+                                    }
+                                });
+                                Dimension x= ctf.getPreferredSize();
+                                x.width= Integer.MAX_VALUE;
+                                ctf.setMaximumSize(x);
+                                ctf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                                                                
+                            } else {
+                                final JTextField tf= new JTextField();
+                                Dimension x= tf.getPreferredSize();
+                                x.width= Integer.MAX_VALUE;
+                                tf.setMaximumSize(x);
+                                tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                                tf.setText( val );
+                                ctf= tf;    
+                            }
+                            fjcf= ctf;
+                            valuePanel.add( ctf );
+                            
+                            if ( parm.enums==null || parm.enums.isEmpty() ) {
+                                Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/autoplot/datasource/calendar.png"));
+                                JButton button= new JButton( fileIcon );
+                                button.addActionListener( new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        Color c;
+                                        String t;
+                                        if ( fjcf instanceof JComboBox ) {
+                                            t= (String)(((JComboBox)fjcf).getSelectedItem());
+                                        } else {
+                                            t= ((JTextField)fjcf).getText();
+                                        }
+                                        try {
+                                            c= ColorUtil.decodeColor( t );
+                                        } catch ( IllegalArgumentException ex ) {
+                                            c= Color.GRAY;
+                                        }
+                                        c = JColorChooser.showDialog( paramsPanel, "color", c );
+                                        if ( c!=null ) {
+                                            if ( fjcf instanceof JComboBox ) {
+                                                ((JComboBox)fjcf).setSelectedItem(ColorUtil.encodeColor(c));
+                                            } else {
+                                                ((JTextField)fjcf).setText( ColorUtil.encodeColor(c) );
+                                            }
+
+                                        }
+                                    }
+                                });     
+                                button.setToolTipText("Colorpicker");
+                                button.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                                valuePanel.add( button );
+                            }
+                            break;
+                        }                        
                     default:
                         {
                             String val;
@@ -575,7 +678,11 @@ public class ParametersFormPanel {
                 fd.tflist.add(ctf);
 
                 fd.paramsList.add( parm.name );
-                fd.deftsList.add( String.valueOf( parm.deft ) );
+                if ( parm.type=='C' ) {
+                    fd.deftsList.add( ColorUtil.encodeColor( (Color)parm.deft ) );
+                } else {
+                    fd.deftsList.add( String.valueOf( parm.deft ) );
+                }
                 fd.deftObjectList.add( parm.deft );
                 fd.typesList.add( parm.type );
 
