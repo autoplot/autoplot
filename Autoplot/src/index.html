@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Study of download speed bug can see a daily spike.
+        <p><small>PNG Walk Tool used to study final RBSP orbits.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-10-22 r24249):</p>
+        <p>Bugfixes (2019-10-24 r24257):</p>
         <ul>
+            <li>bugfix for 20191023a which fixed reducex when DEPEND_0 had a DEPEND_0 introduced new bug, which was fixed.
             <li>CDF files containing both zvariables and rvariables can be read again.
             <li>check VARIABLE_PURPOSE in CDF Metadata when filtering parameter list.
         </ul>
@@ -50,6 +51,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>360: allow color type in jython script parameters.
             <li>334: allow where constaint to have slice, so Z component can be used to filter with URIs like ...&where=BGSEc[:,2].lt(0)
             <li>360: allow either values or enum to be used in script parameter constraints.
             <li>add button on popup slicers to write to PDF.
