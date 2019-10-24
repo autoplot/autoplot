@@ -7,6 +7,7 @@ import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
 import org.netbeans.jemmy.operators.JTreeOperator;
 import org.das2.qds.filters.AddFilterDialog;
+import org.netbeans.jemmy.operators.JTabbedPaneOperator;
 
 /**
  *
@@ -24,9 +25,11 @@ public class FiltersTreePicker {
             // Implement reducex() filter
             new JMenuBarOperator( mainFrame ).pushMenuNoBlock("Tools|Additional Operations...");
 
+            
             DialogOperator addFilterFrame = new DialogOperator( new RegexComponentChooser("Add Operation" ) );
             
-            // NOTE this hangs when the tree view "By Category" is not set.
+            JTabbedPaneOperator op= new JTabbedPaneOperator(addFilterFrame);
+            op.selectPage("By Category");
             
             JTreeOperator tree= new JTreeOperator( addFilterFrame );
             tree.clickMouse();
