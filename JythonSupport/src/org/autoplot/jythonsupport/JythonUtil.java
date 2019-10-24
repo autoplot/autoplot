@@ -1,6 +1,7 @@
 
 package org.autoplot.jythonsupport;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -1243,6 +1244,7 @@ public class JythonUtil {
       * L URL
       * D Datum
       * S DatumRange
+      * C Color
       * 
       *}</small></pre></blockquote>
       * note "arg_0" "arg_1" are used to refer to positional (unnamed) parameters.
@@ -1399,8 +1401,14 @@ public class JythonUtil {
                                 pp=  ((PyJavaInstance)p.deft).__tojava__( DatumRange.class ); 
                                 if ( pp==Py.NoConversion ) {
                                     pp=  ((PyJavaInstance)p.deft).__tojava__( URL.class ); 
-                                    p.type= 'L';
-                                    p.deft= pp;
+                                    if ( pp==Py.NoConversion ) {
+                                        pp=  ((PyJavaInstance)p.deft).__tojava__( Color.class ); 
+                                        p.type= 'C';
+                                        p.deft= pp;
+                                    } else {
+                                        p.type= 'L';
+                                        p.deft= pp;
+                                    }
                                 } else {
                                     p.type= 'S';
                                     p.deft= pp;
