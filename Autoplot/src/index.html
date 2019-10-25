@@ -28,8 +28,8 @@
         
         <p>Bugfixes (2019-10-24 r24257):</p>
         <ul>
-            <li>bugfix for 20191023a which fixed reducex when DEPEND_0 had a DEPEND_0 introduced new bug, which was fixed.
-            <li>CDF files containing both zvariables and rvariables can be read again.
+            <li>20191023a had new bug where reducex would drop DEPEND_1.
+            <li>v2019a_10' had bug where CDF files containing both zvariables and rvariables could not be read.
             <li>check VARIABLE_PURPOSE in CDF Metadata when filtering parameter list.
         </ul>
         <p>Older Bugfixes:</p>
@@ -54,7 +54,7 @@
             <li>360: allow color type in jython script parameters.
             <li>334: allow where constaint to have slice, so Z component can be used to filter with URIs like ...&where=BGSEc[:,2].lt(0)
             <li>360: allow either values or enum to be used in script parameter constraints.
-            <li>add button on popup slicers to write to PDF.
+            <li>popup slicers have write to PDF button.
         </ul>
         <p>Less recent features:</p>
         <ul>
