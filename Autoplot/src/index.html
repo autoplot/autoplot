@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>PNG Walk Tool used to study final RBSP orbits.
+        <p><small>Mashup tool used to look at time series as color plot against time and hour of day.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-10-24 r24257):</p>
+        <p>Bugfixes (2019-10-26 r24257):</p>
         <ul>
+            <li>add read timeouts on CDAWeb web service calls.
             <li>20191023a had new bug where reducex would drop DEPEND_1.
             <li>v2019a_10 had bug where CDF files containing both zvariables and rvariables could not be read.
             <li>check VARIABLE_PURPOSE in CDF Metadata when filtering parameter list.
