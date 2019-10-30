@@ -23,8 +23,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
+import org.das2.util.LoggerManager;
 
 /**
  * A directory and <code>PropertiesFile</code> based <code>Preferences</code>
@@ -32,6 +35,8 @@ import java.util.prefs.BackingStoreException;
  */
 public final class PropertiesFilePreferences extends AbstractPreferences {
 
+    private static final Logger logger= LoggerManager.getLogger("autoplot.dom.options");
+    
     /** Filename the properties of this node are stored under. */
     public static final String FILENAME = "preferences.properties";
 
@@ -93,8 +98,17 @@ public final class PropertiesFilePreferences extends AbstractPreferences {
             final String name, final String propertiesFileName) {
         super(parent, name);
         this.dir = dir;
-        this.file = new PropertiesFile(new File(dir, propertiesFileName));
+        File propertiesFile= new File(dir, propertiesFileName);
+        if ( !propertiesFile.exists() ) {
+            if ( !propertiesFile.getParentFile().canWrite() ) {
+                logger.log(Level.INFO, "unable to write prefs file at {0}", propertiesFile);
+            } else {
+                logger.log(Level.INFO, "creating prefs file at {0}", propertiesFile);
+            }
+        }
+        this.file = new PropertiesFile(propertiesFile);
         this.removed = false;
+        
     }
 
     /**
