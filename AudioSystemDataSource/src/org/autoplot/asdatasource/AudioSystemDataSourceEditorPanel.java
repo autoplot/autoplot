@@ -38,7 +38,8 @@ public class AudioSystemDataSourceEditorPanel extends javax.swing.JPanel impleme
         fftLenComboBox = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        samplingRateCB = new javax.swing.JComboBox<>();
+        jLabel4 = new javax.swing.JLabel();
 
         jLabel1.setText("Sample Length, Seconds:");
 
@@ -58,8 +59,11 @@ public class AudioSystemDataSourceEditorPanel extends javax.swing.JPanel impleme
 
         jLabel3.setText("Sampling Rate (1/Seconds):");
 
-        jComboBox1.setEditable(true);
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "8000", "16000", "32000", "64000" }));
+        samplingRateCB.setEditable(true);
+        samplingRateCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "8000", "16000", "32000", "64000" }));
+
+        jLabel4.setFont(jLabel4.getFont().deriveFont(jLabel4.getFont().getSize()+2f));
+        jLabel4.setText("<html>A computer's audio system often provides a nice source for data.");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -67,7 +71,7 @@ public class AudioSystemDataSourceEditorPanel extends javax.swing.JPanel impleme
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(12, 12, 12)
                         .addComponent(jLabel2)
@@ -81,13 +85,15 @@ public class AudioSystemDataSourceEditorPanel extends javax.swing.JPanel impleme
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(49, Short.MAX_VALUE))
+                        .addComponent(samplingRateCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(lenTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -100,8 +106,8 @@ public class AudioSystemDataSourceEditorPanel extends javax.swing.JPanel impleme
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(167, Short.MAX_VALUE))
+                    .addComponent(samplingRateCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(123, Short.MAX_VALUE))
         );
 
         bindingGroup.bind();
@@ -109,11 +115,12 @@ public class AudioSystemDataSourceEditorPanel extends javax.swing.JPanel impleme
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox fftCB;
     private javax.swing.JComboBox fftLenComboBox;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JFormattedTextField lenTF;
+    private javax.swing.JComboBox<String> samplingRateCB;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
@@ -143,6 +150,11 @@ public class AudioSystemDataSourceEditorPanel extends javax.swing.JPanel impleme
         if ( fft!=null ) {
             this.fftLenComboBox.setSelectedItem(fft);
         }
+        String s= params.get("rate");
+        if ( s!=null ) {
+            this.samplingRateCB.setSelectedItem(s);
+        }
+        
     }
 
     @Override
@@ -160,6 +172,9 @@ public class AudioSystemDataSourceEditorPanel extends javax.swing.JPanel impleme
         String result=  "vap+audiosystem:len="+this.lenTF.getValue();
         if ( fftCB.isSelected() ) {
             result= result+"&spec="+fftLenComboBox.getSelectedItem();
+        }
+        if ( !samplingRateCB.getSelectedItem().equals("8000") ) {
+            result= result+"&rate="+samplingRateCB.getSelectedItem();
         }
         return result;
     }
