@@ -3860,10 +3860,11 @@ private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
             String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
         initLogConsole();
         logConsolePanel.setViewportView( logConsole );
+        setStatus( "Use [menubar]->Options->Save Options to make console tab visible in future sessions.");
     } else if ( logConsoleMenuItem.isSelected() && logConsolePanel!=null ) {
         tabs.addTab(TAB_CONSOLE, null, logConsolePanel,
             String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
-        
+        setStatus( "Use [menubar]->Options->Save Options to make console tab visible in future sessions.");
     } else {
         if ( logConsoleMenuItem.isSelected() && logConsolePanel!=null ) {
             logConsole.undoLogConsoleMessages();
@@ -4460,6 +4461,7 @@ private void makeDataVisibleImmediately( boolean newValue ) {
         jsp.setViewportView(dataPanel);
         tabs.insertTab("data", null, jsp,
                 String.format( TAB_TOOLTIP_DATA, TABS_TOOLTIP ), idx );
+        setStatus( "Use [menubar]->Options->Save Options to make data tab visible in future sessions.");
     } else {
         if ( dataPanel!=null ) {
             Component dataPanelComponent= dataPanel.getParent();
@@ -4502,6 +4504,7 @@ private void makeLayoutVisibleImmediately( boolean newValue ) {
         jsp.setViewportView(layoutPanel);
         tabs.insertTab("layout", null, jsp,
                 String.format( TAB_TOOLTIP_LAYOUT, TABS_TOOLTIP ), idx+1 );
+        setStatus( "Use [menubar]->Options->Save Options to make layout tab visible in future sessions.");
     } else {
         if ( layoutPanel!=null ) tabs.remove(layoutPanel.getParent().getParent());
     }    
