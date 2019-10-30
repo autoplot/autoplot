@@ -32,7 +32,7 @@ import org.das2.qds.ops.Ops;
  * provide a dataset by grabbing data from the desktop's audio system.
  * @author jbf
  */
-public class AudioSystemDataSource extends AbstractDataSource implements Updating {
+public final class AudioSystemDataSource extends AbstractDataSource implements Updating {
 
     public AudioSystemDataSource( URI uri ) {
         super(uri);
@@ -57,7 +57,7 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
         int sampleRate= Integer.parseInt( getParam( "rate", "8000" ) );
         
         nsamples = (int) (lenSeconds * sampleRate );
-        int len = nsamples * 4;
+        int len = nsamples * 2;
         int nchannels= 1;
         int bitsPerSample= 16;
         int frameSize= bitsPerSample / ( nchannels * 8 );
@@ -200,10 +200,12 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
 
     PropertyChangeSupport pcs= new PropertyChangeSupport(this);
 
+    @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(listener);
     }
 
+    @Override
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         pcs.removePropertyChangeListener(listener);
     }
