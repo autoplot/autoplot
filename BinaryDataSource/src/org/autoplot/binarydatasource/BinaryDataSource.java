@@ -323,6 +323,9 @@ public class BinaryDataSource extends AbstractDataSource {
 
         s= params.get( "format" );
         if ( s!=null ) {
+            if ( s.length()==1 && !s.startsWith("%") ) {
+                s= "%"+s;
+            }
             ds.putProperty( QDataSet.FORMAT, s );
         }
             
