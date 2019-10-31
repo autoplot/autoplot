@@ -1104,6 +1104,9 @@ public class BatchMaster extends javax.swing.JPanel {
         f2= f2.replaceAll("/", "_");
         f1= f1.replaceAll(" ", "_");
         f2= f2.replaceAll(" ", "_");
+        f1= f1.replaceAll(":", "_"); // times
+        f2= f2.replaceAll(":", "_");
+        
         if ( writeCheckBox.isSelected() ) {
             String template= writeFilenameCB.getSelectedItem().toString();
             String[] ss= template.split("\\$x",-2);
