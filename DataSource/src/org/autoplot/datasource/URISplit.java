@@ -754,17 +754,29 @@ public class URISplit {
         if ( rsurl.substring(0,iquery ).contains("\\") ){
             rsurl= rsurl.substring(0,iquery).replaceAll("\\\\","/") + rsurl.substring(iquery);
         }
-        if (result.scheme != null) {
-            int iauth = result.scheme.length() + 1;
-            while (iauth < rsurl.length() && rsurl.charAt(iauth) == '/') {
-                iauth++;
+        if(result.scheme != null){
+            if(result.scheme.equalsIgnoreCase("tag")){
+                // For the tag scheme, the authority is odd.  In addition the authority
+                // has a date.  For the purposes here, we combine the date with the
+                // authority, but they are two different components.
+                String[] aTmp = result.surl.split(":", 3);
+                if( aTmp.length > 1) result.authority = "tag:"+aTmp[1];  //see def on line 204 above
+                else result.authority = "tag:";                          
             }
-            iauth = rsurl.indexOf('/', iauth);
-            if (iauth == -1) iauth = rsurl.length();
-            if ( rsurl.charAt(iauth-1)==':' && rsurl.charAt(iauth-3)==':'  ) {
-                    iauth= iauth-2;
+            else{
+                int iauth = result.scheme.length() + 1;
+                while(iauth < rsurl.length() && rsurl.charAt(iauth) == '/'){
+                    iauth++;
+                }
+                iauth = rsurl.indexOf('/', iauth);
+                if(iauth == -1){
+                    iauth = rsurl.length();
+                }
+                if(rsurl.charAt(iauth - 1) == ':' && rsurl.charAt(iauth - 3) == ':'){
+                    iauth = iauth - 2;
+                }
+                result.authority = rsurl.substring(0, iauth);
             }
-            result.authority = rsurl.substring(0, iauth);
         }
 
         if ( ext!=null && ext.length()==0 ) ext=null;
