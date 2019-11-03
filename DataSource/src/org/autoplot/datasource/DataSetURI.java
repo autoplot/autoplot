@@ -2074,8 +2074,8 @@ public class DataSetURI {
 						 
                     // Temporary: Keep das2 federated catalog out of the top level list
                     // while testing is in progress.  --cwp
-                    if(! ext.equals((".dfc")))
-                    result.add(ext);
+                    if(! ext.equals((".dc")))
+                    result.add(ext); /* dascat */
                 }
             } catch (RuntimeException ex) {
                 throw ex;

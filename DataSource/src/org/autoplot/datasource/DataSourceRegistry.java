@@ -774,7 +774,7 @@ public class DataSourceRegistry {
             return "CDAWeb database at NASA/SPDF";
         } else if ( vapext.startsWith("vap+das2server") ) {
             return "Das2Server";
-        } else if (vapext.startsWith("vap+dfc")){
+        } else if (vapext.startsWith("vap+dc")){
             return "Federated das2 catalog";
         } else if ( vapext.startsWith("vap+inline") ) {
             return "Data encoded within the URI";
@@ -793,7 +793,7 @@ public class DataSourceRegistry {
         int i= vapScheme.indexOf(':');
         if ( i>0 ) vapScheme= vapScheme.substring(0,i);
         boolean noUri= vapScheme.endsWith("cdaweb") || vapScheme.endsWith("inline" ) || 
-                       vapScheme.endsWith("pdsppi") || vapScheme.endsWith("dfc");
+                       vapScheme.endsWith("pdsppi") || vapScheme.endsWith("dc") /* dascat */; 
         return !noUri;
     }
     
