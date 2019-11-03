@@ -2071,6 +2071,10 @@ public class DataSetURI {
             try {
                 DataSourceFactory o = DataSourceRegistry.getInstance().getSource(ext);
                 if ( o!=null && o.supportsDiscovery() ) {
+						 
+                    // Temporary: Keep das2 federated catalog out of the top level list
+                    // while testing is in progress.  --cwp
+                    if(! ext.equals((".dfc")))
                     result.add(ext);
                 }
             } catch (RuntimeException ex) {
