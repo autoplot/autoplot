@@ -586,8 +586,8 @@ public class EditorContextMenu {
                         a.setContentType("text/python");
                         a.setText(jython);
                         JDialog d= new JDialog();
-                        a.setMinimumSize( new Dimension(400,400) );
-                        a.setPreferredSize( new Dimension(400,400) );
+                        a.setMinimumSize( new Dimension(800,800) );
+                        a.setPreferredSize( new Dimension(800,800) );
                         d.getContentPane().add(new JScrollPane(a));
                         d.pack();
                         d.setVisible(true);

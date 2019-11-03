@@ -6,8 +6,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -65,10 +68,14 @@ public class JythonToJavaConverter {
     public static String convertReverse(String doThis) {
         String[] ss= doThis.split("\n");
         StringBuilder b= new StringBuilder();
-        Pattern assignPattern= Pattern.compile("([A-Z]\\S*)(\\s+)(\\S*)(\\s*=.*)");
+        Pattern assignPattern= Pattern.compile("([a-zA-Z.]*[A-Z]\\S+)(\\s+)(\\S+)(\\s*=.*)");
         Pattern importPattern1= Pattern.compile("import ([a-z\\.]*)\\.([A-Za-z\\*]*)");
+        Pattern newPattern= Pattern.compile("(.*)([=\\s]*)?new\\s*([a-zA-Z\\.]+)(.*)");
         int indentLevel= 0;
         String indent="";
+        
+        ArrayList<String> importedPaths= new ArrayList<>();
+        
         int lineNumber= 0;
         for ( String s: ss ) {
             logger.log(Level.FINER, "line {0}: {1}", new Object[]{lineNumber, s});
@@ -76,9 +83,22 @@ public class JythonToJavaConverter {
             s= s.trim();
             if ( s.endsWith(";") ) s= s.substring(0,s.length()-1);
             s= s.replaceAll("//","#");
-            s= s.replaceAll(" new ", "" );
+            Matcher m= newPattern.matcher(s);
+            if ( m.matches() ) {
+                String clas= "import " + m.group(3);
+                if ( !importedPaths.contains(clas) ) {
+                    importedPaths.add(clas);
+                }
+                s= m.group(1) + m.group(2) + m.group(3) + m.group(4);
+            }
+            if ( s.contains("Short.") ) {
+                String clas= "from java.lang import Short";
+                if ( !importedPaths.contains(clas)) {
+                    importedPaths.add(clas);
+                }
+            }
             s= s.replaceAll("null","None");
-            Matcher m= assignPattern.matcher(s);
+            m= assignPattern.matcher(s);
             if ( m.matches() ) {
                 s= m.group(3)+m.group(4);
             } else {
@@ -87,6 +107,12 @@ public class JythonToJavaConverter {
                     s= "from "+m.group(1)+" import "+m.group(2);
                 }
             }
+            if ( s.contains("(") && !s.contains(")") ) {
+                indentLevel= Math.min( 16, indentLevel+4 );
+            }
+            if ( s.contains(")") && !s.contains("(") ) {
+                indentLevel= Math.max( 0, indentLevel-4 );
+            }   
             if ( s.contains("{") ) {
                 indentLevel= Math.min( 16, indentLevel+4 );
                 s= s.replace("{",":");
@@ -102,7 +128,13 @@ public class JythonToJavaConverter {
                 indent= "                ".substring(0,indentLevel);
             }
         }
-        return b.toString();
+        StringBuilder sb= new StringBuilder();
+        for ( String s : importedPaths ) {
+            sb.append(s).append("\n");
+        }
+        if ( importedPaths.size()>0 ) sb.append("\n");
+        sb.append(b);
+        return sb.toString();
     }
 
     private static class MyVisitorBase<R> extends VisitorBase {
