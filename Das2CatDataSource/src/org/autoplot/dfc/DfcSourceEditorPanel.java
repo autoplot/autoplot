@@ -4,9 +4,14 @@ package org.autoplot.dfc;
 
 import java.awt.Window;
 import java.util.List;
+import java.util.Map;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.URISplit;
+import org.das2.util.catalog.DasNode;
+import org.das2.util.catalog.DasNodeFactory;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 
 /**
@@ -15,6 +20,11 @@ import org.das2.util.monitor.ProgressMonitor;
  */
 public class DfcSourceEditorPanel extends javax.swing.JPanel 
 	implements DataSourceEditorPanel {
+
+	private DasNode nodeCur;
+	private DasNode nodeRoot;
+	private Map<String,String> paramCur;
+	private String sCurUri;
 
 	/**
 	 * Creates new form Das2CatSourceEditorPanel
@@ -259,7 +269,7 @@ public class DfcSourceEditorPanel extends javax.swing.JPanel
 	public boolean reject(String sFullUri) throws Exception
 	{
 		// We know how to deal with an empty resource URL, just pull the root nodes
-		if(sFullUri.equals("vap+dfc:")) return false;
+		if(sFullUri.equals("vap+dc:")) return false;
 				
 		//URISplit split = URISplit.parse(sFullUri);
 		
@@ -272,22 +282,93 @@ public class DfcSourceEditorPanel extends javax.swing.JPanel
 		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 
+	
+	/** Gather any node definitions that will be needed for the dialog box
+	 * 
+	 * URI examples that we may have to edit:
+	 * 
+	 *   vap+dc:tag:das2.org,2012:test:/swri/mars_express/aspera3/els?radius=2,3
+	 *   vap+dc:site:/uiowa/juno/survey/wav/das2?band=LFRL&time=2017-01-01,2017-01-02,60
+	 *   vap+dc:http://random.site.edu/~person/mysource.json?some_key=some_value
+	 * 
+	 * @param sFullUri The full Autoplot URI, examples above
+	 * @param parent   The window parent, in case we need to pop a dlg with a cancel button
+	 * @param mon      A progress monitor
+	 * @return true, since at present there is no way to cancel
+	 * @throws Exception 
+	 */
 	@Override
-	public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception
+	public boolean prepare(String sFullUri, Window parent, ProgressMonitor mon) 
+		throws Exception
 	{
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		sCurUri = sFullUri;  // Save off the full uri as a sanity check in setURI to make
+		                     // sure I've prepared for the right thing
+		
+		URISplit split = URISplit.parse(sFullUri);
+		
+		String sNodeUrl = null;
+		if( ! sFullUri.equals("vap+dc:")){ 
+			sNodeUrl = split.surl;
+		}
+		
+		// Try to get a node definition
+		nodeCur = DasNodeFactory.getNearestNode(sNodeUrl, mon, false /*don't force reload*/);
+		if(nodeCur == null){
+			// Fall back to the root nodes, if that fails pop an error and give up.
+			nodeCur = DasNodeFactory.getNearestNode(null, mon, false);
+			if(nodeCur == null){
+				
+				//Todo pop a cancel dialog???
+				String sMsg;
+				if(sNodeUrl != null){
+					sMsg = "Couldn't find a catalog node at:<br>   "+sNodeUrl+"<br>";
+					sMsg += "and fallback to catalog root definitions at:<br>";
+					sMsg += DasNodeFactory.defRootNodesAsStr("   ", "<br>");
+					sMsg += "<br>Failed.";
+				}
+				else{
+					sMsg = "Couldn't get root catalog definitions from:<br>";
+					sMsg += DasNodeFactory.defRootNodesAsStr("   ", "<br>");
+				}
+				
+				Object[] options = {"Cancel"};
+				JOptionPane.showOptionDialog(
+					null, sMsg, "Connection Error", JOptionPane.DEFAULT_OPTION,
+					JOptionPane.INFORMATION_MESSAGE, null, options, options[0]
+				);
+				return false;
+			}
+		}
+		
+		// A root node has no parents, but that doesn't mean it's the global catalog root
+		// that is a different concept.  Note that getRootNode can return 'this'.
+		if(!nodeCur.isRootNode()) nodeRoot = nodeCur.getRootNode();
+		
+		return true;
 	}
 
+	/** Provides a starting full URI to the editor and trigger a runnable to show the
+	 * editor GUI.
+	 * 
+	 * In general both the catalog panel and the source options panel are displayed
+	 * together, however if this is a standalone root of type source, that has no 
+	 * parents, then only the source controls are displayed
+	 * @param uri 
+	 */
 	@Override
-	public void setURI(String uri)
+	public void setURI(String sFullUri)
 	{
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		assert sFullUri.equals(sCurUri) : "URI changed after prepare";
+		
+		// TODO: Prep the dialog
+		 
 	}
 
 	@Override
 	public void markProblems(List<String> problems)
 	{
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		// TODO: Add and problems with the URL you wish to specify.  For now,
+		// we surely have no problems ;) 
 	}
 
 	@Override

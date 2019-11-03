@@ -31,7 +31,7 @@ public class DfcSourceFactory extends AbstractDataSourceFactory
 	public DataSource getDataSource(URI uri) throws Exception
 	{
 		ProgressMonitor mon = new NullProgressMonitor();
-		DasNode node = DasNodeFactory.getNode(uri.toString(), mon, false);
+		DasNode node = DasNodeFactory.getNearestNode(uri.toString(), mon, false);
 		return new DfcSource(uri, node);
 	}
 	
@@ -60,8 +60,8 @@ public class DfcSourceFactory extends AbstractDataSourceFactory
 		 
 		 // If the URI provided does not reference a source type then it's not complete
 		 String sNodeUrl = null;
-		 if( ! sUrl.equals("vap+dfc:")) sNodeUrl = split.surl;
-		 DasNode node = DasNodeFactory.getNode(sNodeUrl, mon, false);
+		 if( ! sUrl.equals("vap+dc:")) sNodeUrl = split.surl;
+		 DasNode node = DasNodeFactory.getNearestNode(sNodeUrl, mon, false);
 		 if(!node.isDataSource()) return true;
 		 
 		 DasSrcNode srcNode = (DasSrcNode)node;
