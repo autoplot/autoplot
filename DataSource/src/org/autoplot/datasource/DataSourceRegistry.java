@@ -563,6 +563,7 @@ public class DataSourceRegistry {
      * @return the DataSourceFactory which will create the reader.
      */
     public synchronized DataSourceFactory getSource(String extension) {
+        // dfc: Break here to find out how to autoset the mime-type from the path
         if ( extension==null ) return null;
         extension= getExtension(extension);
         Object o = dataSourcesByExt.get(extension);
@@ -773,6 +774,8 @@ public class DataSourceRegistry {
             return "CDAWeb database at NASA/SPDF";
         } else if ( vapext.startsWith("vap+das2server") ) {
             return "Das2Server";
+        } else if (vapext.startsWith("vap+dfc")){
+            return "Federated das2 catalog";
         } else if ( vapext.startsWith("vap+inline") ) {
             return "Data encoded within the URI";
         } else {
@@ -789,7 +792,8 @@ public class DataSourceRegistry {
     public boolean hasResourceUri(String vapScheme) {
         int i= vapScheme.indexOf(':');
         if ( i>0 ) vapScheme= vapScheme.substring(0,i);
-        boolean noUri= vapScheme.endsWith("cdaweb") || vapScheme.endsWith("inline" ) || vapScheme.endsWith("pdsppi");
+        boolean noUri= vapScheme.endsWith("cdaweb") || vapScheme.endsWith("inline" ) || 
+                       vapScheme.endsWith("pdsppi") || vapScheme.endsWith("dfc");
         return !noUri;
     }
     
