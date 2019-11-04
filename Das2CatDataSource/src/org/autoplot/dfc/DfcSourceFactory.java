@@ -39,11 +39,7 @@ public class DfcSourceFactory extends AbstractDataSourceFactory
 	 * @return true
 	 */
 	@Override
-    public boolean supportsDiscovery() {
-       // Hide from users for now... 
-		 //return true; //TODO: completions should support this.
-		  return true;
-    }
+    public boolean supportsDiscovery() { return true; }
 	 
 	 /** We have to reject the URI in order to pop up the inspection dialog box. 
 	  * This makes sense because if the URI is good, folks just want to see the data.
@@ -61,7 +57,10 @@ public class DfcSourceFactory extends AbstractDataSourceFactory
 		 // If the URI provided does not reference a source type then it's not complete
 		 String sNodeUrl = null;
 		 if( ! sUrl.equals("vap+dc:")) sNodeUrl = split.surl;
-		 DasNode node = DasNodeFactory.getNearestNode(sNodeUrl, mon, false);
+		 DasNode node = DasNodeFactory.getNode(sNodeUrl, mon, false);
+		 
+		 if(node == null) return true;
+		 
 		 if(!node.isDataSource()) return true;
 		 
 		 DasSrcNode srcNode = (DasSrcNode)node;
