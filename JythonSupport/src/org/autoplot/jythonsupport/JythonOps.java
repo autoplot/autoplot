@@ -325,7 +325,7 @@ public class JythonOps {
     }
     
     /**
-     * download the resource, unpack it, and add it to the search path.  Note
+     * download the jar file resource, unpack it, and add it to the search path.  Note
      * such scripts will not work with Webstart releases!
      *
      * Here is an example use:
@@ -355,7 +355,7 @@ public class JythonOps {
     }
     
     /**
-     * download the resource, unpack it, and add it to the search path.  Note
+     * download the jar file resource, unpack it, and add it to the search path.  Note
      * such scripts will not work with Webstart releases!
      *
      * Here is an example use:
