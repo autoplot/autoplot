@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Scary sounds from RBSP-B's magnetometer.  Listen <a href="scary.wav">here</a>.  Happy Holloween!
+        <p><small>Script draws graph paper showing pixel locations.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-10-31 r24273):</p>
+        <p>Bugfixes (2019-11-05 r24296):</p>
         <ul>
+            <li>binary data source add the percent to the format, supporting ...&format=c, so that percent need not be within the URI.   URI encoding is tricky with percents.
             <li>vap+audiosystem: would record for twice as long as it needed to.
             <li>cache IndexOutOfBounds when events renderer sees an empty dataset (ds[0,4]).
             <li>Run Batch tool replaces " " in output names with "_" so that filenames don't break.  Thanks, George!
