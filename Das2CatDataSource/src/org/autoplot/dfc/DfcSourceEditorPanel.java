@@ -313,32 +313,6 @@ public class DfcSourceEditorPanel extends javax.swing.JPanel
 		
 		// Try to get a node definition
 		nodeCur = DasNodeFactory.getNearestNode(sNodeUrl, mon, false /*don't force reload*/);
-		if(nodeCur == null){
-			// Fall back to the root nodes, if that fails pop an error and give up.
-			nodeCur = DasNodeFactory.getNearestNode(null, mon, false);
-			if(nodeCur == null){
-				
-				//Todo pop a cancel dialog???
-				String sMsg;
-				if(sNodeUrl != null){
-					sMsg = "Couldn't find a catalog node at:<br>   "+sNodeUrl+"<br>";
-					sMsg += "and fallback to catalog root definitions at:<br>";
-					sMsg += DasNodeFactory.defRootNodesAsStr("   ", "<br>");
-					sMsg += "<br>Failed.";
-				}
-				else{
-					sMsg = "Couldn't get root catalog definitions from:<br>";
-					sMsg += DasNodeFactory.defRootNodesAsStr("   ", "<br>");
-				}
-				
-				Object[] options = {"Cancel"};
-				JOptionPane.showOptionDialog(
-					null, sMsg, "Connection Error", JOptionPane.DEFAULT_OPTION,
-					JOptionPane.INFORMATION_MESSAGE, null, options, options[0]
-				);
-				return false;
-			}
-		}
 		
 		// A root node has no parents, but that doesn't mean it's the global catalog root
 		// that is a different concept.  Note that getRootNode can return 'this'.

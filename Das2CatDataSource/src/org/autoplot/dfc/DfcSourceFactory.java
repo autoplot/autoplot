@@ -4,7 +4,9 @@
  */
 package org.autoplot.dfc;
 
+import java.io.IOException;
 import java.net.URI;
+import java.text.ParseException;
 import java.util.Collections;
 import org.autoplot.datasource.AbstractDataSourceFactory;
 import org.autoplot.datasource.DataSource;
@@ -12,10 +14,12 @@ import org.autoplot.datasource.CompletionContext;
 import java.util.List;
 import org.autoplot.datasource.URISplit;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.catalog.DasNode;
 import org.das2.util.catalog.DasNodeFactory;
 import org.das2.util.catalog.DasSrcNode;
+import org.das2.util.catalog.ResolutionException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 
@@ -57,7 +61,12 @@ public class DfcSourceFactory extends AbstractDataSourceFactory
 		 // If the URI provided does not reference a source type then it's not complete
 		 String sNodeUrl = null;
 		 if( ! sUrl.equals("vap+dc:")) sNodeUrl = split.surl;
-		 DasNode node = DasNodeFactory.getNode(sNodeUrl, mon, false);
+		 DasNode node;
+		try{
+			node = DasNodeFactory.getNode(sNodeUrl, mon, false);
+		} catch(ResolutionException | IOException | ParseException ex){
+			return true;
+		}
 		 
 		 if(node == null) return true;
 		 
