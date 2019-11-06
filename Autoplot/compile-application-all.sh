@@ -99,6 +99,7 @@ for i in \
   AudioSystemDataSource \
   BinaryDataSource DataSourcePack JythonDataSource \
   Das2ServerDataSource TsdsDataSource  \
+  Das2CatDataSource \
   NetCdfDataSource CefDataSource \
   WavDataSource ImageDataSource ExcelDataSource \
   FitsDataSource OpenDapDataSource \
