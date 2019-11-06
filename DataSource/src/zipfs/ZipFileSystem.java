@@ -65,6 +65,12 @@ public class ZipFileSystem extends FileSystem {
         ZipFileObject zfo = new ZipFileObject(this, entry, filemap.get(parentName),n);
         filemap.put(name, zfo);
         filemap.get(parentName).addChildObject(zfo);
+        if ( name.endsWith(".gz") ) {
+            n= name.substring(0,name.length()-3);
+            zfo = new ZipFileObject(this, entry, filemap.get(parentName), n);
+            filemap.put(n, zfo);
+            filemap.get(parentName).addChildObject(zfo);
+        }
     }
 
     // ZipFileObject will need this for opening streams
@@ -80,6 +86,8 @@ public class ZipFileSystem extends FileSystem {
             return filemap.get(f);
         } else if (filemap.containsKey(f+"/")) {  //maybe it's a folder with out trailing /
             return filemap.get(f+"/");
+        } else if ( filemap.containsKey(f+".gz") ) {
+            return filemap.get(f+".gz");
         } else {
             return new ZipFileObject( this, null, null, filename );
         }

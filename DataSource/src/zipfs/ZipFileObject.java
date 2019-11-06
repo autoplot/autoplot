@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystemUtil;
@@ -24,6 +25,7 @@ public class ZipFileObject extends FileObject {
     private ZipFileObject parent;
     private String name;            // Full name of file; only used when zipEntry is null
     private ArrayList<ZipFileObject> children;
+    private boolean unzip;          // the file must also be unzipped.
 
     /** Create a new <code>ZipFileObject</code>.
      * 
@@ -52,6 +54,7 @@ public class ZipFileObject extends FileObject {
         this.zipEntry = zipEntry;
         this.parent = par;
         this.name = name;       // used by getNameExt only when zipEntry is null
+        this.unzip= zipEntry!=null && name!=null && zipEntry.getName().endsWith(".gz") && !name.endsWith(".gz") ;
         children = new ArrayList<>();
     }
 
@@ -75,7 +78,11 @@ public class ZipFileObject extends FileObject {
         if ( !exists() ) {
             throw new FileNotFoundException("file not found in zip: "+name );
         } else {
-            return zfs.getZipFile().getInputStream(zipEntry);
+            if ( unzip ) {
+                return new GZIPInputStream( zfs.getZipFile().getInputStream(zipEntry) );
+            } else {
+                return zfs.getZipFile().getInputStream(zipEntry);
+            }
         }
     }
 
@@ -91,7 +98,12 @@ public class ZipFileObject extends FileObject {
         // ignoring the monitor for now; possibly we'll need to use it this proves slow
         if ( !exists() ) throw new FileNotFoundException(
                 String.format( "file %s does not exist in %s", this.name, this.zfs.toString() ) );
-        String tmpFileName = zfs.getLocalRoot().getAbsoluteFile() + "/" + zipEntry.getName();
+        String tmpFileName;
+        if ( unzip ) {
+            tmpFileName= zfs.getLocalRoot().getAbsoluteFile() + "/" + name;
+        } else {
+            tmpFileName= zfs.getLocalRoot().getAbsoluteFile() + "/" + zipEntry.getName();
+        }
         File tmpFile = new File(tmpFileName);
         File tmpDir = tmpFile.getParentFile();
 
@@ -110,7 +122,7 @@ public class ZipFileObject extends FileObject {
             throw new IllegalArgumentException("unable to create file "+tmpFile );
         }
 
-        try (InputStream zStream = zfs.getZipFile().getInputStream(zipEntry)) {
+        try (InputStream zStream = getInputStream(monitor) ) {
             FileSystemUtil.dumpToFile(zStream, tmpFile);
         }
 
