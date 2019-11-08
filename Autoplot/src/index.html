@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Script draws graph paper showing pixel locations.
+        <p><small>New area for digitizing scripts is started at <a href='https://github.com/autoplot/dev/blob/master/demos/digitizers/'>https://github.com/autoplot/dev/blob/master/demos/digitizers/</a>.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2019-11-05 r24296):</p>
         <ul>
+            <li>.gz files found within .zip files are can be read in.
             <li>binary data source add the percent to the format, supporting ...&format=c, so that percent need not be within the URI.   URI encoding is tricky with percents.
             <li>vap+audiosystem: would record for twice as long as it needed to.
             <li>cache IndexOutOfBounds when events renderer sees an empty dataset (ds[0,4]).
@@ -56,6 +57,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>"http://autoplot.org/jnlp/v2019*/screen.png" can be browsed with the PNG Walk Tool.<li>
             <li>360: allow color type in jython script parameters.
             <li>334: allow where constraint to have slice, so Z component can be used to filter with URIs like ...&where=BGSEc[:,2].lt(0)
             <li>360: allow either values or enum to be used in script parameter constraints.
