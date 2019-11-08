@@ -1334,28 +1334,83 @@ public class DomUtil {
                 ids.put( n.id, n );
             }
         }
-        for ( DomNode n: dom.plotElements ) {
+        List<Column> cc= new ArrayList( dom.getCanvases(0).columns );
+        cc.add( dom.getCanvases(0).marginColumn );
+        for ( DomNode n: cc ) {
             DomNode n1= ids.get(n.id);
             if ( n1!=null ) {
-                problems.add( "PlotElement id is already taken by "+n1+"." );
+                problems.add( "Column id is already taken by "+n1+"." );
+            } else {
+                ids.put( n.id, n );
+            }
+        }
+        List<Row> rr= new ArrayList( dom.getCanvases(0).rows );
+        rr.add( dom.getCanvases(0).marginRow );
+        for ( DomNode n: rr ) {
+            DomNode n1= ids.get(n.id);
+            if ( n1!=null ) {
+                problems.add( "Row id is already taken by "+n1+"." );
             } else {
                 ids.put( n.id, n );
             }
         }        
-        for ( DomNode n: dom.plots ) {
+        for ( Plot n: dom.plots ) {
             DomNode n1= ids.get(n.id);
             if ( n1!=null ) {
                 problems.add( "Plot id is already taken by "+n1+"." );
             } else {
                 ids.put( n.id, n );
             }
+            if ( ids.get( n.getRowId() )==null ) {
+                problems.add( "PlotElement refers to row '"+n.getRowId()+"' which is not found: "+n );
+            }
+            if ( ids.get( n.getColumnId() )==null ) {
+                problems.add( "PlotElement refers to column '"+n.getColumnId()+"' which is not found: "+n );
+            }
         }
-        for ( DomNode n: dom.connectors ) {
-            DomNode n1= ids.get(n.id);
+        for ( PlotElement pe: dom.plotElements ) {
+            DomNode n1= ids.get(pe.id);
+            if ( n1!=null ) {
+                problems.add( "PlotElement id is already taken by "+n1+"." );
+            } else {
+                ids.put( pe.id, pe );
+            }
+            if ( ids.get(pe.plotId)==null ) {
+                problems.add( "PlotElement refers to plot '"+pe.plotId+"' which is not found: "+pe );
+            }
+            if ( ids.get(pe.dataSourceFilterId)==null ) {
+                problems.add( "PlotElement refers to dataSourceFilter '"+pe.dataSourceFilterId+"' which is not found: "+pe );
+            }
+        }        
+        for ( Connector c: dom.connectors ) {
+            DomNode n1= ids.get(c.id);
             if ( n1!=null ) {
                 problems.add( "Connector id is already taken by "+n1+"." );
             } else {
-                ids.put( n.id, n );
+                ids.put( c.id, c );
+            }
+            if ( ids.get(c.plotA)==null ) {
+                problems.add( "Connector refers to plot '"+c.plotA +"' which is not found: "+c );
+            }
+            if ( ids.get(c.plotB)==null ) {
+                problems.add( "Connector refers to plot '"+c.plotB +"' which is not found: "+c );
+            }            
+        }
+        for ( Annotation a: dom.annotations ) {
+            DomNode n1= ids.get(a.id);
+            if ( n1!=null ) {
+                problems.add( "Annotation id is already taken by "+n1+"." );
+            } else {
+                ids.put( a.id, a );
+            }
+            if ( a.getPlotId().length()>0 && ids.get(a.getPlotId())==null ) {
+                problems.add( "Annotation refers to plot '"+a.getPlotId() +"' which is not found: "+a );
+            }
+            if ( a.getColumnId().trim().length()>0 && ids.get(a.getColumnId())==null ) {
+                problems.add( "Annotation refers to column '"+a.getColumnId() +"' which is not found: "+a );
+            }
+            if ( a.getRowId().trim().length()>0 && ids.get(a.getRowId())==null ) {
+                problems.add( "Annotation refers to row '"+a.getRowId() +"' which is not found: "+a );
             }
         }
         return problems;
