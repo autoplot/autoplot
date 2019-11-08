@@ -478,6 +478,14 @@ public class StatePersistence {
     public static Application restoreState(InputStream in, LinkedHashMap<String, String> deltas) throws IOException {
         
         Application state = (Application) StatePersistence.restoreState(in);
+        
+        List<String> problems= DomUtil.checkUniqueIdsAndReferences( state, new ArrayList<String>() );
+        if ( problems.size()>0 ) {
+            for ( String s: problems ) {
+                logger.warning(s);
+            }
+        }
+        
         makeValid( state );
         
         if (deltas != null) {
