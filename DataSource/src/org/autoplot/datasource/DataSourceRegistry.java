@@ -792,8 +792,8 @@ public class DataSourceRegistry {
     public boolean hasResourceUri(String vapScheme) {
         int i= vapScheme.indexOf(':');
         if ( i>0 ) vapScheme= vapScheme.substring(0,i);
-        boolean noUri= vapScheme.endsWith("cdaweb") || vapScheme.endsWith("inline" ) || 
-                       vapScheme.endsWith("pdsppi") || vapScheme.endsWith("dc") /* dascat */; 
+        boolean noUri= vapScheme.equals("vap+cdaweb") || vapScheme.endsWith("vap+inline" ) || 
+                       vapScheme.equals("vap+pdsppi") || vapScheme.endsWith("vap+dc") /* dascat */; 
         return !noUri;
     }
     
