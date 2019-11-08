@@ -15,6 +15,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -1320,5 +1321,43 @@ public class DomUtil {
                 "||" + c.marginColumn.getLeft()+","+c.marginColumn.getRight(), 
                 "=" + c.marginRow.getTop()+","+c.marginRow.getBottom(), 
                 "=" + arow.getTop() + "," + arow.getBottom() );
+    }
+
+    public static List<String> checkUniqueIdsAndReferences( Application dom, List<String> problems ) {
+        // check that all ids within the .vap are unique
+        Map<String,DomNode> ids= new HashMap<>();
+        for ( DomNode n: dom.dataSourceFilters ) {
+            DomNode n1= ids.get(n.id);
+            if ( n1!=null ) {
+                problems.add( "DataSourceFilter id is already taken by "+n1+"." );
+            } else {
+                ids.put( n.id, n );
+            }
+        }
+        for ( DomNode n: dom.plotElements ) {
+            DomNode n1= ids.get(n.id);
+            if ( n1!=null ) {
+                problems.add( "PlotElement id is already taken by "+n1+"." );
+            } else {
+                ids.put( n.id, n );
+            }
+        }        
+        for ( DomNode n: dom.plots ) {
+            DomNode n1= ids.get(n.id);
+            if ( n1!=null ) {
+                problems.add( "Plot id is already taken by "+n1+"." );
+            } else {
+                ids.put( n.id, n );
+            }
+        }
+        for ( DomNode n: dom.connectors ) {
+            DomNode n1= ids.get(n.id);
+            if ( n1!=null ) {
+                problems.add( "Connector id is already taken by "+n1+"." );
+            } else {
+                ids.put( n.id, n );
+            }
+        }
+        return problems;
     }
 }
