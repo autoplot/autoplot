@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 import org.das2.util.catalog.DasNode;
 import org.das2.util.catalog.DasNodeFactory;
 import org.das2.util.catalog.DasSrcNode;
-import org.das2.util.catalog.ResolutionException;
+import org.das2.util.catalog.DasResolveException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 
@@ -53,29 +53,30 @@ public class DfcSourceFactory extends AbstractDataSourceFactory
 	  * @param mon
 	  * @return 
 	  */
-	 @Override
-    public boolean reject(String sUrl, List<String> lProblems, ProgressMonitor mon) {
-		 URISplit split = URISplit.parse(sUrl);
-		 Map<String,String> params= URISplit.parseParams(split.params);
+	@Override
+	public boolean reject(String sUrl, List<String> lProblems, ProgressMonitor mon) {
+		URISplit split = URISplit.parse(sUrl);
+		Map<String,String> params= URISplit.parseParams(split.params);
 		 
-		 // If the URI provided does not reference a source type then it's not complete
-		 String sNodeUrl = null;
-		 if( ! sUrl.equals("vap+dc:")) sNodeUrl = split.surl;
-		 DasNode node;
+		// If the URI provided does not reference a source type then it's not complete
+		String sNodeUrl = null;
+		if( ! sUrl.equals("vap+dc:")) sNodeUrl = split.file;
+		
+		DasNode node;
 		try{
 			node = DasNodeFactory.getNode(sNodeUrl, mon, false);
-		} catch(ResolutionException | IOException | ParseException ex){
+		} catch(DasResolveException | IOException | ParseException ex){
 			return true;
 		}
 		 
-		 if(node == null) return true;
+		if(node == null) return true;
 		 
-		 if(!node.isSrc()) return true;
+		if(!node.isSrc()) return true;
 		 
-		 DasSrcNode srcNode = (DasSrcNode)node;
+		DasSrcNode srcNode = (DasSrcNode)node;
 		 
-		 // If the query passes, then there is no need for the source dialog
-		 return  ! srcNode.queryVerify(params); 
+		// If the query passes, then there is no need for the source dialog
+		return  ! srcNode.queryVerify(params); 
     }
 
 	@Override
