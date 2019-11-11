@@ -70,7 +70,7 @@ public class DfcSourceFactory extends AbstractDataSourceFactory
 		 
 		 if(node == null) return true;
 		 
-		 if(!node.isDataSource()) return true;
+		 if(!node.isSrc()) return true;
 		 
 		 DasSrcNode srcNode = (DasSrcNode)node;
 		 

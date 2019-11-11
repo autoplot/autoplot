@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.URISplit;
 import org.das2.util.catalog.DasNode;
 import org.das2.util.catalog.DasNodeFactory;
+import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 
@@ -264,22 +266,33 @@ public class DfcSourceEditorPanel extends javax.swing.JPanel
    // End of variables declaration//GEN-END:variables
 
 	// I think I am here because the data source factory rejected the given URL, so now
-	// I, the GUI am asked to deal with it.
+	// I, the GUI, am asked to deal with it.
 	@Override
 	public boolean reject(String sFullUri) throws Exception
 	{
 		// We know how to deal with an empty resource URL, just pull the root nodes
 		if(sFullUri.equals("vap+dc:")) return false;
 				
-		//URISplit split = URISplit.parse(sFullUri);
+		URISplit split = URISplit.parse(sFullUri);
 		
-		// If this starts with one of the filsystem URLs, then it needs to handle the
-		// completions first.
-		//if ( split.file==null || split.file.equals("file:///") ) { 
-		//	return false;
-		//}
+		// The split function above will represent the node url as a file item so pull that
+		String sCatPath = split.file;
 		
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		// If this starts with a known das top-branch catalog, or one of it's convienence
+		// strings, we can resolve it to something
+		if((sCatPath.startsWith(DasNodeFactory.DAS_ROOT_PATH)) ||
+			sCatPath.startsWith("site:") || sCatPath.startsWith("test:") ) return false;
+			
+		// FIXME:  For regular filesystem URLs I don't know if this URL is bad unless I
+		// download the object and inspect it.  But there is no progress monitor here
+		// so I'm probably not supposed to do that.  Not sure what to do and so have just
+		// copied in code from CdfDataSourceEditoryPanel. --cwp 2019-11-10
+		if( split.resourceUri==null) return true;
+        
+		FileSystem fs = FileSystem.create( 
+			DataSetURI.getWebURL( DataSetURI.toUri(split.path) ).toURI()
+		);
+		return fs.isDirectory( split.file.substring(split.path.length()) );
 	}
 
 	
@@ -306,17 +319,10 @@ public class DfcSourceEditorPanel extends javax.swing.JPanel
 		
 		URISplit split = URISplit.parse(sFullUri);
 		
-		String sNodeUrl = null;
-		if( ! sFullUri.equals("vap+dc:")){ 
-			sNodeUrl = split.surl;
-		}
-		
-		// Try to get a node definition
-		nodeCur = DasNodeFactory.getNearestNode(sNodeUrl, mon, false /*don't force reload*/);
-		
-		// A root node has no parents, but that doesn't mean it's the global catalog root
-		// that is a different concept.  Note that getRootNode can return 'this'.
-		if(!nodeCur.isRootNode()) nodeRoot = nodeCur.getRootNode();
+		// Try to get a node definition, this version will fail if there is a system 
+		// that selects das2 catalog node definitions using HTTP GET parameters, as these
+		// will be interpreted as data select parameters.
+		nodeCur = DasNodeFactory.getNearestNode(split.file, mon, false /*don't force reload ?*/);
 		
 		return true;
 	}
@@ -327,7 +333,7 @@ public class DfcSourceEditorPanel extends javax.swing.JPanel
 	 * In general both the catalog panel and the source options panel are displayed
 	 * together, however if this is a standalone root of type source, that has no 
 	 * parents, then only the source controls are displayed
-	 * @param uri 
+	 * @param sFullUri
 	 */
 	@Override
 	public void setURI(String sFullUri)
