@@ -1,6 +1,12 @@
-/* License: MIT */
+/* Copyright (C) 2019 Chris Piker, Jeremy Faden
+ * 
+ * This package, org.autoplot.dfc, is part Autoplot <autoplot.org>.  It provides an
+ * interface to the Das2 Federated Catalog (DFC) system.
+ *
+ * Autoplot is open source
+ */
 
-package org.autoplot.dfc;
+package org.autoplot.fdc;
 
 import java.awt.Window;
 import java.util.List;
@@ -10,8 +16,8 @@ import javax.swing.JPanel;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.URISplit;
-import org.das2.util.catalog.DasNode;
-import org.das2.util.catalog.DasNodeFactory;
+import org.das2.catalog.DasNode;
+import org.das2.catalog.DasNodeFactory;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -20,7 +26,7 @@ import org.das2.util.monitor.ProgressMonitor;
  *
  * @author cwp
  */
-public class DfcSourceEditorPanel extends javax.swing.JPanel 
+public class FedCatSourceEditorPanel extends javax.swing.JPanel 
 	implements DataSourceEditorPanel {
 
 	private DasNode nodeCur;
@@ -31,7 +37,7 @@ public class DfcSourceEditorPanel extends javax.swing.JPanel
 	/**
 	 * Creates new form FedCatSourceEditorPanel
 	 */
-	public DfcSourceEditorPanel()
+	public FedCatSourceEditorPanel()
 	{
 		initComponents();
 	}
@@ -43,7 +49,8 @@ public class DfcSourceEditorPanel extends javax.swing.JPanel
 	 */
 	@SuppressWarnings("unchecked")
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-   private void initComponents() {
+   private void initComponents()
+   {
 
       btnGroupRoot = new javax.swing.ButtonGroup();
       tabbedPane = new javax.swing.JTabbedPane();
@@ -71,8 +78,10 @@ public class DfcSourceEditorPanel extends javax.swing.JPanel
       btnGroupRoot.add(jRadioButton1);
       jRadioButton1.setSelected(true);
       jRadioButton1.setText("Main");
-      jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+      jRadioButton1.addActionListener(new java.awt.event.ActionListener()
+      {
+         public void actionPerformed(java.awt.event.ActionEvent evt)
+         {
             jRadioButton1ActionPerformed(evt);
          }
       });
@@ -82,14 +91,18 @@ public class DfcSourceEditorPanel extends javax.swing.JPanel
 
       btnGroupRoot.add(jRadioButton3);
       jRadioButton3.setText("Custom Root");
-      jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+      jRadioButton3.addActionListener(new java.awt.event.ActionListener()
+      {
+         public void actionPerformed(java.awt.event.ActionEvent evt)
+         {
             jRadioButton3ActionPerformed(evt);
          }
       });
 
-      jTextField1.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+      jTextField1.addActionListener(new java.awt.event.ActionListener()
+      {
+         public void actionPerformed(java.awt.event.ActionEvent evt)
+         {
             jTextField1ActionPerformed(evt);
          }
       });
@@ -172,8 +185,10 @@ public class DfcSourceEditorPanel extends javax.swing.JPanel
       jButton1.setText("Okay");
 
       jButton2.setText("jButton2");
-      jButton2.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+      jButton2.addActionListener(new java.awt.event.ActionListener()
+      {
+         public void actionPerformed(java.awt.event.ActionEvent evt)
+         {
             jButton2ActionPerformed(evt);
          }
       });
@@ -280,7 +295,7 @@ public class DfcSourceEditorPanel extends javax.swing.JPanel
 		
 		// If this starts with a known das top-branch catalog, or one of it's convienence
 		// strings, we can resolve it to something
-		if((sCatPath.startsWith(DasNodeFactory.DAS_ROOT_PATH)) ||
+		if((sCatPath.startsWith(DasNodeFactory.dasRootPath())) ||
 			sCatPath.startsWith("site:") || sCatPath.startsWith("test:") ) return false;
 			
 		// FIXME:  For regular filesystem URLs I don't know if this URL is bad unless I

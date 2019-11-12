@@ -1,8 +1,11 @@
-/* Copyright (C) 2019 Chris Piker
+/* Copyright (C) 2019 Chris Piker, Jeremy Faden
  * 
- * License: Whatever the rest of Autoplot is using
+ * This package, org.autoplot.dfc, is part Autoplot <autoplot.org>.  It provides an
+ * interface to the Das2 Federated Catalog (DFC) system.
+ *
+ * Autoplot is open source
  */
-package org.autoplot.dfc;
+package org.autoplot.fdc;
 
 import java.io.IOException;
 import java.net.URI;
@@ -18,11 +21,11 @@ import org.autoplot.datasource.URISplit;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.das2.util.catalog.DasDirNode;
-import org.das2.util.catalog.DasNode;
-import org.das2.util.catalog.DasNodeFactory;
-import org.das2.util.catalog.DasSrcNode;
-import org.das2.util.catalog.DasResolveException;
+import org.das2.catalog.DasDirNode;
+import org.das2.catalog.DasNode;
+import org.das2.catalog.DasNodeFactory;
+import org.das2.catalog.DasSrcNode;
+import org.das2.catalog.DasResolveException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 
@@ -30,7 +33,7 @@ import org.das2.util.monitor.ProgressMonitor;
  *
  * @author cwp
  */
-public class DfcSourceFactory extends AbstractDataSourceFactory
+public class FedCatSourceFactory extends AbstractDataSourceFactory
 {
 	private static final Logger logger = Logger.getLogger("apdss.dfc");
 	
@@ -39,7 +42,7 @@ public class DfcSourceFactory extends AbstractDataSourceFactory
 	{
 		ProgressMonitor mon = new NullProgressMonitor();
 		DasNode node = DasNodeFactory.getNearestNode(uri.toString(), mon, false);
-		return new DfcSource(uri, node);
+		return new FedCatSource(uri, node);
 	}
 	
 	/** This data source is pretty much only discovery, so of course we return true here.
@@ -62,7 +65,7 @@ public class DfcSourceFactory extends AbstractDataSourceFactory
 		Map<String,String> dParams = URISplit.parseParams(split.params);
 		 
 		// If the URI provided does not reference a source type then it's not complete
-		String sNodeUrl = DasNodeFactory.DAS_ROOT_PATH;
+		String sNodeUrl = DasNodeFactory.dasRootPath();
 		//String sNodeUrl = null;
 		if( ! sUrl.equals("vap+dc:")) sNodeUrl = split.file;
 		
@@ -94,7 +97,7 @@ public class DfcSourceFactory extends AbstractDataSourceFactory
 		//FIXME: Go into filesystem completions if URL starts with a common
 		//       filesystem type, such as https://, file://, etc.
 		
-		String sNodeUrl = DasNodeFactory.DAS_ROOT_PATH;
+		String sNodeUrl = DasNodeFactory.dasRootPath();
 		//String sNodeUrl = null;
 		if( ! sUrl.equals("vap+dc:")) sNodeUrl = split.file;
 		
