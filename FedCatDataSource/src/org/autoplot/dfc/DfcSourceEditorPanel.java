@@ -29,7 +29,7 @@ public class DfcSourceEditorPanel extends javax.swing.JPanel
 	private String sCurUri;
 
 	/**
-	 * Creates new form Das2CatSourceEditorPanel
+	 * Creates new form FedCatSourceEditorPanel
 	 */
 	public DfcSourceEditorPanel()
 	{
