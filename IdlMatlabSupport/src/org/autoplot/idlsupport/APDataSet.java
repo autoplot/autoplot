@@ -45,7 +45,7 @@ public class APDataSet extends QDataSetBridge {
      */
     public APDataSet() {
         super();
-        System.err.println("APDataSet v1.6.5");
+        System.err.println("APDataSet v1.7.0");
         String j= System.getProperty("java.version");
         System.err.println("Java Version "+j);
         System.err.println("disabling HTTP certificate checks.");

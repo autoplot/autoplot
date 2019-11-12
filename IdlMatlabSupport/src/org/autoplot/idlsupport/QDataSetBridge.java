@@ -384,6 +384,19 @@ public abstract class QDataSetBridge {
         copyValues( ds1, result );
     }
 
+    public void svalues( String name, String[] result) {
+        if ( debug ) {
+            System.err.println("reading "+name+" into double["+result.length+"]" );
+        }
+        QDataSet ds1 = datasets.get(name);
+        if (ds1==null ) {
+            throw new IllegalArgumentException("no dataset with the name \""+name+"\"" );
+        }
+        for ( int i=0; i<ds1.length(); i++ ) {
+            result[i]= ds1.slice(i).svalue();
+        }
+    }
+    
     public void values(String name, double[][] result) {
         if ( debug ) {
             System.err.println("reading "+name+" into double["+result.length+","+result[0].length+"]" );
@@ -413,6 +426,10 @@ public abstract class QDataSetBridge {
         copyValues( ds1, result );
     }
 
+    public void svalues(String[] result) {
+        svalues(this.name(), result);
+    }
+    
     public void values(double[] result) {
         values(this.name(), result);
     }
@@ -460,7 +477,7 @@ public abstract class QDataSetBridge {
         }
         return UnitsConverter.IDENTITY;
     }
-
+    
     /* -- convert qubes to float arrays -- */
     private void copyValues( QDataSet ds1, long[] result ) {
         UnitsConverter uc= maybeGetConverter(ds1);
@@ -728,6 +745,37 @@ public abstract class QDataSetBridge {
     public void slice(int i, double[][][] result) {
         slice(this.name(), i, result);
     }
+     
+    /**
+     * return an 1,2,or 3-D array of doubles or floats containing the values
+     * in the default dataset.
+     * @return
+     */
+    public Object values() {
+        return values(name);
+    }
+
+    /**
+     * return a array of strings, which can be useful for data discovery,
+     * for a rank 1 dataset.
+     * @return a string array.
+     */
+    public String[] svalues(  ) {
+        return svalues(name);
+    }
+    
+    /**
+     * return a array of strings, which can be useful for data discovery,
+     * for a rank 1 dataset.
+     * @param name the dataset name, such as "Epoch"
+     * @return a string array.
+     */
+    public String[] svalues( String name ) {
+        QDataSet ds1 = datasets.get(name);
+        String[] result = new String[ds1.length()];
+        svalues( name, result );
+        return result;
+    }
         
     /**
      * return an 1,2,or 3-D array of doubles or floats containing the values
@@ -972,15 +1020,6 @@ public abstract class QDataSetBridge {
                     throw new IllegalArgumentException("rank limit");
             }
         }
-    }
-
-    /**
-     * return an 1,2,or 3-D array of doubles or floats containing the values
-     * in the default dataset.
-     * @return
-     */
-    public Object values() {
-        return values(name);
     }
 
     /**
