@@ -1008,7 +1008,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     @Override
                     public void run() {
                         if ( pendingVap==null ) { // non-null means we are loading something.
-                            dataSetSelector.setValue( appController.getFocusUri() );
+                            if ( !isBasicMode() ) {
+                                dataSetSelector.setValue( appController.getFocusUri() );
+                            }
                         }
                     } 
                 } );
@@ -1684,7 +1686,7 @@ APSplash.checkTime("init 270");
                 } else {
                     String uri= dsf.getUri();
                     if ( uri!=null ) {
-                        if ( pendingVap==null ) {
+                        if ( pendingVap==null && !isBasicMode() ) {
                             dataSetSelector.setValue(uri);
                         }
                     } else {
