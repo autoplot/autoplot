@@ -429,6 +429,19 @@ public abstract class QDataSetBridge {
         values(this.name(), result);
     }
 
+    private Units getUnitFor( QDataSet ds ) {
+        Units u= SemanticOps.getUnits(ds);
+        for ( Units prefUnit: prefUnits ) {
+            if ( prefUnit.isConvertibleTo(u) ) {
+                UnitsConverter uc= u.getConverter(prefUnit);
+                if ( uc!=UnitsConverter.IDENTITY ) {
+                    return prefUnit;
+                }
+            }
+        }
+        return u;
+    }
+            
     /**
      * returns the converter if there is one.  If no converter is
      * registered, then UnitsConverter.IDENTITY is returned.
@@ -439,18 +452,13 @@ public abstract class QDataSetBridge {
         Units u= SemanticOps.getUnits(ds1);
         UnitsConverter uc= UnitsConverter.IDENTITY;
         if ( prefUnits!=null ) {
-            for ( Units prefUnit: prefUnits ) {
-                if ( prefUnit.isConvertibleTo(u) ) {
-                    uc= u.getConverter(prefUnit);
-                    if ( uc!=UnitsConverter.IDENTITY ) {
-                        if ( debug ) {
-                            System.err.println("Using units converter to get "+prefUnit );
-                        }
-                    }
-                }
+            Units u1= getUnitFor( ds1 );
+            if ( debug ) {
+                 System.err.println("Using units converter to get "+u1 );
             }
+            return UnitsConverter.getConverter( u, u1 );
         }
-        return uc;
+        return UnitsConverter.IDENTITY;
     }
 
     /* -- convert qubes to float arrays -- */
@@ -1010,11 +1018,21 @@ public abstract class QDataSetBridge {
         if (result == null) return "";
         else return nameFor(result);
     }
-
+    
+    /**
+     * return the default dataset property value as a string.
+     * @param property property name 
+     * @return 
+     */
     public String propertyAsString(String property) {
         Object result = this.ds.property(property);
-        if (result == null) return "";
-        else return String.valueOf(result);
+        if ( property.equals("UNITS") ) {
+            return String.valueOf( getUnitFor( this.ds ) );
+        } else if (result == null) {
+            return "";
+        } else {    
+            return String.valueOf(result);
+        }
     }
 
     public double propertyAsDouble(String property) {
@@ -1023,10 +1041,21 @@ public abstract class QDataSetBridge {
         else return ((Number) result).doubleValue();
     }
 
+    /**
+     * return the property value as a string.
+     * @param name dataset name
+     * @param property property name like "UNITS" or "LABEL"
+     * @return 
+     */
     public String propertyAsString(String name, String property) {
         Object result = datasets.get(name).property(property);
-        if (result == null) return "";
-        else return String.valueOf(result);
+        if ( property.equals("UNITS") ) {
+            return String.valueOf( getUnitFor( this.ds ) );
+        } else if (result == null) {
+            return "";
+        } else {    
+            return String.valueOf(result);
+        }
     }
 
     public double propertyAsDouble(String name, String property) {
