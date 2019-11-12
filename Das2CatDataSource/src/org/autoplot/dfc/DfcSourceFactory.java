@@ -7,6 +7,8 @@ package org.autoplot.dfc;
 import java.io.IOException;
 import java.net.URI;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import org.autoplot.datasource.AbstractDataSourceFactory;
 import org.autoplot.datasource.DataSource;
@@ -16,6 +18,7 @@ import org.autoplot.datasource.URISplit;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.util.catalog.DasDirNode;
 import org.das2.util.catalog.DasNode;
 import org.das2.util.catalog.DasNodeFactory;
 import org.das2.util.catalog.DasSrcNode;
@@ -56,10 +59,11 @@ public class DfcSourceFactory extends AbstractDataSourceFactory
 	@Override
 	public boolean reject(String sUrl, List<String> lProblems, ProgressMonitor mon) {
 		URISplit split = URISplit.parse(sUrl);
-		Map<String,String> params= URISplit.parseParams(split.params);
+		Map<String,String> dParams = URISplit.parseParams(split.params);
 		 
 		// If the URI provided does not reference a source type then it's not complete
-		String sNodeUrl = null;
+		String sNodeUrl = DasNodeFactory.DAS_ROOT_PATH;
+		//String sNodeUrl = null;
 		if( ! sUrl.equals("vap+dc:")) sNodeUrl = split.file;
 		
 		DasNode node;
@@ -68,15 +72,14 @@ public class DfcSourceFactory extends AbstractDataSourceFactory
 		} catch(DasResolveException | IOException | ParseException ex){
 			return true;
 		}
-		 
-		if(node == null) return true;
-		 
-		if(!node.isSrc()) return true;
+		
+		if(node == null) return true;  // Need an actual node to load data
+		if(!node.isSrc()) return true; // And it should be a source node
 		 
 		DasSrcNode srcNode = (DasSrcNode)node;
 		 
 		// If the query passes, then there is no need for the source dialog
-		return  ! srcNode.queryVerify(params); 
+		return  ! srcNode.queryVerify(dParams); 
     }
 
 	@Override
@@ -84,6 +87,49 @@ public class DfcSourceFactory extends AbstractDataSourceFactory
 		CompletionContext cc, ProgressMonitor mon
 	) throws Exception {
 		
-		return Collections.emptyList();
+		String sUrl = cc.surl;
+		URISplit split = URISplit.parse(sUrl);
+		Map<String,String> dParams = URISplit.parseParams(split.params);
+		
+		//FIXME: Go into filesystem completions if URL starts with a common
+		//       filesystem type, such as https://, file://, etc.
+		
+		String sNodeUrl = DasNodeFactory.DAS_ROOT_PATH;
+		//String sNodeUrl = null;
+		if( ! sUrl.equals("vap+dc:")) sNodeUrl = split.file;
+		
+		DasNode node;
+		try{
+			node = DasNodeFactory.getNode(sNodeUrl, mon, false);
+		} catch(DasResolveException | IOException | ParseException ex){
+			return Collections.emptyList();
+		}
+		
+		if(node == null) return Collections.emptyList();  // Need node for completions
+		
+		List<CompletionContext> lComp = new ArrayList<>();
+		
+		/*  Directory completions don't really work here.
+		if(node.isSrc()){
+			DasDirNode dir = (DasDirNode)node;
+			String aList[] = dir.list();
+			String sSep = dir.pathSeparator(mon);
+			for(String sSub: aList){
+				CompletionContext ccChild;
+				DasNode child = dir.get(sSub);
+				// Args are:
+				// 1. Context, 2. 
+				ccChild = new CompletionContext(
+					CompletionContext.CONTEXT_PARAMETER_NAME, dir.childPath(child),
+					sSep + sSub, child.type()
+				);
+				
+				lComp.add(ccChild);
+			}
+		}
+		*/
+		
+		// Next up, source completions...
+		return lComp;
 	}
 }

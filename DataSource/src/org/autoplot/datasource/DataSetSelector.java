@@ -441,6 +441,9 @@ public class DataSetSelector extends javax.swing.JPanel {
 
                     }
                     
+                    // dascat: When we first open the catalog we don't know if any particular
+                    // source will have the time series browse property until we load the source
+                    // description itself. --cwp
                     TimeSeriesBrowse tsb= f.getCapability( TimeSeriesBrowse.class ); // https://sourceforge.net/p/autoplot/bugs/1518/
                     if ( false ) { // TODO: experiment more with this code
                     if ( tsb!=null ) {
@@ -1059,7 +1062,10 @@ public class DataSetSelector extends javax.swing.JPanel {
         
         boolean haveSource= DataSourceRegistry.getInstance().hasSourceByExt(ext);
         
-        boolean sourceNeedsNoFile= ext!=null && ( ext.equals("inline") || ext.equals("cdaweb") || ext.equals("pdsppi") );
+        boolean sourceNeedsNoFile= ext!=null && ( 
+            ext.equals("inline") || ext.equals("cdaweb") || ext.equals("pdsppi") || 
+            ext.equals("dc")
+        );
         
         if ( ( split.file==null || split.resourceUriCarotPos > split.file.length() ) && haveSource || sourceNeedsNoFile ) {
             showFactoryCompletions( surl, carotpos );
