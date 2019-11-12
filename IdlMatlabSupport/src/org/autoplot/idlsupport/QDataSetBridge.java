@@ -1050,7 +1050,7 @@ public abstract class QDataSetBridge {
     public String propertyAsString(String name, String property) {
         Object result = datasets.get(name).property(property);
         if ( property.equals("UNITS") ) {
-            return String.valueOf( getUnitFor( this.ds ) );
+            return String.valueOf( getUnitFor( datasets.get(name) ) );
         } else if (result == null) {
             return "";
         } else {    
