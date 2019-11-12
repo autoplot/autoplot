@@ -8,9 +8,12 @@
 
 package org.autoplot.fdc;
 
+import java.awt.Image;
 import java.awt.Window;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.autoplot.datasource.DataSetURI;
@@ -33,12 +36,24 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
 	private DasNode nodeRoot;
 	private Map<String,String> paramCur;
 	private String sCurUri;
+	private ImageIcon iconSiteDefault;
 
 	/**
 	 * Creates new form FedCatSourceEditorPanel
 	 */
 	public FedCatSourceEditorPanel()
 	{
+		// Need to manually scale the default imageIcon for the catalog site display
+		// for now this just defaults to a das2 logo, but should load site logos in the
+		// future
+		
+		String sDefaultIcon = "/org/das2/catalog/das2_circle.png";
+		URL urlIcon = getClass().getResource(sDefaultIcon);
+		ImageIcon imageIcon = new ImageIcon(urlIcon);
+		Image image = imageIcon.getImage(); 
+		Image newimg = image.getScaledInstance(60, 60,  java.awt.Image.SCALE_SMOOTH);
+		iconSiteDefault = new ImageIcon(newimg);  // transform it back
+
 		initComponents();
 	}
 
@@ -49,39 +64,45 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
 	 */
 	@SuppressWarnings("unchecked")
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-   private void initComponents()
-   {
+   private void initComponents() {
+      java.awt.GridBagConstraints gridBagConstraints;
 
       btnGroupRoot = new javax.swing.ButtonGroup();
-      tabbedPane = new javax.swing.JTabbedPane();
-      tabNav = new javax.swing.JPanel();
-      jPanel1 = new javax.swing.JPanel();
+      splitPane = new javax.swing.JSplitPane();
+      pnlCatalog = new javax.swing.JPanel();
+      pnlWhichCat = new javax.swing.JPanel();
       jLabel1 = new javax.swing.JLabel();
       jRadioButton1 = new javax.swing.JRadioButton();
       jRadioButton2 = new javax.swing.JRadioButton();
       jRadioButton3 = new javax.swing.JRadioButton();
       jTextField1 = new javax.swing.JTextField();
-      jScrollPane3 = new javax.swing.JScrollPane();
-      jTree2 = new javax.swing.JTree();
-      tabSrc = new javax.swing.JPanel();
+      scrPaneCatalog = new javax.swing.JScrollPane();
+      treeCatalog = new javax.swing.JTree();
+      lblSiteImage = new javax.swing.JLabel();
+      pnlSource = new javax.swing.JPanel();
       lblNodeOrigin = new javax.swing.JLabel();
-      jScrollPane1 = new javax.swing.JScrollPane();
+      pnlQueryCtrl = new javax.swing.JScrollPane();
       jTextArea1 = new javax.swing.JTextArea();
-      pnlBottom = new javax.swing.JPanel();
-      jButton1 = new javax.swing.JButton();
-      jButton2 = new javax.swing.JButton();
 
-      tabbedPane.setMaximumSize(new java.awt.Dimension(8000, 8000));
+      setLayout(new java.awt.GridBagLayout());
+
+      splitPane.setDividerLocation(200);
+      splitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+      splitPane.setResizeWeight(0.5);
+      splitPane.setMinimumSize(new java.awt.Dimension(100, 100));
+
+      pnlCatalog.setFocusable(false);
+      pnlCatalog.setMinimumSize(new java.awt.Dimension(200, 60));
+      pnlCatalog.setPreferredSize(new java.awt.Dimension(500, 200));
+      pnlCatalog.setLayout(new java.awt.GridBagLayout());
 
       jLabel1.setText("Catalog:");
 
       btnGroupRoot.add(jRadioButton1);
       jRadioButton1.setSelected(true);
       jRadioButton1.setText("Main");
-      jRadioButton1.addActionListener(new java.awt.event.ActionListener()
-      {
-         public void actionPerformed(java.awt.event.ActionEvent evt)
-         {
+      jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
             jRadioButton1ActionPerformed(evt);
          }
       });
@@ -90,28 +111,24 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
       jRadioButton2.setText("Test");
 
       btnGroupRoot.add(jRadioButton3);
-      jRadioButton3.setText("Custom Root");
-      jRadioButton3.addActionListener(new java.awt.event.ActionListener()
-      {
-         public void actionPerformed(java.awt.event.ActionEvent evt)
-         {
+      jRadioButton3.setText("Custom");
+      jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
             jRadioButton3ActionPerformed(evt);
          }
       });
 
-      jTextField1.addActionListener(new java.awt.event.ActionListener()
-      {
-         public void actionPerformed(java.awt.event.ActionEvent evt)
-         {
+      jTextField1.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
             jTextField1ActionPerformed(evt);
          }
       });
 
-      javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-      jPanel1.setLayout(jPanel1Layout);
-      jPanel1Layout.setHorizontalGroup(
-         jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(jPanel1Layout.createSequentialGroup()
+      javax.swing.GroupLayout pnlWhichCatLayout = new javax.swing.GroupLayout(pnlWhichCat);
+      pnlWhichCat.setLayout(pnlWhichCatLayout);
+      pnlWhichCatLayout.setHorizontalGroup(
+         pnlWhichCatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGroup(pnlWhichCatLayout.createSequentialGroup()
             .addContainerGap()
             .addComponent(jLabel1)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -121,14 +138,14 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addComponent(jRadioButton3)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
+            .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 441, Short.MAX_VALUE)
             .addContainerGap())
       );
-      jPanel1Layout.setVerticalGroup(
-         jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(jPanel1Layout.createSequentialGroup()
+      pnlWhichCatLayout.setVerticalGroup(
+         pnlWhichCatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGroup(pnlWhichCatLayout.createSequentialGroup()
             .addContainerGap()
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+            .addGroup(pnlWhichCatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(jLabel1)
                .addComponent(jRadioButton1)
                .addComponent(jRadioButton2)
@@ -137,105 +154,87 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
             .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
       );
 
-      jScrollPane3.setViewportView(jTree2);
+      gridBagConstraints = new java.awt.GridBagConstraints();
+      gridBagConstraints.gridx = 0;
+      gridBagConstraints.gridy = 0;
+      gridBagConstraints.gridwidth = 2;
+      gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+      gridBagConstraints.ipadx = 278;
+      gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+      gridBagConstraints.weightx = 1.0;
+      gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+      pnlCatalog.add(pnlWhichCat, gridBagConstraints);
 
-      javax.swing.GroupLayout tabNavLayout = new javax.swing.GroupLayout(tabNav);
-      tabNav.setLayout(tabNavLayout);
-      tabNavLayout.setHorizontalGroup(
-         tabNavLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(tabNavLayout.createSequentialGroup()
-            .addGroup(tabNavLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addGroup(tabNavLayout.createSequentialGroup()
-                  .addGap(5, 5, 5)
-                  .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-               .addGroup(tabNavLayout.createSequentialGroup()
-                  .addContainerGap()
-                  .addComponent(jScrollPane3)))
-            .addContainerGap())
-      );
-      tabNavLayout.setVerticalGroup(
-         tabNavLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(tabNavLayout.createSequentialGroup()
-            .addGap(5, 5, 5)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 384, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addContainerGap())
-      );
+      scrPaneCatalog.setViewportView(treeCatalog);
 
-      tabbedPane.addTab("Select Source", tabNav);
+      gridBagConstraints = new java.awt.GridBagConstraints();
+      gridBagConstraints.gridx = 0;
+      gridBagConstraints.gridy = 1;
+      gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+      gridBagConstraints.ipadx = 4;
+      gridBagConstraints.ipady = 4;
+      gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+      gridBagConstraints.weightx = 1.0;
+      gridBagConstraints.weighty = 1.0;
+      gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+      pnlCatalog.add(scrPaneCatalog, gridBagConstraints);
 
-      tabSrc.setLayout(new javax.swing.BoxLayout(tabSrc, javax.swing.BoxLayout.PAGE_AXIS));
+      lblSiteImage.setIcon(iconSiteDefault);
+      lblSiteImage.setFocusable(false);
+      lblSiteImage.setMaximumSize(new java.awt.Dimension(72, 72));
+      lblSiteImage.setPreferredSize(new java.awt.Dimension(72, 72));
+      gridBagConstraints = new java.awt.GridBagConstraints();
+      gridBagConstraints.gridx = 1;
+      gridBagConstraints.gridy = 1;
+      gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+      gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
+      pnlCatalog.add(lblSiteImage, gridBagConstraints);
+
+      splitPane.setLeftComponent(pnlCatalog);
+
+      pnlSource.setMinimumSize(new java.awt.Dimension(200, 40));
+      pnlSource.setPreferredSize(new java.awt.Dimension(500, 200));
+      pnlSource.setLayout(new java.awt.GridBagLayout());
 
       lblNodeOrigin.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
       lblNodeOrigin.setText("<html>tag:das2.org,2012:<b>site:/uiowa/juno/wav/survey</b>");
       lblNodeOrigin.setFocusable(false);
       lblNodeOrigin.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-      tabSrc.add(lblNodeOrigin);
+      gridBagConstraints = new java.awt.GridBagConstraints();
+      gridBagConstraints.gridx = 0;
+      gridBagConstraints.gridy = 0;
+      gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+      gridBagConstraints.weightx = 1.0;
+      gridBagConstraints.insets = new java.awt.Insets(1, 1, 1, 1);
+      pnlSource.add(lblNodeOrigin, gridBagConstraints);
 
       jTextArea1.setColumns(20);
       jTextArea1.setRows(5);
       jTextArea1.setTabSize(3);
-      jScrollPane1.setViewportView(jTextArea1);
+      jTextArea1.setMinimumSize(new java.awt.Dimension(150, 180));
+      pnlQueryCtrl.setViewportView(jTextArea1);
 
-      tabSrc.add(jScrollPane1);
+      gridBagConstraints = new java.awt.GridBagConstraints();
+      gridBagConstraints.gridx = 0;
+      gridBagConstraints.gridy = 1;
+      gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+      gridBagConstraints.weightx = 1.0;
+      gridBagConstraints.weighty = 1.0;
+      gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+      pnlSource.add(pnlQueryCtrl, gridBagConstraints);
 
-      tabbedPane.addTab("Query Options", tabSrc);
+      splitPane.setRightComponent(pnlSource);
 
-      jButton1.setText("Okay");
-
-      jButton2.setText("jButton2");
-      jButton2.addActionListener(new java.awt.event.ActionListener()
-      {
-         public void actionPerformed(java.awt.event.ActionEvent evt)
-         {
-            jButton2ActionPerformed(evt);
-         }
-      });
-
-      javax.swing.GroupLayout pnlBottomLayout = new javax.swing.GroupLayout(pnlBottom);
-      pnlBottom.setLayout(pnlBottomLayout);
-      pnlBottomLayout.setHorizontalGroup(
-         pnlBottomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(pnlBottomLayout.createSequentialGroup()
-            .addContainerGap(365, Short.MAX_VALUE)
-            .addComponent(jButton2)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(jButton1)
-            .addGap(10, 10, 10))
-      );
-      pnlBottomLayout.setVerticalGroup(
-         pnlBottomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlBottomLayout.createSequentialGroup()
-            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(pnlBottomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(jButton2)
-               .addComponent(jButton1))
-            .addContainerGap())
-      );
-
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-      this.setLayout(layout);
-      layout.setHorizontalGroup(
-         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(layout.createSequentialGroup()
-            .addGap(6, 6, 6)
-            .addComponent(pnlBottom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-         .addGroup(layout.createSequentialGroup()
-            .addContainerGap()
-            .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addContainerGap())
-      );
-      layout.setVerticalGroup(
-         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(layout.createSequentialGroup()
-            .addGap(5, 5, 5)
-            .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(pnlBottom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addContainerGap())
-      );
+      gridBagConstraints = new java.awt.GridBagConstraints();
+      gridBagConstraints.gridx = 0;
+      gridBagConstraints.gridy = 0;
+      gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+      gridBagConstraints.ipadx = 2;
+      gridBagConstraints.ipady = 2;
+      gridBagConstraints.weightx = 1.0;
+      gridBagConstraints.weighty = 1.0;
+      gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+      add(splitPane, gridBagConstraints);
    }// </editor-fold>//GEN-END:initComponents
 
    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jRadioButton1ActionPerformed
@@ -253,31 +252,24 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
       // TODO add your handling code here:
    }//GEN-LAST:event_jTextField1ActionPerformed
 
-   private void jButton2ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton2ActionPerformed
-   {//GEN-HEADEREND:event_jButton2ActionPerformed
-      // TODO add your handling code here:
-   }//GEN-LAST:event_jButton2ActionPerformed
-
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.ButtonGroup btnGroupRoot;
-   private javax.swing.JButton jButton1;
-   private javax.swing.JButton jButton2;
    private javax.swing.JLabel jLabel1;
-   private javax.swing.JPanel jPanel1;
    private javax.swing.JRadioButton jRadioButton1;
    private javax.swing.JRadioButton jRadioButton2;
    private javax.swing.JRadioButton jRadioButton3;
-   private javax.swing.JScrollPane jScrollPane1;
-   private javax.swing.JScrollPane jScrollPane3;
    private javax.swing.JTextArea jTextArea1;
    private javax.swing.JTextField jTextField1;
-   private javax.swing.JTree jTree2;
    private javax.swing.JLabel lblNodeOrigin;
-   private javax.swing.JPanel pnlBottom;
-   private javax.swing.JPanel tabNav;
-   private javax.swing.JPanel tabSrc;
-   private javax.swing.JTabbedPane tabbedPane;
+   private javax.swing.JLabel lblSiteImage;
+   private javax.swing.JPanel pnlCatalog;
+   private javax.swing.JScrollPane pnlQueryCtrl;
+   private javax.swing.JPanel pnlSource;
+   private javax.swing.JPanel pnlWhichCat;
+   private javax.swing.JScrollPane scrPaneCatalog;
+   private javax.swing.JSplitPane splitPane;
+   private javax.swing.JTree treeCatalog;
    // End of variables declaration//GEN-END:variables
 
 	// I think I am here because the data source factory rejected the given URL, so now
@@ -332,12 +324,15 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
 		sCurUri = sFullUri;  // Save off the full uri as a sanity check in setURI to make
 		                     // sure I've prepared for the right thing
 		
+		String sNodeUrl = DasNodeFactory.dasRootPath();
 		URISplit split = URISplit.parse(sFullUri);
+		if(! sFullUri.equals("vap+dc:")) sNodeUrl = split.file;
+		
 		
 		// Try to get a node definition, this version will fail if there is a system 
 		// that selects das2 catalog node definitions using HTTP GET parameters, as these
 		// will be interpreted as data select parameters.
-		nodeCur = DasNodeFactory.getNearestNode(split.file, mon, false /*don't force reload ?*/);
+		nodeCur = DasNodeFactory.getNearestNode(sNodeUrl, mon, false /*don't force reload ?*/);
 		
 		return true;
 	}
