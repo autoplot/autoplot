@@ -33,7 +33,7 @@ import org.das2.util.monitor.ProgressMonitor;
  */
 public class FedCatSourceFactory extends AbstractDataSourceFactory
 {
-	private static final Logger LOGGER = Logger.getLogger("apdss.dfc");
+	private static final Logger LOGGER = Logger.getLogger("apdss.dc");
 
 	/** Break a catalog URI down into parts
 	 * 

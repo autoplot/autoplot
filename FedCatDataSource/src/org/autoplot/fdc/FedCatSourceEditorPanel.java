@@ -13,13 +13,13 @@ import java.awt.Window;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.URISplit;
-import org.das2.catalog.DasCatTreeModel;
 import org.das2.catalog.DasNode;
 import org.das2.catalog.DasNodeFactory;
 import org.das2.util.filesystem.FileSystem;
@@ -33,22 +33,21 @@ import org.das2.util.monitor.ProgressMonitor;
 public class FedCatSourceEditorPanel extends javax.swing.JPanel 
 	implements DataSourceEditorPanel {
 
+	private static final Logger LOGGER = Logger.getLogger("apdss.dc");
+	
 	private DasNode nodeCur;
-	private DasNode nodeRoot;
-	private Map<String,String> paramCur;
 	private String sCurUri;
 	private ImageIcon iconSiteDefault;
-	private DasCatTreeModel catModel;
+	private FedCatTreeModel catModel;
 
 	/**
 	 * Creates new form FedCatSourceEditorPanel
 	 */
 	public FedCatSourceEditorPanel()
 	{
-		// Need to manually scale the default imageIcon for the catalog site display
+		// Manually scale the default imageIcon for the catalog site display
 		// for now this just defaults to a das2 logo, but should load site logos in the
-		// future
-		
+		// future	
 		String sDefaultIcon = "/org/das2/catalog/das2_circle.png";
 		URL urlIcon = getClass().getResource(sDefaultIcon);
 		ImageIcon imageIcon = new ImageIcon(urlIcon);
@@ -366,7 +365,7 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
 			}
 			
 			// Directory nodes need a tree model, start it at this node's root
-			catModel = new DasCatTreeModel(nodeCur.getRoot());
+			catModel = new FedCatTreeModel(nodeCur.getRoot());
 			treeControl.setModel(catModel);
 		}
 		
@@ -383,7 +382,7 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
 				lblSrcPath.setVisible(true);
 				
 				// This source is attached to something, fill in the tree up to it's root.
-				catModel = new DasCatTreeModel(nodeCur.getRoot());
+				catModel = new FedCatTreeModel(nodeCur.getRoot());
 				treeControl.setModel(catModel);
 			}
 		}

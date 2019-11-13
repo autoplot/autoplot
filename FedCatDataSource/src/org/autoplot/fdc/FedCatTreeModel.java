@@ -24,22 +24,24 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package org.das2.catalog;
+package org.autoplot.fdc;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
+import org.das2.catalog.DasDirNode;
+import org.das2.catalog.DasNode;
 import org.das2.util.LoggerManager;
 
 /**
  *
  * @author cwp
  */
-public class DasCatTreeModel extends DefaultTreeModel
+public class FedCatTreeModel extends DefaultTreeModel
 {
-	private static final Logger LOGGER = LoggerManager.getLogger("das2.catalog.dctree");
+	private static final Logger LOGGER = LoggerManager.getLogger("apdss.dc");
 	
 	private static class DasCatTreeNode extends DefaultMutableTreeNode
 	{
@@ -55,7 +57,7 @@ public class DasCatTreeModel extends DefaultTreeModel
 		}
 	}
 	
-	public DasCatTreeModel(DasNode dasRoot)
+	public FedCatTreeModel(DasNode dasRoot)
 	{
 		super(new DasCatTreeNode(dasRoot), true);  // true = not all nodes can have children
 	}
