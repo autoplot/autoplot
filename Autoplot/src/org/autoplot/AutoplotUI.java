@@ -483,20 +483,24 @@ public final class AutoplotUI extends javax.swing.JFrame {
         expertMenu= new JMenu("Expert");
         JMenuItem mi;
         mi= new JMenuItem( new AbstractAction( "Basic Mode") {
-           @Override
-           public void actionPerformed( ActionEvent e ) {
-               org.das2.util.LoggerManager.logGuiEvent(e);               
-               setExpertMode(false);
-           }
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                org.das2.util.LoggerManager.logGuiEvent(e);               
+                if ( isExpertMode() ) {
+                    setExpertMode(false);
+                }
+            }
         });
         mi.setToolTipText("Basic mode allows for browsing products composed by data providers");
         expertMenu.add( mi );
         mi= new JMenuItem( new AbstractAction( "Expert Mode") {
-           @Override
-           public void actionPerformed( ActionEvent e ) {
-               org.das2.util.LoggerManager.logGuiEvent(e);                              
-               setExpertMode(true);
-           }
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                              
+                if ( isBasicMode() ) {
+                    setExpertMode(true);
+                }
+            }
         });
         mi.setToolTipText("Expert allows composing new products and scripting");
         expertMenu.add( mi );
