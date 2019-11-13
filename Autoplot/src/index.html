@@ -26,8 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-11-08 r24305):</p>
+        <p>Bugfixes (2019-11-13 r24328):</p>
         <ul>
+            <li>rte15951983: selecting "basic" mode twice would result in a runtime exception.
+            <li>Matlab/IDL/Python interface needs to consider unit preferences, so it is consistent.
+            <li>2126: Basic mode prevents URI references from getting into the DataSetSelector, which is confusing.
             <li>1991: when loading vap, immediately check that all IDs are unique and references resolvable.
             <li>.gz files found within .zip files are can be read in.
             <li>binary data source add the percent to the format, supporting ...&format=c, so that percent need not be within the URI.   URI encoding is tricky with percents.
