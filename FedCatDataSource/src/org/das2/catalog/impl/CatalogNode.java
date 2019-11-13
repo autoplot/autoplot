@@ -82,7 +82,26 @@ class CatalogNode extends AbstractDirNode
 	
 	@Override
 	boolean isLoaded(){ return (data != null); }
+	
+	@Override
+	public Object property(String sFragment, Object oDefault){
+		return JsonUtil.property(data, sFragment, oDefault);
+	}
 
+	@Override
+	public Object property(String sFragment, Class expect, Object oDefault){
+		return JsonUtil.property(data, sFragment, expect, oDefault);
+	}
+
+	@Override
+	public Object property(String sFragment) throws DasResolveException {
+		return JsonUtil.property(data, sFragment);
+	}
+
+	@Override
+	public Object property(String sFragment, Class expect) throws DasResolveException {
+		return JsonUtil.property(data, sFragment, expect);
+	}
 	
 	protected void initFromJson(JSONObject jo) throws JSONException, ParseException{
 		
@@ -200,15 +219,17 @@ class CatalogNode extends AbstractDirNode
 					// already have this child, but maybe there are new locations
 					
 					child = dSubNodes.get(sChildName);
-					for(String sAvail: lChildLocs){
-						boolean bNewLoc = true;
-						for(NodeDefLoc has: child.lLocs){
-							if(has.sUrl.equals(sAvail)){
-								bNewLoc = false;
-								break;
+					if(lChildLocs != null){
+						for(String sAvail: lChildLocs){
+							boolean bNewLoc = true;
+							for(NodeDefLoc has: child.lLocs){
+								if(has.sUrl.equals(sAvail)){
+									bNewLoc = false;
+									break;
+								}
 							}
+							if(bNewLoc) child.addLocation(sAvail);
 						}
-						if(bNewLoc) child.addLocation(sAvail);
 					}
 				}
 			}
@@ -267,17 +288,4 @@ class CatalogNode extends AbstractDirNode
 		NodeDefLoc loc = new NodeDefLoc(sUrl);
 		loc.bLoaded = true;
 	}
-
-	@Override
-	public Object property(String sFragment, Object oDefault)
-	{
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
-	@Override
-	public Object property(String sFragment, Object oDefault, Class expect)
-	{
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-	
 }

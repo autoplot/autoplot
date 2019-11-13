@@ -11,17 +11,15 @@ import java.io.IOException;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import org.autoplot.datasource.AbstractDataSourceFactory;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.CompletionContext;
 import java.util.List;
 import org.autoplot.datasource.URISplit;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.das2.catalog.DasDirNode;
 import org.das2.catalog.DasNode;
 import org.das2.catalog.DasNodeFactory;
 import org.das2.catalog.DasSrcNode;
@@ -36,6 +34,48 @@ import org.das2.util.monitor.ProgressMonitor;
 public class FedCatSourceFactory extends AbstractDataSourceFactory
 {
 	private static final Logger LOGGER = Logger.getLogger("apdss.dfc");
+
+	/** Break a catalog URI down into parts
+	 * 
+	 * Federated Catalog Paths are very different from many Autoplot URIs,
+	 * provide parsing for these.
+	 * 
+	 * @param sUri   - A full Autoplot URI including the type, should start with 
+	 *                     vap+dc
+	 * @return A Map<String,String> that always has the following keys:
+	 *         "handler" - Should always be 'vap+dc'
+	 *         "rootUrl" - The URL to the root node, will often be null, meaning that the
+	 *                     URLs must be found in the global catalog
+	 *         "path"    - The sub path of interest offset from the root URL
+	 *         "params"  - The query parameters.  Will be null for default datasets
+	 */
+	/* public static Map<String,String> splitDasCatUri(String sUri) {
+		Map<String, String> map = new HashMap<>();
+		map.put("handler", null);  // Should always be "vap+dc"
+		map.put("rootUrl", null);  // Will be null for global catalog
+		map.put("path", null);     // The path from the root item
+		map.put("params", null);   // The query parameters
+		
+		int i = sUri.indexOf(":");
+		if(i < 0) return map; // Null case 
+		
+		String sHndrl = sUri.substring(0, i);
+		if(!sHndrl.equals("vap+dc"))
+			throw new IllegalArgumentException("Not a catalog URI, 'vap+dc:' prefix missing.");
+		
+		
+		
+		sUri = sUri.substring(i);
+		i = sUri.indexOf('?');
+		if(i == -1){
+			// no params case
+			
+		}
+		
+		
+		return map;
+	}
+	*/
 	
 	@Override
 	public DataSource getDataSource(URI uri) throws Exception

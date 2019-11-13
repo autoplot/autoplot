@@ -49,7 +49,6 @@ import org.das2.catalog.DasDirNode;
  */
 class CollectionNode extends AbstractDirNode 
 {
-
 	private static final Logger LOGGER = LoggerManager.getLogger("das2.catalog.collection" );
 	
 	JSONObject data;
@@ -89,6 +88,26 @@ class CollectionNode extends AbstractDirNode
 	
 	@Override
 	boolean isLoaded(){ return (data != null); }
+	
+	@Override
+	public Object property(String sFragment, Object oDefault){
+		return JsonUtil.property(data, sFragment, oDefault);
+	}
+
+	@Override
+	public Object property(String sFragment, Class expect, Object oDefault){
+		return JsonUtil.property(data, sFragment, expect, oDefault);
+	}
+
+	@Override
+	public Object property(String sFragment) throws DasResolveException {
+		return JsonUtil.property(data, sFragment);
+	}
+
+	@Override
+	public Object property(String sFragment, Class expect) throws DasResolveException {
+		return JsonUtil.property(data, sFragment, expect);
+	}
 
 	protected void initFromJson(JSONObject jo) throws JSONException, ParseException{
 
@@ -130,7 +149,7 @@ class CollectionNode extends AbstractDirNode
 		data = jo;
 	}
 	
-	private void mergeFromJson(JSONObject jo) throws JSONException, ParseException
+	protected void mergeFromJson(JSONObject jo) throws JSONException, ParseException
 	{
 		if(! jo.getString(KEY_TYPE).equals(TYPE))
 			throw new ParseException("Node type missing or not equal to " + TYPE, -1);
@@ -249,7 +268,6 @@ class CollectionNode extends AbstractDirNode
 		}
 		
 		return false;
-		
 	}
 
 	@Override
@@ -274,17 +292,5 @@ class CollectionNode extends AbstractDirNode
 		
 		NodeDefLoc loc = new NodeDefLoc(sUrl);
 		loc.bLoaded = true;
-	}
-
-	@Override
-	public Object property(String sFragment, Object oDefault)
-	{
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
-	@Override
-	public Object property(String sFragment, Object oDefault, Class expect)
-	{
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 }

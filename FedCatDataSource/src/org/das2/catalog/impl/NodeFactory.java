@@ -22,7 +22,6 @@ package org.das2.catalog.impl;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -32,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.catalog.DasDirNode;
 import org.das2.catalog.DasNode;
@@ -41,7 +38,6 @@ import org.das2.catalog.DasResolveException;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -101,16 +97,6 @@ public class NodeFactory
 				return new HttpGetSrcNode(parent, sName, lLocs);
 		}
 		throw new ParseException("Unknown node type '"+sType+"'.", -1);
-	}
-	
-	// Get a dom object from a document in string form
-	static Document getXmlDoc(String sData)
-		throws IOException, SAXException, ParserConfigurationException
-	{
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		Document doc = builder.parse(new InputSource(new StringReader(sData)));
-		return doc;
 	}
 	
 	// TODO: Figure out how to use the progress monitor here
@@ -176,7 +162,7 @@ public class NodeFactory
 		if(sData.startsWith("<?xml")){
 			Document doc;
 			try{
-				doc = getXmlDoc(sData);
+				doc = XmlUtil.getXmlDoc(sData);
 			} catch(SAXException | ParserConfigurationException ex){
 				ParseException pe = new ParseException(
 					"Error reading "+sUrl+": "+ex.getMessage(), -1

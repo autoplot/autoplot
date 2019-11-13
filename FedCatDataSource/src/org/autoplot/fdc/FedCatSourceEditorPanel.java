@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.URISplit;
+import org.das2.catalog.DasCatTreeModel;
 import org.das2.catalog.DasNode;
 import org.das2.catalog.DasNodeFactory;
 import org.das2.util.filesystem.FileSystem;
@@ -37,6 +38,7 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
 	private Map<String,String> paramCur;
 	private String sCurUri;
 	private ImageIcon iconSiteDefault;
+	private DasCatTreeModel catModel;
 
 	/**
 	 * Creates new form FedCatSourceEditorPanel
@@ -64,8 +66,7 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
 	 */
 	@SuppressWarnings("unchecked")
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-   private void initComponents()
-   {
+   private void initComponents() {
       java.awt.GridBagConstraints gridBagConstraints;
 
       btnGroupRoot = new javax.swing.ButtonGroup();
@@ -78,7 +79,7 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
       btnCustomTree = new javax.swing.JRadioButton();
       txtCustomUrl = new javax.swing.JTextField();
       scrPaneCatalog = new javax.swing.JScrollPane();
-      treeCatalog = new javax.swing.JTree();
+      treeControl = new javax.swing.JTree();
       lblSiteImage = new javax.swing.JLabel();
       pnlSource = new javax.swing.JPanel();
       lblSrcPath = new javax.swing.JLabel();
@@ -104,10 +105,8 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
       btnMainTree.setText("Main");
       btnMainTree.setNextFocusableComponent(btnTestTree);
       btnMainTree.setRequestFocusEnabled(false);
-      btnMainTree.addActionListener(new java.awt.event.ActionListener()
-      {
-         public void actionPerformed(java.awt.event.ActionEvent evt)
-         {
+      btnMainTree.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
             btnMainTreeActionPerformed(evt);
          }
       });
@@ -119,19 +118,15 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
       btnGroupRoot.add(btnCustomTree);
       btnCustomTree.setText("Custom");
       btnCustomTree.setNextFocusableComponent(txtCustomUrl);
-      btnCustomTree.addActionListener(new java.awt.event.ActionListener()
-      {
-         public void actionPerformed(java.awt.event.ActionEvent evt)
-         {
+      btnCustomTree.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
             btnCustomTreeActionPerformed(evt);
          }
       });
 
-      txtCustomUrl.setNextFocusableComponent(treeCatalog);
-      txtCustomUrl.addActionListener(new java.awt.event.ActionListener()
-      {
-         public void actionPerformed(java.awt.event.ActionEvent evt)
-         {
+      txtCustomUrl.setNextFocusableComponent(treeControl);
+      txtCustomUrl.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
             txtCustomUrlActionPerformed(evt);
          }
       });
@@ -178,9 +173,9 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
       pnlCatalog.add(pnlWhichCat, gridBagConstraints);
 
       javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Reading Catalog ...");
-      treeCatalog.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
-      treeCatalog.setNextFocusableComponent(pnlSource);
-      scrPaneCatalog.setViewportView(treeCatalog);
+      treeControl.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+      treeControl.setNextFocusableComponent(pnlSource);
+      scrPaneCatalog.setViewportView(treeControl);
 
       gridBagConstraints = new java.awt.GridBagConstraints();
       gridBagConstraints.gridx = 0;
@@ -283,7 +278,7 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
    private javax.swing.JPanel pnlWhichCat;
    private javax.swing.JScrollPane scrPaneCatalog;
    private javax.swing.JSplitPane splitPane;
-   private javax.swing.JTree treeCatalog;
+   private javax.swing.JTree treeControl;
    private javax.swing.JTextField txtCustomUrl;
    // End of variables declaration//GEN-END:variables
 
@@ -349,6 +344,50 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
 		// will be interpreted as data select parameters.
 		nodeCur = DasNodeFactory.getNearestNode(sNodeUrl, mon, false /*don't force reload ?*/);
 		
+		// Decide if the catalog pane will be turned on or not.  It is turned on
+		// for anything that can have children.  Furthermore decide which of the 
+		// radio buttons will be selected.
+		if(nodeCur.isDir()){
+			pnlCatalog.setVisible(true);
+			
+			// If the root of this node is not the one and only global root, then
+			// it's a detached node
+			DasNode theRoot = DasNodeFactory.getNode(null, mon, false);
+			
+			if(nodeCur.getRoot() != theRoot){
+				btnCustomTree.setSelected(true);
+				txtCustomUrl.setText(split.surl);
+			}
+			else{
+				txtCustomUrl.setEnabled(false);
+				String sPath = nodeCur.path();
+				btnMainTree.setSelected(sPath.startsWith(DasNodeFactory.defaultDataPath()));
+				btnTestTree.setSelected(sPath.startsWith(DasNodeFactory.defaultTestPath()));
+			}
+			
+			// Directory nodes need a tree model, start it at this node's root
+			catModel = new DasCatTreeModel(nodeCur.getRoot());
+			treeControl.setModel(catModel);
+		}
+		
+		// Source nodes that are detached don't need the catalog display
+		if(nodeCur.isSrc()){
+			if(nodeCur.isRoot()){ 
+				// Detached source node, no need for catalog panel or path display
+				pnlCatalog.setVisible(false);
+				lblSrcPath.setText("");
+				lblSrcPath.setVisible(false);
+			}
+			else{
+				lblSrcPath.setText(nodeCur.path());
+				lblSrcPath.setVisible(true);
+				
+				// This source is attached to something, fill in the tree up to it's root.
+				catModel = new DasCatTreeModel(nodeCur.getRoot());
+				treeControl.setModel(catModel);
+			}
+		}
+		
 		return true;
 	}
 
@@ -364,41 +403,11 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
 	public void setURI(String sFullUri)
 	{
 		assert sFullUri.equals(sCurUri) : "URI changed after prepare";
-		boolean bFocusWorked = false;
 		
-		if(nodeCur.isDir()){
-			pnlCatalog.setVisible(true);
-			
-			// Select between the main, test or custom trees
-			if(nodeCur.isRoot()){
-				btnCustomTree.setSelected(true);
-				
-				URISplit split = URISplit.parse(sFullUri);
-				
-				txtCustomUrl.setText(split.surl);
-				
-				
-				
-			}
-			
-			// FIXME: Not setting focus
-			bFocusWorked = treeCatalog.requestFocusInWindow();
-		}
+		boolean bDebugRestStop = true;
+		//Map<String,String> parts = FedCatSourceFactory.splitDasCatUri(sFullUri);
 		
-		if(nodeCur.isSrc()){
-			if(nodeCur.isRoot()){ 
-				// Detached source node, no need for catalog panel or path display
-				pnlCatalog.setVisible(false);
-				lblSrcPath.setText("");
-				lblSrcPath.setVisible(false);
-			}
-			else{
-				lblSrcPath.setText(nodeCur.path());
-				lblSrcPath.setVisible(true);
-			}
-			
-			bFocusWorked = pnlSource.requestFocusInWindow();
-		}
+		
 		
 		
 		 

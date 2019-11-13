@@ -26,9 +26,12 @@
 
 package org.das2.catalog;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
+import org.das2.util.LoggerManager;
 
 /**
  *
@@ -36,6 +39,7 @@ import javax.swing.tree.TreeNode;
  */
 public class DasCatTreeModel extends DefaultTreeModel
 {
+	private static final Logger LOGGER = LoggerManager.getLogger("das2.catalog.dctree");
 	
 	private static class DasCatTreeNode extends DefaultMutableTreeNode
 	{
@@ -46,10 +50,7 @@ public class DasCatTreeModel extends DefaultTreeModel
 		
 		@Override
 		public String toString(){
-			
-			String s2 = "doggy";
-			
-			String s = (String) node.property("title", node.name(), String.class);
+			String s = (String) node.property("title", String.class, node.name());
 			return s;
 		}
 	}
@@ -57,7 +58,6 @@ public class DasCatTreeModel extends DefaultTreeModel
 	public DasCatTreeModel(DasNode dasRoot)
 	{
 		super(new DasCatTreeNode(dasRoot), true);  // true = not all nodes can have children
-		
 	}
 	
 	@Override
@@ -67,8 +67,8 @@ public class DasCatTreeModel extends DefaultTreeModel
 	}
 	
 	@Override
-	public int getChildCount(Object treenode){
-		DasNode node = ((DasCatTreeNode)treenode).node;
+	public int getChildCount(Object parent){
+		DasNode node = ((DasCatTreeNode)parent).node;
 		if(node.isDir()){
 			DasDirNode dir = (DasDirNode)node;
 			String aIds[] = dir.list();
@@ -77,6 +77,32 @@ public class DasCatTreeModel extends DefaultTreeModel
 		return 0;
 	}
 	
+	@Override
+	public Object getChild(Object parent, int index) {
+		DasNode node = ((DasCatTreeNode)parent).node;
+		if(!node.isDir()) return null;
+		DasDirNode dir = (DasDirNode)node;
+		String aIds[] = dir.list();
+		if(index >= aIds.length) return null;
+		
+		return new DasCatTreeNode(dir.get(aIds[index]));
+    }
 	
-	
+	@Override
+	public int getIndexOfChild(Object parent, Object child)
+	{
+		DasNode dnTmp = ((DasCatTreeNode)parent).node;
+		if(!dnTmp.isDir()) return -1;
+		DasDirNode dir = (DasDirNode)dnTmp;
+		
+		DasNode node = ((DasCatTreeNode)child).node;
+		String aIds[] = dir.list();
+		
+		for(int i = 0; i < aIds.length; ++i){
+			if(dir.get(aIds[i]) == node)
+				return i;
+		}
+		
+		return -1;
+	}
 }

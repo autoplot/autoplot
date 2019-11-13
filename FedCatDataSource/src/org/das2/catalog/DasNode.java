@@ -41,7 +41,7 @@ public interface DasNode
 	 * @return  The human readable name of the node, not it's path ID */
 	public String name();
 	
-	/** Get a property of the node given a fragment path
+	/** Get a property of the node, or the default
 	 * 
 	 * Fragment path navigation avoids intermediate lookups.  Unless the default is
 	 * used, the return types are limited to the following:
@@ -60,14 +60,33 @@ public interface DasNode
 	 */
 	public Object property(String sFragment, Object oDefault);
 	
-	/** Get a property of the nod with an expected return type
+	/** Get a property of the node with an expected return type, or the default
 	 * 
 	 * @param sFragment
 	 * @param oDefault
 	 * @param expect
 	 * @return 
 	 */
-	public Object property(String sFragment, Object oDefault, Class expect);
+	public Object property(String sFragment, Class expect, Object oDefault);
+	
+	
+	/** Get a property of a node, or throw
+	 * 
+	 * @param sFragment
+	 * @return
+	 * @throws DasResolveException 
+	 */
+	public Object property(String sFragment) throws DasResolveException;
+	
+	/** Get a property of a node with an expected type, or throw
+	 * 
+	 * @param sFragment
+	 * @param expect
+	 * @return
+	 * @throws DasResolveException 
+	 */
+	public Object property(String sFragment, Class expect) throws DasResolveException;
+	
 	
 	/** Get a property of a node given a fragment path with expected return types
 	

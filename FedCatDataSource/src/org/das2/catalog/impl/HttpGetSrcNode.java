@@ -177,7 +177,7 @@ public class HttpGetSrcNode extends AbstractSrcNode
 	@Override
 	public QDataSet query(Map<String, String> dQuery)
 	{
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 	
 	@Override
@@ -189,13 +189,22 @@ public class HttpGetSrcNode extends AbstractSrcNode
 	@Override
 	public Object property(String sFragment, Object oDefault)
 	{
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		return JsonUtil.property(data, sFragment, oDefault);
 	}
 
 	@Override
-	public Object property(String sFragment, Object oDefault, Class expect)
+	public Object property(String sFragment, Class expect, Object oDefault)
 	{
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		return JsonUtil.property(data, sFragment, expect, oDefault);
 	}
 
+	@Override
+	public Object property(String sFragment) throws DasResolveException {
+		return JsonUtil.property(data, sFragment);
+	}
+
+	@Override
+	public Object property(String sFragment, Class expect) throws DasResolveException {
+		return JsonUtil.property(data, sFragment, expect);
+	}
 }
