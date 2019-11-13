@@ -8,8 +8,6 @@
 # that unreferenced routines are not used.  This list is separate from the ant build script,
 # so the configuration needs to be kept in sync.
 #
-# CDF Support will be awkward because of the binaries.  Support this for the hudson platform.
-#
 # This should be run from the folder "Autoplot"
 #
 # Used by: autoplot-release on Hudson.
