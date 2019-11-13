@@ -179,5 +179,23 @@ public class HttpGetSrcNode extends AbstractSrcNode
 	{
 		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
+	
+	@Override
+	public boolean queryVerify(Map<String, String> dQuery) {
+		// Just say they're all bad for now
+		return false;
+	}
+
+	@Override
+	public Object property(String sFragment, Object oDefault)
+	{
+		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	}
+
+	@Override
+	public Object property(String sFragment, Object oDefault, Class expect)
+	{
+		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	}
 
 }

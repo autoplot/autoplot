@@ -55,9 +55,4 @@ public abstract class AbstractSrcNode extends AbstractNode implements DasSrcNode
 	@Override
 	public boolean isInfo(){ return false; }
 	
-	@Override
-	public boolean queryVerify(Map<String, String> dQuery) {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-	
 }

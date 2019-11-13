@@ -64,7 +64,8 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
 	 */
 	@SuppressWarnings("unchecked")
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-   private void initComponents() {
+   private void initComponents()
+   {
       java.awt.GridBagConstraints gridBagConstraints;
 
       btnGroupRoot = new javax.swing.ButtonGroup();
@@ -72,15 +73,15 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
       pnlCatalog = new javax.swing.JPanel();
       pnlWhichCat = new javax.swing.JPanel();
       jLabel1 = new javax.swing.JLabel();
-      jRadioButton1 = new javax.swing.JRadioButton();
-      jRadioButton2 = new javax.swing.JRadioButton();
-      jRadioButton3 = new javax.swing.JRadioButton();
-      jTextField1 = new javax.swing.JTextField();
+      btnMainTree = new javax.swing.JRadioButton();
+      btnTestTree = new javax.swing.JRadioButton();
+      btnCustomTree = new javax.swing.JRadioButton();
+      txtCustomUrl = new javax.swing.JTextField();
       scrPaneCatalog = new javax.swing.JScrollPane();
       treeCatalog = new javax.swing.JTree();
       lblSiteImage = new javax.swing.JLabel();
       pnlSource = new javax.swing.JPanel();
-      lblNodeOrigin = new javax.swing.JLabel();
+      lblSrcPath = new javax.swing.JLabel();
       pnlQueryCtrl = new javax.swing.JScrollPane();
       jTextArea1 = new javax.swing.JTextArea();
 
@@ -98,29 +99,40 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
 
       jLabel1.setText("Catalog:");
 
-      btnGroupRoot.add(jRadioButton1);
-      jRadioButton1.setSelected(true);
-      jRadioButton1.setText("Main");
-      jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            jRadioButton1ActionPerformed(evt);
+      btnGroupRoot.add(btnMainTree);
+      btnMainTree.setSelected(true);
+      btnMainTree.setText("Main");
+      btnMainTree.setNextFocusableComponent(btnTestTree);
+      btnMainTree.setRequestFocusEnabled(false);
+      btnMainTree.addActionListener(new java.awt.event.ActionListener()
+      {
+         public void actionPerformed(java.awt.event.ActionEvent evt)
+         {
+            btnMainTreeActionPerformed(evt);
          }
       });
 
-      btnGroupRoot.add(jRadioButton2);
-      jRadioButton2.setText("Test");
+      btnGroupRoot.add(btnTestTree);
+      btnTestTree.setText("Test");
+      btnTestTree.setNextFocusableComponent(btnCustomTree);
 
-      btnGroupRoot.add(jRadioButton3);
-      jRadioButton3.setText("Custom");
-      jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            jRadioButton3ActionPerformed(evt);
+      btnGroupRoot.add(btnCustomTree);
+      btnCustomTree.setText("Custom");
+      btnCustomTree.setNextFocusableComponent(txtCustomUrl);
+      btnCustomTree.addActionListener(new java.awt.event.ActionListener()
+      {
+         public void actionPerformed(java.awt.event.ActionEvent evt)
+         {
+            btnCustomTreeActionPerformed(evt);
          }
       });
 
-      jTextField1.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            jTextField1ActionPerformed(evt);
+      txtCustomUrl.setNextFocusableComponent(treeCatalog);
+      txtCustomUrl.addActionListener(new java.awt.event.ActionListener()
+      {
+         public void actionPerformed(java.awt.event.ActionEvent evt)
+         {
+            txtCustomUrlActionPerformed(evt);
          }
       });
 
@@ -132,13 +144,13 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
             .addContainerGap()
             .addComponent(jLabel1)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(jRadioButton1)
+            .addComponent(btnMainTree)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addComponent(jRadioButton2)
+            .addComponent(btnTestTree)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addComponent(jRadioButton3)
+            .addComponent(btnCustomTree)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 441, Short.MAX_VALUE)
+            .addComponent(txtCustomUrl, javax.swing.GroupLayout.DEFAULT_SIZE, 441, Short.MAX_VALUE)
             .addContainerGap())
       );
       pnlWhichCatLayout.setVerticalGroup(
@@ -147,10 +159,10 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
             .addContainerGap()
             .addGroup(pnlWhichCatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(jLabel1)
-               .addComponent(jRadioButton1)
-               .addComponent(jRadioButton2)
-               .addComponent(jRadioButton3)
-               .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+               .addComponent(btnMainTree)
+               .addComponent(btnTestTree)
+               .addComponent(btnCustomTree)
+               .addComponent(txtCustomUrl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
       );
 
@@ -165,6 +177,9 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
       gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
       pnlCatalog.add(pnlWhichCat, gridBagConstraints);
 
+      javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Reading Catalog ...");
+      treeCatalog.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+      treeCatalog.setNextFocusableComponent(pnlSource);
       scrPaneCatalog.setViewportView(treeCatalog);
 
       gridBagConstraints = new java.awt.GridBagConstraints();
@@ -196,17 +211,17 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
       pnlSource.setPreferredSize(new java.awt.Dimension(500, 200));
       pnlSource.setLayout(new java.awt.GridBagLayout());
 
-      lblNodeOrigin.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-      lblNodeOrigin.setText("<html>tag:das2.org,2012:<b>site:/uiowa/juno/wav/survey</b>");
-      lblNodeOrigin.setFocusable(false);
-      lblNodeOrigin.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+      lblSrcPath.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+      lblSrcPath.setText("<html>tag:das2.org,2012:<b>site:/uiowa/juno/wav/survey</b>");
+      lblSrcPath.setFocusable(false);
+      lblSrcPath.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
       gridBagConstraints = new java.awt.GridBagConstraints();
       gridBagConstraints.gridx = 0;
       gridBagConstraints.gridy = 0;
       gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
       gridBagConstraints.weightx = 1.0;
       gridBagConstraints.insets = new java.awt.Insets(1, 1, 1, 1);
-      pnlSource.add(lblNodeOrigin, gridBagConstraints);
+      pnlSource.add(lblSrcPath, gridBagConstraints);
 
       jTextArea1.setColumns(20);
       jTextArea1.setRows(5);
@@ -237,32 +252,31 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
       add(splitPane, gridBagConstraints);
    }// </editor-fold>//GEN-END:initComponents
 
-   private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jRadioButton1ActionPerformed
-   {//GEN-HEADEREND:event_jRadioButton1ActionPerformed
+   private void btnMainTreeActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnMainTreeActionPerformed
+   {//GEN-HEADEREND:event_btnMainTreeActionPerformed
       // TODO add your handling code here:
-   }//GEN-LAST:event_jRadioButton1ActionPerformed
+   }//GEN-LAST:event_btnMainTreeActionPerformed
 
-   private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jRadioButton3ActionPerformed
-   {//GEN-HEADEREND:event_jRadioButton3ActionPerformed
+   private void btnCustomTreeActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnCustomTreeActionPerformed
+   {//GEN-HEADEREND:event_btnCustomTreeActionPerformed
       // TODO add your handling code here:
-   }//GEN-LAST:event_jRadioButton3ActionPerformed
+   }//GEN-LAST:event_btnCustomTreeActionPerformed
 
-   private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jTextField1ActionPerformed
-   {//GEN-HEADEREND:event_jTextField1ActionPerformed
+   private void txtCustomUrlActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_txtCustomUrlActionPerformed
+   {//GEN-HEADEREND:event_txtCustomUrlActionPerformed
       // TODO add your handling code here:
-   }//GEN-LAST:event_jTextField1ActionPerformed
+   }//GEN-LAST:event_txtCustomUrlActionPerformed
 
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
+   private javax.swing.JRadioButton btnCustomTree;
    private javax.swing.ButtonGroup btnGroupRoot;
+   private javax.swing.JRadioButton btnMainTree;
+   private javax.swing.JRadioButton btnTestTree;
    private javax.swing.JLabel jLabel1;
-   private javax.swing.JRadioButton jRadioButton1;
-   private javax.swing.JRadioButton jRadioButton2;
-   private javax.swing.JRadioButton jRadioButton3;
    private javax.swing.JTextArea jTextArea1;
-   private javax.swing.JTextField jTextField1;
-   private javax.swing.JLabel lblNodeOrigin;
    private javax.swing.JLabel lblSiteImage;
+   private javax.swing.JLabel lblSrcPath;
    private javax.swing.JPanel pnlCatalog;
    private javax.swing.JScrollPane pnlQueryCtrl;
    private javax.swing.JPanel pnlSource;
@@ -270,6 +284,7 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
    private javax.swing.JScrollPane scrPaneCatalog;
    private javax.swing.JSplitPane splitPane;
    private javax.swing.JTree treeCatalog;
+   private javax.swing.JTextField txtCustomUrl;
    // End of variables declaration//GEN-END:variables
 
 	// I think I am here because the data source factory rejected the given URL, so now
@@ -287,7 +302,7 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
 		
 		// If this starts with a known das top-branch catalog, or one of it's convienence
 		// strings, we can resolve it to something
-		if((sCatPath.startsWith(DasNodeFactory.dasRootPath())) ||
+		if((sCatPath.startsWith(DasNodeFactory.defaultDataPath())) ||
 			sCatPath.startsWith("site:") || sCatPath.startsWith("test:") ) return false;
 			
 		// FIXME:  For regular filesystem URLs I don't know if this URL is bad unless I
@@ -324,7 +339,7 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
 		sCurUri = sFullUri;  // Save off the full uri as a sanity check in setURI to make
 		                     // sure I've prepared for the right thing
 		
-		String sNodeUrl = DasNodeFactory.dasRootPath();
+		String sNodeUrl = DasNodeFactory.defaultDataPath();
 		URISplit split = URISplit.parse(sFullUri);
 		if(! sFullUri.equals("vap+dc:")) sNodeUrl = split.file;
 		
@@ -349,8 +364,43 @@ public class FedCatSourceEditorPanel extends javax.swing.JPanel
 	public void setURI(String sFullUri)
 	{
 		assert sFullUri.equals(sCurUri) : "URI changed after prepare";
+		boolean bFocusWorked = false;
 		
-		// TODO: Prep the dialog
+		if(nodeCur.isDir()){
+			pnlCatalog.setVisible(true);
+			
+			// Select between the main, test or custom trees
+			if(nodeCur.isRoot()){
+				btnCustomTree.setSelected(true);
+				
+				URISplit split = URISplit.parse(sFullUri);
+				
+				txtCustomUrl.setText(split.surl);
+				
+				
+				
+			}
+			
+			// FIXME: Not setting focus
+			bFocusWorked = treeCatalog.requestFocusInWindow();
+		}
+		
+		if(nodeCur.isSrc()){
+			if(nodeCur.isRoot()){ 
+				// Detached source node, no need for catalog panel or path display
+				pnlCatalog.setVisible(false);
+				lblSrcPath.setText("");
+				lblSrcPath.setVisible(false);
+			}
+			else{
+				lblSrcPath.setText(nodeCur.path());
+				lblSrcPath.setVisible(true);
+			}
+			
+			bFocusWorked = pnlSource.requestFocusInWindow();
+		}
+		
+		
 		 
 	}
 

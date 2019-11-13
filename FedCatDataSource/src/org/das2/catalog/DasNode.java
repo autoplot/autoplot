@@ -38,8 +38,38 @@ public interface DasNode
 	public String type();
 	
 	/** get the node name
-	 * @return  The human readable name of the node, not it's path ID*/
+	 * @return  The human readable name of the node, not it's path ID */
 	public String name();
+	
+	/** Get a property of the node given a fragment path
+	 * 
+	 * Fragment path navigation avoids intermediate lookups.  Unless the default is
+	 * used, the return types are limited to the following:
+	 * 
+	 *   String
+	 *   Integer
+	 *   Double
+	 *   String
+	 *   List<Object>
+	 *   Map<String, Object> 
+	 * 
+	 * @param sFragment  The fragment path, for example "tech_contact/0/email"
+	 * @param oDefault   The default object to return if nothing exists at the
+	 *                   fragment location
+	 * @return 
+	 */
+	public Object property(String sFragment, Object oDefault);
+	
+	/** Get a property of the nod with an expected return type
+	 * 
+	 * @param sFragment
+	 * @param oDefault
+	 * @param expect
+	 * @return 
+	 */
+	public Object property(String sFragment, Object oDefault, Class expect);
+	
+	/** Get a property of a node given a fragment path with expected return types
 	
 	/** get the node path
 	 * @return  The catalog path to this node.  For root nodes this is null */

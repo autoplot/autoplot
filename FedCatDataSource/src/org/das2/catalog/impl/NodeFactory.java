@@ -84,6 +84,8 @@ public class NodeFactory
 	
 	// The starting path for the das2 source catalog
 	public static final String DAS_ROOT_PATH = "tag:das2.org,2012:";
+	public static final String DEFAULT_DATA_PATH = "tag:das2.org,2012:site";
+	public static final String DEFAULT_TEST_PATH = "tag:das2.org,2012:test";
 	
 	// The heart of the factory, preform phase 1 construction of a node given a type
 	// name

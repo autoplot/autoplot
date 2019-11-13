@@ -86,8 +86,13 @@ public class DasNodeFactory
 		return NodeFactory.getNearestNode(sUrl, mon, bReload);
 	}
 
-	public static String dasRootPath()
+	public static String defaultDataPath()
 	{
-		return NodeFactory.DAS_ROOT_PATH;
+		return NodeFactory.DEFAULT_DATA_PATH;
+	}
+	
+	public static String defaultTestPath()
+	{
+		return NodeFactory.DEFAULT_DATA_PATH;
 	}
 }

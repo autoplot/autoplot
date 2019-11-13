@@ -35,7 +35,7 @@ import org.das2.util.monitor.ProgressMonitor;
  */
 public class FedCatSourceFactory extends AbstractDataSourceFactory
 {
-	private static final Logger logger = Logger.getLogger("apdss.dfc");
+	private static final Logger LOGGER = Logger.getLogger("apdss.dfc");
 	
 	@Override
 	public DataSource getDataSource(URI uri) throws Exception
@@ -65,7 +65,7 @@ public class FedCatSourceFactory extends AbstractDataSourceFactory
 		Map<String,String> dParams = URISplit.parseParams(split.params);
 		 
 		// If the URI provided does not reference a source type then it's not complete
-		String sNodeUrl = DasNodeFactory.dasRootPath();
+		String sNodeUrl = DasNodeFactory.defaultDataPath();
 		//String sNodeUrl = null;
 		if( ! sUrl.equals("vap+dc:")) sNodeUrl = split.file;
 		
@@ -97,7 +97,7 @@ public class FedCatSourceFactory extends AbstractDataSourceFactory
 		//FIXME: Go into filesystem completions if URL starts with a common
 		//       filesystem type, such as https://, file://, etc.
 		
-		String sNodeUrl = DasNodeFactory.dasRootPath();
+		String sNodeUrl = DasNodeFactory.defaultDataPath();
 		//String sNodeUrl = null;
 		if( ! sUrl.equals("vap+dc:")) sNodeUrl = split.file;
 		

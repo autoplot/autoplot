@@ -13,7 +13,6 @@ import org.autoplot.datasource.AbstractDataSource;
 import org.das2.qds.QDataSet;
 import org.das2.qds.DataSetUtil;
 import org.das2.catalog.DasNode;
-import org.das2.catalog.impl.NodeFactory;
 import org.das2.util.monitor.ProgressMonitor;
 /**
  *

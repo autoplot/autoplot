@@ -124,7 +124,7 @@ class CollectionNode extends AbstractDirNode
 		// Work around odd implementation for the JSON library, see note in CatalogNode.
 		if(jo.has(KEY_SEPARATOR)){
 			if(jo.isNull(KEY_SEPARATOR)) sSep = "";
-			else sSep = data.getString(KEY_SEPARATOR);
+			else sSep = jo.getString(DEFAULT_PATH_SEP);
 		}
 		
 		data = jo;
@@ -274,5 +274,17 @@ class CollectionNode extends AbstractDirNode
 		
 		NodeDefLoc loc = new NodeDefLoc(sUrl);
 		loc.bLoaded = true;
+	}
+
+	@Override
+	public Object property(String sFragment, Object oDefault)
+	{
+		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	}
+
+	@Override
+	public Object property(String sFragment, Object oDefault, Class expect)
+	{
+		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 }
