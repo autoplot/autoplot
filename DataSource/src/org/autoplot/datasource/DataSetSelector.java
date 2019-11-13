@@ -2394,7 +2394,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     }
 
     private boolean expertMode= true;
-    private boolean isExpertMode() {
+    public boolean isExpertMode() {
         return expertMode;
     }
 

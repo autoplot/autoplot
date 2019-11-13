@@ -480,7 +480,11 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         org.das2.util.LoggerManager.logGuiEvent(evt);
         if ( peer!=null ) {
             String surl = (String) peer.getLastValue().trim();//TODO:check
-            peer.setValue(surl);
+            
+            if ( peer.isExpertMode() ) {
+                peer.setValue(surl);
+            }
+            
             //boolean wasRejected= false;
             DataSourceEditorPanel edit;
             

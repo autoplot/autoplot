@@ -506,7 +506,7 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void plot(String suri) {
         maybeInitModel();
-        if ( view!=null ) {
+        if ( view!=null && view.isExpertMode() ) {
             view.dataSetSelector.setValue(suri);
         }
         model.resetDataSetSourceURL(suri, new NullProgressMonitor());
