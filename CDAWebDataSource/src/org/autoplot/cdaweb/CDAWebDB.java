@@ -723,7 +723,7 @@ public class CDAWebDB {
                 for ( int k=0; k<kids2.getLength(); k++ ) {
                     if ( kids2.item(k).getNodeName().equals("URL") ) {
                         if ( kids2.item(k).getFirstChild()==null ) {
-                            logger.warning("URL is missing for "+id);
+                            logger.log(Level.FINE, "URL is missing for {0}, data cannot be accessed.", id);
                             return null;
                         }
                         String url= kids2.item(k).getFirstChild().getTextContent().trim();
