@@ -33,6 +33,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.das2.catalog.DasResolveException;
 import org.das2.catalog.DasDirNode;
+import org.das2.catalog.DasProp;
+import org.das2.util.monitor.NullProgressMonitor;
 
 /** Engine for turning parameter settings into HTTP GET URLs
  *
@@ -74,14 +76,27 @@ public class HttpGetSrcNode extends AbstractSrcNode
 	public String type() { return TYPE;}
 	
 	@Override
-	boolean isLoaded(){ return data != null; }
+	public boolean isLoaded(){ return data != null; }
 
 	protected void initFromJson(JSONObject jo) throws JSONException, ParseException{
 		data = jo;
 		
 		if(! data.getString(KEY_TYPE).equals(TYPE))
 			throw new ParseException("Node type missing or not equal to " + TYPE, -1);
-		
+	}
+	
+	@Override
+	public DasProp prop(String sFragment, Object oDefault){
+		if(isLoaded()) {
+			return JsonUtil.prop(data, sFragment, oDefault);
+		} else {
+			return new DasProp(oDefault);
+		}
+	}
+
+	@Override
+	public DasProp prop(String sFragment){
+		return JsonUtil.prop(data, sFragment);
 	}
 	
 	private void mergeFromJson(JSONObject jo) throws JSONException, ParseException
@@ -115,7 +130,7 @@ public class HttpGetSrcNode extends AbstractSrcNode
 	}
 
 	@Override
-	void load(ProgressMonitor mon) throws DasResolveException
+	public void load(ProgressMonitor mon) throws DasResolveException
 	{
 		for(NodeDefLoc loc: lLocs){
 			loc.bLoaded = false;
@@ -184,27 +199,5 @@ public class HttpGetSrcNode extends AbstractSrcNode
 	public boolean queryVerify(Map<String, String> dQuery) {
 		// Just say they're all bad for now
 		return false;
-	}
-
-	@Override
-	public Object property(String sFragment, Object oDefault)
-	{
-		return JsonUtil.property(data, sFragment, oDefault);
-	}
-
-	@Override
-	public Object property(String sFragment, Class expect, Object oDefault)
-	{
-		return JsonUtil.property(data, sFragment, expect, oDefault);
-	}
-
-	@Override
-	public Object property(String sFragment) throws DasResolveException {
-		return JsonUtil.property(data, sFragment);
-	}
-
-	@Override
-	public Object property(String sFragment, Class expect) throws DasResolveException {
-		return JsonUtil.property(data, sFragment, expect);
 	}
 }

@@ -33,6 +33,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.das2.catalog.DasResolveException;
 import org.das2.catalog.DasDirNode;
+import org.das2.catalog.DasProp;
 
 /** These nodes represent a general directory of nodes.
  * 
@@ -81,28 +82,18 @@ class CatalogNode extends AbstractDirNode
 	public boolean isInfo(){ return false; }
 	
 	@Override
-	boolean isLoaded(){ return (data != null); }
+	public boolean isLoaded(){ return (data != null); }
 	
 	@Override
-	public Object property(String sFragment, Object oDefault){
-		return JsonUtil.property(data, sFragment, oDefault);
+	public DasProp prop(String sFragment, Object oDefault){
+		return JsonUtil.prop(data, sFragment, oDefault);
 	}
 
 	@Override
-	public Object property(String sFragment, Class expect, Object oDefault){
-		return JsonUtil.property(data, sFragment, expect, oDefault);
+	public DasProp prop(String sFragment){
+		return JsonUtil.prop(data, sFragment);
 	}
 
-	@Override
-	public Object property(String sFragment) throws DasResolveException {
-		return JsonUtil.property(data, sFragment);
-	}
-
-	@Override
-	public Object property(String sFragment, Class expect) throws DasResolveException {
-		return JsonUtil.property(data, sFragment, expect);
-	}
-	
 	protected void initFromJson(JSONObject jo) throws JSONException, ParseException{
 		
 		if(! jo.getString(KEY_TYPE).equals(TYPE))
@@ -149,7 +140,7 @@ class CatalogNode extends AbstractDirNode
 	}
 	
 	@Override
-	void load(ProgressMonitor mon) throws DasResolveException {
+	public void load(ProgressMonitor mon) throws DasResolveException {
 		for(NodeDefLoc loc: lLocs){
 			loc.bLoaded = false;
 			loc.bBad = false;

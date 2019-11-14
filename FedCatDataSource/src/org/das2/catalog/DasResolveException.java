@@ -28,8 +28,8 @@ package org.das2.catalog;
 
 /** Exception thrown if a path can not be resolved.
  * 
- * These are handled internally by the catalog package if possible, but some paths just
- * aren't resolvable no matter how many catalog branches are inspected.
+ * These are handled internally by the catalog package if possible, but some 
+ * paths just aren't resolvable no matter how many catalog branches are inspected.
  * 
  * @author C. Piker, 2019-11-02
  */

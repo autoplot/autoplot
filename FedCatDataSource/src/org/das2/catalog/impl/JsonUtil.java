@@ -1,5 +1,6 @@
 package org.das2.catalog.impl;
 
+import org.das2.catalog.DasProp;
 import org.das2.catalog.DasResolveException;
 import org.json.JSONObject;
 
@@ -16,10 +17,9 @@ class JsonUtil {
 	 * @param oDefault
 	 * @return 
 	 */
-	static Object property(JSONObject data, String sFragment, Object oDefault) 
+	static DasProp prop(JSONObject data, String sFragment, Object oDefault) 
 	{
 		throw new UnsupportedOperationException("Not supported yet.");
-		
 	}
 	
 	/** Get a give property given an internal object fragment string
@@ -30,23 +30,8 @@ class JsonUtil {
 	 * @param oDefault
 	 * @return 
 	 */
-	static Object property(
-		JSONObject data, String sFragment, Class expect, Object oDefault
-	){
+	static DasProp prop(JSONObject data, String sFragment){
 		
-		throw new UnsupportedOperationException("Not supported yet.");
-		
-	}
-
-	static Object property(JSONObject data, String sFragment) 
-		throws DasResolveException 
-	{
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-	
-	static Object property(JSONObject data, String sFragment, Class expect) 
-		throws DasResolveException 
-	{
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }

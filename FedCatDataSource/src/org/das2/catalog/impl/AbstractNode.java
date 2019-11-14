@@ -138,18 +138,6 @@ public abstract class AbstractNode implements DasNode {
 		return bldr.toString();
 	}
 	
-	/** Does this node have a full definition
-	 * @return True if this node successfully passed the second construction stage.
-	 */
-	abstract boolean isLoaded();
-	
-	/** Phase 2 construction for the node.  Actually get the full definition from
-	 * any remote location.  This will trigger a re-load if the node is already 
-	 * loaded.
-	 * @param mon A human amusement device incase network operations are taking a while.
-	 */
-	abstract void load(ProgressMonitor mon) throws DasResolveException;
-	
 	/** If there is another source of information for this node and you might be able
 	 * to load it, return true.  This default version just looks to see if any of the
 	 * source URLs haven't been loaded or haven't been marked as bad.  You may want to

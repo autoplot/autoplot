@@ -52,7 +52,7 @@ public class FedCatTreeModel extends DefaultTreeModel
 		
 		@Override
 		public String toString(){
-			String s = (String) node.property("title", String.class, node.name());
+			String s = node.prop("title", node.name()).str();
 			return s;
 		}
 	}

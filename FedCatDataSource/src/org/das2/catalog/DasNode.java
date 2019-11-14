@@ -25,6 +25,7 @@
  */
 package org.das2.catalog;
 
+import org.das2.util.monitor.ProgressMonitor;
 
 /** A single node from the das2 federated catalog
  *
@@ -40,55 +41,6 @@ public interface DasNode
 	/** get the node name
 	 * @return  The human readable name of the node, not it's path ID */
 	public String name();
-	
-	/** Get a property of the node, or the default
-	 * 
-	 * Fragment path navigation avoids intermediate lookups.  Unless the default is
-	 * used, the return types are limited to the following:
-	 * 
-	 *   String
-	 *   Integer
-	 *   Double
-	 *   String
-	 *   List<Object>
-	 *   Map<String, Object> 
-	 * 
-	 * @param sFragment  The fragment path, for example "tech_contact/0/email"
-	 * @param oDefault   The default object to return if nothing exists at the
-	 *                   fragment location
-	 * @return 
-	 */
-	public Object property(String sFragment, Object oDefault);
-	
-	/** Get a property of the node with an expected return type, or the default
-	 * 
-	 * @param sFragment
-	 * @param oDefault
-	 * @param expect
-	 * @return 
-	 */
-	public Object property(String sFragment, Class expect, Object oDefault);
-	
-	
-	/** Get a property of a node, or throw
-	 * 
-	 * @param sFragment
-	 * @return
-	 * @throws DasResolveException 
-	 */
-	public Object property(String sFragment) throws DasResolveException;
-	
-	/** Get a property of a node with an expected type, or throw
-	 * 
-	 * @param sFragment
-	 * @param expect
-	 * @return
-	 * @throws DasResolveException 
-	 */
-	public Object property(String sFragment, Class expect) throws DasResolveException;
-	
-	
-	/** Get a property of a node given a fragment path with expected return types
 	
 	/** get the node path
 	 * @return  The catalog path to this node.  For root nodes this is null */
@@ -128,5 +80,41 @@ public interface DasNode
 	 * @return the highest node reachable by this catalog node, which may just be itself.
 	 */
 	public DasNode getRoot();
+	
+	/** Does this node have a full definition
+	 * @return True if this node successfully passed the second construction stage.
+	 */
+	abstract boolean isLoaded();
+	
+	/** Phase 2 construction for the node.
+	 * Actually get the full definition from it's source location.  
+	 * This will trigger a re-load if the node is already loaded.
+	 * @param mon A human amusement device incase network operations are taking a while.
+	 * @throws org.das2.catalog.DasResolveException
+	 */
+	abstract void load(ProgressMonitor mon) throws DasResolveException;
+	
+	/** Get a property of the node, or the default
+	 * 
+	 * Fragment path navigation avoids intermediate lookups.  Though fragment 
+	 * paths are strings, array indicies can be used.
+	 * 
+	 * @param sFragment  The fragment path, for example "tech_contact/0/email"
+	 * 
+	 * @param oDefault   The default object to return if nothing exists at the
+	 *                   fragment location.  The object will be wrapped as a 
+	 *                   DasProp, so it must be null or one of the accepted 
+	 *                   object types defined for constructing DasProp objects.
+	 * @return 
+	 */
+	public DasProp prop(String sFragment, Object oDefault);
+	
+	/** Get a property of a node, or throw
+	 * 
+	 * @param sFragment
+	 * @return
+	 * @throws DasResolveException 
+	 */
+	public DasProp prop(String sFragment) throws DasResolveException;
 	
 }
