@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>First look at recently-release Parker Solar Probe data.
+        <p><small>First look at recently-released Parker Solar Probe data.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,7 +28,8 @@
         
         <p>Bugfixes (2019-11-14 r24330):</p>
         <ul>
-            <li>new NullPointerException, caused by careless code in total which assumed there was a DEPEND_2 property.
+            <li>suppress warning wher URL is not found for parameter in CDAWeb's all.xml.
+            <li>new NullPointerException, caused by careless code in total which assumed there was a DEPEND_2 property.  Thanks, Jon N.!
             <li>rte15951983: selecting "basic" mode twice would result in a runtime exception.
             <li>Matlab/IDL/Python interface needs to consider unit preferences, so it is consistent.
             <li>2126: Basic mode prevents URI references from getting into the DataSetSelector, which is confusing.
