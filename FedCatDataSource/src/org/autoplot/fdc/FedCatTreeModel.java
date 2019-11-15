@@ -26,11 +26,10 @@
 
 package org.autoplot.fdc;
 
-import java.util.logging.Level;
+import java.time.ZonedDateTime;
 import java.util.logging.Logger;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
 import org.das2.catalog.DasDirNode;
 import org.das2.catalog.DasNode;
 import org.das2.util.LoggerManager;
@@ -52,8 +51,11 @@ public class FedCatTreeModel extends DefaultTreeModel
 		
 		@Override
 		public String toString(){
-			String s = node.prop("title", node.name()).str();
-			return s;
+			String sRet = "";
+			if(node.name() != null) sRet = "<html><b>"+node.name()+"</b>";
+			String s = node.prop("title").str();  //<-- FIXME: triggers network activity
+			if(s != null) sRet += " "+s;
+			return sRet;
 		}
 	}
 	
@@ -65,7 +67,7 @@ public class FedCatTreeModel extends DefaultTreeModel
 	@Override
 	public boolean isLeaf(Object treenode){
 		DasNode node = ((DasCatTreeNode)treenode).node;
-		return node.isDir();
+		return ! node.isDir();
 	}
 	
 	@Override

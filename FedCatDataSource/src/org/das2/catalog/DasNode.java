@@ -27,8 +27,9 @@ package org.das2.catalog;
 
 import org.das2.util.monitor.ProgressMonitor;
 
-/** A single node from the das2 federated catalog
- *
+/** A single node from the das2 federated catalog, which may, or may not, be fully
+ *  realized from source data.
+ * 
  * @author cwp
  */
 public interface DasNode
@@ -87,7 +88,13 @@ public interface DasNode
 	abstract boolean isLoaded();
 	
 	/** Phase 2 construction for the node.
-	 * Actually get the full definition from it's source location.  
+	 * 
+	 * DasNode objects exist to represent remote catalog data.  Since one catalog
+	 * node can point to others, it is possible to create a stub node that knows 
+	 * how to load itself, but is not actually loaded yet.  This function can be
+	 * used to trigger full catalog node resolution.
+	 * 
+	 * 
 	 * This will trigger a re-load if the node is already loaded.
 	 * @param mon A human amusement device incase network operations are taking a while.
 	 * @throws org.das2.catalog.DasResolveException
@@ -96,25 +103,43 @@ public interface DasNode
 	
 	/** Get a property of the node, or the default
 	 * 
-	 * Fragment path navigation avoids intermediate lookups.  Though fragment 
-	 * paths are strings, array indicies can be used.
+	 * Similar to sub-page references for web-pages, property values are retrieved
+	 * by providing a fragment path.  Fragment paths are standardized using the '/'
+	 * as the sub-item separator.  By combining node paths with fragment paths every
+	 * single property value within the global catalog system has a unique URI.  For
+	 * example:
 	 * 
+	 * :tag:das2.org,2012:site:/uiowa/voyager/1/pws#interface/coords/time/max/value
+	 * ^    ^        ^    ^                         ^
+	 * |    |        |    |                         |
+	 * |    |        |    +- path                   +- fragment
+	 * |    |        +- date
+	 * |    +- authority  
+	 * +-- scheme
+	 * 
+	 * The purpose of this function is to retrieve properties from within a node 
+	 * given a fragment string.
+	 *       
 	 * @param sFragment  The fragment path, for example "tech_contact/0/email"
 	 * 
 	 * @param oDefault   The default object to return if nothing exists at the
 	 *                   fragment location.  The object will be wrapped as a 
 	 *                   DasProp, so it must be null or one of the accepted 
 	 *                   object types defined for constructing DasProp objects.
-	 * @return 
+	 * 
+	 * @return A DasProp. If load has not been called for this node, the return will
+	 *         always be the default.
 	 */
 	public DasProp prop(String sFragment, Object oDefault);
 	
-	/** Get a property of a node, or throw
+	/** Get a property of a node
+	 * 
 	 * 
 	 * @param sFragment
-	 * @return
-	 * @throws DasResolveException 
+	 * @return The property at the given fragment location or null DasProp if the given
+	 *         path does not lead to a property.  If load() has not been called for this
+	 *         node the return will always be null.
 	 */
-	public DasProp prop(String sFragment) throws DasResolveException;
+	public DasProp prop(String sFragment);
 	
 }

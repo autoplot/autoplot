@@ -34,6 +34,7 @@ import org.json.JSONObject;
 import org.das2.catalog.DasResolveException;
 import org.das2.catalog.DasDirNode;
 import org.das2.catalog.DasProp;
+import org.das2.util.monitor.NullProgressMonitor;
 
 /** These nodes represent a general directory of nodes.
  * 
@@ -86,11 +87,37 @@ class CatalogNode extends AbstractDirNode
 	
 	@Override
 	public DasProp prop(String sFragment, Object oDefault){
+		
+		// Probably a bad idea, could get triggered from event thread!
+		if(!isLoaded()){
+			NullProgressMonitor mon = new NullProgressMonitor();
+			LOGGER.log(Level.FINE, "Resolving node {0}", toString());
+			
+			try {
+				load(mon);
+			} catch (DasResolveException ex) {
+				LOGGER.log(Level.INFO, "Couldn''t load node {0}", toString());
+				return new DasProp(null);
+			}
+		}
 		return JsonUtil.prop(data, sFragment, oDefault);
 	}
 
 	@Override
 	public DasProp prop(String sFragment){
+		
+		// Probably a bad idea, could get triggered from event thread!
+		if(!isLoaded()){
+			NullProgressMonitor mon = new NullProgressMonitor();
+			LOGGER.log(Level.FINE, "Resolving node {0}", toString());
+			
+			try {
+				load(mon);
+			} catch (DasResolveException ex) {
+				LOGGER.log(Level.INFO, "Couldn''t load node {0}", toString());
+				return new DasProp(null);
+			}
+		}
 		return JsonUtil.prop(data, sFragment);
 	}
 

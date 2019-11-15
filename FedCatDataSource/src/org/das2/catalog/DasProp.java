@@ -25,14 +25,18 @@
  */
 package org.das2.catalog;
 
+import java.text.ParseException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import org.das2.datum.Datum;
+import org.das2.datum.TimeUtil;
 
 /** Properties retrieved from a das catalog node, a wrapper around Object.  
  *
  * DasNodes can have properties of different types.  Since Java reflection provides
- * methods for determing the actual return type of a property pulled from a catalog
+ * methods for determining the actual return type of a property pulled from a catalog
  * node, introducing a property type seems on it's face to be an unnecessary 
  * complication.  However to avoid having a completely open ended interface that can
  * return just any type of object this class exists to put boundaries around the
@@ -54,15 +58,18 @@ import org.das2.datum.Datum;
  */
 public class DasProp {
 	
-	public static final int NULL  =  0;
-	public static final int STR   = 10;
-	public static final int INT   = 20;
-	public static final int DATUM = 30;
-	public static final int TIME  = 40;  
-	public static final int LIST  = 50;
-	public static final int MAP   = 60;
+	public enum Type { NULL, BOOL, STR, LONG, DOUBLE, DATUM, TIME, LIST, MAP };
 	
-	public enum Type { NULL, STR, INT, DATUM, TIME, LIST, MAP };
+	private static final ZoneOffset UTC_ZONE = ZoneOffset.UTC;
+	
+	public static final Type NULL  =  Type.NULL;
+	public static final Type BOOL  = Type.BOOL;
+	public static final int STR   = 20;
+	public static final int INT   = 30;
+	public static final int DATUM = 40;
+	public static final int TIME  = 50;  
+	public static final int LIST  = 60;
+	public static final int MAP   = 70;
 	
 	protected Object obj;
 	protected Type type;
@@ -77,8 +84,19 @@ public class DasProp {
 	 */
 	public DasProp(Object item){
 		if(item == null){ type = Type.NULL; 	obj = null; return; }
-		if(item instanceof String){ type = Type.STR; obj = item; return; }
-		if(item instanceof Integer){ type = Type.INT; obj = item; return; }
+		if(item instanceof String){ type = Type.STR;    obj = item; return; }
+		if(item instanceof Integer){ 
+			type = Type.LONG;
+			obj = new Long((Integer)item);
+			return; 
+		}
+		if(item instanceof Long){   type = Type.LONG;   obj = item; return; }
+		if(item instanceof Float){  
+			type = Type.DOUBLE; 
+			obj = new Double((Float)item); 
+			return; 
+		}
+		if(item instanceof Double){ type = Type.DOUBLE; obj = item; return; }
 		if(item instanceof Datum){type = Type.DATUM; obj = item; return;}
 		
 		if(item instanceof Double){ 
@@ -108,8 +126,19 @@ public class DasProp {
 		}
 	}
 	
-	public String str(){
-		throw new UnsupportedOperationException("Not supported yet.");
+	public String str(){ 
+		if(obj == null) return null;
+		return obj.toString();
+	}
+	
+	public ZonedDateTime time() throws ParseException{
+		TimeUtil.TimeStruct ts = TimeUtil.parseTime(obj.toString());
+		int nSec = (int)ts.seconds;
+		int nNano = (int)((ts.seconds - nSec) * 1.0e+9);
+		ZonedDateTime zdt = ZonedDateTime.of(
+			ts.year, ts.month, ts.day, ts.hour, ts.minute, nSec, nNano, UTC_ZONE
+		);
+		return zdt;
 	}
 	
 	public List<String> list(){
