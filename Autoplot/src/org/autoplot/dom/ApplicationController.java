@@ -3256,7 +3256,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 // In basic mode, we don't want the vap to flip the time range editor back to URIs, so suppress this.
                 AutoplotUI au= maybeGetApplicatonGUI();
                 if ( au!=null ) {
-                    if ( au.isBasicMode() ) {
+                    if ( au.isBasicMode() && !that.getOptions().isUseTimeRangeEditor() ) {
                         excl= new ArrayList<>(excl);
                         excl.add( Options.PROP_USE_TIME_RANGE_EDITOR);
                     }
