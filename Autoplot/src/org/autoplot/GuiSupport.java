@@ -15,6 +15,7 @@ import org.autoplot.renderer.HugeScatterStylePanel;
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridLayout;
@@ -861,7 +862,7 @@ public class GuiSupport {
 
     /**
      * clone the application into a new AutoplotUI
-     * @return
+     * @return the new application
      */
     ApplicationModel cloneApplication() {
         final ApplicationModel model = new ApplicationModel();
@@ -883,8 +884,8 @@ public class GuiSupport {
                 AutoplotUI.checkStatusLoop(view);
                 Canvas size= parent.applicationModel.dom.getCanvases(0);
                 view.resizeForCanvasSize( size.getWidth(), size.getHeight() );
-            }
-        };
+                }
+            };
         try {
             if ( SwingUtilities.isEventDispatchThread() ) {
                 run.run();
