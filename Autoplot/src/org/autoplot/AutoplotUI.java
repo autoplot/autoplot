@@ -2032,14 +2032,18 @@ APSplash.checkTime("init 270");
 
     private void fillFileMenu() {
         List<JComponent> expertItems= new ArrayList();
+        javax.swing.JMenuItem mi;
+        
+        mi= new JMenuItem(support.createNewApplicationAction());
+        mi.setToolTipText("Create another window");
+        fileMenu.add( mi );
+        
+        mi= new JMenuItem(support.createCloneApplicationAction());
+        mi.setToolTipText("Duplicate to another new window");
+        expertItems.add( mi );        
+        fileMenu.add( mi );
 
-        expertItems.add( new JMenuItem(support.createNewApplicationAction()) );
-        expertItems.add( new JMenuItem(support.createCloneApplicationAction()) );
-        fileMenu.add( expertItems.get(0) );
-        fileMenu.add( expertItems.get(1) );
-
-        javax.swing.JMenuItem mi= new JMenuItem( support.createNewDOMAction() );
-        expertItems.add(mi);
+        mi= new JMenuItem( support.createNewDOMAction() );
         mi.setToolTipText("Reset application to initial state");
         fileMenu.add(mi);
 
