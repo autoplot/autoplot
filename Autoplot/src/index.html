@@ -26,9 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-11-14 r24330):</p>
+        <p>Bugfixes (2019-11-15 r24330):</p>
         <ul>
-            <li>suppress warning wher URL is not found for parameter in CDAWeb's all.xml.
+            <li>resetting the DasPlot's DasAxis calls update ticksV on the new axis.
+            <li>2126: in basic mode, loading vap doesn't reset selector to URI.
+            <li>suppress warning when URL is not found for parameter in CDAWeb's all.xml.
             <li>new NullPointerException, caused by careless code in total which assumed there was a DEPEND_2 property.  Thanks, Jon N.!
             <li>rte15951983: selecting "basic" mode twice would result in a runtime exception.
             <li>Matlab/IDL/Python interface needs to consider unit preferences, so it is consistent.
