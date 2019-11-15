@@ -2106,6 +2106,22 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
     }
     
+    
+    /**
+     * contain the logic which returns a reference to the AutoplotUI, so that 
+     * this nasty bit of code is contained.
+     * @return null or the application
+     */
+    public AutoplotUI maybeGetApplicatonGUI() {
+        // this is probably midguided.  For instance, if the canvas is torn off then this won't work.
+        Window w= SwingUtilities.getWindowAncestor( application.getCanvases(0).getController().getDasCanvas() );
+        if ( w instanceof AutoplotUI ) {
+            return ((AutoplotUI)w);
+        } else {
+            return null;
+        }      
+    }
+    
     /**
      * resets the dom to the initial state by deleting added 
      * plotElements, plots and data sources.
@@ -2135,11 +2151,9 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         try {
             
-            { // this is probably midguided.  For instance, if the canvas is torn off then this won't work.
-                Window w= SwingUtilities.getWindowAncestor( application.getCanvases(0).getController().getDasCanvas() );
-                if ( w instanceof AutoplotUI ) {
-                    ((AutoplotUI)w).resizeForCanvasSize( application.getOptions().getWidth(), application.getOptions().getHeight()); 
-                }
+            AutoplotUI au= maybeGetApplicatonGUI();
+            if ( au!=null ) {
+                au.resizeForCanvasSize( application.getOptions().getWidth(), application.getOptions().getHeight()); 
             }
             
             // reset removes all annotations
@@ -3234,11 +3248,20 @@ public class ApplicationController extends DomNodeController implements RunLater
         try {
 
             if ( !exclude.contains("options") ) {
-                application.getOptions().syncTo(that.getOptions(),
-                    Arrays.asList(Options.PROP_OVERRENDERING,
+                List<String> excl= Arrays.asList(
+                    Options.PROP_OVERRENDERING,
                     Options.PROP_LOGCONSOLEVISIBLE,
                     Options.PROP_SCRIPTVISIBLE,
-                    Options.PROP_SERVERENABLED));
+                    Options.PROP_SERVERENABLED );
+                // In basic mode, we don't want the vap to flip the time range editor back to URIs, so suppress this.
+                AutoplotUI au= maybeGetApplicatonGUI();
+                if ( au!=null ) {
+                    if ( au.isBasicMode() ) {
+                        excl= new ArrayList<>(excl);
+                        excl.add( Options.PROP_USE_TIME_RANGE_EDITOR);
+                    }
+                }
+                application.getOptions().syncTo(that.getOptions(),excl);
             }
 
             Map<String,String> nameMap= new HashMap<String,String>() {
