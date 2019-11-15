@@ -6250,7 +6250,11 @@ APSplash.checkTime("init 240");
                     Runnable run= new Runnable() {
                         @Override
                         public void run() {
-                            getDataSetSelector().setValue(script);
+                            if ( script.endsWith("createScreenShot.jy") ) {
+                                logger.fine("kludge to avoid getting createScreenShot.jy in data set selector");
+                            } else {
+                                getDataSetSelector().setValue(script);
+                            }
                         }
                     };
                     SwingUtilities.invokeLater(run);
