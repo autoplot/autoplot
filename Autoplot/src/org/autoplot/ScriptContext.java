@@ -1,10 +1,6 @@
 
 package org.autoplot;
 
-import org.autoplot.AutoplotUtil;
-import org.autoplot.RenderType;
-import org.autoplot.ApplicationModel;
-import org.autoplot.AppManager;
 import java.awt.Dimension;
 import java.util.logging.Level;
 import java.util.logging.Logger;
