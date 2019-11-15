@@ -909,7 +909,7 @@ public class GuiSupport {
     }
 
     public Action createCloneApplicationAction() {
-        return new AbstractAction("Clone to New Window") {
+        return new AbstractAction("Duplicate in New Window") {
             @Override
             public void actionPerformed( ActionEvent e ) {
                 org.das2.util.LoggerManager.logGuiEvent(e);        
