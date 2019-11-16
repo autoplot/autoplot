@@ -1,14 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.servlet;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.util.List;
 import java.util.Locale;
 import javax.servlet.ServletException;
@@ -18,17 +13,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUtil;
 import org.autoplot.dom.Application;
-import org.autoplot.dom.Options;
-import org.das2.util.AboutUtil;
 
 /**
- *
+ * servlet for reporting version information.  This should be 
+ * updated manually before adding and releasing new features.
  * @author faden@cottagesystems.com
  */
 public class ServletInfo extends HttpServlet {
 
     private static long birthMilli= System.currentTimeMillis();
-    public static final String version = "v20191012.1146";
+    public static final String version = "v20191116.0827";
     
     public static long getAgeMillis() {
         return System.currentTimeMillis() - birthMilli;
