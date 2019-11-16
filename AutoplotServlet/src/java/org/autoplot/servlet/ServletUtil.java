@@ -192,7 +192,8 @@ public class ServletUtil {
     }    
     
     /**
-     * return true if the suri is whitelisted.
+     * return true if the suri is whitelisted, meaning we trust that 
+     * content from this address will not harm the server.
      * @param suri the uri.
      * @return true if the suri is whitelisted.
      * @throws IOException when the whitelist cannot be read.
@@ -229,7 +230,7 @@ public class ServletUtil {
             logger.log( level, "===" );
         }
     }
-    
+
     public static class SecurityResponse {
         boolean whiteListed;
         String suri;
@@ -368,6 +369,33 @@ public class ServletUtil {
         }        
     }
     
+    //private static String contact= null;
+    
+    /**
+     * return the contact info for the server
+     * @return 
+     */
+    public static synchronized String getServletContact() {
+        String contact=null;
+        if ( contact==null ) {
+            try {
+                File servletHome = getServletHome();
+                File contactInfo= new File( servletHome, "contact.txt" );
+                if ( contactInfo.exists() ) {
+                    String s= FileUtil.readFileToString(contactInfo);
+                    String[] ss= s.split("\n");
+                    contact= ss[0];                    
+                } else {
+                    FileUtil.writeStringToFile( contactInfo, "???" );
+                    contact= "???";
+                }
+            } catch (IOException ex) {
+                contact= "???";
+            }
+        } 
+        return contact;
+    }
+        
     public static File getServletHome() {
         File apd= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) );
         if ( !apd.exists() ) {

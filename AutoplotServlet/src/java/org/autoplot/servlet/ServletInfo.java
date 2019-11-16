@@ -120,7 +120,7 @@ public class ServletInfo extends HttpServlet {
                 out.println("</ul>");
                 
             } 
-            
+            out.println("Contact Info: "+ServletUtil.getServletContact()+"</sm>");
             out.println("</p></body>");
             out.println("</html>");
         } finally {
