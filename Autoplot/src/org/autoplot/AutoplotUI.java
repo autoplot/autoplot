@@ -6085,9 +6085,9 @@ APSplash.checkTime("init 240");
             @Override
             public void run() {
                 if ( !fexpert ) {
-                    setEditorCard( CARD_TIME_RANGE_SELECTOR);
+                    setEditorCard( CARD_TIME_RANGE_SELECTOR );
                 } else {
-                    setEditorCard( CARD_DATA_SET_SELECTOR);
+                    setEditorCard( CARD_DATA_SET_SELECTOR );
                 }
             }
         } );
