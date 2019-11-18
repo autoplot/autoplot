@@ -29,6 +29,9 @@ public class DataSourceEditorPanelUtil {
      */
     public static DataSourceEditorPanel getDataSourceEditorPanel( JPanel parent, String uri ) {
         logger.entering("org.autoplot.datasource.DataSourceEditorPanelUtil", "getDataSourceEditorPanel");
+        if ( parent==null ) {
+            throw new IllegalArgumentException("parent is null");
+        }
         DataSourceEditorPanel edit;
         edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel( uri );
         if ( edit==null ) {
