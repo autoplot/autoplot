@@ -192,6 +192,13 @@ public class WindowManager {
         WindowManager.getInstance().recordWindowSizePosition(dia);        
     }
     
+    public static final int YES_NO_CANCEL_OPTION = JOptionPane.YES_NO_CANCEL_OPTION;
+    public static final int OK_CANCEL_OPTION = JOptionPane.OK_CANCEL_OPTION;
+    public static final int CANCEL_OPTION = JOptionPane.CANCEL_OPTION;
+    public static final int OK_OPTION = JOptionPane.OK_OPTION;
+    public static final int NO_OPTION = JOptionPane.NO_OPTION;
+    public static final int YES_OPTION = JOptionPane.YES_OPTION;
+    
     /**
      * New okay/cancel dialog that is resizable and is made with a simple dialog.
      * @param parent the parent window or dialog, or null.
@@ -236,7 +243,7 @@ public class WindowManager {
         pc.add( Box.createGlue() );
         
         if ( optionType==JOptionPane.OK_CANCEL_OPTION ) {
-            pc.add( new JButton( new AbstractAction("Cancel") {
+            AbstractAction aa= new AbstractAction("Cancel") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     org.das2.util.LoggerManager.logGuiEvent(e);
@@ -244,9 +251,10 @@ public class WindowManager {
                     dia.setVisible(false);
                     dia.dispose(); 
                 }
-            }) );
+            };
+            pc.add( new JButton( aa ) );
             pc.add( Box.createHorizontalStrut(7) );
-            pc.add( new JButton( new AbstractAction("OK") {
+            aa= new AbstractAction("OK") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     org.das2.util.LoggerManager.logGuiEvent(e);        
@@ -254,7 +262,9 @@ public class WindowManager {
                     dia.setVisible(false);
                     dia.dispose(); 
                 }
-            }) );
+            };
+            pc.add( new JButton( aa ) );
+            
         } else if ( optionType==JOptionPane.YES_NO_CANCEL_OPTION ) {
             pc.add( new JButton( new AbstractAction("Yes") {
                 @Override
