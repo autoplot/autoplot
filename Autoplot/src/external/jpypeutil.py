@@ -1,5 +1,10 @@
-# Do not use this.  See http://github.com/autoplot/python/
-
+# Do not use this.  See https://github.com/autoplot/python/
+#
+#
+#
+#
+#
+#
 import urllib2
 
 # This code from https://stackoverflow.com/questions/22676/how-do-i-download-a-file-over-http-using-python

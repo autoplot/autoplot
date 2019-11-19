@@ -1,3 +1,8 @@
+# Do not use this.  See https://github.com/autoplot/python/.
+#
+#
+#
+#
 # send data over to Autoplot via its server port.  This is a port of the applot for IDL that supports NumPy.
 #
 # Write from python to d2s.  This will not work on Windows because of linefeeds.  (Ask Chris
