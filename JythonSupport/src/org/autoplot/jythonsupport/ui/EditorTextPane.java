@@ -400,7 +400,7 @@ public class EditorTextPane extends JEditorPane {
         
             CompletionContext cc= CompletionSupport.getCompletionContext( line, pos, i0, i1, i2 );
             if ( cc==null ) {
-                JOptionPane.showMessageDialog( this, "<html>String URI argument must start with vap+cdaweb:, vap+inline:,etc", "URI needed", JOptionPane.INFORMATION_MESSAGE );
+                JOptionPane.showMessageDialog( this, "<html>String URI argument must start with vap+cdaweb:, vap+inline:, etc", "URI needed", JOptionPane.INFORMATION_MESSAGE );
                 return;
             }
             String oldUri= cc.completable;
