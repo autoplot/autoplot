@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Silly <a href='https://github.com/autoplot/dev/blob/master/demos/2019/20191108/karateChop.jy'>script</a> chops the stack of plots into two, with independent time axes. 
+        <p><small>Silly <a href='https://github.com/autoplot/dev/blob/master/demos/2019/20191108/karateChop.jy'>script</a> chops the stack of plots in two, with independent time axes. 
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-11-18 r24352):</p>
+        <p>Bugfixes (2019-11-19 r24355):</p>
         <ul>
+            <li>calling createGui() from Python would result in null pointer exception because object had not been created before focus change.
             <li>don't obscure IOException, which was hiding SSLException.
             <li>tiny blue/green button tooltip refers to ctrl-T and ctrl-D, improve feedback for mouse over.
             <li>resetting the DasPlot's DasAxis calls update ticksV on the new axis.
