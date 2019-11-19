@@ -1041,6 +1041,10 @@ public final class AutoplotUI extends javax.swing.JFrame {
             @Override
             public void focusGained(FocusEvent e) {
                 logger.fine("focus to canvas");
+                if ( stateSupport==null ) {
+                    System.err.println("stateSupport is null");
+                    return;
+                }
                 if ( stateSupport.getCurrentFile() != null) {
                     dataSetSelector.setValue(stateSupport.getCurrentFile());
                 }
