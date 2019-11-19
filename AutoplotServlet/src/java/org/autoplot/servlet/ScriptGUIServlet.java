@@ -84,6 +84,7 @@ public class ScriptGUIServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
  
+        System.setProperty( "noCheckCertificate", "true" );
         String script= request.getParameter("script");
         Map params= request.getParameterMap();
         Map<String,String> ssparams= new LinkedHashMap<>();
