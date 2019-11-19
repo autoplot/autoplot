@@ -1029,18 +1029,6 @@ public final class AutoplotUI extends javax.swing.JFrame {
             }
         } );
         
-        
-        applicationModel.getCanvas().addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                logger.fine("focus to canvas");
-                if (stateSupport.getCurrentFile() != null) {
-                    dataSetSelector.setValue(stateSupport.getCurrentFile());
-                }
-                super.focusGained(e);
-            }
-        });
-
         APSplash.checkTime("init 50");
 
         setIconImage( AutoplotUtil.getAutoplotIcon() );
@@ -1048,6 +1036,17 @@ public final class AutoplotUI extends javax.swing.JFrame {
         updateFrameTitle();
         
         stateSupport = getPersistentStateSupport(this, applicationModel);
+        
+        applicationModel.getCanvas().addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                logger.fine("focus to canvas");
+                if ( stateSupport.getCurrentFile() != null) {
+                    dataSetSelector.setValue(stateSupport.getCurrentFile());
+                }
+                super.focusGained(e);
+            }
+        });
         
         fillFileMenu(); // init 51,52
         APSplash.checkTime("init 52.999");
