@@ -2467,7 +2467,20 @@ APSplash.checkTime("init 52.9");
      * @return nominal scale factor
      */
     public double resizeForCanvasSize( int w, int h ) {
-        
+        return resizeForCanvasSize( w, h, windowExtraWidth, windowExtraHeight );
+    }
+    
+    /**
+     * resize the outer GUI attempting to get a fitted canvas size.  This fixes the
+     * problem where a loaded vap doesn't appear as it does when it was saved because
+     * the canvas is resized.
+     * @param w
+     * @param h
+     * @param extraW extra width needed by the GUI
+     * @param extraH extra height needed by the GUI
+     * @return 
+     */
+    public double resizeForCanvasSize( int w, int h, int extraW, int extraH ) {
         resizeLogger.log(Level.FINE, "resizeForCanvasSize({0,number,#},{1,number,#})", new Object[]{w, h});
         Component parentToAdjust;
         if ( SwingUtilities.isDescendingFrom( applicationModel.getCanvas(), this ) ) {
@@ -2495,6 +2508,9 @@ APSplash.checkTime("init 52.9");
             } else if ( osName.startsWith("Linux") ) {
                 maximizedPixelGain= 10;
             } 
+            
+            windowExtraHeight= extraH;
+            windowExtraWidth= extraW;
                         
             resizeLogger.log(Level.FINER, "windowExtraWidth={0} windowExtraHeight={1}", new Object[] { windowExtraWidth, windowExtraHeight } );
             desiredAppSize.width= w + windowExtraWidth ;
@@ -5370,6 +5386,22 @@ APSplash.checkTime("init 240");
         };
         app.apbusy.schedule(run, 500, 200);
         
+    }
+    
+    /**
+     * return the extra pixels needed by the GUI for borders and address bar.
+     * @return the extra pixels needed by the GUI for borders and address bar.
+     */
+    public int getWindowExtraWidth() {
+        return windowExtraWidth;
+    }
+    
+    /**
+     * return the extra pixels needed by the GUI for borders and address bar.
+     * @return the extra pixels needed by the GUI for borders and address bar.
+     */
+    public int getWindowExtraHeight() {
+        return windowExtraHeight;
     }
     
     /**

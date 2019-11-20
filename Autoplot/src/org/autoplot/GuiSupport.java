@@ -883,7 +883,9 @@ public class GuiSupport {
                 view.setMessage("ready");
                 AutoplotUI.checkStatusLoop(view);
                 Canvas size= parent.applicationModel.dom.getCanvases(0);
-                view.resizeForCanvasSize( size.getWidth(), size.getHeight() );
+                int extraWidth= GuiSupport.this.parent.getWindowExtraWidth();
+                int extraHeight= GuiSupport.this.parent.getWindowExtraHeight();
+                view.resizeForCanvasSize( size.getWidth(), size.getHeight(), extraWidth, extraHeight  );
                 }
             };
         try {

@@ -2155,7 +2155,9 @@ public class ApplicationController extends DomNodeController implements RunLater
             
             AutoplotUI au= maybeGetApplicatonGUI();
             if ( au!=null ) {
-                au.resizeForCanvasSize( application.getOptions().getWidth(), application.getOptions().getHeight()); 
+                int extraWidth= au.getWindowExtraWidth();
+                int extraHeight= au.getWindowExtraHeight();
+                au.resizeForCanvasSize( application.getOptions().getWidth(), application.getOptions().getHeight(), extraWidth, extraHeight ); 
             }
             
             // reset removes all annotations
