@@ -225,9 +225,6 @@ public class Plot extends DomNode {
     }
 
     public void setColortable(DasColorBar.Type colortable) {
-        if ( this.id.equals("plot_0") ) {
-            System.err.println(">>>> " +colortable );
-        }
         Object oldVal= this.colortable;
         this.colortable = colortable;
         propertyChangeSupport.firePropertyChange( PROP_COLORTABLE, oldVal, this.colortable );
