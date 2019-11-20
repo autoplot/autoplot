@@ -57,9 +57,10 @@ public class RequestHandler {
      * @param in
      * @param model
      * @param out
+     * @param rlistener the 
      * @return 
      */
-    public String handleRequest( InputStream in, ApplicationModel model, OutputStream out ) {
+    public String handleRequest( InputStream in, ApplicationModel model, OutputStream out, RequestListener rlistener) {
         try {
             PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
             interp.setOut( out );
@@ -80,6 +81,10 @@ public class RequestHandler {
                 s= untaint(s,out);
                 if ( s!=null ) {
                     logger.log(Level.FINE, "executing command: \"{0}\"", s);
+                    if ( s.equals("quit") || !rlistener.isListening() ) {
+                        rlistener.stopListening();
+                        break;
+                    }
                     try {
                         echo = !s.trim().endsWith(";");
                         interp.exec(JythonRefactory.fixImports(s));

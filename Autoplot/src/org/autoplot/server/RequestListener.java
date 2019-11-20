@@ -46,13 +46,22 @@ public class RequestListener {
         propertyChangeSupport.firePropertyChange(PROP_READDATA, oldreadData, newreadData);
     }
 
-    private Runnable run = new Runnable() {
+    private final Runnable run = new Runnable() {
 
+        @Override
         public void run() {
 
+            ServerSocket listen;
+            try {
+                listen= new ServerSocket(port, 1000);
+            } catch ( IOException ex ) {
+                listening = false;
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
+                listen= null;
+            }
             while (listening) {
+                assert listen!=null;
                 try {
-                    ServerSocket listen = new ServerSocket(port, 1000);
                     setPort( listen.getLocalPort() );
                     
                     System.err.println("Autoplot is listening on port "+port+".");
@@ -91,6 +100,14 @@ public class RequestListener {
 
             }
 
+            if ( listen!=null ) {
+                try {
+                    logger.info("closing connection");
+                    listen.close();
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                }
+            }
 
         }
     };
