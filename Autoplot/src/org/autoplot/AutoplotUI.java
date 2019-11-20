@@ -1757,10 +1757,6 @@ APSplash.checkTime("init 270");
             public void run() {
                 logger.fine("adding bindings");
                 BindingGroup bc = new BindingGroup();
-                bind( bc, dom.getOptions(), Options.PROP_DRAWANTIALIAS, drawAntiAliasMenuItem, "selected" );
-                bind( bc, dom.getOptions(), Options.PROP_TEXTANTIALIAS, textAntiAlias, "selected") ;
-                bind( bc, dom.getOptions(), Options.PROP_SPECIALEFFECTS, specialEffectsMenuItem, "selected" );
-                bind( bc, dom.getOptions(), Options.PROP_OVERRENDERING, overRenderingMenuItem, "selected" );
                 bind( bc, dom.getOptions(), Options.PROP_DRAWGRID, drawGridCheckBox, "selected" );
                 bind( bc, dom.getOptions(), Options.PROP_AUTOLABELLING, autoLabellingCheckBoxMenuItem, "selected" );
                 bind( bc, dom.getOptions(), Options.PROP_AUTOLAYOUT, autoLayoutCheckBoxMenuItem, "selected" );
@@ -2864,10 +2860,6 @@ APSplash.checkTime("init 52.9");
         zoomOutMenuItem = new javax.swing.JMenuItem();
         optionsMenu = new javax.swing.JMenu();
         renderingOptionsMenu = new javax.swing.JMenu();
-        textAntiAlias = new javax.swing.JCheckBoxMenuItem();
-        drawAntiAliasMenuItem = new javax.swing.JCheckBoxMenuItem();
-        specialEffectsMenuItem = new javax.swing.JCheckBoxMenuItem();
-        overRenderingMenuItem = new javax.swing.JCheckBoxMenuItem();
         drawGridCheckBox = new javax.swing.JCheckBoxMenuItem();
         doyCB = new javax.swing.JCheckBoxMenuItem();
         nnCb = new javax.swing.JCheckBoxMenuItem();
@@ -3200,51 +3192,32 @@ APSplash.checkTime("init 52.9");
 
         renderingOptionsMenu.setText("Rendering Options");
 
-        textAntiAlias.setSelected(true);
-        textAntiAlias.setText("Text Antialias");
-        textAntiAlias.setToolTipText("Enable/Disable Text Antialiasing");
-        textAntiAlias.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                textAntiAliasActionPerformed(evt);
-            }
-        });
-        renderingOptionsMenu.add(textAntiAlias);
-
-        drawAntiAliasMenuItem.setSelected(true);
-        drawAntiAliasMenuItem.setText("Graphics Antialias");
-        drawAntiAliasMenuItem.setToolTipText("Enable/Disable Graphics Antialiasing");
-        drawAntiAliasMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                drawAntiAliasMenuItemActionPerformed(evt);
-            }
-        });
-        renderingOptionsMenu.add(drawAntiAliasMenuItem);
-
-        specialEffectsMenuItem.setText("Special Effects");
-        specialEffectsMenuItem.setToolTipText("Enable animated axes and other visual clues");
-        specialEffectsMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                specialEffectsMenuItemActionPerformed(evt);
-            }
-        });
-        renderingOptionsMenu.add(specialEffectsMenuItem);
-
-        overRenderingMenuItem.setSelected(true);
-        overRenderingMenuItem.setText("Over-Rendering");
-        overRenderingMenuItem.setToolTipText("Render (and load) data outside plot bounds to improve appearance.");
-        renderingOptionsMenu.add(overRenderingMenuItem);
-
         drawGridCheckBox.setSelected(true);
         drawGridCheckBox.setText("Draw Grid");
         drawGridCheckBox.setToolTipText("Draw gridlines at major ticks");
+        drawGridCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                drawGridCheckBoxActionPerformed(evt);
+            }
+        });
         renderingOptionsMenu.add(drawGridCheckBox);
 
         doyCB.setText("Day of Year Labels");
         doyCB.setToolTipText("Use Day of Year instead of Year-Month-Day for labels");
+        doyCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                doyCBActionPerformed(evt);
+            }
+        });
         renderingOptionsMenu.add(doyCB);
 
         nnCb.setText("Nearest Neighbor Spectrograms");
         nnCb.setToolTipText("Use Nearest Neighbor rebinning for new spectrograms");
+        nnCb.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nnCbActionPerformed(evt);
+            }
+        });
         renderingOptionsMenu.add(nnCb);
 
         optionsMenu.add(renderingOptionsMenu);
@@ -3758,21 +3731,6 @@ APSplash.checkTime("init 52.9");
         fontAndColorsDialog.setVisible(true);
     }//GEN-LAST:event_fontsAndColorsMenuItemActionPerformed
 
-    private void specialEffectsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_specialEffectsMenuItemActionPerformed
-        org.das2.util.LoggerManager.logGuiEvent(evt);
-        applicationModel.getDocumentModel().getOptions().setSpecialEffects(specialEffectsMenuItem.isSelected());
-    }//GEN-LAST:event_specialEffectsMenuItemActionPerformed
-
-    private void drawAntiAliasMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_drawAntiAliasMenuItemActionPerformed
-        org.das2.util.LoggerManager.logGuiEvent(evt);
-        applicationModel.getDocumentModel().getOptions().setDrawAntiAlias(drawAntiAliasMenuItem.isSelected());
-    }//GEN-LAST:event_drawAntiAliasMenuItemActionPerformed
-
-    private void textAntiAliasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textAntiAliasActionPerformed
-        org.das2.util.LoggerManager.logGuiEvent(evt);
-        applicationModel.getDocumentModel().getOptions().setTextAntiAlias(textAntiAlias.isSelected());
-    }//GEN-LAST:event_textAntiAliasActionPerformed
-
     private void aboutAutoplotMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutAutoplotMenuItemActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         try {
@@ -3829,7 +3787,7 @@ APSplash.checkTime("init 52.9");
 
     private void aboutDas2MenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutDas2MenuItemActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
-        AutoplotUtil.openBrowser("http://das2.org");
+        AutoplotUtil.openBrowser("https://das2.org");
     }//GEN-LAST:event_aboutDas2MenuItemActionPerformed
 
     private void autoplotHomepageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoplotHomepageButtonActionPerformed
@@ -3862,6 +3820,7 @@ private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
     } else {
         tabs.remove( jythonScriptPanel );
     }
+    setStatus( "Use [menubar]->Options->Save Options to use this setting in future sessions.");
 }//GEN-LAST:event_scriptPanelMenuItemActionPerformed
 
 private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logConsoleMenuItemActionPerformed
@@ -3873,17 +3832,16 @@ private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
             String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
         initLogConsole();
         logConsolePanel.setViewportView( logConsole );
-        setStatus( "Use [menubar]->Options->Save Options to make console tab visible in future sessions.");
     } else if ( logConsoleMenuItem.isSelected() && logConsolePanel!=null ) {
         tabs.addTab(TAB_CONSOLE, null, logConsolePanel,
             String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
-        setStatus( "Use [menubar]->Options->Save Options to make console tab visible in future sessions.");
     } else {
         if ( logConsoleMenuItem.isSelected() && logConsolePanel!=null ) {
             logConsole.undoLogConsoleMessages();
         }
         tabs.remove(logConsolePanel);
     }
+    setStatus( "Use [menubar]->Options->Save Options to use this setting in future sessions.");
 }//GEN-LAST:event_logConsoleMenuItemActionPerformed
 
 private void serverCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serverCheckBoxMenuItemActionPerformed
@@ -3893,7 +3851,6 @@ private void serverCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent ev
         initServer();
     } else {
         stopServer();
-        JOptionPane.showMessageDialog( rootPane, "<html>The server will not be stopped completely.<br>https://sourceforge.net/tracker/?func=detail&aid=3441071&group_id=199733&atid=970682" );
     }
     serverCheckBoxMenuItem.setSelected( rlistener!=null );
     serverCheckBoxMenuItem.setToolTipText( rlistener==null ? null : ( "listening on port " + rlistener.getPort() ) );
@@ -4417,6 +4374,18 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
         dom.getOptions().setHeight( dom.getCanvases(0).getHeight() );
         dom.getOptions().getController().copyOptionsToPersistentPreferences();
     }//GEN-LAST:event_saveOptionsMenuItemActionPerformed
+
+    private void drawGridCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_drawGridCheckBoxActionPerformed
+        setMessage("Use Options->Save Options to make the change persist between sessions.");
+    }//GEN-LAST:event_drawGridCheckBoxActionPerformed
+
+    private void doyCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_doyCBActionPerformed
+        setMessage("Use Options->Save Options to make the change persist between sessions.");
+    }//GEN-LAST:event_doyCBActionPerformed
+
+    private void nnCbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nnCbActionPerformed
+        setMessage("New spectrograms will be affected.  Use Options->Save Options to make the change persist between sessions.");
+    }//GEN-LAST:event_nnCbActionPerformed
 
     
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
@@ -5485,8 +5454,10 @@ APSplash.checkTime("init 240");
                         socket.close();
                     } else {
                         logger.log(Level.FINE, "connection from {0}", socket);
-                        rhandler.handleRequest( socket.getInputStream(), model, socket.getOutputStream());
+                        rhandler.handleRequest(socket.getInputStream(), model, socket.getOutputStream(), rlistener);
                         org.das2.util.LoggerManager.getLogger("autoplot.server").log(Level.INFO, "disconnect @ {0}", new Date( System.currentTimeMillis() ));
+                        serverCheckBoxMenuItem.setSelected(false);
+                        stopServer();
                     }
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
@@ -5586,7 +5557,6 @@ APSplash.checkTime("init 240");
     private javax.swing.JRadioButtonMenuItem dataSetSelectorMenuItem;
     private javax.swing.JMenuItem decodeURLItem;
     private javax.swing.JCheckBoxMenuItem doyCB;
-    private javax.swing.JCheckBoxMenuItem drawAntiAliasMenuItem;
     private javax.swing.JCheckBoxMenuItem drawGridCheckBox;
     private javax.swing.JMenuItem editDomMenuItem;
     private javax.swing.JSeparator editDomSeparator;
@@ -5620,7 +5590,6 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenuItem mashDataMenuItem;
     private javax.swing.JCheckBoxMenuItem nnCb;
     private javax.swing.JMenu optionsMenu;
-    private javax.swing.JCheckBoxMenuItem overRenderingMenuItem;
     private javax.swing.JMenuItem pasteDataSetURLMenuItem;
     private javax.swing.JMenu plotStyleMenu;
     private javax.swing.JMenuItem pngWalkMenuItem;
@@ -5642,11 +5611,9 @@ APSplash.checkTime("init 240");
     private javax.swing.JCheckBoxMenuItem scriptPanelMenuItem;
     private javax.swing.JMenuItem searchToolTipsMenuItem;
     private javax.swing.JCheckBoxMenuItem serverCheckBoxMenuItem;
-    private javax.swing.JCheckBoxMenuItem specialEffectsMenuItem;
     private javax.swing.JLabel statusLabel;
     private javax.swing.JTextField statusTextField;
     private javax.swing.JPanel tabbedPanelContainer;
-    private javax.swing.JCheckBoxMenuItem textAntiAlias;
     private javax.swing.JMenu textSizeMenu;
     private javax.swing.JPanel timeRangePanel;
     private javax.swing.JRadioButtonMenuItem timeRangeSelectorMenuItem;

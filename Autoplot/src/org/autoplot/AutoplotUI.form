@@ -295,60 +295,33 @@
                 <Property name="text" type="java.lang.String" value="Rendering Options"/>
               </Properties>
               <SubComponents>
-                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="textAntiAlias">
-                  <Properties>
-                    <Property name="selected" type="boolean" value="true"/>
-                    <Property name="text" type="java.lang.String" value="Text Antialias"/>
-                    <Property name="toolTipText" type="java.lang.String" value="Enable/Disable Text Antialiasing"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="textAntiAliasActionPerformed"/>
-                  </Events>
-                </MenuItem>
-                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="drawAntiAliasMenuItem">
-                  <Properties>
-                    <Property name="selected" type="boolean" value="true"/>
-                    <Property name="text" type="java.lang.String" value="Graphics Antialias"/>
-                    <Property name="toolTipText" type="java.lang.String" value="Enable/Disable Graphics Antialiasing"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="drawAntiAliasMenuItemActionPerformed"/>
-                  </Events>
-                </MenuItem>
-                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="specialEffectsMenuItem">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Special Effects"/>
-                    <Property name="toolTipText" type="java.lang.String" value="Enable animated axes and other visual clues"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="specialEffectsMenuItemActionPerformed"/>
-                  </Events>
-                </MenuItem>
-                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="overRenderingMenuItem">
-                  <Properties>
-                    <Property name="selected" type="boolean" value="true"/>
-                    <Property name="text" type="java.lang.String" value="Over-Rendering"/>
-                    <Property name="toolTipText" type="java.lang.String" value="Render (and load) data outside plot bounds to improve appearance."/>
-                  </Properties>
-                </MenuItem>
                 <MenuItem class="javax.swing.JCheckBoxMenuItem" name="drawGridCheckBox">
                   <Properties>
                     <Property name="selected" type="boolean" value="true"/>
                     <Property name="text" type="java.lang.String" value="Draw Grid"/>
                     <Property name="toolTipText" type="java.lang.String" value="Draw gridlines at major ticks"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="drawGridCheckBoxActionPerformed"/>
+                  </Events>
                 </MenuItem>
                 <MenuItem class="javax.swing.JCheckBoxMenuItem" name="doyCB">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Day of Year Labels"/>
                     <Property name="toolTipText" type="java.lang.String" value="Use Day of Year instead of Year-Month-Day for labels"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="doyCBActionPerformed"/>
+                  </Events>
                 </MenuItem>
                 <MenuItem class="javax.swing.JCheckBoxMenuItem" name="nnCb">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Nearest Neighbor Spectrograms"/>
                     <Property name="toolTipText" type="java.lang.String" value="Use Nearest Neighbor rebinning for new spectrograms"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="nnCbActionPerformed"/>
+                  </Events>
                 </MenuItem>
               </SubComponents>
             </Menu>
