@@ -84,7 +84,6 @@ public class ScriptGUIServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
  
-        System.setProperty( "noCheckCertificate", "true" );
         String script= request.getParameter("script");
         Map params= request.getParameterMap();
         Map<String,String> ssparams= new LinkedHashMap<>();
@@ -187,9 +186,12 @@ public class ScriptGUIServlet extends HttpServlet {
                 for ( Entry<String,Param> pe: parms.entrySet() ) {
                     Param p= pe.getValue();
                     Object currentValue= p.value == null ? p.deft : p.value;
-                    out.println(""+p.name +", <em>" + p.doc +"</em><br>");
+                    boolean isCheckBox= p.enums!=null && p.enums.size()==2 && p.enums.contains("T") && p.enums.contains("F");
+                    if ( !isCheckBox ) {
+                        out.println(""+p.name +", <em>" + p.doc +"</em><br>");
+                    }
                     if ( p.enums!=null ) {
-                        if ( p.enums.size()==2 && p.enums.contains("T") && p.enums.contains("F") ) {
+                        if ( isCheckBox ) {
                             if ( "T".equals(currentValue) ) {
                                 out.println("<input type='checkbox' name='"+p.name+"' checked>"+p.name + ", " + p.doc);
                             } else if ( "on".equals(currentValue) ) {
