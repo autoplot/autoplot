@@ -4107,11 +4107,8 @@ private void timeRangeSelectorMenuItemActionPerformed(java.awt.event.ActionEvent
 
 private void editOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editOptionsActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
-    OptionsDialog p= new OptionsDialog();
-    p.setOptions( applicationModel.dom.getOptions() );
-    if ( AutoplotUtil.showConfirmDialog( this, p, "Options", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-        p.copyOptions( applicationModel.dom.getOptions() );
-    }
+    PropertyEditor edit= new PropertyEditor(applicationModel.dom.getOptions());
+    edit.showDialog(this,"DOM Options",new ImageIcon(this.getClass().getResource("/resources/logo16.png")).getImage());
 }//GEN-LAST:event_editOptionsActionPerformed
 
 private void fixLayoutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixLayoutMenuItemActionPerformed
