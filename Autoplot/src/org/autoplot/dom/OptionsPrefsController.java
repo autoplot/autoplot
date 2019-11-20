@@ -12,6 +12,8 @@ import org.das2.util.LoggerManager;
 import org.autoplot.MouseModuleType;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.util.MigratePreference;
+import org.das2.graph.DasColorBar;
+import org.das2.graph.SpectrogramRenderer;
 import org.fuin.utils4j.PropertiesFilePreferences;
 
 /**
@@ -38,6 +40,7 @@ public final class OptionsPrefsController {
         prefs.put( Options.PROP_FOREGROUND, DomUtil.encodeColor(options.getForeground()) );
         prefs.put( Options.PROP_COLOR, DomUtil.encodeColor( options.getColor() ) );
         prefs.put( Options.PROP_FILLCOLOR, DomUtil.encodeColor( options.getFillColor() ) );
+        prefs.put( Options.PROP_COLORTABLE, options.getColortable().getListLabel() );
         prefs.put( Options.PROP_CANVASFONT, options.getCanvasFont() );
         prefs.putInt(Options.PROP_WIDTH, options.getWidth() );
         prefs.putInt(Options.PROP_HEIGHT, options.getHeight());
@@ -143,6 +146,7 @@ public final class OptionsPrefsController {
         options.setDrawGrid ( prefs.getBoolean(Options.PROP_DRAWGRID, options.drawGrid) );
         options.setDrawMinorGrid ( prefs.getBoolean(Options.PROP_DRAWMINORGRID, options.drawMinorGrid) );
         options.setFillColor ( Color.decode(prefs.get(Options.PROP_FILLCOLOR, DomUtil.encodeColor(options.fillColor))) );
+        options.setColortable( DasColorBar.Type.parse( prefs.get(Options.PROP_COLORTABLE, options.colortable.getListLabel() )) );
         options.setForeground ( Color.decode(prefs.get(Options.PROP_FOREGROUND, DomUtil.encodeColor(options.foreground))) );
         options.setLogConsoleVisible ( prefs.getBoolean(Options.PROP_LOGCONSOLEVISIBLE, options.logConsoleVisible) );
         options.setOverRendering ( prefs.getBoolean(Options.PROP_OVERRENDERING, options.overRendering) );
@@ -200,6 +204,7 @@ public final class OptionsPrefsController {
         options.drawGrid = prefs.getBoolean(Options.PROP_DRAWGRID, options.drawGrid);
         options.drawMinorGrid = prefs.getBoolean(Options.PROP_DRAWMINORGRID, options.drawMinorGrid);
         options.fillColor = Color.decode(prefs.get(Options.PROP_FILLCOLOR, DomUtil.encodeColor(options.fillColor)));
+        options.colortable= DasColorBar.Type.parse( prefs.get(Options.PROP_COLORTABLE, options.colortable.getListLabel() ));
         options.foreground = Color.decode(prefs.get(Options.PROP_FOREGROUND, DomUtil.encodeColor(options.foreground)));
         options.logConsoleVisible = prefs.getBoolean(Options.PROP_LOGCONSOLEVISIBLE, options.logConsoleVisible);
         options.overRendering = prefs.getBoolean(Options.PROP_OVERRENDERING, options.overRendering);

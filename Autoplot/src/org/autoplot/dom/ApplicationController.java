@@ -1322,14 +1322,16 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         if (domPlot == null) {
             domPlot = addPlot(LayoutConstants.BELOW);
+            domPlot.setColortable( application.getOptions().getColortable() );
         }
 
         assignId(pele1);
 
         pele1.getStyle().setColor(application.getOptions().getColor());
         pele1.getStyle().setFillColor(application.getOptions().getFillColor());
+        pele1.getStyle().setColortable(application.getOptions().getColortable());
         pele1.getStyle().setAntiAliased(application.getOptions().isDrawAntiAlias());
-
+        
         pele1.addPropertyChangeListener(PlotElement.PROP_PLOTID, plotIdListener);
 
         if ( parent!=null ) {
@@ -2231,7 +2233,9 @@ public class ApplicationController extends DomNodeController implements RunLater
             application.getPlots(0).getYaxis().setLog(false); // TODO kludge
             application.getPlots(0).getZaxis().setLog(false); // TODO kludge
 
-            application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
+            Plot rawPlot= new Plot();
+            rawPlot.setColortable( application.getOptions().getColortable() );
+            application.getPlots(0).syncTo( rawPlot, Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
             application.getPlots(0).getXaxis().setAutoRange(true);
             application.getPlots(0).getYaxis().setAutoRange(true);
             application.getPlots(0).getZaxis().setAutoRange(true);
@@ -2271,11 +2275,13 @@ public class ApplicationController extends DomNodeController implements RunLater
             
             application.getDataSourceFilters(0).syncTo( new DataSourceFilter(), Collections.singletonList(DomNode.PROP_ID) );
             application.getDataSourceFilters(0).getController().setDataSetInternal(null,null,true);
-            application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
-            application.getPlotElements(0).syncTo( new PlotElement(), Arrays.asList( DomNode.PROP_ID, PlotElement.PROP_PLOTID,PlotElement.PROP_DATASOURCEFILTERID, PlotElement.PROP_RENDERTYPE ) );
-            application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
+            application.getPlots(0).syncTo( rawPlot, Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
+            PlotElement rawPE= new PlotElement();
+            rawPE.style.setColortable( application.getOptions().getColortable() );
+            application.getPlotElements(0).syncTo( rawPE, Arrays.asList( DomNode.PROP_ID, PlotElement.PROP_PLOTID,PlotElement.PROP_DATASOURCEFILTERID, PlotElement.PROP_RENDERTYPE ) );
+            application.getPlots(0).syncTo( rawPlot, Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
             application.getPlots(0).setAutoLabel(true);
-            application.getPlotElements(0).syncTo( new PlotElement(), Arrays.asList( DomNode.PROP_ID, PlotElement.PROP_PLOTID, PlotElement.PROP_DATASOURCEFILTERID ) );
+            application.getPlotElements(0).syncTo( rawPE, Arrays.asList( DomNode.PROP_ID, PlotElement.PROP_PLOTID, PlotElement.PROP_DATASOURCEFILTERID ) );
             application.getPlotElements(0).setAutoLabel(true);
             application.getPlotElements(0).getPlotDefaults().setId("plot_defaults_0");
             application.getPlotElements(0).getStyle().setId("style_0");

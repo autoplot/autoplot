@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import org.autoplot.MouseModuleType;
+import org.das2.graph.DasColorBar;
 
 /**
  * Bean for holding AP configuration options.  Note there are a few AutoplotUI prefs here that shouldn't be.
@@ -224,6 +225,19 @@ public final class Options extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_FILLCOLOR, oldFillColor, fillColor);
     }
 
+    public final static String PROP_COLORTABLE= "colortable";
+    
+    protected DasColorBar.Type colortable= DasColorBar.Type.COLOR_WEDGE;
+    
+    public DasColorBar.Type getColortable() {
+        return this.colortable;
+    }
+    
+    public void setColortable(DasColorBar.Type colortable) {
+        Object oldVal= this.colortable;
+        this.colortable = colortable;
+        propertyChangeSupport.firePropertyChange( PROP_COLORTABLE, oldVal, this.colortable );
+    }    
 
     protected String ticklen = "0.66em";
     public static final String PROP_TICKLEN = "ticklen";
@@ -654,6 +668,7 @@ public final class Options extends DomNode {
         if ( !exclude.contains(PROP_FOREGROUND) ) this.setForeground(that.getForeground());
         if ( !exclude.contains(PROP_COLOR) )this.setColor(that.getColor());
         if ( !exclude.contains(PROP_FILLCOLOR) )this.setFillColor(that.getFillColor());
+        if ( !exclude.contains(PROP_COLORTABLE) )this.setColortable(that.getColortable());
         if ( !exclude.contains(PROP_CANVASFONT) )this.setCanvasFont(that.getCanvasFont());
         if ( !exclude.contains(PROP_USE_TIME_RANGE_EDITOR) ) this.setUseTimeRangeEditor(that.isUseTimeRangeEditor());
         if ( !exclude.contains(PROP_FLIPCOLORBARLABEL) ) this.setFlipColorbarLabel(that.isFlipColorbarLabel());
@@ -684,6 +699,8 @@ public final class Options extends DomNode {
         if (!b) result.add(new PropertyChangeDiff(PROP_COLOR, that.getColor(), this.getColor()));
         b = that.getFillColor().equals(this.getFillColor());
         if (!b) result.add(new PropertyChangeDiff(PROP_FILLCOLOR, that.getFillColor(), this.getFillColor()));
+        b = that.getColortable().equals(this.getColortable());
+        if (!b) result.add(new PropertyChangeDiff(PROP_COLORTABLE, that.getColortable(), this.getColortable()));
         b = that.getCanvasFont().equals(this.getCanvasFont());
         if (!b) result.add(new PropertyChangeDiff(PROP_CANVASFONT, that.getCanvasFont(), this.getCanvasFont()));
         b = that.isUseTimeRangeEditor() == this.isUseTimeRangeEditor();
@@ -723,6 +740,7 @@ public final class Options extends DomNode {
         that.setForeground( this.getForeground() );
         that.setColor( this.getColor() );
         that.setFillColor( this.getFillColor() );
+        that.setColortable( this.getColortable() );
         that.setCanvasFont( this.getCanvasFont() );
         that.setUseTimeRangeEditor( this.isUseTimeRangeEditor() );
         that.setFlipColorbarLabel( this.isFlipColorbarLabel() );

@@ -3244,9 +3244,9 @@ public class PlotElementController extends DomNodeController {
         ac.bind(plotElement.style, "rebinMethod", spectrogramRenderer, "rebinner");
         ac.bind(plotElement, PlotElement.PROP_CADENCECHECK, spectrogramRenderer, "cadenceCheck");
         
-        if ( spectrogramRenderer.getColorBar()!=null )
+        if ( spectrogramRenderer.getColorBar()!=null ) {
             ac.bind(plotElement.style, "colortable", spectrogramRenderer.getColorBar(), "type");
-
+        }
     }
 
     public void bindToImageVectorDataSetRenderer(HugeScatterRenderer renderer) {
