@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-11-19 r24355):</p>
+        <p>Bugfixes (2019-11-20 r24364):</p>
         <ul>
+            <li>2216: options.colortable now allows scientists to specify colorbar preference.
+            <li>0786: server can now be stopped by either the Autoplot app or by the client issuing "close".
             <li>calling createGui() from Python would result in null pointer exception because object had not been created before focus change.
             <li>don't obscure IOException, which was hiding SSLException.
             <li>tiny blue/green button tooltip refers to ctrl-T and ctrl-D, improve feedback for mouse over.
