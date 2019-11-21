@@ -21,7 +21,7 @@ import org.autoplot.dom.Application;
  */
 public class ServletInfo extends HttpServlet {
 
-    private static long birthMilli= System.currentTimeMillis();
+    private static final long birthMilli= System.currentTimeMillis();
     public static final String version = "v20191121.1131";
     
     public static long getAgeMillis() {
@@ -59,8 +59,7 @@ public class ServletInfo extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        try {
+        try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -123,8 +122,6 @@ public class ServletInfo extends HttpServlet {
             out.println("Contact Info: "+ServletUtil.getServletContact()+"</sm>");
             out.println("</p></body>");
             out.println("</html>");
-        } finally {
-            out.close();
         }
     }
 
