@@ -1045,6 +1045,29 @@ public class CdfUtil {
     }
     
     /**
+     * abbreviate names, motivated by Cluster CDF files which have 
+     * Data__C1_CP_PEA_3DRH_cnts with DEPEND_0 of
+     * time_tags__C1_CP_PEA_3DRH_cnts.
+     * @param context
+     * @param name
+     * @return 
+     */
+    public static String maybeShorten( String context, String name ) {
+        int i1= context.length()-1;
+        int i2= name.length()-1;
+        while( i1>0 && i2>0 && context.charAt(i1)==name.charAt(i2) ) {
+            i1=i1-1;
+            i2=i2-1;
+        }
+        i2++;
+        if ( i2<(name.length()-3) ) {
+            return name.substring(0,i2)+"...";
+        } else {
+            return name;
+        }
+    }
+    
+    /**
      * Return a map where keys are the names of the variables, and values are descriptions.  This 
      * allows for a deeper query, getting detailed descriptions within the values, and also supports the
      * mode where the master CDFs (used by the CDAWeb plugin) don't contain data and record counts should
@@ -1236,16 +1259,16 @@ public class CdfUtil {
             }
             String desc = svar;
             if (xDependVariable != null) {
-                desc += "[" + xDependVariable;
+                desc += "[" + maybeShorten( svar, xDependVariable );
                 if ( ( xMaxRec>0 || !isMaster ) && xMaxRec==maxRec ) { // small kludge for CDAWeb, where we expect masters to be empty.
                     desc+= "=" + (xMaxRec);
                 }
                 if ( dep1desc.dep != null) {
-                    desc += "," + dep1desc.dep + "=" + dep1desc.nrec + ( dep1desc.rank2 ? "*": "" );
+                    desc += "," + maybeShorten( svar, dep1desc.dep ) + "=" + dep1desc.nrec + ( dep1desc.rank2 ? "*": "" );
                     if ( dep2desc.dep != null) {
-                        desc += "," + dep2desc.dep + "=" + dep2desc.nrec + ( dep2desc.rank2 ? "*": "" );
+                        desc += "," + maybeShorten( svar, dep2desc.dep ) + "=" + dep2desc.nrec + ( dep2desc.rank2 ? "*": "" );
                         if (dep3desc.dep != null) {
-                            desc += "," + dep3desc.dep + "=" + dep3desc.nrec + ( dep3desc.rank2 ? "*": "" );
+                            desc += "," + maybeShorten( svar, dep3desc.dep ) + "=" + dep3desc.nrec + ( dep3desc.rank2 ? "*": "" );
                         }
                     }
                 } else if ( rank>1 ) {
