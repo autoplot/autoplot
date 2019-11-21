@@ -28,6 +28,11 @@
         
         <p>Bugfixes (2019-11-20 r24364):</p>
         <ul>
+            <li>2221: CDF editor dialog gives incorrect warnings when rank 3 data has rank 2 depend_2.
+            <li>Edit->Options now brings up editor for options node, since Options->Additional options already brings up the specialized editor.
+            <li>Edit->Duplicate Window would resize the new application improperly.
+            <li>ScriptGUIServet printed the labels twice for checkboxes. 
+            <li>when enabling new features, use status bar to remind that "save options" must be invoked.
             <li>2216: options.colortable now allows scientists to specify colorbar preference.
             <li>0786: server can now be stopped by either the Autoplot app or by the client issuing "close".
             <li>calling createGui() from Python would result in null pointer exception because object had not been created before focus change.
@@ -70,7 +75,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>CDF editor dialog summary abbreviates depend names with common suffix.
             <li>ScriptGUIServlet now uses whitelist file.
+            <li>highlight the green/blue pushbuttons on mouseover, to better indicate the intent.
+            <li>Basic mode more aggressively protects the address bar from URI references, so that the scientist can reenter .vap and .jy references.
             <li>"http://autoplot.org/jnlp/v2019*/screen.png" can be browsed with the PNG Walk Tool.<li>
             <li>360: allow color type in jython script parameters.
             <li>334: allow where constraint to have slice, so Z component can be used to filter with URIs like ...&where=BGSEc[:,2].lt(0)
