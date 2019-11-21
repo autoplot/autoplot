@@ -966,7 +966,7 @@ public class CdfUtil {
         result.nrec=-1;
    
         try {
-            if ( hasAttribute( cdf, svar, "DEPEND_"+dim ) ) {  // check for metadata for DEPEND_1
+            if ( hasAttribute( cdf, svar, "DEPEND_"+dim ) ) {  // check for metadata for DEPEND_<dim>
                 Object att= getAttribute( cdf, svar, "DEPEND_"+dim );
                 if ( att!=null && rank>1 ) {
                     logger.log(Level.FINER, "get attribute DEPEND_"+dim+" entry for {0}", svar );
@@ -978,7 +978,7 @@ public class CdfUtil {
                     } else {
                         result.nrec = cdf.getNumberOfValues( result.dep );
                         if (result.nrec == 1) {
-                            result.nrec = getDimensions( cdf, svar)[0];
+                            result.nrec = getDimensions( cdf, result.dep )[0];
                         }
                     }
                     if ( dims.length>(dim-2) && (result.nrec)!=dims[dim-1] ) {
@@ -1301,8 +1301,9 @@ public class CdfUtil {
                         descbuf.append( recCount ).append(" records of ").append(recDesc).append("<br>");
                     }
                 }
-                        
+
                 for ( String s: warn ) {
+                    descbuf.append("<br>");
                     if ( s.startsWith("NOTE") ) {
                         descbuf.append(s);
                     } else {
