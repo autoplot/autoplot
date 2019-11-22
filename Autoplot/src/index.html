@@ -49,7 +49,7 @@
             <li>.gz files found within .zip files are can be read in.
             <li>binary data source add the percent to the format, supporting ...&format=c, so that percent need not be within the URI.   URI encoding is tricky with percents.
             <li>vap+audiosystem: would record for twice as long as it needed to.
-            <li>cache IndexOutOfBounds when events renderer sees an empty dataset (ds[0,4]).
+            <li>catch IndexOutOfBounds when events renderer sees an empty dataset (ds[0,4]).
             <li>Run Batch tool replaces " " in output names with "_" so that filenames don't break.  Thanks, George!
             <li>add read timeouts on CDAWeb web service calls.
             <li>20191023a had new bug where reducex would drop DEPEND_1.
@@ -79,7 +79,7 @@
             <li>ScriptGUIServlet now uses whitelist file.
             <li>highlight the green/blue pushbuttons on mouseover, to better indicate the intent.
             <li>Basic mode more aggressively protects the address bar from URI references, so that the scientist can reenter .vap and .jy references.
-            <li>"http://autoplot.org/jnlp/v2019*/screen.png" can be browsed with the PNG Walk Tool.<li>
+            <li>"http://autoplot.org/jnlp/v2019*/screen.png" can be browsed with the PNG Walk Tool.
             <li>360: allow color type in jython script parameters.
             <li>334: allow where constraint to have slice, so Z component can be used to filter with URIs like ...&where=BGSEc[:,2].lt(0)
             <li>360: allow either values or enum to be used in script parameter constraints.
