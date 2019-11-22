@@ -6,10 +6,6 @@
  */
 package org.autoplot;
 
-import org.autoplot.AutoplotUtil;
-import org.autoplot.BindToHiddenDialog;
-import org.autoplot.ApplicationModel;
-import org.autoplot.AddPlotsDialog;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
