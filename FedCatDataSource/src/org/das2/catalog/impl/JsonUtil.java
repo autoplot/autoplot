@@ -99,7 +99,7 @@ class JsonUtil {
 		
 		if(data instanceof JSONArray){
 			JSONArray ja = (JSONArray)data;
-			int i = new Integer(aFragPath[0]);
+			int i = Integer.parseInt(aFragPath[0]);
 			
 			if((i < 0 )||(i >= ja.length())) return nullProp;
 			if(ja.isNull(i)) return new DasProp(null);
