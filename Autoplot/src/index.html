@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Silly <a href='https://github.com/autoplot/dev/blob/master/demos/2019/20191108/karateChop.jy'>script</a> chops the stack of plots in two, with independent time axes. 
+        <p><small>Cluster/PEACE data shown with Sci-Py Plasma colorbar.  The default colorbar to use can now be set in [menubar]->Edit->Options.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-11-20 r24364):</p>
+        <p>Bugfixes (2019-11-26 r24379):</p>
         <ul>
+            <li>2222: clean-up of orbit mode style properties editor.
             <li>2221: CDF editor dialog gives incorrect warnings when rank 3 data has rank 2 depend_2.
             <li>Edit->Options now brings up editor for options node, since Options->Additional options already brings up the specialized editor.
             <li>Edit->Duplicate Window would resize the new application improperly.
@@ -75,6 +76,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>2222: add new tickDirection property to orbit mode, one of left,right, or outside (the default).
+            <li>2222: tickValues property added to Das2 TickCurveRenderer (used for orbit mode), to be consistent with DasAxis and ContoursRenderer.
+            <li>removeFill function added.
             <li>CDF editor dialog summary abbreviates depend names with common suffix.
             <li>ScriptGUIServlet now uses whitelist file.
             <li>highlight the green/blue pushbuttons on mouseover, to better indicate the intent.
