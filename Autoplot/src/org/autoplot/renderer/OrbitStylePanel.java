@@ -7,8 +7,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.das2.components.propertyeditor.EnumerationEditor;
-import org.das2.graph.DigitalRenderer;
+import javax.swing.DefaultComboBoxModel;
 import org.das2.graph.Renderer;
 import org.jdesktop.beansbinding.AutoBinding;
 import org.jdesktop.beansbinding.BeanProperty;
@@ -23,7 +22,7 @@ import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
  * Style panel for orbit renderer
  * @author jbf
  */
-public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePanel.StylePanel {
+public final class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePanel.StylePanel {
 
     /**
      * Creates new form DigitalStylePanel
@@ -39,6 +38,8 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
                 update();
             }
         });
+        tickSpacingComboBox.setModel( new DefaultComboBoxModel<>( new String[] { "", "2hr", "12hr", "1days", "2days", "10days" } ) );
+        tickDirectionComboBox.setModel( new DefaultComboBoxModel<>( new String[] { "", "outside", "right", "left" } ) );
         validate();
     }
 
@@ -76,6 +77,7 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
         controls.put( Renderer.CONTROL_KEY_LINE_THICK, thickTextField.getText() );
         controls.put( "tickLength", tickLengthTextField.getText() );
         controls.put( "tickSpacing", tickSpacingComboBox.getSelectedItem().toString() );
+        controls.put( "tickDirection", tickDirectionComboBox.getSelectedItem().toString() );
         String c= Renderer.formatControl(controls);
         this.control= c;
         firePropertyChange( Renderer.PROP_CONTROL, oldValue, c );
@@ -87,6 +89,7 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
         thickTextField.setText( renderer.getControl( Renderer.CONTROL_KEY_LINE_THICK, thickTextField.getText() ) );
         tickLengthTextField.setText( renderer.getControl( "tickLength", tickLengthTextField.getText() ) );
         tickSpacingComboBox.setSelectedItem( renderer.getControl( "tickSpacing", tickSpacingComboBox.getSelectedItem().toString() ) );
+        tickDirectionComboBox.setSelectedItem( renderer.getControl( "tickDirection", tickDirectionComboBox.getSelectedItem().toString() ) );
     }
     
     @Override
@@ -144,6 +147,8 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
         tickLengthTextField = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         tickSpacingComboBox = new javax.swing.JComboBox<>();
+        jLabel5 = new javax.swing.JLabel();
+        tickDirectionComboBox = new javax.swing.JComboBox<>();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Orbit Plot"));
 
@@ -198,7 +203,7 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
         jLabel4.setToolTipText("override the default spacing, to specific cadence");
 
         tickSpacingComboBox.setEditable(true);
-        tickSpacingComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1hr", "2hr", "12hr", "1day", "2day", "10day" }));
+        tickSpacingComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "default", "1hr", "2hr", "12hr", "1day", "2day", "10day" }));
         tickSpacingComboBox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 tickSpacingComboBoxItemStateChanged(evt);
@@ -210,13 +215,28 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
             }
         });
 
+        jLabel5.setText("Tick Direction:");
+        jLabel5.setToolTipText("direction of the ticks, where left is to the left along the data, and outside is to the outside of bends.");
+
+        tickDirectionComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "default", "outside", "left", "right" }));
+        tickDirectionComboBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                tickDirectionComboBoxItemStateChanged(evt);
+            }
+        });
+        tickDirectionComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tickDirectionComboBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addComponent(colorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(layout.createSequentialGroup()
@@ -237,8 +257,12 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(tickSpacingComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(tickSpacingComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tickDirectionComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -264,7 +288,11 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(tickSpacingComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4))
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(tickDirectionComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(41, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -303,6 +331,16 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
         }
     }//GEN-LAST:event_tickSpacingComboBoxItemStateChanged
 
+    private void tickDirectionComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tickDirectionComboBoxActionPerformed
+        update();
+    }//GEN-LAST:event_tickDirectionComboBoxActionPerformed
+
+    private void tickDirectionComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_tickDirectionComboBoxItemStateChanged
+        if ( evt.getStateChange()==ItemEvent.SELECTED ) {
+            update();
+        }
+    }//GEN-LAST:event_tickDirectionComboBoxItemStateChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.das2.components.propertyeditor.ColorEditor colorEditor;
@@ -312,8 +350,10 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JTextField thickTextField;
+    private javax.swing.JComboBox<String> tickDirectionComboBox;
     private javax.swing.JTextField tickLengthTextField;
     private javax.swing.JComboBox<String> tickSpacingComboBox;
     // End of variables declaration//GEN-END:variables
