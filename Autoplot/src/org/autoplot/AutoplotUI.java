@@ -4886,6 +4886,7 @@ private void updateFrameTitle() {
                 "Arguments following are " +
                 "passed into the script as sys.argv");
         alm.addOptionalSwitchArgument("testPngFilename", null, "testPngFilename", "", "write canvas to this png file after script is run" );
+        alm.addOptionalSwitchArgument("scriptExit",null,"scriptExit","","force exit after running the script");
         alm.addOptionalSwitchArgument("autoLayout",null,"autoLayout",ArgumentList.TRUE,"turn on/off initial autolayout setting");
         alm.addOptionalSwitchArgument("mode","m","mode","expert","start in basic (browse,reduced) mode or expert mode" );
         //alm.addOptionalSwitchArgument("exit", null, "exit", "0", "exit after running script" );
@@ -5256,7 +5257,14 @@ APSplash.checkTime("init 230");
                     String s= URISplit.makeAbsolute( new File(".").getAbsolutePath(), script );
                     
                     if ( app!=null ) app.setStatus("running script "+s);
-                    Runnable run= getRunScriptRunnable(app, model, s, scriptArgs, headless && !server, alm.getValue("testPngFilename") );
+                    
+                    boolean scriptExit= alm.getBooleanValue("scriptExit");
+                    Runnable run= getRunScriptRunnable(app, 
+                            model, 
+                            s, 
+                            scriptArgs, 
+                            scriptExit || ( headless && !server ), 
+                            alm.getValue("testPngFilename") );
                     new Thread(run,"batchRunScriptThread").start();
                     
                     try {
