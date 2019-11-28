@@ -28,6 +28,9 @@
         
         <p>Bugfixes (2019-11-26 r24379):</p>
         <ul>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>2222: clean-up of orbit mode style properties editor.
             <li>2221: CDF editor dialog gives incorrect warnings when rank 3 data has rank 2 depend_2.
             <li>Edit->Options now brings up editor for options node, since Options->Additional options already brings up the specialized editor.
@@ -57,26 +60,12 @@
             <li>v2019a_10 had bug where CDF files containing both zvariables and rvariables could not be read.
             <li>check VARIABLE_PURPOSE in CDF Metadata when filtering parameter list.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>2212: New Das2Stream parser did not handle Voyager peaks-and-averages properly, with data coming from cache.
-            <li>dataset command now parses "2014-01-09 00:00 to 01:00" as datum range, not datum with enumeration units.
-            <li>1659: double-call on monitor when cancel was pressed in "Run Batch"
-            <li>Run Batch tool replaces "/" in output names with "_" so that filenames don't break.  Thanks, Connor!
-            <li>dataset(datumRange) could not be used with createEvent, because it was mistaken for a 2-element array.  Thanks, Kristoff!
-            <li>mute messages at command line startup about the Help system, which is not used anyway.
-            <li>BIN_MAX and BIN_MIN are correlative properties, and slice1 should slice them.
-            <li>odd bug where .vap files wouldn't load from GitHubFileSystem during testing resolved by loading into memory.
-            <li>2212: New Das2Stream parser did not handle Voyager peaks-and-averages properly.
-            <li>2202: reset method needs to resize Autoplot GUI as well to support scripts.
-            <li>2206: reduce=T supported in aggregation, before high rank datasets were not reduced.
-            <li>2206: CDF library initialization sped up, noticeable when there are many variables.
-            <li>2193: handle redirects, put in code for github.com to get vaps from github rawusercontent website.
-            <li>2202: screen size of loaded .vap is often incorrect.
-        </ul>
         <p>Features:</p>
         <ul>
             <li>1801: add wordy but fast implementation of magnitude for rank 2 and rank 3 datasets.
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>2222: add new tickDirection property to orbit mode, one of left,right, or outside (the default).
             <li>2222: tickValues property added to Das2 TickCurveRenderer (used for orbit mode), to be consistent with DasAxis and ContoursRenderer.
             <li>removeFill function added.
@@ -89,21 +78,6 @@
             <li>334: allow where constraint to have slice, so Z component can be used to filter with URIs like ...&where=BGSEc[:,2].lt(0)
             <li>360: allow either values or enum to be used in script parameter constraints.
             <li>popup slicers have write to PDF button.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>New JNLP signature for Oct 2019-September 2020.
-            <li>Jython scripts can now have labels on enumerated values, like { 'values':['A','B'], labels:['RBSP-A','RBSP-B'] }
-            <li>future proofing scripting commands setScriptTitle, setScriptDescription, which will be used to improve GUI.
-            <li>command line option --version.
-            <li>introduce --sandbox switch which starts a very permissive sandbox.
-            <li>BinaryDataSource editor now shows the bytes of the first record.
-            <li>DDataSet gets addValues(qds) so that high-rank datasets can be accumulated quickly.
-            <li>new signature for JNLP release.
-            <li>add pointAtOffset to annotation command
-            <li>696: support for HAPI 3.0 references.
-            <li>IFFT takes Real and Complex spectra to make a waveform.
-            <li>ScriptGUIServlet allows script to be run, creating web GUI for parameters and displaying the output.
         </ul>
         <p>Known issues:</p>
         <ul>
