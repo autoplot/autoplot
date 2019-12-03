@@ -1809,7 +1809,7 @@ public class DataSourceController extends DomNodeController {
                 //if (dsf.getUri().length() > 0) {
                 //    this.model.addRecent(dsf.getUri());
                 //}
-                logger.log(Level.FINE, "{0} read dataset: {1}", new Object[]{dss, result});
+                logger.log(Level.FINE, "read dataset: {1} from {0}", new Object[]{dss, result});
                 Map<String, Object> props = dss.getMetadata(new AlertNullProgressMonitor("getMetadata"));
 
                 TimeSeriesBrowse ltsb= getTsb();
@@ -1821,7 +1821,13 @@ public class DataSourceController extends DomNodeController {
                         logger.warning("unexpected timeSeriesBrowseController.domPlot==null");
                     } else {
                         if ( UnitsUtil.isTimeLocation( p.getXaxis().getRange().getUnits() ) ) {
-                            p.getXaxis().setAutoRange(true);
+                            List<PlotElement> pes= dom.getController().getPlotElementsFor(p);
+                            if ( pes.size()>1 ) {
+                                logger.log(Level.INFO,"not resetting because others use this axis");
+                            } else {
+                                logger.log(Level.INFO, "resetting autorange=T because dataset is not time series: {0}", result);
+                                p.getXaxis().setAutoRange(true);
+                            }
                         }
                     }
                     //https://sourceforge.net/p/autoplot/bugs/1559/ Let's trim it...
