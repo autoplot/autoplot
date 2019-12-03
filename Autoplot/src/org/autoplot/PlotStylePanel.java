@@ -269,7 +269,7 @@ public final class PlotStylePanel extends javax.swing.JPanel {
 
                 logger.log(Level.FINE, "doElementBindingsRunnable (bug1356)");
 
-                StylePanel editorPanel = GuiSupport.getStylePanelMaybeCached(element.getRenderType());
+                StylePanel editorPanel = applicationModel.getStylePanelMaybeCached(element.getRenderType());
 
                 if (currentEditorPanel == null || (PlotStylePanel.this.currentElement != element) || (!(currentEditorPanel.getClass() == editorPanel.getClass()))) {
                     if (currentEditorPanel != null) {

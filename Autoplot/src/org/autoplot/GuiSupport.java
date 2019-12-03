@@ -245,23 +245,6 @@ public class GuiSupport {
     }
     
     
-    private static Map<RenderType,PlotStylePanel.StylePanel> panelCache= new HashMap<>();
-            
-    /**
-     * return a GUI controller for the RenderType, using a cached instance if
-     * available.
-     * @param renderType
-     * @return 
-     */
-    public static PlotStylePanel.StylePanel getStylePanelMaybeCached( RenderType renderType ) { 
-        PlotStylePanel.StylePanel editorPanel= panelCache.get(renderType);
-        if ( editorPanel==null ) {
-            editorPanel= getStylePanel(renderType);
-            panelCache.put( renderType, editorPanel );
-        }
-        return editorPanel;
-    }
-    
     /**
      * return a GUI controller for the RenderType.
      * @param renderType the render type, such as RenderType.colorScatter

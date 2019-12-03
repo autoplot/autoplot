@@ -39,6 +39,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -1381,6 +1382,23 @@ public final class ApplicationModel {
      */
     public DataSourceController getDataSourceFilterController() {
         return dom.getController().getDataSourceFilter().getController();
+    }
+    
+    private final Map<RenderType,PlotStylePanel.StylePanel> panelCache= new HashMap<>();
+            
+    /**
+     * return a GUI controller for the RenderType, using a cached instance if
+     * available.
+     * @param renderType
+     * @return 
+     */
+    public PlotStylePanel.StylePanel getStylePanelMaybeCached( RenderType renderType ) { 
+        PlotStylePanel.StylePanel editorPanel= panelCache.get(renderType);
+        if ( editorPanel==null ) {
+            editorPanel= GuiSupport.getStylePanel(renderType);
+            panelCache.put( renderType, editorPanel );
+        }
+        return editorPanel;
     }
 
 }
