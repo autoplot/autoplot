@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Two contours renderers are used to show major and minor contours. Contour linestyle can now be controlled.
+        <p><small>Image data source used to digitize screen photo of blower door test.  Gimp was used to deskew the image.  Thanks, Green Iowa!
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,14 +26,15 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-12-03 r24388):</p>
+        <p>Bugfixes (2019-12-06 r24390):</p>
         <ul>
-            <li>2225: new app steals editor panel from old app.
+            <li>rte 1638285244: guard against strange index-out-of-bounds with JTable when digitizing.  Thanks, Ivar!
+            <li>2225: new app steals editor panel from old app.  Thanks, Ivar!
         </ul>
         <p>Older Bugfixes:</p>
         <ul>
-            <li>2222: clean-up of orbit mode style properties editor.
-            <li>2221: CDF editor dialog gives incorrect warnings when rank 3 data has rank 2 depend_2.
+            <li>2222: clean-up of orbit mode style properties editor.  Thanks, Ivar!
+            <li>2221: CDF editor dialog gives incorrect warnings when rank 3 data has rank 2 depend_2.  Thanks, Arnaud!
             <li>Edit->Options now brings up editor for options node, since Options->Additional options already brings up the specialized editor.
             <li>Edit->Duplicate Window would resize the new application improperly.
             <li>ScriptGUIServet printed the labels twice for checkboxes. 
@@ -42,7 +43,7 @@
             <li>0786: server can now be stopped by either the Autoplot app or by the client issuing "close".
             <li>calling createGui() from Python would result in null pointer exception because object had not been created before focus change.
             <li>don't obscure IOException, which was hiding SSLException.
-            <li>tiny blue/green button tooltip refers to ctrl-T and ctrl-D, improve feedback for mouse over.
+            <li>tiny blue/green button tooltip refers to ctrl-T and ctrl-D, improve feedback for mouse over.  Thanks, Chris!
             <li>resetting the DasPlot's DasAxis calls update ticksV on the new axis.
             <li>2126: in basic mode, loading vap doesn't reset selector to URI.
             <li>suppress warning when URL is not found for parameter in CDAWeb's all.xml.
