@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-12-06 r24390):</p>
+        <p>Bugfixes (2019-12-16 r24393):</p>
         <ul>
+            <li>2227: Jython fixImports never closed input file, relying on OS to implicitly close the file and preventing some operations on Windows.  Thanks, Jim S.!
             <li>rte 1638285244: guard against strange index-out-of-bounds with JTable when digitizing.  Thanks, Ivar!
             <li>2225: new app steals editor panel from old app.  Thanks, Ivar!
         </ul>
