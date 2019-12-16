@@ -566,6 +566,10 @@ public class DataSourceUtil {
             return null; // I had the file in my directory: "file:///home/jbf/das2Server?dataset=juno%2Fwaves%2Fflight%2Fsurvey.dsdf;start_time=$Y-$m-$dT15:00:00.000Z;end_time=$Y-$m-$dT19:00:00.000Z;params=EINT;server=dataset"
         } catch ( ParseException ex ) {
             return null;
+        } catch ( StringIndexOutOfBoundsException ex ) {
+            StringIndexOutOfBoundsException e= new StringIndexOutOfBoundsException(s); // rte_0336734710_20191127_115020
+            e.initCause(ex);
+            throw e;
         }
         
     }
