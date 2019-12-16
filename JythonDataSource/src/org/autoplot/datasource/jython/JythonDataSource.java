@@ -8,9 +8,11 @@ import java.beans.ExceptionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.LineNumberReader;
+import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -62,7 +64,7 @@ import org.autoplot.jythonsupport.PyQDataSet;
  * <li>  timerange  if used then TimeSeriesBrowse is added.
  * @author jbf
  */
-public class JythonDataSource extends AbstractDataSource implements Caching {
+public final class JythonDataSource extends AbstractDataSource implements Caching {
 
     ExceptionListener listener;
     private Map<String, Object> metadata;
@@ -88,9 +90,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     tsb= tsb1;
                     notCheckedTsb= false;
                 }
-            } catch (ParseException ex) {
-                logger.severe( ex.toString() );
-            } catch ( IOException ex ) {
+            } catch (ParseException | IOException ex) {
                 logger.severe( ex.toString() );
             }
         }
@@ -287,22 +287,22 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 try {
                     boolean debug = false;  //TODO: exceptions will have the wrong line number in this mode.
                     if (debug) {
-                        FileReader fr= new FileReader( jythonScript );
-                        reader = new LineNumberReader( fr );
-                        String[] nextLine= new String[1];
-
-                        String s = nextExec( reader, nextLine );
-                        long t0= System.currentTimeMillis();
-                        while (s != null) {
-                            logger.log(Level.FINEST, "{0}: {1}", new Object[]{reader.getLineNumber(), s});
-                            interp.exec(s);
-                            logger.finest( String.format( "line=%d time=%dms  %s\n", reader.getLineNumber(), (System.currentTimeMillis()-t0), s ) );
-                            if ( mon.isCancelled() ) break;
-                            mon.setProgressMessage("exec line "+reader.getLineNumber() );
-                            s = nextExec( reader, nextLine );
-                            t0= System.currentTimeMillis();
+                        try ( Reader fr = new InputStreamReader( JythonRefactory.fixImports( new FileInputStream( jythonScript ),jythonScript.getName() ) ) ) {
+                            reader = new LineNumberReader( fr );
+                            String[] nextLine= new String[1];
+                            
+                            String s = nextExec( reader, nextLine );
+                            long t0= System.currentTimeMillis();
+                            while (s != null) {
+                                logger.log(Level.FINEST, "{0}: {1}", new Object[]{reader.getLineNumber(), s});
+                                interp.exec(s);
+                                logger.finest( String.format( "line=%d time=%dms  %s\n", reader.getLineNumber(), (System.currentTimeMillis()-t0), s ) );
+                                if ( mon.isCancelled() ) break;
+                                mon.setProgressMessage("exec line "+reader.getLineNumber() );
+                                s = nextExec( reader, nextLine );
+                                t0= System.currentTimeMillis();
+                            }
                         }
-                        fr.close();
 
                     } else {
                         InputStream in = new FileInputStream( jythonScript );
