@@ -179,70 +179,25 @@ public class JythonRefactory {
         
         boolean affected= false;
         
-        LineNumberReader reader= new LineNumberReader( new InputStreamReader(in) );
-        String line= reader.readLine(); 
-        ByteArrayOutputStream baos= new ByteArrayOutputStream(10000);
-        PrintStream writer= new PrintStream( baos );
-        while ( line!=null ) {
-            Matcher m;
-            //if ( line.contains( "org.virbo.jythonsupport.ui.Util.FormData" ) ) {
-            //    System.err.println("here114");
-            //}
-            
-            int ibs= line.indexOf(".BoxSelected");
-            if ( ibs>-1 ) {
-                line= line.substring(0,ibs) + ".boxSelected" + line.substring(ibs+12);
-                affected= true;
-                logger.log(Level.WARNING, "fixImports found use of old .BoxSelected method" );
-            }
-            
-            m= IMPORT_REGEX.matcher(line);
-            if ( m.matches() ) {
-                String p= m.group(3);
-                String cl= null;
-                String n=null;
-                String[] ss= p.split("\\.",-2);
-                int i= p.length();
-                for ( int k=ss.length; k>0; k-- ) {
-                    String path= p.substring(0,i);
-                    n= forwardMap.get(path);
-                    if ( n==null ) {
-                        i= i-ss[k-1].length()-1;
-                    } else {
-                        cl= p.substring(i);
-                        break;
-                    }
+        ByteArrayOutputStream baos;
+        try (LineNumberReader reader = new LineNumberReader( new InputStreamReader(in) )) {
+            String line= reader.readLine();
+            baos = new ByteArrayOutputStream(10000);
+            PrintStream writer= new PrintStream( baos );
+            while ( line!=null ) {
+                Matcher m;
+                //if ( line.contains( "org.virbo.jythonsupport.ui.Util.FormData" ) ) {
+                //    System.err.println("here114");
+                //}
+                
+                int ibs= line.indexOf(".BoxSelected");
+                if ( ibs>-1 ) {
+                    line= line.substring(0,ibs) + ".boxSelected" + line.substring(ibs+12);
+                    affected= true;
+                    logger.log(Level.WARNING, "fixImports found use of old .BoxSelected method" );
                 }
-                if ( n!=null ) {
-                    writer.print( m.group(1) );
-                    writer.print( "from" );
-                    writer.print( m.group(2) );
-                    writer.print( n );
-                    if ( cl!=null ) {
-                        writer.print( cl );
-                    }
-                    writer.print( m.group(4) );
-                    writer.print( "import" );
-                    writer.print( m.group(5) );
-                    writer.print( m.group(6) );
-                    writer.print( m.group(7) );
-                    writer.println();
-                    if ( cl!=null ) {
-                        if ( !p.equals( n+cl ) ) {
-                            logger.log(Level.FINER, "affected line {0} of {2}: {1}", new Object[]{ reader.getLineNumber(), line, name});
-                            affected= true;
-                        }
-                    } else {
-                        if ( !p.equals( n ) ) {
-                            logger.log(Level.FINER, "affected line {0} of {2}: {1}", new Object[]{ reader.getLineNumber(), line, name });
-                            affected= true;
-                        }
-                    }
-                } else {
-                    writer.println(line);
-                }
-            } else {
-                m= IMPORT_AS_REGEX.matcher(line);
+                
+                m= IMPORT_REGEX.matcher(line);
                 if ( m.matches() ) {
                     String p= m.group(3);
                     String cl= null;
@@ -256,71 +211,118 @@ public class JythonRefactory {
                             i= i-ss[k-1].length()-1;
                         } else {
                             cl= p.substring(i);
-                            p= path;
                             break;
                         }
                     }
                     if ( n!=null ) {
                         writer.print( m.group(1) );
-                        writer.print( "import" );
+                        writer.print( "from" );
                         writer.print( m.group(2) );
                         writer.print( n );
                         if ( cl!=null ) {
                             writer.print( cl );
                         }
                         writer.print( m.group(4) );
-                        if ( m.group(5)!=null ) { // as clause
-                            writer.print( m.group(5) ); 
-                        } else {
-                            for ( int k=ss.length; k>0; k-- ) {
-                                String path= p.substring(0,i);
-                                n= forwardMap.get(path);
-                                if ( n!=null && n.equals(p) ) {
-                                    fullNameMap.put( p, n );
-                                }
-                            }
-                            fullNameMap.put( p+cl, n+cl );
-                        }
+                        writer.print( "import" );
+                        writer.print( m.group(5) ); 
+                        writer.print( m.group(6) );
+                        writer.print( m.group(7) );
                         writer.println();
-                        if ( !p.equals(n) ) {
-                            logger.log(Level.FINER, "affected line {0} of {2}: {1}", new Object[]{reader.getLineNumber(), line, name});
-                            affected= true;
+                        if ( cl!=null ) {
+                            if ( !p.equals( n+cl ) ) {
+                                logger.log(Level.FINER, "affected line {0} of {2}: {1}", new Object[]{ reader.getLineNumber(), line, name});
+                                affected= true;
+                            }
+                        } else {
+                            if ( !p.equals( n ) ) {
+                                logger.log(Level.FINER, "affected line {0} of {2}: {1}", new Object[]{ reader.getLineNumber(), line, name });
+                                affected= true;
+                            }
                         }
                     } else {
                         writer.println(line);
                     }
                 } else {
-                    if ( fullNameMap.size()>0 ) {
-                        for ( Entry<String,String> e: fullNameMap.entrySet() ) {
-                            Pattern identifierP= Pattern.compile("([a-zA-Z0-9\\.\\_]+)");
-                            String skey= e.getKey(); //BUG need to prefix with space or chindex=0.
-                            int i= line.indexOf(skey);
-                            while ( i>-1 ) {
-                                String s= line.substring(0,i);
-                                int singleQuoteCount= s.split("'",-2).length - 1;
-                                if ( singleQuoteCount % 2 != 0 ) break; // within string
-                                Matcher matcher= identifierP.matcher(line.substring(i));
-                                if ( matcher.find() ) { // should be true
-                                    String mehave= matcher.group(1);
-                                    String mewant= magicMatch(mehave);
-                                    line= line.replace( mehave, mewant );
-                                    i= line.indexOf( skey, i+mewant.length() );
-                                    if ( !mehave.equals(mewant ) ) {
-                                        logger.log(Level.FINER, "affected line {0} of {2}: {1}", new Object[]{reader.getLineNumber(), line, name});
-                                        affected= true;
-                                    }
-                                } else {
-                                    logger.warning("something has gone terribly wrong at JythonRefactory line 233");
-                                    i= -1; //
-                                }
+                    m= IMPORT_AS_REGEX.matcher(line);
+                    if ( m.matches() ) {
+                        String p= m.group(3);
+                        String cl= null;
+                        String n=null;
+                        String[] ss= p.split("\\.",-2);
+                        int i= p.length();
+                        for ( int k=ss.length; k>0; k-- ) {
+                            String path= p.substring(0,i);
+                            n= forwardMap.get(path);
+                            if ( n==null ) {
+                                i= i-ss[k-1].length()-1;
+                            } else {
+                                cl= p.substring(i);
+                                p= path;
+                                break;
                             }
-                            
                         }
+                        if ( n!=null ) {
+                            writer.print( m.group(1) );
+                            writer.print( "import" );
+                            writer.print( m.group(2) );
+                            writer.print( n );
+                            if ( cl!=null ) {
+                                writer.print( cl );
+                            }
+                            writer.print( m.group(4) );
+                            if ( m.group(5)!=null ) { // as clause
+                                writer.print( m.group(5) );
+                            } else {
+                                for ( int k=ss.length; k>0; k-- ) {
+                                    String path= p.substring(0,i);
+                                    n= forwardMap.get(path);
+                                    if ( n!=null && n.equals(p) ) {
+                                        fullNameMap.put( p, n );
+                                    }
+                                }
+                                fullNameMap.put( p+cl, n+cl );
+                            }
+                            writer.println();                            
+                            if ( !p.equals(n) ) {
+                                logger.log(Level.FINER, "affected line {0} of {2}: {1}", new Object[]{reader.getLineNumber(), line, name});
+                                affected= true;
+                            }
+                        } else {
+                            writer.println(line);
+                        }
+                    } else {
+                        if ( fullNameMap.size()>0 ) {
+                            for ( Entry<String,String> e: fullNameMap.entrySet() ) {
+                                Pattern identifierP= Pattern.compile("([a-zA-Z0-9\\.\\_]+)");
+                                String skey= e.getKey(); //BUG need to prefix with space or chindex=0.
+                                int i= line.indexOf(skey);
+                                while ( i>-1 ) {
+                                    String s= line.substring(0,i);
+                                    int singleQuoteCount= s.split("'",-2).length - 1;
+                                    if ( singleQuoteCount % 2 != 0 ) break; // within string
+                                    Matcher matcher= identifierP.matcher(line.substring(i));
+                                    if ( matcher.find() ) { // should be true
+                                        String mehave= matcher.group(1);
+                                        String mewant= magicMatch(mehave);
+                                        line= line.replace( mehave, mewant );
+                                        i= line.indexOf( skey, i+mewant.length() );
+                                        if ( !mehave.equals(mewant ) ) {
+                                            logger.log(Level.FINER, "affected line {0} of {2}: {1}", new Object[]{reader.getLineNumber(), line, name});
+                                            affected= true;
+                                        }
+                                    } else {
+                                        logger.warning("something has gone terribly wrong at JythonRefactory line 233");
+                                        i= -1; //
+                                    }
+                                }
+                                
+                            }
+                        }
+                        writer.println(line);
                     }
-                    writer.println(line);
                 }
+                line= reader.readLine();
             }
-            line= reader.readLine(); 
         }
         if (affected) {
             logger.log(Level.WARNING, "{2} fixImports in {0}ms, affected={1}.  Code contains imports with old (\"virbo\") names.", new Object[] { System.currentTimeMillis()-t0, affected, name } );
