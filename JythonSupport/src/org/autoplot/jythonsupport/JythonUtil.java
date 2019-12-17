@@ -629,12 +629,20 @@ public class JythonUtil {
          @Override
          public void traverse(SimpleNode sn) throws Exception {
              if ( sn instanceof Call ) {
-                 looksOkay= trivialFunctionCall(sn);
+                 boolean newLooksOkay= trivialFunctionCall(sn);
+                 if ( !newLooksOkay ) {
+                    logger.log(Level.FINE, "looksOkay=False, {0}", sn);
+                 }
+                 looksOkay= newLooksOkay;
              } else if ( sn instanceof Assign ) { // TODO: I have to admit I don't understand what traverse means.  I would have thought it was all nodes...
                  Assign a= ((Assign)sn);
                  exprType et= a.value;
                  if ( et instanceof Call ) {
-                     looksOkay= trivialFunctionCall(et);
+                     boolean newLooksOkay= trivialFunctionCall(et);
+                     if ( !newLooksOkay ) {
+                         logger.log(Level.FINE, "looksOkay=False, {0}", sn);
+                     }
+                     looksOkay= newLooksOkay;
                  }
              } else if ( sn instanceof Name ) {
                  //visitName((Name)sn).id
@@ -1142,6 +1150,8 @@ public class JythonUtil {
          variableNames.add("datumRange");
          variableNames.add("URI");
          variableNames.add("URL");
+         variableNames.add("True");
+         variableNames.add("False");
          
          try {
              Module n= (Module)org.python.core.parser.parse( script, "exec" );
