@@ -517,7 +517,7 @@ public class JythonUtil {
          * The parameter type:<ul>
          * <li>T (TimeRange), 
          * <li>A (String, but note a string with the values enumerated either T or F is treated as a boolean.)
-         * <li>F (Double or Integer), 
+         * <li>F (Double or Integer, but note the values [0,1] imply it's a boolean.), 
          * <li>D (Datum),
          * <li>S (DatumRange),
          * <li>U (Dataset URI),
