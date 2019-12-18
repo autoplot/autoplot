@@ -17,6 +17,14 @@ public class MigratePreference extends Preferences {
     private final Preferences p1;
     private final Preferences p2;
 
+    /**
+     * create a new where preferences are first read from p1 and if not found 
+     * there the data is read from from p2 (and if not found there then the
+     * default is used.  When writing a preference, a copy is made to both
+     * p1 and p2.
+     * @param p1
+     * @param p2 
+     */
     public MigratePreference( Preferences p1, Preferences p2 ) {
         this.p1= p1;
         this.p2= p2;
