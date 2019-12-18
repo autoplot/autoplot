@@ -261,7 +261,13 @@ public class SimplifyScriptSupport {
                      if ( acceptLine>-1 ) {
                          int thisLine= (o).beginLine;
                          for ( int i=acceptLine; i<=thisLine; i++ ) {
-                             appendToResult(result,ss[i-1]).append("\n");
+                             if ( i<thisLine ) {
+                                 appendToResult(result,ss[i-1]).append("\n");
+                             } else {
+                                 if ( ss[i-1].length()>0 && Character.isWhitespace(ss[i-1].charAt(0) ) ) {
+                                     appendToResult(result,ss[i-1]).append("\n");
+                                 }
+                             }
                          }
                          appendToResult(result,"\n");
                          currentLine= thisLine;
