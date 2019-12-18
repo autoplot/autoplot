@@ -30,7 +30,7 @@ public class MigratePreference extends Preferences {
 
     @Override
     public String get(String key, String def) {
-        return this.p1.get(key, def);
+        return this.p1.get( key, this.p2.get(key, def) );
     }
 
     @Override
@@ -53,7 +53,7 @@ public class MigratePreference extends Preferences {
 
     @Override
     public int getInt(String key, int def) {
-        return this.p1.getInt(key, def);
+        return this.p1.getInt(key, this.p2.getInt( key, def) );
     }
 
     @Override
@@ -64,7 +64,7 @@ public class MigratePreference extends Preferences {
 
     @Override
     public long getLong(String key, long def) {
-        return this.p1.getLong(key, def);
+        return this.p1.getLong(key, this.p2.getLong( key, def) );
     }
 
     @Override
@@ -75,7 +75,7 @@ public class MigratePreference extends Preferences {
 
     @Override
     public boolean getBoolean(String key, boolean def) {
-        return this.p1.getBoolean(key, def);
+        return this.p1.getBoolean(key, this.p2.getBoolean( key, def) );
     }
 
     @Override
@@ -86,7 +86,7 @@ public class MigratePreference extends Preferences {
 
     @Override
     public float getFloat(String key, float def) {
-        return this.p1.getFloat(key, def);
+        return this.p1.getFloat(key, this.p2.getFloat( key, def ) );
     }
 
     @Override
@@ -97,7 +97,7 @@ public class MigratePreference extends Preferences {
 
     @Override
     public double getDouble(String key, double def) {
-        return this.p1.getDouble(key, def);
+        return this.p1.getDouble(key, this.p2.getDouble( key, def) );
     }
 
     @Override
@@ -108,7 +108,7 @@ public class MigratePreference extends Preferences {
 
     @Override
     public byte[] getByteArray(String key, byte[] def) {
-        return this.p1.getByteArray(key, def);
+        return this.p1.getByteArray(key, this.getByteArray( key, def) );
     }
 
     @Override
