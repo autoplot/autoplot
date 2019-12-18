@@ -116,7 +116,7 @@ public class MigratePreference extends Preferences {
 
     @Override
     public byte[] getByteArray(String key, byte[] def) {
-        return this.p1.getByteArray(key, this.getByteArray( key, def) );
+        return this.p1.getByteArray(key, this.p2.getByteArray( key, def) );
     }
 
     @Override
