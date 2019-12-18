@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Image data source used to digitize screen photo of blower door test.  Gimp was used to deskew the image.  Thanks, Green Iowa!
+        <p><small>Bug in LANL Nearest Neighbor fixed, supporting non-monotonic ytags, used to demo colorbars.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,8 @@
         
         <p>Bugfixes (2019-12-16 r24393):</p>
         <ul>
+            <li>LANLNearestNeighbor supports non-monotonic ytags.
+            <li>2228: migrate preference's get wouldn't check the old location for a value, so old prefs like data cache location could be lost.  Thanks, Ivar!
             <li>2227: Jython fixImports never closed input file, relying on OS to implicitly close the file and preventing some operations on Windows.  Thanks, Jim S.!
             <li>rte 1638285244: guard against strange index-out-of-bounds with JTable when digitizing.  Thanks, Ivar!
             <li>2225: new app steals editor panel from old app.  Thanks, Ivar!
@@ -65,6 +67,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>704: add support for boolean Jython parameters (True/False instead of 'T'/'F').
             <li>2223: contours plot has new line style property.
             <li>1801: add wordy but fast implementation of magnitude for rank 2 and rank 3 datasets.
         </ul>
