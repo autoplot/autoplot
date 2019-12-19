@@ -45,11 +45,15 @@ public class CompletionSupport {
     }
     
     private static boolean isContinuation( String possible, String tail ) {
-        int ipos1= 0;
-        while ( ipos1<possible.length() && Character.isWhitespace( possible.charAt(ipos1) ) ) ipos1++;
-        int ipos2= 0;
-        while ( ipos2<tail.length() && Character.isWhitespace( tail.charAt(ipos2) ) ) ipos2++;
-        return ipos1<ipos2;
+        if ( possible.trim().endsWith("\\") ) {
+            return true;
+        } else {
+            int ipos1= 0;
+            while ( ipos1<possible.length() && Character.isWhitespace( possible.charAt(ipos1) ) ) ipos1++;
+            int ipos2= 0;
+            while ( ipos2<tail.length() && Character.isWhitespace( tail.charAt(ipos2) ) ) ipos2++;
+            return ipos1<ipos2;
+        }
     }
     
     /**
@@ -104,7 +108,21 @@ public class CompletionSupport {
             int im1= Utilities.getRowStart( editor, i0-1 );
             String prevLine= editor.getText( im1, i0-im1-1 );
             if ( isContinuation( prevLine, line ) ) { // rfe363: what about second continuation line? 
-                line= prevLine + " " + line; // space is because the newline was removed.
+                logger.finer("carot line is continuation, joining with previous line.");
+                do {                    
+                    im1= Utilities.getRowStart( editor, i0-1 );
+                    String prevLine1= prevLine.trim();
+                    if ( prevLine1.endsWith("\\") ) {
+                        prevLine1= prevLine1.substring(0,prevLine1.length()-1);
+                    }
+                    line= prevLine1 + " " + line; // space is because the newline was removed.
+                    pos= pos - ( prevLine.length() - prevLine1.length() );
+                    int lastLineStart= Utilities.getRowStart( editor, im1-1 );
+                    prevLine= editor.getText( lastLineStart, im1-lastLineStart );
+                    if ( isContinuation( prevLine, line ) ) {
+                        i0= im1;
+                    }
+                } while ( isContinuation( prevLine, line ) );
                 i0= im1;
             }
         }
