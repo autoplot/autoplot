@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2019-12-16 r24393):</p>
         <ul>
+            <li>1687: completions bug where extra line prevented come completions fixed, support third-line completions when continuation is used.
             <li>LANLNearestNeighbor supports non-monotonic ytags.
             <li>2228: migrate preference's get wouldn't check the old location for a value, so old prefs like data cache location could be lost.  Thanks, Ivar!
             <li>2227: Jython fixImports never closed input file, relying on OS to implicitly close the file and preventing some operations on Windows.  Thanks, Jim S.!
