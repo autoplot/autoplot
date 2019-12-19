@@ -77,6 +77,12 @@ public class CompletionSupport {
         return null;
     }
     
+    /**
+     * get the completion context for the editor at the carot position.
+     * @param editor the editor component containing the script and the carot position.
+     * @return the completion context
+     * @throws BadLocationException 
+     */
     public static CompletionContext getCompletionContext( JTextComponent editor ) throws BadLocationException {
         int pos= editor.getCaretPosition();
         int i0= Utilities.getRowStart( editor, pos );
@@ -111,6 +117,7 @@ public class CompletionSupport {
         
         result= getCompletionContext( line, pos, i0, i1, i2 );
         
+        logger.log(Level.FINE, "CompletionContext: {0}", result);
         return result;
     }
     
@@ -383,11 +390,11 @@ public class CompletionSupport {
         
         CompletionContext result= null;
         
-        if ( logger.isLoggable(Level.FINE) ) {
-            logger.log(Level.FINE, "completions finds {0} tokens: ", tokens.size());
+        logger.log(Level.FINE, "completions finds {0} tokens in {1}", new Object[] { tokens.size(), line } );
+        if ( logger.isLoggable(Level.FINER) ) {
             int i=0;
             for ( Token t1: tokens ) {
-                logger.log(Level.FINE, "{0}:\t{1}\t{2}", new Object[]{i++, t1.toString(), grammarConstantLookup.get(t1.kind)});
+                logger.log(Level.FINER, "{0}:\t{1}\t{2}", new Object[]{i++, t1.toString(), grammarConstantLookup.get(t1.kind)});
             }
         }
         
