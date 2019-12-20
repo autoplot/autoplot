@@ -4,6 +4,7 @@ package org.autoplot.servlet;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -35,6 +36,10 @@ import org.autoplot.jythonsupport.ui.Util;
 import org.autoplot.scriptconsole.DumpRteExceptionHandler;
 import org.autoplot.scriptconsole.LoggingOutputStream;
 import org.das2.components.DasProgressPanel;
+import org.das2.datum.Datum;
+import org.das2.datum.TimeParser;
+import org.das2.datum.TimeUtil;
+import org.das2.datum.Units;
 import org.das2.graph.DasCanvas;
 import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
@@ -122,6 +127,26 @@ public class ScriptGUIServlet extends HttpServlet {
         
         if ( request.getParameter("img")!=null ) {
             // now run the script
+            
+            File scriptLogArea= new File( ServletUtil.getServletHome(), "log" );
+            if ( !scriptLogArea.exists() ) {
+                if ( !scriptLogArea.mkdirs() ) {
+                    logger.warning("unable to make log area");
+                }
+            }
+            File scriptLogFile= new File( scriptLogArea, "ScriptGUIServlet.log" );
+            if ( scriptLogFile.exists() ) {
+                try ( PrintWriter w= new PrintWriter( new FileWriter( scriptLogFile, true ) ) ) {
+                    Datum n= TimeUtil.now();
+                    TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
+                    String s= tp.format( n ) + "\t" + scriptURI; 
+                    w.println(s);
+                }
+            } else {
+                try ( PrintWriter w= new PrintWriter( new FileWriter( scriptLogFile ) ) ) {
+                    w.println(scriptURI);
+                }
+            }
             
             org.autoplot.Util.addFonts();
                     
