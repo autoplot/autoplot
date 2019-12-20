@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -19,7 +20,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.SwingUtilities;
 import org.autoplot.ApplicationModel;
+import org.autoplot.BatchMaster;
 import org.autoplot.JythonUtil;
 import org.autoplot.ScriptContext;
 import static org.autoplot.ScriptContext.waitUntilIdle;
@@ -31,6 +34,7 @@ import org.autoplot.jythonsupport.JythonUtil.Param;
 import org.autoplot.jythonsupport.ui.Util;
 import org.autoplot.scriptconsole.DumpRteExceptionHandler;
 import org.autoplot.scriptconsole.LoggingOutputStream;
+import org.das2.components.DasProgressPanel;
 import org.das2.graph.DasCanvas;
 import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
@@ -169,7 +173,10 @@ public class ScriptGUIServlet extends HttpServlet {
         } else {
             response.setContentType("text/html;charset=UTF-8");
         
-            Map<String,Param> parms= Util.getParams( null, script, ssparams, new NullProgressMonitor() );
+            Map<String,Object> env= new HashMap<>();
+            env.put( "PWD", pwd );
+            
+            Map<String,Param> parms= Util.getParams( env, script, ssparams, new NullProgressMonitor() );
         
             try (PrintWriter out = response.getWriter()) {
                 out.println("<!DOCTYPE html>");
@@ -185,20 +192,22 @@ public class ScriptGUIServlet extends HttpServlet {
                 out.println("<form action='ScriptGUIServlet'>");
                 for ( Entry<String,Param> pe: parms.entrySet() ) {
                     Param p= pe.getValue();
+                    p.doc= p.doc.trim();
                     Object currentValue= p.value == null ? p.deft : p.value;
+                    String andDoc= p.doc.length()>0 ? ( ", <em>"+ p.doc +"</em>" ) : "";
                     boolean isCheckBox= p.enums!=null && p.enums.size()==2 && p.enums.contains("T") && p.enums.contains("F");
                     if ( !isCheckBox ) {
-                        out.println(""+p.name +", <em>" + p.doc +"</em><br>");
+                        out.println(""+p.name + andDoc +"<br>");
                     }
                     if ( p.enums!=null ) {
                         if ( isCheckBox ) {
                             if ( "T".equals(currentValue) ) {
-                                out.println("<input type='checkbox' name='"+p.name+"' checked>"+p.name + ", " + p.doc);
+                                out.println("<input type='checkbox' name='"+p.name+"' checked>"+p.name + andDoc );
                             } else if ( "on".equals(currentValue) ) {
-                                out.println("<input type='checkbox' name='"+p.name+"' checked>"+p.name + ", " + p.doc);
+                                out.println("<input type='checkbox' name='"+p.name+"' checked>"+p.name + andDoc );
                                 sparams= sparams.replace(p.name+"=on", p.name+"=T");
                             } else {
-                                out.println("<input type='checkbox' name='"+p.name+"'>"+p.name + ", " + p.doc);
+                                out.println("<input type='checkbox' name='"+p.name+"'>"+p.name + andDoc );
                             }
                         } else {
                             out.println("<select name='"+p.name+"'>");
