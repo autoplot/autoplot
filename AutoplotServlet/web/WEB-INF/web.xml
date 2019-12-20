@@ -51,6 +51,10 @@
         <servlet-name>ScriptGUIServlet</servlet-name>
         <servlet-class>org.autoplot.servlet.ScriptGUIServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ScriptGUIServletPick</servlet-name>
+        <servlet-class>org.autoplot.servlet.ScriptGUIServletPick</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>SimpleServlet</servlet-name>
         <url-pattern>/SimpleServlet</url-pattern>
@@ -94,6 +98,10 @@
     <servlet-mapping>
         <servlet-name>ScriptGUIServlet</servlet-name>
         <url-pattern>/ScriptGUIServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ScriptGUIServletPick</servlet-name>
+        <url-pattern>/ScriptGUIServletPick</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
