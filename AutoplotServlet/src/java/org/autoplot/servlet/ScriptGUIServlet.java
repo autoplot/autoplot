@@ -283,7 +283,7 @@ public class ScriptGUIServlet extends HttpServlet {
             out.println( "</table>");
             out.println( "<hr>" );
             out.println("Running script <a href="+scriptURI+">"+scriptURI+"</a>");
-            out.println("Pick <a href='ScriptGUIServletPick'>another</a>\n");
+            out.println("Pick <a href='ScriptGUIServletPick'>another</a>...\n");
             out.println("</body>");
             out.close();
             

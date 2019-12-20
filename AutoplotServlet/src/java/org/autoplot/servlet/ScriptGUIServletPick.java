@@ -12,7 +12,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,10 +61,15 @@ public class ScriptGUIServletPick extends HttpServlet {
         //String script= request.getParameter("script");
         try (PrintWriter out = response.getWriter()) {
             out.println("<body>");
-            out.println("Recent Scripts:<br>");
+            out.println("Enter script from a whitelisted source, such as https://github.com/autoplot/dev/");
+            out.println("<form action='ScriptGUIServlet'>");
+            out.println("  <input name='script' value='https://github.com/autoplot/dev/blob/master/demos/2019/20190726/demoParams.jy' size='80' type='text'><br>");
+            out.println("  <input type='submit' value='Submit'>");
+            out.println("</form>");
+            out.println("Recent run scripts:<br>");
             File scriptLogFile= getLog();
             if ( scriptLogFile.exists() ) {
-                HashSet<String> scripts= new LinkedHashSet<>();
+                LinkedHashSet<String> scripts= new LinkedHashSet<>();
                 try ( BufferedReader r= new BufferedReader( new FileReader(scriptLogFile) ) ) {
                     String s= r.readLine();
                     while ( s!=null ) {
@@ -75,11 +82,19 @@ public class ScriptGUIServletPick extends HttpServlet {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
                 out.println("<ul>\n");
-                for ( String s: scripts ) {
+                
+                List<String> scriptsList= new ArrayList(scripts);
+                Collections.reverse( scriptsList );
+                
+                int limit=20;
+                int i=0;
+                for ( String s: scriptsList ) {
                     out.print("<li>");
                     out.print("<a href='ScriptGUIServlet?script="+s+"'>");
                     out.print(s);
                     out.println("</li>");
+                    i++;
+                    if ( i==limit ) break;
                 }
                 out.println("</ul>\n");
             }
