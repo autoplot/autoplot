@@ -590,10 +590,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         } );
         editPlotMenu.add(item);
         
-        item= new JMenuItem( new AbstractAction("Insert Plot Elements from Clipboard Plot") {
+        item= new JMenuItem( new AbstractAction("Insert Plot Elements from Clipboard Plot...") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                GuiSupport.pasteClipboardPlotElementsIntoPlot( editPlotMenu, ApplicationController.this, domPlot );
+                GuiSupport.pasteClipboardPlotElementsIntoPlot( plot.getController().getDasPlot(), ApplicationController.this, domPlot );
             }
         } );
         editPlotMenu.add(item);
