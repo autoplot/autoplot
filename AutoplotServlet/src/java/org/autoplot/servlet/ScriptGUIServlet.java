@@ -145,17 +145,12 @@ public class ScriptGUIServlet extends HttpServlet {
             }
         }            
         File scriptLogFile= new File( scriptLogArea, "ScriptGUIServlet.log" );
-        if ( scriptLogFile.exists() ) {
-            try ( PrintWriter w= new PrintWriter( new FileWriter( scriptLogFile, true ) ) ) {
-                Datum n= TimeUtil.now();
-                TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
-                String s= tp.format( n ) + "\t" + scriptURI;
-                w.println(s);
-            }
-        } else {
-            try ( PrintWriter w= new PrintWriter( new FileWriter( scriptLogFile ) ) ) {
-                w.println(scriptURI);
-            }
+        Datum n= TimeUtil.now();
+        TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
+        String s= tp.format( n ) + "\t" + scriptURI;
+
+        try ( PrintWriter w= new PrintWriter( new FileWriter( scriptLogFile, scriptLogFile.exists() ) ) ) {
+            w.println(s);
         }
         
         org.autoplot.Util.addFonts();
