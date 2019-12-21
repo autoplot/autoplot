@@ -3,7 +3,6 @@ package org.autoplot.dom;
 
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
@@ -46,7 +45,6 @@ import org.autoplot.AutoplotUtil;
 import org.autoplot.MouseModuleType;
 import org.autoplot.RenderType;
 import org.autoplot.RenderTypeUtil;
-import org.autoplot.ScriptContext;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
@@ -60,7 +58,7 @@ import org.das2.qds.ops.Ops;
  * and layout changes.
  * @author jbf
  */
-public class PlotController extends DomNodeController {
+public final class PlotController extends DomNodeController {
 
     Application dom;
     Plot plot;
@@ -1865,7 +1863,7 @@ public class PlotController extends DomNodeController {
         final DasPlot p = getDasPlot();
         final DasColorBar cb = getDasColorBar();
         final DasCanvas c= p.getCanvas();
-        p.getDasMouseInputAdapter().setFeedback( null );
+        p.getDasMouseInputAdapter().setFeedback( DasMouseInputAdapter.NULL_FEEDBACK );
         if ( c!=null ) {
             SwingUtilities.invokeLater( new Runnable() {
                 @Override
