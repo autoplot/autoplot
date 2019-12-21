@@ -171,9 +171,6 @@ public final class PropertiesFilePreferences extends AbstractPreferences {
      */
     protected final String getSpi(final String key) {
         loadIfNecessary();
-        if ( key.equals("background") ) {
-            System.err.println("here");
-        }
         return file.get(key);
     }
 
