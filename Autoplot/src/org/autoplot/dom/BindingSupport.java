@@ -248,7 +248,7 @@ public class BindingSupport {
             try {
                 bi.dstSetter.invoke(dst, val);
             } catch ( IllegalArgumentException ex ) {
-                System.err.println("here");
+                logger.info("IllegalArgumentException in bind");
             }
         } catch (IllegalArgumentException ex) {
             String msg= String.format( "failed to bind %s.%s to %s.%s", src, srcProp, dst, dstProp );
