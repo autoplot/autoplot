@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Bug in LANL Nearest Neighbor fixed, supporting non-monotonic ytags, used to demo colorbars.
+        <p><small>PNGWalk Tool used to review previous years' winter screenshots, using http://autoplot.org/jnlp/201*122*/screen.png.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-12-16 r24393):</p>
+        <p>Bugfixes (2019-12-21 r24420):</p>
         <ul>
+            <li>Single-record spectrograms could not be sliced to show the one record.  Improve feedback when no record is found.  Thanks, Ivar!
+            <li>bugfix: 'insert plot elements from clipboard plot' dialog was not centered on app.
+            <li>improve feedback in TimeParser, trivial performance and code clarification.
             <li>1687: completions bug where extra line prevented come completions fixed, support third-line completions when continuation is used.
             <li>LANLNearestNeighbor supports non-monotonic ytags.
             <li>2228: migrate preference's get wouldn't check the old location for a value, so old prefs like data cache location could be lost.  Thanks, Ivar!
