@@ -2286,22 +2286,22 @@ public final class PngWalkTool extends javax.swing.JPanel {
         boolean writeInSitu= base.relativize(f.toURI() ).toString().trim().length()==0;
                     
         try {
-            for ( int i= 0; i<this.seq.size(); i++ ) {
-                monitor.setTaskProgress(i);
-                if ( monitor.isCancelled() ) break;
+            if ( !writeInSitu ) {
+                for ( int i= 0; i<this.seq.size(); i++ ) {
+                    monitor.setTaskProgress(i);
+                    if ( monitor.isCancelled() ) break;
 
-                BufferedImage im= this.seq.imageAt(i).getImage();
-                while ( im==null ) {
-                    try {
-                        Thread.sleep(100);
-                    } catch ( InterruptedException ex ) {
-                        throw new RuntimeException(ex);
+                    BufferedImage im= this.seq.imageAt(i).getImage();
+                    while ( im==null ) {
+                        try {
+                            Thread.sleep(100);
+                        } catch ( InterruptedException ex ) {
+                            throw new RuntimeException(ex);
+                        }
+                        im = this.seq.imageAt(i).getImage();
                     }
-                    im = this.seq.imageAt(i).getImage();
-                }
-                try {
-                    String n;
-                    if ( !writeInSitu ) {
+                    try {
+                        String n;
                         n= base.relativize( this.seq.imageAt(i).getUri() ).getPath();
                         ImageIO.write( im, "png", new File( f, n ) );
                         File qcFile= new File( this.seq.imageAt(i).getUri().getPath() + ".ok" );
@@ -2312,9 +2312,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
                         if ( qcFile.exists() ) {
                             FileUtil.fileCopy( qcFile, new File( f, n+".problem" ) );
                         }
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
                     }
-                } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         } finally {
