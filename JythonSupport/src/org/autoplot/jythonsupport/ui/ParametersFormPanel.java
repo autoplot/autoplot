@@ -66,7 +66,7 @@ public class ParametersFormPanel {
     private static final Logger logger= LoggerManager.getLogger("jython");
 
     private static boolean isBoolean( List<Object> parms ) {
-        return parms.size()==2 && parms.contains("T") && parms.contains("F");
+        return parms.size()==2 && ( parms.contains("T") && parms.contains("F") || parms.contains(0) && parms.contains(1) );
     }
     
     private static JComponent getSpacer() {
@@ -185,6 +185,13 @@ public class ParametersFormPanel {
             String deft= fd.deftsList.get(j);
             char type= fd.typesList.get(j);
 
+            if ( type=='F' ) {
+                if ( value.equals("F") ) {
+                    value="False";
+                } else if (value.equals("T") ) {
+                    value="True";
+                }
+            }
             if ( !value.equals(deft) || params.containsKey(name) || name.equals("timerange") ) {
                 switch (type) {
                     case 'A':
@@ -569,7 +576,7 @@ public class ParametersFormPanel {
                             if ( parm.enums!=null && parm.enums.size()>0 ) {
                                 if ( isBoolean( parm.enums ) ) {
                                     JCheckBox jcb= new JCheckBox( label );
-                                    jcb.setSelected( val.equals("T") );
+                                    jcb.setSelected( val.equals("T") || val.equals("1") || val.equals("True") );
                                     jcb.addActionListener( new ActionListener() {
                                         @Override
                                         public void actionPerformed(ActionEvent e) {
