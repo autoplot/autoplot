@@ -11,7 +11,9 @@ import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.das2.datum.LoggerManager;
 
 /**
  * PropertyChangeSupport implementation that provides debugging information, 
@@ -20,6 +22,8 @@ import java.util.Map.Entry;
  */
 public class DebugPropertyChangeSupport extends PropertyChangeSupport {
 
+    protected static Logger logger= LoggerManager.getLogger("autoplot.dom");
+            
     static long t0= System.currentTimeMillis();
     
     String myBean;
@@ -127,15 +131,17 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
         }
     
     @Override
-    public void firePropertyChange(PropertyChangeEvent event) {
+    public void firePropertyChange(final PropertyChangeEvent event) {
         try {
             super.firePropertyChange(event); 
         } catch ( ConcurrentModificationException ex ) {
             ex.printStackTrace(); // bug1962
         } catch ( NullPointerException ex ) {
-            RuntimeException ex1= new NullPointerException( "NullPointerException with propertyName "+event.getPropertyName()+ ", new value=" + event.getNewValue()+".");
-            ex1.initCause(ex);
-            throw ex1;
+            logger.log(Level.WARNING, "NullPointerException with propertyName {0}, new value={1}.", new Object[]{event.getPropertyName(), event.getNewValue()});
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
+            //RuntimeException ex1= new NullPointerException( "NullPointerException with propertyName "+event.getPropertyName()+ ", new value=" + event.getNewValue()+".");
+            //ex1.initCause(ex);
+            //throw ex1;
         }
     }
 
