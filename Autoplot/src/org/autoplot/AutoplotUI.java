@@ -61,6 +61,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -164,6 +165,7 @@ import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetSelectorSupport;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceFactory;
+import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.HtmlResponseIOException;
 import org.autoplot.datasource.ReferenceCache;
 import org.autoplot.datasource.SourceTypesBrowser;
@@ -4938,6 +4940,8 @@ private void updateFrameTitle() {
             }
         }
         
+        final String[] fargs= args;
+        
         if ( !alm.process(args) ) {
             System.exit( alm.getExitCode() );
         }
@@ -5258,6 +5262,14 @@ APSplash.checkTime("init 230");
                     
                     if ( app!=null ) app.setStatus("running script "+s);
                     
+                    if ( scriptArgs.contains("--help") ) {
+                        try {
+                            printScriptUsage(fargs,s,scriptArgs,System.out);
+                        } catch ( IOException ex ) {
+                            System.err.println("Unable to retrieve script: "+s);
+                        }
+                        System.exit(-1);
+                    }
                     boolean scriptExit= alm.getBooleanValue("scriptExit");
                     Runnable run= getRunScriptRunnable(app, 
                             model, 
@@ -5304,9 +5316,33 @@ APSplash.checkTime("init 240");
                 }
                 
             };
+
         } );
     }
 
+    /**
+     * print a usage document to the print stream.
+     * @param args
+     * @param s
+     * @param scriptArgs
+     * @param out
+     * @throws IOException 
+     */
+    private static void printScriptUsage( String[] args, String s, List<String> scriptArgs, PrintStream out) throws IOException {
+        File f= DataSetURI.getFile(s,new NullProgressMonitor());
+        String script= org.autoplot.jythonsupport.JythonUtil.readScript( new FileReader(f) );
+        List<org.autoplot.jythonsupport.JythonUtil.Param> parms= org.autoplot.jythonsupport.JythonUtil.getGetParams( script );
+        out.println("Usage: " + Util.strjoin( Arrays.asList(args), " " ) + " [args]");
+        for ( org.autoplot.jythonsupport.JythonUtil.Param p: parms ) {
+            String l;
+            l= ""+p.name+"="+p.deft+"\t"+p.doc;
+            if ( p.enums!=null ) {
+                l= l + " (one of: "+ p.enums.toString()+ ")";
+            }
+            out.println( "  "+l );
+        }
+    }
+    
     Icon currentIcon; // the current icon on the status bar
     String currentIconTooltip;  // the current tooltip on the status bar
     
