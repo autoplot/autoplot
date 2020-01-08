@@ -64,6 +64,7 @@ import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
+import org.python.core.PyStringMap;
 import org.python.core.PyTuple;
 
 /**
@@ -379,7 +380,7 @@ public class JythonUtil {
         String vers= "";
         
         // This is the version that Autoplot would like to find, and should be found within the Java class path.
-        double currentVersion= 1.90;  //rfe320 improved getParam support.
+        double currentVersion= 2.00;  //rfe320 improved getParam support.
                 
         if ( ff4.exists() ) {
             try ( BufferedReader r= new BufferedReader( new FileReader( ff4 ) ) ) {
@@ -1172,8 +1173,272 @@ public class JythonUtil {
         return getGetParams( null, readScript(reader),new HashMap<String, String>() );
      }
      
+     public static interface ScriptDescriptor {
+         String getLabel();
+         String getTitle();
+         String getDescription();
+         String getIconURL();
+         List<Param> getParams();
+         //List<Param> getOutputParams();  // this should finally be done as well.
+     }
+     
+     public static ScriptDescriptor EMPTY= new ScriptDescriptor() {
+        @Override
+        public String getLabel() {
+            return null;
+        }
+
+        @Override
+        public String getTitle() {
+            return null;
+        }
+
+        @Override
+        public String getDescription() {
+            return null;
+        }
+
+        @Override
+        public String getIconURL() {
+            return null;
+        }
+
+        @Override
+        public List<Param> getParams() {
+            return new ArrayList<>();
+        }
+    };
+     
      /**
-      * read all the lines of a script into a string
+      * return the script description and arguments.
+      * @param reader
+      * @return
+      * @throws IOException 
+      */
+     public static ScriptDescriptor describeScript( Reader reader ) throws IOException {
+        String script= readScript(reader);
+        return describeScript(script,new HashMap<String,String>());
+     } 
+     
+     /**
+      * return the script description and arguments.
+      * @param script
+      * @param params any operator-defined values.
+      * @return
+      * @throws IOException 
+      */     
+     public static ScriptDescriptor describeScript( String script, Map<String,String>params ) throws IOException {
+        String prog= simplifyScriptToGetParams(script, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
+
+        logger.log(Level.FINER, "Simplified script: {0}", prog);
+        
+        PythonInterpreter interp;
+        try {
+            interp= createInterpreter(true);         
+        } catch ( IOException ex ) {
+            return EMPTY;
+        }
+        
+        interp.set("autoplot2017._scriptLabel","" );
+        interp.set("autoplot2017._scriptTitle","" );
+        interp.set("autoplot2017._scriptDescription","");
+        interp.set("autoplot2017._scriptIcon","");
+        
+        setParams( interp, params );
+                
+        try {
+            prog= JythonRefactory.fixImports(prog,"<J>");
+        } catch (IOException ex) {
+            Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        interp.exec(prog);
+        interp.exec("import autoplot2017 as autoplot\n");
+        PyList sort= (PyList) interp.eval( "autoplot._paramSort" );
+        
+        boolean altWhy= false; // I don't know why things are suddenly showing up in this other space.
+        if ( sort.isEmpty() ) {
+            try {
+                sort= (PyList) interp.eval( "_paramSort" );
+                if ( sort.size()>0 ) {
+                    logger.warning("things are suddenly in the wrong space.  This is because things are incorrectly imported.");
+                    altWhy= true;
+                }
+            } catch ( PyException ex ) {
+                // good...
+            }
+        }
+        
+        final List<Param> result= new ArrayList();
+        for ( int i=0; i<sort.__len__(); i++ ) {
+            String theParamName= (String)sort.get(i);
+            PyList oo= (PyList) interp.eval( "autoplot._paramMap['"+theParamName+"']" );
+            if ( altWhy ) {
+                 oo= (PyList) interp.eval( "_paramMap['"+(String)sort.get(i)+"']" );
+            }
+            Param p= new Param();
+            p.label= (String) sort.get(i);   // should be name in the script
+            if ( p.label.startsWith("__") ) continue;  // __doc__, __main__ symbols defined by Jython.
+            p.name= oo.__getitem__(0).toString(); // name in the URI
+            p.deft= oo.__getitem__(1);
+            p.doc= oo.__getitem__(2).toString();
+            if (  oo.__getitem__(3) instanceof PyList ) {
+                PyList pyList= ((PyList)oo.__getitem__(3));
+                List<Object> enums= new ArrayList(pyList.size());
+                for ( int j=0; j<pyList.size(); j++ ) {
+                    enums.add(j,pyList.get(j));
+                }
+                p.enums= enums;                
+            } else if ( oo.__getitem__(3) instanceof PyDictionary ) {
+                PyDictionary pyDict= ((PyDictionary)oo.__getitem__(3));
+                PyObject enumsObject;
+                if ( pyDict.has_key(new PyString("enum")) ) {
+                    enumsObject= pyDict.pop( new PyString("enum") );
+                } else if ( pyDict.has_key(new PyString("values")) ) {
+                    enumsObject= pyDict.pop( new PyString("values") );
+                } else {
+                    enumsObject= null;
+                }
+                Map<Object,Object> constraints= new HashMap<>();
+                if ( enumsObject!=null && enumsObject instanceof PyList ) {
+                    PyList enumsList= (PyList)enumsObject;
+                    List<Object> enums= new ArrayList(enumsList.size());
+                    for ( int j=0; j<enumsList.size(); j++ ) {
+                        enums.add(j,enumsList.get(j));
+                    }
+                    p.enums= enums;
+                    PyObject labelsObject= pyDict.pop( new PyString("labels") );
+                    if ( labelsObject!=null && labelsObject instanceof PyList ) {
+                        PyList labelsList= (PyList)labelsObject;
+                        List<Object> labels= new ArrayList(labelsList.size());
+                        for ( int j=0; j<labelsList.size(); j++ ) {
+                            labels.add(j,labelsList.get(j));
+                        }
+                        constraints.put( "labels", labels );
+                    }
+                }
+                p.constraints= constraints;
+            }
+            p.value= params==null ? null : params.get(p.name);
+            
+            if ( p.name.equals("resourceUri") ) {
+                p.name= "resourceURI"; //  I will regret allowing for this sloppiness...
+            }
+            switch (p.name) {
+                case "resourceURI":
+                    p.type= 'R';
+                    p.deft= p.deft.toString();
+                    if ( p.value!=null ) p.value= p.value.toString();
+                    break;
+                case "timerange":
+                    p.type= 'T';
+                    p.deft= p.deft.toString();
+                    if ( p.value!=null ) p.value= p.value.toString();
+                    break;
+                default:
+                    if ( p.deft instanceof String ) {
+                        p.type= 'A';
+                        p.deft= p.deft.toString();
+                        if ( p.value!=null ) p.value= p.value.toString();
+                    } else if ( p.deft instanceof PyString ) {
+                        p.type= 'A';
+                        p.deft= p.deft.toString();
+                        if ( p.value!=null ) p.value= p.value.toString();
+                    } else if ( p.deft instanceof PyInteger ) { //TODO: Consider if int types should be preserved.
+                        p.type= 'F';
+                        p.deft= ((PyInteger)p.deft).__tojava__(int.class);
+                        if ( p.value!=null ) {
+                            if ( p.value.equals("False") ) {
+                                p.value= 0;
+                            } else if ( p.value.equals("True") ) {
+                                p.value= 1;
+                            } else {
+                                p.value= Integer.parseInt(p.value.toString());
+                            }
+                        }
+                    } else if ( p.deft instanceof PyFloat ) {
+                        p.type= 'F';
+                        p.deft= ((PyFloat)p.deft).__tojava__(double.class);
+                        if ( p.value!=null ) p.value= Double.parseDouble(p.value.toString());
+                    } else if ( p.deft instanceof PyJavaInstance ) {
+                        Object pp=  ((PyJavaInstance)p.deft).__tojava__( URI.class );
+                        if ( pp==Py.NoConversion ) {
+                            pp=  ((PyJavaInstance)p.deft).__tojava__( Datum.class );
+                            if ( pp==Py.NoConversion ) {
+                                pp=  ((PyJavaInstance)p.deft).__tojava__( DatumRange.class ); 
+                                if ( pp==Py.NoConversion ) {
+                                    pp=  ((PyJavaInstance)p.deft).__tojava__( URL.class ); 
+                                    if ( pp==Py.NoConversion ) {
+                                        pp=  ((PyJavaInstance)p.deft).__tojava__( Color.class ); 
+                                        p.type= 'C';
+                                        p.deft= pp;
+                                    } else {
+                                        p.type= 'L';
+                                        p.deft= pp;
+                                    }
+                                } else {
+                                    p.type= 'S';
+                                    p.deft= pp;
+                                }
+                            } else {
+                                p.type= 'D';
+                                p.deft= pp;                                
+                            }
+                        } else {
+                            p.type= 'U';
+                            p.deft= pp;
+                        }
+                    }   break;
+            }
+            result.add(p);
+        }
+        
+        PyObject po= interp.getLocals();
+        PyStringMap mpo= (PyStringMap)po;
+       
+        interp.eval("params");
+        interp.eval("autoplot.params");
+        
+        final String label= String.valueOf( interp.eval("autoplot._scriptLabel") );
+        final String title= String.valueOf( interp.eval("autoplot._scriptTitle") );
+        final String description= String.valueOf( interp.eval("autoplot._scriptDescription") );
+        final String icon= String.valueOf( interp.eval("autoplot._scriptIcon") );
+        
+        ScriptDescriptor sd= new ScriptDescriptor() {
+            @Override
+            public String getLabel() {
+                return label;
+            }
+
+            @Override
+            public String getTitle() {
+                return title;
+            }
+
+            @Override
+            public String getDescription() {
+                return description;
+            }
+
+            @Override
+            public String getIconURL() {
+                return icon;
+            }
+
+            @Override
+            public List<Param> getParams() {
+                return result;
+            }
+            
+        };
+        
+        return sd;
+         
+     }
+     
+     /**
+      * read all the lines of a script into a string.  The reader will be
+      * closed.
       * @param reader
       * @return
       * @throws IOException 
