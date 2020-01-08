@@ -1468,12 +1468,6 @@ public class JythonUtil {
             result.add(p);
         }
 
-        PyObject po = interp.getLocals();
-        PyStringMap mpo = (PyStringMap) po;
-
-        interp.eval("params");
-        interp.eval("autoplot.params");
-
         final String label = String.valueOf(interp.eval("autoplot._scriptLabel"));
         final String title = String.valueOf(interp.eval("autoplot._scriptTitle"));
         final String description = String.valueOf(interp.eval("autoplot._scriptDescription"));
