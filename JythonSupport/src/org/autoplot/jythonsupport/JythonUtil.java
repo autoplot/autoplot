@@ -1398,7 +1398,15 @@ public class JythonUtil {
                     } else if ( p.deft instanceof PyInteger ) { //TODO: Consider if int types should be preserved.
                         p.type= 'F';
                         p.deft= ((PyInteger)p.deft).__tojava__(int.class);
-                        if ( p.value!=null ) p.value= Integer.parseInt(p.value.toString());
+                        if ( p.value!=null ) {
+                            if ( p.value.equals("False") ) {
+                                p.value= 0;
+                            } else if ( p.value.equals("True") ) {
+                                p.value= 1;
+                            } else {
+                                p.value= Integer.parseInt(p.value.toString());
+                            }
+                        }
                     } else if ( p.deft instanceof PyFloat ) {
                         p.type= 'F';
                         p.deft= ((PyFloat)p.deft).__tojava__(double.class);
