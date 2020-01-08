@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 //import java.util.NoSuchElementException;  <-- important one to remember
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -76,8 +77,9 @@ public abstract class AbstractDirNode extends AbstractNode implements DasDirNode
 		if(parent != null) sPath = parent.childPath(this);
 		if(sSep != null) sPath += sSep;
 		
-		for(String sId: dSubNodes.keySet()){
-			DasNode node = dSubNodes.get(sId);
+		for( Entry<String,AbstractNode> nId: dSubNodes.entrySet() ){
+			String sId= nId.getKey();
+			DasNode node = nId.getValue();
 			if(node == child){
 				sPath += sId;
 				return sPath;
