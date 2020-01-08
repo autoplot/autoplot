@@ -132,7 +132,7 @@ public class FedCatSourceFactory extends AbstractDataSourceFactory
 		
 		String sUrl = cc.surl;
 		URISplit split = URISplit.parse(sUrl);
-		Map<String,String> dParams = URISplit.parseParams(split.params);
+		//Map<String,String> dParams = URISplit.parseParams(split.params);
 		
 		//FIXME: Go into filesystem completions if URL starts with a common
 		//       filesystem type, such as https://, file://, etc.
