@@ -1091,8 +1091,8 @@ public final class AutoplotUI extends javax.swing.JFrame {
         this.addComponentListener( new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
-                int w= AutoplotUI.this.getWidth();
-                int h= AutoplotUI.this.getHeight();
+                //int w= AutoplotUI.this.getWidth();
+                //int h= AutoplotUI.this.getHeight();
                 //if ( w<430 && h>800 ) {
                 //    System.err.println("here stop dimensions");
                 //}
