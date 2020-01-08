@@ -467,7 +467,6 @@ public abstract class QDataSetBridge {
      */
     private UnitsConverter maybeGetConverter( QDataSet ds1 ) {
         Units u= SemanticOps.getUnits(ds1);
-        UnitsConverter uc= UnitsConverter.IDENTITY;
         if ( prefUnits!=null ) {
             Units u1= getUnitFor( ds1 );
             if ( debug ) {
