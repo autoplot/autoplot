@@ -163,6 +163,7 @@ public class NodeFactory
 			Document doc;
 			try{
 				doc = XmlUtil.getXmlDoc(sData);
+				LOGGER.log(Level.FINE, "parsed doc successfully: {0}", doc);
 			} catch(SAXException | ParserConfigurationException ex){
 				ParseException pe = new ParseException(
 					"Error reading "+sUrl+": "+ex.getMessage(), -1
