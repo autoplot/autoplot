@@ -22,7 +22,7 @@ import org.das2.datum.LoggerManager;
  */
 public class DebugPropertyChangeSupport extends PropertyChangeSupport {
 
-    protected static Logger logger= LoggerManager.getLogger("autoplot.dom");
+    protected static final Logger logger= LoggerManager.getLogger("autoplot.dom");
             
     static long t0= System.currentTimeMillis();
     
