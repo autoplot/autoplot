@@ -5342,7 +5342,13 @@ APSplash.checkTime("init 240");
         out.println("Usage: <AUTOPLOT>" + Util.strjoin( Arrays.asList(args), " " ) + " [args]");
         for ( org.autoplot.jythonsupport.JythonUtil.Param p: sd.getParams() ) {
             String l;
-            l= ""+p.name+"="+p.deft+"\t"+p.doc;
+            Object deft;
+            if ( p.deft.toString().trim().contains(" ") ) {
+                deft= "'"+p.deft+"'";
+            } else {
+                deft= p.deft;
+            }
+            l= ""+p.name+"="+deft+"\t"+p.doc;
             if ( p.enums!=null ) {
                 l= l + " (one of: "+ p.enums.toString()+ ")";
             }
