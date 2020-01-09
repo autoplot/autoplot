@@ -5331,9 +5331,16 @@ APSplash.checkTime("init 240");
     private static void printScriptUsage( String[] args, String s, List<String> scriptArgs, PrintStream out) throws IOException {
         File f= DataSetURI.getFile(s,new NullProgressMonitor());
         String script= org.autoplot.jythonsupport.JythonUtil.readScript( new FileReader(f) );
-        List<org.autoplot.jythonsupport.JythonUtil.Param> parms= org.autoplot.jythonsupport.JythonUtil.getGetParams( script );
-        out.println("Usage: " + Util.strjoin( Arrays.asList(args), " " ) + " [args]");
-        for ( org.autoplot.jythonsupport.JythonUtil.Param p: parms ) {
+        //List<org.autoplot.jythonsupport.JythonUtil.Param> parms= org.autoplot.jythonsupport.JythonUtil.getGetParams( script );
+        org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor sd= org.autoplot.jythonsupport.JythonUtil.describeScript(script,null);
+        if ( sd.getTitle().length()>0 ) {
+            out.println( sd.getTitle() );
+        }
+        if ( sd.getDescription().length()>0 ) {
+            out.println( sd.getDescription() );
+        }
+        out.println("Usage: <AUTOPLOT>" + Util.strjoin( Arrays.asList(args), " " ) + " [args]");
+        for ( org.autoplot.jythonsupport.JythonUtil.Param p: sd.getParams() ) {
             String l;
             l= ""+p.name+"="+p.deft+"\t"+p.doc;
             if ( p.enums!=null ) {
