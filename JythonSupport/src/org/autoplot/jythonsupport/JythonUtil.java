@@ -1245,22 +1245,22 @@ public class JythonUtil {
     public static ScriptDescriptor EMPTY = new ScriptDescriptor() {
         @Override
         public String getLabel() {
-            return null;
+            return "";
         }
 
         @Override
         public String getTitle() {
-            return null;
+            return "";
         }
 
         @Override
         public String getDescription() {
-            return null;
+            return "";
         }
 
         @Override
         public String getIconURL() {
-            return null;
+            return "";
         }
 
         @Override
@@ -1268,6 +1268,36 @@ public class JythonUtil {
             return new ArrayList<>();
         }
     };
+    
+    public static ScriptDescriptor errorScriptDescriptor( final PySyntaxError ex ) {
+        return new ScriptDescriptor() {
+            @Override
+            public String getLabel() {
+                return "ERROR";
+            }
+
+            @Override
+            public String getTitle() {
+                return "PySyntaxError";
+            }
+
+            @Override
+            public String getDescription() {
+                return ex.traceback.dumpStack();
+            }
+
+            @Override
+            public String getIconURL() {
+                return "";
+            }
+
+            @Override
+            public List<Param> getParams() {
+                return Collections.emptyList();
+            }
+            
+        };
+    }
 
     /**
      * return the script description and arguments.
@@ -1290,7 +1320,12 @@ public class JythonUtil {
      * @throws IOException
      */
     public static ScriptDescriptor describeScript(String script, Map<String, String> params) throws IOException {
-        String prog = simplifyScriptToGetParams(script, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
+        String prog;
+        try {
+            prog= simplifyScriptToGetParams(script, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
+        } catch ( PySyntaxError ex ) {
+            return errorScriptDescriptor(ex);
+        }
 
         logger.log(Level.FINER, "Simplified script: {0}", prog);
 
@@ -1306,7 +1341,9 @@ public class JythonUtil {
         interp.set("autoplot2017._scriptDescription", "");
         interp.set("autoplot2017._scriptIcon", "");
 
-        setParams(interp, params);
+        if ( params!=null ) {
+            setParams(interp, params);
+        }
 
         try {
             prog = JythonRefactory.fixImports(prog, "<J>");
