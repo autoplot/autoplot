@@ -1242,7 +1242,7 @@ public class JythonUtil {
         //List<Param> getOutputParams();  // this should finally be done as well.
     }
 
-    public static ScriptDescriptor EMPTY = new ScriptDescriptor() {
+    public static final ScriptDescriptor EMPTY = new ScriptDescriptor() {
         @Override
         public String getLabel() {
             return "";
