@@ -289,8 +289,8 @@ public class WalkImage  {
         BufferedImage bimg = new BufferedImage( neww, newh, img.getType() );
         Graphics2D g = bimg.createGraphics();
 
-        g.translate((neww-w)/2, (newh-h)/2);
-        g.rotate(Math.toRadians(angle), w/2, h/2);
+        g.translate((neww-w)/2., (newh-h)/2.);
+        g.rotate(Math.toRadians(angle), w/2., h/2.);
         g.drawRenderedImage( img, null );
         g.dispose();  
         return bimg;
