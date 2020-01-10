@@ -40,6 +40,7 @@ import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.LogNames;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.jythonsupport.JythonUtil;
+import org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor;
 import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel.FormData;
@@ -97,19 +98,6 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         });
     }
     
-    private void redoVariables() {
-        paramsPanel.removeAll();
-        Map<String, String> params = getParamsFromGui();
-        try {
-            if ( doDocumentation(file) ) {
-                paramsPanel.add( new JLabel("<html><br></html>") );
-            }
-            doVariables( file, params );
-            paramsPanel.revalidate();
-        } catch ( PyException ex ) {
-            JOptionPane.showMessageDialog(this,"<html>Error:<br>"+ex);   
-        }
-    }
             
     /** This method is called from within the constructor to
      * initialize the form.
@@ -241,7 +229,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
      * @param f
      * @return true if some documentation was found.
      */
-    private boolean doDocumentation( File f ) {
+    private boolean doDocumentation( Map<String,Object> env, File f) {
         BufferedReader reader=null;
         boolean hasDoc= false;
         try {
@@ -303,7 +291,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
      * @param params
      * @return 
      */
-    private boolean doVariables( File f, Map<String,String> params ) throws PyException {
+    private boolean doVariables( Map<String,Object> env, File f, Map<String,String> params ) throws PyException {
 
         boolean hasVars= false;
         
@@ -315,7 +303,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             
             //paramsPanel.add( new JLabel("<html>This script has the following input parameters.  Buttons on the right show default values.<br><br></html>") );
 
-            FormData fd= p.doVariables( src, params, paramsPanel );
+            FormData fd= p.doVariables( env, src, params, paramsPanel );
             
             hasVars= fd.count>0;
             parametersFormPanel= p;
@@ -410,7 +398,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 variableComboBox.setSelectedIndex(0);
             }
 
-            if ( doDocumentation(f) ) {
+            Map<String,Object> env= Collections.singletonMap( "PWD", (Object)split.path );
+            if ( doDocumentation( env, f) ) {
                 paramsPanel.add( new JLabel("<html><br></html>") );
             }
 
@@ -425,7 +414,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             }
 
             try {
-                hasVariables= doVariables( f,ffparams );
+                hasVariables= doVariables( env, f, ffparams );
             } catch ( PyException e ) {
                 hasVariables= false;
                 try {
