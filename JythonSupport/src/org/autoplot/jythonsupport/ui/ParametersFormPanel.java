@@ -49,6 +49,7 @@ import static org.autoplot.jythonsupport.ui.Util.getParams;
 import org.das2.util.ColorUtil;
 import java.awt.Color;
 import javax.swing.JColorChooser;
+import org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor;
 
 /**
  * GUI component for controlling script parameters.  
@@ -304,13 +305,25 @@ public class ParametersFormPanel {
         paramsPanel.setLayout(new javax.swing.BoxLayout(paramsPanel, javax.swing.BoxLayout.Y_AXIS));
         
         try {
-            Map<String,Param> parms= getParams( env, src, this.params, new NullProgressMonitor() );
+            ScriptDescriptor sd= JythonUtil.describeScript( env, src, params );
+            List<Param> parms= sd.getParams(); //getParams( env, src, this.params, new NullProgressMonitor() );
 
-            paramsPanel.add( new JLabel("<html>This script has the following input parameters.  Buttons on the right show default values.<br><br></html>") );
+            boolean hasMeta= false;
+            if ( sd.getTitle().length()>0 ) {
+                paramsPanel.add( new JLabel("<html><H2>"+sd.getTitle()+"</H2></html>") );
+                hasMeta= true;
+            }
+            if ( sd.getDescription().length()>0 ) {
+                paramsPanel.add( new JLabel("<html>"+sd.getDescription()+"</html>") );
+                hasMeta= true;
+            }
+            if ( !hasMeta ) {
+                paramsPanel.add( new JLabel("<html>This script has the following input parameters.  Buttons on the right show default values.<br><br></html>") );
+            } else {
+                paramsPanel.add( new JLabel("<html><br><br></html>") );  
+            } 
 
-            for ( Map.Entry<String,JythonUtil.Param> e: parms.entrySet() ) {
-                //String s= e.getKey();
-                JythonUtil.Param parm= e.getValue();
+            for ( JythonUtil.Param parm : parms ) {
                 
                 String vname= parm.name;                
                 String label;
