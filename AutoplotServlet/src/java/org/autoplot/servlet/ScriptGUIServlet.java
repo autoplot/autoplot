@@ -203,7 +203,8 @@ public class ScriptGUIServlet extends HttpServlet {
         Map<String,Object> env= new HashMap<>();
         env.put( "PWD", pwd );
         
-        Map<String,Param> parms= Util.getParams( env, script, ssparams, new NullProgressMonitor() );
+        org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor sd= 
+            org.autoplot.jythonsupport.JythonUtil.describeScript( env, script, ssparams );
         
         try (PrintWriter out = response.getWriter()) {
             out.println("<!DOCTYPE html>");
@@ -212,12 +213,18 @@ public class ScriptGUIServlet extends HttpServlet {
             out.println("<title>"+name+"</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ScriptGUIServlet at " + request.getContextPath() + "</h1>");
+            if ( sd.getTitle().length()>0 ) {
+                out.println("<h1>"+sd.getTitle()+"</h1>");
+                if ( sd.getDescription().length()>0 ) {
+                    out.println("<p>"+sd.getDescription() +"</p>");
+                }
+            } else {
+                out.println("<h1>Servlet ScriptGUIServlet at " + request.getContextPath() + "</h1>");
+            }
             out.println("<table><tr>");
             out.println("<td valign='top'>");
             out.println("<form action='ScriptGUIServlet'>");
-            for ( Entry<String,Param> pe: parms.entrySet() ) {
-                Param p= pe.getValue();
+            for ( Param p: sd.getParams() ) {
                 p.doc= p.doc.trim();
                 Object currentValue= p.value == null ? p.deft : p.value;
                 String andDoc= p.doc.length()>0 ? ( ", <em>"+ p.doc +"</em>" ) : "";
@@ -260,7 +267,7 @@ public class ScriptGUIServlet extends HttpServlet {
                 }
                 out.println("<br><br>");
             }
-            if ( parms.isEmpty() ) {
+            if ( sd.getParams().isEmpty() ) {
                 out.println("script has no parameters.");
             }
             out.println("<input type='hidden' name='script' value='"+scriptURI+"'>");
