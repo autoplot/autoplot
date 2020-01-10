@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>PNGWalk Tool used to review previous years' winter screenshots, using http://autoplot.org/jnlp/201*122*/screen.png.  Happy Winter!
+        <p><small><a href="https://jfaden.net/git/jbfaden/public/blob/master/u/jeremy/2020/20200105/parsePluggedInGraphic.jyds">Script</a> for unplotting screenshots of the monitoring app from a power company is used to get digital data when no export option is available.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2019-12-21 r24420):</p>
+        <p>Bugfixes (2020-01-10 r24445):</p>
         <ul>
+            <li>round of findbugs cleanup.
+            <li>occasional NullPointerException when loading particular .vap files, caused by beans binding, is handled.  Thanks, Kris!
+            <li>clean up of warnings issued to stderr unnecessarily with magnitude function.
             <li>Single-record spectrograms could not be sliced to show the one record.  Improve feedback when no record is found.  Thanks, Ivar!
             <li>bugfix: 'insert plot elements from clipboard plot' dialog was not centered on app.
             <li>improve feedback in TimeParser, trivial performance and code clarification.
@@ -71,6 +74,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>704: autoplot --script ... --help will print the script's arguments.
             <li>704: add support for boolean Jython parameters (True/False instead of 'T'/'F').
             <li>2223: contours plot has new line style property.
             <li>1801: add wordy but fast implementation of magnitude for rank 2 and rank 3 datasets.
