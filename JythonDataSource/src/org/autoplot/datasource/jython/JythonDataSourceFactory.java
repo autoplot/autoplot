@@ -117,7 +117,12 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
         try (FileReader reader = new FileReader(src)) {
             String script= JythonUtil.readScript( new BufferedReader( reader ) );
-            List<JythonUtil.Param> r2= JythonUtil.getGetParams( script, current );
+            
+            URISplit split= URISplit.parse(suri);
+            Map<String,Object> env= new HashMap<>();
+            env.put( "PWD", split.path );
+            
+            List<JythonUtil.Param> r2= JythonUtil.getGetParams( env, script, current );
 
             Map<String,JythonUtil.Param> result= new LinkedHashMap();
 
