@@ -1228,17 +1228,42 @@ public class JythonUtil {
         return getGetParams(null, readScript(reader), new HashMap<String, String>());
     }
 
+    /**
+     * Object containing a description of a script, containing its parameters
+     * and title describing it.
+     */
     public static interface ScriptDescriptor {
 
+        /**
+         * a short label, suitable for a menu item.
+         * @return a short label, suitable for a menu item.
+         */
         String getLabel();
 
+        /**
+         * a one-line title, suitable for a GUI heading.
+         * @return a one-line title, suitable for a GUI heading.
+         */
         String getTitle();
 
+        /**
+         * sentence or paragraph documenting the script.
+         * @return 
+         */
         String getDescription();
 
+        /**
+         * the web address of an icon for the script.
+         * @return 
+         */
         String getIconURL();
 
+        /**
+         * the list of the script parameters, containing the type and default values.
+         * @return 
+         */
         List<Param> getParams();
+        
         //List<Param> getOutputParams();  // this should finally be done as well.
     }
 
@@ -1302,24 +1327,24 @@ public class JythonUtil {
     /**
      * return the script description and arguments.
      *
-     * @param reader
-     * @return
-     * @throws IOException
-     */
-    public static ScriptDescriptor describeScript(Reader reader) throws IOException {
-        String script = readScript(reader);
-        return describeScript(script, new HashMap<String, String>());
-    }
-
-    /**
-     * return the script description and arguments.
-     *
-     * @param script
+     * @param script the script Jython code.
      * @param params any operator-defined values.
      * @return
      * @throws IOException
      */
     public static ScriptDescriptor describeScript(String script, Map<String, String> params) throws IOException {
+        return describeScript( null, script, params );
+    }
+    
+    /**
+     * return the script description and arguments.
+     * @param env the environment, containing PWD and maybe DOM.
+     * @param script the script Jython code.
+     * @param params any operator-defined values.
+     * @return a description of the script parameters and metadata.
+     * @throws IOException
+     */
+    public static ScriptDescriptor describeScript( Map<String,Object> env, String script, Map<String, String> params) throws IOException {        
         String prog;
         try {
             prog= simplifyScriptToGetParams(script, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
@@ -1333,9 +1358,27 @@ public class JythonUtil {
         try {
             interp = createInterpreter(true);
         } catch (IOException ex) {
+            logger.log( Level.WARNING, ex.getMessage(), ex );
             return EMPTY;
         }
 
+        if (env != null) {
+            for (Entry<String, Object> ent : env.entrySet()) {
+                if (ent.getKey() == null) {
+                    logger.log(Level.WARNING, "parameter name was null");
+                } else if (ent.getValue() == null) {
+                    if (ent.getKey().equals("dom")) {
+                        logger.log(Level.FINE, "parameter \"dom\" value was set to null");  // Some scripts don't use dom.
+                    } else {
+                        logger.log(Level.WARNING, "parameter value was null");
+                    }
+                } else {
+                    logger.log(Level.FINER, "setting env {0} to {1}", new Object[]{ent.getKey(), ent.getValue()});
+                    interp.set(ent.getKey(), ent.getValue());
+                }
+            }
+        }
+        
         interp.set("autoplot2017._scriptLabel", "");
         interp.set("autoplot2017._scriptTitle", "");
         interp.set("autoplot2017._scriptDescription", "");
@@ -1507,8 +1550,9 @@ public class JythonUtil {
 
         final String label = String.valueOf(interp.eval("autoplot._scriptLabel"));
         final String title = String.valueOf(interp.eval("autoplot._scriptTitle"));
-        final String description = String.valueOf(interp.eval("autoplot._scriptDescription"));
-        final String icon = String.valueOf(interp.eval("autoplot._scriptIcon"));
+        final String description = 
+                             String.valueOf(interp.eval("autoplot._scriptDescription"));
+        final String icon =  String.valueOf(interp.eval("autoplot._scriptIcon"));
 
         ScriptDescriptor sd = new ScriptDescriptor() {
             @Override
@@ -1640,12 +1684,13 @@ public class JythonUtil {
      * note "arg_0" "arg_1" are used to refer to positional (unnamed)
      * parameters.
      *
-     * @param env any values which may be defined already, such as "dom" and
-     * "monitor"
+     * @param env any values which may be defined already, such as "dom" and "PWD"
      * @param script any jython script.
      * @param params user-specified values or null.
      * @return a list of parameters.
      * @throws PyException
+     * @deprecated use #desc
+     * @see #describeScript(java.util.Map, java.lang.String, java.util.Map) 
      */
     public static List<Param> getGetParams(Map<String, Object> env, String script, Map<String, String> params) throws PyException {
         String prog = simplifyScriptToGetParams(script, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
