@@ -269,6 +269,7 @@ public class ScriptGUIServlet extends HttpServlet {
             }
             if ( sd.getParams().isEmpty() ) {
                 out.println("script has no parameters.");
+                out.println("<br><br>");
             }
             out.println("<input type='hidden' name='script' value='"+scriptURI+"'>");
             out.println("<input type='submit' value='Submit'>");
