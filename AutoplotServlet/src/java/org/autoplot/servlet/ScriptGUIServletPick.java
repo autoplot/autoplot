@@ -8,15 +8,11 @@ package org.autoplot.servlet;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,9 +20,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.das2.datum.Datum;
-import org.das2.datum.TimeParser;
-import org.das2.datum.TimeUtil;
 
 /**
  *
@@ -66,7 +59,7 @@ public class ScriptGUIServletPick extends HttpServlet {
             out.println("  <input name='script' value='https://github.com/autoplot/dev/blob/master/demos/2019/20190726/demoParams.jy' size='80' type='text'><br>");
             out.println("  <input type='submit' value='Submit'>");
             out.println("</form>");
-            out.println("Recent run scripts:<br>");
+            out.println("Recently run scripts:<br>");
             File scriptLogFile= getLog();
             if ( scriptLogFile.exists() ) {
                 LinkedHashSet<String> scripts= new LinkedHashSet<>();
