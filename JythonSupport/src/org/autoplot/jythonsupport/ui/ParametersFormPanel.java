@@ -314,7 +314,7 @@ public class ParametersFormPanel {
                 hasMeta= true;
             }
             if ( sd.getDescription().length()>0 ) {
-                paramsPanel.add( new JLabel("<html>"+sd.getDescription()+"</html>") );
+                paramsPanel.add( new JLabel("<html><div width=600>"+sd.getDescription()+"</div></html>") );
                 hasMeta= true;
             }
             if ( !hasMeta ) {
