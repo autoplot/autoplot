@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small><a href="https://jfaden.net/git/jbfaden/public/blob/master/u/jeremy/2020/20200105/parsePluggedInGraphic.jyds">Script</a> for unplotting screenshots of the monitoring app from a power company is used to get digital data when no export option is available.
+        <p><small><a href="https://jfaden.net/git/jbfaden/public/blob/master/u/jeremy/2020/20200105/parsePluggedInGraphic.jyds">Script</a> for "unplotting" screenshots of the power company monitoring app is used to get digital data when no export option is available.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,7 +28,7 @@
         
         <p>Bugfixes (2020-01-10 r24445):</p>
         <ul>
-            <li>new SHADE error bar mode didn't consider case where first point was fill.  Thanks, Masafumi!
+            <li>new SHADE error bar mode didn't consider case where first point was not valid.  Thanks, Masafumi!
             <li>round of findbugs cleanup.
             <li>occasional NullPointerException when loading particular .vap files, caused by beans binding, is handled.  Thanks, Kris!
             <li>clean up of warnings issued to stderr unnecessarily with magnitude function.
