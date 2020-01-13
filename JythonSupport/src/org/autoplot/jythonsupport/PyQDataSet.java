@@ -645,9 +645,9 @@ public class PyQDataSet extends PyJavaInstance {
                 if ( betterBeAllLists && !allLists ) {
                     throw new IllegalArgumentException("index error, because all indeces must be lists.");
                 }
-                
+                    
                 ArrayDataSet result;
-                if ( allLists ) {
+                if ( allLists && lists.length == rods.rank() ) {
                     lists = checkIndexBundle( lists );
                     result= getItemAllLists( lists );
                     
@@ -1415,7 +1415,7 @@ public class PyQDataSet extends PyJavaInstance {
             lists[0]= ll[0];
             lists[i]= ll[1];
         }
-
+        
         ArrayDataSet result;
         switch (lists[0].rank()) {
             case 0:
