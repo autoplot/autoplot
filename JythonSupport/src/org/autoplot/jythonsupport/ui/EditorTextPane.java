@@ -67,6 +67,9 @@ import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.DataSourceEditorPanelUtil;
+import org.autoplot.datasource.DataSourceFormatEditorPanel;
+import org.autoplot.datasource.DataSourceRegistry;
+import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.PyQDataSet;
@@ -381,6 +384,43 @@ public class EditorTextPane extends JEditorPane {
     public EditorAnnotationsSupport getEditorAnnotationsSupport() {
         return support;
     }
+    
+    /**
+     * kludge in a branch for where "inspect URI" is entered for a formatDataSet
+     * command.
+     * @param lineStart
+     * @param line
+     * @param suri 
+     */
+    private void doInspectURIFormat( int lineStart, String line, String suri ) {
+                    
+        int uri0= line.indexOf(suri);
+        int uri1= uri0 + suri.length();
+            
+        JPanel parent= new JPanel();
+        parent.setLayout( new BorderLayout() );
+        URISplit split= URISplit.parse(suri);
+        suri= URISplit.format(split);
+        
+        int i= suri.indexOf('?');
+        String ss;
+        if ( i>-1 ){
+            ss= suri.substring(0,i);
+        } else {
+            ss= suri;
+        }
+        Object oeditorPanel= DataSourceRegistry.getInstance().getDataSourceFormatEditorByExt(ss);
+        DataSourceFormatEditorPanel editorPanel= (DataSourceFormatEditorPanel)DataSourceRegistry.getInstanceFromClassName( (String)oeditorPanel );
+        editorPanel.setURI(suri);
+        parent.add(editorPanel.getPanel());
+        Icon icon= new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/fileMag.png") );
+        if ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( this, parent, "Editing URI", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon ) ) {
+            String newUri= editorPanel.getURI();
+            this.setSelectionStart(lineStart+uri0);
+            this.setSelectionEnd(lineStart+uri1);
+            this.replaceSelection(newUri);
+        }    
+    }
 
     protected void inspectURI( ) {
         try {
@@ -397,6 +437,16 @@ public class EditorTextPane extends JEditorPane {
             i2= pos;
             i1= i1- i0;
             i0= 0;
+            
+            if ( line.trim().startsWith("formatDataSet") ) {
+                int i3= line.lastIndexOf("'",pos);
+                if ( i3>-1 ) i3= i3+1;
+                int i4= line.indexOf("'",i3);
+                if ( i4==-1 ) i4= line.length();
+                String s= line.substring(i3,i4);
+                doInspectURIFormat(lineStart,line,s);
+                return;
+            }
         
             CompletionContext cc= CompletionSupport.getCompletionContext( line, pos, i0, i1, i2 );
             if ( cc==null ) {
