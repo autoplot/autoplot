@@ -1,1 +1,0 @@
-javac -d ../classes -cp ../classes -source 1.4 -target 1.4 *.java
