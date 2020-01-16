@@ -39,7 +39,7 @@ public class JavadocLookup {
         return instance;
     }
     
-    private final LinkedHashMap<String,String> lookups= new LinkedHashMap<String,String>();
+    private final LinkedHashMap<String,String> lookups= new LinkedHashMap<>();
     
     /**
      * return a link to the documentation for a java signature.  For standard library
