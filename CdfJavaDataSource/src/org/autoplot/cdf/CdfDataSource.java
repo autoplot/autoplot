@@ -492,8 +492,7 @@ public class CdfDataSource extends AbstractDataSource {
             if ( attr1.get("COMPONENT_3")!=null ) args.add( loadVariableAndDependents( cdf, (String)attr1.get("COMPONENT_3"), constraint, false, true, null, -1, mon.getSubtaskMonitor("c3") ) );
             if ( attr1.get("COMPONENT_4")!=null ) args.add( loadVariableAndDependents( cdf, (String)attr1.get("COMPONENT_4"), constraint, false, true, null, -1, mon.getSubtaskMonitor("c4") ) );
             try {
-                Map<String,Object> qmetadata= new IstpMetadataModel().properties(attr1);
-                result= (MutablePropertyDataSet) CdfVirtualVars.execute( qmetadata, function, args, mon.getSubtaskMonitor("virtual variable") );
+                result= (MutablePropertyDataSet) CdfVirtualVars.execute( attr1, function, args, mon.getSubtaskMonitor("virtual variable") );
             } catch ( IllegalArgumentException ex ) {
                 throw ex;
             }

@@ -31,12 +31,13 @@ public class CdfVirtualVars {
     /**
      * Implementations of CDF virtual functions.  These are a subset of those in the CDAWeb library, plus a couple
      * extra that they will presumably add to the library at some point.
-     * @param metadata the metadata for the new result dataset, in QDataSet semantics such as FILL_VALUE=-1e31
+     * @param metadata the metadata for the new result dataset, CDF semantics such as FILLVAL=-1e31
      * @param function the function name, which is case insensitive.  See code isSupported for list of function names.
      * @param args list of QDataSets that are the arguments to the function
      * @param mon monitor for the function
      * @see #isSupported(java.lang.String) 
      * @return the computed variable.
+     * @see https://spdf.gsfc.nasa.gov/istp_guide/vattributes.html
      */
     public static QDataSet execute( Map<String,Object> metadata, String function, List<QDataSet> args, ProgressMonitor mon ) throws IllegalArgumentException {
         logger.log(Level.FINE, "implement virtual variable \"{0}\"", function);
@@ -104,7 +105,7 @@ public class CdfVirtualVars {
             //return args.get(0);
             ArrayDataSet real_data = ArrayDataSet.copy( args.get(0) );
             QDataSet region_data = args.get(1);
-            Number fill= (Number) metadata.get(QDataSet.FILL_VALUE);
+            Number fill= (Number) metadata.get("FILLVAL");
             if ( fill==null ) fill= Double.NaN;
             for ( int i=0; i<real_data.length(); i++ ) {
                 if ( region_data.value(i) != 1 ) { // 1=solar wind
@@ -152,7 +153,7 @@ public class CdfVirtualVars {
         } else if ( function.equalsIgnoreCase("apply_esa_qflag") ) {
             ArrayDataSet esa_data= ArrayDataSet.copy(args.get(0));
             QDataSet quality_data= args.get(1);
-            Number fill= (Number) metadata.get(QDataSet.FILL_VALUE);
+            Number fill= (Number) metadata.get("FILLVAL");
             if ( fill==null ) fill= Double.NaN;
             double dfill= fill.doubleValue();
             int n= DataSetUtil.product(DataSetUtil.qubeDims(esa_data.slice(0)));
@@ -198,6 +199,34 @@ public class CdfVirtualVars {
                 }
             }
             return esa_data;
+        } else if ( function.equalsIgnoreCase("arr_slice") ) {
+            //TODO: how is the index communicated?
+            QDataSet sliceable= args.get(0);
+            Map<String,Object> m= metadata;
+            if ( m==null ) {
+                throw new IllegalArgumentException("unable to implement because metadata is needed");
+            } else {
+                Object oi= m.get("ARR_INDEX");
+                Object od= m.get("ARR_DIM");
+                QDataSet result;
+                if ( od instanceof Number ) {
+                    int i= ((Number)od).intValue();
+                    switch ( i ) {
+                        case 1:
+                            result= Ops.slice2(sliceable,((Number)oi).intValue());
+                            break;
+                        case 2:
+                            result= Ops.slice3(sliceable,((Number)oi).intValue());
+                            break;
+                        default:
+                            throw new IllegalArgumentException("not supported slice dimension");
+                    }
+                } else {
+                    throw new IllegalArgumentException("ARR_DIM property in metadata should be a number");
+                }
+                return result;
+            }
+            
         } else {
             throw new IllegalArgumentException("virtual variable function not implemented: "+function );
         }
@@ -256,7 +285,7 @@ public class CdfVirtualVars {
                 "fftpower","fftPower512","fftPower1024","fftpowerdeltatranslation512", 
                 "alternate_view", "calc_p", "region_filt", 
                 "apply_esa_qflag", "apply_qflag",
-                "sum_values" );
+                "sum_values", "arr_slice" );
         boolean supported= functions.contains(function.toLowerCase());
         logger.log(Level.FINE, "virtual variable function \"{0}\" is supported: {1}", new Object[]{function, supported});
         return supported;
