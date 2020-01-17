@@ -72,8 +72,15 @@ public final class AutoplotSettings {
     public void loadPreferences() {
         this.autoplotData= prefs.get( PROP_AUTOPLOTDATA, "${HOME}/autoplot_data" );
         String p= System.getProperty("AUTOPLOT_DATA");
+        if ( p==null ) {
+            p= System.getenv("AUTOPLOT_DATA");
+            if ( p!=null ) {
+                logger.log(Level.WARNING, "AUTOPLOT_DATA environment variable used to set AUTOPLOT_DATA={0}", p);
+            }
+        } else {
+            logger.log(Level.WARNING, "AUTOPLOT_DATA system property (-D on cmd line) used to set AUTOPLOT_DATA={0}", p);
+        }
         if ( p!=null ) {
-            logger.log(Level.WARNING, "AUTOPLOT_DATA system property used to set AUTOPLOT_DATA={0}", p);
             File f= new File(p);
             try {
                 this.autoplotData= f.getCanonicalPath();
