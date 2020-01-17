@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small><a href="https://jfaden.net/git/jbfaden/public/blob/master/u/jeremy/2020/20200105/parsePluggedInGraphic.jyds">Script</a> for "unplotting" screenshots of the power company monitoring app is used to get digital data when no export option is available.
+        <p><small>Script setScriptTitle and setScriptDescription are used to make a friendlier GUI.  The <a href='https://github.com/autoplot/dev/blob/master/demos/2019/20190726/demoParams.jy'>script</a>.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,7 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-01-10 r24445):</p>
+        <p>Bugfixes (2020-01-17 r24469):</p>
         <ul>
             <li>new SHADE error bar mode didn't consider case where first point was not valid.  Thanks, Masafumi!
             <li>round of findbugs cleanup.
@@ -75,6 +75,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>672: CDF virtual function "arr_slice" is added.
+            <li>705: environment variable "AUTOPLOT_DATA" can be used to reset data and configuration location.
+            <li>Jython script editor "inspect URI" mouse menu item now senses exportDataSet and uses the format editor GUI instead.
             <li>704: autoplot --script ... --help will print the script's arguments.
             <li>704: add support for boolean Jython parameters (True/False instead of 'T'/'F').
             <li>2223: contours plot has new line style property.
