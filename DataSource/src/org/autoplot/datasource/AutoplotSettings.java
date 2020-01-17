@@ -5,6 +5,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -73,7 +74,12 @@ public final class AutoplotSettings {
         String p= System.getProperty("AUTOPLOT_DATA");
         if ( p!=null ) {
             logger.log(Level.WARNING, "AUTOPLOT_DATA system property used to set AUTOPLOT_DATA={0}", p);
-            this.autoplotData= p;
+            File f= new File(p);
+            try {
+                this.autoplotData= f.getCanonicalPath();
+            } catch (IOException ex) {
+                this.autoplotData= p;
+            }
         }
         this.fscache= prefs.get( PROP_FSCACHE, this.autoplotData+"/fscache" );
         p= System.getProperty("AUTOPLOT_FSCACHE");
