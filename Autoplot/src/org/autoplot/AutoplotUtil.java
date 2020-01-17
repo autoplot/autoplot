@@ -1801,7 +1801,9 @@ public class AutoplotUtil {
             }
         }
 
-
+        String autoplotData= AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA );
+        String fscache= AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_FSCACHE );
+        
         String aboutContent = "<ul>" +
             "<li>Java version: " + javaVersion + " " + javaVersionWarning + 
             memWarning +    
@@ -1815,6 +1817,8 @@ public class AutoplotUtil {
             "<li>hostname: "+ host +
             "<li>pid: " + pid +
             "<li>pwd: " + pwd +
+            "<li>autoplotData: "+ autoplotData +
+            "<li>fscache: "+ fscache +
             "</ul>";
         buffy.append( aboutContent );
 
