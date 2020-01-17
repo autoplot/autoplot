@@ -244,10 +244,9 @@ public class CDAWebDataSource extends AbstractDataSource {
                             }
                             if ( !missingComponent ) {
                                 try {
-                                    Map<String,Object> qmetadata= new IstpMetadataModel().properties( metadata );
-                                    ds1= (MutablePropertyDataSet)CdfVirtualVars.execute( qmetadata, function, comps, t1 );
+                                    ds1= (MutablePropertyDataSet)CdfVirtualVars.execute( metadata, function, comps, t1 );
                                 } catch (IllegalArgumentException ex ){
-                                    throw new IllegalArgumentException("The virtual variable " + id + " cannot be plotted because the function is not supported: "+function );
+                                    throw new IllegalArgumentException("The virtual variable " + id + " cannot be plotted because the function is not supported: "+function, ex);
                                 }
                             } else {
                                 throw new IllegalArgumentException("The virtual variable "+id + " cannot be plotted because a component "+missingComponentName+" is missing");
