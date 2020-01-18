@@ -62,11 +62,13 @@ public final class AutoplotSettings {
     static Preferences prefs;
 
     /**
-     * load the preferences from getPreferences( AutoplotSettings.class ),
+     * load the preferences,
      * which include the location of the autoplot_data directory and fscache.
      * The system property AUTOPLOT_DATA will override the user preference 
-     * /opt/virbo/datasource/autoplotData which is by default "${HOME}/autoplot_data", and
-     * can be set on the command line.  AUTOPLOT_FSCACHE is the location of the remote
+     * autoplotData which is by default "${HOME}/autoplot_data", and
+     * can be set on the command line.  The environment variable AUTOPLOT_DATA
+     * will also override the default location.
+     * AUTOPLOT_FSCACHE is the location of the remote
      * file mirror storing lots of data and can be moved separately.
      */
     public void loadPreferences() {
@@ -75,10 +77,10 @@ public final class AutoplotSettings {
         if ( p==null ) {
             p= System.getenv("AUTOPLOT_DATA");
             if ( p!=null ) {
-                logger.log(Level.WARNING, "AUTOPLOT_DATA environment variable used to set AUTOPLOT_DATA={0}", p);
+                logger.log(Level.FINE, "AUTOPLOT_DATA environment variable used to set AUTOPLOT_DATA={0}", p);
             }
         } else {
-            logger.log(Level.WARNING, "AUTOPLOT_DATA system property (-D on cmd line) used to set AUTOPLOT_DATA={0}", p);
+            logger.log(Level.FINE, "AUTOPLOT_DATA system property (-D on cmd line) used to set AUTOPLOT_DATA={0}", p);
         }
         if ( p!=null ) {
             File f= new File(p);
@@ -91,6 +93,14 @@ public final class AutoplotSettings {
         this.fscache= prefs.get( PROP_FSCACHE, this.autoplotData+"/fscache" );
         p= System.getProperty("AUTOPLOT_FSCACHE");
         if ( p!=null ) this.fscache= p;
+        if ( p==null ) {
+            p= System.getenv("AUTOPLOT_FSCACHE");
+            if ( p!=null ) {
+                logger.log(Level.FINE, "AUTOPLOT_FSCACHE environment variable used to set AUTOPLOT_FSCACHE={0}", p);
+            }
+        } else {
+            logger.log(Level.FINE, "AUTOPLOT_FSCACHE system property (-D on cmd line) used to set AUTOPLOT_FSCACHE={0}", p);
+        }
     }
     
     /**
