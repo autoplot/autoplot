@@ -60,7 +60,6 @@ import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
-import org.python.core.PyStringMap;
 import org.python.core.PyTuple;
 
 /**
@@ -88,7 +87,8 @@ public class JythonUtil {
      */
     public static InteractiveInterpreter createInterpreter(boolean sandbox) throws IOException {
         if (PySystemState.cachedir == null) {
-            System.setProperty("python.cachedir", System.getProperty("user.home") + "/autoplot_data/pycache");
+            String autoplotData= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA);
+            System.setProperty("python.cachedir", autoplotData + "/pycache");
         }
         ///  http://www.gossamer-threads.com/lists/python/python/697524
         org.python.core.PySystemState pySys = new org.python.core.PySystemState();
