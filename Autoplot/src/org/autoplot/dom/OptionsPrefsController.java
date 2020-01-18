@@ -13,7 +13,6 @@ import org.autoplot.MouseModuleType;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.util.MigratePreference;
 import org.das2.graph.DasColorBar;
-import org.das2.graph.SpectrogramRenderer;
 import org.fuin.utils4j.PropertiesFilePreferences;
 
 /**
@@ -32,7 +31,7 @@ public final class OptionsPrefsController {
      * write the current options out to persistent preferences, so that they will
      * be used next session.  Note the persistent preferences is a Java Preference
      * stored in ~/.java/... but it is being migrated to
-     * ~/autoplot_data/config/options.preferences.
+     * AUTOPLOT_DATA/config/options.preferences.
      */
     public void copyOptionsToPersistentPreferences() {
         logger.fine("copy options to persistent preferences storage.");
