@@ -52,7 +52,7 @@ import org.autoplot.datasource.AutoplotSettings;
 /**
  * This presents the URI history in a useful dialog where URIs are
  * sorted into today, yesterday, last week, etc.  The URI history is
- * stored in ~/autoplot_data/bookmarks/history.txt.  Times in the history file
+ * stored in AUTOPLOT_DATA/bookmarks/history.txt.  Times in the history file
  * in UT, not the local time.
  * 
  * This useful dialog needs to be rewritten.  

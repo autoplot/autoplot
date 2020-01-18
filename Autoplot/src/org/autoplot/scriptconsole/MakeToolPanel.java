@@ -34,7 +34,7 @@ public class MakeToolPanel extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
 
         toolsCB.setText("Install in tools folder and menu");
-        toolsCB.setToolTipText("<html>The script will be added to the Autoplot \"Tools\" menu,<br> which invokes scripts found in HOME/autoplot_data/tools/");
+        toolsCB.setToolTipText("The script will be added to the Autoplot \"Tools\" menu");
 
         jLabel2.setText("Make sure the script does not contain malicious code.");
         jLabel2.setToolTipText("<html>Scripts are run with your privileges, so be careful <br>\nto make sure scripts are coming from a trusted source <br>\nand do not contain code that would harm your files.");

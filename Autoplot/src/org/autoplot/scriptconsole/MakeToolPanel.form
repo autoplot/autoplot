@@ -45,7 +45,7 @@
     <Component class="javax.swing.JCheckBox" name="toolsCB">
       <Properties>
         <Property name="text" type="java.lang.String" value="Install in tools folder and menu"/>
-        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;The script will be added to the Autoplot &quot;Tools&quot; menu,&lt;br&gt; which invokes scripts found in HOME/autoplot_data/tools/"/>
+        <Property name="toolTipText" type="java.lang.String" value="The script will be added to the Autoplot &quot;Tools&quot; menu"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
