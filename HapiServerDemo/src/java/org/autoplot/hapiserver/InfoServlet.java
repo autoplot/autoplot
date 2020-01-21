@@ -102,7 +102,7 @@ public class InfoServlet extends HttpServlet {
         status.put( "message", "OK request successful");
                 
         o.put( "status", status );
-        o.put("x_infoVersion__", "20171201.1" );
+        o.put( "x_infoVersion__", "20190120.1" );
         return o;
 
     }

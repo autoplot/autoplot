@@ -99,7 +99,7 @@ public class Util {
     public static final String HAPI_SERVER_HOME_PROPERTY = "HAPI_SERVER_HOME";
 
     public static final String hapiVersion() {
-        return "2.0";
+        return "2.1";
     }
     
     static boolean isKey(String key) {
