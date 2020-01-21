@@ -261,6 +261,9 @@ public class Util {
         }
         JSONArray newParameters= new JSONArray();
         int[] indexMap= new int[pps.length];
+        for ( int i=0; i<pps.length; i++ ) {
+            indexMap[i]=-1;
+        }
         int[] lengths= new int[pps.length];
         boolean hasTime= false;
         for ( int ip=0; ip<pps.length; ip++ ) {
@@ -315,7 +318,7 @@ public class Util {
             }
             indexMap= indexMap1;
         }
-        if ( indexMap[indexMap.length-1]==0 ) {
+        if ( indexMap[indexMap.length-1]==-1 ) {
             throw new IllegalArgumentException("last index of index map wasn't set--server implementation error");
         }
 
