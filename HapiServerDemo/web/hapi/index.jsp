@@ -173,6 +173,7 @@
             <li>2019-03-27: correct bug with file handling when cache files are used and multiple days are requested.
             <li>2019-04-24: when cache files are found, check dates to see if If-Modified-Since can be used to implement request.
             <li>2019-09-30: correction for where time-varying channels are used.
+            <li>2020-01-21: update to 2.1
         </ul>
         </small>
     </body>
