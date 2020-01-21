@@ -85,7 +85,10 @@ public final class AutoplotSettings {
         if ( p!=null ) {
             File f= new File(p);
             try {
-                this.autoplotData= f.getCanonicalPath();
+                if (f.getCanonicalPath().equals(f.getAbsolutePath()) ) {
+                    logger.log(Level.FINE, "Canonical path is not equal to path, may be a link: {0}", f);
+                }
+                this.autoplotData= f.getAbsolutePath();
             } catch (IOException ex) {
                 this.autoplotData= p;
             }
