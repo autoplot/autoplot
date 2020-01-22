@@ -1239,7 +1239,7 @@ public class AutoplotUtil {
                         spec= RenderType.colorScatter;
                     } else if (bundle1.length() == 3 && bundle1.property(QDataSet.DEPENDNAME_0, 2) != null) { // bad kludge
                         spec= RenderType.colorScatter;
-                    } else if ( bundle1.length()==3 && fillds.property(QDataSet.DEPEND_0)==null && bundle1.property(QDataSet.CONTEXT_0,2)!=null ) {  // this is more consistent with PlotElementController code.
+                    } else if ( bundle1.length()==3 && fillds.property(QDataSet.DEPEND_0)==null ) { 
                         spec= RenderType.colorScatter;
                     } else if ( bundle1.length()==3 || bundle1.length()==4 || bundle1.length()==5 ) {
                         if ( Schemes.isEventsList(fillds) ) {
