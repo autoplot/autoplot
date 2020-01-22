@@ -68,7 +68,7 @@ public final class JythonDataSource extends AbstractDataSource implements Cachin
 
     ExceptionListener listener;
     private Map<String, Object> metadata;
-    protected final static String PARAM_SCRIPT= "script";
+    public final static String PARAM_SCRIPT= "script";
     protected final static String PARAM_TIMERANGE= "timerange";
     protected final static String PARAM_RESOURCE_URI= "resourceURI";
 
