@@ -90,6 +90,7 @@ import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.datasource.jython.JythonDataSource;
 import org.autoplot.datasource.jython.JythonDataSourceFactory;
 import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
@@ -203,7 +204,17 @@ public class ScriptPanelSupport {
     private boolean maybeDisplayDataSourceScript() throws HeadlessException {
         
         try {
-            final String fsfile=  applicationController.getFocusUri();
+            final String sfile=  applicationController.getFocusUri();
+            
+            final String fsfile;
+            URISplit split= URISplit.parse(sfile);
+            Map<String,String> params= URISplit.parseParams(split.params);
+            String script= params.get(JythonDataSource.PARAM_SCRIPT);
+            if ( script!=null && script.trim().length()>0 ) {
+                fsfile= script;
+            } else {
+                fsfile= split.file;
+            }
             
             if ( canDisplayDataSourceScript( fsfile )==false ) {
                 return false;
