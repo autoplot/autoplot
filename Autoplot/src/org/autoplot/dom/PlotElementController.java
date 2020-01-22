@@ -1466,7 +1466,7 @@ public class PlotElementController extends DomNodeController {
             //boolean lastDimBundle= isLastDimBundle( fillDs );
             //boolean joinOfBundle= fillDs.property(QDataSet.JOIN_0)!=null && lastDimBundle;
             int ndim= Ops.dimensionCount(fillDs);
-            boolean isxyz= SemanticOps.isBundle(fillDs) && fillDs.property(QDataSet.DEPEND_0)!=null;
+            boolean isxyz= SemanticOps.isBundle(fillDs) && fillDs.property(QDataSet.DEPEND_0)==null;
             boolean shouldSlice= ( fillDs.rank()>2 && ndim>3 && plotElement.isAutoComponent() && !isxyz );
             if ( renderType==RenderType.image && fillDs.rank()==3 ) {
                 shouldSlice= false; //TODO: some how render types should indicate they can handle a slice.
