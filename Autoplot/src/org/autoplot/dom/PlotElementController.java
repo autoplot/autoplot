@@ -2494,9 +2494,11 @@ public class PlotElementController extends DomNodeController {
             if ( SemanticOps.isBundle(fillDs) ) {
                 depend0= SemanticOps.xtagsDataSet(fillDs);
                 if ( spec==RenderType.colorScatter ) {
-                    ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 1 ), props, ignoreDsProps );
+                    ydesc= AutoRangeUtil.autoRange( DataSetOps.unbundle(fillDs, 1 ), props, ignoreDsProps );
+                } else if ( spec==RenderType.scatter && fillDs.property(QDataSet.DEPEND_0)==null ) { 
+                    ydesc= AutoRangeUtil.autoRange( DataSetOps.unbundle(fillDs, 1 ), props, ignoreDsProps );
                 } else {
-                    ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, fillDs.length(0)-1 ), props, ignoreDsProps ); 
+                    ydesc= AutoRangeUtil.autoRange( DataSetOps.unbundle(fillDs, fillDs.length(0)-1 ), props, ignoreDsProps ); 
                     Units u= ydesc.range.getUnits();
                     for ( int i=fillDs.length(0)-2; i>=0; i-- ) {
                         AutoRangeUtil.AutoRangeDescriptor ydesc1= AutoRangeUtil.autoRange( DataSetOps.unbundle(fillDs,i ), props, ignoreDsProps );
@@ -2511,7 +2513,7 @@ public class PlotElementController extends DomNodeController {
                     }
                 }
             } else {
-                ydesc = AutoplotUtil.autoRange( fillDs, props, ignoreDsProps );
+                ydesc = AutoRangeUtil.autoRange( fillDs, props, ignoreDsProps );
                 depend0 = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
             }
 
