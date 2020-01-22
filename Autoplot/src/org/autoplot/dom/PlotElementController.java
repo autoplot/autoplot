@@ -1498,8 +1498,13 @@ public class PlotElementController extends DomNodeController {
                 }
             }
 
-            boolean shouldHaveChildren= fillDs.rank() == 2 && !isWaveform
-                    &&  ( renderType == RenderType.hugeScatter || renderType==RenderType.series || renderType==RenderType.scatter || renderType==RenderType.stairSteps );
+            boolean shouldHaveChildren= 
+                    fillDs.rank() == 2 
+                    && !isWaveform
+                    &&  ( renderType == RenderType.hugeScatter 
+                    || renderType==RenderType.series 
+                    || renderType==RenderType.scatter 
+                    || renderType==RenderType.stairSteps );
             //if ( joinOfBundle ) shouldHaveChildren= true;
 
             if ( fillDs.rank()==2 && SemanticOps.isBundle(fillDs) ) { //TODO: LANL has datasets with both BUNDLE_1 and DEPEND_1 set, so the user can pick.
