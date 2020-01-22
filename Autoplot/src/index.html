@@ -26,8 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-01-17 r24469):</p>
+        <p>Bugfixes (2020-01-22 r24485):</p>
         <ul>
+            <li>digital renderer would draw text which was outside of the axis bounds, reducing performance.
+            <li>2232: Script editor would load data instead of script when "script=" keyword was used.
+            <li>NybbleDataSet slice operator was not implemented.  Thanks, Chris!
+            <li>AUTOPLOT_DATA setting would not reset pycache area location.  Thanks, Darren!
             <li>new SHADE error bar mode didn't consider case where first point was not valid.  Thanks, Masafumi!
             <li>round of findbugs cleanup.
             <li>occasional NullPointerException when loading particular .vap files, caused by beans binding, is handled.  Thanks, Kris!
