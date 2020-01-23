@@ -9,6 +9,7 @@ import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,7 @@ import org.autoplot.datasource.URISplit;
  * interfaced to Autoplot via Java Native Interface.
  * @author jbf
  */
-public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
+public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
     public static final String NO_PLOTTABLE_PARAMETERS_MSG = "<html><i>No plottable parameters</i></html>";
 
     /** the maximum number of DEPEND_1 channels where we should show option for depend_1. */
@@ -58,7 +59,9 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     /** Creates new form AggregatingDataSourceEditorPanel */
     public CdfJavaDataSourceEditorPanel() {
         initComponents();
-        parameterTree.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION );
+        parameterTree.getSelectionModel().setSelectionMode( TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION );
+        parameterTree1.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION );
+        parameterTree2.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION );
         jPanel3.setVisible(false);
         if ( AutoplotHelpSystem.getHelpSystem()!=null ) { // to help with debugging, check for null so we needn't initialize all of Autoplot to debug.
             AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "cdf_main");
@@ -839,21 +842,27 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         }
         
         if ( isValidCDF ) {
-            TreePath treePath= parameterTree.getSelectionPath();
-            if ( treePath==null ) {
-                logger.fine("param was null");
-            } else if ( treePath.getPathCount()==3 ) {
-                String p= String.valueOf( treePath.getPathComponent(1) );
-                p= p.replaceAll("=", "%3D");
-                lparams.put( "arg_0", p + subset );
-                String val=  String.valueOf( treePath.getPathComponent(2) );
-                int idx= val.indexOf(":");
-                lparams.put( "slice1", val.substring(0,idx).trim() );
-            } else {
-                String p= String.valueOf( treePath.getPathComponent(1) );
-                p= p.replaceAll("=", "%3D");
-                lparams.put( "arg_0", p + subset );
+            TreePath[] tps= parameterTree.getSelectionPaths();
+            StringBuilder arg0= new StringBuilder();
+            
+            for ( TreePath treePath : tps ) {
+                if ( arg0.length()>0 ) arg0.append(";");
+                if ( treePath==null ) {
+                    logger.fine("param was null");
+                } else if ( treePath.getPathCount()==3 ) {
+                    String p= String.valueOf( treePath.getPathComponent(1) );
+                    p= p.replaceAll("=", "%3D");
+                    String val=  String.valueOf( treePath.getPathComponent(2) );
+                    int idx= val.indexOf(":");
+                    arg0.append(p).append("[:,").append(val.substring(0,idx).trim()).append("]");
+                } else {
+                    String p= String.valueOf( treePath.getPathComponent(1) );
+                    p= p.replaceAll("=", "%3D");
+                    arg0.append(p).append(subset);
+                }
             }
+            
+            lparams.put( "arg_0", arg0.toString() );
             
             if ( xCheckBox.isSelected() ) {
                 TreePath depend0Path= parameterTree1.getSelectionPath();
@@ -952,6 +961,14 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             mm= sortedMM;
         }
             
+        List<TreePath> selections= new ArrayList<>();
+        List<String> params;
+        if ( param!=null ) {
+            params = Arrays.asList(param.split(";"));
+        } else {
+            params= new ArrayList<>();
+        }
+                
         TreePath selection=null;
         for ( Entry<String,String> e: mm.entrySet() ) {
 
@@ -1021,6 +1038,9 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 } else {
                     DefaultMutableTreeNode node=  new DefaultMutableTreeNode( e.getKey() );
                     root.add( node );
+                    if ( params.contains(e.getKey()) ) {
+                        selections.add( new TreePath( new Object[] { root, node } ) );
+                    }
                     if ( e.getKey().equals(param) ) {
                         selection= new TreePath( new Object[] { root, node } );
                     }
@@ -1041,9 +1061,14 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             parameterTree.scrollPathToVisible(selection);
         }
         
+        if ( selections.size()>0 ) {
+            parameterTree.setSelectionPaths( selections.toArray(new TreePath[selections.size()]) );
+        }
+        
         for ( TreePath tp: expand ) {
             parameterTree.expandPath(tp);
         }
+        
         logger.exiting("CdfJavaDataSourceEditorPanel", "fillTree" );
         
     }
