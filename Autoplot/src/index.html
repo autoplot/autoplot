@@ -28,7 +28,7 @@
         
         <p>Bugfixes (2020-01-22 r24485):</p>
         <ul>
-            <li>2169: properly handle X,Y,Z scatter and X,Y scatter schemes.
+            <li>2169: properly handle <a href='https://github.com/autoplot/documentation/wiki/QDataSet.Schemes#color-scatter'>X,Y,Z scatter</a> and X,Y scatter schemes.
             <li>digital renderer would draw text which was outside of the axis bounds, reducing performance.
             <li>2232: Script editor would load data instead of script when "script=" keyword was used.
             <li>NybbleDataSet slice operator was not implemented.  Thanks, Chris!
@@ -80,6 +80,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>707: CDF reader supports multiple variables to be read into a bundle, GUI supports multiple selection.
             <li>672: CDF virtual function "arr_slice" is added.
             <li>705: environment variable "AUTOPLOT_DATA" can be used to reset data and configuration location.
             <li>Jython script editor "inspect URI" mouse menu item now senses exportDataSet and uses the format editor GUI instead.
