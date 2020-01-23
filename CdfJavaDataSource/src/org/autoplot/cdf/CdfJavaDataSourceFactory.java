@@ -207,7 +207,17 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                 if ( i>-1 ) {
                     param= param.substring(0,i);
                 }
-                return ! result.containsKey(param);
+                
+                if ( param.contains(";") ) {
+                    String[] ss= param.split(";",-2);
+                    boolean reject= false;
+                    for ( String s: ss ){
+                        if ( !result.containsKey(s) ) reject= true;
+                    }
+                    return reject;
+                } else {
+                    return ! result.containsKey(param);
+                }
             }
         } catch (Exception ex) {
             logger.log( Level.SEVERE, surl, ex );

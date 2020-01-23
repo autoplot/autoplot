@@ -328,6 +328,11 @@ public class CdfDataSource extends AbstractDataSource {
                 constraint = svariable.substring(i);
                 svariable = svariable.substring(0, i);
             }
+            
+            i= svariable.indexOf(";");
+            if (i != -1) {
+                svariable = svariable.substring(0, i);
+            }
                 
             long numRec,numRecDepend0=-1;
             try {
@@ -461,6 +466,7 @@ public class CdfDataSource extends AbstractDataSource {
         mon.setProgressMessage("open CDF file");
         CDFReader cdf= getCdfFile(fileName);
 
+        String[] svariables= null;
         String svariable = (String) map.get(PARAM_ID);
         if (svariable == null) {
             svariable = (String) map.get("arg_0");
@@ -476,6 +482,10 @@ public class CdfDataSource extends AbstractDataSource {
             constraint = svariable.substring(i);
             svariable = svariable.substring(0, i);
         }
+        
+        if ( svariable.contains(";") ) {
+            svariables= svariable.split(";");
+        }
 
         String interpMeta = (String) map.get(PARAM_INTERPMETA);
 
@@ -483,6 +493,9 @@ public class CdfDataSource extends AbstractDataSource {
 
         MutablePropertyDataSet result;
         if ( attr1!=null && attr1.containsKey("VIRTUAL") && ( attr1.containsKey("FUNCTION") || attr1.containsKey("FUNCT") ) ) {
+            if ( svariables!=null ) {
+                throw new IllegalArgumentException("virtual variables not supported for multi-variable reads");
+            }
             List<QDataSet> args= new ArrayList();
             String function= (String)attr1.get("FUNCTION");
             if ( function==null ) function= (String)attr1.get("FUNCT");
@@ -501,7 +514,21 @@ public class CdfDataSource extends AbstractDataSource {
                 int is= Integer.parseInt(os1);
                 result= (MutablePropertyDataSet)Ops.slice1( result, is );
             }
+        } else if ( svariables!=null ) {
+            String os1= (String)map.get(PARAM_SLICE1);
+            if ( os1!=null && !os1.equals("") && cdf.getDimensions(svariable).length>0 ) {
+                throw new IllegalArgumentException("slice is not supported for multi-variable reads");
+            } else {
+                QDataSet result0=null;
+                for ( String s: svariables ) {
+                    QDataSet result1= loadVariableAndDependents(cdf, s, constraint, false, doDep, attr1, -1, mon.getSubtaskMonitor("reading "+s+" from CDF file") );
+                    result0= Ops.bundle( result0, result1 );
+                }
+                result= Ops.maybeCopy(result0);
+            }
+            
         } else { // typical route
+            
             String os1= (String)map.get(PARAM_SLICE1);
             if ( os1!=null && !os1.equals("") && cdf.getDimensions(svariable).length>0 ) {
                 int is= Integer.parseInt(os1);
@@ -1585,6 +1612,11 @@ public class CdfDataSource extends AbstractDataSource {
                     //constraint = svariable.substring(i);
                     svariable = svariable.substring(0, i);
                 }
+                i= svariable.lastIndexOf(";");
+                if ( i!=-1 ) {
+                    svariable= svariable.substring(i+1);
+                }
+                
                 if ( !hasVariable(cdf,svariable) ) {
                     throw new IllegalArgumentException("No such variable \""+svariable+"\"");
                 }
