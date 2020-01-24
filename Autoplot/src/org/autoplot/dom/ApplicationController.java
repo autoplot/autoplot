@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -933,8 +934,8 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
 
             if (dsf != null) {
-                List<PlotElement> dsfElements = getPlotElementsFor(dsf);
-                if ( dsfElements.isEmpty() && application.getDataSourceFilters().length>1 ) {
+                List<Plot> plotsUsing= getPlotsFor(dsf);
+                if ( plotsUsing.isEmpty() && application.getDataSourceFilters().length>1 ) {
                     deleteDataSourceFilter(dsf);
                 }
             }
@@ -2974,6 +2975,29 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
         return result;
     }
+    
+    /**
+     * return the Plot using the DataSourceFilter, checking for ticksURI
+     * as well.  This does not
+     * return indirect (via vap+internal) references.
+     * @param dsf the data source filter.
+     * @return return the PlotElements for the data source filter, if any.
+     */
+    public List<Plot> getPlotsFor(DataSourceFilter dsf) {
+        String id = dsf.getId();
+        HashSet<Plot> result = new HashSet<>();
+        for ( Plot p: application.getPlots() ) {
+            for (PlotElement pe : getPlotElementsFor(p)) {
+                if (pe.getDataSourceFilterId().equals(id)) {
+                    result.add(p);
+                }
+            }
+            if ( p.getTicksURI().equals(id) ) {
+                result.add(p);
+            }
+        }
+        return Arrays.asList(result.toArray(new Plot[result.size()]));
+    }
 
     /**
      * find the first plot that is connected to this data, following vap+internal
@@ -3288,11 +3312,9 @@ public class ApplicationController extends DomNodeController implements RunLater
                 logger.log(Level.FINE, "layout: {0}", DomUtil.layoutToString(canvas)); //TODO 2202
             }
             
-            // is the canvas size and font set at this time?
+            if ( !exclude.contains("dataSourceFilters") ) syncSupport.syncToDataSourceFilters(that.getDataSourceFilters(), nameMap);
 
             if ( !exclude.contains("plots") ) syncSupport.syncToPlots( that.getPlots(),nameMap );
-
-            if ( !exclude.contains("dataSourceFilters") ) syncSupport.syncToDataSourceFilters(that.getDataSourceFilters(), nameMap);
 
             if ( !exclude.contains("plotElements") )  syncSupport.syncToPlotElements(that.getPlotElements(), nameMap);
 
