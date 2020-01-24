@@ -326,6 +326,10 @@ public class CdfDataSource extends AbstractDataSource {
             int i = svariable.indexOf("[");
             if (i != -1) {
                 constraint = svariable.substring(i);
+                int i2= constraint.indexOf(";");
+                if ( i2>-1 ) {
+                    constraint= constraint.substring(0,i2);
+                }
                 svariable = svariable.substring(0, i);
             }
             
@@ -475,12 +479,39 @@ public class CdfDataSource extends AbstractDataSource {
         if ( svariable==null ) {
             throw new IllegalArgumentException("CDF URI needs an argument");
         }
-
+        
+        //latitude[0:1000];longitude[0:1000];altitude[0:1000]"
+        //Pattern p= Pattern.compile( "[a-z]+(\\[(0-9:)+\\])?"); TODO: how to match?
+        
         String constraint = null;
         int i = svariable.indexOf("[");
         if (i != -1) {
+            String newSvariable;
             constraint = svariable.substring(i);
-            svariable = svariable.substring(0, i);
+            newSvariable = svariable.substring(0, i);
+            int i2= constraint.indexOf(";");
+            if ( i2>-1 ) {
+                constraint= constraint.substring(0,i2);
+                i2= svariable.indexOf(";");
+                int i3= svariable.indexOf(";",i2+1);
+                while ( i3>-1 ) {
+                    int i4= svariable.indexOf("[",i2+1);
+                    if ( i4==-1 ) {
+                        newSvariable+= ";"+svariable.substring(i2+1,i3);
+                    } else {
+                        newSvariable+= ";"+svariable.substring(i2+1,i4);
+                    }
+                    i2= i3;
+                    i3= svariable.indexOf(";",i3+1);
+                }
+                int i4= svariable.indexOf("[",i2+1);
+                if ( i4==-1 ) {
+                    newSvariable+= ";"+svariable.substring(i2+1);
+                } else {
+                    newSvariable+= ";"+svariable.substring(i2+1,i4);
+                }
+            }
+            svariable = newSvariable;
         }
         
         if ( svariable.contains(";") ) {
