@@ -19,8 +19,8 @@ import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
-import org.autoplot.dom.Application;
 import org.autoplot.dom.DataSourceFilter;
+import org.das2.qds.DataSetOps;
 import org.das2.qds.ops.Ops;
 
 /**
@@ -41,6 +41,7 @@ public class DataSourceTcaSource extends AbstractQFunction {
     QDataSet nonValueDs;
     //QDataSet nonMonoDs;
     QDataSet initialError;
+    DataSourceFilter dsf;
 
     static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.tca.uritcasource" );
     
@@ -57,6 +58,7 @@ public class DataSourceTcaSource extends AbstractQFunction {
 
         DataSource dss1;
         try {
+            dsf= node;
             dss1= node.getController().getDataSource();
             initialError= null;
             this.tsb= dss1.getCapability( TimeSeriesBrowse.class );
@@ -78,7 +80,8 @@ public class DataSourceTcaSource extends AbstractQFunction {
             logger.log(Level.FINE, "reading TCAs from {0}", dss);
         }
         needToRead= false; // clear the flag in case there is an exception.
-        ds= dss.getDataSet( mon );
+        ds= dss.getDataSet( mon.getSubtaskMonitor("read data") );
+        ds= DataSetOps.sprocess( this.dsf.getFilters(), ds, mon.getSubtaskMonitor("sprocess") );
         
         if ( ds==null ) {
             logger.log(Level.FINE, "doRead getDataSet got null ");
