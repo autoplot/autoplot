@@ -50,7 +50,9 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.tca.DataSourceTcaSource;
 import org.autoplot.util.TickleTimer;
+import org.das2.qds.QFunction;
 import org.das2.qds.ops.Ops;
 
 /**
@@ -195,17 +197,42 @@ public final class PlotController extends DomNodeController {
          public void propertyChange(PropertyChangeEvent evt) {
             LoggerManager.logPropertyChangeEvent(evt,"ticksURIListener");  
             if ( evt.getPropertyName().equals(Plot.PROP_TICKS_URI) ) {
-                if ( ((String)evt.getNewValue()).length()>0 ) {
-                    logger.log(Level.FINE, "prop_ticks_uri={0}", evt.getNewValue());
-                    String dasAddress= "class:org.autoplot.tca.UriTcaSource:" + evt.getNewValue();
-                    //TODO: check for time series browse here and set to time axis.
-                    plot.getXaxis().getController().getDasAxis().setDataPath(dasAddress);
-                    plot.getXaxis().getController().getDasAxis().setDrawTca(true);
-                    plot.getXaxis().setLabel("%{RANGE}");
-                } else {
+                String control= (String) evt.getNewValue();
+                if ( control.length()==0 ) {
                     plot.getXaxis().getController().getDasAxis().setDataPath("");
                     plot.getXaxis().getController().getDasAxis().setDrawTca(false);
                     plot.getXaxis().setLabel("");
+                } else {
+                    if ( Ops.isSafeName(control) ) { // hey wow it's a data source
+                        DomNode n= dom.getElementById(control);
+                        if ( n instanceof DataSourceFilter ) {
+                            DataSourceFilter dsf= (DataSourceFilter)n;
+                            QFunction f;
+                            try {
+                                f = new DataSourceTcaSource(dsf);
+                                plot.getXaxis().getController().getDasAxis().setTcaFunction(f);
+                                plot.getXaxis().getController().getDasAxis().setDrawTca(true);
+                                plot.getXaxis().setLabel("%{RANGE}");
+                            } catch (Exception ex) {
+                                plot.getXaxis().getController().getDasAxis().setDataPath("");
+                                plot.getXaxis().getController().getDasAxis().setDrawTca(false);
+                                plot.getXaxis().setLabel("Error with init using "+control);
+                            }
+                            
+                        } else {
+                            plot.getXaxis().getController().getDasAxis().setDataPath("");
+                            plot.getXaxis().getController().getDasAxis().setDrawTca(false);
+                            plot.getXaxis().setLabel("node must be data source");
+                        }
+                        
+                    } else {
+                        logger.log(Level.FINE, "prop_ticks_uri={0}", evt.getNewValue());
+                        String dasAddress= "class:org.autoplot.tca.UriTcaSource:" + evt.getNewValue();
+                        //TODO: check for time series browse here and set to time axis.
+                        plot.getXaxis().getController().getDasAxis().setDataPath(dasAddress);
+                        plot.getXaxis().getController().getDasAxis().setDrawTca(true);
+                        plot.getXaxis().setLabel("%{RANGE}");
+                    }
                 }
             }
          }
