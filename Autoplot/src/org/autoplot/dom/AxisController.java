@@ -276,23 +276,18 @@ public class AxisController extends DomNodeController {
     protected LabelConverter labelConverter;
     
     public final synchronized void bindTo() {
-        //System.err.println("       bindTo  for "+axis + " " + scaleListener ); //bug2053
         ApplicationController ac = dom.controller;
-        ac.bind(axis, "range", dasAxis, "datumRange");
-        ac.bind(axis, "log", dasAxis, "log");
+        ac.bind(axis, Axis.PROP_RANGE, dasAxis, DasAxis.PROPERTY_DATUMRANGE);
+        ac.bind(axis, Axis.PROP_LOG, dasAxis, DasAxis.PROP_LOG);
         labelConverter= new LabelConverter( dom, plot, axis, null, null );
         ac.bind(axis, Axis.PROP_LABEL, dasAxis, DasAxis.PROP_LABEL, labelConverter );
-        ///ac.bind(axis, "label", p, "label", plot.getController().labelContextConverter(axis) );
-        ac.bind(axis, "fontSize", dasAxis, "fontSize" );
-        ac.bind(axis, "drawTickLabels", dasAxis, "tickLabelsVisible");
-        ac.bind(axis, "flipped", dasAxis, "flipped");
-        ac.bind(axis, "visible", dasAxis, "visible" );
-        ac.bind(axis, "opposite", dasAxis, "orientation", getOppositeConverter(axis,dasAxis) );
+        ac.bind(axis, Axis.PROP_FONTSIZE, dasAxis, DasAxis.PROP_FONTSIZE );
+        ac.bind(axis, Axis.PROP_DRAWTICKLABELS, dasAxis, "tickLabelsVisible");
+        ac.bind(axis, Axis.PROP_FLIPPED, dasAxis, DasAxis.PROP_FLIPPED );
+        ac.bind(axis, Axis.PROP_VISIBLE, dasAxis, "visible" );
+        ac.bind(axis, Axis.PROP_OPPOSITE, dasAxis, "orientation", getOppositeConverter(axis,dasAxis) );
         ac.bind(axis, Axis.PROP_TICKVALUES, dasAxis, DasAxis.PROP_TICKVALUES );
         ac.bind(axis, Axis.PROP_REFERENCE, dasAxis, DasAxis.PROP_REFERENCE );
-        //if ( this.axis.getId().equals("xaxis_2") ) {
-        //    System.err.println("here2 bind xaxis_2="+this.axis+ "@"+ this.axis.hashCode() + "dasColumn=@"+dasAxis.getColumn().hashCode()+" dasAxis="+ dasAxis.getDasName() + "@" + dasAxis.hashCode() );
-        //}
         column= dasAxis.getColumn();
         row= dasAxis.getRow();
         if ( dasAxis.isHorizontal() ) {
