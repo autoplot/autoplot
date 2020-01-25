@@ -219,9 +219,13 @@ public class Axis extends DomNode {
     }
 
     public void setAutoRange(boolean autorange) {
-        if ( this.controller!=null ) {
-            logger.log(Level.FINEST, "{0}.setAutoRange({1})", new Object[]{this.id, autorange});
-        }
+        //if ( this.controller!=null ) {
+        //    if ( this.id.startsWith("yaxis") ) {
+        //        logger.log(Level.FINEST, "Y {0}.setAutoRange({1})", new Object[]{this.id, autorange});
+        //    } else {
+        //        logger.log(Level.FINEST, "{0}.setAutoRange({1})", new Object[]{this.id, autorange});
+        //    }
+        //}
         boolean oldAutorange = this.autoRange;
         this.autoRange = autorange;
         propertyChangeSupport.firePropertyChange(PROP_AUTORANGE, oldAutorange, autorange);
