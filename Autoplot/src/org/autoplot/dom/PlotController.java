@@ -1040,6 +1040,7 @@ public final class PlotController extends DomNodeController {
      * @see AutoplotUtil#resetZoomZ(org.autoplot.dom.Application, org.autoplot.dom.Plot) 
      */
     public void resetZoom(boolean x, boolean y, boolean z) {
+        logger.entering("PlotController","resetZoom",new Object[]{x,y,z});
         List<PlotElement> elements = dom.controller.getPlotElementsFor(plot);
         if ( elements.isEmpty() ) return;
         Plot newSettings = null;
@@ -1135,6 +1136,7 @@ public final class PlotController extends DomNodeController {
             plot.getXaxis().setAutoRange(true);
             plot.getYaxis().setAutoRange(true);
             plot.getZaxis().setAutoRange(true);
+            logger.exiting( "PlotController","resetZoom");
             return;
         }
 
@@ -1188,6 +1190,11 @@ public final class PlotController extends DomNodeController {
             plot.getZaxis().setAutoRange(true);
             plot.getZaxis().getController().dasAxis.setScanRange(  newAxis.getRange() );
         }
+        
+        logger.log(Level.FINER, "xrange: {0}", plot.getXaxis().getRange());
+        logger.log(Level.FINER, "yrange: {0}", plot.getYaxis().getRange());
+        logger.log(Level.FINER, "zrange: {0}", plot.getZaxis().getRange());
+        logger.exiting( "PlotController", "resetZoom" );
     }
     
     private final PropertyChangeListener plotDefaultsListener= new PropertyChangeListener() {
