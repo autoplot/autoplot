@@ -94,7 +94,7 @@ public class StatePersistence {
     }
 
     public static void saveState( File f, Object state ) throws IOException {
-        saveState( f, state, "" );
+        saveState( new FileOutputStream(f), state, "" );
     }
 
     /**
@@ -105,27 +105,6 @@ public class StatePersistence {
      * @throws IOException
      */
     public static void saveState( File f, Object state, String sscheme ) throws IOException {
-        /* XMLEncoder e = new XMLEncoder( new BufferedOutputStream( new FileOutputStream(f) ) );
-        
-        e.setPersistenceDelegate( DatumRange.class, new DatumRangePersistenceDelegate() );
-        e.setPersistenceDelegate( Units.class, new UnitsPersistenceDelegate() );
-        e.setPersistenceDelegate( Datum.class, new DatumPersistenceDelegate() );
-        e.setPersistenceDelegate( Datum.Double.class, new DatumPersistenceDelegate() );
-        e.setPersistenceDelegate( DasColorBar.Type.class, new TypeSafeEnumPersistenceDelegate() );
-        e.setPersistenceDelegate( DefaultPlotSymbol.class, new TypeSafeEnumPersistenceDelegate() );
-        e.setPersistenceDelegate( BindingModel.class, new BindingPersistenceDelegate() );
-        e.setPersistenceDelegate( Connector.class, new ConnectorPersistenceDelegate() );
-
-        //e.setPersistenceDelegate( ApplicationModel.RenderType.class, new TypeSafeEnumPersistenceDelegate() );
-        
-        e.setExceptionListener( new ExceptionListener() {
-            public void exceptionThrown(Exception e) {
-                e.printStackTrace();
-            }
-        } );
-        e.writeObject(state);
-        e.close();
-        */
         saveState( new FileOutputStream(f), state, sscheme );
     }
         
@@ -209,7 +188,6 @@ public class StatePersistence {
      * write the document out to the file, hiding the details of the serializer.
      * @param out outputStream
      * @param document XML document object
-     * @return
      * @throws LSException
      * @throws DOMException
      * @throws FileNotFoundException
@@ -566,7 +544,8 @@ public class StatePersistence {
             pbin.unread(five);
         }
         
-        InputStreamReader isr= new InputStreamReader( pbin );
+        InputStreamReader isr= new InputStreamReader( pbin, "UTF-8" );
+
         Application state;
         String domVersion;
 
