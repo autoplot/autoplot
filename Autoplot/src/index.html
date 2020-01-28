@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Polishing silver with Autoplot.  Script is used to extract small portion from two images for comparison.
+        <p><small>A rank 2 elevation map is interpolated with digital renderer to show depth.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-01-24 r24501):</p>
+        <p>Bugfixes (2020-01-28 r24511):</p>
         <ul>
+            <li>2234: restore vap from InputStream should always assume that the InputStream is UTF-8, since on Windows-jumbojar was using windows-1252.
             <li>Ephemeris which did not contain LABEL property used the NAME property instead, but layout code didn't have this logic, clipping the display.
             <li>2169: properly handle <a href='https://github.com/autoplot/documentation/wiki/QDataSet.Schemes#color-scatter'>X,Y,Z scatter</a> and X,Y scatter schemes.  Thanks, Chris!
             <li>digital renderer would draw text which was outside of the axis bounds, reducing performance.
@@ -81,6 +82,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>experimental code allows "data_1" to be used for a ticksURI.  Do not use this in production.
             <li>707: CDF reader supports multiple variables to be read into a bundle, GUI supports multiple selection.
             <li>672: CDF virtual function "arr_slice" is added.
             <li>705: environment variable "AUTOPLOT_DATA" can be used to reset data and configuration location.
