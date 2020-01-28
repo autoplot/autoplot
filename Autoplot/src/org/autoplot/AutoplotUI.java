@@ -5339,7 +5339,7 @@ APSplash.checkTime("init 240");
         if ( sd.getDescription().length()>0 ) {
             out.println( sd.getDescription() );
         }
-        out.println("Usage: <AUTOPLOT>" + Util.strjoin( Arrays.asList(args), " " ) + " [args]");
+        out.println("Usage: <AUTOPLOT> " + Util.strjoin( Arrays.asList(args), " " ) + " [args]");
         for ( org.autoplot.jythonsupport.JythonUtil.Param p: sd.getParams() ) {
             String l;
             Object deft;
