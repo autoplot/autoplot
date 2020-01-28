@@ -41,7 +41,7 @@ public class TcaElementDialog extends javax.swing.JDialog {
         final List<String> ss= DataSetURI.getSortedDiscoverableExtentions();
         for ( String s: ss) {
             if ( !s.equals( "file:" ) ) {
-                m.addElement( s );
+                m.addElement( s.substring(1)+"..." );
             }
         }
         addTicksFromComboBox.setModel(m);
@@ -49,10 +49,10 @@ public class TcaElementDialog extends javax.swing.JDialog {
             @Override
             public void actionPerformed( ActionEvent e ) {
                 String s= (String)addTicksFromComboBox.getSelectedItem();
-                if ( s.startsWith(".") ) {
+                if ( s.endsWith("...") ) {
                     String ext= s;
                     addTicksFromComboBox.setSelectedIndex(0);
-                    primaryDataSetSelector.setValue("vap+"+ext.substring(1)+":");
+                    primaryDataSetSelector.setValue("vap+"+ext.substring(0,ext.length()-3)+":");
                     primaryDataSetSelector.browseSourceType();
                 }
             }
