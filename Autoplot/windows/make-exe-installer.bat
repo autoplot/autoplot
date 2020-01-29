@@ -22,7 +22,7 @@ SET PATH=%INNO_PATH%;%PATH%
 SET "PACKAGER=C:\Program Files\Java\jdk1.8.0_111\bin\javapackager"
 
 SET "MAIN=org.autoplot.AutoplotUI"
-SET VERNUM=2020a_1
+SET VERNUM=v2020a_1
 
 rem The default install directory for non-admin installs is:
 rem %HOMEPATH%\APPDATA\Local\Autoplot
