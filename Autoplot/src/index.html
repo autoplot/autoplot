@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A rank 2 elevation map is interpolated with digital renderer to show depth.
+        <p><small>New documentation popups are coming which are more space-efficient, connect to examples, and allow open curation.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,9 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-01-28 r24511):</p>
+        <p>Bugfixes (2020-01-29 r24516):</p>
         <ul>
-            <li>2234: restore vap from InputStream should always assume that the InputStream is UTF-8, since on Windows-jumbojar was using windows-1252.
+            <li>editor javadoc location is tolerant of paths missing final /, and generated URLs should not have spaces for <a href="http://www-pw.physics.uiowa.edu/~jbf/autoplot/doc">new location</a>.
+            <li>2234: restore vap from InputStream should always assume that the InputStream is UTF-8, since on Windows-jumbojar was using windows-1252.  Thanks, Chris and George!
             <li>Ephemeris which did not contain LABEL property used the NAME property instead, but layout code didn't have this logic, clipping the display.
             <li>2169: properly handle <a href='https://github.com/autoplot/documentation/wiki/QDataSet.Schemes#color-scatter'>X,Y,Z scatter</a> and X,Y scatter schemes.  Thanks, Chris!
             <li>digital renderer would draw text which was outside of the axis bounds, reducing performance.
