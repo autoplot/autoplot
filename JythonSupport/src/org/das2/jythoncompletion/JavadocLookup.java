@@ -61,6 +61,8 @@ public class JavadocLookup {
                     return s + signature.replaceAll("[\\(\\)\\,]", "-");
                 } else if ( s.startsWith("http://www-pw.physics.uiowa.edu/~jbf/autoplot/javadoc2018/") ) {
                     return s + signature.replaceAll("[\\(\\)\\,]", "-");
+                } else if ( s.startsWith("http://www-pw.physics.uiowa.edu/~jbf/autoplot/doc")) {
+                    return s + signature;
                 } else {
                     return s + signature.replaceAll(",", ", ");
                 }

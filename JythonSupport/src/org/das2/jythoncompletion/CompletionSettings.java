@@ -29,7 +29,11 @@ public class CompletionSettings {
     public static final String PROP_DOCHOME = "docHome";
 
     public String getDocHome() {
-        return docHome;
+        if ( !docHome.endsWith("/") ) {
+            return docHome+"/";
+        } else {
+            return docHome;
+        }
     }
 
     public void setDocHome(String docHome) {
