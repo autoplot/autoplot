@@ -63,19 +63,15 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
 
             CDFReader cdf;
 
-            if ( !mon.isFinished() ) mon.started();
-            mon.setProgressMessage("opening CDF file");
             cdf = CdfDataSource.getCdfFile(fileName);
 
             logger.finest("inspect cdf for plottable parameters");
             Map<String,String> result= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, 4 );
             
-            mon.finished();
-            
             logger.finest("close cdf");
             //cdf.close();
             
-            List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
+            List<CompletionContext> ccresult= new ArrayList<>();
             for ( java.util.Map.Entry<String,String> e:result.entrySet() ) {
                 String key= e.getKey();
                 CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, key, this, "arg_0", e.getValue(), null, true );
