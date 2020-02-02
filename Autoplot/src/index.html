@@ -26,9 +26,13 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-01-29 r24516):</p>
+        <p>Bugfixes (2020-02-02 r24524):</p>
         <ul>
+            <li>getCompletions call of Cdf would download file, the monitor was used twice.
             <li>editor javadoc location is tolerant of paths missing final /, and generated URLs should not have spaces for <a href="http://www-pw.physics.uiowa.edu/~jbf/autoplot/doc">new location</a>.
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>2234: restore vap from InputStream should always assume that the InputStream is UTF-8, since on Windows-jumbojar was using windows-1252.  Thanks, Chris and George!
             <li>Ephemeris which did not contain LABEL property used the NAME property instead, but layout code didn't have this logic, clipping the display.
             <li>2169: properly handle <a href='https://github.com/autoplot/documentation/wiki/QDataSet.Schemes#color-scatter'>X,Y,Z scatter</a> and X,Y scatter schemes.  Thanks, Chris!
@@ -50,38 +54,11 @@
             <li>rte 1638285244: guard against strange index-out-of-bounds with JTable when digitizing.  Thanks, Ivar!
             <li>2225: new app steals editor panel from old app.  Thanks, Ivar!
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>2222: clean-up of orbit mode style properties editor.  Thanks, Ivar!
-            <li>2221: CDF editor dialog gives incorrect warnings when rank 3 data has rank 2 depend_2.  Thanks, Arnaud!
-            <li>Edit->Options now brings up editor for options node, since Options->Additional options already brings up the specialized editor.
-            <li>Edit->Duplicate Window would resize the new application improperly.
-            <li>ScriptGUIServet printed the labels twice for checkboxes. 
-            <li>when enabling new features, use status bar to remind that "save options" must be invoked.
-            <li>2216: options.colortable now allows scientists to specify colorbar preference.
-            <li>0786: server can now be stopped by either the Autoplot app or by the client issuing "close".
-            <li>calling createGui() from Python would result in null pointer exception because object had not been created before focus change.
-            <li>don't obscure IOException, which was hiding SSLException.
-            <li>tiny blue/green button tooltip refers to ctrl-T and ctrl-D, improve feedback for mouse over.  Thanks, Chris!
-            <li>resetting the DasPlot's DasAxis calls update ticksV on the new axis.
-            <li>2126: in basic mode, loading vap doesn't reset selector to URI.
-            <li>suppress warning when URL is not found for parameter in CDAWeb's all.xml.
-            <li>new NullPointerException, caused by careless code in total which assumed there was a DEPEND_2 property.  Thanks, Jon N.!
-            <li>rte15951983: selecting "basic" mode twice would result in a runtime exception.
-            <li>Matlab/IDL/Python interface needs to consider unit preferences, so it is consistent.
-            <li>2126: Basic mode prevents URI references from getting into the DataSetSelector, which is confusing.
-            <li>1991: when loading vap, immediately check that all IDs are unique and references resolvable.
-            <li>.gz files found within .zip files are can be read in.
-            <li>binary data source add the percent to the format, supporting ...&format=c, so that percent need not be within the URI.   URI encoding is tricky with percents.
-            <li>vap+audiosystem: would record for twice as long as it needed to.
-            <li>catch IndexOutOfBounds when events renderer sees an empty dataset (ds[0,4]).
-            <li>Run Batch tool replaces " " in output names with "_" so that filenames don't break.  Thanks, George!
-            <li>add read timeouts on CDAWeb web service calls.
-            <li>20191023a had new bug where reducex would drop DEPEND_1.
-            <li>v2019a_10 had bug where CDF files containing both zvariables and rvariables could not be read.
-            <li>check VARIABLE_PURPOSE in CDF Metadata when filtering parameter list.
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>add "cleanData" function which removes data three sigmas away from the mean.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>experimental code allows "data_1" to be used for a ticksURI.  Do not use this in production.
             <li>707: CDF reader supports multiple variables to be read into a bundle, GUI supports multiple selection.
@@ -92,21 +69,6 @@
             <li>704: add support for boolean Jython parameters (True/False instead of 'T'/'F').
             <li>2223: contours plot has new line style property.
             <li>1801: add wordy but fast implementation of magnitude for rank 2 and rank 3 datasets.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>2222: add new tickDirection property to orbit mode, one of left,right, or outside (the default).
-            <li>2222: tickValues property added to Das2 TickCurveRenderer (used for orbit mode), to be consistent with DasAxis and ContoursRenderer.
-            <li>removeFill function added.
-            <li>CDF editor dialog summary abbreviates depend names with common suffix.
-            <li>ScriptGUIServlet now uses whitelist file.
-            <li>highlight the green/blue pushbuttons on mouseover, to better indicate the intent.
-            <li>Basic mode more aggressively protects the address bar from URI references, so that the scientist can reenter .vap and .jy references.
-            <li>"http://autoplot.org/jnlp/v2019*/screen.png" can be browsed with the PNG Walk Tool.
-            <li>360: allow color type in jython script parameters.
-            <li>334: allow where constraint to have slice, so Z component can be used to filter with URIs like ...&where=BGSEc[:,2].lt(0)
-            <li>360: allow either values or enum to be used in script parameter constraints.
-            <li>popup slicers have write to PDF button.
         </ul>
         <p>Known issues:</p>
         <ul>
