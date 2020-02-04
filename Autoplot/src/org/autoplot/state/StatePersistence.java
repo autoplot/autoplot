@@ -1,11 +1,3 @@
-/*
- * StatePersistence.java
- *
- * Created on August 8, 2007, 10:47 AM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
 
 package org.autoplot.state;
 
@@ -28,7 +20,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
