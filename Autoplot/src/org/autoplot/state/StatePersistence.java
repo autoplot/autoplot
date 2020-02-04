@@ -75,7 +75,7 @@ import org.das2.qstream.SerializeDelegate;
 import org.das2.qstream.SerializeRegistry;
 
 /**
- *
+ * Class for serializing and deserializing application configuration.
  * @author jbf
  */
 public class StatePersistence {
@@ -127,18 +127,24 @@ public class StatePersistence {
         VapScheme currentScheme= new Vap1_09Scheme();
 
         VapScheme scheme;
-        if ( sscheme.equals("") ) {
-            scheme= new Vap1_08Scheme();
-        } else if ( sscheme.equals("1.09") ) {
-            scheme= new Vap1_09Scheme();
-        } else if ( sscheme.equals("1.08") ) {
-            scheme= new Vap1_08Scheme();
-        } else if ( sscheme.equals("1.07") ) {
-            scheme= new Vap1_07Scheme();
-        } else if ( sscheme.equals("1.06") ) {
-            scheme= new Vap1_06Scheme();
-        } else {
-            throw new IllegalArgumentException("output scheme not supported: "+sscheme);
+        switch (sscheme) {
+            case "":
+                scheme= new Vap1_08Scheme();
+                break;
+            case "1.09":
+                scheme= new Vap1_09Scheme();
+                break;
+            case "1.08":
+                scheme= new Vap1_08Scheme();
+                break;
+            case "1.07":
+                scheme= new Vap1_07Scheme();
+                break;
+            case "1.06":
+                scheme= new Vap1_06Scheme();
+                break;
+            default:
+                throw new IllegalArgumentException("output scheme not supported: "+sscheme);
         }
         
         if ( scheme.getId().equals( "1.08" ) && currentScheme.getId().equals("1.09") ) {
@@ -177,8 +183,6 @@ public class StatePersistence {
                 throw result;
             }
         }
-        
-        
 
         writeDocument( out, document);
     }
@@ -217,9 +221,8 @@ public class StatePersistence {
     }
     /**
      * write the document out to the file, hiding the details of the serializer.
-     * @param f
-     * @param document
-     * @return
+     * @param f the file
+     * @param document the XML document model.
      * @throws LSException
      * @throws DOMException
      * @throws FileNotFoundException
@@ -232,8 +235,8 @@ public class StatePersistence {
 
     /**
      * return the first child, if any, with the given tag name.
-     * @param parent
-     * @param tagName
+     * @param parent the node of the tree.
+     * @param tagName the node to look for.
      * @return return the child or null if no such child exists.
      */
     public static Element getChildElement( Element parent, String tagName ) {
@@ -249,7 +252,7 @@ public class StatePersistence {
 
     /**
      * restore the XML file, possibly promoting it.
-     * @param f
+     * @param f the xml vap file.
      * @return the dom object.
      * @throws IOException
      */
@@ -351,8 +354,8 @@ public class StatePersistence {
      * we need to way to implement bindings, since we may mutate the state
      * before syncing to it.  This makes the state more valid and avoids
      * bugs like 
-     * https://sourceforge.net/tracker/?func=detail&aid=3017554&group_id=199733&atid=970682
-     * @param state
+     * https://sourceforge.net/p/autoplot/bugs/362/
+     * @param state the application model
      */
     private static void doBindings( Application state ) {
         for ( BindingModel m: state.getBindings() ) {
@@ -375,7 +378,7 @@ public class StatePersistence {
      * since it's tied to classes in the running JRE.  It would be non-trivial
      * to implement this.  So we do this for now.
      * 
-     * @param state
+     * @param state the application model
      */
     private static void makeValid( Application state ) {
         if ( state.getController()!=null ) throw new IllegalArgumentException("state must not have controller");
@@ -670,15 +673,10 @@ public class StatePersistence {
             
             return state;
 
-        } catch (ParseException ex) {
+        } catch (ParseException | TransformerException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
-        } catch (TransformerException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new RuntimeException(ex);
-        } catch (SAXException ex) {
-            throw new RuntimeException(ex);
-        } catch (ParserConfigurationException ex) {
+        } catch (SAXException | ParserConfigurationException ex) {
             throw new RuntimeException(ex);
         }
 
@@ -692,39 +690,45 @@ public class StatePersistence {
         NodeList nl= element.getChildNodes();
         for ( int i=0; i<nl.getLength(); i++ ) {
             Node n= nl.item(i);
-            if ( n.getNodeName().equals("void") ) {
-                NamedNodeMap nn= n.getAttributes();
-                Node prop= nn.getNamedItem("property");
-                if ( prop!=null ) {
-                    if ( prop.getNodeValue().equals("autorange") ) prop.setNodeValue("autoRange");
-                    if ( prop.getNodeValue().equals("autolabel") ) prop.setNodeValue("autoLabel");
-                    if ( prop.getNodeValue().equals("panels") ) prop.setNodeValue("plotElements");
-                    if ( prop.getNodeValue().equals("parentPanel") ) prop.setNodeValue("parent");
-                }
-            } else if ( n.getNodeName().equals("object") ) {
-                NamedNodeMap nn= n.getAttributes();
-
-                Node prop= nn.getNamedItem("class");
-                if ( prop==null ) {
-                    continue;
-                }
-                if ( prop.getNodeValue().equals("org.virbo.autoplot.dom.Panel") ) {
-                    prop.setNodeValue("org.virbo.autoplot.dom.PlotElement");
-                } else if ( prop.getNodeValue().equals("org.virbo.autoplot.dom.PanelStyle") ) {
-                    prop.setNodeValue("org.virbo.autoplot.dom.PlotElementStyle");
-                }
-            } else if ( n.getNodeName().equals("array") ) {
-                NamedNodeMap nn= n.getAttributes();
-
-                Node prop= nn.getNamedItem("class");
-                if ( prop==null ) {
-                    continue;
-                }
-                if ( prop.getNodeValue().equals("org.virbo.autoplot.dom.Panel") ) {
-                    prop.setNodeValue("org.virbo.autoplot.dom.PlotElement");
-                } else if ( prop.getNodeValue().equals("org.virbo.autoplot.dom.PanelStyle") ) {
-                    prop.setNodeValue("org.virbo.autoplot.dom.PlotElementStyle");
-                }
+            NamedNodeMap nn;
+            Node prop;
+            switch (n.getNodeName()) {
+                case "void":
+                    nn= n.getAttributes();
+                    prop= nn.getNamedItem("property");
+                    if ( prop!=null ) {
+                        if ( prop.getNodeValue().equals("autorange") ) prop.setNodeValue("autoRange");
+                        if ( prop.getNodeValue().equals("autolabel") ) prop.setNodeValue("autoLabel");
+                        if ( prop.getNodeValue().equals("panels") ) prop.setNodeValue("plotElements");
+                        if ( prop.getNodeValue().equals("parentPanel") ) prop.setNodeValue("parent");
+                    }       
+                    break;
+                case "object":
+                    nn= n.getAttributes();
+                    prop= nn.getNamedItem("class");
+                    if ( prop==null ) {
+                        continue;
+                    } 
+                    if ( prop.getNodeValue().equals("org.virbo.autoplot.dom.Panel") ) {
+                        prop.setNodeValue("org.virbo.autoplot.dom.PlotElement");
+                    } else if ( prop.getNodeValue().equals("org.virbo.autoplot.dom.PanelStyle") ) {
+                        prop.setNodeValue("org.virbo.autoplot.dom.PlotElementStyle");
+                    }       
+                    break;
+                case "array":
+                    nn= n.getAttributes();
+                    prop= nn.getNamedItem("class");
+                    if ( prop==null ) {
+                        continue;
+                    }       
+                    if ( prop.getNodeValue().equals("org.virbo.autoplot.dom.Panel") ) {
+                        prop.setNodeValue("org.virbo.autoplot.dom.PlotElement");
+                    } else if ( prop.getNodeValue().equals("org.virbo.autoplot.dom.PanelStyle") ) {
+                        prop.setNodeValue("org.virbo.autoplot.dom.PlotElementStyle");
+                    }       
+                    break;
+                default:
+                    break;
             }
 
             if ( n.hasChildNodes() && n instanceof Element ) {
