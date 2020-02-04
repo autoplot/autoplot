@@ -671,7 +671,8 @@ public class CdfUtil {
         if ( slice1>-1 && qube.length>1 ) {
             buf[0]= doSlice1( buf[0], varType, qube, slice1, cdf.rowMajority() );
             if ( recCount==-1 ) {
-                throw new IllegalArgumentException("recCount==-1 and slice1>-1 when loading "+svariable);
+               // throw new IllegalArgumentException("recCount==-1 and slice1>-1 when loading "+svariable);
+               logger.fine("recCount==-1 and slice1>-1 when loading "+svariable);
             }
             int[] nqube= new int[qube.length-1];
             nqube[0]= qube[0];

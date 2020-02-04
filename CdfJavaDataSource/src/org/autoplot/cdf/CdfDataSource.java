@@ -1474,7 +1474,11 @@ public class CdfDataSource extends AbstractDataSource {
                             result.putProperty("DEPEND_" + idep, depDs);
                         } else {
                             if ( idep==1 ) {
-                                result.putProperty( QDataSet.CONTEXT_0, depDs.slice(slice1) ); 
+                                if ( depDs.rank()==0 ) {
+                                    result.putProperty( QDataSet.CONTEXT_0, depDs ); // rte 242122682: Hmm. I bet is always rank 0. 
+                                } else {
+                                    result.putProperty( QDataSet.CONTEXT_0, depDs.slice(slice1) ); 
+                                }
                             } else {
                                 if ( idep>1 ) {
                                     result.putProperty( "DEPEND_"+(idep-1), depDs );                    
