@@ -2,9 +2,6 @@
  * CdfUtil.java
  *
  * Created on July 24, 2007, 12:56 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
  */
 package org.autoplot.cdf;
 
@@ -672,7 +669,7 @@ public class CdfUtil {
             buf[0]= doSlice1( buf[0], varType, qube, slice1, cdf.rowMajority() );
             if ( recCount==-1 ) {
                // throw new IllegalArgumentException("recCount==-1 and slice1>-1 when loading "+svariable);
-               logger.fine("recCount==-1 and slice1>-1 when loading "+svariable);
+               logger.log(Level.FINE, "recCount==-1 and slice1>-1 when loading {0}", svariable);
             }
             int[] nqube= new int[qube.length-1];
             nqube[0]= qube[0];
@@ -920,6 +917,7 @@ public class CdfUtil {
      * @param cdf
      * @param variableName
      * @return the dimensions for each record.
+     * @throws gov.nasa.gsfc.spdf.cdfj.CDFException.ReaderError
      */
     public static int[] getDimensions( CDFReader cdf, String variableName ) throws CDFException.ReaderError {
         int[] dims= cdf.getDimensions( variableName );
