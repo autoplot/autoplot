@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.dom;
 
@@ -11,16 +7,20 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasRow;
 import org.das2.util.LoggerManager;
 
 /**
- *
+ * Controller for Row objects, mostly keeping the DasRow in sync with the DOM.
  * @author jbf
  */
 public class RowController extends DomNodeController {
+    
+    protected static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.dom.row" );
+    
     Row row;
     DasRow dasRow;
     Canvas canvas;
@@ -58,9 +58,17 @@ public class RowController extends DomNodeController {
                 try {
                     double[] dd= DasDevicePosition.parseLayoutStr((String)evt.getNewValue());
                     if ( evt.getPropertyName().equals(Row.PROP_TOP) ) {
-                        dasRow.setMin( dd[0], dd[1], (int) dd[2] );
+                        if ( dd[0]==dasRow.getMinimum() && dd[1]==dasRow.getEmMinimum() && ((int)dd[2])==dasRow.getPtMinimum() ) {
+                            logger.fine("suppressing change which would have no effect");
+                        } else {
+                            dasRow.setMin( dd[0], dd[1], (int) dd[2] );
+                        }
                     } else if ( evt.getPropertyName().equals(Row.PROP_BOTTOM) ) {
-                        dasRow.setMax( dd[0], dd[1], (int) dd[2] );
+                        if ( dd[0]==dasRow.getMaximum() && dd[1]==dasRow.getEmMaximum() && ((int)dd[2])==dasRow.getPtMinimum() ) {
+                            logger.fine("suppressing change which would have no effect");
+                        } else {
+                            dasRow.setMax( dd[0], dd[1], (int) dd[2] );
+                        }
                     }
                     //DasDevicePosition.parseLayoutStr( dasRow, row.getTop() + "," + row.getBottom() );
                 } catch (ParseException ex) {
