@@ -381,6 +381,13 @@ public class ParametersFormPanel {
                 valuePanel.setLayout( new BoxLayout( valuePanel, BoxLayout.X_AXIS ) );
                 if ( !isBool ) valuePanel.add( getSpacer() );
 
+                List<Object> values;
+                if ( parm.examples!=null ) {
+                    values= parm.examples;
+                } else {
+                    values= parm.enums;
+                }
+                
                 switch (parm.type) {
                     case 'U':
                         {
@@ -394,7 +401,8 @@ public class ParametersFormPanel {
                             } else {
                                 val= String.valueOf( parm.deft );
                                 params.put( vname, val );
-                            }       sel.setRecent( DataSetSelector.getDefaultRecent() );
+                            }       
+                            sel.setRecent( DataSetSelector.getDefaultRecent() );
                             sel.setValue( val );
                             valuePanel.add( getSpacer(7) );  // kludge.  Set on Jeremy's home Ubuntu
                             valuePanel.add( sel );
@@ -427,7 +435,8 @@ public class ParametersFormPanel {
                             } else {
                                 val= String.valueOf( parm.deft );
                                 params.put( vname, val );
-                            }       sel.setRecent( DataSetSelector.getDefaultRecent() );
+                            }       
+                            sel.setRecent( DataSetSelector.getDefaultRecent() );
                             sel.setValue( val );
                             valuePanel.add( getSpacer(7) );  // kludge.  Set on Jeremy's home Ubuntu
                             valuePanel.add( sel );
@@ -485,15 +494,21 @@ public class ParametersFormPanel {
                                 params.put( vname, val );
                             }       
                             final JComponent fjcf;
-                            if ( parm.enums!=null && parm.enums.size()>0 ) {
-                                Object[] labels= parm.enums.toArray();
+                                                        
+                            if ( values!=null && values.size()>0 ) {
+                                Object[] labels;
+                                if ( parm.examples!=null ) {
+                                    labels= parm.examples.toArray();
+                                } else {
+                                    labels= values.toArray();
+                                }
                                 if ( parm.constraints!=null && parm.constraints.containsKey("labels") ) {
                                     Object olabels= parm.constraints.get("labels");
                                     if ( olabels instanceof List ) {
                                         List labelsList= (List)olabels;
-                                        labels= new String[parm.enums.size()];
-                                        for ( int i=0; i<parm.enums.size(); i++ ) {
-                                            labels[i]= parm.enums.get(i)+": "+labelsList.get(i);
+                                        labels= new String[values.size()];
+                                        for ( int i=0; i<values.size(); i++ ) {
+                                            labels[i]= values.get(i)+": "+labelsList.get(i);
                                         }
                                     }
                                 }
@@ -502,7 +517,7 @@ public class ParametersFormPanel {
                                 }
                                 JComboBox jcb= new JComboBox(labels);
                                 jcb.setEditable(false);
-                                int index= parm.enums.indexOf(ColorUtil.decodeColor(val));
+                                int index= values.indexOf(ColorUtil.decodeColor(val));
                                 if ( index>-1 ) {
                                     jcb.setSelectedIndex(index);
                                 } else {
@@ -522,7 +537,7 @@ public class ParametersFormPanel {
                                 x.width= Integer.MAX_VALUE;
                                 ctf.setMaximumSize(x);
                                 ctf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-                                                                
+                                                              
                             } else {
                                 final JTextField tf= new JTextField();
                                 Dimension x= tf.getPreferredSize();
@@ -535,7 +550,7 @@ public class ParametersFormPanel {
                             fjcf= ctf;
                             valuePanel.add( ctf );
                             
-                            if ( parm.enums==null || parm.enums.isEmpty() ) {
+                            if ( values==null || values.isEmpty() ) {
                                 Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/autoplot/datasource/calendar.png"));
                                 JButton button= new JButton( fileIcon );
                                 button.addActionListener( new ActionListener() {
@@ -586,8 +601,8 @@ public class ParametersFormPanel {
                                 val= String.valueOf( parm.deft );
                                 params.put( vname, val );
                             }       
-                            if ( parm.enums!=null && parm.enums.size()>0 ) {
-                                if ( isBoolean( parm.enums ) ) {
+                            if ( values!=null && values.size()>0 ) {
+                                if ( isBoolean( values ) ) {
                                     JCheckBox jcb= new JCheckBox( label );
                                     jcb.setSelected( val.equals("T") || val.equals("1") || val.equals("True") );
                                     jcb.addActionListener( new ActionListener() {
@@ -598,19 +613,25 @@ public class ParametersFormPanel {
                                     });
                                     ctf= jcb;
                                 } else {
-                                    Object[] labels= parm.enums.toArray();
+                                    Object[] labels= values.toArray();
                                     if ( parm.constraints!=null && parm.constraints.containsKey("labels") ) {
                                         Object olabels= parm.constraints.get("labels");
                                         if ( olabels instanceof List ) {
                                             List labelsList= (List)olabels;
-                                            labels= new String[parm.enums.size()];
-                                            for ( int i=0; i<parm.enums.size(); i++ ) {
-                                                labels[i]= parm.enums.get(i)+": "+labelsList.get(i);
+                                            labels= new String[values.size()];
+                                            for ( int i=0; i<values.size(); i++ ) {
+                                                labels[i]= values.get(i)+": "+labelsList.get(i);
                                             }
                                         }
                                     }
                                     JComboBox jcb= new JComboBox(labels);
-                                    jcb.setEditable(false);
+                                    
+                                    if ( parm.examples==null || parm.examples.isEmpty() ) {
+                                        jcb.setEditable(false);
+                                    } else {
+                                        jcb.setEditable(true);
+                                    }
+                                    
                                     if ( parm.deft instanceof Long ) {
                                         oval = Long.valueOf(val);
                                     } else if ( parm.deft instanceof Integer ) {
@@ -622,16 +643,16 @@ public class ParametersFormPanel {
                                     } else {
                                         oval = val;
                                     }
-                                    int index= parm.enums.indexOf(oval);
+                                    int index= values.indexOf(oval);
                                     if ( index>-1 ) {
                                         jcb.setSelectedIndex(index);
                                     } else {
                                         jcb.setSelectedItem(oval);
                                     }
-                                    if ( !jcb.getSelectedItem().toString().startsWith(oval.toString()) ) {
+                                    if ( parm.examples==null && !jcb.getSelectedItem().toString().startsWith(oval.toString()) ) {
                                         logger.fine("uh-oh.");
                                     }
-                                    ctf= jcb;
+                                    ctf= jcb;                                    
                                     jcb.addActionListener( new ActionListener() {
                                         @Override
                                         public void actionPerformed(ActionEvent e) {
