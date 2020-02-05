@@ -50,6 +50,13 @@ public class Row extends DomNode {
     }
 
     public void setTop(String top) {
+        if ( this.id.equals("marginRow_0") ) {
+            if ( this.top.equals("2em") ) {
+                new Exception("marginRow set to 2em debugging").printStackTrace();
+            } else {
+                new Exception("marginRow set to 0% debugging").printStackTrace();
+            }
+        }
         String oldTop = this.top;
         this.top = top;
         propertyChangeSupport.firePropertyChange(PROP_TOP, oldTop, top);
