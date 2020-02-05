@@ -1459,7 +1459,7 @@ public class JythonUtil {
                         for (int j = 0; j < enumsList.size(); j++) {
                             enums.add(j, enumsList.get(j));
                         }
-                        p.enums = enums;
+                        p.enums = enums; 
                         PyObject labelsObject = pyDict.get(new PyString("labels"));
                         if (labelsObject != null && labelsObject instanceof PyList) {
                             PyList labelsList = (PyList) labelsObject;
