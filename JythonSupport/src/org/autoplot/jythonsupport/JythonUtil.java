@@ -514,6 +514,7 @@ public class JythonUtil {
         public Object value; // the value if available, null means not present.
         public String doc;
         public List<Object> enums;  // the allowed values
+        public List<Object> examples;    // example values
 
         /**
          * constraints for the value, such as:<ul>
@@ -1436,31 +1437,66 @@ public class JythonUtil {
             } else if (oo.__getitem__(3) instanceof PyDictionary) {
                 PyDictionary pyDict = ((PyDictionary) oo.__getitem__(3));
                 PyObject enumsObject;
+                PyObject examplesObject;
                 if (pyDict.has_key(new PyString("enum"))) {
-                    enumsObject = pyDict.pop(new PyString("enum"));
+                    logger.warning("values should be used instead of enum");
+                    enumsObject = pyDict.get(new PyString("enum"));
                 } else if (pyDict.has_key(new PyString("values"))) {
-                    enumsObject = pyDict.pop(new PyString("values"));
+                    enumsObject = pyDict.get(new PyString("values"));
                 } else {
                     enumsObject = null;
                 }
+                if (pyDict.has_key(new PyString("examples"))) {
+                    examplesObject = pyDict.get(new PyString("examples"));
+                } else {
+                    examplesObject = null;
+                }
                 Map<Object, Object> constraints = new HashMap<>();
-                if (enumsObject != null && enumsObject instanceof PyList) {
-                    PyList enumsList = (PyList) enumsObject;
-                    List<Object> enums = new ArrayList(enumsList.size());
-                    for (int j = 0; j < enumsList.size(); j++) {
-                        enums.add(j, enumsList.get(j));
-                    }
-                    p.enums = enums;
-                    PyObject labelsObject = pyDict.pop(new PyString("labels"));
-                    if (labelsObject != null && labelsObject instanceof PyList) {
-                        PyList labelsList = (PyList) labelsObject;
-                        List<Object> labels = new ArrayList(labelsList.size());
-                        for (int j = 0; j < labelsList.size(); j++) {
-                            labels.add(j, labelsList.get(j));
+                if ( enumsObject != null ) {
+                    if (  enumsObject instanceof PyList ) {
+                        PyList enumsList = (PyList) enumsObject;
+                        List<Object> enums = new ArrayList(enumsList.size());
+                        for (int j = 0; j < enumsList.size(); j++) {
+                            enums.add(j, enumsList.get(j));
                         }
-                        constraints.put("labels", labels);
+                        p.enums = enums;
+                        PyObject labelsObject = pyDict.get(new PyString("labels"));
+                        if (labelsObject != null && labelsObject instanceof PyList) {
+                            PyList labelsList = (PyList) labelsObject;
+                            List<Object> labels = new ArrayList(labelsList.size());
+                            for (int j = 0; j < labelsList.size(); j++) {
+                                labels.add(j, labelsList.get(j));
+                            }
+                            constraints.put("labels", labels);
+                        }
+                        
+                    } else {
+                        logger.log(Level.WARNING, "should be a list: {0}", enumsObject);
                     }
                 }
+                if ( examplesObject!=null ) {
+                    if (  examplesObject instanceof PyList ) {
+                        PyList examplesList = (PyList) examplesObject;
+                        List<Object> list = new ArrayList(examplesList.size());
+                        for (int j = 0; j < examplesList.size(); j++) {
+                            list.add(j, examplesList.get(j));
+                        }
+                        p.examples = list;
+                        PyObject labelsObject = pyDict.get(new PyString("labels"));
+                        if (labelsObject != null && labelsObject instanceof PyList) {
+                            PyList labelsList = (PyList) labelsObject;
+                            List<Object> labels = new ArrayList(labelsList.size());
+                            for (int j = 0; j < labelsList.size(); j++) {
+                                labels.add(j, labelsList.get(j));
+                            }
+                            constraints.put("labels", labels);
+                        }
+                        
+                    } else {
+                        logger.log(Level.WARNING, "should be a list: {0}", enumsObject);
+                    }
+                }
+                    
                 p.constraints = constraints;
             }
             p.value = params == null ? null : params.get(p.name);
