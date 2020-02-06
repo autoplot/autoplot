@@ -6419,8 +6419,9 @@ APSplash.checkTime("init 240");
      * to provide a way to experiment with setting editor colors, but might be 
      * useful for other purposes.  
      * @return null or the editor panel
+     * @see #getScriptPanel() which returns the panel
      */
-    public EditorTextPane getScriptPanel() {
+    public EditorTextPane getScriptEditor() {
         if ( this.scriptPanel!=null ) {
             return this.scriptPanel.getEditorPanel();
         } else {
@@ -6428,6 +6429,22 @@ APSplash.checkTime("init 240");
         }
     }
 
+    /**
+     * Return the script editor panel.  Until v2020a_2 and 20200202a, this 
+     * returned the EditorTextPane rather than the tab itself.  This is 
+     * inconsistent with other calls.  For example:
+     * <pre>
+     * s= getApplication().getScriptPanel().getFilename() 
+     * print( 'script editor filename:' )
+     * print( s )
+     * </pre>
+     * @see #getScriptEditor() which returns the editor itself.
+     * @return the editor panel in the script tab.
+     */
+    public JythonScriptPanel getScriptPanel() {
+        return this.scriptPanel;
+    }
+    
 //
 //    /**
 //     * temporary to debug https://sourceforge.net/p/autoplot/bugs/1520/
