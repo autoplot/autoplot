@@ -6415,9 +6415,9 @@ APSplash.checkTime("init 240");
     }
     
     /**
-     * access the editor for scripts, if available.  This was initially added to provide
-     * a way to experiment with setting editor colors, but might be useful
-     * for other purposes.  
+     * access the editor for scripts, if available.  This was initially added 
+     * to provide a way to experiment with setting editor colors, but might be 
+     * useful for other purposes.  
      * @return null or the editor panel
      */
     public EditorTextPane getScriptPanel() {
@@ -6459,9 +6459,9 @@ APSplash.checkTime("init 240");
                             String cmd= e.getActionCommand();
                             File f= new File( new URI( URISplit.parse(cmd).file ) );
                             Map<String,Object> env= new HashMap<>();
-                            env.put( "editor", scriptPanel.getEditorPanel() );
-                            env.put( "scriptPanel", scriptPanel );
-                            env.put( "script", scriptPanel.getFilename() );
+                            // env.put( "editor", scriptPanel.getEditorPanel() ); getApplication().getScriptPanel().getEditorPanel()
+                            // env.put( "scriptPanel", scriptPanel ); getApplication().getScriptPanel()
+                            // env.put( "script", scriptPanel.getFilename() );  getApplication().getScriptPanel().getFilename() )
                             JythonUtil.invokeScriptNow( env, f );
                         } catch (IOException|URISyntaxException ex) {
                             logger.log(Level.SEVERE, null, ex);
