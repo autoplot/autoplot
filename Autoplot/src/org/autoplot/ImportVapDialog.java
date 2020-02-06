@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import org.das2.components.DasProgressPanel;
@@ -37,6 +38,7 @@ public class ImportVapDialog extends javax.swing.JPanel {
     /** Creates new form ImportVapDialog */
     public ImportVapDialog() {
         initComponents();
+        dataSetsPanel.setLayout( new BoxLayout(dataSetsPanel, BoxLayout.Y_AXIS) );
     }
 
     /**
