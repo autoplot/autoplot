@@ -240,8 +240,9 @@ public class BookmarksManager extends javax.swing.JDialog {
     /**
      * return the remoteUrl containing this bookmark, or an empty string.
      * @param b the target bookmark.  This can be null.
+     * @param model internal model for the GUI.
      * @param treeModel the model containing the bookmark
-     * @param ppath the path to the bookmark.
+     * @param ppath null or the path to the bookmark.
      * @return the first remote URL containing the bookmark, or an empty string if it is local.
      */
     protected static String maybeGetRemoteBookmarkUrl(Bookmark b, BookmarksManagerModel model, TreeModel treeModel, TreePath ppath ) {

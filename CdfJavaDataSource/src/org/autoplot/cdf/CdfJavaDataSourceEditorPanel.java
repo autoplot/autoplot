@@ -845,24 +845,25 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             TreePath[] tps= parameterTree.getSelectionPaths();
             StringBuilder arg0= new StringBuilder();
             
-            for ( TreePath treePath : tps ) {
-                if ( arg0.length()>0 ) arg0.append(";");
-                if ( treePath==null ) {
-                    logger.fine("param was null");
-                } else if ( treePath.getPathCount()==3 ) {
-                    String p= String.valueOf( treePath.getPathComponent(1) );
-                    p= p.replaceAll("=", "%3D");
-                    String val=  String.valueOf( treePath.getPathComponent(2) );
-                    int idx= val.indexOf(":");
-                    arg0.append(p).append("[:,").append(val.substring(0,idx).trim()).append("]");
-                } else {
-                    String p= String.valueOf( treePath.getPathComponent(1) );
-                    p= p.replaceAll("=", "%3D");
-                    arg0.append(p).append(subset);
+            if ( tps!=null ) {
+                for ( TreePath treePath : tps ) {
+                    if ( arg0.length()>0 ) arg0.append(";");
+                    if ( treePath==null ) {
+                        logger.fine("param was null");
+                    } else if ( treePath.getPathCount()==3 ) {
+                        String p= String.valueOf( treePath.getPathComponent(1) );
+                        p= p.replaceAll("=", "%3D");
+                        String val=  String.valueOf( treePath.getPathComponent(2) );
+                        int idx= val.indexOf(":");
+                        arg0.append(p).append("[:,").append(val.substring(0,idx).trim()).append("]");
+                    } else {
+                        String p= String.valueOf( treePath.getPathComponent(1) );
+                        p= p.replaceAll("=", "%3D");
+                        arg0.append(p).append(subset);
+                    }
                 }
+                lparams.put( "arg_0", arg0.toString() );
             }
-            
-            lparams.put( "arg_0", arg0.toString() );
             
             if ( xCheckBox.isSelected() ) {
                 TreePath depend0Path= parameterTree1.getSelectionPath();

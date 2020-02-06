@@ -585,6 +585,7 @@ public class MetadataPanel extends javax.swing.JPanel {
     private void copyMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyMenuItemActionPerformed
         LoggerManager.logGuiEvent(evt);
         TreePath tp= metaDataTree.getSelectionPath();
+        if ( tp==null ) return;
         StringSelection stringSelection = new StringSelection( tp.getLastPathComponent().toString() );
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(stringSelection, new ClipboardOwner() {
@@ -597,6 +598,7 @@ public class MetadataPanel extends javax.swing.JPanel {
     private void copyValueMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyValueMenuItemActionPerformed
         LoggerManager.logGuiEvent(evt);
         TreePath tp= metaDataTree.getSelectionPath();
+        if ( tp==null ) return;
         String s= tp.getLastPathComponent().toString();
         int i= s.indexOf('=');
         if ( i>-1 ) {

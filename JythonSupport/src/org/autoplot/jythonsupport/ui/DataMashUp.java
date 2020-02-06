@@ -1332,7 +1332,9 @@ public class DataMashUp extends javax.swing.JPanel {
      * use the resolver to get the QDataSet, then plot it.
      */
     private void plotExpr( ) {
-        QDataSet showMe= resolved.get( getAsJythonInline( (TreeNode)expressionTree.getSelectionPath().getLastPathComponent() ));
+        TreePath tp= expressionTree.getSelectionPath();
+        if ( tp==null ) return;
+        QDataSet showMe= resolved.get( getAsJythonInline( (TreeNode)tp.getLastPathComponent() ));
         if ( showMe!=null ) {
             resolver.interactivePlot( showMe );
         } else {
@@ -1340,7 +1342,9 @@ public class DataMashUp extends javax.swing.JPanel {
                 Runnable run= new Runnable() {
                     @Override
                     public void run() {
-                        QDataSet showMe= resolver.getDataSet( getAsJythonInline( (TreeNode)expressionTree.getSelectionPath().getLastPathComponent() ) );
+                        TreePath tp= expressionTree.getSelectionPath();
+                        if ( tp==null ) return;
+                        QDataSet showMe= resolver.getDataSet( getAsJythonInline( (TreeNode)tp.getLastPathComponent() ) );
                         resolver.interactivePlot( showMe );
                     }
                 };
@@ -1800,11 +1804,12 @@ public class DataMashUp extends javax.swing.JPanel {
                 } else if  ( dge.getComponent()==expressionTree ) {
                     if ( expressionTree.getSelectionCount()==1 ) {
                         TreePath tp= expressionTree.getSelectionPath();
+                        if ( tp==null ) return;
                         DefaultMutableTreeNode n= (DefaultMutableTreeNode)tp.getLastPathComponent();
                         s= getJython( (DefaultTreeModel)expressionTree.getModel(), n );
                     }
                 } else if  ( dge.getComponent()==namedURIListTool1 ) {
-                    System.err.println("herehere");   
+                    logger.fine("here where dge.getComponent()==namedURIListTool1");
                 }
                 if ( s!=null ) {
                     if ( s.contains(": ") ) {
