@@ -296,6 +296,22 @@ public class NetCdfVarDataSet extends AbstractDataSet {
             }
         }
         
+        Object lablPtr= attributes.get("LABL_PTR_1");
+        if ( lablPtr!=null && lablPtr instanceof String ) {
+            Variable vv= ncfile.findVariable((String)lablPtr);
+            if ( vv==null ) {
+                logger.log(Level.WARNING, "unable to find variable: {0}", lablPtr);
+            } else {
+                if ( vv.getDataType()==DataType.CHAR && vv.getDimensions().size()==2 && shape[1]==vv.getDimension(0).getLength() ) {
+                    String[] ss= new String[vv.getDimension(0).getLength()];
+                    char[][] arr= (char[][])vv.read().copyToNDJavaArray();
+                    for ( int i=0; i<ss.length; i++ ) {
+                        ss[i]= String.copyValueOf(arr[i]);
+                    }
+                    properties.put( "DEPEND_1", Ops.labelsDataset(ss) );
+                }
+            }
+        }
         
         if ( attributes.containsKey("units") ) {
             String unitsString= (String)attributes.get("units");
