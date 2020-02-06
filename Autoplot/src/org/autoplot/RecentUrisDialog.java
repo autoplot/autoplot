@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /*
  * RecentUrisDialog.java
@@ -19,15 +15,21 @@ import java.awt.event.MouseEvent;
  * Present GUI showing history of plotted URIs with buttons for
  * ok, plotting below, as an overplot, or editing.  The getModifiers()
  * method is called to see which action was pressed:
+ *<pre>
  *   0                    replace plot
  *   KeyEvent.CTRL_MASK   plot below
  *   KeyEvent.SHIFT_MASK  overplot
  *   KeyEvent.ALT_MASK    edit this URI.
+ * </pre>
  * @author jbf
  */
-public class RecentUrisDialog extends javax.swing.JDialog {
+public final class RecentUrisDialog extends javax.swing.JDialog {
 
-    /** Creates new form RecentUrisDialog */
+    /** 
+     * Creates new form RecentUrisDialog
+     * @param parent
+     * @param modal 
+     */
     public RecentUrisDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -35,7 +37,7 @@ public class RecentUrisDialog extends javax.swing.JDialog {
         recentUrisGUI1.getTree().addMouseListener( new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Object o=null;
+                Object o;
                 o= recentUrisGUI1.getTree().getSelectionPath();
                 if ( o==null ) return;
                 o= recentUrisGUI1.getTree().getSelectionPath().getLastPathComponent();
@@ -52,9 +54,12 @@ public class RecentUrisDialog extends javax.swing.JDialog {
         recentUrisGUI1.setFilter("");
         setLocationRelativeTo(parent);
         
-        
     }
 
+    /**
+     * set the filter constraining the list.
+     * @param filter 
+     */
     public void setFilter( String filter ) {
         recentUrisGUI1.setFilter( filter );
     }
