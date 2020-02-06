@@ -1211,13 +1211,16 @@ public class GuiSupport {
             if ( d.showDialog( SwingUtilities.getWindowAncestor( dom.getController().getDasCanvas() ) )==JOptionPane.OK_OPTION ) {
                 String lock= "merging vaps";
                 dom.getController().registerPendingChange( d,lock );
-                dom.getController().performingChange( d, lock );
-                List<String> uris= d.getSelectedURIs();
-                for ( String uri: uris ) {
-                    dom.getController().doplot( plot, pelement, uri );
-                    pelement= null; //otherwise we'd clobber last dataset.
+                try {
+                    dom.getController().performingChange( d, lock );
+                    List<String> uris= d.getSelectedURIs();
+                    for ( String uri: uris ) {
+                        dom.getController().doplot( plot, pelement, uri );
+                        pelement= null; //otherwise we'd clobber last dataset.
+                    }
+                } finally {
+                    dom.getController().changePerformed( d, lock );
                 }
-                dom.getController().changePerformed( d, lock );
             }
         } catch (IOException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
@@ -1329,7 +1332,11 @@ public class GuiSupport {
                 case 0:
                     String val= uris[0];
                     if ( val.endsWith(".vap") ) {
-                        mergeVap(dom,lplot, lpelement, val);
+                        try {
+                            mergeVap(dom,lplot, lpelement, val);
+                        } finally {
+                            dom.getController().changePerformed( dom, lock );
+                        }
                     } else {
                         final String lval= val;
                         run= new Runnable() {
@@ -1430,13 +1437,15 @@ public class GuiSupport {
             //    pelement = dom.getController().addPlotElement(plot, null);
             //}
                 case -1:
+                    dom.getController().changePerformed( dom, lock );
                     break;
                 default:
+                    dom.getController().changePerformed( dom, lock );
                     break;
             }
         } catch ( IllegalArgumentException ex ) { // TODO: the IllegalArgumentException is wrapped in a RuntimeException, I don't know why.  I should have MalformedURIException
             applicationModel.showMessage( ex.getMessage(), "Illegal Argument", JOptionPane.ERROR_MESSAGE );
-        }
+        } 
     }
 
     /**
