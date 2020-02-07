@@ -117,9 +117,17 @@ public class JythonUtil {
 
     protected static void runScript( ApplicationModel model, String script, String[] argv, String pwd ) throws IOException {
         logger.entering( "org.autoplot.JythonUtil", "runScript {0}", script );
-        URL url= DataSetURI.getURL(script);
-        try (InputStream in = url.openStream()) {
-            runScript(model, in, script, argv, pwd );
+        try {
+            URI scriptURI;
+            scriptURI= DataSetURI.getURI(script);
+            try (InputStream in = DataSetURI.getInputStream( scriptURI, new NullProgressMonitor() ) ) {
+               runScript(model, in, script, argv, pwd );
+            }
+        } catch (URISyntaxException ex) {
+            URL scriptURL= DataSetURI.getURL(script);
+            try (InputStream in = DataSetURI.getInputStream( scriptURL, new NullProgressMonitor() ) ) {
+               runScript(model, in, script, argv, pwd );
+            }
         }
         logger.exiting( "org.autoplot.JythonUtil", "runScript {0}", script );
     }
