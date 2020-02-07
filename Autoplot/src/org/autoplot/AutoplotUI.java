@@ -5322,8 +5322,8 @@ APSplash.checkTime("init 240");
 
     /**
      * print a usage document to the print stream.
-     * @param args
-     * @param s
+     * @param args Autoplot's args
+     * @param s the script URI
      * @param scriptArgs
      * @param out
      * @throws IOException 
@@ -5333,6 +5333,13 @@ APSplash.checkTime("init 240");
         String script= org.autoplot.jythonsupport.JythonUtil.readScript( new FileReader(f) );
         //List<org.autoplot.jythonsupport.JythonUtil.Param> parms= org.autoplot.jythonsupport.JythonUtil.getGetParams( script );
         org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor sd= org.autoplot.jythonsupport.JythonUtil.describeScript(script,null);
+        
+        String label= sd.getLabel();
+        if ( label.length()==0 ) {
+            out.println("# "+f.getName());
+        } else {
+            out.println("# "+label);
+        }
         if ( sd.getTitle().length()>0 ) {
             out.println( sd.getTitle() );
         }
