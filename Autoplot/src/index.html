@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Cookie weight is entered directly into GitLab file from a cell phone in the kitchen, then plotted the next day in Autoplot.
+        <p><small>New <a href='http://www-pw.physics.uiowa.edu/~jbf/autoplot/javadoc2018/org/das2/qds/ops/Ops.html#cleanData-org.das2.qds.QDataSet-double-int-'>cleanData</a> function removes data which is three standard deviations from the norm.  It is available as a filter and in scripts.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,11 +26,20 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-02-02 r24524):</p>
+        <p>Bugfixes (2020-02-08 r24554):</p>
         <ul>
+            <li>applyUnaryOp performance improved for rank 1 data.
+            <li>2235: atan2 documentation tweak
+            <li>getApplication().getScriptPanel() would return the editor, not the entire panel.  Codes should use getApplication().getScriptEditor() for this.
+            <li>bugfix:autoplot --script=https://github.com/.../extractReferences.jy didn't work because it would load the html from GitHub directly, not via GitHubFileSystem.
+            <li>clean up of old code which allowed loading URIs found in .vap file.
+            <li>2114: Support <a href="https://github.com/autoplot/documentation/wiki/QDataSet.Schemes#vector-time-series">vector array</a> in NetCDF file using CDAWeb metadata.  Thanks, Andres!
+            <li>bugfix parse of |cleanData(11) 
+            <li>rfe 1978078909: check for null selection in CDFEditorPanel, and review use of all JTrees.  Thanks, Dan!
+            <li>clean up of row change events to fix noise problems on Jenkins server.
             <li>242122682: condition where ...cdf?var[:,0] would result in runtime error.
             <li>experiment with Level.CONFIG, to be used to log client use of DasCanvas.
-            <li>getCompletions call of Cdf would download file, the monitor was used twice.
+            <li>getCompletions call of CDF would download file, the monitor was used twice.
             <li>editor javadoc location is tolerant of paths missing final /, and generated URLs should not have spaces for <a href="http://www-pw.physics.uiowa.edu/~jbf/autoplot/doc">new location</a>.
         </ul>
         <p>Older Bugfixes:</p>
@@ -58,6 +67,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>editor scripts don't need special "editor" and "script" symbols, since they can use getApplication().getScriptPanel().
+            <li>360: support Jython "examples":[2,3,4,5] which doesn't require that the value be one of these.
             <li>672: cleanData allows the number of sigmas to be set.
             <li>672: add "cleanData" function which removes data three sigmas away from the mean.
         </ul>
