@@ -125,7 +125,10 @@ import java.util.zip.*;
             while (true) {
                 _buf.position(offset_NEXT_VDR);
                 //int next = lowOrderInt(_buf);
-                long next = longInt(_buf);
+                long next = longInt(_buf); // psp_fld_l2_dfb_dbm_scm_2018102700_v01.cdf fails at 81551972  psp_fld_l2_dfb_dbm_scmv
+                if ( next==81551972 ) {
+                    System.err.println("here130 fails next");
+                }
                 CDFVariable cdfv = new CDFVariable(offset, vtypes[vtype]);
                 String name = cdfv.getName();
                 v.add(name);
