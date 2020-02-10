@@ -62,7 +62,12 @@ public class JavadocLookup {
                 } else if ( s.startsWith("http://www-pw.physics.uiowa.edu/~jbf/autoplot/javadoc2018/") ) {
                     return s + signature.replaceAll("[\\(\\)\\,]", "-");
                 } else if ( s.startsWith("http://www-pw.physics.uiowa.edu/~jbf/autoplot/doc")) {
-                    return s + signature;
+                    if ( signature.startsWith("org/das2/qds/ops/Ops.html") ) {
+                        char let= signature.charAt(26);
+                        return s + signature.substring(0,20) + "_" + let + signature.substring(20);
+                    } else {
+                        return s + signature;
+                    }
                 } else {
                     return s + signature.replaceAll(",", ", ");
                 }
