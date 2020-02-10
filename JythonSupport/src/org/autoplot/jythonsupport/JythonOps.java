@@ -468,4 +468,21 @@ public class JythonOps {
         new Thread(run).start();
     }
 
+    /**
+     * return the current line in the Jython script as &lt;filename&gt;:&lt;linenum&gt;
+     * or ??? if this cannot be done.  Note calls to this will collect a stack
+     * trace and will affect performance.
+     * @return the current line or ???
+     */
+    public static String currentLine() {
+        StackTraceElement[] sts= new Exception().getStackTrace();
+        int i= 0;
+        while ( i<sts.length ) {
+            if ( sts[i].getClassName().startsWith("org.python.pycode") ) {
+                return sts[i].getFileName()+":"+ sts[i].getLineNumber();
+            }
+            i=i+1;
+        }
+        return "???";
+    }
 }
