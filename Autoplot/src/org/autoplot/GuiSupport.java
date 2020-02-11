@@ -2010,54 +2010,11 @@ public class GuiSupport {
                 
             }
             if ( JOptionPane.showConfirmDialog( app, panel, "Add Plot Elements", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-                Object lockObject= "addPlotElements";
-        
-                controller.registerPendingChange( app, lockObject );
-                DomLock lock= controller.mutatorLock();
-        
-                try {
-                    lock.lock("pasting plot elements");
-                    controller.performingChange( app, lockObject ); 
-                    
-                    Map<String,String> nameMap= new HashMap<>();
-            
-                    for ( int i=0; i<state.getDataSourceFilters().length; i++ ) {
-                        DataSourceFilter stateDsf= state.getDataSourceFilters(i);
-                        List<PlotElement> pes1= DomUtil.getPlotElementsFor( state, stateDsf );
-                        boolean inUse= false;
-                        for ( PlotElement pe1: pes1 ) {
-                            for ( int j=0; j<pes.length; j++ ) {
-                                if ( pes[j]==pe1 ) {
-                                    if ( cbs[j].isSelected() ) {
-                                        inUse=true;
-                                    }
-                                }
-                            }
-                        }
-                        if ( inUse ) {
-                            DataSourceFilter newDsf= controller.addDataSourceFilter();
-                        
-                            if ( stateDsf.getUri().startsWith("vap+internal:") ) {
-                                //unresolved.add(stateDsf);
-                            } else {
-                                newDsf.syncTo(stateDsf,Collections.singletonList("id"));   
-                                state.setDataSourceFilters(i,null); // mark as done
-                            }
-                            nameMap.put( stateDsf.getId(), newDsf.getId() );
-                        }
-                    }
-                    //TODO: vap+internal:data_1,data_2
-                    for ( int i=0; i<pes.length; i++ ) {
-                        if ( cbs[i].isSelected() ) {
-                            PlotElement peNew= controller.addPlotElement( targetPlot, null, null );
-                            peNew.syncTo( pes[i], Arrays.asList("id","plotId","dataSourceFilterId") );
-                            peNew.setDataSourceFilterId( nameMap.get(pes[i].getDataSourceFilterId()));
-                        }
-                    }
-                } finally {
-                    controller.changePerformed( app, lockObject );
-                    lock.unlock();
+                boolean[] selected= new boolean[pes.length];
+                for ( int i=0; i<pes.length; i++ ) {
+                    selected[i]= cbs[i].isSelected();
                 }
+                doPasteClipboardPlotElementsIntoPlot(app, controller, pes, selected, targetPlot );
             }
             
         } catch (UnsupportedFlavorException | IOException ex) {
@@ -2065,6 +2022,67 @@ public class GuiSupport {
         }
     }  
     
+    /**
+     * do not use, this is introduced for testing.
+     * @param client just used as lock object
+     * @param controller
+     * @param pes
+     * @param selected 
+     * @param targetPlot
+     */
+    public static void doPasteClipboardPlotElementsIntoPlot( Object client, ApplicationController controller, PlotElement[] pes, boolean[] selected, Plot targetPlot) {
+        Object lockObject = "addPlotElements";
+
+        Application state = controller.getApplication();
+
+        controller.registerPendingChange(client, lockObject);
+        DomLock lock = controller.mutatorLock();
+
+        try {
+            lock.lock("pasting plot elements");
+            controller.performingChange(client, lockObject);
+
+            Map<String, String> nameMap = new HashMap<>();
+
+            for (int i = 0; i < state.getDataSourceFilters().length; i++) {
+                DataSourceFilter stateDsf = state.getDataSourceFilters(i);
+                List<PlotElement> pes1 = DomUtil.getPlotElementsFor(state, stateDsf);
+                boolean inUse = false;
+                for (PlotElement pe1 : pes1) {
+                    for (int j = 0; j < pes.length; j++) {
+                        if (pes[j] == pe1) {
+                            if (selected[j]) {
+                                inUse = true;
+                            }
+                        }
+                    }
+                }
+                if (inUse) {
+                    DataSourceFilter newDsf = controller.addDataSourceFilter();
+
+                    if (stateDsf.getUri().startsWith("vap+internal:")) {
+                        //unresolved.add(stateDsf);
+                    } else {
+                        newDsf.syncTo(stateDsf, Collections.singletonList("id"));
+                        state.setDataSourceFilters(i, null); // mark as done
+                    }
+                    nameMap.put(stateDsf.getId(), newDsf.getId());
+                }
+            }
+            //TODO: vap+internal:data_1,data_2
+            for (int i = 0; i < pes.length; i++) {
+                if (selected[i]) {
+                    PlotElement peNew = controller.addPlotElement(targetPlot, null, null);
+                    peNew.syncTo(pes[i], Arrays.asList("id", "plotId", "dataSourceFilterId"));
+                    peNew.setDataSourceFilterId(nameMap.get(pes[i].getDataSourceFilterId()));
+                }
+            }
+        } finally {
+            controller.changePerformed(client, lockObject);
+            lock.unlock();
+        }
+
+    }
     
     /**
      * Add items to the plot context menu, such as properties and add plot.
