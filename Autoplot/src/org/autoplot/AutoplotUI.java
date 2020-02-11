@@ -6481,13 +6481,10 @@ APSplash.checkTime("init 240");
                     public void actionPerformed(ActionEvent e) {
                         try {
                             String cmd= e.getActionCommand();
-                            File f= new File( new URI( URISplit.parse(cmd).file ) );
+                            File f= DataSetURI.getFile( cmd, new NullProgressMonitor() );
                             Map<String,Object> env= new HashMap<>();
-                            // env.put( "editor", scriptPanel.getEditorPanel() ); getApplication().getScriptPanel().getEditorPanel()
-                            // env.put( "scriptPanel", scriptPanel ); getApplication().getScriptPanel()
-                            // env.put( "script", scriptPanel.getFilename() );  getApplication().getScriptPanel().getFilename() )
                             JythonUtil.invokeScriptNow( env, f );
-                        } catch (IOException|URISyntaxException ex) {
+                        } catch (IOException ex) {
                             logger.log(Level.SEVERE, null, ex);
                         }
                     }
