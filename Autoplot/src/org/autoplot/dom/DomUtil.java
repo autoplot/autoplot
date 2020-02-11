@@ -1150,7 +1150,7 @@ public class DomUtil {
      * @param domPlot
      * @return 
      */
-    static String getPlotAsString(Application application, Plot domPlot) {
+    public static String getPlotAsString(Application application, Plot domPlot) {
         Application newApp= new Application();
         newApp.setPlots( new Plot[] { domPlot } );
         List<PlotElement> pes= getPlotElementsFor( application, domPlot );
