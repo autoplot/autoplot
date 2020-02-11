@@ -126,9 +126,6 @@ import java.util.zip.*;
                 _buf.position(offset_NEXT_VDR);
                 //int next = lowOrderInt(_buf);
                 long next = longInt(_buf); // psp_fld_l2_dfb_dbm_scm_2018102700_v01.cdf fails at 81551972  psp_fld_l2_dfb_dbm_scmv
-                if ( next==81551972 ) {
-                    System.err.println("here130 fails next");
-                }
                 CDFVariable cdfv = new CDFVariable(offset, vtypes[vtype]);
                 String name = cdfv.getName();
                 v.add(name);
@@ -140,7 +137,11 @@ import java.util.zip.*;
                 table.put(name, cdfv);
                 if (next == 0) break;
                 offset = next;
-                _buf = getRecord(offset);
+                try {
+                    _buf = getRecord(offset);
+                } catch ( IllegalArgumentException ex ) {
+                    throw new IllegalStateException("Unable to access variable \""+name+"\" at offset "+offset + " which is past file length "+buf.limit()+", is the file truncated?",ex);
+                }
             }
         }
         varNames = new String[v.size()];
