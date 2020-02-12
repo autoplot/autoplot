@@ -2,6 +2,7 @@
 package org.autoplot.datasource;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.FocusAdapter;
@@ -153,8 +154,12 @@ public final class TimeRangeTool extends javax.swing.JPanel {
                 g.setClip(null);
                 int inow= (int)dasAxis.transform( TimeUtil.now() );
                 int iy= (int)dasAxis.getRow().getDMaximum();
+                g.setColor(Color.BLUE);
                 g.fillPolygon( new int[] {inow-7,inow,inow+7,inow-7}, 
-                        new int[] { iy-7,iy, iy-7, iy-7 }, 4 );
+                        new int[] { iy-11,iy, iy-11, iy-11 }, 4 );
+                g.setColor(Color.BLUE.darker());
+                g.drawPolygon( new int[] {inow-7,inow,inow+7,inow-7}, 
+                        new int[] { iy-11,iy, iy-11, iy-11 }, 4 );
             }
             
         };
