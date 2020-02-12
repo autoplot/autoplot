@@ -1,7 +1,9 @@
 
 package org.autoplot.datasource;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
@@ -34,6 +36,10 @@ import org.das2.datum.LoggerManager;
 import org.das2.datum.Orbits;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.format.TimeDatumFormatter;
+import org.das2.graph.DasAxis;
+import org.das2.graph.DasCanvas;
+import org.das2.graph.DasColumn;
+import org.das2.graph.DasRow;
 
 /**
  * GUI for creating valid time ranges by calendar times, orbit, or NRT
@@ -54,7 +60,8 @@ public final class TimeRangeTool extends javax.swing.JPanel {
      * datumrange where we started.
      */
     private DatumRange pendingTimeRange;
-
+    private DasAxis dasAxis;
+    
     private final Preferences prefs;
     private static final String PREF_SPACECRAFT = "spacecraft";
 
@@ -133,6 +140,32 @@ public final class TimeRangeTool extends javax.swing.JPanel {
             }
         });
         interpretationLabel.setText( interpretIso8601Range( nrtComboBox.getSelectedItem().toString() ));
+        
+        final DasCanvas canvas= new DasCanvas( 528, 89 );
+        DasRow row= new DasRow( canvas, 0.3, 0.5 );
+        DasColumn column= new DasColumn( canvas, 0.1, 0.9 );
+        dasAxis= new DasAxis( DatumRangeUtil.parseTimeRangeValid("P1D"), DasAxis.HORIZONTAL ) {
+            @Override
+            protected void paintComponent(Graphics graphics) {
+                Graphics g= graphics.create();
+                super.paintComponent(graphics);
+                g.translate(-getX(), -getY());
+                g.setClip(null);
+                int inow= (int)dasAxis.transform( TimeUtil.now() );
+                int iy= (int)dasAxis.getRow().getDMaximum();
+                g.fillPolygon( new int[] {inow-7,inow,inow+7,inow-7}, 
+                        new int[] { iy-7,iy, iy-7, iy-7 }, 4 );
+            }
+            
+        };
+        dasAxis.removeMouseListener( dasAxis.getDasMouseInputAdapter() );
+        dasAxis.setAnimated(true);
+        canvas.add( dasAxis, row, column );
+        
+        jPanel5.setLayout( new BorderLayout() );
+        
+        jPanel5.add( canvas, BorderLayout.CENTER );
+        jPanel5.revalidate();
         
         scComboBox.setModel( new DefaultComboBoxModel(getSpacecraft()) );
 
@@ -774,11 +807,11 @@ public final class TimeRangeTool extends javax.swing.JPanel {
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 0, Short.MAX_VALUE)
+            .add(0, 528, Short.MAX_VALUE)
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 100, Short.MAX_VALUE)
+            .add(0, 89, Short.MAX_VALUE)
         );
 
         interpretationLabel.setText("---------");
@@ -787,15 +820,15 @@ public final class TimeRangeTool extends javax.swing.JPanel {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 552, Short.MAX_VALUE)
+            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(jPanel3Layout.createSequentialGroup()
                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel3Layout.createSequentialGroup()
                         .add(12, 12, 12)
-                        .add(nrtComboBox, 0, 495, Short.MAX_VALUE))
+                        .add(nrtComboBox, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .add(jPanel3Layout.createSequentialGroup()
                         .addContainerGap()
-                        .add(jPanel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .add(jPanel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(jPanel3Layout.createSequentialGroup()
                         .addContainerGap()
                         .add(interpretationLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
@@ -811,7 +844,7 @@ public final class TimeRangeTool extends javax.swing.JPanel {
                 .add(interpretationLabel)
                 .add(9, 9, 9)
                 .add(jPanel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(190, Short.MAX_VALUE))
+                .addContainerGap(201, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("NRT", jPanel3);
@@ -1000,6 +1033,11 @@ public final class TimeRangeTool extends javax.swing.JPanel {
 
     private void nrtComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nrtComboBoxActionPerformed
         interpretationLabel.setText( interpretIso8601Range( nrtComboBox.getSelectedItem().toString() ));
+        try {
+            dasAxis.setDatumRange( DatumRangeUtil.parseTimeRange( nrtComboBox.getSelectedItem().toString() ) );
+        } catch ( ParseException ex ) {
+            
+        }
     }//GEN-LAST:event_nrtComboBoxActionPerformed
 
     /**
