@@ -1,6 +1,7 @@
 
 package org.autoplot.datasource;
 
+import java.awt.Component;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
@@ -20,7 +21,9 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import org.das2.datum.Datum;
@@ -59,6 +62,12 @@ public final class TimeRangeTool extends javax.swing.JPanel {
     /** Creates new form TimeRangeTool */
     public TimeRangeTool() {
         initComponents();
+        nrtComboBox.setRenderer( new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                return new JLabel(value.toString());
+            }
+        });
         scComboBox.setModel( new DefaultComboBoxModel(getSpacecraft()) );
 
         prefs = AutoplotSettings.settings().getPreferences( TimeRangeTool.class );
