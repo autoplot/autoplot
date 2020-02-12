@@ -145,7 +145,7 @@ public final class TimeRangeTool extends javax.swing.JPanel {
         final DasCanvas canvas= new DasCanvas( 528, 89 );
         DasRow row= new DasRow( canvas, 0.3, 0.5 );
         DasColumn column= new DasColumn( canvas, 0.1, 0.9 );
-        dasAxis= new DasAxis( DatumRangeUtil.parseTimeRangeValid("P1D"), DasAxis.HORIZONTAL ) {
+        dasAxis= new DasAxis( DatumRangeUtil.parseTimeRangeValid( nrtComboBox.getSelectedItem().toString() ), DasAxis.HORIZONTAL ) {
             @Override
             protected void paintComponent(Graphics graphics) {
                 Graphics g= graphics.create();
