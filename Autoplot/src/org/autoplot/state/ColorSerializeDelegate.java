@@ -19,7 +19,18 @@ public class ColorSerializeDelegate implements SerializeDelegate {
 
     @Override
     public String format(Object o) {
-        return ColorUtil.encodeColor((Color)o);
+        Color color= (Color)o;
+        String s= ColorUtil.nameForColor((Color)o);
+        if ( s.startsWith("#") ) {
+            return s;
+        } else {
+            if ( color.getAlpha()==255 ) {
+                s= "#" + String.format( "%06X", color.getRGB() & 0xFFFFFF) + " ("+s+")";
+            } else {
+                s= "#" + String.format( "%02X%06X", color.getAlpha(), color.getRGB() & 0xFFFFFF ) + " ("+s+")";
+            }
+            return s;
+        }
     }
 
     @Override
