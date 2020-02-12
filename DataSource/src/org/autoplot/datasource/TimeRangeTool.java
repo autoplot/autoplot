@@ -20,10 +20,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import org.das2.datum.Datum;
@@ -59,15 +60,80 @@ public final class TimeRangeTool extends javax.swing.JPanel {
 
     private final InputVerifier verifier=null; //TODO: review where this was used, since now it is not used.
         
+    private static String interpretIso8601Range( String range ) {
+        int ispace= range.indexOf(' ');
+        if ( ispace>-1 ) {
+            range= range.substring(0,ispace);
+        }
+        try {
+            int[] digits= DatumRangeUtil.parseISO8601Duration( range );
+            
+            String[] sdigits= new String[] { "years", "months", "days", "hours", "minutes", "seconds" };
+            StringBuilder result= new StringBuilder();
+            for ( int i=0; i<digits.length; i++ ) {
+                if ( digits[i]>0 ) {
+                    int d= digits[i];
+                    String sd= d==1 ? sdigits[i].substring(0,sdigits[i].length()-1) :  sdigits[i];
+                    if ( result.length()>0 ) result.append(", ");
+                    result.append( digits[i] ).append(" ").append(sd);
+                }
+            }
+            return "last " + result.toString();
+        } catch (ParseException ex) {
+            if ( range.startsWith("now/now+") ) {
+                return "next " + interpretIso8601Range( range.substring(8) ).substring(5);
+            } else {
+                switch ( range ) {
+                    case "P1D/lastday": {
+                        return "24 hours leading up to the last day boundary";
+                    }
+                    case "P1Y/lastyear": {
+                        return "last calendar year";
+                    }
+                    case "lastyear/P1Y": {
+                        return "the current year";
+                    }
+                    case "lastday/P1D": {
+                        return "the current day (in UT)";
+                    }
+                    case "P2M/lastmonth": {
+                        return interpretIso8601Range( range.substring(0,3) ).substring(5) + " leading up to the last month boundary";
+                    }
+                    default: {
+                        try {
+                            DatumRange dr= DatumRangeUtil.parseDatumRange(range);
+                            return dr.toString();
+                        } catch (ParseException ex1) {
+                            return range + ("(parse error)");
+                        }
+                    }
+                }   
+            }
+        }
+        
+    }
+    
+    
     /** Creates new form TimeRangeTool */
     public TimeRangeTool() {
         initComponents();
-        nrtComboBox.setRenderer( new ListCellRenderer() {
+        nrtComboBox.setRenderer( new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                return new JLabel(value.toString());
+                Component parent= super.getListCellRendererComponent( list, value, index, isSelected, cellHasFocus );
+                if ( parent instanceof JLabel ) {
+                    String s= interpretIso8601Range((String)value);
+                    if ( s.equals(value) ) {
+                        ((JLabel) parent).setText(s);
+                    } else {
+                        ((JLabel) parent).setText(value+": "+s);
+                    }
+                } 
+                return parent;
             }
         });
+        interpretationLabel.setText( interpretIso8601Range( nrtComboBox.getSelectedItem().toString() ));
+        
         scComboBox.setModel( new DefaultComboBoxModel(getSpacecraft()) );
 
         prefs = AutoplotSettings.settings().getPreferences( TimeRangeTool.class );
@@ -456,6 +522,8 @@ public final class TimeRangeTool extends javax.swing.JPanel {
         jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         nrtComboBox = new javax.swing.JComboBox();
+        jPanel5 = new javax.swing.JPanel();
+        interpretationLabel = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         recentTimesListSP = new javax.swing.JScrollPane();
         recentTimesList = new javax.swing.JList();
@@ -695,16 +763,42 @@ public final class TimeRangeTool extends javax.swing.JPanel {
         jLabel1.setText("Near Real Time timeranges");
 
         nrtComboBox.setEditable(true);
-        nrtComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "PT2H (last two hours)", "P1D  (last 24 hours)", "P5D  (last 5 days)", "P30D  (last thirty days)", "now/now+P1D (next 24 hours)", "now/now+P5D (next 5 days)", "now/now+P30D (next 30 days)", "P1D/lastday (24 hours leading up the the last day boundary)", "lastday/P1D (24 hours following up the the last day boundary)", "P2M/lastmonth (two months leading up to the last month boundary)", "lastyear/P1Y (the last five years leading up to the year boundary)" }));
+        nrtComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "PT2H", "P1D", "P5D", "P30D", "now/now+P1D", "now/now+P5D", "now/now+P30D", "P1D/lastday", "lastday/P1D", "P2M/lastmonth", "lastyear/P1Y" }));
+        nrtComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nrtComboBoxActionPerformed(evt);
+            }
+        });
+
+        org.jdesktop.layout.GroupLayout jPanel5Layout = new org.jdesktop.layout.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 0, Short.MAX_VALUE)
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 100, Short.MAX_VALUE)
+        );
+
+        interpretationLabel.setText("---------");
 
         org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE)
+            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 552, Short.MAX_VALUE)
             .add(jPanel3Layout.createSequentialGroup()
-                .add(12, 12, 12)
-                .add(nrtComboBox, 0, 495, Short.MAX_VALUE)
+                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel3Layout.createSequentialGroup()
+                        .add(12, 12, 12)
+                        .add(nrtComboBox, 0, 495, Short.MAX_VALUE))
+                    .add(jPanel3Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(jPanel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(jPanel3Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(interpretationLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -713,7 +807,11 @@ public final class TimeRangeTool extends javax.swing.JPanel {
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(nrtComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(318, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(interpretationLabel)
+                .add(9, 9, 9)
+                .add(jPanel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(190, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("NRT", jPanel3);
@@ -900,6 +998,10 @@ public final class TimeRangeTool extends javax.swing.JPanel {
         setSelectedRange("orbit:"+(String)scComboBox.getSelectedItem()+":"+s);
     }//GEN-LAST:event_orbitNumberTFActionPerformed
 
+    private void nrtComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nrtComboBoxActionPerformed
+        interpretationLabel.setText( interpretIso8601Range( nrtComboBox.getSelectedItem().toString() ));
+    }//GEN-LAST:event_nrtComboBoxActionPerformed
+
     /**
      * shows the orbit timerange, clipping off text past the first colon.
      * @param sorbit like "172: 2012-11-02 07:00 to 11:20"
@@ -932,6 +1034,7 @@ public final class TimeRangeTool extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel feedbackLabel;
+    private javax.swing.JLabel interpretationLabel;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -947,6 +1050,7 @@ public final class TimeRangeTool extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton nextIntervalButton;
