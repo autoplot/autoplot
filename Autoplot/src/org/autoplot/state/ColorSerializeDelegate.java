@@ -25,9 +25,9 @@ public class ColorSerializeDelegate implements SerializeDelegate {
             return s;
         } else {
             if ( color.getAlpha()==255 ) {
-                s= "#" + String.format( "%06X", color.getRGB() & 0xFFFFFF) + " ("+s+")";
+                s= "#" + String.format( "%06x", color.getRGB() & 0xFFFFFF) + " ("+s+")";
             } else {
-                s= "#" + String.format( "%02X%06X", color.getAlpha(), color.getRGB() & 0xFFFFFF ) + " ("+s+")";
+                s= "#" + String.format( "%02x%06x", color.getAlpha(), color.getRGB() & 0xFFFFFF )  + " ("+s+")";
             }
             return s;
         }
