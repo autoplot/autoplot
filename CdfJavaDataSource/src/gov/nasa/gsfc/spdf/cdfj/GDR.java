@@ -10,7 +10,7 @@ import java.nio.ByteBuffer;
 public class GDR {
 
     ByteBuffer record = ByteBuffer.allocate(8 + 4 + 8 + 8 + 8
-            + 8 + 4 + 4 + 4 + 4 + 4 + 8 + 4 + 4 + 4);
+            + 8 + 4 + 4 + 4 + 4 + 4 + 8 + 4 + 4 + 4); // see Figure 2.5 
     protected long position;
     long zVDRHead;
     long aDRHead;
