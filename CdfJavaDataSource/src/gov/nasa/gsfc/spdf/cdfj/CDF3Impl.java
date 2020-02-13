@@ -1,10 +1,9 @@
 package gov.nasa.gsfc.spdf.cdfj;
-import java.io.*;
-import java.nio.*;
-import java.util.*;
-import java.io.*;
-import java.nio.channels.*;
-import java.util.zip.*;
+
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.nio.channels.FileChannel;
+
 final class CDF3Impl extends CDFImpl implements CDF3, java.io.Serializable {
     public long GDROffset;
     FileChannel fc;
@@ -45,6 +44,10 @@ final class CDF3Impl extends CDFImpl implements CDF3, java.io.Serializable {
         zVDRHead = buf.getLong();
         ADRHead = buf.getLong();
         long CDFSize = buf.getLong();
+        if ( buf.capacity()<CDFSize ) {
+            throw new Throwable("file appears to be truncated, as the header says it should contain " + CDFSize + "bytes." );
+        }
+        System.err.println( String.format( "buf.capacity - eof: %d", buf.capacity() - CDFSize ) );
         numberOfRVariables = buf.getInt();
         numberOfAttributes = buf.getInt();
         buf.getInt(); // skip rMaxRec
