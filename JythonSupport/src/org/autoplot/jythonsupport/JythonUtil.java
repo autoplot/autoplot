@@ -577,6 +577,7 @@ public class JythonUtil {
         if ( sd.getDescription().length()>0 ) result.put( "DESCRIPTION", sd.getDescription() );
         if ( sd.getTitle().length()>0 ) result.put( "TITLE", sd.getTitle() );
         if ( sd.getLabel().length()>0 ) result.put( "LABEL", sd.getLabel() );
+        if ( sd.getIconURL().length()>0 ) result.put( "ICONURL", sd.getIconURL() );
         
         if ( result.isEmpty() ) {
             reader= new BufferedReader( new StringReader(line) );
@@ -1196,6 +1197,12 @@ public class JythonUtil {
             if (line.contains("getParam")) {
                 lastLine = i + 1;
             } else if (line.contains("setScriptTitle")) {
+                lastLine = i + 1;
+            } else if (line.contains("setScriptDescription")) {
+                lastLine = i + 1;
+            } else if (line.contains("setScriptLabel")) {
+                lastLine = i + 1;
+            } else if (line.contains("setScriptIcon")) {
                 lastLine = i + 1;
             }
 
