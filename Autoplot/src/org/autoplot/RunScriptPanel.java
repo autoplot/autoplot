@@ -78,6 +78,10 @@ public class RunScriptPanel extends javax.swing.JPanel {
 
     }
 
+    /**
+     * return the checkbox indicating that the script should be added as a tool.
+     * @return 
+     */
     public JCheckBox getToolsCB() {
         return toolsCB;
     }
@@ -163,7 +167,8 @@ public class RunScriptPanel extends javax.swing.JPanel {
 
         jLabel1.setText("Run the script:");
 
-        toolsCB.setText("Install in tools folder and menu");
+        toolsCB.setText("Add to Tools menu");
+        toolsCB.setToolTipText("Add to tools menu for convenient access.");
 
         scriptPanel.setLayout(new java.awt.BorderLayout());
         jScrollPane1.setViewportView(scriptPanel);

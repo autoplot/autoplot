@@ -212,20 +212,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     }
 
     /**
-     * TODO: params is object?
-     * @param parms
-     * @return
-     */
-    private boolean isBoolean( List<Object> parms ) {
-        if ( parms.size()==2 && parms.contains("T") && parms.contains("F") ) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * add JLabels if documentation is available.
+     * get documentation if available.
      * @param f
      * @return true if some documentation was found.
      */

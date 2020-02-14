@@ -6209,12 +6209,19 @@ APSplash.checkTime("init 240");
             Runnable run= new Runnable() {
                 @Override
                 public void run() {
+                    //TODO: there's a problem that the PWD has been lost.  Map<String,String> env= new HashMap<>();
                     try ( BufferedReader reader= new BufferedReader( new FileReader(ff) ) ) {
                         Map<String,String> doc= org.autoplot.jythonsupport.JythonUtil.getDocumentation( reader );
                         String title= doc.get( "TITLE" );
                         if ( title!=null ) b.setDescription(title); //TODO: bookmarks use inconsistent names... 
                         String label= doc.get( "LABEL" );
+                        if ( label==null && title!=null && title.length()<40 ) label= title;
                         if ( label!=null ) b.setTitle(label);
+                        String iconURl= doc.get("ICONURL");
+                        if ( iconURl!=null ) {
+                            ImageIcon icon= new ImageIcon( new URL(iconURl) );
+                            b.setIcon(icon);
+                        }
                         Window w= ScriptContext.getViewWindow();
                         if ( w instanceof AutoplotUI ) {
                             ((AutoplotUI)w).reloadTools();

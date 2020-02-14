@@ -58,7 +58,8 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="toolsCB">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Install in tools folder and menu"/>
+        <Property name="text" type="java.lang.String" value="Add to Tools menu"/>
+        <Property name="toolTipText" type="java.lang.String" value="Add to tools menu for convenient access."/>
       </Properties>
     </Component>
     <Container class="javax.swing.JScrollPane" name="jScrollPane1">

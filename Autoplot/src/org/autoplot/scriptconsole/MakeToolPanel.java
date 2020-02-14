@@ -17,6 +17,10 @@ public class MakeToolPanel extends javax.swing.JPanel {
         initComponents();
     }
 
+    /**
+     * return true if the script should be added as a tool.
+     * @return 
+     */
     public boolean isInstall() {
         return toolsCB.isSelected();
     }
@@ -33,7 +37,7 @@ public class MakeToolPanel extends javax.swing.JPanel {
         toolsCB = new javax.swing.JCheckBox();
         jLabel2 = new javax.swing.JLabel();
 
-        toolsCB.setText("Install in tools folder and menu");
+        toolsCB.setText("Add to Tools menu");
         toolsCB.setToolTipText("The script will be added to the Autoplot \"Tools\" menu");
 
         jLabel2.setText("Make sure the script does not contain malicious code.");
