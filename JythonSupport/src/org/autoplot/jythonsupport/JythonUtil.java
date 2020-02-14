@@ -552,29 +552,50 @@ public class JythonUtil {
      * <li>TITLE sentence
      * <li>DESCRIPTION short paragraph
      * </ul>
-     *
+     * This would originally look for lines like:<br>
+     * # TITLE: Text Recombinator<br>
+     * but this has been deprecated and scripts should use setScriptTitle 
+     * and setScriptDescription
+     * 
      * @param reader, open and ready to read, which will be closed.
      * @return the documentation found.
      * @throws java.io.IOException
      */
     public static Map<String, String> getDocumentation(BufferedReader reader) throws IOException {
 
-        Map<String, String> result = new HashMap<>();
-        String s = reader.readLine();
-        Pattern p = Pattern.compile("#\\s*([a-zA-Z]+)\\s*:(.*)");
-        while (s != null) {
-            Matcher m = p.matcher(s);
-            if (m.matches()) {
-                String prop = m.group(1).toUpperCase();
-                String value = m.group(2).trim();
-                if (prop.equals("LABEL") || prop.equals("TITLE") || prop.equals("DESCRIPTION")) {
-                    result.put(prop, value);
-                }
-            }
-            s = reader.readLine();
+        String line = reader.readLine();
+        StringBuilder scriptBuilder= new StringBuilder();
+        while ( line!=null ) {
+            scriptBuilder.append(line).append('\n');
+            line= reader.readLine();
         }
 
-        reader.close();
+        String script= scriptBuilder.toString();
+        ScriptDescriptor sd= org.autoplot.jythonsupport.JythonUtil.describeScript( script, new HashMap<String, String>() );
+        
+        Map<String, String> result = new HashMap<>();
+        if ( sd.getDescription().length()>0 ) result.put( "DESCRIPTION", sd.getDescription() );
+        if ( sd.getTitle().length()>0 ) result.put( "TITLE", sd.getTitle() );
+        if ( sd.getLabel().length()>0 ) result.put( "LABEL", sd.getLabel() );
+        
+        if ( result.isEmpty() ) {
+            reader= new BufferedReader( new StringReader(line) );
+            String s = reader.readLine();
+            Pattern p = Pattern.compile("#\\s*([a-zA-Z]+)\\s*:(.*)");
+            while (s != null) {
+                Matcher m = p.matcher(s);
+                if (m.matches()) {
+                    String prop = m.group(1).toUpperCase();
+                    String value = m.group(2).trim();
+                    if (prop.equals("LABEL") || prop.equals("TITLE") || prop.equals("DESCRIPTION")) {
+                        result.put(prop, value);
+                    }
+                }
+                s = reader.readLine();
+            }
+            reader.close();
+        }
+
         return result;
 
     }
