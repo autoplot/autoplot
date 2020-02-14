@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-02-13 r24574):</p>
+        <p>Bugfixes (2020-02-14 r24583):</p>
         <ul>
+            <li>rfe704: add script to tools uses setScriptLabel and setScriptTitle for menu label.
             <li>Colors are encoded in vaps as "#040404 (Dark Gray)", to improve readability of .vap files.
             <li>2239: Time Range Tool's NRT tab clean up, use DasAxis to show new setting. 
             <li>improve feedback for truncated CDF file.
@@ -71,6 +72,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Throw more abstract error when a CDF variable pointer points to a location past the end of the CDF file.
             <li>DasProgressPanel can be a Java/Swing component, so that it can be part of a GUI.
             <li>speed up binary operations for rank 1-3 operands by avoiding DataSetIterator use, which is known to be slow.  (By a factor of 3-4!)
             <li>currentLine function reports the Jython code name and line number of the call, useful for debugging.
