@@ -75,7 +75,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
         }
         bean.setPassiveModeTransfer(true);
         if ( getRootURL().getPort()>-1 ) {
-            bean.setPort(  getRootURL().getPort() );
+            bean.setPort(  getRootURL().getPort() ); 
         }
         return bean;
     }
