@@ -412,6 +412,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 File listing;
                 File listingt;
                 FtpBean bean = getFtpBean();
+                if ( url.getPort()>-1 ) bean.setPort(url.getPort());
                 try {
                     userInfo= KeyChain.getDefault().getUserInfo(url);
                     if ( userInfo!=null ) {
@@ -465,7 +466,11 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 if ( e.getMessage().startsWith("530" ) ) { // invalid login
                     if ( userInfo==null ) {
                         userInfo="user:pass";
-                        url= new URL( url.getProtocol() + "://"+ userInfo + "@" + url.getHost() + url.getFile() );
+                        if ( url.getPort()>-1 ) {
+                            url= new URL( url.getProtocol() + "://"+ userInfo + "@" + url.getHost() + ":" + url.getPort() + url.getFile() );
+                        } else {
+                            url= new URL( url.getProtocol() + "://"+ userInfo + "@" + url.getHost() + url.getFile() );
+                        }
                     }
                     KeyChain.getDefault().clearUserPassword(url);
                     // loop for them to try again.
