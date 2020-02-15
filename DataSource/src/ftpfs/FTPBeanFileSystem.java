@@ -74,6 +74,9 @@ public class FTPBeanFileSystem extends WebFileSystem {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
         bean.setPassiveModeTransfer(true);
+        if ( getRootURL().getPort()>-1 ) {
+            bean.setPort(  getRootURL().getPort() );
+        }
         return bean;
     }
 
@@ -412,7 +415,6 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 File listing;
                 File listingt;
                 FtpBean bean = getFtpBean();
-                if ( url.getPort()>-1 ) bean.setPort(url.getPort());
                 try {
                     userInfo= KeyChain.getDefault().getUserInfo(url);
                     if ( userInfo!=null ) {
