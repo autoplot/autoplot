@@ -26,7 +26,7 @@ import org.das2.qds.ops.Ops;
  *
  * @author mmclouth
  */
-public class Experiment1 {
+public class FFTMultiThreadExperiment {
 
     private static ProgressMonitor getMonitor(String label) {
         //DasProgressPanel p = DasProgressPanel.createFramed(label);
@@ -143,11 +143,11 @@ public class Experiment1 {
             try {
                 ScriptContext.writeToPng("/tmp/Experiment1.png");
             } catch (IOException ex) {
-                Logger.getLogger(Experiment1.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(FFTMultiThreadExperiment.class.getName()).log(Level.SEVERE, null, ex);
             }
             
         } catch (Exception ex) {
-            Logger.getLogger(Experiment1.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FFTMultiThreadExperiment.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
