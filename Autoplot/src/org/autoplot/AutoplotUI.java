@@ -6477,6 +6477,19 @@ APSplash.checkTime("init 240");
 //    }
 
     private void addEditorCustomActions(final JythonScriptPanel scriptPanel) {
+        JMenuItem mi= new JMenuItem( new AbstractAction("Editor Bookmarks") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);
+                    BookmarksManager bm= new BookmarksManager(AutoplotUI.this,true,"editor");
+                    bm.setPrefNode("editor");
+                    bm.setVisible(true);
+                }
+            } );
+        mi.setToolTipText( "add scripts for editor actions" );
+
+        scriptPanel.addMenuItem( mi );
+        
         File f= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "bookmarks" );
         f= new File( f.toString(), "editor.xml" );
         if ( f.exists() ) {
