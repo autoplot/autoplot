@@ -709,8 +709,6 @@ public class EditorContextMenu {
             mi.setToolTipText("uncomment the selected block of lines");
             actionsMenu.add( mi );
 
-            menu.add( actionsMenu );
-
             mi= new JMenuItem( new AbstractAction("Show Usages") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -721,7 +719,9 @@ public class EditorContextMenu {
             mi.setToolTipText( "highlite use of name" );
             mi.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_U, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ) );
             actionsMenu.add( mi );
-
+            
+            menu.add( actionsMenu );
+            
             JMenu settingsMenu= new JMenu("Settings");
             mi= new JMenuItem( new AbstractAction("Edit Settings") {
                 @Override
