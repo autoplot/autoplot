@@ -22,6 +22,7 @@ import org.python.parser.ast.Name;
 import org.python.parser.ast.Num;
 import org.python.parser.ast.Subscript;
 import org.python.parser.ast.VisitorBase;
+import org.python.parser.ast.aliasType;
 import org.python.parser.ast.exprType;
 
 /**
@@ -179,7 +180,8 @@ public class SimplifyScriptSupport {
          StringBuilder result= new StringBuilder();
          for ( int istatement=0; istatement<stmts.length; istatement++ ) {
              stmtType o= stmts[istatement];
-             logger.log( Level.FINER, "line {0}: {1}", new Object[] { o.beginLine, o.beginLine>0 ? ss[o.beginLine-1] : "(bad line number)" } );
+             String theLine= o.beginLine>0 ? ss[o.beginLine-1] : "(bad line number)";
+             logger.log( Level.FINER, "line {0}: {1}", new Object[] { o.beginLine, theLine } );
              if ( o.beginLine>0 ) {
                  if ( beginLine<0 && istatement==0 ) acceptLine= o.beginLine;
                  beginLine= o.beginLine;
@@ -341,8 +343,28 @@ public class SimplifyScriptSupport {
       */
      private static boolean simplifyScriptToGetCompletionsOkay( stmtType o, HashSet<String> variableNames ) {
          logger.log(Level.FINEST, "simplify script line: {0}", o.beginLine);
-         if ( ( o instanceof org.python.parser.ast.ImportFrom ) ) return true;
-         if ( ( o instanceof org.python.parser.ast.Import ) ) return true;
+         if ( ( o instanceof org.python.parser.ast.ImportFrom ) ) {
+             org.python.parser.ast.ImportFrom importFrom= (org.python.parser.ast.ImportFrom)o;
+             for ( aliasType a: importFrom.names ) {
+                 if ( a.asname!=null ) {
+                     variableNames.add( a.asname );
+                 } else {
+                     variableNames.add( a.name );
+                 }
+             }
+             return true;
+         }
+         if ( ( o instanceof org.python.parser.ast.Import ) ) {
+             org.python.parser.ast.Import imporrt= (org.python.parser.ast.Import)o;
+             for ( aliasType a: imporrt.names ) {
+                 if ( a.asname!=null ) {
+                     variableNames.add( a.asname );
+                 } else {
+                     variableNames.add( a.name );
+                 }
+             }
+             return true;
+         }
          if ( ( o instanceof org.python.parser.ast.ClassDef ) ) return true;
          if ( ( o instanceof org.python.parser.ast.FunctionDef ) ) return true;
          if ( ( o instanceof org.python.parser.ast.Assign ) ) {
