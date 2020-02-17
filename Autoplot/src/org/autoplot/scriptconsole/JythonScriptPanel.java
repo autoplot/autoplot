@@ -81,6 +81,10 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
     private transient DocumentListener dirtyListener; // this contains repeated code in ScriptPanelSupport  
 
+    /**
+     * this downloads the URI and loads the local version into the editor.
+     * @param uri the URI
+     */
     public void loadExampleUri( String uri ) {
         try {
             File ff= DataSetURI.getFile( uri, new NullProgressMonitor() );
