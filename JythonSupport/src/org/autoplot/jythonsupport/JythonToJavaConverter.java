@@ -60,6 +60,21 @@ public class JythonToJavaConverter {
         return packages.get(clas);
     }
     
+    private static int[] count( String line, char[] chrs ) {
+        int[] result= new int[chrs.length];
+        for ( int i=0; i<chrs.length; i++ ) {
+            result[i]= 0;
+        }
+        for ( char c: line.toCharArray() ) {
+            for ( int i=0; i<chrs.length; i++ ) {
+                if ( c==chrs[i] ) {
+                    result[i]++;
+                }
+            }
+        }
+        return result;
+    }
+    
     /**
      * The goal is to take Java snippets and turn them into Jython code.
      * @param doThis
@@ -75,7 +90,7 @@ public class JythonToJavaConverter {
         String indent="";
         
         ArrayList<String> importedPaths= new ArrayList<>();
-        
+        char[] chrs= new char[] { '(', ')', '{', '}' };
         int lineNumber= 0;
         for ( String s: ss ) {
             logger.log(Level.FINER, "line {0}: {1}", new Object[]{lineNumber, s});
@@ -107,25 +122,22 @@ public class JythonToJavaConverter {
                     s= "from "+m.group(1)+" import "+m.group(2);
                 }
             }
-            if ( s.contains("(") && !s.contains(")") ) {
-                indentLevel= Math.min( 16, indentLevel+4 );
-            }
-            if ( s.contains(")") && !s.contains("(") ) {
-                indentLevel= Math.max( 0, indentLevel-4 );
-            }   
+            int[] chrcount= count( s, chrs );
+            indentLevel= Math.max( 0, Math.min( 32, indentLevel 
+                    + (chrcount[0]-chrcount[1])*4 
+                    + (chrcount[2]-chrcount[3])*4 ) );
+            
             if ( s.contains("{") ) {
-                indentLevel= Math.min( 16, indentLevel+4 );
                 s= s.replace("{",":");
             } 
             if ( s.contains("}") ) {
-                indentLevel= Math.max( 0, indentLevel-4 );
                 s= s.replace("}","");
             } 
             b.append(indent).append(s).append("\n");
             logger.log(Level.FINER, "out  {0}: {1}", new Object[]{lineNumber, s});
             
             if ( indentLevel!=indent.length()) {
-                indent= "                ".substring(0,indentLevel);
+                indent= "                                ".substring(0,indentLevel);
             }
         }
         StringBuilder sb= new StringBuilder();
