@@ -69,7 +69,7 @@ class TsdsDataSource extends AbstractDataSource {
     public TsdsDataSource(URI uri) {
         super(uri);
         try {
-            addCability(TimeSeriesBrowse.class, getTimeSeriesBrowse());
+            addCapability(TimeSeriesBrowse.class, getTimeSeriesBrowse());
 
             setTSBParameters();  // we don't yet know the parameter resolution, but the time extent is set.
 
