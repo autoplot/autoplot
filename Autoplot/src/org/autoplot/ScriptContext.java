@@ -712,13 +712,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param y QDataSet for the independent parameter for the Y values
      */
     public static void plot( int chNum, String label, QDataSet x, QDataSet y ) {
-        maybeInitModel();
-        MutablePropertyDataSet yds= ensureMutable(y);
-        QDataSet xds= x;
-        if ( xds!=null ) yds.putProperty( QDataSet.DEPEND_0, xds );
-        model.setDataSet( chNum, label, yds);
-        ensureImmutable(x,y);
-        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
+        plot( chNum, label, x, y, (String)null );
     }
 
     /**
@@ -737,7 +731,13 @@ public class ScriptContext extends PyJavaInstance {
         } else {
             QDataSet xds= x;
             MutablePropertyDataSet yds= ensureMutable(y);
-            if ( xds!=null && yds!=null ) yds.putProperty( QDataSet.DEPEND_0,xds );
+            if ( xds!=null && yds!=null ) {
+                if ( yds.rank()==0 ) {
+                    yds.putProperty( QDataSet.CONTEXT_0,xds );
+                } else {
+                    yds.putProperty( QDataSet.DEPEND_0,xds );
+                }
+            }
             if ( ( yds!=null ) && ( xds!=null || renderType!=null ) ) yds.putProperty( QDataSet.RENDER_TYPE, renderType ); // plot command calls this with all-null arguments, and we don't when RENDER_TYPE setting to be nulled.
             model.setDataSet( chNum, label, yds);
         }
