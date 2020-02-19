@@ -2293,7 +2293,7 @@ public final class HapiDataSource extends AbstractDataSource {
                                 pds[i].fillValue= pds[i].units.parse( sfill ).doubleValue( pds[i].units );
                                 pds[i].hasFill= true;
                             } catch ( ParseException ex ) {
-                                logger.warning("unable to use fill value: "+sfill);
+                                logger.log(Level.WARNING, "unable to use fill value: {0}", sfill);
                             }
                         }
                     }
