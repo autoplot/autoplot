@@ -38,6 +38,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.autoplot.datasource.AutoplotSettings;
+import org.autoplot.datasource.DataSetURI;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeUtil;
@@ -269,10 +270,15 @@ public class HapiServer {
      * @return 
      */
     public static String urlEncode( String id ) {
-        try {
-            return URLEncoder.encode( id, "UTF-8" );
-        } catch (UnsupportedEncodingException ex) {
-            throw new IllegalArgumentException(ex);
+        Pattern p= Pattern.compile("[a-zA-Z0-9_:,/\\.]+");
+        if ( p.matcher(id).matches() ) {
+            return id;
+        } else {
+            try {
+                return URLEncoder.encode( id, "UTF-8" );
+            } catch (UnsupportedEncodingException ex) {
+                throw new IllegalArgumentException(ex);
+            }
         }
     }
 
