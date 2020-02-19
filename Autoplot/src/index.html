@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-02-17 r24592):</p>
+        <p>Bugfixes (2020-02-19 r24600):</p>
         <ul>
+            <li>2245: HAPI issues with UCLA PDS-PPI server, like excessive and unnecessary escaping of URLs.
+            <li>2243: vertical slice of spectrogram created by list of X,Y,Z triples works now.
             <li>1687: as symbols are imported, add them to the list of variableNames in code that simplifies Jython.
             <li>correct code counting () and {}, to support turning Matisse GUI builder code into Jython.  See <a href='https://github.com/autoplot/dev/blob/master/demos/guis/demoMatisseGUI.jy'>this</a>.
             <li>2240: ftp servers can now use alternate ports, supporting ad-hoc servers on phones.
