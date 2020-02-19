@@ -927,16 +927,21 @@ public final class HapiDataSource extends AbstractDataSource {
             }
             if ( subsetPds.length==2 && subsetPds[1].size.length>0 ) {
                 // Oooh, it's a spectrogram.  Maybe it has time-varying DEPEND_1.
-                String dependName= subsetPds[1].dependName[0];
+                String dependName= null;
+                if ( subsetPds[1].dependName!=null ) {
+                    dependName= subsetPds[1].dependName[0];
+                } else {
+                    logger.warning("depend name missing!");
+                }
                 if ( dependName!=null ) {
                     
                     ParamDescription[] subsetPds1= new ParamDescription[3];
-                    for ( int k=0; k<2; k++ ) {
-                        subsetPds1[k]= subsetPds[k];
-                    }
+                    
+                    System.arraycopy(subsetPds, 0, subsetPds1, 0, 2);
+                    
                     int k= indexOfParameter( pds, dependName );
                     if ( k==-1 ) {
-                        logger.warning("unable to find parameter: "+dependName );
+                        logger.log(Level.WARNING, "unable to find parameter: {0}", dependName);
                     } else {
                         subsetPds1[2]= pds[k];
                         subsetPds= subsetPds1;
@@ -2284,8 +2289,12 @@ public final class HapiDataSource extends AbstractDataSource {
                             pds[i].fillValue= ((EnumerationUnits)pds[i].units).createDatum( sfill ).doubleValue( pds[i].units );
                             pds[i].hasFill= true;
                         } else {
-                            pds[i].fillValue= pds[i].units.parse( sfill ).doubleValue( pds[i].units );
-                            pds[i].hasFill= true;
+                            try {
+                                pds[i].fillValue= pds[i].units.parse( sfill ).doubleValue( pds[i].units );
+                                pds[i].hasFill= true;
+                            } catch ( ParseException ex ) {
+                                logger.warning("unable to use fill value: "+sfill);
+                            }
                         }
                     }
                 } else {
