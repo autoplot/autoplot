@@ -270,7 +270,7 @@ public class HapiServer {
      * @return 
      */
     public static String urlEncode( String id ) {
-        Pattern p= Pattern.compile("[a-zA-Z0-9_:,/\\.]+");
+        Pattern p= Pattern.compile("[a-zA-Z0-9_:\\-\\+,/\\.]+");
         if ( p.matcher(id).matches() ) {
             return id;
         } else {

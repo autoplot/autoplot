@@ -888,11 +888,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( id==null ) {
             id= "";
         } else {           
-            try {
-                id= URLEncoder.encode(id,"UTF-8");
-            } catch (UnsupportedEncodingException ex) {
-                throw new RuntimeException(ex);
-            }
+            id= HapiServer.urlEncode(id);
         }
         String uri= "vap+hapi:" + serversComboBox.getSelectedItem().toString() + "?id=" + id + "&timerange="+timeRangeComboBox.getText().replaceAll(" ","+");
         if ( binaryCB.isSelected() && binaryCB.isEnabled() ) {
