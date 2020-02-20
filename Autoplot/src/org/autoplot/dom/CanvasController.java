@@ -671,7 +671,7 @@ public class CanvasController extends DomNodeController {
             for (int i = 0; i < count; i++) {
                 final Column column = new Column();
 
-                column.setParent(canvas.getMarginRow().getId());
+                column.setParent(canvas.getMarginColumn().getId());
 
                 new ColumnController(column).createDasPeer(this.canvas, canvas.getMarginColumn().getController().getDasColumn());
                 this.dom.getController().assignId(column);
