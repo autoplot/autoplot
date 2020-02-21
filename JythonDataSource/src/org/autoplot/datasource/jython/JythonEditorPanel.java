@@ -212,41 +212,6 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     }
 
     /**
-     * get documentation if available.
-     * @param f
-     * @return true if some documentation was found.
-     */
-    private boolean doDocumentation( Map<String,Object> env, File f) {
-        BufferedReader reader=null;
-        boolean hasDoc= false;
-        try {
-            reader = new BufferedReader( new FileReader(f) );
-            Map<String,String> doc= JythonUtil.getDocumentation( reader );
-
-            String title= doc.get("TITLE");
-            if ( title!=null ) {
-                 paramsPanel.add( new JLabel("<html><b>"+title+"</b></html>") );
-                 hasDoc= true;
-            }
-            String description= doc.get("DESCRIPTION");
-            if ( description!=null ) {
-                 paramsPanel.add( new JLabel("<html>"+description+"</html>") );
-                 hasDoc= true;
-            }
-
-        } catch (IOException ex ) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } finally {
-            if ( reader!=null ) try {
-                reader.close();
-            } catch (IOException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            }
-        }
-        return hasDoc;
-    }
-
-    /**
      * return spacer of width 20.
      * @param size
      * @return 
@@ -370,6 +335,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
             String param= params.remove("arg_0");
 
+            // populate the list of quanities calculated.
             dropList[0]= "";
             for ( Entry<String,String> ent: results.entrySet()  ) {
                 dropList[i+1]= "<html>"+ent.getKey()+"<span color=#808080>: <i>"+ent.getValue()+"</i></span>";
@@ -386,10 +352,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             }
 
             Map<String,Object> env= Collections.singletonMap( "PWD", (Object)split.path );
-            if ( doDocumentation( env, f) ) {
-                paramsPanel.add( new JLabel("<html><br></html>") );
-            }
 
+            // make the GUI for the title, description, and the parameters.
             Map<String,String> ffparams= new HashMap( params );
 
             if ( furir[1]!=null ) ffparams.put( JythonDataSource.PARAM_RESOURCE_URI, furir[1] );
