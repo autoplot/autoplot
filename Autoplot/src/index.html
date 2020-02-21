@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Two PNGWalks are linked together, used to make sure new images are properly named.  See the <a href='https://jfaden.net/git/jbfaden/public/blob/master/u/jeremy/2020/20200105/compareScreenshots.jy'>script</a>.
+        <p><small>USGS DEM Reader shown with new interface.  <a href='https://github.com/autoplot/dev/blob/master/demos/2019/20190529/readUsgsDem.jyds'>Here</a> is the script.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-02-19 r24600):</p>
+        <p>Bugfixes (2020-02-21 r24607):</p>
+        <ul>
+            <li>rfe704: corrections to GUI generation.  Thanks, kh6sky!
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>2245: HAPI issues with UCLA PDS-PPI server, like excessive and unnecessary escaping of URLs.
             <li>2243: vertical slice of spectrogram created by list of X,Y,Z triples works now.
@@ -52,30 +56,10 @@
             <li>getCompletions call of CDF would download file, the monitor was used twice.
             <li>editor javadoc location is tolerant of paths missing final /, and generated URLs should not have spaces for <a href="http://www-pw.physics.uiowa.edu/~jbf/autoplot/doc">new location</a>.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>2234: restore vap from InputStream should always assume that the InputStream is UTF-8, since on Windows-jumbojar was using windows-1252.  Thanks, Chris and George!
-            <li>Ephemeris which did not contain LABEL property used the NAME property instead, but layout code didn't have this logic, clipping the display.
-            <li>2169: properly handle <a href='https://github.com/autoplot/documentation/wiki/QDataSet.Schemes#color-scatter'>X,Y,Z scatter</a> and X,Y scatter schemes.  Thanks, Chris!
-            <li>digital renderer would draw text which was outside of the axis bounds, reducing performance.
-            <li>2232: Script editor would load data instead of script when "script=" keyword was used.
-            <li>NybbleDataSet slice operator was not implemented.  Thanks, Chris!
-            <li>AUTOPLOT_DATA setting would not reset pycache area location.  Thanks, Darren!
-            <li>new SHADE error bar mode didn't consider case where first point was not valid.  Thanks, Masafumi!
-            <li>round of findbugs cleanup.
-            <li>occasional NullPointerException when loading particular .vap files, caused by beans binding, is handled.  Thanks, Kris!
-            <li>clean up of warnings issued to stderr unnecessarily with magnitude function.
-            <li>Single-record spectrograms could not be sliced to show the one record.  Improve feedback when no record is found.  Thanks, Ivar!
-            <li>bugfix: 'insert plot elements from clipboard plot' dialog was not centered on app.
-            <li>improve feedback in TimeParser, trivial performance and code clarification.
-            <li>1687: completions bug where extra line prevented come completions fixed, support third-line completions when continuation is used.
-            <li>LANLNearestNeighbor supports non-monotonic ytags.
-            <li>2228: migrate preference's get wouldn't check the old location for a value, so old prefs like data cache location could be lost.  Thanks, Ivar!
-            <li>2227: Jython fixImports never closed input file, relying on OS to implicitly close the file and preventing some operations on Windows.  Thanks, Jim S.!
-            <li>rte 1638285244: guard against strange index-out-of-bounds with JTable when digitizing.  Thanks, Ivar!
-            <li>2225: new app steals editor panel from old app.  Thanks, Ivar!
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>new "Editor Bookmarks" actions allows actions like <a href='https://github.com/autoplot/dev/blob/master/demos/tools/editor/pull.jy'>pull</a> to be added to the editor menu.
             <li>Throw more abstract error when a CDF variable pointer points to a location past the end of the CDF file.
@@ -86,18 +70,6 @@
             <li>360: support Jython "examples":[2,3,4,5] which doesn't require that the value be one of these.
             <li>672: cleanData allows the number of sigmas to be set.
             <li>672: add "cleanData" function which removes data three sigmas away from the mean.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>experimental code allows "data_1" to be used for a ticksURI.  Do not use this in production.
-            <li>707: CDF reader supports multiple variables to be read into a bundle, GUI supports multiple selection.
-            <li>672: CDF virtual function "arr_slice" is added.
-            <li>705: environment variable "AUTOPLOT_DATA" can be used to reset data and configuration location.
-            <li>Jython script editor "inspect URI" mouse menu item now senses exportDataSet and uses the format editor GUI instead.
-            <li>704: autoplot --script ... --help will print the script's arguments.
-            <li>704: add support for boolean Jython parameters (True/False instead of 'T'/'F').
-            <li>2223: contours plot has new line style property.
-            <li>1801: add wordy but fast implementation of magnitude for rank 2 and rank 3 datasets.
         </ul>
         <p>Known issues:</p>
         <ul>
