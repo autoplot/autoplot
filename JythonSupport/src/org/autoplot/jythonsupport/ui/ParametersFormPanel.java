@@ -334,7 +334,8 @@ public class ParametersFormPanel {
                 
                 JComponent ctf;
 
-                boolean isBool= parm.enums!=null && isBoolean( parm.enums );
+                boolean hasLabels= parm.constraints!=null && parm.constraints.containsKey("labels");
+                boolean isBool= parm.enums!=null && isBoolean( parm.enums ) && !hasLabels;
 
                 if ( parm.enums!=null ) {
                     boolean okay=false;
@@ -502,13 +503,19 @@ public class ParametersFormPanel {
                                 } else {
                                     labels= values.toArray();
                                 }
-                                if ( parm.constraints!=null && parm.constraints.containsKey("labels") ) {
+                                if ( hasLabels ) {
                                     Object olabels= parm.constraints.get("labels");
                                     if ( olabels instanceof List ) {
                                         List labelsList= (List)olabels;
+                                        boolean useLabels= false; // only use labels if they add information.
+                                        for ( int i=0; i<values.size(); i++ ) {
+                                            if ( !String.valueOf(values.get(i)).equals(labelsList.get(i)) ) {
+                                                useLabels= true;
+                                            }
+                                        }
                                         labels= new String[values.size()];
                                         for ( int i=0; i<values.size(); i++ ) {
-                                            labels[i]= values.get(i)+": "+labelsList.get(i);
+                                            labels[i]= useLabels ? values.get(i)+": "+labelsList.get(i) : values.get(i);
                                         }
                                     }
                                 }
@@ -602,7 +609,7 @@ public class ParametersFormPanel {
                                 params.put( vname, val );
                             }       
                             if ( values!=null && values.size()>0 ) {
-                                if ( isBoolean( values ) ) {
+                                if ( isBool ) {
                                     JCheckBox jcb= new JCheckBox( label );
                                     jcb.setSelected( val.equals("T") || val.equals("1") || val.equals("True") );
                                     jcb.addActionListener( new ActionListener() {
@@ -614,13 +621,19 @@ public class ParametersFormPanel {
                                     ctf= jcb;
                                 } else {
                                     Object[] labels= values.toArray();
-                                    if ( parm.constraints!=null && parm.constraints.containsKey("labels") ) {
+                                    if ( hasLabels ) {
                                         Object olabels= parm.constraints.get("labels");
                                         if ( olabels instanceof List ) {
                                             List labelsList= (List)olabels;
+                                            boolean useLabels= false; // only use labels if they add information.
+                                            for ( int i=0; i<values.size(); i++ ) {
+                                                if ( !String.valueOf(values.get(i)).equals(labelsList.get(i)) ) {
+                                                    useLabels= true;
+                                                }
+                                            }                                            
                                             labels= new String[values.size()];
                                             for ( int i=0; i<values.size(); i++ ) {
-                                                labels[i]= values.get(i)+": "+labelsList.get(i);
+                                                labels[i]= useLabels ? values.get(i)+": "+labelsList.get(i) : String.valueOf( values.get(i) );
                                             }
                                         }
                                     }
