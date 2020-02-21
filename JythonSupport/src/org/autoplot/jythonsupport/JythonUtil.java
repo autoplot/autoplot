@@ -1455,15 +1455,16 @@ public class JythonUtil {
             p.name = oo.__getitem__(0).toString(); // name in the URI
             p.deft = oo.__getitem__(1);
             p.doc = oo.__getitem__(2).toString();
-            if (oo.__getitem__(3) instanceof PyList) {
-                PyList pyList = ((PyList) oo.__getitem__(3));
+            PyObject oconstraints= oo.__getitem__(3); 
+            if (oconstraints instanceof PyList) {
+                PyList pyList = ((PyList) oconstraints);
                 List<Object> enums = new ArrayList(pyList.size());
                 for (int j = 0; j < pyList.size(); j++) {
                     enums.add(j, pyList.get(j));
                 }
                 p.enums = enums;
-            } else if (oo.__getitem__(3) instanceof PyDictionary) {
-                PyDictionary pyDict = ((PyDictionary) oo.__getitem__(3));
+            } else if (oconstraints instanceof PyDictionary) {
+                PyDictionary pyDict = ((PyDictionary) oconstraints);
                 PyObject enumsObject;
                 PyObject examplesObject;
                 if (pyDict.has_key(new PyString("enum"))) {
@@ -1710,7 +1711,7 @@ public class JythonUtil {
      * @throws PyException
      */
     public static List<Param> getGetParams(String script) throws PyException {
-        return getGetParams(script, new HashMap<String, String>());
+        return getGetParams(null,script, new HashMap<String, String>());
 
     }
 
@@ -1753,7 +1754,7 @@ public class JythonUtil {
      * @param params user-specified values or null.
      * @return a list of parameters.
      * @throws PyException
-     * @deprecated use #desc
+     * @deprecated use describeScript
      * @see #describeScript(java.util.Map, java.lang.String, java.util.Map) 
      */
     public static List<Param> getGetParams(Map<String, Object> env, String script, Map<String, String> params) throws PyException {
