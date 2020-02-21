@@ -579,8 +579,8 @@ public class JythonUtil {
         if ( sd.getLabel().length()>0 ) result.put( "LABEL", sd.getLabel() );
         if ( sd.getIconURL().length()>0 ) result.put( "ICONURL", sd.getIconURL() );
         
-        if ( result.isEmpty() && line!=null ) {
-            reader= new BufferedReader( new StringReader(line) );
+        if ( result.isEmpty() ) {
+            reader= new BufferedReader( new StringReader(script) );
             String s = reader.readLine();
             Pattern p = Pattern.compile("#\\s*([a-zA-Z]+)\\s*:(.*)");
             while (s != null) {
