@@ -111,6 +111,8 @@ public class FileSystemUtil {
      * @return the file
      * @throws org.das2.util.filesystem.FileSystem.FileSystemOfflineException
      * @throws java.net.URISyntaxException
+     * @deprecated use DataSetURI.getFile instead
+     * @see DataSetURI#getFile(java.lang.String, boolean, org.das2.util.monitor.ProgressMonitor) 
      */
     public static File doDownload(String suri,ProgressMonitor mon) throws FileSystemOfflineException, IOException, URISyntaxException  {
         URISplit split= URISplit.parse(suri);
