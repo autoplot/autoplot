@@ -1,19 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.datasource;
 
 import java.awt.Component;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import javax.swing.CellRendererPane;
 import javax.swing.JComponent;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.JScrollPane;
 
 /**
  * Utility class for working with GUIs, first introduced to listen for
@@ -70,6 +62,30 @@ public class GuiUtil {
         }
     }
     
+    /**
+     * scan through all the child components looking to see if there is a 
+     * JScrollPane.  This was introduced when a JSplitPane with two JScrollPanes
+     * was used with addTab, and an extra JScrollPane was added.
+     * @param c the component
+     * @return true if a child has a scroll
+     */
+    public static boolean hasScrollPane( JComponent c ) {       
+        if ( c instanceof JScrollPane ) {
+            return true;
+        } else {
+            for ( int i=0; i<c.getComponentCount(); i++ ) {
+                Component child= c.getComponent(i);
+                if ( child instanceof JScrollPane ) {
+                    return true;
+                } else if ( child instanceof JComponent ) {
+                    if ( hasScrollPane( (JComponent)child ) ) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
     // see SlicesFilterEditorPanel for addMouseWheelListenerToSpinner
     
 }
