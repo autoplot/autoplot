@@ -1,6 +1,7 @@
 
 package org.autoplot;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,6 +34,7 @@ import java.util.concurrent.locks.Lock;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -923,6 +925,31 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
     }
 
     /**
+     * scan through all the child components looking to see if there is a 
+     * JScrollPane.  This was introduced when a JSplitPane with two scrollpanes
+     * was used with addTab, and an extra JScrollPane was added.
+     * @param c the component
+     * @return true if a child has a scroll
+     */
+    public static boolean hasScrollPane( JComponent c ) {       
+        if ( c instanceof JScrollPane ) {
+            return true;
+        } else {
+            for ( int i=0; i<c.getComponentCount(); i++ ) {
+                Component child= c.getComponent(i);
+                if ( child instanceof JScrollPane ) {
+                    return true;
+                } else if ( child instanceof JComponent ) {
+                    if ( hasScrollPane( (JComponent)child ) ) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+    
+    /**
      * add a tab to the running application.  A new tab will be added with the
      * label, with the component added within a scroll pane.
      * @param label the label for the component.
@@ -942,7 +969,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
                         break;
                     }
                 }
-                if ( c instanceof JScrollPane ) {
+                if ( hasScrollPane(c) ) {
                     view.getTabs().add(label,c);
                 } else {
                     JScrollPane jsp= new JScrollPane();
