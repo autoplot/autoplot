@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>USGS DEM Reader shown with new interface.  <a href='https://github.com/autoplot/dev/blob/master/demos/2019/20190529/readUsgsDem.jyds'>Here</a> is the script.
+        <p><small>RadioJove SPS file with space in the filename now loads properly.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,12 +28,14 @@
         
         <p>Bugfixes (2020-02-21 r24607):</p>
         <ul>
+            <li>2248: Jython script could not contain a space in the name of the resource URI when Jython Extensions were used, as with .sps files.  Thanks, Shing!
+            <li>Jython addTab now checks to see if the added component has embedded scrollpanes (in split pane, for example) before adding a scrollpane automatically.
             <li>rfe704: corrections to GUI generation.  Thanks, kh6sky!
         </ul>
         <p>Older Bugfixes:</p>
         <ul>
             <li>2245: HAPI issues with UCLA PDS-PPI server, like excessive and unnecessary escaping of URLs.
-            <li>2243: vertical slice of spectrogram created by list of X,Y,Z triples works now.
+            <li>2243: vertical slice of spectrogram created by list of X,Y,Z triples works now.  Plot command accepts rank 0 data.
             <li>1687: as symbols are imported, add them to the list of variableNames in code that simplifies Jython.
             <li>correct code counting () and {}, to support turning Matisse GUI builder code into Jython.  See <a href='https://github.com/autoplot/dev/blob/master/demos/guis/demoMatisseGUI.jy'>this</a>.
             <li>2240: ftp servers can now use alternate ports, supporting ad-hoc servers on phones.
