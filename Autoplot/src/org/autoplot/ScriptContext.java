@@ -72,6 +72,7 @@ import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.FileSystemUtil;
+import org.autoplot.datasource.GuiUtil;
 import org.autoplot.datasource.URISplit;
 import org.das2.graph.DasColorBar;
 import org.das2.qds.DataSetOps;
@@ -924,30 +925,6 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
         JOptionPane.showMessageDialog( view, message );
     }
 
-    /**
-     * scan through all the child components looking to see if there is a 
-     * JScrollPane.  This was introduced when a JSplitPane with two scrollpanes
-     * was used with addTab, and an extra JScrollPane was added.
-     * @param c the component
-     * @return true if a child has a scroll
-     */
-    public static boolean hasScrollPane( JComponent c ) {       
-        if ( c instanceof JScrollPane ) {
-            return true;
-        } else {
-            for ( int i=0; i<c.getComponentCount(); i++ ) {
-                Component child= c.getComponent(i);
-                if ( child instanceof JScrollPane ) {
-                    return true;
-                } else if ( child instanceof JComponent ) {
-                    if ( hasScrollPane( (JComponent)child ) ) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-    }
     
     /**
      * add a tab to the running application.  A new tab will be added with the
@@ -969,7 +946,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
                         break;
                     }
                 }
-                if ( hasScrollPane(c) ) {
+                if ( GuiUtil.hasScrollPane(c) ) {
                     view.getTabs().add(label,c);
                 } else {
                     JScrollPane jsp= new JScrollPane();
