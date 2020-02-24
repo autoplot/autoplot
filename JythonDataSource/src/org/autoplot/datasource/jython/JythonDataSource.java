@@ -600,7 +600,7 @@ public final class JythonDataSource extends AbstractDataSource implements Cachin
     }
 
     private Date resourceDate(URI uri) throws IOException {
-        File src = DataSetURI.getFile( uri.toString(), true, new NullProgressMonitor()); //TODO: this is probably wrong, because it should always be the script...
+        File src = DataSetURI.getFile( DataSetURI.fromUri(uri), true, new NullProgressMonitor()); //TODO: this is probably wrong, because it should always be the script...
         return new Date(src.lastModified());
     }
     Date cacheDate = null;
