@@ -256,7 +256,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
             if ( split.file==null ) {
                 throw new IllegalArgumentException("template does not appear to be files: "+template);
             }
-            File local= FileSystemUtil.doDownload( split.file, new NullProgressMonitor() );
+            final File local = DataSetURI.getFile( split.resourceUri, new NullProgressMonitor() ); 
+
             in= new FileInputStream( local );
             p.load( in );
             String vers= p.getProperty("version");
@@ -277,7 +278,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
             }
             template= t;
             product= p.getProperty("product");
-        } catch (FileSystemOfflineException | URISyntaxException ex) {
+        } catch (FileSystemOfflineException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (FileNotFoundException ex) {
             throw new IllegalArgumentException("File does not exist: "+template);
