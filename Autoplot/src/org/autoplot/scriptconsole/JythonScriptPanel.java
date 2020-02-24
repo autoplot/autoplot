@@ -594,18 +594,20 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
         String oldFilename = this.filename;
         this.filename = filename;
         if ( filename!=oldFilename && ( oldFilename==null || !oldFilename.equals(filename) ) ) {
-            final File loadFile= new File(filename);
-            Runnable r= new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        loadFile(loadFile);
-                    } catch (IOException ex) {
-                        Logger.getLogger(JythonScriptPanel.class.getName()).log(Level.SEVERE, null, ex);
+            if ( filename!=null ) {
+                final File loadFile= new File(filename);
+                Runnable r= new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            loadFile(loadFile);
+                        } catch (IOException ex) {
+                            Logger.getLogger(JythonScriptPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
-                }
-            };
-            new Thread(r,"loadScript603").start();
+                };
+                new Thread(r,"loadScript603").start();
+            }
         }
         updateStatus();
         firePropertyChange(PROP_FILENAME, oldFilename, filename);
