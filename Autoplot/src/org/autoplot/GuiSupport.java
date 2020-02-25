@@ -2022,7 +2022,7 @@ public class GuiSupport {
                 for ( int i=0; i<pes.length; i++ ) {
                     selected[i]= cbs[i].isSelected();
                 }
-                doPasteClipboardPlotElementsIntoPlot(app, controller, pes, selected, targetPlot );
+                doPasteClipboardPlotElementsIntoPlot(app, controller, state, pes, selected, targetPlot );
             }
             
         } catch (UnsupportedFlavorException | IOException ex) {
@@ -2033,15 +2033,14 @@ public class GuiSupport {
     /**
      * do not use, this is introduced for testing.
      * @param client just used as lock object
-     * @param controller
-     * @param pes
+     * @param controller the drop target's controller.
+     * @param state the DOM we are merging in.
+     * @param pes the plotElements from state.
      * @param selected 
      * @param targetPlot
      */
-    public static void doPasteClipboardPlotElementsIntoPlot( Object client, ApplicationController controller, PlotElement[] pes, boolean[] selected, Plot targetPlot) {
-        Object lockObject = "addPlotElements";
-
-        Application state = controller.getApplication();
+    public static void doPasteClipboardPlotElementsIntoPlot( Object client, ApplicationController controller, Application state, PlotElement[] pes, boolean[] selected, Plot targetPlot) {
+        Object lockObject = "addPlotElements";        
 
         controller.registerPendingChange(client, lockObject);
         DomLock lock = controller.mutatorLock();
@@ -2082,7 +2081,12 @@ public class GuiSupport {
                 if (selected[i]) {
                     PlotElement peNew = controller.addPlotElement(targetPlot, null, null);
                     peNew.syncTo(pes[i], Arrays.asList("id", "plotId", "dataSourceFilterId"));
-                    peNew.setDataSourceFilterId(nameMap.get(pes[i].getDataSourceFilterId()));
+                    String mappedName= nameMap.get(pes[i].getDataSourceFilterId());
+                    if ( mappedName!=null ) {
+                        peNew.setDataSourceFilterId(mappedName);
+                    } else {
+                        logger.warning("no DSF ID mapping--something has gone horribly wrong.");
+                    }
                 }
             }
         } finally {
