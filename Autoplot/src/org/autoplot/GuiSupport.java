@@ -1870,16 +1870,15 @@ public class GuiSupport {
     }  
 
     /**
-     * make the plot Plot newP reflect the state in String s.  This should be
-     * called from the event thread.
-     * @param app
+     * make the plot <code>newP</code> reflect the state in String 
+     * <code>theVap</code>.  This should be called from the event thread.
+     * @param app GUI component used as the client for the lock.
      * @param controller
-     * @param newP
-     * @param theVap
+     * @param newP the plot to insert plot elements.
+     * @param theVap string containing a single-plot vap.
      * @throws HeadlessException
      * @throws IOException 
      * @throws IllegalArgumentException if the string is not a vap.
-     * 
      */
     private static void insertStringVapIntoPlot( 
             Component app, 
