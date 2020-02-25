@@ -8,6 +8,7 @@ package org.autoplot.pngwalk;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
@@ -426,6 +427,11 @@ public class QualityControlPanel extends javax.swing.JPanel {
         newCommentTextArea.setColumns(20);
         newCommentTextArea.setLineWrap(true);
         newCommentTextArea.setWrapStyleWord(true);
+        newCommentTextArea.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                newCommentTextAreaKeyTyped(evt);
+            }
+        });
         jScrollPane2.setViewportView(newCommentTextArea);
 
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
@@ -593,6 +599,15 @@ public class QualityControlPanel extends javax.swing.JPanel {
         saveButtonActionPerformed(evt);
         walkImageSequence.next();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void newCommentTextAreaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_newCommentTextAreaKeyTyped
+        if ( evt.isShiftDown() && evt.getKeyChar()=='\n' ) {
+            okRadioButton.setSelected(true);
+            saveButtonActionPerformed(null);
+            walkImageSequence.next();
+            evt.consume();
+        }
+    }//GEN-LAST:event_newCommentTextAreaKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
