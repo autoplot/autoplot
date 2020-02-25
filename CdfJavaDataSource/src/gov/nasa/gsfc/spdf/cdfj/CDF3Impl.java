@@ -47,7 +47,7 @@ final class CDF3Impl extends CDFImpl implements CDF3, java.io.Serializable {
         if ( buf.capacity()<CDFSize ) {
             throw new Throwable("file appears to be truncated, as the header says it should contain " + CDFSize + "bytes." );
         }
-        System.err.println( String.format( "buf.capacity - eof: %d", buf.capacity() - CDFSize ) );
+        // String.format( "buf.capacity - eof: %d", buf.capacity() - CDFSize ) );
         numberOfRVariables = buf.getInt();
         numberOfAttributes = buf.getInt();
         buf.getInt(); // skip rMaxRec
