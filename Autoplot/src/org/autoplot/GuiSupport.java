@@ -1830,18 +1830,22 @@ public class GuiSupport {
      * @param newP the plotElements are added to this plot 
      * @throws HeadlessException 
      */
-    public static void pasteClipboardIntoPlot( final Component app, final ApplicationController controller, final Plot newP ) throws HeadlessException {
+    public static void pasteClipboardIntoPlot( final Component app, 
+            final ApplicationController controller, 
+            final Plot newP ) throws HeadlessException {
         try {
             Clipboard clpbrd= Toolkit.getDefaultToolkit().getSystemClipboard();
-            final String s;
+            final String thevap;
             if ( clpbrd.isDataFlavorAvailable(DataFlavor.stringFlavor) ) {
-                s= (String) clpbrd.getData(DataFlavor.stringFlavor);
-                if ( !isStringVap(s) ) {
-                    JOptionPane.showMessageDialog(app,"Use \"Edit Plot\"->\"Copy Plot to Clipboard\"<br>(Pasted content should be XML.)");
+                thevap= (String) clpbrd.getData(DataFlavor.stringFlavor);
+                if ( !isStringVap(thevap) ) {
+                    JOptionPane.showMessageDialog(app,
+                            "Use \"Edit Plot\"->\"Copy Plot to Clipboard\"<br>(Pasted content should be XML.)");
                     return;
                 }
             } else {
-                JOptionPane.showMessageDialog(app,"Use \"Edit Plot\"->\"Copy Plot to Clipboard\"");
+                JOptionPane.showMessageDialog(app,
+                        "Use \"Edit Plot\"->\"Copy Plot to Clipboard\"");
                 return;
             }
             
@@ -1849,7 +1853,9 @@ public class GuiSupport {
                 @Override
                 public void run() {
                     try {
-                        pasteClipboardIntoPlotImmediately( app, controller, newP, s );
+                        insertStringVapIntoPlot( app, controller, newP, thevap );
+                    } catch ( IllegalArgumentException ex ) {
+                        JOptionPane.showMessageDialog(app,"Use \"Edit Plot\"->\"Copy Plot to Clipboard\"<br>(Pasted content is not XML containing a plot.)");
                     } catch (HeadlessException | IOException ex) {
                         Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -1864,22 +1870,25 @@ public class GuiSupport {
     }  
 
     /**
-     * make the plot Plot newP reflect the state in String s.
+     * make the plot Plot newP reflect the state in String s.  This should be
+     * called from the event thread.
      * @param app
      * @param controller
      * @param newP
-     * @param s
+     * @param theVap
      * @throws HeadlessException
      * @throws IOException 
+     * @throws IllegalArgumentException if the string is not a vap.
+     * 
      */
-    private static void pasteClipboardIntoPlotImmediately( Component app, ApplicationController controller, Plot newP, String s ) throws HeadlessException, IOException {
+    private static void insertStringVapIntoPlot( 
+            Component app, 
+            ApplicationController controller, 
+            Plot newP, 
+            String theVap ) throws HeadlessException, IOException, IllegalArgumentException {
         Application state;
-        try {
-            state = (Application)StatePersistence.restoreState(new ByteArrayInputStream(s.getBytes()));
-        } catch ( IllegalArgumentException ex ) {
-            JOptionPane.showMessageDialog(app,"Use \"Edit Plot\"->\"Copy Plot to Clipboard\"<br>(Pasted content is not XML containing a plot.)");
-            return;
-        }
+        
+        state = (Application)StatePersistence.restoreState(new ByteArrayInputStream(theVap.getBytes()));
         
         Object lockObject= "pasteClipboard";
         
