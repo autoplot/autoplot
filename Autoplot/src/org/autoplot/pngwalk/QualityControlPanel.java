@@ -30,6 +30,7 @@ import org.das2.util.filesystem.KeyChain;
 import org.das2.util.filesystem.WriteCapability;
 import org.das2.util.monitor.CancelledOperationException;
 import org.autoplot.datasource.DataSetURI;
+import org.das2.util.LoggerManager;
 
 /**
  *
@@ -277,6 +278,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         statusButtonGroup = new javax.swing.ButtonGroup();
         jLabel2 = new javax.swing.JLabel();
@@ -287,6 +289,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
         saveButton = new javax.swing.JButton();
         loginButton = new javax.swing.JButton();
         sequencePropertiesHost = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
         commentSplitPane = new javax.swing.JSplitPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         previousCommentEditorPane = new javax.swing.JEditorPane();
@@ -353,6 +356,18 @@ public class QualityControlPanel extends javax.swing.JPanel {
         sequencePropertiesHost.setText("reading sequence.properties...");
         sequencePropertiesHost.setToolTipText("reading sequence.properties...");
 
+        jButton1.setText("OK Save Next");
+        jButton1.setToolTipText("Mark as OK, Save, and advance to next image.");
+
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, okRadioButton, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), jButton1, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -366,7 +381,10 @@ public class QualityControlPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(saveButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 69, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(loginButton))
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(jButton1)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(loginButton)))
                 .addContainerGap())
             .add(sequencePropertiesHost)
         );
@@ -380,7 +398,8 @@ public class QualityControlPanel extends javax.swing.JPanel {
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                             .add(okRadioButton)
-                            .add(loginButton))
+                            .add(loginButton)
+                            .add(jButton1))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(problemRadioButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -413,7 +432,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)
+            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
             .add(jPanel2Layout.createSequentialGroup()
                 .add(jLabel1)
                 .add(0, 0, Short.MAX_VALUE))
@@ -463,6 +482,8 @@ public class QualityControlPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
+
+        bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
 
     private void okRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okRadioButtonActionPerformed
@@ -566,10 +587,18 @@ public class QualityControlPanel extends javax.swing.JPanel {
         login();
     }//GEN-LAST:event_loginButtonActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        LoggerManager.logGuiEvent(evt);
+        okRadioButton.setSelected(true);
+        saveButtonActionPerformed(evt);
+        walkImageSequence.next();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSplitPane commentSplitPane;
     private javax.swing.JRadioButton ignoreRadioButton;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
@@ -586,6 +615,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
     private javax.swing.JTextField sequencePropertiesHost;
     private javax.swing.ButtonGroup statusButtonGroup;
     private javax.swing.JLabel statusLabel;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
     public static void main(String[] args) {

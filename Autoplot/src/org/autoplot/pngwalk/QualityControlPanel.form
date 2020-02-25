@@ -65,7 +65,11 @@
                   <EmptySpace max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="1" attributes="0">
                       <Component id="saveButton" min="-2" pref="69" max="-2" attributes="0"/>
-                      <Component id="loginButton" alignment="1" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" alignment="1" attributes="0">
+                          <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="loginButton" min="-2" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -83,6 +87,7 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="okRadioButton" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="loginButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="problemRadioButton" min="-2" max="-2" attributes="0"/>
@@ -166,6 +171,18 @@
             <Property name="toolTipText" type="java.lang.String" value="reading sequence.properties..."/>
           </Properties>
         </Component>
+        <Component class="javax.swing.JButton" name="jButton1">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="OK Save Next"/>
+            <Property name="toolTipText" type="java.lang.String" value="Mark as OK, Save, and advance to next image."/>
+          </Properties>
+          <BindingProperties>
+            <BindingProperty name="enabled" source="okRadioButton" sourcePath="${enabled}" target="jButton1" targetPath="enabled" updateStrategy="0" immediately="false"/>
+          </BindingProperties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+          </Events>
+        </Component>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JSplitPane" name="commentSplitPane">
@@ -206,7 +223,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane2" pref="324" max="32767" attributes="0"/>
+                  <Component id="jScrollPane2" pref="333" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
