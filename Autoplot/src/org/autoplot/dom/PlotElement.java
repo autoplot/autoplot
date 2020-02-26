@@ -400,21 +400,21 @@ public class PlotElement extends DomNode {
         super.syncTo(node,exclude);
         if ( !( node instanceof PlotElement ) ) throw new IllegalArgumentException("node should be a PlotElement");                
         PlotElement that = (PlotElement) node;
-        if ( !exclude.contains( PROP_PLOTID ) ) this.setPlotId(that.getPlotId());
+        if ( !exclude.contains( PROP_PLOTID ) )         this.setPlotId(that.getPlotId());
         if ( !exclude.contains( PROP_DATASOURCEFILTERID ) ) this.setDataSourceFilterId(that.getDataSourceFilterId());
-        if ( !exclude.contains( PROP_PARENT ) ) this.setParent(that.getParent());
-        if ( !exclude.contains( PROP_LEGENDLABEL ) ) this.setLegendLabel(that.getLegendLabel());
-        if ( !exclude.contains( PROP_DISPLAYLEGEND ) ) this.setDisplayLegend(that.isDisplayLegend());
-        if ( !exclude.contains( PROP_ACTIVE ) ) this.setActive(that.isActive());
-        if ( !exclude.contains( PROP_RENDERTYPE ) ) this.setRenderType( that.getRenderType() );
-        if ( !exclude.contains( PROP_RENDERCONTROL ) ) this.setRenderControl( that.getRenderControl() );
-        if ( !exclude.contains( PROP_AUTOLABEL ) ) this.setAutoLabel(that.isAutoLabel());
+        if ( !exclude.contains( PROP_PARENT ) )         this.setParent(that.getParent());
+        if ( !exclude.contains( PROP_LEGENDLABEL ) )    this.setLegendLabel(that.getLegendLabel());
+        if ( !exclude.contains( PROP_DISPLAYLEGEND ) )  this.setDisplayLegend(that.isDisplayLegend());
+        if ( !exclude.contains( PROP_ACTIVE ) )         this.setActive(that.isActive());
+        if ( !exclude.contains( PROP_RENDERTYPE ) )     this.setRenderType( that.getRenderType() );
+        if ( !exclude.contains( PROP_RENDERCONTROL ) )  this.setRenderControl( that.getRenderControl() );
+        if ( !exclude.contains( PROP_AUTOLABEL ) )      this.setAutoLabel(that.isAutoLabel());
         if ( !exclude.contains( PROP_AUTORENDERTYPE ) ) this.setAutoRenderType(that.isAutoRenderType());
-        if ( !exclude.contains( PROP_STYLE ) ) this.style.syncTo(that.style,exclude); // possibly exclude id's.
-        if ( !exclude.contains( PROP_PLOT_DEFAULTS ) )this.plotDefaults.syncTo(that.plotDefaults,exclude);
-        if ( !exclude.contains( PROP_COMPONENT ) ) this.setComponent(that.getComponent());
-        if ( !exclude.contains( PROP_AUTOCOMPONENT ) ) this.setAutoComponent(that.isAutoComponent());
-        if ( !exclude.contains( PROP_CADENCECHECK ) ) this.setCadenceCheck(that.isCadenceCheck() );
+        if ( !exclude.contains( PROP_STYLE ) )          this.style.syncTo(that.style,exclude); // possibly exclude id's.
+        if ( !exclude.contains( PROP_PLOT_DEFAULTS ) )  this.plotDefaults.syncTo(that.plotDefaults,exclude);
+        if ( !exclude.contains( PROP_COMPONENT ) )      this.setComponent(that.getComponent());
+        if ( !exclude.contains( PROP_AUTOCOMPONENT ) )  this.setAutoComponent(that.isAutoComponent());
+        if ( !exclude.contains( PROP_CADENCECHECK ) )   this.setCadenceCheck(that.isCadenceCheck() );
     }
 
     @Override
