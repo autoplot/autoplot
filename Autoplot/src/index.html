@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-02-21 r24607):</p>
+        <p>Bugfixes (2020-02-26 r24634):</p>
         <ul>
+            <li>2249: copy plot, insert plotElements doesn't reset style and symbol size.  Thanks, Jon N!
             <li>2249: copy plot, insert plotElements from clipboard would result in NullPointerException.  Thanks, Jon N!
             <li>2250: .pngwalk file with spaces, which happens when Windows downloads files in the browser, are properly supported.  Thanks, Chris!
             <li>2248: Jython script could not contain a space in the name of the resource URI when Jython Extensions were used, as with .sps files.  Thanks, Shing!
@@ -62,6 +63,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add experimental "Ok Save Next" button to PNGWalk Quality Control code to speed up common workflow.
         </ul>
         <p>Less recent features:</p>
         <ul>
