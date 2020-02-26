@@ -1955,7 +1955,7 @@ public class GuiSupport {
                     plot1.getController().setAutoBinding(true); // TODO: check on why there are two autoBinding properties
                 }
                 pe.setPlotDefaults( pe1.getPlotDefaults() );
-
+                pe.getController().setResetPlotElement(false);
             }
         } finally {
             controller.changePerformed( app, lockObject );
@@ -2087,6 +2087,7 @@ public class GuiSupport {
                     } else {
                         logger.warning("no DSF ID mapping--something has gone horribly wrong.");
                     }
+                    peNew.getController().setResetPlotElement(false); // this seems a bit of a kludge.  Also resetting the ID (to mappedName) resets this flag.
                 }
             }
         } finally {
