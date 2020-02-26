@@ -358,7 +358,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
         sequencePropertiesHost.setToolTipText("reading sequence.properties...");
 
         jButton1.setText("OK Save Next");
-        jButton1.setToolTipText("Mark as OK, Save, and advance to next image.");
+        jButton1.setToolTipText("Mark as OK, Save, and advance to next image.  Ctrl+Enter can be used as well.");
 
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, okRadioButton, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), jButton1, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -601,7 +601,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void newCommentTextAreaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_newCommentTextAreaKeyTyped
-        if ( evt.isShiftDown() && evt.getKeyChar()=='\n' ) {
+        if ( evt.isControlDown() && evt.getKeyChar()=='\n' ) {
             okRadioButton.setSelected(true);
             saveButtonActionPerformed(null);
             walkImageSequence.next();

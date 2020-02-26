@@ -174,7 +174,7 @@
         <Component class="javax.swing.JButton" name="jButton1">
           <Properties>
             <Property name="text" type="java.lang.String" value="OK Save Next"/>
-            <Property name="toolTipText" type="java.lang.String" value="Mark as OK, Save, and advance to next image."/>
+            <Property name="toolTipText" type="java.lang.String" value="Mark as OK, Save, and advance to next image.  Ctrl+Enter can be used as well."/>
           </Properties>
           <BindingProperties>
             <BindingProperty name="enabled" source="okRadioButton" sourcePath="${enabled}" target="jButton1" targetPath="enabled" updateStrategy="0" immediately="false"/>
