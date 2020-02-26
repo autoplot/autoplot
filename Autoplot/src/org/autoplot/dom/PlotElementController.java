@@ -1795,6 +1795,7 @@ public class PlotElementController extends DomNodeController {
     }
 
     public void setResetRanges(boolean resetRanges) {
+        logger.log(Level.FINE, "{0}.setResetRanges({1})", new Object[] { plotElement.id, resetRanges } );
         boolean oldResetRanges = this.resetRanges;
         this.resetRanges = resetRanges;
         propertyChangeSupport.firePropertyChange(PROP_RESETRANGES, oldResetRanges, resetRanges);
@@ -1813,7 +1814,7 @@ public class PlotElementController extends DomNodeController {
     }
 
     public void setResetPlotElement(boolean resetPlotElement) {
-        logger.log(Level.FINER, "{0}.setResetPlotElement({1})", new Object[] { plotElement.id, resetPlotElement } );
+        logger.log(Level.FINE, "{0}.setResetPlotElement({1})", new Object[] { plotElement.id, resetPlotElement } );
         boolean old = this.resetPlotElement;
         this.resetPlotElement = resetPlotElement;
         propertyChangeSupport.firePropertyChange(PROP_RESETPLOTELEMENT, old, resetPlotElement);
