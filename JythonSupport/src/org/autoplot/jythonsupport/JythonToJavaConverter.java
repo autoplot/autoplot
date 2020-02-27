@@ -77,11 +77,13 @@ public class JythonToJavaConverter {
     
     /**
      * The goal is to take Java snippets and turn them into Jython code.
-     * @param doThis
-     * @return 
+     * This is all overly simplistic and should be done properly.
+     * 
+     * @param javaCode
+     * @return conversion to Jython-like code.
      */
-    public static String convertReverse(String doThis) {
-        String[] ss= doThis.split("\n");
+    public static String convertReverse(String javaCode) {
+        String[] ss= javaCode.split("\n");
         StringBuilder b= new StringBuilder();
         Pattern assignPattern= Pattern.compile("([a-zA-Z.]*[A-Z]\\S+)(\\s+)(\\S+)(\\s*=.*)");
         Pattern importPattern1= Pattern.compile("import ([a-z\\.]*)\\.([A-Za-z\\*]*)");
@@ -106,13 +108,17 @@ public class JythonToJavaConverter {
                 }
                 s= m.group(1) + m.group(2) + m.group(3) + m.group(4);
             }
-            if ( s.contains("Short.") ) {
+            if ( s.contains("Short.") ) { // support Matisse
                 String clas= "from java.lang import Short";
                 if ( !importedPaths.contains(clas)) {
                     importedPaths.add(clas);
                 }
             }
+            
             s= s.replaceAll("null","None");
+            s= s.replaceAll("false","False");
+            s= s.replaceAll("true","True");
+            
             m= assignPattern.matcher(s);
             if ( m.matches() ) {
                 s= m.group(3)+m.group(4);
