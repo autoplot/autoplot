@@ -907,6 +907,7 @@ addTopDecoration( dom.canvases[0], paint )
      *}</small></pre></blockquote>
      * @param node the plot or canvas over which to plot
      * @param painter the PyFunction to call when painting
+     * @see https://github.com/autoplot/dev/blob/master/demos/2020/20200229/demoAddBottomDecoration.jy
      * 
      */
     public static void addTopDecoration( DomNode node, final PyFunction painter ) {
@@ -949,6 +950,7 @@ addBottomDecoration( dom.canvases[0], paint )
      *}</small></pre></blockquote>
      * @param node the plot or canvas over which to plot
      * @param painter the PyFunction to call when painting
+     * @see https://github.com/autoplot/dev/blob/master/demos/2020/20200229/demoAddBottomDecoration.jy
      * 
      */
     public static void addBottomDecoration( DomNode node, final PyFunction painter ) {
