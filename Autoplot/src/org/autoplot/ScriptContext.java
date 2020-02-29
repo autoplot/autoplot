@@ -1,8 +1,10 @@
 
 package org.autoplot;
 
+import java.awt.Canvas;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.dataset.DataSet;
@@ -75,6 +77,7 @@ import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.GuiUtil;
 import org.autoplot.datasource.URISplit;
 import org.das2.graph.DasColorBar;
+import org.das2.graph.Painter;
 import org.das2.qds.DataSetOps;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.MutablePropertyDataSet;
@@ -887,6 +890,90 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
         mm.addBoxSelectionListener(bsl);
         p.getDasMouseInputAdapter().setPrimaryModule(mm);
         return mm;
+    }
+    
+    /**
+     * add code that will paint custom graphics on the canvas or on a plot.
+     * The command will be invoked after all other painting is done, making
+     * the decoration to be on top.  Note plots can only have one decoration,
+     * and the Canvas can have any number.  Calling reset() will remove all
+     * decorations.
+     *<blockquote><pre><small>{@code
+def paint(g):
+    for i in xrange(0,1000,100):
+        g.drawOval(500-i/2,500-i/2,i,i)
+
+addTopDecoration( dom.canvases[0], paint )
+     *}</small></pre></blockquote>
+     * @param node the plot or canvas over which to plot
+     * @param painter the PyFunction to call when painting
+     * 
+     */
+    public static void addTopDecoration( DomNode node, final PyFunction painter ) {
+        if ( !( node instanceof Plot ) && ! ( node instanceof org.autoplot.dom.Canvas ) ) {
+            throw new IllegalArgumentException("first argument must be plot or canvas");
+        }
+        if ( node instanceof Plot ) {
+            final Plot p= (Plot)node;
+            Painter thep= new Painter() {
+                @Override
+                public void paint(Graphics2D g) {
+                    painter.__call__(Py.java2py(g));
+                }   
+            };
+            p.getController().getDasPlot().setTopDecorator(thep);
+        } else if ( node instanceof org.autoplot.dom.Canvas ) {
+            final org.autoplot.dom.Canvas c= (org.autoplot.dom.Canvas)node;
+            Painter thep= new Painter() {
+                @Override
+                public void paint(Graphics2D g) {
+                    painter.__call__(Py.java2py(g));
+                }   
+            };
+            c.getController().getDasCanvas().addTopDecorator(thep);
+        }
+    }
+    
+    /**
+     * add code that will paint custom graphics on the canvas or on a plot.
+     * The command will be invoked after all other painting is done, making
+     * the decoration to be on top.  Note plots can only have one decoration,
+     * and the Canvas can have any number.  Calling reset() will remove all
+     * decorations.
+     *<blockquote><pre><small>{@code
+def paint(g):
+    for i in xrange(0,1000,100):
+        g.drawOval(500-i/2,500-i/2,i,i)
+
+addBottomDecoration( dom.canvases[0], paint )
+     *}</small></pre></blockquote>
+     * @param node the plot or canvas over which to plot
+     * @param painter the PyFunction to call when painting
+     * 
+     */
+    public static void addBottomDecoration( DomNode node, final PyFunction painter ) {
+        if ( !( node instanceof Plot ) && ! ( node instanceof org.autoplot.dom.Canvas ) ) {
+            throw new IllegalArgumentException("first argument must be plot or canvas");
+        }
+        if ( node instanceof Plot ) {
+            final Plot p= (Plot)node;
+            Painter thep= new Painter() {
+                @Override
+                public void paint(Graphics2D g) {
+                    painter.__call__(Py.java2py(g));
+                }   
+            };
+            p.getController().getDasPlot().setBottomDecorator(thep);
+        } else if ( node instanceof org.autoplot.dom.Canvas ) {
+            final org.autoplot.dom.Canvas c= (org.autoplot.dom.Canvas)node;
+            Painter thep= new Painter() {
+                @Override
+                public void paint(Graphics2D g) {
+                    painter.__call__(Py.java2py(g));
+                }   
+            };
+            c.getController().getDasCanvas().addBottomDecorator(thep);
+        }
     }
     
     /**
