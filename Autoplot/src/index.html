@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>FFTPower with slide&gt;0 now combines two adjacent records so there are not breaks in the spectrum.
+        <p><small>New addTopDecoration and addBottomDecoration make it easier to add custom graphics to plots.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,10 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-02-28 r24646):</p>
+        <p>Bugfixes (2020-03-02 r24646):</p>
         <ul>
+            <li>DasPlot setTopDecorator and setBottomDecorator failed to invalidate the cached image and would not repaint immediately.
+            <li>append data source would fail if the first granule had less than 10 records.  Thanks, Jon N!
             <li>applyIndex function was preserving cadence, when it shouldn't.
-            <li>2252: FFTPower with slide option can span records.
+            <li>2252: FFTPower with slide option can span records.  Thanks, George!
             <li>2251: handle strange bug where GitLabs us suddenly adding a /-/ to URLs
             <li>2249: copy plot, insert plotElements doesn't reset style and symbol size.  Thanks, Jon N!
             <li>2249: copy plot, insert plotElements from clipboard would result in NullPointerException.  Thanks, Jon N!
@@ -67,7 +69,7 @@
         <p>Features:</p>
         <ul>
             <li>623: new addTopDecoration and addBottomDecoration functions added.
-            <li>Decimate of rank 2 BinaryDataSet is efficient, using rfe711.
+            <li>Decimate of rank 2 BinaryDataSet is efficient, using rfe711.  Thanks, Shing!
             <li>RadioJove .sps reader now efficiently handles antenna parameter, using new BufferDataSource stride feature.
             <li>711: BufferDataSource now has stride parameter to supports datasets where two datasets are interleaved.
             <li>709: add experimental "Ok Save Next" button to PNGWalk Quality Control code to speed up common workflow.
