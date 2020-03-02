@@ -84,4 +84,17 @@ public class GZIPResponseStream extends ServletOutputStream {
   public void reset() {
     //noop
   }
+
+    @Override
+    public void setWriteListener(WriteListener writeListener) {
+        output.setWriteListener(writeListener);
+    }
+
+    @Override
+    public boolean isReady() {
+        return output.isReady();
+    }
+  
+    
+  
 }
