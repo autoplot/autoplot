@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New addTopDecoration and addBottomDecoration make it easier to add custom graphics to plots.
+        <p><small>Feather Plot script is found quickly on github.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-03-02 r24646):</p>
+        <p>Bugfixes (2020-03-05 r24660):</p>
         <ul>
+            <li>when custom renderer was used in script, rgb color data set could cause runtime error when autoranging.
+            <li>recent refactoring introduced an error with rank 4 BufferDataSets--whoops!
             <li>DasPlot setTopDecorator and setBottomDecorator failed to invalidate the cached image and would not repaint immediately.
             <li>append data source would fail if the first granule had less than 10 records.  Thanks, Jon N!
             <li>applyIndex function was preserving cadence, when it shouldn't.
