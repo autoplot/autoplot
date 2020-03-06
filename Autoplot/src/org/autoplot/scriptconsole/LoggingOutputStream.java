@@ -41,6 +41,7 @@ public class LoggingOutputStream extends ByteArrayOutputStream {
         synchronized (this) {
             super.flush();
             try {
+                // Because of Jython 2.2, we need to use ISO-8859-1, which handles Units.microseconds2 properly.
                 record = this.toString("ISO-8859-1");  // Try "print Units.microseconds3" (&micro;s) at the command line to see where the encoding is messed up.
             } catch ( UnsupportedEncodingException ex ) {
                 record = this.toString(); 
