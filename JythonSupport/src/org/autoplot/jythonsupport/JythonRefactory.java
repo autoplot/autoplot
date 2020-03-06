@@ -54,11 +54,11 @@ public class JythonRefactory {
      * @throws IOException 
      */
     public static String fixImports( String s ) throws IOException {
-        InputStream fin= new ByteArrayInputStream( s.getBytes(Charset.forName("US-ASCII")) );
+        InputStream fin= new ByteArrayInputStream( s.getBytes(Charset.forName("UTF-8")) );
         InputStream out= fixImports( fin, "<memory>" );
         ByteArrayOutputStream baos= new ByteArrayOutputStream(s.length()*110/100);
         DataSourceUtil.transfer( out, baos );
-        String result= baos.toString("US-ASCII");
+        String result= baos.toString("UTF-8");
         return result;
     }
 
@@ -72,11 +72,11 @@ public class JythonRefactory {
      * @throws IOException 
      */
     public static String fixImports( String s, String name ) throws IOException {
-        InputStream fin= new ByteArrayInputStream( s.getBytes(Charset.forName("US-ASCII")) );
+        InputStream fin= new ByteArrayInputStream( s.getBytes(Charset.forName("UTF-8")) );
         InputStream out= fixImports( fin,name );
         ByteArrayOutputStream baos= new ByteArrayOutputStream(s.length()*110/100);
         DataSourceUtil.transfer( out, baos );
-        String result= baos.toString("US-ASCII");
+        String result= baos.toString("UTF-8");
         return result;
     }
     
