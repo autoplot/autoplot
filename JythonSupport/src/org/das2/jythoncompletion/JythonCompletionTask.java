@@ -659,7 +659,7 @@ public class JythonCompletionTask implements CompletionTask {
     private int queryNames(CompletionContext cc, CompletionResultSet rs) throws BadLocationException {
         logger.fine("queryNames");
         int count=0;
-        String[] keywords = new String[]{"assert", "def", "elif", "except", "from", "for", "finally", "import", "while", "print", "raise"}; //TODO: not complete
+        String[] keywords = new String[]{ "def", "elif", "except", "from", "for", "finally", "import", "while", "print", "raise"}; //TODO: not complete
         for (String kw : keywords) {
             if (kw.startsWith(cc.completable)) {
                 if ( rs!=null ) rs.addItem(new DefaultCompletionItem(kw, cc.completable.length(), kw, kw, null, 0));
