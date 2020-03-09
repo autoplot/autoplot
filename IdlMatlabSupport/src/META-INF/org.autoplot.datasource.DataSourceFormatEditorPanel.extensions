@@ -1,2 +1,2 @@
 org.autoplot.idlsupport.IdlsavDataSourceFormatEditorPanel idlsav
-org.autoplot.idlsupport.MatDataSourceFormatEditorPanel mat
+org.autoplot.matsupport.MatDataSourceFormatEditorPanel mat

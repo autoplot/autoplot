@@ -3,7 +3,7 @@
  * IdlsavDataSourceFormatEditorPanel.java
  *
  */
-package org.autoplot.idlsupport;
+package org.autoplot.matsupport;
 
 import java.util.HashMap;
 import java.util.Map;

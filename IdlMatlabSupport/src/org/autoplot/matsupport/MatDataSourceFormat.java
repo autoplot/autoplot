@@ -1,5 +1,5 @@
 
-package org.autoplot.idlsupport;
+package org.autoplot.matsupport;
 
 import com.jmatio.io.MatFileWriter;
 import com.jmatio.types.MLArray;
