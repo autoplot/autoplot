@@ -60,14 +60,19 @@ public class MatDataSource extends AbstractDataSource {
             ByteBuffer buffer= mlna.getRealByteBuffer();
             Object type= bufferDataSetType(array.getType());
             int[] qube= array.getDimensions();
-            int reclen= DataSetUtil.product(qube)/qube[0]*BufferDataSet.byteCount(type);
+            int reclen;
             switch (qube.length) {
                 case 2:
+                    int t= qube[0];
+                    qube[0]= qube[1];
+                    qube[1]= t;
+                    reclen= qube[1] * BufferDataSet.byteCount(type);
                     QDataSet result= 
                             BufferDataSet.makeDataSet( qube.length, reclen, 0, 
                             qube, buffer, type );
-                    return Ops.transpose(result);
+                    return result;
                 case 1:
+                    reclen= qube[0]*BufferDataSet.byteCount(type);
                     return BufferDataSet.makeDataSet( qube.length, reclen, 0,
                             qube, buffer, type );
                 default:
