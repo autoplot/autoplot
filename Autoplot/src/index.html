@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Feather Plot script is found quickly on github.
+        <p><small>Inverted V's on Rope Swing.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-03-05 r24660):</p>
+        <p>Bugfixes (2020-03-09 r24671):</p>
+        <ul>
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>when custom renderer was used in script, rgb color data set could cause runtime error when autoranging.
             <li>recent refactoring introduced an error with rank 4 BufferDataSets--whoops!
@@ -42,51 +45,18 @@
             <li>Jython addTab now checks to see if the added component has embedded scrollpanes (in split pane, for example) before adding a scrollpane automatically.
             <li>rfe704: corrections to GUI generation.  Thanks, kh6sky!
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>2245: HAPI issues with UCLA PDS-PPI server, like excessive and unnecessary escaping of URLs.
-            <li>2243: vertical slice of spectrogram created by list of X,Y,Z triples works now.  Plot command accepts rank 0 data.
-            <li>1687: as symbols are imported, add them to the list of variableNames in code that simplifies Jython.
-            <li>correct code counting () and {}, to support turning Matisse GUI builder code into Jython.  See <a href='https://github.com/autoplot/dev/blob/master/demos/guis/demoMatisseGUI.jy'>this</a>.
-            <li>2240: ftp servers can now use alternate ports, supporting ad-hoc servers on phones.
-            <li>rfe704: add script to tools uses setScriptLabel and setScriptTitle for menu label.
-            <li>Colors are encoded in vaps as "#040404 (Dark Gray)", to improve readability of .vap files.
-            <li>2239: Time Range Tool's NRT tab clean up, use DasAxis to show new setting. 
-            <li>improve feedback for truncated CDF file.
-            <li>1801: applyUnaryOp performance improved for rank 1 data.
-            <li>2235: atan2 documentation tweak
-            <li>getApplication().getScriptPanel() would return the editor, not the entire panel.  Codes should use getApplication().getScriptEditor() for this.
-            <li>bugfix:autoplot --script=https://github.com/.../extractReferences.jy didn't work because it would load the html from GitHub directly, not via GitHubFileSystem.
-            <li>clean up of old code which allowed loading URIs found in .vap file.
-            <li>2114: Support <a href="https://github.com/autoplot/documentation/wiki/QDataSet.Schemes#vector-time-series">vector array</a> in NetCDF file using CDAWeb metadata.  Thanks, Andres!
-            <li>bugfix parse of |cleanData(11) 
-            <li>2241: rfe 1978078909: check for null selection in CDFEditorPanel, and review use of all JTrees.  Thanks, Dan!
-            <li>clean up of row change events to fix noise problems on Jenkins server.
-            <li>2241: 064169462: multi-variable selection in CDF editor could lead to NullPointerException.  Thanks, pmaf and orufai!
-            <li>242122682: condition where ...cdf?var[:,0] would result in runtime error.
-            <li>experiment with Level.CONFIG, to be used to log client use of DasCanvas.
-            <li>getCompletions call of CDF would download file, the monitor was used twice.
-            <li>editor javadoc location is tolerant of paths missing final /, and generated URLs should not have spaces for <a href="http://www-pw.physics.uiowa.edu/~jbf/autoplot/doc">new location</a>.
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>698: support read of old matlab files, containing rank 1 or rank 2 data.
+            <li>713: GitHub support now supports branches.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>623: new addTopDecoration and addBottomDecoration functions added.
             <li>Decimate of rank 2 BinaryDataSet is efficient, using rfe711.  Thanks, Shing!
             <li>RadioJove .sps reader now efficiently handles antenna parameter, using new BufferDataSource stride feature.
             <li>711: BufferDataSource now has stride parameter to supports datasets where two datasets are interleaved.
             <li>709: add experimental "Ok Save Next" button to PNGWalk Quality Control code to speed up common workflow.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>new "Editor Bookmarks" actions allows actions like <a href='https://github.com/autoplot/dev/blob/master/demos/tools/editor/pull.jy'>pull</a> to be added to the editor menu.
-            <li>Throw more abstract error when a CDF variable pointer points to a location past the end of the CDF file.
-            <li>DasProgressPanel can be a Java/Swing component, so that it can be part of a GUI.
-            <li>1801: speed up binary operations for rank 1-3 operands by avoiding DataSetIterator use, which is known to be slow.  (By a factor of 3-4!)
-            <li>currentLine function reports the Jython code name and line number of the call, useful for debugging.
-            <li>editor scripts don't need special "editor" and "script" symbols, since they can use getApplication().getScriptPanel().
-            <li>360: support Jython "examples":[2,3,4,5] which doesn't require that the value be one of these.
-            <li>672: cleanData allows the number of sigmas to be set.
-            <li>672: add "cleanData" function which removes data three sigmas away from the mean.
         </ul>
         <p>Known issues:</p>
         <ul>
