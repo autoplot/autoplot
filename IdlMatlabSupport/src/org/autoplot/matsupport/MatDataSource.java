@@ -4,6 +4,7 @@ package org.autoplot.matsupport;
 import com.jmatio.io.MatFileReader;
 import com.jmatio.types.MLArray;
 import com.jmatio.types.MLNumericArray;
+import com.jmatio.types.MLStructure;
 import java.io.File;
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -46,6 +47,31 @@ public class MatDataSource extends AbstractDataSource {
         throw new IllegalArgumentException("mltype should be between 0 and 15.");
     }
     
+    private MLArray getArray( MatFileReader reader, MLArray s, String name ) {
+        if ( name.contains(".") ) {
+            int n= name.indexOf(".");
+            String root= name.substring(0,n);
+            MLArray s1= reader.getMLArray(root);
+            if ( s1 instanceof MLNumericArray ) {
+                return s1; // shouldn't get here
+            } else if ( s1 instanceof MLStructure ) {
+                String tagname= name.substring(n+1);
+                MLStructure mls= (MLStructure)s1;
+                return getArray( reader, mls.getField(tagname), tagname );
+            } else {
+                throw new IllegalArgumentException("not supported (l62): "+s1);
+            }
+        } else {
+            if ( s==null ) {
+                return reader.getMLArray(name);
+            } else if ( s instanceof MLNumericArray ) {
+                return s;
+            } else {
+                return null;
+            }
+        }
+    }
+            
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         File f= getFile( uri, mon );
@@ -54,7 +80,8 @@ public class MatDataSource extends AbstractDataSource {
         if ( name.length()==0 ) {
             throw new IllegalArgumentException("name must be set");
         }
-        MLArray array= reader.getMLArray(name);
+        MLArray array= getArray( reader, null, name);
+        
         if ( array instanceof MLNumericArray ) {
             MLNumericArray mlna= (MLNumericArray)array;
             ByteBuffer buffer= mlna.getRealByteBuffer();
@@ -63,6 +90,9 @@ public class MatDataSource extends AbstractDataSource {
             int reclen;
             switch (qube.length) {
                 case 2:
+                    if ( qube[0]==6 ) {
+                        //logger.fine
+                    } 
                     int t= qube[0];
                     qube[0]= qube[1];
                     qube[1]= t;

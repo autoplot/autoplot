@@ -4,10 +4,12 @@ package org.autoplot.matsupport;
 import com.jmatio.io.MatFileReader;
 import com.jmatio.types.MLArray;
 import com.jmatio.types.MLNumericArray;
+import com.jmatio.types.MLStructure;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,18 +33,30 @@ public class MatDataSourceFactory extends AbstractDataSourceFactory {
 
     @Override
     public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
-        try {
-            URISplit split= URISplit.parse(surl);
-            Map<String,String> params= URISplit.parseParams(split.params);
-            String var= params.get(URISplit.PARAM_ARG_0);
-            if ( var==null ) return true;
-            File file = DataSetURI.getFile( split.file, mon );
-            MatFileReader reader= new MatFileReader(file);
-            Map<String,MLArray> content= reader.getContent();
-            return !content.containsKey(var);
-        } catch ( IOException ex ) {
-            return true;
-        }
+        URISplit split= URISplit.parse(surl);
+        Map<String,String> params= URISplit.parseParams(split.params);
+        String var= params.get(URISplit.PARAM_ARG_0);
+        if ( var==null ) return true;
+        return false;
+    }
+    
+    private void addCompletions( String root, String key, MLArray array, List<CompletionContext> ccresult ) {
+        String keyn= root==null ? key : root + "." + key;
+        if ( array instanceof MLNumericArray ) {
+            CompletionContext cc1= new CompletionContext( 
+                    CompletionContext.CONTEXT_PARAMETER_NAME,
+                    keyn, this, "arg_0", keyn+" " +array, "" );
+            ccresult.add(cc1);
+        } else if ( array instanceof MLStructure ) {
+            MLStructure mls= (MLStructure)array;
+            String[] tagnames= mls.getFieldNames().toArray(new String[mls.getAllFields().size()]);
+            MLArray[] aas= mls.getAllFields().toArray(new MLArray[mls.getAllFields().size()]);
+            for ( int i=0; i<tagnames.length; i++ ) {
+                MLArray a= aas[i];
+                String n= tagnames[i];
+                addCompletions( keyn, n, a, ccresult);                
+            }
+        }   
     }
     
     @Override
@@ -53,12 +67,7 @@ public class MatDataSourceFactory extends AbstractDataSourceFactory {
             MatFileReader reader= new MatFileReader(file);
             Map<String,MLArray> content= reader.getContent();
             for ( Entry<String,MLArray> e : content.entrySet() ) {
-                if ( e.getValue() instanceof MLNumericArray ) {
-                    CompletionContext cc1= new CompletionContext( 
-                            CompletionContext.CONTEXT_PARAMETER_NAME,
-                            e.getKey(), this, "arg_0", e.getKey()+" " +e.getValue(), "" );
-                    ccresult.add(cc1);
-                }
+                addCompletions( null, e.getKey(), e.getValue(), ccresult );
             }
             return ccresult;
         } else {
