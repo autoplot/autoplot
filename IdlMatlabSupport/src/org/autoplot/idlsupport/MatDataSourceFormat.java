@@ -106,6 +106,8 @@ public class MatDataSourceFormat extends AbstractDataSourceFormat {
         setUri(uri);
         maybeMkdirs();
         
+        String name= getParam( "arg_0", "data" );
+        
         List<MLArray> stage= new ArrayList<>();
         
         QDataSet dep0= (QDataSet) data.property(QDataSet.DEPEND_0);
@@ -118,10 +120,10 @@ public class MatDataSourceFormat extends AbstractDataSourceFormat {
         } else {
             switch (data.rank()) {
                 case 2:
-                    stage.add( formatRank2( data, "data") );
+                    stage.add( formatRank2( data, name ) );
                     break;
                 case 1:
-                    stage.add( formatRank1( data, "data") );
+                    stage.add( formatRank1( data, name ) );
                     break;
                 default:
                     throw new IllegalArgumentException("unsupported rank: "+data.rank());
