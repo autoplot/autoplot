@@ -28,7 +28,7 @@ public abstract class AbstractDataSourceFactory implements DataSourceFactory {
     }
 
     @Override
-    public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
+    public boolean reject(String suri, List<String> problems, ProgressMonitor mon) {
         return false;
     }
     
