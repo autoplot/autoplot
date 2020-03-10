@@ -81,49 +81,67 @@ public class MatDataSource extends AbstractDataSource {
             throw new IllegalArgumentException("name must be set");
         }
         
-        MLArray array= getArray( reader, null, name);
-        
-        if ( array instanceof MLNumericArray ) {
-            MLNumericArray mlna= (MLNumericArray)array;
-            ByteBuffer buffer= mlna.getRealByteBuffer();
-            Object type= bufferDataSetType(array.getType());
-            int[] qube= array.getDimensions();
-            int reclen;
-            QDataSet result;
-            switch (qube.length) {
-                case 2:
-                    int t= qube[0];
-                    qube[0]= qube[1];
-                    qube[1]= t;
-                    reclen= qube[1] * BufferDataSet.byteCount(type);
-                    result= 
-                            BufferDataSet.makeDataSet( qube.length, reclen, 0, 
-                            qube, buffer, type );
-                    if ( result.length(0)==6 && result.length()>0 ) {
-                        double yr= result.value(0,0);
-                        if ( Math.floor(yr)==yr && yr>1900 && yr<2200 ) {
-                            result= Ops.toTimeDataSet( Ops.slice1(result,0),
-                                    Ops.slice1(result,1), 
-                                    Ops.slice1(result,2),
-                                    Ops.slice1(result,3),
-                                    Ops.slice1(result,4),
-                                    Ops.slice1(result,5), null );
-                        }
-                    }
-                    break;
-                case 1:
-                    reclen= qube[0]*BufferDataSet.byteCount(type);
-                    result= BufferDataSet.makeDataSet( qube.length, reclen, 0,
-                            qube, buffer, type );
-                    break;
-                default:
-                    throw new IllegalArgumentException("rank 3 and up is not supported");
-            }
-            result= Ops.putProperty( result, QDataSet.NAME, name.replaceAll("\\.","_") );
-            result= Ops.putProperty( result, QDataSet.LABEL, name );
-            return result;
+        String[] names= name.split(",");
+        QDataSet[] datas= new QDataSet[names.length];
+        if ( names.length>4 ) {
+            throw new IllegalArgumentException("first argument can only"
+                    + " contain four comma-separated names." );
         }
-        throw new IllegalArgumentException("unexpected type, should be MLArray");
+        
+        for ( int i=0; i<names.length; i++ ) {
+            MLArray array= getArray( reader, null, names[i]);
+
+            if ( array instanceof MLNumericArray ) {
+                MLNumericArray mlna= (MLNumericArray)array;
+                ByteBuffer buffer= mlna.getRealByteBuffer();
+                Object type= bufferDataSetType(array.getType());
+                int[] qube= array.getDimensions();
+                int reclen;
+                QDataSet result;
+                switch (qube.length) {
+                    case 2:
+                        int t= qube[0];
+                        qube[0]= qube[1];
+                        qube[1]= t;
+                        reclen= qube[1] * BufferDataSet.byteCount(type);
+                        result= 
+                                BufferDataSet.makeDataSet( qube.length, reclen, 0, 
+                                qube, buffer, type );
+                        if ( result.length(0)==6 && result.length()>0 ) {
+                            double yr= result.value(0,0);
+                            if ( Math.floor(yr)==yr && yr>1900 && yr<2200 ) {
+                                result= Ops.toTimeDataSet( Ops.slice1(result,0),
+                                        Ops.slice1(result,1), 
+                                        Ops.slice1(result,2),
+                                        Ops.slice1(result,3),
+                                        Ops.slice1(result,4),
+                                        Ops.slice1(result,5), null );
+                            }
+                        }
+                        break;
+                    case 1:
+                        reclen= qube[0]*BufferDataSet.byteCount(type);
+                        result= BufferDataSet.makeDataSet( qube.length, reclen, 0,
+                                qube, buffer, type );
+                        break;
+                    default:
+                        throw new IllegalArgumentException("rank 3 and up is not supported");
+                }
+                result= Ops.putProperty( result, QDataSet.NAME, names[i].replaceAll("\\.","_") );
+                result= Ops.putProperty( result, QDataSet.LABEL, names[i] );
+                datas[i]= result;
+            } else {
+                throw new IllegalArgumentException("unexpected type, should be MLArray");
+            }
+        }
+        
+        switch( names.length ) {
+            case 1: return datas[0];
+            case 2: return Ops.link(datas[0],datas[1]);
+            case 3: return Ops.link(datas[0],datas[1],datas[2]);
+            case 4: return Ops.link(datas[0],datas[1],datas[2],datas[3]);
+            default: throw new IllegalArgumentException("not supported");
+        }
     }
 
     
