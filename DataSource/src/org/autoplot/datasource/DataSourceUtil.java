@@ -595,15 +595,21 @@ public class DataSourceUtil {
         String sfile= surl;
         
         String yyyy= "/(19|20)\\d{2}/";
-
-        String yyyymmdd= "(?<!\\d)(19|20)(\\d{6})(?!\\d)"; //"(\\d{8})";
-        String yyyyjjj= "(?<!\\d)(19|20)\\d{2}\\d{3}(?!\\d)";
-        String yyyymm= "(?<!\\d)(19|20)\\d{2}\\d{2}(?!\\d)";
-        String yyyy_mm_dd= "(?<!\\d)(19|20)\\d{2}([\\-_/])\\d{2}\\2\\d{2}(?!\\d)";
-        String yyyy_mm= "(?<!\\d)(19|20)\\d{2}([\\-_/])\\d{2}(?!\\d)";
-        String yyyy_jjj= "(?<!\\d)(19|20)\\d{2}([\\-_/])\\d{3}(?!\\d)";
-        String yyyymmdd_HH= "(?<!\\d)(19|20)(\\d{6})(\\D)\\d{2}(?!\\d)"; //"(\\d{8})"; 20140204T15
-        String yyyymmdd_HHMM= "(?<!\\d)(19|20)(\\d{6})(\\D)\\d{2}\\d{2}(?!\\d)"; //"(\\d{8})"; 20140204T1515
+        String y4= "(19|20)\\d{2}";
+        String mm= "(01|02|03|04|05|06|07|08|09|10|11|12)";
+        String dd= "((?:0|1|2|3)\\d)";
+        String ddd= "([0123]\\d\\d)";
+        String hh= "(00|01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24)";
+        String min= "([0-6]\\d)";
+        
+        String yyyymmdd= "(?<!\\d)"+y4+mm+dd+"(?!\\d)"; //"(\\d{8})";
+        String yyyyjjj= "(?<!\\d)"+y4+ddd+"(?!\\d)";
+        String yyyymm= "(?<!\\d)"+y4+mm+"(?!\\d)";
+        String yyyy_mm_dd= "(?<!\\d)"+y4+"([\\-_/])"+mm+"\\2"+dd+"(?!\\d)";
+        String yyyy_mm= "(?<!\\d)"+y4+"([\\-_/])"+mm+"(?!\\d)";
+        String yyyy_jjj= "(?<!\\d)"+y4+"([\\-_/])"+ddd+"(?!\\d)";
+        String yyyymmdd_HH= "(?<!\\d)"+y4+mm+dd+"(\\D)"+hh+"(?!\\d)"; //"(\\d{8})"; 20140204T15
+        String yyyymmdd_HHMM= "(?<!\\d)"+y4+mm+dd+"(\\D)"+hh+min+"(?!\\d)"; //"(\\d{8})"; 20140204T1515
 
         //DANGER: code assumes starts with 4-digit year and then a delimiter, or no delimiter.  See replaceLast
         
@@ -623,6 +629,7 @@ public class DataSourceUtil {
                     break; // we found something
                 }
             }
+            logger.fine("unable to find any digits for aggregation.");
             if ( timeRange==null ) return null;
         }
 
@@ -632,8 +639,8 @@ public class DataSourceUtil {
         int hour= TimeUtil.HOUR;
         int minute= TimeUtil.MINUTE;
 
-        List<String> search= new ArrayList( Arrays.asList( yyyymmdd_HHMM, yyyymmdd_HH, yyyy_jjj, yyyymmdd, yyyyjjj, yyyymm, yyyy_mm_dd, yyyy_mm, yyyy ) );
-        List<String> replac= new ArrayList( Arrays.asList( "\\$Y\\$m\\$d$3\\$H\\$M", "\\$Y\\$m\\$d$3\\$H", "\\$Y$2\\$j", "\\$Y\\$m\\$d","\\$Y\\$j","\\$Y\\$m", "\\$Y$2\\$m$2\\$d", "\\$Y$2\\$m", "/\\$Y/" ) );
+        List<String> search= new ArrayList( Arrays.asList( yyyymmdd_HHMM, yyyymmdd_HH, yyyymmdd, yyyy_jjj, yyyyjjj, yyyymm, yyyy_mm_dd, yyyy_mm, yyyy ) );
+        List<String> replac= new ArrayList( Arrays.asList( "\\$Y\\$m\\$d$3\\$H\\$M", "\\$Y\\$m\\$d$3\\$H", "\\$Y\\$m\\$d", "\\$Y$2\\$j","\\$Y\\$j","\\$Y\\$m", "\\$Y$2\\$m$2\\$d", "\\$Y$2\\$m", "/\\$Y/" ) );
         List<Integer> resol= new ArrayList( Arrays.asList( minute, hour, day, day, day, month, day, month, year ) );
         
         // it looks like to have $Y$m01 resolution, we would need to have a flag to only accept the aggregation if the more general one is not needed for other files.
