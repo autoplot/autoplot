@@ -33,6 +33,7 @@ public class ImageDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "xaxis=", "apply a linear transform to label each column of the image [valmin,pixmin,valmax,pixmax]"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "yaxis=", "apply a linear transform to label each row of the image [valmin,pixmin,valmax,pixmax]"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "plotInfo=", "read the rich png metadata to get axes.  http://autoplot.org/developer.richPng"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "clip=", "clip to the plot bounds inferred by plotInfo, xaxis and yaxis switches."));
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
             switch (paramName) {
@@ -66,6 +67,9 @@ public class ImageDataSourceFactory implements DataSourceFactory {
                 case "plotInfo":
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "0", "read the rich png metadata to get axes") );
                     break;
+                case "clip":
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "T", "clip to the axes in plotInfo or xaxis and yaxis") );
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "F", "don't clip") );
                 default:
                     break;
             }

@@ -291,6 +291,9 @@ public class ImageDataSource extends AbstractDataSource {
             result.putProperty( QDataSet.RENDER_TYPE, "image" );
         }
         
+        int[] xclip= null;
+        int[] yclip= null;
+        
         String xaxis= getParam( "xaxis", null );
         if ( xaxis!=null ) {
             Datum[] transform= tryParseArray( xaxis );
@@ -315,6 +318,8 @@ public class ImageDataSource extends AbstractDataSource {
                 xx= Ops.multiply( xx, s );
                 xx= Ops.add( Ops.putProperty( xx, QDataSet.UNITS, xunits.getOffsetUnits() ), transform[0] );
             }
+            xclip= new int[] { (int)transform[1].value(), (int)transform[3].value() };
+            
             if ( UnitsUtil.isIntervalMeasurement(xunits) ) {
                 ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MIN,transform[0].doubleValue(xunits) );
                 ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MAX,transform[2].doubleValue(xunits) );
@@ -348,6 +353,7 @@ public class ImageDataSource extends AbstractDataSource {
                 yy= Ops.multiply( yy, s );
                 yy= Ops.add( Ops.putProperty( yy, QDataSet.UNITS, yunits.getOffsetUnits() ), transform[0] );
             }
+            yclip= new int[] { (int)transform[1].value(), (int)transform[3].value() };
             if ( UnitsUtil.isIntervalMeasurement(yunits) ) {
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MIN,transform[0].doubleValue(yunits) );
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MAX,transform[2].doubleValue(yunits) );
@@ -383,6 +389,7 @@ public class ImageDataSource extends AbstractDataSource {
                 ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MAX,xrange.value(1) );
                 ((MutablePropertyDataSet)xx).putProperty( QDataSet.UNITS,xunits );
                 result.putProperty( QDataSet.DEPEND_0, xx );
+                xclip= new int[] { (int)x.get("left"), (int)x.get("right") };
 
                 JSONObject y= plot.getJSONObject("yaxis");
                 QDataSet yrange= getRange(y);
@@ -401,11 +408,8 @@ public class ImageDataSource extends AbstractDataSource {
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MAX,yrange.value(1) );
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.UNITS,yunits );
                 result.putProperty( QDataSet.DEPEND_1, yy );
+                yclip= new int[] { (int)y.get("top"), (int)x.get("bottom") };
                 
-                if ( getParam("clip","F").equals("T") ) {
-                    QDataSet r= result.trim( (int)x.get("left"), (int)x.get("right") );
-                    result= Ops.maybeCopy( Ops.trim1( r, (int)y.get("top"), (int)y.get("bottom") ) );
-                } 
             } else {
                 throw new IllegalArgumentException("png contains no rich metadata.");
             }
@@ -413,6 +417,15 @@ public class ImageDataSource extends AbstractDataSource {
                
         }
         
+        if ( getParam("clip","F").equals("T") ) {
+            if ( xclip!=null ) {
+                result= Ops.maybeCopy( result.trim( xclip[0], xclip[1] ) );
+            }
+            if ( yclip!=null ) {
+                result= Ops.maybeCopy( Ops.trim1( result, yclip[0], yclip[1] ) );
+            }
+        } 
+
         if ( channel!=null ) {
             if ( channel.equals("greyscale") || channel.equals("value") ) {
                 result.putProperty( QDataSet.RENDER_TYPE, "spectrogram>colorTable=black_white");
