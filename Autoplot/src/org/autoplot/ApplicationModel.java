@@ -690,7 +690,7 @@ public final class ApplicationModel {
         if ( suri.contains("fscache") ) {
             File local = new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE) );
             if ( suri.contains(local.toString() ) ) {
-                bookmarksLogger.info("Not logging reference to fscache");
+                bookmarksLogger.fine("Reference to fscache will not be used in recent URIs.");
                 return;
             }
         }
