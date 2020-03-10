@@ -90,9 +90,6 @@ public class MatDataSource extends AbstractDataSource {
             int reclen;
             switch (qube.length) {
                 case 2:
-                    if ( qube[0]==6 ) {
-                        //logger.fine
-                    } 
                     int t= qube[0];
                     qube[0]= qube[1];
                     qube[1]= t;
@@ -100,6 +97,17 @@ public class MatDataSource extends AbstractDataSource {
                     QDataSet result= 
                             BufferDataSet.makeDataSet( qube.length, reclen, 0, 
                             qube, buffer, type );
+                    if ( result.length(0)==6 && result.length()>0 ) {
+                        double yr= result.value(0,0);
+                        if ( Math.floor(yr)==yr && yr>1900 && yr<2200 ) {
+                            result= Ops.toTimeDataSet( Ops.slice1(result,0),
+                                    Ops.slice1(result,1), 
+                                    Ops.slice1(result,2),
+                                    Ops.slice1(result,3),
+                                    Ops.slice1(result,4),
+                                    Ops.slice1(result,5), null );
+                        }
+                    }
                     return result;
                 case 1:
                     reclen= qube[0]*BufferDataSet.byteCount(type);
