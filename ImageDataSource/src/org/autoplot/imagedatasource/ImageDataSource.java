@@ -155,7 +155,7 @@ public class ImageDataSource extends AbstractDataSource {
 
         mon.started();
 
-        File ff= DataSetURI.getFile(uri, mon.getSubtaskMonitor("get file") );
+        File ff= DataSetURI.getFile( uri, mon.getSubtaskMonitor("get file") );
         if ( ff.length()==0 ) {
             throw new IllegalArgumentException("Image file is empty: "+ff);
         }
@@ -285,7 +285,7 @@ public class ImageDataSource extends AbstractDataSource {
             }
         }
 
-        ImageDataSet result = new ImageDataSet(image, c, op);
+        MutablePropertyDataSet result = new ImageDataSet(image, c, op);
 
         if ( channel==null ) {
             result.putProperty( QDataSet.RENDER_TYPE, "image" );
@@ -301,7 +301,7 @@ public class ImageDataSource extends AbstractDataSource {
             if ( transform.length==5 && transform[4].equals(Datum.create(1)) ) {
                 transform[0]= transform[0].log10();
                 transform[2]= transform[2].log10();
-                xx= Ops.findgen(result.length());
+                xx= Ops.dindgen(result.length());
                 xx= Ops.subtract( xx, transform[1] );
                 double s= (transform[2].subtract(transform[0]).doubleValue(xunits.getOffsetUnits())/transform[3].subtract(transform[1]).value() );
                 xx= Ops.multiply( xx, s );
@@ -309,7 +309,7 @@ public class ImageDataSource extends AbstractDataSource {
                 xx= Ops.pow( 10, xx );
                 ((MutablePropertyDataSet)xx).putProperty( QDataSet.SCALE_TYPE, "log" );
             } else {
-                xx= Ops.findgen(result.length());
+                xx= Ops.dindgen(result.length());
                 xx= Ops.subtract( xx, transform[1] );
                 double s= (transform[2].subtract(transform[0]).doubleValue(xunits.getOffsetUnits())/transform[3].subtract(transform[1]).value() );
                 xx= Ops.multiply( xx, s );
@@ -332,7 +332,7 @@ public class ImageDataSource extends AbstractDataSource {
             Units yunits= transform[0].getUnits();
             QDataSet yy;
             if ( transform.length==5 && transform[4].equals(Datum.create(1)) ) {
-                yy= Ops.findgen(result.length(0));
+                yy= Ops.dindgen(result.length(0));
                 transform[0]= transform[0].log10();
                 transform[2]= transform[2].log10();
                 yy= Ops.subtract( yy, transform[1] );
@@ -342,7 +342,7 @@ public class ImageDataSource extends AbstractDataSource {
                 yy= Ops.pow( 10, yy );
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.SCALE_TYPE, "log" );
             } else {
-                yy= Ops.findgen(result.length(0));
+                yy= Ops.dindgen(result.length(0));
                 yy= Ops.subtract( yy, transform[1] );
                 double s= (transform[2].subtract(transform[0]).doubleValue(yunits.getOffsetUnits())/transform[3].subtract(transform[1]).value() );
                 yy= Ops.multiply( yy, s );
@@ -371,7 +371,7 @@ public class ImageDataSource extends AbstractDataSource {
                 Units xunits= SemanticOps.getUnits(xrange);
                 double dxmin= xrange.value(0);
                 double dxmax= xrange.value(1);
-                QDataSet xx= Ops.findgen(result.length());
+                QDataSet xx= Ops.dindgen(result.length());
                 boolean xlog= x.has("type") && x.get("type").equals("log");
                 if ( xlog ) dxmin= Math.log10(dxmin);
                 if ( xlog ) dxmax= Math.log10(dxmax);
@@ -387,7 +387,7 @@ public class ImageDataSource extends AbstractDataSource {
                 JSONObject y= plot.getJSONObject("yaxis");
                 QDataSet yrange= getRange(y);
                 Units yunits= SemanticOps.getUnits(yrange);
-                QDataSet yy= Ops.findgen(result.length(0));
+                QDataSet yy= Ops.dindgen(result.length(0));
                 double dymin= yrange.value(0);
                 double dymax= yrange.value(1);
                 boolean ylog= y.has("type") && y.get("type").equals("log");
@@ -401,9 +401,16 @@ public class ImageDataSource extends AbstractDataSource {
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MAX,yrange.value(1) );
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.UNITS,yunits );
                 result.putProperty( QDataSet.DEPEND_1, yy );
+                
+                if ( getParam("clip","F").equals("T") ) {
+                    QDataSet r= result.trim( (int)x.get("left"), (int)x.get("right") );
+                    result= Ops.maybeCopy( Ops.trim1( r, (int)y.get("top"), (int)y.get("bottom") ) );
+                } 
             } else {
                 throw new IllegalArgumentException("png contains no rich metadata.");
             }
+            
+               
         }
         
         if ( channel!=null ) {
