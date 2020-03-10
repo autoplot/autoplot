@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-03-09 r24671):</p>
+        <p>Bugfixes (2020-03-10 r24676):</p>
         <ul>
+            <li>1146: condition where flipped axes and no yTagWidth guess would cause index out of bounds.  Thanks, Mike!
         </ul>
         <p>Older Bugfixes:</p>
         <ul>
@@ -47,7 +48,7 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>698: support read of old matlab files, containing rank 1 or rank 2 data.
+            <li>698: support read of old Matlab .mat files, containing rank 1 or rank 2 data and structures and datetime arrays.
             <li>713: GitHub support now supports branches.
         </ul>
         <p>Less recent features:</p>
