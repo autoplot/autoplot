@@ -501,7 +501,7 @@ public class DataSourceUtil {
         String vsep= "([Vv])(\\d+\\.\\d+(\\.\\d+)+)";  // $(v,sep)
 
         String[] abs= new String[] { yyyymmdd_HHMM, yyyymmdd_HH, yyyy_mm_dd, yyyy_jjj, yyyymmdd, yyyyjjj, yyyymm, yyyy_mm };
-
+        
         String timeRange=null;
         for ( String ab : abs ) {
             Matcher m = Pattern.compile(ab).matcher(surl);
@@ -510,7 +510,7 @@ public class DataSourceUtil {
                 break; // we found something
             }
         }
-
+        
         if ( timeRange==null ) return null;
 
         int day= TimeUtil.DAY;
@@ -561,6 +561,109 @@ public class DataSourceUtil {
             String result= URISplit.format(split);
             
             return result;
+            
+        } catch ( IllegalArgumentException ex ) {
+            return null; // I had the file in my directory: "file:///home/jbf/das2Server?dataset=juno%2Fwaves%2Fflight%2Fsurvey.dsdf;start_time=$Y-$m-$dT15:00:00.000Z;end_time=$Y-$m-$dT19:00:00.000Z;params=EINT;server=dataset"
+        } catch ( ParseException ex ) {
+            return null;
+        } catch ( StringIndexOutOfBoundsException ex ) {
+            StringIndexOutOfBoundsException e= new StringIndexOutOfBoundsException(s); // rte_0336734710_20191127_115020
+            e.initCause(ex);
+            throw e;
+        }
+    }
+    
+    /**
+     * attempt to create a String that uses an aggregation template
+     * instead of the particular time.  This also return null when things go wrong.
+     * For example, file:/tmp/20091102.dat -> file:/tmp/$Y$m$d.dat?timerange=20091102
+     * Also, look for version numbers.  If multiple periods are found, then use $(v,sep) otherwise use numeric $v.
+     *<blockquote><pre><small>{@code
+     *ss= [ "1991_095/1993/19930303.dat","1991_095/1993/19930304.dat","1991_095/1991/19930305.dat" ]
+     *y= makeAggregationForOne("1991_095/1993/19930303.dat",ss)       // 1991_095/$Y/$Y$m$d.dat?timerange=2009-11-02
+     *}</small></pre></blockquote>
+     * @param surl the URI.
+     * @param others other URIs in the group, used to reject solutions which would not produce unique results.
+     * @return null or the string with aggregations ($Y.dat) instead of filename (1999.dat), or the original filename.
+     */
+    public static String makeAggregationForGroup( String surl, String[] others ) {
+        
+        if ( surl==null && others!=null && others.length>0 ) {
+            surl= others[0];
+        }
+        
+        String sfile= surl;
+        
+        String yyyy= "/(19|20)\\d{2}/";
+
+        String yyyymmdd= "(?<!\\d)(19|20)(\\d{6})(?!\\d)"; //"(\\d{8})";
+        String yyyyjjj= "(?<!\\d)(19|20)\\d{2}\\d{3}(?!\\d)";
+        String yyyymm= "(?<!\\d)(19|20)\\d{2}\\d{2}(?!\\d)";
+        String yyyy_mm_dd= "(?<!\\d)(19|20)\\d{2}([\\-_/])\\d{2}\\2\\d{2}(?!\\d)";
+        String yyyy_mm= "(?<!\\d)(19|20)\\d{2}([\\-_/])\\d{2}(?!\\d)";
+        String yyyy_jjj= "(?<!\\d)(19|20)\\d{2}([\\-_/])\\d{3}(?!\\d)";
+        String yyyymmdd_HH= "(?<!\\d)(19|20)(\\d{6})(\\D)\\d{2}(?!\\d)"; //"(\\d{8})"; 20140204T15
+        String yyyymmdd_HHMM= "(?<!\\d)(19|20)(\\d{6})(\\D)\\d{2}\\d{2}(?!\\d)"; //"(\\d{8})"; 20140204T1515
+
+        //DANGER: code assumes starts with 4-digit year and then a delimiter, or no delimiter.  See replaceLast
+        
+        String version= "([Vv])\\d{2}";                // $v
+        String vsep= "([Vv])(\\d+\\.\\d+(\\.\\d+)+)";  // $(v,sep)
+
+        String[] abs= new String[] { yyyymmdd_HHMM, yyyymmdd_HH, yyyy_mm_dd, yyyy_jjj, yyyymmdd, yyyyjjj, yyyymm, yyyy_mm };
+        
+        String timeRange=null;
+
+        boolean doQuickSanityCheck= true;
+        if ( doQuickSanityCheck) {
+            for ( String ab : abs ) {
+                Matcher m = Pattern.compile(ab).matcher(surl);
+                if ( m.find() ) {
+                    timeRange= m.group(0);
+                    break; // we found something
+                }
+            }
+            if ( timeRange==null ) return null;
+        }
+
+        int day= TimeUtil.DAY;
+        int year= TimeUtil.YEAR;
+        int month= TimeUtil.MONTH;
+        int hour= TimeUtil.HOUR;
+        int minute= TimeUtil.MINUTE;
+
+        List<String> search= new ArrayList( Arrays.asList( yyyymmdd_HHMM, yyyymmdd_HH, yyyy_jjj, yyyymmdd, yyyyjjj, yyyymm, yyyy_mm_dd, yyyy_mm, yyyy ) );
+        List<String> replac= new ArrayList( Arrays.asList( "\\$Y\\$m\\$d$3\\$H\\$M", "\\$Y\\$m\\$d$3\\$H", "\\$Y$2\\$j", "\\$Y\\$m\\$d","\\$Y\\$j","\\$Y\\$m", "\\$Y$2\\$m$2\\$d", "\\$Y$2\\$m", "/\\$Y/" ) );
+        List<Integer> resol= new ArrayList( Arrays.asList( minute, hour, day, day, day, month, day, month, year ) );
+        
+        // it looks like to have $Y$m01 resolution, we would need to have a flag to only accept the aggregation if the more general one is not needed for other files.
+        
+        String s;
+        try {
+            s= replaceLast( sfile, search, replac, resol );
+        } catch ( IllegalArgumentException ex ) {
+            logger.log( Level.FINE, ex.getMessage(), ex );
+            return null;
+        }
+        
+        try {
+            TimeParser tp= TimeParser.create(s);
+            timeRange= tp.parse( sfile ).getTimeRange().toString();
+            //s= s.replaceFirst(version, "$1\\$2v"); //TODO: version causes problems elsewhere, see line 189.  Why?
+
+            Matcher m;
+            m= Pattern.compile(vsep).matcher(s);
+            if ( m.find() ) {
+                s= s.replaceFirst( m.group(), Matcher.quoteReplacement(m.group(1)+"$(v,sep)") );
+            }
+            m= Pattern.compile(version).matcher(s);
+            if ( m.find() ) {
+                s= s.replaceFirst( m.group(), Matcher.quoteReplacement(m.group(1)+"$v") );
+            }
+            
+            String result= s;
+            
+            return result + "?" + timeRange;
             
         } catch ( IllegalArgumentException ex ) {
             return null; // I had the file in my directory: "file:///home/jbf/das2Server?dataset=juno%2Fwaves%2Fflight%2Fsurvey.dsdf;start_time=$Y-$m-$dT15:00:00.000Z;end_time=$Y-$m-$dT19:00:00.000Z;params=EINT;server=dataset"
