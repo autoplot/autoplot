@@ -80,6 +80,7 @@ public class MatDataSource extends AbstractDataSource {
         if ( name.length()==0 ) {
             throw new IllegalArgumentException("name must be set");
         }
+        
         MLArray array= getArray( reader, null, name);
         
         if ( array instanceof MLNumericArray ) {
@@ -88,13 +89,14 @@ public class MatDataSource extends AbstractDataSource {
             Object type= bufferDataSetType(array.getType());
             int[] qube= array.getDimensions();
             int reclen;
+            QDataSet result;
             switch (qube.length) {
                 case 2:
                     int t= qube[0];
                     qube[0]= qube[1];
                     qube[1]= t;
                     reclen= qube[1] * BufferDataSet.byteCount(type);
-                    QDataSet result= 
+                    result= 
                             BufferDataSet.makeDataSet( qube.length, reclen, 0, 
                             qube, buffer, type );
                     if ( result.length(0)==6 && result.length()>0 ) {
@@ -108,15 +110,18 @@ public class MatDataSource extends AbstractDataSource {
                                     Ops.slice1(result,5), null );
                         }
                     }
-                    return result;
+                    break;
                 case 1:
                     reclen= qube[0]*BufferDataSet.byteCount(type);
-                    return BufferDataSet.makeDataSet( qube.length, reclen, 0,
+                    result= BufferDataSet.makeDataSet( qube.length, reclen, 0,
                             qube, buffer, type );
+                    break;
                 default:
                     throw new IllegalArgumentException("rank 3 and up is not supported");
             }
-            
+            result= Ops.putProperty( result, QDataSet.NAME, name.replaceAll("\\.","_") );
+            result= Ops.putProperty( result, QDataSet.LABEL, name );
+            return result;
         }
         throw new IllegalArgumentException("unexpected type, should be MLArray");
     }
