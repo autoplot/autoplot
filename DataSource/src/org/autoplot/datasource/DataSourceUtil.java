@@ -358,6 +358,27 @@ public class DataSourceUtil {
 
 
     }
+    
+    /**
+     * return true if the characters in the range st to en do not change.
+     * @param others
+     * @param st
+     * @param en
+     * @return 
+     */
+    public static boolean isConstant( String[] others, int st, int en ) {
+        if ( others.length==0 ) return true;
+        if ( st>en ) throw new IllegalArgumentException("st is greater than en");
+        if ( others[0].length()<en ) throw new IndexOutOfBoundsException("en is too big");
+        String s= others[0].substring( st, en );
+        for ( int i=1; i<others.length; i++ ) {
+            if ( others[i].length()<en ) return false;
+            if ( !others[i].substring( st, en ).equals(s) ) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * return the replacement or null.  remove the used items.  This will not match anything 
@@ -366,9 +387,16 @@ public class DataSourceUtil {
      * @param search
      * @param replaceWith 
      * @param resolution 
+     * @param others other strings which will be used with the same template, or null.
+     * @param constraint if non-null, the time must be within this time range.
      * @return the string with 2014 replaced with $Y, etc.
      */
-    private static String replaceLast( String s, List<String> search, List<String> replaceWith, List<Integer> resolution ) {
+    private static String replaceLast( String s, 
+            List<String> search, 
+            List<String> replaceWith, 
+            List<Integer> resolution, 
+            String[] others, 
+            DatumRange timerange) {
         Map<String,Integer> found= new HashMap();
         int last= -1;
         String flast= null;
@@ -383,15 +411,40 @@ public class DataSourceUtil {
         
         while (true ) {
             for ( int i=0; i<n; i++ ) {
-                if ( search.get(i)==null ) continue; // search.get(i)==null means that search is no longer eligible.
-                Matcher m= Pattern.compile(search.get(i)).matcher(s);
+                String search1= search.get(i);
+                if ( search1==null ) continue; // search.get(i)==null means that search is no longer eligible.
+                Matcher m= Pattern.compile(search1).matcher(s);
                 int idx= -1;
-                while ( m.find() ) idx= m.start();
+                int ien= -1;
+                while ( m.find() ) {
+                    idx= m.start();
+                    ien= m.end();
+                }
                 if ( idx>-1 && idx<limit ) {
-                    found.put( search.get(i), idx );
+                    found.put( search1, idx );
                     if ( idx>last ) {
+                        if ( others!=null ) {
+                            if ( isConstant( others, idx, ien ) ) {
+                                continue;
+                            }
+                        }
+                        if ( timerange!=null ) {
+                            String trypattern= replaceWith.get(i);
+                            trypattern= trypattern.replaceAll("\\$\\d", ".");
+                            trypattern= trypattern.replaceAll("\\\\","");
+                            TimeParser tp= TimeParser.create(trypattern);
+                            try {
+                                DatumRange tr= tp.parse(s.substring(idx,ien)).getTimeRange();
+                                if ( !tr.contains(timerange) ) {
+                                    continue;
+                                }
+                            } catch (ParseException ex) {
+                                Logger.getLogger(DataSourceUtil.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            
+                        }
                         last= idx;
-                        flast= search.get(i);
+                        flast= search1;
                         frepl= replaceWith.get(i);
                         best= i;
                     }
@@ -527,10 +580,10 @@ public class DataSourceUtil {
         
         String s;
         try {
-            s= replaceLast( split.file, 
+            s= replaceLast(split.file, 
                 search,
                 replac,
-                resol );
+                resol, null, null );
         } catch ( IllegalArgumentException ex ) {
             logger.log( Level.FINE, ex.getMessage(), ex );
             return null;
@@ -582,6 +635,7 @@ public class DataSourceUtil {
      *ss= [ "1991_095/1993/19930303.dat","1991_095/1993/19930304.dat","1991_095/1991/19930305.dat" ]
      *y= makeAggregationForOne("1991_095/1993/19930303.dat",ss)       // 1991_095/$Y/$Y$m$d.dat?timerange=2009-11-02
      *}</small></pre></blockquote>
+     * @see https://github.com/autoplot/dev/blob/master/bugs/sf/0484/makeAggregationForGroup_001.jy
      * @param surl the URI.
      * @param others other URIs in the group, used to reject solutions which would not produce unique results.
      * @return null or the string with aggregations ($Y.dat) instead of filename (1999.dat), or the original filename.
@@ -643,11 +697,9 @@ public class DataSourceUtil {
         List<String> replac= new ArrayList( Arrays.asList( "\\$Y\\$m\\$d$3\\$H\\$M", "\\$Y\\$m\\$d$3\\$H", "\\$Y\\$m\\$d", "\\$Y$2\\$j","\\$Y\\$j","\\$Y\\$m", "\\$Y$2\\$m$2\\$d", "\\$Y$2\\$m", "/\\$Y/" ) );
         List<Integer> resol= new ArrayList( Arrays.asList( minute, hour, day, day, day, month, day, month, year ) );
         
-        // it looks like to have $Y$m01 resolution, we would need to have a flag to only accept the aggregation if the more general one is not needed for other files.
-        
         String s;
         try {
-            s= replaceLast( sfile, search, replac, resol );
+            s= replaceLast(sfile, search, replac, resol, others, null );
         } catch ( IllegalArgumentException ex ) {
             logger.log( Level.FINE, ex.getMessage(), ex );
             return null;
@@ -655,9 +707,19 @@ public class DataSourceUtil {
         
         try {
             TimeParser tp= TimeParser.create(s);
-            timeRange= tp.parse( sfile ).getTimeRange().toString();
+            DatumRange drtr= tp.parse( sfile ).getTimeRange();
+            timeRange= drtr.toString();
             //s= s.replaceFirst(version, "$1\\$2v"); //TODO: version causes problems elsewhere, see line 189.  Why?
 
+            int i=s.indexOf("$Y");
+            if ( i>-1 ) {
+                String s0= s.substring(0,i);
+                String s1= replaceLast( s0, search, replac, resol, null, drtr );
+                if ( !s1.equals(s0) ) {
+                    s= s1 + s.substring(i);
+                }
+            }
+            
             Matcher m;
             m= Pattern.compile(vsep).matcher(s);
             if ( m.find() ) {
