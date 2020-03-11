@@ -389,7 +389,7 @@ public class ImageDataSource extends AbstractDataSource {
                 ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MAX,xrange.value(1) );
                 ((MutablePropertyDataSet)xx).putProperty( QDataSet.UNITS,xunits );
                 result.putProperty( QDataSet.DEPEND_0, xx );
-                xclip= new int[] { (int)x.get("left"), (int)x.get("right") };
+                xclip= new int[] { x.getInt("left"), x.getInt("right") };
 
                 JSONObject y= plot.getJSONObject("yaxis");
                 QDataSet yrange= getRange(y);
@@ -408,7 +408,7 @@ public class ImageDataSource extends AbstractDataSource {
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MAX,yrange.value(1) );
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.UNITS,yunits );
                 result.putProperty( QDataSet.DEPEND_1, yy );
-                yclip= new int[] { (int)y.get("top"), (int)x.get("bottom") };
+                yclip= new int[] { y.getInt("top"), y.getInt("bottom") };
                 
             } else {
                 throw new IllegalArgumentException("png contains no rich metadata.");
