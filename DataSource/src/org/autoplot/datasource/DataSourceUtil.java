@@ -224,10 +224,12 @@ public class DataSourceUtil {
         List<String> notAccountedFor;
         notAccountedFor= new LinkedList(files);
 
+        String[] ss= files.toArray( new String[notAccountedFor.size()] );
+        
         while ( notAccountedFor.size()>0 ) {
             String surl= notAccountedFor.remove(0);
 
-            String sagg = makeAggregation(surl);
+            String sagg = makeAggregationForGroup(surl,ss);
 
             if (sagg==null || sagg.equals(surl)) {
                 nonAgg.add(surl);
@@ -325,7 +327,8 @@ public class DataSourceUtil {
      */
     public static String makeAggregation( String surl, String[] surls ) {
         try {
-            String sagg = makeAggregation(surl);
+            String sagg = makeAggregationForGroup(surl, surls);
+            
             if (sagg==null || sagg.equals(surl))
                 return surl;
             DatumRange dr;
@@ -369,7 +372,9 @@ public class DataSourceUtil {
     public static boolean isConstant( String[] others, int st, int en ) {
         if ( others.length==0 ) return true;
         if ( st>en ) throw new IllegalArgumentException("st is greater than en");
-        if ( others[0].length()<en ) throw new IndexOutOfBoundsException("en is too big");
+        if ( others[0].length()<en ) {
+            return false;
+        }
         String s= others[0].substring( st, en );
         for ( int i=1; i<others.length; i++ ) {
             if ( others[i].length()<en ) return false;
