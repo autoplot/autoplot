@@ -49,6 +49,7 @@ import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.RichPngUtil;
 import org.das2.qds.ops.Ops;
 import org.autoplot.metatree.MetadataUtil;
 import org.w3c.dom.Node;
@@ -149,7 +150,7 @@ public class ImageDataSource extends AbstractDataSource {
         return dest;
         
     }
-
+    
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
@@ -373,7 +374,7 @@ public class ImageDataSource extends AbstractDataSource {
                 Units xunits= SemanticOps.getUnits(xrange);
                 double dxmin= xrange.value(0);
                 double dxmax= xrange.value(1);
-                QDataSet xx= Ops.dindgen(result.length());
+                QDataSet xx= Ops.add( 0.5, Ops.dindgen(result.length()) );
                 boolean xlog= x.has("type") && x.get("type").equals("log");
                 if ( xlog ) dxmin= Math.log10(dxmin);
                 if ( xlog ) dxmax= Math.log10(dxmax);
@@ -387,17 +388,19 @@ public class ImageDataSource extends AbstractDataSource {
                 result.putProperty( QDataSet.DEPEND_0, xx );
                 xclip= new int[] { x.getInt("left"), x.getInt("right") };
 
+                JSONArray size= jo.getJSONArray("size");
+                int height= size.getInt(1);                
                 JSONObject y= plot.getJSONObject("yaxis");
                 QDataSet yrange= getRange(y);
                 Units yunits= SemanticOps.getUnits(yrange);
-                QDataSet yy= Ops.dindgen(result.length(0));
+                QDataSet yy= Ops.subtract( height, Ops.dindgen(result.length(0)) );
                 double dymin= yrange.value(0);
                 double dymax= yrange.value(1);
                 boolean ylog= y.has("type") && y.get("type").equals("log");
                 if ( ylog ) dymin= Math.log10(dymin);
                 if ( ylog ) dymax= Math.log10(dymax);
-                yy= Ops.subtract( yy, y.getDouble("top") );
-                yy= Ops.multiply( yy, ( dymax-dymin ) / ( y.getInt("bottom") -y.getInt("top") ) );
+                yy= Ops.subtract( yy, y.getDouble("bottom") );
+                yy= Ops.multiply( yy, ( dymax-dymin ) / ( y.getInt("top") -y.getInt("bottom") ) );
                 yy= Ops.add( yy, dymin );
                 if ( ylog ) yy= Ops.exp10(yy);
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MIN,yrange.value(0) );
@@ -419,6 +422,9 @@ public class ImageDataSource extends AbstractDataSource {
             }
             if ( yclip!=null ) {
                 result= Ops.maybeCopy( Ops.trim1( result, yclip[0], yclip[1] ) );
+                
+                System.err.println( Ops.extent( (QDataSet)result.property(QDataSet.DEPEND_1) ) );
+                
             }
         } 
 
