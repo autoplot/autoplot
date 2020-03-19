@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>BufferDataSet's append method had new code containing a bug missed by automated testing.  Hope everyone is healthy!
+        <p><small>New guess aggregation code correctly sees 20140101 as an aggregation and not 1991-080.  Happy Spring!
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2020-03-19 r24688):</p>
         <ul>
+            <li>714: corrections to yaxis locations for each pixel row.
             <li>2255: rfe711 was incorrectly implemented when appending two datasets.  Thanks, Ivar!
             <li>0484: improve support for guessing aggregations, by looking at extent of digits and for constant digits.  Thanks, Mike!
             <li>1146: condition where flipped axes and no yTagWidth guess would cause index out of bounds.  Thanks, Mike!
