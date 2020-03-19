@@ -1,13 +1,19 @@
 
 package org.autoplot.imagedatasource;
 
+import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.datasource.CompletionContext;
+import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
+import org.autoplot.datasource.URISplit;
+import org.das2.util.ImageUtil;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Factory for ImageDataSource, which read in images into datasets.
@@ -51,25 +57,38 @@ public class ImageDataSourceFactory implements DataSourceFactory {
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "0", "rotate image clockwise in degrees" ) );
                     break;
                 case "blur":
-                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "5", "apply boxcar blur square kernel"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "5", "apply boxcar blur square kernel"));
                     break;
                 case "fog":
-                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "100", "apply fog with this opacity percent, based on 0,0 color"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "100", "apply fog with this opacity percent, based on 0,0 color"));
                     break;
                 case "xaxis":
-                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "[valmin,pixmin,valmax,pixmax]", "add labels for each bin"));
-                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "[valmin,pixmin,valmax,pixmax,log]", "add labels for each bin"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "[valmin,pixmin,valmax,pixmax]", "add labels for each bin"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "[valmin,pixmin,valmax,pixmax,log]", "add labels for each bin"));
                     break;
                 case "yaxis":
-                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "[valmin,pixmin,valmax,pixmax]", "add labels for each bin"));
-                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "[valmin,pixmin,valmax,pixmax,log]", "add labels for each bin"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "[valmin,pixmin,valmax,pixmax]", "add labels for each bin"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "[valmin,pixmin,valmax,pixmax,log]", "add labels for each bin"));
                     break;
                 case "plotInfo":
-                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "0", "read the rich png metadata to get axes") );
+                    File imageFile= DataSetURI.getFile( cc.resourceURI, mon );
+                    String json= ImageUtil.getJSONMetadata(imageFile);
+                    if ( json!=null ) {
+                        JSONObject jo = new JSONObject( json );
+                        JSONArray plots= jo.getJSONArray("plots");
+                        for ( int i= 0; i<plots.length(); i++ ) {
+                            JSONObject plot= plots.getJSONObject(i);
+                            result.add(
+                                    new CompletionContext(
+                                            CompletionContext.CONTEXT_PARAMETER_VALUE, 
+                                            String.valueOf(i), String.valueOf(i)+": " +plot.getString("title"),
+                                            "read the rich png metadata to get axes for the plot" ) );
+                        }
+                    }
                     break;
                 case "clip":
-                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "T", "clip to the axes in plotInfo or xaxis and yaxis") );
-                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "F", "don't clip") );
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "T", "clip to the axes in plotInfo or xaxis and yaxis") );
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "F", "don't clip") );
                 default:
                     break;
             }
