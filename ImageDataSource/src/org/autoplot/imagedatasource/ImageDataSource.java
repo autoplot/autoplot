@@ -286,10 +286,6 @@ public class ImageDataSource extends AbstractDataSource {
         }
 
         MutablePropertyDataSet result = new ImageDataSet(image, c, op);
-
-        if ( channel==null ) {
-            result.putProperty( QDataSet.RENDER_TYPE, "image" );
-        }
         
         int[] xclip= null;
         int[] yclip= null;
@@ -427,15 +423,26 @@ public class ImageDataSource extends AbstractDataSource {
         } 
 
         if ( channel!=null ) {
-            if ( channel.equals("greyscale") || channel.equals("value") ) {
-                result.putProperty( QDataSet.RENDER_TYPE, "spectrogram>colorTable=black_white");
-            } else if ( channel.equals("red") ) {
-                result.putProperty( QDataSet.RENDER_TYPE, "spectrogram>colorTable=black_red");
-            } else if ( channel.equals("green") ) {
-                result.putProperty( QDataSet.RENDER_TYPE, "spectrogram>colorTable=black_green");
-            } else if ( channel.equals("blue") ) {
-                result.putProperty( QDataSet.RENDER_TYPE, "spectrogram>colorTable=black_blue");
+            switch (channel) {
+                case "greyscale":
+                case "value":
+                    result.putProperty( QDataSet.RENDER_TYPE, "spectrogram>colorTable=black_white");
+                    break;
+                case "red":
+                    result.putProperty( QDataSet.RENDER_TYPE, "spectrogram>colorTable=black_red");
+                    break;
+                case "green":
+                    result.putProperty( QDataSet.RENDER_TYPE, "spectrogram>colorTable=black_green");
+                    break;
+                case "blue":
+                    result.putProperty( QDataSet.RENDER_TYPE, "spectrogram>colorTable=black_blue");
+                    break;
+                default:
+                    result.putProperty( QDataSet.RENDER_TYPE, "image" );
+                    break;
             }
+        } else {
+            result.putProperty( QDataSet.RENDER_TYPE, "image" );
         }
                
         mon.finished();

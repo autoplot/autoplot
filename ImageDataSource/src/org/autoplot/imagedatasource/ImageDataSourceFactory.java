@@ -10,7 +10,6 @@ import org.autoplot.datasource.CompletionContext;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
-import org.autoplot.datasource.URISplit;
 import org.das2.util.ImageUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
