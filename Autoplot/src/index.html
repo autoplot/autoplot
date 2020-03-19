@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Inverted V's on Rope Swing.
+        <p><small>BufferDataSet's append method had new code containing a bug missed by automated testing.  Hope everyone is healthy!
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2020-03-11 r24685):</p>
         <ul>
+            <li>2255: rfe711 was incorrectly implemented when appending two datasets.
             <li>0484: improve support for guessing aggregations, by looking at extent of digits and for constant digits.  Thanks, Mike!
             <li>1146: condition where flipped axes and no yTagWidth guess would cause index out of bounds.  Thanks, Mike!
         </ul>
@@ -50,6 +51,7 @@
         <p>Features:</p>
         <ul>
             <li>698: support read of old Matlab .mat files, containing rank 1 or rank 2 data and structures and datetime arrays.
+            <li>714: ImageDataSource clip=T switch allows aggregation of images containing plotInfo.
             <li>713: GitHub support now supports branches.
         </ul>
         <p>Less recent features:</p>
