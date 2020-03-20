@@ -49,7 +49,6 @@ import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
-import org.autoplot.datasource.RichPngUtil;
 import org.das2.qds.ops.Ops;
 import org.autoplot.metatree.MetadataUtil;
 import org.w3c.dom.Node;
