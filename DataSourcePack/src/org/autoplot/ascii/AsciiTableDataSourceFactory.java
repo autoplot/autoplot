@@ -294,7 +294,6 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         if (params.containsKey("headerDelim") ) {
             parser.setHeaderDelimiter(params.get("headerDelim"));
         }
-        DelimParser dp= parser.guessSkipAndDelimParser(file.toString());
 
         if ( params.containsKey("eventListColumn") ) {
             int i= parser.getFieldIndex(params.get("eventListColumn"));
@@ -304,6 +303,11 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         if ( line==null ) {
             //dp= parser.guessSkipAndDelimParser(file.toString());
             throw new IllegalArgumentException("unable to find parseable record");
+        }
+        
+        DelimParser dp= parser.guessSkipAndDelimParser(file.toString());
+        if ( dp==null ) {
+            throw new IllegalArgumentException("unable to find delimited columns");
         }
         
         String[] fields= new String[ dp.fieldCount() ];
