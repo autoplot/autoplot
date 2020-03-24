@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New guess aggregation code correctly sees 20140101 as an aggregation and not 1991-080.  Happy Spring!
+        <p><small>PNG with plotInfo for a log y-axis was handled incorrectly.  Here the white line is a plot of the data on top of an plot image of the data.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-03-19 r24688):</p>
+        <p>Bugfixes (2020-03-24 r24700):</p>
         <ul>
+            <li>LeafTrim didn't slice the properties properly, dropping DEPEND_1 when the vertical slice was used with spectrograms from AsciiTableDataSource
+            <li>AsciiParser had some path which would result in a parsable line but then would fail to create a DelimParser.  Thanks, yumin!
             <li>714: corrections to yaxis locations for each pixel row.
             <li>2255: rfe711 was incorrectly implemented when appending two datasets.  Thanks, Ivar!
             <li>0484: improve support for guessing aggregations, by looking at extent of digits and for constant digits.  Thanks, Mike!
@@ -51,6 +53,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>ASCII table GUI allows selection of values to use for y-tags (depend1Values keyword).  Thanks, Bill!
             <li>714: other improvements to image data source, like showing plot titles in completions.
             <li>698: support read of old Matlab .mat files, containing rank 1 or rank 2 data and structures and datetime arrays.  Thanks, Chris!
             <li>714: ImageDataSource clip=T switch allows aggregation of images containing plotInfo.
