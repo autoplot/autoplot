@@ -11,7 +11,7 @@
 <%@page import="java.net.URLEncoder"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html xmlns="https://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>Autoplot Servlet Image Zoom</title>
@@ -110,7 +110,7 @@
 		<!--<pre><div id="idrow"></div></pre>-->
 		<!--<pre><div id="iddifftime"></div></pre>-->
                 
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>                 
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>                 
 	<script type="text/javascript" src="js/jquery.ui.js"></script>
 	<script type="text/javascript" src="js/jquery.imgareaselect.min.js"></script>
         <script type="text/javascript" src="TimeRangeParser.js"></script>

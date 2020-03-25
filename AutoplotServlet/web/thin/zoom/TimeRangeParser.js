@@ -222,7 +222,7 @@ function parseISO8601Datum( str, result, lsd ) {
      *   P1Y2M10DT2H30M/2008-05-11T15:30:00Z
      *   2007-03-01T00:00Z/P1D
      *   2012-100T02:00/03:45
-     * http://en.wikipedia.org/wiki/ISO_8601#Time_intervals
+     * https://en.wikipedia.org/wiki/ISO_8601#Time_intervals
      * @param stringIn
      * @param result if non-null should be an int[14] to provide storage to routine.
      * @return int[14] with [Y,M,D,H,M,S,NS,Y,M,D,H,M,S,NS]
