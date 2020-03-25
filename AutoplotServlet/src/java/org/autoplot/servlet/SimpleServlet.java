@@ -392,7 +392,7 @@ public class SimpleServlet extends HttpServlet {
                 logger.log(Level.FINER, "vap isLocalVap={0}", isLocalVap);
                 File openable = DataSetURI.getFile(vap,new NullProgressMonitor());
                 if ( !isLocalVap ) {
-                    if ( vapHasLocalReferences( openable ) ) {
+                    if ( vapHasLocalReferences( openable ) && !ServletUtil.isWhitelisted( vap ) ) {
                         throw new IllegalArgumentException("remote .vap file has local references");
                     }
                 }
