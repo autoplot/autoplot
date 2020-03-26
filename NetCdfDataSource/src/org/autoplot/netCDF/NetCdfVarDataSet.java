@@ -266,7 +266,12 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                         if ( dv!=variable && dv.getRank()==1 ) {
                             mon.setProgressMessage( "reading "+dv.getNameAndDimensions() );
                             QDataSet dependi= create( dv, sliceConstraints(constraints,ir), ncfile, new NullProgressMonitor() );
-                            properties.put( "DEPEND_"+(ir-sliceCount(slice,ir) ), dependi );
+                            if ( dependi.length()==3 && dependi.value(0)==dependi.value(1) && dependi.value(0)==dependi.value(2) ) {
+                                // https://cdaweb.sci.gsfc.nasa.gov/sp_test3017/data/goes/goes10/mag_l2_netcdf/$Y/dn_magn-l2-hires_g10_d$Y$m$d_v0_0_5.nc?b_total?timerange=2005-05-30&b_eci&timerange=2005-05-30+12:00+to+18:00
+                                properties.put( "DEPEND_"+(ir-sliceCount(slice,ir) ), Ops.labelsDataset( new String[] { "X","Y","Z" } ) );
+                            } else {
+                                properties.put( "DEPEND_"+(ir-sliceCount(slice,ir) ), dependi );
+                            }
                         } else if ( dv!=variable && dv.getRank()==2 && dv.getDataType()==DataType.CHAR ) { // assume they are times.
                             mon.setProgressMessage( "reading "+dv.getNameAndDimensions() );
                             QDataSet dependi= create( dv, sliceConstraints(constraints,ir), ncfile, new NullProgressMonitor() );
