@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 import org.das2.datum.Units;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -18,13 +17,13 @@ import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.qds.AbstractDataSet;
-import org.das2.qds.DataSetOps;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.MetadataModel;
 import org.das2.qds.ops.Ops;
 import org.autoplot.metatree.IstpMetadataModel;
 import org.autoplot.metatree.MetadataUtil;
+import org.das2.datum.UnitsUtil;
 import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;
 import ucar.ma2.Range;
@@ -345,6 +344,11 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         if ( o!=null && o instanceof String ) {
             properties.put( QDataSet.DESCRIPTION, (String)o );
         }
+  
+        o= attributes.get("comments");
+        if ( o!=null && o instanceof String ) {
+            properties.put( QDataSet.TITLE, (String)o );
+        }
         
         o= attributes.get("long_label");
         if ( o!=null && o instanceof String ) {
@@ -354,6 +358,17 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         o= attributes.get("short_label");
         if ( o!=null && o instanceof String ) {
             properties.put( QDataSet.LABEL, (String)o );
+        }
+
+        o= attributes.get("long_name");
+        if ( o!=null && o instanceof String ) {
+            properties.put( QDataSet.NAME, Ops.safeName((String)o) );
+            if ( properties.get( QDataSet.LABEL )==null ) {
+                Units u= (Units)properties.get(QDataSet.UNITS);
+                if ( u==null || !UnitsUtil.isTimeLocation(u) ) {
+                    properties.put( QDataSet.LABEL, o );
+                }
+            }
         }
         
         o= attributes.get("lin_log");
@@ -501,6 +516,8 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 }
         }
 
+        properties.put( QDataSet.USER_PROPERTIES, attributes );
+        
         // perform the slices
         ArrayList<Integer> newShape= new ArrayList(shape.length);
         for ( int i=0; i<shape.length; i++ ) {
