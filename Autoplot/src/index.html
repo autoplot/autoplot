@@ -26,46 +26,31 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-03-24 r24700):</p>
+        <p>Bugfixes (2020-03-24 r24707):</p>
         <ul>
-            <li>LeafTrim didn't slice the properties properly, dropping DEPEND_1 when the vertical slice was used with spectrograms from AsciiTableDataSource
+            <li>AutoplotServlet uses https for third-party codes, so the thin client works again.
+            <li>LeafTrim didn't slice the properties properly, dropping DEPEND_1 when the vertical slice was used with spectrograms from AsciiTableDataSource.  Thanks, Bill!
             <li>AsciiParser had some path which would result in a parsable line but then would fail to create a DelimParser.  Thanks, yumin!
             <li>714: corrections to yaxis locations for each pixel row.
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>2255: rfe711 was incorrectly implemented when appending two datasets.  Thanks, Ivar!
             <li>0484: improve support for guessing aggregations, by looking at extent of digits and for constant digits.  Thanks, Mike!
             <li>1146: condition where flipped axes and no yTagWidth guess would cause index out of bounds.  Thanks, Mike!
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>when custom renderer was used in script, rgb color data set could cause runtime error when autoranging.
-            <li>recent refactoring introduced an error with rank 4 BufferDataSets--whoops!
-            <li>DasPlot setTopDecorator and setBottomDecorator failed to invalidate the cached image and would not repaint immediately.
-            <li>append data source would fail if the first granule had less than 10 records.  Thanks, Jon N!
-            <li>applyIndex function was preserving cadence, when it shouldn't.
-            <li>2252: FFTPower with slide option can span records.  Thanks, George!
-            <li>2251: handle strange bug where GitLabs is suddenly adding "-/" to URLs
-            <li>2249: copy plot, insert plotElements doesn't reset style and symbol size.  Thanks, Jon N!
-            <li>2249: copy plot, insert plotElements from clipboard would result in NullPointerException.  Thanks, Jon N!
-            <li>2250: .pngwalk file with spaces, which happens when Windows downloads files in the browser, are properly supported.  Thanks, Chris!
-            <li>2248: Jython script could not contain a space in the name of the resource URI when Jython Extensions were used, as with .sps files.  Thanks, Shing!
-            <li>Jython addTab now checks to see if the added component has embedded scrollpanes (in split pane, for example) before adding a scrollpane automatically.
-            <li>rfe704: corrections to GUI generation.  Thanks, kh6sky!
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>NetCDF variable attributes are visible in USER_PROPERTIES, and long_name is used for label when nothing else is available.
+            <li>NetCDF GOES n,3 arrays are rendered as X,Y,Z components to match CDAWeb logic. 
             <li>ASCII table GUI allows selection of values to use for y-tags (depend1Values keyword).  Thanks, Bill!
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>714: other improvements to image data source, like showing plot titles in completions.
             <li>698: support read of old Matlab .mat files, containing rank 1 or rank 2 data and structures and datetime arrays.  Thanks, Chris!
             <li>714: ImageDataSource clip=T switch allows aggregation of images containing plotInfo.
             <li>713: GitHub support now supports branches.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>623: new addTopDecoration and addBottomDecoration functions added.
-            <li>Decimate of rank 2 BinaryDataSet is efficient, using rfe711.  Thanks, Shing!
-            <li>RadioJove .sps reader now efficiently handles antenna parameter, using new BufferDataSource stride feature.
-            <li>711: BufferDataSource now has stride parameter to supports datasets where two datasets are interleaved.
-            <li>709: add experimental "Ok Save Next" button to PNGWalk Quality Control code to speed up common workflow.
         </ul>
         <p>Known issues:</p>
         <ul>
