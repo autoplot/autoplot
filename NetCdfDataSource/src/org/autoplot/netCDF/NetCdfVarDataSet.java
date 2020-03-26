@@ -362,7 +362,9 @@ public class NetCdfVarDataSet extends AbstractDataSet {
 
         o= attributes.get("long_name");
         if ( o!=null && o instanceof String ) {
-            properties.put( QDataSet.NAME, Ops.safeName((String)o) );
+            if ( properties.get( QDataSet.NAME )==null ) {
+                properties.put( QDataSet.NAME, Ops.safeName((String)o) );
+            }
             if ( properties.get( QDataSet.LABEL )==null ) {
                 Units u= (Units)properties.get(QDataSet.UNITS);
                 if ( u==null || !UnitsUtil.isTimeLocation(u) ) {
