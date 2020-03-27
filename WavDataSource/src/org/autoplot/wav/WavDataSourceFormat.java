@@ -333,8 +333,19 @@ public class WavDataSourceFormat implements DataSourceFormat {
             if ( u==null ) {
                 u= Units.dimensionless;
             }
-            UnitsConverter uc= u.getConverter( Units.seconds );
-            double periodSeconds= uc.convert( dep1.value(1) - dep1.value(0) );
+            UnitsConverter uc;
+            if ( UnitsUtil.isTimeLocation(u) ) {
+                uc= u.getOffsetUnits().getConverter( Units.seconds );
+            } else {
+                uc= u.getConverter( Units.seconds );
+            }
+            
+            double periodSeconds;
+            if ( dep1.rank()==1 ) {
+                periodSeconds= uc.convert( dep1.value(1) - dep1.value(0) );
+            } else {
+                periodSeconds= uc.convert( dep1.value(0,1) - dep1.value(0,0) );
+            }
 
             samplesPerSecond= (float) Math.round( 1/periodSeconds );
 
@@ -347,7 +358,12 @@ public class WavDataSourceFormat implements DataSourceFormat {
             if ( u==null ) {
                 u= Units.dimensionless;
             }
-            UnitsConverter uc= u.getConverter( Units.seconds );
+            UnitsConverter uc;
+            if ( UnitsUtil.isTimeLocation(u) ) {
+                uc= u.getOffsetUnits().getConverter( Units.seconds );
+            } else {
+                uc= u.getConverter( Units.seconds );
+            }
             double periodSeconds= uc.convert( dep1.value(1) - dep1.value(0) );
 
             samplesPerSecond= (float) Math.round( 1/periodSeconds );
