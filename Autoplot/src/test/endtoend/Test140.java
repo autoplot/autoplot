@@ -351,13 +351,15 @@ public class Test140 {
     
     /**
      * list of URIs.  # comments.
+     * @param historyFileUri the URI for the history file.
      * @param f
      * @param iid
      * @param exceptions
      * @return
      * @throws IOException 
      */
-    private static int doHistory( File f, int iid, Map<String,Exception> exceptions, Map<String,Integer> exceptionNumbers ) throws IOException {
+    private static int doHistory( String historyFileUri, File f, int iid, Map<String,Exception> exceptions, Map<String,Integer> exceptionNumbers ) throws IOException {
+        String pwd= URISplit.parse(historyFileUri).path;
         try (BufferedReader read = new BufferedReader( new InputStreamReader( new FileInputStream(f), "UTF-8" ) )) {
             String s= read.readLine();
             System.err.println(">> doHistory " +s);
@@ -383,6 +385,9 @@ public class Test140 {
                     if ( uri.startsWith("x ") ) {
                         uri= uri.substring(2).trim();
                         publc= false;
+                    }
+                    if ( uri.startsWith("%{PWD}") ) {
+                        uri= pwd + uri.substring(6);
                     }
                     try {
                         do1(uri, iid, true, publc );
@@ -437,7 +442,8 @@ public class Test140 {
             //args= new String[] { "147", "http://autoplot.org//developer.listOfUris" };
             //args= new String[] { "148", "http://www-pw.physics.uiowa.edu/~jbf/pdsppi/examples/pdsppi.xml" };
             //args= new String[] { "149", "http://sarahandjeremy.net/~jbf/" };
-            args= new String[] { "099", "/home/jbf/ct/hudson/test099.txt" };
+            //args= new String[] { "099", "/home/jbf/ct/hudson/test099.txt" };
+            args= new String[] { "000", "/home/jbf/ct/autoplot/git/dev/bugs/sf/1682/testuris.txt" };
         }
         testid= Integer.parseInt( args[0] );
         int iid= 0;
@@ -458,7 +464,7 @@ public class Test140 {
                 iid= doBookmarks(ff,iid,exceptions,exceptionNumbers);
             } else if ( uri.endsWith(".txt") ) {
                 File ff= DataSetURI.getFile( uri, new NullProgressMonitor() );
-                iid= doHistory(ff,iid,exceptions,exceptionNumbers);
+                iid= doHistory( uri, ff,iid,exceptions,exceptionNumbers);
             } else {
                 iid= doHtml( new URL(uri),iid,exceptions,exceptionNumbers );
             }
