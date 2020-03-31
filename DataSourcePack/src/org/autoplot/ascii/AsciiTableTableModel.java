@@ -190,7 +190,7 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
             if ( parser1!=null ) {
                 while ( parser1.readNextRecord(reader)!=null ) {
                     lineCount1++;
-                }
+                } 
                 return lineCount1;
             } else {
                 String s = reader.readLine();
