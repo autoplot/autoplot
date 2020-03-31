@@ -35,7 +35,7 @@ import org.das2.qds.util.AsciiParser.RecordParser;
  */
 public class AsciiTableTableModel extends AbstractTableModel implements ColSpanTableCellRenderer.ColSpanTableModel {
 
-    private static final Logger logger= LoggerManager.getLogger("apdss");
+    private static final Logger logger= LoggerManager.getLogger("apdss.ascii.tablemodel");
     
     String[] lines;
     int lineStart; // line number of the first line.
@@ -128,15 +128,28 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new FileReader(file));
-            String s;
-            for (int i = 0; i < lineNumber; i++) {
-                s = reader.readLine();
+            if ( recParser!=null ) {
+                String s;
+                for (int i = 0; i < lineNumber; i++) {
+                    s = recParser.readNextRecord(reader);
+                }
+            } else {
+                String s;
+                for (int i = 0; i < lineNumber; i++) {
+                    s = reader.readLine();
+                }
             }
             lines = new String[count];
             isRecord= new boolean[count];
 
-            for (int i = 0; i < count; i++) {
-                lines[i] = reader.readLine();
+            if ( recParser!=null ) {
+                for (int i = 0; i < count; i++) {
+                    lines[i] = recParser.readNextRecord(reader);
+                }                
+            } else {
+                for (int i = 0; i < count; i++) {
+                    lines[i] = reader.readLine();
+                }
             }
             lineStart = lineNumber;
             lineCount = count;
@@ -158,6 +171,7 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
     }
 
     public void setFile(File file) {
+        logger.entering("AsciiTableTableModel","setFile");
         File oldFile = this.file;
         this.file = file;
         this.recCount = countLines();
@@ -166,17 +180,26 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
     }
 
     private int countLines() {
+        logger.entering("AsciiTableTableModel","countLines");
         BufferedReader reader = null;
 
+        RecordParser parser1= this.recParser;
         try {
             int lineCount1 = 0;
             reader = new BufferedReader(new FileReader(file));
-            String s = reader.readLine();
-            while (s != null) {
-                lineCount1++;
-                s = reader.readLine();
+            if ( parser1!=null ) {
+                while ( parser1.readNextRecord(reader)!=null ) {
+                    lineCount1++;
+                }
+                return lineCount1;
+            } else {
+                String s = reader.readLine();
+                while (s != null) {
+                    lineCount1++;
+                    s = reader.readLine();
+                }
+                return lineCount1;
             }
-            return lineCount1;
         } catch (IOException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         } finally {
@@ -197,11 +220,13 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
     }
 
     public void setRecParser(RecordParser recParser) {
+        logger.entering("AsciiTableTableModel","setRecParser");
         RecordParser oldRecParser;
         synchronized (this) {
             oldRecParser = this.recParser;
             this.recParser = recParser;
             this.fieldCount= recParser.fieldCount();
+            this.recCount  = this.countLines();
         }
         fireTableStructureChanged();
         fireTableDataChanged();
@@ -218,6 +243,9 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
     public void setParser(AsciiParser parser) {
         AsciiParser oldParser = this.parser;
         this.parser = parser;
+        if ( this.file!=null ) {
+            this.recCount= countLines();
+        }
         fireTableDataChanged();
         propertyChangeSupport.firePropertyChange(PROP_PARSER, oldParser, parser);
     }
