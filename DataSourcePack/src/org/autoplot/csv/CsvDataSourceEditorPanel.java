@@ -413,6 +413,11 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
                         fields[0]= line;
                         return true;
                     }
+
+                    @Override
+                    public String readNextRecord(BufferedReader reader) throws IOException {
+                        return reader.readLine();
+                    }
                 });
             } else {
                 model.setRecParser(p);
