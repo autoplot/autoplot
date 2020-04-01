@@ -173,7 +173,7 @@
             <Component class="javax.swing.JLabel" name="jLabel14">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Column Values:"/>
-                <Property name="toolTipText" type="java.lang.String" value="Select the columns which will be the values for each row of a spectrogram.  "/>
+                <Property name="toolTipText" type="java.lang.String" value="Select the columns which will be the Y-axis values for each row of a spectrogram.  "/>
               </Properties>
             </Component>
             <Component class="javax.swing.JComboBox" name="dep1Values">

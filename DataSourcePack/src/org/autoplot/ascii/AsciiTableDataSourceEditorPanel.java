@@ -483,7 +483,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         });
 
         jLabel14.setText("Column Values:");
-        jLabel14.setToolTipText("Select the columns which will be the values for each row of a spectrogram.  ");
+        jLabel14.setToolTipText("Select the columns which will be the Y-axis values for each row of a spectrogram.  ");
 
         dep1Values.setEditable(true);
         dep1Values.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -1458,6 +1458,8 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
             }
             if ( params.containsKey("depend1Values") ) {
                 dep1Values.setSelectedItem(params.get("depend1Values"));
+            } else {
+                dep1Values.setSelectedItem("");
             }
 
             if (params.containsKey("depend0")) {
