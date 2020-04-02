@@ -317,7 +317,7 @@ public class CDAWebDB {
 
             Document doc;
             
-            synchronized ( CDAWebDB.class ) {
+            synchronized ( CDAWebDB.class ) { 
                 ins= urlc.getInputStream();
                 InputSource source = new InputSource( ins );
             
