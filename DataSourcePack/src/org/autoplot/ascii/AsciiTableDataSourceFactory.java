@@ -1,11 +1,4 @@
-/*
- * AsciiTableDataSourceFactory.java
- *
- * Created on November 7, 2007, 11:41 AM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
+
 package org.autoplot.ascii;
 
 import java.io.File;
@@ -31,7 +24,7 @@ import org.das2.qds.util.AsciiParser;
 import org.das2.qds.util.AsciiParser.DelimParser;
 
 /**
- * Factory for AsciiTableDataSource readers for the ascii table reader.
+ * Factory for AsciiTableDataSource readers for the ASCII table reader.
  * @author jbf
  */
 public class AsciiTableDataSourceFactory implements DataSourceFactory {
@@ -59,6 +52,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             List<CompletionContext> result = new ArrayList<>();
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "skipLines=", "the number of lines to skip before attempting to parse"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "recCount=", "the number of records to read in"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "recStart=", "skip this number of records"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "column=", "the column to read in"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "units=", "units of the data"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "ordinal=fpe,fuh", "set of ordinals that appear in this column"));
@@ -104,8 +98,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 case "skip":
                 case "skipLines":
                     return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "the number of lines to skip before attempting to parse."));
-                case "headerDelim":
-                {
+                case "headerDelim": {
                     List<CompletionContext> result = new ArrayList<>();
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<string>" ) );
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "#####" ));
@@ -113,12 +106,13 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                     return result;
                 }
                 case "recCount":
-                    return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "limit number of records to parse."));
+                    return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "limit number of records to parse"));
+                case "recStart":
+                    return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "skip this number of records"));
                 case "columnCount":
                     return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "number of columns to expect"));
                     
-                case "rank2":
-                {
+                case "rank2": {
                     List<CompletionContext> result = new ArrayList<>();
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "number of columns to expect"));
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:", "all but first column"));
@@ -127,8 +121,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, ":", "all columns"));
                     return result;
                 }
-                case "bundle":
-                {
+                case "bundle": {
                     List<CompletionContext> result = new ArrayList<>();
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "number of columns to expect"));
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "Bx-Bz", "three named columns"));
@@ -137,25 +130,21 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "-5:", "last five columns"));
                     return result;
                 }
-                case "depend1Labels":
-                {
+                case "depend1Labels": {
                     List<CompletionContext> result = new ArrayList<>();
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>:<int>", "labels for each column"));
                     return result;
                 }
-                case "depend1Values":
-                {
+                case "depend1Values": {
                     List<CompletionContext> result = new ArrayList<>();
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>:<int>", "values for each column"));
                     return result;
                 }
-                case "column":
-                {
+                case "column": {
                     List<CompletionContext> result = getFieldNames(cc, mon);
                     return result;
                 }
-                case "units":
-                {
+                case "units":  {
                     List<CompletionContext> result = new ArrayList<>();
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "nT", "example units for the data"));
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "enum", "the data is nominal data, not numeric"));
@@ -163,32 +152,27 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 }
                 case "fixedColumns":
                     return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "Hint at the number of columns to expect, then use fast parser that assumes fixed columns."));
-                case "time":
-                {
+                case "time": {
                     List<CompletionContext> result = getFieldNames(cc, mon);
                     return result;
                 }
-                case "intervalTag":
-                {
+                case "intervalTag": {
                     List<CompletionContext> result = new ArrayList<>();
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "start","tag values indicate the start of measurement interval"));
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "center", "tag values indicate the start of measurement interval."));
                     return result;
                 }
-                case "depend0":
-                {
+                case "depend0": {
                     List<CompletionContext> result = getFieldNames(cc, mon);
                     return result;
                 }
-                case "depend0Units":
-                {
+                case "depend0Units": {
                     List<CompletionContext> result = new ArrayList<>();
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "ms", "units for the x tags"));
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "hours+since+2015-01-01T00:00", "units for the x tags"));
                     return result;
                 }
-                case "timeFormat":
-                {
+                case "timeFormat": {
                     List<CompletionContext> result = new ArrayList<>();
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "$Y+$j+$H+$M","times can span multiple fields"));
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "ISO8601", "parse ISO8601 times in one field."));
@@ -202,14 +186,12 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                     return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>"));
                 case "tail":
                     return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>"));
-                case "eventListColumn":
-                {
+                case "eventListColumn": {
                     List<CompletionContext> result = getFieldNames(cc, mon);
                     if ( result.size()>2 ) result= result.subList( 2, result.size() );
                     return result;
                 }
-                case "where":
-                { // TODO: a fun project would be to make completions for this that look in the file...
+                case "where": { // TODO: a fun project would be to make completions for this that look in the file...
                     List<CompletionContext> result = new ArrayList<>();
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field17.gt(1)","where the double value in field17 is greater than 17 "));
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field5.eq(off)", "where the nominal data in field5 is equal to \"off\""));
