@@ -47,6 +47,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
+import org.das2.client.InputStreamMeter;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -54,6 +55,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import sun.net.www.MeteredStream;
 
 /**
  * Class for encapsulating the functions of the database
@@ -231,7 +233,7 @@ public class CDAWebDB {
      * we can use the web service when it is available.
      * @param spid the service provider id, like "AC_H2_CRIS"
      * @param tr the timerange
-     * @param useWebServiceHint null means no preference, or "T", or "F"
+     * @param useWebServiceHint null means no preference, or "T", or "F" means use file template found in all.xml.
      * @param mon progress monitor for the download
      * @return array of strings, with filename|startTime|endTime
      * @throws java.io.IOException 
@@ -294,7 +296,7 @@ public class CDAWebDB {
      * @throws java.io.IOException
      * @throws org.das2.util.monitor.CancelledOperationException
      */    
-    public String[] getOriginalFilesAndRangesFromWebService(String spid, DatumRange tr, ProgressMonitor mon ) throws IOException, CancelledOperationException {
+    public static String[] getOriginalFilesAndRangesFromWebService(String spid, DatumRange tr, ProgressMonitor mon ) throws IOException, CancelledOperationException {
         TimeParser tp= TimeParser.create("$Y$m$dT$H$M$SZ");
         String tstart= tp.format(tr.min(),tr.min());
         String tstop= tp.format(tr.max(),tr.max());
@@ -313,15 +315,19 @@ public class CDAWebDB {
             //urlc= HttpUtil.checkRedirect(urlc);
             loggerUrl.log(Level.FINE,"GET data from CDAWeb {0}", urlc.getURL() );
 
-            ins= urlc.getInputStream();
-            
-            InputSource source = new InputSource( ins );
-
-            DocumentBuilder builder;
-            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document doc;
-            doc = builder.parse(source);
-
+            
+            synchronized ( CDAWebDB.class ) {
+                ins= urlc.getInputStream();
+                InputSource source = new InputSource( ins );
+            
+                DocumentBuilder builder;
+                builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                doc = builder.parse(source);
+            
+                ins.close();
+            }
+            
             XPath xp = XPathFactory.newInstance().newXPath();
 
             NodeList set = (NodeList) xp.evaluate( "/DataResult/FileDescription", doc.getDocumentElement(), javax.xml.xpath.XPathConstants.NODESET );
@@ -369,7 +375,7 @@ public class CDAWebDB {
      * @return  filename|startTime|endTime
      * @throws java.io.IOException
      */
-    public String[] getFilesAndRangesFromWebService(String spid, DatumRange tr) throws IOException {
+    public static String[] getFilesAndRangesFromWebService(String spid, DatumRange tr) throws IOException {
         TimeParser tp= TimeParser.create("$Y$m$dT$H$M$SZ");
         String tstart= tp.format(tr.min(),tr.min());
         String tstop= tp.format(tr.max(),tr.max());
@@ -389,14 +395,19 @@ public class CDAWebDB {
             //urlc= HttpUtil.checkRedirect(urlc);
             
             loggerUrl.log(Level.FINE,"getInputStream {0}", url);
-            ins= urlc.getInputStream();
-            InputSource source = new InputSource( ins );
-
-            DocumentBuilder builder;
-            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            
             Document doc;
-            doc = builder.parse(source);
-
+            synchronized ( CDAWebDB.class ) {
+                ins= urlc.getInputStream();
+                InputSource source = new InputSource( ins );
+            
+                DocumentBuilder builder;
+                builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                doc = builder.parse(source);
+            
+                ins.close();
+            }            
+            
             XPath xp = XPathFactory.newInstance().newXPath();
 
             NodeList set = (NodeList) xp.evaluate( "/DataResult/FileDescription", doc.getDocumentElement(), javax.xml.xpath.XPathConstants.NODESET );
