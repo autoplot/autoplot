@@ -573,6 +573,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
         if (o != null) {
             parser.setRecordCountLimit(Integer.parseInt(o));
         }
+        
+        o= params.get("recStart");
+        if ( o!=null ) {
+            parser.setRecordStart(Integer.parseInt(o));
+        }
 
         parser.setKeepFileHeader(true);
 
