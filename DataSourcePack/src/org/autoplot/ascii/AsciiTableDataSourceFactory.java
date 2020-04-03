@@ -22,6 +22,7 @@ import org.autoplot.datasource.MetadataModel;
 import org.autoplot.datasource.URISplit;
 import org.das2.qds.util.AsciiParser;
 import org.das2.qds.util.AsciiParser.DelimParser;
+import org.das2.util.monitor.NullProgressMonitor;
 
 /**
  * Factory for AsciiTableDataSource readers for the ASCII table reader.
@@ -231,7 +232,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             File file = DataSetURI.getFile(split.resourceUri, mon);
             if ( !file.isFile() ) return true;
             
-            List<CompletionContext> cc= getFieldNames( file, params, mon );
+            List<CompletionContext> cc= getFieldNames(file, params);
 
             if ( cc.size()<=2 ) {
                 return false;
@@ -261,7 +262,26 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         }
     }
 
-    private List<CompletionContext> getFieldNames( File file, Map<String,String> params, ProgressMonitor mon ) throws IOException {
+    /**
+     * return the list of fields names found in the ASCII file.
+     * @param uri the URI, containing modifiers like skip.
+     * @param mon progress monitor for the download
+     * @return the list of field names
+     * @throws IOException 
+     */
+    public List<String> getFieldNames( String uri, ProgressMonitor mon ) throws IOException {
+        URISplit split= URISplit.parse(uri);
+        Map<String,String> params = URISplit.parseParams(split.params);
+        File file = DataSetURI.getFile( split.resourceUri, mon);
+        List<CompletionContext> cc= getFieldNames(file, params);
+        List<String> result= new ArrayList<>(cc.size());
+        for ( CompletionContext c: cc ) {
+            result.add( c.label );
+        }
+        return result;
+    }
+    
+    private List<CompletionContext> getFieldNames( File file, Map<String,String> params) throws IOException {
 
         AsciiParser parser = AsciiParser.newParser(5);
         if (params.containsKey("skip")) {
@@ -277,6 +297,8 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             parser.setHeaderDelimiter(params.get("headerDelim"));
         }
 
+        parser.guessSkipAndDelimParser(file.toString());
+        
         if ( params.containsKey("eventListColumn") ) {
             int i= parser.getFieldIndex(params.get("eventListColumn"));
             if ( i!=-1 ) parser.setUnits( i, new EnumerationUnits("events") );
@@ -288,6 +310,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         }
         
         DelimParser dp= parser.guessSkipAndDelimParser(file.toString());
+        
         if ( dp==null ) {
             throw new IllegalArgumentException("unable to find delimited columns");
         }
@@ -334,7 +357,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         Map<String,String> params = URISplit.parseParams(cc.params);
         File file = DataSetURI.getFile(cc.resourceURI, mon);
 
-        return getFieldNames( file, params, mon );
+        return getFieldNames(file, params);
 
     }
 
