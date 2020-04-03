@@ -269,7 +269,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
      * @return the list of field names
      * @throws IOException 
      */
-    public List<String> getFieldNames( String uri, ProgressMonitor mon ) throws IOException {
+    public static List<String> getFieldNames( String uri, ProgressMonitor mon ) throws IOException {
         URISplit split= URISplit.parse(uri);
         Map<String,String> params = URISplit.parseParams(split.params);
         File file = DataSetURI.getFile( split.resourceUri, mon);
@@ -281,7 +281,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         return result;
     }
     
-    private List<CompletionContext> getFieldNames( File file, Map<String,String> params) throws IOException {
+    private static List<CompletionContext> getFieldNames( File file, Map<String,String> params) throws IOException {
 
         AsciiParser parser = AsciiParser.newParser(5);
         if (params.containsKey("skip")) {
