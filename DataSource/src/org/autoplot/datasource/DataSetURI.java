@@ -916,7 +916,7 @@ public class DataSetURI {
         URL url= isUrl( split.resourceUri ) ? split.resourceUri.toURL() : null;
 
         try {
-            FileSystem fs = FileSystem.create(toUri(split.path),mon); // mon because of ZipFileSystem
+            FileSystem fs = FileSystem.create(toUri(split.path),mon.getSubtaskMonitor("create filesystem")); // mon because of ZipFileSystem
             String filename = split.file.substring(split.path.length());
             FileObject fo = fs.getFileObject(filename);
             File tfile;
