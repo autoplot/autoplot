@@ -1185,7 +1185,6 @@ addBottomDecoration( dom.canvases[0], paint )
     public static void writeToPng( BufferedImage image, String filename, Map<String,String> metadata ) throws IOException {
         
         logger.log(Level.CONFIG, "writeToPng(image,{0},metadata)", new Object[]{filename});
-        System.err.println("writeToPng(image,{0},metadata)");
         if ( !( filename.endsWith(".png") || filename.endsWith(".PNG") ) ) {
             filename= filename + ".png";
         }
