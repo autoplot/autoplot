@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>PNG with plotInfo for a log y-axis was handled incorrectly.  Here the white line is a plot of the data on top of an plot image of the data.
+        <p><small>Test set of data URIs which should look the same whether vap+csv or vap+dat reads them.  (Getting there!)
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,17 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-03-24 r24707):</p>
+        <p>Bugfixes (2020-04-04 r24740):</p>
         <ul>
+            <li>support "r= where( county.eq('Cook') )" in Jython.
+            <li>psp_fld_l2_mag_SC_2018110400_v01.cdf?slice1=0 could not be FFTPower'd, because of CONTEXT_0 property.  Thanks, Kristoff!
+            <li>interactions with CDAWeb so that only one connection occurs at a time, which was causing problems when .vaps with many CDAWeb URIs were loaded.  Thanks, Bernie!
+            <li>1682: .dat supports the case where all fields are quoted, which is allowed in CSV.
+            <li>1682: .dat split function now has look-ahead regex to check for commas within quotes.
+            <li>1682: .dat supports recStart
+            <li>1682: .dat supports quoted fields containing newlines now.
+            <li>1682: make sure .dat can handle all .csv so one reader can handle all ASCII files, ending years of confusion.
+            <li>fixed indexOutOfBounds with cross hair digitizer when all data was off canvas and snapping was on.
             <li>AutoplotServlet uses https for third-party codes, so the thin client works again.
             <li>LeafTrim didn't slice the properties properly, dropping DEPEND_1 when the vertical slice was used with spectrograms from AsciiTableDataSource.  Thanks, Bill!
             <li>AsciiParser had some path which would result in a parsable line but then would fail to create a DelimParser.  Thanks, yumin!
@@ -41,6 +50,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>tickValues property can contain control for minor tick count, like "+1hr/4" means minor ticks on 15 minute boundaries.
             <li>715: waveform data can contain TT2000 timetags for DEPEND_1, supporting Parker Solar Probe groups.
             <li>NetCDF variable attributes are visible in USER_PROPERTIES, and long_name is used for label when nothing else is available.
             <li>NetCDF GOES n,3 arrays are rendered as X,Y,Z components to match CDAWeb logic. 
