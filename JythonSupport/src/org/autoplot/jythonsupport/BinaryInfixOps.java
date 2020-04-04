@@ -5,6 +5,9 @@
 
 package org.autoplot.jythonsupport;
 
+import java.text.ParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.python.core.PyInteger;
@@ -12,6 +15,7 @@ import org.python.core.PyObject;
 import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.das2.qds.ops.Ops;
+import org.python.core.PyString;
 
 /**
  * Operators that do element-wise binary operations that are not assigned to
@@ -38,6 +42,33 @@ public class BinaryInfixOps {
         }
     }
 
+    private static QDataSet[] datasetCoerce( PyObject arg1, PyObject arg2 ) {
+        QDataSet jarg1;
+        jarg1 = JythonOps.dataset(arg1);
+        QDataSet jarg2;
+        if ( arg2 instanceof PyString ) {
+            try {
+                jarg2 = Ops.dataset(arg2);
+            } catch (IllegalArgumentException ex) {
+                Units u= SemanticOps.getUnits(jarg1);
+                try {
+                    if ( u instanceof EnumerationUnits ) {
+                        jarg2 = Ops.dataset( ((EnumerationUnits)u).createDatum(arg2.toString()));
+                    } else {
+                        jarg2 = Ops.dataset(u.parse(arg2.toString()));
+                    }
+                } catch (ParseException ex1) {
+                    throw new IllegalArgumentException("unable to interpret argument: "+arg2);
+                }
+            }
+        } else {
+            jarg2 = JythonOps.dataset(arg2);
+        }
+        jarg2= enumerationUnitsCheck( jarg1, arg2, jarg2 );
+        jarg1= enumerationUnitsCheck( jarg2, arg1, jarg1 );
+        return new QDataSet[] { jarg1, jarg2 };
+    }
+    
     /**
      * perform eq, allowing string arguments to be converted to enumerations.
      * @param arg1 None, a QDataSet, String, array, scalar, etc
@@ -45,20 +76,18 @@ public class BinaryInfixOps {
      * @return PyInteger for rank 0 inputs, or PyQDataSet
      */
     public static PyObject eq( PyObject arg1, PyObject arg2 ) {
-        QDataSet jarg1= JythonOps.dataset(arg1);
-        QDataSet jarg2= JythonOps.dataset(arg2);
-        jarg2= enumerationUnitsCheck( jarg1, arg2, jarg2 );
-        jarg1= enumerationUnitsCheck( jarg2, arg1, jarg1 );
+        QDataSet[] jargs2= datasetCoerce( arg1, arg2 );
+        QDataSet jarg1= jargs2[0];
+        QDataSet jarg2= jargs2[1];
         if ( jarg1==null || jarg2==null ) return new PyInteger( jarg1==jarg2 ? 1 : 0 );
         QDataSet r= Ops.eq(  jarg1, jarg2 );
         return mycast( r );
     }
 
     public static PyObject ne( PyObject arg1, PyObject arg2 ) {
-        QDataSet jarg1= JythonOps.dataset(arg1);
-        QDataSet jarg2= JythonOps.dataset(arg2);
-        jarg2= enumerationUnitsCheck( jarg1, arg2, jarg2 );
-        jarg1= enumerationUnitsCheck( jarg2, arg1, jarg1 );        
+        QDataSet[] jargs2= datasetCoerce( arg1, arg2 );
+        QDataSet jarg1= jargs2[0];
+        QDataSet jarg2= jargs2[1];
         if ( jarg1==null || jarg2==null ) return new PyInteger( jarg1!=jarg2 ? 1 : 0 );
         QDataSet r= Ops.ne( jarg1, jarg2 );
         return mycast( r );
