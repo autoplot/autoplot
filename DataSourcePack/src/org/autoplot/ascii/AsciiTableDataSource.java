@@ -735,10 +735,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
             String timeFormatDelim= delim;
             if ( delim==null ) timeFormatDelim= " ";
             timeFormats= timeFormat.split(timeFormatDelim,-2);
-            if ( timeFormats.length==1 ) {
-                timeFormatDelim= " ";
-                timeFormats= timeFormat.split(timeFormatDelim,-2);
-            }
+
             if (timeFormat.equals("ISO8601")) {
                 String line = parser.readFirstParseableRecord(file.toString());
                 if (line == null) {
