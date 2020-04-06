@@ -70,6 +70,9 @@ public abstract class AbstractDataSource implements DataSource {
         }
         URISplit split = URISplit.parse(s);
 
+        if ( split.params!=null && split.params.contains("?") ) {
+            logger.log(Level.WARNING, "URI contains two question marks:{0}", uri);
+        }
         params = URISplit.parseParams(split.params);
 
         String f= split.file;
