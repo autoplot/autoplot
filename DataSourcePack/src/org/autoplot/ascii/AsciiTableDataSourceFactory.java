@@ -75,6 +75,8 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                     "comment line prefix, default is hash (#)"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "headerDelim=",
                     "string indicating the end of the header (a regular expression)"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "pattern=",
+                    "regular expression for each record, and data from matching groups are plotted."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "validMin=",
                     "values less than this value are treated as fill."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "validMax=",
@@ -104,6 +106,12 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<string>" ) );
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "#####" ));
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "DATA_UNTIL", "Cluster CEF uses these"));
+                    return result;
+                }
+                case "pattern": {
+                    List<CompletionContext> result = new ArrayList<>();
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, ".+:(\\d+).*", "load the one or more integers" ) );
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, ".+:(?<vv>[0-9e\\.\\-]+).*", "name the float field vv" ) );
                     return result;
                 }
                 case "recCount":
