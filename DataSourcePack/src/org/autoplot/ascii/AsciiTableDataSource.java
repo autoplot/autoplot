@@ -596,15 +596,23 @@ public class AsciiTableDataSource extends AbstractDataSource {
         }
 
         delim = params.get("delim");
+        
+        String spattern= params.get("pattern");
+        String format= params.get("format");
+        if ( format!=null ) {
+            spattern= AsciiParser.getRegexForFormat( format );
+        }
+        
         String sFixedColumns = params.get("fixedColumns");
-        if (sFixedColumns == null) {
-            String format= params.get("format");
-            if ( format!=null ) {
-                AsciiParser.RegexParser p= parser.getRegexParserForFormat( format );
-                columnCount = p.fieldCount();
-                parser.setRecordParser(p);
-                delim= " "; // this is because timeformats needs a delimiter
-            } else if (delim == null) {
+        
+        if ( spattern!=null )  {
+            AsciiParser.RegexParser p = new AsciiParser.RegexParser(parser,spattern);
+            parser.setRecordParser( p );
+            columnCount= p.fieldCount();
+            delim= " "; // this is because timeformats needs a delimiter
+            
+        } else if (sFixedColumns == null) {
+            if (delim == null) {
                 AsciiParser.DelimParser p = parser.guessSkipAndDelimParser(file.toString());
                 if ( p == null) {
                     String cc= params.get("columnCount");
