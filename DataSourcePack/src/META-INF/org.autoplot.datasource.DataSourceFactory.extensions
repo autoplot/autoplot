@@ -1,4 +1,4 @@
-org.autoplot.ascii.AsciiTableDataSourceFactory dat txt
+org.autoplot.ascii.AsciiTableDataSourceFactory dat txt csv
 org.autoplot.das2Stream.Das2StreamDataSourceFactory d2s d2t das2Stream das2stream qds qdst
 org.autoplot.spase.SpaseRecordDataSourceFactory xml
 org.autoplot.html.HtmlTableDataSourceFactory htm html
