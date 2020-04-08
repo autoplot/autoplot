@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Test set of data URIs which should look the same whether vap+csv or vap+dat reads them.  (Getting there!)
+        <p><small>Data is read from a VOTable and combined with the mash-up tool.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,7 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-04-04 r24740):</p>
+        <p>Bugfixes (2020-04-08 r24754):</p>
         <ul>
             <li>support "r= where( county.eq('Cook') )" in Jython.
             <li>psp_fld_l2_mag_SC_2018110400_v01.cdf?slice1=0 could not be FFTPower'd, because of CONTEXT_0 property.  Thanks, Kristoff!
@@ -50,6 +50,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>more checks for valid URIs like FPE_1997_12_16_V01.CSV?&delim=;column=field20 where arg0 is "".
+            <li>add "pattern=" keyword to ascii file parser to support regular expressions parsing.
             <li>tickValues property can contain control for minor tick count, like "+1hr/4" means minor ticks on 15 minute boundaries.
             <li>715: waveform data can contain TT2000 timetags for DEPEND_1, supporting Parker Solar Probe groups.
             <li>NetCDF variable attributes are visible in USER_PROPERTIES, and long_name is used for label when nothing else is available.
