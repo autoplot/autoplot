@@ -471,7 +471,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
         } else {
             if (vds == null) {
-                throw new IllegalArgumentException("didn't find column: " + column);
+                if ( column==null ) {
+                    throw new IllegalArgumentException("column was not specified.  Use column, rank2, or bundle to specify data to plot.");
+                } else {
+                    throw new IllegalArgumentException("didn't find column: " + column);
+                }
             }
 
             String label= getParam( "label", null );
@@ -808,7 +812,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         }
 
         o = params.get( "arg_0" );
-        if ( o!=null && !o.equals("rank2") ) {
+        if ( o!=null && o.length()>0 && !o.equals("rank2") ) {
             column = o;
             timeColumn= 0;
             final Units u = AsciiParser.UNIT_UTC;
