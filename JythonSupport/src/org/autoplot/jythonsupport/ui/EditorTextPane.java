@@ -616,7 +616,11 @@ public class EditorTextPane extends JEditorPane {
                     if ( line.startsWith("def ") && line.contains("(") ) {
                         int i= line.indexOf("(");
                         jumpToList.add( reader.getLineNumber() + ":" + line.substring(0,i) );
+                    } else if ( line.startsWith("class ") && line.contains(":") ) {
+                        int i= line.indexOf("(");
+                        jumpToList.add( reader.getLineNumber() + ":" + line.substring(0,i) );
                     }
+                    
                     length= reader.getLineNumber()+1;
                     line= reader.readLine();
                 }
