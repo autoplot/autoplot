@@ -465,7 +465,7 @@ public class JythonUtil {
      * @throws java.io.IOException
      */
     public static boolean pythonLint(LineNumberReader reader, List<String> errs) throws IOException {
-        String vnarg = "\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*"; // any variable name  VERIFIED
+        String vnarg = "(\\s*)([a-zA-Z_][a-zA-Z0-9_]*)\\s*"; // any variable name  VERIFIED
 
         Pattern assign = Pattern.compile(vnarg + "=.*");
 
@@ -475,10 +475,15 @@ public class JythonUtil {
         while (line != null) {
             Matcher m = assign.matcher(line);
             if (m.matches()) {
-                String vname = m.group(1);
+                String vname = m.group(2);
+                String indent= m.group(1);
                 try {
-                    PyObject po = interp.eval(vname);
-                    errs.add("" + reader.getLineNumber() + ": " + vname + "=" + po.__repr__());
+                    if ( vname.equals("xrange") && indent.length()>0 ) {
+                        logger.fine("this is just xrange keyword in plot");
+                    } else {
+                        PyObject po = interp.eval(vname);
+                        errs.add("" + reader.getLineNumber() + ": " + vname + "=" + po.__repr__());
+                    }
                 } catch (PyException ex) {
                     // this is what we want
                 }
