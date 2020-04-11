@@ -625,7 +625,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 }
                 columnCount = p.fieldCount();
                 delim = p.getDelim();
-                p.setShowException(true);
+                p.setShowException(true); 
+                parser.setRecordParser( p );
             } else {
                 if ( delim.equals(",") ) delim="COMMA";
                 delim= delim.replaceAll("WHITESPACE", "\\s+");
