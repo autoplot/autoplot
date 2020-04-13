@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Data is read from a VOTable and combined with the mash-up tool.
+        <p><small>Rarely used AM/PM field in time strings ($p) had a bug where 12AM and 12PM were mishandled is corrected.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-04-08 r24754):</p>
+        <p>Bugfixes (2020-04-13 r24759):</p>
         <ul>
+            <li>2258: correction to $p, AM/PM field, where 12am and 12pm were mishandled.
+            <li>jython editor would incorrectly warn when xrange keyword was used in plot, this is not reassigning xrange function.
+            <li>1682: further corrections needed for test143_002, where units were not initialized properly.
             <li>support "r= where( county.eq('Cook') )" in Jython.
             <li>psp_fld_l2_mag_SC_2018110400_v01.cdf?slice1=0 could not be FFTPower'd, because of CONTEXT_0 property.  Thanks, Kristoff!
             <li>interactions with CDAWeb so that only one connection occurs at a time, which was causing problems when .vaps with many CDAWeb URIs were loaded.  Thanks, Bernie!
@@ -50,6 +53,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Jython editor goto line includes class declarations.
             <li>more checks for valid URIs like FPE_1997_12_16_V01.CSV?&delim=;column=field20 where arg0 is "".
             <li>add "pattern=" keyword to ascii file parser to support regular expressions parsing.
             <li>tickValues property can contain control for minor tick count, like "+1hr/4" means minor ticks on 15 minute boundaries.
