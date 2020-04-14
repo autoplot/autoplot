@@ -1045,7 +1045,8 @@ public class URISplit {
         surl = surl.replaceAll("%5B", "\\[" ); // Windows appends these in temporary downloadf rte_1495358356
         surl = surl.replaceAll("%5D", "\\]" );
         surl = surl.replaceAll("%5E", "^" );
-
+        surl = surl.replaceAll("%5C", "\\\\" );
+        surl = surl.replaceAll("%7C", "|" );
         return surl;
     }
 
