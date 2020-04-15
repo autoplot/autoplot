@@ -1,0 +1,17 @@
+from org.hapiserver.HapiClient import *
+
+hapiServer= URL( "https://jfaden.net/HapiServerDemo/hapi/" )
+jo= getCatalogArray( hapiServer )
+for i in xrange(jo.length()):
+    print jo.getJSONObject(i).get('id')
+    
+info= getInfo( hapiServer, 'Iowa+City+Conditions' )
+
+print info
+
+it= getData( hapiServer, 'Iowa+City+Conditions', '2019-10-21T00:00', '2019-10-22T00:00' )
+
+while ( it.hasNext() ):
+    print it.next().getIsoTime(0)
+    
+# https://jfaden.net/HapiServerDemo/hapi/data?id=Iowa+City+Conditions&start.time=2020-01-01T00:00Z&stop.time=2020-02-01T00:00Z

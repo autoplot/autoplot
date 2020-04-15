@@ -1,0 +1,6 @@
+from org.hapiserver.HapiClient import *
+
+d1= toArray( '2000-01-02T03:04:05.006007008Z' )
+d2= toArray( '2000-001T03:04:05.006007008Z' )
+d3= toArray( '2000-230T03:04Z' )
+d4= toArray( '2000-265T03:04:05.Z' )
