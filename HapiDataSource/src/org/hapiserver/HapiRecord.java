@@ -1,12 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.hapiserver;
 
 /**
- *
+ * Interface for conveying a single HAPI record, regardless of its source
+ * (binary, csv, etc).
  * @author jbf
  */
 public interface HapiRecord {
@@ -21,7 +18,7 @@ public interface HapiRecord {
     String getIsoTime(int i);
 
     /**
-     * return the string value
+     * get the string value
      * @param i the index of the column
      * @return the string
      */
@@ -42,8 +39,17 @@ public interface HapiRecord {
      */
     double[] getDoubleArray(int i);
 
+    /**
+     * get the integer
+     * @param i
+     * @return 
+     */
     int getInteger(int i);
 
+    /**
+     * return the number of items.
+     * @return 
+     */
     int length();
     
 }

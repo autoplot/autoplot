@@ -370,9 +370,9 @@ public class HapiClient {
      * return the time as milliseconds since 1970-01-01T00:00Z.  This
      * will include leap seconds.
      * @param time
-     * @return 
+     * @return number of milliseconds since 1970-01-01T00:00Z.
      */
-    public static long toSecondsSince1970( String time ) {
+    public static long toMillisecondsSince1970( String time ) {
         TemporalAccessor ta = DateTimeFormatter.ISO_INSTANT.parse(time);
         Instant i = Instant.from(ta);
         Date d = Date.from(i);
@@ -448,12 +448,10 @@ public class HapiClient {
      * @return the decomposed time
      */
     public static int[] toArray( String time ) {
-        String tsave= time;
         int[] result;
         if ( time.length()==4 ) {
             result= new int[] { Integer.parseInt(time), 1, 1, 0, 0, 0, 0 };
         } else {
-            int doyAdd;
             if ( time.length()<8 ) throw new IllegalArgumentException("time must have 4 or greater than 7 elements");
             if ( time.charAt(8)=='T' ) {
                 result= new int[] { 
@@ -489,7 +487,6 @@ public class HapiClient {
                 result[5]= parseInt(time.substring(6,8));
             } 
             if ( time.length()>9 ) {
-                // 2023-012T00:01:02.123456789
                 result[6]= (int)( Math.pow( 10, 18-time.length() ) ) * parseInt(time.substring(9));
             }
             normalizeTime(result);
