@@ -291,7 +291,7 @@ public class HapiClient {
     }
     
     /**
-     * return the catalog as a JSONArray.
+     * return the catalog as a String array.
      * <code><pre>
      * catalog= getCatalogIdsArray( URL( "https://jfaden.net/HapiServerDemo/hapi/catalog" ) )
      * for s in catalog:
@@ -386,7 +386,7 @@ public class HapiClient {
     }
     
     /**
-     * return a list of the parameters for the id, as a string.
+     * return a list of the parameters for the id, as a String array.
      * @param server
      * @param id
      * @return
@@ -394,7 +394,7 @@ public class HapiClient {
      * @throws JSONException 
      * @see #getInfo(java.net.URL, java.lang.String) 
      */
-    public String[] getInfoParametersArray( URL server, String id ) 
+    public static String[] getInfoParametersArray( URL server, String id ) 
             throws IOException, JSONException {
         JSONObject jo= getInfo(server, id);
         JSONArray joa= jo.getJSONArray("parameters");
