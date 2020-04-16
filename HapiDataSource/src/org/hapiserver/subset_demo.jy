@@ -1,16 +1,15 @@
 from org.hapiserver.HapiClient import *
 
 hapiServer= URL( "https://jfaden.net/HapiServerDemo/hapi/" )
-    
-info= getInfo( hapiServer, 'specBins' )
+
+info= getInfo( hapiServer, 'Iowa+City+Conditions' )
 
 print info
 
-it= getData( hapiServer, 'specBins', '2016-01-01T12:30', '2016-01-01T13:00' )
+it= getData( hapiServer, 'Iowa+City+Conditions', 'Temperature,Humidity', '2019-10-21T00:00', '2019-10-22T00:00' )
 
 while ( it.hasNext() ):
-    rec= it.next()
-    print rec.getIsoTime(0)
-    print rec.getDoubleArray(1)
+    r= it.next()
+    print r.getIsoTime(0), r.getDouble(1), r.getDouble(2)
     
 # https://jfaden.net/HapiServerDemo/hapi/data?id=Iowa+City+Conditions&start.time=2020-01-01T00:00Z&stop.time=2020-02-01T00:00Z

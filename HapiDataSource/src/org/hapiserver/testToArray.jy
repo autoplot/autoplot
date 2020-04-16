@@ -1,6 +1,17 @@
 from org.hapiserver.HapiClient import *
 
-d1= toArray( '2000-01-02T03:04:05.006007008Z' )
-d2= toArray( '2000-001T03:04:05.006007008Z' )
-d3= toArray( '2000-230T03:04Z' )
-d4= toArray( '2000-265T03:04:05.Z' )
+print toMillisecondsSince1970('2000-01-02T03:04:05.006007008Z')
+
+d1= isoTimeToArray( '2000-01-02T03:04:05.006007008Z' )
+d2= isoTimeToArray( '2000-001T03:04:05.006007008Z' )
+d3= isoTimeToArray( '2000-230T03:04Z' )
+d4= isoTimeToArray( '2000-265T03:04:05.Z' )
+
+print '2000-265T03:04:05.Z'
+for d in d4: print d,
+print ''
+d4[2]= dayOfYear( d4[0], d4[1], d4[2] )
+d4[1]= 1
+for d in d4: print d,
+print ''
+

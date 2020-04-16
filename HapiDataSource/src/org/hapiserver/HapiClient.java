@@ -276,6 +276,7 @@ public class HapiClient {
      * @return 
      * @throws java.io.IOException 
      * @throws org.json.JSONException 
+     * @see #getCatalogIdsArray
      */
     public static org.json.JSONObject getCatalog( URL server ) 
             throws IOException, JSONException {
@@ -292,20 +293,25 @@ public class HapiClient {
     /**
      * return the catalog as a JSONArray.
      * <code><pre>
-     * catalog= getCatalogArray( URL( "https://jfaden.net/HapiServerDemo/hapi/catalog" ) )
-     * for i in range(catalog.length()):
-     *    print catalog.getJSONObject(i).get('id')
+     * catalog= getCatalogIdsArray( URL( "https://jfaden.net/HapiServerDemo/hapi/catalog" ) )
+     * for s in catalog:
+     *    print s
      * </pre></code>
      * @param server
      * @return
      * @throws IOException
      * @throws JSONException 
      */
-    public static org.json.JSONArray getCatalogArray( URL server ) 
+    public static String[] getCatalogIdsArray( URL server ) 
             throws IOException, JSONException {
         JSONObject jo= getCatalog(server);
-        JSONArray ja= jo.getJSONArray("catalog");
-        return ja;
+        JSONArray joa= jo.getJSONArray("catalog");
+        
+        String[] result= new String[joa.length()];
+        for ( int i=0; i<joa.length(); i++ ) {
+            result[i]= joa.getJSONObject(i).getString("id");
+        }
+        return result;
     }
     
     /**
@@ -379,6 +385,25 @@ public class HapiClient {
         return o;
     }
     
+    /**
+     * return a list of the parameters for the id, as a string.
+     * @param server
+     * @param id
+     * @return
+     * @throws IOException
+     * @throws JSONException 
+     * @see #getInfo(java.net.URL, java.lang.String) 
+     */
+    public String[] getInfoParametersArray( URL server, String id ) 
+            throws IOException, JSONException {
+        JSONObject jo= getInfo(server, id);
+        JSONArray joa= jo.getJSONArray("parameters");
+        String[] result= new String[joa.length()];
+        for ( int i=0; i<joa.length(); i++ ) {
+            result[i]= joa.getJSONObject(i).getString("name");
+        }
+        return result;
+    }
     
     /**
      * return the data record-by-record, using the CSV response.
