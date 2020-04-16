@@ -43,7 +43,7 @@ public class HapiClient {
     private static final Lock LOCK= new ReentrantLock();
     
     private HapiClient() {
-        
+        // this class is not instanciated.
     }
     
     /**
