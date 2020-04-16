@@ -41,7 +41,7 @@ public class HapiClient {
     private static final Logger LOGGER= Logger.getLogger("org.hapiserver");
     
     private static final Lock LOCK= new ReentrantLock();
-    
+
     private HapiClient() {
         // this class is not instanciated.
     }
@@ -303,7 +303,7 @@ public class HapiClient {
      * get the info for the id
      * @param server
      * @param id HAPI dataset identifier, matching [a-zA-Z_]+[a-zA-Z0-9_/]*
-     * @return the JSON for info, see 
+     * @return the JSON for info
      * @throws java.io.IOException 
      * @throws org.json.JSONException 
      */
@@ -324,7 +324,53 @@ public class HapiClient {
         JSONObject o= new JSONObject(s);
         return o;
     }
+    
+    /**
+     * get the info for the id, for a subset of the parameters.
+     * @param server
+     * @param id HAPI dataset identifier, matching [a-zA-Z_]+[a-zA-Z0-9_/]*
+     * @param parameters comma-separated list of parameter names.
+     * @return the JSON for info
+     * @throws java.io.IOException 
+     * @throws org.json.JSONException 
+     */
+    public static JSONObject getInfo(URL server, String id, String parameters) 
+            throws IOException, JSONException {
+        if ( EventQueue.isDispatchThread() ) {
+            LOGGER.warning("HAPI network call on event thread");
+        }        
+        URL url;
+        try {
+            url= new URL( server, "info?id="+id + "&parameters="+parameters );
+        } catch (MalformedURLException ex) {
+            throw new IllegalArgumentException(ex);
+        }
         
+        String s= readFromURL(url, "json");
+        
+        JSONObject o= new JSONObject(s);
+        String[] ss= parameters.split(",",-2);
+        
+        JSONArray joa= o.getJSONArray("parameters");
+        
+        if ( ss.length==joa.length() || ss.length==joa.length()-1 ) {
+            int ioff= joa.length()-ss.length;
+            StringBuilder sb= new StringBuilder(joa.getJSONObject(ioff).getString("name"));
+            for ( int i=1+ioff; i<joa.length(); i++ ) {
+                sb.append(",").append(joa.getJSONObject(i).get("name"));
+            }
+            String sbs= sb.toString();
+            if ( !sbs.equals(parameters) ) {
+                throw new IllegalArgumentException("parameters must be requested in order, use instead "+sbs);
+            }
+        } else {
+            throw new IllegalArgumentException("number of parameters in result doesn't jibe with request");
+        }
+        
+        return o;
+    }
+    
+    
     /**
      * return the data record-by-record, using the CSV response.
      * @param server
@@ -351,6 +397,35 @@ public class HapiClient {
         
     }
     
+        
+    /**
+     * return the data record-by-record, using the CSV response.
+     * @param server
+     * @param id
+     * @param parameters
+     * @param startTime
+     * @param endTime
+     * @return Iterator, which will return records until the stream is empty.
+     * @throws java.io.IOException  
+     * @throws org.json.JSONException should the server return an invalid response.
+     */
+    public static Iterator<HapiRecord> getDataCSV( 
+            URL server, 
+            String id, 
+            String parameters,
+            String startTime,
+            String endTime ) throws IOException, JSONException {
+        
+        JSONObject info= getInfo( server, id, parameters );
+        
+        URL dataURL= new URL( server, "data?id="+id + "&parameters="+parameters + "&time.min="+startTime + "&time.max="+endTime );
+        
+        InputStream ins= dataURL.openStream();
+        BufferedReader reader= new BufferedReader( new InputStreamReader(ins) );
+        return new HapiClientIterator( info, reader );
+        
+    }
+        
     /**
      * return the data record-by-record
      * @param server the HAPI server
@@ -367,6 +442,26 @@ public class HapiClient {
             String startTime,
             String endTime ) throws IOException, JSONException {
         return getDataCSV(server, id, startTime, endTime);
+    }
+    
+    /**
+     * return the data record-by-record
+     * @param server the HAPI server
+     * @param id the dataset id
+     * @param parameters a comma-separated list of parameter names
+     * @param startTime the start time
+     * @param endTime the end time
+     * @return the records in an iterator
+     * @throws java.io.IOException
+     * @throws org.json.JSONException should the server return an invalid response
+     */
+    public static Iterator<HapiRecord> getData( 
+            URL server, 
+            String id, 
+            String parameters,
+            String startTime,
+            String endTime ) throws IOException, JSONException {
+        return getDataCSV(server, id, parameters, startTime, endTime);
     }
     
     /**
