@@ -38,9 +38,9 @@ import org.json.JSONObject;
  */
 public class HapiClient {
     
-    private static final Logger logger= Logger.getLogger("org.hapiserver");
+    private static final Logger LOGGER= Logger.getLogger("org.hapiserver");
     
-    private static final Lock lock= new ReentrantLock();
+    private static final Lock LOCK= new ReentrantLock();
     
     private HapiClient() {
         
@@ -113,11 +113,11 @@ public class HapiClient {
         File f= new File(su);
         if ( f.exists() && f.canRead() ) {
             if ( ( System.currentTimeMillis() - f.lastModified() < cacheAgeLimitMillis() ) || FileSystem.settings().isOffline() ) {
-                logger.log(Level.FINE, "read from hapi cache: {0}", url);
+                LOGGER.log(Level.FINE, "read from hapi cache: {0}", url);
                 String r= readFromFile( f );
                 return r;
             } else {
-                logger.log(Level.FINE, "old cache item will not be used: {0}", url);
+                LOGGER.log(Level.FINE, "old cache item will not be used: {0}", url);
                 return null;
             }
         } else {
@@ -173,7 +173,7 @@ public class HapiClient {
             }
         }
         if ( !f.exists() ) {
-            logger.log(Level.FINE, "write to hapi cache: {0}", url);
+            LOGGER.log(Level.FINE, "write to hapi cache: {0}", url);
             try ( BufferedWriter w= new BufferedWriter( new FileWriter(f) ) ) {
                 w.write(data);
             }
@@ -195,7 +195,7 @@ public class HapiClient {
             String s= readFromCachedURL( url, type );
             if ( s!=null ) return s;
         }
-        logger.log(Level.FINE, "GET {0}", new Object[] { url } );
+        LOGGER.log(Level.FINE, "GET {0}", new Object[] { url } );
         URLConnection urlc= url.openConnection();
         urlc.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() );
         urlc.setReadTimeout( FileSystem.settings().getReadTimeoutMs() );
@@ -219,15 +219,15 @@ public class HapiClient {
                     }
                     String s2= builder2.toString().trim();
                     if ( type.equals("json") && s2.length()>0 && s2.charAt(0)=='{' ) {
-                        logger.warning("incorrect error code returned, content is JSON");
+                        LOGGER.warning("incorrect error code returned, content is JSON");
                         return s2;
                     }
                 } catch ( IOException ex2 ) {
-                    logger.log( Level.FINE, ex2.getMessage(), ex2 );
+                    LOGGER.log( Level.FINE, ex2.getMessage(), ex2 );
                 }
             }
-            logger.log( Level.FINE, ex.getMessage(), ex );
-            lock.lock();
+            LOGGER.log( Level.FINE, ex.getMessage(), ex );
+            LOCK.lock();
             try {
                 if ( useCache() ) {
                     String s= readFromCachedURL( url, type );
@@ -236,7 +236,7 @@ public class HapiClient {
                     throw ex;
                 }
             } finally {
-                lock.unlock();
+                LOCK.unlock();
             }
         }
         
@@ -245,13 +245,13 @@ public class HapiClient {
         }
         String result=builder.toString();
         
-        lock.lock();
+        LOCK.lock();
         try {
             if ( useCache() ) {
                 writeToCachedURL( url, type, result );
             }
         } finally {
-            lock.unlock();
+            LOCK.unlock();
         }
         return result;
     }
@@ -267,7 +267,7 @@ public class HapiClient {
     public static org.json.JSONObject getInfo( URL server, String id ) 
             throws IOException, JSONException {
         if ( EventQueue.isDispatchThread() ) {
-            logger.warning("HAPI network call on event thread");
+            LOGGER.warning("HAPI network call on event thread");
         }        
         URL url;
         try {
@@ -296,7 +296,7 @@ public class HapiClient {
      */
     public static org.json.JSONObject getCatalog( URL server ) throws IOException, JSONException {
         if ( EventQueue.isDispatchThread() ) {
-            logger.warning("HAPI network call on event thread");
+            LOGGER.warning("HAPI network call on event thread");
         }        
         URL url;
         url= new URL( server, "catalog" );
@@ -368,9 +368,17 @@ public class HapiClient {
     
     /**
      * return the time as milliseconds since 1970-01-01T00:00Z.  This
-     * will include leap seconds.
+     * does not include leap seconds.  For example, in Jython:
+     * <pre>
+     * {@code
+     * from org.hapiserver.HapiClient import *
+     * x= toMillisecondsSince1970('2000-01-02T00:00:00.0Z')
+     * print x / 86400000   # 10958.0 days
+     * print x % 86400000   # and no milliseconds
+     * }
+     * </pre>
      * @param time
-     * @return number of milliseconds since 1970-01-01T00:00Z.
+     * @return number of non-leap-second milliseconds since 1970-01-01T00:00Z.
      */
     public static long toMillisecondsSince1970( String time ) {
         TemporalAccessor ta = DateTimeFormatter.ISO_INSTANT.parse(time);
@@ -402,12 +410,12 @@ public class HapiClient {
         }
     }
 
-    private final static int[][] daysInMonth = {
+    private final static int[][] DAYS_IN_MONTH = {
         {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 0},
         {0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 0}
     };
     
-    private final static int[][] dayOffset = {
+    private final static int[][] DAY_OFFSET = {
         {0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365},
         {0, 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366}
     };
@@ -420,8 +428,13 @@ public class HapiClient {
     }
     
     /**
-     * return the doy of year of the month and day for the year.  For example
-     * dayOfYear( 2000, 5, 29 ) -> 150.
+     * return the doy of year of the month and day for the year.  For example,
+     * <pre>
+     * {@code
+     * from org.hapiserver.HapiClient import *
+     * print dayOfYear( 2000, 5, 29 ) # 150
+     * }
+     * </pre>
      * @param year the year
      * @param month the month, from 1 to 12.
      * @param day the day in the month.
@@ -434,7 +447,7 @@ public class HapiClient {
         if ( month<1 ) throw new IllegalArgumentException("month must be greater than 0.");
         if ( month>12 ) throw new IllegalArgumentException("month must be less than 12.");
         int leap= isLeapYear(year) ? 1: 0;
-        return dayOffset[leap][month] + day;
+        return DAY_OFFSET[leap][month] + day;
     }
     
     /**
@@ -453,11 +466,11 @@ public class HapiClient {
         
         int leap= isLeapYear(time[0]) ? 1: 0;
         
-        int d= daysInMonth[leap][time[1]];
+        int d= DAYS_IN_MONTH[leap][time[1]];
         while ( time[2]>d ) {
             time[1]++;
             time[2]-= d;
-            d= daysInMonth[leap][time[1]];
+            d= DAYS_IN_MONTH[leap][time[1]];
             if ( time[1]>12 ) throw new IllegalArgumentException("time[2] is too big");
         }
         
