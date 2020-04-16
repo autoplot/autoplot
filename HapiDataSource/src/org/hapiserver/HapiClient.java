@@ -70,7 +70,8 @@ public class HapiClient {
      */
     public static String readFromFile( File f ) throws IOException {
         StringBuilder builder= new StringBuilder();
-        try ( BufferedReader in= new BufferedReader( new InputStreamReader( new FileInputStream(f) ) ) ) {
+        try ( BufferedReader in= new BufferedReader( 
+                new InputStreamReader( new FileInputStream(f) ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
                 builder.append(line);
@@ -112,7 +113,8 @@ public class HapiClient {
         String su= hapiCache + u;
         File f= new File(su);
         if ( f.exists() && f.canRead() ) {
-            if ( ( System.currentTimeMillis() - f.lastModified() < cacheAgeLimitMillis() ) || FileSystem.settings().isOffline() ) {
+            if ( ( System.currentTimeMillis() - f.lastModified() < cacheAgeLimitMillis() ) 
+                    || FileSystem.settings().isOffline() ) {
                 LOGGER.log(Level.FINE, "read from hapi cache: {0}", url);
                 String r= readFromFile( f );
                 return r;
@@ -127,14 +129,16 @@ public class HapiClient {
 
     
     /**
-     * write the data (for example, an info response) to a cache file.  This is called
-     * from readFromURL to cache the data.
-     * @param url the resource location, query param id is handled specially, but others are ignored.
+     * write the data (for example, an info response) to a cache file.  This is 
+     * called from readFromURL to cache the data.
+     * @param url the resource location, query param id is handled specially, 
+     *    but others are ignored.
      * @param type "json" (the extension), or "" if no extension should be added.
      * @param data the data.
      * @throws IOException 
      */
-    public static void writeToCachedURL( URL url, String type, String data ) throws IOException {
+    public static void writeToCachedURL( URL url, String type, String data ) 
+            throws IOException {
         
         String hapiCache= HapiDataSource.getHapiCache();
         
@@ -189,7 +193,8 @@ public class HapiClient {
      * @return non-empty string
      * @throws IOException 
      */
-    public static String readFromURL( URL url, String type ) throws IOException {
+    public static String readFromURL( URL url, String type ) 
+            throws IOException {
         
         if ( FileSystem.settings().isOffline() ) {
             String s= readFromCachedURL( url, type );
@@ -200,7 +205,8 @@ public class HapiClient {
         urlc.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() );
         urlc.setReadTimeout( FileSystem.settings().getReadTimeoutMs() );
         StringBuilder builder= new StringBuilder();
-        try ( BufferedReader in= new BufferedReader( new InputStreamReader( urlc.getInputStream() ) ) ) {
+        try ( BufferedReader in= new BufferedReader( 
+                new InputStreamReader( urlc.getInputStream() ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
                 builder.append(line);
@@ -210,7 +216,8 @@ public class HapiClient {
         } catch ( IOException ex ) {
             if ( urlc instanceof HttpURLConnection ) {
                 StringBuilder builder2= new StringBuilder();
-                try ( BufferedReader in2= new BufferedReader( new InputStreamReader( ((HttpURLConnection)urlc).getErrorStream() ) ) ) {
+                try ( BufferedReader in2= new BufferedReader( 
+                        new InputStreamReader( ((HttpURLConnection)urlc).getErrorStream() ) ) ) {
                     String line= in2.readLine();
                     while ( line!=null ) {
                         builder2.append(line);
@@ -270,7 +277,8 @@ public class HapiClient {
      * @throws java.io.IOException 
      * @throws org.json.JSONException 
      */
-    public static org.json.JSONObject getCatalog( URL server ) throws IOException, JSONException {
+    public static org.json.JSONObject getCatalog( URL server ) 
+            throws IOException, JSONException {
         if ( EventQueue.isDispatchThread() ) {
             LOGGER.warning("HAPI network call on event thread");
         }        
@@ -293,7 +301,8 @@ public class HapiClient {
      * @throws IOException
      * @throws JSONException 
      */
-    public static org.json.JSONArray getCatalogArray( URL server ) throws IOException, JSONException {
+    public static org.json.JSONArray getCatalogArray( URL server ) 
+            throws IOException, JSONException {
         JSONObject jo= getCatalog(server);
         JSONArray ja= jo.getJSONArray("catalog");
         return ja;
@@ -389,7 +398,10 @@ public class HapiClient {
         
         JSONObject info= getInfo( server, id );
         
-        URL dataURL= new URL( server, "data?id="+id + "&time.min="+startTime + "&time.max="+endTime );
+        URL dataURL= new URL( server, 
+                "data?id="+id 
+                + "&time.min="+startTime 
+                + "&time.max="+endTime );
         
         InputStream ins= dataURL.openStream();
         BufferedReader reader= new BufferedReader( new InputStreamReader(ins) );
@@ -418,7 +430,11 @@ public class HapiClient {
         
         JSONObject info= getInfo( server, id, parameters );
         
-        URL dataURL= new URL( server, "data?id="+id + "&parameters="+parameters + "&time.min="+startTime + "&time.max="+endTime );
+        URL dataURL= new URL( server, 
+                "data?id="+id 
+                + "&parameters="+parameters 
+                + "&time.min="+startTime 
+                + "&time.max="+endTime );
         
         InputStream ins= dataURL.openStream();
         BufferedReader reader= new BufferedReader( new InputStreamReader(ins) );
@@ -497,7 +513,8 @@ public class HapiClient {
                 result= 10 * ( s.charAt(0)-48 ) + (s.charAt(1)-48);
                 return result;
             case 3:
-                result= 100 * ( s.charAt(0)-48 ) + 10 * ( s.charAt(1)-48 ) + (s.charAt(2)-48);
+                result= 100 * ( s.charAt(0)-48 )
+                        + 10 * ( s.charAt(1)-48 ) + (s.charAt(2)-48);
                 return result;
             default:        
                 result=0;
