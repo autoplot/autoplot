@@ -257,32 +257,6 @@ public class HapiClient {
     }
 
     /**
-     * get the info for the id
-     * @param server
-     * @param id HAPI dataset identifier, matching [a-zA-Z_]+[a-zA-Z0-9_/]*
-     * @return the JSON for info, see 
-     * @throws java.io.IOException 
-     * @throws org.json.JSONException 
-     */
-    public static org.json.JSONObject getInfo( URL server, String id ) 
-            throws IOException, JSONException {
-        if ( EventQueue.isDispatchThread() ) {
-            LOGGER.warning("HAPI network call on event thread");
-        }        
-        URL url;
-        try {
-            url= new URL( server, "info?id="+id );
-        } catch (MalformedURLException ex) {
-            throw new IllegalArgumentException(ex);
-        }
-        
-        String s= readFromURL(url, "json");
-        
-        JSONObject o= new JSONObject(s);
-        return o;
-    }
-    
-    /**
      * return the catalog as a JSONObject.  For example:
      * <code><pre>
      * jo= getCatalog( URL( "https://jfaden.net/HapiServerDemo/hapi/catalog" ) )
@@ -325,6 +299,32 @@ public class HapiClient {
         return ja;
     }
     
+    /**
+     * get the info for the id
+     * @param server
+     * @param id HAPI dataset identifier, matching [a-zA-Z_]+[a-zA-Z0-9_/]*
+     * @return the JSON for info, see 
+     * @throws java.io.IOException 
+     * @throws org.json.JSONException 
+     */
+    public static org.json.JSONObject getInfo( URL server, String id ) 
+            throws IOException, JSONException {
+        if ( EventQueue.isDispatchThread() ) {
+            LOGGER.warning("HAPI network call on event thread");
+        }        
+        URL url;
+        try {
+            url= new URL( server, "info?id="+id );
+        } catch (MalformedURLException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+        
+        String s= readFromURL(url, "json");
+        
+        JSONObject o= new JSONObject(s);
+        return o;
+    }
+        
     /**
      * return the data record-by-record, using the CSV response.
      * @param server
