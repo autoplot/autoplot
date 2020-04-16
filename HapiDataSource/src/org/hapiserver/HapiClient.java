@@ -286,8 +286,10 @@ public class HapiClient {
      * return the catalog as a JSONObject.  For example:
      * <code><pre>
      * jo= getCatalog( URL( "https://jfaden.net/HapiServerDemo/hapi/catalog" ) )
-     * for j in jo.getJsonArray( 'catalog' ):
-     *    print j.get('id')
+     * print jo.get('HAPI') # "2.0"
+     * catalog= jo.getJSONArray( 'catalog' )
+     * for i in range(catalog.length()):
+     *    print catalog.getJSONObject(i).get('id')
      * </pre></code>
      * @param server
      * @return 
@@ -308,9 +310,9 @@ public class HapiClient {
     /**
      * return the catalog as a JSONArray.
      * <code><pre>
-     * jo= getCatalogArray( URL( "https://jfaden.net/HapiServerDemo/hapi/catalog" ) )
-     * for i in xrange(jo.length()):
-     *    print jo.get(i,'id')
+     * catalog= getCatalogArray( URL( "https://jfaden.net/HapiServerDemo/hapi/catalog" ) )
+     * for i in range(catalog.length()):
+     *    print catalog.getJSONObject(i).get('id')
      * </pre></code>
      * @param server
      * @return
@@ -322,6 +324,7 @@ public class HapiClient {
         JSONArray ja= jo.getJSONArray("catalog");
         return ja;
     }
+    
     /**
      * return the data record-by-record, using the CSV response.
      * @param server
