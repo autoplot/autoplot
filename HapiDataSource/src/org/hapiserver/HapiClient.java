@@ -407,11 +407,34 @@ public class HapiClient {
         {0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 0}
     };
     
+    private final static int[][] dayOffset = {
+        {0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365},
+        {0, 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366}
+    };
+    
     private static boolean isLeapYear( int year ) {
-        if ( year<100 ) {
-            throw new IllegalArgumentException("years must be 4-digit years");
+        if ( year<1800 || year>2400 ) {
+            throw new IllegalArgumentException("year must be between 1800 and 2400");
         }
         return (year % 4)==0 && ( year%400==0 || year%100!=0 );
+    }
+    
+    /**
+     * return the doy of year of the month and day for the year.  For example
+     * dayOfYear( 2000, 5, 29 ) -> 150.
+     * @param year the year
+     * @param month the month, from 1 to 12.
+     * @param day the day in the month.
+     * @return the day of year.
+     */
+    public static int dayOfYear( int year, int month, int day ) {
+        if ( month==1 ) {
+            return day;
+        }
+        if ( month<1 ) throw new IllegalArgumentException("month must be greater than 0.");
+        if ( month>12 ) throw new IllegalArgumentException("month must be less than 12.");
+        int leap= isLeapYear(year) ? 1: 0;
+        return dayOffset[leap][month] + day;
     }
     
     /**
@@ -430,8 +453,6 @@ public class HapiClient {
         
         int leap= isLeapYear(time[0]) ? 1: 0;
         
-        int month= 12;
-        
         int d= daysInMonth[leap][time[1]];
         while ( time[2]>d ) {
             time[1]++;
@@ -447,7 +468,7 @@ public class HapiClient {
      * @param time
      * @return the decomposed time
      */
-    public static int[] toArray( String time ) {
+    public static int[] isoTimeToArray( String time ) {
         int[] result;
         if ( time.length()==4 ) {
             result= new int[] { Integer.parseInt(time), 1, 1, 0, 0, 0, 0 };
