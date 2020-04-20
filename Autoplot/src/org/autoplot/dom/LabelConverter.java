@@ -130,7 +130,9 @@ public class LabelConverter extends Converter {
                     QDataSet dataSet= pe.getController().getDataSet();
                     if ( dataSet!=null ) {
                         Map<String,Object> props= (Map<String, Object>) dataSet.property(QDataSet.USER_PROPERTIES);
-                        title= DomUtil.resolveProperties( title, "USER_PROPERTIES", props );
+                        if ( props!=null ) {
+                            title= DomUtil.resolveProperties( title, "USER_PROPERTIES", props );
+                        }
                     }
                 }
             }
@@ -140,7 +142,9 @@ public class LabelConverter extends Converter {
                     DataSourceFilter dsf= (DataSourceFilter) DomUtil.getElementById( dom, pe.getDataSourceFilterId() );
                     if ( dsf!=null ) { // ought not to be!
                         Map<String,Object> props= (Map<String, Object>) dsf.getController().getRawProperties(); //TODO: this is a really old name that needs updating...
-                        title= DomUtil.resolveProperties( title, "METADATA", props );
+                        if ( props!=null ) {
+                            title= DomUtil.resolveProperties( title, "METADATA", props );
+                        }
                     }
                 }
             }
