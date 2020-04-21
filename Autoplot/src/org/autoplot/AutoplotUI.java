@@ -4016,9 +4016,9 @@ private void exceptionReportActionPerformed(java.awt.event.ActionEvent evt) {//G
     org.das2.util.LoggerManager.logGuiEvent(evt);
     ExceptionHandler eh= applicationModel.getExceptionHandler();
     if ( eh==null || !( eh instanceof GuiExceptionHandler ) ) {
-        new GuiExceptionHandler().submitRuntimeException(new RuntimeException("user-generated comment"), false);
+        new GuiExceptionHandler().submitFeedback(new RuntimeException("user-generated comment"));
     } else {
-        ((GuiExceptionHandler)eh).submitRuntimeException(new RuntimeException("user-generated comment"), false);
+        ((GuiExceptionHandler)eh).submitFeedback(new RuntimeException("user-generated comment"));
     }
 }//GEN-LAST:event_exceptionReportActionPerformed
 
