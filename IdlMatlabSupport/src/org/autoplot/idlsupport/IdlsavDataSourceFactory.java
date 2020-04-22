@@ -17,7 +17,7 @@ import org.autoplot.idlsupport.ReadIDLSav.ArrayDesc;
 import org.das2.util.monitor.ProgressMonitor;
 
 /**
- *
+ * Factory for reading IDLSave files.
  * @author jbf
  */
 public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
@@ -40,10 +40,11 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
         
         if ( reader.isArray( buf, key ) ) {
             ArrayDesc desc= reader.readArrayDesc( buf, key );
-            StringBuilder sqube= new StringBuilder(desc.dims[0]);
+            StringBuilder sqube= new StringBuilder("[").append(String.valueOf(desc.dims[0]));
             for ( int i=1; i<desc.ndims; i++ ) {
-                sqube.append(",").append(desc.dims[i]);
+                sqube.append(",").append(String.valueOf(desc.dims[i]));
             }
+            sqube.append("]");
             CompletionContext cc1= new CompletionContext( 
                     CompletionContext.CONTEXT_PARAMETER_NAME,
                     keyn, this, "arg_0", keyn+" " +sqube, "" );
