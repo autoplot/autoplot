@@ -64,7 +64,7 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             List<CompletionContext> ccresult= new ArrayList<>();
             File file= DataSetURI.getFile( cc.resourceURI, mon );
             ByteBuffer buf= ReadIDLSav.readFileIntoByteBuffer(file);
-            String[] names= new ReadIDLSav().listVars(buf);
+            String[] names= new ReadIDLSav().readVarNames(buf);
             ReadIDLSav reader= new ReadIDLSav();
             for ( int i=0; i<names.length; i++ ) {
                 addCompletions( reader, null, names[i], buf, ccresult );

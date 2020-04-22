@@ -100,12 +100,13 @@ public class ReadIDLSav {
     private static final int TYPECODE_INT64=14;
 
     /**
-     * return true if the name refers to an array
+     * read the TypeDesc for the variable.
      * @param in
      * @param name
-     * @return 
+     * @return
+     * @throws IOException 
      */
-    public boolean isArray(ByteBuffer in, String name) throws IOException {
+    private TypeDesc readTypeDesc( ByteBuffer in, String name ) throws IOException {
         int magic= in.getInt(0);
         if ( magic!=1397882884 ) {
             logger.warning("magic number is incorrect");
@@ -125,7 +126,7 @@ public class ReadIDLSav {
                         int nextField= ( int)( 4 * Math.ceil( ( varName.length() ) / 4.0 ) ); // Note they use a silly trick where the next field is known to have a 0. 
                         ByteBuffer var= slice( rec, 20+nextField, rec.limit() );
                         TypeDesc td= readTypeDesc(var);
-                        return td.isArray();
+                        return td;
                     }
                     break;
                 case RECTYPE_VERSION:
@@ -141,9 +142,28 @@ public class ReadIDLSav {
             pos= nextPos;
             rec= readRecord( in, pos );
         }
-        throw new IllegalArgumentException("unable to find variable: "+name);
-        
-
+        throw new IllegalArgumentException("unable to find variable: "+name);        
+    }
+    /**
+     * return true if the name refers to an array
+     * @param in ByteBuffer for the entire file
+     * @param name the variable name
+     * @return td.isStructure();
+     */
+    public boolean isArray(ByteBuffer in, String name) throws IOException {
+        TypeDesc td= readTypeDesc(in, name);
+        return td.isArray();
+    }
+    
+    /**
+     * return true if the name refers to a structure
+     * @param in ByteBuffer for the entire file
+     * @param name the variable name
+     * @return true if the name refers to a structure
+     */
+    public boolean isStructure(ByteBuffer in, String name) throws IOException {
+        TypeDesc td= readTypeDesc(in, name);
+        return td.isStructure();
     }
         
     private static class TypeDescScalar extends TypeDesc {
@@ -283,6 +303,9 @@ public class ReadIDLSav {
         boolean isArray( ) {
             return ( varFlags & 0x04 ) == 0x04;
         }
+        boolean isStructure( ) {
+            return ( varFlags & 0x20 ) == 0x20;
+        }
         /**
          * read the data, where data is a byte buffer starting
          * with the TypeDesc.
@@ -336,22 +359,6 @@ public class ReadIDLSav {
         } else {
             return readTypeDescScalar(typeDescBuf);
         }
-    }
-    
-    private ArrayDesc readArrayDescriptionForVariable( ByteBuffer rec ) {
-        int type= rec.getInt(0);
-        if ( type!=RECTYPE_VARIABLE ) {
-            throw new IllegalArgumentException("not a variable");
-        }
-        //printBuffer(rec);
-        String varName= readString( rec, 20 );
-        logger.log(Level.INFO, "variable name is {0}", readString( rec, 20 ));
-
-        int nextField= ( int)( 4 * Math.ceil( ( varName.length() ) / 4.0 ) ); // Note they use a silly trick where the next field is known to have a 0. 
-
-        ByteBuffer var= slice( rec, 20+nextField, rec.limit() );
-        TypeDescArray typeDesc= readTypeDescArray( var );
-        return typeDesc.arrayDesc;
     }
     
     private Object variable( ByteBuffer rec, Map<String,Object> vars) {
@@ -459,12 +466,13 @@ public class ReadIDLSav {
     }
 
     /**
-     * list the names in the IDLSav file.
+     * list the names in the IDLSav file.  This is only the supported
+     * variable types.
      * @param in
      * @return the names found.
      * @throws IOException 
      */
-    public String[] listVars( ByteBuffer in ) throws IOException {
+    public String[] readVarNames( ByteBuffer in ) throws IOException {
         int magic= in.getInt(0);
         if ( magic!=1397882884 ) {
             logger.warning("magic number is incorrect");
@@ -482,7 +490,15 @@ public class ReadIDLSav {
                 case RECTYPE_VARIABLE:
                     logger.config("variable");
                     String varName= readString( rec, 20 );
-                    names.add(varName);
+
+                    int nextField= ( int)( 4 * Math.ceil( ( varName.length() ) / 4.0 ) ); // Note they use a silly trick where the next field is known to have a 0. 
+
+                    ByteBuffer var= slice( rec, 20+nextField, rec.limit() );
+                    TypeDesc typeDesc= readTypeDesc( var );
+                    
+                    if ( !typeDesc.isStructure() ) {
+                        names.add(varName); 
+                    }
                     break;
                 case RECTYPE_VERSION:
                     logger.config("version");

@@ -49,7 +49,11 @@ public class IdlsavDataSource extends AbstractDataSource {
         Object v= reader.readVar( buffer, arg );        
         
         if ( v==null ) {
-            throw new IllegalArgumentException("unable to find variable: "+arg);
+            if ( reader.isStructure( buffer, arg ) ) {
+                throw new IllegalArgumentException("structures are not supported");
+            } else {
+                throw new IllegalArgumentException("unable to find variable: "+arg);
+            }
         }
         
         if ( v.getClass().isArray() ) {
