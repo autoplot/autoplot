@@ -1,2 +1,2 @@
-org.autoplot.idlsupport.IdlsavDataSourceFormat idlsav
+org.autoplot.idlsupport.IdlsavDataSourceFormat idlsav sav
 org.autoplot.matsupport.MatDataSourceFormat mat
