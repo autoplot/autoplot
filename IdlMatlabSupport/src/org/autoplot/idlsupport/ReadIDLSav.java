@@ -57,6 +57,23 @@ public class ReadIDLSav {
         }
     }
     
+    /**
+     * somehow I didn't notice the length before other strings.  In the python 
+     * code they have "_read_string" and "_read_string_data" which has a 
+     * second length.
+     * @param rec
+     * @param pos
+     * @return 
+     */
+    private String readStringData( ByteBuffer rec, int pos ) {
+        int len= rec.getInt(pos);
+        byte[] mybytes= new byte[len];
+        rec.position(pos+4);
+        rec.get(mybytes);
+        return new String( mybytes );
+    }
+    
+    
     private String readString( ByteBuffer rec, int pos ) {
         int endPos= pos;
         while ( rec.get(endPos)!=0 ) {
@@ -204,6 +221,30 @@ public class ReadIDLSav {
         int nmax;
         int[] dims;
     }
+
+    public static class TagDesc {
+        int offset;
+        int typecode;
+        int tagflags;
+    }
+    
+    private TagDesc readTagDesc( ByteBuffer rec ) {
+        TagDesc result= new TagDesc();
+        result.offset= rec.getInt(0);
+        result.typecode= rec.getInt(4);
+        result.tagflags= rec.getInt(8);
+        return result;
+    }    
+    
+    public static class StructDesc {
+        int predef;
+        int ntags;
+        int nbytes;
+        TagDesc[] tagtable;
+        String[] tagnames;
+        ArrayDesc[] arrTable;
+        StructDesc[] structTable;
+    }
     
     private static class TypeDescArray extends TypeDesc {
         ArrayDesc arrayDesc;
@@ -297,6 +338,17 @@ public class ReadIDLSav {
         
     }
     
+    private static class TypeDescStructure extends TypeDesc {
+        ArrayDesc arrayDesc;
+        StructDesc structDesc;
+        
+        @Override
+        Object readData(ByteBuffer data) {
+            return null;
+        }
+        
+    }
+    
     private static abstract class TypeDesc {
         int typeCode;
         int varFlags;
@@ -339,6 +391,40 @@ public class ReadIDLSav {
         return result;
     }
     
+    private StructDesc readStructDesc( ByteBuffer rec ) {
+        StructDesc result= new StructDesc();
+        if ( rec.getInt(0)!=9 ) {
+            throw new IllegalArgumentException("expected 9 for STRUCTSTART");
+        }
+        String name= readString( rec, 4 );
+        int nextField= 4+ (int)( 4 * Math.ceil( ( name.length() ) / 4.0 ) ); 
+        if ( name.length()==0 ) nextField+= 4;
+        result.predef= rec.getInt(nextField+0);
+        result.ntags= rec.getInt(nextField+4); 
+        result.nbytes= rec.getInt(nextField+8);
+        result.tagtable= new TagDesc[result.ntags];
+        int ipos= nextField + 12;
+        for ( int i=0; i<result.ntags; i++ ) {
+            result.tagtable[i]= readTagDesc( slice( rec, ipos, ipos+12 ) );
+            ipos+= 12;
+        }
+        result.tagnames= new String[result.ntags];
+        for ( int i=0; i<result.ntags; i++ ) {
+            result.tagnames[i]= readStringData( rec, ipos );
+            ipos+= 4 + (int)( 4 * Math.ceil( ( result.tagnames[i].length() ) / 4.0 ) ); 
+        }
+        return result;
+    }
+    
+    private TypeDescStructure readTypeDescStructure( ByteBuffer rec ) {
+        TypeDescStructure result= new TypeDescStructure();
+        result.typeCode= rec.getInt(0);
+        result.varFlags= rec.getInt(4);
+        result.arrayDesc= readArrayDesc( slice( rec, 8, rec.limit() ) );
+        result.structDesc= readStructDesc( slice( rec, 10*4+result.arrayDesc.nmax*4, rec.limit() ) );
+        return result;
+    }
+    
     private TypeDescArray readTypeDescArray( ByteBuffer rec ) {
         TypeDescArray result= new TypeDescArray();
         result.typeCode= rec.getInt(0);
@@ -354,13 +440,23 @@ public class ReadIDLSav {
      */
     private TypeDesc readTypeDesc( ByteBuffer typeDescBuf ) {
         int varFlags= typeDescBuf.getInt(4);
-        if ( ( varFlags & 0x04 ) == 0x04 ) {
+        if ( ( varFlags & 0x20 ) == 0x20 ) {
+            return readTypeDescStructure(typeDescBuf);
+        } else if ( ( varFlags & 0x04 ) == 0x04 ) {
             return readTypeDescArray(typeDescBuf);
         } else {
             return readTypeDescScalar(typeDescBuf);
         }
     }
     
+    /**
+     * read the scalar, array, or structure at this position.  An
+     * array is returned flattened, and readTypeDesc should be used
+     * to unflatten it.  Structures are returned as a LinkedHashMap.
+     * @param rec
+     * @param vars
+     * @return 
+     */
     private Object variable( ByteBuffer rec, Map<String,Object> vars) {
         int type= rec.getInt(0);
         if ( type!=RECTYPE_VARIABLE ) {
@@ -443,6 +539,9 @@ public class ReadIDLSav {
         while ( rec!=null ) {
             int type= rec.getInt(0);
             int nextPos= rec.getInt(4);
+            if ( rec.getInt(8)!=0 ) {
+                throw new IllegalArgumentException("records bigger than 2**32 bytes are not supported.");
+            }
             logger.log(Level.CONFIG, "RecType: {0} Length: {1}", new Object[]{labelType(type), nextPos-pos});
             switch ( type ) {
                 case RECTYPE_VARIABLE:
@@ -633,8 +732,12 @@ public class ReadIDLSav {
         //                    "/home/jbf/public_html/autoplot/data/sav/arrayVsScalar.idlsav","r");
         //RandomAccessFile aFile = new RandomAccessFile(
         //                    "/home/jbf/public_html/autoplot/data/sav/floats.idlsav","r");
+        //RandomAccessFile aFile = new RandomAccessFile(
+        //                    "/home/jbf/public_html/autoplot/data/sav/doublearray.idlsav","r");
         RandomAccessFile aFile = new RandomAccessFile(
-                            "/home/jbf/public_html/autoplot/data/sav/doublearray.idlsav","r");
+                            "/home/jbf/public_html/autoplot/data/sav/structure.idlsav","r");
+        //RandomAccessFile aFile = new RandomAccessFile(
+        //                    "/home/jbf/public_html/autoplot/data/sav/structureWithinStructure.idlsav","r");
         FileChannel inChannel = aFile.getChannel();
         long fileSize = inChannel.size();
         ByteBuffer buffer = ByteBuffer.allocate((int) fileSize);
