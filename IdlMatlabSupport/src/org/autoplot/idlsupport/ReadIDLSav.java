@@ -66,19 +66,19 @@ public class ReadIDLSav {
      * @param pos
      * @return StringDesc to describe the string.
      */
-    private StringDesc readStringData( ByteBuffer rec, int pos ) {
+    private StringData readStringData( ByteBuffer rec, int pos ) {
         int len= rec.getInt(pos);
         byte[] mybytes= new byte[len];
         rec.position(pos+4);
         rec.get(mybytes);
-        StringDesc result= new StringDesc();
+        StringData result= new StringData();
         result.string= new String( mybytes );
         result._lengthBytes= 4 + Math.max( 4, (int)( 4 * Math.ceil( ( len ) / 4.0 ) ) ); 
         return result;
     }
     
     
-    private StringDesc readString( ByteBuffer rec, int pos ) {
+    private StringData readString( ByteBuffer rec, int pos ) {
         int endPos= pos;
         while ( rec.get(endPos)!=0 ) {
             endPos++;
@@ -86,7 +86,7 @@ public class ReadIDLSav {
         byte[] mybytes= new byte[endPos-pos];
         rec.position(pos);
         rec.get(mybytes);
-        StringDesc result= new StringDesc();
+        StringData result= new StringData();
         result.string= new String( mybytes );
         result._lengthBytes= Math.max( 4, (int)( 4 * Math.ceil( ( result.string.length() ) / 4.0 ) ) ); 
         return result;
@@ -145,7 +145,7 @@ public class ReadIDLSav {
             switch ( type ) {
                 case RECTYPE_VARIABLE:
                     logger.config("variable");
-                    StringDesc varName= readString( rec, 20 );
+                    StringData varName= readString( rec, 20 );
                     if ( varName.string.equals(name) ) {
                         int nextField= 20 + varName._lengthBytes;
                         ByteBuffer var= slice( rec, 20+nextField, rec.limit() );
@@ -220,14 +220,24 @@ public class ReadIDLSav {
         }
     }
     
-    public static class StringDesc {
-        String string;
+    /**
+     * structure containing a string and metadata used to read it.
+     */
+    public static class StringData {
+        public String string;
         int _lengthBytes; // note not necessarily the length of the string.
         @Override
         public String toString() {
             return string;
         }
-        
+    }
+    
+    /**
+     * structure containing an array and dimension information.
+     */
+    public static class ArrayData {
+        public Object array;
+        int[] dims;
     }
     
     public static class ArrayDesc {
@@ -276,6 +286,13 @@ public class ReadIDLSav {
         ArrayDesc arrayDesc;
         int offsToArray= 76;
         
+        private ArrayData makeArrayData( Object array ) {
+            ArrayData result= new ArrayData();
+            result.array= array;
+            result.dims= arrayDesc.dims;
+            return result;
+        }
+        
         /**
          * read the data as an array.  Note Java's arrays are 1-D,
          * and only 1-D arrays are used to return the data.  For
@@ -293,73 +310,74 @@ public class ReadIDLSav {
                     for ( int i=0; i<result.length; i++ ) {
                         result[i]= (short)buf.getInt(offsToArray+4*i);
                     }
-                    return result;
+                    return makeArrayData( result );
                 }
                 case TYPECODE_INT32: {
                     int[] result= new int[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
                         result[i]= buf.getInt(offsToArray+4*i);
                     }
-                    return result;
+                    return makeArrayData( result );
                 }
                 case TYPECODE_INT64: {
                     int[] result= new int[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
                         result[i]= buf.getInt(offsToArray+8*i);
                     }
-                    return result;
+                    return makeArrayData( result );
                 }
                 case TYPECODE_FLOAT: {
                     float[] result= new float[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
                         result[i]= buf.getFloat(offsToArray+4*i);
                     }
-                    return result;
+                    return makeArrayData( result );
                 }   
                 case TYPECODE_DOUBLE: {
                     double[] result= new double[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
                         result[i]= buf.getDouble(offsToArray+8*i);
                     }
-                    return result;
+                    return makeArrayData( result );
                 }
                 default:
                     break;
             }
             return null;
-        }
-        
-        /**
-         * read the data into 1-D and 2-D arrays.
-         * @param buf
-         * @return 
-         */
-        public Object readArrayData( ByteBuffer buf ) {
-            Object flattenedArray= readData(buf);
-            if ( flattenedArray==null ) return null;
-            
-            switch (arrayDesc.ndims) {
-                case 1:
-                    return flattenedArray;
-                case 2:
-                    Object result= Array.newInstance( flattenedArray.getClass(), arrayDesc.dims[0] );
-                    for ( int i=0; i<arrayDesc.dims[0]; i++ ) {
-                        Object a1= Array.newInstance( flattenedArray.getClass().getComponentType(), arrayDesc.dims[1] );
-                        int nj= arrayDesc.dims[1];
-                        for ( int j=0; j<nj; j++ ) {
-                            Array.set( a1, j, Array.get( flattenedArray, i*nj+j ) );
-                        }
-                        Array.set( result, i, a1 );
-                    }
-                    return result;
-                default:
-                    throw new UnsupportedOperationException("only 1-D and 2-D arrays are supported for now.");
-            }
-        }
-        
+        }        
         
     }
     
+    /**
+     * read the data into 1-D and 2-D arrays.  This is provided for reference, but 
+     * can be extended to 3-D and higher arrays, if the need arrises.
+     * @param data
+     * @return 
+     */
+    public static Object readArrayDataIntoArrayOfArrays( ArrayData data ) {
+        Object flattenedArray= data.array;
+        if ( flattenedArray==null ) return null;
+
+        switch ( data.dims.length ) {
+            case 1:
+                return flattenedArray;
+            case 2:
+                Object result= Array.newInstance( flattenedArray.getClass(), data.dims[0] );
+                for ( int i=0; i<data.dims[0]; i++ ) {
+                    Object a1= Array.newInstance( flattenedArray.getClass().getComponentType(), data.dims[1] );
+                    int nj= data.dims[1];
+                    for ( int j=0; j<nj; j++ ) {
+                        Array.set( a1, j, Array.get( flattenedArray, i*nj+j ) );
+                    }
+                    Array.set( result, i, a1 );
+                }
+                return result;
+            default:
+                throw new UnsupportedOperationException("only 1-D and 2-D arrays are supported for now.");
+        }
+    }
+
+        
     private static class TypeDescStructure extends TypeDesc {
         ArrayDesc arrayDesc;
         StructDesc structDesc;
@@ -367,7 +385,6 @@ public class ReadIDLSav {
         
         @Override
         Object readData(ByteBuffer data) {
-            ReadIDLSav.printBuffer(data);
             LinkedHashMap<String,Object> result= new LinkedHashMap<>();
             int iptr= offsetToData + 4;
             int iarray= 0;
@@ -439,7 +456,7 @@ public class ReadIDLSav {
         if ( rec.getInt(0)!=9 ) {
             throw new IllegalArgumentException("expected 9 for STRUCTSTART");
         }
-        StringDesc name= readString( rec, 4 );
+        StringData name= readString( rec, 4 );
         int nextField= name._lengthBytes + 4;
         
         final int PREDEF_PREDEF= 0x01;
@@ -474,7 +491,7 @@ public class ReadIDLSav {
         
         result.tagnames= new String[result.ntags];
         for ( int i=0; i<result.ntags; i++ ) {
-            StringDesc stringDesc= readStringData( rec, ipos );
+            StringData stringDesc= readStringData( rec, ipos );
             result.tagnames[i]= stringDesc.string;
             ipos+= stringDesc._lengthBytes;
         }
@@ -556,7 +573,7 @@ public class ReadIDLSav {
             throw new IllegalArgumentException("not a variable");
         }
         //printBuffer(rec);
-        StringDesc varName= readString( rec, 20 );
+        StringData varName= readString( rec, 20 );
         logger.log(Level.INFO, "variable name is {0}", varName );
 
         int nextField= 20 + varName._lengthBytes;
@@ -681,7 +698,7 @@ public class ReadIDLSav {
             switch ( type ) {
                 case RECTYPE_VARIABLE:
                     logger.config("variable");
-                    StringDesc varName= readString( rec, 20 );
+                    StringData varName= readString( rec, 20 );
 
                     int nextField= varName._lengthBytes;
 
@@ -730,7 +747,7 @@ public class ReadIDLSav {
             switch ( type ) {
                 case RECTYPE_VARIABLE:
                     logger.config("variable");
-                    StringDesc varName= readString( rec, 20 );
+                    StringData varName= readString( rec, 20 );
                     if ( varName.string.equals(name) ) {
                         Map<String,Object> result= new HashMap<>();
                         variable(rec, result);
@@ -775,7 +792,7 @@ public class ReadIDLSav {
             switch ( type ) {
                 case RECTYPE_VARIABLE:
                     logger.config("variable");
-                    StringDesc varName= readString( rec, 20 );
+                    StringData varName= readString( rec, 20 );
                     if ( varName.string.equals(name) ) {
                         int nextField= varName._lengthBytes;
                         ByteBuffer var= slice( rec, 20+nextField, rec.limit() );                        
