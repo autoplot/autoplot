@@ -34,7 +34,8 @@ public class ReadIDLSav {
     private static final int RECTYPE_VARIABLE = 2;
     private static final int RECTYPE_VERSION = 14;
     
-    private static final int VARFLAG_ARRAY = 4;
+    private static final int VARFLAG_ARRAY = 0x04;
+    private static final int VARFLAG_STRUCT = 0x20;
     
     /**
      * return the next record buffer, or returns null at the end.
@@ -58,23 +59,26 @@ public class ReadIDLSav {
     }
     
     /**
-     * somehow I didn't notice the length before other strings.  In the python 
+     * somehow I didn't notice the length before other strings.  In the Python 
      * code they have "_read_string" and "_read_string_data" which has a 
      * second length.
      * @param rec
      * @param pos
-     * @return 
+     * @return StringDesc to describe the string.
      */
-    private String readStringData( ByteBuffer rec, int pos ) {
+    private StringDesc readStringData( ByteBuffer rec, int pos ) {
         int len= rec.getInt(pos);
         byte[] mybytes= new byte[len];
         rec.position(pos+4);
         rec.get(mybytes);
-        return new String( mybytes );
+        StringDesc result= new StringDesc();
+        result.string= new String( mybytes );
+        result._lengthBytes= 4 + Math.max( 4, (int)( 4 * Math.ceil( ( len ) / 4.0 ) ) ); 
+        return result;
     }
     
     
-    private String readString( ByteBuffer rec, int pos ) {
+    private StringDesc readString( ByteBuffer rec, int pos ) {
         int endPos= pos;
         while ( rec.get(endPos)!=0 ) {
             endPos++;
@@ -82,10 +86,13 @@ public class ReadIDLSav {
         byte[] mybytes= new byte[endPos-pos];
         rec.position(pos);
         rec.get(mybytes);
-        return new String( mybytes );
+        StringDesc result= new StringDesc();
+        result.string= new String( mybytes );
+        result._lengthBytes= Math.max( 4, (int)( 4 * Math.ceil( ( result.string.length() ) / 4.0 ) ) ); 
+        return result;
     }
     
-    private void printBuffer( ByteBuffer rec ) {
+    private static void printBuffer( ByteBuffer rec ) {
         for ( int i=0; i<rec.limit(); i++ ) {
             byte c= rec.get(i);
             if ( i % 4 == 0 ) {
@@ -138,9 +145,9 @@ public class ReadIDLSav {
             switch ( type ) {
                 case RECTYPE_VARIABLE:
                     logger.config("variable");
-                    String varName= readString( rec, 20 );
-                    if ( varName.equals(name) ) {
-                        int nextField= ( int)( 4 * Math.ceil( ( varName.length() ) / 4.0 ) ); // Note they use a silly trick where the next field is known to have a 0. 
+                    StringDesc varName= readString( rec, 20 );
+                    if ( varName.string.equals(name) ) {
+                        int nextField= 20 + varName._lengthBytes;
                         ByteBuffer var= slice( rec, 20+nextField, rec.limit() );
                         TypeDesc td= readTypeDesc(var);
                         return td;
@@ -169,7 +176,7 @@ public class ReadIDLSav {
      */
     public boolean isArray(ByteBuffer in, String name) throws IOException {
         TypeDesc td= readTypeDesc(in, name);
-        return td.isArray();
+        return isArray( td.varFlags );
     }
     
     /**
@@ -180,7 +187,7 @@ public class ReadIDLSav {
      */
     public boolean isStructure(ByteBuffer in, String name) throws IOException {
         TypeDesc td= readTypeDesc(in, name);
-        return td.isStructure();
+        return isStructure( td.varFlags );
     }
         
     private static class TypeDescScalar extends TypeDesc {
@@ -213,6 +220,16 @@ public class ReadIDLSav {
         }
     }
     
+    public static class StringDesc {
+        String string;
+        int _lengthBytes; // note not necessarily the length of the string.
+        @Override
+        public String toString() {
+            return string;
+        }
+        
+    }
+    
     public static class ArrayDesc {
         int nbytesEl;
         int nbytes;
@@ -220,6 +237,10 @@ public class ReadIDLSav {
         int ndims;
         int nmax;
         int[] dims;
+        /**
+         * for convenience, keep track of the total length.
+         */
+        int _lengthBytes;
     }
 
     public static class TagDesc {
@@ -244,10 +265,16 @@ public class ReadIDLSav {
         String[] tagnames;
         ArrayDesc[] arrTable;
         StructDesc[] structTable;
+        String className;
+        int nsupClasses;
+        String[] supClassNames;
+        StructDesc[] supClassTable;
+        int _lengthBytes; // convenient place to store
     }
     
     private static class TypeDescArray extends TypeDesc {
         ArrayDesc arrayDesc;
+        int offsToArray= 76;
         
         /**
          * read the data as an array.  Note Java's arrays are 1-D,
@@ -264,7 +291,6 @@ public class ReadIDLSav {
                 case TYPECODE_INT16: {
                     short[] result= new short[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
-                        int offsToArray= 76;
                         result[i]= (short)buf.getInt(offsToArray+4*i);
                     }
                     return result;
@@ -272,7 +298,6 @@ public class ReadIDLSav {
                 case TYPECODE_INT32: {
                     int[] result= new int[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
-                        int offsToArray= 76;
                         result[i]= buf.getInt(offsToArray+4*i);
                     }
                     return result;
@@ -280,7 +305,6 @@ public class ReadIDLSav {
                 case TYPECODE_INT64: {
                     int[] result= new int[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
-                        int offsToArray= 76;
                         result[i]= buf.getInt(offsToArray+8*i);
                     }
                     return result;
@@ -288,7 +312,6 @@ public class ReadIDLSav {
                 case TYPECODE_FLOAT: {
                     float[] result= new float[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
-                        int offsToArray= 76;
                         result[i]= buf.getFloat(offsToArray+4*i);
                     }
                     return result;
@@ -296,7 +319,6 @@ public class ReadIDLSav {
                 case TYPECODE_DOUBLE: {
                     double[] result= new double[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
-                        int offsToArray= 76;
                         result[i]= buf.getDouble(offsToArray+8*i);
                     }
                     return result;
@@ -341,23 +363,43 @@ public class ReadIDLSav {
     private static class TypeDescStructure extends TypeDesc {
         ArrayDesc arrayDesc;
         StructDesc structDesc;
+        int offsetToData;
         
         @Override
         Object readData(ByteBuffer data) {
-            return null;
+            ReadIDLSav.printBuffer(data);
+            LinkedHashMap<String,Object> result= new LinkedHashMap<>();
+            int iptr= offsetToData + 4;
+            int iarray= 0;
+            for ( int i=0; i<structDesc.tagnames.length; i++ ) {
+                if ( isArray( structDesc.tagtable[i].tagflags ) ) {
+                    TypeDescArray arr1= new TypeDescArray();
+                    arr1.arrayDesc= structDesc.arrTable[iarray];
+                    arr1.offsToArray= iptr;
+                    arr1.typeCode= structDesc.tagtable[i].typecode;
+                    arr1.varFlags= structDesc.tagtable[i].tagflags;
+                    Object arr= arr1.readData(data);
+                    result.put( structDesc.tagnames[i], arr );
+                    iarray= iarray+1;
+                    iptr= iptr + arr1.arrayDesc.nbytes;
+                }
+            }
+            return result;
         }
         
+    }
+    
+    private static boolean isArray( int varFlags ) {
+        return ( varFlags & 0x04 ) == 0x04;
+    }
+    
+    private static boolean isStructure( int varFlags ) {
+        return ( varFlags & 0x20 ) == 0x20;
     }
     
     private static abstract class TypeDesc {
         int typeCode;
         int varFlags;
-        boolean isArray( ) {
-            return ( varFlags & 0x04 ) == 0x04;
-        }
-        boolean isStructure( ) {
-            return ( varFlags & 0x20 ) == 0x20;
-        }
         /**
          * read the data, where data is a byte buffer starting
          * with the TypeDesc.
@@ -386,8 +428,9 @@ public class ReadIDLSav {
         result.nmax= rec.getInt(28);
         result.dims= new int[result.ndims];
         for ( int i=0; i<result.ndims; i++ ){
-            result.dims[i]= rec.getInt(32+4*i);
+            result.dims[result.ndims-1-i]= rec.getInt(32+4*i);
         }
+        result._lengthBytes= 32+4*result.nmax;
         return result;
     }
     
@@ -396,24 +439,69 @@ public class ReadIDLSav {
         if ( rec.getInt(0)!=9 ) {
             throw new IllegalArgumentException("expected 9 for STRUCTSTART");
         }
-        String name= readString( rec, 4 );
-        int nextField= 4+ (int)( 4 * Math.ceil( ( name.length() ) / 4.0 ) ); 
-        if ( name.length()==0 ) nextField+= 4;
+        StringDesc name= readString( rec, 4 );
+        int nextField= name._lengthBytes + 4;
+        
+        final int PREDEF_PREDEF= 0x01;
+        final int PREDEF_INHERITS= 0x02;
+        final int PREDEF_IS_SUPER= 0x02;
+        
         result.predef= rec.getInt(nextField+0);
+        
+        if ( ( result.predef & PREDEF_PREDEF ) == PREDEF_PREDEF ) {
+            //not supported.
+            logger.warning("PREDEF predefined structures are not supported.");
+            return null;
+        }
+        
         result.ntags= rec.getInt(nextField+4); 
         result.nbytes= rec.getInt(nextField+8);
         result.tagtable= new TagDesc[result.ntags];
         int ipos= nextField + 12;
+        
+        int narray= 0;
+        int nstruct= 0;
         for ( int i=0; i<result.ntags; i++ ) {
             result.tagtable[i]= readTagDesc( slice( rec, ipos, ipos+12 ) );
+            if ( ( result.tagtable[i].tagflags & VARFLAG_ARRAY ) == VARFLAG_ARRAY ) {
+                narray++;
+            }
+            if ( ( result.tagtable[i].tagflags & VARFLAG_STRUCT ) == VARFLAG_STRUCT ) {
+                nstruct++;
+            }
             ipos+= 12;
         }
+        
         result.tagnames= new String[result.ntags];
         for ( int i=0; i<result.ntags; i++ ) {
-            result.tagnames[i]= readStringData( rec, ipos );
-            ipos+= 4 + (int)( 4 * Math.ceil( ( result.tagnames[i].length() ) / 4.0 ) ); 
+            StringDesc stringDesc= readStringData( rec, ipos );
+            result.tagnames[i]= stringDesc.string;
+            ipos+= stringDesc._lengthBytes;
         }
-        return result;
+        
+        result.arrTable= new ArrayDesc[narray];
+        for ( int i=0; i<narray; i++ ) {
+            result.arrTable[i]= readArrayDesc( slice( rec, ipos, rec.limit() ) );
+            ipos+= result.arrTable[i]._lengthBytes;           
+        }
+        
+        result.structTable= new StructDesc[nstruct];
+        for ( int i=0; i<nstruct; i++ ) {
+            result.structTable[i]= readStructDesc( slice( rec, ipos, rec.limit() ) );
+            ipos+= result.structTable[i]._lengthBytes;           
+        }
+        if ( ( result.predef & PREDEF_INHERITS ) == PREDEF_INHERITS
+              || ( result.predef & PREDEF_IS_SUPER ) == PREDEF_IS_SUPER ) {
+            //StringDesc stringDesc= readStringData( rec, ipos );
+            //result.className= stringDesc.string;
+            //result.nsupClasses= rec.getInt(ipos);
+            logger.warning("PREDEF classes are not supported.");
+            return null;
+        } else {
+            result._lengthBytes= ipos;
+            return result;
+        }
+                
     }
     
     private TypeDescStructure readTypeDescStructure( ByteBuffer rec ) {
@@ -422,6 +510,7 @@ public class ReadIDLSav {
         result.varFlags= rec.getInt(4);
         result.arrayDesc= readArrayDesc( slice( rec, 8, rec.limit() ) );
         result.structDesc= readStructDesc( slice( rec, 10*4+result.arrayDesc.nmax*4, rec.limit() ) );
+        result.offsetToData= 10*4+result.arrayDesc.nmax*4 + result.structDesc._lengthBytes;
         return result;
     }
     
@@ -439,10 +528,14 @@ public class ReadIDLSav {
      * @return 
      */
     private TypeDesc readTypeDesc( ByteBuffer typeDescBuf ) {
+        int typeCode= typeDescBuf.getInt(0);
+        if ( typeCode<0 || typeCode>14 ) {
+            throw new IllegalArgumentException("expected 0-14 for type code in readTypeDesc");
+        }
         int varFlags= typeDescBuf.getInt(4);
-        if ( ( varFlags & 0x20 ) == 0x20 ) {
+        if ( ( varFlags & VARFLAG_STRUCT ) == VARFLAG_STRUCT ) {
             return readTypeDescStructure(typeDescBuf);
-        } else if ( ( varFlags & 0x04 ) == 0x04 ) {
+        } else if ( ( varFlags & VARFLAG_ARRAY ) == VARFLAG_ARRAY ) {
             return readTypeDescArray(typeDescBuf);
         } else {
             return readTypeDescScalar(typeDescBuf);
@@ -463,17 +556,17 @@ public class ReadIDLSav {
             throw new IllegalArgumentException("not a variable");
         }
         //printBuffer(rec);
-        String varName= readString( rec, 20 );
+        StringDesc varName= readString( rec, 20 );
         logger.log(Level.INFO, "variable name is {0}", varName );
 
-        int nextField= ( int)( 4 * Math.ceil( ( varName.length() ) / 4.0 ) ); // Note they use a silly trick where the next field is known to have a 0. 
+        int nextField= 20 + varName._lengthBytes;
 
-        ByteBuffer var= slice( rec, 20+nextField, rec.limit() );
+        ByteBuffer var= slice( rec, nextField, rec.limit() );
         TypeDesc typeDesc= readTypeDesc( var );
         
         Object result= typeDesc.readData( var );
         
-        vars.put( varName, result );
+        vars.put( varName.string, result );
         
         return result;
         
@@ -588,15 +681,15 @@ public class ReadIDLSav {
             switch ( type ) {
                 case RECTYPE_VARIABLE:
                     logger.config("variable");
-                    String varName= readString( rec, 20 );
+                    StringDesc varName= readString( rec, 20 );
 
-                    int nextField= ( int)( 4 * Math.ceil( ( varName.length() ) / 4.0 ) ); // Note they use a silly trick where the next field is known to have a 0. 
+                    int nextField= varName._lengthBytes;
 
                     ByteBuffer var= slice( rec, 20+nextField, rec.limit() );
                     TypeDesc typeDesc= readTypeDesc( var );
                     
-                    if ( !typeDesc.isStructure() ) {
-                        names.add(varName); 
+                    if ( !isStructure(typeDesc.varFlags) ) {
+                        names.add(varName.string); 
                     }
                     break;
                 case RECTYPE_VERSION:
@@ -637,8 +730,8 @@ public class ReadIDLSav {
             switch ( type ) {
                 case RECTYPE_VARIABLE:
                     logger.config("variable");
-                    String varName= readString( rec, 20 );
-                    if ( varName.equals(name) ) {
+                    StringDesc varName= readString( rec, 20 );
+                    if ( varName.string.equals(name) ) {
                         Map<String,Object> result= new HashMap<>();
                         variable(rec, result);
                         return result.get(name);
@@ -682,9 +775,9 @@ public class ReadIDLSav {
             switch ( type ) {
                 case RECTYPE_VARIABLE:
                     logger.config("variable");
-                    String varName= readString( rec, 20 );
-                    if ( varName.equals(name) ) {
-                        int nextField= ( int)( 4 * Math.ceil( ( varName.length() ) / 4.0 ) ); // Note they use a silly trick where the next field is known to have a 0. 
+                    StringDesc varName= readString( rec, 20 );
+                    if ( varName.string.equals(name) ) {
+                        int nextField= varName._lengthBytes;
                         ByteBuffer var= slice( rec, 20+nextField, rec.limit() );                        
                         return readTypeDescArray(var).arrayDesc;
                     }
@@ -733,9 +826,11 @@ public class ReadIDLSav {
         //RandomAccessFile aFile = new RandomAccessFile(
         //                    "/home/jbf/public_html/autoplot/data/sav/floats.idlsav","r");
         //RandomAccessFile aFile = new RandomAccessFile(
-        //                    "/home/jbf/public_html/autoplot/data/sav/doublearray.idlsav","r");
+        //                /home/jbf/public_html/autoplot/data/sav/structureOfLonarr.idlsav    "/home/jbf/public_html/autoplot/data/sav/doublearray.idlsav","r");
         RandomAccessFile aFile = new RandomAccessFile(
-                            "/home/jbf/public_html/autoplot/data/sav/structure.idlsav","r");
+                            "/home/jbf/public_html/autoplot/data/sav/structureOfLonarr.idlsav","r");
+        //RandomAccessFile aFile = new RandomAccessFile(
+        //                    "/home/jbf/public_html/autoplot/data/sav/structure.idlsav","r");
         //RandomAccessFile aFile = new RandomAccessFile(
         //                    "/home/jbf/public_html/autoplot/data/sav/structureWithinStructure.idlsav","r");
         FileChannel inChannel = aFile.getChannel();
