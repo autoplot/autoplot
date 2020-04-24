@@ -148,7 +148,7 @@ public class ReadIDLSav {
                     StringData varName= readString( rec, 20 );
                     if ( varName.string.equals(name) ) {
                         int nextField= 20 + varName._lengthBytes;
-                        ByteBuffer var= slice( rec, 20+nextField, rec.limit() );
+                        ByteBuffer var= slice( rec, nextField, rec.limit() );
                         TypeDesc td= readTypeDesc(var);
                         return td;
                     }
@@ -703,11 +703,9 @@ public class ReadIDLSav {
                     int nextField= varName._lengthBytes;
 
                     ByteBuffer var= slice( rec, 20+nextField, rec.limit() );
-                    TypeDesc typeDesc= readTypeDesc( var );
                     
-                    if ( !isStructure(typeDesc.varFlags) ) {
-                        names.add(varName.string); 
-                    }
+                    names.add(varName.string); 
+
                     break;
                 case RECTYPE_VERSION:
                     logger.config("version");
