@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.autoplot.datasource.AbstractDataSourceFactory;
 import org.autoplot.datasource.CompletionContext;
 import org.autoplot.datasource.DataSetURI;
@@ -38,6 +39,17 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
     private void addCompletions( ReadIDLSav reader, String root, String key, ByteBuffer buf, List<CompletionContext> ccresult ) throws IOException {
         String keyn= root==null ? key : root + "." + key;
         
+        if ( root!=null ) {
+            Object o= reader.readVar( buf, root );
+            Map<String,Object> m= (Map<String,Object>)o;
+            
+            for ( Entry<String,Object> e: m.entrySet() ) {
+                CompletionContext cc1= new CompletionContext( 
+                    CompletionContext.CONTEXT_PARAMETER_NAME,
+                    keyn, this, "arg_0", root + "." + key, "", true );
+                ccresult.add(cc1);
+            }            
+        }
         if ( reader.isArray( buf, key ) ) {
             ArrayDesc desc= reader.readArrayDesc( buf, key );
             StringBuilder sqube= new StringBuilder("[").append(String.valueOf(desc.dims[0]));
@@ -47,12 +59,12 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             sqube.append("]");
             CompletionContext cc1= new CompletionContext( 
                     CompletionContext.CONTEXT_PARAMETER_NAME,
-                    keyn, this, "arg_0", keyn+" " +sqube, "" );
+                    keyn, this, "arg_0", keyn+" " +sqube, "", true );
             ccresult.add(cc1);
         } else {
             CompletionContext cc1= new CompletionContext( 
                     CompletionContext.CONTEXT_PARAMETER_NAME,
-                    keyn, this, "arg_0", keyn+" scalar", "" );
+                    keyn, this, "arg_0", keyn+" scalar", "", true );
             ccresult.add(cc1);
         }
 
@@ -66,8 +78,21 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             ByteBuffer buf= ReadIDLSav.readFileIntoByteBuffer(file);
             String[] names= new ReadIDLSav().readVarNames(buf);
             ReadIDLSav reader= new ReadIDLSav();
-            for ( int i=0; i<names.length; i++ ) {
-                addCompletions( reader, null, names[i], buf, ccresult );
+            if ( cc.completable.contains(".") ) {
+                int i= cc.completable.indexOf('.');
+                String root= cc.completable.substring(0,i);
+                Object o= reader.readVar( buf, root );
+                Map<String,Object> m= (Map<String,Object>)o;
+                for ( Entry<String,Object> e: m.entrySet() ) {
+                    CompletionContext cc1= new CompletionContext( 
+                        CompletionContext.CONTEXT_PARAMETER_NAME,
+                        root + "." + e.getKey(), this, "arg_0", root + "." + e.getKey(), "", true );
+                    ccresult.add(cc1);
+                }
+            } else {
+                for ( int i=0; i<names.length; i++ ) {
+                    addCompletions( reader, null, names[i], buf, ccresult );
+                }
             }
             return ccresult;
         } else {
