@@ -428,7 +428,7 @@ public class ReadIDLSav {
         result.nmax= rec.getInt(28);
         result.dims= new int[result.ndims];
         for ( int i=0; i<result.ndims; i++ ){
-            result.dims[result.ndims-1-i]= rec.getInt(32+4*i);
+            result.dims[result.ndims-1-i]= rec.getInt(32+4*i); 
         }
         result._lengthBytes= 32+4*result.nmax;
         return result;
