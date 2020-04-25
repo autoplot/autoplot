@@ -46,19 +46,38 @@ public class IdlsavDataSource extends AbstractDataSource {
         }
 
         ReadIDLSav reader= new ReadIDLSav();
-        Object v= reader.readVar( buffer, arg );        
         
-        if ( v==null ) {
-            if ( reader.isStructure( buffer, arg ) ) {
-                throw new IllegalArgumentException("structures are not supported");
+        Object v;
+        
+        int i= arg.indexOf('.');
+        String t=arg;
+        if ( i>-1 ) { // structure
+            String h= t.substring(0,i);
+            t= t.substring(i+1);
+            v= reader.readVar( buffer, h );
+            if ( !( v instanceof Map ) ) {
+                throw new IllegalArgumentException("expected map for '"+h+"'");
             } else {
-                throw new IllegalArgumentException("unable to find variable: "+arg);
+                i= t.indexOf('.');
+                if ( i==-1 ) {
+                    v= ((Map)v).get(t);
+                } else {
+                    throw new IllegalArgumentException("nested strctures are not supported.");
+                }
             }
+        } else {
+            v= reader.readVar( buffer, arg );
         }
         
-        if ( v.getClass().isArray() ) {
-            ReadIDLSav.ArrayDesc meta= reader.readArrayDesc( buffer, arg );
-            return ArrayDataSet.wrap( v, meta.dims, false );
+        if ( v==null ) {
+            throw new IllegalArgumentException("unable to find variable or not supported: "+arg);
+        }
+        
+        if ( v instanceof ReadIDLSav.ArrayData ) {
+            ReadIDLSav.ArrayData arrayData= (ReadIDLSav.ArrayData)v;
+            return ArrayDataSet.wrap( arrayData.array, arrayData.dims, false );
+        } else if ( v instanceof Map ) { 
+            throw new IllegalArgumentException("Map is not supported, select one of its tags");
         } else {
             return Ops.dataset(v);
         }
