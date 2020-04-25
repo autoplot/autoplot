@@ -2,7 +2,6 @@
 package org.autoplot.idlsupport;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
@@ -21,8 +20,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * read data from IDL Save File
+ * Read data from IDL Save Files.  This was written using
  * http://www.physics.wisc.edu/~craigm/idl/savefmt/node20.html
+ * https://cow.physics.wisc.edu/~craigm/idl/savefmt.pdf
+ * and https://github.com/scipy/scipy/blob/master/scipy/io/idl.py
+ * for reference, and with no involvement from individuals at
+ * Harris Geospacial.  No warrenties are implied and this must
+ * be used at your own risk.
+ * 
  * @author jbf
  */
 public class ReadIDLSav {
@@ -124,6 +129,17 @@ public class ReadIDLSav {
     private static final int TYPECODE_INT64=14;
 
     /**
+     * return the size of the IDL data type in bytes.  Note shorts are stored
+     * in 4-bytes.
+     * @param typeCode
+     * @return 
+     */
+    private static int sizeOf( int typeCode ) {
+        int[] sizes= new int[] { 0, 4, 4, 4, 4,   8, 8, 0, 0, 16,   0, 0, 0, 0, 8 };
+        return sizes[typeCode];
+    }
+    
+    /**
      * read the TypeDesc for the variable.
      * @param in
      * @param name
@@ -191,30 +207,32 @@ public class ReadIDLSav {
     }
         
     private static class TypeDescScalar extends TypeDesc {
+        int offs= 12;
         @Override
         Object readData( ByteBuffer buf ) {
-            int offs= 12;
             switch ( typeCode ) {
                 case TYPECODE_INT16:
                     return (short)buf.getInt(offs);
                 case TYPECODE_INT32:
                     return buf.getInt(offs);
+                case TYPECODE_INT64:
+                    return buf.getLong(offs);
                 case TYPECODE_FLOAT:
                     return buf.getFloat(offs);
+                case TYPECODE_DOUBLE:
+                    return buf.getDouble(offs);
                 case TYPECODE_STRING:
                     int len= buf.getInt(offs);
                     byte[] bb= new byte[len];
                     for ( int i=0; i<len; i++ ) {
                         bb[i]= buf.get(offs+8+i);
                     }
-                    //buf.get( bb, offs+8, len );
                     try {
                         return new String( bb, "US-ASCII" );
                     } catch (UnsupportedEncodingException ex) {
                         throw new IllegalArgumentException(ex);
                     }
                 default:
-                    
                     throw new IllegalArgumentException("unsupported");
             }
         }
@@ -377,28 +395,95 @@ public class ReadIDLSav {
         }
     }
 
+    private static Class getPrimativeClass( Class t ) {
+        if ( t==Integer.class ) {
+            return int.class;
+        } else if ( t==Long.class ) {
+            return long.class;
+        } else if ( t==Short.class ) {
+            return short.class;
+        } else if ( t==Double.class ) {
+            return double.class;
+        } else if ( t==Float.class ) {
+            return float.class;
+        } else {
+            throw new UnsupportedOperationException("not implemented: "+t);
+        }
+    }
         
     private static class TypeDescStructure extends TypeDesc {
-        ArrayDesc arrayDesc;
+        ArrayDesc structArrayDesc;
         StructDesc structDesc;
         int offsetToData;
         
         @Override
         Object readData(ByteBuffer data) {
-            LinkedHashMap<String,Object> result= new LinkedHashMap<>();
-            int iptr= offsetToData + 4;
-            int iarray= 0;
-            for ( int i=0; i<structDesc.tagnames.length; i++ ) {
-                if ( isArray( structDesc.tagtable[i].tagflags ) ) {
-                    TypeDescArray arr1= new TypeDescArray();
-                    arr1.arrayDesc= structDesc.arrTable[iarray];
-                    arr1.offsToArray= iptr;
-                    arr1.typeCode= structDesc.tagtable[i].typecode;
-                    arr1.varFlags= structDesc.tagtable[i].tagflags;
-                    Object arr= arr1.readData(data);
-                    result.put( structDesc.tagnames[i], arr );
-                    iarray= iarray+1;
-                    iptr= iptr + arr1.arrayDesc.nbytes;
+            LinkedHashMap<String,Object> result;
+            if ( structArrayDesc.nelements>1 ) {
+                result= new LinkedHashMap<>();
+                int iptr= offsetToData + 4;
+                for ( int j=0; j<structArrayDesc.nelements; j++ ) {
+                    int iarray= 0;
+                    for ( int i=0; i<structDesc.tagnames.length; i++ ) {
+                        if ( isArray( structDesc.tagtable[i].tagflags ) ) {
+                            TypeDescArray arr1= new TypeDescArray();
+                            arr1.arrayDesc= structDesc.arrTable[iarray];
+                            arr1.offsToArray= iptr;
+                            arr1.typeCode= structDesc.tagtable[i].typecode;
+                            arr1.varFlags= structDesc.tagtable[i].tagflags;
+                            Object arr= arr1.readData(data);
+                            if ( j==0 && arr instanceof ArrayData ) {
+                                ArrayData ad= (ArrayData)arr;
+                                ArrayData accumulator= new ArrayData();
+                                accumulator.dims= new int[ad.dims.length+1];
+                                accumulator.dims[0]= structArrayDesc.nelements;
+                                System.arraycopy( ad.dims, 0, accumulator.dims, 1, ad.dims.length );
+                                accumulator.array= Array.newInstance( ad.array.getClass(), structArrayDesc.nelements );
+                                Array.set( accumulator.array, j, ad.array );
+                                result.put( structDesc.tagnames[i], accumulator );
+                            } else {
+                                ArrayData ad= (ArrayData)arr;
+                                ArrayData accumulator= (ArrayData) result.get( structDesc.tagnames[i] );
+                                Array.set( accumulator.array, j, ad.array );
+                            }
+                            iarray= iarray+1;
+                            iptr= iptr + arr1.arrayDesc.nbytes;
+                        } else if ( !isStructure( structDesc.tagtable[i].tagflags ) ) {
+                            TypeDescScalar scalarTypeDesc= new TypeDescScalar();
+                            scalarTypeDesc.offs= iptr;
+                            scalarTypeDesc.typeCode= structDesc.tagtable[i].typecode;
+                            Object scalar= scalarTypeDesc.readData(data);                            
+                            if ( j==0 ) {
+                                if ( scalar.getClass().isArray() ) throw new IllegalArgumentException("scalar should be array");
+                                ArrayData accumulator= new ArrayData();
+                                accumulator.dims= new int[] {  structArrayDesc.nelements };
+                                Class t= getPrimativeClass( scalar.getClass() );
+                                accumulator.array= Array.newInstance( t, structArrayDesc.nelements );
+                                result.put( structDesc.tagnames[i], accumulator );
+                            } else {
+                                ArrayData accumulator= (ArrayData) result.get( structDesc.tagnames[i] );
+                                Array.set( accumulator.array, j, scalar );
+                            }
+                            iptr= iptr + sizeOf( scalarTypeDesc.typeCode );
+                        }
+                    }
+                }
+            } else {
+                result= new LinkedHashMap<>();
+                int iptr= offsetToData + 4;
+                int iarray= 0;
+                for ( int i=0; i<structDesc.tagnames.length; i++ ) {
+                    if ( isArray( structDesc.tagtable[i].tagflags ) ) {
+                        TypeDescArray arr1= new TypeDescArray();
+                        arr1.arrayDesc= structDesc.arrTable[iarray];
+                        arr1.offsToArray= iptr;
+                        arr1.typeCode= structDesc.tagtable[i].typecode;
+                        arr1.varFlags= structDesc.tagtable[i].tagflags;
+                        Object arr= arr1.readData(data);
+                        result.put( structDesc.tagnames[i], arr );
+                        iarray= iarray+1;
+                        iptr= iptr + arr1.arrayDesc.nbytes;
+                    }
                 }
             }
             return result;
@@ -525,9 +610,9 @@ public class ReadIDLSav {
         TypeDescStructure result= new TypeDescStructure();
         result.typeCode= rec.getInt(0);
         result.varFlags= rec.getInt(4);
-        result.arrayDesc= readArrayDesc( slice( rec, 8, rec.limit() ) );
-        result.structDesc= readStructDesc( slice( rec, 10*4+result.arrayDesc.nmax*4, rec.limit() ) );
-        result.offsetToData= 10*4+result.arrayDesc.nmax*4 + result.structDesc._lengthBytes;
+        result.structArrayDesc= readArrayDesc( slice( rec, 8, rec.limit() ) );
+        result.structDesc= readStructDesc( slice( rec, 10*4+result.structArrayDesc.nmax*4, rec.limit() ) );
+        result.offsetToData= 10*4+result.structArrayDesc.nmax*4 + result.structDesc._lengthBytes;
         return result;
     }
     
@@ -842,8 +927,12 @@ public class ReadIDLSav {
         //                    "/home/jbf/public_html/autoplot/data/sav/floats.idlsav","r");
         //RandomAccessFile aFile = new RandomAccessFile(
         //                /home/jbf/public_html/autoplot/data/sav/structureOfLonarr.idlsav    "/home/jbf/public_html/autoplot/data/sav/doublearray.idlsav","r");
+        //RandomAccessFile aFile = new RandomAccessFile(
+        //                  "/home/jbf/public_html/autoplot/data/sav/structureOfLonarr.idlsav","r");
         RandomAccessFile aFile = new RandomAccessFile(
-                            "/home/jbf/public_html/autoplot/data/sav/structureOfLonarr.idlsav","r");
+                            "/home/jbf/public_html/autoplot/data/sav/arrayOfStruct.idlsav","r");
+        //RandomAccessFile aFile = new RandomAccessFile(
+        //                    "/home/jbf/public_html/autoplot/data/sav/arrayOfStruct1Var.idlsav","r");
         //RandomAccessFile aFile = new RandomAccessFile(
         //                    "/home/jbf/public_html/autoplot/data/sav/structure.idlsav","r");
         //RandomAccessFile aFile = new RandomAccessFile(
