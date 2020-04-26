@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -256,6 +257,14 @@ public class ReadIDLSav {
     public static class ArrayData {
         public Object array;
         int[] dims;
+        public String toString() {
+            StringBuilder b= new StringBuilder("["+dims[0]);
+            for ( int i=1; i<dims.length; i++ ) {
+                b.append(",").append(dims[i]);
+            }
+            b.append("]");
+            return "" + this.array.getClass().getComponentType().getName() + b.toString();            
+        }
     }
     
     public static class ArrayDesc {
@@ -266,7 +275,7 @@ public class ReadIDLSav {
         int nmax;
         int[] dims;
         /**
-         * for convenience, keep track of the total length.
+         * for convenience, keep track of the total length of the descriptor.
          */
         int _lengthBytes;
     }
@@ -303,6 +312,7 @@ public class ReadIDLSav {
     private static class TypeDescArray extends TypeDesc {
         ArrayDesc arrayDesc;
         int offsToArray= 76;
+        int _lengthBytes; // length of the array.
         
         private ArrayData makeArrayData( Object array ) {
             ArrayData result= new ArrayData();
@@ -322,6 +332,7 @@ public class ReadIDLSav {
          */
         @Override
         Object readData( ByteBuffer buf ) {
+            _lengthBytes= sizeOf(typeCode) * arrayDesc.nelements;
             switch (typeCode) {
                 case TYPECODE_INT16: {
                     short[] result= new short[arrayDesc.nelements];
@@ -362,7 +373,17 @@ public class ReadIDLSav {
                     break;
             }
             return null;
-        }        
+        }
+        
+        @Override
+        public String toString() {
+            StringBuilder b= new StringBuilder("["+this.arrayDesc.dims[0]);
+            for ( int i=1; i<this.arrayDesc.ndims; i++ ) {
+                b.append(",").append(this.arrayDesc.dims[i]);
+            }
+            b.append("]");
+            return "" + this.typeCode + b.toString();
+        }
         
     }
     
@@ -445,9 +466,10 @@ public class ReadIDLSav {
                                 ArrayData ad= (ArrayData)arr;
                                 ArrayData accumulator= (ArrayData) result.get( structDesc.tagnames[i] );
                                 Array.set( accumulator.array, j, ad.array );
+                                System.err.println(""+i+","+j+":"+ad);
                             }
                             iarray= iarray+1;
-                            iptr= iptr + arr1.arrayDesc.nbytes;
+                            iptr= iptr + arr1._lengthBytes;
                         } else if ( !isStructure( structDesc.tagtable[i].tagflags ) ) {
                             TypeDescScalar scalarTypeDesc= new TypeDescScalar();
                             scalarTypeDesc.offs= iptr;
@@ -459,10 +481,13 @@ public class ReadIDLSav {
                                 accumulator.dims= new int[] {  structArrayDesc.nelements };
                                 Class t= getPrimativeClass( scalar.getClass() );
                                 accumulator.array= Array.newInstance( t, structArrayDesc.nelements );
+                                Array.set( accumulator.array, j, scalar );
                                 result.put( structDesc.tagnames[i], accumulator );
+                                System.err.println(""+i+","+j+":"+scalar);
                             } else {
                                 ArrayData accumulator= (ArrayData) result.get( structDesc.tagnames[i] );
                                 Array.set( accumulator.array, j, scalar );
+                                System.err.println(""+i+","+j+":"+scalar);
                             }
                             iptr= iptr + sizeOf( scalarTypeDesc.typeCode );
                         }
@@ -659,7 +684,7 @@ public class ReadIDLSav {
         }
         //printBuffer(rec);
         StringData varName= readString( rec, 20 );
-        logger.log(Level.INFO, "variable name is {0}", varName );
+        logger.log(Level.FINE, "variable name is {0}", varName );
 
         int nextField= 20 + varName._lengthBytes;
 
@@ -898,9 +923,28 @@ public class ReadIDLSav {
         return null;        
     }
     
+    private static void arrayToString( Object o, StringBuilder b ) {
+        char delim=',';
+        for ( int j=0; j<4; j++ ) {
+            Object i= Array.get(o,j);
+            if ( i.getClass().isArray() ) {
+                delim=';';
+                if ( j>0 ) b.append(delim);
+                arrayToString( i, b );
+            } else {
+                if ( j>0 ) b.append(delim);
+                b.append(i.toString());
+            }
+        }
+        if ( Array.getLength(o)>4 ) {
+            b.append(delim);
+            b.append("...");
+        }
+    }
+    
     public static void main( String[] args ) throws IOException {
         Logger logger= Logger.getLogger("autoplot.idlsav");
-        logger.setLevel( Level.FINE );
+        //logger.setLevel( Level.FINE );
         Handler h= new ConsoleHandler();
         h.setLevel(Level.ALL);
         logger.addHandler(h);
@@ -946,7 +990,27 @@ public class ReadIDLSav {
         }
        
         Map<String,Object> vars= new ReadIDLSav().readVars(buffer);
-        vars.get("da");
+        
+        for ( Entry<String,Object> v : vars.entrySet() ) {
+            System.err.println( v );
+            if ( v.getValue() instanceof Map ) {
+                Map<String,Object> m= (Map<String,Object>)v.getValue();
+                for ( Entry<String,Object> j : m.entrySet() ) {
+                    Object k= j.getValue();
+                    if ( k instanceof ArrayData ) {
+                        System.err.print(j.getKey()+":");
+                        StringBuilder b= new StringBuilder();
+                        arrayToString( ((ArrayData)k).array, b);
+                        System.err.println(b.toString());
+                    } else {
+                        System.err.println(k.toString());
+                    }
+                }
+            } else {
+                System.err.println(v.getValue());
+            }
+        }
+        
     }
 
 }
