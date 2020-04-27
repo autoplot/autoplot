@@ -948,7 +948,7 @@ public class ReadIDLSav {
             logger.warning("magic number is incorrect");
         }
         int pos= 4;
-        
+        String name0= name; // keep name for reference.
         ByteBuffer rec= readRecord( in, pos );
         while ( rec!=null ) {
             int type= rec.getInt(0);
@@ -978,8 +978,9 @@ public class ReadIDLSav {
                             assert rest!=null;
                             i= rest.indexOf('.');
                             while ( i>-1 ) {
+                                i= rest.indexOf('.');
                                 res= (Map<String,Object>)res.get( rest.substring(0,i) );
-                                rest= rest.substring(i+1);
+                                rest= rest.substring(i+1);                                
                             }
                             return res.get(rest);
                         }
