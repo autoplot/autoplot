@@ -69,6 +69,7 @@ public class IdlsavDataSource extends AbstractDataSource {
                 throw new IllegalArgumentException("expected map for '"+h+"'");
             } else {
                 v= getFromStructure( ((Map)v), t );
+                if ( v==null ) throw new IllegalArgumentException("unable to find variable: "+arg);
             }
         } else {
             v= reader.readVar( buffer, arg );
