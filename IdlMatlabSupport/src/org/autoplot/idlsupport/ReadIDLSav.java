@@ -255,8 +255,13 @@ public class ReadIDLSav {
      * structure containing an array and dimension information.
      */
     public static class ArrayData {
-        public Object array;
+        Object array;
         int[] dims;
+        /** 
+         * number of bytes within the IDLSAV file.
+         */
+        int _lengthBytes; 
+        @Override
         public String toString() {
             StringBuilder b= new StringBuilder("["+dims[0]);
             for ( int i=1; i<dims.length; i++ ) {
@@ -275,7 +280,7 @@ public class ReadIDLSav {
         int nmax;
         int[] dims;
         /**
-         * for convenience, keep track of the total length of the descriptor.
+         * for convenience, keep track of the total length of the descriptor within the IDLSAV file.
          */
         int _lengthBytes;
     }
@@ -306,7 +311,10 @@ public class ReadIDLSav {
         int nsupClasses;
         String[] supClassNames;
         StructDesc[] supClassTable;
-        int _lengthBytes; // convenient place to store
+        /**
+         * length of the descriptor within the IDLSAV file.
+         */
+        int _lengthBytes; 
     }
     
     private static class TypeDescArray extends TypeDesc {
@@ -436,6 +444,10 @@ public class ReadIDLSav {
         ArrayDesc structArrayDesc;
         StructDesc structDesc;
         int offsetToData;
+        /**
+         * length of the data within the IDLSav file.
+         */
+        int _lengthBytes;
         
         @Override
         Object readData(ByteBuffer data) {
@@ -443,6 +455,7 @@ public class ReadIDLSav {
             if ( structArrayDesc.nelements>1 ) {
                 result= new LinkedHashMap<>();
                 int iptr= offsetToData + 4;
+                int iptr0= iptr;
                 for ( int j=0; j<structArrayDesc.nelements; j++ ) {
                     int iarray= 0;
                     for ( int i=0; i<structDesc.tagnames.length; i++ ) {
@@ -493,12 +506,27 @@ public class ReadIDLSav {
                         }
                     }
                 }
+                this._lengthBytes= iptr-iptr0;
             } else {
                 result= new LinkedHashMap<>();
                 int iptr= offsetToData + 4;
+                int iptr0= iptr;
                 int iarray= 0;
+                int istructure= 0;
                 for ( int i=0; i<structDesc.tagnames.length; i++ ) {
-                    if ( isArray( structDesc.tagtable[i].tagflags ) ) {
+                    if ( isStructure( structDesc.tagtable[i].tagflags ) ) {
+                        TypeDescStructure struct1= new TypeDescStructure();
+                        StructDesc structDesc1= structDesc.structTable[istructure];
+                        struct1.structDesc= structDesc1;
+                        struct1.structArrayDesc= structDesc.arrTable[iarray];
+                        struct1.offsetToData= iptr;
+                        Object map= struct1.readData(data);
+                        result.put( structDesc.tagnames[i], map );
+                        iptr= iptr + struct1._lengthBytes;
+                        iarray= iarray + 1;
+                        istructure= istructure + 1;
+                        //iptr= iptr + struct1._lengthBytes;
+                    } else if ( isArray( structDesc.tagtable[i].tagflags ) ) {
                         TypeDescArray arr1= new TypeDescArray();
                         arr1.arrayDesc= structDesc.arrTable[iarray];
                         arr1.offsToArray= iptr;
@@ -507,9 +535,10 @@ public class ReadIDLSav {
                         Object arr= arr1.readData(data);
                         result.put( structDesc.tagnames[i], arr );
                         iarray= iarray+1;
-                        iptr= iptr + arr1.arrayDesc.nbytes;
+                        iptr= iptr + arr1._lengthBytes;
                     }
                 }
+                this._lengthBytes= iptr-iptr0;
             }
             return result;
         }
@@ -973,14 +1002,14 @@ public class ReadIDLSav {
         //                /home/jbf/public_html/autoplot/data/sav/structureOfLonarr.idlsav    "/home/jbf/public_html/autoplot/data/sav/doublearray.idlsav","r");
         //RandomAccessFile aFile = new RandomAccessFile(
         //                  "/home/jbf/public_html/autoplot/data/sav/structureOfLonarr.idlsav","r");
-        RandomAccessFile aFile = new RandomAccessFile(
-                            "/home/jbf/public_html/autoplot/data/sav/arrayOfStruct.idlsav","r");
+        //RandomAccessFile aFile = new RandomAccessFile(
+        //                    "/home/jbf/public_html/autoplot/data/sav/arrayOfStruct.idlsav","r");
         //RandomAccessFile aFile = new RandomAccessFile(
         //                    "/home/jbf/public_html/autoplot/data/sav/arrayOfStruct1Var.idlsav","r");
         //RandomAccessFile aFile = new RandomAccessFile(
         //                    "/home/jbf/public_html/autoplot/data/sav/structure.idlsav","r");
-        //RandomAccessFile aFile = new RandomAccessFile(
-        //                    "/home/jbf/public_html/autoplot/data/sav/structureWithinStructure.idlsav","r");
+        RandomAccessFile aFile = new RandomAccessFile(
+                            "/home/jbf/public_html/autoplot/data/sav/structureWithinStructure.idlsav","r");
         FileChannel inChannel = aFile.getChannel();
         long fileSize = inChannel.size();
         ByteBuffer buffer = ByteBuffer.allocate((int) fileSize);
@@ -1002,6 +1031,8 @@ public class ReadIDLSav {
                         StringBuilder b= new StringBuilder();
                         arrayToString( ((ArrayData)k).array, b);
                         System.err.println(b.toString());
+                    } else if ( k==null ) {
+                        System.err.println("<<null>>");
                     } else {
                         System.err.println(k.toString());
                     }
