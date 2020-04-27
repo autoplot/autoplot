@@ -440,6 +440,50 @@ public class ReadIDLSav {
         }
     }
         
+    private static void accumulate( Map<String,Object> accumulator, Map<String,Object> rec, int j, int nj ) {
+        if ( accumulator.entrySet().isEmpty() ) {
+            for ( Entry<String,Object> e: rec.entrySet() ) {
+                Object o;
+                if ( e.getValue() instanceof ArrayData ) {
+                    ArrayData ad= (ArrayData)e.getValue(); // Java 14 is coming and we won't need a cast, so exciting.
+                    ArrayData ac= new ArrayData();
+                    ac.dims= new int[ad.dims.length+1];
+                    ac.dims[0]= nj;
+                    System.arraycopy( ad.dims, 0, ac.dims, 1, ad.dims.length );
+                    ac.array= Array.newInstance( ad.array.getClass(), nj );
+                    Array.set( ac.array, j, ad.array );
+                    o= ac;
+                } else if ( e.getValue() instanceof Map ) {
+                    Map accumulator1= new LinkedHashMap();
+                    accumulate( accumulator1, (Map<String,Object>)e.getValue(), j, nj );
+                    o= accumulator1;
+                } else  {
+                    Object d= e.getValue();
+                    ArrayData ac= new ArrayData();
+                    ac.dims= new int[] { nj };
+                    Class t= getPrimativeClass( d.getClass() );
+                    ac.array= Array.newInstance( t, nj );
+                    Array.set( ac.array, j, d );
+                    o= ac;
+                }
+                accumulator.put( e.getKey(), o );
+            }
+        }
+        for ( Entry<String,Object> e: accumulator.entrySet() ) {
+            Object o= rec.get(e.getKey());
+            if ( o instanceof ArrayData ) {
+                ArrayData ad= (ArrayData)o;
+                ArrayData ac= (ArrayData)e.getValue();
+                Array.set( ac.array, j, ad.array );
+            } else if ( e.getValue() instanceof Map ) {
+                accumulate( (Map<String,Object>)e.getValue(), (Map<String,Object>)o, j, nj);
+            } else {
+                ArrayData ac= (ArrayData)e.getValue();
+                Array.set( ac.array, j, o );
+            }
+        }
+    }
+    
     private static class TypeDescStructure extends TypeDesc {
         ArrayDesc structArrayDesc;
         StructDesc structDesc;
@@ -452,14 +496,37 @@ public class ReadIDLSav {
         @Override
         Object readData(ByteBuffer data) {
             LinkedHashMap<String,Object> result;
-            if ( structArrayDesc.nelements>1 ) {
+            int nj= structArrayDesc.nelements;
+            if ( nj>1 ) {
                 result= new LinkedHashMap<>();
                 int iptr= offsetToData + 4;
                 int iptr0= iptr;
-                for ( int j=0; j<structArrayDesc.nelements; j++ ) {
+                for ( int j=0; j<nj; j++ ) {
                     int iarray= 0;
+                    int istructure= 0;
                     for ( int i=0; i<structDesc.tagnames.length; i++ ) {
-                        if ( isArray( structDesc.tagtable[i].tagflags ) ) {
+                        if ( isStructure( structDesc.tagtable[i].tagflags ) ) {
+                            TypeDescStructure struct1= new TypeDescStructure();
+                            StructDesc structDesc1= structDesc.structTable[istructure];
+                            struct1.structDesc= structDesc1;
+                            struct1.structArrayDesc= structDesc.arrTable[iarray];
+                            struct1.offsetToData= iptr;
+                            Object map1= struct1.readData(data);                        
+                            if ( j==0 ) {
+                                Map mapd= (Map)map1;
+                                Map accumulator= new LinkedHashMap();
+                                accumulate( accumulator, mapd, j, nj );
+                                result.put( structDesc.tagnames[i], accumulator );
+                            } else {
+                                Map mapd= (Map)map1;
+                                Map accumulator= (Map)result.get( structDesc.tagnames[i] );
+                                accumulate( accumulator, mapd, j, nj );
+                            }
+                            iptr= iptr + struct1._lengthBytes;
+                            iarray= iarray + 1;
+                            istructure= istructure + 1;
+                            //iptr= iptr + struct1._lengthBytes;
+                        } else if ( isArray( structDesc.tagtable[i].tagflags ) ) {
                             TypeDescArray arr1= new TypeDescArray();
                             arr1.arrayDesc= structDesc.arrTable[iarray];
                             arr1.offsToArray= iptr;
@@ -489,7 +556,7 @@ public class ReadIDLSav {
                             scalarTypeDesc.typeCode= structDesc.tagtable[i].typecode;
                             Object scalar= scalarTypeDesc.readData(data);                            
                             if ( j==0 ) {
-                                if ( scalar.getClass().isArray() ) throw new IllegalArgumentException("scalar should be array");
+                                if ( scalar.getClass().isArray() ) throw new IllegalArgumentException("scalar should not be an array");
                                 ArrayData accumulator= new ArrayData();
                                 accumulator.dims= new int[] {  structArrayDesc.nelements };
                                 Class t= getPrimativeClass( scalar.getClass() );
@@ -536,6 +603,12 @@ public class ReadIDLSav {
                         result.put( structDesc.tagnames[i], arr );
                         iarray= iarray+1;
                         iptr= iptr + arr1._lengthBytes;
+                    } else { 
+                        TypeDescScalar scalarTypeDesc= new TypeDescScalar();
+                        scalarTypeDesc.offs= iptr;
+                        scalarTypeDesc.typeCode= structDesc.tagtable[i].typecode;
+                        Object scalar= scalarTypeDesc.readData(data);     
+                        result.put( structDesc.tagnames[i], scalar );
                     }
                 }
                 this._lengthBytes= iptr-iptr0;
@@ -885,10 +958,31 @@ public class ReadIDLSav {
                 case RECTYPE_VARIABLE:
                     logger.config("variable");
                     StringData varName= readString( rec, 20 );
-                    if ( varName.string.equals(name) ) {
-                        Map<String,Object> result= new HashMap<>();
-                        variable(rec, result);
-                        return result.get(name);
+                    String rest= null;
+                    int i= name.indexOf(".");
+                    if ( i>-1 ) {
+                        rest= name.substring(i+1);
+                        name= name.substring(0,i);
+                    }
+                    if ( i==-1 ) {
+                        if ( varName.string.equals(name) ) {
+                            Map<String,Object> result= new HashMap<>();
+                            variable(rec, result);
+                            return result.get(name);
+                        }
+                    } else {
+                        if ( varName.string.equals(name) ) {
+                            Map<String,Object> result= new HashMap<>();
+                            variable(rec,result);
+                            Map<String,Object> res= (Map<String,Object>) result.get(name);
+                            assert rest!=null;
+                            i= rest.indexOf('.');
+                            while ( i>-1 ) {
+                                res= (Map<String,Object>)res.get( rest.substring(0,i) );
+                                rest= rest.substring(i+1);
+                            }
+                            return res.get(rest);
+                        }
                     }
                     break;
                 case RECTYPE_VERSION:
@@ -1004,12 +1098,16 @@ public class ReadIDLSav {
         //                  "/home/jbf/public_html/autoplot/data/sav/structureOfLonarr.idlsav","r");
         //RandomAccessFile aFile = new RandomAccessFile(
         //                    "/home/jbf/public_html/autoplot/data/sav/arrayOfStruct.idlsav","r");
-        //RandomAccessFile aFile = new RandomAccessFile(
-        //                    "/home/jbf/public_html/autoplot/data/sav/arrayOfStruct1Var.idlsav","r");
+        RandomAccessFile aFile = new RandomAccessFile(
+                            "/home/jbf/public_html/autoplot/data/sav/arrayOfStruct1Var.idlsav","r");
         //RandomAccessFile aFile = new RandomAccessFile(
         //                    "/home/jbf/public_html/autoplot/data/sav/structure.idlsav","r");
-        RandomAccessFile aFile = new RandomAccessFile(
-                            "/home/jbf/public_html/autoplot/data/sav/structureWithinStructure.idlsav","r");
+        //RandomAccessFile aFile = new RandomAccessFile(
+        //                    "/home/jbf/public_html/autoplot/data/sav/structureWithinStructure.idlsav","r");
+        //RandomAccessFile aFile = new RandomAccessFile(
+        //                    "/home/jbf/public_html/autoplot/data/sav/stuctOfStruct.idlsav","r");
+        //RandomAccessFile aFile = new RandomAccessFile(
+        //                    "/home/jbf/public_html/autoplot/data/sav/stuctOfStructOfStruct.idlsav","r");
         FileChannel inChannel = aFile.getChannel();
         long fileSize = inChannel.size();
         ByteBuffer buffer = ByteBuffer.allocate((int) fileSize);

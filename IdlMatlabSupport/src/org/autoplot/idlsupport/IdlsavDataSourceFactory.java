@@ -79,7 +79,7 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             String[] names= new ReadIDLSav().readVarNames(buf);
             ReadIDLSav reader= new ReadIDLSav();
             if ( cc.completable.contains(".") ) {
-                int i= cc.completable.indexOf('.');
+                int i= cc.completable.lastIndexOf('.');
                 String root= cc.completable.substring(0,i);
                 Object o= reader.readVar( buf, root );
                 Map<String,Object> m= (Map<String,Object>)o;

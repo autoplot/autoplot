@@ -27,6 +27,16 @@ public class IdlsavDataSource extends AbstractDataSource {
         super(uri);
     }
 
+    public Object getFromStructure( Map v, String t ) {
+        int i= t.indexOf('.');
+        if ( i==-1 ) {
+            return ((Map)v).get(t);
+        } else {
+            Map vc= (Map)(((Map)v).get(t.substring(0,i)));  // child of v
+            return getFromStructure( vc, t.substring(i+1) );
+        }
+    }
+    
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         File f= getFile(mon);
@@ -58,12 +68,7 @@ public class IdlsavDataSource extends AbstractDataSource {
             if ( !( v instanceof Map ) ) {
                 throw new IllegalArgumentException("expected map for '"+h+"'");
             } else {
-                i= t.indexOf('.');
-                if ( i==-1 ) {
-                    v= ((Map)v).get(t);
-                } else {
-                    throw new IllegalArgumentException("nested strctures are not supported.");
-                }
+                v= getFromStructure( ((Map)v), t );
             }
         } else {
             v= reader.readVar( buffer, arg );
