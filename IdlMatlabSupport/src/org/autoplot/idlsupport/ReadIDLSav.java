@@ -98,26 +98,6 @@ public class ReadIDLSav {
         return result;
     }
     
-    private static void printBuffer( ByteBuffer rec ) {
-        for ( int i=0; i<rec.limit(); i++ ) {
-            byte c= rec.get(i);
-            if ( i % 4 == 0 ) {
-                int theInt= rec.getInt(i);
-                if (  c>32 && c<128 ) {
-                    System.err.println( String.format( "%05d %d (%c)  I4: %d", i, c, c, theInt ) );
-                } else {
-                    System.err.println( String.format( "%05d %d      I4: %d", i, c, theInt ) );
-                }                
-            } else {
-                if (  c>32 && c<128 ) {
-                    System.err.println( String.format( "%05d %d (%c)", i, c, c ) );
-                } else {
-                    System.err.println( String.format( "%05d %d", i, c) );
-                }
-            }
-        }
-    }
-    
     private static final int TYPECODE_BYTE=1;
     private static final int TYPECODE_INT16=2;
     private static final int TYPECODE_INT32=3;
@@ -163,7 +143,12 @@ public class ReadIDLSav {
                 case RECTYPE_VARIABLE:
                     logger.config("variable");
                     StringData varName= readString( rec, 20 );
-                    if ( varName.string.equals(name) ) {
+                    if ( name.startsWith(varName.string) ) {
+                        int nextField= 20 + varName._lengthBytes;
+                        ByteBuffer var= slice( rec, nextField, rec.limit() );
+                        TypeDesc td= readTypeDesc(var);
+                        return td; // struct
+                    } else if ( varName.string.equals(name) ) {
                         int nextField= 20 + varName._lengthBytes;
                         ByteBuffer var= slice( rec, nextField, rec.limit() );
                         TypeDesc td= readTypeDesc(var);
@@ -205,6 +190,52 @@ public class ReadIDLSav {
     public boolean isStructure(ByteBuffer in, String name) throws IOException {
         TypeDesc td= readTypeDesc(in, name);
         return isStructure( td.varFlags );
+    }
+
+    private TagDesc findStructureTag(StructDesc structDesc, String s) {
+        String[] ss= s.split("\\.",2);
+        int istruct= 0;
+        int iarray= 0;
+        if ( ss.length==1 ) {
+            int itagfind=-1;
+            for ( int itag=0; itag<structDesc.ntags; itag++ ) {
+                if ( ( structDesc.tagtable[itag].tagflags & VARFLAG_STRUCT )==VARFLAG_STRUCT ) {
+                    if ( structDesc.tagnames[itag].equals(s) ) {
+                        itagfind=itag;
+                        break;
+                    }
+                    istruct++;
+                }
+                if ( ( structDesc.tagtable[itag].tagflags & VARFLAG_ARRAY )==VARFLAG_ARRAY ) {
+                    if ( structDesc.tagnames[itag].equals(s) ) {
+                        itagfind=itag;
+                        break;
+                    }
+                    iarray++;
+                }
+                if ( structDesc.tagnames[itag].equals(s) ) {
+                    itagfind=itag;
+                    break;
+                }
+            }
+            if ( itagfind==-1 ) {
+                throw new IllegalArgumentException("tag not found");
+            }
+            if ( ( structDesc.tagtable[itagfind].tagflags & VARFLAG_STRUCT )==VARFLAG_STRUCT ) {
+                return structDesc.structTable[istruct];
+            } else if ( ( structDesc.tagtable[itagfind].tagflags & VARFLAG_ARRAY )==VARFLAG_ARRAY ) {
+                return structDesc.arrTable[iarray];
+            } else {
+                return structDesc.tagtable[itagfind];
+            }
+        } else {
+            TagDesc td= findStructureTag(structDesc, ss[0]);
+            if ( td instanceof StructDesc ) {
+                return findStructureTag( (StructDesc)td, ss[1] );
+            } else {
+                throw new IllegalArgumentException("no such location, expected structure at: "+ss[0]);
+            }
+        }
     }
         
     private static class TypeDescScalar extends TypeDesc {
@@ -272,23 +303,27 @@ public class ReadIDLSav {
         }
     }
     
-    public static class ArrayDesc {
+    public static class ScalarDesc extends TagDesc {
+        
+    }
+    
+    public static class ArrayDesc extends TagDesc {
         int nbytesEl;
         int nbytes;
         int nelements;
         int ndims;
         int nmax;
         int[] dims;
-        /**
-         * for convenience, keep track of the total length of the descriptor within the IDLSAV file.
-         */
-        int _lengthBytes;
     }
 
     public static class TagDesc {
         int offset;
         int typecode;
         int tagflags;
+        /**
+         * for convenience, keep track of the total length of the descriptor within the IDLSAV file.
+         */
+        int _lengthBytes;
     }
     
     private TagDesc readTagDesc( ByteBuffer rec ) {
@@ -299,7 +334,7 @@ public class ReadIDLSav {
         return result;
     }    
     
-    public static class StructDesc {
+    public static class StructDesc extends TagDesc {
         int predef;
         int ntags;
         int nbytes;
@@ -311,10 +346,6 @@ public class ReadIDLSav {
         int nsupClasses;
         String[] supClassNames;
         StructDesc[] supClassTable;
-        /**
-         * length of the descriptor within the IDLSAV file.
-         */
-        int _lengthBytes; 
     }
     
     private static class TypeDescArray extends TypeDesc {
@@ -666,7 +697,7 @@ public class ReadIDLSav {
         return result;
     }
     
-    private StructDesc readStructDesc( ByteBuffer rec ) {
+    public StructDesc readStructDesc( ByteBuffer rec ) {
         StructDesc result= new StructDesc();
         if ( rec.getInt(0)!=9 ) {
             throw new IllegalArgumentException("expected 9 for STRUCTSTART");
@@ -1013,7 +1044,7 @@ public class ReadIDLSav {
      * @return
      * @throws IOException 
      */
-    public ArrayDesc readArrayDesc( ByteBuffer in, String name ) throws IOException {
+    public TagDesc readTagDesc( ByteBuffer in, String name ) throws IOException {
         int magic= in.getInt(0);
         if ( magic!=1397882884 ) {
             logger.warning("magic number is incorrect");
@@ -1029,10 +1060,23 @@ public class ReadIDLSav {
                 case RECTYPE_VARIABLE:
                     logger.config("variable");
                     StringData varName= readString( rec, 20 );
-                    if ( varName.string.equals(name) ) {
+                    if ( name.startsWith(varName+".") || name.equals(varName) ) {
                         int nextField= varName._lengthBytes;
-                        ByteBuffer var= slice( rec, 20+nextField, rec.limit() );                        
-                        return readTypeDescArray(var).arrayDesc;
+                        ByteBuffer var= slice( rec, 20+nextField, rec.limit() );
+                        if ( var.getInt(0)==8 ) {
+                            if ( ( var.getInt(4) & VARFLAG_STRUCT ) == VARFLAG_STRUCT ) {
+                                TypeDescStructure typeDescStructure= readTypeDescStructure(var);
+                                if ( name.equals(varName) ) {
+                                    return typeDescStructure.structDesc;
+                                } else {
+                                    return findStructureTag( typeDescStructure.structDesc, name.substring(varName.string.length()+1) );
+                                }
+                            } else {
+                                return readTypeDescArray(var).arrayDesc;
+                            }
+                        } else {
+                            return readTagDesc(var);
+                        }
                     }
                     break;
                 case RECTYPE_VERSION:
