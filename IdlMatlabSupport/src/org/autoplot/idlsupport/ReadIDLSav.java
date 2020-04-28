@@ -982,9 +982,9 @@ public class ReadIDLSav {
                             assert rest!=null;
                             i= rest.indexOf('.');
                             while ( i>-1 ) {
-                                i= rest.indexOf('.');
                                 res= (Map<String,Object>)res.get( rest.substring(0,i) );
-                                rest= rest.substring(i+1);                                
+                                rest= rest.substring(i+1);
+                                i= rest.indexOf('.');
                             }
                             return res.get(rest);
                         }
