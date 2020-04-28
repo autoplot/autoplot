@@ -548,7 +548,6 @@ public class ReadIDLSav {
                                 ArrayData ad= (ArrayData)arr;
                                 ArrayData accumulator= (ArrayData) result.get( structDesc.tagnames[i] );
                                 Array.set( accumulator.array, j, ad.array );
-                                System.err.println(""+i+","+j+":"+ad);
                             }
                             iarray= iarray+1;
                             iptr= iptr + arr1._lengthBytes;
@@ -1112,6 +1111,8 @@ public class ReadIDLSav {
         //                    "/home/jbf/public_html/autoplot/data/sav/structureWithinStructure.idlsav","r");
         //RandomAccessFile aFile = new RandomAccessFile(
         //                    "/home/jbf/public_html/autoplot/data/sav/stuctOfStruct.idlsav","r");
+        //RandomAccessFile aFile = new RandomAccessFile(
+        //                    "/home/jbf/public_html/autoplot/data/sav/stuctOfStructOfStruct.idlsav","r");
         RandomAccessFile aFile = new RandomAccessFile(
                             "/home/jbf/public_html/autoplot/data/sav/stuctOfStructOfStruct.idlsav","r");
         
