@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.autoplot.datasource.AbstractDataSourceFactory;
 import org.autoplot.datasource.CompletionContext;
 import org.autoplot.datasource.DataSetURI;
@@ -38,6 +36,11 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             URISplit split= URISplit.parse(surl);
             Map<String,String> params= URISplit.parseParams(split.params);
             String var= params.get(URISplit.PARAM_ARG_0);
+            
+            if ( var==null ) {
+                problems.add("need variable name to read");
+                return true;
+            }
             
             List<CompletionContext> ccresult= new ArrayList<>();
             File file= DataSetURI.getFile( split.resourceUri, mon );
