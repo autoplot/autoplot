@@ -488,6 +488,7 @@ public class ReadIDLSav {
         ArrayDesc structArrayDesc;
         StructDesc structDesc;
         int offsetToData;
+        boolean isSubstructure; // structure within a structure.
         /**
          * length of the data within the IDLSav file.
          */
@@ -499,7 +500,7 @@ public class ReadIDLSav {
             int nj= structArrayDesc.nelements;
             if ( nj>1 ) {
                 result= new LinkedHashMap<>();
-                int iptr= offsetToData + 4;
+                int iptr= offsetToData + ( isSubstructure ? 0 : 4 );
                 int iptr0= iptr;
                 for ( int j=0; j<nj; j++ ) {
                     int iarray= 0;
@@ -511,6 +512,7 @@ public class ReadIDLSav {
                             struct1.structDesc= structDesc1;
                             struct1.structArrayDesc= structDesc.arrTable[iarray];
                             struct1.offsetToData= iptr;
+                            struct1.isSubstructure= true;
                             Object map1= struct1.readData(data);                        
                             if ( j==0 ) {
                                 Map mapd= (Map)map1;
@@ -576,7 +578,7 @@ public class ReadIDLSav {
                 this._lengthBytes= iptr-iptr0;
             } else {
                 result= new LinkedHashMap<>();
-                int iptr= offsetToData + 4;
+                int iptr= offsetToData + ( isSubstructure ? 0 : 4 );
                 int iptr0= iptr;
                 int iarray= 0;
                 int istructure= 0;
@@ -587,6 +589,7 @@ public class ReadIDLSav {
                         struct1.structDesc= structDesc1;
                         struct1.structArrayDesc= structDesc.arrTable[iarray];
                         struct1.offsetToData= iptr;
+                        struct1.isSubstructure= true;
                         Object map= struct1.readData(data);
                         result.put( structDesc.tagnames[i], map );
                         iptr= iptr + struct1._lengthBytes;
@@ -740,6 +743,7 @@ public class ReadIDLSav {
         result.structArrayDesc= readArrayDesc( slice( rec, 8, rec.limit() ) );
         result.structDesc= readStructDesc( slice( rec, 10*4+result.structArrayDesc.nmax*4, rec.limit() ) );
         result.offsetToData= 10*4+result.structArrayDesc.nmax*4 + result.structDesc._lengthBytes;
+        result.isSubstructure= false;
         return result;
     }
     
@@ -1099,18 +1103,20 @@ public class ReadIDLSav {
         //                  "/home/jbf/public_html/autoplot/data/sav/structureOfLonarr.idlsav","r");
         //RandomAccessFile aFile = new RandomAccessFile(
         //                    "/home/jbf/public_html/autoplot/data/sav/arrayOfStruct.idlsav","r");
-        RandomAccessFile aFile = new RandomAccessFile(
-                            "/home/jbf/public_html/autoplot/data/sav/arrayOfStruct1Var.idlsav","r");
+        //RandomAccessFile aFile = new RandomAccessFile(
+        //                    "/home/jbf/public_html/autoplot/data/sav/arrayOfStruct1Var.idlsav","r");
         //RandomAccessFile aFile = new RandomAccessFile(
         //                    "/home/jbf/public_html/autoplot/data/sav/structure.idlsav","r");
         //RandomAccessFile aFile = new RandomAccessFile(
         //                    "/home/jbf/public_html/autoplot/data/sav/structureWithinStructure.idlsav","r");
-        //RandomAccessFile aFile = new RandomAccessFile(
-        //                    "/home/jbf/public_html/autoplot/data/sav/stuctOfStruct.idlsav","r");
+        RandomAccessFile aFile = new RandomAccessFile(
+                            "/home/jbf/public_html/autoplot/data/sav/stuctOfStruct.idlsav","r");
         //RandomAccessFile aFile = new RandomAccessFile(
         //                    "/home/jbf/public_html/autoplot/data/sav/stuctOfStructOfStruct.idlsav","r");
+        
         FileChannel inChannel = aFile.getChannel();
         long fileSize = inChannel.size();
+        
         ByteBuffer buffer = ByteBuffer.allocate((int) fileSize);
         int bytesRead= 0;
         while ( bytesRead<fileSize ) {
