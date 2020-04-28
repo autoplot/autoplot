@@ -1060,13 +1060,13 @@ public class ReadIDLSav {
                 case RECTYPE_VARIABLE:
                     logger.config("variable");
                     StringData varName= readString( rec, 20 );
-                    if ( name.startsWith(varName+".") || name.equals(varName) ) {
+                    if ( name.startsWith(varName.string+".") || name.equals(varName.string) ) {
                         int nextField= varName._lengthBytes;
                         ByteBuffer var= slice( rec, 20+nextField, rec.limit() );
-                        if ( var.getInt(0)==8 ) {
+                        if ( var.getInt(0)==8 ) { // TODO: what is 8?
                             if ( ( var.getInt(4) & VARFLAG_STRUCT ) == VARFLAG_STRUCT ) {
                                 TypeDescStructure typeDescStructure= readTypeDescStructure(var);
-                                if ( name.equals(varName) ) {
+                                if ( name.equals(varName.string) ) {
                                     return typeDescStructure.structDesc;
                                 } else {
                                     return findStructureTag( typeDescStructure.structDesc, name.substring(varName.string.length()+1) );
@@ -1075,7 +1075,11 @@ public class ReadIDLSav {
                                 return readTypeDescArray(var).arrayDesc;
                             }
                         } else {
-                            return readTagDesc(var);
+                            if ( ( var.getInt(4) & VARFLAG_ARRAY ) == VARFLAG_ARRAY ) {
+                                return readTypeDescArray(var).arrayDesc;
+                            } else {
+                                return readTagDesc(var);
+                            }
                         }
                     }
                     break;
