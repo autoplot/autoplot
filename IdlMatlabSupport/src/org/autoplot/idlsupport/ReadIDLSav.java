@@ -612,6 +612,7 @@ public class ReadIDLSav {
                         scalarTypeDesc.typeCode= structDesc.tagtable[i].typecode;
                         Object scalar= scalarTypeDesc.readData(data);     
                         result.put( structDesc.tagnames[i], scalar );
+                        iptr= iptr + sizeOf( scalarTypeDesc.typeCode );
                     }
                 }
                 this._lengthBytes= iptr-iptr0;
@@ -1109,10 +1110,10 @@ public class ReadIDLSav {
         //                    "/home/jbf/public_html/autoplot/data/sav/structure.idlsav","r");
         //RandomAccessFile aFile = new RandomAccessFile(
         //                    "/home/jbf/public_html/autoplot/data/sav/structureWithinStructure.idlsav","r");
-        RandomAccessFile aFile = new RandomAccessFile(
-                            "/home/jbf/public_html/autoplot/data/sav/stuctOfStruct.idlsav","r");
         //RandomAccessFile aFile = new RandomAccessFile(
-        //                    "/home/jbf/public_html/autoplot/data/sav/stuctOfStructOfStruct.idlsav","r");
+        //                    "/home/jbf/public_html/autoplot/data/sav/stuctOfStruct.idlsav","r");
+        RandomAccessFile aFile = new RandomAccessFile(
+                            "/home/jbf/public_html/autoplot/data/sav/stuctOfStructOfStruct.idlsav","r");
         
         FileChannel inChannel = aFile.getChannel();
         long fileSize = inChannel.size();
