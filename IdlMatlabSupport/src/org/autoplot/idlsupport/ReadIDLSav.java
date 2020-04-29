@@ -35,10 +35,11 @@ public class ReadIDLSav {
         
     private static final Logger logger= Logger.getLogger("autoplot.idlsav");
             
+    private static final int RECTYPE_VARIABLE = 2;
     private static final int RECTYPE_ENDMARKER = 6;
     private static final int RECTYPE_TIMESTAMP = 10;
-    private static final int RECTYPE_VARIABLE = 2;
     private static final int RECTYPE_VERSION = 14;
+    private static final int RECTYPE_PROMOTE64 = 17;
     
     private static final int VARFLAG_ARRAY = 0x04;
     private static final int VARFLAG_STRUCT = 0x20;
@@ -116,7 +117,7 @@ public class ReadIDLSav {
      * @return 
      */
     private static int sizeOf( int typeCode ) {
-        int[] sizes= new int[] { 0, 4, 4, 4, 4,   8, 8, 0, 0, 16,   0, 0, 0, 0, 8 };
+        int[] sizes= new int[] { 0, 4, 4, 4, 4,   8, 8, 1, 0, 16,   0, 0, 0, 0, 8 };
         return sizes[typeCode];
     }
     
@@ -408,6 +409,13 @@ public class ReadIDLSav {
                     }
                     return makeArrayData( result );
                 }
+                case TYPECODE_STRING: {
+                    byte[] result= new byte[arrayDesc.nelements];
+                    for ( int i=0; i<result.length; i++ ) {
+                        result[i]= buf.get(offsToArray+i);
+                    }
+                    return makeArrayData( result );
+                }
                 default:
                     break;
             }
@@ -466,6 +474,8 @@ public class ReadIDLSav {
             return double.class;
         } else if ( t==Float.class ) {
             return float.class;
+        } else if ( t==String.class ) {
+            return String.class;
         } else {
             throw new UnsupportedOperationException("not implemented: "+t);
         }
@@ -601,7 +611,12 @@ public class ReadIDLSav {
                                 Array.set( accumulator.array, j, scalar );
                                 System.err.println(""+i+","+j+":"+scalar);
                             }
-                            iptr= iptr + sizeOf( scalarTypeDesc.typeCode );
+                            if ( scalar instanceof String ) {
+                                iptr = iptr + 8 + Math.max( 4, ( (String) scalar).length() / 4 );
+                            } else {
+                                iptr= iptr + sizeOf( scalarTypeDesc.typeCode );
+                            }
+                            
                         }
                     }
                 }
@@ -660,6 +675,10 @@ public class ReadIDLSav {
         return ( varFlags & 0x20 ) == 0x20;
     }
     
+    /**
+     * a TypeDesc is a description of a thing that is in the IDLSav file.  Its readData
+     * method will return something of the type.
+     */
     private static abstract class TypeDesc {
         int typeCode;
         int varFlags;
@@ -811,8 +830,8 @@ public class ReadIDLSav {
      * array is returned flattened, and readTypeDesc should be used
      * to unflatten it.  Structures are returned as a LinkedHashMap.
      * @param rec
-     * @param vars
-     * @return 
+     * @param vars map containing read data.
+     * @return the read data.
      */
     private Object variable( ByteBuffer rec, Map<String,Object> vars) {
         int type= rec.getInt(0);
@@ -1027,6 +1046,9 @@ public class ReadIDLSav {
                 case RECTYPE_TIMESTAMP:
                     logger.config("timestamp");
                     break;
+                case RECTYPE_PROMOTE64:
+                    logger.config("promote64");
+                    throw new IllegalArgumentException("promote64 is not supported.");
                 default:
                     logger.config("???");
                     break;
