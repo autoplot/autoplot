@@ -7,16 +7,18 @@
 
 pro obfuscate, s
    t= tag_names(s)
-   for i=0,n_elements(t)-1 do begin
-       t= s.(i)
-       if ( size(t,/type) eq 8 ) then begin
-           obfuscate, t
-       endif else if ( size(t,/n_dim) gt 0 ) then begin
-           t[*]= 9.9
-           s.(i)= t
-       endif else begin
-           s.(i)= 9
-       endelse
+   for j=0,n_elements(s)-1 do begin
+       for i=0,n_elements(t)-1 do begin
+           t= s[j].(i)
+           if ( size(t,/type) eq 8 ) then begin
+               obfuscate, t
+           endif else if ( size(t,/n_dim) gt 0 ) then begin
+               t[*]= 9.9
+               s[j].(i)= t
+           endif else begin
+               s[j].(i)= 9
+           endelse
+       endfor
    endfor
 end
 
