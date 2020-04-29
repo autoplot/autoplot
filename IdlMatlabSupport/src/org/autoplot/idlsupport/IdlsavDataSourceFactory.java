@@ -89,7 +89,18 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
                 ccresult.add(cc1);
             }            
         }
-        if ( reader.isArray( buf, key ) ) {
+        if ( reader.isStructure( buf, key ) ) {
+            StructDesc desc= (StructDesc)reader.readTagDesc( buf, key );
+            
+            for ( String t : desc.tagnames ) {
+                CompletionContext cc1= new CompletionContext( 
+                    CompletionContext.CONTEXT_PARAMETER_NAME,
+                    keyn+"." +t, this, "arg_0", keyn+"." +t, "", true );
+                ccresult.add(cc1);
+                
+            }
+            
+        } else if ( reader.isArray( buf, key ) ) {
             ArrayDesc desc= (ArrayDesc)reader.readTagDesc( buf, key );
             StringBuilder sqube= new StringBuilder("[").append(String.valueOf(desc.dims[0]));
             for ( int i=1; i<desc.ndims; i++ ) {
