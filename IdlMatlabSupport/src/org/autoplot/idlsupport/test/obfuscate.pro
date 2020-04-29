@@ -7,7 +7,7 @@
 
 pro obfuscate, s
    t= tag_names(s)
-   for j=0,n_elements(s)-1 do begin
+   for j=0L,n_elements(s)-1 do begin
        for i=0,n_elements(t)-1 do begin
            t= s[j].(i)
            if ( size(t,/type) eq 8 ) then begin
