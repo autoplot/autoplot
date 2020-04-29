@@ -612,7 +612,7 @@ public class ReadIDLSav {
                                 System.err.println(""+i+","+j+":"+scalar);
                             }
                             if ( scalar instanceof String ) {
-                                iptr = iptr + 8 + Math.max( 4, ( (String) scalar).length() / 4 );
+                                iptr = iptr + 8 + Math.max( 4, 4 * ( (String) scalar).length() / 4 );
                             } else {
                                 iptr= iptr + sizeOf( scalarTypeDesc.typeCode );
                             }
