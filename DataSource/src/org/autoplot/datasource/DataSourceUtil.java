@@ -645,7 +645,11 @@ public class DataSourceUtil {
             
             String result= s;
             
-            return result + "?timerange=" + timeRange;
+            if ( result.contains("?") ) {
+                return result + "&timerange=" + timeRange;
+            } else {
+                return result + "?timerange=" + timeRange;
+            }
             
         } catch ( IllegalArgumentException | ParseException ex ) {
             return null; // I had the file in my directory: "file:///home/jbf/das2Server?dataset=juno%2Fwaves%2Fflight%2Fsurvey.dsdf;start_time=$Y-$m-$dT15:00:00.000Z;end_time=$Y-$m-$dT19:00:00.000Z;params=EINT;server=dataset"
