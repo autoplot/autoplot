@@ -48,27 +48,33 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             ByteBuffer buf= ReadIDLSav.readFileIntoByteBuffer(file);
             String[] names= new ReadIDLSav().readVarNames(buf);
             
-            boolean found= false;
-            for ( int i=0; i<names.length; i++ ) {
-                if ( var.startsWith(names[i]) ) {
-                    found= true;
+            String[] vars= var.split(",",-2);
+            
+            for ( int ivar=0; ivar<vars.length; ivar++ ) {
+                var= vars[ivar];
+                        
+                boolean found= false;
+                for ( int i=0; i<names.length; i++ ) {
+                    if ( var.startsWith(names[i]) ) {
+                        found= true;
+                    }
+                }
+            
+                if ( !found ) {
+                    problems.add("no plottable parameters start with "+var);
+                }
+            
+                ReadIDLSav reader= new ReadIDLSav();
+                TagDesc t= reader.readTagDesc( buf, var );
+                if ( t==null ) {
+                    problems.add("no tag desc found for "+var);
+                } else if ( t instanceof StructDesc ) {
+                    problems.add("tag is a structure: "+var);                    
                 }
             }
             
-            if ( !found ) {
-                problems.add("no plottable parameters start with "+var);
-            }
+            return problems.size()>0 ;
             
-            ReadIDLSav reader= new ReadIDLSav();
-            TagDesc t= reader.readTagDesc( buf, var );
-            if ( t==null ) {
-                problems.add("no tag desc found for "+var);
-                return true;
-            } else if ( t instanceof StructDesc ) {
-                return true;
-            }
-            
-            return var==null;
         } catch (IOException ex) {
             problems.add( ex.toString() );
             return true;
