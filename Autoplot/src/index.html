@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>"Digital" rendering mode is useful when writing new code to plot data from IDLSave files.
+        <p><small>IDLSave file which sat for twenty years untouched can now be read into Autoplot.  The IDLSave file was from an ancient IDL digitizer that was used to identify a reference point in images.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-04-22 r24779):</p>
+        <p>Bugfixes (2020-04-30 r24820):</p>
         <ul>
+            <li>EnumerationUnits within a DataPointRecorder would cause problem when file was loaded and then additional points are added.
+            <li>corrections to IDLSav files containing structures with string tags.
+            <li>new make aggregation code would assume there wasn't already a question mark in the URI, creating URIs with two question marks.
             <li>Provide feedback dialog now says "provide feedback" and not "error report"
             <li>Runtime error dialog now includes the words "runtime error" since that seems to be what we call it.
             <li>check for null USER_PROPERTIES and METADATA resolving macros, to avoid noise on stderr during transitional states.
@@ -57,6 +60,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Units.createDatum(Datum) added, so that codes don't have to check for EnumerationUnits so much when ingesting Datums.
+            <li>IDLSav files allow X,Y,Z notation like the .mat (Matlab) files support.  Automatically transpose array to make fit.
             <li>Initial support for reading data from IDLSav files introduced.
             <li>Jython editor goto line includes class declarations.
             <li>more checks for valid URIs like FPE_1997_12_16_V01.CSV?&delim=;column=field20 where arg0 is "".
