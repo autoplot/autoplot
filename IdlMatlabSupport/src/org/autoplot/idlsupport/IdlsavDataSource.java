@@ -128,12 +128,27 @@ public class IdlsavDataSource extends AbstractDataSource {
             datas[i]= result;
             
         }
-        
+                
         switch( names.length ) {
-            case 1: return datas[0];
-            case 2: return Ops.link(datas[0],datas[1]);
-            case 3: return Ops.link(datas[0],datas[1],datas[2]);
-            case 4: return Ops.link(datas[0],datas[1],datas[2],datas[3]);
+            case 1: {
+                return datas[0];
+            }
+            case 2: {
+                return Ops.link(datas[0],datas[1]);
+            }
+            case 3: {
+                if ( datas[2].length()!=datas[0].length() ) { // automatically transpose, since this happens with IDL often.
+                    if ( datas[2].rank()==2 ) {
+                        if ( datas[2].length(0)==datas[0].length() ) {
+                            datas[2]= Ops.transpose(datas[2]);
+                        }
+                    }
+                }
+                return Ops.link(datas[0],datas[1],datas[2]);
+            }
+            case 4: {
+                return Ops.link(datas[0],datas[1],datas[2],datas[3]);
+            }
             default: throw new IllegalArgumentException("not supported");
         }
     }
