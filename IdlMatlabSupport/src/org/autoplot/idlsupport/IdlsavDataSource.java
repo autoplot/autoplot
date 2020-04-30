@@ -1,13 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.idlsupport;
 
-import com.jmatio.io.MatFileReader;
-import com.jmatio.types.MLArray;
-import com.jmatio.types.MLNumericArray;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -19,7 +12,6 @@ import org.autoplot.datasource.AbstractDataSource;
 import org.das2.qds.ArrayDataSet;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
-import org.das2.qds.buffer.BufferDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.util.monitor.ProgressMonitor;
 
