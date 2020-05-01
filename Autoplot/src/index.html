@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2020-04-30 r24820):</p>
         <ul>
+            <li>Slope drag renderer shows fit equations when yaxis or xaxis is log.
             <li>EnumerationUnits within a DataPointRecorder would cause problem when file was loaded and then additional points are added.
             <li>corrections to IDLSav files containing structures with string tags.
             <li>new make aggregation code would assume there wasn't already a question mark in the URI, creating URIs with two question marks.
@@ -60,6 +61,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Mouse modules' label is rounded.
             <li>Units.createDatum(Datum) added, so that codes don't have to check for EnumerationUnits so much when ingesting Datums.
             <li>IDLSav files allow X,Y,Z notation like the .mat (Matlab) files support.  Automatically transpose array to make fit.
             <li>Initial support for reading data from IDLSav files introduced.
