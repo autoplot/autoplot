@@ -42,7 +42,6 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
                 return true;
             }
             
-            List<CompletionContext> ccresult= new ArrayList<>();
             File file= DataSetURI.getFile( split.resourceUri, mon );
             
             ByteBuffer buf= ReadIDLSav.readFileIntoByteBuffer(file);
@@ -50,20 +49,17 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             
             String[] vars= var.split(",",-2);
             
-            for ( int ivar=0; ivar<vars.length; ivar++ ) {
-                var= vars[ivar];
-                        
+            for (String var1 : vars) {
+                var = var1;
                 boolean found= false;
-                for ( int i=0; i<names.length; i++ ) {
-                    if ( var.startsWith(names[i]) ) {
+                for (String name : names) {
+                    if (var.startsWith(name)) {
                         found= true;
                     }
                 }
-            
                 if ( !found ) {
                     problems.add("no plottable parameters start with "+var);
                 }
-            
                 ReadIDLSav reader= new ReadIDLSav();
                 TagDesc t= reader.readTagDesc( buf, var );
                 if ( t==null ) {
@@ -156,8 +152,8 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
                     }
                 }
             } else {
-                for ( int i=0; i<names.length; i++ ) {
-                    addCompletions( reader, null, names[i], buf, ccresult );
+                for (String name : names) {
+                    addCompletions(reader, null, name, buf, ccresult);
                 }
             }
             return ccresult;
