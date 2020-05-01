@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
+import org.autoplot.datasource.DataSourceUtil;
 import org.das2.catalog.DasDirNode;
 import org.das2.catalog.DasNode;
 import org.das2.catalog.DasResolveException;
@@ -111,14 +112,15 @@ public class NodeFactory
 		//File file = fo.getFile();
 		//String s = FileUtil.readFileToString(file);
 		
-		BufferedInputStream input = new BufferedInputStream(new URL(sUrl).openStream());
-		ByteArrayOutputStream output = new ByteArrayOutputStream(100_000);
+		try ( BufferedInputStream input = new BufferedInputStream(new URL(sUrl).openStream());
+				ByteArrayOutputStream output = new ByteArrayOutputStream(100_000) ) {
 		
-		byte aBuf[] = new byte[1024];
-		int nRead;
-		while ((nRead = input.read(aBuf, 0, 1024)) != -1) { output.write(aBuf, 0, nRead); }
-		String sThing = output.toString("UTF-8");
-		return sThing;
+			byte aBuf[] = new byte[1024];
+			int nRead;
+			while ((nRead = input.read(aBuf, 0, 1024)) != -1) { output.write(aBuf, 0, nRead); }
+			String sThing = output.toString("UTF-8");
+			return sThing;
+		}
 	}
 	
 	static DasNode getDetachedRoot(String sUrl, ProgressMonitor mon, boolean bReload) 
