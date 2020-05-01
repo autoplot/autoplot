@@ -134,6 +134,10 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             if ( completable.contains(".") ) {
                 int i= completable.lastIndexOf('.');
                 String root= completable.substring(0,i);
+                int i2= root.lastIndexOf(",");
+                if ( i2>-1 ) {
+                    root= root.substring(i2+1);
+                }
                 Object o= reader.readVar( buf, root );
                 Map<String,Object> m= (Map<String,Object>)o;
                 for ( Entry<String,Object> e: m.entrySet() ) {
@@ -156,7 +160,23 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
                     addCompletions(reader, null, name, buf, ccresult);
                 }
             }
+            ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "xunits=", "units for the x values"));
+            ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "yunits=", "units for the y values"));
+            ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "units=", "units for the values"));
+            
             return ccresult;
+        } else if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_VALUE ) ) {
+            String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
+            switch (paramName) {
+                case "xunits":
+                    List<CompletionContext> result = new ArrayList<>();
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "t1970", "seconds since 1970-01-01T00:00" ) );
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "cdfTT2000", "cdf times" ) );
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "hours+since+2015-01-01T00:00", "arbitrary time base" ) );
+                    return result;
+                default:
+                    return super.getCompletions(cc, mon);
+            }
         } else {
             return super.getCompletions(cc, mon);
         }
