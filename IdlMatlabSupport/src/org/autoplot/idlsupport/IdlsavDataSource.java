@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Map;
 import org.autoplot.datasource.AbstractDataSource;
+import org.das2.datum.Units;
 import org.das2.qds.ArrayDataSet;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
@@ -127,6 +128,28 @@ public class IdlsavDataSource extends AbstractDataSource {
             result= Ops.putProperty( result, QDataSet.LABEL, names[i] );
             datas[i]= result;
             
+        }
+        
+        String sxunits= getParam("xunits","");
+        if ( sxunits.length()>0 ) {
+            Units xunits= Units.lookupUnits(sxunits);
+            if ( names.length>0 ) {
+                datas[0]= Ops.putProperty( datas[0], QDataSet.UNITS, xunits );
+            }
+        }
+
+        String syunits= getParam("yunits", "" );
+        if ( syunits.length()>0 ) {
+            Units yunits= Units.lookupUnits(syunits);
+            int ids= 1;
+            datas[ids]= Ops.putProperty( datas[ids], QDataSet.UNITS, yunits );
+        }
+        
+        String sunits= getParam("units", "" );
+        if ( sunits.length()>0 ) {
+            Units units= Units.lookupUnits(sunits);
+            int ids= names.length-1;
+            datas[ids]= Ops.putProperty( datas[ids], QDataSet.UNITS, units );
         }
                 
         switch( names.length ) {
