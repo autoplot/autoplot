@@ -754,7 +754,7 @@ public class ReadIDLSav {
         
         final int PREDEF_PREDEF= 0x01;
         final int PREDEF_INHERITS= 0x02;
-        final int PREDEF_IS_SUPER= 0x02;
+        final int PREDEF_IS_SUPER= 0x04;
         
         result.predef= rec.getInt(nextField+0);
         
@@ -1168,87 +1168,87 @@ public class ReadIDLSav {
         }
     }
     
-    public static void main( String[] args ) throws IOException {
-        Logger logger= Logger.getLogger("autoplot.idlsav");
-        //logger.setLevel( Level.FINE );
-        Handler h= new ConsoleHandler();
-        h.setLevel(Level.ALL);
-        logger.addHandler(h);
-            
-//        FileOutputStream fos = new FileOutputStream(new File("/tmp/test.autoplot.idlsav"));
+//    public static void main( String[] args ) throws IOException {
+//        Logger logger= Logger.getLogger("autoplot.idlsav");
+//        //logger.setLevel( Level.FINE );
+//        Handler h= new ConsoleHandler();
+//        h.setLevel(Level.ALL);
+//        logger.addHandler(h);
+//            
+////        FileOutputStream fos = new FileOutputStream(new File("/tmp/test.autoplot.idlsav"));
+////        
+////        WriteIDLSav widls= new WriteIDLSav();
+////        //widls.addVariable( "wxyz", new double[] { 120,100,120,45,46,47,48,49,120,100,120 } );
+////        widls.addVariable( "abcd", 240 );
+////        //widls.addVariable( "oneval", 19.95 );
+////        widls.write(fos);
+////        
+////        fos.close();
+//
+//        //RandomAccessFile aFile = new RandomAccessFile(
+//        //                    "/home/jbf/public_html/autoplot/data/sav/simple.idlsav","r");
+//        //RandomAccessFile aFile = new RandomAccessFile(
+//        //                    "/home/jbf/public_html/autoplot/data/sav/vnames.idlsav","r");
+//        //RandomAccessFile aFile = new RandomAccessFile(
+//        //                    "/home/jbf/public_html/autoplot/data/sav/scalars.idlsav","r");
+//        //RandomAccessFile aFile = new RandomAccessFile(
+//        //                    "/home/jbf/public_html/autoplot/data/sav/arrayVsScalar.idlsav","r");
+//        //RandomAccessFile aFile = new RandomAccessFile(
+//        //                    "/home/jbf/public_html/autoplot/data/sav/floats.idlsav","r");
+//        //RandomAccessFile aFile = new RandomAccessFile(
+//        //                /home/jbf/public_html/autoplot/data/sav/structureOfLonarr.idlsav    "/home/jbf/public_html/autoplot/data/sav/doublearray.idlsav","r");
+//        //RandomAccessFile aFile = new RandomAccessFile(
+//        //                  "/home/jbf/public_html/autoplot/data/sav/structureOfLonarr.idlsav","r");
+//        //RandomAccessFile aFile = new RandomAccessFile(
+//        //                    "/home/jbf/public_html/autoplot/data/sav/arrayOfStruct.idlsav","r");
+//        //RandomAccessFile aFile = new RandomAccessFile(
+//        //                    "/home/jbf/public_html/autoplot/data/sav/arrayOfStruct1Var.idlsav","r");
+//        //RandomAccessFile aFile = new RandomAccessFile(
+//        //                    "/home/jbf/public_html/autoplot/data/sav/structure.idlsav","r");
+//        //RandomAccessFile aFile = new RandomAccessFile(
+//        //                    "/home/jbf/public_html/autoplot/data/sav/structureWithinStructure.idlsav","r");
+//        //RandomAccessFile aFile = new RandomAccessFile(
+//        //                    "/home/jbf/public_html/autoplot/data/sav/stuctOfStruct.idlsav","r");
+//        //RandomAccessFile aFile = new RandomAccessFile(
+//        //                    "/home/jbf/public_html/autoplot/data/sav/stuctOfStructOfStruct.idlsav","r");
+//        //RandomAccessFile aFile = new RandomAccessFile(
+//        //                    "/home/jbf/public_html/autoplot/data/sav/stuctOfStructOfStruct.idlsav","r");
+//        RandomAccessFile aFile = new RandomAccessFile(
+//                            "/home/jbf/ct/autoplot/data/sav/kristoff/test_fit.idlsav","r");
+//                
+//        FileChannel inChannel = aFile.getChannel();
+//        long fileSize = inChannel.size();
 //        
-//        WriteIDLSav widls= new WriteIDLSav();
-//        //widls.addVariable( "wxyz", new double[] { 120,100,120,45,46,47,48,49,120,100,120 } );
-//        widls.addVariable( "abcd", 240 );
-//        //widls.addVariable( "oneval", 19.95 );
-//        widls.write(fos);
+//        ByteBuffer buffer = ByteBuffer.allocate((int) fileSize);
+//        int bytesRead= 0;
+//        while ( bytesRead<fileSize ) {
+//            bytesRead+= inChannel.read(buffer);
+//        }
+//       
+//        Map<String,Object> vars= new ReadIDLSav().readVars(buffer);
 //        
-//        fos.close();
-
-        //RandomAccessFile aFile = new RandomAccessFile(
-        //                    "/home/jbf/public_html/autoplot/data/sav/simple.idlsav","r");
-        //RandomAccessFile aFile = new RandomAccessFile(
-        //                    "/home/jbf/public_html/autoplot/data/sav/vnames.idlsav","r");
-        //RandomAccessFile aFile = new RandomAccessFile(
-        //                    "/home/jbf/public_html/autoplot/data/sav/scalars.idlsav","r");
-        //RandomAccessFile aFile = new RandomAccessFile(
-        //                    "/home/jbf/public_html/autoplot/data/sav/arrayVsScalar.idlsav","r");
-        //RandomAccessFile aFile = new RandomAccessFile(
-        //                    "/home/jbf/public_html/autoplot/data/sav/floats.idlsav","r");
-        //RandomAccessFile aFile = new RandomAccessFile(
-        //                /home/jbf/public_html/autoplot/data/sav/structureOfLonarr.idlsav    "/home/jbf/public_html/autoplot/data/sav/doublearray.idlsav","r");
-        //RandomAccessFile aFile = new RandomAccessFile(
-        //                  "/home/jbf/public_html/autoplot/data/sav/structureOfLonarr.idlsav","r");
-        //RandomAccessFile aFile = new RandomAccessFile(
-        //                    "/home/jbf/public_html/autoplot/data/sav/arrayOfStruct.idlsav","r");
-        //RandomAccessFile aFile = new RandomAccessFile(
-        //                    "/home/jbf/public_html/autoplot/data/sav/arrayOfStruct1Var.idlsav","r");
-        //RandomAccessFile aFile = new RandomAccessFile(
-        //                    "/home/jbf/public_html/autoplot/data/sav/structure.idlsav","r");
-        //RandomAccessFile aFile = new RandomAccessFile(
-        //                    "/home/jbf/public_html/autoplot/data/sav/structureWithinStructure.idlsav","r");
-        //RandomAccessFile aFile = new RandomAccessFile(
-        //                    "/home/jbf/public_html/autoplot/data/sav/stuctOfStruct.idlsav","r");
-        //RandomAccessFile aFile = new RandomAccessFile(
-        //                    "/home/jbf/public_html/autoplot/data/sav/stuctOfStructOfStruct.idlsav","r");
-        //RandomAccessFile aFile = new RandomAccessFile(
-        //                    "/home/jbf/public_html/autoplot/data/sav/stuctOfStructOfStruct.idlsav","r");
-        RandomAccessFile aFile = new RandomAccessFile(
-                            "/home/jbf/ct/autoplot/data/sav/kristoff/test_fit.idlsav","r");
-                
-        FileChannel inChannel = aFile.getChannel();
-        long fileSize = inChannel.size();
-        
-        ByteBuffer buffer = ByteBuffer.allocate((int) fileSize);
-        int bytesRead= 0;
-        while ( bytesRead<fileSize ) {
-            bytesRead+= inChannel.read(buffer);
-        }
-       
-        Map<String,Object> vars= new ReadIDLSav().readVars(buffer);
-        
-        for ( Entry<String,Object> v : vars.entrySet() ) {
-            System.err.println( v );
-            if ( v.getValue() instanceof Map ) {
-                Map<String,Object> m= (Map<String,Object>)v.getValue();
-                for ( Entry<String,Object> j : m.entrySet() ) {
-                    Object k= j.getValue();
-                    if ( k instanceof ArrayData ) {
-                        System.err.print(j.getKey()+":");
-                        StringBuilder b= new StringBuilder();
-                        arrayToString( ((ArrayData)k).array, b);
-                        System.err.println(b.toString());
-                    } else if ( k==null ) {
-                        System.err.println("<<null>>");
-                    } else {
-                        System.err.println(k.toString());
-                    }
-                }
-            } else {
-                System.err.println(v.getValue());
-            }
-        }
-        
-    }
+//        for ( Entry<String,Object> v : vars.entrySet() ) {
+//            System.err.println( v );
+//            if ( v.getValue() instanceof Map ) {
+//                Map<String,Object> m= (Map<String,Object>)v.getValue();
+//                for ( Entry<String,Object> j : m.entrySet() ) {
+//                    Object k= j.getValue();
+//                    if ( k instanceof ArrayData ) {
+//                        System.err.print(j.getKey()+":");
+//                        StringBuilder b= new StringBuilder();
+//                        arrayToString( ((ArrayData)k).array, b);
+//                        System.err.println(b.toString());
+//                    } else if ( k==null ) {
+//                        System.err.println("<<null>>");
+//                    } else {
+//                        System.err.println(k.toString());
+//                    }
+//                }
+//            } else {
+//                System.err.println(v.getValue());
+//            }
+//        }
+//        
+//    }
 
 }
