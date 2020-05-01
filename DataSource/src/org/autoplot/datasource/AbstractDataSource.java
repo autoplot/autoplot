@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static org.autoplot.datasource.DataSetURI.fromUri;
-import static org.autoplot.datasource.DataSetURI.getFile;
 import org.das2.qds.buffer.BufferDataSet;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.DatumRange;
@@ -94,6 +93,7 @@ public abstract class AbstractDataSource implements DataSource {
      * Note that this is not necessarily the extension associated with the DataSource.  For example,
      * ImageDataSource has a canonical extension of ".jpg", but for a png file this will return .png.
      * 
+     * @param url the URL.
      * @return lower-case extension with a period, or empty string.
      */
     protected String getExt(URL url) {
@@ -103,13 +103,7 @@ public abstract class AbstractDataSource implements DataSource {
             logger.fine("Failed to convert URL to URI.");
             return "";
         }
-        /*String s = url.getFile();
-        int i = s.lastIndexOf("."); // URI okay
-        if (i == -1) {
-        return "";
-        } else {
-        return s.substring(i).toLowerCase();
-        }*/    }
+    }
 
     protected String getExt(URI uri) {
         String s = uri.getPath();
@@ -120,6 +114,7 @@ public abstract class AbstractDataSource implements DataSource {
             return s.substring(i).toLowerCase();
         }
     }
+    
     /**
      * available to subclasses for convenience.  
      */
