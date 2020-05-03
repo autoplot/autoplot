@@ -22,7 +22,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -52,6 +51,8 @@ import org.python.util.PythonInterpreter;
 /**
  * Run a script on the server side, and produce a client-side GUI for the 
  * getParam calls.
+ * Note this has logging installed which is set up in code, which is bad practice.  This should be 
+ * removed should this be used in production!
  * @author jbf
  */
 public class ScriptGUIServlet extends HttpServlet {
@@ -64,7 +65,13 @@ public class ScriptGUIServlet extends HttpServlet {
         timelogger= Logger.getLogger("autoplot.servlet.script.gui.timing");
         timelogger.setLevel(Level.FINE);
         try {
-            Handler h= new FileHandler( "%h/log/tomcat/scriptGuiTiming.%g.log" );
+            final Handler h= new FileHandler( "%h/log/tomcat/scriptGuiTiming.%g.log" ) {
+                @Override
+                public synchronized void publish(LogRecord record) {
+                    super.publish(record);
+                    flush();
+                }
+            };
             Formatter f= new Formatter() {
                 @Override
                 public String format(LogRecord record) {
