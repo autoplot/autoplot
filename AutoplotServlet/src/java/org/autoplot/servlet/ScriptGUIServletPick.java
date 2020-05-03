@@ -16,6 +16,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +40,19 @@ public class ScriptGUIServletPick extends HttpServlet {
             File scriptLogFile= new File( scriptLogArea, "ScriptGUIServlet.log" );
             return scriptLogFile;
     }
+    
+    private static boolean isWhiteListed( String uri ) throws IOException {
+        boolean whiteListed= false;
+        List<String> whiteList= ServletUtil.getWhiteList();
+        for ( String s: whiteList ) {
+            if ( Pattern.matches( s, uri ) ) {
+                whiteListed= true;
+                logger.fine("uri is whitelisted");
+            }
+        }
+        return whiteListed;
+    }
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -67,9 +81,11 @@ public class ScriptGUIServletPick extends HttpServlet {
                     String s= r.readLine();
                     while ( s!=null ) {
                         String script= s.substring(25);
-                        scripts.remove(script);
-                        scripts.add(script);
-                        s= r.readLine();
+                        if ( isWhiteListed(script) ) {
+                            scripts.remove(script);
+                            scripts.add(script);
+                        }
+                        s= r.readLine();     
                     }
                 } catch ( IOException ex ) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
