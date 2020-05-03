@@ -101,9 +101,9 @@ public final class PropertiesFilePreferences extends AbstractPreferences {
         File propertiesFile= new File(dir, propertiesFileName);
         if ( !propertiesFile.exists() ) {
             if ( !propertiesFile.getParentFile().canWrite() ) {
-                logger.log(Level.INFO, "unable to write prefs file at {0}", propertiesFile);
+                logger.log(Level.FINE, "unable to write prefs file at {0}", propertiesFile);
             } else {
-                logger.log(Level.INFO, "creating prefs file at {0}", propertiesFile);
+                logger.log(Level.FINE, "creating prefs file at {0}", propertiesFile);
             }
         }
         this.file = new PropertiesFile(propertiesFile);
