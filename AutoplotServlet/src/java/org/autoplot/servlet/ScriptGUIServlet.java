@@ -16,8 +16,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +41,7 @@ import org.autoplot.scriptconsole.LoggingOutputStream;
 import org.das2.datum.Datum;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
+import org.das2.datum.Units;
 import org.das2.graph.DasCanvas;
 import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
@@ -51,6 +57,31 @@ import org.python.util.PythonInterpreter;
 public class ScriptGUIServlet extends HttpServlet {
 
     static final Logger logger= Logger.getLogger("autoplot.servlet.scriptgui");
+    
+    static Logger timelogger;
+    
+    static {
+        timelogger= Logger.getLogger("autoplot.servlet.script.gui.timing");
+        timelogger.setLevel(Level.FINE);
+        try {
+            Handler h= new FileHandler( "%h/log/tomcat/scriptGuiTiming.%g.log" );
+            Formatter f= new Formatter() {
+                @Override
+                public String format(LogRecord record) {
+                    String msg= formatMessage(record);
+                    return Units.t1970.createDatum(record.getMillis()).toString() + ":" + msg + "\n";
+                }
+            };
+            h.setFormatter( f );
+            timelogger.addHandler(h);
+        } catch (IOException ex) {
+            Logger.getLogger(ScriptGUIServlet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(ScriptGUIServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    File logfile= new File( "/home/jbf/log/ScriptGUIServlet.log" );
     
     /**
      * write out the current canvas to stdout.  This is introduced to support servers.
@@ -191,14 +222,14 @@ public class ScriptGUIServlet extends HttpServlet {
         script= "def showMessageDialog(msg): \n    pass\n" + script;
         
         long t0= System.currentTimeMillis();
-        logger.log(Level.FINE, "begin runScript {0}", name);
+        timelogger.log(Level.FINE, "begin runScript {0}", name);
         JythonUtil.runScript( dom,
                 new ByteArrayInputStream(script.getBytes("UTF-8")),
                 name,
                 aaparams,
                 pwd );
-        logger.log(Level.FINE, "end runScript {0} ({1}ms)", new Object[]{name, System.currentTimeMillis()-t0});
-        
+        timelogger.log(Level.FINE, "end runScript {0} ({1}ms)", new Object[]{name, System.currentTimeMillis()-t0});
+                
         try (OutputStream out = response.getOutputStream()) {
             writeToPng(dom,out);
             try { los1.close(); } catch ( IOException ex ) {}
@@ -293,10 +324,10 @@ public class ScriptGUIServlet extends HttpServlet {
         env.put( "PWD", pwd );
         
         long t0= System.currentTimeMillis();
-        logger.log(Level.FINE, "begin describeScript {0}", name);
+        timelogger.log(Level.FINE, "begin describeScript {0}", name);
         org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor sd= 
             org.autoplot.jythonsupport.JythonUtil.describeScript( env, script, ssparams );
-        logger.log(Level.FINE, "end describeScript {0} ({1}ms)", new Object[]{name, System.currentTimeMillis()-t0});
+        timelogger.log(Level.FINE, "end describeScript {0} ({1}ms)", new Object[]{name, System.currentTimeMillis()-t0});
         
         try (PrintWriter out = response.getWriter()) {
             out.println("<!DOCTYPE html>");
