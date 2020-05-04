@@ -385,7 +385,7 @@ public class ScriptGUIServlet extends HttpServlet {
                     }
                 } else if ( (p.type=='F') || (p.type=='A') ) {
                     Object s= (p.value!=null) ? p.value : p.deft;
-                    if ( p.examples.size()>0 ) {
+                    if ( p.examples!=null && p.examples.size()>0 ) {
                         out.println("<input name='"+p.name+"' value='"+s+"' list='examples"+p.name+"'></input>");
                         out.println("<datalist id='examples"+p.name+"'>");
                         for ( Object ex: p.examples ) {
@@ -398,7 +398,11 @@ public class ScriptGUIServlet extends HttpServlet {
                 } else if ( p.type=='T' ) {
                     //TODO: nice timerange GUI
                     Object s= (p.value!=null) ? p.value : p.deft;
-                    out.println("<input name='"+p.name+"' value='"+s+"'></input>");
+                    out.println("<input name='"+p.name+"' value='"+s+"'></input><br>");
+                    out.println("<script language='javascript' src='util.js'></script>");
+                    out.println("<button title='Previous interval' onclick='scanPrev()'>&lt;&lt; PREV</button>");
+                    out.println("<button title='Next interval' onclick='scanNext()'>NEXT &gt;&gt;</button>");
+                    //out.println("<script language='javascript'>addScanButtons(dom.getElementById('"+p.name+"'),null,null)</script>");
                 } else {
                     //TODO: GUIs for URIs and other parameters.
                     Object s= (p.value!=null) ? p.value : p.deft;
