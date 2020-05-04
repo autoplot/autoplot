@@ -385,7 +385,16 @@ public class ScriptGUIServlet extends HttpServlet {
                     }
                 } else if ( (p.type=='F') || (p.type=='A') ) {
                     Object s= (p.value!=null) ? p.value : p.deft;
-                    out.println("<input name='"+p.name+"' value='"+s+"'></input>");
+                    if ( p.examples.size()>0 ) {
+                        out.println("<input name='"+p.name+"' value='"+s+"' list='examples"+p.name+"'></input>");
+                        out.println("<datalist id='examples"+p.name+"'>");
+                        for ( Object ex: p.examples ) {
+                            out.println("<option value='"+ex+"'>"+ex+"</option>");
+                        }
+                        out.println("</datalist>");
+                    } else {
+                        out.println("<input name='"+p.name+"' value='"+s+"'></input>");
+                    }
                 } else if ( p.type=='T' ) {
                     //TODO: nice timerange GUI
                     Object s= (p.value!=null) ? p.value : p.deft;
