@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>IDLSave file which sat for twenty years untouched can now be read into Autoplot.  The IDLSave file was from an IDL digitizing code that was used to identify a reference point in images.  The <a href='https://www.youtube.com/watch?v=EfJv7em52eM'>video</a>.
+        <p><small>Slice of spectrogram interpolated using the trigrid rebin method, and slice setting "sliceRebinnedData" set to true.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-04-30 r24820):</p>
+        <p>Bugfixes (2020-05-05 r24844):</p>
+        <ul>
+            <li>aggregation of CDF file with 1 record in a file would fail because BufferDataSet.append code was incorrectly implemented.
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>Slope drag renderer shows fit equations when yaxis or xaxis is log.
             <li>EnumerationUnits within a DataPointRecorder would cause problem when file was loaded and then additional points are added.
@@ -53,13 +57,11 @@
             <li>AsciiParser had some path which would result in a parsable line but then would fail to create a DelimParser.  Thanks, yumin!
             <li>714: corrections to yaxis locations for each pixel row.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>2255: rfe711 was incorrectly implemented when appending two datasets.  Thanks, Ivar!
-            <li>0484: improve support for guessing aggregations, by looking at extent of digits and for constant digits.  Thanks, Mike!
-            <li>1146: condition where flipped axes and no yTagWidth guess would cause index out of bounds.  Thanks, Mike!
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>bundle of rank 2 datasets can be exported to CDF file.  Thanks, Kristoff!
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>Mouse modules' label is rounded.
             <li>Units.createDatum(Datum) added, so that codes don't have to check for EnumerationUnits so much when ingesting Datums.
@@ -73,13 +75,6 @@
             <li>NetCDF variable attributes are visible in USER_PROPERTIES, and long_name is used for label when nothing else is available.
             <li>NetCDF GOES n,3 arrays are rendered as X,Y,Z components to match CDAWeb logic. 
             <li>ASCII table GUI allows selection of values to use for y-tags (depend1Values keyword).  Thanks, Bill!
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>714: other improvements to image data source, like showing plot titles in completions.
-            <li>698: support read of old Matlab .mat files, containing rank 1 or rank 2 data and structures and datetime arrays.  Thanks, Chris!
-            <li>714: ImageDataSource clip=T switch allows aggregation of images containing plotInfo.
-            <li>713: GitHub support now supports branches.
         </ul>
         <p>Known issues:</p>
         <ul>
