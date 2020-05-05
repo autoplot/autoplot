@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 import org.das2.qds.DataSetOps;
 import org.das2.qds.SemanticOps;
+import org.das2.qds.TailBundleDataSet;
 import org.das2.qds.examples.Schemes;
 import org.das2.qds.ops.Ops;
 
@@ -242,10 +243,19 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
             if ( bds!=null && dep1==null && "T".equals(params.get("bundle")) ) {
                 for ( int i=0; i<bds.length(); i++ ) {
-                    QDataSet data1= Ops.unbundle( data, i ) ;
+                    QDataSet data1= Ops.unbundle( data, 0 ) ;
                     addVariableRankN( cdf, data1, nameFor(data1), false, params, mon );
                     if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data1), "DEPEND_0", CDFDataType.CHAR, nameFor(dep0) );
                 }
+                
+            } else if ( data instanceof TailBundleDataSet && data.rank()==3 ) {
+                int n= data.length(0,0);
+                for ( int i=0; i<n; i++ ) {
+                    QDataSet data1= Ops.slice2( data, i );
+                    addVariableRankN( cdf, data1, nameFor(data1), false, params, mon );
+                    if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data1), "DEPEND_0", CDFDataType.CHAR, nameFor(dep0) );
+                }
+                
             } else {
                 addVariableRankN( cdf, data, nameFor(data), false, params, mon );
 
