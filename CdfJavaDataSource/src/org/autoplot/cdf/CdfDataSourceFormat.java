@@ -243,7 +243,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
             if ( bds!=null && dep1==null && "T".equals(params.get("bundle")) ) {
                 for ( int i=0; i<bds.length(); i++ ) {
-                    QDataSet data1= Ops.unbundle( data, 0 ) ;
+                    QDataSet data1= Ops.unbundle( data, i ) ;
                     addVariableRankN( cdf, data1, nameFor(data1), false, params, mon );
                     if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data1), "DEPEND_0", CDFDataType.CHAR, nameFor(dep0) );
                 }
