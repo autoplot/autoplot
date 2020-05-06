@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 import org.das2.qds.DataSetOps;
 import org.das2.qds.SemanticOps;
-import org.das2.qds.TailBundleDataSet;
 import org.das2.qds.examples.Schemes;
 import org.das2.qds.ops.Ops;
 
@@ -44,13 +43,13 @@ import org.das2.qds.ops.Ops;
 public class CdfDataSourceFormat implements DataSourceFormat {
 
     Map<QDataSet,String> names;
-    Map<String,QDataSet> seman;
+    Map<String,QDataSet> namesRev;
 
     private static final Logger logger= LoggerManager.getLogger("apdss.cdf");
     
     public CdfDataSourceFormat() {
         names= new HashMap<>();
-        seman= new HashMap<>();
+        namesRev= new HashMap<>();
     }
 
     //@Override
@@ -66,9 +65,9 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         }
         
         name = (String) dep0.property(QDataSet.NAME);
-        if ( seman.containsKey(name) ) {
+        if ( namesRev.containsKey(name) ) {
             int i= 1;
-            while ( seman.containsKey(name+"_"+i) ) {
+            while ( namesRev.containsKey(name+"_"+i) ) {
                 i=i+1;
             }
             name= name + "_"+ i;
@@ -79,12 +78,12 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             if ( units!=null && UnitsUtil.isTimeLocation(units)) {
                 name = "Epoch";
             } else {
-                name = "Variable_" + seman.size();
+                name = "Variable_" + namesRev.size();
             }
         }
         
         names.put(dep0, name);
-        seman.put(name, dep0);
+        namesRev.put(name, dep0);
         
         return name;
     }
@@ -110,7 +109,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             } else {
                 CDFReader read= new CDFReader( ffile.toString() );
                 for ( String n : read.getVariableNames() ) {
-                    seman.put( n,null );
+                    namesRev.put( n,null );
                 }
                 logger.log(Level.FINE, "call cdf= new CDFWriter( {0}, false )", ffile.toString() );
                 cdf = new CDFWriter( ffile.toString(), false ); // read in the old file first
@@ -121,7 +120,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
             if ( name1!=null ) {
                 names.put(data,name1);
-                seman.put(name1,data);
+                namesRev.put(name1,data);
             }
 
             nameFor(data); // allocate a good name
