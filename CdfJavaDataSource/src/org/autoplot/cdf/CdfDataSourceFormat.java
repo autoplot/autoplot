@@ -248,7 +248,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                     if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data1), "DEPEND_0", CDFDataType.CHAR, nameFor(dep0) );
                 }
                 
-            } else if ( data instanceof TailBundleDataSet && data.rank()==3 ) {
+            } else if ( data.rank()==3 && data.property(QDataSet.BUNDLE_2)!=null && "T".equals(params.get("bundle")) ) {
                 int n= data.length(0,0);
                 for ( int i=0; i<n; i++ ) {
                     QDataSet data1= Ops.slice2( data, i );
