@@ -332,11 +332,19 @@ public class NamedURIListTool extends JPanel {
                 List<String> recent= DataSetSelector.getDefaultRecent();
                 List<String> recentSansInline= new ArrayList<>();
                 for ( String s: recent ) {
-                    if ( !s.startsWith("vap+inline:") ) { // don't include mash-ups in the list of things to mash-up.
-                        URISplit split= URISplit.parse(s);
-                        if ( !".vap".equals(split.ext) ) {
-                            recentSansInline.add(s);
+                    if ( s.startsWith("vap+inline:") ) {
+                        if ( s.contains("getDataSet") ) {
+                            logger.log(Level.FINEST, "skipping {0}", s);
+                            continue;  // don't include mash-ups in the list of things to mash-up.
                         }
+                    }
+                    URISplit split= URISplit.parse(s);
+                    if ( ".jy".equals(split.ext) ) {
+                        logger.log(Level.FINEST, "skipping {0}", s);
+                        continue;
+                    }
+                    if ( !".vap".equals(split.ext) ) {
+                        recentSansInline.add(s);
                     }
                 }
                 dss.setRecent( recentSansInline );
