@@ -980,7 +980,7 @@ public class CdfUtil {
                             result.nrec = getDimensions( cdf, result.dep )[0];
                         }
                     }
-                    if ( dims.length>(dim-2) && (result.nrec)!=dims[dim-1] ) {
+                    if ( dims.length>(dim-1) && (result.nrec)!=dims[dim-1] ) {
                         warn.add("DEPEND_"+dim+" length ("+result.nrec+") is inconsistent with length ("+dims[dim-1]+")" );
                     }
                 }
@@ -1000,7 +1000,7 @@ public class CdfUtil {
                     if (result.nrec == 1) {
                         result.nrec = cdf.getDimensions(svar)[0];
                     }
-                    if ( dims.length>(dim-2) && (result.nrec)!=dims[dim-1] ) {
+                    if ( dims.length>(dim-1) && (result.nrec)!=dims[dim-1] ) {
                         warn.add("LABL_PTR_"+dim+" length is inconsistent with length ("+dims[dim-1]+")" );
                     }
                 }
@@ -1013,7 +1013,7 @@ public class CdfUtil {
                     if ( nrec == 1 ) {
                         nrec = cdf.getDimensions(result.labl)[0];
                     }
-                    if ( dims.length>(dim-2) && (nrec)!=dims[dim-1] ) {
+                    if ( dims.length>(dim-1) && (nrec)!=dims[dim-1] ) {
                         warn.add("LABL_PTR_"+dim+" length is inconsistent with length ("+dims[dim-1]+")" );
                     }
                 }
