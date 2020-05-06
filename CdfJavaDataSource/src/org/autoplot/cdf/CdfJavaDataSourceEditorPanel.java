@@ -632,7 +632,14 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             logger.finest("inspect cdf for plottable parameters");
             
             boolean isMaster= fileName.contains("MASTERS");
-            parameterDescriptions= org.autoplot.cdf.CdfUtil.getPlottable( cdf, !this.showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, false, false );
+            
+            try {
+                parameterDescriptions= org.autoplot.cdf.CdfUtil.getPlottable( cdf, !this.showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, false, false );
+            } catch ( Exception ex ) {
+                this.parameterTree.setModel( new DefaultTreeModel( new DefaultMutableTreeNode("") ) );
+                this.paramInfo.setText( "<html>Unable to work with metadata in CDF file:<br>"+ex );
+                throw ex;
+            }
             
             Map<String,String> allParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, QDataSet.MAX_RANK, true, isMaster );
             Map<String,String> dataParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable( cdf, true, QDataSet.MAX_RANK, true, isMaster );
