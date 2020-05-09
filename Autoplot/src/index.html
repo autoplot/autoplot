@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Slice of spectrogram interpolated using the trigrid rebin method, and slice setting "sliceRebinnedData" set to true.
+        <p><small>Crosshair digitizer looking up Z values from spectra, would fail with rank 3 bundle of 1-record tables.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,9 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-05-05 r24844):</p>
+        <p>Bugfixes (2020-05-09 r24844):</p>
         <ul>
+            <li>Crosshair digitizer looking up Z values from spectra, would fail with rank 3 bundle of 1-record tables.  Thanks, George!
+            <li>Don't include .jy scripts in list of mashable recent datasets.
             <li>aggregation of CDF file with 1 record in a file would fail because BufferDataSet.append code was incorrectly implemented.
+            <li>findbugs OS_OPEN_STREAM in old das2stream code.
         </ul>
         <p>Older Bugfixes:</p>
         <ul>
