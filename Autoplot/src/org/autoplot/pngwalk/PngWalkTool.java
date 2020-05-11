@@ -1732,7 +1732,6 @@ public final class PngWalkTool extends javax.swing.JPanel {
     private void writeContactSheet() {
         Component ttt= tabs.getTabByTitle("Grid");
         if ( ttt instanceof GridPngWalkView ) {
-            BufferedImage im= ((GridPngWalkView)ttt).paintContactSheet();
             try {
                 Preferences prefs= Preferences.userNodeForPackage(PngWalkTool.class);
                 String fname= prefs.get( "writeToContactSheet", "/tmp/contactSheet.png" );
@@ -1755,14 +1754,27 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     if ( !f.getName().endsWith(".png") ) {
                         f= new File( f.getParentFile(), f.getName()+".png" );
                     }
+                    writeContactSheet( f );
                     prefs.put( "writeToContactSheet", f.toString() );
-                    ImageIO.write( im, "png", f );
-                    setMessage("Wrote to "+f);
                 }
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, null, ex);
                 JOptionPane.showMessageDialog( parentWindow, "Error while creating contact sheet");
             }
+        }
+    }
+
+    /**
+     * write the current Grid view to a single PNG file.
+     * @param f
+     * @throws IOException 
+     */
+    public void writeContactSheet( File f ) throws IOException {
+        Component ttt= tabs.getTabByTitle("Grid");
+        if ( ttt instanceof GridPngWalkView ) {
+            BufferedImage im= ((GridPngWalkView)ttt).paintContactSheet();
+            ImageIO.write( im, "png", f );
+            setMessage("Wrote to "+f);
         }
     }
     
