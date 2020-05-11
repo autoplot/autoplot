@@ -98,6 +98,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.filechooser.FileFilter;
 import org.das2.components.DasProgressPanel;
 import org.das2.components.DataPointRecorder;
 import org.das2.components.TearoffTabbedPane;
@@ -1046,6 +1047,18 @@ public final class PngWalkTool extends javax.swing.JPanel {
         
         result.add( toolsMenu );
         
+        final JMenuItem writeContactSheet= new JMenuItem( new AbstractAction( "Write to PNG Contact Sheet..." ) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);        
+                tool.writeContactSheet();
+            }
+        });
+        writeContactSheet.setToolTipText("Write the visible thumbnails to PNG file.");
+        toolsMenu.add( writeContactSheet );
+        
+        result.add( toolsMenu );
+        
         final JMenu bookmarksMenu= new JMenu("Bookmarks");
         final BookmarksManager man= new BookmarksManager(frame,true,"PNG Bookmarks");
 
@@ -1714,6 +1727,43 @@ public final class PngWalkTool extends javax.swing.JPanel {
      */
     public void setDigitizerRecording( boolean enable ) {
         this.digitizerRecording= enable;
+    }
+
+    private void writeContactSheet() {
+        Component ttt= tabs.getTabByTitle("Grid");
+        if ( ttt instanceof GridPngWalkView ) {
+            BufferedImage im= ((GridPngWalkView)ttt).paintContactSheet();
+            try {
+                Preferences prefs= Preferences.userNodeForPackage(PngWalkTool.class);
+                String fname= prefs.get( "writeToContactSheet", "/tmp/contactSheet.png" );
+                JFileChooser chooser= new JFileChooser(fname);
+                if ( !fname.equals("/tmp/contactSheet.png") ) {
+                    chooser.setSelectedFile( new File(fname) );
+                }
+                chooser.setFileFilter( new FileFilter() {
+                    @Override
+                    public boolean accept(File f) {
+                        return f.isDirectory() || f.getName().endsWith(".png");
+                    }
+                    @Override
+                    public String getDescription() {
+                        return "PNG Files";
+                    }
+                });
+                if ( chooser.showSaveDialog(this)==JFileChooser.APPROVE_OPTION ) {
+                    File f= chooser.getSelectedFile();
+                    if ( !f.getName().endsWith(".png") ) {
+                        f= new File( f.getParentFile(), f.getName()+".png" );
+                    }
+                    prefs.put( "writeToContactSheet", f.toString() );
+                    ImageIO.write( im, "png", f );
+                    setMessage("Wrote to "+f);
+                }
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog( parentWindow, "Error while creating contact sheet");
+            }
+        }
     }
     
     public static interface ActionEnabler {

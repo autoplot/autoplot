@@ -151,6 +151,21 @@ public class GridPngWalkView extends PngWalkView {
 
         add(scrollPane);
     }
+    
+    /**
+     * provide the view as a static contact sheet.
+     * @return 
+     */
+    public BufferedImage paintContactSheet( ) {
+        int w= canvas.getWidth();
+        int h= canvas.getHeight();
+        BufferedImage im= new BufferedImage( w, h, BufferedImage.TYPE_INT_ARGB );
+        canvas.paint(im.getGraphics());
+        int y0= this.scrollPane.getViewport().getViewRect().y;
+        int yh= this.scrollPane.getViewport().getHeight();
+        im= im.getSubimage( 0, y0, im.getWidth(), yh );
+        return im;
+    }
 
     private void updateLayout() {
         if (canvas == null) return;
