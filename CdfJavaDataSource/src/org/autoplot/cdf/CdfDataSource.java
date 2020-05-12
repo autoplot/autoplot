@@ -1332,7 +1332,7 @@ public class CdfDataSource extends AbstractDataSource {
 
         // CDF uses DELTA_PLUS and DELTA_MINUS on a dependency to represent the BIN boundaries.
         // vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/po_h0_tim_19960409_v03.cdf?Flux_H has units error.
-        boolean doPlusMinus= loadDependents==false;
+        boolean doPlusMinus= loadDependents==false || getParam("loadErrors","F").equals("T");
         Object deltaPlus= thisAttributes.get( "DELTA_PLUS_VAR" );
         Object deltaMinus= thisAttributes.get( "DELTA_MINUS_VAR" );
         if ( doPlusMinus 
@@ -1347,11 +1347,13 @@ public class CdfDataSource extends AbstractDataSource {
                     delta= null;
                 }
                 if ( delta!=null ) {
+                    String plusAttr= loadDependents==false ? QDataSet.BIN_PLUS : QDataSet.DELTA_PLUS;
+                    String minusAttr= loadDependents==false ? QDataSet.BIN_MINUS : QDataSet.DELTA_MINUS;
                     Units deltaUnits= SemanticOps.getUnits(delta);
                     if ( UnitsUtil.isRatioMeasurement(deltaUnits)
                             && deltaUnits.isConvertibleTo( SemanticOps.getUnits(result).getOffsetUnits() )
                             && ( delta.rank()==0 || result.length()==delta.length() ) ) {
-                        result.putProperty( QDataSet.BIN_PLUS, delta );
+                        result.putProperty( plusAttr, delta );
                         if ( !deltaMinus.equals(deltaPlus) ) {
                             delta= getDeltaPlusMinus( cdf, result, (String)deltaMinus, constraints );
                             if ( delta.length()==1 && delta.rank()==1 && delta.length()!=result.length() ) {
@@ -1359,9 +1361,9 @@ public class CdfDataSource extends AbstractDataSource {
                             }
                         }
                         if ( SemanticOps.getUnits(delta).isConvertibleTo( SemanticOps.getUnits(result).getOffsetUnits() ) ) {
-                            result.putProperty( QDataSet.BIN_MINUS, delta );
+                            result.putProperty( minusAttr, delta );
                         } else {
-                            result.putProperty( QDataSet.BIN_PLUS, null );
+                            result.putProperty( plusAttr, null );
                             logger.log(Level.FINE, "DELTA_MINUS_VAR units are not convertible: {0}", SemanticOps.getUnits(delta));
                         }
                     } else {
