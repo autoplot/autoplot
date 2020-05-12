@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Crosshair digitizer looking up Z values from spectra, would fail with rank 3 bundle of 1-record tables.
+        <p><small>PngWalkTool has tool to write out the grid view as a png, making a contact sheet.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,7 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-05-11 r24846):</p>
+        <p>Bugfixes (2020-05-12 r24858):</p>
         <ul>
             <li>Crosshair digitizer looking up Z values from spectra, would fail with rank 3 bundle of 1-record tables.  Thanks, George!
             <li>Don't include .jy scripts in list of mashable recent datasets.
@@ -62,6 +62,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>IDLSav data source has X=, Y=, and Z= keywords to match CDF.  Thanks, Scott!
+            <li>loadErrors=T introduced to CDF data source.  Thanks, Jon N!
             <li>Write contact sheet in PngWalkTool created.  Thanks, Kris!
             <li>bundle of rank 2 datasets can be exported to CDF file.  Thanks, Kristoff!
         </ul>
