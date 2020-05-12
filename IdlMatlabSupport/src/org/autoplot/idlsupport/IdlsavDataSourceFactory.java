@@ -37,7 +37,11 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             Map<String,String> params= URISplit.parseParams(split.params);
             String var= params.get(URISplit.PARAM_ARG_0);
             
-            if ( var==null ) {
+            String x= params.get("X");
+            String y= params.get("Y");
+            String z= params.get("Z");
+            
+            if ( var==null && x==null && y==null && z==null ) {
                 problems.add("need variable name to read");
                 return true;
             }
@@ -47,10 +51,27 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             ByteBuffer buf= ReadIDLSav.readFileIntoByteBuffer(file);
             String[] names= new ReadIDLSav().readVarNames(buf);
             
-            String[] vars= var.split(",",-2);
+            String[] vars=null;
+            if ( var!=null ) {
+                vars = var.split(",",-2);
+            } else {
+                if ( params.get("Z")!=null ) {
+                    vars= new String[3];
+                    vars[2]= params.get("Z");
+                }
+                if ( params.get("Y")!=null ) {
+                    if ( vars==null ) vars= new String[2];
+                    vars[1]= params.get("Y");
+                } 
+                if ( params.get("X")!=null ) {
+                    if ( vars==null ) vars= new String[1];
+                    vars[0]= params.get("X");
+                }
+            }
             
             for (String var1 : vars) {
                 var = var1;
+                if ( var==null ) continue;
                 boolean found= false;
                 for (String name : names) {
                     if (var.startsWith(name)) {
@@ -122,6 +143,36 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
 
     }
     
+    private String[] getVariableNames( File file, String completable ) throws IOException {
+        ArrayList<String> result= new ArrayList<>();
+        ByteBuffer buf= ReadIDLSav.readFileIntoByteBuffer(file);
+        String[] names= new ReadIDLSav().readVarNames(buf);
+        ReadIDLSav reader= new ReadIDLSav();
+        if ( completable.contains(".") ) {
+            int i= completable.lastIndexOf('.');
+            String root= completable.substring(0,i);
+            int i2= root.lastIndexOf(",");
+            if ( i2>-1 ) {
+                root= root.substring(i2+1);
+            }
+            Object o= reader.readVar( buf, root );
+            Map<String,Object> m= (Map<String,Object>)o;
+            for ( Entry<String,Object> e: m.entrySet() ) {
+                if ( e.getValue() instanceof Map ) {
+                    for ( Entry<String,Object> e2: ((Map<String,Object>)e.getValue()).entrySet() ) {
+                        result.add( root + "." + e.getKey() + "."+ e2.getKey() );
+                    }
+                } else {
+                    result.add( root + "." + e.getKey() + "."+ e.getKey() );
+                }
+            }
+            return result.toArray( new String[result.size()] );
+        } else {
+            return names;
+        }
+        
+    }
+    
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
         if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_NAME) ) {
@@ -163,11 +214,25 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "xunits=", "units for the x values"));
             ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "yunits=", "units for the y values"));
             ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "units=", "units for the values"));
+            ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "X=", "variable for the x values"));
+            ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "Y=", "variable for the y values"));
+            ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "Z=", "variable for the z values"));
             
             return ccresult;
         } else if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_VALUE ) ) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
             switch (paramName) {
+                case "X":
+                case "Y":
+                case "Z":
+                    List<CompletionContext> ccresult= new ArrayList<>();
+                    File file= DataSetURI.getFile( cc.resourceURI, mon );
+                    String completable= cc.params;
+                    String[] names= getVariableNames(file, completable);
+                    for ( String n: names ) {
+                        ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, n, "variable..." ) );
+                    }
+                    return ccresult;
                 case "xunits":
                     List<CompletionContext> result = new ArrayList<>();
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "t1970", "seconds since 1970-01-01T00:00" ) );
