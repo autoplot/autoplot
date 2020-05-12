@@ -69,6 +69,38 @@ public class IdlsavDataSource extends AbstractDataSource {
         }
     }
     
+    private QDataSet handleDs( QDataSet array, String name ) {
+        int[] qube= DataSetUtil.qubeDims(array);
+
+        QDataSet result;
+        switch (qube.length) {
+            case 2:
+                int t= qube[0];
+                qube[0]= qube[1];
+                qube[1]= t;
+
+                result= array;
+                if ( result.length(0)==6 && result.length()>0 ) {
+                    double yr= result.value(0,0);
+                    if ( Math.floor(yr)==yr && yr>1900 && yr<2200 ) {
+                        result= Ops.toTimeDataSet( Ops.slice1(result,0),
+                                Ops.slice1(result,1), 
+                                Ops.slice1(result,2),
+                                Ops.slice1(result,3),
+                                Ops.slice1(result,4),
+                                Ops.slice1(result,5), null );
+                    }
+                }
+                break;
+            default:
+                result= array;
+                break;
+        }
+        result= Ops.putProperty( result, QDataSet.NAME, name.replaceAll("\\.","_") );
+        result= Ops.putProperty( result, QDataSet.LABEL, name );
+        return result;
+    }
+    
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         File f= getFile( uri, mon );
@@ -83,57 +115,61 @@ public class IdlsavDataSource extends AbstractDataSource {
             bytesRead+= inChannel.read(buffer);
         }
         
+        String x= getParam("X","");
+        String y= getParam("Y","");
+        String z= getParam("Z","");
+        
         String name = getParam( "arg_0", "" );
         if ( name.length()==0 ) {
-            throw new IllegalArgumentException("name must be set");
-        }
-        
-        String[] names= name.split(",");
-        QDataSet[] datas= new QDataSet[names.length];
-        if ( names.length>4 ) {
-            throw new IllegalArgumentException("first argument can only"
-                    + " contain four comma-separated names." );
-        }
-        
-        for ( int i=0; i<names.length; i++ ) {
-            QDataSet array= getArray( reader, buffer, names[i]);
-
-            int[] qube= DataSetUtil.qubeDims(array);
-
-            QDataSet result;
-            switch (qube.length) {
-                case 2:
-                    int t= qube[0];
-                    qube[0]= qube[1];
-                    qube[1]= t;
-
-                    result= array;
-                    if ( result.length(0)==6 && result.length()>0 ) {
-                        double yr= result.value(0,0);
-                        if ( Math.floor(yr)==yr && yr>1900 && yr<2200 ) {
-                            result= Ops.toTimeDataSet( Ops.slice1(result,0),
-                                    Ops.slice1(result,1), 
-                                    Ops.slice1(result,2),
-                                    Ops.slice1(result,3),
-                                    Ops.slice1(result,4),
-                                    Ops.slice1(result,5), null );
-                        }
-                    }
-                    break;
-                default:
-                    result= array;
-                    break;
+            if ( x.length()==0 && y.length()==0 && z.length()==0 ) {
+                throw new IllegalArgumentException("name or X must be set");
             }
-            result= Ops.putProperty( result, QDataSet.NAME, names[i].replaceAll("\\.","_") );
-            result= Ops.putProperty( result, QDataSet.LABEL, names[i] );
-            datas[i]= result;
+        }
+        
+        QDataSet[] datas=null;
+
+        String[] names;
+        
+        if ( name.length()==0 ) {
+            if ( z.length()>0 ) {
+                datas = new QDataSet[3];
+                QDataSet array= getArray( reader, buffer, z );
+                array= handleDs( array, z );
+                datas[2]= array;
+            }
+            if ( y.length()>0 ) {
+                if ( datas==null ) datas= new QDataSet[2];
+                QDataSet array= getArray( reader, buffer, y );
+                array= handleDs( array, y );
+                datas[1]= array;
+            }
+            if ( x.length()>0 ) {
+                if ( datas==null ) datas= new QDataSet[1];
+                QDataSet array= getArray( reader, buffer, x );
+                array= handleDs( array, x );
+                datas[0]= array;
+            }
             
+        } else {
+            names = name.split(",");
+            datas = new QDataSet[names.length];
+            if ( names.length>4 ) {
+                throw new IllegalArgumentException("first argument can only"
+                        + " contain four comma-separated names." );
+            }
+
+            for ( int i=0; i<names.length; i++ ) {
+                QDataSet array= getArray( reader, buffer, names[i]);
+                array= handleDs( array, names[i] );
+                datas[i]= array;
+
+            }
         }
         
         String sxunits= getParam("xunits","");
         if ( sxunits.length()>0 ) {
             Units xunits= Units.lookupUnits(sxunits);
-            if ( names.length>0 ) {
+            if ( datas.length>0 ) {
                 datas[0]= Ops.putProperty( datas[0], QDataSet.UNITS, xunits );
             }
         }
@@ -148,11 +184,11 @@ public class IdlsavDataSource extends AbstractDataSource {
         String sunits= getParam("units", "" );
         if ( sunits.length()>0 ) {
             Units units= Units.lookupUnits(sunits);
-            int ids= names.length-1;
+            int ids= datas.length-1;
             datas[ids]= Ops.putProperty( datas[ids], QDataSet.UNITS, units );
         }
                 
-        switch( names.length ) {
+        switch( datas.length ) {
             case 1: {
                 return datas[0];
             }
