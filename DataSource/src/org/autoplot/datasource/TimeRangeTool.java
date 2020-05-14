@@ -224,6 +224,11 @@ public final class TimeRangeTool extends javax.swing.JPanel {
         
     }
     
+    /**
+     * set the selected range.  When the range is an orbit range (for example orbit:rbspa-pp:300),
+     * the orbit list will be set.
+     * @param s a timerange parseable with <code>DatumRangeUtil.parseTimeRange(s);</code>
+     */
     public void setSelectedRange( String s ) {
         DatumRange dr= null;
         try {
@@ -285,6 +290,10 @@ public final class TimeRangeTool extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * return the range selected, the type of which will depend on which tab is visible.
+     * @return the range selected 
+     */
     public String getSelectedRange() {
         int idx= jTabbedPane1.getSelectedIndex();
         switch (idx) {
@@ -376,7 +385,7 @@ public final class TimeRangeTool extends javax.swing.JPanel {
      * this must be called before the GUI is created.
      * 
      * These will be the names of local orbit/event files or missions not
-     * hardcoded into Autoplot.
+     * hard-coded into Autoplot.
      * 
      * @param scs 
      */
@@ -987,6 +996,11 @@ public final class TimeRangeTool extends javax.swing.JPanel {
             Datum tmin= TimeUtil.create(min);
             Datum tmax= TimeUtil.create(max);
             DatumRange dr= new DatumRange( tmin, tmax );
+            String s= timeRangeTextField.getText();
+            DatumRange dr0= DatumRangeUtil.parseTimeRange(s);
+            if ( dr.equals(dr0) ) {
+                dr= dr0;
+            }            
             dr= dr.next();
             startTextField.setText(dr.min().toString());
             stopTextField.setText(dr.max().toString());
@@ -1004,6 +1018,11 @@ public final class TimeRangeTool extends javax.swing.JPanel {
             Datum tmin= TimeUtil.create(min);
             Datum tmax= TimeUtil.create(max);
             DatumRange dr= new DatumRange( tmin, tmax );
+            String s= timeRangeTextField.getText();
+            DatumRange dr0= DatumRangeUtil.parseTimeRange(s);
+            if ( dr.equals(dr0) ) {
+                dr= dr0;
+            }
             dr= dr.previous();
             startTextField.setText(dr.min().toString());
             stopTextField.setText(dr.max().toString());
@@ -1020,7 +1039,14 @@ public final class TimeRangeTool extends javax.swing.JPanel {
             Datum tmin= TimeUtil.create(min);
             Datum tmax= TimeUtil.create(max);
             DatumRange dr= new DatumRange( tmin, tmax );
-            dr= DatumRangeUtil.rescale( dr, -1.0, 2.0 );
+            String s= timeRangeTextField.getText();
+            DatumRange dr0= DatumRangeUtil.parseTimeRange(s);
+            if ( dr.equals(dr0) ) {
+                dr= dr0;
+            }
+            DatumRange pp= dr.previous();
+            DatumRange pn= dr.next();
+            dr= pp.union(dr).union(pn);
             startTextField.setText(dr.min().toString());
             stopTextField.setText(dr.max().toString());
             timeRangeTextField.setText( dr.toString() );
