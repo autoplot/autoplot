@@ -55,6 +55,7 @@ import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.autoplot.jythonsupport.ui.ScriptPanelSupport;
 import org.das2.util.FileUtil;
+import org.python.core.PySyntaxError;
 
 /**
  * Utilities for Jython functions, such as a standard way to initialize
@@ -300,7 +301,14 @@ public class JythonUtil {
         p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
         
         ParametersFormPanel fpf= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
-        ParametersFormPanel.FormData fd=  fpf.doVariables( env, file, fparams, p );
+        ParametersFormPanel.FormData fd;
+        try {
+            fd=  fpf.doVariables( env, file, fparams, p );
+        } catch ( PySyntaxError ex ) {
+            System.err.println("pse: "+ex);
+            fd= new ParametersFormPanel.FormData();
+            fd.count=0;
+        }
 
         if ( fd.count==0 && !makeTool ) {
             return JOptionPane.OK_OPTION;
@@ -618,7 +626,15 @@ public class JythonUtil {
             args.put( "PWD", split.path ); 
     
             JPanel paramPanel= new JPanel();
-            fd=  pfp.doVariables( env, file, params, paramPanel );
+            ParametersFormPanel.FormData fd1;
+            try {
+                fd1=  pfp.doVariables( env, file, params, paramPanel );
+            } catch ( PySyntaxError ex ) {
+                System.err.println("pse: "+ex);
+                fd1= new ParametersFormPanel.FormData();
+                fd1.count=0;
+            }
+            fd= fd1;
             
             response= showScriptDialog( dom.getController().getDasCanvas(), args, file, fparams, makeTool, uri );
             
