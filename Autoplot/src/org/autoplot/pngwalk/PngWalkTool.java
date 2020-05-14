@@ -84,6 +84,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -144,6 +145,7 @@ import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.FileSystemUtil;
+import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.Plot;
@@ -2194,22 +2196,19 @@ public final class PngWalkTool extends javax.swing.JPanel {
 }//GEN-LAST:event_prevSetButtonActionPerformed
 
     private void timeFilterTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeFilterTextFieldActionPerformed
+        LoggerManager.logGuiEvent(evt);
+        updateTimeRangeFilter( );
+    }//GEN-LAST:event_timeFilterTextFieldActionPerformed
+
+    public void updateTimeRangeFilter() {
         try {
-            LoggerManager.logGuiEvent(evt);
             timeFilterTextField.setBackground( dataSetSelector1.getBackground() );
             DatumRange range= DatumRangeUtil.parseTimeRange(timeFilterTextField.getText());
             seq.setActiveSubrange( range );
         } catch ( ParseException ex ) {
             timeFilterTextField.setBackground( Color.PINK );
         }
-
-        //        canvas.setTimeRange( timeFilterTextField.getText() );
-//        if ( !canvas.getTimeRange().equals(timeFilterTextField.getText() ) ) {
-//            timeFilterTextField.setBackground( Color.PINK );
-//        } else {
-//            timeFilterTextField.setBackground( dataSetSelector1.getBackground() );
-//        }
-    }//GEN-LAST:event_timeFilterTextFieldActionPerformed
+    }
 
     private void timeFilterTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_timeFilterTextFieldFocusLost
 //        canvas.setTimeRange( timeFilterTextField.getText() );
@@ -2249,23 +2248,28 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
     private void editRangeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editRangeButtonActionPerformed
         LoggerManager.logGuiEvent(evt);
-        Frame myFrame = (java.awt.Frame)SwingUtilities.getWindowAncestor(this);
-        SubrangeEditorDialog d = new SubrangeEditorDialog(myFrame, true);
-        List<DatumRange> times= seq.getAllTimes();
-        d.setTimeSpan(times);
-        if(seq.isUseSubRange()) {
-            List<DatumRange> sub = seq.getActiveSubrange();
-            d.setStartIndex(times.indexOf(sub.get(0)));
-            d.setEndIndex(times.indexOf(sub.get(sub.size()-1)));
+        TimeRangeTool t= new TimeRangeTool();
+        List<DatumRange> times;
+        if ( seq.isUseSubRange() ) {
+            t.setSelectedRange( timeFilterTextField.getText() );
+        } else {
+            times = seq.getAllTimes();
+            DatumRange tr= times.get(0);
+            for ( DatumRange tr1: times ) {
+                tr= tr.union(tr1);
+            }
+            t.setSelectedRange( timeFilterTextField.getText() );
         }
-        d.setVisible(true);  //blocks until dialog closes
+        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( parentWindow, t, "Subrange", JOptionPane.OK_CANCEL_OPTION ) ) {
+            try {
+                DatumRange range= DatumRangeUtil.parseDatumRange( t.getSelectedRange() );
+                timeFilterTextField.setText( range.toString() );
+                updateTimeRangeFilter();
+            } catch (ParseException ex) {
+                Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 
-        if (d.isOkClicked()) {
-            //System.err.printf("OK, start index is %d and end index is %d.%n", d.getStartIndex(), d.getEndIndex());
-            seq.setActiveSubrange(d.getStartIndex(), d.getEndIndex());
-            DatumRange range= new DatumRange( times.get(d.getStartIndex()).min(), times.get(d.getEndIndex()).max() );
-            timeFilterTextField.setText( range.toString() );
-        }
     }//GEN-LAST:event_editRangeButtonActionPerformed
 
     private void useRangeCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_useRangeCheckBoxItemStateChanged
