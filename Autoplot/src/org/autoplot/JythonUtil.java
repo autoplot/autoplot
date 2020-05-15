@@ -626,16 +626,15 @@ public class JythonUtil {
             args.put( "PWD", split.path ); 
     
             JPanel paramPanel= new JPanel();
-            ParametersFormPanel.FormData fd1;
             try {
-                fd1=  pfp.doVariables( env, file, params, paramPanel );
+                fd=  pfp.doVariables( env, file, params, paramPanel );
             } catch ( PySyntaxError ex ) {
-                System.err.println("pse: "+ex);
-                fd1= new ParametersFormPanel.FormData();
-                fd1.count=0;
+                
+                AutoplotUtil.showMessageDialog( dom.getController().getDasCanvas(), "The script has a syntax error which prevents use in the address bar.", "Syntax Error", JOptionPane.OK_OPTION );
+                
+                return JOptionPane.CANCEL_OPTION;
             }
-            fd= fd1;
-            
+                         
             response= showScriptDialog( dom.getController().getDasCanvas(), args, file, fparams, makeTool, uri );
             
         } else {
