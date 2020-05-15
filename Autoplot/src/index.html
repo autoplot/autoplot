@@ -26,8 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-05-12 r24858):</p>
+        <p>Bugfixes (2020-05-15 r24867):</p>
         <ul>
+            <li>1682: CSV files containing events lists were broken after refactoring.  Thanks, Masafumi!
+            <li>TimeRangeTool's next and previous buttons preserve month identity.
+            <li>cut-n-paste code mixed recVariance and reform.
+            <li>Jython scripts with syntax errors failed quietly when run from the address bar.  Now a clear error message is indicated.
             <li>Crosshair digitizer looking up Z values from spectra, would fail with rank 3 bundle of 1-record tables.  Thanks, George!
             <li>Don't include .jy scripts in list of mashable recent datasets.
             <li>aggregation of CDF file with 1 record in a file would fail because BufferDataSet.append code was incorrectly implemented.
@@ -62,6 +66,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>PngWalkTool's show sublist uses TimeRangeTool to select time ranges.
             <li>IDLSav data source has X=, Y=, and Z= keywords to match CDF.  Thanks, Scott!
             <li>loadErrors=T introduced to CDF data source.  Thanks, Jon N!
             <li>Write contact sheet in PngWalkTool created.  Thanks, Kris!
