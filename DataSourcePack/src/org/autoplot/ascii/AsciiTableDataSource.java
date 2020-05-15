@@ -47,7 +47,6 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.DataSourceUtil;
-//import org.virbo.datasource.ReferenceCache;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.AsciiHeadersParser;
 import org.das2.qds.util.AsciiParser.FieldParser;
@@ -57,7 +56,14 @@ import org.das2.qds.util.AsciiParser.FieldParser;
  * one line of the file, and each record has the same number of fields.  
  * This reads in each record and splits on the delimiter, which is typically
  * guessed by examining the first 5 viable records.  This also supports
- * synthesizing times that are in several fields.  
+ * combining times that are in several fields.  
+ * 
+ * This also handles true CSV files, where a quoted field may contain a 
+ * newline character.  
+ * 
+ * Last, a three or four column ASCII file containing two ISO8601 strings 
+ * for the first two columns is automatically treated as an "events list",
+ * a list of named intervals.
  * 
  * @author jbf
  */
@@ -194,6 +200,17 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
         QDataSet bundleDescriptor= (QDataSet) ds.property(QDataSet.BUNDLE_1);
 
+        //auto-detect event lists
+        if ( eventListColumn==null ) { 
+            if ( ds.length(0)>2 && ds.length(0)<5 ) {
+                Units u0= parser.getUnits(0);
+                Units u1= parser.getUnits(1);
+                if ( UnitsUtil.isTimeLocation(u0) && ( u1==u0 ) ) {
+                    eventListColumn= "field"+(ds.length(0)-1);
+                }
+            }
+        }
+        
         if ( eventListColumn!=null ) {
             dep0= ArrayDataSet.maybeCopy( DataSetOps.leafTrim( ds, 0, 2) );
             Units u0= parser.getUnits(0);
