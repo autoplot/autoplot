@@ -267,7 +267,10 @@
             </Container>
             <Component class="javax.swing.JButton" name="editRangeButton">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Select..."/>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/org/autoplot/resources/calendar.png"/>
+                </Property>
+                <Property name="toolTipText" type="java.lang.String" value="Time Range Tool"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
