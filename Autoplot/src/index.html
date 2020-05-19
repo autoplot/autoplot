@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2020-05-15 r24867):</p>
         <ul>
+            <li>1682: header of events list resulted in fill record, when CSV reader would properly skip.  Thanks, Masafumi!
             <li>1682: CSV files containing events lists were broken after refactoring.  Thanks, Masafumi!
             <li>TimeRangeTool's next and previous buttons preserve month identity.
             <li>cut-n-paste code mixed recVariance and reform.
@@ -66,6 +67,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>link supports rank 0 datasets.
+            <li>join supports rank 0 dataset arguments with CONTEXT_0 property to form datasets.
             <li>PngWalkTool's show sublist uses TimeRangeTool to select time ranges.
             <li>IDLSav data source has X=, Y=, and Z= keywords to match CDF.  Thanks, Scott!
             <li>loadErrors=T introduced to CDF data source.  Thanks, Jon N!
