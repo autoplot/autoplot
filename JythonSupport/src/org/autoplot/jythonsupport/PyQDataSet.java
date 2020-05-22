@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumUtil;
+import org.das2.datum.EnumerationUnits;
 import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
@@ -1132,7 +1133,15 @@ public class PyQDataSet extends PyJavaInstance {
                 
             } else if (arg0 instanceof PyString ) {
                 try {
-                    return DataSetUtil.asDataSet(DatumUtil.parse(arg0.toString()));
+                    if ( units!=null ) {
+                        if ( units instanceof EnumerationUnits ) {
+                            return DataSetUtil.asDataSet(((EnumerationUnits)units).createDatum(arg0.toString()));
+                        } else {
+                            return DataSetUtil.asDataSet(units.parse(arg0.toString()));
+                        }
+                    } else {
+                        return DataSetUtil.asDataSet(DatumUtil.parse(arg0.toString()));
+                    }
                 } catch (ParseException ex) {
                     throw new IllegalArgumentException(ex);
                 }
