@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Studying copy-and-paste plot back in February.
+        <p><small>From the graphics of Dr. Ted Fujita, who pioneered the study of tornados at University of Chicago.  Taken from his autobiography.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-05-15 r24867):</p>
+        <p>Bugfixes (2020-05-22 r24883):</p>
         <ul>
+            <li>correct X cadence when Y is cycling.
+            <li>corrections to setDepend0Cadence, where valid inputs "1" and "4.5" were not accepted by the GUI.
             <li>1682: header of events list resulted in fill record, when CSV reader would properly skip.  Thanks, Masafumi!
             <li>1682: CSV files containing events lists were broken after refactoring.  Thanks, Masafumi!
             <li>TimeRangeTool's next and previous buttons preserve month identity.
@@ -67,6 +69,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add spectrogram interpolation model which first interpolates in X and then in Y.
+            <li>new strarr functions return rank 1 and rank 2 arrays of empty strings.  Thanks, Ivar!
+            <li>support assigning strings to datasets in Jython when the units are set already.
             <li>link supports rank 0 datasets.
             <li>join supports rank 0 dataset arguments with CONTEXT_0 property to form datasets.
             <li>PngWalkTool's show sublist uses TimeRangeTool to select time ranges.
