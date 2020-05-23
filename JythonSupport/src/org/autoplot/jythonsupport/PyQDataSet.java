@@ -1137,7 +1137,8 @@ public class PyQDataSet extends PyJavaInstance {
                         if ( units instanceof EnumerationUnits ) {
                             return DataSetUtil.asDataSet(((EnumerationUnits)units).createDatum(arg0.toString()));
                         } else {
-                            return DataSetUtil.asDataSet(units.parse(arg0.toString()));
+                            // do not attempt to interpret this with is dataset's units because it might be intentionally dimensionless.
+                            return DataSetUtil.asDataSet(DatumUtil.parse(arg0.toString()));
                         }
                     } else {
                         return DataSetUtil.asDataSet(DatumUtil.parse(arg0.toString()));
