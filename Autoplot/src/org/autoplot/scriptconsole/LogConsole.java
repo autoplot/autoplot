@@ -441,7 +441,7 @@ public class LogConsole extends javax.swing.JPanel {
                         } catch (UnsupportedEncodingException ex) {
                             logger.log( Level.WARNING, ex.getMessage(), ex );
                         }
-                        int i=0; // breakpoint here for debugging.  Set the "Highlite Lines Matching" field of the Log Console Settings dialog to the text where this should stop.
+                        LogConsoleUtil.checkBreakpoint(); // put a breakpoint in this code to stop.
                     }
                     LogRecord copy= new LogRecord( rec.getLevel(), recMsg ); //bug 3479791: just flatten this, so we don't have to format it each time
                     copy.setLoggerName(rec.getLoggerName());

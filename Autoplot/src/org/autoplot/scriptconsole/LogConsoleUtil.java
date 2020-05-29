@@ -91,4 +91,12 @@ public class LogConsoleUtil {
         } );
         return records;
     }
+
+    /**
+     * This method is here for the sole purpose of providing a place to insert a breakpoint when a log message is found for
+     * matching highlite pattern.
+     */
+    public static void checkBreakpoint() {
+        int i=0;
+    }
 }
