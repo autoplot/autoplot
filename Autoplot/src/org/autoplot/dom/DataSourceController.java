@@ -1955,11 +1955,13 @@ public class DataSourceController extends DomNodeController {
                     logger.log(Level.WARNING, ex.getMessage(), ex);
                     setDataSet(null);
                     setStatus("error: " + ex.getClass());
+                    ex.printStackTrace();
                     handleException(ex);
                 } else {
                     setException(ex);
                     setDataSet(null);
                     setStatus("error: " + ex.getMessage());
+                    ex.printStackTrace();
                     handleException(ex);
                 }
                 if (dsf.getUri().length() > 0) {
