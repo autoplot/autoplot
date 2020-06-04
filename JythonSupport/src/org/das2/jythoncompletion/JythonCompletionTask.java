@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.ImageIcon;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Utilities;
@@ -62,6 +63,8 @@ import org.autoplot.jythonsupport.SimplifyScriptSupport;
 public class JythonCompletionTask implements CompletionTask {
 
     private static final Logger logger= LoggerManager.getLogger("jython.editor.completion");
+    
+    private static final ImageIcon LOCALVARICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/localVariable.png") );
     
     public static final String CLIENT_PROPERTY_INTERPRETER_PROVIDER = "JYTHON_INTERPRETER_PROVIDER";
     JTextComponent editor;
@@ -662,7 +665,7 @@ public class JythonCompletionTask implements CompletionTask {
         String[] keywords = new String[]{ "def", "elif", "except", "from", "for", "finally", "import", "while", "print", "raise"}; //TODO: not complete
         for (String kw : keywords) {
             if (kw.startsWith(cc.completable)) {
-                if ( rs!=null ) rs.addItem(new DefaultCompletionItem(kw, cc.completable.length(), kw, kw, null, 0));
+                if ( rs!=null ) rs.addItem(new DefaultCompletionItem(kw, cc.completable.length(), kw, kw, null, 0, null));
                 count++;
             }
         }
@@ -1273,7 +1276,7 @@ public class JythonCompletionTask implements CompletionTask {
                         if ( allStatic ) {
                             result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args + ".", label, link) );
                         } else {
-                            result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link) );
+                            result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, 1, LOCALVARICON ) );
                         }
                     }
                 }
