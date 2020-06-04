@@ -65,6 +65,7 @@ public class JythonCompletionTask implements CompletionTask {
     private static final Logger logger= LoggerManager.getLogger("jython.editor.completion");
     
     private static final ImageIcon LOCALVARICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/localVariable.png") );
+    private static final ImageIcon JYTHONCOMMANDICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/jythonCommand.png") );
     
     public static final String CLIENT_PROPERTY_INTERPRETER_PROVIDER = "JYTHON_INTERPRETER_PROVIDER";
     JTextComponent editor;
@@ -665,7 +666,7 @@ public class JythonCompletionTask implements CompletionTask {
         String[] keywords = new String[]{ "def", "elif", "except", "from", "for", "finally", "import", "while", "print", "raise"}; //TODO: not complete
         for (String kw : keywords) {
             if (kw.startsWith(cc.completable)) {
-                if ( rs!=null ) rs.addItem(new DefaultCompletionItem(kw, cc.completable.length(), kw, kw, null, 0, null));
+                if ( rs!=null ) rs.addItem(new DefaultCompletionItem(kw, cc.completable.length(), kw, kw, null, 0, JYTHONCOMMANDICON));
                 count++;
             }
         }
