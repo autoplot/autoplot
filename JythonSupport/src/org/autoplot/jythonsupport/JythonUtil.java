@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -605,13 +606,18 @@ public class JythonUtil {
         return result;
 
     }
-
-    //there are a number of functions which take a trivial amount of time to execute and are needed for some scripts, such as the string.upper() function.
-    //The commas are to guard against the id being a subset of another id ("lower," does not match "lowercase").
-    //TODO: update this after Python upgrade.
-    private static final String[] okay = new String[]{"range,", "xrange,", "getParam,", "lower,", "upper,", "URI,", "URL,", "DatumRangeUtil,", "TimeParser",
-        "str,", "int,", "long,", "float,", "datum,", "datumRange,"};
-
+    
+    final static String[] okay = new String[]{"range,", "xrange,", "irange,", 
+            "getParam,", "lower,", "upper,", "URI,", "URL,",
+            "DatumRangeUtil,", "TimeParser,",
+            "str,", "int,", "long,", "float,", "datum,", "datumRange,","dataset,",
+            "indgen,", "findgen,","dindgen,",
+            "ones,", "zeros,",
+            "linspace,", "logspace,",
+            "dblarr,", "fltarr,", "strarr,", "intarr,", "bytarr,",
+            "ripples,", "split,", 
+            "color,", "colorFromString," };
+    
     /**
      * return true if the function call is trivial to execute and can be
      * evaluated within a few milliseconds.
@@ -620,6 +626,10 @@ public class JythonUtil {
      * @return
      */
     private static boolean trivialFunctionCall(SimpleNode sn) {
+        //there are a number of functions which take a trivial amount of time to execute and are needed for some scripts, such as 
+        //the string.upper() function.
+        //The commas are to guard against the id being a subset of another id ("lower," does not match "lowercase").
+        //TODO: update this after Python upgrade.
         if (sn instanceof Call) {
             Call c = (Call) sn;
             boolean klugdyOkay = false;
@@ -988,6 +998,7 @@ public class JythonUtil {
      * @param lastLine INCLUSIVE last line of the script being processed.
      * @param depth recursion depth, for debugging.
      * @return
+     * @see SimplifyScriptSupport
      */
     public static String simplifyScriptToGetParams(String[] ss, stmtType[] stmts, HashSet variableNames, int beginLine, int lastLine, int depth) {
         int acceptLine = -1;  // first line to accept

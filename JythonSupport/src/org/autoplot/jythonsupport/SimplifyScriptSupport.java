@@ -29,6 +29,7 @@ import org.python.parser.ast.exprType;
  * AST support for Jython completions.  This is not meant to be thorough, but
  * instead should be helpful when working with scripts.  
  * @author jbf
+ * @see JythonUtil#simplifyScriptToGetParams(java.lang.String, boolean) 
  */
 public class SimplifyScriptSupport {
     
@@ -59,9 +60,6 @@ public class SimplifyScriptSupport {
      * @return 
      */
      private static StringBuilder appendToResult( StringBuilder result, String line ) {
-        //if ( line.contains("sTimeBinSeconds") ) {
-        //    System.err.println("heresTimeBinSeconds");
-        //}
         result.append(line);
         return result;
     }
@@ -136,7 +134,8 @@ public class SimplifyScriptSupport {
          }
      }
      
-     private static String getIfBlock( String[] ss, If iff, stmtType[] body, HashSet variableNames, int firstLine, int lastLine1, int depth) {
+     private static String getIfBlock( String[] ss, If iff, stmtType[] body, HashSet variableNames, 
+             int firstLine, int lastLine1, int depth) {
         StringBuilder result= new StringBuilder();
         String ss1= simplifyScriptToGetCompletions(ss, body, variableNames, firstLine, lastLine1, depth+1 );
         if ( ss1.length()==0 ) {
@@ -172,9 +171,10 @@ public class SimplifyScriptSupport {
       * @param beginLine first line of the script being processed, or -1 to use stmts[0].beginLine
       * @param lastLine INCLUSIVE last line of the script being processed.
       * @param depth recursion depth, for debugging.
-      * @return 
+      * @return the simplified script
       */
-     public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stmts, HashSet variableNames, int beginLine, int lastLine, int depth  ) {
+     public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stmts, 
+             HashSet variableNames, int beginLine, int lastLine, int depth  ) {
          int acceptLine= -1;  // first line to accept
          int currentLine= beginLine; // current line we are writing (0 is first line).
          StringBuilder result= new StringBuilder();
@@ -338,8 +338,8 @@ public class SimplifyScriptSupport {
      
      /**
       * return true if we can include this in the script without a huge performance penalty.
-      * @param o
-      * @return 
+      * @param o the statement, for example an import or an assignment
+      * @return true if we can include this in the script without a huge performance penalty.
       */
      private static boolean simplifyScriptToGetCompletionsOkay( stmtType o, HashSet<String> variableNames ) {
          logger.log(Level.FINEST, "simplify script line: {0}", o.beginLine);
@@ -397,6 +397,16 @@ public class SimplifyScriptSupport {
                              Name n= (Name)at.value;
                              if ( !variableNames.contains( n.id ) ) return false;
                          }
+                     } else if ( et instanceof Subscript ) {
+                         Subscript subscript= (Subscript)et;
+                         exprType et2= subscript.value;
+                         if ( et2 instanceof Name ) {
+                             Name n= (Name)et2;
+                             if ( variableNames.contains( n.id ) ) return true;
+                         }
+                         return false;
+                     } else {
+                         return false;
                      }
                  }
                  return true;
@@ -445,24 +455,28 @@ public class SimplifyScriptSupport {
          return false;
      }
 
-     //there are a number of functions which take a trivial amount of time to execute and are needed for some scripts, such as the string.upper() function.
-     //The commas are to guard against the id being a subset of another id ("lower," does not match "lowercase").
-     //TODO: update this after Python upgrade.  //TODO: this should be a map and a long list
-     private static final String[] okay= new String[] { "range,", "xrange,", 
+     /**
+      * there are a number of functions which take a trivial amount of time to execute and are needed for some scripts, 
+      * such as the string.upper() function. The commas are to guard against the id being a subset of another 
+      * id ("lower," does not match "lowercase").
+      * TODO: update this after Python upgrade.  
+      */
+     private static final String[] okay= new String[] { "range,", "xrange,", "irange,", 
          "getParam,", "getDataSet,", "lower,", "upper,", "URI,", "URL,", 
-         "DatumRangeUtil,", "TimeParser",
+         "DatumRangeUtil,", "TimeParser,",
          "str,", "int,", "long,", "float,", "datum,", "datumRange,", "dataset,",
-         "findgen,", "dindgen,", "ones,", "zeros,", 
-         "linspace,", "dblarr,", "fltarr,", 
+         "indgen,","findgen,", "dindgen,", 
+         "ones,", "zeros,", 
+         "linspace,", "logspace,",
+         "dblarr,", "fltarr,", "strarr,", "intarr,", "bytarr,",
          "ripples,", "split,", 
          "color,", "colorFromString,"  };
-     
      private static final Set<String> okaySet= new HashSet<>();
      static {
          for ( String o: okay ) okaySet.add(o.substring(0,o.length()-1));
      }
      
-     private static final String getFunctionName( exprType t ) {
+     private static String getFunctionName( exprType t ) {
          if ( t instanceof Name ) {
              return ((Name)t).id;
          } else if ( t instanceof Attribute ) {
@@ -474,9 +488,11 @@ public class SimplifyScriptSupport {
      } 
      
      /**
-      * return true if the function call is trivial to execute and can be evaluated within a few milliseconds.
-      * @param sn
-      * @return 
+      * return true if the function call is trivial to execute and can be evaluated within a few milliseconds.  For example,
+      * findgen can be called because no calculations are made in the call, but fft cannot.  Typically these are Order 1 (a.k.a.
+      * constant time) operations, but also many order N operations are so fast they are allowed.
+      * @param sn an AST node pointed at a Call.
+      * @return true if the function call is trivial to execute 
       */
      private static boolean trivialFunctionCall( SimpleNode sn ) {
          if ( sn instanceof Call ) {
@@ -557,7 +573,7 @@ public class SimplifyScriptSupport {
              if ( sn instanceof Call ) {
                  looksOkay= trivialFunctionCall(sn) || trivialConstructorCall(sn);
                  logger.log(Level.FINER, "looksOkay={0}", looksOkay);
-             } else if ( sn instanceof Assign ) { // TODO: I have to admit I don't understand what traverse means.  I would have thought it was all nodes...
+             } else if ( sn instanceof Assign ) { 
                  Assign a= ((Assign)sn);
                  exprType et= a.value;
                  if ( et instanceof Call ) {

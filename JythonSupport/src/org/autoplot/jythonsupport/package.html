@@ -1,0 +1,20 @@
+<html><body>
+    <p>PyQDataSet and PyDatum are wrappers which make infix operations possible
+with these Das2 objects.  For example, calling ds+2 calls the method __add__(2)
+of the PyQDataSet called ds.  Additionally, PyQDataSets can always be modified
+and a copy of the data might be made to allow this, since QDataSets are often 
+immutable.</p>
+    </p>
+    <p>Additional commands are added to Jython to make it more useful, like the
+        dataset command which converts Python arrays and Datums into QDataSets
+        and getDataSet which reads URIs into a PyQDataSet for scripting.
+    </p>
+    <p>This package contains support for completions and control GUI generation.
+Both of these have the similar task that they need to quickly generate code
+which can be executed to get a result.  For example, when completions are 
+triggered, we run a simplified version of the script which allows us to query
+for completions.  When a GUI is needed a simplified version of the script which
+only has the "getParam" calls is created.
+    </p>
+    </body>
+</html>
