@@ -50,6 +50,7 @@ public class DefaultCompletionItem implements CompletionItem  {
      * @param label the human readable presentation of this, maybe with html.
      * @param link handed over to DefaultDocumentationItem, if non null.  May be "inline:&lt;html&gt;..."
      * @param sortPriority 1 is default.
+     * @param icon the icon to show next to this completion.
      */
     public DefaultCompletionItem( String text, int offset, String complete, String label, String link, int sortPriority, ImageIcon icon) {
         if ( complete.length()<offset ) {
