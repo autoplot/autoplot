@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
@@ -19,8 +20,10 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
@@ -54,19 +57,25 @@ public class DataSetSelectorSupport {
      * @return the URI for the vap file, or null if cancel was pressed.
      */
     public static String browseLocalVap( java.awt.Component parent, String initialSelection) {
-        Preferences prefs = AutoplotSettings.settings().getPreferences( AutoplotSettings.class);
+        Preferences prefs = AutoplotSettings.getPreferences( AutoplotSettings.class);
 
         String currentDirectory = prefs.get( AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, prefs.get(AutoplotSettings.PREF_LAST_OPEN_FOLDER, userHome().toString() ) );
         String currentFile=  prefs.get( AutoplotSettings.PREF_LAST_OPEN_VAP_FILE, "" );
-        JFileChooser chooser = new JFileChooser(currentDirectory);
 
-        if ( currentFile.length()>0 ) {
-            chooser.setSelectedFile( new File( currentFile ) );
-        }
-        if ( initialSelection!=null ) {
-            URISplit split= URISplit.parse(initialSelection);
-            if ( split.file!=null && "vap".equals(split.ext) ) {
-                chooser.setSelectedFile( new File( split.file ));
+        boolean isLocal= initialSelection==null || initialSelection.startsWith("file:/");
+        
+        JFileChooser chooser=null;
+        if ( isLocal ) {
+            chooser= new JFileChooser(currentDirectory);
+            
+            if ( currentFile.length()>0 ) {
+                chooser.setSelectedFile( new File( currentFile ) );
+            }
+            if ( initialSelection!=null ) {
+                URISplit split= URISplit.parse(initialSelection);
+                if ( split.file!=null && "vap".equals(split.ext) ) {
+                    chooser.setSelectedFile( new File( split.file ));
+                }
             }
         }
         
@@ -114,43 +123,59 @@ public class DataSetSelectorSupport {
         
         trPanel.add( Box.createVerticalGlue() );
         
-        chooser.setAccessory(trPanel);
+        if ( chooser!=null ) {
+            chooser.setAccessory(trPanel);
         
-        FileFilter ff;
-        ff = new FileFilter() {
+            FileFilter ff;
+            ff = new FileFilter() {
 
-            @Override
-            public boolean accept(File f) {
-                if (f.isDirectory()) {
-                    return true;
+                @Override
+                public boolean accept(File f) {
+                    if (f.isDirectory()) {
+                        return true;
+                    }
+                    String t = f.getName();
+                    return t.endsWith(".vap");
                 }
-                String t = f.getName();
-                return t.endsWith(".vap");
-            }
 
-            @Override
-            public String getDescription() {
-                return ".vap files";
-            }
-        };
+                @Override
+                public String getDescription() {
+                    return ".vap files";
+                }
+            };
 
+            chooser.addChoosableFileFilter(ff);
+            FileFilter select = ff;
 
-        chooser.addChoosableFileFilter(ff);
-        FileFilter select = ff;
+            chooser.setFileFilter(select);
 
-        chooser.setFileFilter(select);
-
-        Window w= parent==null ? null : SwingUtilities.getWindowAncestor( parent);
-        int result = chooser.showOpenDialog(w);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            prefs.put(AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, chooser.getSelectedFile().getParent() );
-            if ( b2.isSelected() ) {
-                return chooser.getSelectedFile().toURI().toString() + "?timerange="+ t.getRange().toString().replaceAll("\\s+", "+");
+            Window w= parent==null ? null : SwingUtilities.getWindowAncestor( parent);
+            int result = chooser.showOpenDialog(w);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                prefs.put(AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, chooser.getSelectedFile().getParent() );
+                if ( b2.isSelected() ) {
+                    return chooser.getSelectedFile().toURI().toString() + "?timerange="+ t.getRange().toString().replaceAll("\\s+", "+");
+                } else {
+                    return chooser.getSelectedFile().toURI().toString();
+                }
             } else {
-                return chooser.getSelectedFile().toURI().toString();
+                return null;
             }
         } else {
-            return null;
+            if ( JOptionPane.showConfirmDialog( parent, trPanel, "New Time Range", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                URISplit split= URISplit.parse( initialSelection );
+                Map<String,String> params= URISplit.parseParams(split.params);
+                if ( b2.isSelected() ) {
+                    params.put( "timerange", t.getRange().toString().replaceAll("\\s","+") );
+                } else {
+                    params.remove("timerange");
+                }
+                split.params= URISplit.formatParams(params);
+                return URISplit.format(split);
+            } else {
+                return null;
+            }
+            
         }
 
     }
