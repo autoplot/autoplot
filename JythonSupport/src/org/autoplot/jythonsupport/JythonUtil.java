@@ -1204,6 +1204,7 @@ public class JythonUtil {
         String[] ss = script.split("\n");
 
         int lastLine = -1;
+        boolean withinTripleQuote= false;
         for (int i = 0; i < ss.length; i++) {
             String line = ss[i];
             int ich = line.indexOf('#');
@@ -1221,6 +1222,12 @@ public class JythonUtil {
             } else if (line.contains("setScriptIcon")) {
                 lastLine = i + 1;
             }
+            if ( line.contains("'''") ) {
+                if ( withinTripleQuote ) {
+                    lastLine = i + 1;
+                }
+                withinTripleQuote= !withinTripleQuote;
+            } 
 
         }
 
