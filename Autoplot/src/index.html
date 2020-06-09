@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>MatLab HSV Colorbar is available for modulo data, where -PI and +PI are the same thing.
+        <p><small>GitHub Filesystem bug corrected and multiple threads can read from New York Times CSV file hosted on GitHub.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,12 +26,13 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-06-05 r24901):</p>
+        <p>Bugfixes (2020-06-09 r24901):</p>
         <ul>
             <li>correction to rfe720, where spectrogram was miscalculated.
+            <li>errors when multiple threads would access the same file on GitHubFileSystem.  Thanks, Kristoff!
             <li>try/catch on DasPlot topDecorator, making debugging difficult when there is a runtime error.
             <li>series renderer properly handles case where data has one fill record.
-            <li>errors when multiple threads would access the same file on GitHubFileSystem.  Thanks, Kristoff!
+            <li>StackedHistogramRenderer didn't handle when cadence guess failure occurs.
             <li>Das2 Render legendLabel property had typo, was lengendLabel.
             <li>correct X cadence when Y is cycling.
             <li>corrections to setDepend0Cadence, where valid inputs "1" and "4.5" were not accepted by the GUI.
