@@ -971,9 +971,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String surl= dataSetSelector.getValue();
-                URISplit split= URISplit.parse(surl);
+                //URISplit split= URISplit.parse(surl);
                 boolean blurFocus= false;
-                if ( split.path.startsWith("file:") ) {
+                //if ( split.path.startsWith("file:") ) {
                     String result= DataSetSelectorSupport.browseLocalVap( dataSetSelector, surl);
                     if (result != null ) {
                         dataSetSelector.setValue(result);
@@ -981,9 +981,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
                         pendingVap= result;
                         blurFocus= true;
                     }
-                } else {
-                    JOptionPane.showMessageDialog( AutoplotUI.this, "Unable to inspect .vap files" );
-                }
+                //} else {
+                //    JOptionPane.showMessageDialog( AutoplotUI.this, "Unable to inspect remote .vap files" );
+                //}
                 setCursor( Cursor.getDefaultCursor() );
                 if ( blurFocus ) dom.getController().setFocusUri(ApplicationController.VALUE_BLUR_FOCUS);
             }
