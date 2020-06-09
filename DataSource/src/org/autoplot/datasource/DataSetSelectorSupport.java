@@ -170,7 +170,11 @@ public class DataSetSelectorSupport {
                 } else {
                     params.remove("timerange");
                 }
-                split.params= URISplit.formatParams(params);
+                if ( params.isEmpty() ) {
+                    split.params= null;
+                } else {
+                    split.params= URISplit.formatParams(params);
+                }
                 return URISplit.format(split);
             } else {
                 return null;
