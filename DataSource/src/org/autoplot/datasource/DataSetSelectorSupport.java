@@ -53,6 +53,7 @@ public class DataSetSelectorSupport {
      * Show a file chooser component, and return the name of a .vap file.
      * @param parent parent component for focus.  If a dataSetSelector is
      * used then its timerange is used for the initial timerange.
+     * This will now allow a non-local vap to be browsed as well.
      * @param initialSelection if non-null, then the initial selection.
      * @return the URI for the vap file, or null if cancel was pressed.
      */
