@@ -62,7 +62,11 @@ public class DataSetSelectorSupport {
         String currentDirectory = prefs.get( AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, prefs.get(AutoplotSettings.PREF_LAST_OPEN_FOLDER, userHome().toString() ) );
         String currentFile=  prefs.get( AutoplotSettings.PREF_LAST_OPEN_VAP_FILE, "" );
 
-        boolean isLocal= initialSelection==null || initialSelection.startsWith("file:/");
+        boolean isRemote= initialSelection!=null && ( initialSelection.startsWith("https:/") 
+                || initialSelection.startsWith("http:/")
+                || initialSelection.startsWith("ftp:/") 
+                || initialSelection.startsWith("sftp:/") );
+        boolean isLocal= initialSelection==null || initialSelection.isEmpty() || !isRemote;
         
         JFileChooser chooser=null;
         if ( isLocal ) {
