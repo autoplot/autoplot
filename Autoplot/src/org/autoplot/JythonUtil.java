@@ -687,10 +687,15 @@ public class JythonUtil {
                             
                         } catch ( PyException ex ) {
                             if ( scriptPanel!=null ) {
-                                try {
-                                    scriptPanel.getAnnotationsSupport().annotateError( ex, 0 );
-                                } catch (BadLocationException ex1) {
-                                    logger.log(Level.SEVERE, null, ex1);
+                                String fn= scriptPanel.getFilename();
+                                if ( fn!=null ) {
+                                    try {
+                                        if ( new File( fn ).equals( file ) ) {
+                                            scriptPanel.getAnnotationsSupport().annotateError( ex, 0 );
+                                        }
+                                    } catch (BadLocationException ex1) {
+                                        logger.log(Level.SEVERE, null, ex1);
+                                    }
                                 }
                             }
                             throw ex;
