@@ -33,6 +33,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
+import jsyntaxpane.SyntaxDocument;
 import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.jythoncompletion.JythonCompletionTask;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
@@ -630,6 +631,16 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
         this.dirty = dirty;
         if ( oldDirty!=dirty ) updateStatus();
         firePropertyChange(PROP_DIRTY, oldDirty, dirty);
+    }
+    
+    /**
+     * reset the undo history.
+     */
+    public void resetUndo() {
+        Document doc= textArea.getDocument();
+        if ( doc instanceof SyntaxDocument ) {
+            ((SyntaxDocument)textArea.getDocument()).resetUndo();
+        }
     }
 
     /**

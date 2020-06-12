@@ -93,6 +93,7 @@ import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.jython.JythonDataSource;
 import org.autoplot.datasource.jython.JythonDataSourceFactory;
 import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
+import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 
 /**
@@ -532,6 +533,7 @@ public class ScriptPanelSupport {
                         d.remove(0, d.getLength());
                         d.insertString(0, fs, null);
                         panel.setDirty(false);
+                        panel.resetUndo();
                     } catch ( NullPointerException ex ) {
                         try {
                             Document d = panel.getEditorPanel().getDocument();
