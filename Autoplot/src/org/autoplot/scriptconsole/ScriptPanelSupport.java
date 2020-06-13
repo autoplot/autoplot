@@ -1380,6 +1380,14 @@ public class ScriptPanelSupport {
             
             int r = chooser.showOpenDialog(panel);
             if (r == JFileChooser.APPROVE_OPTION) {
+                if ( panel.isDirty() ) {
+                    int option= JOptionPane.showConfirmDialog( panel, "Save edits first?", "Save Current Editor", JOptionPane.YES_NO_CANCEL_OPTION );
+                    if ( option==JOptionPane.YES_OPTION ) {
+                        saveAs();
+                    } else if ( option==JOptionPane.CANCEL_OPTION ) {
+                        return;
+                    }
+                }
                 file = chooser.getSelectedFile();
                 prefs.put(PREFERENCE_OPEN_FILE, file.toString());
                 loadFile(file);
