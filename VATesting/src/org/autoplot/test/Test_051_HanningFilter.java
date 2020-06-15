@@ -37,6 +37,7 @@ public class Test_051_HanningFilter implements Scenario {
 
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
 
+        System.err.println("$Date: 2006-07-22 21:42:37 -0700 (Sat, 22 Jul 2006) $");
         try {
             ScriptContext.createGui();
 
@@ -57,6 +58,7 @@ public class Test_051_HanningFilter implements Scenario {
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             
             Thread.sleep(3000);
+            
             ScriptContext.waitUntilIdle();
             
             FiltersTreePicker.pickFilter( mainFrame, "Filters|Fourier Filtering|Hanning".split("\\|") );
