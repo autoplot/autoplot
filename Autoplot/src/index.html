@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Second GitHub Filesystem bug corrected and multiple threads can read from New York Times CSV file hosted on GitHub.
+        <p><small>Working on code which will precisely locate a letter within a box.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,10 +26,17 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-06-09 r24915):</p>
+        <p>Bugfixes (2020-06-14 r24921):</p>
+        <ul>
+            <li>1674: loose jython work by switching file.
+            <li>2262: script editor undo's script load.
+            <li>1983: jython error reporting doesn't check file name and can mark the wrong file.
+            <li>new irange function had a bug where it would return 1..4 instead of 0..3.
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>2266: File->Open .vap file was broken by code change.  Thanks, Bill!
-            <li>GitHubFileSystem code still showed problems on Windows.  
+            <li>2264: GitHubFileSystem code still showed problems on Windows.  
             <li>triple quotes when grabbing the part of script that is just the parameters
             <li>correction to rfe720, where spectrogram was miscalculated.
             <li>errors when multiple threads would access the same file on GitHubFileSystem.  Thanks, Kristoff!
@@ -50,34 +57,10 @@
             <li>aggregation of CDF file with 1 record in a file would fail because BufferDataSet.append code was incorrectly implemented.
             <li>findbugs OS_OPEN_STREAM in old das2stream code.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>Slope drag renderer shows fit equations when yaxis or xaxis is log.
-            <li>EnumerationUnits within a DataPointRecorder would cause problem when file was loaded and then additional points are added.
-            <li>corrections to IDLSav files containing structures with string tags.
-            <li>new make aggregation code would assume there wasn't already a question mark in the URI, creating URIs with two question marks.
-            <li>Provide feedback dialog now says "provide feedback" and not "error report"
-            <li>Runtime error dialog now includes the words "runtime error" since that seems to be what we call it.
-            <li>check for null USER_PROPERTIES and METADATA resolving macros, to avoid noise on stderr during transitional states.
-            <li>non-monotonic timetags would mess up expandToFillGaps process.  Thanks, George!
-            <li>2258: correction to $p, AM/PM field, where 12am and 12pm were mishandled.
-            <li>jython editor would incorrectly warn when xrange keyword was used in plot, this is not reassigning xrange function.
-            <li>1682: further corrections needed for test143_002, where units were not initialized properly.
-            <li>support "r= where( county.eq('Cook') )" in Jython.
-            <li>psp_fld_l2_mag_SC_2018110400_v01.cdf?slice1=0 could not be FFTPower'd, because of CONTEXT_0 property.  Thanks, Kristoff!
-            <li>interactions with CDAWeb so that only one connection occurs at a time, which was causing problems when .vaps with many CDAWeb URIs were loaded.  Thanks, Bernie!
-            <li>1682: .dat supports the case where all fields are quoted, which is allowed in CSV.
-            <li>1682: .dat split function now has look-ahead regex to check for commas within quotes.
-            <li>1682: .dat supports recStart
-            <li>1682: .dat supports quoted fields containing newlines now.
-            <li>1682: make sure .dat can handle all .csv so one reader can handle all ASCII files, ending years of confusion.
-            <li>fixed indexOutOfBounds with cross hair digitizer when all data was off canvas and snapping was on.
-            <li>AutoplotServlet uses https for third-party codes, so the thin client works again.
-            <li>LeafTrim didn't slice the properties properly, dropping DEPEND_1 when the vertical slice was used with spectrograms from AsciiTableDataSource.  Thanks, Bill!
-            <li>AsciiParser had some path which would result in a parsable line but then would fail to create a DelimParser.  Thanks, yumin!
-            <li>714: corrections to yaxis locations for each pixel row.
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>finally allow inspect button to be used to change the timerange of remote .vap files.
             <li>720: reducex has third argument which will will also average timetags in each bin.  Thanks, Bill!
@@ -95,21 +78,6 @@
             <li>loadErrors=T introduced to CDF data source.  Thanks, Jon N!
             <li>Write contact sheet in PngWalkTool created.  Thanks, Kris!
             <li>bundle of rank 2 datasets can be exported to CDF file.  Thanks, Kristoff!
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>Mouse modules' label is rounded.
-            <li>Units.createDatum(Datum) added, so that codes don't have to check for EnumerationUnits so much when ingesting Datums.
-            <li>IDLSav files allow X,Y,Z notation like the .mat (Matlab) files support.  Automatically transpose array to make fit.
-            <li>Initial support for reading data from IDLSav files introduced.
-            <li>Jython editor goto line includes class declarations.
-            <li>more checks for valid URIs like FPE_1997_12_16_V01.CSV?&delim=;column=field20 where arg0 is "".
-            <li>add "pattern=" keyword to ascii file parser to support regular expressions parsing.
-            <li>tickValues property can contain control for minor tick count, like "+1hr/4" means minor ticks on 15 minute boundaries.
-            <li>715: waveform data can contain TT2000 timetags for DEPEND_1, supporting Parker Solar Probe groups.
-            <li>NetCDF variable attributes are visible in USER_PROPERTIES, and long_name is used for label when nothing else is available.
-            <li>NetCDF GOES n,3 arrays are rendered as X,Y,Z components to match CDAWeb logic. 
-            <li>ASCII table GUI allows selection of values to use for y-tags (depend1Values keyword).  Thanks, Bill!
         </ul>
         <p>Known issues:</p>
         <ul>
