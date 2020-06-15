@@ -37,7 +37,7 @@ public class Test_051_HanningFilter implements Scenario {
 
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
 
-        System.err.println("$Date: 2006-07-22 21:42:37 -0700 (Sat, 22 Jul 2006) $");
+        System.err.println("$Date$");
         try {
             ScriptContext.createGui();
 
