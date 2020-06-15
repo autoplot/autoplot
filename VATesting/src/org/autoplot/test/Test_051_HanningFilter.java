@@ -57,6 +57,7 @@ public class Test_051_HanningFilter implements Scenario {
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             
             Thread.sleep(3000);
+            ScriptContext.waitUntilIdle();
             
             FiltersTreePicker.pickFilter( mainFrame, "Filters|Fourier Filtering|Hanning".split("\\|") );
         
