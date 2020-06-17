@@ -98,8 +98,20 @@ public class Util {
      */
     public static final String HAPI_SERVER_HOME_PROPERTY = "HAPI_SERVER_HOME";
 
+    /**
+     * return the HAPI protocol version.
+     * @return the HAPI protocol version.
+     */
     public static final String hapiVersion() {
         return "2.1";
+    }
+    
+    /**
+     * return the server implementation version.
+     * @return the server implementation version. 
+     */
+    public static final String serverVersion() {
+        return "20200617a";
     }
     
     static boolean isKey(String key) {

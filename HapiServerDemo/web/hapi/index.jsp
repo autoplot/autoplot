@@ -177,7 +177,10 @@
             <li>2019-09-30: correction for where time-varying channels are used.
             <li>2020-01-21: update to 2.1.  Bug when just "Time" was requested
             <li>2020-03-02: javacsv library needed.
+            <li>2020-06-17: allow individual columns to be requested.  verify number of characters in time column.
         </ul>
+        version <%= Util.serverVersion() %><br>
+        HAPI protocol version <%= Util.hapiVersion() %>
         </small>
     </body>
 </html>
