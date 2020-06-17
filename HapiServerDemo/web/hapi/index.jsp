@@ -80,12 +80,13 @@
                 
                 DatumRange exampleRange= HapiServerSupport.getExampleRange(info);
 
+                String exampleTimeRange= String.format( "time.min=%s&time.max=%s", exampleRange.min().toString(), exampleRange.max().toString() ); 
                 out.println( String.format( "<p style=\"background-color: #e0e0e0;\">%s</p>", title ) );
                 if ( exampleRange!=null ) {
-                    out.println( String.format("<a href=\"info?id=%s\">Info</a> <a href=\"data?id=%s&time.min=%s&time.max=%s\">Data</a>", 
-                        ds.getString("id"), ds.getString("id"), exampleRange.min().toString(), exampleRange.max().toString() ) );
+                    out.println( String.format("[<a href=\"info?id=%s\">Info</a>] [<a href=\"data?id=%s&%s\">Data</a>]", 
+                        ds.getString("id"), ds.getString("id"), exampleTimeRange ) );
                 } else {
-                    out.println( String.format("<a href=\"info?id=%s\">Info</a> Data", 
+                    out.println( String.format("[<a href=\"info?id=%s\">Info</a>] [Data]", 
                         ds.getString("id"), ds.getString("id") ) );
                 }
                 
@@ -94,7 +95,8 @@
                 for ( int j=0; j<parameters.length(); j++ ) {
                     if ( j>0 ) out.print(", ");
                     try {
-                        out.print( parameters.getJSONObject(j).getString("name") );
+                        String pname= parameters.getJSONObject(j).getString("name");
+                        out.print( String.format( "<a href=\"data?id=%s&parameters=%s&%s\">%s</a>", ds.getString("id"), pname, exampleTimeRange, pname ) );
                     } catch ( JSONException ex ) {
                         out.print( "???" );
                     }

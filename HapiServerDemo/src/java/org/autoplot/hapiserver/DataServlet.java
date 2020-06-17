@@ -45,6 +45,7 @@ import org.json.JSONObject;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.util.filesystem.FileSystem;
+import org.json.JSONArray;
 
 /**
  * Servlet for data responses.  
@@ -297,7 +298,7 @@ public class DataServlet extends HttpServlet {
             
             if ( dataFiles!=null ) {
                 for ( File dataFile : dataFiles ) {
-                    cachedDataCsv(out, dataFile, dr, parameters, indexMap );
+                    cachedDataCsv( jo, out, dataFile, dr, parameters, indexMap );
                 }
                 
                 if ( out instanceof IdleClockOutputStream ) {
@@ -472,7 +473,7 @@ public class DataServlet extends HttpServlet {
      * @throws IOException 
      * 
      */
-    private void cachedDataCsv( OutputStream out, File dataFile, DatumRange dr, String parameters, int[] indexMap) throws FileNotFoundException, IOException {
+    private void cachedDataCsv( JSONObject info, OutputStream out, File dataFile, DatumRange dr, String parameters, int[] indexMap) throws FileNotFoundException, IOException {
 
         long t0= System.currentTimeMillis();
         
@@ -491,6 +492,8 @@ public class DataServlet extends HttpServlet {
             pmap= indexMap;
         }
         
+        boolean quickVerify= true;
+        
         int nrec=0;
         int nf= -1;
         try {
@@ -508,6 +511,20 @@ public class DataServlet extends HttpServlet {
                             } else {
                                 String[] ss= Util.csvSplit(line,nf);
                                 if ( nf==-1 ) nf= ss.length;
+                                if ( quickVerify ) {
+                                    try {
+                                        quickVerify= false;
+                                        JSONArray pps= info.getJSONArray("parameters");
+                                        JSONObject time= pps.getJSONObject(0);
+                                        int len= time.getInt("length");
+                                        if ( ss[0].length()!=len ) {
+                                            throw new IllegalArgumentException("cache file length is incorrect");
+                                        }
+                                    } catch (JSONException ex) {
+                                        throw new IllegalArgumentException(ex); // should have caught this already
+                                    }
+                                    quickVerify= false;
+                                }
                                 for ( int j=0; j<pmap.length; j++ ) {
                                     if ( j>0 ) writer.write(',');
                                     writer.write( ss[pmap[j]] );
