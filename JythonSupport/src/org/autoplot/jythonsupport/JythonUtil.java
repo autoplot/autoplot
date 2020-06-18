@@ -24,7 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -1001,6 +1000,9 @@ public class JythonUtil {
      * @see SimplifyScriptSupport
      */
     public static String simplifyScriptToGetParams(String[] ss, stmtType[] stmts, HashSet variableNames, int beginLine, int lastLine, int depth) {
+        String spaces= "                              "
+                + "                              "
+                + "                              ";
         int acceptLine = -1;  // first line to accept
         int currentLine = 0; // current line we are writing (0 is first line).
         StringBuilder result = new StringBuilder();
@@ -1093,8 +1095,12 @@ public class JythonUtil {
                 if (simplifyScriptToGetParamsOkay(o, variableNames)) {
                     if (acceptLine < 0) {
                         acceptLine = (o).beginLine;
-                        for (int i = currentLine + 1; i < acceptLine; i++) {
-                            result.append("\n");
+                        for (int i = currentLine; i < acceptLine; i++) {
+                            int icomment= ss[i].indexOf("#");
+                            if ( icomment>=0 ) {
+                                String line= spaces.substring(0,icomment)+ss[i].substring(icomment);
+                                result.append(line).append("\n");
+                            }
                             currentLine = acceptLine;
                         }
                     }
@@ -1224,7 +1230,14 @@ public class JythonUtil {
             }
             if ( line.contains("'''") ) {
                 if ( withinTripleQuote ) {
-                    lastLine = i + 1;
+                    if ( !Character.isWhitespace(line.charAt(0)) ) {
+                        lastLine = i + 1;
+                    }
+                }
+                if ( withinTripleQuote ) {
+                    logger.log(Level.FINE, "close triple quote at line {0}", i);
+                } else {
+                    logger.log(Level.FINE, "open triple quote at line {0}", i);
                 }
                 withinTripleQuote= !withinTripleQuote;
             } 
