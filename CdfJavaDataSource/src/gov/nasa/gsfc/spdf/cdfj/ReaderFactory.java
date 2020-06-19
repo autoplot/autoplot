@@ -13,6 +13,15 @@ public final class ReaderFactory {
      * creates  CDFReader object from a file using array backed ByteBuffer.
      */
     static int preamble = 3000;
+    
+    /**
+     * Return a reader for the CDF file.  This looks at the CDF file internals
+     * to calculate the version and returns an implementation.
+     * @param fname
+     * @return a reader for the CDF file
+     * @throws CDFException.ReaderError if there is an issue while reading the file
+     * @throws IllegalArgumentException if the file is not a CDF file
+     */
     public static CDFReader getReader(String fname) throws
         CDFException.ReaderError {
         CDFImpl cdf = null;
@@ -27,6 +36,9 @@ public final class ReaderFactory {
             cdf = getVersion(buf, raf.getChannel());
         } catch (Throwable th) {
             throw new CDFException.ReaderError("I/O Error reading " + fname);
+        }
+        if ( cdf==null ) {
+            throw new IllegalArgumentException("File is not a CDF-format file.");
         }
         final String _fname = file.getPath();
         cdf.setSource(new CDFFactory.CDFSource() {
@@ -71,6 +83,14 @@ public final class ReaderFactory {
         return rdr;
     }
 
+    /**
+     * returns an implementation for reading the CDF, or null if the file
+     * does not have magic numbers indicating it is a CDF.
+     * @param buf the buffer containing the CDF data.
+     * @param ch the file channel for the data.
+     * @return the implementation for reading the CDF, or null.
+     * @throws Throwable 
+     */
     static CDFImpl getVersion(ByteBuffer buf, FileChannel ch) throws
         Throwable {
         LongBuffer lbuf = buf.asLongBuffer();
