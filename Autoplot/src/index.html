@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-06-14 r24921):</p>
+        <p>Bugfixes (2020-06-22 r24931):</p>
         <ul>
+            <li>rte_1424143028: handle non-CDF file error on machine where memory mapping cannot be used.
+            <li>triple quotes could cause problems when parsing Jython file to get arguments.
             <li>1674: loose jython work by switching file.
             <li>2262: script editor undo's script load.
             <li>1983: jython error reporting doesn't check file name and can mark the wrong file.
