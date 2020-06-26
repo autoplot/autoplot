@@ -178,6 +178,7 @@
             <li>2020-01-21: update to 2.1.  Bug when just "Time" was requested
             <li>2020-03-02: javacsv library needed.
             <li>2020-06-17: allow individual columns to be requested.  verify number of characters in time column.
+            <li>2020-06-26: lastminute keyword added to time parsing.
         </ul>
         version <%= Util.serverVersion() %><br>
         HAPI protocol version <%= Util.hapiVersion() %>
