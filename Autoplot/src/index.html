@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Working on code which will precisely locate a text within a box.
+        <p><small>New SeriesRenderer property backgroundThick draws a convenient outline to provide contrast in digitizing applications.  See <a href='https://github.com/autoplot/dev/blob/master/demos/2020/20200626/backSeriesBackground.jy'>this script</a>.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-06-22 r24931):</p>
+        <p>Bugfixes (2020-06-26 r24934):</p>
         <ul>
+            <li>occasional half-pixel error when position of image is calculated in SeriesRenderer.
             <li>rte_1424143028: handle non-CDF file error on machine where memory mapping cannot be used.
             <li>triple quotes could cause problems when parsing Jython file to get arguments.
             <li>1674: loose jython work by switching file.
@@ -61,6 +62,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>backgroundThick property added so that contrasting color is provided by SeriesRenderer.  Thanks, Ivar!
+            <li>rank 2 replicate added.  Thanks, Ivar!
+            <li>lastminute keyword added to times, to provide a way to refer to the last minute elapsed in real-time applications.
         </ul>
         <p>Less recent features:</p>
         <ul>
