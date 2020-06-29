@@ -828,6 +828,10 @@ public final class Das2ServerDataSource extends AbstractDataSource {
 		return in;
 	}
  
+    /**
+     * TODO: why are there two of these???
+     * @return TimeSeriesBrowse
+     */
     public final TimeSeriesBrowse getTimeSeriesBrowse() {
         return new TimeSeriesBrowse() {
             @Override
