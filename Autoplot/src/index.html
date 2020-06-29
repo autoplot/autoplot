@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-06-26 r24934):</p>
+        <p>Bugfixes (2020-06-29 r24934):</p>
         <ul>
+            <li>2269: SeriesRenderer would not clear exception, so returning to correctly-loading interval would not correctly display.
             <li>occasional half-pixel error when position of image is calculated in SeriesRenderer.
             <li>rte_1424143028: handle non-CDF file error on machine where memory mapping cannot be used.
             <li>triple quotes could cause problems when parsing Jython file to get arguments.
@@ -62,6 +63,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add lonarr(n) and lonarr(n,m) for storing CDF_TT2000 data.
+            <li>Das2 renderer ID is displayed.
             <li>backgroundThick property added so that contrasting color is provided by SeriesRenderer.  Thanks, Ivar!
             <li>rank 2 replicate added.  Thanks, Ivar!
             <li>lastminute keyword added to times, to provide a way to refer to the last minute elapsed in real-time applications.
