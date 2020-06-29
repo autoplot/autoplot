@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -1882,6 +1883,7 @@ public class PlotElementController extends DomNodeController {
         propertyChangeSupport.firePropertyChange(PROP_SLICEAUTORANGES, oldSliceAutoranges, sliceAutoranges);
     }
 
+    private static AtomicInteger renderCount= new AtomicInteger();
 
     protected Renderer renderer = null;
 
@@ -1935,7 +1937,7 @@ public class PlotElementController extends DomNodeController {
             JMenuItem mi= mip.getController().getPlotElementPropsMenuItem();
             if ( mi!=null ) mi.setIcon( renderer.getListIcon() );
         }
-        renderer.setId( "rend_"+plotElement.getId());
+        renderer.setId( "rend_"+plotElement.getId()+"_"+String.format( "%04d", PlotElementController.renderCount.incrementAndGet() ) ); // for debugging, make unique names
         ac.bind(plotElement, PlotElement.PROP_LEGENDLABEL, renderer, Renderer.PROP_LEGENDLABEL, getLabelConverter() );
         ac.bind(plotElement, PlotElement.PROP_DISPLAYLEGEND, renderer, Renderer.PROP_DRAWLEGENDLABEL);
         ac.bind(plotElement, PlotElement.PROP_RENDERCONTROL, renderer, Renderer.PROP_CONTROL );
@@ -2118,12 +2120,14 @@ public class PlotElementController extends DomNodeController {
 
     /**
      * extract properties from the data and metadata to get axis labels, fill values, and
-     * preconditions:
-     *    fillData is set.
-     *    fillProperties is set.
-     * postconditions:
-     *    metadata is inspected to get axis labels, fill values, etc.
-     *    renderType is determined and set.
+     * preconditions:<ul>
+     * <li>fillData is set.
+     * <li>fillProperties is set.
+     * </ul>
+     * postconditions:<ul>
+     * <li>metadata is inspected to get axis labels, fill values, etc.
+     * <li>renderType is determined and set.
+     * </ul>
      * @param autorange
      * @param interpretMetadata
      */
