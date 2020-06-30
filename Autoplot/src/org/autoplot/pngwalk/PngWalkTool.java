@@ -2658,9 +2658,10 @@ public final class PngWalkTool extends javax.swing.JPanel {
      * @param monitor
      * @param f
      * @param overrideDelays if null, then just use 100ms between frames, otherwise use this delay. "realTime", "10ms", "secondPerDay"
+     * @param r60, if true, then reduce the image to 60% of its original size.
      * @throws FileNotFoundException 
      */
-    private void writeToAnimatedGifImmediately( final ProgressMonitor monitor, File f, final String overrideDelays ) throws FileNotFoundException {
+    private void writeToAnimatedGifImmediately( final ProgressMonitor monitor, File f, final String overrideDelays, final boolean r60 ) throws FileNotFoundException {
         try {
             monitor.setTaskSize(this.seq.size());
             monitor.started();
@@ -2696,6 +2697,12 @@ public final class PngWalkTool extends javax.swing.JPanel {
                         }
                         im= seq.imageAt(i).getImage();
                     }
+                    
+                    if ( r60 ) {
+                        int size= (int)Math.sqrt( im.getWidth()*im.getWidth() + im.getHeight()*im.getHeight() );
+                        im= ImageResize.getScaledInstance( im, size*60/100 );
+                    }
+                                        
                     i=i+1;
                     return im;
                 }
@@ -2783,10 +2790,14 @@ public final class PngWalkTool extends javax.swing.JPanel {
         JComboBox jo= new JComboBox(opts);
         jo.setSelectedIndex(1);
         jo.setMaximumSize( new Dimension( 1000, 30 ) );
+        jo.setEditable(true);
+        
         p.add(new JLabel("Interslide-Delay:"));
         p.add(jo);
+        final JCheckBox r60= new JCheckBox( "Reduce to 60%" );
+        p.add(r60);
         p.add(Box.createGlue());
-        
+                
         choose.setAccessory(p);
         if ( choose.showSaveDialog(PngWalkTool.this)==JFileChooser.APPROVE_OPTION ) {
             final File f= choose.getSelectedFile();
@@ -2796,7 +2807,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
             Runnable run= new Runnable() {
                 public void run() {
                     try {
-                        writeToAnimatedGifImmediately( mon, f, fdelay );
+                        writeToAnimatedGifImmediately( mon, f, fdelay, r60.isSelected() );
                         JPanel panel= new javax.swing.JPanel();
                         panel.setLayout( new BoxLayout(panel,BoxLayout.Y_AXIS ));
                         panel.add( new javax.swing.JLabel("wrote file "+f) );
