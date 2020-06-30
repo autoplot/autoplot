@@ -966,12 +966,13 @@ public class DataMashUp extends javax.swing.JPanel {
      */
     public static boolean isDataMashupJythonInline( String jython ) {
         try {
-            new DataMashUp().setAsJythonInline(jython);
+            DataMashUp dmu= new DataMashUp();
+            dmu.setAsJythonInline(jython);
+            return !"vap+inline:ds".equals(dmu.getAsJythonInline());
         } catch ( Exception ex ) {
             logger.log( Level.FINER, null, ex );
             return false;
         }
-        return true;
     }
         
     /**
