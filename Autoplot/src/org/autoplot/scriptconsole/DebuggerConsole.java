@@ -137,7 +137,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
     PythonInterpreter out;
     
     public void println( String s ) {
-        jythonOutputTextArea.append(s);
+        print(s);
         jythonOutputTextArea.append("\n");
     }
     
