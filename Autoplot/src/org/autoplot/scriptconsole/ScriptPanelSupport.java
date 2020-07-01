@@ -711,6 +711,185 @@ public class ScriptPanelSupport {
     }
 
     /**
+     * Execute the script in the current thread.  For context data source, 
+     * this means putting the URI in the data set selector and telling it to 
+     * plot.  "mode" controls how the script is run, for example by bringing up 
+     * the parameters GUI first, or by tracing execution.  The bit array is:<ul>
+     * <li>0 normal
+     * <li>1 parameters GUI (SHIFT is pressed)
+     * <li>2 trace (CRTL is pressed)
+     * <li>8 enter editor (ALT is pressed)
+     * </ul>
+     * @param mode bit array controlling execution.
+     * @throws RuntimeException
+     * @throws Error 
+     */
+    private void executeScriptImmediately( int mode ) throws RuntimeException, Error {
+        int offset = 0;
+        //ProgressMonitor mon= //DasProgressPanel.createComponentPanel(model.getCanvas(),"running script");
+        ProgressMonitor mon= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(panel), "running script");
+
+        try {
+            if (file != null && ( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) {
+                if ( panel.isDirty() ) {
+                    save();
+                }
+                applicationController.getApplicationModel().addRecent("script:"+file.toURI().toString());
+            }
+            InteractiveInterpreter interp = null;
+            try {
+                interp= JythonUtil.createInterpreter(true, false);
+
+                EditorAnnotationsSupport.setExpressionLookup(annotationsSupport.getForInterp(interp));
+
+                interp.set("dom", model.getDocumentModel() );
+                interp.set("monitor", mon );
+                if ( file!=null ) {
+                    URISplit split= URISplit.parse(file.toString());
+                    interp.set( "PWD", split.path );   
+                }
+                setInterruptible( interp );
+                ts= Py.getThreadState();
+                boolean dirty0 = panel.isDirty();
+
+                clearAnnotations();
+
+                panel.setDirty(dirty0);
+                if ( ( ( mode & Event.CTRL_MASK ) == Event.CTRL_MASK ) ) { // trace
+                    String text = panel.getEditorPanel().getText();
+                    int i0 = 0;
+                    while (i0 < text.length()) {
+                        int i1 = text.indexOf('\n', i0);
+                        while (i1 < text.length() - 1 && Character.isWhitespace(text.charAt(i1 + 1))) {
+                            i1 = text.indexOf('\n', i1 + 1);
+                        }
+                        String s;
+                        if (i1 != -1) {
+                            i1 = i1 + 1;
+                            s = text.substring(i0, i1);
+                        } else {
+                            s = text.substring(i0);
+                            i1= text.length();
+                        }
+                        try {
+                            clearAnnotations();
+                            annotationsSupport.annotateChars( i0, i1, "programCounter", "pc", interp );
+
+                            logger.finest("add Netbeans breakpoint here to debug jython code line-by-line without GDB");
+
+                            interp.exec(JythonRefactory.fixImports(s));
+                        } catch (PyException ex) {
+                            throw ex;
+                        }
+                        i0 = i1;
+                        offset += 1;
+                        System.err.println(s);
+                    }
+                    clearAnnotations();
+                } else if ( ( ( mode & Event.SHIFT_MASK ) == Event.SHIFT_MASK ) || ( ( mode & Event.ALT_MASK ) == Event.ALT_MASK ) ) {
+                    JPanel p= new JPanel();
+                    Map<String,String> vars= new HashMap();
+                    ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
+                    Map<String,Object> env= new HashMap();
+                    env.put("dom",interp.get("dom") );
+                    env.put("PWD",interp.get("PWD") );
+                    ParametersFormPanel.FormData fd=  pfp.doVariables( env, panel.getEditorPanel().getText(), vars, p );
+                    if ( fd.count>0 ) {
+                        JScrollPane pane= new JScrollPane(p);
+
+                        if ( AutoplotUtil.showConfirmDialog2( panel, pane, "edit parameters", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                            ParametersFormPanel.resetVariables( fd, vars );
+                            String parseExcept= null;
+                            for ( Entry<String,String> v: vars.entrySet() ) {
+                                try {
+                                    fd.implement( interp, v.getKey(), v.getValue() );
+                                } catch ( ParseException ex ) {
+                                    parseExcept= v.getKey();
+                                }
+                            }
+                            if ( parseExcept!=null ) {
+                                JOptionPane.showMessageDialog( panel, "ParseException in parameter "+parseExcept );
+                            } else {
+                                interp.exec(JythonRefactory.fixImports(panel.getEditorPanel().getText()));
+                            }
+                        }
+                    } else {
+                        // no parameters
+                        interp.exec(JythonRefactory.fixImports(panel.getEditorPanel().getText()));
+                    }
+                } else {
+                    boolean experiment= System.getProperty("jythonDebugger","false").equals("true");
+                    if ( experiment ) {
+                        final DebuggerConsole dc= DebuggerConsole.getInstance(panel);
+                        dc.setInterp(interp);
+                        interp.setOut(getOutput(dc));
+                        EditorAnnotationsSupport.setExpressionLookup( new EditorAnnotationsSupport.ExpressionLookup() {
+                            @Override
+                            public PyObject lookup( final String expr ) {
+                                return dc.setEval(expr);
+                                //return dc.getEval();                                                
+                            }
+                        });
+                    }
+                    String code= panel.getEditorPanel().getText();
+                    if ( file!=null ) {
+                        char[] cc= code.toCharArray();
+                        boolean warning= false;
+                        for ( char c: cc ) {
+                            if ( c>128 ) warning= true;
+                        }
+                        if ( warning ) {
+                            System.err.println("code contains data that will not be represented properly!");
+                        }
+                        //experiment with writing to a temporary file and executing it.
+                        if ( experiment ) {
+                            String fixedCode= JythonRefactory.fixImports( code );
+                            if ( fixedCode.equals(code) ) {
+                                interp.execfile( file.getAbsolutePath() );
+                            } else {
+                                File tempFile= new File( file.getAbsolutePath() + ".t" );
+                                Files.copy( new ByteArrayInputStream( fixedCode.getBytes() ), 
+                                        tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
+                                interp.execfile( tempFile.getAbsolutePath() );
+                            }
+                        } else {
+                            try (InputStream in = new ByteArrayInputStream( code.getBytes() )) {
+                                interp.execfile(JythonRefactory.fixImports(in,file.getName()),file.getName());
+                            }
+                        }
+                    } else {
+                        interp.exec(JythonRefactory.fixImports(code));
+                    }
+                }
+                setInterruptible( null );
+                if ( !mon.isFinished() ) mon.finished(); // bug1251: in case script didn't call finished
+                applicationController.setStatus("done executing script");
+            } catch (IOException ex) {
+                if ( !mon.isFinished() ) mon.finished();
+                logger.log(Level.WARNING, ex.getMessage(), ex);
+                applicationController.setStatus("error: I/O exception: " + ex.toString());
+            } catch (PyException ex) {
+                if ( !mon.isFinished() ) mon.finished();
+                annotateError(ex, offset, interp );
+                //logger.log(Level.WARNING, ex.getMessage(), ex );
+                applicationController.setStatus("error: " + ex.toString());
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        } catch ( Error ex ) {
+            if ( !ex.getMessage().contains("Python interrupt") ) {
+                throw ex;
+            } else {
+                applicationController.setStatus("script interrupted");
+            }
+        } finally {
+            if ( !mon.isFinished() ) mon.finished();  // bug1251: in case script didn't call finished
+            setInterruptible( null );
+            panel.setRunningScript(null);
+        }
+    }
+                    
+    /**
      * Execute the script.  For context data source, this means putting the URI in the data set selector and telling it to plot.
      * "mode" controls how the script is run, for example by bringing up the parameters GUI first, or by tracing execution.
      * The bit array is:<ul>
@@ -795,169 +974,7 @@ public class ScriptPanelSupport {
                 Runnable run = new Runnable() {
                     @Override
                     public void run() {
-                        int offset = 0;
-                        //ProgressMonitor mon= //DasProgressPanel.createComponentPanel(model.getCanvas(),"running script");
-                        ProgressMonitor mon= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(panel), "running script");
-                        
-                        try {
-                            if (file != null && ( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) {
-                                if ( panel.isDirty() ) {
-                                    save();
-                                }
-                                applicationController.getApplicationModel().addRecent("script:"+file.toURI().toString());
-                            }
-                            InteractiveInterpreter interp = null;
-                            try {
-                                interp= JythonUtil.createInterpreter(true, false);
-                                
-                                EditorAnnotationsSupport.setExpressionLookup(annotationsSupport.getForInterp(interp));
-                
-                                interp.set("dom", model.getDocumentModel() );
-                                interp.set("monitor", mon );
-                                if ( file!=null ) {
-                                    URISplit split= URISplit.parse(file.toString());
-                                    interp.set( "PWD", split.path );   
-                                }
-                                setInterruptible( interp );
-                                ts= Py.getThreadState();
-                                boolean dirty0 = panel.isDirty();
-                                
-                                clearAnnotations();
-            
-                                panel.setDirty(dirty0);
-                                if ( ( ( mode & Event.CTRL_MASK ) == Event.CTRL_MASK ) ) { // trace
-                                    String text = panel.getEditorPanel().getText();
-                                    int i0 = 0;
-                                    while (i0 < text.length()) {
-                                        int i1 = text.indexOf('\n', i0);
-                                        while (i1 < text.length() - 1 && Character.isWhitespace(text.charAt(i1 + 1))) {
-                                            i1 = text.indexOf('\n', i1 + 1);
-                                        }
-                                        String s;
-                                        if (i1 != -1) {
-                                            i1 = i1 + 1;
-                                            s = text.substring(i0, i1);
-                                        } else {
-                                            s = text.substring(i0);
-                                            i1= text.length();
-                                        }
-                                        try {
-                                            clearAnnotations();
-                                            annotationsSupport.annotateChars( i0, i1, "programCounter", "pc", interp );
-                                            
-                                            logger.finest("add Netbeans breakpoint here to debug jython code line-by-line without GDB");
-                                            
-                                            interp.exec(JythonRefactory.fixImports(s));
-                                        } catch (PyException ex) {
-                                            throw ex;
-                                        }
-                                        i0 = i1;
-                                        offset += 1;
-                                        System.err.println(s);
-                                    }
-                                    clearAnnotations();
-                                } else if ( ( ( mode & Event.SHIFT_MASK ) == Event.SHIFT_MASK ) || ( ( mode & Event.ALT_MASK ) == Event.ALT_MASK ) ) {
-                                    JPanel p= new JPanel();
-                                    Map<String,String> vars= new HashMap();
-                                    ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
-                                    Map<String,Object> env= new HashMap();
-                                    env.put("dom",interp.get("dom") );
-                                    env.put("PWD",interp.get("PWD") );
-                                    ParametersFormPanel.FormData fd=  pfp.doVariables( env, panel.getEditorPanel().getText(), vars, p );
-                                    if ( fd.count>0 ) {
-                                        JScrollPane pane= new JScrollPane(p);
-                                        
-                                        if ( AutoplotUtil.showConfirmDialog2( panel, pane, "edit parameters", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-                                            ParametersFormPanel.resetVariables( fd, vars );
-                                            String parseExcept= null;
-                                            for ( Entry<String,String> v: vars.entrySet() ) {
-                                                try {
-                                                    fd.implement( interp, v.getKey(), v.getValue() );
-                                                } catch ( ParseException ex ) {
-                                                    parseExcept= v.getKey();
-                                                }
-                                            }
-                                            if ( parseExcept!=null ) {
-                                                JOptionPane.showMessageDialog( panel, "ParseException in parameter "+parseExcept );
-                                            } else {
-                                                interp.exec(JythonRefactory.fixImports(panel.getEditorPanel().getText()));
-                                            }
-                                        }
-                                    } else {
-                                        // no parameters
-                                        interp.exec(JythonRefactory.fixImports(panel.getEditorPanel().getText()));
-                                    }
-                                } else {
-                                    boolean experiment= System.getProperty("jythonDebugger","false").equals("true");
-                                    if ( experiment ) {
-                                        final DebuggerConsole dc= DebuggerConsole.getInstance(panel);
-                                        dc.setInterp(interp);
-                                        interp.setOut(getOutput(dc));
-                                        EditorAnnotationsSupport.setExpressionLookup( new EditorAnnotationsSupport.ExpressionLookup() {
-                                            @Override
-                                            public PyObject lookup( final String expr ) {
-                                                return dc.setEval(expr);
-                                                //return dc.getEval();                                                
-                                            }
-                                        });
-                                    }
-                                    String code= panel.getEditorPanel().getText();
-                                    if ( file!=null ) {
-                                        char[] cc= code.toCharArray();
-                                        boolean warning= false;
-                                        for ( char c: cc ) {
-                                            if ( c>128 ) warning= true;
-                                        }
-                                        if ( warning ) {
-                                            System.err.println("code contains data that will not be represented properly!");
-                                        }
-                                        //experiment with writing to a temporary file and executing it.
-                                        if ( experiment ) {
-                                            String fixedCode= JythonRefactory.fixImports( code );
-                                            if ( fixedCode.equals(code) ) {
-                                                interp.execfile( file.getAbsolutePath() );
-                                            } else {
-                                                File tempFile= new File( file.getAbsolutePath() + ".t" );
-                                                Files.copy( new ByteArrayInputStream( fixedCode.getBytes() ), 
-                                                        tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
-                                                interp.execfile( tempFile.getAbsolutePath() );
-                                            }
-                                        } else {
-                                            try (InputStream in = new ByteArrayInputStream( code.getBytes() )) {
-                                                interp.execfile(JythonRefactory.fixImports(in,file.getName()),file.getName());
-                                            }
-                                        }
-                                    } else {
-                                        interp.exec(JythonRefactory.fixImports(code));
-                                    }
-                                }
-                                setInterruptible( null );
-                                if ( !mon.isFinished() ) mon.finished(); // bug1251: in case script didn't call finished
-                                applicationController.setStatus("done executing script");
-                            } catch (IOException ex) {
-                                if ( !mon.isFinished() ) mon.finished();
-                                logger.log(Level.WARNING, ex.getMessage(), ex);
-                                applicationController.setStatus("error: I/O exception: " + ex.toString());
-                            } catch (PyException ex) {
-                                if ( !mon.isFinished() ) mon.finished();
-                                annotateError(ex, offset, interp );
-                                //logger.log(Level.WARNING, ex.getMessage(), ex );
-                                applicationController.setStatus("error: " + ex.toString());
-                            }
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
-                        } catch ( Error ex ) {
-                            if ( !ex.getMessage().contains("Python interrupt") ) {
-                                throw ex;
-                            } else {
-                                applicationController.setStatus("script interrupted");
-                            }
-                        } finally {
-                            if ( !mon.isFinished() ) mon.finished();  // bug1251: in case script didn't call finished
-                            setInterruptible( null );
-                            panel.setRunningScript(null);
-                        }
-
+                        executeScriptImmediately(mode);
                     }
                 };
                 new Thread(run,"sessionRunScriptThread").start();
