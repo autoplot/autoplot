@@ -507,7 +507,9 @@ public class AsciiTableDataSource extends AbstractDataSource {
        
 
             if (dep0 != null) {
-                vds.putProperty(QDataSet.DEPEND_0, dep0);
+                if ( x==null ) {
+                    vds.putProperty(QDataSet.DEPEND_0, dep0);
+                }
             }
             if ( eventListColumn!=null && dep0!=null ) {
                 Units u0= parser.getUnits(0);
