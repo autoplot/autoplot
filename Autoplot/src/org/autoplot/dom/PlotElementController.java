@@ -1163,21 +1163,27 @@ public class PlotElementController extends DomNodeController {
      */
     private boolean axisDimensionsChange( RenderType oldRenderType, RenderType newRenderType ) {
         if ( oldRenderType==newRenderType ) return false;
-        if ( newRenderType==RenderType.pitchAngleDistribution ) return true;
-        if ( newRenderType==RenderType.polar ) return true;
-        if ( oldRenderType==RenderType.spectrogram && newRenderType==RenderType.nnSpectrogram ) {
-            return false;
-        } else if ( oldRenderType==RenderType.nnSpectrogram && newRenderType==RenderType.spectrogram ) {
-            return false;
-        } else if ( newRenderType==RenderType.spectrogram || newRenderType==RenderType.nnSpectrogram ) {
-            return true;
-        } else {
-            if ( oldRenderType==RenderType.spectrogram || oldRenderType==RenderType.nnSpectrogram ) {
-                return true;
-            } else {
-                return false;
-            }
-        }
+        return true;
+        
+//        if ( newRenderType==RenderType.pitchAngleDistribution ) return true;
+//        if ( newRenderType==RenderType.polar ) return true;
+//        if ( oldRenderType==RenderType.spectrogram && newRenderType==RenderType.nnSpectrogram ) {
+//            return false;
+//        } else if ( oldRenderType==RenderType.nnSpectrogram && newRenderType==RenderType.spectrogram ) {
+//            return false;
+//        } else if ( newRenderType==RenderType.spectrogram || newRenderType==RenderType.nnSpectrogram ) {
+//            return true;
+//        } else {
+//            if ( oldRenderType==RenderType.spectrogram || oldRenderType==RenderType.nnSpectrogram ) {
+//                return true;
+//            } else {
+//                if ( oldRenderType==RenderType.scatter || oldRenderType==RenderType.series ) {
+//                    return true;
+//                } else {
+//                    return false;
+//                }
+//            }
+//        }
     }
 
     private static String[] getDimensionNames( QDataSet ds ) {
