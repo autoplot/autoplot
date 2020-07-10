@@ -93,7 +93,12 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                     "title for the dataset"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "label=",
                     "label for the dataset"));
-
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "X=",
+                    "values typically displayed in horizontal dimension"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "Y=",
+                    "values typically displayed in vertical dimension"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "Z=",
+                    "values typically color coded"));
             return result;
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
@@ -207,6 +212,18 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field0.le(2000-01-01T00:00)", "where the nominal data in field5 is equal to \"off\""));
                     return result;
                 }
+                case "X": {
+                    List<CompletionContext> result = getFieldNames(cc, mon);
+                    return result;
+                }
+                case "Y": {
+                    List<CompletionContext> result = getFieldNames(cc, mon);
+                    return result;
+                }
+                case "Z": {
+                    List<CompletionContext> result = getFieldNames(cc, mon);
+                    return result;
+                }                
                 default:
                     return Collections.emptyList();
             }
