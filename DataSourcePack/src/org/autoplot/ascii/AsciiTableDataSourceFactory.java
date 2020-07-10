@@ -243,8 +243,9 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             if ( params.get("bundle")!=null ) return false;
             if ( params.get("group")!=null ) return false;
             if ( params.get("eventListColumn")!=null ) return false;
-            if ( params.get("Z")!=null ) return false;
-
+            if ( params.get("Z")!=null && params.get("Z").length()>0 ) return false;
+            if ( params.get("Y")!=null && params.get("Y").length()>0  ) return false;
+            
             String arg_0= params.get("arg_0");
             if ( arg_0!=null ) {
                 if ( arg_0.equals("rank2") || arg_0.equals("bundle") ) return false;
