@@ -26,10 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-07-08 r24950):</p>
+        <p>Bugfixes (2020-07-10 r24952):</p>
         <ul>
             <li>Color Scatter from ASCII file, using X=, Y=, and Z= switches works again.
-            <li>always reset the renderType.  There's no benefit to trying to recycle the old renderer, or at least it seems so.
             <li>bugfix: jump-to-line menu construction assumed classes were always inherited.
             <li>vap+inline:randn(100),randn(100) was mistaken for a mash-up URI.
             <li>selection area (yellow flashes) miscalculated for color scatter mode.
@@ -68,6 +67,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>X, Y, and Z, controls supported in ASCII editor.
             <li>pngwalk animated gif output has option to shrink each frame by 60%.
             <li>add lonarr(n) and lonarr(n,m) for storing CDF_TT2000 data.
             <li>Das2 renderer ID is displayed in property tables and can be accessed by scripts.
