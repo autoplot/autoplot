@@ -426,7 +426,15 @@ public class IstpMetadataModel extends MetadataModel {
             properties.put(QDataSet.FILL_VALUE, dv );
         }
 
-        boolean isEpoch = ( units == Units.milliseconds && !isMillis ) || "Epoch".equals(attrs.get(QDataSet.NAME)) || "Epoch".equalsIgnoreCase(DataSourceUtil.unquote((String) attrs.get("LABLAXIS")));
+        Object olablaxis= attrs.get("LABLAXIS");
+        if ( olablaxis!=null && !(olablaxis instanceof String) ) {
+            logger.log(Level.WARNING, "LABLAXIS should be type String: {0}", olablaxis);
+        }
+        String label = olablaxis==null ? null : String.valueOf( attrs.get("LABLAXIS") );
+            
+        boolean isEpoch = ( units == Units.milliseconds && !isMillis ) 
+                || "Epoch".equals(attrs.get(QDataSet.NAME)) 
+                || "Epoch".equalsIgnoreCase(DataSourceUtil.unquote( String.valueOf(attrs.get("LABLAXIS"))) );
         if (isEpoch) {
             if ( ofv!=null && ofv instanceof Long ) {
                 units= Units.cdfTT2000;
@@ -435,8 +443,11 @@ public class IstpMetadataModel extends MetadataModel {
                 units = Units.cdfEpoch;
             }
         } else {
-            String label = (String) attrs.get("LABLAXIS");
-            String sslice1= (String) attrs.get("slice1");
+            Object oslice1= attrs.get("slice1");
+            if ( oslice1!=null && !(oslice1 instanceof String ) ) {
+                logger.warning("internal error, slice1 should be string");
+            }
+            String sslice1= (String) oslice1;
             if ( sslice1!=null ) {
                 int islice= Integer.parseInt(sslice1);
                 Object o = (Object) attrs.get("slice1_labels");
