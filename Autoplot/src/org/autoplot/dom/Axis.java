@@ -348,8 +348,8 @@ public class Axis extends DomNode {
             if ( !exclude.contains( PROP_LABEL ) ) this.setLabel(that.getLabel());
             if ( !exclude.contains( PROP_FONTSIZE ) ) this.setFontSize(that.getFontSize());
             if ( !exclude.contains( PROP_AUTORANGE ) ) this.setAutoRange(that.isAutoRange());
-            if ( !exclude.contains( PROP_AUTORANGEHINTS ) ) this.setAutoRangeHints(that.getAutoRangeHints());
             if ( !exclude.contains( PROP_AUTOLABEL ) ) this.setAutoLabel(that.isAutoLabel());
+            if ( !exclude.contains( PROP_AUTORANGEHINTS ) ) this.setAutoRangeHints(that.getAutoRangeHints());
             if ( !exclude.contains( PROP_DRAWTICKLABELS ) ) this.setDrawTickLabels(that.isDrawTickLabels());
             if ( !exclude.contains( PROP_TICKVALUES ) ) this.setTickValues(that.getTickValues());
             if ( !exclude.contains( PROP_REFERENCE ) ) this.setReference(that.getReference());            

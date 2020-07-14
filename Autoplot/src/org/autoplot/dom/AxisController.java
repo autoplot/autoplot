@@ -373,6 +373,7 @@ public class AxisController extends DomNodeController {
         if ( !exclude.contains( Axis.PROP_FLIPPED ) ) axis.setFlipped(that.isFlipped());
         if ( !exclude.contains( Axis.PROP_OPPOSITE ) ) axis.setOpposite(that.isOpposite());
         if ( !exclude.contains( Axis.PROP_RANGE ) ) axis.setRange(that.getRange());
+        if ( !exclude.contains( Axis.PROP_SCALE ) ) axis.setScale(that.getScale());
         if ( !exclude.contains( Axis.PROP_LABEL ) ) axis.setLabel(that.getLabel());
         if ( !exclude.contains( Axis.PROP_FONTSIZE ) ) axis.setFontSize( that.getFontSize() );
         if ( !exclude.contains( Axis.PROP_AUTORANGE ) ) axis.setAutoRange(that.isAutoRange());
@@ -380,6 +381,7 @@ public class AxisController extends DomNodeController {
         if ( !exclude.contains( Axis.PROP_AUTORANGEHINTS ) ) axis.setAutoRangeHints(that.getAutoRangeHints());
         if ( !exclude.contains( Axis.PROP_DRAWTICKLABELS ) ) axis.setDrawTickLabels( that.isDrawTickLabels() );
         if ( !exclude.contains( Axis.PROP_TICKVALUES ) ) axis.setTickValues( that.getTickValues() );
+        if ( !exclude.contains( Axis.PROP_REFERENCE ) ) axis.setReference( that.getReference() );
         if ( !exclude.contains( Axis.PROP_VISIBLE ) ) axis.setVisible( that.isVisible() );
         if ( lock!=null ) lock.unlock();
     }
