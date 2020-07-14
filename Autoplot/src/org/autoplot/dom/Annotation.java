@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.dom;
 
 import java.awt.Color;
@@ -222,6 +218,34 @@ public class Annotation extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_ANCHORTYPE, oldAnchorType, anchorType);
     }
     
+    private boolean splitAnchorType = false;
+
+    public static final String PROP_SPLITANCHORTYPE = "splitAnchorType";
+
+    public boolean isSplitAnchorType() {
+        return splitAnchorType;
+    }
+
+    public void setSplitAnchorType(boolean splitAnchorType) {
+        boolean oldSplitAnchorType = this.splitAnchorType;
+        this.splitAnchorType = splitAnchorType;
+        propertyChangeSupport.firePropertyChange(PROP_SPLITANCHORTYPE, oldSplitAnchorType, splitAnchorType);
+    }
+
+    private AnchorType verticalAnchorType = AnchorType.CANVAS;
+
+    public static final String PROP_VERTICALANCHORTYPE = "verticalAnchorType";
+
+    public AnchorType getVerticalAnchorType() {
+        return verticalAnchorType;
+    }
+
+    public void setVerticalAnchorType(AnchorType verticalAnchorType) {
+        AnchorType oldVerticalAnchorType = this.verticalAnchorType;
+        this.verticalAnchorType = verticalAnchorType;
+        propertyChangeSupport.firePropertyChange(PROP_VERTICALANCHORTYPE, oldVerticalAnchorType, verticalAnchorType);
+    }
+    
     private String anchorOffset= "1em,1em";
 
     public static final String PROP_ANCHOROFFSET = "anchorOffset";
@@ -376,6 +400,8 @@ public class Annotation extends DomNode {
         if ( !exclude.contains( PROP_ANCHORPOSITION ) ) this.setAnchorPosition(that.getAnchorPosition() );
         if ( !exclude.contains( PROP_ANCHOROFFSET ) ) this.setAnchorOffset(that.getAnchorOffset() );
         if ( !exclude.contains( PROP_ANCHORTYPE ) ) this.setAnchorType(that.getAnchorType() );
+        if ( !exclude.contains( PROP_SPLITANCHORTYPE ) ) this.setSplitAnchorType( that.isSplitAnchorType() );
+        if ( !exclude.contains( PROP_VERTICALANCHORTYPE ) ) this.setVerticalAnchorType( that.getVerticalAnchorType() );
         if ( !exclude.contains( PROP_ANCHORBORDERTYPE ) ) this.setAnchorBorderType(that.getAnchorBorderType() );
         if ( !exclude.contains( PROP_XRANGE ) ) this.setXrange( that.getXrange() );
         if ( !exclude.contains( PROP_YRANGE ) ) this.setYrange( that.getYrange() );
@@ -423,6 +449,10 @@ public class Annotation extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff( PROP_ANCHOROFFSET, that.anchorOffset, this.anchorOffset ) );
         b=  that.anchorType.equals(this.anchorType) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_ANCHORTYPE, that.anchorType, this.anchorType ) );
+        b=  that.splitAnchorType==this.splitAnchorType;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_SPLITANCHORTYPE, that.splitAnchorType, this.splitAnchorType ) );
+        b=  that.verticalAnchorType.equals( this.verticalAnchorType );
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_VERTICALANCHORTYPE, that.verticalAnchorType, this.verticalAnchorType ) );
         b=  that.anchorBorderType.equals(this.anchorBorderType) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_ANCHORBORDERTYPE, that.anchorBorderType, this.anchorBorderType ) );
         b=  that.xrange.equals(this.xrange) ;
