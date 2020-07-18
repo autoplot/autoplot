@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Controls for X=, Y=, and Z= keywords added to the ASCII Editor Panel.
+        <p><small>Annotations can now be anchored to the plot edge in X and data location in Y.  See <a href='https://github.com/autoplot/dev/blob/master/rfe/sf/634/splitAnchorFollowsDataDemo.jy'>the script</a>.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-07-13 r24952):</p>
+        <p>Bugfixes (2020-07-18 r24961):</p>
+        <ul>
+            <li>axis reference property didn't load properly from .vap files.
+        </ul>
+        <p>Older Bugfixes (2020-07-13 r24952):</p>
         <ul>
             <li>Don't assume that LABLAXIS in CDF file is string data, and print a warning when it isn't.  Thanks, Chris!
             <li>Color Scatter from ASCII file, using X=, Y=, and Z= switches works again.  Thanks, Sadie!
@@ -42,31 +46,11 @@
             <li>1983: jython error reporting doesn't check file name and can mark the wrong file.
             <li>new irange function had a bug where it would return 1..4 instead of 0..3.
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>2266: File->Open .vap file was broken by code change.  Thanks, Bill!
-            <li>2264: GitHubFileSystem code still showed problems on Windows.  
-            <li>triple quotes when grabbing the part of script that is just the parameters
-            <li>correction to rfe720, where spectrogram was miscalculated.
-            <li>errors when multiple threads would access the same file on GitHubFileSystem.  Thanks, Kristoff!
-            <li>try/catch on DasPlot topDecorator, making debugging difficult when there is a runtime error.
-            <li>series renderer properly handles case where data has one fill record.
-            <li>StackedHistogramRenderer didn't handle when cadence guess failure occurs.
-            <li>Das2 Render legendLabel property had typo, was lengendLabel.
-            <li>correct X cadence when Y is cycling.
-            <li>corrections to setDepend0Cadence, where valid inputs "1" and "4.5" were not accepted by the GUI.
-            <li>1682: header of events list resulted in fill record, when CSV reader would properly skip.  Thanks, Masafumi!
-            <li>1682: CSV files containing events lists were broken after refactoring.  Thanks, Masafumi!
-            <li>improve feedback when orbits file is not found.
-            <li>TimeRangeTool's next and previous buttons preserve month identity.
-            <li>cut-n-paste code mixed recVariance and reform.
-            <li>Jython scripts with syntax errors failed quietly when run from the address bar.  Now a clear error message is indicated.
-            <li>Crosshair digitizer looking up Z values from spectra, would fail with rank 3 bundle of 1-record tables.  Thanks, George!
-            <li>Don't include .jy scripts in list of mashable recent datasets.
-            <li>aggregation of CDF file with 1 record in a file would fail because BufferDataSet.append code was incorrectly implemented.
-            <li>findbugs OS_OPEN_STREAM in old das2stream code.
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>Annotation splitAnchor allows annotation X position to anchor to plot edge while Y anchors to data.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>X, Y, and Z, controls supported in ASCII editor.
             <li>pngwalk animated gif output has option to shrink each frame by 60%.
@@ -75,25 +59,6 @@
             <li>backgroundThick property added so that contrasting color is provided by SeriesRenderer.  Thanks, Ivar!
             <li>rank 2 replicate added.  Thanks, Ivar!
             <li>lastminute keyword added to times, to provide a way to refer to the last minute elapsed in real-time applications.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>finally allow inspect button to be used to change the timerange of remote .vap files.
-            <li>720: reducex has third argument which will will also average timetags in each bin.  Thanks, Bill!
-            <li>add icons for jython commands in completion popups.
-            <li>add irange function to avoid the confusion of xrange, and which allows double arguments.
-            <li>GrannyTextRenderer has getBounds2D so that code can be used without cast to float.
-            <li>add matlab_hsv colorbar.  Thanks, Andrei!
-            <li>add spectrogram interpolation mode which first interpolates in X and then in Y.  Thanks, Bill!
-            <li>new strarr functions return rank 1 and rank 2 arrays of empty strings.  Thanks, Ivar!
-            <li>support assigning strings to datasets in Jython when the units are set already.
-            <li>link supports rank 0 datasets.
-            <li>join supports rank 0 dataset arguments with CONTEXT_0 property to form datasets.
-            <li>PngWalkTool's show sublist uses TimeRangeTool to select time ranges.
-            <li>IDLSav data source has X=, Y=, and Z= keywords to match CDF.  Thanks, Scott!
-            <li>loadErrors=T introduced to CDF data source.  Thanks, Jon N!
-            <li>Write contact sheet in PngWalkTool created.  Thanks, Kris!
-            <li>bundle of rank 2 datasets can be exported to CDF file.  Thanks, Kristoff!
         </ul>
         <p>Known issues:</p>
         <ul>
