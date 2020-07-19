@@ -49,7 +49,7 @@ public class SetLogLevel extends HttpServlet {
                 out.println("<title>Servlet SetLogLevel</title>");  
                 out.println("</head>");
                 out.println("<body>");
-                out.println("<p>.../SetLogLevel must be called from 127.0.0.1<br>");
+                out.println("<p>.../SetLogLevel must be called from 127.0.0.1, was called from "+remoteAddr+"<br>");
                 out.println("</code>");
                 
             } else {
