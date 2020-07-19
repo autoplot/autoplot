@@ -34,7 +34,9 @@ public class ServletInfo extends HttpServlet {
      * @return a duration like "2.6 hours"
      */
     public static String getDurationForHumans( long dt ) {
-        if ( dt<2*1000 ) {
+        if ( dt<100 ) {
+            return "just now";
+        } else if ( dt<2*1000 ) {
             return dt+" milliseconds";
         } else if ( dt<2*60000 ) {
             return String.format( Locale.US, "%.1f",dt/1000.)+" seconds";
