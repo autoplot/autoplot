@@ -850,6 +850,22 @@ public final class HapiDataSource extends AbstractDataSource {
         }
         return -1;
     }
+    
+    /**
+     * replace this with String.join after Java8 upgrade.
+     * @param delim
+     * @param pieces
+     * @return 
+     */
+    private String join( String delim, List<String> pieces ) {
+        if ( pieces.isEmpty() ) return "";
+        StringBuilder b= new StringBuilder(pieces.get(0));
+        for ( int i=1; i<pieces.size(); i++ ) {
+            b.append(delim);
+            b.append(pieces.get(i));
+        }
+        return b.toString();
+    }
             
     @Override
     public synchronized QDataSet getDataSet(ProgressMonitor monitor) throws Exception {
@@ -920,10 +936,21 @@ public final class HapiDataSource extends AbstractDataSource {
                 pps= pp.split(",");
             }
             
+            ArrayList namesNotFound= new ArrayList();
             ParamDescription[] subsetPds= new ParamDescription[pps.length];
             for ( int ip=0; ip<pps.length; ip++ ) {
-                int i= map.get(pps[ip]);
-                subsetPds[ip]= pds[i];
+                Integer ii= map.get(pps[ip]);
+                if ( ii==null ) {
+                    namesNotFound.add(pps[ip]);
+                } else {
+                    int i= map.get(pps[ip]);
+                    subsetPds[ip]= pds[i];
+                }
+            }
+            if ( namesNotFound.size()==1 ) {
+                throw new IllegalArgumentException("Parameter name not found: "+namesNotFound.get(0) );
+            } else if ( namesNotFound.size()>1 ) {
+                throw new IllegalArgumentException("Parameter names not found: "+join(",",namesNotFound) );
             }
             if ( subsetPds.length==2 && subsetPds[1].size.length>0 ) {
                 // Oooh, it's a spectrogram.  Maybe it has time-varying DEPEND_1.
