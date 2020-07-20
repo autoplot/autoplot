@@ -1330,6 +1330,7 @@ public class GuiSupport {
             Runnable run;
             switch (depCount) {
                 case 0:
+                    applicationModel.addRecent(uris[0]);
                     String val= uris[0];
                     if ( val.endsWith(".vap") ) {
                         try {
