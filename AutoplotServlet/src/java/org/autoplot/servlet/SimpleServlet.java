@@ -83,7 +83,7 @@ public class SimpleServlet extends HttpServlet {
 
     private static void addHandlers(long requestId) {
         try {
-            FileHandler h = new FileHandler("/tmp/testservlet/log" + requestId + ".txt");
+            FileHandler h = new FileHandler("/tmp/apservlet/log" + requestId + ".txt");
             TimerConsoleFormatter form = new TimerConsoleFormatter();
             form.setResetMessage("getImage");
             h.setFormatter(form);
