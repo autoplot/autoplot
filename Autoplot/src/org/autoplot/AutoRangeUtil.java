@@ -991,7 +991,9 @@ public class AutoRangeUtil {
             logger1.finer("checking typical");
             if (result.log && typical.log) {
                 if (typical.range.min().doubleValue(typical.range.getUnits()) <= 0) {
-                    typical.range = new DatumRange(result.range.min(), typical.range.max());
+                    Datum d10= typical.range.max().divide(10);
+                    Datum m= result.range.min().le(d10) ? result.range.min() : d10;
+                    typical.range = new DatumRange( m, typical.range.max());
                 }
                 if (result.range.intersects(typical.range)) {
                     double overlap = DatumRangeUtil.normalizeLog(result.range, typical.range.max()) - DatumRangeUtil.normalizeLog(result.range, typical.range.min());
