@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Annotations can now be anchored to the plot edge in X and data location in Y.  See <a href='https://github.com/autoplot/dev/blob/master/rfe/sf/634/splitAnchorFollowsDataDemo.jy'>the script</a>.
+        <p><small>A bug was fixed which prevented a second password attempt when the first attempt was incorrect.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,11 @@
         
         <p>Bugfixes (2020-07-18 r24961):</p>
         <ul>
+            <li>2274: keep track of 401 exceptions so we ask for password again if incorrect password is entered.  Thanks, Chris!
+            <li>add calendar button to mashup tool.
+            <li>1728: set the value of the JComboBox directly, fixing old problem where black to white change was rejected.  Thanks, Sadie!
+            <li>"add plot..." dialog didn't add to recent URIs list when only one URI was used.
+            <li>Java8 is now required in the webstart JNLP file.  (No Java8 code yet.)
             <li>axis reference property didn't load properly from .vap files.
         </ul>
         <p>Older Bugfixes (2020-07-13 r24952):</p>
