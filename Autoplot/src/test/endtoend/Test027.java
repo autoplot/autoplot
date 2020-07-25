@@ -94,6 +94,9 @@ public class Test027 {
             doTest( 20, "http://autoplot.org/data/autoplot.cdf?Magnitude#trim(0,12)" );
             doTest( 21, "http://autoplot.org/data/autoplot.cdf?Magnitude#putProperty(TITLE,'My%20Data')" );
             
+            // TODO: this one fails because the question mark is misinterpretted.
+            doTest( 22, "vap+inline:ds=getDataSet('http://emfisis.physics.uiowa.edu/Flight/RBSP-A/L4/$Y/$m/$d/rbsp-a_wna-continuous-burst_emfisis-L4_$Y$m$dT$H_v$(v,sep).cdf?thpoy1_2_3&timerange=2013-01-09+6:20:50+to+6:21:02')&ds1=180-ds[where(gt(ds,90))]&putValues(ds,where(gt(ds,90)),ds1)&timerange=2013-01-09+6:20:50+to+6:21:02" );
+            
             doTestComp( 100, "vap+cdaweb:ds=ac_k0_epm&H_lo&timerange=2010-01" );
             doTestComp( 101, "Enter Data Set" );
             doTestComp( 103, "papco@mrfrench.lanl.gov/" );
