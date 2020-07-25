@@ -83,6 +83,7 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.DataSourceUtil;
+import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
 import org.python.core.PyException;
@@ -982,6 +983,7 @@ public class DataMashUp extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         palettePopupMenu = new javax.swing.JPopupMenu();
         addItemMenuItem = new javax.swing.JMenuItem();
@@ -1021,6 +1023,7 @@ public class DataMashUp extends javax.swing.JPanel {
         timeRangeLabel = new javax.swing.JLabel();
         timeRangeRecentComboBox = new org.autoplot.datasource.RecentComboBox();
         helpButton = new javax.swing.JButton();
+        calendarButton = new javax.swing.JButton();
 
         addItemMenuItem.setText("Add function...");
         addItemMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -1297,6 +1300,17 @@ public class DataMashUp extends javax.swing.JPanel {
             }
         });
 
+        calendarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/calendar.png"))); // NOI18N
+
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, timeRangeRecentComboBox, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), calendarButton, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        calendarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                calendarButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -1307,6 +1321,8 @@ public class DataMashUp extends javax.swing.JPanel {
                 .addComponent(timeRangeLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(timeRangeRecentComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 265, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(calendarButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(helpButton, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1319,10 +1335,15 @@ public class DataMashUp extends javax.swing.JPanel {
                     .addComponent(jLabel1)
                     .addComponent(timeRangeLabel)
                     .addComponent(timeRangeRecentComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(helpButton))
+                    .addComponent(helpButton)
+                    .addComponent(calendarButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSplitPane1))
         );
+
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {calendarButton, helpButton});
+
+        bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
 
     private void timeRangeTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_timeRangeTextFieldFocusLost
@@ -1520,6 +1541,17 @@ public class DataMashUp extends javax.swing.JPanel {
     private void helpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_helpButtonActionPerformed
         DataSourceUtil.openBrowser("http://autoplot.org/help.mashup");
     }//GEN-LAST:event_helpButtonActionPerformed
+
+    private void calendarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calendarButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+        TimeRangeTool tt= new TimeRangeTool();
+        String s= timeRangeRecentComboBox.getText();
+        if ( s!=null ) tt.setSelectedRange(s);
+        int r= JOptionPane.showConfirmDialog( this, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
+        if ( r==JOptionPane.OK_OPTION) {
+            timeRangeRecentComboBox.setText(tt.getSelectedRange());
+        }
+    }//GEN-LAST:event_calendarButtonActionPerformed
 
     /**
      * this should be called from the event thread, but will start a new thread
@@ -1856,6 +1888,7 @@ public class DataMashUp extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem addItemMenuItem;
     private javax.swing.JList<String> allList;
+    private javax.swing.JButton calendarButton;
     private javax.swing.JList datasetList;
     private javax.swing.JMenuItem deleteItemsMenuItem;
     private javax.swing.JLabel directionsLabel;
@@ -1892,5 +1925,6 @@ public class DataMashUp extends javax.swing.JPanel {
     private javax.swing.JCheckBox synchronizeCB;
     private javax.swing.JLabel timeRangeLabel;
     private org.autoplot.datasource.RecentComboBox timeRangeRecentComboBox;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 }
