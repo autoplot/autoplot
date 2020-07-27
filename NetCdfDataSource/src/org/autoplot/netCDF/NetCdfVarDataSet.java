@@ -474,6 +474,10 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                     istpProps.remove(QDataSet.RENDER_TYPE);
                 }
             }
+            
+            if ( properties.containsKey(QDataSet.UNITS) ) {
+                istpProps.remove("UNITS");
+            };
             properties.putAll(istpProps);
 
             for ( int ir=0; ir<a.getRank(); ir++ ) {
