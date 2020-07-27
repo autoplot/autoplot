@@ -929,7 +929,9 @@ public class CreatePngWalk {
         alm.addOptionalSwitchArgument( "product", "n", "product", "product", "product name in each filename (default=product)");
         alm.addOptionalSwitchArgument( "outputFolder", "o", "outputFolder", "pngwalk", "location of root of pngwalk");
         alm.addOptionalSwitchArgument( "outputFormat", null, "outputFormat", "png", "output format png or pdf");
-        alm.addSwitchArgument( "vap", "v", "vap", "vap file or URI to plot");
+        alm.addOptionalSwitchArgument( "vap", "v", "vap", null, "vap file to plot");
+        alm.addOptionalSwitchArgument( "uri", "u", "uri", null, "single URI plotted");
+        alm.requireOneOf(new String[] { "vap","uri" } );
         alm.addOptionalSwitchArgument( "rescalex", null, "rescalex", "0%,100%", "rescale factor, such as '0%-1hr,100%+1hr', to provide context to each image");
         alm.addOptionalSwitchArgument( "version", null, "version", null, "additional version string to add to each filename, like v1.0");
         alm.addBooleanSwitchArgument( "autorange", null, "autorange", "rerange dependent dimensions Y and Z");
@@ -1004,15 +1006,26 @@ public class CreatePngWalk {
             params.batchUriName= alm.getValue("batchUriName");
         }
         params.outputFormat= alm.getValue("outputFormat");
+        
+        Application dom;
+        
         String vap= alm.getValue("vap");
-        if ( ( vap.length()>2 && vap.charAt(1)==':' ) ) {
-            logger.fine("reference appears to be absolute (Windows)");
+        if ( vap!=null ) {
+            if ( ( vap.length()>2 && vap.charAt(1)==':' ) ) {
+                logger.fine("reference appears to be absolute (Windows)");
+            } else {
+                vap= URISplit.makeAbsolute(new File(".").getAbsolutePath(),vap);
+            }
+            dom = (Application) StatePersistence.restoreState(new File(vap));
         } else {
-            vap= URISplit.makeAbsolute(new File(".").getAbsolutePath(),vap);
+            String uri = alm.getValue("uri");
+            ScriptContext.setCanvasSize( 800, 600 );
+            ScriptContext.plot(uri);
+            dom = ScriptContext.getDocumentModel();
         }
 
-        Application dom= (Application) StatePersistence.restoreState(new File(vap));
-        if ( vap.contains(params.outputFolder) ) {
+        
+        if ( vap!=null && vap.contains(params.outputFolder) ) {
             params.writeVap= false;
         }
         
