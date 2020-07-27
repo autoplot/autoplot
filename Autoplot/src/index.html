@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A bug was fixed which prevented a second password attempt when the first attempt was incorrect.
+        <p><small>Autoplot assumes timetags are centered.  The CDF attribute <a href='https://spdf.gsfc.nasa.gov/istp_guide/vattributes.html#Bin_Location'>BIN_LOCATION</a> is not supported but will be soon.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-07-25 r24976):</p>
+        <p>Bugfixes (2020-07-27 r24976):</p>
         <ul>
+            <li>CreatePngWalk no longer allowed single URI to be used in place of .vap.  Add uri= argument which is better anyway.  Thanks, Warren!
             <li>2274: keep track of 401 exceptions so we ask for password again if incorrect password is entered.  Thanks, Chris!
             <li>add calendar button to mashup tool.
             <li>1728: set the value of the JComboBox directly, fixing old problem where black to white change was rejected.  Thanks, Sadie!
