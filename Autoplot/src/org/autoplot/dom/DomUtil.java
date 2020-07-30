@@ -679,16 +679,17 @@ public class DomUtil {
     }
 
     /**
-     *return the list of diffs that will make node2 look like node1.
-     * @param node1
-     * @param node2
+     * return the list of diffs that will make node2 look like node1.  This
+     * assumes that the two nodes are not modified by another thread.
+     * @param node1 a node
+     * @param node2 a node
      * @param exclude if non-null, exclude these properties.
      * @return
      */
     public static List<Diff> getDiffs(DomNode node1, DomNode node2, List<String> exclude) {
         String[] props = BeansUtil.getPropertyNames(node1.getClass());
         PropertyDescriptor[] pds = BeansUtil.getPropertyDescriptors(node1.getClass());
-
+        
         List<Diff> diffs = new ArrayList<>();
         for (int i = 0; i < props.length; i++) {
             if (props[i].equals("controller")) continue;
