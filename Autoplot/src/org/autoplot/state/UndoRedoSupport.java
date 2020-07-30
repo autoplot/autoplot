@@ -106,7 +106,7 @@ public class UndoRedoSupport {
      */
     public static class StateStackElement {
 
-        Application state;
+        private final Application state;
         String deltaDesc; // one-line description
         String docString; // more verbose description, describing the transition to this state.
         BufferedImage thumb;
