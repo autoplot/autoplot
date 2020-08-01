@@ -72,7 +72,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
-import javax.swing.text.BadLocationException;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.httpclient.HttpClient;
@@ -849,28 +849,6 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         return s;
     }
 
-    javax.swing.filechooser.FileFilter getFileNameExtensionFilter( final String desc, final String[] exts ) {
-        return new javax.swing.filechooser.FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                if ( pathname.isFile() ) return true;
-                for (String ext : exts) {
-                    if (ext.length() > 1 && ext.charAt(0) == '.') {
-                        return pathname.toString().endsWith(ext);
-                    } else {
-                        return pathname.toString().endsWith("." + ext);
-                    }
-                }
-                return false;
-            }
-
-            @Override
-            public String getDescription() {
-                return desc;
-            }
-        };
-    }
-
     List<LogRecord> recs;
     List<String> bis;
     Map<String,Object> map;
@@ -982,7 +960,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                     
                     report= getReport( form );
                     JFileChooser chooser= new JFileChooser();
-                    chooser.setFileFilter( this.getFileNameExtensionFilter("xml files", new String[] { ".xml" } ) );
+                    chooser.setFileFilter( new FileNameExtensionFilter("xml files", new String[] { "xml" } ) );
                     String fname= String.format( "rte_%010d_%s_%s.xml", rteHash, eventId, id );
                     chooser.setSelectedFile( new File(fname) );
                     if ( chooser.showSaveDialog(form) == JFileChooser.APPROVE_OPTION ) {

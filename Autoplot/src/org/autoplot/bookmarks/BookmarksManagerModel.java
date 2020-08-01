@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
@@ -35,16 +36,7 @@ public class BookmarksManagerModel {
     
     protected void doImport(Component c) {
         JFileChooser chooser = new JFileChooser();
-        chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                return f.isDirectory() || f.getName().endsWith(".xml");
-            }
-            @Override
-            public String getDescription() {
-                return "bookmarks files (*.xml)";
-            }
-        });
+        chooser.setFileFilter( new FileNameExtensionFilter( "bookmarks files (*.xml)", "xml" ) );
         int r = chooser.showOpenDialog(c);
         if (r == JFileChooser.APPROVE_OPTION) {
             try {
@@ -77,16 +69,7 @@ public class BookmarksManagerModel {
 
     protected void doExport(Component c, List<Bookmark> list) {
         JFileChooser chooser = new JFileChooser();
-        chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                return f.isDirectory() || f.getName().endsWith(".xml");
-            }
-            @Override
-            public String getDescription() {
-                return "bookmarks files (*.xml)";
-            }
-        });
+        chooser.setFileFilter( new FileNameExtensionFilter( "bookmarks files (*.xml)", "xml" ) );
         int r = chooser.showSaveDialog(c);
         if (r == JFileChooser.APPROVE_OPTION) {
             FileOutputStream out=null;

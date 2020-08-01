@@ -87,6 +87,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.autoplot.renderer.ContourStylePanel;
 import org.autoplot.renderer.DigitalStylePanel;
 import org.autoplot.renderer.EventsStylePanel;
@@ -1046,17 +1047,7 @@ public class GuiSupport {
 
     protected void exportRecent(Component c) {
         JFileChooser chooser = new JFileChooser();
-        chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                String s= f.getName();
-                return f.isDirectory() || s.endsWith(".xml");
-            }
-            @Override
-            public String getDescription() {
-                return "bookmarks files (*.xml)";
-            }
-        });
+        chooser.setFileFilter( new FileNameExtensionFilter("bookmarks files", "xml" ) );
         int r = chooser.showSaveDialog(c);
         if (r == JFileChooser.APPROVE_OPTION) {
             try {
@@ -1095,6 +1086,13 @@ public class GuiSupport {
 
     private static File currentFile;
 
+    /**
+     * return an action which will send the canvas to the printer. 
+     * @param app app containing the canvas
+     * @param parent the focus dialog
+     * @param ext extention like "svg" or "pdf" or "png"
+     * @return 
+     */
     public static Action getPrintAction( final Application app, final Component parent,final String ext) {
         return new AbstractAction("Print as "+ext.toUpperCase()) {
             @Override
@@ -1104,8 +1102,8 @@ public class GuiSupport {
                 final DasCanvas canvas = app.getController().getDasCanvas();
                 final JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setDialogTitle("Print to "+ext.toUpperCase());
-                fileChooser.setFileFilter(getFileNameExtensionFilter( ext + " files", ext ));
-                Preferences prefs = AutoplotSettings.settings().getPreferences(DasCanvas.class);
+                fileChooser.setFileFilter( new FileNameExtensionFilter( ext + " files", ext )) ;
+                Preferences prefs = AutoplotSettings.getPreferences(DasCanvas.class);
                 String savedir = prefs.get("savedir", null);
                 if (savedir != null) fileChooser.setCurrentDirectory(new File(savedir));
                 if (currentFile != null) {
@@ -2473,21 +2471,8 @@ public class GuiSupport {
             chooser.setSelectedFile( new File( lcurrentFile ) );
         }
         
-        FileFilter ff = new FileFilter() {
-
-            @Override
-            public boolean accept(File f) {
-                String s= f.getName();
-                return s.endsWith(".vap") || f.isDirectory();
-            }
-
-            @Override
-            public String getDescription() {
-                return "*.vap";
-            }
-        };
+        FileFilter ff = new FileNameExtensionFilter("vap files","vap");
         chooser.addChoosableFileFilter(ff);
-
         chooser.setFileFilter(ff);
         
         if ( JFileChooser.APPROVE_OPTION==chooser.showOpenDialog(parent) ) {

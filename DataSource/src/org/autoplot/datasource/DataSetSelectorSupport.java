@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
@@ -20,13 +19,13 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.das2.datum.DatumRange;
 
 /**
@@ -132,27 +131,10 @@ public class DataSetSelectorSupport {
             chooser.setAccessory(trPanel);
         
             FileFilter ff;
-            ff = new FileFilter() {
-
-                @Override
-                public boolean accept(File f) {
-                    if (f.isDirectory()) {
-                        return true;
-                    }
-                    String t = f.getName();
-                    return t.endsWith(".vap");
-                }
-
-                @Override
-                public String getDescription() {
-                    return ".vap files";
-                }
-            };
+            ff = new FileNameExtensionFilter( ".vap files", "vap" );
 
             chooser.addChoosableFileFilter(ff);
-            FileFilter select = ff;
-
-            chooser.setFileFilter(select);
+            chooser.setFileFilter(ff);
 
             Window w= parent==null ? null : SwingUtilities.getWindowAncestor( parent);
             int result = chooser.showOpenDialog(w);
@@ -198,7 +180,7 @@ public class DataSetSelectorSupport {
         Preferences prefs = AutoplotSettings.settings().getPreferences(DataSetSelectorSupport.class);
 
         String currentDirectory = prefs.get(AutoplotSettings.PREF_LAST_OPEN_FOLDER, userHome().toString());
-        final HashMap exts = DataSourceRegistry.getInstance().dataSourcesByExt;
+        final HashMap exts = DataSourceRegistry.getInstance().dataSourcesByExt; // TODO: file resources.
 
         JFileChooser chooser = new JFileChooser(currentDirectory);
 
@@ -235,45 +217,12 @@ public class DataSetSelectorSupport {
 
         for (Object ext1 : exts.keySet()) {
             final String extf = (String) ext1;
-            ff = new FileFilter() {
-
-                @Override
-                public boolean accept(File f) {
-                    if (f.isDirectory()) {
-                        return true;
-                    }
-                    String t = f.getName();
-                    String ext = DataSetURI.getExt(t);
-                    if ( ext!=null ) ext= "."+ext;
-                    return (ext != null && extf.equals(ext));
-                }
-
-                @Override
-                public String getDescription() {
-                    return "*" + extf;
-                }
-            };
+            ff = new FileNameExtensionFilter( "*"+ext1, extf.substring(1) );
             chooser.addChoosableFileFilter(ff);
         }
         
         if ( isAutoplotApp ) {
-            ff = new FileFilter() {
-                @Override
-                public boolean accept(File f) {
-                    if (f.isDirectory()) {
-                        return true;
-                    }
-                    String t = f.getName();
-                    String ext = DataSetURI.getExt(t);
-                    if ( ext!=null ) ext= "."+ext;
-                    return (ext != null && ".vap".equals(ext));
-                }
-
-                @Override
-                public String getDescription() {
-                    return "*.vap";
-                }
-            };
+            ff = new FileNameExtensionFilter( "*.vap", "vap");
             chooser.addChoosableFileFilter(ff);
         }
 

@@ -60,6 +60,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
@@ -280,7 +281,7 @@ public class ScriptPanelSupport {
      */
     public int getSaveFile() throws IOException {
         JFileChooser chooser = new JFileChooser();
-        chooser.setFileFilter(getFileFilter());
+        chooser.setFileFilter(new FileNameExtensionFilter( "python and jython scripts", new String [] { "jy", "py", "jyds" } ));
         final JCheckBox cb= new JCheckBox("rename");
         cb.setEnabled(true);
         cb.setToolTipText("rename file, deleting old name \""+file+"\"");
@@ -1176,22 +1177,6 @@ public class ScriptPanelSupport {
         return new MyOutputStream(System.out, dc);
     }
     
-    private FileFilter getFileFilter() {
-        return new FileFilter() {
-
-            @Override
-            public boolean accept(File f) {
-                String name= f.getName();
-                return (f.isDirectory() || name.endsWith(".jy") || name.endsWith(".py") || name.endsWith(".jyds"));
-            }
-
-            @Override
-            public String getDescription() {
-                return "python and jython scripts";
-            }
-        };
-    }
-
     /**
      * returns JFileChooser.APPROVE_OPTION or JFileChooser.CANCEL_OPTION
      * @return JFileChooser.APPROVE_OPTION or JFileChooser.CANCEL_OPTION
@@ -1380,7 +1365,7 @@ public class ScriptPanelSupport {
 
             JFileChooser chooser = new JFileChooser();
             chooser.setFileSelectionMode( JFileChooser.FILES_ONLY );
-            chooser.setFileFilter(getFileFilter());
+            chooser.setFileFilter(new FileNameExtensionFilter( "python and jython scripts", new String [] { "jy", "py", "jyds" } ));
             if (file != null) {
                 chooser.setSelectedFile(file);
             }

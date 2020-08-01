@@ -22,7 +22,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
@@ -180,21 +180,6 @@ public class ScriptPanelSupport {
         annotationsSupport.annotateError(ex,offset);
     }
 
-    private FileFilter getFileFilter() {
-        return new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                String name= f.getName();
-                if ( name==null ) return false;
-                return (f.isDirectory() || name.endsWith(".jy") || name.endsWith(".py") || name.endsWith(".jyds"));
-            }
-            @Override
-            public String getDescription() {
-                return "python and jython scripts";
-            }
-        };
-    }
-
     /**
      * show the save as dialog and return the result.  This was recently public, but
      * no one appears to be using it and it seems like private is more appropriate.
@@ -203,7 +188,7 @@ public class ScriptPanelSupport {
      */
     private int getSaveFile() throws IOException {
         JFileChooser chooser = new JFileChooser();
-        chooser.setFileFilter(getFileFilter());
+        chooser.setFileFilter( new FileNameExtensionFilter( "python and jython scripts", "jy", "jyds", "py" ) );
         if (file != null && ! FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), file ) ) {
             chooser.setSelectedFile(file);
         }

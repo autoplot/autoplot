@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /*
  * PngWalkTool.java
@@ -31,8 +27,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
@@ -84,7 +78,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -95,11 +88,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.das2.components.DasProgressPanel;
 import org.das2.components.DataPointRecorder;
 import org.das2.components.TearoffTabbedPane;
@@ -1741,16 +1733,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 if ( !fname.equals("/tmp/contactSheet.png") ) {
                     chooser.setSelectedFile( new File(fname) );
                 }
-                chooser.setFileFilter( new FileFilter() {
-                    @Override
-                    public boolean accept(File f) {
-                        return f.isDirectory() || f.getName().endsWith(".png");
-                    }
-                    @Override
-                    public String getDescription() {
-                        return "PNG Files";
-                    }
-                });
+                chooser.setFileFilter( new FileNameExtensionFilter( "PNG Files", "png") );
                 if ( chooser.showSaveDialog(this)==JFileChooser.APPROVE_OPTION ) {
                     File f= chooser.getSelectedFile();
                     if ( !f.getName().endsWith(".png") ) {
@@ -2614,7 +2597,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         String fname= prefs.get( "writeToPdf", "/tmp/pngwalk.pdf" );
         
         choose.setSelectedFile( new File(fname) );
-        choose.setFileFilter( GuiSupport.getFileNameExtensionFilter("pdf files", "pdf" ));
+        choose.setFileFilter( new FileNameExtensionFilter("pdf files", "pdf" ));
         if ( choose.showSaveDialog(PngWalkTool.this)==JFileChooser.APPROVE_OPTION ) {
             final File f= choose.getSelectedFile();
             prefs.put( "writeToPdf", f.toString() );

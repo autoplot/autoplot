@@ -1824,7 +1824,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                             chooser.setFileFilter( new FileFilter() {
                                 @Override
                                 public boolean accept(File f) {
-                                    return f.isDirectory() || p.matcher(f.toString()).matches();
+                                    return f!=null && ( f.isDirectory() || p.matcher(f.toString()).matches() );
                                 }
 
                                 @Override

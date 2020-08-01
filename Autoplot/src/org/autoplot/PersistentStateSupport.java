@@ -8,7 +8,6 @@ import org.das2.components.DasProgressPanel;
 import org.das2.dasml.SerializeUtil;
 import org.das2.dasml.DOMBuilder;
 import org.das2.graph.DasCanvas;
-import org.das2.util.filesystem.Glob;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -21,7 +20,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
-import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFileChooser;
@@ -29,7 +27,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -44,7 +42,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -56,7 +53,11 @@ public class PersistentStateSupport {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.dom");
 
+    /**
+     * the extension of the format, like .vap.
+     */
     String ext;
+    
     private String currentFile;
     JMenu openRecentMenu;
     SerializationStrategy strategy;
@@ -166,24 +167,17 @@ public class PersistentStateSupport {
         this.strategy= strategy;
         this.ext= "."+extension;
         this.component= parent;
-        Preferences prefs= AutoplotSettings.settings().getPreferences(PersistentStateSupport.class);
+        Preferences prefs= AutoplotSettings.getPreferences(PersistentStateSupport.class);
         setDirectory( "" );
         String recentFileString= prefs.get( PREF_FILE+ext+"_recent", "" );
         setRecentFiles( recentFileString );
     }
     
-    private FileFilter simpleFilter( final String glob ) {
-        final Pattern pattern= Glob.getPattern(glob);
-        return new FileFilter() {
-            @Override
-            public boolean accept( File pathname ) {
-                return pathname.isDirectory() || pattern.matcher(pathname.getName()).matches();
-            }
-            @Override
-            public String getDescription() { return glob; }
-        };
-    }
-    
+    /**
+     * Create an action which will trigger the save as dialog.  This is
+     * used to create a "save as" button.
+     * @return the action
+     */
     public Action createSaveAsAction() {
         return new AbstractAction("Save As...") {
             @Override
@@ -219,7 +213,7 @@ public class PersistentStateSupport {
         VapSchemeChooser vapVersion= new VapSchemeChooser();
         chooser.setAccessory( vapVersion );
         
-        chooser.setFileFilter( simpleFilter("*"+ext ) );
+        chooser.setFileFilter( new FileNameExtensionFilter( "*"+ext, ext.substring(1) ) );
         int result= chooser.showSaveDialog(this.component);
         if ( result==JFileChooser.APPROVE_OPTION ) {
             String lext= ext;
@@ -424,7 +418,7 @@ public class PersistentStateSupport {
                     JFileChooser chooser = new JFileChooser();
                     if ( getCurrentFile()!=null ) 
                         chooser.setCurrentDirectory(new File(getCurrentFile()).getParentFile());
-                    chooser.setFileFilter( simpleFilter( "*"+ext ) );
+                    chooser.setFileFilter( new FileNameExtensionFilter( "*"+ext, ext.substring(1) ) );
                     int result = chooser.showOpenDialog(component);
                     if (result == JFileChooser.APPROVE_OPTION) {
                         open( chooser.getSelectedFile() );
