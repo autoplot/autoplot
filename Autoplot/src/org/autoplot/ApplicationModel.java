@@ -105,15 +105,16 @@ public final class ApplicationModel {
     }
 
     /**
-     * an early version of Autoplot worked as an applet.
-     * @return 
+     * An early version of Autoplot worked as an applet.  The applet mode
+     * is no longer supported.
+     * @return true if this is an applet.
      */
     public boolean isApplet() {
         return this.applet;
     }
     
     /**
-     * return true if this is running as an application.
+     * Return true if this is running as an application.
      * @return true if this is running as an application.
      */
     public boolean isApplication() {
@@ -121,7 +122,7 @@ public final class ApplicationModel {
     }
     
     /**
-     * return true if the application is headless.
+     * Return true if the application is headless.
      * @return true if the application is headless.
      */
     public boolean isHeadless() {
@@ -137,8 +138,9 @@ public final class ApplicationModel {
     }
 
     /**
-     * set the prompt used for command line sessions.
-     * @param prompt 
+     * Set the prompt used for command line sessions.  By default this is 
+     * "autoplot> ".
+     * @param prompt the new one-line prompt
      */
     public void setPrompt(String prompt) {
         String oldPrompt = this.prompt;
@@ -151,7 +153,7 @@ public final class ApplicationModel {
     }
 
     /**
-     * set the code that will handle uncaught exceptions.  This could be a
+     * Set the code that will handle uncaught exceptions.  This could be a
      * GUI that shows the user the problem and submits bug reports.  This could
      * also simply call exit with a non-zero return code for headless use.
      * @param eh 
@@ -173,9 +175,10 @@ public final class ApplicationModel {
     }
 
     /**
-     * show a message to the user.
-     * @param message
-     * @param title
+     * Show a message to the scientist.  This will handle headless mode
+     * by printing to stderr.
+     * @param message the message to show
+     * @param title a title for the dialog
      * @param messageType JOptionPane.WARNING_MESSAGE, JOptionPane.INFORMATION_MESSAGE, JOptionPane.PLAIN_MESSAGE,
      */
     public void showMessage( String message, String title, int messageType ) {
@@ -296,9 +299,9 @@ public final class ApplicationModel {
     ProgressMonitor mon = null;
 
     /**
-     * just plot this dataset.  No capabilities, no urls.  Metadata is set to
+     * Just plot this dataset.  No capabilities, no URLs.  Metadata is set to
      * allow inspection of dataset.
-     * @param ds
+     * @param ds a dataset
      */
     public void setDataSet(QDataSet ds) {
         dom.getController().getPlotElement().getController().setResetRanges(true);
@@ -310,7 +313,7 @@ public final class ApplicationModel {
     }
 
     /**
-     * just plot this dataset using the specified dataSourceFilter index.  plotElements and dataSourceFilters
+     * Just plot this dataset using the specified dataSourceFilter index.  plotElements and dataSourceFilters
      * are added until the index exists.  This is introduced to support jython scripting, but may be
      * useful elsewhere.
      * @param chNum the index of the DataSourceFilter to use.
@@ -343,7 +346,7 @@ public final class ApplicationModel {
     }
 
     /**
-     * just plot this dataset using the specified dataSourceFilter index.  plotElements and dataSourceFilters
+     * Just plot this dataset using the specified dataSourceFilter index.  plotElements and dataSourceFilters
      * are added until the index exists.  This is introduced to support jython scripting, but may be
      * useful elsewhere.
      * @param chNum the index of the DataSourceFilter to use.
@@ -373,7 +376,7 @@ public final class ApplicationModel {
     }
 
     /**
-     * just set the focus to the given dataSourceFilter index.  plotElements and dataSourceFilters
+     * Just set the focus to the given dataSourceFilter index.  plotElements and dataSourceFilters
      * are added until the index exists.  This is introduced to support code where we reenter
      * Autoplot with the position switch, and we can to then call maybePlot so that completions can
      * happen.
@@ -493,8 +496,8 @@ public final class ApplicationModel {
      * When using the AutoplotUI, it is preferable to use AutoplotUI.plotUri, 
      * which will have the effect of typing in the URI and hitting the "go" 
      * arrow button.
-     * @param suri
-     * @throws RuntimeException when _getDataSource throws Exception
+     * @param suri the URI
+     * @throws RuntimeException when resetDataSetSourceURL throws Exception
      */
     public void setDataSourceURL(String suri) {
         String oldVal = dom.getController().getDataSourceFilter().getUri();
@@ -516,7 +519,7 @@ public final class ApplicationModel {
     protected List<Bookmark> bookmarks = null;
 
     /**
-     * get the recent URIs, from bookmarks/bookmarks.recent.xml
+     * Get the recent URIs, from autoplot_data/bookmarks/bookmarks.recent.xml
      * @return the recent URIs
      */
     public List<Bookmark> getRecent() {
@@ -581,7 +584,7 @@ public final class ApplicationModel {
     }
 
     /**
-     * read the default bookmarks in, or those from the user's "bookmarks" pref node.  
+     * Read the default bookmarks in, or those from the user's "bookmarks" pref node.  
      * @return the bookmarks of the legacy user.
      */
     public List<Bookmark> getLegacyBookmarks() {
@@ -614,13 +617,15 @@ public final class ApplicationModel {
     }
 
     /**
-     * record exceptions the same way we would record successful plots.
-     * Right now this only records exceptions for user=jbf...
+     * Record exceptions the same way we would record successful plots.
+     * This checks the system property "enableLogExceptions" and
+     * if "true" the exception is logged.  
+     * See HOME/autoplot_data/bookmarks/exceptions.txt.
      * 
-     * @param surl the URI we were trying to plot.
+     * @param suri the URI we were trying to plot.
      * @param exx the exception we got instead.
      */
-    public void addException( String surl, Exception exx ) {
+    public void addException( String suri, Exception exx ) {
         if ( !DasApplication.hasAllPermission() ) {
             return;
         }
@@ -644,7 +649,7 @@ public final class ApplicationModel {
             TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
             Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
             out3.append( "=== " + tp.format( now, null) + " ===\n" );
-            out3.append( surl + "\n" );
+            out3.append( suri + "\n" );
             StringWriter sw= new StringWriter();
             PrintWriter pw= new PrintWriter( sw );
             exx.printStackTrace(pw);
@@ -652,7 +657,7 @@ public final class ApplicationModel {
             out3.append("\n");
 
         } catch ( IOException ex ) {
-            logger.log( Level.SEVERE, "exception: "+surl, ex );
+            logger.log( Level.SEVERE, "exception: "+suri, ex );
         }
 
     }
@@ -665,10 +670,10 @@ public final class ApplicationModel {
     long lastRecentCount= 1; // number of times we used this uri.
     
     /**
-     * add the URI to the recently used list, and to the user's
+     * Add the URI to the recently used list, and to the user's
      * autoplot_data/bookmarks/history.txt.  No interpretation is done
-     * as of June 2011, and pngwalk: and script: uris are acceptable.
-     * @param suri
+     * and pngwalk: and script: uris are acceptable.
+     * @param suri the URI to add.
      */
     public void addRecent(String suri) {
         
@@ -813,7 +818,7 @@ public final class ApplicationModel {
      * the map is a LinkedHashMap, which preserves the order, and the
      * last element is the more recently used.  If the entry appears to be a 
      * file, 
-     * @param filter String like "*.jy", (a glob, not a regex);
+     * @param filter String like "*.jy", (a glob, not a regex)
      * @param limit maximum number of items to return
      * @return LinkedHashMap, ordered by time, mapping URI to time.
      */
