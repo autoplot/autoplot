@@ -931,7 +931,7 @@ public final class ApplicationModel {
 
     /**
      * creates an ApplicationState object representing the current state.
-     * @param deep if true, do a deeper, more expensive gathering of state.  In the initial implementation, this calculates the embededded dataset.
+     * @param deep if true, do a deeper, more expensive gathering of state.  In the initial implementation, this calculates the embedded dataset.
      * @return ApplicationState object
      */
     public Application createState(boolean deep) {
