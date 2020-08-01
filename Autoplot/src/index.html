@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-07-27 r24978):</p>
+        <p>Bugfixes (2020-08-01 r24988):</p>
         <ul>
+            <li>2276: PngwalkTool inspect action now shows folders in local file chooser.  Use Java 6 FileNameFileFilter everywhere, reducing code and making things consistent.
+            <li>don't replace existing NetCDF units with those found in the ISTP metadata, since the NetCDF ones are more likely to be correct.
             <li>CreatePngWalk no longer allowed single URI to be used in place of .vap.  Add uri= argument which is better anyway.  Thanks, Warren!
             <li>2274: keep track of 401 exceptions so we ask for password again if incorrect password is entered.  Thanks, Chris!
             <li>add calendar button to mashup tool.
@@ -54,6 +56,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>bundle command now has 5, 6, and 7 dataset versions.  Thanks, Sadie!
             <li>Annotation splitAnchor allows annotation X position to anchor to plot edge while Y anchors to data.
         </ul>
         <p>Less recent features:</p>
