@@ -440,7 +440,12 @@ public class IstpMetadataModel extends MetadataModel {
                 units= Units.cdfTT2000;
                 properties.put(QDataSet.FILL_VALUE, ofv );
             } else {
-                units = Units.cdfEpoch;
+                if ( UnitsUtil.isTimeLocation(units) ) {
+                    // do nothing, assume that they know what they are doing.  
+                    // (Steven's NetCDF file, https://sourceforge.net/p/autoplot/feature-requests/724/).
+                } else {
+                    units = Units.cdfEpoch;
+                }
             }
         } else {
             Object oslice1= attrs.get("slice1");
