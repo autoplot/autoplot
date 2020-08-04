@@ -177,6 +177,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
             for ( Variable vv: vvs ) {
                 if ( vv.findAttribute("DEPEND_0" )!=null ) {
                     mm= new IstpMetadataModel();
+                    break;
                 }
             }
             logger.log(Level.FINER, "look for DEPEND_0 (ms):{0}", (System.currentTimeMillis()-t0));
