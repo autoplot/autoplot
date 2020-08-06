@@ -42,6 +42,7 @@ import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.util.LoggerManager;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSourceUtil;
+import org.autoplot.jythonsupport.JavaJythonConverter;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
 import static org.das2.jythoncompletion.JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
@@ -572,23 +573,16 @@ public class EditorContextMenu {
             mi= new JMenuItem( new AbstractAction("Convert Java To Jython") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    LoggerManager.logGuiEvent(e);       
+                    LoggerManager.logGuiEvent(e);
                     String doThis= editor.getSelectedText();
                     if ( doThis==null || doThis.length()==0 ) {
                         doThis= editor.getText();
                     }
                     try {
-                        String jython= JythonToJavaConverter.convertReverse(doThis);
-                        JEditorPane a= new JEditorPane();
-                        a.setBackground( editor.getBackground() );
-                        a.setForeground( editor.getForeground() );
-                        DefaultSyntaxKit.initKit();
-                        a.setContentType("text/python");
-                        a.setText(jython);
+                        JavaJythonConverter cc= new JavaJythonConverter(editor);
+                        cc.setJavaSource(doThis);
                         JDialog d= new JDialog();
-                        a.setMinimumSize( new Dimension(800,800) );
-                        a.setPreferredSize( new Dimension(800,800) );
-                        d.getContentPane().add(new JScrollPane(a));
+                        d.setContentPane(cc);
                         d.pack();
                         d.setVisible(true);
                     } catch ( Exception ex ) {
