@@ -77,8 +77,18 @@ public class JythonToJavaConverter {
     
     /**
      * The goal is to take Java snippets and turn them into Jython code.
-     * This is all overly simplistic and should be done properly.
+     * This is all overly simplistic and should be done properly.  Cheesy!
      * 
+     * More TODOs:
+     * throw IllegalArgumentException -> raise exception
+     * Character.isDigit -> string.isnumeric
+     * "".startsWith -> "".startswith
+     * "".trim() -> "".strip()
+     * || -> or
+     * && -> and
+     * ! -> not
+     * int[] d -> d
+     * System.arraycopy -> for i in range(0,6): a[i]=a[i+6]
      * @param javaCode
      * @return conversion to Jython-like code.
      */
@@ -90,6 +100,7 @@ public class JythonToJavaConverter {
         Pattern newPattern= Pattern.compile("(.*)([=\\s]*)?new\\s*([a-zA-Z\\.]+)(.*)");
         int indentLevel= 0;
         String indent="";
+        boolean withinComment= false;
         
         ArrayList<String> importedPaths= new ArrayList<>();
         char[] chrs= new char[] { '(', ')', '{', '}' };
@@ -100,6 +111,7 @@ public class JythonToJavaConverter {
             s= s.trim();
             if ( s.endsWith(";") ) s= s.substring(0,s.length()-1);
             s= s.replaceAll("//","#");
+            if ( s.startsWith("/*") ) withinComment= true;
             Matcher m= newPattern.matcher(s);
             if ( m.matches() ) {
                 String clas= "import " + m.group(3);
@@ -132,19 +144,40 @@ public class JythonToJavaConverter {
             indentLevel= Math.max( 0, Math.min( 32, indentLevel 
                     + (chrcount[0]-chrcount[1])*4 
                     + (chrcount[2]-chrcount[3])*4 ) );
-            
+            if ( s.startsWith("}") && indent.length()>=4 ) {
+                indent= indent.substring(4);
+            }
             if ( s.contains("{") ) {
                 s= s.replace("{",":");
             } 
             if ( s.contains("}") ) {
                 s= s.replace("}","");
             } 
-            b.append(indent).append(s).append("\n");
+            s= s.trim();
+            b.append(indent);
+            if ( withinComment ) {
+                b.append("# ");
+                if ( s.endsWith("*/") ) withinComment= false;
+                if ( s.startsWith("/*") ) s= s.substring(2).trim();
+                if ( s.startsWith("*/") ) s= s.substring(2).trim();
+                if ( s.startsWith("*") ) s= s.substring(1).trim();
+            }
+            
+            if ( s.startsWith("public static") && s.endsWith("{")) {
+                s= s.substring(13).trim();
+                int i= s.indexOf(" ");
+                if ( i>0 ) {
+                    s= s.substring(i).trim();
+                }
+                s= "def " + s;
+            }
+            b.append(s).append("\n");
             logger.log(Level.FINER, "out  {0}: {1}", new Object[]{lineNumber, s});
             
             if ( indentLevel!=indent.length()) {
                 indent= "                                ".substring(0,indentLevel);
             }
+            
         }
         StringBuilder sb= new StringBuilder();
         for ( String s : importedPaths ) {
