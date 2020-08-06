@@ -33,6 +33,13 @@ public class JythonToJavaConverter {
     
     private static Map<String,String> packages= null;
     
+    /**
+     * scan through the list of imports in /importLookup.jy, to see
+     * if the symbol can be imported.  This will return null (None) if
+     * there are no suggestions, or the name of the package.
+     * @param clas the class name, for example "JSlider"
+     * @return the package or null, for example "javax.swing"
+     */
     public synchronized static String guessPackage( String clas ) {
         if ( packages==null ) {
             try {

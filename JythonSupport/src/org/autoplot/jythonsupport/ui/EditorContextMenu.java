@@ -714,6 +714,17 @@ public class EditorContextMenu {
             mi.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_U, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ) );
             actionsMenu.add( mi );
             
+            mi= new JMenuItem( new AbstractAction("Import Java Code") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);
+                    editor.doImports();
+                }
+            } );
+            mi.setToolTipText( "search for and add import" );
+            mi.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_I, InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK ) );
+            actionsMenu.add( mi );
+            
             menu.add( actionsMenu );
             
             JMenu settingsMenu= new JMenu("Settings");
@@ -772,6 +783,7 @@ public class EditorContextMenu {
                             + "<tr><td>SHIFT-F5</td><td> settings </td> <br></tr>"
                             + "<tr><td>CTRL-SHIFT-C</td><td> plot expression via server mode (See [menubar]->Options->Enable Feature->Server)\" </td> <br></tr>"
                             + "<tr><td>CTRL-SHIFT-U</td><td> show usages of a variable<br></td></tr>"
+                            + "<tr><td>ALT-SHIFT-U</td><td>import the symbol<br></td></tr>"
                             + "<tr><td>CTRL-S</td><td>  Save<br></td></tr>"
                             + "<tr><td>F6</td><td> Execute<br></td> </tr>"
                             + "<tr><td>SHIFT-F6</td><td> Execute with Parameters Dialog<br></td> </tr>"

@@ -29,6 +29,8 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -71,6 +73,7 @@ import org.autoplot.datasource.DataSourceFormatEditorPanel;
 import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
+import org.autoplot.jythonsupport.JythonToJavaConverter;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.PyQDataSet;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
@@ -180,6 +183,14 @@ public class EditorTextPane extends JEditorPane {
                         showUsages();
                     }
                 } );
+
+                getActionMap().put( "importCode", new AbstractAction( "importCode" ) {
+                    @Override
+                    public void actionPerformed( ActionEvent e ) {
+                        LoggerManager.logGuiEvent(e);  
+                        doImports();
+                    }
+                } );
                 
                 Toolkit tk= Toolkit.getDefaultToolkit();
 
@@ -190,6 +201,7 @@ public class EditorTextPane extends JEditorPane {
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_F5, InputEvent.SHIFT_DOWN_MASK ), "settings" );
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ), "plotItem" );
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_U, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ), "showUsages" );
+                getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_I, InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK ), "importCode" );
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_F12, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ), "developer1" );
                 
                 doLayout(); // kludge for DefaultSyntaxKit
@@ -354,6 +366,76 @@ public class EditorTextPane extends JEditorPane {
             support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+var.length(), EditorAnnotationsSupport.ANNO_USAGE, var, null );
         }
     }
+    
+    private static String addImport( String src, String pkg, String name ) {
+        String[] ss= src.split("\n");
+        Pattern p= Pattern.compile("from (.+) import (.*)");
+        boolean haveIt=false;
+        int addToLine= -1;
+        for ( int i=0; i<ss.length; i++ ) {
+            String line= ss[i];
+            Matcher m= p.matcher(line);
+            if ( m.matches() ) {
+                if ( m.group(1).equals(pkg) ) {
+                    String names= m.group(2);
+                    String[] namess= names.split(",",-2);
+                    for ( String n: namess ) {
+                        if ( n.equals(name) ) {
+                            haveIt= true;
+                        }
+                    }
+                    if ( haveIt==false ) {
+                        addToLine= i;
+                    }
+                }
+            }
+        }
+        if ( haveIt==false ) {
+            if ( addToLine>-1 ) {
+                ss[addToLine]= ss[addToLine]+","+name;
+                return String.join("\n",ss);
+            } else {
+                return "from "+pkg+" import "+name + "\n" + String.join("\n",ss);
+            }
+        } else {
+            return src;
+        }
+        
+    }
+    
+    /**
+     * offer possible imports and insert an import for the Java class
+     */
+    protected void doImports() {
+        String var= getSelectedText();
+        if ( var==null || var.length()==0 ) {
+            var= EditorAnnotationsSupport.getSymbolAt(this, this.getCaretPosition() );
+        }
+        String pkg= JythonToJavaConverter.guessPackage(var);
+        
+        if ( pkg!=null) {
+            String src= getText();
+            String src2= addImport( src, pkg, var );
+            if ( src.equals(src2) ) {
+                JOptionPane.showMessageDialog( this,
+                "\""+var+"\" is already imported." );
+            }
+
+            if ( JOptionPane.OK_OPTION==
+                    JOptionPane.showConfirmDialog( this, 
+                            "Add import for "+var + " in " +pkg + "?", "Import", 
+                            JOptionPane.OK_CANCEL_OPTION ) ) {
+                src= addImport( src, pkg, var );
+                setText(src);
+            }
+        } else {
+            JOptionPane.showMessageDialog( this,
+                "No suggestions found." );
+        }
+        
+    }
+    
+    
     
     /**
      * plot the selected expression, assuming that it is defined where the interpretter is stopped.
