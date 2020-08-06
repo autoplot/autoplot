@@ -70,10 +70,10 @@ public class EditorAnnotationsSupport {
     public static String getSymbolAt( EditorTextPane editor, int position) {
         int i= position;
         String s= editor.getText();
-        if ( i>=1 && i<s.length() && !Character.isJavaIdentifierPart(s.charAt(i)) && Character.isJavaIdentifierPart(s.charAt(i-1)) ) {
+        if ( i>0 && i<s.length() && !Character.isJavaIdentifierPart(s.charAt(i)) && Character.isJavaIdentifierPart(s.charAt(i-1)) ) {
             i=i-1;
         }
-        if ( i==s.length() && Character.isJavaIdentifierPart(s.charAt(i-1) ) ) {
+        if ( i>0 && i==s.length() && Character.isJavaIdentifierPart(s.charAt(i-1) ) ) {
             i=i-1;
         }
         while ( i>0 && i<s.length() && Character.isJavaIdentifierPart(s.charAt(i)) ) {
