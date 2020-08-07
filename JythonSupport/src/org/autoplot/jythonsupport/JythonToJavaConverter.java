@@ -8,9 +8,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -19,7 +18,23 @@ import org.autoplot.datasource.DataSetURI;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.parser.SimpleNode;
-import org.python.parser.ast.*;
+import org.python.parser.ast.Assign;
+import org.python.parser.ast.Attribute;
+import org.python.parser.ast.BinOp;
+import org.python.parser.ast.Call;
+import org.python.parser.ast.Compare;
+import org.python.parser.ast.Continue;
+import org.python.parser.ast.Expr;
+import org.python.parser.ast.For;
+import org.python.parser.ast.FunctionDef;
+import org.python.parser.ast.If;
+import org.python.parser.ast.ImportFrom;
+import org.python.parser.ast.Name;
+import org.python.parser.ast.Num;
+import org.python.parser.ast.Print;
+import org.python.parser.ast.Str;
+import org.python.parser.ast.VisitorBase;
+import org.python.parser.ast.exprType;
 
 /**
  * experiment with code which converts the Jython AST (syntax tree) into Java
@@ -66,6 +81,117 @@ public class JythonToJavaConverter {
         }
         return packages.get(clas);
     }
+    
+    /**
+     * return a list of classes which are reasonable completions for the class
+     * provided. For example, "JP" would result in "JPanel" and "JPasswordField"
+     *
+     * @param clas
+     * @return list of completions.
+     */
+    public synchronized static List<String> guessCompletions(String clas) {
+        ArrayList<String> result = new ArrayList<>();
+        try (BufferedReader r = new BufferedReader(new InputStreamReader(
+                JythonToJavaConverter.class.getResourceAsStream("/importLookup.jy")))) {
+            String l;
+            Pattern p = Pattern.compile("from (.*) import (.*)");
+            while ((l = r.readLine()) != null) {
+                if (l.length() == 0) {
+                    continue;
+                }
+                if (l.charAt(0) == '#') {
+                    continue;
+                }
+                Matcher m = p.matcher(l);
+                if (m.matches()) {
+                    // here is the logic
+                    String tclas = m.group(2);
+                    if (tclas.startsWith(clas)) {
+                        result.add(tclas);
+                    }
+                } else {
+                    logger.log(Level.INFO, "does not match pattern: {0}", l);
+                }
+            }
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        return result;
+    }
+    
+    /**
+     * add the class to the list of imports.
+     * @param src the Jython source
+     * @param pkg the Java package
+     * @param name the Java class name.
+     * @return the new version of the script.
+     */
+    public static String addImport( String src, String pkg, String name ) {
+        String[] ss= src.split("\n");
+        Pattern p= Pattern.compile("from (.+) import (.*)");
+        boolean haveIt=false;
+        int addToLine= -1;
+        for ( int i=0; i<ss.length; i++ ) {
+            String line= ss[i];
+            Matcher m= p.matcher(line);
+            if ( m.matches() ) {
+                if ( m.group(1).equals(pkg) ) {
+                    String names= m.group(2);
+                    String[] namess= names.split(",",-2);
+                    for ( String n: namess ) {
+                        if ( n.equals(name) ) {
+                            haveIt= true;
+                        }
+                    }
+                    if ( haveIt==false ) {
+                        addToLine= i;
+                    }
+                }
+            }
+        }
+        if ( haveIt==false ) {
+            if ( addToLine>-1 ) {
+                ss[addToLine]= ss[addToLine]+","+name;
+                return String.join("\n",ss);
+            } else {
+                return "from "+pkg+" import "+name + "\n" + String.join("\n",ss);
+            }
+        } else {
+            return src;
+        }
+        
+    }    
+    
+    /**
+     * return true if the class has been imported.  Note this is not thorough
+     * and should be reviewed at some point.
+     * @param src the Jython source
+     * @param pkg the Java package
+     * @param name the Java class name.
+     * @return true if the class has been imported already.
+     */
+    public static boolean hasImport( String src, String pkg, String name ) {
+        String[] ss= src.split("\n");
+        Pattern p= Pattern.compile("from (.+) import (.*)");
+        boolean haveIt=false;
+        for ( int i=0; i<ss.length; i++ ) {
+            String line= ss[i];
+            Matcher m= p.matcher(line);
+            if ( m.matches() ) {
+                if ( m.group(1).equals(pkg) ) {
+                    String names= m.group(2);
+                    String[] namess= names.split(",",-2);
+                    for ( String n: namess ) {
+                        if ( n.equals(name) ) {
+                            haveIt= true;
+                        }
+                    }
+                }
+            }
+        }
+        return haveIt;
+    }
+        
     
     private static int[] count( String line, char[] chrs ) {
         int[] result= new int[chrs.length];
