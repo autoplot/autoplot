@@ -51,7 +51,9 @@ import org.python.core.PyTableCode;
 import org.python.util.PythonInterpreter;
 import org.autoplot.jythonsupport.JythonOps;
 import org.autoplot.jythonsupport.JythonRefactory;
+import org.autoplot.jythonsupport.JythonToJavaConverter;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
+import org.autoplot.jythonsupport.ui.EditorTextPane;
 
 /**
  * Completions for Jython code.  The completion task is created with the
@@ -63,8 +65,9 @@ import org.autoplot.jythonsupport.SimplifyScriptSupport;
 public class JythonCompletionTask implements CompletionTask {
 
     private static final Logger logger= LoggerManager.getLogger("jython.editor.completion");
-    
+            
     private static final ImageIcon LOCALVARICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/localVariable.png") );
+    private static final ImageIcon JAVACLASSICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/javaClass.png") );
     private static final ImageIcon JYTHONCOMMANDICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/jythonCommand.png") );
     
     public static final String CLIENT_PROPERTY_INTERPRETER_PROVIDER = "JYTHON_INTERPRETER_PROVIDER";
@@ -701,7 +704,14 @@ public class JythonCompletionTask implements CompletionTask {
             return 0;
         }
         
-        return count + getLocalsCompletions( interp, cc, rs);
+        int nlocal=  getLocalsCompletions( interp, cc, rs);
+        int nimportable;
+        if ( cc.completable.length()>0 ) {
+            nimportable= getImportableCompletions( eval, cc, rs );
+        } else {
+            nimportable= 0;
+        }
+        return count + nlocal + nimportable;
     }
 
     private static String argsList( Class[] classes ) {
@@ -945,7 +955,35 @@ public class JythonCompletionTask implements CompletionTask {
     }
     
     /**
-     * replace java names like org.virbo.dataset.QDataSet with less-ominous names like "QDataSet"
+     * get completions by looking at importLookup.jy, which is a list of commonly imported codes.
+     * @param source the script source.
+     * @param cc
+     * @param result
+     * @return 
+     */
+    public static int getImportableCompletions( String source, CompletionContext cc, CompletionResultSet result ) {
+        int count= 0;
+        List<String> completions= JythonToJavaConverter.guessCompletions(cc.completable);
+        for ( String ss: completions ) {
+            String pkg= JythonToJavaConverter.guessPackage(ss);
+            if ( !JythonToJavaConverter.hasImport( source, pkg, ss ) ) {
+                String javaClass= pkg+"."+ss;
+                String signature= join( javaClass.split("\\."), "/") + ".html";
+                String link= JavadocLookup.getInstance().getLinkForJavaSignature(signature);
+                DefaultCompletionItem ci= 
+                        new DefaultCompletionItem( 
+                                cc.completable, cc.completable.length(), 
+                                ss, ss + " to be imported from " + pkg, link, 
+                                0, JAVACLASSICON );
+                result.addItem( ci );
+            }
+            count++;
+        }
+        return count;
+    }
+    
+    /**
+     * replace java names like org.das2.qds.QDataSet with less-ominous names like "QDataSet"
      * @param label
      * @return the simplified name.
      */

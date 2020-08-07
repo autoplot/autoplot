@@ -367,41 +367,6 @@ public class EditorTextPane extends JEditorPane {
         }
     }
     
-    private static String addImport( String src, String pkg, String name ) {
-        String[] ss= src.split("\n");
-        Pattern p= Pattern.compile("from (.+) import (.*)");
-        boolean haveIt=false;
-        int addToLine= -1;
-        for ( int i=0; i<ss.length; i++ ) {
-            String line= ss[i];
-            Matcher m= p.matcher(line);
-            if ( m.matches() ) {
-                if ( m.group(1).equals(pkg) ) {
-                    String names= m.group(2);
-                    String[] namess= names.split(",",-2);
-                    for ( String n: namess ) {
-                        if ( n.equals(name) ) {
-                            haveIt= true;
-                        }
-                    }
-                    if ( haveIt==false ) {
-                        addToLine= i;
-                    }
-                }
-            }
-        }
-        if ( haveIt==false ) {
-            if ( addToLine>-1 ) {
-                ss[addToLine]= ss[addToLine]+","+name;
-                return String.join("\n",ss);
-            } else {
-                return "from "+pkg+" import "+name + "\n" + String.join("\n",ss);
-            }
-        } else {
-            return src;
-        }
-        
-    }
     
     /**
      * offer possible imports and insert an import for the Java class
@@ -415,7 +380,7 @@ public class EditorTextPane extends JEditorPane {
         
         if ( pkg!=null) {
             String src= getText();
-            String src2= addImport( src, pkg, var );
+            String src2= JythonToJavaConverter.addImport( src, pkg, var );
             if ( src.equals(src2) ) {
                 JOptionPane.showMessageDialog( this,
                 "\""+var+"\" is already imported." );
@@ -425,7 +390,7 @@ public class EditorTextPane extends JEditorPane {
                     JOptionPane.showConfirmDialog( this, 
                             "Add import for "+var + " in " +pkg + "?", "Import", 
                             JOptionPane.OK_CANCEL_OPTION ) ) {
-                src= addImport( src, pkg, var );
+                src= JythonToJavaConverter.addImport( src, pkg, var );
                 setText(src);
             }
         } else {

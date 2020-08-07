@@ -48,6 +48,7 @@ public class JavadocLookup {
      * Java8 http://docs.oracle.com/javase/8/docs/api/java/io/File.html#createTempFile-java.lang.String-java.lang.String-java.io.File-
      * @param signature signature like javax.swing.JCheckBox#paramString()
      * @return null or the link, like http://docs.oracle.com/javase/6/docs/api/javax/swing/JCheckBox#paramString()
+     * TODO: it appears that this needs /x/y/z.html!
      */
     public String getLinkForJavaSignature(String signature) {
         if ( signature==null ) return null;
