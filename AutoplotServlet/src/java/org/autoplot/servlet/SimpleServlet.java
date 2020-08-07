@@ -521,8 +521,8 @@ public class SimpleServlet extends HttpServlet {
                             tsb.setURI(suri);
                             tsb.setTimeRange(timeRange);
                             logit("timeSeriesBrowse got data source", t0, uniq, debug);
+                            suri= tsb.getURI();
                         }
-                        suri= tsb.getURI();
                     }
                     
                     DataSourceFactory dsf= DataSetURI.getDataSourceFactory( DataSetURI.getURI(suri),new NullProgressMonitor());
