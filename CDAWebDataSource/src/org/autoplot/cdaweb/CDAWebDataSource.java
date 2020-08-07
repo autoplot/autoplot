@@ -526,7 +526,10 @@ public class CDAWebDataSource extends AbstractDataSource {
                 public void setURI(String suri) throws ParseException {
                     URISplit split= URISplit.parse(suri);
                     Map<String,String> params= URISplit.parseParams(split.params);
-                    tr= DatumRangeUtil.parseTimeRange(params.get( URISplit.PARAM_TIME_RANGE ) );
+                    String str= params.get( URISplit.PARAM_TIME_RANGE );
+                    if ( str!=null ) {
+                        tr= DatumRangeUtil.parseTimeRange(params.get( URISplit.PARAM_TIME_RANGE ) );
+                    }
                 }
 
             };
