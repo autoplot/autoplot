@@ -517,6 +517,7 @@ public class SimpleServlet extends HttpServlet {
                     if (!stimeRange.equals("")) {
                         timeRange = DatumRangeUtil.parseTimeRangeValid(stimeRange);
                         TimeSeriesBrowse tsb = dsource.getCapability(TimeSeriesBrowse.class);
+                        tsb.setURI(suri);
                         if (tsb != null) {
                             tsb.setTimeRange(timeRange);
                             logit("timeSeriesBrowse got data source", t0, uniq, debug);
