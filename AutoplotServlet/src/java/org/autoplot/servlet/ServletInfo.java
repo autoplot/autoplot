@@ -126,7 +126,29 @@ public class ServletInfo extends HttpServlet {
             out.println("</html>");
         }
     }
+    
+    /**
+     * return true if we can cache requests.
+     * @return 
+     */
+    public static boolean isCaching() {
+        return true;
+    }
 
+    private static File cacheDirectory=null;
+            
+    public static File getCacheDirectory() {
+        if ( cacheDirectory==null ) {
+            cacheDirectory= new File("/tmp/apsrv/cache/");
+            if ( !cacheDirectory.exists() ) {
+                if ( !cacheDirectory.mkdirs() ) {
+                    throw new IllegalArgumentException("fail to make cache directory");
+                }
+            }
+        }
+        return cacheDirectory;
+    }
+    
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
