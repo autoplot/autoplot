@@ -23,7 +23,7 @@
         <h1>This is a HAPI Server.</h1>  More information about this type of server is found at <a href="https://github.com/hapi-server/data-specification" target="_blank">GitHub</a>.
         This implementation of the HAPI server uses Autoplot URIs to load data, more information about Autoplot can be found <a href="http://autoplot.org" target="_blank">here</a>.
 
-        <br>Run HAPI server <a href="http://tsds.org/verify-hapi/?url=http://jfaden.net/HapiServerDemo/hapi">verifier</a>.
+        <br>Run HAPI server <a href="http://hapi-server.org/verify?url=https://jfaden.net/HapiServerDemo/hapi">verifier</a>.
         <%
             Util.maybeInitialize( getServletContext() );
             if ( Util.getHapiHome()==null ) {
