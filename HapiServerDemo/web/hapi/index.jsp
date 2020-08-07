@@ -4,6 +4,7 @@
     Author     : jbf
 --%>
 
+<%@page import="java.net.URLEncoder"%>
 <%@page import="org.json.JSONException"%>
 <%@page import="java.util.Enumeration"%>
 <%@page import="java.io.File"%>
@@ -23,7 +24,10 @@
         <h1>This is a HAPI Server.</h1>  More information about this type of server is found at <a href="https://github.com/hapi-server/data-specification" target="_blank">GitHub</a>.
         This implementation of the HAPI server uses Autoplot URIs to load data, more information about Autoplot can be found <a href="http://autoplot.org" target="_blank">here</a>.
 
-        <br>Run HAPI server <a href="http://hapi-server.org/verify?url=https://jfaden.net/HapiServerDemo/hapi">verifier</a>.
+        <%
+            String me= "https://jfaden.net/HapiServerDemo/hapi";
+            %>
+            <br>Run HAPI server <a href="http://hapi-server.org/verify?url=<%=me%>verifier</a>.
         <%
             Util.maybeInitialize( getServletContext() );
             if ( Util.getHapiHome()==null ) {
@@ -97,6 +101,27 @@
                     try {
                         String pname= parameters.getJSONObject(j).getString("name");
                         out.print( String.format( "<a href=\"data?id=%s&parameters=%s&%s\">%s</a>", ds.getString("id"), pname, exampleTimeRange, pname ) );
+                        if ( j>0 ) { //sparklines
+                            //     vap  +hapi  :https      ://jfaden.net  /HapiServerDemo  /hapi  ?id=?parameters=Temperature
+                            //?url=vap%2Bhapi%3Ahttps%3A%2F%2Fjfaden.net%2FHapiServerDemo%2Fhapi%3Fid%3DpoolTemperature%26timerange%3D2020-08-06&format=image%2Fpng&width=70&height=20&column=0%2C100%25&row=0%2C100%25&timeRange=2003-mar&renderType=&color=%23000000&symbolSize=&fillColor=%23aaaaff&foregroundColor=%23000000&backgroundColor=none
+                            StringBuilder sb= new StringBuilder();
+                            sb.append("uri=");
+                            StringBuilder ub= new StringBuilder();
+                            ub.append("vap+hapi:"+me);
+                            ub.append("?");
+                            ub.append("id="+id);
+                            ub.append("&parameters="+pname);
+                            sb.append( URLEncoder.encode(ub.toString()) );
+                            sb.append("&format=image%2Fpng");
+                            sb.append("&width=70");
+                            sb.append("&height=16");
+                            sb.append("&row=0%2C100%25");
+                            sb.append("&column=0%2C100%25");
+                            sb.append("&timerange="+URLEncoder.encode(exampleRange.toString()) );
+                            out.print( "<img src=\"https://jfaden.net/AutoplotServlet/SimpleServlet?"+sb.toString()+"\">" );                        
+                            //out.print( "<img src=\"http://localhost:8084/AutoplotServlet/SimpleServlet?"+sb.toString()+"\">" );                        
+                        }
+
                     } catch ( JSONException ex ) {
                         out.print( "???" );
                     }
