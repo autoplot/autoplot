@@ -158,30 +158,33 @@ public class SimpleServlet extends HttpServlet {
         
         String qs= request.getQueryString();
         if ( ServletInfo.isCaching() && qs!=null ) {
-            String hash= request.getQueryString();
-            File s= ServletInfo.getCacheDirectory();
-            hash= String.format( "%02d", Math.abs( hash.hashCode() % 100 ) );
-            cacheFile= new File( s, hash );
-            metaCacheFile= new File( s, hash + ".txt" );
+            String format = ServletUtil.getStringParameter(request, "format", "image/png");
+            if ( format.equals("image/png") ) {
+                String hash= request.getQueryString();
+                File s= ServletInfo.getCacheDirectory();
+                hash= String.format( "%02d", Math.abs( hash.hashCode() % 400 ) );
+                cacheFile= new File( s, hash + ".png" );
+                metaCacheFile= new File( s, hash + ".txt" );
 
-            if ( cacheFile.exists() ) {
-                byte[] bb= Files.readAllBytes(metaCacheFile.toPath());
-                String qs0= new String( bb );
-                if ( qs0.equals(qs) ) {
-                
-                    String host= java.net.InetAddress.getLocalHost().getCanonicalHostName();
-                    response.setHeader( "X-Served-By", host );
-                    response.setHeader( "X-Server-Version", ServletInfo.version );
-                    response.setHeader( "X-Autoplot-cache", "yep" );
-                
-                    try ( OutputStream outs= response.getOutputStream() ) {
-                        Files.copy( cacheFile.toPath(), outs );
+                if ( cacheFile.exists() ) {
+                    byte[] bb= Files.readAllBytes(metaCacheFile.toPath());
+                    String qs0= new String( bb );
+                    if ( qs0.equals(qs) ) {
+
+                        String host= java.net.InetAddress.getLocalHost().getCanonicalHostName();
+                        response.setHeader( "X-Served-By", host );
+                        response.setHeader( "X-Server-Version", ServletInfo.version );
+                        response.setHeader( "X-Autoplot-cache", "yep" );
+
+                        try ( OutputStream outs= response.getOutputStream() ) {
+                            Files.copy( cacheFile.toPath(), outs );
+                        }
                     }
+
+                    //TODO: this is very underimplemented, e.g. unloading, verify same args.
+
+                    return;
                 }
-                
-                //TODO: this is very underimplemented, e.g. unloading, verify same args.
-                
-                return;
             }
         }
         
