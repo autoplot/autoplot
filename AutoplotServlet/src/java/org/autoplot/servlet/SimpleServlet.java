@@ -162,7 +162,7 @@ public class SimpleServlet extends HttpServlet {
             if ( format.equals("image/png") ) {
                 String hash= request.getQueryString();
                 File s= ServletInfo.getCacheDirectory();
-                hash= String.format( "%02d", Math.abs( hash.hashCode() % 400 ) );
+                hash= String.format( "%03d", Math.abs( hash.hashCode() % 400 ) );
                 cacheFile= new File( s, hash + ".png" );
                 metaCacheFile= new File( s, hash + ".txt" );
 
