@@ -6,12 +6,15 @@ import org.autoplot.ApplicationModel;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.logging.Logger;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,6 +36,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.output.TeeOutputStream;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeUtil;
@@ -149,6 +153,38 @@ public class SimpleServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        File cacheFile= null;
+        File metaCacheFile= null;
+        
+        String qs= request.getQueryString();
+        if ( ServletInfo.isCaching() && qs!=null ) {
+            String hash= request.getQueryString();
+            File s= ServletInfo.getCacheDirectory();
+            hash= String.format( "%02d", Math.abs( hash.hashCode() % 100 ) );
+            cacheFile= new File( s, hash );
+            metaCacheFile= new File( s, hash + ".txt" );
+
+            if ( cacheFile.exists() ) {
+                byte[] bb= Files.readAllBytes(metaCacheFile.toPath());
+                String qs0= new String( bb );
+                if ( qs0.equals(qs) ) {
+                
+                    String host= java.net.InetAddress.getLocalHost().getCanonicalHostName();
+                    response.setHeader( "X-Served-By", host );
+                    response.setHeader( "X-Server-Version", ServletInfo.version );
+                    response.setHeader( "X-Autoplot-cache", "yep" );
+                
+                    try ( OutputStream outs= response.getOutputStream() ) {
+                        Files.copy( cacheFile.toPath(), outs );
+                    }
+                }
+                
+                //TODO: this is very underimplemented, e.g. unloading, verify same args.
+                
+                return;
+            }
+        }
+        
         //logger.setLevel(Level.FINE);
         
         logger.finer(ServletInfo.version);
@@ -694,7 +730,14 @@ public class SimpleServlet extends HttpServlet {
             
             response.setHeader( "X-Autoplot-vaptimer-ms",  String.valueOf( System.currentTimeMillis()-t0 ) );
             
-            try (OutputStream out = response.getOutputStream()) {
+            OutputStream out = response.getOutputStream();
+            
+            try {
+                
+                if ( cacheFile!=null ) {
+                    out= new TeeOutputStream( out, new FileOutputStream( new File( cacheFile.getAbsolutePath()+".temp") ) );
+                }
+                
                 switch (format) {
                     case "image/png":
                         logger.log(Level.FINE, "time to create image: {0} ms", ( System.currentTimeMillis()-t0 ));
@@ -737,6 +780,15 @@ public class SimpleServlet extends HttpServlet {
                         
                     default:
                         throw new ServletException("format must be image/png, application/pdf, or image/svg+xml");
+                }
+            } finally { 
+                if ( out!=null ) {
+                    out.close();
+                    
+                    new File( cacheFile.getAbsolutePath()+".temp").renameTo(cacheFile);
+                    byte[] metaBytes= qs.getBytes();
+                    assert metaCacheFile!=null;
+                    Files.write( metaCacheFile.toPath(), metaBytes );
                 }
             }
             logit("done with request", t0, uniq, debug);
