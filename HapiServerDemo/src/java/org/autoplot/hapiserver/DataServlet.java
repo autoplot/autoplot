@@ -201,7 +201,7 @@ public class DataServlet extends HttpServlet {
         
         if ( dataFiles==null ) {
             try {
-               logger.log(Level.FINER, "data files is null at {0} ms.", System.currentTimeMillis()-t0);
+                logger.log(Level.FINER, "data files is null at {0} ms.", System.currentTimeMillis()-t0);
                 dsiter= checkAutoplotSource( id, dr, allowStream );
                 logger.log(Level.FINER, "done checkAutoplotSource at {0} ms.", System.currentTimeMillis()-t0);
                 if ( dsiter==null ) {
@@ -492,7 +492,7 @@ public class DataServlet extends HttpServlet {
             pmap= indexMap;
         }
         
-        boolean quickVerify= true;
+        boolean quickVerify= true; // verify cache entry
         
         int nrec=0;
         int nf= -1;
@@ -518,7 +518,7 @@ public class DataServlet extends HttpServlet {
                                         JSONObject time= pps.getJSONObject(0);
                                         int len= time.getInt("length");
                                         if ( ss[0].length()!=len ) {
-                                            throw new IllegalArgumentException("cache file length is incorrect");
+                                            throw new IllegalArgumentException("cache field 0 length ("+ss[0].length()+") in file "+dataFile+" is incorrect, should be "+len);
                                         }
                                     } catch (JSONException ex) {
                                         throw new IllegalArgumentException(ex); // should have caught this already
