@@ -170,7 +170,7 @@ public class SimpleServlet extends HttpServlet {
                     byte[] bb= Files.readAllBytes(metaCacheFile.toPath());
                     String qs0= new String( bb );
                     if ( qs0.equals(qs) ) {
-
+                        cacheFile.setLastModified( new Date().getTime() );
                         String host= java.net.InetAddress.getLocalHost().getCanonicalHostName();
                         response.setHeader( "X-Served-By", host );
                         response.setHeader( "X-Server-Version", ServletInfo.version );
