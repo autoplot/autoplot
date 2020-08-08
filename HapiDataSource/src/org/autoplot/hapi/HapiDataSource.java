@@ -905,6 +905,10 @@ public final class HapiDataSource extends AbstractDataSource {
         DatumRange tr; // TSB = DatumRangeUtil.parseTimeRange(timeRange);
         tr= tsb.getTimeRange();
         
+        if ( tr==null ) {
+            throw new IllegalArgumentException("timerange is missing");
+        }
+        
         Datum cadence= null;
         
         if ( info.has("cadence") ) { // add one cadence length to beginning and end.
