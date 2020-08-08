@@ -997,9 +997,9 @@ public final class HapiDataSource extends AbstractDataSource {
                 tr= DatumRangeUtil.sloppyIntersection( tr, startStopDate );
             } else {
                 if ( tr.max().lt(startStopDate.min() ) ) {
-                    throw new NoDataInIntervalException("data begins after this time range");
+                    throw new NoDataInIntervalException("info startDate ("+info.getString("startDate")+") is after requested time range ("+tr+")" );
                 } else {
-                    throw new NoDataInIntervalException("data ends before this time range");
+                    throw new NoDataInIntervalException("info stopDate ("+info.getString("stopDate")+") is before requested time range ("+tr+")");
                 }
             }
             //TODO: caching when enabled may round out to day boundaries.
