@@ -175,6 +175,7 @@ public class SimpleServlet extends HttpServlet {
                         response.setHeader( "X-Served-By", host );
                         response.setHeader( "X-Server-Version", ServletInfo.version );
                         response.setHeader( "X-Autoplot-cache", "yep" );
+                        response.setHeader( "X-Autoplot-cache-filename", cacheFile.getName() );
 
                         try ( OutputStream outs= response.getOutputStream() ) {
                             Files.copy( cacheFile.toPath(), outs );
