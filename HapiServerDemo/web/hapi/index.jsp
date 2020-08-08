@@ -82,9 +82,13 @@
                 File infoFile= new File( new File( Util.getHapiHome(), "info" ), id+".json" );
                 JSONObject info= HapiServerSupport.readJSON( infoFile );
                 
+                DatumRange availableRange= HapiServerSupport.getRange(info);
                 DatumRange exampleRange= HapiServerSupport.getExampleRange(info);
+                if ( exampleRange!=null ) {
+                    title= title+ "<em> (available "+availableRange + ", example range "+exampleRange + " shown)</em>";
+                }
 
-                String exampleTimeRange= String.format( "time.min=%s&time.max=%s", exampleRange.min().toString(), exampleRange.max().toString() ); 
+                String exampleTimeRange= exampleRange==null ? null : String.format( "time.min=%s&time.max=%s", exampleRange.min().toString(), exampleRange.max().toString() ); 
                 out.println( String.format( "<p style=\"background-color: #e0e0e0;\">%s</p>", title ) );
                 if ( exampleRange!=null ) {
                     out.println( String.format("[<a href=\"info?id=%s\">Info</a>] [<a href=\"data?id=%s&%s\">Data</a>]", 
@@ -204,6 +208,7 @@
             <li>2020-03-02: javacsv library needed.
             <li>2020-06-17: allow individual columns to be requested.  verify number of characters in time column.
             <li>2020-06-26: lastminute keyword added to time parsing.
+            <li>2020-08-08: sparklines added.  Improve feedback when time requested is out of bounds.
         </ul>
         version <%= Util.serverVersion() %><br>
         HAPI protocol version <%= Util.hapiVersion() %>
