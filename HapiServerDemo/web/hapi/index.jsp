@@ -27,7 +27,7 @@
         <%
             String me= "https://jfaden.net/HapiServerDemo/hapi";
             %>
-            <br>Run HAPI server <a href="http://hapi-server.org/verify?url=<%=me%>verifier</a>.
+            <br>Run HAPI server <a href="http://hapi-server.org/verify?url=<%=me%>">verifier</a>.
         <%
             Util.maybeInitialize( getServletContext() );
             if ( Util.getHapiHome()==null ) {
