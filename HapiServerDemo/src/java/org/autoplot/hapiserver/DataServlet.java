@@ -260,10 +260,6 @@ public class DataServlet extends HttpServlet {
             response.setHeader( "X-WARNING", "data is not monotonic in time, sending everything." );
         }
         
-        if ( format.equals("binary") ) {
-            if ( include.equals("header") ) throw new IllegalArgumentException("header cannot be sent with binary");  //TODO: check this
-        }
-        
         JSONObject jo0, jo;
         
         try {
@@ -284,7 +280,7 @@ public class DataServlet extends HttpServlet {
             if ( include.equals("header") ) {
                 ByteArrayOutputStream boas= new ByteArrayOutputStream(10000);
                 PrintWriter pw= new PrintWriter(boas);
-                
+                jo.put( "format", format ); // Thanks Bob's verifier for catching this.
                 pw.write( jo.toString(4) );
                 pw.close();
                 boas.close();
