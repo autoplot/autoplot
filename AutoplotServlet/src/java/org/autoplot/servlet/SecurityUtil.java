@@ -19,62 +19,76 @@ import javax.servlet.http.HttpServletRequest;
  * @author jbf
  */
 public class SecurityUtil {
-    
+
     /**
      * check that the person has access to this resource
+     *
      * @param request
      * @throws IOException, SecurityException
      */
-    public static void checkAllowed( HttpServletRequest request ) throws IOException {
-        String who= request.getRemoteAddr();
-            if ( who.equals("0:0:0:0:0:0:0:1") ) who= "localhost";
-            if ( who.equals("127.0.0.1") ) who= "localhost";
-            
-        String home= System.getProperty( "AUTOPLOT_SERVLET_HOME" );
-            if ( home==null ) home= "/tmp/autoplotservlet/";
+    public static void checkAllowed(HttpServletRequest request) throws IOException {
+        String who = request.getRemoteAddr();
+        if (who.equals("0:0:0:0:0:0:0:1")) {
+            who = "localhost";
+        }
+        if (who.equals("127.0.0.1")) {
+            who = "localhost";
+        }
 
-            home= new File(home).getCanonicalPath();
+        String remoteHost= request.getHeader("X-Forwarded-For");
+        if ( remoteHost!=null ) {
+            who= remoteHost;
+        }
+        
+        String home = System.getProperty("AUTOPLOT_SERVLET_HOME");
+        if (home == null) {
+            home = "/tmp/autoplotservlet/";
+        }
 
-            home= home + File.separator; 
+        home = new File(home).getCanonicalPath();
 
-            new File(home).mkdirs();
+        home = home + File.separator;
 
-            File hostsallow= new File( home + "allowhosts" );
+        new File(home).mkdirs();
 
-            if ( !hostsallow.exists() ) {
-                PrintWriter write= new PrintWriter( new FileWriter( hostsallow ) );
-                write.println("# Initially, only clients from the localhost can connect.  List the allowed clients, one per line.");
-                write.println("# Globs like 192.168.0.* may be used.");
-                write.println("localhost");
-                write.close();
-            }
+        File hostsallow = new File(home + "allowhosts");
 
-            if ( hostsallow.exists() ) {
-                boolean reject= true;
-                BufferedReader r= new BufferedReader( new FileReader( hostsallow ) );
-                String h= r.readLine();
-                while ( h!=null ) {
-                    int i= h.indexOf("#");
-                    if (i>-1 ) h= h.substring(0,i);
-                    if ( h.trim().length()==0 ) {
-                        h= r.readLine();
-                        continue;
-                    }
-                    h= h.replaceAll("\\*","\\.\\*");
+        if (!hostsallow.exists()) {
+            PrintWriter write = new PrintWriter(new FileWriter(hostsallow));
+            write.println("# Initially, only clients from the localhost can connect.  List the allowed clients, one per line.");
+            write.println("# Globs like 192.168.0.* may be used.");
+            write.println("localhost");
+            write.close();
+        }
 
-                    if ( Pattern.matches( h, who ) ) {
-                        reject= false;
-                    }
+        if (hostsallow.exists()) {
+            boolean reject = true;
+            BufferedReader r = new BufferedReader(new FileReader(hostsallow));
+            String h = r.readLine();
+            while (h != null) {
+                int i = h.indexOf("#");
+                if (i > -1) {
+                    h = h.substring(0, i);
+                }
+                if (h.trim().length() == 0) {
+                    h = r.readLine();
+                    continue;
+                }
+                h = h.replaceAll("\\*", "\\.\\*");
 
-                    h= r.readLine();
+                if (Pattern.matches(h, who)) {
+                    reject = false;
                 }
 
-                if ( reject ) {
-                    throw new SecurityException( hostsallow + " does not permit host=\""+who+"\"" );
-                }
-            } else {
-                throw new SecurityException( hostsallow + " file does not exist: "+hostsallow );
+                h = r.readLine();
             }
+
+            if (reject) {
+                throw new SecurityException(hostsallow + " does not permit host=\"" + who + "\"");
+            }
+        } else {
+            throw new SecurityException(hostsallow + " file does not exist: " + hostsallow);
+        }
     }
-    
+
 }
