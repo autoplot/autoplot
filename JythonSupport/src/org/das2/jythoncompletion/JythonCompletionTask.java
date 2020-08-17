@@ -970,11 +970,11 @@ public class JythonCompletionTask implements CompletionTask {
                 String javaClass= pkg+"."+ss;
                 String signature= join( javaClass.split("\\."), "/") + ".html";
                 String link= JavadocLookup.getInstance().getLinkForJavaSignature(signature);
-                DefaultCompletionItem ci= 
-                        new DefaultCompletionItem( 
+                ClassImportCompletionItem ci= 
+                        new ClassImportCompletionItem( 
                                 cc.completable, cc.completable.length(), 
                                 ss, ss + " to be imported from " + pkg, link, 
-                                0, JAVACLASSICON );
+                                0, JAVACLASSICON, pkg, ss );
                 result.addItem( ci );
             }
             count++;
