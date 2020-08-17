@@ -43,5 +43,11 @@ public class ClassImportCompletionItem extends DefaultCompletionItem{
             Logger.getLogger(ClassImportCompletionItem.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+    @Override
+    public boolean instantSubstitution(JTextComponent jTextComponent) {
+        return false;
+    }
+    
     
 }
