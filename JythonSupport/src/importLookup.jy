@@ -1,4 +1,4 @@
-# written automatically, see sftp://nudnik.physics.uiowa.edu/home/jbf/project/autoplot/study/20190605/importsTable.jy
+# written automatically, see https://github.com/autoplot/dev/blob/master/bugs/sf/1687/importsTable.jy
 from org.das2.util import AboutUtil
 from javax.swing import AbstractAction
 from org.das2.event import AbstractDragRenderer
@@ -192,6 +192,7 @@ from org.das2.qds import LDataSet
 from org.das2.event import LabelDragRenderer
 from org.autoplot.layout import LayoutConstants
 from java.util.logging import Level
+from org.das2.qds.util import LinFit
 from java.awt.geom import Line2D
 from java.util import LinkedHashMap
 from java.util.logging import Logger
@@ -275,6 +276,7 @@ from javax.swing import SpinnerNumberModel
 from org.apache.commons.math.analysis.interpolation import SplineInterpolator
 from org.das2.graph import StackedHistogramRenderer
 from org.astrogrid.samp.xmlrpc import StandardClientProfile
+from org.autoplot.state import StatePersistence
 from org.das2.stream import StreamTool
 from java.lang import String
 from java.awt import Stroke
@@ -305,22 +307,3 @@ from javax.xml.xpath import XPath
 from javax.xml.xpath import XPathConstants
 from javax.xml.xpath import XPathExpressionException
 from javax.xml.xpath import XPathFactory
-from org.das2.graph.SpectrogramRenderer.RebinnerEnum import binAverageNoInterpolateNoEnlarge
-from java.awt.Color import blue
-from org.das2.qds.util.BinAverage import boxcar
-from math import ceil
-from math import cos
-from java.lang.System import currentTimeMillis
-from org.das2.util.FileUtil import deleteFileTree
-from org.das2.qds.DataSetUtil import getPreviousIndexStrict
-from org.das2.qds.DataSetUtil import inferBins
-from org.autoplot.JythonUtil import invokeScriptSoon
-from org.das2.graph.DasColorBar.Type import makeColorTable
-from math import pi
-from org.das2.qds.util.Reduction import reducex
-from javax.swing.JOptionPane import showMessageDialog
-from math import sin
-from java.lang.Thread import sleep
-from math import sqrt
-from org.das2 import util
-from java.awt.Color import white
