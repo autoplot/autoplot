@@ -14,7 +14,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import org.autoplot.datasource.DataSetURI;
+import org.autoplot.jythonsupport.ui.TextDiff;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.parser.SimpleNode;
@@ -118,6 +121,55 @@ public class JythonToJavaConverter {
         }
         return result;
     }
+    
+    /**
+     * add the class to the list of imports.
+     * @param doc the document 
+     * @param pkg the Java package
+     * @param name the Java class name.
+     */
+    public static void addImport( Document doc, String pkg, String name ) {
+        try {
+            String s= doc.getText( 0, doc.getLength() );
+            String[] ss= s.split("\n");
+            Pattern p= Pattern.compile("from (.+) import (.*)");
+            boolean haveIt=false;
+            int addToLine= -1;
+            int addAtOffset= -1;
+            int offset= 0;
+            for ( int i=0; i<ss.length; i++ ) {
+                String line= ss[i];
+                Matcher m= p.matcher(line);
+                if ( m.matches() ) {
+                    if ( m.group(1).equals(pkg) ) {
+                        String names= m.group(2);
+                        String[] namess= names.split(",",-2);
+                        for ( String n: namess ) {
+                            if ( n.equals(name) ) {
+                                haveIt= true;
+                            }
+                        }
+                        if ( haveIt==false ) {
+                            addToLine= i;
+                            addAtOffset= offset + line.length();
+                        }
+                    }
+                }
+                offset= offset + line.length() + 1;
+            }
+            if ( haveIt==false ) {
+                if ( addToLine>-1 ) {
+                    doc.insertString( addAtOffset, ","+name, null );
+                } else {
+                    doc.insertString( 0, "from "+pkg+" import "+name + "\n", null );
+                }
+            }
+            
+        } catch (BadLocationException ex) {
+            Logger.getLogger(JythonToJavaConverter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }    
     
     /**
      * add the class to the list of imports.
