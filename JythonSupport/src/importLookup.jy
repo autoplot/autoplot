@@ -279,6 +279,7 @@ from org.astrogrid.samp.xmlrpc import StandardClientProfile
 from org.autoplot.state import StatePersistence
 from org.das2.stream import StreamTool
 from java.lang import String
+from java.lang import StringBuilder
 from java.awt import Stroke
 from javax.swing import SwingConstants
 from javax.swing import SwingUtilities
