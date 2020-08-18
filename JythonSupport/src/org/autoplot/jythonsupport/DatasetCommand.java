@@ -219,6 +219,12 @@ public class DatasetCommand extends PyObject {
                         result= Ops.putProperty( result, QDataSet.USER_PROPERTIES, val );
                     }
                     break;
+                case "deltaPlus":
+                    result= Ops.putProperty( result, QDataSet.DELTA_PLUS, JythonOps.dataset( val ) );
+                    break;
+                case "deltaMinus":
+                    result= Ops.putProperty( result, QDataSet.DELTA_MINUS, JythonOps.dataset( val ) );
+                    break;  
                 default:
                     throw new IllegalArgumentException("bad keyword");
             }
