@@ -973,7 +973,7 @@ public class JythonCompletionTask implements CompletionTask {
                 ClassImportCompletionItem ci= 
                         new ClassImportCompletionItem( 
                                 cc.completable, cc.completable.length(), 
-                                ss, ss + " to be imported from " + pkg, link, 
+                                ss, ss + " and import from " + pkg, link, 
                                 0, JAVACLASSICON, pkg, ss );
                 result.addItem( ci );
             }
