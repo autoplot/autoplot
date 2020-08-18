@@ -153,7 +153,7 @@ public class SimplifyScriptSupport {
             } else {
                 indent= "";
             }
-            result.append(indent).append("pass  ## huphup130 \n");  
+            result.append(indent).append("pass  ## SimplifyScriptSupport.getIfBlock \n");  
             logger.fine("things have probably gone wrong...");
         } else {
             appendToResult( result,ss1);
@@ -212,7 +212,7 @@ public class SimplifyScriptSupport {
                  int lastLine1;  //lastLine1 is the last line of the "if" clause.
                  if ( iff.orelse!=null && iff.orelse.length>0 ) {
                      if ( iff.orelse[0].beginLine>0 ) {
-                         lastLine1= iff.orelse[0].beginLine-2;  // -2 is for the "else:" part.
+                         lastLine1= iff.orelse[0].beginLine-1;  // -1 is for the "else:" part.
                      } else {
                          if ( iff.orelse[0] instanceof If ) {
                              lastLine1= ((If)iff.orelse[0]).test.beginLine-1;
@@ -235,17 +235,14 @@ public class SimplifyScriptSupport {
                          } else {
                             lastLine1= stmts[istatement+1].beginLine-1;
                          }
+                         result.append(ss[iff.orelse[0].beginLine-2]).append("\n");
+                         ss1= getIfBlock(ss, iff, iff.orelse, variableNames, beginLine+1, lastLine1, depth+1 );
+                         appendToResult( result,ss1);
                          if ( iff.orelse[0].beginLine==0 ) {
                             appendToResult( result, ss[beginLine+1] + "\n    pass # huphup else" ); 
                          } else {
                             beginLine= iff.orelse[0].beginLine;
                          }
-                         String ss2= getIfBlock(ss, iff, iff.orelse, variableNames, beginLine, lastLine1, depth+1 );
-                         if ( iff.orelse[0].beginLine>2 ) {
-                            appendToResult( result,ss[iff.orelse[0].beginLine-2] ); 
-                         }
-                         result.append("\n");
-                         //appendToResult( result,ss2);
                      }
                  }
                  currentLine= lastLine1;
