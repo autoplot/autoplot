@@ -103,6 +103,7 @@ public class DatasetCommand extends PyObject {
             "fillValue", "validMin", "validMax", "typicalMin", "typicalMax",
             "scaleType",
             "renderType", "bins1", "bins0", "cacheTag", "userProperties",
+            "deltaPlus", "deltaMinus", "binPlus", "binMinus", "binMin", "binMax",
         },
         new PyObject[] { Py.None, Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None,
@@ -110,6 +111,7 @@ public class DatasetCommand extends PyObject {
             Py.None, Py.None, Py.None, Py.None, Py.None,
             Py.None,
             Py.None, Py.None, Py.None, Py.None, Py.None,
+            Py.None, Py.None, Py.None, Py.None, Py.None, Py.None,
         } );
         
         fs.args( args, keywords );
@@ -224,6 +226,18 @@ public class DatasetCommand extends PyObject {
                     break;
                 case "deltaMinus":
                     result= Ops.putProperty( result, QDataSet.DELTA_MINUS, JythonOps.dataset( val ) );
+                    break;  
+                case "binPlus":
+                    result= Ops.putProperty( result, QDataSet.BIN_PLUS, JythonOps.dataset( val ) );
+                    break;
+                case "binMinus":
+                    result= Ops.putProperty( result, QDataSet.BIN_MINUS, JythonOps.dataset( val ) );
+                    break;  
+                case "binMin":
+                    result= Ops.putProperty( result, QDataSet.BIN_MIN, JythonOps.dataset( val ) );
+                    break;
+                case "binMax":
+                    result= Ops.putProperty( result, QDataSet.BIN_MAX, JythonOps.dataset( val ) );
                     break;  
                 default:
                     throw new IllegalArgumentException("bad keyword");
