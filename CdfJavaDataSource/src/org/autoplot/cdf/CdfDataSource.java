@@ -586,6 +586,9 @@ public class CdfDataSource extends AbstractDataSource {
                 constraint1 = constraint;
             }
             QDataSet parm= loadVariableAndDependents(cdf, sx, constraint1, false);
+            if ( parm.length()!=result.length() ) {
+                throw new IllegalArgumentException("length of X doesn't match that of data, check each variable's length.");
+            }
             result = (MutablePropertyDataSet) Ops.link( parm, result );
         }
 
