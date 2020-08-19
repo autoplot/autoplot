@@ -98,6 +98,9 @@
                         ds.getString("id"), ds.getString("id") ) );
                 }
                 
+                String autoplotServer= "https://jfaden.net/AutoplotServlet";
+                //String autoplotServer= "http://localhost:8084/AutoplotServlet";
+                
                 out.println(" ");
                 JSONArray parameters= info.getJSONArray("parameters");
                 for ( int j=0; j<parameters.length(); j++ ) {
@@ -115,6 +118,7 @@
                             ub.append("?");
                             ub.append("id="+id);
                             ub.append("&parameters="+pname);
+                            ub.append("&timerange="+URLEncoder.encode(exampleRange.toString()) );
                             sb.append( URLEncoder.encode(ub.toString()) );
                             sb.append("&format=image%2Fpng");
                             sb.append("&width=70");
@@ -122,8 +126,8 @@
                             sb.append("&row=0%2C100%25");
                             sb.append("&column=0%2C100%25");
                             sb.append("&timerange="+URLEncoder.encode(exampleRange.toString()) );
-                            out.print( "<a href='https://jfaden.net/AutoplotServlet/thin/zoom/demo.jsp?uri="+sb.toString()+"' target='top'>");
-                            out.print( "<img src='https://jfaden.net/AutoplotServlet/SimpleServlet?"+sb.toString()+"'>" );
+                            out.print( "<a href='"+autoplotServer+"/thin/zoom/demo.jsp?"+sb.toString()+"' target='top'>");
+                            out.print( "<img src='"+autoplotServer+"/SimpleServlet?"+sb.toString()+"'>" );
                             out.print( "</a>");
                             //out.print( "<img src=\"http://localhost:8084/AutoplotServlet/SimpleServlet?"+sb.toString()+"\">" );                        
                         }
