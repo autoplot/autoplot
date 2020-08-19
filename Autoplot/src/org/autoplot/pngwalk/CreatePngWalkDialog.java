@@ -78,7 +78,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         updateCB.setSelected( prefs.getBoolean( "update", updateCB.isSelected() ) );
         runOnCopyCB.setSelected( prefs.getBoolean( "runOnCopy", runOnCopyCB.isSelected() ) );
         versionTextField.setText( prefs.get( "version", versionTextField.getText() ) );
-
+        removeNoDataImagesCB.setSelected( prefs.getBoolean( "removeNoData", removeNoDataImagesCB.isSelected() ));
         pngFormatCB.setSelected( prefs.get("outputFormat", pngFormatCB.isSelected() ? "png": "pdf" ).equals("png") );
         pdfFormatCB.setSelected( prefs.get("outputFormat", pngFormatCB.isSelected() ? "png": "pdf" ).equals("pdf") );
     }
@@ -96,6 +96,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         prefs.putBoolean( "autorangeFlags", autorangeFlagsCB.isSelected() );
         prefs.put( "rescalex", ((String)rescaleComboBox.getSelectedItem()).trim() );
         prefs.putBoolean( "update", updateCB.isSelected() );
+        prefs.putBoolean( "removeNoData", removeNoDataImagesCB.isSelected() );
         prefs.putBoolean( "runOnCopy", runOnCopyCB.isSelected() );
         prefs.put( "version", ((String)versionTextField.getText().trim()) );
 
@@ -138,6 +139,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         params.rescalex= ((String)rescaleComboBox.getSelectedItem()).trim();
         params.update= updateCB.isSelected();
         params.runOnCopy= runOnCopyCB.isSelected();
+        params.removeNoData= removeNoDataImagesCB.isSelected();
         params.version= versionTextField.getText().trim();
 
         String s= eventsFileSelector.getValue();
@@ -234,6 +236,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         batchUriNameCB = new javax.swing.JCheckBox();
         runOnCopyCB = new javax.swing.JCheckBox();
         autorangeFlagsCB = new javax.swing.JCheckBox();
+        removeNoDataImagesCB = new javax.swing.JCheckBox();
 
         jLabel1.setText("Filename Root:");
         jLabel1.setToolTipText("Stem to identify result within folder.");
@@ -364,6 +367,9 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, autorangeCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), autorangeFlagsCB, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
+        removeNoDataImagesCB.setText("Remove No Data Images");
+        removeNoDataImagesCB.setToolTipText("Check that the image produced will actually contain displayed data, and skip those that don't.");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -435,7 +441,8 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
                                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                             .add(rescaleComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 174, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                             .add(versionTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 74, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                            .add(autorangeFlagsCB))))
+                                            .add(autorangeFlagsCB)))
+                                    .add(removeNoDataImagesCB))
                                 .add(0, 0, Short.MAX_VALUE))))))
         );
         layout.setVerticalGroup(
@@ -493,7 +500,9 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
                     .add(layout.createSequentialGroup()
                         .add(updateCB)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(runOnCopyCB)))
+                        .add(runOnCopyCB)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(removeNoDataImagesCB)))
                 .addContainerGap(53, Short.MAX_VALUE))
         );
 
@@ -563,6 +572,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
     private javax.swing.JRadioButton pdfFormatCB;
     private javax.swing.JButton pickFolderButton;
     private javax.swing.JRadioButton pngFormatCB;
+    private javax.swing.JCheckBox removeNoDataImagesCB;
     private javax.swing.JComboBox rescaleComboBox;
     private javax.swing.JCheckBox runOnCopyCB;
     private javax.swing.JComboBox timeFormatCB;

@@ -111,6 +111,7 @@
                                           <Component id="autorangeFlagsCB" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
+                                  <Component id="removeNoDataImagesCB" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
@@ -186,6 +187,8 @@
                       <Component id="updateCB" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="runOnCopyCB" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="removeNoDataImagesCB" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace pref="53" max="32767" attributes="0"/>
@@ -414,6 +417,12 @@
       <BindingProperties>
         <BindingProperty name="enabled" source="autorangeCB" sourcePath="${selected}" target="autorangeFlagsCB" targetPath="enabled" updateStrategy="0" immediately="false"/>
       </BindingProperties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="removeNoDataImagesCB">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Remove No Data Images"/>
+        <Property name="toolTipText" type="java.lang.String" value="Check that the image produced will actually contain displayed data, and skip those that don&apos;t."/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

@@ -56,6 +56,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import org.autoplot.dom.PlotElement;
+import org.das2.datum.InconvertibleUnitsException;
 
 /**
  * CreatePngWalk makes a sequence of images from a .vap file or the current state.
@@ -138,6 +140,29 @@ public class CreatePngWalk {
             times = ScriptContext.generateTimeRanges(params.timeFormat, params.timeRangeStr);
         }
         return times;
+    }
+
+    /**
+     * return true if any data is visible.
+     * @param dom2
+     * @return true if some data is visible.
+     */
+    private static boolean isDataVisible(Application dom2) {
+        DatumRange tr= dom2.getTimeRange();
+        boolean dataVisible= false;
+        for ( PlotElement pe: dom2.getPlotElements() ) {
+            QDataSet dsout=  pe.getController().getDataSet();
+            if ( dsout==null ) continue;
+            try {
+                dsout= SemanticOps.trim( dsout, tr, null );
+            } catch ( InconvertibleUnitsException ex ) {
+                // do nothing--I think it's a non-time-axis TSB.
+            }
+            if ( dsout.length()==0 ) continue;
+            dataVisible= true;
+            break;
+        }
+        return dataVisible;
     }
     
     /**
@@ -231,6 +256,11 @@ public class CreatePngWalk {
          * also write a .vap file
          */
         public boolean writeVap= true;
+        
+        /**
+         * check that image contains data.
+         */
+        public boolean removeNoData = false;
         
         @Override
         public String toString() {
@@ -585,6 +615,12 @@ public class CreatePngWalk {
                     appmodel.waitUntilIdle();
                 }
 
+                if ( params.removeNoData ) {
+                    if ( !isDataVisible( dom2 ) ) {
+                        continue;
+                    }
+                }
+                
                 BufferedImage image = null;
 
                 //LoggerManager.markTime("538");
@@ -918,7 +954,7 @@ public class CreatePngWalk {
      */
     public static void main( String[] args ) throws InterruptedException, ParseException, IOException {
         
-        System.err.println("CreatePngWalk 20180725");
+        System.err.println("CreatePngWalk 20200819");
         final ArgumentList alm = new ArgumentList("CreatePngWalk");
         alm.addOptionalSwitchArgument( "timeFormat", "f", "timeFormat", "$Y$m$d", "timeformat for png files, e.g. $Y is year, $j is day of year");
         alm.addOptionalSwitchArgument( "timeRange", "r", "timeRange", "", "time range to cover, e.g. 2011 through 2012" );
@@ -937,6 +973,7 @@ public class CreatePngWalk {
         alm.addBooleanSwitchArgument( "autorange", null, "autorange", "rerange dependent dimensions Y and Z");
         alm.addBooleanSwitchArgument( "autorangeFlags", null, "autorangeFlags", "only autorange axes with autorange=true");
         alm.addBooleanSwitchArgument( "update", null, "update", "only calculate missing images");
+        alm.addBooleanSwitchArgument( "removeNoData", null, "removeNoData", "don't produce images which have no visible data.");
         alm.addBooleanSwitchArgument( "testException", null, "testException", "throw a runtime exception to test exit code");
         
         if ( !alm.process(args) ) {
@@ -1001,6 +1038,7 @@ public class CreatePngWalk {
         params.autorangeFlags= alm.getBooleanValue("autorangeFlags");
         params.update= alm.getBooleanValue("update");
         params.batchUri= alm.getValue("batchUri");
+        params.removeNoData= alm.getBooleanValue("removeNoData");
         if ( params.batchUri!=null && params.batchUri.length()>0 ) {
             params.useBatchUri= true;
             params.batchUriName= alm.getValue("batchUriName");
