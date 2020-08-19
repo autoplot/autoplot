@@ -122,7 +122,9 @@
                             sb.append("&row=0%2C100%25");
                             sb.append("&column=0%2C100%25");
                             sb.append("&timerange="+URLEncoder.encode(exampleRange.toString()) );
-                            out.print( "<img src=\"https://jfaden.net/AutoplotServlet/SimpleServlet?"+sb.toString()+"\">" );                        
+                            out.print( "<a href='https://jfaden.net/AutoplotServlet/thin/zoom/demo.jsp?uri="+sb.toString()+"' target='top'>");
+                            out.print( "<img src='https://jfaden.net/AutoplotServlet/SimpleServlet?"+sb.toString()+"'>" );
+                            out.print( "</a>");
                             //out.print( "<img src=\"http://localhost:8084/AutoplotServlet/SimpleServlet?"+sb.toString()+"\">" );                        
                         }
 
