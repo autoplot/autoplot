@@ -533,6 +533,7 @@ public class GuiSupport {
             switch (dscontrol) {
                 case "plotElementTrim":
                     {
+                        // see also CreatePngWalk's isDataVisible
                         DasPlot p= pe.getController().getDasPlot();
                         DatumRange xbounds= p.getXAxis().getDatumRange();
                         QDataSet dsout=  pe.getController().getDataSet();
@@ -541,7 +542,8 @@ public class GuiSupport {
                         if ( SemanticOps.isRank2Waveform(dsout) ) {
                             dsout= DataSetOps.flattenWaveform(dsout);
                             //dsout= ArrayDataSet.copy( dsout );
-                        }       dsout= SemanticOps.trim( dsout, xbounds, null );
+                        }       
+                        dsout= SemanticOps.trim( dsout, xbounds, null );
                         format.formatData( uriOut, dsout, mon );
                         logger.log( Level.FINE, "format in {0} millis", (System.currentTimeMillis()-t0));
                         break;
