@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import org.autoplot.datasource.DataSetURI;
-import org.autoplot.jythonsupport.ui.TextDiff;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.parser.SimpleNode;
