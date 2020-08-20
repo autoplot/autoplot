@@ -36,8 +36,6 @@ ImageInfo.range = 10240;
 
 	function readInfoFromData(data) {
 
-		var offset = 0;
-
 		if (data.getByteAt(0) === 0xFF && data.getByteAt(1) === 0xD8) {
 			return readJPEGInfo(data);
 		}
@@ -49,9 +47,6 @@ ImageInfo.range = 10240;
 		}
 		if (data.getByteAt(0) === 0x42 && data.getByteAt(1) === 0x4D) {
 			return readBMPInfo(data);
-		}
-		if (data.getByteAt(0) === 0x00 && data.getByteAt(1) === 0x00) {
-			return readICOInfo(data);
 		}
 
 		return {

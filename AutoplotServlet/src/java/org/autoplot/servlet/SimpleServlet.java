@@ -7,10 +7,14 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.logging.Logger;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -143,6 +147,14 @@ public class SimpleServlet extends HttpServlet {
         
     }
     
+    private static void copyStream( InputStream source, OutputStream target ) throws IOException {
+        byte[] buf = new byte[8192];
+        int length;
+        while ((length = source.read(buf)) > 0) {
+            target.write(buf, 0, length);
+        } 
+    }
+    
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
@@ -156,37 +168,48 @@ public class SimpleServlet extends HttpServlet {
         File cacheFile= null;
         File metaCacheFile= null;
         
+        FileInputStream fin= null;
+        
         String qs= request.getQueryString();
-        if ( ServletInfo.isCaching() && qs!=null ) {
-            String format = ServletUtil.getStringParameter(request, "format", "image/png");
-            if ( format.equals("image/png") ) {
-                String hash= request.getQueryString();
-                File s= ServletInfo.getCacheDirectory();
-                hash= String.format( "%03d", Math.abs( hash.hashCode() % 400 ) );
-                cacheFile= new File( s, hash + ".png" );
-                metaCacheFile= new File( s, hash + ".txt" );
+        
+        synchronized ( this ) {
+            if ( ServletInfo.isCaching() && qs!=null ) {
+                String format = ServletUtil.getStringParameter(request, "format", "image/png");
+                if ( format.equals("image/png") ) {
+                    String hash= request.getQueryString();
+                    File s= ServletInfo.getCacheDirectory();
+                    hash= String.format( "%04d", Math.abs( hash.hashCode() % 10000 ) );
+                    cacheFile= new File( s, hash + ".png" );
+                    metaCacheFile= new File( s, hash + ".txt" );
 
-                if ( cacheFile.exists() ) {
-                    byte[] bb= Files.readAllBytes(metaCacheFile.toPath());
-                    String qs0= new String( bb );
-                    if ( qs0.equals(qs) ) {
-                        cacheFile.setLastModified( new Date().getTime() );
-                        String host= java.net.InetAddress.getLocalHost().getCanonicalHostName();
-                        response.setHeader( "X-Served-By", host );
-                        response.setHeader( "X-Server-Version", ServletInfo.version );
-                        response.setHeader( "X-Autoplot-cache", "yep" );
-                        response.setHeader( "X-Autoplot-cache-filename", cacheFile.getName() );
+                    if ( cacheFile.exists() ) {
+                        byte[] bb= Files.readAllBytes(metaCacheFile.toPath());
+                        String qs0= new String( bb );
+                        if ( qs0.equals(qs) ) {
+                            cacheFile.setLastModified( new Date().getTime() );
+                            String host= java.net.InetAddress.getLocalHost().getCanonicalHostName();
+                            response.setHeader( "X-Served-By", host );
+                            response.setHeader( "X-Server-Version", ServletInfo.version );
+                            response.setHeader( "X-Autoplot-cache", "yep" );
+                            response.setHeader( "X-Autoplot-cache-filename", cacheFile.getName() );
 
-                        try ( OutputStream outs= response.getOutputStream() ) {
-                            Files.copy( cacheFile.toPath(), outs );
+                            fin= new FileInputStream( cacheFile );
+
+                        } else {
+                            logger.finer( "cache slot occupied by another image, overwriting.");
                         }
+
                     }
-
-                    //TODO: this is very underimplemented, e.g. unloading, verify same args.
-
-                    return;
                 }
             }
+        }
+        
+        if ( fin!=null ) {
+            try ( OutputStream outs= response.getOutputStream() ) {
+                copyStream( fin, outs );
+            }
+            fin.close();
+            return;
         }
         
         //logger.setLevel(Level.FINE);
@@ -737,10 +760,13 @@ public class SimpleServlet extends HttpServlet {
             
             OutputStream out = response.getOutputStream();
             
+            ByteArrayOutputStream baos= null;
+            
             try {
                 
                 if ( cacheFile!=null ) {
-                    out= new TeeOutputStream( out, new FileOutputStream( new File( cacheFile.getAbsolutePath()+".temp") ) );
+                    baos= new ByteArrayOutputStream( 100000 );
+                    out= new TeeOutputStream( out, baos );
                 }
                 
                 switch (format) {
@@ -790,10 +816,17 @@ public class SimpleServlet extends HttpServlet {
                 if ( out!=null ) {
                     out.close();
                     
-                    new File( cacheFile.getAbsolutePath()+".temp").renameTo(cacheFile);
-                    byte[] metaBytes= qs.getBytes();
-                    assert metaCacheFile!=null;
-                    Files.write( metaCacheFile.toPath(), metaBytes );
+                    synchronized ( this ) {
+                        if ( baos!=null && cacheFile!=null ) {
+                            byte[] buf= baos.toByteArray();
+                            try ( ByteArrayInputStream bais= new ByteArrayInputStream(buf) ) {
+                                Files.copy( bais, cacheFile.toPath() );
+                            }
+                            byte[] metaBytes= qs.getBytes();
+                            assert metaCacheFile!=null;
+                            Files.write( metaCacheFile.toPath(), metaBytes );
+                        }
+                    }
                 }
             }
             logit("done with request", t0, uniq, debug);
