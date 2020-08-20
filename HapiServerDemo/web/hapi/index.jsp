@@ -118,7 +118,7 @@
                             ub.append("?");
                             ub.append("id="+id);
                             ub.append("&parameters="+pname);
-                            ub.append("&timerange="+URLEncoder.encode(exampleRange.toString()) );
+                            ub.append("&timerange="+exampleRange.toString().replaceAll(" ","+") );
                             sb.append( URLEncoder.encode(ub.toString()) );
                             sb.append("&format=image%2Fpng");
                             sb.append("&width=70");
