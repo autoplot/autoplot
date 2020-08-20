@@ -492,7 +492,7 @@ public class SimplifyScriptSupport {
      /**
       * return true if the function call is trivial to execute and can be evaluated within a few milliseconds.  For example,
       * findgen can be called because no calculations are made in the call, but fft cannot.  Typically these are Order 1 (a.k.a.
-      * constant time) operations, but also many order N operations are so fast they are allowed.
+      * constant time) operations, but also many Order N operations are so fast they are allowed.
       * @param sn an AST node pointed at a Call.
       * @return true if the function call is trivial to execute 
       */
@@ -556,13 +556,13 @@ public class SimplifyScriptSupport {
             if ( !names.contains(node.id) ) {
                 visitNameFail= true;
             }
-            return super.visitName(node); //To change body of generated methods, choose Tools | Templates.
+            return super.visitName(node); 
         }
 
         @Override
         public Object visitCall(Call node) throws Exception {
             logger.log(Level.FINER, "visitCall({0})", node);
-            return super.visitCall(node); //To change body of generated methods, choose Tools | Templates.
+            return super.visitCall(node); 
         }
         
          @Override
