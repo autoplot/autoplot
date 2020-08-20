@@ -18,6 +18,7 @@ import org.python.parser.ast.Assign;
 import org.python.parser.ast.Attribute;
 import org.python.parser.ast.BinOp;
 import org.python.parser.ast.Call;
+import org.python.parser.ast.Index;
 import org.python.parser.ast.Name;
 import org.python.parser.ast.Num;
 import org.python.parser.ast.Subscript;
@@ -235,12 +236,16 @@ public class SimplifyScriptSupport {
                          } else {
                             lastLine1= stmts[istatement+1].beginLine-1;
                          }
-                         if ( ss[iff.orelse[0].beginLine-2].trim().startsWith("else:") ) {
-                             result.append(ss[iff.orelse[0].beginLine-2]).append("\n");
-                             ss1= getIfBlock(ss, iff, iff.orelse, variableNames, beginLine+1, lastLine1, depth+1 );
-                            appendToResult( result,ss1);
+                         if ( iff.orelse[0].beginLine==0 ) {
+                             result.append("\n");
                          } else {
-                             result.append(ss[iff.orelse[0].beginLine-1]).append("\n");
+                             if ( iff.orelse[0].beginLine>0 && ss[iff.orelse[0].beginLine-2].trim().startsWith("else:") ) {
+                                 result.append(ss[iff.orelse[0].beginLine-2]).append("\n");
+                                 ss1= getIfBlock(ss, iff, iff.orelse, variableNames, beginLine+1, lastLine1, depth+1 );
+                                 appendToResult( result,ss1);
+                             } else {
+                                 result.append(ss[iff.orelse[0].beginLine-1]).append("\n");
+                             }
                          }
                          
                      }
@@ -604,6 +609,10 @@ public class SimplifyScriptSupport {
                  traverse( bo.left );
                  traverse( bo.right );
              } else if ( sn instanceof Num ) {
+                 
+             } else if ( sn instanceof Index ) {
+                 Index index= (Index)sn;
+                 traverse( index.value );
                  
              } else {
                  logger.log(Level.FINE, "unchecked: {0}", sn);
