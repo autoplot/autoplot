@@ -24,6 +24,7 @@
          String vap= request.getParameter("vap");
          String uri= request.getParameter("uri");
          String id= request.getParameter("id");
+         String timerange= request.getParameter("timeRange");
 
          String[] dropList= null;
          String loadingMessage= null;
@@ -74,6 +75,10 @@
              ssArg= "vap="+URLEncoder.encode(vap,"US-ASCII");
          } else {
              ssArg= "uri="+URLEncoder.encode(uri,"US-ASCII");
+         }
+         
+         if ( timerange!=null ) {
+             ssArg= ssArg + "&timeRange="+timerange;
          }
          
      %>
