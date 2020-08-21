@@ -7,6 +7,15 @@
         <link rel="stylesheet" type="text/css" href="demo.css" />
 </head>
     <body>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script> 
+	<script type="text/javascript" src="js/jquery.ui.js"></script>
+	<script type="text/javascript" src="js/jquery.imgareaselect.min.js"></script>
+        <script type="text/javascript" src="TimeRangeParser.js"></script>
+        <script type="text/javascript" src="autoplot-zoom.js"></script>
+        <script type="text/javascript" src="prepimage.js"></script>
+        <script type="text/javascript" src="binaryajax.js"></script>
+        <script type="text/javascript" src="imageinfo.js"></script>
+        
 	<div id="iddivimg">
 		<img id="idplot" 
                      src="../../SimpleServlet?vap=http://jfaden.net/~jbf/geothermalTemps.vap"
@@ -37,16 +46,7 @@
 		<!--<pre><div id="idwidthheight"></div></pre>-->
 		<!--<pre><div id="idcolumn"></div></pre>-->
 		<!--<pre><div id="idrow"></div></pre>-->
-		<!--<pre><div id="iddifftime"></div></pre>-->
-                
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script> 
-	<script type="text/javascript" src="js/jquery.ui.js"></script>
-	<script type="text/javascript" src="js/jquery.imgareaselect.min.js"></script>
-        <script type="text/javascript" src="TimeRangeParser.js"></script>
-        <script type="text/javascript" src="autoplot-zoom.js"></script>
-        <script type="text/javascript" src="prepimage.js"></script>
-        <script type="text/javascript" src="binaryajax.js"></script>
-        <script type="text/javascript" src="imageinfo.js"></script>
+		<!--<pre><div id="iddifftime"></div></pre>-->                
 
 <script>
     $("#idplot").click(clickshift);

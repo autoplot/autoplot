@@ -20,6 +20,16 @@
         <link rel="stylesheet" type="text/css" href="demo.css" />
 </head>
 <body>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>                 
+    <script type="text/javascript" src="js/jquery.ui.js"></script>
+    <script type="text/javascript" src="js/jquery.imgareaselect.min.js"></script>
+    <script type="text/javascript" src="TimeRangeParser.js"></script>
+    <script type="text/javascript" src="autoplot-zoom.js"></script>
+    <script type="text/javascript" src="prepimage.js"></script>
+    <script type="text/javascript" src="binaryajax.js"></script>
+    <script type="text/javascript" src="imageinfo.js"></script>
+        
     <%
          String vap= request.getParameter("vap");
          String uri= request.getParameter("uri");

@@ -362,6 +362,7 @@ function mycallback() {
     if ( imgloaded===0 ) {
        $('#progress').attr('src', 'idle-icon.png');
     }
+    window.history.pushState( {}, '', 'demo.jsp?'+imgurl.substring(20) );
 }
 
 
