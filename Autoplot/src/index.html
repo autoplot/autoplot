@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-08-19 r25050):</p>
+        <p>Bugfixes (2020-08-24 r25060):</p>
         <ul>
+            <li>simplifyScript checks for indeces which cannot be resolved d[r1] where r1 is not known.
             <li>rte 761822764: Improve error message when X and Y arguments of CDF reader load variables of different lengths. 
             <li>ArgumentList utility assumed that default values for requireOneOf parameters where non-null.
             <li>2276: PngwalkTool inspect action now shows folders in local file chooser.  Use Java 6 FileNameFileFilter everywhere, reducing code and making things consistent.
@@ -58,7 +59,7 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>725: create pngwalk removes images which don't contain data.
+            <li>725: create pngwalk has option to remove pngs which don't contain data.
             <li>bug 1687: introduce completions based on Java classes which could be imported and are imported when the completion proposal is accepted.
             <li>improvements to the Java to Jython GUI, improvements to conversion (to support URI_Templates effort).
             <li>724: ISTP metadata allows for time location units like "seconds since 1970-01-01T00:00".  Thanks, Steven!
