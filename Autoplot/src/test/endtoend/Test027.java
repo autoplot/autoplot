@@ -21,6 +21,18 @@ public class Test027 {
     private static final String spaces= "         "
             + "                             "
             + "                             "
+            + "                             "
+            + "                             "
+            + "                             "
+            + "                             "
+            + "                             "
+            + "                             "
+            + "                             "
+            + "                             "
+            + "                             "
+            + "                             "
+            + "                             "
+            + "                             "
             + "                             ";
 
 
