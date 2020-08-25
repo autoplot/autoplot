@@ -10,17 +10,29 @@ public class CDFException extends Exception {
     /**
      * Exceptions thrown by methods of CDFReader and its superclasses.
      */
-    public static class ReaderError extends CDFException {
+    public static final class ReaderError extends CDFException {
         public ReaderError(String message) {
             super(message);
         }
+        public ReaderError(String message,Throwable initCause) {
+            super(message);
+            initCause(initCause);
+        }
+        public ReaderError(Throwable initCause) {
+            super(initCause.getMessage());
+            initCause(initCause);
+        }        
     }
     /**
      * Exceptions thrown by methods of CDFWriter and its superclass.
      */
-    public static class WriterError extends CDFException {
+    public static final class WriterError extends CDFException {
         public WriterError(String message) {
             super(message);
+        }
+        public WriterError(String message,Throwable initCause) {
+            super(message);
+            initCause(initCause);
         }
     }
 

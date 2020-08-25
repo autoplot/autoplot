@@ -48,7 +48,7 @@ public class GenericReader extends MetaData {
         try {
             thisCDF = CDFFactory.getCDF(cdfFile);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
         LOGGER.exiting("GenericReader","constructor");
         //setup();
@@ -63,7 +63,7 @@ public class GenericReader extends MetaData {
         try {
             thisCDF = CDFFactory.getCDF(url);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
         //setup();
     }
@@ -97,7 +97,7 @@ public class GenericReader extends MetaData {
             }
             return method.invoke(null, new Object [] {thisCDF, var});
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -124,7 +124,7 @@ public class GenericReader extends MetaData {
         try {
             return thisCDF.getLong(varName);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -155,7 +155,7 @@ public class GenericReader extends MetaData {
             }
             return da;
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -176,7 +176,7 @@ public class GenericReader extends MetaData {
                     "-dimensional variable " + varName);
             return (double[][])get(varName);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -197,7 +197,7 @@ public class GenericReader extends MetaData {
                     "-dimensional variable " + varName);
             return (double[][][])get(varName);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -218,7 +218,7 @@ public class GenericReader extends MetaData {
                     "-dimensional variable " + varName);
             return (double[][][][])get(varName);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -244,7 +244,7 @@ public class GenericReader extends MetaData {
         try {
             return (double[])thisCDF.getOneD(varName, columnMajor);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -281,7 +281,7 @@ public class GenericReader extends MetaData {
                 new Object[] {thisCDF, var, new Integer(first),
                 new Integer(last)});
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -310,7 +310,7 @@ public class GenericReader extends MetaData {
             return (double[]) thisCDF.getRangeOneD(varName, first, last,
             columnMajor);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 /*
@@ -322,7 +322,7 @@ public class GenericReader extends MetaData {
         try {
             return thisCDF.get1D(varName, first, last, stride);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 */
@@ -349,7 +349,7 @@ public class GenericReader extends MetaData {
             return (double[])method.invoke(null,
                 new Object[] {thisCDF, var, new Integer(component)});
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -376,7 +376,7 @@ public class GenericReader extends MetaData {
             return (double[][])method.invoke(null,
                 new Object[] {thisCDF, var, components});
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -408,7 +408,7 @@ public class GenericReader extends MetaData {
                 new Object[] {thisCDF, var, new Integer(first),
                 new Integer(last), new Integer(component)});
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -440,7 +440,7 @@ public class GenericReader extends MetaData {
                 new Object[] {thisCDF, var, new Integer(first),
                 new Integer(last), components});
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -468,7 +468,7 @@ public class GenericReader extends MetaData {
             return startContainerThread(varName, targetType, recordRange,
             preserve, ByteOrder.nativeOrder());
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -534,7 +534,7 @@ public class GenericReader extends MetaData {
                 try {
                     buffer = container.getBuffer();
                 } catch (Throwable th) {
-                    throw new CDFException.ReaderError(th.getMessage());
+                    throw new CDFException.ReaderError(th);
                 }
                 threadMap.remove(threadName);
                 return buffer;
@@ -560,7 +560,7 @@ public class GenericReader extends MetaData {
                 try {
                     array = container.asOneDArray(columnMajor);
                 } catch (Throwable th) {
-                    throw new CDFException.ReaderError(th.getMessage());
+                    throw new CDFException.ReaderError(th);
                 }
                 threadMap.remove(threadName);
                 return array;
@@ -609,7 +609,7 @@ public class GenericReader extends MetaData {
         try {
             type = getContainerClass(targetType);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
         if (!isCompatible(varName, type, preserve)) throw
             new CDFException.ReaderError("Requested type " + targetType +
@@ -619,7 +619,7 @@ public class GenericReader extends MetaData {
             container = getContainer(varName, type,
             recordRange, preserve, ByteOrder.nativeOrder());
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
         container.setDirect(useDirect);
         container.run();
@@ -648,7 +648,7 @@ public class GenericReader extends MetaData {
             container = getContainer(varName, type,
             recordRange, preserve, ByteOrder.nativeOrder());
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
         container.run();
         return container.asOneDArray(columnMajor);
@@ -814,7 +814,7 @@ public class GenericReader extends MetaData {
                    new int[] {-1, -stride};
             return container.asOneDArray(columnMajor, new Stride(_stride));
         } catch (Throwable t) {
-            throw new CDFException.ReaderError(t.getMessage());
+            throw new CDFException.ReaderError(t);
         }
     }
     /**
@@ -841,7 +841,7 @@ public class GenericReader extends MetaData {
                    new int[] {-1, -stride};
             return container.asSampledArray(new Stride(_stride));
         } catch (Throwable t) {
-            throw new CDFException.ReaderError(t.getMessage());
+            throw new CDFException.ReaderError(t);
         }
     }
 
@@ -898,7 +898,7 @@ public class GenericReader extends MetaData {
             container = getContainer(varName, type,
             recordRange, false, ByteOrder.nativeOrder());
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
         return container.getCapacity();
     }
@@ -911,7 +911,7 @@ public class GenericReader extends MetaData {
             container = getContainer(varName, type,
             recordRange, preserve, ByteOrder.nativeOrder());
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
         container.setUserBuffer(buffer);
         container.run();

@@ -90,7 +90,7 @@ public class CDFReader extends GenericReader {
             false, timeRange, tspec, false, true);
             return new TimeSeriesImpl(ts);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -128,7 +128,7 @@ public class CDFReader extends GenericReader {
                 startTime, stopTime);
             return getTimeSeries(varName, tr, tspec);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th.getMessage(),th);
         }
     }
 
@@ -142,7 +142,7 @@ public class CDFReader extends GenericReader {
             false, timeRange, tspec, true, columnMajor);
             return new TimeSeriesOneDImpl(ts);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th.getMessage(),th);
         }
     }
 
@@ -185,7 +185,7 @@ public class CDFReader extends GenericReader {
         } catch (Throwable th) {
                 System.out.println(th.getMessage());
             th.printStackTrace();
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -204,7 +204,7 @@ public class CDFReader extends GenericReader {
             double[] times = tv.getTimes();
             return new double[] {times[0], times[times.length - 1]};
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
     boolean overlaps(double[] t) {
@@ -261,7 +261,7 @@ public class CDFReader extends GenericReader {
             }
             return null;
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
     /**
@@ -312,7 +312,7 @@ public class CDFReader extends GenericReader {
             }
             return null;
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
     int[] GMT(Calendar c) {
@@ -343,7 +343,7 @@ public class CDFReader extends GenericReader {
             msec += TimeVariableFactory.JANUARY_1_1970_LONG;
             return getTimeInstantModel(msec);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th.getMessage(),th);
         }
     }
 
@@ -373,7 +373,7 @@ public class CDFReader extends GenericReader {
         try {
             return TSExtractor.getTime(this, varName, time);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -474,7 +474,7 @@ public class CDFReader extends GenericReader {
                (Vector)getAttribute(varName, "DEPEND_" + (1 + index));
             return (String)attr.get(0);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
     /**
@@ -495,7 +495,7 @@ public class CDFReader extends GenericReader {
         try {
             return scalar.getTimeSeries(varName);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -529,7 +529,7 @@ public class CDFReader extends GenericReader {
         try {
             return scalar.getTimeSeries(varName, startTime, stopTime);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -562,7 +562,7 @@ public class CDFReader extends GenericReader {
         try {
             return scalar.getTimeSeries(varName, startTime, stopTime, tspec);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -584,7 +584,7 @@ public class CDFReader extends GenericReader {
         try {
             return scalar.getTimeSeries(varName, ignoreFill);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -617,7 +617,7 @@ public class CDFReader extends GenericReader {
             return scalar.getTimeSeries(varName, ignoreFill, startTime,
             stopTime);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -652,7 +652,7 @@ public class CDFReader extends GenericReader {
             return scalar.getTimeSeries(varName, ignoreFill, startTime,
             stopTime, tspec);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 /*
@@ -754,7 +754,7 @@ public class CDFReader extends GenericReader {
         try {
             return vector.getTimeSeries(varName, component);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -786,7 +786,7 @@ public class CDFReader extends GenericReader {
             return vector.getTimeSeries(varName, component, startTime,
             stopTime);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -824,7 +824,7 @@ public class CDFReader extends GenericReader {
             return vector.getTimeSeries(varName, component, startTime, stopTime,
             tspec);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -846,7 +846,7 @@ public class CDFReader extends GenericReader {
         try {
             return vector.getTimeSeries(varName, component, ignoreFill);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -878,7 +878,7 @@ public class CDFReader extends GenericReader {
             return vector.getTimeSeries(varName, component, ignoreFill,
             startTime, stopTime);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -917,7 +917,7 @@ public class CDFReader extends GenericReader {
             return vector.getTimeSeries(varName, component, ignoreFill,
             startTime, stopTime, tspec);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
         
     }

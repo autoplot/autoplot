@@ -106,7 +106,7 @@ public abstract class MetaData {
         try {
             return thisCDF.getAttributeEntries(aname);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -119,7 +119,7 @@ public abstract class MetaData {
         try {
             return thisCDF.getGlobalAttribute(atr);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 
@@ -297,7 +297,7 @@ public abstract class MetaData {
         try {
             return thisCDF.getVariable(varName).isCompatible(cl);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th.getMessage());
+            throw new CDFException.ReaderError(th);
         }
     }
 

@@ -35,7 +35,8 @@ public final class ReaderFactory {
             ByteBuffer buf = ByteBuffer.wrap(ba);
             cdf = getVersion(buf, raf.getChannel());
         } catch (Throwable th) {
-            throw new CDFException.ReaderError("I/O Error reading " + fname);
+            CDFException.ReaderError ex= new CDFException.ReaderError("I/O Error reading " + fname,th);
+            throw ex;
         }
         if ( cdf==null ) {
             throw new IllegalArgumentException("File is not a CDF-format file.");
@@ -71,7 +72,7 @@ public final class ReaderFactory {
             ByteBuffer buf = ByteBuffer.wrap(ba);
             cdf = CDFFactory.getVersion(buf);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError("I/O Error reading " + url);
+            throw new CDFException.ReaderError("I/O Error reading " + url,th);
         }
         CDFReader rdr = new CDFReader();
         rdr.setImpl(cdf);

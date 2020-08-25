@@ -477,7 +477,7 @@ public class TSExtractor extends Extractor {
                 if (timeRange == null)  return tv.getTimes(tspec);
                 return tv.getTimes(timeRange, tspec);
             } catch (Throwable th) {
-                throw new CDFException.ReaderError(th.getMessage());
+                throw new CDFException.ReaderError(th);
             }
         }
 
@@ -499,7 +499,7 @@ public class TSExtractor extends Extractor {
                     recordRange[1], columnMajor);
                 }
             } catch (Throwable th) {
-                throw new CDFException.ReaderError(th.getMessage());
+                throw new CDFException.ReaderError(th);
             }
         }
 
