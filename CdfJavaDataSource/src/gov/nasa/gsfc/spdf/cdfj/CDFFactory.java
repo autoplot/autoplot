@@ -101,6 +101,9 @@ public final class CDFFactory {
         ByteBuffer buf = ch.map(FileChannel.MapMode.READ_ONLY, 0, ch.size());
         fis.close();
         CDFImpl cdf = getVersion(buf);
+        if ( cdf==null ) {
+            throw new CDFException.ReaderError("File is not a CDF-format file: "+fname);
+        }
         ((CDFImpl)cdf).setOption(new ProcessingOption() {
             public String missingRecordOption() {
                 if (option) return "accept";
