@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Autoplot is used to make sparklines (<img src='https://jfaden.net/AutoplotServlet/SimpleServlet?uri=vap%2Bhapi%3Ahttps%3A%2F%2Fjfaden.net%2FHapiServerDemo%2Fhapi%3Fid%3DpoolTemperature%26parameters%3DTemperature%26timerange%3D2020-08-23&format=image%2Fpng&width=70&height=16&row=0%2C100%25&column=0%2C100%25&timerange=2020-08-23'>) for a prototype <a href='https://jfaden.net/HapiServerDemo/hapi'>HAPI server</a>.
+        <p><small>Autoplot is used to make sparklines (<img src='https://jfaden.net/AutoplotServlet/SimpleServlet?uri=vap%2Bhapi%3Ahttps%3A%2F%2Fjfaden.net%2FHapiServerDemo%2Fhapi%3Fid%3DpoolTemperature%26parameters%3DTemperature%26timerange%3D2020-08-23&format=image%2Fpng&width=70&height=16&row=0%2C100%25&column=0%2C100%25&timerange=2020-08-23' alt='sparkline'>) for a prototype <a href='https://jfaden.net/HapiServerDemo/hapi'>HAPI server</a>.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-08-24 r25060):</p>
+        <p>Bugfixes (2020-08-25 r25060):</p>
         <ul>
+            <li>rte 1783311991: Check for null when identifying format of CDF file.  Thanks, Alamo!
+            <li>rte 1783311991: CDFExceptions now keep track of initial cause to aid in support.  Thanks, Alamo! 
             <li>simplifyScript checks for indeces which cannot be resolved d[r1] where r1 is not known.
             <li>rte 761822764: Improve error message when X and Y arguments of CDF reader load variables of different lengths. 
             <li>ArgumentList utility assumed that default values for requireOneOf parameters where non-null.
