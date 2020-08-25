@@ -133,6 +133,9 @@ public final class CDFFactory {
             remaining -= got;
         }
         CDFImpl cdf = getCDF(ba);
+        if ( cdf==null ) {
+            throw new IllegalArgumentException("File is not a CDF-format file: "+url);
+        }
         cdf.setSource(new CDFSource() {
             public String getName() {return _url;};
             public boolean isFile() {return false;};

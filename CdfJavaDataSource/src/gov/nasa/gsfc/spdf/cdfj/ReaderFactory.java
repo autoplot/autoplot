@@ -71,6 +71,9 @@ public final class ReaderFactory {
             ((HttpURLConnection)con).disconnect();
             ByteBuffer buf = ByteBuffer.wrap(ba);
             cdf = CDFFactory.getVersion(buf);
+            if ( cdf==null ) {
+                throw new IllegalArgumentException("File is not a CDF-format file.");
+            }
         } catch (Throwable th) {
             throw new CDFException.ReaderError("I/O Error reading " + url,th);
         }
@@ -145,6 +148,9 @@ public final class ReaderFactory {
             }
             fis.close();
             cdf = CDFFactory.getCDF(ba);
+            if ( cdf==null ) {
+                throw new IllegalArgumentException("File is not a CDF-format file: "+fname);
+            }
         } catch (Throwable th) {
             throw new CDFException.ReaderError("I/O Error reading " + fname);
         }
