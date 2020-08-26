@@ -38,7 +38,7 @@ function buildImgUrl(srcurl, start, end) {
 }
 
 function echoImgUrl() {
-    //$('#idechourl').text(imgurl);
+    //$('#idEchoImgUrl').text(imgurl);
 }
 
 function echoGraphParams() {
@@ -311,7 +311,7 @@ function setTime(startMilliseconds, endMilliseconds) {
     diffmilliseconds = enddateinmilliseconds - startdateinmilliseconds;
     msecperpx = diffmilliseconds / graphwidth;
     
-    //echoImgUrl();
+    echoImgUrl();
     
     t0= Date.now();
     ImageInfo.loadInfo(imgurl, mycallback, myErrorCallback );

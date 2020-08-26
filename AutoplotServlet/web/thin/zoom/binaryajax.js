@@ -140,7 +140,10 @@ var BinaryAjax = (function() {
 	}
 
 	function sendRequest(strURL, fncCallback, fncError, aRange, bAcceptRanges, iFileSize) {
-		var oHTTP = createRequest();
+                if ( strURL===undefined ) {
+                    throw "strURL is undefined";
+                }
+                var oHTTP = createRequest();
 		if (oHTTP) {
 
 			var iDataOffset = 0;
