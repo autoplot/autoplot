@@ -164,6 +164,29 @@ function iso8601Str( startMilliseconds, endMilliseconds, t ) {
     return s;
 }
 
+/**
+ * 
+ * @param {type} startMilliseconds
+ * @param {type} endMilliseconds
+ * @param {type} t
+ * @param {type} f factor to reduce resolution
+ * @returns {Number}
+ */
+function roundNice( startMilliseconds, endMilliseconds, t, f ) {
+    var dt= ( endMilliseconds - startMilliseconds ) * f;
+    var s= new Date(t).toJSON();
+    if ( dt/(100*24*86400000) > 1.0 ) {
+        s= s.substring(0,11)+"00:00Z";
+    } else if ( dt/(5*24*86400000) > 1.0  ) {
+        s= s.substring(0,13)+":00Z";
+    } else if ( dt/43200000 > 1.0 ) {
+        s= s.substring(0,16)+"Z";
+    } else if ( dt/3600000 > 1.0 ) {
+        s= s.substring(0,19)+"Z";
+    }
+    return new Date(s).getTime();
+}
+
 function resetWidth() {
     if (typeof xwidth === "undefined") {
         $("#info").html('reset the width of the time axis');
@@ -289,7 +312,10 @@ function clickshift(subEvent) {
 
 
 function setTime(startMilliseconds, endMilliseconds) {
-    console.log('==setTime()==');
+    startMilliseconds= roundNice( startMilliseconds, endMilliseconds, startMilliseconds, 240 );
+    endMilliseconds= roundNice( startMilliseconds, endMilliseconds, endMilliseconds, 240 );
+    
+    console.log('==setTime()== 24');
     console.log('    startMilliseconds=' + iso8601Str( startMilliseconds,endMilliseconds,startMilliseconds ) );
     console.log('    diffmilliseconds=' + (endMilliseconds - startMilliseconds));
     console.log('PLOTINFO.plots[0].xaxis.min,max=' + PLOTINFO.plots[0].xaxis.min + '/' + PLOTINFO.plots[0].xaxis.max);
