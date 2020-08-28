@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Feedback is improved when malformed CDF files are read.
+        <p><small>Autoplot is used to make sparklines (<img src='https://jfaden.net/AutoplotServlet/SimpleServlet?uri=vap%2Bhapi%3Ahttps%3A%2F%2Fjfaden.net%2FHapiServerDemo%2Fhapi%3Fid%3DpoolTemperature%26parameters%3DTemperature%26timerange%3D2020-08-27&format=image%2Fpng&width=70&height=16&row=0%2C100%25&column=0%2C100%25&timerange=2020-08-27' alt='sparkline'>) for a prototype <a href='https://jfaden.net/HapiServerDemo/hapi'>HAPI server</a>.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-08-25 r25060):</p>
+        <p>Bugfixes (2020-08-28 r25072):</p>
+        <ul>
+            <li>2278: CDF slice1 keyword didn't work when Epoch16 timetags were used.
+        </ul>
+        <p>Older Bugfixes (2020-07-13 r24952):</p>
         <ul>
             <li>rte 1783311991: Check for null when identifying format of CDF file.  Thanks, Alamo!
             <li>rte 1783311991: CDFExceptions now keep track of initial cause to aid in support.  Thanks, Alamo! 
@@ -43,23 +47,11 @@
             <li>Java8 is now required in the Webstart JNLP file.  (No Java8 code yet.)
             <li>axis reference property didn't load properly from .vap files.
         </ul>
-        <p>Older Bugfixes (2020-07-13 r24952):</p>
-        <ul>
-            <li>Don't assume that LABLAXIS in CDF file is string data, and print a warning when it isn't.  Thanks, Chris!
-            <li>Color Scatter from ASCII file, using X=, Y=, and Z= switches works again.  Thanks, Sadie!
-            <li>bugfix: jump-to-line menu construction assumed classes were always inherited.
-            <li>vap+inline:randn(100),randn(100) was mistaken for a mash-up URI.
-            <li>selection area (yellow flashes) miscalculated for color scatter mode.
-            <li>2269: SeriesRenderer would not clear exception, so returning to correctly-loading interval would not correctly display.  Thanks Chris and Bill!
-            <li>occasional half-pixel error when position of image is calculated in SeriesRenderer.
-            <li>rte_1424143028: handle non-CDF file error on machine where memory mapping cannot be used.
-            <li>triple quotes could cause problems when parsing Jython file to get arguments.
-            <li>1674: loose jython work by switching file.
-            <li>2262: script editor undo's script load.
-            <li>1983: jython error reporting doesn't check file name and can mark the wrong file.
-            <li>new irange function had a bug where it would return 1..4 instead of 0..3.
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>suppress the legend when the plot width is less than 100 pixels.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>725: create pngwalk has option to remove pngs which don't contain data.
             <li>bug 1687: introduce completions based on Java classes which could be imported and are imported when the completion proposal is accepted.
@@ -67,16 +59,6 @@
             <li>724: ISTP metadata allows for time location units like "seconds since 1970-01-01T00:00".  Thanks, Steven!
             <li>bundle command now has 5, 6, and 7 dataset versions.  Thanks, Sadie!
             <li>Annotation splitAnchor allows annotation X position to anchor to plot edge while Y anchors to data.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>X, Y, and Z, controls supported in ASCII editor.
-            <li>pngwalk animated gif output has option to shrink each frame by 60%.
-            <li>add lonarr(n) and lonarr(n,m) for storing CDF_TT2000 data.
-            <li>Das2 renderer ID is displayed in property tables and can be accessed by scripts.
-            <li>backgroundThick property added so that contrasting color is provided by SeriesRenderer.  Thanks, Ivar!
-            <li>rank 2 replicate added.  Thanks, Ivar!
-            <li>lastminute keyword added to times, to provide a way to refer to the last minute elapsed in real-time applications.
         </ul>
         <p>Known issues:</p>
         <ul>
