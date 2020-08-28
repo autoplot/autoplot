@@ -546,6 +546,11 @@ public class CdfUtil {
         
         long varType = cdf.getType(svariable);
         
+        if ( varType==32 ) {
+            logger.fine("disabling slice1 because epoch16");
+            slice1= -1;
+        }
+        
         int[] dimSizes = cdf.getDimensions(svariable);
         boolean[] dimVaries= cdf.getVarys(svariable);
         int[] repeatDimensions= new int[dimVaries.length]; // number of times to repeat because we didn't remove the dimension.
@@ -607,7 +612,7 @@ public class CdfUtil {
         logger.log( Level.FINEST, "size of {0}: {1}MB  type: {2}", new Object[]{svariable, sizeOf(dims, dimSizes, varType, rc) / 1024. / 1024., varType});
         
         String stype = getTargetType( cdf.getType(svariable) );
-        ByteBuffer buff2;
+        ByteBuffer buff;
 
         long t0= System.currentTimeMillis();
         logger.entering("gov.nasa.gsfc.spdf.cdfj.CDFReader", "getBuffer" );
@@ -616,23 +621,19 @@ public class CdfUtil {
             try {
                 boolean preserve= true;
                 if ( stype.equals("string") ) {
-                    buff2= null;
+                    buff= null;
                 } else {
-                    buff2= cdf.getBuffer(svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, preserve  );
+                    buff= cdf.getBuffer(svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, preserve  );
                 }
             } catch ( CDFException ex ) {
-                buff2= myGetBuffer(cdf, svariable, (int)recStart, (int)(recStart+rc*recInterval), (int)recInterval  );
+                buff= myGetBuffer(cdf, svariable, (int)recStart, (int)(recStart+rc*recInterval), (int)recInterval  );
             }
         } else {
-            buff2= myGetBuffer(cdf, svariable, (int)recStart, (int)(recStart+rc*recInterval), (int)recInterval  );
+            buff= myGetBuffer(cdf, svariable, (int)recStart, (int)(recStart+rc*recInterval), (int)recInterval  );
         }
         
         logger.exiting("gov.nasa.gsfc.spdf.cdfj.CDFReader", "getBuffer" );
         logger.log(Level.FINE, "read variable {0} in (ms): {1}", new Object[]{svariable, System.currentTimeMillis()-t0});
-
-        ByteBuffer[] buf;
-        
-        buf= new ByteBuffer[] { buff2 };
 
         Object bbType= byteBufferType( cdf.getType(svariable) );
         
@@ -660,13 +661,9 @@ public class CdfUtil {
                 return result;
             }
         }
-
-        if ( buf.length>1 ) {
-            throw new IllegalArgumentException("multiple buffers not yet implemented");
-        }
         
         if ( slice1>-1 && qube.length>1 ) {
-            buf[0]= doSlice1( buf[0], varType, qube, slice1, cdf.rowMajority() );
+            buff= doSlice1( buff, varType, qube, slice1, cdf.rowMajority() );
             if ( recCount==-1 ) {
                // throw new IllegalArgumentException("recCount==-1 and slice1>-1 when loading "+svariable);
                logger.log(Level.FINE, "recCount==-1 and slice1>-1 when loading {0}", svariable);
@@ -697,28 +694,28 @@ public class CdfUtil {
             if ( recCount==-1 ) {
                 result= BufferDataSet.makeDataSet( qube.length, recLenBytes, 0, 
                         qube,
-                        buf[0], bbType );
+                        buff, bbType );
                 result= (MutablePropertyDataSet)result.slice(0);
                 
             } else {
                 result= BufferDataSet.makeDataSet(qube.length, recLenBytes, 0, 
                         qube,
-                        buf[0], bbType );
+                        buff, bbType );
             }
         } else {
             if ( recCount==-1 ) {
-                buf[0]= transpose(recLenBytes,qube,buf[0],bbType );
+                buff= transpose(recLenBytes,qube,buff,bbType );
                 
                 result= BufferDataSet.makeDataSet( qube.length, recLenBytes, 0, 
                         qube,
-                        buf[0], bbType );
+                        buff, bbType );
                 result= (MutablePropertyDataSet)result.slice(0);
             } else {
-                buf[0]= transpose(recLenBytes,qube,buf[0],bbType );
+                buff= transpose(recLenBytes,qube,buff,bbType );
 
                 result= BufferDataSet.makeDataSet(qube.length, recLenBytes, 0, 
                         qube,
-                        buf[0], bbType );
+                        buff, bbType );
             }
         }
         
