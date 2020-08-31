@@ -2501,7 +2501,9 @@ public final class HapiDataSource extends AbstractDataSource {
                 ds= Ops.putProperty( ds, QDataSet.RENDER_TYPE, pds[1].renderType );
             }
         } else if ( pds.length==1 ) {
-            return depend0;
+            ds= Ops.link( depend0, depend0 );
+            ds= Ops.putProperty( ds, QDataSet.RENDER_TYPE, QDataSet.VALUE_RENDER_TYPE_EVENTS_BAR );
+            return ds;
             
         } else if ( combineRank2Depend1 ) {
             // we need to remove Epoch to DEPEND_0.
