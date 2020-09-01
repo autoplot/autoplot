@@ -105,7 +105,7 @@
                 out.println(" ");
                 JSONArray parameters= info.getJSONArray("parameters");
                 for ( int j=0; j<parameters.length(); j++ ) {
-                    if ( j>0 ) out.print(", ");
+                    if ( j>0 ) out.print("  ");
                     try {
                         String pname= parameters.getJSONObject(j).getString("name");
                         out.print( String.format( "<a href=\"data?id=%s&parameters=%s&%s\">%s</a>", ds.getString("id"), pname, exampleTimeRange, pname ) );
