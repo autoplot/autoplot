@@ -22,7 +22,7 @@ import org.autoplot.dom.Application;
 public class ServletInfo extends HttpServlet {
 
     private static final long birthMilli= System.currentTimeMillis();
-    public static final String version = "v20200826.1122";
+    public static final String version = "v20200901.1124";
     
     public static long getAgeMillis() {
         return System.currentTimeMillis() - birthMilli;
