@@ -117,7 +117,7 @@
                     <br>
                         <button onclick="resetTime();" title="Jump to this range">Reset</button> to <input id="timerange" size="50"></input>
             </p>
-            
+            <span id="aplink">Autoplot URI here.</span>
             <div id="info"></div>
                
 		<!--<pre><div id="iddates"></div></pre> -->

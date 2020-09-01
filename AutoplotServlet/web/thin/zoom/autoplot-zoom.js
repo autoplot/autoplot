@@ -39,6 +39,8 @@ function buildImgUrl(srcurl, start, end) {
 
 function echoImgUrl() {
     //$('#idEchoImgUrl').text(imgurl);
+    aplinkSpan= document.getElementById("aplink");
+    aplinkSpan.textContent= decodeURIComponent( imgurl.substring(24) );
 }
 
 function echoGraphParams() {
@@ -100,6 +102,9 @@ function resetUrl(url) {
     $('#idstatus').text("reset url "+url);
     $('#progress').attr('src', 'spinner.gif');
     imgurl = url;
+        
+    aplinkSpan= document.getElementById("aplink");
+    aplinkSpan.textContent= decodeURIComponent( imgurl.substring(24) );
     
     t0= Date.now();
     ImageInfo.loadInfo(imgurl, mycallback, myErrorCallback );
@@ -332,6 +337,10 @@ function setTime(startMilliseconds, endMilliseconds) {
 
     // update imgurl
     imgurl = zoomurl;
+    
+    aplinkSpan= document.getElementById("aplink");
+    aplinkSpan.textContent= decodeURIComponent( imgurl.substring(24) );
+    
     startdateinmilliseconds = startMilliseconds;
     enddateinmilliseconds = endMilliseconds;
     diffmilliseconds = enddateinmilliseconds - startdateinmilliseconds;
