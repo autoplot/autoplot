@@ -2,9 +2,6 @@
  * AggregatingDataSourceFactory.java
  *
  * Created on October 25, 2007, 11:02 AM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
  */
 package org.autoplot.aggregator;
 
@@ -399,6 +396,11 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
     @Override
     public boolean supportsDiscovery() {
+        return false;
+    }
+
+    @Override
+    public boolean isFileResource() {
         return false;
     }
 

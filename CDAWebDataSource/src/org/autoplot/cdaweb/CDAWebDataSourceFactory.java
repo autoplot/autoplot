@@ -189,5 +189,10 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
     public boolean supportsDiscovery() {
         return true;
     }
+
+    @Override
+    public boolean isFileResource() {
+        return false;
+    }
     
 }

@@ -36,4 +36,9 @@ public abstract class AbstractDataSourceFactory implements DataSourceFactory {
     public boolean supportsDiscovery() {
         return false;
     }
+    
+    @Override
+    public boolean isFileResource() {
+        return true;
+    }
 }

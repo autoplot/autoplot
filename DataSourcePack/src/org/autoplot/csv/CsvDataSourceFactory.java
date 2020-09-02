@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
+import org.autoplot.datasource.AbstractDataSourceFactory;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.datasource.CompletionContext;
 import org.autoplot.datasource.DataSetURI;
@@ -20,7 +21,7 @@ import org.autoplot.datasource.DataSourceFactory;
  * Factory for producing comma separated values file sources.
  * @author jbf
  */
-public class CsvDataSourceFactory implements DataSourceFactory {
+public class CsvDataSourceFactory extends AbstractDataSourceFactory implements DataSourceFactory {
 
     @Override
     public DataSource getDataSource(URI uri) throws Exception {
@@ -171,21 +172,6 @@ public class CsvDataSourceFactory implements DataSourceFactory {
             }
         }
         return columnHeaders;
-    }
-
-    @Override
-    public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
-        return false;
-    }
-
-    @Override
-    public <T> T getCapability(Class<T> clazz) {
-        return null;
-    }
-
-    @Override
-    public boolean supportsDiscovery() {
-        return false;
     }
 
 }

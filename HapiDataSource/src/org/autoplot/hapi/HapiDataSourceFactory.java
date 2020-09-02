@@ -88,5 +88,10 @@ public class HapiDataSourceFactory extends AbstractDataSourceFactory {
     public boolean supportsDiscovery() {
         return true;
     }
+
+    @Override
+    public boolean isFileResource() {
+        return false;
+    }
     
 }

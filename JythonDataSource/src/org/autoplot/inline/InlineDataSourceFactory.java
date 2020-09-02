@@ -214,5 +214,9 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
         return true;
     }
 
-
+    @Override
+    public boolean isFileResource() {
+        return false;
+    }
+    
 }

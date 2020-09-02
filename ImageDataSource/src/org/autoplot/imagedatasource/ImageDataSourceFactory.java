@@ -111,4 +111,10 @@ public class ImageDataSourceFactory implements DataSourceFactory {
     public boolean supportsDiscovery() {
         return false;
     }
+
+    @Override
+    public boolean isFileResource() {
+        return true;
+    }
+    
 }

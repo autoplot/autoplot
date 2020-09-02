@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.tsds.datasource;
 
 import java.net.URI;
@@ -22,13 +19,15 @@ import org.autoplot.datasource.capability.TimeSeriesBrowse;
  */
 public class TsdsDataSourceFactory extends AbstractDataSourceFactory implements DataSourceFactory {
 
+    @Override
     public DataSource getDataSource(URI uri) throws Exception {
         return new TsdsDataSource(uri);
     }
     
+    @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
 
-        List<CompletionContext> result = new ArrayList<CompletionContext>();
+        List<CompletionContext> result = new ArrayList<>();
 
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "param1=", "dataset identifier"));
@@ -50,6 +49,7 @@ public class TsdsDataSourceFactory extends AbstractDataSourceFactory implements 
     }
 
 
+    @Override
     public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
         URISplit split= URISplit.parse( surl );
         Map params= URISplit.parseParams(split.params);
@@ -61,6 +61,7 @@ public class TsdsDataSourceFactory extends AbstractDataSourceFactory implements 
         }
     }
 
+    @Override
     public <T> T getCapability(Class<T> clazz) {
         if ( clazz==TimeSeriesBrowse.class ) {
            return (T) new TsdsTimeSeriesBrowse();
@@ -68,4 +69,10 @@ public class TsdsDataSourceFactory extends AbstractDataSourceFactory implements 
             return null;
         }
     }
+
+    @Override
+    public boolean isFileResource() {
+        return false;
+    }
+        
 }

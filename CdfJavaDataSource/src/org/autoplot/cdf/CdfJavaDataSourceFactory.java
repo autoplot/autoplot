@@ -2,9 +2,6 @@
  * CdfFileDataSourceFactory.java
  *
  * Created on July 23, 2007, 8:29 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
  */
 
 package org.autoplot.cdf;
@@ -20,7 +17,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.autoplot.cdf.CdfDataSource;
+import org.autoplot.datasource.AbstractDataSourceFactory;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.datasource.CompletionContext;
 import org.autoplot.datasource.DataSetURI;
@@ -32,7 +29,7 @@ import org.autoplot.datasource.URISplit;
  * Read data from CDF files using the Java reader provided by NASA/Goddard.
  * @author jbf
  */
-public class CdfJavaDataSourceFactory implements DataSourceFactory {
+public class CdfJavaDataSourceFactory extends AbstractDataSourceFactory implements DataSourceFactory {
     
     private static final Logger logger = Logger.getLogger("apdss.cdf");
     
@@ -224,16 +221,5 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
             return false;
         }
     }
-
-    @Override
-    public <T> T getCapability(Class<T> clazz) {
-        return null;
-    }
-
-    @Override
-    public boolean supportsDiscovery() {
-        return false;
-    }
-    
     
 }

@@ -1,16 +1,7 @@
-/*
- * SpaseRecordDataSourceFactory.java
- *
- * Created on October 8, 2007, 6:57 AM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
 
 package org.autoplot.spase;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.autoplot.datasource.AbstractDataSourceFactory;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
@@ -34,18 +26,19 @@ import org.das2.qds.ops.Ops;
  *
  * @author jbf
  */
-public class SpaseRecordDataSourceFactory implements DataSourceFactory {
+public class SpaseRecordDataSourceFactory extends AbstractDataSourceFactory implements DataSourceFactory {
     
     private static final Logger logger= LoggerManager.getLogger("apdss");
     
-    /** Creates a new instance of SpaseRecordDataSourceFactory */
     public SpaseRecordDataSourceFactory() {
     }
     
+    @Override
     public DataSource getDataSource(URI uri) throws Exception {
         return new SpaseRecordDataSource(uri);
     }
     
+    @Override
     public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         
             File f= DataSetURI.getFile( cc.surl, mon );
@@ -55,7 +48,7 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
             if ( type==XMLTypeCheck.TYPE_VOTABLE ) {
                 QDataSet bds= new VOTableReader().readHeader(f.toString(), mon);
                 if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_NAME) ) {
-                    List<CompletionContext> result= new ArrayList<CompletionContext>();
+                    List<CompletionContext> result= new ArrayList<>();
                     for ( int i=0; i<bds.length(); i++ ) {
                         String label= (String)bds.property(QDataSet.LABEL,i);
                         String name= (String)bds.property(QDataSet.NAME,i);
@@ -87,6 +80,7 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
     }
     
     
+    @Override
     public boolean reject( String surl, List<String> problems, ProgressMonitor mon ) throws IllegalArgumentException {
         
         try {
@@ -138,14 +132,6 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
 
     public String urlForServer(String surl) {
         return surl; //TODO
-    }
-
-    public <T> T getCapability(Class<T> clazz) {
-        return null;
-    }
-
-    public boolean supportsDiscovery() {
-        return false;
     }
     
 }

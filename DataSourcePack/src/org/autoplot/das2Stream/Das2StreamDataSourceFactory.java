@@ -48,13 +48,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.autoplot.datasource.AbstractDataSourceFactory;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.datasource.CompletionContext;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.MetadataModel;
-import org.autoplot.datasource.URISplit;
 import org.das2.qstream.QDataSetStreamHandler;
 import org.das2.qstream.StreamException;
 
@@ -62,14 +62,16 @@ import org.das2.qstream.StreamException;
  *
  * @author jbf
  */
-public class Das2StreamDataSourceFactory implements DataSourceFactory {
+public class Das2StreamDataSourceFactory extends AbstractDataSourceFactory implements DataSourceFactory {
 
+    @Override
     public DataSource getDataSource(URI uri) throws IOException {
         return new Das2StreamDataSource(uri);
     }
 
+    @Override
     public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws IOException, StreamException {
-        List<CompletionContext> result= new ArrayList<CompletionContext>();
+        List<CompletionContext> result= new ArrayList<>();
         if ( cc.context==cc.CONTEXT_PARAMETER_NAME ) {
             if ( DataSetURI.fromUri( cc.resourceURI ).endsWith(".qds") ) {
                 result.add( new CompletionContext(
@@ -96,12 +98,7 @@ public class Das2StreamDataSourceFactory implements DataSourceFactory {
 
     public MetadataModel getMetadataModel(URL url) {
         return MetadataModel.createNullModel();
-    }
-
-    public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
-        return false;
-    }
-    
+    }   
     
     private Map<String,String> getNames( CompletionContext cc, ProgressMonitor mon ) throws IOException, StreamException {
         
@@ -114,14 +111,6 @@ public class Das2StreamDataSourceFactory implements DataSourceFactory {
         return h.getDataSetNamesAndDescriptions();
         
     }
-
-    public <T> T getCapability(Class<T> clazz) {
-        return null;
-    }
-
-    public boolean supportsDiscovery() {
-        return false;
-    }
-
+    
 
 }

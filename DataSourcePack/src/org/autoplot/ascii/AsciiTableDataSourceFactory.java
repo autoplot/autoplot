@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.autoplot.datasource.AbstractDataSourceFactory;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.ProgressMonitor;
@@ -22,13 +23,12 @@ import org.autoplot.datasource.MetadataModel;
 import org.autoplot.datasource.URISplit;
 import org.das2.qds.util.AsciiParser;
 import org.das2.qds.util.AsciiParser.DelimParser;
-import org.das2.util.monitor.NullProgressMonitor;
 
 /**
  * Factory for AsciiTableDataSource readers for the ASCII table reader.
  * @author jbf
  */
-public class AsciiTableDataSourceFactory implements DataSourceFactory {
+public class AsciiTableDataSourceFactory extends AbstractDataSourceFactory implements DataSourceFactory {
 
     /** Creates a new instance of AsciiTableDataSourceFactory */
     public AsciiTableDataSourceFactory() {
@@ -387,13 +387,4 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
 
     }
 
-    @Override
-    public <T> T getCapability(Class<T> clazz) {
-        return null;
-    }
-
-    @Override
-    public boolean supportsDiscovery() {
-        return false;
-    }
 }

@@ -77,5 +77,10 @@ public class AudioSystemDataSourceFactory extends AbstractDataSourceFactory {
 
     }
 
+    @Override
+    public boolean isFileResource() {
+        return false;
+    }
+
 
 }

@@ -90,7 +90,12 @@ public class FedCatSourceFactory extends AbstractDataSourceFactory
 	 */
 	@Override
     public boolean supportsDiscovery() { return true; }
-	 
+
+	@Override
+	public boolean isFileResource() {
+		return false;
+	}
+
 	 /** We have to reject the URI in order to pop up the inspection dialog box. 
 	  * This makes sense because if the URI is good, folks just want to see the data.
 	  * 

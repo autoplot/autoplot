@@ -191,5 +191,9 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
         return true;
     }
 
+    @Override
+    public boolean isFileResource() {
+        return false;
+    }
     
 }

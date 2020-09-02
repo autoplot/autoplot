@@ -241,6 +241,10 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
         return true; //TODO: completions should support this.
     }
 
+    @Override
+    public boolean isFileResource() {
+        return true;
+    }
     
     @Override
     public <T> T getCapability(Class<T> clazz) {
