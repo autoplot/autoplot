@@ -55,7 +55,7 @@ public class ColorScatterStylePanel extends javax.swing.JPanel implements PlotSt
         edit.setValue( DasColorBar.Type.GRAYSCALE );
         colortableTypePanel.add(edit.getCustomEditor(), BorderLayout.CENTER);
 
-        symSizeSpinner.setModel(new SpinnerNumberModel(2.0f, 0.09f, 10.f, 0.2f));
+        symSizeSpinner.setModel(new SpinnerNumberModel(2.0f, 0.09f, 20.f, 0.2f));
 
         psymEditor = new EnumerationEditor();
         psymEditor.setValue( DefaultPlotSymbol.BOX );
@@ -65,7 +65,7 @@ public class ColorScatterStylePanel extends javax.swing.JPanel implements PlotSt
         lineEditor.setValue( PsymConnector.SOLID );
         lineStylePanel.add(lineEditor.getCustomEditor(), BorderLayout.CENTER);
 
-        lineThickSpinner.setModel(new SpinnerNumberModel(1.0f, 0.09f, 10.f, 0.2f));
+        lineThickSpinner.setModel(new SpinnerNumberModel(1.0f, 0.09f, 20.f, 0.2f));
 
         colorEditor = new ColorEditor();
         colorEditor.setValue( Color.BLACK );
