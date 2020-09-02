@@ -851,6 +851,8 @@ public class AxisPanel extends javax.swing.JPanel {
         processMenu.add( createMenuItem( tf, "%{CONTEXT}", "Context from the dataset, such as slice location or component" ) );
         processMenu.add( createMenuItem( tf, "%{PLOT_CONTEXT}", "plot context control" ) );
         processMenu.add( createMenuItem( tf, "%{TIMERANGE}", "Special timerange property from the plot element controller" ) );
+        processMenu.add( createMenuItem( tf, "%{PROPERTIES.CONTEXT_0}", "get a property from the plotted dataset" ) );
+        processMenu.add( createMenuItem( tf, "%{USER_PROPERTIES.CUSTOMPROP}", "get a property from the USER_PROPERTIES of the plotted dataset" ) );
         processMenu.add( createMenuItem( tf, "!c", "Line Break", "Insert new line escape character" ) );
         return processMenu;
     }
