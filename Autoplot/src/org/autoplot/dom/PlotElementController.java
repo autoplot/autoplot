@@ -1902,6 +1902,7 @@ public class PlotElementController extends DomNodeController {
      * @see external.PlotCommand
      */
     public void setRenderer(Renderer renderer) {
+        logger.entering("PlotElementController","setRenderer");
         Renderer oldRenderer= this.renderer;
         ApplicationController ac = this.dom.controller;
         if ( oldRenderer!=null ) {
@@ -1946,6 +1947,7 @@ public class PlotElementController extends DomNodeController {
         ac.bind(plotElement, PlotElement.PROP_DISPLAYLEGEND, renderer, Renderer.PROP_DRAWLEGENDLABEL);
         ac.bind(plotElement, PlotElement.PROP_RENDERCONTROL, renderer, Renderer.PROP_CONTROL );
         ac.bind(plotElement, PlotElement.PROP_ACTIVE, renderer, Renderer.PROP_ACTIVE );
+        logger.exiting("PlotElementController","setRenderer");
     }
 
     /**
@@ -3244,6 +3246,8 @@ public class PlotElementController extends DomNodeController {
         ac.bind(plotElement.style, PlotElementStyle.PROP_REFERENCE, seriesRenderer, "reference");
         ac.bind(plotElement.style, PlotElementStyle.PROP_FILL_DIRECTION, seriesRenderer, Renderer.CONTROL_KEY_FILL_DIRECTION );
         ac.bind(plotElement.style, PlotElementStyle.PROP_SHOWLIMITS, seriesRenderer, SeriesRenderer.PROP_SHOWLIMITS );
+        ac.bind(plotElement.style, PlotElementStyle.PROP_DRAWERROR, seriesRenderer, Renderer.CONTROL_KEY_DRAW_ERROR );
+        ac.bind(plotElement.style, PlotElementStyle.PROP_ERRORBARTYPE, seriesRenderer, SeriesRenderer.PROP_ERRORBARTYPE );
         ac.bind(plotElement.style, PlotElementStyle.PROP_ANTIALIASED, seriesRenderer, "antiAliased");
         ac.bind(plotElement, PlotElement.PROP_CADENCECHECK, seriesRenderer, "cadenceCheck");
         if ( seriesRenderer.getColorBar()!=null )

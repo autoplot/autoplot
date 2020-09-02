@@ -12,6 +12,7 @@ import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DefaultPlotSymbol;
+import org.das2.graph.ErrorBarType;
 import org.das2.graph.PlotSymbol;
 import org.das2.graph.PsymConnector;
 import org.das2.graph.SpectrogramRenderer.RebinnerEnum;
@@ -99,6 +100,34 @@ public class PlotElementStyle extends DomNode {
         String oldFillDirection = this.fillDirection;
         this.fillDirection = fillDirection;
         propertyChangeSupport.firePropertyChange(PROP_FILL_DIRECTION, oldFillDirection, fillDirection);
+    }
+
+    private boolean drawError = true;
+
+    public static final String PROP_DRAWERROR = "drawError";
+
+    public boolean isDrawError() {
+        return drawError;
+    }
+
+    public void setDrawError(boolean drawError) {
+        boolean oldDrawError = this.drawError;
+        this.drawError = drawError;
+        propertyChangeSupport.firePropertyChange(PROP_DRAWERROR, oldDrawError, drawError);
+    }
+
+    private ErrorBarType errorBarType = ErrorBarType.BAR;
+
+    public static final String PROP_ERRORBARTYPE = "errorBarType";
+
+    public ErrorBarType getErrorBarType() {
+        return errorBarType;
+    }
+
+    public void setErrorBarType(ErrorBarType errorBarType) {
+        ErrorBarType oldErrorBarType = this.errorBarType;
+        this.errorBarType = errorBarType;
+        propertyChangeSupport.firePropertyChange(PROP_ERRORBARTYPE, oldErrorBarType, errorBarType);
     }
 
     public final static String PROP_COLORTABLE= "colortable";
