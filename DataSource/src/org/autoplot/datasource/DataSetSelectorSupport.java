@@ -180,8 +180,8 @@ public class DataSetSelectorSupport {
         Preferences prefs = AutoplotSettings.settings().getPreferences(DataSetSelectorSupport.class);
 
         String currentDirectory = prefs.get(AutoplotSettings.PREF_LAST_OPEN_FOLDER, userHome().toString());
-        final HashMap exts = DataSourceRegistry.getInstance().dataSourcesByExt; // TODO: file resources.
-
+        final HashMap exts = DataSourceRegistry.getInstance().dataSourcesByExt;
+        
         JFileChooser chooser = new JFileChooser(currentDirectory);
 
         final boolean isAutoplotApp;
@@ -211,14 +211,20 @@ public class DataSetSelectorSupport {
             }
         };
 
-
         chooser.addChoosableFileFilter(ff);
         FileFilter select = ff;
-
-        for (Object ext1 : exts.keySet()) {
-            final String extf = (String) ext1;
-            ff = new FileNameExtensionFilter( "*"+ext1, extf.substring(1) );
-            chooser.addChoosableFileFilter(ff);
+        
+        ArrayList s= new ArrayList( exts.keySet() );
+        Collections.sort(s);
+        
+        for (Object ext1 : s ) {
+            DataSourceFactory factory= (DataSourceFactory)exts.get(ext1);
+            if ( factory.isFileResource() ) {
+                //            if ( DataSourceRegistry.getInstance().
+                final String extf = (String) ext1;
+                ff = new FileNameExtensionFilter( "*"+ext1, extf.substring(1) );
+                chooser.addChoosableFileFilter(ff);
+            }
         }
         
         if ( isAutoplotApp ) {
