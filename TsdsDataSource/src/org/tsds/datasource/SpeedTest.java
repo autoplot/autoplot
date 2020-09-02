@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.tsds.datasource;
 
 import java.io.IOException;
@@ -9,8 +6,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-//import sun.net.www.http.HttpClient;
 
 /**
  *
