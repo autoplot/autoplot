@@ -243,7 +243,7 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
 
     @Override
     public boolean isFileResource() {
-        return true;
+        return false;
     }
     
     @Override
@@ -253,4 +253,10 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
         }
         return null;
     }
+
+    @Override
+    public String getDescription() {
+        return "Das2 Data Servers";
+    }
+    
 }

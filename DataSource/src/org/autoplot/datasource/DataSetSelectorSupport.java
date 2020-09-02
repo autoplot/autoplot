@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -180,7 +181,7 @@ public class DataSetSelectorSupport {
         Preferences prefs = AutoplotSettings.settings().getPreferences(DataSetSelectorSupport.class);
 
         String currentDirectory = prefs.get(AutoplotSettings.PREF_LAST_OPEN_FOLDER, userHome().toString());
-        final HashMap exts = DataSourceRegistry.getInstance().dataSourcesByExt;
+        final HashMap<String,Object> exts = DataSourceRegistry.getInstance().dataSourcesByExt;
         
         JFileChooser chooser = new JFileChooser(currentDirectory);
 
@@ -214,15 +215,26 @@ public class DataSetSelectorSupport {
         chooser.addChoosableFileFilter(ff);
         FileFilter select = ff;
         
-        ArrayList s= new ArrayList( exts.keySet() );
+        ArrayList<String> s= new ArrayList( exts.keySet() );
         Collections.sort(s);
         
-        for (Object ext1 : s ) {
-            DataSourceFactory factory= (DataSourceFactory)exts.get(ext1);
+        HashSet<String> skip= new HashSet<>();
+        skip.add(".cdfj");
+        skip.add(".cdfn");
+        skip.add(".csv0");
+        
+        for (String ext1 : s ) {
+            if ( skip.contains(ext1) ) continue;
+            DataSourceFactory factory= DataSourceRegistry.getInstance().getSource(ext1);
             if ( factory.isFileResource() ) {
-                //            if ( DataSourceRegistry.getInstance().
                 final String extf = (String) ext1;
-                ff = new FileNameExtensionFilter( "*"+ext1, extf.substring(1) );
+                String desc= DataSourceRegistry.getInstance().describe( factory, extf );
+                if ( desc.length()==0 || desc.startsWith(".") ) {
+                    desc= "*"+ext1;
+                } else {
+                    desc= "*"+ext1+" " +desc;
+                }
+                ff = new FileNameExtensionFilter( desc, extf.substring(1) );
                 chooser.addChoosableFileFilter(ff);
             }
         }

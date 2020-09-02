@@ -65,4 +65,11 @@ public class FitsDataSourceFactory extends AbstractDataSourceFactory {
         }
         return result;
     }
+
+    @Override
+    public String getDescription() {
+        return "NASA Fits files";
+    }
+    
+    
 }

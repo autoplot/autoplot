@@ -221,5 +221,10 @@ public class CdfJavaDataSourceFactory extends AbstractDataSourceFactory implemen
             return false;
         }
     }
+
+    @Override
+    public String getDescription() {
+        return "NASA Common Data Format files";
+    }
     
 }

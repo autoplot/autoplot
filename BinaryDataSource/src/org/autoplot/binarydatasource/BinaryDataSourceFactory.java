@@ -166,5 +166,9 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
         }
     }
 
+    @Override
+    public String getDescription() {
+        return "Binary Tables within files";
+    }
     
 }

@@ -5,6 +5,7 @@ import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import org.autoplot.datasource.AbstractDataSourceFactory;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.datasource.CompletionContext;
 import org.autoplot.datasource.DataSetURI;
@@ -18,7 +19,7 @@ import org.json.JSONObject;
  * Factory for ImageDataSource, which read in images into datasets.
  * @author jbf
  */
-public class ImageDataSourceFactory implements DataSourceFactory {
+public class ImageDataSourceFactory extends AbstractDataSourceFactory implements DataSourceFactory {
 
     @Override
     public DataSource getDataSource(URI uri) throws Exception { 
@@ -98,23 +99,8 @@ public class ImageDataSourceFactory implements DataSourceFactory {
     }
 
     @Override
-    public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
-        return false;
+    public String getDescription() {
+        return "Image Formats";
     }
 
-    @Override
-    public <T> T getCapability(Class<T> clazz) {
-        return null;
-    }
-
-    @Override
-    public boolean supportsDiscovery() {
-        return false;
-    }
-
-    @Override
-    public boolean isFileResource() {
-        return true;
-    }
-    
 }

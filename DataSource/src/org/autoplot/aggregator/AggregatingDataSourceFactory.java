@@ -404,4 +404,9 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         return false;
     }
 
+    @Override
+    public String getDescription() {
+        return "Combination of Files From a Supported Data Source";
+    }
+    
 }

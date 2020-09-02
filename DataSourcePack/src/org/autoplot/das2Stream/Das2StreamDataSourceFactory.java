@@ -111,6 +111,10 @@ public class Das2StreamDataSourceFactory extends AbstractDataSourceFactory imple
         return h.getDataSetNamesAndDescriptions();
         
     }
-    
 
+    @Override
+    public String getDescription() {
+        return "Das2Streams and QStreams";
+    }
+    
 }

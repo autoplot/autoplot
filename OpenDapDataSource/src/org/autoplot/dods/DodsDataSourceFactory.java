@@ -124,4 +124,15 @@ public class DodsDataSourceFactory extends AbstractDataSourceFactory implements 
         return result;
     }
 
+    @Override
+    public boolean isFileResource() {
+        return false;
+    }
+
+    @Override
+    public String getDescription() {
+        return "OpenDAP Servers";
+    }
+    
+    
 }

@@ -128,4 +128,10 @@ public class ExcelSpreadsheetDataSourceFactory extends AbstractDataSourceFactory
         return surl; // TODO
     }
 
+    @Override
+    public String getDescription() {
+        return "Excel Spreadsheets (not .xlsx)";
+    }
+
+    
 }

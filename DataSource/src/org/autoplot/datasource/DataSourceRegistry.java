@@ -829,7 +829,12 @@ public class DataSourceRegistry {
             if ( s!=null ) {
                 return s;
             } else {
-                return ext;
+                String s2= f.getDescription();
+                if ( s2.length()!=0 ) {
+                    return s2;
+                } else {
+                    return ext;
+                }
             }
         }
     }

@@ -246,7 +246,11 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             return super.getCompletions(cc, mon);
         }
     }
-    
+
+    @Override
+    public String getDescription() {
+        return "IDL Savesets";
+    }
     
     
 }

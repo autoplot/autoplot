@@ -72,7 +72,11 @@ public class MatDataSourceFactory extends AbstractDataSourceFactory {
             return super.getCompletions(cc, mon);
         }
     }
-    
+
+    @Override
+    public String getDescription() {
+        return "MATLAB MAT-Files";
+    }
     
     
 }

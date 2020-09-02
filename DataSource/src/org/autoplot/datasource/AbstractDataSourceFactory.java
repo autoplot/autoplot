@@ -41,4 +41,9 @@ public abstract class AbstractDataSourceFactory implements DataSourceFactory {
     public boolean isFileResource() {
         return true;
     }
+    
+    @Override
+    public String getDescription() {
+        return "";
+    }
 }

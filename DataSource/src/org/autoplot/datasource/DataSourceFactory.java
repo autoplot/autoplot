@@ -76,4 +76,12 @@ public interface DataSourceFactory {
      */
     public boolean isFileResource();
     
+    /**
+     * return a short description of the factory, or empty string.  For example,
+     * "NASA Common Data Format (CDF) Files" or "NASA CDAWeb".  This will 
+     * be used to identify files or discovery sources.
+     * @return a short description of the factory.
+     */
+    public String getDescription();
+    
 }

@@ -194,5 +194,10 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
     public boolean isFileResource() {
         return false;
     }
+
+    @Override
+    public String getDescription() {
+        return "NASA/Goddard CDAWeb";
+    }
     
 }

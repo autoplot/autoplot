@@ -387,4 +387,9 @@ public class AsciiTableDataSourceFactory extends AbstractDataSourceFactory imple
 
     }
 
+    @Override
+    public String getDescription() {
+        return "ASCII Tables";
+    }
+
 }
