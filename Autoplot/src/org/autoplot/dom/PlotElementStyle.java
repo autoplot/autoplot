@@ -270,6 +270,8 @@ public class PlotElementStyle extends DomNode {
         if ( !exclude.contains(PROP_SYMBOL_CONNECTOR ) )this.setSymbolConnector( that.getSymbolConnector() );
         if ( !exclude.contains(PROP_REBINMETHOD ) ) this.setRebinMethod(that.getRebinMethod());
         if ( !exclude.contains(PROP_SHOWLIMITS ) ) this.setShowLimits(that.showLimits);
+        if ( !exclude.contains(PROP_DRAWERROR ) ) this.setDrawError(that.isDrawError());
+        if ( !exclude.contains(PROP_ERRORBARTYPE ) ) this.setErrorBarType(that.getErrorBarType());
     }
 
     @Override
@@ -304,7 +306,10 @@ public class PlotElementStyle extends DomNode {
         if ( !b ) result.add( new PropertyChangeDiff( PROP_REFERENCE,  that.reference, this.reference ));
         b= that.showLimits==this.showLimits;
         if ( !b ) result.add( new PropertyChangeDiff( PROP_SHOWLIMITS,  that.showLimits, this.showLimits ));
-
+        b= that.drawError==this.drawError;
+        if ( !b ) result.add( new PropertyChangeDiff( PROP_DRAWERROR,  that.drawError, this.drawError ));
+        b= that.errorBarType.equals(this.errorBarType);
+        if ( !b ) result.add( new PropertyChangeDiff( PROP_ERRORBARTYPE,  that.errorBarType, this.errorBarType ));
         return result;
     }
 
