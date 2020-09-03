@@ -140,6 +140,46 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
     }
  
+    /**
+     * return a list of column names, supporting:<ul>
+     * <li>field1,field3,field5
+     * <li>field1,field3-field5
+     * <li>field1,field3:field5  exclusive
+     * </ul>
+     * @param s
+     * @param fieldCount 
+     * @return 
+     * @see #parseRangeStr(java.lang.String, int) 
+     */
+    public int[] parseColumns( String s, int fieldCount ) {
+        String[] ss= s.split(",");
+        ArrayList<Integer> r= new ArrayList<>();
+        String[] nn= parser.getFieldNames();
+        for ( String sss: ss ) {
+            if ( sss.contains("-") ) {
+                String[] sss4= sss.split("-");
+                if ( sss4.length!=2 ) {
+                    throw new IllegalArgumentException("must be name-name");
+                }
+                int i1= columnIndex( sss4[0], fieldCount );
+                int i2= columnIndex( sss4[1], fieldCount );
+                if ( i2<i1 ) {
+                    throw new IllegalArgumentException("start column must be before end column");
+                }
+                for ( int i=i1; i<=i2; i++ ) {
+                    r.add(i);
+                }
+            } else {
+                r.add( columnIndex( sss, fieldCount ) );
+            }
+        }
+        int[] result= new int[r.size()];
+        for ( int i=0; i<r.size(); i++ ) {
+            result[i]= r.get(i);
+        }
+        return result;
+    }
+    
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws IOException, CancelledOperationException, NoDataInIntervalException {
        
@@ -244,14 +284,10 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
         } else if (column != null) {
             if ( bundleDescriptor!=null ) {
-                String[] columns;
-                if ( !column.contains(",") ) {
-                    columns= new String[] { column };
-                } else {
-                    columns= column.split(",");
-                }
+                int[] columns= parseColumns( column, parser.getFieldCount() );
+
                 QDataSet vdss=null;
-                for ( String c: columns ) {
+                for ( int c: columns ) {
                     try {
                         vdss= Ops.bundle( vdss, ArrayDataSet.copy(DataSetOps.unbundle(ds,c)) );
                     } catch ( IllegalArgumentException ex ) {
@@ -1203,6 +1239,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
      * @param columnCount
      * @return two-element int array of the first and last indeces+1.
      * @throws java.lang.NumberFormatException
+     * @see #parseColumns(java.lang.String) 
      */
     private int[] parseRangeStr(String o, int columnCount) throws NumberFormatException {
         String s = o;
