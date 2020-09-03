@@ -770,16 +770,12 @@ public class DataSourceRegistry {
      * @return
      */
     public static String getDescriptionFor(String vapext) {
-        if ( vapext.startsWith("vap+cdaweb") ) {
-            return "CDAWeb database at NASA/SPDF";
-        } else if ( vapext.startsWith("vap+das2server") ) {
-            return "Das2Server";
-        } else if (vapext.startsWith("vap+dc")){
-            return "Federated das2 catalog";
-        } else if ( vapext.startsWith("vap+inline") ) {
-            return "Data encoded within the URI";
-        } else {
+        DataSourceFactory dsf= instance.getSource(vapext);
+        String d= dsf.getDescription();
+        if ( d.length()==0 ) {
             return null;
+        } else {
+            return dsf.getDescription();
         }
     }
 
