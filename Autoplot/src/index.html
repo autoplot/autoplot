@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Autoplot is used to make sparklines (<img src='https://jfaden.net/AutoplotServlet/SimpleServlet?uri=vap%2Bhapi%3Ahttps%3A%2F%2Fjfaden.net%2FHapiServerDemo%2Fhapi%3Fid%3DpoolTemperature%26parameters%3DTemperature%26timerange%3D2020-08-27&format=image%2Fpng&width=70&height=16&row=0%2C100%25&column=0%2C100%25&timerange=2020-08-27' alt='sparkline'>) for a prototype <a href='https://jfaden.net/HapiServerDemo/hapi'>HAPI server</a>.
+        <p><small>slice2 and slice3 operators now correctly propagate DELTA_PLUS and DELTA_MINUS properties.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,9 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-08-28 r25072):</p>
+        <p>Bugfixes (2020-09-03 r25072):</p>
         <ul>
-            <li>2278: CDF slice1 keyword didn't work when Epoch16 timetags were used.
+            <li>slice2 and slice3 propagate DELTA_PLUS and DELTA_MINUS properties.  Thanks, Mike!
+            <li>2282: ASCII table reader would use enumeration units when the first N records were empty fields, even if numeric data followed.  Thanks, Joe!
+            <li>ASCII column headers can include granny strings for units, like "N_e(cm!a-3!n)"
+            <li>2278: CDF slice1 keyword didn't work when Epoch16 timetags were used.  Thanks, Kristoff!
         </ul>
         <p>Older Bugfixes (2020-07-13 r24952):</p>
         <ul>
@@ -49,6 +52,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>provide GUI to enable and control error bars, used when data contains DELTA_PLUS and DELTA_MINUS.  Thanks, Mike!
+            <li>File chooser has types alphabetized and now shows only file-based data sources.  Thanks, Allison!
+            <li>HAPI data source shows events bar when only timetags are requested, useful for availability.
             <li>suppress the legend when the plot width is less than 100 pixels.
         </ul>
         <p>Less recent features:</p>
