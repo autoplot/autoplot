@@ -154,7 +154,6 @@ public class AsciiTableDataSource extends AbstractDataSource {
     public int[] parseColumns( String s, int fieldCount ) {
         String[] ss= s.split(",");
         ArrayList<Integer> r= new ArrayList<>();
-        String[] nn= parser.getFieldNames();
         for ( String sss: ss ) {
             if ( sss.contains("-") ) {
                 String[] sss4= sss.split("-");
@@ -168,6 +167,16 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 }
                 for ( int i=i1; i<=i2; i++ ) {
                     r.add(i);
+                }
+            } else if ( sss.contains(":") ) {
+                String[] sss4= sss.split(":");
+                int i1= columnIndex( sss4[0], fieldCount );
+                int i2= columnIndex( sss4[1], fieldCount );
+                int st= sss4.length==3 ? Integer.parseInt(sss4[2]) : 1;
+                if ( sss4.length==3 ) {                    
+                    for ( int i=i1; i<i2; i+=st ) {
+                        r.add( i );
+                    }
                 }
             } else {
                 r.add( columnIndex( sss, fieldCount ) );
@@ -921,7 +930,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
         o = params.get("bundle");
         if (o != null) {
-            if ( o.contains(",") ) {
+            if ( o.contains(",") || o.split(":",-2).length==3 ) {
                 column= o;
                 bundle= null;
             } else {
