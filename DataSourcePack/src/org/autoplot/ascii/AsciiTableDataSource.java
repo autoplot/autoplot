@@ -237,40 +237,52 @@ public class AsciiTableDataSource extends AbstractDataSource {
             // this may raise an exception in a future version.
             throw new NoDataInIntervalException("no records found");
         }
-
+        
         String group= getParam( "group", null );
         if ( group!=null ) {
             vds= ArrayDataSet.copy( DataSetOps.unbundle( ds, group ) );
 
         } else if (column != null) {
             if ( bundleDescriptor!=null ) {
-                //vds = ArrayDataSet.copy(DataSetOps.slice1(ds, icol));
-                try {
-                    vds= ArrayDataSet.copy(DataSetOps.unbundle(ds,column));
-                } catch ( IllegalArgumentException ex ) {
-                    int icol = parser.getFieldIndex(column);
-                    if ( icol!=-1 ) {
-                        vds = ArrayDataSet.copy(DataSetOps.slice1(ds, icol));
-                        vds.putProperty( QDataSet.CONTEXT_0, null );
-                        vds.putProperty(QDataSet.UNITS, parser.getUnits(icol));
-                        if ( column.length()>1 ) vds.putProperty( QDataSet.NAME, column );
-                        vds.putProperty( QDataSet.LABEL, parser.getFieldNames()[icol] );
-                    } else {
-                        //BUG2000: bundleDescriptor is supposed to be a AsciiHeadersParser.BundleDescriptor.  Message is poor when wrong column name is used.
-                        //https://sourceforge.net/p/autoplot/bugs/1999/
-                        if ( bundleDescriptor instanceof AsciiHeadersParser.BundleDescriptor ) {
-                        QDataSet _vds= AsciiHeadersParser.getInlineDataSet( bundleDescriptor, column );
-                            if ( _vds==null ) {
-                                throw new IllegalArgumentException("No such dataset: " +column );
-                            } else {
-                                vds= ArrayDataSet.maybeCopy(_vds);
-                            }
+                String[] columns;
+                if ( !column.contains(",") ) {
+                    columns= new String[] { column };
+                } else {
+                    columns= column.split(",");
+                }
+                QDataSet vdss=null;
+                for ( String c: columns ) {
+                    try {
+                        vdss= Ops.bundle( vdss, ArrayDataSet.copy(DataSetOps.unbundle(ds,c)) );
+                    } catch ( IllegalArgumentException ex ) {
+                        int icol = parser.getFieldIndex(column);
+                        if ( icol!=-1 ) {
+                            MutablePropertyDataSet vds1 = ArrayDataSet.copy(DataSetOps.slice1(ds, icol));
+                            vds1.putProperty( QDataSet.CONTEXT_0, null );
+                            vds1.putProperty(QDataSet.UNITS, parser.getUnits(icol));
+                            if ( column.length()>1 ) vds1.putProperty( QDataSet.NAME, column );
+                            vds1.putProperty( QDataSet.LABEL, parser.getFieldNames()[icol] );
                         } else {
-                            throw new IllegalArgumentException("No such dataset: " +column );
+                            //BUG2000: bundleDescriptor is supposed to be a AsciiHeadersParser.BundleDescriptor.  Message is poor when wrong column name is used.
+                            //https://sourceforge.net/p/autoplot/bugs/1999/
+                            if ( bundleDescriptor instanceof AsciiHeadersParser.BundleDescriptor ) {
+                                QDataSet _vds= AsciiHeadersParser.getInlineDataSet( bundleDescriptor, column );
+                                if ( _vds==null ) {
+                                    throw new IllegalArgumentException("No such dataset: " +column );
+                                } else {
+                                    vdss= Ops.bundle( vdss, ArrayDataSet.maybeCopy(_vds) );
+                                }
+                            } else {
+                                throw new IllegalArgumentException("No such dataset: " +column );
+                            }
                         }
                     }
                 }
-
+                if ( columns.length==1 ) {
+                    vds= (ArrayDataSet) Ops.unbundle( vdss, 0 );
+                } else {
+                    vds= Ops.maybeCopy( vdss );
+                }
             } else {
                 int icol = parser.getFieldIndex(column);
                 if (icol == -1) {
@@ -873,8 +885,13 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
         o = params.get("bundle");
         if (o != null) {
-            bundle = parseRangeStr(o, columnCount);
-            column = null;
+            if ( o.contains(",") ) {
+                column= o;
+                bundle= null;
+            } else {
+                bundle = parseRangeStr(o, columnCount);
+                column = null;
+            }
         }
 
         o = params.get("arg_0");
