@@ -117,6 +117,38 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         };
     }
 
+    private static String getColumnsString( int[] cols, Map<Integer,String> columnsMap ) {
+        boolean haveColumnNames = true;
+        int last = cols[cols.length-1];
+        String slast= columnsMap.get(last);
+        if (slast == null) {
+            slast = "" + slast;
+            haveColumnNames = false;
+        }
+        StringBuilder sb= new StringBuilder();
+        int t0= -999;
+        int r0= -999; 
+        for ( int t: cols ) {
+            if ( t-t0>1 ) {
+                if ( t0>-999 ) sb.append(columnsMap.get(t0)).append(',');
+                t0=t;
+                r0=t;
+            } else {
+                if ( r0>-999 ) {
+                    if ( haveColumnNames ) {
+                        sb.append(columnsMap.get(r0)).append('-');
+                    } else {
+                        sb.append(columnsMap.get(r0)).append('-'); //TODO
+                    }
+                    r0=-999;
+                }
+            }
+            t0= t;
+        }
+        if ( t0>-999 ) sb.append( columnsMap.get(t0) );
+        return sb.toString();
+    }
+    
     /**
      * do the actions for the tool based on the current selection.
      * @param tool
@@ -161,33 +193,18 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                 break;
             default:
                 int[] cols = jTable1.getColumnModel().getSelectedColumns();
-                int first = cols[0];
-                int last = cols[cols.length - 1];
-                String sfirst = columns.get(first);
-                if (sfirst == null) {
-                    sfirst = "" + first;
-                }   boolean haveColumnNames = true;
-                String slast = columns.get(last);
-                if (slast == null) {
-                    slast = "" + last;
-                    haveColumnNames = false;
-                }   
+                String scols= getColumnsString( cols, columns );
 
                 if (tool==Tool.DEPEND_0 ) {
+                    
                 } else if ( tool==Tool.COLUMN ) {
-                    if (haveColumnNames) {
-                        setColumn(sfirst + "-" + slast);
-                    } else {
-                        setColumn("" + first + ":" + (last + 1));
-                    }
+                    setColumn(scols);
                 } else if ( tool==Tool.DEPEND_1 ) {
-                    if (haveColumnNames) {
-                        dep1Values.setSelectedItem(sfirst + "-" + slast);
-                    } else {
-                        dep1Values.setSelectedItem("" + first + ":" + (last + 1));
-                    }                    
+                    dep1Values.setSelectedItem(scols);
                 } else if ( tool==Tool.TIMEFORMAT ) {
                     int row= jTable1.getSelectedRow();
+                    int first = cols[0];
+                    int last = cols[cols.length - 1];
                     StringBuilder val= new StringBuilder( timeFormatCB.getSelectedItem().toString() ); // don't clubber existing work
                     val.append( jTable1.getModel().getValueAt(row, first) );
                     for ( int icol= first+1; icol<=last; icol++ ) {
@@ -198,6 +215,8 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                     setDep0(columns.get(first));
                     
                 } else if ( tool==Tool.GUESSTIMEFORMAT ) {
+                    int first = cols[0];
+                    int last = cols[cols.length - 1];
                     int row= jTable1.getSelectedRow();
                     StringBuilder val= new StringBuilder(); // existing work is clubbered
                     val.append( jTable1.getModel().getValueAt(row, first) );
