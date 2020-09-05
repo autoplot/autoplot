@@ -71,6 +71,7 @@ import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.autoplot.datasource.jython.JythonDataSourceFactory;
 import org.das2.qds.ops.Ops;
+import org.das2.util.TimingConsoleFormatter;
 
 /**
  * SimpleServlet produces PNG,PDF, and SVG products for
@@ -167,6 +168,7 @@ public class SimpleServlet extends HttpServlet {
 
         File cacheFile= null;
         File metaCacheFile= null;
+        File logFile= null; // logging information from when file was created.
         
         FileInputStream fin= null;
         
@@ -181,6 +183,7 @@ public class SimpleServlet extends HttpServlet {
                     hash= String.format( "%04d", Math.abs( hash.hashCode() % 10000 ) );
                     cacheFile= new File( s, hash + ".png" );
                     metaCacheFile= new File( s, hash + ".txt" );
+                    logFile= new File( s, hash+".log" );
 
                     if ( cacheFile.exists() ) {
                         byte[] bb= Files.readAllBytes(metaCacheFile.toPath());
@@ -211,6 +214,12 @@ public class SimpleServlet extends HttpServlet {
             fin.close();
             return;
         }
+        
+        Handler h= new FileHandler(String.valueOf(logFile));
+        h.setFormatter( new TimingConsoleFormatter() );
+        logger.addHandler(h);
+        logger.setLevel( Level.ALL );
+        h.setLevel( Level.ALL );
         
         //logger.setLevel(Level.FINE);
         
@@ -825,6 +834,9 @@ public class SimpleServlet extends HttpServlet {
                             byte[] metaBytes= qs.getBytes();
                             assert metaCacheFile!=null;
                             Files.write( metaCacheFile.toPath(), metaBytes );
+                            logger.removeHandler(h);
+                            h.flush();
+                            h.close();
                         }
                     }
                 }
