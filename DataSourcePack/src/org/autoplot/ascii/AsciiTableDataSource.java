@@ -298,7 +298,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 QDataSet vdss=null;
                 for ( int c: columns ) {
                     try {
-                        vdss= Ops.bundle( vdss, ArrayDataSet.copy(DataSetOps.unbundle(ds,c)) );
+                        if ( c==-1 ) {
+                            vdss= Ops.bundle( vdss, ArrayDataSet.copy( Ops.unbundle( ds, column ) ) );
+                        } else {
+                            vdss= Ops.bundle( vdss, ArrayDataSet.copy(DataSetOps.unbundle(ds,c)) );
+                        }
                     } catch ( IllegalArgumentException ex ) {
                         int icol = parser.getFieldIndex(column);
                         if ( icol!=-1 ) {
