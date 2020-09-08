@@ -688,6 +688,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         if ( spattern!=null )  {
             AsciiParser.RegexParser p = new AsciiParser.RegexParser(parser,spattern);
             parser.setRecordParser( p );
+            parser.setCommentPrefix(null);
             columnCount= p.fieldCount();
             delim= " "; // this is because timeformats needs a delimiter
             

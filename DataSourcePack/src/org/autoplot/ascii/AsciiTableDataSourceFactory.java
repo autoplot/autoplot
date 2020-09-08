@@ -75,6 +75,8 @@ public class AsciiTableDataSourceFactory extends AbstractDataSourceFactory imple
                     "comment line prefix, default is hash (#)"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "headerDelim=",
                     "string indicating the end of the header (a regular expression)"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "format=",
+                    "C style format specifier."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "pattern=",
                     "regular expression for each record, and data from matching groups are plotted."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "validMin=",
@@ -190,6 +192,11 @@ public class AsciiTableDataSourceFactory extends AbstractDataSourceFactory imple
                     List<CompletionContext> result = new ArrayList<>();
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "$Y+$j+$H+$M","times can span multiple fields"));
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "ISO8601", "parse ISO8601 times in one field."));
+                    return result;
+                }
+                case "format": {
+                    List<CompletionContext> result = new ArrayList<>();
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "%5d%5d%9f%s","int,int,double,string"));
                     return result;
                 }
                 case "fill":
