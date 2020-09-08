@@ -91,7 +91,6 @@ import org.python.core.PyException;
 import org.autoplot.AppManager;
 import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUI;
-import static org.autoplot.AutoplotUI.getProcessId;
 import org.autoplot.AutoplotUtil;
 import org.autoplot.ScriptContext;
 import org.autoplot.dom.Application;
@@ -109,7 +108,7 @@ import org.w3c.dom.ls.LSSerializer;
  * This is the original das2 Exception handler dialog, but modified to
  * support submitting an error report to a server.
  *
- * The server is hard-coded to be http://www.papco.org:8080/RTEReceiver/LargeUpload.jsp,
+ * The server is hard-coded to be https://jfaden.net/RTEReceiver/LargeUpload.jsp,
  * TODO: add runtime property to set this.  This client will submit a file containing the
  * report to the server.  The filename is a client-side calculated hash of the stack trace
  * and timestamp.  The server is expecting a multi-part post, containing:
@@ -926,7 +925,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
         String report= formatReport( t, bis, recs, map, uncaught, "USER COMMENTS" );
 
-        String url = "http://papco.org/RTEReceiver/LargeUpload.jsp";
+        String url = "https://jfaden.net/RTEReceiver/LargeUpload.jsp";
 
         GuiExceptionHandlerSubmitForm form= new GuiExceptionHandlerSubmitForm();
         form.setGuiExceptionHandler( this );
