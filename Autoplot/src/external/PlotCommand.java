@@ -497,6 +497,7 @@ public class PlotCommand extends PyObject {
                         plot.getController().getDasPlot().removeRenderer(oldRenderer);
                         plot.getController().getDasPlot().addRenderer(r);
                         r.setDataSet(ds);
+                        r.setColorBar((DasColorBar) plot.getZaxis().getController().getDasAxis());
                         element.getController().setRenderer(r);
                         element.setRenderType(RenderType.internal);
                         r.setControl(control);
