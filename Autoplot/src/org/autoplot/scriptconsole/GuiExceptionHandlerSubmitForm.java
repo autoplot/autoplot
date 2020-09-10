@@ -81,7 +81,7 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
         jLabel5 = new javax.swing.JLabel();
         screenshotCB = new javax.swing.JCheckBox();
 
-        jLabel1.setText("<html>Press \"Submit\" to submit stack traces, application state, and undo information to the server.  Optionally, add comments briefly describing actions preceding the event.  Your usename is automatically detected, and provide an email address if you'd like to be contacted.</html> ");
+        jLabel1.setText("<html>Press \"Submit\" to submit stack traces, application state, and undo information to the Autoplot developers.  Optionally, add comments briefly describing actions preceding the event.  Your usename is automatically detected, and provide an email address if you'd like to be contacted.</html> ");
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         jLabel2.setText("Preview of data that will be submitted:");
