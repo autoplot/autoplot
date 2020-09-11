@@ -103,6 +103,7 @@ public class UriDropTargetListener implements DropTargetListener {
                 try {
                     df = new DataFlavor("application/x-java-url;class=java.net.URL");
                     if ( dtde.isDataFlavorSupported( df ) ) {
+                        logger.fine("data flavor application/x-java-url supported");
                         if ( !haveAcceptedDrop ) {
                             dtde.acceptDrop(DnDConstants.ACTION_COPY);
                             haveAcceptedDrop= true;
