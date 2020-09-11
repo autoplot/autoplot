@@ -74,6 +74,24 @@ public class UriDropTargetListener implements DropTargetListener {
                     item = new Bookmark.Item(data);
                 }
             }
+            if ( item==null ) {
+                try {
+                    logger.fine("data flavor not supported, try text/uri-list");
+                    DataFlavor nixFileDataFlavor = new DataFlavor("text/uri-list;class=java.lang.String");
+                    if ( dtde.isDataFlavorSupported(nixFileDataFlavor) ) {
+                        if ( !haveAcceptedDrop ) {
+                            dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                            haveAcceptedDrop= true;
+                        }
+                        String data = (String)dtde.getTransferable().getTransferData(nixFileDataFlavor);
+                        if ( data!=null ) {
+                            item= new Bookmark.Item( data );
+                        }
+                    }
+                } catch ( Exception ex) {
+                    logger.log(Level.FINE, "unable to get text/uri-list: {0}", ex.getMessage());
+                }
+            }
             if ( item==null ) { // how to do the drop on a Mac???     
 
                 DataFlavor df;
@@ -93,24 +111,6 @@ public class UriDropTargetListener implements DropTargetListener {
                     }
                 } catch ( Exception ex ) {
                     logger.log(Level.FINE, "unable to get application/x-java-url: {0}", ex.getMessage());
-                }
-            }
-            if ( item==null ) {
-                try {
-                    logger.fine("data flavor not supported, try text/uri-list");
-                    DataFlavor nixFileDataFlavor = new DataFlavor("text/uri-list;class=java.lang.String");
-                    if ( dtde.isDataFlavorSupported(nixFileDataFlavor) ) {
-                        if ( !haveAcceptedDrop ) {
-                            dtde.acceptDrop(DnDConstants.ACTION_COPY);
-                            haveAcceptedDrop= true;
-                        }
-                        String data = (String)dtde.getTransferable().getTransferData(nixFileDataFlavor);
-                        if ( data!=null ) {
-                            item= new Bookmark.Item( data );
-                        }
-                    }
-                } catch ( Exception ex) {
-                    logger.log(Level.FINE, "unable to get text/uri-list: {0}", ex.getMessage());
                 }
             }
             if ( item==null ) {
