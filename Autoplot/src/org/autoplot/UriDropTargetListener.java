@@ -68,10 +68,12 @@ public class UriDropTargetListener implements DropTargetListener {
         }
     }
     /**
-     * I was hoping we could peek to see if it really was a URI...
-     * TODO: rewrite this.
-     * @param dtde
-     * @return
+     * get the URI when a reference is dropped on to Autoplot.  This is quite
+     * platform-specific, how the drop appears, and a number of different 
+     * transfer types are queried to see if a URI can be found.
+     * 
+     * @param dtde the drop target.
+     * @return the URI or null.
      */
     private String getURI( DropTargetDropEvent dtde ) {
         try {
@@ -113,25 +115,32 @@ public class UriDropTargetListener implements DropTargetListener {
                             data= data.substring(16); // mac at least does this...
                         }
                         item= new Bookmark.Item( data );
-                    } else {
-                        logger.fine("data flavor not supported, try text/uri-list");
-                        DataFlavor nixFileDataFlavor = new DataFlavor("text/uri-list;class=java.lang.String");
-                        if ( dtde.isDataFlavorSupported(nixFileDataFlavor) ) {
-                            if ( !haveAcceptedDrop ) {
-                               dtde.acceptDrop(DnDConstants.ACTION_COPY);
-                                haveAcceptedDrop= true;
-                            }
-                            String data = (String)dtde.getTransferable().getTransferData(nixFileDataFlavor);
-                            if ( data!=null ) {
-                                item= new Bookmark.Item( data );
-                            }
+                    }
+                } catch ( Exception ex ) {
+                    logger.log(Level.FINE, "unable to get application/x-java-url: {0}", ex.getMessage());
+                }
+            }
+            if ( item==null ) {
+                try {
+                    logger.fine("data flavor not supported, try text/uri-list");
+                    DataFlavor nixFileDataFlavor = new DataFlavor("text/uri-list;class=java.lang.String");
+                    if ( dtde.isDataFlavorSupported(nixFileDataFlavor) ) {
+                        if ( !haveAcceptedDrop ) {
+                            dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                            haveAcceptedDrop= true;
+                        }
+                        String data = (String)dtde.getTransferable().getTransferData(nixFileDataFlavor);
+                        if ( data!=null ) {
+                            item= new Bookmark.Item( data );
                         }
                     }
-                } catch (ClassNotFoundException ex) {
-                    logger.log(Level.FINE, "class not found for flavor, wrong platform");
+                } catch ( Exception ex) {
+                    logger.log(Level.FINE, "unable to get text/uri-list: {0}", ex.getMessage());
                 }
+            }
+            if ( item==null ) {
                 try {
-                    df = new DataFlavor("application/x-java-file-list;class=java.util.List");
+                    DataFlavor df = new DataFlavor("application/x-java-file-list;class=java.util.List");
                     if ( dtde.isDataFlavorSupported( df ) ) {
                         if ( !haveAcceptedDrop ) {
                             dtde.acceptDrop(DnDConstants.ACTION_COPY);
@@ -145,9 +154,9 @@ public class UriDropTargetListener implements DropTargetListener {
                             }
                             item= new Bookmark.Item( data );
                         }
-                    } 
-                } catch (ClassNotFoundException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                    }
+                } catch (Exception ex) {
+                    logger.log(Level.FINE, "unable to get application/x-java-file-list: {0}", ex.getMessage());
                 }
             }
             
