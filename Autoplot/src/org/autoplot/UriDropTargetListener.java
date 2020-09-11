@@ -98,7 +98,7 @@ public class UriDropTargetListener implements DropTargetListener {
                 }
             }
             if ( item==null ) { // how to do the drop on a Mac???     
-                dtde.getCurrentDataFlavorsAsList();
+
                 DataFlavor df;
                 try {
                     df = new DataFlavor("application/x-java-url;class=java.net.URL");
@@ -113,6 +113,7 @@ public class UriDropTargetListener implements DropTargetListener {
                         }
                         item= new Bookmark.Item( data );
                     } else {
+                        logger.fine("data flavor not supported, try text/uri-list");
                         DataFlavor nixFileDataFlavor = new DataFlavor("text/uri-list;class=java.lang.String");
                         if ( dtde.isDataFlavorSupported(nixFileDataFlavor) ) {
                             if ( !haveAcceptedDrop ) {
