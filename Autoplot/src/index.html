@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>slice2 and slice3 operators now correctly propagate DELTA_PLUS and DELTA_MINUS properties.
+        <p><small>Spectrogram and local waveform renderer used to explore data.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-09-04 r25098):</p>
+        <p>Bugfixes (2020-09-10 r25106):</p>
         <ul>
+            <li>Use new receiver for RTE reports.
             <li>slice2 and slice3 propagate DELTA_PLUS and DELTA_MINUS properties.  Thanks, Mike!
             <li>2282: ASCII table reader would use enumeration units when the first N records were empty fields, even if numeric data followed.  Thanks, Joe!
             <li>ASCII column headers can include granny strings for units, like "N_e(cm!a-3!n)"
@@ -52,6 +53,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Jython-defined renderers can use colorbar.
+            <li>add completions for pattern and format for ASCII data source.
             <li>728: Allow multiple, non-adjacent columns of ASCII table to be plotted.  Thanks, In Sook!
             <li>725: Create PNGWalk has checkbox will remove images where no data is visible.  Thanks, In Sook!
             <li>provide GUI to enable and control error bars, used when data contains DELTA_PLUS and DELTA_MINUS.  Thanks, Mike!
