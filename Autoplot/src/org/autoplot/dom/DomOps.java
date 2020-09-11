@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.dom;
 
@@ -44,11 +40,20 @@ public class DomOps {
      */
     public static void swapPosition( Plot a, Plot b ) {
         if ( a==b ) return;
+        
+        if ( a.controller!=null ) {
+            a.controller.dom.options.setAutolayout( false );
+        }
+        
         String trowid= a.getRowId();
         String tcolumnid= a.getColumnId();
         boolean txtv= a.getXaxis().isDrawTickLabels();
         boolean tytv= a.getYaxis().isDrawTickLabels();
 
+        String ticksUriA= a.getTicksURI();
+        String ticksUriB= b.getTicksURI();
+        a.setTicksURI( ticksUriB );
+        b.setTicksURI( ticksUriA );        
         a.setRowId(b.getRowId());
         a.setColumnId(b.getColumnId());
         a.getXaxis().setDrawTickLabels(b.getXaxis().isDrawTickLabels());
@@ -58,6 +63,10 @@ public class DomOps {
         b.getXaxis().setDrawTickLabels(txtv);
         b.getYaxis().setDrawTickLabels(tytv);
 
+        if ( a.controller!=null ) {
+            a.controller.dom.controller.waitUntilIdle();
+            a.controller.dom.options.setAutolayout( true );
+        }
     }
 
     /**
