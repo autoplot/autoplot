@@ -40,8 +40,15 @@ public class UriDropTargetListener implements DropTargetListener {
     public UriDropTargetListener(DataSetSelector dss, ApplicationModel model) {
         this.model = model;
         this.dss = dss;
+        try {
+            nixFileDataFlavor = new DataFlavor("text/uri-list;class=java.lang.String");
+        } catch (ClassNotFoundException ex) {
+            logger.log( Level.WARNING, ex.getMessage(), ex );
+        }
     }
 
+    private DataFlavor nixFileDataFlavor;
+    
     /**
      * get the URI when a reference is dropped on to Autoplot.  This is quite
      * platform-specific, how the drop appears, and a number of different 
@@ -77,7 +84,6 @@ public class UriDropTargetListener implements DropTargetListener {
             if ( item==null ) {
                 try {
                     logger.fine("data flavor not supported, try text/uri-list");
-                    DataFlavor nixFileDataFlavor = new DataFlavor("text/uri-list;class=java.lang.String");
                     if ( dtde.isDataFlavorSupported(nixFileDataFlavor) ) {
                         if ( !haveAcceptedDrop ) {
                             dtde.acceptDrop(DnDConstants.ACTION_COPY);
@@ -172,6 +178,8 @@ public class UriDropTargetListener implements DropTargetListener {
         }
         if ( cc instanceof DasPlot ) {
             if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                dtde.acceptDrag(DnDConstants.ACTION_COPY);
+            } else if ( dtde.isDataFlavorSupported(nixFileDataFlavor)) {
                 dtde.acceptDrag(DnDConstants.ACTION_COPY);
             }
         }
