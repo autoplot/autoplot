@@ -1,10 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot;
 
-import org.autoplot.ApplicationModel;
 import java.awt.Component;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -46,27 +42,6 @@ public class UriDropTargetListener implements DropTargetListener {
         this.dss = dss;
     }
 
-    private String getURILinux( DropTargetDropEvent dtde )  {
-        try {
-            DataFlavor nixFileDataFlavor = new DataFlavor("text/uri-list;class=java.lang.String");
-            if ( dtde.isDataFlavorSupported(nixFileDataFlavor) ) {
-                // assume that we have already accepted the drop. dtde.acceptDrop(DnDConstants.ACTION_NONE);
-                String data = (String)dtde.getTransferable().getTransferData(nixFileDataFlavor);
-                return data;
-            } else {
-                return null;
-            }
-        } catch (UnsupportedFlavorException ex ) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            return null;
-        } catch (ClassNotFoundException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            return null;
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            return null;
-        }
-    }
     /**
      * get the URI when a reference is dropped on to Autoplot.  This is quite
      * platform-specific, how the drop appears, and a number of different 
@@ -177,19 +152,15 @@ public class UriDropTargetListener implements DropTargetListener {
         } catch (UnsupportedFlavorException ex) {
             logger.log( Level.SEVERE, ex.getMessage(), ex );
 
-        } catch (IOException ex) {
+        } catch (IOException | SAXException | BookmarksException ex) {
             logger.log( Level.SEVERE, null, ex );
 
-        } catch (SAXException ex) {
-            logger.log( Level.SEVERE, null, ex );
-
-        } catch (BookmarksException ex) {
-            logger.log( Level.SEVERE, null, ex );
         }
         return null;
 
     }
 
+    @Override
     public void dragEnter(DropTargetDragEvent dtde) {
 
         Object s= dtde.getSource();
@@ -207,23 +178,24 @@ public class UriDropTargetListener implements DropTargetListener {
 
     }
 
+    @Override
     public void dragOver(DropTargetDragEvent dtde) {
     }
 
+    @Override
     public void dropActionChanged(DropTargetDragEvent dtde) {
     }
 
+    @Override
     public void dragExit(DropTargetEvent dte) {
     }
 
+    @Override
     public void drop(DropTargetDropEvent dtde) {
         
         String uri= getURI( dtde );
 
-        if (uri == null) {
-            return;
-            
-        } else {
+        if (uri != null) {
 
             DasCanvasComponent cc=null;
 
@@ -264,11 +236,10 @@ public class UriDropTargetListener implements DropTargetListener {
                     dss.maybePlot(true);
                 }
                 
-                return;
             } else {
 
                 final List<PlotElement> pe = model.dom.getController().getPlotElementsFor(plot);
-                if (pe.size() == 0) {
+                if (pe.isEmpty()) {
                     model.showMessage("no plot elements here", "no plot elements", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
