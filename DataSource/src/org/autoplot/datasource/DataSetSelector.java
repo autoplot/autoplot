@@ -2444,6 +2444,33 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     }
     
     /**
+     * return true if all the time ranges are for a similar time, where they
+     * differ by no more than 10%.
+     * @param timeRanges
+     * @return 
+     */
+    private static boolean allSimilarTimes( List<DatumRange> timeRanges ) {
+        if ( timeRanges.size()<2 ) return true;
+        DatumRange dr1= timeRanges.get(0);
+        if ( !UnitsUtil.isIntervalOrRatioMeasurement( dr1.getUnits()) ) throw new IllegalArgumentException("data must be numeric or location");
+        if ( dr1.width().value()==0 ) return false; 
+        boolean result= true;
+        for ( int i=1; result && i<timeRanges.size(); i++ ) {
+            DatumRange dr2= timeRanges.get(i);
+            double d1= DatumRangeUtil.normalize( dr1, dr2.min() );
+            if ( !( d1>-0.05 && d1<0.05 ) ) {
+                result= false;
+            } else {
+                double d2= DatumRangeUtil.normalize( dr1, dr2.max() );
+                if ( !( d2>0.95 || d2<1.05 ) ) {
+                    result= false;
+                }
+            }
+        }
+        return result;
+    }
+    
+    /**
      * Allow the user to pick one of a set of times, when it is ambiguous what they want.
      * @param parent null or the component to focus.
      * @param timeRange list of time ranges, which may also contain null.
@@ -2460,6 +2487,11 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
             }
         }
         if ( timeRange.size()==1 ) return timeRange.get(0);
+        
+        if ( allSimilarTimes(timeRange) ) {
+            return timeRange.get(timeRange.size()-1);
+        }
+        
         JPanel p= new JPanel();
         p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
         p.add( new JLabel("<html>The URI contains a time different than the current<br>application time range.  Which should be used?</html>") );
