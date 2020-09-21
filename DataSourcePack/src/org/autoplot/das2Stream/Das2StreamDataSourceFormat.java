@@ -45,6 +45,8 @@ import org.das2.qds.QDataSet;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.DataSourceFormat;
 import org.das2.qstream.QdsToD2sStream;
+import org.das2.qstream.QdsToDas22;
+import org.das2.qstream.QdsToDas23;
 import org.das2.qstream.StreamException;
 
 /** Format the data into das2 streams.
@@ -168,29 +170,44 @@ public class Das2StreamDataSourceFormat implements DataSourceFormat {
 
 		try(FileOutputStream fo = new FileOutputStream(new File(split.resourceUri))) {
 			QdsToD2sStream writer;
-			if(binary){
-				writer = new QdsToD2sStream(sVersion);
-			}
-			else{
-				writer = new QdsToD2sStream(sVersion, nSigDigit, nFracSec);
+			switch(sVersion){
+			case QdsToD2sStream.FORMAT_2_2:
+				if(binary) writer = new QdsToDas22();
+				else writer = new QdsToDas22(nSigDigit, nFracSec);
+				break;
+			case QdsToD2sStream.FORMAT_2_3_BASIC:
+				if(binary) writer = new QdsToDas23();
+				else writer = new QdsToDas23(nSigDigit, nFracSec);
+				break;
+			default:
+				throw new StreamException(String.format("Unknown stream format %s", sVersion));
 			}
 
 			if(!writer.write(data, fo)){
-				throw new StreamException("Dataset is rank 3 or otherwise incompatible "
-					+ "with the das2 stream format");
+				if(sVersion.equals(QdsToD2sStream.FORMAT_2_2))
+					throw new StreamException(
+					"This dataset looks to be rank 3 or otherwise incompatible with "+
+					"the original das2 stream fromat.  Hint: Try using das2.3/basic "+
+					"instead.");
+				else
+					throw new StreamException(
+					"This dataset looks to incompatable with any das2 stream format."
+					);
 			}
 		}
 	}
 
 	@Override
 	public boolean canFormat(QDataSet ds){
-		QdsToD2sStream writer = new QdsToD2sStream(QdsToD2sStream.FORMAT_2_2);
+		/* Wether I can write this or not depends on the stream version.  Assume
+		the most capable implemented version since we don't know what was picked */
+		QdsToD2sStream writer = new QdsToDas23();
 		return writer.canWrite(ds); 
 	}
 
 	@Override
 	public String getDescription(){
-		return "Das2 Stream data transfer format";
+		return "das2 stream";
 	}
 
 }

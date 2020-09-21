@@ -54,11 +54,11 @@ public class Das2StreamDataSourceFormatEditorPanel extends javax.swing.JPanel
 	
 	static final int BASIC_2_2 = 0;
 	static final int BASIC_2_3 = 1;
-	static final int GENERAL_2_3 = 2;
+	static final int GENERAL_2_4 = 2;
 	
 	static final String[] lVersions = {
 		QdsToD2sStream.FORMAT_2_2, QdsToD2sStream.FORMAT_2_3_BASIC,
-		QdsToD2sStream.FORMAT_2_3_GENERAL,
+		QdsToD2sStream.FORMAT_2_4_GENERAL,
 	};
 	
 	static final String[] lVerInfo = {
@@ -331,7 +331,7 @@ public class Das2StreamDataSourceFormatEditorPanel extends javax.swing.JPanel
 		
 		switch(sVersion){
 			case QdsToD2sStream.FORMAT_2_3_BASIC:   iStreamVer = BASIC_2_3; break;
-			case QdsToD2sStream.FORMAT_2_3_GENERAL: iStreamVer = GENERAL_2_3; break;
+			case QdsToD2sStream.FORMAT_2_4_GENERAL: iStreamVer = GENERAL_2_4; break;
 			default:                                iStreamVer = BASIC_2_2; break;
 		}
 		comboVersion.setSelectedIndex(iStreamVer);
