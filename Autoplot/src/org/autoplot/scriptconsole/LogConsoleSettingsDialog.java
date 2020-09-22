@@ -10,7 +10,6 @@ import ZoeloeSoft.projects.JFontChooser.JFontChooser;
 import java.awt.Color;
 import java.awt.Component;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
@@ -230,12 +229,27 @@ public final class LogConsoleSettingsDialog extends javax.swing.JDialog {
         public Component getTableCellRendererComponent(JTable table, Object lvalue, boolean isSelected, boolean hasFocus, int row, int column) {
             Logger logger = (Logger) lvalue;
             long time;
+            Component c;
             if ( logger instanceof org.das2.util.LoggerManager.TimeTaggingLogger ) {
                 time= ((org.das2.util.LoggerManager.TimeTaggingLogger)logger).getLastTime();
-                return new JLabel(String.valueOf( System.currentTimeMillis()-time ) );
+                c= new JLabel(String.valueOf( System.currentTimeMillis()-time ) );
             } else {
-                return new JLabel("???");
+                c= new JLabel("???");
             }
+            if ( row % 2 == 0 ) {
+                if ( isSelected ) {
+                    c.setBackground( table.getSelectionBackground() );
+                } else {
+                    c.setBackground( table.getBackground() );
+                }                
+            } else {
+                if ( isSelected ) {
+                    c.setBackground( slightlyDarker(table.getSelectionBackground()) );
+                } else {
+                    c.setBackground( slightlyDarker(table.getBackground()) );
+                }
+            }
+            return c;
         }
 
     }
@@ -439,7 +453,7 @@ public final class LogConsoleSettingsDialog extends javax.swing.JDialog {
         int irow = 0;
         for (String slogger : sloggers) {
             m.setValueAt(slogger, irow, 0);
-            Logger logger = Logger.getLogger(slogger);
+            Logger logger = LoggerManager.getLogger(slogger);
             m.setValueAt(logger, irow, 1);
             if ( org.das2.util.LoggerManager.isUseTimeTaggingLoggers() ) {
                 m.setValueAt(logger, irow, 2);
