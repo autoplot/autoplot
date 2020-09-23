@@ -13,14 +13,15 @@ import org.das2.datum.Units;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
+import org.das2.qds.ops.Ops;
 import org.das2.qstream.AsciiTimeTransferType;
 import org.das2.qstream.TransferType;
 
 /**
- * Format to doubles.
+ * Format to binary types.  Note that TransferTypes use doubles to communicate,
+ * so floating point numbers may not format precisely.
  * @author jbf
  */
 public class BinaryDataFormatter implements DataFormatter {
@@ -28,6 +29,7 @@ public class BinaryDataFormatter implements DataFormatter {
     private static final Logger logger= Logger.getLogger("hapi");    
     
     TransferType[] transferTypes;
+    double[] fill;
     ByteBuffer b;
     int bufferSize;
     
@@ -38,6 +40,8 @@ public class BinaryDataFormatter implements DataFormatter {
     public void initialize( JSONObject info, OutputStream out, QDataSet record) {
         try {
             transferTypes= new TransferType[record.length()];
+            fill= new double[record.length()];
+            
             bufferSize= 0;
             
             int totalFields= 0;
@@ -46,6 +50,7 @@ public class BinaryDataFormatter implements DataFormatter {
                 JSONObject parameter= parameters.getJSONObject(i);
                 TransferType tt;
                 final String stype = parameter.getString("type");
+                double fl=-1;
                 Units u= SemanticOps.getUnits(record.slice(i));
                 if ( stype.equals("isotime") ) {
                     if ( !parameter.has("length") ) throw new RuntimeException("required tag length is missing");
@@ -115,6 +120,7 @@ public class BinaryDataFormatter implements DataFormatter {
                     };
                 } else if ( stype.equals("double") || stype.equals("integer")) {
                     tt= TransferType.getForName(stype, Collections.singletonMap(QDataSet.UNITS,(Object)u) );
+                    fl= Double.parseDouble( parameter.getString("fill") );
                 } else {
                     throw new IllegalArgumentException("server is misconfigured, using unsupported type: "+stype );
                 }
@@ -131,6 +137,7 @@ public class BinaryDataFormatter implements DataFormatter {
                 }
                 for ( int j=0; j<nfields; j++ ) {
                     transferTypes[totalFields+j]= tt;
+                    fill[totalFields+j]= fl;
                 }
                 totalFields+= nfields;
                 bufferSize+= nfields * tt.sizeBytes();
@@ -148,7 +155,11 @@ public class BinaryDataFormatter implements DataFormatter {
 
         for ( int i=0; i<record.length(); i++ ) {
             QDataSet d= record.slice(i);
-            transferTypes[i].write( d.value(), b );
+            if ( i>0 && Ops.valid(d).value()==0 ) {
+                transferTypes[i].write( fill[i], b );
+            } else {
+                transferTypes[i].write( d.value(), b );
+            }
         }
         byte[] bytes= b.array();
         

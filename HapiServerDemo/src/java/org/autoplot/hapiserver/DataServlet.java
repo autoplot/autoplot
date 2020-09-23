@@ -176,7 +176,7 @@ public class DataServlet extends HttpServlet {
         
         // Look to see if we can cover the time range using cached files.  These files
         // must: be csv, contain all data, cover all data within $Y$m$d
-        boolean allowCache= dataFormatter instanceof CsvDataFormatter;
+        boolean allowCache= false; //dataFormatter instanceof CsvDataFormatter;
         if ( allowCache ) {
             File dataFileHome= new File( Util.getHapiHome(), "cache" );
             dataFileHome= new File( dataFileHome, id );
