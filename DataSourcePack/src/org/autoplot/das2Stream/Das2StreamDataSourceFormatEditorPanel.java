@@ -62,10 +62,10 @@ public class Das2StreamDataSourceFormatEditorPanel extends javax.swing.JPanel
 	};
 	
 	static final String[] lVerInfo = {
-		"<html>Version <b>"+QdsToD2sStream.FORMAT_2_2+"</b>:  The current standard format "+
+		"<html>Version <b>"+QdsToD2sStream.FORMAT_2_2+"</b>:  The format "+
 		"understood by most das2 clients and utility programs <i>(recommended)</i></html>",
 		
-		"<html>Version <b>"+QdsToD2sStream.FORMAT_2_3_BASIC+"</b>:  A prototype format with more "+
+		"<html>Version <b>"+QdsToD2sStream.FORMAT_2_3_BASIC+"</b>:  A new format with more "+
 		"exact syntax for waveforms and offset spectragrams <i>(prototype)</i></html>" 
 	};
 		//Add this in later if it ever get's implemented
@@ -123,13 +123,18 @@ public class Das2StreamDataSourceFormatEditorPanel extends javax.swing.JPanel
       gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
       add(lblVersion, gridBagConstraints);
 
-      comboVersion.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "2.2", "2.3-basic" }));
+      comboVersion.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "2.2", "2.3/basic" }));
       comboVersion.setMaximumSize(new java.awt.Dimension(200, 200));
       comboVersion.setMinimumSize(new java.awt.Dimension(84, 25));
       comboVersion.setNextFocusableComponent(btnText);
       comboVersion.addItemListener(new java.awt.event.ItemListener() {
          public void itemStateChanged(java.awt.event.ItemEvent evt) {
             comboVersionItemStateChanged(evt);
+         }
+      });
+      comboVersion.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            comboVersionActionPerformed(evt);
          }
       });
       gridBagConstraints = new java.awt.GridBagConstraints();
@@ -320,6 +325,10 @@ public class Das2StreamDataSourceFormatEditorPanel extends javax.swing.JPanel
       // So why can't we get the value from the event?
 		nFracSec = ((Number)spinFracSec.getValue()).intValue();
    }//GEN-LAST:event_spinFracSecStateChanged
+
+   private void comboVersionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboVersionActionPerformed
+      // TODO add your handling code here:
+   }//GEN-LAST:event_comboVersionActionPerformed
 
 	@Override
 	public JPanel getPanel(){ return this; }
