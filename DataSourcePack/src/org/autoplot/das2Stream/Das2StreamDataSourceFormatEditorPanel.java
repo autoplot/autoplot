@@ -66,7 +66,7 @@ public class Das2StreamDataSourceFormatEditorPanel extends javax.swing.JPanel
 		"understood by most das2 clients and utility programs <i>(recommended)</i></html>",
 		
 		"<html>Version <b>"+QdsToD2sStream.FORMAT_2_3_BASIC+"</b>:  A new format with more "+
-		"exact syntax for waveforms and offset spectragrams <i>(prototype)</i></html>" 
+		"exact syntax for waveforms and offset spectragrams <i>(in beta test)</i></html>" 
 	};
 		//Add this in later if it ever get's implemented
 		/*,
