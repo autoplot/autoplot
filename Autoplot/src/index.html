@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Spectrogram and local waveform renderer used to explore data.
+        <p><small>Shift-clicking on the axis bounds allows resize of a plot.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-09-11 r25109):</p>
+        <p>Bugfixes (2020-09-24 r25126):</p>
         <ul>
+            <li>2274: Handle redirect to authenticated URL.  Thanks, Jon N!
+            <li>HapiServerDemo, the Autoplot-based HAPI Server, didn't properly handle fill data.
             <li>1486: swap plot position doesn't move the empheris data.
             <li>drag and drop file onto canvas works again on the Mac DMG release.   Thanks, Allison!
             <li>Use new receiver for RTE reports.
@@ -55,6 +57,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>export to Das2Stream version 2.3 introduced by Chris.
+            <li>experimental ColorSeriesRenderer introduced, which allows color along the line.
             <li>Jython-defined renderers can use colorbar.
             <li>add completions for pattern and format for ASCII data source.
             <li>728: Allow multiple, non-adjacent columns of ASCII table to be plotted.  Thanks, In Sook!
