@@ -242,7 +242,7 @@ import java.util.zip.*;
             String [] sa = new String[a.gEntries.size()];
             for (int i = 0; i < a.gEntries.size(); i++) {
                 ae = (AttributeEntry)a.gEntries.elementAt(i);
-                sa[i] = (String)ae.getValue();
+                sa[i] = String.valueOf(ae.getValue());
             }
             return sa;
         }
