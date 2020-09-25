@@ -934,7 +934,7 @@ public class CdfDataSource extends AbstractDataSource {
                             }
                         }
                     } catch ( RuntimeException ex ) {
-                        logger.warning("Runtime exception while trying to read attribute \""+vv1+"\"" );
+                        logger.log(Level.WARNING, "Runtime exception while trying to read attribute \"{0}\": {1}", new Object[]{vv1, ex.getMessage()});
                     }
                 }
 
