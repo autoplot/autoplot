@@ -919,18 +919,22 @@ public class CdfDataSource extends AbstractDataSource {
                     throw ex;
                 }        
                 for (String vv1 : vv) {
-                    Object attr = cdf.getAttribute(vv1);
-                    if (attr!=null && attr.getClass().isArray() && Array.getLength(attr)>0) {
-                        int n= Array.getLength(attr);
-                        if (n>1) {
-                            Object[] oo= new Object[n];
-                            for ( int ii=0; ii<n; ii++ ) {
-                                oo[ii]= Array.get(attr,ii);
+                    try {
+                        Object attr = cdf.getAttribute(vv1);
+                        if (attr!=null && attr.getClass().isArray() && Array.getLength(attr)>0) {
+                            int n= Array.getLength(attr);
+                            if (n>1) {
+                                Object[] oo= new Object[n];
+                                for ( int ii=0; ii<n; ii++ ) {
+                                    oo[ii]= Array.get(attr,ii);
+                                }
+                                gattrs.put(vv1, oo);
+                            } else {
+                                gattrs.put(vv1, Array.get(attr,0));
                             }
-                            gattrs.put(vv1, oo);
-                        } else {
-                            gattrs.put(vv1, Array.get(attr,0));
                         }
+                    } catch ( RuntimeException ex ) {
+                        logger.warning("Runtime exception while trying to read attribute \""+vv1+"\"" );
                     }
                 }
 
