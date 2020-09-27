@@ -617,10 +617,12 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         String[] ss= Util.guardedSplit( uri, '&', '\'', '\"' );
         DefaultTableModel mtm= new DefaultTableModel( ss.length-1, 4 );
         Pattern p= Pattern.compile("ds=createEvent\\((ds\\,)?\\'(.*)\\'\\,(.*)\\,\\'(.*)\\'\\)");
+        boolean foundOne= false;
         for ( int i=0; i<ss.length; i++ ) {
             if ( i<ss.length-1 ) {
                 Matcher m= p.matcher(ss[i]);
                 if ( m.matches() ) {
+                    foundOne= true;
                     String time= m.group(2);
                     try {
                         DatumRange tr= DatumRangeUtil.parseTimeRange(time);
@@ -639,7 +641,11 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 }
             }
         }
-        return mtm;
+        if ( foundOne ) {
+            return mtm;
+        } else {
+            return null;
+        }
     }
     
     @Override
