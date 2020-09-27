@@ -179,6 +179,7 @@ import org.autoplot.jythonsupport.ui.DataMashUp;
 import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.layout.LayoutConstants;
 import org.autoplot.state.StatePersistence;
+import org.autoplot.util.PlotDataMashupResolver;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -4330,29 +4331,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
             dataSetSelector.maybePlot( KeyEvent.ALT_MASK );
         } else {
             final DataMashUp dm= new DataMashUp();
-            dm.setResolver(new DataMashUp.Resolver() {
-                @Override
-                public QDataSet getDataSet(String uri) {
-                    try {
-                        return DataSetURI.getDataSource(uri).getDataSet( new NullProgressMonitor() );
-                    } catch (Exception ex) {
-                        logger.log(Level.INFO,null,ex);
-                        return null;
-                    }
-                }
-
-                @Override
-                public BufferedImage getImage(QDataSet qds) {
-                    return AutoplotUtil.createImage( qds, 120, 60 );
-                }
-
-                @Override
-                public void interactivePlot( QDataSet qds ) {
-                    Window w= SwingUtilities.getWindowAncestor(dm);
-                    ApplicationModel model= ScriptContext.newDialogWindow( w, qds.toString() );
-                    model.setDataSet( qds );
-                }
-            });
+            dm.setResolver( new PlotDataMashupResolver(dm) );
 
             if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, dm, "Data Mash Up", JOptionPane.OK_CANCEL_OPTION ) ) {
                 dataSetSelector.setValue(dm.getAsJythonInline());
