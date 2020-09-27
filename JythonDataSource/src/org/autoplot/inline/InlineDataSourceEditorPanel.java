@@ -52,6 +52,14 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
      */
     public InlineDataSourceEditorPanel() {
     }
+    
+    /**
+     * return the mashup tool, so that a resolver can be added.
+     * @return the mashup tool used.
+     */
+    public DataMashUp getDataMashUp() {
+        return this.dataMashUp1;
+    }
 
     private static final String SCHEME_EVENT_LIST= "eventList";
     private static final String SCHEME_Y_VS_T= "y_vs_t";
