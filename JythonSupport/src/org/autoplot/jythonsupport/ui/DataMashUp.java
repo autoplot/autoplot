@@ -87,7 +87,6 @@ import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
 import org.python.core.PyException;
-import org.python.core.PySyntaxError;
 import org.python.parser.ast.BinOp;
 
 /**
@@ -398,70 +397,75 @@ public class DataMashUp extends javax.swing.JPanel {
         return b.toString();
     }
     
-    private void fillTreeExprType( exprType et, MutableTreeNode parent, int i ) {
+    private void fillTreeExprType( exprType et, MutableTreeNode parent, int i, List<String> datasets, List<String> usedDatasets) {
         if ( et instanceof Name ) {
-            parent.insert( new DefaultMutableTreeNode(((Name)et).id), i );
+            String name= ((Name)et).id;
+            if ( datasets.contains(name) || datasets.isEmpty() ) {
+                parent.insert( new DefaultMutableTreeNode( name ), i );
+            } else {
+                parent.insert( new DefaultMutableTreeNode( datasets.get(0) ), i );
+            }
         } else if ( et instanceof Num ) {
             parent.insert( new DefaultMutableTreeNode( String.valueOf(((Num)et).n) ),i );
         } else if ( et instanceof Str ) {
-            parent.insert( new DefaultMutableTreeNode( "'"+String.valueOf(((Str)et).s)+"'" ),i );
+            parent.insert(new DefaultMutableTreeNode( "'"+String.valueOf(((Str)et).s)+"'" ),i );
         } else if ( et instanceof Attribute ) {
             exprType vv= ((Attribute)et).value;
             if ( vv instanceof Name ) {
-                parent.insert( new DefaultMutableTreeNode( ((Name)vv).id + "." + ((Attribute)et).attr), i );
+                parent.insert(new DefaultMutableTreeNode( ((Name)vv).id + "." + ((Attribute)et).attr), i );
             } else {
                 logger.log(Level.FINE, "expected Name at {0}", (et).toString());
-                parent.insert( new DefaultMutableTreeNode( "." + ((Attribute)et).attr), i );
+                parent.insert(new DefaultMutableTreeNode( "." + ((Attribute)et).attr), i );
             }
         } else if ( et instanceof UnaryOp ) { // a negative number appears as a unary minus op and positive number.
             exprType et1= ((UnaryOp)et).operand;
             switch (((UnaryOp)et).op) {
                 case 4:
-                    fillTreeExprType( et1, parent, i );
-                    ((DefaultMutableTreeNode)parent.getChildAt(i)).setUserObject( "-"+((DefaultMutableTreeNode)parent.getChildAt(i)).getUserObject() );
+                    fillTreeExprType( et1, parent, i, datasets, usedDatasets );
+                    ((DefaultMutableTreeNode)parent.getChildAt(i)).setUserObject("-"+((DefaultMutableTreeNode)parent.getChildAt(i)).getUserObject() );
                     break;
                 case 3:
-                    fillTreeExprType( et1, parent, i );
-                    ((DefaultMutableTreeNode)parent.getChildAt(i)).setUserObject( "+"+((DefaultMutableTreeNode)parent.getChildAt(i)).getUserObject() );
+                    fillTreeExprType( et1, parent, i, datasets, usedDatasets );
+                    ((DefaultMutableTreeNode)parent.getChildAt(i)).setUserObject("+"+((DefaultMutableTreeNode)parent.getChildAt(i)).getUserObject() );
                     break;            
                 default:
-                    fillTreeExprType( et1, parent, i );
+                    fillTreeExprType( et1, parent, i, datasets, usedDatasets );
                     break;
             }
         } else if ( et instanceof BinOp ) { // a negative number appears as a unary minus op and positive number.
             DefaultMutableTreeNode child= new DefaultMutableTreeNode( nameForBinOp( ((BinOp)et).op ) );
-            fillTreeBinOp( (BinOp)et, child );            
+            fillTreeBinOp( (BinOp)et, child, datasets, usedDatasets );            
             parent.insert( child, i );
         } else {
             Call call= (Call)et;
             DefaultMutableTreeNode child= new DefaultMutableTreeNode( funcCallName( call ) );
             if ( call.func instanceof Attribute ) {
-                fillTreeCall( ((Attribute)call.func).value, call, child );
+                fillTreeCall( ((Attribute)call.func).value, call, child, datasets, usedDatasets  );
             } else {
-                fillTreeCall( call, child );
+                fillTreeCall(call, child, datasets, usedDatasets  );
             }
             parent.insert( child, i);
         }        
     }
     
-    private void fillTreeCall( Call c, MutableTreeNode parent ) {
+    private void fillTreeCall( Call c, MutableTreeNode parent, List<String> datasets, List<String> usedDatasets) {
         for ( int i=0; i<c.args.length; i++ ) {
             exprType et= c.args[i];
-            fillTreeExprType( et, parent, i );
+            fillTreeExprType(et, parent, i, datasets, usedDatasets );
         }
     }
     
-    private void fillTreeCall( exprType n, Call c, MutableTreeNode parent ) {
-        fillTreeExprType( n, parent, 0 );
+    private void fillTreeCall( exprType n, Call c, MutableTreeNode parent, List<String> datasets, List<String> usedDatasets ) {
+        fillTreeExprType(n, parent, 0, datasets, usedDatasets );
         for ( int i=0; i<c.args.length; i++ ) {
             exprType et= c.args[i];
-            fillTreeExprType( et, parent, i+1 );
+            fillTreeExprType(et, parent, i+1, datasets, usedDatasets );
         }
     }    
     
-    private void fillTreeBinOp( BinOp c, MutableTreeNode parent ) {
-        fillTreeExprType( c.left, parent, 0 );
-        fillTreeExprType( c.right, parent, 1 );
+    private void fillTreeBinOp( BinOp c, MutableTreeNode parent, List<String> datasets, List<String> usedDatasets ) {
+        fillTreeExprType(c.left, parent, 0, datasets, usedDatasets );
+        fillTreeExprType(c.right, parent, 1, datasets, usedDatasets );
     }
     
     private String funcCallName( Call c ) {
@@ -646,7 +650,7 @@ public class DataMashUp extends javax.swing.JPanel {
         };     
     }
     
-    private MutableTreeNode getTreeNode( String expr ) {
+    private MutableTreeNode getTreeNode( String expr, List<String> datasets, List<String> usedDatasets ) {
         Module n;
         
         try {
@@ -660,7 +664,12 @@ public class DataMashUp extends javax.swing.JPanel {
         DefaultMutableTreeNode root;
         Assign assign= (Assign)n.body[0];
         if ( assign.value instanceof Name ) {
-            root= new DefaultMutableTreeNode( ((Name)assign.value).id );
+            String name= ((Name)assign.value).id;
+            if ( datasets.contains(name) || datasets.isEmpty() ) {
+                root= new DefaultMutableTreeNode( name );
+            } else {
+                root= new DefaultMutableTreeNode( datasets.get(datasets.size()-1) );
+            }
         } else if ( assign.value instanceof Num ) {
             root= new DefaultMutableTreeNode( ((Num)assign.value).n );
         } else if ( assign.value instanceof Str ) {
@@ -678,16 +687,16 @@ public class DataMashUp extends javax.swing.JPanel {
             BinOp op= (BinOp)assign.value;
             String sop= nameForBinOp( op.op );
             root= new DefaultMutableTreeNode( sop );
-            fillTreeBinOp( op, root );
+            fillTreeBinOp( op, root, datasets, usedDatasets );
         } else {
             root= new DefaultMutableTreeNode( funcCallName( (Call)assign.value ) );
             if ( assign.value instanceof Call ) {
                 Call c= (Call)assign.value;
                 if ( c.func instanceof Attribute ) {
                     Attribute attr= (Attribute)c.func;
-                    fillTreeCall( attr.value, c, root );
+                    fillTreeCall( attr.value, c, root, datasets, usedDatasets );
                 } else {
-                    fillTreeCall( c, root );
+                    fillTreeCall(c, root, datasets, usedDatasets );
                 }
             }            
         }
@@ -711,8 +720,8 @@ public class DataMashUp extends javax.swing.JPanel {
         return sop;
     }
     
-    private void fillTree( String expr ) {
-        Module n= (Module)org.python.core.parser.parse( "x="+expr, "exec" );
+    private void fillTree( String expr, List<String> datasets, List<String> usedDatasets) {
+        Module n= (Module)org.python.core.parser.parse("x="+expr, "exec" );
         
         Assign assign= (Assign)n.body[0];
         if ( assign.value instanceof Name ) {
@@ -728,16 +737,16 @@ public class DataMashUp extends javax.swing.JPanel {
                 Call c= (Call)assign.value;
                 if ( c.func instanceof Attribute ) {
                     Attribute attr= (Attribute)c.func;
-                    fillTreeCall( attr.value, c, root );
+                    fillTreeCall( attr.value, c, root, datasets, usedDatasets );
                 } else {
-                    fillTreeCall( c, root );
+                    fillTreeCall(c, root, datasets, usedDatasets );
                 }
                 expressionTree.setModel(model);
             } else if ( et instanceof BinOp ) {
                 String sop= nameForBinOp( ((BinOp)et).op );
                 DefaultMutableTreeNode root= new DefaultMutableTreeNode( sop );
                 DefaultTreeModel model= new DefaultTreeModel( root );
-                fillTreeBinOp( (BinOp)et, root );
+                fillTreeBinOp( (BinOp)et, root, datasets, usedDatasets );
                 expressionTree.setModel(model);
             }
             
@@ -857,7 +866,7 @@ public class DataMashUp extends javax.swing.JPanel {
                     setIds(ids);
                     setUris(uris);
                 }
-                fillTree( s );
+                fillTree(s, ids, new ArrayList<String>() );
             }
         }
         synchronizeCB.setSelected(synch);
@@ -912,7 +921,7 @@ public class DataMashUp extends javax.swing.JPanel {
         MutableTreeNode oldBranch= (MutableTreeNode)tp.getLastPathComponent();
         MutableTreeNode parent= (MutableTreeNode)oldBranch.getParent();
         
-        final MutableTreeNode newBranch= getTreeNode(data);
+        final MutableTreeNode newBranch= getTreeNode(data, namedURIListTool1.ids, new ArrayList<String>() );
         
         int index= -1;
         String arg0= null;
@@ -926,10 +935,11 @@ public class DataMashUp extends javax.swing.JPanel {
         } 
         
         if ( moveOldNodeDown && newBranch.getChildCount()>0 ) {
+            // replace the first argument with what we are replacing
             newBranch.remove(0);
             newBranch.insert( oldBranch, 0 );
         }
-
+        
         if ( parent==null ) {
             model.setRoot(newBranch);
         } else {
@@ -1880,7 +1890,7 @@ public class DataMashUp extends javax.swing.JPanel {
             }
 
         });
-        dmu.fillTree("add(a,b)");
+        dmu.fillTree("add(a,b)", Collections.singletonList("z"), new ArrayList<String>() );
         JOptionPane.showConfirmDialog( null, dmu );
         System.err.println( dmu.getAsJythonInline() );
     }
