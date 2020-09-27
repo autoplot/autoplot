@@ -890,6 +890,14 @@ public class DataSetSelector extends javax.swing.JPanel {
                     }
 
                     fedit.setURI(surl);
+                    if ( surl.startsWith("vap+inline" ) ) {
+                        // tiny kludge for Autoplot
+                        if ( fedit.getClass().getName().equals("org.autoplot.inline.InlineDataSourceEditorPanel") ) {
+                            if ( window.getClass().getName().equals("org.autoplot.AutoplotUI") ) {
+                                //bug 2044: TODO: this should fire off events with the DataSourceEditor to make it available to Autoplot.
+                            }
+                        }
+                    }
                     fedit.markProblems(problems);
                     
                     final String fsurl= surl;
