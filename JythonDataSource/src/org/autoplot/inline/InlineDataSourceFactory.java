@@ -218,5 +218,10 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
     public boolean isFileResource() {
         return false;
     }
+
+    @Override
+    public String getDescription() {
+        return "Data encoded within the URI";
+    }
     
 }
