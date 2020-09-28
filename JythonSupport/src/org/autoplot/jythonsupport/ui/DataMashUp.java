@@ -1710,6 +1710,9 @@ public class DataMashUp extends javax.swing.JPanel {
         }
     }
     
+    /**
+     * load the scientist's custom functions off the event thread.
+     */
     private void backFromFile() {
         final DefaultListModel dlm= new DefaultListModel();
         try {
