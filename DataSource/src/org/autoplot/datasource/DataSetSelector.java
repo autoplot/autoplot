@@ -72,6 +72,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
@@ -946,6 +947,10 @@ public class DataSetSelector extends javax.swing.JPanel {
                     logger.finer("ignore escape pressed within a JTextField");
                     return;
                 }
+                if ( focus!=null && focus instanceof JRootPane ) {
+                    logger.finer("ignore escape pressed within a JRootPane");
+                    return;
+                }
                 dialog.setVisible(false);
                 dialog.dispose(); 
             }
@@ -1014,6 +1019,9 @@ public class DataSetSelector extends javax.swing.JPanel {
         return run;
     }
     
+    /**
+     * show completions, as if the scientist had hit tab
+     */
     public void showCompletions() {
         JTextField tf= ((JTextField) dataSetSelector.getEditor().getEditorComponent());
         final String surl = tf.getText();
@@ -1022,6 +1030,15 @@ public class DataSetSelector extends javax.swing.JPanel {
         setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
         showCompletions(surl, carotpos);
 
+    }
+    
+    /**
+     * force hide the completions list.
+     */
+    public void hideCompletions() {
+        if ( completionsPopupMenu!=null ) {
+            completionsPopupMenu.setVisible(false);
+        }
     }
     
     private void clearBusyIcon() {
@@ -1164,7 +1181,12 @@ public class DataSetSelector extends javax.swing.JPanel {
         completionsPopupMenu = CompletionsList.fillPopupNew(completions, labelPrefix, new JScrollPopupMenu(), listener);
         //TODO Here's the plan: we will make the popupMenu be non-focusable, then delegate the Up,Down,Enter and Escape to it when the popup is showing.
         //completionsPopupMenu.setFocusable(true);
-        
+        completionsPopupMenu.registerKeyboardAction( new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                hideCompletions();
+            }
+        }, KeyStroke.getKeyStroke( KeyEvent.VK_ESCAPE, 0 ), JComponent.WHEN_IN_FOCUSED_WINDOW );
         setMessage("done getting completions");
         setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) );
 
