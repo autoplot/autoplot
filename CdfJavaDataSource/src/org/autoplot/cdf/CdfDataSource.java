@@ -5,7 +5,6 @@
 
 package org.autoplot.cdf;
 
-import gov.nasa.gsfc.spdf.cdfj.AttributeEntry;
 import gov.nasa.gsfc.spdf.cdfj.CDFException;
 import java.beans.PropertyChangeEvent;
 import java.util.logging.Level;
@@ -24,6 +23,7 @@ import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,7 +35,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.qds.buffer.BufferDataSet;
 import org.das2.dataset.NoDataInIntervalException;
-import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
@@ -333,9 +332,13 @@ public class CdfDataSource extends AbstractDataSource {
                 svariable = svariable.substring(0, i);
             }
             
+            String[] svariables;
             i= svariable.indexOf(";");
             if (i != -1) {
+                svariables= svariable.split(";");
                 svariable = svariable.substring(0, i);
+            } else {
+                svariables= null;
             }
                 
             long numRec,numRecDepend0=-1;
@@ -372,7 +375,11 @@ public class CdfDataSource extends AbstractDataSource {
                 
                 if ( attributes==null ) {
                     getMetadata( new NullProgressMonitor() );
-                    attributes = readAttributes(cdf, svariable, 0);
+                    if ( svariables!=null ) {
+                        attributes= new HashMap();
+                    } else {
+                        attributes = readAttributes(cdf, svariable, 0);
+                    }
                     if ( recs[2]==-1 ) { // if slice0
                         attributes= MetadataUtil.sliceProperties(attributes, 0);
                     }
@@ -470,7 +477,6 @@ public class CdfDataSource extends AbstractDataSource {
         mon.setProgressMessage("open CDF file");
         CDFReader cdf= getCdfFile(fileName);
 
-        String[] svariables= null;
         String svariable = (String) map.get(PARAM_ID);
         if (svariable == null) {
             svariable = (String) map.get("arg_0");
@@ -484,11 +490,11 @@ public class CdfDataSource extends AbstractDataSource {
         //Pattern p= Pattern.compile( "[a-z]+(\\[(0-9:)+\\])?"); TODO: how to match?
         
         String constraint = null;
-        int i = svariable.indexOf("[");
-        if (i != -1) {
+        int ibracket = svariable.indexOf("[");
+        if (ibracket != -1) {
             String newSvariable;
-            constraint = svariable.substring(i);
-            newSvariable = svariable.substring(0, i);
+            constraint = svariable.substring(ibracket);
+            newSvariable = svariable.substring(0, ibracket);
             int i2= constraint.indexOf(";");
             if ( i2>-1 ) {
                 constraint= constraint.substring(0,i2);
@@ -513,9 +519,13 @@ public class CdfDataSource extends AbstractDataSource {
             }
             svariable = newSvariable;
         }
-        
+
+        String[] svariables;
+
         if ( svariable.contains(";") ) {
             svariables= svariable.split(";");
+        } else {
+            svariables= null;
         }
 
         String interpMeta = (String) map.get(PARAM_INTERPMETA);
@@ -545,14 +555,15 @@ public class CdfDataSource extends AbstractDataSource {
                 int is= Integer.parseInt(os1);
                 result= (MutablePropertyDataSet)Ops.slice1( result, is );
             }
-        } else if ( svariables!=null ) {
+        } else if ( svariables!=null ) { // multi-variable read to bundle.
             String os1= (String)map.get(PARAM_SLICE1);
             if ( os1!=null && !os1.equals("") && cdf.getDimensions(svariable).length>0 ) {
                 throw new IllegalArgumentException("slice is not supported for multi-variable reads");
             } else {
                 QDataSet result0=null;
                 for ( String s: svariables ) {
-                    QDataSet result1= loadVariableAndDependents(cdf, s, constraint, false, doDep, attr1, -1, mon.getSubtaskMonitor("reading "+s+" from CDF file") );
+                    HashMap<String,Object> attrs1 = readAttributes(cdf, s, 0);
+                    QDataSet result1= loadVariableAndDependents(cdf, s, constraint, false, doDep, attrs1, -1, mon.getSubtaskMonitor("reading "+s+" from CDF file") );
                     result0= Ops.bundle( result0, result1 );
                 }
                 result= Ops.maybeCopy(result0);
@@ -646,89 +657,25 @@ public class CdfDataSource extends AbstractDataSource {
         }
         
         if (!"no".equals(interpMeta)) {
-            MetadataModel model = new IstpMetadataModel();
 
-            Map<String, Object> istpProps = model.properties(attr1);
-            CdfUtil.maybeAddValidRange(istpProps, result);
-            Number n= (Number)istpProps.get(QDataSet.FILL_VALUE);
-            if ( result instanceof BufferDataSet ) {
-                Class c= ((BufferDataSet)result).getCompatibleComponentType();
-                if ( n instanceof Double ) {
-                    if ( c==float.class ) {
-                        istpProps.put( QDataSet.FILL_VALUE, (float)n.doubleValue() );
-                    }
-                }
-            }
-            result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
-            result.putProperty(QDataSet.LABEL, istpProps.get(QDataSet.LABEL)  );
-            result.putProperty(QDataSet.TITLE, istpProps.get(QDataSet.TITLE)  );
-            result.putProperty(QDataSet.DESCRIPTION, istpProps.get(QDataSet.DESCRIPTION) );
-            
-            String renderType= (String)istpProps.get(QDataSet.RENDER_TYPE);
-            if ( renderType!=null && renderType.equals( "time_series" ) ) {
-                // kludge for rbsp-a_WFR-waveform_emfisis-L2_20120831_v1.2.1.cdf.  This is actually a waveform.
-                // Note Seth (RBSP/ECT Team) has a file with 64 channels.  Dan's file rbsp-a_HFR-spectra_emfisis-L2_20120831_v1.2.3.cdf has 82 channels.
-                if ( result.rank()>1 && result.length(0)>QDataSet.MAX_UNIT_BUNDLE_COUNT ) {
-                    logger.log(Level.FINE, "result.length(0)>QDataSet.MAX_UNIT_BUNDLE_COUNT={0}, this cannot be treated as a time_series", QDataSet.MAX_UNIT_BUNDLE_COUNT);
-                    renderType=null;
-                }
-            }
-            if ( renderType !=null && renderType.startsWith("image") ) {
-                logger.fine("renderType=image not supported in CDF files");
-                renderType= null;
-            }
-            if ( UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(result)) ) {
-                renderType= "eventsbar";
-            }             
-            if ( sy!=null || sx!=null ) {
-                renderType= null;
-            }
-            String os1= (String)map.get(PARAM_SLICE1);
-            if ( constraint!=null ) {
-                logger.finer("dropping render type because of constraint");
-            } else if ( os1!=null && os1.length()>0 ) {
-                logger.finer("dropping render type because of slice1");
-                for ( int i1=1; i1<result.rank()+1; i1++ ) {
-                    istpProps.put( "DEPEND_"+i1, istpProps.get( "DEPEND_"+(i1+1) ) );
+            if ( svariables==null ) {
+                doApplyAttributes(attr1, result, (String)map.get(PARAM_SLICE1), constraint);
+                if ( sy!=null || sx!=null ) {
+                    result.putProperty( QDataSet.RENDER_TYPE, null );
                 }
             } else {
-                result.putProperty(QDataSet.RENDER_TYPE, renderType );
-            }
-
-            if ( UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(result)) ) {
-                if ( result.property(QDataSet.DEPEND_0)==null ) {
-                    result.putProperty(QDataSet.RENDER_TYPE, QDataSet.VALUE_RENDER_TYPE_DIGITAL );
-                } else {
-                    result.putProperty(QDataSet.RENDER_TYPE, QDataSet.VALUE_RENDER_TYPE_EVENTS_BAR );
-                }
-            } else {                
-                if ( result.rank()<3 ) { // POLAR_H0_CEPPAD_20010117_V-L3-1-20090811-V.cdf?FEDU is "time_series"
-                    if ( result.rank()==2 && result.length()>0 && result.length(0)<QDataSet.MAX_UNIT_BUNDLE_COUNT && sy==null ) { //allow time_series for [n,16]
-                        String rt= (String)istpProps.get("RENDER_TYPE" );
-                        if ( rt!=null ) result.putProperty(QDataSet.RENDER_TYPE, rt );
-                        if ( istpProps.get("RENDER_TYPE")==null ) { //goes11_k0s_mag
-                            if ( result.property("DEPEND_1")==null ) {
-                                result.putProperty(QDataSet.RENDER_TYPE, "time_series" );
-                            }
-                        }
+                for ( int j=0; j<svariables.length; j++ ) {
+                    HashMap<String,Object> attrs1 = readAttributes(cdf, svariables[j], 0);
+                    doApplyAttributes(attrs1, 
+                            (MutablePropertyDataSet)result.slice(j), 
+                            (String)map.get(PARAM_SLICE1), 
+                            constraint );
+                    if ( sy!=null || sx!=null ) {
+                        result.putProperty( QDataSet.RENDER_TYPE, null );
                     }
                 }
             }
-
-            for ( int j=0; j<result.rank(); j++ ) {
-                MutablePropertyDataSet depds= (MutablePropertyDataSet) result.property("DEPEND_"+j);
-                Map<String,Object> depProps= (Map<String, Object>) istpProps.get("DEPEND_"+j);
-                if ( depds!=null && depProps!=null ) {
-                    CdfUtil.maybeAddValidRange( depProps, depds );
-                    Map<String, Object> istpProps2 = model.properties(depProps);
-                    depds.putProperty(QDataSet.FILL_VALUE, istpProps2.get(QDataSet.FILL_VALUE));
-                    if ( !UnitsUtil.isTimeLocation( SemanticOps.getUnits(depds) ) ) {
-                        depds.putProperty(QDataSet.LABEL, istpProps2.get(QDataSet.LABEL) );
-                        depds.putProperty(QDataSet.TITLE, istpProps2.get(QDataSet.TITLE) );
-                    }
-                }
-            }
-        // apply properties.
+            
         } else {
             QDataSet dep;
             dep= (QDataSet)result.property(QDataSet.DEPEND_0); // twins misuses DEPEND properties.
@@ -736,10 +683,13 @@ public class CdfDataSource extends AbstractDataSource {
             result.putProperty( QDataSet.DEPEND_1, null );
             result.putProperty( QDataSet.DEPEND_2, null );
             result.putProperty( QDataSet.DEPEND_3, null );
+            if ( svariables==null ) {
+                result.putProperty( QDataSet.METADATA, attr1 );
+                result.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
+            } else {
+                logger.info("TODO: attributes should appear in each bundled dataset, to be consistent.");
+            }
         }
-
-        result.putProperty( QDataSet.METADATA, attr1 );
-        result.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
 
         synchronized (this) {
             if ( attributes!=null && "waveform".equals( attributes.get("DISPLAY_TYPE") ) ) {
@@ -763,13 +713,95 @@ public class CdfDataSource extends AbstractDataSource {
         
         //DataSetUtil.validate( result, new ArrayList<String>() );
 
-        result.makeImmutable(); // this may cause problems with scripts that assume data is mutable.        
+        result.makeImmutable(); 
         if ( !mon.isFinished() ) mon.finished();  
         
         logger.exiting( "CdfDataSource", "getDataSet" );
         
         return result;
 
+    }
+
+    private void doApplyAttributes(Map<String, Object> attr1, MutablePropertyDataSet result, String os1, String constraint) {
+        
+        Map<String, Object> istpProps;
+        MetadataModel model = new IstpMetadataModel();
+        istpProps= model.properties(attr1);
+        CdfUtil.maybeAddValidRange(istpProps, result);
+        Number n= (Number)istpProps.get(QDataSet.FILL_VALUE);
+        if ( result instanceof BufferDataSet ) {
+            Class c= ((BufferDataSet)result).getCompatibleComponentType();
+            if ( n instanceof Double ) {
+                if ( c==float.class ) {
+                    istpProps.put( QDataSet.FILL_VALUE, (float)n.doubleValue() );
+                }
+            }
+        }
+        result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
+        result.putProperty(QDataSet.LABEL, istpProps.get(QDataSet.LABEL)  );
+        result.putProperty(QDataSet.TITLE, istpProps.get(QDataSet.TITLE)  );
+        result.putProperty(QDataSet.DESCRIPTION, istpProps.get(QDataSet.DESCRIPTION) );
+        String renderType= (String)istpProps.get(QDataSet.RENDER_TYPE);
+        if ( renderType!=null && renderType.equals( "time_series" ) ) {
+            // kludge for rbsp-a_WFR-waveform_emfisis-L2_20120831_v1.2.1.cdf.  This is actually a waveform.
+            // Note Seth (RBSP/ECT Team) has a file with 64 channels.  Dan's file rbsp-a_HFR-spectra_emfisis-L2_20120831_v1.2.3.cdf has 82 channels.
+            if ( result.rank()>1 && result.length(0)>QDataSet.MAX_UNIT_BUNDLE_COUNT ) {
+                logger.log(Level.FINE, "result.length(0)>QDataSet.MAX_UNIT_BUNDLE_COUNT={0}, this cannot be treated as a time_series", QDataSet.MAX_UNIT_BUNDLE_COUNT);
+                renderType=null;
+            }
+        }
+        if ( renderType !=null && renderType.startsWith("image") ) {
+            logger.fine("renderType=image not supported in CDF files");
+            renderType= null;
+        }
+        if ( UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(result)) ) {
+            renderType= "eventsbar";
+        }
+        
+        if ( constraint!=null ) {
+            logger.finer("dropping render type because of constraint");
+        } else if ( os1!=null && os1.length()>0 ) {
+            logger.finer("dropping render type because of slice1");
+            for ( int i1=1; i1<result.rank()+1; i1++ ) {
+                istpProps.put( "DEPEND_"+i1, istpProps.get( "DEPEND_"+(i1+1) ) );
+            }
+        } else {
+            result.putProperty(QDataSet.RENDER_TYPE, renderType );
+        }
+        if ( UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(result)) ) {
+            if ( result.property(QDataSet.DEPEND_0)==null ) {
+                result.putProperty(QDataSet.RENDER_TYPE, QDataSet.VALUE_RENDER_TYPE_DIGITAL );
+            } else {
+                result.putProperty(QDataSet.RENDER_TYPE, QDataSet.VALUE_RENDER_TYPE_EVENTS_BAR );
+            }
+        } else {
+            if ( result.rank()<3 ) { // POLAR_H0_CEPPAD_20010117_V-L3-1-20090811-V.cdf?FEDU is "time_series"
+                if ( result.rank()==2 && result.length()>0 && result.length(0)<QDataSet.MAX_UNIT_BUNDLE_COUNT ) { //allow time_series for [n,16]
+                    String rt= (String)istpProps.get("RENDER_TYPE" );
+                    if ( rt!=null ) result.putProperty(QDataSet.RENDER_TYPE, rt );
+                    if ( istpProps.get("RENDER_TYPE")==null ) { //goes11_k0s_mag
+                        if ( result.property("DEPEND_1")==null ) {
+                            result.putProperty(QDataSet.RENDER_TYPE, "time_series" );
+                        }
+                    }
+                }
+            }
+        }
+        for ( int j=0; j<result.rank(); j++ ) {
+            MutablePropertyDataSet depds= (MutablePropertyDataSet) result.property("DEPEND_"+j);
+            Map<String,Object> depProps= (Map<String, Object>) istpProps.get("DEPEND_"+j);
+            if ( depds!=null && depProps!=null ) {
+                CdfUtil.maybeAddValidRange( depProps, depds );
+                Map<String, Object> istpProps2 = model.properties(depProps);
+                depds.putProperty(QDataSet.FILL_VALUE, istpProps2.get(QDataSet.FILL_VALUE));
+                if ( !UnitsUtil.isTimeLocation( SemanticOps.getUnits(depds) ) ) {
+                    depds.putProperty(QDataSet.LABEL, istpProps2.get(QDataSet.LABEL) );
+                    depds.putProperty(QDataSet.TITLE, istpProps2.get(QDataSet.TITLE) );
+                }
+            }
+        }
+        result.putProperty( QDataSet.METADATA, attr1 );
+        result.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
     }
 
     /**
@@ -1658,7 +1690,7 @@ public class CdfDataSource extends AbstractDataSource {
                 }
                 i= svariable.lastIndexOf(";");
                 if ( i!=-1 ) {
-                    svariable= svariable.substring(i+1);
+                    return Collections.emptyMap();
                 }
                 
                 if ( !hasVariable(cdf,svariable) ) {
