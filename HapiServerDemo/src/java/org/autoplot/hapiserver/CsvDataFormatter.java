@@ -70,10 +70,13 @@ public class CsvDataFormatter implements DataFormatter {
             quotes= new boolean[record.length()];
             units= new Units[record.length()];
             fill= new String[record.length()];
+            int[] lens= Util.getNumberOfElements(info);
             JSONArray parameters= info.getJSONArray("parameters");
+            JSONObject parameter= parameters.getJSONObject(0);
+            int iparam=0;
+            int iele=0;
             for ( int i=0; i<record.length(); i++ ) {
                 QDataSet field= record.slice(i);
-                JSONObject parameter= parameters.getJSONObject(columnMap(i));
                 Units u= (Units)field.property(QDataSet.UNITS);
                 if ( u==null ) u= Units.dimensionless;
                 units[i]= u;
@@ -96,16 +99,28 @@ public class CsvDataFormatter implements DataFormatter {
                     quotes[i]= false;
                     fill[i]= parameter.getString("fill");
                 }
-            }
-            if ( false ) {
-                System.err.println("===");
-                for ( int i=0; i<record.length(); i++ ) {
-                    System.err.println( String.format( "%4d %s", i,datumFormatter[i] ) );
+                iele++;
+                if ( iele==lens[iparam] ) {
+                    iparam++;
+                    iele=0;
+                    if ( iparam==parameters.length() ) {
+                        if ( i+1!=record.length() ) {
+                            throw new IllegalStateException("things have gone wrong");
+                        }
+                    } else {
+                        parameter= parameters.getJSONObject(iparam);
+                    }
                 }
-                System.err.println("===");
             }
+//            if ( false ) {
+//                System.err.println("===");
+//                for ( int i=0; i<record.length(); i++ ) {
+//                    System.err.println( String.format( "%4d %s", i,datumFormatter[i] ) );
+//                }
+//                System.err.println("===");
+//            }
         } catch (JSONException ex) {
-            Logger.getLogger(CsvDataFormatter.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         
     }
@@ -119,9 +134,18 @@ public class CsvDataFormatter implements DataFormatter {
             fieldDatum= DataSetUtil.asDatum(field);
             if ( quotes[i] ) out.write('"');
             if ( fieldDatum.isFill() ) {
-                out.write( fill[i].getBytes() );
+                String f= fill[i];
+                if ( f==null ) {
+                    logger.log(Level.SEVERE, "fill is not defined for parameter formatted to column #{0}", i);
+                    throw new IllegalStateException("fill is not defined for parameter formatted to column #" + i);
+                }
+                out.write( f.getBytes() );
             } else {
-                out.write( datumFormatter[i].format( fieldDatum, units[i] ).getBytes() );
+                String s=  datumFormatter[i].format( fieldDatum, units[i] );
+                if ( quotes[i] ) {
+                    s= s.replaceAll("\"", "\"\""); // See https://github.com/hapi-server/data-specification/issues/99
+                }
+                out.write( s.getBytes() );
             }
             if ( quotes[i] ) out.write('"');
             if ( i<n-1 ) out.write(',');

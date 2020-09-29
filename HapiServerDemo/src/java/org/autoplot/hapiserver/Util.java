@@ -246,37 +246,54 @@ public class Util {
     }
     
     /**
-     * return a new JSONObject for the info request, with the subset of parameters.
-     * @param jo the root node of the info response.
-     * @param parameters comma-delimited list of parameters.
-     * @return the new JSONObject, with special tag __indexmap__ showing which columns are to be included in a data response.
+     * return the total number of elements of each parameter.
+     * @param info the info
+     * @return an int array with the number of elements in each parameter.
      * @throws JSONException 
      */
-    public static JSONObject subsetParams( JSONObject jo, String parameters ) throws JSONException {
-        jo= new JSONObject( jo.toString() );
-        String[] pps= parameters.split(",");
-        Map<String,Integer> map= new HashMap();  // map from name to index in dataset.
-        Map<String,Integer> iMap= new HashMap(); // map from name to position in csv.
-        JSONArray jsonParameters= jo.getJSONArray("parameters");
-        int index=0;
-        for ( int i=0; i<jsonParameters.length(); i++ ) {
-            map.put( jsonParameters.getJSONObject(i).getString("name"), i ); 
-            iMap.put( jsonParameters.getJSONObject(i).getString("name"), index );
+    public static int[] getNumberOfElements( JSONObject info ) throws JSONException {
+        JSONArray parameters= info.getJSONArray("parameters");
+        int[] result= new int[parameters.length()];
+        for ( int i=0; i<parameters.length(); i++ ) {
             int len=1;
-            if ( jsonParameters.getJSONObject(i).has("size") ) {
-                JSONArray jarray1= jsonParameters.getJSONObject(i).getJSONArray("size");
+            if ( parameters.getJSONObject(i).has("size") ) {
+                JSONArray jarray1= parameters.getJSONObject(i).getJSONArray("size");
                 for ( int k=0; k<jarray1.length(); k++ ) {
                     len*= jarray1.getInt(k);
                 }
             }
-            index+= len;
+            result[i]= len;
+        }    
+        return result;
+    }
+    
+    /**
+     * return a new JSONObject for the info request, with the subset of parameters.
+     * @param info the root node of the info response.
+     * @param parameters comma-delimited list of parameters.
+     * @return the new JSONObject, with special tag __indexmap__ showing which columns are to be included in a data response.
+     * @throws JSONException 
+     */
+    public static JSONObject subsetParams( JSONObject info, String parameters ) throws JSONException {
+        info= new JSONObject( info.toString() ); // force a copy
+        String[] pps= parameters.split(",");
+        Map<String,Integer> map= new HashMap();  // map from name to index in dataset.
+        Map<String,Integer> iMap= new HashMap(); // map from name to position in csv.
+        JSONArray jsonParameters= info.getJSONArray("parameters");
+        int index=0;
+        int[] lens= getNumberOfElements(info);
+        for ( int i=0; i<jsonParameters.length(); i++ ) {
+            String name= jsonParameters.getJSONObject(i).getString("name");
+            map.put( name, i ); 
+            iMap.put( name, index );
+            index+= lens[i];
         }
         JSONArray newParameters= new JSONArray();
         int[] indexMap= new int[pps.length];
         for ( int i=0; i<pps.length; i++ ) {
             indexMap[i]=-1;
         }
-        int[] lengths= new int[pps.length];
+        int[] lengths= new int[pps.length]; //lengths for the new infos
         boolean hasTime= false;
         for ( int ip=0; ip<pps.length; ip++ ) {
             Integer i= map.get(pps[ip]);
@@ -288,13 +305,7 @@ public class Util {
                 hasTime= true;
             }
             newParameters.put( ip, jsonParameters.get(i) );
-            lengths[ip]= 1;
-            if ( jsonParameters.getJSONObject(i).has("size") ) {
-                JSONArray jarray1= jsonParameters.getJSONObject(i).getJSONArray("size");
-                for ( int k=0; k<jarray1.length(); k++ ) {
-                    lengths[ip]*= jarray1.getInt(k);
-                }
-            }
+            lengths[ip]= lens[i];
         }
 
         // add time if it was missing.  This demonstrates a feature that is burdensome to implementors, I believe.
@@ -335,10 +346,10 @@ public class Util {
         }
 
         jsonParameters= newParameters;
-        jo.put( "parameters", jsonParameters );        
+        info.put( "parameters", jsonParameters );        
 
-        jo.put( "x_indexmap", indexMap );
-        return jo;
+        info.put( "x_indexmap", indexMap );
+        return info;
     }
 
     /**
