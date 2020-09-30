@@ -368,7 +368,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
 
             samplesPerSecond= (float) Math.round( 1/periodSeconds );
             
-        } else if ( data.rank()==1 || ( data.rank()==2 && SemanticOps.isBundle(data) ) ) {
+        } else if ( data.rank()==1 || ( data.rank()==2 && ( SemanticOps.isBundle(data) || SemanticOps.isLegacyBundle(data) ) ) ) {
             if ( dep0!=null && dep0.length()>1 ) {
                 Units u= (Units) dep0.property( QDataSet.UNITS ) ;
                 if ( u==null ) {
