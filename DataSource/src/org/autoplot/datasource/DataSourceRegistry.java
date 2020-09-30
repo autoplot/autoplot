@@ -613,6 +613,7 @@ public class DataSourceRegistry {
      * @return extension, such as ".gif"
      */
     protected static String getExtension( String name ) {
+        if (name.startsWith("vap+") ) name=name.substring(4);
         if (name.indexOf('.') == -1 ) name= "."+name;
         if ( name.indexOf('.') > 0 ) {
             int i= name.lastIndexOf('.');
