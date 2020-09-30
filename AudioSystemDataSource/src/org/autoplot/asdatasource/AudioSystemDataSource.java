@@ -58,11 +58,12 @@ public final class AudioSystemDataSource extends AbstractDataSource implements U
         
         nsamples = (int) (lenSeconds * sampleRate );
         int len = nsamples * 2;
-        int nchannels= 1;
+        int nchannels= Integer.parseInt( getParam( "channels", "1" ) );
+        if ( nchannels<1 || nchannels>8 ) throw new IllegalArgumentException("channels must be between 1 and 8");
         int bitsPerSample= 16;
-        int frameSize= bitsPerSample / ( nchannels * 8 );
+        int frameSize= nchannels * bitsPerSample / 8;
 
-        dataBuffer = ByteBuffer.allocateDirect(len);
+        dataBuffer = ByteBuffer.allocateDirect( nsamples*frameSize );
 
         TargetDataLine targetDataLine;
         AudioInputStream audioInputStream;
@@ -95,7 +96,20 @@ public final class AudioSystemDataSource extends AbstractDataSource implements U
         t.putProperty( QDataSet.LABEL, "Seconds Offset");
         //startUpdateTimer();
         
-        MutablePropertyDataSet ds= BufferDataSet.makeDataSet( 1, 2, 0, nsamples, 1, 1, 1, dataBuffer, BufferDataSet.SHORT );
+        MutablePropertyDataSet ds;
+        if ( nchannels>1 ) {
+            ds= BufferDataSet.makeDataSet( 2, 2*nchannels, 0, nsamples, nchannels, 1, 1, dataBuffer, BufferDataSet.SHORT );
+            String[] cc= new String[nchannels];
+            for ( int i=0;i<nchannels; i++ ) {
+                cc[i]= "ch_"+String.valueOf(i);
+            }
+            ds.putProperty( QDataSet.DEPEND_1, Ops.labelsDataset(cc) );
+        } else if ( nchannels==1 ) {
+            ds= BufferDataSet.makeDataSet( 1, 2, 0, nsamples, 1, 1, 1, dataBuffer, BufferDataSet.SHORT );
+        } else {
+            throw new IllegalArgumentException("nchannels");
+        }
+        
         ds.putProperty( QDataSet.DEPEND_0, t );
         
         if ( spec>-1 ) {
@@ -113,12 +127,12 @@ public final class AudioSystemDataSource extends AbstractDataSource implements U
         public Iterator<QDataSet> streamDataSet( final ProgressMonitor mon) throws Exception {
 
             nsamples= 2048; // this is per record now.
-            int len = nsamples * 2;
-            int nchannels= 1;
-            int bitsPerSample= 16;
-            int frameSizeBytes= bitsPerSample / ( nchannels * 8 );
 
-            dataBuffer = ByteBuffer.allocateDirect(len);
+            final int nchannels= Integer.parseInt( getParam( "channels", "1" ) );
+            int bitsPerSample= 16;
+            int frameSizeBytes= nchannels * bitsPerSample / 8;
+
+            dataBuffer = ByteBuffer.allocateDirect( nsamples*frameSizeBytes );
             
             final int sampleRate= Integer.parseInt( getParam( "rate", "8000" ) );
         
@@ -161,8 +175,19 @@ public final class AudioSystemDataSource extends AbstractDataSource implements U
                         
                         TagGenDataSet t= new TagGenDataSet( nsamples, 1./sampleRate, 0.0, Units.seconds );
                         t.putProperty( QDataSet.LABEL, "Seconds Offset");
+                        
+                        MutablePropertyDataSet ds;
+                        if ( nchannels>1 ) {
+                            ds= BufferDataSet.makeDataSet( 2, 2*nchannels, 0, nsamples, nchannels, 1, 1, dataBuffer, BufferDataSet.SHORT );
+                            String[] cc= new String[nchannels];
+                            for ( int i=0;i<nchannels; i++ ) {
+                                cc[i]= "ch_"+String.valueOf(i);
+                            }
+                            ds.putProperty( QDataSet.DEPEND_1, Ops.labelsDataset(cc) );
+                        } else {
+                            ds= BufferDataSet.makeDataSet( 1, 2, 0, nsamples, 1, 1, 1, dataBuffer, BufferDataSet.SHORT );
+                        }
                                                 
-                        MutablePropertyDataSet ds= BufferDataSet.makeDataSet( 1, 2, 0, nsamples, 1, 1, 1, dataBuffer, BufferDataSet.SHORT );
                         ds.putProperty( QDataSet.DEPEND_0, t );
         
                         result= BufferDataSet.copy(ds);
