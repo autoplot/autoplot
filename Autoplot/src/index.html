@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Autoplot script is used to calculate number of insulation boards are needed for the attic.  Happy Fall!
+        <p><small>Several datasets can be loaded at once from a CDF file.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,11 +26,13 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-09-25 r25126):</p>
+        <p>Bugfixes (2020-09-30 r25126):</p>
         <ul>
+            <li>2274: Handle redirect to authenticated URL.  Thanks, Jon N!
+            <li>when loading several datasets from CDF into a bundle, all would have the label of the first.  Thanks, Warren!
+            <li>rfe694: explicitly handle escape in DataSetSelector, so that it doesn't escape the dialog which contains it.
             <li>2287: handle case where CDF attribute has String for first value and double array for second and third.
             <li>backgroundThick line (used for contrast) would draw with dashes as well, making it unusable with anything other that solid.
-            <li>2274: Handle redirect to authenticated URL.  Thanks, Jon N!
             <li>HapiServerDemo, the Autoplot-based HAPI Server, didn't properly handle fill data.
             <li>1486: swap plot position doesn't move the empheris data.
             <li>drag and drop file onto canvas works again on the Mac DMG release.   Thanks, Allison!
@@ -59,6 +61,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe425: Mashup will replace parameter names with the names of datasets, so that the tree is valid.
             <li>export to Das2Stream version 2.3 introduced by Chris.
             <li>experimental ColorSeriesRenderer introduced, which allows color along the line.
             <li>Jython-defined renderers can use colorbar.
