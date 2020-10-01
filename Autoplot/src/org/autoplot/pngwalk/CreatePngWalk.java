@@ -47,6 +47,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.BufferedWriter;
+import java.net.URI;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -576,13 +582,30 @@ public class CreatePngWalk {
                 }
                 mon.setTaskProgress(count);
 
+                File outTemp= new File( filename+".lock" );
+                
                 if ( params.update ) {
+                    File lockFile= new File( params.outputFolder + params.product + ".lock" );
+                    FileLock lock=null;
+                    if ( lockFile.exists() ) {
+                        Path p= Paths.get( lockFile.toURI() );
+                        FileChannel fileChannel = FileChannel.open( p, StandardOpenOption.WRITE );
+                        lock = fileChannel.lock();
+                    }
                     File out= new File( filename );
-                    if ( out.exists() ) {
+                    if ( out.exists() || outTemp.exists() ) {
                         mon.setProgressMessage( String.format("skipping %s", filename ) );
                         logger.log( Level.FINE, String.format("skipping %s", filename ) );
+                        if ( lock!=null ) {
+                            lock.release();
+                        }
                         continue;
+                    } else {
+                        outTemp.createNewFile();
                     }
+                    if ( lock!=null ) lock.release();
+                } else {
+                    outTemp.createNewFile();
                 }
 
                 //LoggerManager.markTime("486");
@@ -714,6 +737,11 @@ public class CreatePngWalk {
                 } else {
                     mon.setAdditionalInfo(String.format( Locale.US, "(%.1f/sec%s)", imagesPerSec, etaStr ) );
                 }
+                
+                if ( !outTemp.delete() ) {
+                    logger.log(Level.WARNING, "unable to delete {0}", outTemp);
+                }
+                
                 //LoggerManager.markTime("597");
                 
             } while ( times.hasNext() );
