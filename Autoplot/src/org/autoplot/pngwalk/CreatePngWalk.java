@@ -50,6 +50,8 @@ import java.io.BufferedWriter;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Iterator;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -311,7 +313,22 @@ public class CreatePngWalk {
      * @throws InterruptedException 
      */
     public static int doBatch( String[] times, Application readOnlyDom, Params params, ProgressMonitor mon ) throws IOException, InterruptedException {
+        return doBatch( Arrays.asList(times).iterator(), times.length, readOnlyDom, params, mon );
+    }
     
+    /**
+     * run the pngwalk for the list of times.  The dom argument is copied so the
+     * scientist can continue working while the pngwalk is run.
+     * @param times iterator with each time.
+     * @param size size, if known, or -1 if not known.
+     * @param readOnlyDom the dom to render for each time.
+     * @param params outputFolder and spec.
+     * @param mon progress monitor to provide feedback about the run.
+     * @return 0 if any were successful, 10 otherwise.
+     * @throws IOException
+     * @throws InterruptedException 
+     */    
+    public static int doBatch( Iterator<String> times, int size, Application readOnlyDom, Params params, ProgressMonitor mon ) throws IOException, InterruptedException {        
         final ArrayList<String> pngFilenameArrayThumbs= new ArrayList();
         final ArrayList<String> pngFilenameArrayBig= new ArrayList();
         final ArrayList<String> timeLabels= new ArrayList();
@@ -345,7 +362,7 @@ public class CreatePngWalk {
             }
         }
 
-        int n = times.length;
+        int n = size;
         mon.setTaskSize(n);
         mon.started();
 
@@ -356,8 +373,12 @@ public class CreatePngWalk {
             Application dom= (Application) readOnlyDom.copy();
             dom.getOptions().syncToAll( readOnlyDom.getOptions(), new ArrayList() );
 
+            if ( !times.hasNext() ) {
+                throw new IllegalArgumentException("there must be at least one time");
+            }
+            
+            String atime= times.next();
             try {
-                String atime= times[0];
                 int ic= atime.indexOf(": ");
                 String exactTime; 
                 if ( ic>-1 ) { // rfe batchfile time.
@@ -513,8 +534,17 @@ public class CreatePngWalk {
             //LoggerManager.setTimerLogfile("/tmp/foo.autoplot.txt");
 
             String currentTimeLabel;
-            for ( String atime : times ) {
+            
+            boolean firstTime= true;
+            
+            do {
 
+                if ( !firstTime ) {
+                    atime= times.next();
+                } else {
+                    firstTime= false;
+                }
+                
                 //LoggerManager.resetTimer();
 
                 returnCode1= 0;
@@ -610,7 +640,7 @@ public class CreatePngWalk {
 
                 //LoggerManager.markTime("529");
 
-                if ( atime.equals(times[0]) ) { // resetting zoomY and zoomZ can cause the labels and bounds to change.  Turn off autoranging.
+                if ( firstTime ) { // resetting zoomY and zoomZ can cause the labels and bounds to change.  Turn off autoranging.
                     dom2.getOptions().setAutolayout(false);
                     appmodel.waitUntilIdle();
                 }
@@ -685,7 +715,8 @@ public class CreatePngWalk {
                     mon.setAdditionalInfo(String.format( Locale.US, "(%.1f/sec%s)", imagesPerSec, etaStr ) );
                 }
                 //LoggerManager.markTime("597");
-            }
+                
+            } while ( times.hasNext() );
 
             //LoggerManager.setEnableTimers(false);
 
