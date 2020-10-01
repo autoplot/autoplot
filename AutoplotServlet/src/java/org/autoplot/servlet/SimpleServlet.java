@@ -173,9 +173,10 @@ public class SimpleServlet extends HttpServlet {
         FileInputStream fin= null;
         
         String qs= request.getQueryString();
-        
+        String cacheControl= request.getHeader("Cache-Control");
+
         synchronized ( this ) {
-            if ( ServletInfo.isCaching() && qs!=null ) {
+            if ( ServletInfo.isCaching() && qs!=null && !"no-cache".equals(cacheControl) ) {
                 String format = ServletUtil.getStringParameter(request, "format", "image/png");
                 if ( format.equals("image/png") ) {
                     String hash= request.getQueryString();
@@ -560,7 +561,7 @@ public class SimpleServlet extends HttpServlet {
                             suri= tsb.getURI();
                         }
                     }
-                    
+                    response.setHeader( "X-Autoplot-TSB-URI", suri );
                     DataSourceFactory dsf= DataSetURI.getDataSourceFactory( DataSetURI.getURI(suri),new NullProgressMonitor());
                     List<String> problems= new ArrayList<>(1);
                     if ( dsf.reject(suri, problems, new NullProgressMonitor() )) {
