@@ -176,7 +176,7 @@ public class SimpleServlet extends HttpServlet {
         String cacheControl= request.getHeader("Cache-Control");
 
         synchronized ( this ) {
-            if ( ServletInfo.isCaching() && qs!=null && !"no-cache".equals(cacheControl) ) {
+            if ( ServletInfo.isCaching() && qs!=null ) {
                 String format = ServletUtil.getStringParameter(request, "format", "image/png");
                 if ( format.equals("image/png") ) {
                     String hash= request.getQueryString();
@@ -186,7 +186,7 @@ public class SimpleServlet extends HttpServlet {
                     metaCacheFile= new File( s, hash + ".txt" );
                     logFile= new File( s, hash+".log" );
 
-                    if ( cacheFile.exists() ) {
+                    if ( cacheFile.exists() && !"no-cache".equals(cacheControl) ) {
                         byte[] bb= Files.readAllBytes(metaCacheFile.toPath());
                         String qs0= new String( bb );
                         if ( qs0.equals(qs) ) {
@@ -205,6 +205,9 @@ public class SimpleServlet extends HttpServlet {
 
                     }
                 }
+            } else { 
+                File s= ServletInfo.getCacheDirectory();
+                logFile= new File( s, "request.log" );
             }
         }
         
@@ -214,6 +217,10 @@ public class SimpleServlet extends HttpServlet {
             }
             fin.close();
             return;
+        }
+        
+        if ( logFile==null ) {
+            throw new NullPointerException("logfile should be set");
         }
         
         Handler h= new FileHandler(String.valueOf(logFile));
