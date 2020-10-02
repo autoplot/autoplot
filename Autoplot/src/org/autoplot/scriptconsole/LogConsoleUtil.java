@@ -1,17 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.scriptconsole;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -19,8 +12,6 @@ import java.util.logging.XMLFormatter;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import org.das2.datum.TimeUtil;
-import org.das2.datum.Units;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -42,7 +33,7 @@ public class LogConsoleUtil {
     }
     public static List<LogRecord> deserializeLogRecords( InputStream in ) throws ParserConfigurationException, SAXException, IOException {
         SAXParser parser= SAXParserFactory.newInstance().newSAXParser();
-        final List<LogRecord> records= new ArrayList<LogRecord>();
+        final List<LogRecord> records= new ArrayList<>();
         parser.parse( in, new DefaultHandler() {
             LogRecord rec;
             StringBuffer databuf;
@@ -64,20 +55,30 @@ public class LogConsoleUtil {
             @Override
             public void endElement(String uri, String localName, String qName) throws SAXException {
                 String data= databuf.toString();
-                if ( qName.equals("record") ) {
-                    records.add(rec);
-                } else if ( qName.equals("millis") ) {
-                    rec.setMillis( (long) Long.parseLong(data));
-                } else if ( qName.equals("logger") ) {
-                    rec.setLoggerName(data);
-                } else if ( qName.equals("level") ) {
-                    rec.setLevel(Level.parse(data));
-                } else if ( qName.equals("sequence") ) {
-                    rec.setSequenceNumber(Integer.parseInt(data));
-                } else if ( qName.equals("thread") ) {
-                    rec.setThreadID(Integer.parseInt(data));
-                } else if ( qName.equals("message") ) {
-                    rec.setMessage(data);
+                switch (qName) {
+                    case "record":
+                        records.add(rec);
+                        break;
+                    case "millis":
+                        rec.setMillis( (long) Long.parseLong(data));
+                        break;
+                    case "logger":
+                        rec.setLoggerName(data);
+                        break;
+                    case "level":
+                        rec.setLevel(Level.parse(data));
+                        break;
+                    case "sequence":
+                        rec.setSequenceNumber(Integer.parseInt(data));
+                        break;
+                    case "thread":
+                        rec.setThreadID(Integer.parseInt(data));
+                        break;
+                    case "message":
+                        rec.setMessage(data);
+                        break;
+                    default:
+                        break;
                 }
                 databuf= new StringBuffer();
                 super.endElement(uri, localName, qName);
