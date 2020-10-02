@@ -9,6 +9,7 @@ import java.awt.datatransfer.Transferable;
 import java.io.IOException;
 import java.util.Stack;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import jsyntaxpane.DefaultSyntaxKit;
@@ -201,6 +202,7 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
         boolean lastNameOrConstant= false;
         
         String lastToken="";
+        Pattern intPattern= Pattern.compile("\\d+");
         
         while ( st.hasMoreTokens() ) {
             String t= st.nextToken();
@@ -214,27 +216,35 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
                 
             } else if ( t.equals("=") ) {
                 sb.append("=");
+                lastNameOrConstant= false;
             } else if ( t.equals("[") ) {
                 stack.push(t);
             } else if ( t.equals("]") ) {
                 String lastt= stack.pop();
                 if ( stack.size()>0 && stack.peek().equals("[") ) {
                     stack.pop();
+                    if ( lastNameOrConstant ) {
+                        sb.append(" * ");
+                    }
                     if ( lastt.equals("Sqrt") ) {
                         sb.append("sqrt");
+                        lastNameOrConstant= false;
                     } else {
                         sb.append('(').append(lastt).append(')');
+                        lastNameOrConstant= true;
                     }
                 }
             } else if ( t.equals("(") ) {
                 if ( lastToken.equals(")") ) {
                     sb.append(" * ");
+                } else if ( lastNameOrConstant ) {
+                    sb.append("* ");
                 }
                 sb.append(t);
                 lastNameOrConstant= false;
             } else if ( t.equals(")") ) {
                 sb.append(t);
-                lastNameOrConstant= false;
+                lastNameOrConstant= true;
             } else if ( t.equals("^") ) {
                 sb.append("**");
                 lastNameOrConstant= false;
@@ -246,21 +256,32 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
                 lastNameOrConstant= false;
             } else if ( t.equals("/") ) {
                 sb.append(t);
-                lastNameOrConstant= false;                
+                lastNameOrConstant= false;
+            } else if ( intPattern.matcher(t).matches() ) {
+                if ( stack.size()>0 ) {
+                    stack.push(t);
+                } else {
+                    if ( lastToken.equals("/") ) {
+                        sb.append(t).append(".");
+                    } else {
+                        sb.append(t);
+                    } 
+                    lastNameOrConstant= true;
+                }
             } else {
                 if ( stack.size()>0 ) {
                     stack.push(t);
                 } else {
+                    boolean isFunctionName= false;
                     if ( t.equals("Sqrt") ) {
                         t= "sqrt";
+                        isFunctionName= true;
                     }
                     if ( lastNameOrConstant ) {
                         sb.append("* ");
-                        sb.append(t);
-                    } else {
-                        sb.append(t);
-                        lastNameOrConstant= true;
                     }
+                    sb.append(t);
+                    lastNameOrConstant= !isFunctionName;
                 }
             }
             //System.out.print( t );
@@ -286,11 +307,32 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
     public static void main( String[] args ) throws IOException {
         MathematicaJythonConverter cc= new MathematicaJythonConverter(null);
 
-        String src= "{flh -> (1/(\n" +
+        String src1= "{flh -> (1/(\n" +
 "   6 Sqrt[102]))(\\[Sqrt](1836 fce^2 + 1836 fci^2 +\n" +
 "       1837 fpe^2 - \\[Sqrt](3370896 fce^4 - 6741792 fce^2 fci^2 +\n" +
 "          3370896 fci^4 + 6738120 fce^2 fpe^2 - 6738120 fci^2 fpe^2 +\n" +
 "          3374569 fpe^4)))}";
+        
+        String src2= "fl -> 1/306 (102 (fce + fci) - (17^(\n" +
+"         2/3) (612 fce^2 - 612 fce fci + 612 fci^2 +\n" +
+"           1837 fpe^2))/(-62424 fce^3 + 93636 fce^2 fci +\n" +
+"         93636 fce fci^2 - 62424 fci^3 - 280602 fce fpe^2 +\n" +
+"         561663 fci fpe^2 +\n" +
+"         Sqrt[17] \\[Sqrt](-(612 fce^2 - 612 fce fci + 612 fci^2 +\n" +
+"                1837 fpe^2)^3 +\n" +
+"             1377 (408 fce^3 - 612 fce^2 fci - 612 fce fci^2 +\n" +
+"                408 fci^3 + 1834 fce fpe^2 - 3671 fci fpe^2)^2))^(\n" +
+"       1/3) - 17^(\n" +
+"       1/3) (-62424 fce^3 + 93636 fce^2 fci + 93636 fce fci^2 -\n" +
+"         62424 fci^3 - 280602 fce fpe^2 + 561663 fci fpe^2 +\n" +
+"         Sqrt[17] \\[Sqrt](-(612 fce^2 - 612 fce fci + 612 fci^2 +\n" +
+"                1837 fpe^2)^3 +\n" +
+"             1377 (408 fce^3 - 612 fce^2 fci - 612 fce fci^2 +\n" +
+"                408 fci^3 + 1834 fce fpe^2 - 3671 fci fpe^2)^2))^(\n" +
+"       1/3))}";
+        
+        String src= src2;
+        
         cc.mathematicaEditorPane.setText(src);
         
         JDialog dia= new JDialog();
