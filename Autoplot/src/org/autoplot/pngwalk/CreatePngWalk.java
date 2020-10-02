@@ -582,6 +582,7 @@ public class CreatePngWalk {
                 }
                 mon.setTaskProgress(count);
 
+                FileChannel fileChannel=null;
                 File outTemp= new File( filename+".lock" );
                 
                 if ( params.update ) {
@@ -589,7 +590,7 @@ public class CreatePngWalk {
                     FileLock lock=null;
                     if ( lockFile.exists() ) {
                         Path p= Paths.get( lockFile.toURI() );
-                        FileChannel fileChannel = FileChannel.open( p, StandardOpenOption.WRITE );
+                        fileChannel = FileChannel.open( p, StandardOpenOption.WRITE );
                         lock = fileChannel.lock();
                     }
                     File out= new File( filename );
@@ -598,14 +599,22 @@ public class CreatePngWalk {
                         logger.log( Level.FINE, String.format("skipping %s", filename ) );
                         if ( lock!=null ) {
                             lock.release();
+                            fileChannel.close();
                         }
                         continue;
                     } else {
-                        outTemp.createNewFile();
+                        if ( !outTemp.createNewFile() ) {
+                            logger.log(Level.WARNING, "unable to make new file: {0}", outTemp);
+                        }
                     }
-                    if ( lock!=null ) lock.release();
+                    if ( lock!=null ) {
+                        lock.release();
+                        fileChannel.close();
+                    }
                 } else {
-                    outTemp.createNewFile();
+                    if ( !outTemp.createNewFile() ) {
+                        logger.log(Level.WARNING, "unable to make new file: {0}", outTemp);
+                    }
                 }
 
                 //LoggerManager.markTime("486");
