@@ -44,6 +44,7 @@ import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.jythonsupport.JavaJythonConverter;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
+import org.autoplot.jythonsupport.MathematicaJythonConverter;
 import static org.das2.jythoncompletion.JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
 
@@ -580,6 +581,28 @@ public class EditorContextMenu {
                     }
                     try {
                         JavaJythonConverter cc= new JavaJythonConverter(editor);
+                        cc.setJavaSource(doThis);
+                        JDialog d= new JDialog();
+                        d.setContentPane(cc);
+                        d.pack();
+                        d.setVisible(true);
+                    } catch ( Exception ex ) {
+                        JOptionPane.showMessageDialog( menu, ex.toString() );
+                    }
+                }                
+            });
+            developerMenu.add(mi);
+
+            mi= new JMenuItem( new AbstractAction("Convert Mathematica To Jython") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);
+                    String doThis= editor.getSelectedText();
+                    if ( doThis==null || doThis.length()==0 ) {
+                        doThis= editor.getText();
+                    }
+                    try {
+                        MathematicaJythonConverter cc= new MathematicaJythonConverter(editor);
                         cc.setJavaSource(doThis);
                         JDialog d= new JDialog();
                         d.setContentPane(cc);
