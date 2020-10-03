@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New Series Renderer property backThick can be used to draw two-color lines, here set to "1em" to mean the same thickness as the foreground line.
+        <p><small>URLs can be dragged from website and dropped on to Autoplot.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-10-01 r25152):</p>
+        <p>Bugfixes (2020-10-03 r25168):</p>
+        <ul>
+            <li>rfe425: in MashUp tool, leave tree branch unfolded when inserting an operation, to minimize changes.
+        </ul>
+        <p>Older Bugfixes (2020-09-30 r25152):</p>
         <ul>
             <li>2289: IOException when TAB is pressed in empty data set selector, instead of discovery of types.
             <li>2274: Handle redirect to authenticated URL.  Thanks, Jon N and Kristoff!
@@ -43,27 +47,13 @@
             <li>ASCII column headers can include granny strings for units, like "N_e(cm!a-3!n)"
             <li>2278: CDF slice1 keyword didn't work when Epoch16 timetags were used.  Thanks, Kristoff!
         </ul>
-        <p>Older Bugfixes (2020-07-13 r24952):</p>
-        <ul>
-            <li>rte 1783311991: Check for null when identifying format of CDF file.  Thanks, Alamo!
-            <li>rte 1783311991: CDFExceptions now keep track of initial cause to aid in support.  Thanks, Alamo! 
-            <li>simplifyScript checks for indeces which cannot be resolved d[r1] where r1 is not known.
-            <li>rte 761822764: Improve error message when X and Y arguments of CDF reader load variables of different lengths. 
-            <li>ArgumentList utility assumed that default values for requireOneOf parameters where non-null.
-            <li>2276: PngwalkTool inspect action now shows folders in local file chooser.  Use Java 6 FileNameFileFilter everywhere, reducing code and making things consistent.
-            <li>don't replace existing NetCDF units with those found in the ISTP metadata, since the NetCDF ones are more likely to be correct.
-            <li>CreatePngWalk no longer allowed single URI to be used in place of .vap.  Add uri= argument which is better anyway.  Thanks, Warren!
-            <li>2274: keep track of 401 exceptions so we ask for password again if incorrect password is entered.  Thanks, Chris!
-            <li>add calendar button to mashup tool.
-            <li>1728: set the value of the JComboBox directly, fixing old problem where black to white change was rejected.  Thanks, Sadie!
-            <li>"add plot..." dialog didn't add to recent URIs list when only one URI was used.
-            <li>Java8 is now required in the Webstart JNLP file.  (No Java8 code yet.)
-            <li>axis reference property didn't load properly from .vap files.
-        </ul>
         <p>Features:</p>
         <ul>
-            <li>Jython editor has new developer->"Convert Mathematica to Jython" tool.
+            <li>Jython editor has new developer->"Convert Mathematica code to Jython" tool.
             <li>create pngwalk checks for lockfile, so that multiple processes can work on pngwalk in concert.
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>rfe425: Mashup will replace parameter names with the names of datasets, so that the tree is valid.
             <li>export to Das2Stream version 2.3 introduced by Chris.
             <li>experimental ColorSeriesRenderer introduced, which allows color along the line.
@@ -75,15 +65,6 @@
             <li>File chooser has types alphabetized and now shows only file-based data sources.  Thanks, Allison!
             <li>HAPI data source shows events bar when only timetags are requested, useful for availability.
             <li>suppress the legend when the plot width is less than 100 pixels.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>725: create pngwalk has option to remove pngs which don't contain data.
-            <li>bug 1687: introduce completions based on Java classes which could be imported and are imported when the completion proposal is accepted.
-            <li>improvements to the Java to Jython GUI, improvements to conversion (to support URI_Templates effort).
-            <li>724: ISTP metadata allows for time location units like "seconds since 1970-01-01T00:00".  Thanks, Steven!
-            <li>bundle command now has 5, 6, and 7 dataset versions.  Thanks, Sadie!
-            <li>Annotation splitAnchor allows annotation X position to anchor to plot edge while Y anchors to data.
         </ul>
         <p>Known issues:</p>
         <ul>
