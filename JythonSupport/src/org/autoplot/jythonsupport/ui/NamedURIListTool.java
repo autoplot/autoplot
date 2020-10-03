@@ -357,7 +357,11 @@ public class NamedURIListTool extends JPanel {
                     String newName= null;
                     String currentName= null;
                     if ( uris.get(fi).trim().length()==0 ) {
-                        newName= DataSourceUtil.guessNameFor( dss.getValue() );
+                        List<String> nids= new ArrayList<>(ids);
+                        List<String> nuris= new ArrayList<>(uris);
+                        nids.remove(fi);
+                        nuris.remove(fi);
+                        newName= DataSourceUtil.guessNameFor( dss.getValue(), nuris, nids );
                         if ( isValidIdentifier(newName) ) { 
                             currentName= ids.get( fi );
                         }
@@ -460,7 +464,7 @@ public class NamedURIListTool extends JPanel {
         while ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( scrollPane, p, title, JOptionPane.OK_CANCEL_OPTION ) ) {
             String newName= tf.getText();
             if ( !cb.isSelected() && edit!=null ) {
-                newName= DataSourceUtil.guessNameFor(edit.getURI());
+                newName= DataSourceUtil.guessNameFor(edit.getURI(),uris,ids);
             }
             if ( isValidIdentifier(newName) ) {
                 doVariableRename( fi, currentName, newName );
