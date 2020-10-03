@@ -1186,7 +1186,8 @@ public class DataSourceUtil {
      * create a name which is unique, not in otherNames, perhaps looking at
      * differences with other URIs found in otherURIs. TODO: there's lots of
      * fun we could have here, for example looking for the closest URI in 
-     * otherNames, and then basing the name on the difference.
+     * otherNames, and then basing the name on the difference. (Possible student
+     * project!)
      * @param uri the URI which needs naming.
      * @param otherURIs list of URIs, or null.
      * @param otherNames list of names for each URI, or null.
