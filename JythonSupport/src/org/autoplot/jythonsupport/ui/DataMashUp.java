@@ -34,6 +34,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -909,16 +910,59 @@ public class DataMashUp extends javax.swing.JPanel {
     }
     
     /**
+     * print the path to a string, comma delimited.
+     * @param newPath
+     * @return 
+     */
+    public static String printPath(Object [] newPath ) {
+        StringBuilder bb= new StringBuilder();
+        for (Object newPath1 : newPath) {
+            bb.append(",");
+            bb.append(newPath1);
+        }
+        return bb.length()==0 ? "" : bb.substring(1);
+    }
+    
+    /**
+     * insert element into array at index, as long as index is within the array
+     * or at the length of the array.
+     * @param array array of elements
+     * @param index index for insertion, which may be out of bounds for the array.
+     * @param node the object to insert.
+     * @return 
+     * @see 
+     */
+    public static Object[] insertElement( Object[] array, int index, Object node ) {
+        if ( array.length>=index ) {
+            Object[] result= new Object[array.length+1];
+            System.arraycopy( array, 0, result, 0, index );
+            result[index]= node;
+            System.arraycopy( array, index, result, index+1, array.length-index );
+            return result;
+        } else {
+            return array;
+        }
+    }
+    
+    /**
      * 
      * @param data the expression to incorporate into the tree
      * @param tp the path where the expression is to be inserted
      * @param moveOldNodeDown if true, then make the drop target the first child.
      */
-    private void doDrop( String data, TreePath tp, boolean moveOldNodeDown ) {
+    private void doDrop( final String data, final TreePath tp, boolean moveOldNodeDown ) {
     
         DefaultTreeModel model= (DefaultTreeModel) expressionTree.getModel();
 
         MutableTreeNode oldBranch= (MutableTreeNode)tp.getLastPathComponent();
+        final Enumeration<TreePath> ppp= expressionTree.getExpandedDescendants(tp);
+        final List<TreePath> expandedDescendants= new ArrayList<>();
+        if ( ppp!=null ) {
+            while ( ppp.hasMoreElements() ) {
+                expandedDescendants.add(ppp.nextElement());
+            }
+        }
+        
         MutableTreeNode parent= (MutableTreeNode)oldBranch.getParent();
         
         final MutableTreeNode newBranch= getTreeNode(data, namedURIListTool1.ids, new ArrayList<String>() );
@@ -949,7 +993,15 @@ public class DataMashUp extends javax.swing.JPanel {
         SwingUtilities.invokeLater( new Runnable() {
             @Override
             public void run() {
-                expressionTree.expandPath( getPath(newBranch) );
+                TreePath newTreePath= getPath(newBranch);
+                expressionTree.expandPath( newTreePath );
+                for ( TreePath tp1 : expandedDescendants ) {
+                    Object[] path= tp1.getPath();
+                    Object[] newPath= insertElement( path, tp.getPathCount()-1, newBranch );
+
+                    TreePath mtp1= new TreePath(newPath);
+                    expressionTree.expandPath(mtp1);
+                }
                 imaged.clear();
                 resolved.clear();
                 expressionTree.treeDidChange();
@@ -1773,7 +1825,9 @@ public class DataMashUp extends javax.swing.JPanel {
 
                     DefaultMutableTreeNode n= (DefaultMutableTreeNode)tp.getLastPathComponent();
                     String old= getJython( (DefaultTreeModel)expressionTree.getModel(), n );
-                    addToScratch( old );
+                    if ( old.contains("(") ) {
+                        addToScratch( old );
+                    }
                     if ( data.endsWith(REPLACEARGSFLAG) ) {
                         data= data.substring(0,data.length()-17);
                         doDrop(data,tp,true);
