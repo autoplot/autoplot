@@ -188,7 +188,11 @@ public class WindowManager {
     public void showModalDialog( Dialog dia ) {
         if ( !dia.isModal() ) throw new IllegalArgumentException("dialog should be modal");
         WindowManager.getInstance().recallWindowSizePosition(dia);
-        dia.setVisible(true);
+        try { 
+            dia.setVisible(true);
+        } catch ( ClassCastException ex ) {
+            logger.log( Level.WARNING, null, ex ); // TODO: explore where this comes from.
+        }
         WindowManager.getInstance().recordWindowSizePosition(dia);        
     }
     
