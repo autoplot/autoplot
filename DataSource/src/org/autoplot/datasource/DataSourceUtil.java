@@ -1183,6 +1183,31 @@ public class DataSourceUtil {
     }
     
     /**
+     * create a name which is unique, not in otherNames, perhaps looking at
+     * differences with other URIs found in otherURIs. TODO: there's lots of
+     * fun we could have here, for example looking for the closest URI in 
+     * otherNames, and then basing the name on the difference.
+     * @param uri the URI which needs naming.
+     * @param otherURIs list of URIs, or null.
+     * @param otherNames list of names for each URI, or null.
+     * @return the suggested name
+     */
+    public static String guessNameFor( String uri, List<String> otherURIs, List<String> otherNames ) {
+        String n= guessNameFor(uri);
+        if ( otherNames.contains(n) ) {
+            int serial= 1;
+            String newn= n + serial;
+            while ( otherNames.contains(newn) ) {
+                serial++;
+                newn= n + serial;
+            }
+            return newn;
+        } else {
+            return n;
+        }
+    }
+    
+    /**
      * return a one-line string representation of the exception.  This was introduced
      * when a NullPointerException was represented as "null", and it was somewhat
      * unclear about what was going on.
