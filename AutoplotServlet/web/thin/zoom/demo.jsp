@@ -92,7 +92,7 @@
          }
          
      %>
-	<div id="iddivimg">
+        <div id="iddivimg" style="min-width: 700px; min-height: 400px"> 
             <% if (ssArg!=null ) { %>
 		<img id="idplot" 
                      src="../../SimpleServlet?<%= ssArg %>"
