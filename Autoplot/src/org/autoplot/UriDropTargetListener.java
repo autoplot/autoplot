@@ -3,14 +3,12 @@ package org.autoplot;
 
 import java.awt.Component;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -20,12 +18,10 @@ import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasPlot;
 import org.das2.util.LoggerManager;
 import org.autoplot.bookmarks.Bookmark;
-import org.autoplot.bookmarks.BookmarksException;
 import org.autoplot.dom.Plot;
 import org.autoplot.dom.PlotElement;
 import org.autoplot.layout.LayoutConstants;
 import org.autoplot.datasource.DataSetSelector;
-import org.xml.sax.SAXException;
 
 /**
  * DropTarget allows URIs to be dropped onto plots of the page.
