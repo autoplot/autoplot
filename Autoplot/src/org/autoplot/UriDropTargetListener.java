@@ -11,6 +11,7 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,19 +37,18 @@ public class UriDropTargetListener implements DropTargetListener {
     
     DataSetSelector dss;
     ApplicationModel model;
+    List<String> supportedFlavors;
 
     public UriDropTargetListener(DataSetSelector dss, ApplicationModel model) {
         this.model = model;
         this.dss = dss;
-        try {
-            nixFileDataFlavor = new DataFlavor("text/uri-list;class=java.lang.String");
-        } catch (ClassNotFoundException ex) {
-            logger.log( Level.WARNING, ex.getMessage(), ex );
-        }
+        supportedFlavors= new ArrayList<>();
+        supportedFlavors.add("text/uri-list;class=java.lang.String");
+        supportedFlavors.add("application/x-java-url;class=java.net.URL");
+        supportedFlavors.add("application/x-java-file-list;class=java.util.List");
+        //TODO: make sure this list is consistent with getURI code, and eventually make into loop.
     }
 
-    private DataFlavor nixFileDataFlavor;
-    
     /**
      * get the URI when a reference is dropped on to Autoplot.  This is quite
      * platform-specific, how the drop appears, and a number of different 
@@ -58,21 +58,22 @@ public class UriDropTargetListener implements DropTargetListener {
      * @return the URI or null.
      */
     private String getURI( DropTargetDropEvent dtde ) {
-        try {
-            boolean haveAcceptedDrop= false;
-            Bookmark item = null;
-            List<Bookmark> items = null;
-            if ( logger.isLoggable(Level.FINE) ) {
-                for ( DataFlavor df: dtde.getCurrentDataFlavors() ) {
-                    logger.log(Level.FINE, "drop data flavor: {0} {1}", new Object[]{df.getMimeType(), df.getHumanPresentableName()});
-                }
+
+        boolean haveAcceptedDrop= false;
+        Bookmark item = null;
+        List<Bookmark> items = null;
+        if ( logger.isLoggable(Level.FINE) ) {
+            for ( DataFlavor df: dtde.getCurrentDataFlavors() ) {
+                logger.log(Level.FINE, "drop data flavor: {0} {1}", new Object[]{df.getMimeType(), df.getHumanPresentableName()});
             }
-            if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                if ( !haveAcceptedDrop ) {
-                    dtde.acceptDrop(DnDConstants.ACTION_COPY);
-                    haveAcceptedDrop= true;
-                }
+        }
+        if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+            try {
+                dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                haveAcceptedDrop= true;
+                logger.fine("looking, try using DataFlavor.stringFlavor to get uri");
                 String data = ((String) dtde.getTransferable().getTransferData(DataFlavor.stringFlavor)).trim();
+                logger.log(Level.FINER, "got string data: {0}", data);
                 if (data.length() > 19 && data.startsWith("<bookmark-list")) {
                     items = Bookmark.parseBookmarks(data);
                 } else if (data.length() > 14 && data.startsWith("<bookmark")) {
@@ -80,89 +81,96 @@ public class UriDropTargetListener implements DropTargetListener {
                 } else {
                     item = new Bookmark.Item(data);
                 }
+            } catch ( Exception ex) {
+                logger.log(Level.FINE, "unable to get text/uri-list: {0}", ex.getMessage());
             }
-            if ( item==null ) {
-                try {
-                    logger.fine("data flavor not supported, try text/uri-list");
-                    if ( dtde.isDataFlavorSupported(nixFileDataFlavor) ) {
-                        if ( !haveAcceptedDrop ) {
-                            dtde.acceptDrop(DnDConstants.ACTION_COPY);
-                            haveAcceptedDrop= true;
-                        }
-                        String data = (String)dtde.getTransferable().getTransferData(nixFileDataFlavor);
-                        if ( data!=null ) {
-                            item= new Bookmark.Item( data );
-                        }
-                    }
-                } catch ( Exception ex) {
-                    logger.log(Level.FINE, "unable to get text/uri-list: {0}", ex.getMessage());
-                }
-            }
-            if ( item==null ) { // how to do the drop on a Mac???     
+        }
 
-                DataFlavor df;
-                try {
-                    df = new DataFlavor("application/x-java-url;class=java.net.URL");
-                    if ( dtde.isDataFlavorSupported( df ) ) {
-                        logger.fine("data flavor application/x-java-url supported");
-                        if ( !haveAcceptedDrop ) {
-                            dtde.acceptDrop(DnDConstants.ACTION_COPY);
-                            haveAcceptedDrop= true;
-                        }
-                        String data = String.valueOf( dtde.getTransferable().getTransferData(df) );
+        if ( item==null ) {
+            try {
+                DataFlavor df = new DataFlavor("text/uri-list;class=java.lang.String");
+                logger.fine("looking, try text/uri-list;class=java.lang.String");
+                if ( dtde.isDataFlavorSupported(df) ) {
+                    if ( !haveAcceptedDrop ) {
+                        dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                        haveAcceptedDrop= true;
+                    }
+                    String data = String.valueOf( dtde.getTransferable().getTransferData(df) );
+                    logger.log(Level.FINER, "got string data: {0}", data);
+                    if ( data!=null ) {
+                        item= new Bookmark.Item( data );
+                    }
+                } else {
+                    logger.finer("not supported");
+                }
+            } catch ( Exception ex) {
+                logger.log(Level.FINE, "unable to get text/uri-list: {0}", ex.getMessage());
+            }
+        }
+
+        if ( item==null ) { // how to do the drop on a Mac???     
+            try {
+                DataFlavor df = new DataFlavor("application/x-java-url;class=java.net.URL");
+                logger.fine("looking, try application/x-java-url;class=java.net.URL");
+                if ( dtde.isDataFlavorSupported( df ) ) {
+                    logger.fine("data flavor application/x-java-url;class=java.net.URL supported");
+                    if ( !haveAcceptedDrop ) {
+                        dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                        haveAcceptedDrop= true;
+                    }
+                    String data = String.valueOf( dtde.getTransferable().getTransferData(df) );
+                    logger.log(Level.FINER, "got string data: {0}", data);
+                    if (data.startsWith("file://localhost/")) {
+                        data= data.substring(16); // mac at least does this...
+                    }
+                    item= new Bookmark.Item( data );
+                } else {
+                    logger.finer("not supported");
+                }
+            } catch ( Exception ex ) {
+                logger.log(Level.FINE, "unable to get application/x-java-url: {0}", ex.getMessage());
+            }
+        }
+        if ( item==null ) {
+            try {
+                DataFlavor df = new DataFlavor("application/x-java-file-list;class=java.util.List");
+                logger.fine("looking, try application/x-java-url;class=java.net.List");
+                if ( dtde.isDataFlavorSupported( df ) ) {
+                    logger.fine("data flavor application/x-java-url;class=java.net.List supported");
+                    if ( !haveAcceptedDrop ) {
+                        dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                        haveAcceptedDrop= true;
+                    }
+                    List list= (List)dtde.getTransferable().getTransferData(df);
+                    logger.log(Level.FINER, "got list data with number of elements: {0}", list.size() );
+                    if ( list.size()==1 ) {
+                        String data = list.get(0).toString();
                         if (data.startsWith("file://localhost/")) {
                             data= data.substring(16); // mac at least does this...
                         }
                         item= new Bookmark.Item( data );
                     }
-                } catch ( Exception ex ) {
-                    logger.log(Level.FINE, "unable to get application/x-java-url: {0}", ex.getMessage());
-                }
-            }
-            if ( item==null ) {
-                try {
-                    DataFlavor df = new DataFlavor("application/x-java-file-list;class=java.util.List");
-                    if ( dtde.isDataFlavorSupported( df ) ) {
-                        if ( !haveAcceptedDrop ) {
-                            dtde.acceptDrop(DnDConstants.ACTION_COPY);
-                            haveAcceptedDrop= true;
-                        }
-                        List list= (List)dtde.getTransferable().getTransferData(df);
-                        if ( list.size()==1 ) {
-                            String data = list.get(0).toString();
-                            if (data.startsWith("file://localhost/")) {
-                                data= data.substring(16); // mac at least does this...
-                            }
-                            item= new Bookmark.Item( data );
-                        }
-                    }
-                } catch (Exception ex) {
-                    logger.log(Level.FINE, "unable to get application/x-java-file-list: {0}", ex.getMessage());
-                }
-            }
-            
-            String uri=null;
-            if ( item != null ) {
-                if ( item instanceof Bookmark.Item ) {
-                    uri= ((Bookmark.Item)item).getUri();
                 } else {
-                    model.showMessage( "only one URI can be dropped", "only one URI", JOptionPane.WARNING_MESSAGE);
+                    logger.finer("not supported");
                 }
-            } else if ( items!=null ) {
-                model.showMessage( "only one URI can be dropped", "only one URI", JOptionPane.WARNING_MESSAGE);
-            } else {
-                model.showMessage("couldn't find URI in drop target", "no URI", JOptionPane.WARNING_MESSAGE);
+            } catch (Exception ex) {
+                logger.log(Level.FINE, "unable to get application/x-java-file-list: {0}", ex.getMessage());
             }
-            return uri;
-
-        } catch (UnsupportedFlavorException ex) {
-            logger.log( Level.SEVERE, ex.getMessage(), ex );
-
-        } catch (IOException | SAXException | BookmarksException ex) {
-            logger.log( Level.SEVERE, null, ex );
-
         }
-        return null;
+
+        String uri=null;
+        if ( item != null ) {
+            if ( item instanceof Bookmark.Item ) {
+                uri= ((Bookmark.Item)item).getUri();
+            } else {
+                model.showMessage( "only one URI can be dropped", "only one URI", JOptionPane.WARNING_MESSAGE);
+            }
+        } else if ( items!=null ) {
+            model.showMessage( "only one URI can be dropped", "only one URI", JOptionPane.WARNING_MESSAGE);
+        } else {
+            model.showMessage("couldn't find URI in drop target", "no URI", JOptionPane.WARNING_MESSAGE);
+        }
+        return uri;
 
     }
 
@@ -179,8 +187,15 @@ public class UriDropTargetListener implements DropTargetListener {
         if ( cc instanceof DasPlot ) {
             if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 dtde.acceptDrag(DnDConstants.ACTION_COPY);
-            } else if ( dtde.isDataFlavorSupported(nixFileDataFlavor)) {
-                dtde.acceptDrag(DnDConstants.ACTION_COPY);
+            } else {
+                for ( String ss: supportedFlavors ) {
+                    try {
+                        DataFlavor df= new DataFlavor(ss);
+                        dtde.isDataFlavorSupported(df);
+                    } catch (ClassNotFoundException ex) {
+                        logger.log(Level.FINE, null, ex);
+                    }
+                }
             }
         }
 
