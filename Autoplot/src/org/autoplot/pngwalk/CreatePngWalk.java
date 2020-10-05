@@ -58,6 +58,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedList;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -520,7 +521,8 @@ public class CreatePngWalk {
 
             mon.setProgressMessage("making images");
 
-            long t0 = java.lang.System.currentTimeMillis();
+            List<Long> t0s= new LinkedList<>();
+            
             int count = 0;
 
             appmodel.setExceptionHandler( new ExceptionHandler() {
@@ -543,7 +545,14 @@ public class CreatePngWalk {
             
             boolean firstTime= true;
             
+            int countRecent= 20;  // approx number in past minute
+            
             do {
+                
+                t0s.add( System.currentTimeMillis() );
+                while ( t0s.size()>countRecent ) {
+                    t0s.remove(0);
+                }
 
                 if ( !firstTime ) {
                     atime= times.next();
@@ -731,8 +740,8 @@ public class CreatePngWalk {
                 }
 
                 //LoggerManager.markTime("581");
-
-                double imagesPerSec = count * 1000. / (java.lang.System.currentTimeMillis() - t0);
+                
+                double imagesPerSec = t0s.size() * 1000. / (java.lang.System.currentTimeMillis() - t0s.get(0) );
                 double etaSec= (n-count) / imagesPerSec;
                 String etaStr= "";
                 if ( count>3 ) {
