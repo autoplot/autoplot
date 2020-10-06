@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.state;
 
 import org.autoplot.dom.DomUtil;
@@ -34,6 +31,7 @@ import org.das2.graph.PsymConnector;
 import org.das2.graph.SpectrogramRenderer;
 import org.autoplot.MouseModuleType;
 import org.autoplot.RenderType;
+import org.das2.graph.ErrorBarType;
 import org.das2.qstream.SerializeDelegate;
 import org.das2.qstream.SerializeRegistry;
 import org.das2.qstream.XMLSerializeDelegate;
@@ -44,10 +42,11 @@ import org.w3c.dom.NodeList;
 
 /**
  * Utility class for creating a Document from a DomNode.  Note that there is special
- * handling for:
- *    controller -- these nodes are dropped.
- *    class -- this is noise from java.
- *    *Automatically -- this is a property used to set another property.
+ * handling for:<ul>
+ * <li>controller -- these nodes are dropped.
+ * <li>class -- this is noise from java.
+ * <li>*Automatically -- properties ending in "Automatically" are used to set another property.
+ * </ul>
  * There may be other exceptional properties that are not documented here.
  * @author jbf
  */
@@ -73,6 +72,7 @@ public class SerializeUtil {
         SerializeRegistry.register( AnchorPosition.class, new TypeSafeEnumSerializeDelegate() );
         SerializeRegistry.register( BorderType.class, new TypeSafeEnumSerializeDelegate() );
         SerializeRegistry.register( AnchorType.class, new TypeSafeEnumSerializeDelegate() );
+        SerializeRegistry.register( ErrorBarType.class, new TypeSafeEnumSerializeDelegate() );
         SerializeRegistry.register( Level.class, new LevelSerializeDelegate() );
     }
     
