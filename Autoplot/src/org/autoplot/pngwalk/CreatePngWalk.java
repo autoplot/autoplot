@@ -355,6 +355,16 @@ public class CreatePngWalk {
             throw new IOException( "unable to write to folder "+outputFolder );
         }
 
+        if ( params.update ) {
+            File f= new java.io.File( outputFolder, params.product + ".lock");
+            if ( !f.exists() ) {
+                logger.info("creating lock file so multiple processes can work on pngwalk.");
+                if ( !f.createNewFile() ) {
+                    logger.info("failed to create lock file, some work may be redone.");
+                }
+            }
+        }
+        
         if (params.createThumbs) {
             File thumbsFolder= new java.io.File(params.outputFolder,"thumbs400/" );
             if ( !thumbsFolder.exists() && !( thumbsFolder.mkdirs() ) ) {
