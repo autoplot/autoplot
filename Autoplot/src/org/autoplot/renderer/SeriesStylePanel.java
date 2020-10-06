@@ -11,6 +11,7 @@ import org.das2.components.propertyeditor.ColorEditor;
 import org.das2.components.propertyeditor.EnumerationEditor;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.FocusAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -87,7 +88,10 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
 
         errorBarStyle = new EnumerationEditor();
         errorBarStyle.setValue( ErrorBarType.BAR );
-        errorBarStylePanel.add(errorBarStyle.getCustomEditor(), BorderLayout.CENTER);
+        Component myc= errorBarStyle.getCustomEditor();
+        myc.setEnabled(false);
+        errorBarStylePanel.add(myc, BorderLayout.CENTER);
+        errorBarStylePanel.setEnabled(false);
         
         validate();
                 
