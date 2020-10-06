@@ -65,6 +65,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import org.autoplot.dom.Options;
 import org.autoplot.dom.PlotElement;
 import org.das2.datum.InconvertibleUnitsException;
 
@@ -556,8 +557,6 @@ public class CreatePngWalk {
 
                 if ( !firstTime ) {
                     atime= times.next();
-                } else {
-                    firstTime= false;
                 }
                 
                 //LoggerManager.resetTimer();
@@ -684,6 +683,7 @@ public class CreatePngWalk {
                 if ( firstTime ) { // resetting zoomY and zoomZ can cause the labels and bounds to change.  Turn off autoranging.
                     dom2.getOptions().setAutolayout(false);
                     appmodel.waitUntilIdle();
+                    firstTime= false;
                 }
 
                 if ( params.removeNoData ) {
