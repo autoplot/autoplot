@@ -609,6 +609,11 @@ public class CreatePngWalk {
                             lock.release();
                             fileChannel.close();
                         }
+                        if ( firstTime ) { // resetting zoomY and zoomZ can cause the labels and bounds to change.  Turn off autoranging.
+                            dom2.getOptions().setAutolayout(false);
+                            appmodel.waitUntilIdle();
+                            firstTime= false;
+                        }
                         continue;
                     } else {
                         if ( !outTemp.createNewFile() ) {
