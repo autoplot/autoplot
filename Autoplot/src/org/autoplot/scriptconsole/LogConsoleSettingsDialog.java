@@ -313,6 +313,9 @@ public final class LogConsoleSettingsDialog extends javax.swing.JDialog {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object lvalue, boolean isSelected, boolean hasFocus, int row, int column) {
             Logger logger = (Logger) lvalue;
+            if ( logger==null ) {
+                return new JLabel("<null>");
+            }
             Object value = logger.getLevel();
             //We just need to handle null as a special case
             if (value == null) {
