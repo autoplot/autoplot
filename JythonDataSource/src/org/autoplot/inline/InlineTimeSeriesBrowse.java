@@ -19,6 +19,7 @@ import org.das2.util.LoggerManager;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.autoplot.jythonsupport.Util;
+import org.autoplot.jythonsupport.ui.DataMashUp;
 
 /**
  * This was DefaultTimeSeriesBrowse until it became clear that it didn't properly
@@ -78,14 +79,21 @@ public class InlineTimeSeriesBrowse implements TimeSeriesBrowse {
         if ( uri!=null ) {
             String[] ascript;
             ascript= Util.guardedSplit( uri, '&', '\'', '\"' );
-            List<String> script= Arrays.asList(ascript);
+            List<String> script= new ArrayList( Arrays.asList(ascript) );
+            boolean modified= false;
             for ( int i=0; i<script.size(); i++ ) {
                 String line= script.get(i);
                 if ( line.startsWith("timerange") ) {
                     line= "timerange="+dr.toString().replaceAll(" ","+");
+                    modified= true;
                 }
                 script.set(i, line);
             }
+            if ( DataMashUp.isDataMashupJythonInline( uri ) && !modified ) {
+                int n= script.size();
+                script.add( script.get(n-1) );
+                script.set( n-1, "timerange="+dr.toString().replaceAll(" ","+") );
+            }            
             String uri1= DataSourceUtil.strjoin( script, "&" );
             uri= uri1;
         }
