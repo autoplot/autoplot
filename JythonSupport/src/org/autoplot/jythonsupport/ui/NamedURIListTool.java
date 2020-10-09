@@ -366,7 +366,12 @@ public class NamedURIListTool extends JPanel {
                             currentName= ids.get( fi );
                         }
                     }
-                    uris.set( fi,dss.getValue());
+                    String uri= dss.getValue();
+                    String uri2= DataSetURI.blurTsbUri(uri);
+                    uris.set( fi,uri2 );
+                    if ( !uri.equals(uri2) ) {
+                        dss.setValue(uri2);
+                    }
                     if (dataMashUp!=null ) dataMashUp.refresh();
                     if ( currentName!=null && newName!=null ) {
                         doVariableRename( fi, currentName, newName );
