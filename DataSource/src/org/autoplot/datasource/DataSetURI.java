@@ -378,7 +378,7 @@ public class DataSetURI {
             DataSourceFactory dsf= getDataSourceFactory( toUri(value), new NullProgressMonitor() );
             if ( dsf==null ) return null; // I was getting this because I removed a datasource (HAPI)
             TimeSeriesBrowse tsb= dsf.getCapability( TimeSeriesBrowse.class );
-            if (tsb==null ) return null;
+            if (tsb==null ) return value; // nothing to blur.
             tsb.setURI(value);
             return tsb.blurURI();
         } catch (URISyntaxException | IOException | IllegalArgumentException | ParseException ex) {
@@ -1795,6 +1795,10 @@ public class DataSetURI {
      */
     public static List<CompletionResult> getFileSystemCompletions(final String surl, final int carotpos, boolean inclAgg, List<String> inclFiles, String acceptPattern, ProgressMonitor mon) throws IOException, URISyntaxException {
         URISplit split = URISplit.parse(surl.substring(0, carotpos),carotpos,false);
+        if ( split.file==null ) {
+            logger.info("url passed to getFileSystemCompletions does not appear to be a filesystem.");
+            return Collections.emptyList();
+        }
         String prefix = URISplit.uriDecode(split.file.substring(split.path.length()));
         String surlDir = URISplit.uriDecode(split.path);
 
