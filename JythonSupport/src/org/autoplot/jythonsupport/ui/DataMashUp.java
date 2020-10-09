@@ -826,7 +826,6 @@ public class DataMashUp extends javax.swing.JPanel {
                     } catch (URISyntaxException ex) {
                         uri= null;
                     }
-                    uris.add(suri);
                     if ( uri!=null ) {
                         try {
                             DataSourceFactory dsf= DataSetURI.getDataSourceFactory(uri,new NullProgressMonitor());
@@ -836,11 +835,12 @@ public class DataMashUp extends javax.swing.JPanel {
                                     TimeSeriesBrowse tsb= dss.getCapability( TimeSeriesBrowse.class );
                                     if ( tsb!=null ) {
                                         DatumRange tr= tsb.getTimeRange();
-										if ( tr!=null ) {
-											timerange= tr.toString();
-										} else {
-											timerange= "";
-										}
+                                        if (tr != null) {
+                                            timerange = tr.toString();
+                                            suri= tsb.blurURI();
+                                        } else {
+                                            timerange = "";
+                                        }
                                     }
                                 } catch (Exception ex) {
                                     logger.log(Level.SEVERE, null, ex);
@@ -850,6 +850,8 @@ public class DataMashUp extends javax.swing.JPanel {
                             logger.log(Level.SEVERE, null, ex);
                         }
                     }
+                    uris.add(suri);
+                    
                 } else if ( s.contains("synchronize(") ) {
                     synch=true;
                 } else if ( s.contains("synchronizeOne(") ) {
@@ -1635,7 +1637,8 @@ public class DataMashUp extends javax.swing.JPanel {
     
     private void checkForTSBImmediately() {
         String[] suris= namedURIListTool1.getUris();
-        String timerange= null;
+        String timerange= this.timeRangeRecentComboBox.getText().trim();
+        boolean haveTsb= false;
         for ( String suri: suris ) {
             URI uri;
             try {
@@ -1651,7 +1654,10 @@ public class DataMashUp extends javax.swing.JPanel {
                             DataSource dss= dsf.getDataSource(new URI(suri));
                             TimeSeriesBrowse tsb= dss.getCapability( TimeSeriesBrowse.class );
                             if ( tsb!=null ) {
-                                timerange= tsb.getTimeRange().toString();
+                                haveTsb= true;
+                                if ( timerange.length()==0 ) {
+                                    timerange= tsb.getTimeRange().toString();
+                                }
                             }
                         } catch (Exception ex) {
                             logger.log(Level.SEVERE, null, ex);
@@ -1663,9 +1669,10 @@ public class DataMashUp extends javax.swing.JPanel {
             }
         }
         final String ftimerange= timerange;
+        final boolean fhaveTsb= haveTsb;
         Runnable run= new Runnable() {
             public void run() {
-                if ( ftimerange!=null ) {
+                if ( fhaveTsb ) {
                     timeRangeRecentComboBox.setEnabled(true);
                     timeRangeLabel.setEnabled(true);
                     timeRangeRecentComboBox.setText( ftimerange );
