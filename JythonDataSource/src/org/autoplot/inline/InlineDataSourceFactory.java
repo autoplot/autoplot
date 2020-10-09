@@ -25,6 +25,7 @@ import org.python.util.PythonInterpreter;
 import org.autoplot.datasource.AbstractDataSourceFactory;
 import org.autoplot.datasource.CompletionContext;
 import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSetURI.CompletionResult;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.DataSourceUtil;
@@ -82,7 +83,28 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
             interp.execfile(imports.openStream(),"imports2017.py");
             String frag= cc.completable;
             org.das2.jythoncompletion.CompletionContext cc1= CompletionSupport.getCompletionContext( "x="+frag, cc.completablepos+2, 0, 0, 0 );        
-            List<DefaultCompletionItem> r=  JythonCompletionTask.getLocalsCompletions( interp, cc1 );
+            List<DefaultCompletionItem> r;
+            if ( cc1.contextType.equals("stringLiteralArgument") ) {
+                if ( cc1.contextString.equals("getDataSet") ) {
+                    String s= cc1.completable;
+                    char q= s.charAt(0);
+                    s= s.substring(1);
+                    if ( s.charAt(s.length()-1)==q ) {
+                        s= s.substring(0,s.length()-1);
+                    }
+                    int len= s.length();
+                    List<CompletionResult> rx= DataSetURI.getCompletions( s, len, mon );
+                    r= new ArrayList<>(rx.size());
+                    for ( int i=0; i<rx.size(); i++ ) {
+                        String t= cc1.contextString +"("+ q+rx.get(i).completion+q;
+                        r.add( new DefaultCompletionItem( t, len, t, "xxx", null ) );
+                    }    
+                } else {
+                    r= JythonCompletionTask.getLocalsCompletions( interp, cc1 );
+                }
+            } else {
+                r=  JythonCompletionTask.getLocalsCompletions( interp, cc1 );
+            }
 
             Collections.sort(r,new Comparator<DefaultCompletionItem>() {
                 @Override
