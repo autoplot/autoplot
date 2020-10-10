@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>URLs can be dragged from website and dropped on to Autoplot.
+        <p><small>The MashUp tool's output is now trimmed properly when bundling three time series.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,10 +26,19 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-10-03 r25168):</p>
+        <p>Bugfixes (2020-10-10 r25196):</p>
         <ul>
+            <li>2292: bugfix in DataSourceUtil.trimScatterToTimeRange, which didn't find the timetags when three timeseries datasets were bundled.  Thanks, Allison!
+            <li>2292: correction to the timerange used in the resultant dataset.  
+            <li>2292: mashup tool now puts current list of URIs into the recent URIs, for easier to create URIs of that other datasets from the same file.  Thanks, Allison!
+            <li>2292: mashup tool now removes timerange from each URI, which was cluttered and confusing.  
             <li>rfe425: in MashUp tool, use new guessNameFor which guarantees unique names.
             <li>rfe425: in MashUp tool, leave tree branch unfolded when inserting an operation, to minimize changes.
+            <li>graphical ProgressMonitor shows rate in tooltip as well as the status.
+            <li>there was a path where the keychain file would get a file for credentials, not the folder the file is within.
+            <li>correction to "show error bars" binding, the initial setting should be disabled.
+            <li>bugfix: SerializeDelegate was not added for ErrorBarType
+            <li>rte_1611550558: old $x for localized m/d/Y or d.m.Y was leftover in old code, which could be confusing.
         </ul>
         <p>Older Bugfixes (2020-09-30 r25152):</p>
         <ul>
@@ -50,6 +59,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>create pngwalk shows processing rate based on last 20 images, not the whole run, so that parallel processing is improved.
             <li>Jython editor has new developer->"Convert Mathematica code to Jython" tool.
             <li>create pngwalk checks for lockfile, so that multiple processes can work on pngwalk in concert.
         </ul>
