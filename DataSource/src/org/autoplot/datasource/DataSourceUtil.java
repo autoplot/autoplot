@@ -1102,6 +1102,9 @@ public class DataSourceUtil {
         } else {
             if ( SemanticOps.isBundle(tsbData) ) {
                 time= Ops.unbundle( tsbData, 0 );
+                if ( time!=null && !UnitsUtil.isTimeLocation( SemanticOps.getUnits(time) ) ) {
+                    time= (QDataSet) time.property(QDataSet.DEPEND_0); // bundle of three time series, maybe?
+                }
             }
         }
         if ( time!=null && UnitsUtil.isTimeLocation( SemanticOps.getUnits(time) ) && time.rank()==1 ) {
