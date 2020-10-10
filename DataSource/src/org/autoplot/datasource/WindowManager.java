@@ -191,7 +191,7 @@ public class WindowManager {
         try { 
             dia.setVisible(true);
         } catch ( ClassCastException ex ) {
-            logger.log( Level.WARNING, null, ex ); // TODO: explore where this comes from.
+            logger.log( Level.WARNING, null, ex ); // TODO: bug2293: explore where this comes from.
         }
         WindowManager.getInstance().recordWindowSizePosition(dia);        
     }
