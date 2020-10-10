@@ -19,6 +19,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,7 +56,7 @@ import org.das2.qds.filters.FiltersChainPanel;
  */
 public class NamedURIListTool extends JPanel {
     
-    private static final Logger logger= LoggerManager.getLogger("jython.dashup");
+    private static final Logger logger= LoggerManager.getLogger("jython.mashup");
     private static final String CLASS_NAME = NamedURIListTool.class.getName();    
     
     protected static final String PROP_URIS= "uris";
@@ -347,7 +348,11 @@ public class NamedURIListTool extends JPanel {
                         recentSansInline.add(s);
                     }
                 }
-                dss.setRecent( recentSansInline );
+                recentSansInline.addAll( uris );
+                LinkedHashSet<String> nuris= new LinkedHashSet<>();
+                nuris.addAll( uris );
+                
+                dss.setRecent( new ArrayList<String>(nuris) ); //TODO: This was breaking mashup tool, clearing all entries.
             } catch ( IllegalArgumentException ex ) {
                 
             }
