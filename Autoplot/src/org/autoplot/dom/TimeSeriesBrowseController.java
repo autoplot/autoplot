@@ -222,6 +222,7 @@ public class TimeSeriesBrowseController {
      * @param property 
      */
     protected void setupGen( DomNode node, final String property ) {
+        logger.entering("TimeSeriesBrowseController", "setupGen");
         timeSeriesBrowseListener = new PropertyChangeListener() {
             @Override
             public String toString() {
@@ -254,13 +255,16 @@ public class TimeSeriesBrowseController {
 
             DatumRange defaultTimeRange= dsf.getController().getTsb().getTimeRange();
             DatumRange appTimeRange=  (DatumRange) getter.invoke( node );
-            if ( !appTimeRange.equals( Application.DEFAULT_TIME_RANGE ) && UnitsUtil.isTimeLocation( appTimeRange.getUnits() ) ) { //TODO: clean up.  This really should be based on if there is another guy controlling the timerange.
-                setTimeRange( appTimeRange );
-                dsf.getController().getTsb().setTimeRange( appTimeRange );
-            } else {
+            logger.log(Level.FINER, "using app time range: {0}", appTimeRange);
+            //if ( !appTimeRange.equals( Application.DEFAULT_TIME_RANGE ) && UnitsUtil.isTimeLocation( appTimeRange.getUnits() ) ) { //TODO: clean up.  This really should be based on if there is another guy controlling the timerange.
+            //    logger.finer("using appTimeRange");
+            //    setTimeRange( appTimeRange );
+            //    dsf.getController().getTsb().setTimeRange( appTimeRange );
+            //} else {
+                logger.finer("using DSF TSB timeRange");
                 setTimeRange( defaultTimeRange );
                 pd.getWriteMethod().invoke( node, defaultTimeRange );
-            }
+            //}
 
             //dsf.getController().getApplication().getController().bind( node, property, this, PROP_TIMERANGE ); // use node's property value.
             node.addPropertyChangeListener( property, timeSeriesBrowseListener );
@@ -270,6 +274,7 @@ public class TimeSeriesBrowseController {
         listenNode= node;
         listenProp= property;
         released= false;
+        logger.exiting("TimeSeriesBrowseController", "setupGen");
     }
 
     /**
