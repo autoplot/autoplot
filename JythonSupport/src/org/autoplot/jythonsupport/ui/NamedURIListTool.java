@@ -477,10 +477,14 @@ public class NamedURIListTool extends JPanel {
                 newName= DataSourceUtil.guessNameFor(edit.getURI(),uris,ids);
             }
             if ( isValidIdentifier(newName) ) {
-                doVariableRename( fi, currentName, newName );
+                if ( !currentName.equals(newName) ) {
+                    doVariableRename( fi, currentName, newName );
+                }
                 isAuto.set( fi, !cb.isSelected() );
                 if ( edit!=null ) {
-                    uris.set( fi, edit.getURI() );
+                    String uri= edit.getURI();
+                    uri= DataSetURI.blurTsbUri(uri);
+                    uris.set( fi, uri );
                 }
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
