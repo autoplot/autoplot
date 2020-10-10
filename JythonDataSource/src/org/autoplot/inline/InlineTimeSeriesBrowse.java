@@ -90,9 +90,7 @@ public class InlineTimeSeriesBrowse implements TimeSeriesBrowse {
                 script.set(i, line);
             }
             if ( DataMashUp.isDataMashupJythonInline( uri ) && !modified ) {
-                int n= script.size();
-                script.add( script.get(n-1) );
-                script.set( n-1, "timerange="+dr.toString().replaceAll(" ","+") );
+                script.add( "timerange="+dr.toString().replaceAll(" ","+") );
             }            
             String uri1= DataSourceUtil.strjoin( script, "&" );
             uri= uri1;
