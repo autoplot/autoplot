@@ -36,7 +36,7 @@ public abstract class BaseVarContainer implements Runnable {
         elements = itemSize/DataTypes.size[type];
         int[] range = var.getRecordRange();
         if (range == null) {
-//          if (pt == null) {
+//          if (pt == null) {  
                 throw new Throwable("Variable " + var.getName() + " has no " +
                 "records.");
 //          }
@@ -147,6 +147,9 @@ public abstract class BaseVarContainer implements Runnable {
         int numberOfValues = pt[1] - pt[0] + 1;
         int words = elements*numberOfValues;
         ByteBuffer _buf;
+        if ( words > Integer.MAX_VALUE/getLength() ) {
+            throw new IllegalArgumentException("Variable is too large to read, any variable must be less than 2GB in length.");
+        }
         int _words = words*getLength();
         if (allocationMode == null) {
             if (userBuffer == null) {
