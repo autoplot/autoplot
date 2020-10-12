@@ -45,7 +45,9 @@ final class CDF3Impl extends CDFImpl implements CDF3, java.io.Serializable {
         ADRHead = buf.getLong();
         long CDFSize = buf.getLong();
         if ( buf.capacity()<CDFSize ) {
-            throw new Throwable("file appears to be truncated, as the header says it should contain " + CDFSize + "bytes." );
+            //throw new Throwable("file appears to be truncated, as the header says it should contain " + CDFSize + "bytes." );
+            //TODO: check to see if just the headers were read in.
+            CDFReader.logger.fine("the entire file has not been mapped into memory");
         }
         // String.format( "buf.capacity - eof: %d", buf.capacity() - CDFSize ) );
         numberOfRVariables = buf.getInt();
