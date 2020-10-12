@@ -20,6 +20,8 @@ import org.das2.datum.Units;
 import org.das2.util.filesystem.FileSystem;
 import org.autoplot.dom.DebugPropertyChangeSupport;
 import org.autoplot.datasource.DataSetURI;
+import org.das2.qds.QDataSet;
+import org.das2.qds.ops.Ops;
 import org.das2.util.filesystem.FileSystemUtil;
 
 /**
@@ -214,6 +216,15 @@ public class WalkImageSequence implements PropertyChangeListener  {
                 possibleRanges = DatumRangeUtil.generateList(timeSpan, datumRanges.get(0));
             }
         }
+        
+        // There's a funny bug where things aren't regularly spaced, because we
+        // realign at year boundaries.  Just use the original ranges in this 
+        // case.
+        if ( datumRanges.size()>possibleRanges.size() ) {
+            logger.info("jumps in cadence, just use original ranges");
+            possibleRanges= datumRanges;
+        }
+        
 
         for (WalkImage i : existingImages) {
             i.addPropertyChangeListener(this);
