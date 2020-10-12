@@ -4,12 +4,15 @@ import java.net.*;
 import java.nio.*;
 import java.util.*;
 import java.lang.reflect.*;
+import java.util.logging.Logger;
 /**
  * CDFReader extends GenericReader with access methods for time series
  * variables. Time series methods of this class do not require a detailed
  * knowledge of the internal structure of CDF.
  */
 public class CDFReader extends GenericReader {
+    
+    public static Logger logger= Logger.getLogger("cdfj.cdfreader");
     Scalar scalar;
     CDFVector vector;
     public CDFReader() {
