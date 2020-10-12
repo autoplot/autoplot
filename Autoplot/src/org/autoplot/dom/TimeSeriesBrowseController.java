@@ -256,16 +256,13 @@ public class TimeSeriesBrowseController {
             DatumRange defaultTimeRange= dsf.getController().getTsb().getTimeRange();
             DatumRange appTimeRange=  (DatumRange) getter.invoke( node );
             logger.log(Level.FINER, "using app time range: {0}", appTimeRange);
-            //if ( !appTimeRange.equals( Application.DEFAULT_TIME_RANGE ) && UnitsUtil.isTimeLocation( appTimeRange.getUnits() ) ) { //TODO: clean up.  This really should be based on if there is another guy controlling the timerange.
-            //    logger.finer("using appTimeRange");
-            //    setTimeRange( appTimeRange );
-            //    dsf.getController().getTsb().setTimeRange( appTimeRange );
-            //} else {
-                logger.finer("using DSF TSB timeRange");
+            if ( !appTimeRange.equals( Application.DEFAULT_TIME_RANGE ) && UnitsUtil.isTimeLocation( appTimeRange.getUnits() ) ) { //TODO: clean up.  This really should be based on if there is another guy controlling the timerange.
+                setTimeRange( appTimeRange );
+                dsf.getController().getTsb().setTimeRange( appTimeRange );
+            } else {
                 setTimeRange( defaultTimeRange );
                 pd.getWriteMethod().invoke( node, defaultTimeRange );
-            //}
-
+            }
             //dsf.getController().getApplication().getController().bind( node, property, this, PROP_TIMERANGE ); // use node's property value.
             node.addPropertyChangeListener( property, timeSeriesBrowseListener );
         } catch (IntrospectionException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
