@@ -361,7 +361,7 @@ public class NamedURIListTool extends JPanel {
                 public void actionPerformed(ActionEvent e) {
                     String newName= null;
                     String currentName= null;
-                    if ( uris.get(fi).trim().length()==0 ) {
+                    if ( isAuto.get(fi) || uris.get(fi).trim().length()==0 ) {
                         List<String> nids= new ArrayList<>(ids);
                         List<String> nuris= new ArrayList<>(uris);
                         nids.remove(fi);
