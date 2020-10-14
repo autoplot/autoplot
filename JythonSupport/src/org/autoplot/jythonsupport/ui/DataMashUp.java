@@ -269,17 +269,23 @@ public class DataMashUp extends javax.swing.JPanel {
         switch (op) {
             case "and":
             case "or":
-            //case "add":
-            //case "multiply":
+            case "add":
+            case "multiply":
+            case "subtract":
+            case "divide":
                 return true;
             default:
                 return false;
         }
     }
     
-    // this is not-trivial because of parentheses.
-    // Shouldn't  this be getInfix
-    private String getInline( DefaultTreeModel m, Object o) {
+    /**
+     * return the infix expression for the tree.
+     * @param m
+     * @param o
+     * @return 
+     */
+    private String getInfix( DefaultTreeModel m, Object o) {
         String op= o.toString();
         DefaultMutableTreeNode n= (DefaultMutableTreeNode)o;
         switch (op) {
@@ -291,6 +297,10 @@ public class DataMashUp extends javax.swing.JPanel {
                 return getJython( m, m.getChild( n, 0 ) ) + "*" + getJython( m, m.getChild( n, 1 ) );
             case "add":
                 return getJython( m, m.getChild( n, 0 ) ) + "+" + getJython( m, m.getChild( n, 1 ) );
+            case "divide":
+                return getJython( m, m.getChild( n, 0 ) ) + "/" + getJython( m, m.getChild( n, 1 ) );
+            case "subtract":
+                return getJython( m, m.getChild( n, 0 ) ) + "-" + getJython( m, m.getChild( n, 1 ) );
             default:
                 return null;
         }
@@ -311,7 +321,7 @@ public class DataMashUp extends javax.swing.JPanel {
             if ( iparen>-1 ) sn= sn.substring(0,iparen);
             int nchild= m.getChildCount(n);
             if ( isInfix(sn) && nchild==2 ) {
-                String alt= getInline(m, n);
+                String alt= getInfix(m, n);
                 if ( alt!=null ) {
                     if ( m.getRoot()==n ) {
                         return alt;
