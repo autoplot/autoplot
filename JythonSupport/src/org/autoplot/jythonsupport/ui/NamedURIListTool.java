@@ -241,7 +241,7 @@ public class NamedURIListTool extends JPanel {
                     public void actionPerformed(ActionEvent e) {
                         org.das2.util.LoggerManager.logGuiEvent(e);                    
                         String oldName= ids.get(fi);
-                        rename(fi);
+                        renameAndEdit(fi);
                         String newName= ids.get(fi);
                         firePropertyChange( PROP_ID + "Name_"+fi, oldName, newName );
                     }
@@ -425,7 +425,12 @@ public class NamedURIListTool extends JPanel {
         return s;
     }
     
-    private void rename( int fi ) {
+    /**
+     * bring up the editor for the URI in this position with GUI
+     * controls to manually name the parameter.
+     * @param fi 
+     */
+    private void renameAndEdit( int fi ) {
         String currentName= ids.get(fi);
         boolean autoName= isAuto.get(fi);
         
@@ -454,7 +459,7 @@ public class NamedURIListTool extends JPanel {
                 tf.setEnabled( cb.isSelected() ); 
             }
         });
-        p1.add( Box.createHorizontalStrut( 3*em ) );
+        //p1.add( Box.createHorizontalStrut( 3*em ) );
         p1.add( tf );
         p1.add( Box.createGlue() );
         p1.setAlignmentX( Component.LEFT_ALIGNMENT );
@@ -474,7 +479,11 @@ public class NamedURIListTool extends JPanel {
         while ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( scrollPane, p, title, JOptionPane.OK_CANCEL_OPTION ) ) {
             String newName= tf.getText();
             if ( !cb.isSelected() && edit!=null ) {
-                newName= DataSourceUtil.guessNameFor(edit.getURI(),uris,ids);
+                List<String> nids= new ArrayList(ids);
+                List<String> nuris= new ArrayList(uris);
+                nids.remove(fi);
+                nuris.remove(fi);
+                newName= DataSourceUtil.guessNameFor(edit.getURI(),nuris,nids);
             }
             if ( isValidIdentifier(newName) ) {
                 if ( !currentName.equals(newName) ) {
