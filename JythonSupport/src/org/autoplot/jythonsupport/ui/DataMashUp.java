@@ -269,10 +269,11 @@ public class DataMashUp extends javax.swing.JPanel {
         switch (op) {
             case "and":
             case "or":
-            case "add":
-            case "multiply":
-            case "subtract":
-            case "divide":
+            //case "add":
+            //case "multiply":
+            //case "subtract":
+            //case "divide":
+            //case "pow":
                 return true;
             default:
                 return false;
@@ -281,9 +282,9 @@ public class DataMashUp extends javax.swing.JPanel {
     
     /**
      * return the infix expression for the tree.
-     * @param m
-     * @param o
-     * @return 
+     * @param m the tree, which should have two children.
+     * @param o the root of the tree, which is an operator like "and" or "multiply"
+     * @return the Jython code for the tree.
      */
     private String getInfix( DefaultTreeModel m, Object o) {
         String op= o.toString();
@@ -301,16 +302,18 @@ public class DataMashUp extends javax.swing.JPanel {
                 return getJython( m, m.getChild( n, 0 ) ) + "/" + getJython( m, m.getChild( n, 1 ) );
             case "subtract":
                 return getJython( m, m.getChild( n, 0 ) ) + "-" + getJython( m, m.getChild( n, 1 ) );
+            case "pow":
+                return getJython( m, m.getChild( n, 0 ) ) + "**" + getJython( m, m.getChild( n, 1 ) );
             default:
                 return null;
         }
     }
     
     /**
-     * return the jython expression for this tree.
-     * @param m
-     * @param n
-     * @return 
+     * return the Jython expression for this tree.
+     * @param m the tree
+     * @param n the node, typically the root of the tree (maybe always)?
+     * @return the jython code for the tree.
      */
     private String getJython( DefaultTreeModel m, Object n ) {
         if ( m.isLeaf(n) ) {
@@ -725,8 +728,10 @@ public class DataMashUp extends javax.swing.JPanel {
                 sop= "multiply"; break;
             case 4:
                 sop= "divide"; break;
+            case 6:
+                sop= "pow"; break;
             default:
-                throw new IllegalArgumentException("not supported 720" );
+                throw new IllegalArgumentException("cannot find name for BinOp (internal error at line 732)" );
         }
         return sop;
     }
