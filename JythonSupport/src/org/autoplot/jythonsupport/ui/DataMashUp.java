@@ -825,6 +825,7 @@ public class DataMashUp extends javax.swing.JPanel {
         List<String> uris= new ArrayList<>();
         boolean haveAllIds= false;
         String timerange= null;
+        String explicitTimerange= null;
         boolean synch= false;
         for ( String s: ss ) {
             if ( s.trim().length()==0 ) continue;
@@ -873,7 +874,7 @@ public class DataMashUp extends javax.swing.JPanel {
                     synch=true;
                 } else {
                      if ( s.substring(0,i).trim().equals("timerange") ) {
-                        timerange= s.substring(i+1).trim();
+                        explicitTimerange= s.substring(i+1).trim();
                     } else {
                         throw new IllegalArgumentException("script is not jython mashup");
                     }
@@ -899,6 +900,7 @@ public class DataMashUp extends javax.swing.JPanel {
             timeRangeLabel.setEnabled(false);
             timeRangeLabel.setToolTipText("In-line code does not support Time Series Browse");
         } else {
+            if ( explicitTimerange!=null ) timerange= explicitTimerange;
             timeRangeRecentComboBox.setText( timerange.replaceAll("\\+", " " ) );
             timeRangeRecentComboBox.setEnabled(true);
             timeRangeLabel.setEnabled(true);
