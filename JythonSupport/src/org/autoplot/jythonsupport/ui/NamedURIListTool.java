@@ -506,19 +506,34 @@ public class NamedURIListTool extends JPanel {
         }
     }
 
+    /**
+     * set the ids, where these should be one ID for each URI.  When there
+     * are the same number of URIs and IDs, refresh is called.
+     * @param ids 
+     */
     public void setIds( List<String> ids ) {
         this.ids= new ArrayList<>(ids);
         if ( uris.size()==ids.size() ) refresh();
     }
     
+    /**
+     * set the URIs, where there should be one for each ID.  When there
+     * are the same number of URIs and IDs, refresh is called.
+     * @param uris 
+     */
     public void setUris( List<String> uris ) {
         this.uris= new ArrayList<>(uris);
         if ( uris.size()==ids.size() ) refresh();
     }
     
+    /**
+     * set the automatic renaming flag for each ID.   When there
+     * are the same number as URIs and IDs, refresh is called.
+     * @param isAuto 
+     */
     public void setIsAuto( List<Boolean> isAuto ) {
         this.isAuto= new ArrayList<>(isAuto);
-        if ( isAuto.size()==isAuto.size() ) refresh();
+        if ( isAuto.size()==ids.size() ) refresh();
     }
     
     /**
