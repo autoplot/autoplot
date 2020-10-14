@@ -350,7 +350,7 @@ public class NamedURIListTool extends JPanel {
                 }
                 recentSansInline.addAll( uris );
                 LinkedHashSet<String> nuris= new LinkedHashSet<>();
-                nuris.addAll( uris );
+                nuris.addAll( recentSansInline );
                 
                 dss.setRecent( new ArrayList<String>(nuris) ); //TODO: This was breaking mashup tool, clearing all entries.
             } catch ( IllegalArgumentException ex ) {
