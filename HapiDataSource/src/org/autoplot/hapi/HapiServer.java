@@ -16,6 +16,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,6 +58,11 @@ public class HapiServer {
      * this logger is for opening connections to remote sites.
      */
     protected static final Logger loggerUrl= org.das2.util.LoggerManager.getLogger( "das2.url" );
+    
+    /**
+     * all transactions must be done in UTF-8
+     */
+    public static final Charset UTF8= Charset.forName("UTF-8");
     
     /**
      * get known servers.  
@@ -138,7 +144,7 @@ public class HapiServer {
             try {
                 String seek="hapi:";
                 int ttaglen= 25;
-                r = new BufferedReader(new FileReader(hist));
+                r = new BufferedReader( new FileReader(hist) ); //sf2295 what is the encoding of the history file?
                 String s = r.readLine();
                 LinkedHashSet dss = new LinkedHashSet();
 
@@ -458,7 +464,7 @@ public class HapiServer {
      */
     public static String readFromFile( File f ) throws IOException {
         StringBuilder builder= new StringBuilder();
-        try ( BufferedReader in= new BufferedReader( new InputStreamReader( new FileInputStream(f) ) ) ) {
+        try ( BufferedReader in= new BufferedReader( new InputStreamReader( new FileInputStream(f), UTF8 ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
                 builder.append(line);
@@ -491,7 +497,7 @@ public class HapiServer {
         urlc.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() );
         urlc.setReadTimeout( FileSystem.settings().getReadTimeoutMs() );
         StringBuilder builder= new StringBuilder();
-        try ( BufferedReader in= new BufferedReader( new InputStreamReader( urlc.getInputStream() ) ) ) {
+        try ( BufferedReader in= new BufferedReader( new InputStreamReader( urlc.getInputStream(), UTF8 ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
                 builder.append(line);
@@ -501,7 +507,7 @@ public class HapiServer {
         } catch ( IOException ex ) {
             if ( urlc instanceof HttpURLConnection ) {
                 StringBuilder builder2= new StringBuilder();
-                try ( BufferedReader in2= new BufferedReader( new InputStreamReader( ((HttpURLConnection)urlc).getErrorStream() ) ) ) {
+                try ( BufferedReader in2= new BufferedReader( new InputStreamReader( ((HttpURLConnection)urlc).getErrorStream(), UTF8 ) ) ) {
                     String line= in2.readLine();
                     while ( line!=null ) {
                         builder2.append(line);

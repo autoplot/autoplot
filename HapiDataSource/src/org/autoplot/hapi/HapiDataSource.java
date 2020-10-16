@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -431,7 +432,8 @@ public final class HapiDataSource extends AbstractDataSource {
             String f= hapiCache + u + "/" + sxx + "." + pp[0].name + "." + format;
             File ff= new File(f);
             if ( ff.exists() ) {
-                try ( BufferedReader read= new BufferedReader(new FileReader(ff)) ) {
+                try ( BufferedReader read= new BufferedReader(
+                        new InputStreamReader( new FileInputStream(ff), HapiServer.UTF8 ) ) ) {
                     String line= read.readLine();
                     String lastLine= null;
                     while ( line!=null ) {
@@ -499,7 +501,8 @@ public final class HapiDataSource extends AbstractDataSource {
             String f= hapiCache + u + "/" + sxx + "." + pp[0].name + ".csv";
             File ff= new File(f);
             if ( ff.exists() ) {
-                try ( BufferedReader read= new BufferedReader(new FileReader(ff)) ) {
+                try ( BufferedReader read= new BufferedReader(
+                        new InputStreamReader( new FileInputStream(ff), HapiServer.UTF8 ) ) ) {
                     String line= read.readLine();
                     String lastLine= null;
                     while ( line!=null ) {
@@ -720,7 +723,8 @@ public final class HapiDataSource extends AbstractDataSource {
         httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
         httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
         httpConnect= (HttpURLConnection) HttpUtil.checkRedirect( httpConnect );
-        try ( BufferedReader in= new BufferedReader( new InputStreamReader( httpConnect.getInputStream() ) ) ) {
+        try ( BufferedReader in= new BufferedReader( 
+                new InputStreamReader( httpConnect.getInputStream(), HapiServer.UTF8 ) ) ) {
             String line= in.readLine();
             lineNum++;
             while ( line!=null ) {
@@ -1238,8 +1242,16 @@ public final class HapiDataSource extends AbstractDataSource {
             }
         }
         
-        try ( AbstractLineReader in= ( cacheReader!=null ? cacheReader :
-                new SingleFileBufferedReader( new BufferedReader( new InputStreamReader( gzip ? new GZIPInputStream( httpConnect.getInputStream() ) : httpConnect.getInputStream() ) ) ) ) ) {
+        try (AbstractLineReader in = (cacheReader != null ? cacheReader
+                : new SingleFileBufferedReader(
+                        new BufferedReader(
+                                new InputStreamReader(
+                                        gzip ? new GZIPInputStream(httpConnect.getInputStream())
+                                                : httpConnect.getInputStream(),
+                                        HapiServer.UTF8
+                                )
+                        )
+                ))) {
             
             String line= in.readLine();
             
@@ -1709,7 +1721,8 @@ public final class HapiDataSource extends AbstractDataSource {
         httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
         httpConnect= (HttpURLConnection) HttpUtil.checkRedirect(httpConnect);
         loggerUrl.log(Level.FINE, "--> {0} {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
-        try ( BufferedReader in= new BufferedReader( new InputStreamReader( httpConnect.getInputStream() ) ) ) {
+        try ( BufferedReader in= new BufferedReader( 
+                new InputStreamReader( httpConnect.getInputStream(), HapiServer.UTF8 ) ) ) {
             String line= in.readLine();
             lineNum++;
             while ( line!=null ) {
@@ -1857,8 +1870,12 @@ public final class HapiDataSource extends AbstractDataSource {
                 r1.setDelim(',');
                 for ( int j=0; j<files[i].length; j++ ) {
                     try {
-                        FileReader oneDayOneParam= new FileReader(files[i][j]);
-                        r1.pasteBufferedReader( new SingleFileBufferedReader( new BufferedReader(oneDayOneParam) ) );
+                        FileInputStream fin= new FileInputStream(files[i][j]);
+                        InputStreamReader read= new InputStreamReader(fin,HapiServer.UTF8);
+                        BufferedReader buff= new BufferedReader(read);
+                        r1.pasteBufferedReader( 
+                                new SingleFileBufferedReader( 
+                                        buff ) );
                     }catch ( IOException ex ) {
                         logger.log( Level.SEVERE, ex.getMessage(), ex );
                         return null;
@@ -1923,7 +1940,9 @@ public final class HapiDataSource extends AbstractDataSource {
         }
         boolean gzip= "gzip".equals( httpConnect.getContentEncoding() );
         return new SingleFileBufferedReader( new BufferedReader( 
-            new InputStreamReader( gzip ? new GZIPInputStream( httpConnect.getInputStream() ) : httpConnect.getInputStream() ) ) );
+            new InputStreamReader( gzip ? 
+                    new GZIPInputStream( httpConnect.getInputStream() ) 
+                    : httpConnect.getInputStream(), HapiServer.UTF8 ) ) );
     }
 
     /**

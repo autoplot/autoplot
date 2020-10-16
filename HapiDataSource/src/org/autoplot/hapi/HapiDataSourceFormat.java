@@ -351,7 +351,8 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         JSONArray catalogArray;
         if ( catalogFile.exists() ) {
             StringBuilder builder= new StringBuilder();
-            try ( BufferedReader in= new BufferedReader( new InputStreamReader( new FileInputStream(catalogFile) ) ) ) {
+            try ( BufferedReader in= new BufferedReader( 
+                    new InputStreamReader( new FileInputStream(catalogFile), HapiServer.UTF8 ) ) ) {
                 String line= in.readLine();
                 while ( line!=null ) {                
                     builder.append(line);
