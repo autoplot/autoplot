@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The PNGWalk Tool is used to "parse" readings from a radon meter.  A Jython <a href="https://github.com/autoplot/dev/blob/master/demos/2019/20190330/parseOkayFiles.jy">script</a> compiles all the XML ".ok" files into a dataset.
+        <p><small>The PNGWalk Tool is used to record readings from a radon meter.  A Jython <a href="https://github.com/autoplot/dev/blob/master/demos/2019/20190330/parseOkayFiles.jy">script</a> compiles all the XML ".ok" files into a dataset.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -30,7 +30,7 @@
         <ul>
             <li>2295: HAPI server transactions should use UTF-8 and not the system default encoding.  Thanks, Vincent and Benjamin!
             <li>2295: improvements to automatic variable name selection.
-            <li>improve support for huge CDF files (&gt;2G), by removing a check which assumed that the ByteBuffer was a mapping of the entire file, improve feedback.
+            <li>improve support for huge CDF files (&gt;2G), by removing a check which assumed that the ByteBuffer was a mapping of the entire file. Improve feedback.
             <li>When PNGWalk has roughly the expected number of files, don't count off intervals, which causes problems when 10-day plots start at year boundaries.
             <li>Yearly update of digital signature for JNLP.
             <li>2292: bugfix in DataSourceUtil.trimScatterToTimeRange, which didn't find the timetags when three timeseries datasets were bundled.  Thanks, Allison!
