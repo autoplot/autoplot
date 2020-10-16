@@ -58,8 +58,10 @@ public final class AudioSystemDataSource extends AbstractDataSource implements U
         
         nsamples = (int) (lenSeconds * sampleRate );
         int len = nsamples * 2;
+        
         int nchannels= Integer.parseInt( getParam( "channels", "1" ) );
         if ( nchannels<1 || nchannels>8 ) throw new IllegalArgumentException("channels must be between 1 and 8");
+        
         int bitsPerSample= 16;
         int frameSize= nchannels * bitsPerSample / 8;
 
@@ -104,11 +106,9 @@ public final class AudioSystemDataSource extends AbstractDataSource implements U
                 cc[i]= "ch_"+String.valueOf(i);
             }
             ds.putProperty( QDataSet.DEPEND_1, Ops.labelsDataset(cc) );
-        } else if ( nchannels==1 ) {
+        } else { // if ( nchannels==1 ) {
             ds= BufferDataSet.makeDataSet( 1, 2, 0, nsamples, 1, 1, 1, dataBuffer, BufferDataSet.SHORT );
-        } else {
-            throw new IllegalArgumentException("nchannels");
-        }
+        } 
         
         ds.putProperty( QDataSet.DEPEND_0, t );
         
