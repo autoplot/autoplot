@@ -102,7 +102,7 @@ public class PlotElementStyle extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_FILL_DIRECTION, oldFillDirection, fillDirection);
     }
 
-    private boolean drawError = true;
+    private boolean drawError = false;
 
     public static final String PROP_DRAWERROR = "drawError";
 
