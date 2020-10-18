@@ -182,6 +182,7 @@ public class RecordIterator implements Iterator<QDataSet>  {
         if ( this.src==null ) {      
             this.depend0Constraint= dr;
             if ( streamingIterator!=null && streamingIterator.hasNext() ) {
+                logger.finer("advancing streamingIterator to first record");
                 nextRecord= streamingIterator.next();
                 nextRecord= normalize(nextRecord);
                 QDataSet dep0= nextRecord.slice(0);
@@ -195,9 +196,12 @@ public class RecordIterator implements Iterator<QDataSet>  {
                 }
                 index= -1;
             } else {
+                logger.finer("not streaming, src=null");
                 nextRecord= null;
             }
             return;
+        } else {
+            logger.finer("src does not equal null");
         }
         if ( this.src.length()==0 ) {
             return;
