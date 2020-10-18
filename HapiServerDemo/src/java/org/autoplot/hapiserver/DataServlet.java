@@ -199,6 +199,8 @@ public class DataServlet extends HttpServlet {
             }
         }
         
+        logger.log(Level.FINE, "dataFiles(one): {0}", dataFiles);
+        
         if ( dataFiles==null ) {
             try {
                 logger.log(Level.FINER, "data files is null at {0} ms.", System.currentTimeMillis()-t0);
@@ -225,7 +227,8 @@ public class DataServlet extends HttpServlet {
             }
         }
         
-        logger.log(Level.FINE, "dataFiles: {0}", dataFiles);
+        logger.log(Level.FINE, "dataFiles(two): {0}", dataFiles);
+        logger.log(Level.FINE, "dsiter: {0}", dsiter);
         
         if ( dataFiles!=null ) {
             // implement if-modified-since logic, where a 302 can be used instead of expensive data response.
@@ -341,6 +344,7 @@ public class DataServlet extends HttpServlet {
         try {
             assert dsiter!=null;
             if ( dsiter.hasNext() ) {
+                logger.fine("dsiter has at least one record");
                             
                 QDataSet first= dsiter.next();
             
