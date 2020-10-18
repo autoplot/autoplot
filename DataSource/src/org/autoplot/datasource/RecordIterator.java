@@ -20,7 +20,12 @@ import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
 
 /**
- * Introduce class to hold code for iterating through any dataset.
+ * Introduce class to hold code for iterating through any dataset.  
+ * This will detect the time series browse capability and streaming.
+ * So if the data source is already streaming, then this is trivial.  If
+ * not, then it will request chunks of data from the time series browse
+ * and handle them one chunk at a time.  And additional trim can be used,
+ * see constrainDepend0.
  * @author jbf
  */
 public class RecordIterator implements Iterator<QDataSet>  {
@@ -181,20 +186,24 @@ public class RecordIterator implements Iterator<QDataSet>  {
     public final void constrainDepend0( DatumRange dr ) {
         if ( this.src==null ) {      
             this.depend0Constraint= dr;
-            if ( streamingIterator!=null && streamingIterator.hasNext() ) {
-                logger.finer("advancing streamingIterator to first record");
-                nextRecord= streamingIterator.next();
-                nextRecord= normalize(nextRecord);
-                QDataSet dep0= nextRecord.slice(0);
-                while ( DataSetUtil.asDatum(dep0).lt( dr.min() ) && streamingIterator.hasNext() ) {
+            if ( streamingIterator!=null ) {
+                if ( streamingIterator.hasNext() ) {
+                    logger.finer("advancing streamingIterator to first record");
                     nextRecord= streamingIterator.next();
                     nextRecord= normalize(nextRecord);
-                    dep0= nextRecord.slice(0);
+                    QDataSet dep0= nextRecord.slice(0);
+                    while ( DataSetUtil.asDatum(dep0).lt( dr.min() ) && streamingIterator.hasNext() ) {
+                        nextRecord= streamingIterator.next();
+                        nextRecord= normalize(nextRecord);
+                        dep0= nextRecord.slice(0);
+                    }
+                    if ( depend0Constraint==null || DataSetUtil.asDatum(dep0).ge( depend0Constraint.max() ) ) {
+                        nextRecord= null;
+                    }
+                    index= -1;
+                } else {
+                    logger.finer("have streamingIterator, but hasNext()=false");
                 }
-                if ( depend0Constraint==null || DataSetUtil.asDatum(dep0).ge( depend0Constraint.max() ) ) {
-                    nextRecord= null;
-                }
-                index= -1;
             } else {
                 logger.finer("not streaming, src=null");
                 nextRecord= null;
