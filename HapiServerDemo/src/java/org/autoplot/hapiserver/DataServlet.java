@@ -36,6 +36,7 @@ import org.apache.commons.io.output.TeeOutputStream;
 import org.das2.datum.Datum;
 import org.autoplot.datasource.RecordIterator;
 import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
@@ -149,7 +150,9 @@ public class DataServlet extends HttpServlet {
         
         DatumRange dr;
         try {
-            dr = new DatumRange( Units.cdfTT2000.parse(timeMin), Units.cdfTT2000.parse(timeMax) );
+            // see https://github.com/autoplot/dev/blob/master/bugs/2020/20201018/demoBug.jy
+            //dr = DatumRangeUtil.parseISO8601Range( String.format("%s/%s",timeMin,timeMax ) );
+            dr = new DatumRange( Units.cdfTT2000.parse(timeMin), Units.cdfTT2000.parse(timeMax) ); 
         } catch (ParseException ex) {
             throw new IllegalArgumentException(ex);
         }
