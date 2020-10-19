@@ -220,7 +220,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
         // There's a funny bug where things aren't regularly spaced, because we
         // realign at year boundaries.  Just use the original ranges in this 
         // case.
-        if ( datumRanges.size()>possibleRanges.size() ) {
+        if ( possibleRanges!=null && datumRanges.size()>possibleRanges.size() ) {
             logger.info("jumps in cadence, just use original ranges");
             possibleRanges= datumRanges;
         }
