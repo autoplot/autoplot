@@ -51,6 +51,15 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadUriMenuItemActionPerformed"/>
           </Events>
         </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="loadFromFileMI">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Load from File"/>
+            <Property name="toolTipText" type="java.lang.String" value="Load lines from file into this text area"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadFromFileMIActionPerformed"/>
+          </Events>
+        </MenuItem>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPanel" name="timeRangesPanel">
@@ -151,6 +160,15 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem2ActionPerformed"/>
+          </Events>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="loadFromFileMI2">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Load from File"/>
+            <Property name="toolTipText" type="java.lang.String" value="Load lines from file into this text area"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadFromFileMI2ActionPerformed"/>
           </Events>
         </MenuItem>
       </SubComponents>

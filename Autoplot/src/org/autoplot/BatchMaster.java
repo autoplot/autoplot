@@ -241,6 +241,7 @@ public class BatchMaster extends javax.swing.JPanel {
         jPopupMenu1 = new javax.swing.JPopupMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         loadUriMenuItem = new javax.swing.JMenuItem();
+        loadFromFileMI = new javax.swing.JMenuItem();
         timeRangesPanel = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         timeRangeComboBox = new javax.swing.JComboBox<>();
@@ -248,6 +249,7 @@ public class BatchMaster extends javax.swing.JPanel {
         jLabel3 = new javax.swing.JLabel();
         jPopupMenu2 = new javax.swing.JPopupMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
+        loadFromFileMI2 = new javax.swing.JMenuItem();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         OpenMenuItem = new javax.swing.JMenuItem();
@@ -296,6 +298,15 @@ public class BatchMaster extends javax.swing.JPanel {
         });
         jPopupMenu1.add(loadUriMenuItem);
 
+        loadFromFileMI.setText("Load from File");
+        loadFromFileMI.setToolTipText("Load lines from file into this text area");
+        loadFromFileMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadFromFileMIActionPerformed(evt);
+            }
+        });
+        jPopupMenu1.add(loadFromFileMI);
+
         jLabel2.setText("Time Range:");
 
         timeRangeComboBox.setEditable(true);
@@ -341,6 +352,15 @@ public class BatchMaster extends javax.swing.JPanel {
             }
         });
         jPopupMenu2.add(jMenuItem2);
+
+        loadFromFileMI2.setText("Load from File");
+        loadFromFileMI2.setToolTipText("Load lines from file into this text area");
+        loadFromFileMI2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadFromFileMI2ActionPerformed(evt);
+            }
+        });
+        jPopupMenu2.add(loadFromFileMI2);
 
         fileMenu.setText("File");
 
@@ -759,6 +779,53 @@ public class BatchMaster extends javax.swing.JPanel {
     private void showHelpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showHelpMenuItemActionPerformed
         AutoplotUtil.openBrowser("http://autoplot.org/batch");
     }//GEN-LAST:event_showHelpMenuItemActionPerformed
+
+    
+    private void loadFromFileMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadFromFileMIActionPerformed
+        doLoadFromFile(param1Values);
+    }//GEN-LAST:event_loadFromFileMIActionPerformed
+
+    private void loadFromFileMI2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadFromFileMI2ActionPerformed
+        doLoadFromFile(param2Values);
+    }//GEN-LAST:event_loadFromFileMI2ActionPerformed
+
+    private void doLoadFromFile( JTextArea paramValues ) {
+        JFileChooser chooser= new JFileChooser();
+        chooser.setFileFilter( new FileNameExtensionFilter( "Text Files", "txt") );
+        chooser.setDialogType( JFileChooser.OPEN_DIALOG );
+        Preferences prefs= Preferences.userNodeForPackage( BatchMaster.class );
+        String s= prefs.get("textfile",null);
+        if ( s!=null ) {
+            chooser.setSelectedFile(new File(s));
+        }
+        if ( JFileChooser.APPROVE_OPTION==chooser.showSaveDialog( this ) ) {
+            readFromFile(chooser,paramValues);
+        }
+    }
+    
+    private void readFromFile(JFileChooser chooser, JTextArea param1Values ) {
+        StringBuilder b= new StringBuilder();
+        try {    
+            try ( BufferedReader read= new BufferedReader( new FileReader(chooser.getSelectedFile()) ) ) {
+                String l= read.readLine();
+                while ( l!=null ) {
+                    if ( l.trim().length()>0 ) {
+                        b.append(l).append("\n");
+                    }
+                    l= read.readLine();
+                }
+            }
+        } catch ( IOException ex ) {
+            logger.log( Level.WARNING, null, ex );
+        }
+        Runnable run= new Runnable() {
+            public void run() {
+                param1Values.setText(b.toString());
+            }
+        };
+        SwingUtilities.invokeLater(run);
+            
+    }
 
     private void exportResults( File f ) throws IOException, JSONException {
         if ( results==null ) {
@@ -1411,6 +1478,8 @@ public class BatchMaster extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JMenuItem loadFromFileMI;
+    private javax.swing.JMenuItem loadFromFileMI2;
     private javax.swing.JMenuItem loadUriMenuItem;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JLabel messageLabel;
