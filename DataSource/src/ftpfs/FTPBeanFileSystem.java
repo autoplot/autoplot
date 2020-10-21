@@ -417,6 +417,13 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 FtpBean bean = getFtpBean();
                 try {
                     userInfo= KeyChain.getDefault().getUserInfo(url);
+//                    if ( userInfo==null ) {
+//                        String surl= url.toExternalForm();
+//                        int i0=surl.indexOf("://")+3;
+//                        surl= surl.substring(0,i0)+"user:pass@"+surl.substring(i0);
+//                        url= new URL( surl );
+//                        userInfo= KeyChain.getDefault().getUserInfo(url);
+//                    }
                     if ( userInfo!=null ) {
                         String[] userHostArr= userInfo.split(":");
                         if ( userHostArr.length==1 ) {
@@ -600,6 +607,13 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     final FtpBean bean = getFtpBean();
 
                     userInfo= KeyChain.getDefault().getUserInfo(url);
+//                    if ( userInfo==null ) {
+//                        String surl= url.toExternalForm();
+//                        int i0=surl.indexOf("://")+3;
+//                        surl= surl.substring(0,i0)+"user:pass@"+surl.substring(i0);
+//                        url= new URL( surl );
+//                        userInfo= KeyChain.getDefault().getUserInfo(url);
+//                    }
                     if ( userInfo!=null ) {
                         String[] userHostArr= userInfo.split(":");
                         if ( userHostArr.length==1 ) {
