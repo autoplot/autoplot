@@ -363,7 +363,7 @@ public class SimplifyScriptSupport {
                         if ( a1 instanceof Name ) {
                             exprType a2= cc.args[1];
                             if ( a2 instanceof Name && variableNames.contains(((Name)a2).id)) {
-                                return String.format( "%s=%s() # inserted by maybeModelAssert", ((Name)a1).id, ((Name)a2).id );
+                                return String.format( "%s__class=%s # inserted by maybeModelAssert", ((Name)a1).id, ((Name)a2).id );
                             }
                         }
                     }
