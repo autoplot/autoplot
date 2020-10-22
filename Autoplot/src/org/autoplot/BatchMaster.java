@@ -818,8 +818,11 @@ public class BatchMaster extends javax.swing.JPanel {
         } catch ( IOException ex ) {
             logger.log( Level.WARNING, null, ex );
         }
-        Runnable run= () -> {
-            paramValues.setText(b.toString());
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                paramValues.setText(b.toString());
+            }
         };
         SwingUtilities.invokeLater(run);
             
