@@ -14,6 +14,7 @@ import org.python.parser.ast.Module;
 import org.python.parser.ast.stmtType;
 import org.das2.util.LoggerManager;
 import org.python.parser.SimpleNode;
+import org.python.parser.ast.Assert;
 import org.python.parser.ast.Assign;
 import org.python.parser.ast.Attribute;
 import org.python.parser.ast.BinOp;
@@ -252,6 +253,13 @@ public class SimplifyScriptSupport {
                  }
                  currentLine= lastLine1;
                  acceptLine= -1;
+             } else if ( o instanceof Assert ) {
+                 String m= maybeModelAssert((Assert)o,variableNames);
+                 if ( m!=null ) {
+                     result.append(m).append("\n");
+                     currentLine= acceptLine;
+                 }
+                 
              } else {
                  if ( simplifyScriptToGetCompletionsOkay( o, variableNames ) ) {
                      if ( acceptLine<0 ) {
@@ -337,6 +345,35 @@ public class SimplifyScriptSupport {
         logger.finest( String.format( "!! %04d canResolve->false: %s", o.beginLine, o ) );
          return false;
      }     
+     
+     /**
+      * dumb kludge where no-arg constructor is called to get an instance for
+      * completions.  This is really an experiment...
+      * @param a
+      * @return 
+      */
+     private static String maybeModelAssert( Assert a, HashSet<String> variableNames ) {
+        if ( a.test instanceof Call ) {
+            org.python.parser.ast.Call cc= ( org.python.parser.ast.Call)a.test;
+            exprType f= cc.func;
+            if ( f instanceof Name ) {
+                if ( ((Name)f).id.equals("isinstance") ) {
+                    if ( cc.args.length==2 ) {
+                        exprType a1= cc.args[0];
+                        if ( a1 instanceof Name ) {
+                            exprType a2= cc.args[1];
+                            if ( a2 instanceof Name && variableNames.contains(((Name)a2).id)) {
+                                return String.format( "%s=%s() # inserted by maybeModelAssert", ((Name)a1).id, ((Name)a2).id );
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
+        } else {
+            return null;
+        }
+     }
      
      /**
       * return true if we can include this in the script without a huge performance penalty.
@@ -472,7 +509,7 @@ public class SimplifyScriptSupport {
          "linspace,", "logspace,",
          "dblarr,", "fltarr,", "strarr,", "intarr,", "bytarr,",
          "ripples,", "split,", 
-         "color,", "colorFromString,"  };
+         "color,", "colorFromString,", "isinstance,"  };
      private static final Set<String> okaySet= new HashSet<>();
      static {
          for ( String o: okay ) okaySet.add(o.substring(0,o.length()-1));
