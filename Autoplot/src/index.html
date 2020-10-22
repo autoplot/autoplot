@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The PNGWalk Tool is used to record readings from a radon meter.  A Jython <a href="https://github.com/autoplot/dev/blob/master/demos/2019/20190330/parseOkayFiles.jy">script</a> compiles all the XML ".ok" files into a dataset.
+        <p><small>Access from FTP site works again, where the username and password is only entered once.  Images from https://www.wftpserver.com/.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,9 +26,15 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-10-16 r25215):</p>
+        <p>Bugfixes (2020-10-22 r25232):</p>
         <ul>
-            <li>2295: HAPI server transactions should use UTF-8 and not the system default encoding.  Thanks, Vincent and Benjamin!
+            <li>NegativeArraySizeException in intermediate state of SeriesRenderer, when log axis is used and plot has not been sized.
+            <li>2290: unbundle filter GUI contained bug which would insert extra quote in the argument.
+            <li>recent change to pngWalkTool didn't consider one of the initialization modes.
+            <li>datumRange constructor which took two long-backed cdf_tt2000 datums would convert the end datum unnecessarily, introducing numerical noise.
+            <li>correction to FTP so that user:pass is only requested once, anonymous ftp is dropped.
+            <li>HAPI server transactions should use UTF-8 and not the system default encoding.  Thanks, Vincent and Benjamin!
+            <li>Tooltip on progress monitor, which is never truncated, shows transfer rate.
             <li>2295: improvements to automatic variable name selection.
             <li>improve support for huge CDF files (&gt;2G), by removing a check which assumed that the ByteBuffer was a mapping of the entire file. Improve feedback.
             <li>When PNGWalk has roughly the expected number of files, don't count off intervals, which causes problems when 10-day plots start at year boundaries.
