@@ -803,7 +803,7 @@ public class BatchMaster extends javax.swing.JPanel {
         }
     }
     
-    private void readFromFile(JFileChooser chooser, JTextArea param1Values ) {
+    private void readFromFile(JFileChooser chooser, final JTextArea param1Values ) {
         StringBuilder b= new StringBuilder();
         try {    
             try ( BufferedReader read= new BufferedReader( new FileReader(chooser.getSelectedFile()) ) ) {
@@ -818,10 +818,8 @@ public class BatchMaster extends javax.swing.JPanel {
         } catch ( IOException ex ) {
             logger.log( Level.WARNING, null, ex );
         }
-        Runnable run= new Runnable() {
-            public void run() {
-                param1Values.setText(b.toString());
-            }
+        Runnable run= () -> {
+            param1Values.setText(b.toString());
         };
         SwingUtilities.invokeLater(run);
             
