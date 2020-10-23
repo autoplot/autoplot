@@ -1227,6 +1227,12 @@ public class JythonCompletionTask implements CompletionTask {
             List<String> signatures= new ArrayList();
             List<String> argss= new ArrayList();
             if (ss.startsWith(cc.completable)) {
+                if ( ss.endsWith("__class") ) {
+                    ss= ss.substring(0,ss.length()-7);
+                    if ( !ss.startsWith(cc.completable) ){
+                        continue;
+                    }
+                }
                 logger.log(Level.FINER, "found completion item: {0}", ss);
                 boolean allStatic= false;  // true if the completion is a utility class.
                 PyObject po = locals.get(s);
