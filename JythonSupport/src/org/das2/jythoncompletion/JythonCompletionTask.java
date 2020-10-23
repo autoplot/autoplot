@@ -246,14 +246,31 @@ public class JythonCompletionTask implements CompletionTask {
             return 0;
         }
 
-        PyObject lcontext;
+        PyObject lcontext=null;
+        PyJavaClass lcontextClass=null;
+        
         try {
             lcontext = interp.eval(cc.contextString);
         } catch (PyException ex) {
-            rs.addItem(new MessageCompletionItem("Eval error: " + cc.contextString, ex.toString()));
-            return 0;
+            try {
+                PyObject occ= interp.eval(cc.contextString+"__class");
+                if ( occ!=null && occ instanceof PyJavaClass ) {
+                    lcontextClass= (PyJavaClass)occ;
+                } else {
+                    rs.addItem(new MessageCompletionItem("EVAL error: " + cc.contextString, ex.toString()));
+                    return 0;
+                }
+            } catch ( PyException ex2 ) {
+                rs.addItem(new MessageCompletionItem("Eval error: " + cc.contextString, ex.toString()));
+                return 0;
+            }
         }
 
+        if ( lcontext==null ) {
+            logger.log(Level.FINE, "completions have the class but not the instance to work with: {0}", lcontextClass.__name__);
+            lcontext= lcontextClass;
+        }
+        
         PyList po2;
         try {
             po2= (PyList) lcontext.__dir__();
