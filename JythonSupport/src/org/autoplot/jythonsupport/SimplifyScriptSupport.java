@@ -13,6 +13,7 @@ import org.python.parser.ast.If;
 import org.python.parser.ast.Module;
 import org.python.parser.ast.stmtType;
 import org.das2.util.LoggerManager;
+import org.python.core.PyJavaClass;
 import org.python.parser.SimpleNode;
 import org.python.parser.ast.Assert;
 import org.python.parser.ast.Assign;
@@ -193,6 +194,15 @@ public class SimplifyScriptSupport {
              if ( beginLine>lastLine ) {
                  continue;
              }
+             if ( o instanceof Assign && !simplifyScriptToGetCompletionsOkay( o, variableNames ) ) {
+                 Assign a= (Assign)o;
+                 String cl= maybeIdentifyType( a );
+                 if ( cl!=null ) {
+                     result.append(cl);
+                     continue;
+                 }
+             }
+               
              if ( o instanceof org.python.parser.ast.If ) {
                  if ( acceptLine>-1 ) {
                     for ( int i=acceptLine; i<beginLine; i++ ) {
@@ -259,7 +269,7 @@ public class SimplifyScriptSupport {
                      result.append(m).append("\n");
                      currentLine= acceptLine;
                  }
-                 
+    
              } else {
                  if ( simplifyScriptToGetCompletionsOkay( o, variableNames ) ) {
                      if ( acceptLine<0 ) {
@@ -577,6 +587,37 @@ public class SimplifyScriptSupport {
              return false;
          }
      }
+
+     /**
+      * if we recognize the function that is called, then go ahead and keep track
+      * of the type.  This is a quick and cheesy implementation that just looks
+      * for a few names.
+      * @param a
+      * @return 
+      */
+     private static String maybeIdentifyType(Assign a) {
+        if ( a.targets.length==1 ) {
+            exprType target= a.targets[0];
+            exprType et = (exprType) target;
+            if (et instanceof Name) {
+                String id = ((Name) target).id;
+                if ( a.value instanceof Call ) {
+                    Call c= (Call)a.value;
+                    if ( c.func instanceof Name ) {
+                        String funcName= ((Name)c.func).id;
+                        if ( funcName.equals("getApplication") ) {
+                            return "from org.autoplot import AutoplotUI\n" + id + "__class=AutoplotUI\n";
+                        } else if ( funcName.equals("getApplicationModel") ) {
+                            return "from org.autoplot import ApplicationModel\n" + id + "__class=ApplicationModel\n";
+                        } else if ( funcName.equals("getDataSource") ) {
+                            return "from org.autoplot.datasource import DataSource\n" + id + "__class=DataSource\n";
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
      
      private static class MyVisitorBase<R> extends VisitorBase {
          boolean looksOkay= true; 
