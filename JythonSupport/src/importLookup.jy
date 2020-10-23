@@ -185,6 +185,7 @@ from org.das2.jythoncompletion import JavadocLookup
 from org.das2.qds import JoinDataSet
 from org.das2.jythoncompletion import JythonCompletionTask
 from org.autoplot.scriptconsole import JythonScriptPanel
+from org.autoplot.jythonsupport.ui import EditorTextPane
 from java.awt.event import KeyAdapter
 from org.das2.util.filesystem import KeyChain
 from java.awt.event import KeyEvent
