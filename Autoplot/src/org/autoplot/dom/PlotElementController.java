@@ -964,12 +964,14 @@ public class PlotElementController extends DomNodeController {
     }
     
     /**
-     * Resolve the renderType and renderControl for the dataset.
+     * Resolve the renderType and renderControl for the dataset.  This may be
+     * set explicitly by the dataset, in its RENDER_TYPE property, or resolved
+     * using the dataset scheme.
      * 
      * @param fillds 
      * @return the render string with canonical types.  The result will always contain a greater than (&gt;).
      */
-    private static String resolveRenderType( QDataSet fillds ) {
+    public static String resolveRenderType( QDataSet fillds ) {
         String srenderType= (String) fillds.property(QDataSet.RENDER_TYPE);
         RenderType renderType;
         String renderControl="";
@@ -1015,10 +1017,17 @@ public class PlotElementController extends DomNodeController {
                     }
                     break;
             }
+            return renderType.toString() + ">" + renderControl;
         } else {
             renderType = AutoplotUtil.guessRenderType(fillds);
+            if ( renderType==RenderType.series ) {
+                if ( Schemes.isScalarSeriesWithErrors(fillds) ) {
+                    renderControl= "drawError=T";
+                }
+            }
+            return renderType.toString() + ">" + renderControl;
         }
-        return renderType.toString() + ">" + renderControl;
+        
     }
 
     private void updateDataSetImmediately() throws Exception {
