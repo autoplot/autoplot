@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package external;
 
@@ -10,7 +6,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
-import org.das2.datum.Units;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.PlotSymbol;
@@ -33,12 +28,10 @@ import org.autoplot.dom.PlotElement;
 import org.autoplot.dom.Row;
 import org.das2.qds.QDataSet;
 import org.autoplot.jythonsupport.JythonOps;
-import org.autoplot.jythonsupport.PyQDataSet;
 import org.autoplot.jythonsupport.PyQDataSetAdapter;
 import org.das2.graph.FillStyle;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
-import org.das2.graph.TickVDescriptor;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.ops.Ops;
 import org.python.core.PyJavaInstance;
