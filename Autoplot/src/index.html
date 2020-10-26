@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Access from FTP site works again, where the username and password is only entered once.  Images from https://www.wftpserver.com/.
+        <p><small>URI_Template with end time is used with avail=T to show availability of data from Ecobee thermostat.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-10-22 r25232):</p>
+        <p>Bugfixes (2020-10-26 r25232):</p>
         <ul>
+            <li>medianFilter would fail if there was too much fill data.  Thanks, Kristoff!
             <li>NegativeArraySizeException in intermediate state of SeriesRenderer, when log axis is used and plot has not been sized.
             <li>2290: unbundle filter GUI contained bug which would insert extra quote in the argument.
             <li>recent change to pngWalkTool didn't consider one of the initialization modes.
