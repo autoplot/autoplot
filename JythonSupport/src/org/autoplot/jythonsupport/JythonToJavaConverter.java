@@ -310,10 +310,19 @@ public class JythonToJavaConverter {
                     importedPaths.add(clas);
                 }
             }
-            
+
             s= s.replaceAll("null","None");
             s= s.replaceAll("false","False");
             s= s.replaceAll("true","True");
+            s= s.replaceAll("startsWith","startswith");
+            s= s.replaceAll("else if","elif");
+            s= s.replaceAll("\\|\\|","or");
+            s= s.replaceAll("\\&\\&","and");
+            s= s.replaceAll("null","None");
+            s= s.replaceAll("public static","");
+            s= s.replaceAll(".substring\\(([a-z\\+\\-\\.0-9\\(\\)]+\\s*)(,\\s*([a-z\\+\\-\\.0-9]+)\\s*)?\\)","[$1:$3]" );
+            s= s.replaceAll(".charAt\\(([a-z\\+\\-\\.0-9\\(\\)]+\\s*)\\)","[$1]" );
+            s= s.replaceAll("([a-zA-Z0-9_]+).length\\(\\)","len($1)" );
             
             m= assignPattern.matcher(s);
             if ( m.matches() ) {
