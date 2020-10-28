@@ -128,8 +128,19 @@ public class JythonToJavaConverter {
      * @param name the Java class name.
      */
     public static void addImport( Document doc, String pkg, String name ) {
+        addImport( doc, pkg, name, doc.getLength() );
+    }
+        
+    /**
+     * add the class to the list of imports.
+     * @param doc the document 
+     * @param pkg the Java package
+     * @param name the Java class name.
+     * @param cursorPosition the cursor position.
+     */
+    public static void addImport( Document doc, String pkg, String name, int cursorPosition ) {
         try {
-            String s= doc.getText( 0, doc.getLength() );
+            String s= doc.getText( 0, cursorPosition );
             String[] ss= s.split("\n");
             Pattern p= Pattern.compile("from (.+) import (.*)");
             boolean haveIt=false;

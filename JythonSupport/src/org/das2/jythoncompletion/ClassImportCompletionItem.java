@@ -36,7 +36,7 @@ public class ClassImportCompletionItem extends DefaultCompletionItem{
             if ( !restOfLine.startsWith( complete.substring(offset) ) ) { // in case they triggered completion just for reference
                 d.insertString( pos, complete.substring(offset), null );
             }
-            JythonToJavaConverter.addImport( d, pkg, name );
+            JythonToJavaConverter.addImport( d, pkg, name, lineEnd );
             //jTextComponent.setCaretPosition(carot);
             CompletionImpl.get().hideCompletion(false);
         } catch (BadLocationException ex) {
