@@ -15,7 +15,7 @@ import javax.swing.JEditorPane;
 import jsyntaxpane.DefaultSyntaxKit;
 
 /**
- *
+ * Tool for converting Mathematica expressions into Jython code.
  * @author jbf
  */
 public class MathematicaJythonConverter extends javax.swing.JPanel {
@@ -214,7 +214,9 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
         while ( st.hasMoreTokens() ) {
             String t= st.nextToken();
             if ( t.equals(" ") ) {
-                sb.append(t);
+                if ( !lastNameOrConstant ) {
+                    sb.append(t);
+                }
             } else if ( t.equals("\n") ) {
                 sb.append(t);
             } else if ( t.equals("{") ) {
@@ -256,10 +258,14 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
                 sb.append("**");
                 lastNameOrConstant= false;
             } else if ( t.equals("+") ) {
-                sb.append(t);
+                sb.append(" ").append(t).append(" ");
                 lastNameOrConstant= false;
             } else if ( t.equals("-") ) {
-                sb.append(t);
+                if ( lastNameOrConstant ) {
+                    sb.append(" ").append(t);
+                } else {
+                    sb.append(t);
+                }
                 lastNameOrConstant= false;
             } else if ( t.equals("/") ) {
                 sb.append(t);
@@ -268,6 +274,9 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
                 if ( stack.size()>0 ) {
                     stack.push(t);
                 } else {
+                    if ( lastNameOrConstant ) {
+                        sb.append("*");
+                    }
                     if ( lastToken.equals("/") ) {
                         sb.append(t).append(".");
                     } else {
@@ -285,7 +294,7 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
                         isFunctionName= true;
                     }
                     if ( lastNameOrConstant ) {
-                        sb.append("* ");
+                        sb.append("*");
                     }
                     sb.append(t);
                     lastNameOrConstant= !isFunctionName;
