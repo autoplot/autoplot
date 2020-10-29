@@ -53,6 +53,7 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.ui.Util;
+import org.das2.components.DasProgressLabel;
 import org.das2.qds.util.AsciiHeadersParser;
 import org.das2.qds.util.AsciiParser;
 import org.das2.qds.util.AutoHistogram;
@@ -768,9 +769,9 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                                 .add(jLabel7)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(dataPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(fillValueTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 111, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(validMinTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 94, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .add(17, 17, 17)
+                            .add(validMinTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+                            .add(fillValueTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 116, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(dataPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(dataPanelLayout.createSequentialGroup()
                                 .add(jToggleButton4)
@@ -1057,27 +1058,31 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
     }//GEN-LAST:event_whereParamListActionPerformed
 
     private void guessFillButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guessFillButtonActionPerformed
-        fillValueTextField.setText( "moment..." );
+        fillValueTextField.setText(MSG_MOMENT);
         guessFillButton.setEnabled(false);
+        dataStatusLabel.setText("looking for outliers which could be interpretted as fill.");
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                ProgressMonitor mon= null;
+                DasProgressLabel mon= null;
+                String resultText=null;
                 try {
                     DataSetBuilder builder= new DataSetBuilder( 1, 100 );
 
                     int[] cols= getDataColumns();
 
-                    mon= new NullProgressMonitor();
+                    mon= new DasProgressLabel("looking for outliers which could be interpretted as fill");
+                    mon.setLabelComponent(dataStatusLabel);
                     //            mon= DasProgressPanel.createFramed("parsing file");
-
-                    mon.setTaskSize(model.getRowCount());
+                    
+                    final int rowCount = model.getRowCount();
+                    mon.setTaskSize(rowCount);
                     mon.started();
-                    for ( int i=0; i<model.getRowCount(); i++ ) {
+                    for ( int i=0; i<rowCount; i++ ) {
                         mon.setTaskProgress(i);
                         for ( int j=cols[0]; j<=cols[1]; j++ ) {
                             try {
-                                builder.putValue(-1, Double.parseDouble(String.valueOf(model.getValueAt(i, j))));
+                                builder.putValue(-1, Double.parseDouble(String.valueOf(model.getValueAt(i,j))));
                                 builder.nextRecord();
                             } catch (NumberFormatException numberFormatException) {
                             }
@@ -1090,20 +1095,34 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
 
                     Map<Double,Integer> outliers= (Map<Double, Integer>) DataSetUtil.getUserProperty( hist, AutoHistogram.USER_PROP_OUTLIERS );
                     if ( outliers!=null &&  outliers.size()==1 ) {
-                        fillValueTextField.setText( String.valueOf(outliers.keySet().iterator().next()) );
+                        resultText= String.valueOf(outliers.keySet().iterator().next());
                     } else {
-                        fillValueTextField.setText( "" );
+                        resultText= "";
                     }
                 } catch (IllegalArgumentException ex) {
-                    throw new RuntimeException(ex);
+                    resultText= "";
+                    throw ex;
                 } finally {
-                    if ( mon!=null ) mon.finished();
-                    guessFillButton.setEnabled(true);
+                    if ( mon!=null ) {
+                        mon.finished();
+                        mon.setLabelComponent(null);
+                    }
+                    final String fresultText= resultText;
+                    Runnable run= new Runnable() {
+                        @Override
+                        public void run() {
+                            fillValueTextField.setText( fresultText );
+                            dataStatusLabel.setText("                    ");
+                            guessFillButton.setEnabled(true);
+                        }
+                    };
+                    SwingUtilities.invokeLater(run);
                 }
             }
         };
         new Thread(run).start();
     }//GEN-LAST:event_guessFillButtonActionPerformed
+    private static final String MSG_MOMENT = "moment...";
 
     private void validMaxTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_validMaxTextFieldActionPerformed
         // TODO add your handling code here:
@@ -1734,7 +1753,10 @@ private void guessTimeFormatButtonAP( int row, int first, int last ) {
         } else {
             params.remove("timeFormat");
         }
-        setParam( params, "fill", fillValueTextField.getText() );
+        String s2= fillValueTextField.getText().trim();
+        if ( !s2.equals(MSG_MOMENT) && s2.length()>0 ) {
+            setParam( params, "fill", s );
+        }
         setParam( params, "validMin", validMinTextField.getText() );
         setParam( params, "validMax", validMaxTextField.getText() );
 
