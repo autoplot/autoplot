@@ -29,7 +29,7 @@ public class JavadocLookup {
             instance.setLinkForJavaSignature("org/jdesktop","http://docs.oracle.com/javase/8/docs/api/");
             instance.setLinkForJavaSignature("org/apache/commons/math3", "http://commons.apache.org/proper/commons-math/javadocs/api-3.6/" );
             instance.setLinkForJavaSignature("org/apache/commons/math", "http://commons.apache.org/proper/commons-math/javadocs/api-2.0/" );
-            instance.setLinkForJavaSignature("gov/nasa/gsfc/spdf/cdfj","https://cdaweb.sci.gsfc.nasa.gov/~nand/cdfj/docs/" );
+            instance.setLinkForJavaSignature("gov/nasa/gsfc/spdf/cdfj", "https://jfaden.net/~jbf/autoplot/cdf/doc/" );
             instance.setLinkForJavaSignature("org/autoplot", JythonCompletionProvider.getInstance().settings.getDocHome() );
             instance.setLinkForJavaSignature("org/das2", JythonCompletionProvider.getInstance().settings.getDocHome() );
             instance.setLinkForJavaSignature("com/matio", JythonCompletionProvider.getInstance().settings.getDocHome() );
@@ -75,7 +75,12 @@ public class JavadocLookup {
                         return s + signature;
                     }
                 } else {
-                    return s + signature.replaceAll(",", ", ");
+                    if ( s.endsWith("/") ) {
+                        return s + signature.replaceAll(",", ", ");
+                    } else {
+                        // Note .zip files do not work!  I thought they did...
+                        return s + "/" + signature.replaceAll(",", ", ");
+                    }
                 }
             }
         }
