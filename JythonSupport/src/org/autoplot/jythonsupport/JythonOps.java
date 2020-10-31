@@ -6,8 +6,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.autoplot.datasource.FileSystemUtil;
 import org.das2.datum.Datum;
@@ -32,6 +36,8 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.URISplit;
+import org.das2.jythoncompletion.JavadocLookup;
+import org.das2.qds.filters.CollapseFilterEditorPanel;
 import org.das2.qds.ops.Ops;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
@@ -393,6 +399,12 @@ public class JythonOps {
             destDir= new File( destDir, ss );
             org.das2.util.filesystem.FileSystemUtil.unzipFile( jarFile, destDir);
             syspath.insert( 0, new PyString(destDir.toString()) );
+            if ( docPath!=null ) {
+                List<String> paths= findJavaPathRoots( FileSystem.create(destDir.toURI()) );
+                for ( String p: paths ) {
+                    JavadocLookup.getInstance().setLinkForJavaSignature(p,docPath);
+                }
+            }
             return destDir.toString();
         } else {
             throw new IllegalArgumentException("only jar files can be added.");
@@ -484,5 +496,51 @@ public class JythonOps {
             i=i+1;
         }
         return "???";
+    }
+
+    /**
+     * search the folder for the names of packages.  This could trivially
+     * return "edu", but instead navigate to find a more precise name, or names.
+     * @param destDir
+     * @return list of packages.
+     */
+    public static List<String> findJavaPathRoots(FileSystem destDir) {
+        return findJavaPathRoots(destDir,"/",new ArrayList<String>() );
+    }
+    
+    private static List<String> findJavaPathRoots( FileSystem destDir, String prefix, List<String> result) {
+        try {
+            String[] roots= destDir.listDirectory("/");
+            for ( String r: roots ) {
+                if ( r.length()==0 || Character.isUpperCase( r.charAt(0) ) ) {
+                    logger.finer("skipping "+r); //META-INF, Class names...
+                } else {
+                    if ( destDir.getFileObject(r).isFolder() ) {
+                        try {
+                            FileSystem child= destDir.createFileSystem(r);
+                            findJavaPathRoots( child, prefix + r, result);
+                        } catch (URISyntaxException ex) {
+                            Logger.getLogger(JythonOps.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+            }
+            if ( prefix.length()>1 ) {
+                boolean haveIt= false;
+                for ( String r: result ) {
+                    if ( r.startsWith(prefix) ) {
+                        haveIt= true;
+                        break;
+                    }
+                }
+                if ( !haveIt ) {
+                    result.add( prefix );
+                }
+            }
+            return result;
+        } catch (IOException ex) {
+            Logger.getLogger(JythonOps.class.getName()).log(Level.SEVERE, null, ex);
+            return result;
+        }
     }
 }
