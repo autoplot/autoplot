@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>URI_Template with end time is used with avail=T to show availability of data from Ecobee thermostat.
+        <p><small>Timely demo URI found in bug <a href='https://sourceforge.net/p/autoplot/bugs/1922/'>1922</a>.  Happy Halloween!
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,12 @@
         
         <p>Bugfixes (2020-10-26 r25232):</p>
         <ul>
+            <li>In Mathematica to Jython, properly handle "2754 2^(2/3)"
             <li>medianFilter would fail if there was too much fill data.  Thanks, Kristoff!
-            <li>NegativeArraySizeException in intermediate state of SeriesRenderer, when log axis is used and plot has not been sized.
+        </ul>
+        <p>Older Bugfixes (2020-09-30 r25152):</p>
+        <ul>
+            <li>NegativeArraySizeException in intermediate state of SeriesRenderer, when log axis is used and plot has not been sized.  Thanks, Jon N!
             <li>2290: unbundle filter GUI contained bug which would insert extra quote in the argument.
             <li>recent change to pngWalkTool didn't consider one of the initialization modes.
             <li>datumRange constructor which took two long-backed cdf_tt2000 datums would convert the end datum unnecessarily, introducing numerical noise.
@@ -53,42 +57,17 @@
             <li>rte_1611550558: index out of bounds in misformatted time resulted in poor error feedback.  Thanks dphartley!
             <li>rte_1611550558: old $x for localized m/d/Y or d.m.Y was leftover in old code, which could be confusing.
         </ul>
-        <p>Older Bugfixes (2020-09-30 r25152):</p>
-        <ul>
-            <li>2289: IOException when TAB is pressed in empty data set selector, instead of discovery of types.
-            <li>2274: Handle redirect to authenticated URL.  Thanks, Jon N and Kristoff!
-            <li>when loading several datasets from CDF into a bundle, all would have the label of the first.  Thanks, Warren!
-            <li>rfe694: explicitly handle escape in DataSetSelector, so that it doesn't escape the dialog which contains it.
-            <li>2287: handle case where CDF attribute has String for first value and double array for second and third.
-            <li>backgroundThick line (used for contrast) would draw with dashes as well, making it unusable with anything other that solid.
-            <li>HapiServerDemo, the Autoplot-based HAPI Server, didn't properly handle fill data.
-            <li>1486: swap plot position doesn't move the empheris data.
-            <li>drag and drop file onto canvas works again on the Mac DMG release.   Thanks, Allison!
-            <li>Use new receiver for RTE reports.
-            <li>slice2 and slice3 propagate DELTA_PLUS and DELTA_MINUS properties.  Thanks, Mike!
-            <li>2282: ASCII table reader would use enumeration units when the first N records were empty fields, even if numeric data followed.  Thanks, Joe!
-            <li>ASCII column headers can include granny strings for units, like "N_e(cm!a-3!n)"
-            <li>2278: CDF slice1 keyword didn't work when Epoch16 timetags were used.  Thanks, Kristoff!
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>rfe363: check version of Javadoc when deciding how to create link.
+            <li>rfe363: finally "addToSearchPath"'s Javadoc argument is used for Javadoc completions. (To be shown at 2020 AGU.)
+            <li>rfe363: first batch of new icons showing Java static method vs instance method, properly filter by context.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>create pngwalk shows processing rate based on last 20 images, not the whole run, so that parallel processing is improved.
             <li>Jython editor has new developer->"Convert Mathematica code to Jython" tool.
             <li>create pngwalk checks for lockfile, so that multiple processes can work on pngwalk in concert.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>rfe425: Mashup will replace parameter names with the names of datasets, so that the tree is valid.
-            <li>export to Das2Stream version 2.3 introduced by Chris.
-            <li>experimental ColorSeriesRenderer introduced, which allows color along the line.
-            <li>Jython-defined renderers can use colorbar.
-            <li>add completions for pattern and format for ASCII data source.
-            <li>728: Allow multiple, non-adjacent columns of ASCII table to be plotted.  Thanks, In Sook!
-            <li>725: Create PNGWalk has checkbox will remove images where no data is visible.  Thanks, In Sook!
-            <li>provide GUI to enable and control error bars, used when data contains DELTA_PLUS and DELTA_MINUS.  Thanks, Mike!
-            <li>File chooser has types alphabetized and now shows only file-based data sources.  Thanks, Allison!
-            <li>HAPI data source shows events bar when only timetags are requested, useful for availability.
-            <li>suppress the legend when the plot width is less than 100 pixels.
         </ul>
         <p>Known issues:</p>
         <ul>
