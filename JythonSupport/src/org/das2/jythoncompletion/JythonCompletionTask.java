@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
@@ -53,7 +54,6 @@ import org.autoplot.jythonsupport.JythonOps;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
-import org.autoplot.jythonsupport.ui.EditorTextPane;
 
 /**
  * Completions for Jython code.  The completion task is created with the
@@ -67,8 +67,12 @@ public class JythonCompletionTask implements CompletionTask {
     private static final Logger logger= LoggerManager.getLogger("jython.editor.completion");
             
     private static final ImageIcon LOCALVARICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/localVariable.png") );
-    private static final ImageIcon JAVACLASSICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/javaClass.png") );
+    private static final ImageIcon JAVA_CLASS_ICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/javaClass.png") );
     private static final ImageIcon JYTHONCOMMANDICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/jythonCommand.png") );
+    private static final ImageIcon JAVA_FIELD_ICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/javaStaticField.png") );
+    private static final ImageIcon JAVA_METHOD_ICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/javaMethod.png") );
+    private static final ImageIcon JAVA_STATIC_METHOD_ICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/javaStaticMethod.png") );
+    private static final ImageIcon JAVA_CONSTRUCTOR_ICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/javaConstructor.png") );
     
     public static final String CLIENT_PROPERTY_INTERPRETER_PROVIDER = "JYTHON_INTERPRETER_PROVIDER";
     JTextComponent editor;
@@ -132,7 +136,7 @@ public class JythonCompletionTask implements CompletionTask {
      * @return the count
      */
     public int doQuery( CompletionContext cc, CompletionResultSet resultSet ) {
-        int c=0;
+         int c=0;
         try {
             switch (cc.contextType) {
                 case CompletionContext.MODULE_NAME:
@@ -300,6 +304,7 @@ public class JythonCompletionTask implements CompletionTask {
                 String label = ss;
                 String signature = null;
                 String args = "";
+                ImageIcon icon= null;
                 if (lcontext instanceof PyJavaClass) {
                     if (po.getClass().toString().equals( "class org.python.core.PyReflectedConstructor" ) ) {
                         args= "()";
@@ -307,12 +312,18 @@ public class JythonCompletionTask implements CompletionTask {
                     } else if (po instanceof PyReflectedFunction) {
                         Method m = new PyReflectedFunctionPeeker((PyReflectedFunction) po).getMethod(0);
                         signature = methodSignature(m);
+                        if ( Modifier.isStatic(m.getModifiers()) ) {
+                            icon= JAVA_STATIC_METHOD_ICON;
+                        } else {
+                            icon= JAVA_METHOD_ICON;
+                        }
                         args = methodArgs(m);
-                    } else if ( po instanceof PyString || po instanceof PyJavaInstance) {
+                    } else if ( po instanceof PyString || po instanceof PyInteger || po instanceof PyJavaInstance) {
                         Class c= new PyClassPeeker((PyJavaClass) lcontext).getJavaClass();
                         try {
                             Field f = c.getField(ss);
                             signature= fieldSignature(f);
+                            icon= JAVA_FIELD_ICON;
                         } catch ( NoSuchFieldException ex ) {   
                         }
                     }
@@ -424,7 +435,12 @@ public class JythonCompletionTask implements CompletionTask {
                         rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, signature));
                     } else {
                         String link = getLinkForJavaSignature(signature);
-                        rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
+                        if ( icon==null ) {
+                            rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
+                        } else {
+                            rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, 1, icon ) );
+                        }
+                        
                     }
                     count++;
                 }
@@ -991,7 +1007,7 @@ public class JythonCompletionTask implements CompletionTask {
                         new ClassImportCompletionItem( 
                                 cc.completable, cc.completable.length(), 
                                 ss, ss + " and import from " + pkg, link, 
-                                0, JAVACLASSICON, pkg, ss );
+                                0, JAVA_CLASS_ICON, pkg, ss );
                 result.addItem( ci );
             }
             count++;
@@ -1220,7 +1236,9 @@ public class JythonCompletionTask implements CompletionTask {
         PyStringMap locals = (PyStringMap) interp.getLocals();
         
         PyList po2 = locals.keys();
+        
         for (int i = 0; i < po2.__len__(); i++) {
+            ImageIcon icon= null;
             PyString s = (PyString) po2.__getitem__(i);
             String ss = s.toString();
             String signature = null; // java signature
@@ -1259,14 +1277,17 @@ public class JythonCompletionTask implements CompletionTask {
                             Class jclass= getJavaClass((PyJavaClass)po);
                             String n= jclass.getCanonicalName();
                             allStatic= true;
+                            logger.log(Level.FINER, "check for non-static methods: {0}", n);
                             Method[] mm= jclass.getMethods();
                             for ( Method m: mm ) {
                                 if ( !m.getDeclaringClass().equals(Object.class) ) {
                                     if ( !Modifier.isStatic(m.getModifiers()) ) {
+                                        logger.log(Level.FINEST, "not static: {0}", m.getName());
                                         allStatic= false;
                                     }
                                 }
                             }   
+                            logger.log(Level.FINER, "  class is all static methods: {0}", allStatic );
                             if ( allStatic ) {
                                 doConstructors(jclass.getConstructors(),labels,signatures,n,argss);
                                 for ( int i1=0; i1<argss.size(); i1++ ) {
@@ -1275,6 +1296,7 @@ public class JythonCompletionTask implements CompletionTask {
                             } else {
                                 doConstructors(jclass.getConstructors(),labels,signatures,n,argss);
                             }
+                            icon= JAVA_CONSTRUCTOR_ICON;
                             //signature=  join( n.split("\\."), "/") + ".html#"+ jclass.getSimpleName() + "()";
                             break;
                         case "javapackage":
@@ -1319,7 +1341,7 @@ public class JythonCompletionTask implements CompletionTask {
                             link= "http://autoplot.org/developer.scripting#DOM";
                         }
                         logger.log(Level.FINER, "DefaultCompletionItem({0},{1},\n{2}{3},\n{4},\n{5})", new Object[]{ss, cc.completable.length(), ss, argss.get(jj), label, link});
-                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + argss.get(jj), label, link) );
+                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + argss.get(jj), label, link, 1, icon ) );
                     }
                 } else {
                     String link = null;
@@ -1338,7 +1360,11 @@ public class JythonCompletionTask implements CompletionTask {
                         if ( allStatic ) {
                             result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args + ".", label, link) );
                         } else {
-                            result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, 1, LOCALVARICON ) );
+                            if ( po instanceof PyJavaClass ) {
+                                result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, 1, JAVA_CONSTRUCTOR_ICON ) );
+                            } else {
+                                result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, 1, LOCALVARICON ) );
+                            }
                         }
                     }
                 }
