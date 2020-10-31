@@ -311,19 +311,19 @@ public class JythonCompletionTask implements CompletionTask {
                         signature= "";
                     } else if (po instanceof PyReflectedFunction) {
                         Method m = new PyReflectedFunctionPeeker((PyReflectedFunction) po).getMethod(0);
-                        signature = methodSignature(m);
-                        if ( Modifier.isStatic(m.getModifiers()) ) {
-                            icon= JAVA_STATIC_METHOD_ICON;
+                        if ( Modifier.isStatic( m.getModifiers() ) ) {
+                            signature = methodSignature(m);
+                            icon= getIconFor(m);
+                            args = methodArgs(m);
                         } else {
-                            icon= JAVA_METHOD_ICON;
+                            continue;
                         }
-                        args = methodArgs(m);
                     } else if ( po instanceof PyString || po instanceof PyInteger || po instanceof PyJavaInstance) {
                         Class c= new PyClassPeeker((PyJavaClass) lcontext).getJavaClass();
                         try {
                             Field f = c.getField(ss);
                             signature= fieldSignature(f);
-                            icon= JAVA_FIELD_ICON;
+                            icon= getIconFor(f);
                         } catch ( NoSuchFieldException ex ) {   
                         }
                     }
@@ -365,13 +365,16 @@ public class JythonCompletionTask implements CompletionTask {
                         try {
                             for ( int im=0; im<getMethodCount(m); im++ ) {
                                 jm = getJavaMethod(m, im);
-                                signature = methodSignature(jm);
-                                args = methodArgs(jm);
-                                label= ss + args;
-                                String link = getLinkForJavaSignature(signature);
-                                rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
-                                count++;
-                                notAlreadyAdded= false;
+                                if ( !Modifier.isStatic(jm.getModifiers() ) ) {
+                                    signature = methodSignature(jm);
+                                    args = methodArgs(jm);
+                                    label= ss + args;
+                                    icon= getIconFor(jm);
+                                    String link = getLinkForJavaSignature(signature);
+                                    rs.addItem( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, 1, icon ) );
+                                    count++;
+                                    notAlreadyAdded= false;
+                                }
                             }
                         } catch ( RuntimeException ex ) {
                             logger.fine(ex.toString());
@@ -398,7 +401,12 @@ public class JythonCompletionTask implements CompletionTask {
                             if (f == null) continue;
                             //TODO: don't include static fields in list.
                             signature = fieldSignature(f);
-                            label = ss;
+                            if ( po instanceof PyInteger ) {
+                                label= ss + " = " + po.toString();
+                                icon= JAVA_FIELD_ICON;
+                            } else {
+                                label = ss;
+                            }
                         }
                     }
                 } else {
@@ -1396,6 +1404,31 @@ public class JythonCompletionTask implements CompletionTask {
      */
     private static String getLinkForJavaSignature(String signature) {
         return JavadocLookup.getInstance().getLinkForJavaSignature(signature);
+    }
+
+    /**
+     * return an identifying icon for the object, or null.
+     * @param jm java.lang.reflect.Method, or PyInteger, etc.
+     * @return the icon or null.
+     */
+    public static ImageIcon getIconFor(Object jm) {
+        ImageIcon icon=null;
+        if ( jm instanceof java.lang.reflect.Method ) {
+            Method m= (Method)jm;
+            if ( Modifier.isStatic(m.getModifiers()) ) {
+                icon= JAVA_STATIC_METHOD_ICON;
+            } else {
+                icon= JAVA_METHOD_ICON;
+            }
+        } else if ( jm instanceof java.lang.reflect.Field ) { 
+            Field m= (Field)jm;
+            if ( Modifier.isStatic(m.getModifiers()) ) {
+                icon= JAVA_FIELD_ICON;
+            } else {
+                icon= JAVA_FIELD_ICON;
+            }
+        }
+        return icon;
     }
 
 }
