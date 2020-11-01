@@ -13,6 +13,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.text.BadLocationException;
@@ -40,7 +41,7 @@ public class DefaultCompletionItem implements CompletionItem  {
     boolean referenceOnly= false;
     ImageIcon icon= null;
     
-    final static Logger logger= Logger.getLogger( "jython.editor" );
+    final static Logger logger= Logger.getLogger( "jython.editor.completion" );
     
     /**
      * 
@@ -53,6 +54,7 @@ public class DefaultCompletionItem implements CompletionItem  {
      * @param icon the icon to show next to this completion.
      */
     public DefaultCompletionItem( String text, int offset, String complete, String label, String link, int sortPriority, ImageIcon icon) {
+        logger.log(Level.FINER, "DefaultCompletionItem {0}", text);
         if ( complete.length()<offset ) {
             throw new IllegalArgumentException("completion offset is less than length");
         }
