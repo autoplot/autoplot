@@ -365,16 +365,14 @@ public class JythonCompletionTask implements CompletionTask {
                         try {
                             for ( int im=0; im<getMethodCount(m); im++ ) {
                                 jm = getJavaMethod(m, im);
-                                if ( !Modifier.isStatic(jm.getModifiers() ) ) {
-                                    signature = methodSignature(jm);
-                                    args = methodArgs(jm);
-                                    label= ss + args;
-                                    icon= getIconFor(jm);
-                                    String link = getLinkForJavaSignature(signature);
-                                    rs.addItem( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, 1, icon ) );
-                                    count++;
-                                    notAlreadyAdded= false;
-                                }
+                                signature = methodSignature(jm);
+                                args = methodArgs(jm);
+                                label= ss + args;
+                                icon= getIconFor(jm);
+                                String link = getLinkForJavaSignature(signature);
+                                rs.addItem( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, 1, icon ) );
+                                count++;
+                                notAlreadyAdded= false;
                             }
                         } catch ( RuntimeException ex ) {
                             logger.fine(ex.toString());
@@ -399,6 +397,7 @@ public class JythonCompletionTask implements CompletionTask {
                                 logger.log(Level.FINEST, "SecurityException for item {0}", s);
                             }
                             if (f == null) continue;
+                            icon= getIconFor(f);
                             //TODO: don't include static fields in list.
                             signature = fieldSignature(f);
                             if ( po instanceof PyInteger ) {
