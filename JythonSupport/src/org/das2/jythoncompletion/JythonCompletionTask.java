@@ -21,7 +21,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
@@ -54,6 +53,7 @@ import org.autoplot.jythonsupport.JythonOps;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
+import org.python.core.PyFloat;
 
 /**
  * Completions for Jython code.  The completion task is created with the
@@ -400,9 +400,17 @@ public class JythonCompletionTask implements CompletionTask {
                             icon= getIconFor(f);
                             //TODO: don't include static fields in list.
                             signature = fieldSignature(f);
-                            if ( po instanceof PyInteger ) {
-                                label= ss + " = " + po.toString();
-                                icon= JAVA_FIELD_ICON;
+                            boolean showValues=false;
+                            if ( showValues ) {
+                                if ( po instanceof PyInteger ) {
+                                    label= ss + " = " + po.toString();
+                                } else if ( po instanceof PyFloat ) {
+                                    label= ss + " = " + po.toString();
+                                } else if ( po instanceof PyString ) {
+                                    label= ss + " = " + po.toString();
+                                } else {
+                                    label = ss;
+                                }
                             } else {
                                 label = ss;
                             }
