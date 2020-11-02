@@ -1,6 +1,7 @@
 package gov.nasa.gsfc.spdf.cdfj;
 /**
  * Supported CDF data types.
+ * @see CDFDataType
  */
 public class SupportedTypes {
      static final CDFDataType[] supportedTypes = 
