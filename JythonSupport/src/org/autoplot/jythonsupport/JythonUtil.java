@@ -60,6 +60,7 @@ import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
+import org.autoplot.jythonsupport.ui.ScriptPanelSupport;
 import org.python.core.PyTuple;
 
 /**
@@ -997,7 +998,7 @@ public class JythonUtil {
      * @param lastLine INCLUSIVE last line of the script being processed.
      * @param depth recursion depth, for debugging.
      * @return
-     * @see SimplifyScriptSupport
+     * @see SimplifyScriptSupport#simplifyScriptToGetCompletions(java.lang.String[], org.python.parser.ast.stmtType[], java.util.HashSet, int, int, int) 
      */
     public static String simplifyScriptToGetParams(String[] ss, stmtType[] stmts, HashSet variableNames, int beginLine, int lastLine, int depth) {
         String spaces= "                              "
@@ -1008,9 +1009,16 @@ public class JythonUtil {
         StringBuilder result = new StringBuilder();
         for (int istatement = 0; istatement < stmts.length; istatement++) {
             stmtType o = stmts[istatement];
-            logger.log(Level.FINER, "line {0}: {1}", new Object[]{o.beginLine, o.beginLine > 0 ? ss[o.beginLine - 1] : "(bad line number)"});
-            if (o.beginLine > 0) {
-                beginLine = o.beginLine;
+            String theLine= SimplifyScriptSupport.getSourceForStatement( ss, o );
+            int lineCount= theLine.split("\n",-2).length;
+            logger.log( Level.FINER, "line {0}: {1}", new Object[] { o.beginLine, theLine } );
+            if ( o.beginLine>0 ) {
+                 if ( beginLine<0 && istatement==0 ) acceptLine= o.beginLine;
+                 if ( lineCount>1 ) {
+                    beginLine= o.beginLine - (lineCount-1) ;
+                 } else {
+                    beginLine= o.beginLine;
+                 }
             } else {
                 acceptLine = beginLine; // elif clause in autoplot-test038/lastSuccessfulBuild/artifact/test038_demoParms1.jy
             }
@@ -1094,7 +1102,7 @@ public class JythonUtil {
             } else {
                 if (simplifyScriptToGetParamsOkay(o, variableNames)) {
                     if (acceptLine < 0) {
-                        acceptLine = (o).beginLine;
+                        acceptLine = beginLine;
                         for (int i = currentLine; i < acceptLine; i++) {
                             int icomment= ss[i].indexOf("#");
                             if ( icomment>=0 ) {
@@ -1106,7 +1114,7 @@ public class JythonUtil {
                     }
                 } else if (isSetScriptCall(o, variableNames)) {
                     if (acceptLine < 0) {
-                        acceptLine = (o).beginLine;
+                        acceptLine = beginLine;
                         for (int i = currentLine + 1; i < acceptLine; i++) {
                             result.append("\n");
                             currentLine = acceptLine;
@@ -1114,7 +1122,7 @@ public class JythonUtil {
                     }
                 } else {
                     if (acceptLine > -1) {
-                        int thisLine = (o).beginLine;
+                        int thisLine = beginLine;
                         for (int i = acceptLine; i < thisLine; i++) {
                             appendToResult(result, ss[i - 1]).append("\n");
                         }
@@ -1205,6 +1213,7 @@ public class JythonUtil {
      * getParam was called. This has no effect now.
      * @return the python program with lengthy calls removed, up to the last
      * getParam call.
+     * @see SimplifyScriptSupport#simplifyScriptToCompletions(java.lang.String) 
      */
     public static String simplifyScriptToGetParams(String script, boolean addSort) throws PySyntaxError {
         String[] ss = script.split("\n");

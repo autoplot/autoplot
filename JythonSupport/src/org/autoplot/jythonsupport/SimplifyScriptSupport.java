@@ -20,6 +20,7 @@ import org.python.parser.ast.Assign;
 import org.python.parser.ast.Attribute;
 import org.python.parser.ast.BinOp;
 import org.python.parser.ast.Call;
+import org.python.parser.ast.Expr;
 import org.python.parser.ast.Index;
 import org.python.parser.ast.Name;
 import org.python.parser.ast.Num;
@@ -43,6 +44,14 @@ public class SimplifyScriptSupport {
         "    'return a dataset for the given URI'\n" +
         "    return dataset(0)\n\n";
     
+    /**
+     * Remove parts of the script which are expensive so that the script can
+     * be run and completions offered.
+     * TODO: What is the difference between this and simplifyScriptToCompletions?
+     * @param script Jython script
+     * @return simplified version of the script.
+     * @see #simplifyScriptToCompletions(java.lang.String) 
+     */
     public static String removeSideEffects( String script ) {
          String[] ss= script.split("\n");
          String lastLine= ss[ss.length-1].trim();
@@ -73,6 +82,8 @@ public class SimplifyScriptSupport {
      *
      * @param script the entire python program
      * @return the python program with lengthy calls removed.
+     * @see #removeSideEffects(java.lang.String) 
+     * @see JythonUtil#simplifyScriptToGetParams(java.lang.String, boolean) 
      */
      public static String simplifyScriptToCompletions( String script ) throws PySyntaxError {
          
@@ -165,6 +176,36 @@ public class SimplifyScriptSupport {
      }
      
      /**
+      * Using the stmtType get the line, or lines.  If the last line contains
+      * a single triple-quote, we need to kludge a little and look for the 
+      * preceding triple-quote in previous lines.
+      * @param ss
+      * @param o
+      * @return 
+      */
+     public static String getSourceForStatement( String[] ss, stmtType o ) {
+         String theLine= o.beginLine>0 ? ss[o.beginLine-1] : "(bad line number)";
+         String tripleQuotes="'''";
+         int i1= theLine.indexOf(tripleQuotes);
+         if ( i1>-1 ) {
+             int i0= theLine.lastIndexOf(tripleQuotes,i1-3);
+             if ( i0==-1 ) {
+                 int lastLine= o.beginLine-1;
+                 int firstLine= lastLine-1;
+                 while ( firstLine>=0 ) {
+                     theLine= ss[firstLine]+"\n"+theLine;
+                     if ( ss[firstLine].contains(tripleQuotes) ) {
+                         break;
+                     } else {
+                         firstLine= firstLine-1;
+                     }
+                 }
+             }
+         }
+         return theLine;
+     }
+     
+     /**
       * Extracts the parts of the program that get parameters or take a trivial amount of time to execute.  
       * This may call itself recursively when if blocks are encountered.
       * See test038.
@@ -175,6 +216,7 @@ public class SimplifyScriptSupport {
       * @param lastLine INCLUSIVE last line of the script being processed.
       * @param depth recursion depth, for debugging.
       * @return the simplified script
+      * @see JythonUtil#simplifyScriptToGetParams(java.lang.String[], org.python.parser.ast.stmtType[], java.util.HashSet, int, int, int) 
       */
      public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stmts, 
              HashSet variableNames, int beginLine, int lastLine, int depth  ) {
@@ -183,11 +225,16 @@ public class SimplifyScriptSupport {
          StringBuilder result= new StringBuilder();
          for ( int istatement=0; istatement<stmts.length; istatement++ ) {
              stmtType o= stmts[istatement];
-             String theLine= o.beginLine>0 ? ss[o.beginLine-1] : "(bad line number)";
+             String theLine= getSourceForStatement( ss, o );
+             int lineCount= theLine.split("\n",-2).length;
              logger.log( Level.FINER, "line {0}: {1}", new Object[] { o.beginLine, theLine } );
              if ( o.beginLine>0 ) {
                  if ( beginLine<0 && istatement==0 ) acceptLine= o.beginLine;
-                 beginLine= o.beginLine;
+                 if ( lineCount>1 ) {
+                    beginLine= o.beginLine - (lineCount-1) ;
+                 } else {
+                    beginLine= o.beginLine;
+                 }
              } else {
                  acceptLine= beginLine; // elif clause in autoplot-test038/lastSuccessfulBuild/artifact/test038_demoParms1.jy
              }
@@ -273,7 +320,7 @@ public class SimplifyScriptSupport {
              } else {
                  if ( simplifyScriptToGetCompletionsOkay( o, variableNames ) ) {
                      if ( acceptLine<0 ) {
-                         acceptLine= (o).beginLine;
+                         acceptLine= beginLine;
                          for ( int i=currentLine+1; i<acceptLine; i++ ) {
                              result.append("\n");
                              currentLine= acceptLine;
@@ -281,7 +328,7 @@ public class SimplifyScriptSupport {
                      }
                  } else {
                      if ( acceptLine>-1 ) {
-                         int thisLine= (o).beginLine;
+                         int thisLine= beginLine;
                          for ( int i=acceptLine; i<=thisLine; i++ ) {
                              if ( i<thisLine ) {
                                  appendToResult(result,ss[i-1]).append("\n");
@@ -414,6 +461,12 @@ public class SimplifyScriptSupport {
              }
              return true;
          }
+         if ( ( o instanceof org.python.parser.ast.Expr ) ) {
+             Expr e= (Expr)o;
+             if ( ( e.value instanceof Call ) && trivialFunctionCall( (Call)e.value ) ) {
+                 return true;
+             }
+         }
          if ( ( o instanceof org.python.parser.ast.ClassDef ) ) return true;
          if ( ( o instanceof org.python.parser.ast.FunctionDef ) ) return true;
          if ( ( o instanceof org.python.parser.ast.Assign ) ) {
@@ -428,6 +481,7 @@ public class SimplifyScriptSupport {
                          String id = ((Name) target).id;
                          variableNames.add(id);
                          logger.log(Level.FINEST, "assign to variable {0}", id);
+                         //TODO: can we identify type?  Insert <id>__type=... for completions.
                      } else if ( et instanceof Attribute ) {
                          Attribute at= (Attribute)et;
                          while ( at.value instanceof Attribute || at.value instanceof Subscript ) {
@@ -512,6 +566,7 @@ public class SimplifyScriptSupport {
       */
      private static final String[] okay= new String[] { "range,", "xrange,", "irange,", 
          "getParam,", "getDataSet,", "lower,", "upper,", "URI,", "URL,", 
+         "setScriptDescription", "setScriptTitle", "setScriptLabel", "setScriptIcon",
          "DatumRangeUtil,", "TimeParser,",
          "str,", "int,", "long,", "float,", "datum,", "datumRange,", "dataset,",
          "indgen,","findgen,", "dindgen,", 
