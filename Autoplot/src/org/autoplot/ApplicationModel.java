@@ -332,7 +332,9 @@ public final class ApplicationModel {
         //    pe.getController().setResetPlotElement(true); //TODO: I would think this would be set anyway with the new datasource.
         //    pe.getController().setResetComponent(true);
         //}
-        dsf.getController().setDataSource(null);
+        if ( dsf.getController().getDataSource()!=null ) {
+            dsf.getController().setDataSource(null);
+        }
         dsf.setUri("vap+internal:");
         dsf.setFilters("");
         dsf.getController().setDataSetInternal(null); // clear out properties and metadata

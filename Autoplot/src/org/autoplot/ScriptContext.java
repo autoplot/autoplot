@@ -733,7 +733,7 @@ public class ScriptContext extends PyJavaInstance {
     public static void plot( int chNum, String label, QDataSet x, QDataSet y, String renderType ) {
         maybeInitModel();
         if ( x==null && renderType==null ) {
-            model.setDataSet( chNum, label, y);
+            model.setDataSet( chNum, label, y );
         } else {
             QDataSet xds= x;
             MutablePropertyDataSet yds= ensureMutable(y);
