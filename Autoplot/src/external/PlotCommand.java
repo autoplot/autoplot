@@ -121,6 +121,7 @@ public class PlotCommand extends PyObject {
     public PyObject __call__(PyObject[] args, String[] keywords) {
 
         PyObject False= Py.newBoolean(false);
+        PyObject True= Py.newBoolean(true);
 
         FunctionSupport fs= new FunctionSupport( "plot", 
             new String[] { "pos", "x", "y", "z",
@@ -141,7 +142,7 @@ public class PlotCommand extends PyObject {
             "xautoRangeHints", "yautoRangeHints", "zautoRangeHints",
             "xtickValues", "ytickValues", "ztickValues",
             "renderer", "rightAxisOf", "topAxisOf", "overplotOf",
-            "index"
+            "index", "reset"
         },
         new PyObject[] { Py.None, Py.None, Py.None, Py.None,
             Py.None, Py.None,
@@ -161,7 +162,7 @@ public class PlotCommand extends PyObject {
             Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None, Py.None,
-            Py.None
+            Py.None, True,
         } );
         
         fs.args( args, keywords );
@@ -176,6 +177,8 @@ public class PlotCommand extends PyObject {
         int iplot=0;
         int nargs= nparm;
 
+        boolean reset=true; // reset axis settings
+        
         // If the first (zeroth) argument is an int, than this is the data source where the value should be inserted.  Additional
         // data sources and plots will be added until there are enough.
         // this is an alias for the index argument.
@@ -299,6 +302,8 @@ public class PlotCommand extends PyObject {
             } else if ( keywords[i].equals("index") ) {
                 int sindex= Integer.parseInt( args[i+nparm].toString() );
                 iplot= sindex;
+            } else if ( keywords[i].equals("reset") ) {
+                reset= args[i+nparm].equals(True);
             } else if ( keywords[i].equals("renderer") ) {
                 renderType="internal";
             }
@@ -341,11 +346,11 @@ public class PlotCommand extends PyObject {
             }
 
             if ( nargs==1 ) {  // x
-                ScriptContext.plot( iplot, null, null, qargs[0], renderType );
+                ScriptContext.plot( iplot, null, null, qargs[0], renderType, reset );
             } else if ( nargs==2 ) {  // x, y
-                ScriptContext.plot( iplot, null, qargs[0], qargs[1], renderType );
+                ScriptContext.plot( iplot, null, qargs[0], qargs[1], renderType, reset );
             } else if ( nargs==3 ) {  // x, y, z
-                ScriptContext.plot( iplot, null, qargs[0], qargs[1], qargs[2], renderType );
+                ScriptContext.plot( iplot, null, qargs[0], qargs[1], qargs[2], renderType, reset );
             }
 
         }

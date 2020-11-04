@@ -731,9 +731,23 @@ public class ScriptContext extends PyJavaInstance {
      * @param renderType string explicitly controlling the renderType and hints.
      */    
     public static void plot( int chNum, String label, QDataSet x, QDataSet y, String renderType ) {
+        plot( chNum, label, x, y, renderType, true );
+    }
+
+    /**
+     * plot the dataset in the specified  dataSource node.  Note this should not
+     * be called from the event thread.
+     * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param label the label for the plot dependent parameter
+     * @param x QDataSet for the independent parameter for the X values, or null.
+     * @param y QDataSet for the independent parameter for the Y values, or null.
+     * @param renderType string explicitly controlling the renderType and hints.
+     * @param reset reset by autoranging, autolabelling, etc.
+     */    
+    public static void plot( int chNum, String label, QDataSet x, QDataSet y, String renderType, boolean reset ) {        
         maybeInitModel();
         if ( x==null && renderType==null ) {
-            model.setDataSet( chNum, label, y );
+            model.setDataSet( chNum, label, y, reset );
         } else {
             QDataSet xds= x;
             MutablePropertyDataSet yds= ensureMutable(y);
@@ -828,6 +842,53 @@ public class ScriptContext extends PyJavaInstance {
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
 
+    /**
+     * plot the dataset in the specified dataSource node, using the render type
+     * specified.  The renderType parameter is a string identifier, and currently the following are
+     * used: digital spectrogram nnSpectrogram hugeScatter series scatter colorScatter stairSteps
+     * fillToZero digital image  pitchAngleDistribution eventsBar vectorPlot orbitPlot contour
+     *<blockquote><pre><small>{@code
+     *plot( 0, 'label', findgen(20), ripples(20), ripples(20), 'digital' )
+     *from org.autoplot import RenderType
+     *plot( 0, 'label', findgen(20), ripples(20), ripples(20), RenderType.digital.toString() )
+     *}</small></pre></blockquote>
+     *
+     * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param label the label for the dependent parameter
+     * @param x QDataSet for the independent parameter for the X values
+     * @param y QDataSet for the independent parameter for the Y values
+     * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter, or null.
+     * @param renderType hint at the render type to use, such as "nnSpectrogram" or "digital", 
+     * @param reset reset by autoranging, autolabelling, etc.
+     */
+    public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z, String renderType, boolean reset ) {
+        maybeInitModel();
+        QDataSet xds= x;
+        MutablePropertyDataSet zds= ensureMutable(z);
+        if ( zds==null ) {
+            MutablePropertyDataSet yds= ensureMutable(y);
+            if ( yds==null ) throw new IllegalArgumentException("y cannot be null if z is null");
+            yds.putProperty( QDataSet.RENDER_TYPE, renderType );
+            yds.putProperty( QDataSet.DEPEND_0, xds );
+            model.setDataSet(chNum, label, yds, reset);
+        } else if ( zds.rank()==1 ) {           
+            MutablePropertyDataSet yds= ensureMutable(y);
+            if ( yds==null ) throw new IllegalArgumentException("y cannot be null if z is null");
+            yds.putProperty( QDataSet.RENDER_TYPE, renderType );
+            yds.putProperty( QDataSet.DEPEND_0, xds );
+            yds.putProperty( QDataSet.PLANE_0, zds );
+            model.setDataSet(chNum, label, yds, reset);
+        } else {
+            QDataSet yds= y;
+            zds.putProperty( QDataSet.RENDER_TYPE, renderType );
+            if ( x!=null ) zds.putProperty( QDataSet.DEPEND_0, xds );
+            if ( y!=null ) zds.putProperty( QDataSet.DEPEND_1, yds );
+            model.setDataSet(chNum, label, zds, reset);
+        }
+        ensureImmutable(x,y,z);
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
+    }
+    
     /**
      * "overplot" by adding another PlotElement to the plot and setting the data to this PlotElement.
      * @param chNum the focus 

@@ -321,6 +321,18 @@ public final class ApplicationModel {
      * @param ds the dataset to plot.
      */
     public void setDataSet( int chNum, String label, QDataSet ds ) {
+        setDataSet( chNum, label, ds, true );
+    }
+    /**
+     * Just plot this dataset using the specified dataSourceFilter index.  plotElements and dataSourceFilters
+     * are added until the index exists.  This is introduced to support jython scripting, but may be
+     * useful elsewhere.
+     * @param chNum the index of the DataSourceFilter to use.
+     * @param label label for the dataset's plotElements, if non-null.
+     * @param ds the dataset to plot.
+     * @param reset reset the autoranging, etc.
+     */
+    public void setDataSet( int chNum, String label, QDataSet ds, boolean reset ) {        
         while ( dom.getDataSourceFilters().length <= chNum ) {
             Plot p= CanvasUtil.getMostBottomPlot(dom.getController().getCanvas());
             dom.getController().setPlot(p);
@@ -328,13 +340,15 @@ public final class ApplicationModel {
         }
         DataSourceFilter dsf= dom.getDataSourceFilters(chNum);
         List<PlotElement> elements= dom.getController().getPlotElementsFor( dsf );
-        //for ( PlotElement pe: elements ) {
-        //    pe.getController().setResetPlotElement(true); //TODO: I would think this would be set anyway with the new datasource.
-        //    pe.getController().setResetComponent(true);
-        //}
-        if ( dsf.getController().getDataSource()!=null ) {
-            dsf.getController().setDataSource(null);
+        
+        for ( PlotElement pe: elements ) {
+            pe.getController().setDsfReset(reset);
+            //pe.getController().setResetPlotElement(reset); //TODO: I would think this would be set anyway with the new datasource.
+            //pe.getController().setResetComponent(reset);
         }
+        
+        dsf.getController().setDataSource(null); // reset if plotElementControllers want to reset because of setDsfReset
+        
         dsf.setUri("vap+internal:");
         dsf.setFilters("");
         dsf.getController().setDataSetInternal(null); // clear out properties and metadata
