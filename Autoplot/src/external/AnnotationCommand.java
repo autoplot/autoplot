@@ -55,8 +55,10 @@ public class AnnotationCommand extends PyObject {
             + " <tr><td> xrange, yrange </td><td> anchor box when using data anchor</td></tr>"
             + " <tr><td> plotId </td><td> ID of the plot containing axes.</td></tr>"    
             + " <tr><td> pointAt </td><td>comma separated X and Y to point the annotation arrow at.</td></tr>"
-            + " <tr><td> rowId </td><td>ID of the row containing for positioning this annotation<br>(See dom.plots[0].rowId)</td></tr>"
-            + " <tr><td> columnId </td><td>ID of the column containing for positioning this annotation</td></tr>"
+            + " <tr><td> pointAtX </td><td>X value to point the arrow at or to anchor the annotation.</td></tr>"
+            + " <tr><td> pointAtX </td><td>Y value to point the arrow at or to anchor the annotation.</td></tr>"
+            + " <tr><td> rowId </td><td>ID of the row containing for positioning this annotation, sets anchorType=CANVAS<br>(See dom.plots[0].rowId)</td></tr>"
+            + " <tr><td> columnId </td><td>ID of the column containing for positioning this annotation, sets anchorType=CANVAS</td></tr>"
             + "</table></html>");
 
     private static AnchorPosition anchorPosition( PyObject val ) {
