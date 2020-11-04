@@ -1731,7 +1731,7 @@ public class PlotElementController extends DomNodeController {
                 plotElement.setAutoComponent(true);
                 plotElement.setAutoRenderType(true);
                 maybeSetPlotAutorange();
-                setDsfReset(false);
+                //setDsfReset(false);
             }
         }
     };
