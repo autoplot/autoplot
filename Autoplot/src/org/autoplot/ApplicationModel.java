@@ -341,10 +341,12 @@ public final class ApplicationModel {
         DataSourceFilter dsf= dom.getDataSourceFilters(chNum);
         List<PlotElement> elements= dom.getController().getPlotElementsFor( dsf );
         
-        for ( PlotElement pe: elements ) {
-            pe.getController().setDsfReset(reset);
-            //pe.getController().setResetPlotElement(reset); //TODO: I would think this would be set anyway with the new datasource.
-            //pe.getController().setResetComponent(reset);
+        if ( reset==false ) {
+            elements.forEach((pe) -> {
+                pe.getController().setDsfReset(reset);
+                //pe.getController().setResetPlotElement(reset); //TODO: I would think this would be set anyway with the new datasource.
+                //pe.getController().setResetComponent(reset);
+            });
         }
         
         dsf.getController().setDataSource(null); // reset if plotElementControllers want to reset because of setDsfReset
