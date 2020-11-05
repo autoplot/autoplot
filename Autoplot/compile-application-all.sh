@@ -21,7 +21,7 @@ if [ "" = "$JAVA_HOME" ]; then
     JAVA_HOME=/usr/local/jdk1.7/
 fi
 
-JAVAARGS="-g -target 1.7 -source 1.7 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10"
+JAVAARGS="-g -target 1.8 -source 1.8 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10"
 
 echo "\${AP_VERSION}=${AP_VERSION}"
 
