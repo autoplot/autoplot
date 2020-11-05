@@ -1,12 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.help;
 
-import java.lang.reflect.Method;
-import javax.swing.JOptionPane;
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -25,42 +25,21 @@ public class Util {
         try {
             return System.getProperty(name, deft);
         } catch (SecurityException ex) {
+            Logger.getLogger(Util.class.getName()).log(Level.INFO, null, ex);
             return deft;
         }
     }
 
     /**
-     * open the URL in a browser.   Borrowed from http://www.centerkey.com/java/browser/.
+     * open the URL in a browser.  
+     * @param url
      */
     public static void openBrowser(String url) {
-        final String errMsg = "Error attempting to launch web browser";
-        String osName = Util.getProperty("os.name", "applet");
         try {
-            if (osName.startsWith("Mac OS")) {
-                Class fileMgr = Class.forName("com.apple.eio.FileManager");
-                Method openURL = fileMgr.getDeclaredMethod("openURL", new Class[]{String.class});
-                openURL.invoke(null, new Object[]{url});
-            } else if (osName.startsWith("Windows")) {
-                Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
-            } else if (osName.equals("applet")) {
-                throw new RuntimeException("applets can't start browser yet");
-                //TODO: this shouldn't be difficult, just get the AppletContext.
-            } else { //assume Unix or Linux
-                String[] browsers = {"firefox", "opera", "konqueror", "epiphany", "mozilla", "netscape"};
-                String browser = null;
-                for (int count = 0; count < browsers.length && browser == null; count++) {
-                    if (Runtime.getRuntime().exec(new String[]{"which", browsers[count]}).waitFor() == 0) {
-                        browser = browsers[count];
-                    }
-                }
-                if (browser == null) {
-                    throw new Exception("Could not find web browser");
-                } else {
-                    Runtime.getRuntime().exec(new String[]{browser, url});
-                }
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, errMsg + ":\n" + e.getLocalizedMessage());
+            java.net.URI target= new URI(url);
+            Desktop.getDesktop().browse( target );
+        } catch (IOException | URISyntaxException ex) {
+            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
