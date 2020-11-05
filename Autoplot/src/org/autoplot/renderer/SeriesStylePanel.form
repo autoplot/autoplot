@@ -43,7 +43,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <EmptySpace min="-2" pref="21" max="-2" attributes="0"/>
-                          <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                          <Component id="styleLabel" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="errorBarStylePanel" min="-2" pref="112" max="-2" attributes="0"/>
                       </Group>
@@ -143,10 +143,10 @@
                   <Component id="showErrorCheckBox" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-                      <Component id="errorBarStylePanel" min="-2" pref="32" max="-2" attributes="0"/>
+                      <Component id="styleLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="errorBarStylePanel" min="-2" pref="25" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="74" max="32767" attributes="0"/>
+                  <EmptySpace pref="81" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -270,17 +270,18 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="showErrorCheckBox">
           <Properties>
+            <Property name="selected" type="boolean" value="false"/>
             <Property name="text" type="java.lang.String" value="Show Error Bars"/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="showErrorCheckBoxActionPerformed"/>
+          </Events>
         </Component>
-        <Component class="javax.swing.JLabel" name="jLabel4">
+        <Component class="javax.swing.JLabel" name="styleLabel">
           <Properties>
             <Property name="text" type="java.lang.String" value="Style:"/>
           </Properties>
-          <BindingProperties>
-            <BindingProperty name="enabled" source="showErrorCheckBox" sourcePath="${selected}" target="jLabel4" targetPath="enabled" updateStrategy="0" immediately="false"/>
-          </BindingProperties>
         </Component>
         <Container class="javax.swing.JPanel" name="errorBarStylePanel">
 

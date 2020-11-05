@@ -16,7 +16,6 @@ import java.awt.event.FocusAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Map;
-import javax.swing.JComponent;
 import javax.swing.SpinnerNumberModel;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.graph.DefaultPlotSymbol;
@@ -36,7 +35,7 @@ import org.das2.qds.QDataSet;
  *
  * @author  jbf
  */
-public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePanel.StylePanel {
+public final class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePanel.StylePanel {
 
     EnumerationEditor psymEditor;
     EnumerationEditor lineEditor;
@@ -99,13 +98,16 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
 
     }
 
+    @Override
     public void releaseElementBindings() {
         if ( elementBindingContext!=null ) {
             elementBindingContext.unbind();
             elementBindingContext= null;
+            this.plotElement.getStyle().removePropertyChangeListener( "drawError", showErrorCheckBoxPCL );
         }
     }
 
+    @Override
     public synchronized void doElementBindings( final PlotElement element) {
         PlotElementStyle style= element.getStyle();
         BindingGroup bc = new BindingGroup();
@@ -123,7 +125,6 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_DRAWERROR ), showErrorCheckBox, BeanProperty.create("selected")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_ERRORBARTYPE ), errorBarStyle, BeanProperty.create("value")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_SHOWLIMITS ), showLimitsCheckBox, BeanProperty.create("selected")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, errorBarStyle.getCustomEditor(), BeanProperty.create( "enabled" ), showErrorCheckBox, BeanProperty.create("selected")));
         element.getController().addPropertyChangeListener( PlotElementController.PROP_DATASET, limitsPCL );
         
         if ( elementBindingContext!=null ) {
@@ -131,6 +132,8 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
             PlotElement oldPlotElement= this.plotElement;
             oldPlotElement.getController().removePropertyChangeListener( PlotElementController.PROP_DATASET, limitsPCL );
         }
+        
+        style.addPropertyChangeListener( "drawError", showErrorCheckBoxPCL );
         
         this.plotElement= element;
         
@@ -167,6 +170,16 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
             }
         }
     };
+    
+    PropertyChangeListener showErrorCheckBoxPCL= new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            boolean enabled= SeriesStylePanel.this.showErrorCheckBox.isSelected();
+            errorBarStylePanel.setEnabled(enabled);
+            errorBarStyle.getCustomEditor().setEnabled(enabled);
+            styleLabel.setEnabled(enabled);
+        }
+    };    
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -175,7 +188,6 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         jPanel2 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
@@ -197,7 +209,7 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
         jLabel1 = new javax.swing.JLabel();
         fillDirectionComboBox = new javax.swing.JComboBox<>();
         showErrorCheckBox = new javax.swing.JCheckBox();
-        jLabel4 = new javax.swing.JLabel();
+        styleLabel = new javax.swing.JLabel();
         errorBarStylePanel = new javax.swing.JPanel();
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Series [?]"));
@@ -253,13 +265,16 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
         fillDirectionComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "above", "below", "both" }));
         fillDirectionComboBox.setSelectedIndex(2);
 
+        showErrorCheckBox.setSelected(false);
         showErrorCheckBox.setText("Show Error Bars");
         showErrorCheckBox.setEnabled(false);
+        showErrorCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showErrorCheckBoxActionPerformed(evt);
+            }
+        });
 
-        jLabel4.setText("Style:");
-
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, showErrorCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), jLabel4, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
-        bindingGroup.addBinding(binding);
+        styleLabel.setText("Style:");
 
         errorBarStylePanel.setLayout(new java.awt.BorderLayout());
 
@@ -272,7 +287,7 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(21, 21, 21)
-                        .add(jLabel4)
+                        .add(styleLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(errorBarStylePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 112, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(showErrorCheckBox)
@@ -356,9 +371,9 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
                 .add(showErrorCheckBox)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel4)
-                    .add(errorBarStylePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 32, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(74, Short.MAX_VALUE))
+                    .add(styleLabel)
+                    .add(errorBarStylePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(81, Short.MAX_VALUE))
         );
 
         jPanel2Layout.linkSize(new java.awt.Component[] {fillColorPanel, jLabel7}, org.jdesktop.layout.GroupLayout.VERTICAL);
@@ -377,13 +392,17 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-
-        bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
 
     private void fillToReferenceCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fillToReferenceCheckBoxActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);                
     }//GEN-LAST:event_fillToReferenceCheckBoxActionPerformed
+
+    private void showErrorCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showErrorCheckBoxActionPerformed
+        boolean enabled= showErrorCheckBox.isSelected();
+        errorBarStyle.getCustomEditor().setEnabled( enabled );
+        styleLabel.setEnabled( enabled );
+    }//GEN-LAST:event_showErrorCheckBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel colorPanel;
@@ -395,7 +414,6 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
@@ -407,7 +425,7 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
     private javax.swing.JPanel referenceValuePanel;
     private javax.swing.JCheckBox showErrorCheckBox;
     private javax.swing.JCheckBox showLimitsCheckBox;
+    private javax.swing.JLabel styleLabel;
     private javax.swing.JSpinner symSizeSpinner;
-    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 }
