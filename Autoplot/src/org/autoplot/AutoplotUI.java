@@ -46,9 +46,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowStateListener;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -159,13 +156,11 @@ import org.autoplot.scriptconsole.GuiExceptionHandler;
 import org.autoplot.state.UndoRedoSupport;
 import org.autoplot.util.TickleTimer;
 import org.das2.qds.DataSetAnnotations;
-import org.das2.qds.QDataSet;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetSelectorSupport;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceFactory;
-import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.HtmlResponseIOException;
 import org.autoplot.datasource.ReferenceCache;
 import org.autoplot.datasource.SourceTypesBrowser;
@@ -407,12 +402,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
             ScriptContext._setDefaultApp(this);
         }
 
-        model.setResizeRequestListener( new ApplicationModel.ResizeRequestListener() {
-            @Override
-            public double resize(int w,int h) {
-                return resizeForCanvasSize(w, h);
-            }
-        });
+        model.setResizeRequestListener( (int w, int h) -> resizeForCanvasSize(w, h) );
 
         APSplash.checkTime("init 10");
         
