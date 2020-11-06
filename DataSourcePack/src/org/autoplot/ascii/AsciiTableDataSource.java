@@ -47,6 +47,8 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.DataSourceUtil;
+import org.das2.qds.BundleDataSet;
+import org.das2.qds.SparseDataSetBuilder;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.AsciiHeadersParser;
 import org.das2.qds.util.AsciiParser.FieldParser;
@@ -482,9 +484,20 @@ public class AsciiTableDataSource extends AbstractDataSource {
             }
 
             if ( bundle!=null ) {
-                QDataSet labels = Ops.labelsDataset(parser.getFieldLabels());
-                labels = labels.trim( bundle[0], bundle[1]);
-                mds.putProperty(QDataSet.DEPEND_1, labels);
+                QDataSet labelsds = Ops.labelsDataset(parser.getFieldLabels());
+                labelsds = labelsds.trim( bundle[0], bundle[1]);
+                mds.putProperty(QDataSet.DEPEND_1, labelsds);
+                SparseDataSetBuilder sdsb= new SparseDataSetBuilder(2);
+                sdsb.setLength( bundle[1]-bundle[0] );
+                sdsb.setQube( new int[] { bundle[1]-bundle[0], 0 } );
+                String[] names= parser.getFieldNames();
+                String[] labels= parser.getFieldLabels();
+                for ( int i=bundle[0]; i<bundle[1]; i++ ) {
+                    sdsb.putProperty( QDataSet.NAME, i, names[i] );
+                    sdsb.putProperty( QDataSet.LABEL, i, labels[i] );
+                    sdsb.putProperty( QDataSet.UNITS, i, parser.getUnits(i) );
+                }
+                mds.putProperty(QDataSet.BUNDLE_1, sdsb.getDataSet() );
             }
 
             if ( depend1Label!=null ) {
@@ -528,11 +541,6 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 if ( firstRecordIsDep1 ) {
                     mds= (MutablePropertyDataSet) mds.trim(1,mds.length());
                 }
-            }
-            
-            if ( !parser.isRichHeader() ) {
-                //http://autoplot.org/data/autoplot.xml, test005_demo6
-                mds.putProperty( QDataSet.BUNDLE_1, null );
             }
             
             String label= getParam( "label", null );
