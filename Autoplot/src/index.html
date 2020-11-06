@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Timely demo URI found in bug <a href='https://sourceforge.net/p/autoplot/bugs/1922/'>1922</a>.  Happy Halloween!
+        <p><small>Ecobee report files have $Y-$m-$d-to-$(Y;end)-$m-$d used to show coverage.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-10-31 r25260):</p>
+        <p>Bugfixes (2020-11-07 r25260):</p>
         <ul>
+            <li>2300: script plot command toggles through invalid intermediate state, experiments with reset. 
+            <li>multi-line string used with setScriptDescription would cause parse error.
             <li>In Mathematica to Jython, properly handle "2754 2^(2/3)"
             <li>medianFilter would fail if there was too much fill data.  Thanks, Kristoff!
         </ul>
