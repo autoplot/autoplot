@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.autoplot.AutoplotUtil;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import static org.das2.datum.DatumRangeUtil.parseISO8601Range;
@@ -328,6 +330,9 @@ public class Test019 {
     
     public static void main( String[] args ) {
         try {
+            
+            Logger.getLogger("test019").warning("disabling certificates");
+            AutoplotUtil.disableCertificates();
             
             ScriptContext.generateTimeRanges( "$(o,id=rbspa-pp)", "orbit:rbspa-pp:70-99" );
             
