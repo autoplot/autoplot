@@ -543,6 +543,12 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 }
             }
             
+            if ( bundle==null && rank2!=null ) { 
+                // remove the bundle which was put there by the parser.
+                //http://autoplot.org/data/autoplot.xml, test005_demo6
+                mds.putProperty( QDataSet.BUNDLE_1, null );
+            }
+            
             String label= getParam( "label", null );
             if ( label!=null ) {
                 mds.putProperty( QDataSet.LABEL, label );
