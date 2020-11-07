@@ -490,14 +490,14 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 SparseDataSetBuilder sdsb= new SparseDataSetBuilder(2);
                 sdsb.setLength( bundle[1]-bundle[0] );
                 sdsb.setQube( new int[] { bundle[1]-bundle[0], 0 } );
-                String[] names= parser.getFieldNames();
-                String[] labels= parser.getFieldLabels();
-                for ( int i=bundle[0]; i<bundle[1]; i++ ) {
-                    sdsb.putProperty( QDataSet.NAME, i, names[i] );
-                    sdsb.putProperty( QDataSet.LABEL, i, labels[i] );
-                    sdsb.putProperty( QDataSet.UNITS, i, parser.getUnits(i) );
-                }
-                mds.putProperty(QDataSet.BUNDLE_1, sdsb.getDataSet() );
+//                String[] names= parser.getFieldNames();
+//                String[] labels= parser.getFieldLabels();
+//                for ( int i=bundle[0]; i<bundle[1]; i++ ) {
+//                    sdsb.putProperty( QDataSet.NAME, i, names[i] );
+//                    sdsb.putProperty( QDataSet.LABEL, i, labels[i] );
+//                    sdsb.putProperty( QDataSet.UNITS, i, parser.getUnits(i) );
+//                }
+//                mds.putProperty(QDataSet.BUNDLE_1, sdsb.getDataSet() );
             }
 
             if ( depend1Label!=null ) {
@@ -543,11 +543,16 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 }
             }
             
-            if ( bundle==null && rank2!=null ) { 
-                // remove the bundle which was put there by the parser.
+            if ( !parser.isRichHeader() ) {
                 //http://autoplot.org/data/autoplot.xml, test005_demo6
                 mds.putProperty( QDataSet.BUNDLE_1, null );
             }
+            
+//            if ( bundle==null && rank2!=null ) { 
+//                // remove the bundle which was put there by the parser.
+//                //http://autoplot.org/data/autoplot.xml, test005_demo6
+//                mds.putProperty( QDataSet.BUNDLE_1, null );
+//            }
             
             String label= getParam( "label", null );
             if ( label!=null ) {
