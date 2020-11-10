@@ -482,4 +482,20 @@ public class Annotation extends DomNode {
 
         return result;
     }
+    
+    @Override
+    public String toString() {
+        String t= this.getText();
+        if ( t==null ) {
+            t= "";
+        }
+        if ( t.length()>20 ) {
+            t= t.substring(0,20)+"...";
+        }
+        if ( t.length()==0 ) {
+            return super.toString();
+        } else {
+            return super.toString() + " ("+t+")";
+        }
+    }    
 }
