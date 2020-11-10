@@ -72,6 +72,7 @@ import org.autoplot.dom.Row;
 import org.autoplot.util.CanvasLayoutPanel;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.DataSourceEditorPanelUtil;
+import org.autoplot.dom.Annotation;
 
 /**
  * LayoutPanel shows all the plots and plot elements on the canvas.  
@@ -198,6 +199,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         plotElementListComponent.addMouseListener(popupTrigger);
         dataSourceList.addMouseListener(popupTrigger);
         bindingListComponent.addMouseListener(popupTrigger);
+        annotationsListComponent.addMouseListener(popupTrigger);
 
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "layoutPanel");
     }
@@ -455,6 +457,7 @@ public class LayoutPanel extends javax.swing.JPanel {
 
         contextMenus.put(plotElementListComponent, plotElementContextMenu );
         contextMenus.put( bindingListComponent, bindingActionsMenu );
+        contextMenus.put( annotationsListComponent, annotationsActionsMenu );
 
     }
     private transient ListSelectionListener plotElementSelectionListener = new ListSelectionListener() {
@@ -493,6 +496,13 @@ public class LayoutPanel extends javax.swing.JPanel {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             updateBindingList();
+        }
+    };
+
+    private transient PropertyChangeListener annotationsListener = new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            updateAnnotationsList();
         }
     };
 
@@ -629,12 +639,14 @@ public class LayoutPanel extends javax.swing.JPanel {
         this.dom = app;
         updatePlotElementList();
         updateBindingList();
+        updateAnnotationsList();
         updateDataSourceList();
         canvasLayoutPanel1.setContainer(app.getController().getDasCanvas());
         canvasLayoutPanel1.addComponentType(DasPlot.class, Color.BLUE);
         app.getController().bind(app.getOptions(), Options.PROP_BACKGROUND, canvasLayoutPanel1, "background");
         app.addPropertyChangeListener(Application.PROP_PLOT_ELEMENTS, plotElementsListener);
         app.addPropertyChangeListener(Application.PROP_BINDINGS, bindingsListener);
+        app.addPropertyChangeListener(Application.PROP_ANNOTATIONS, annotationsListener);
         app.addPropertyChangeListener(Application.PROP_DATASOURCEFILTERS, dataSourcesListener );
         app.getController().addPropertyChangeListener(ApplicationController.PROP_PLOT, plotListener);
         app.getController().addPropertyChangeListener(ApplicationController.PROP_PLOT_ELEMENT, plotElementListener);
@@ -736,6 +748,22 @@ public class LayoutPanel extends javax.swing.JPanel {
         bindingListComponent.repaint();
     }
     
+    private void updateAnnotationsList() {
+        final List annotations= new ArrayList( Arrays.asList(dom.getAnnotations()) );
+        AbstractListModel elementsList = new AbstractListModel() {
+            @Override
+            public int getSize() {
+                return annotations.size();
+            }
+            @Override
+            public Object getElementAt(int index) {
+                return annotations.get(index);
+            }
+        };
+        annotationsListComponent.setModel(elementsList);
+        annotationsListComponent.repaint();
+    }
+    
     private static final ImageIcon blueIcon= new ImageIcon( LayoutPanel.class.getResource("/resources/blue.gif" ) );
     private static final ImageIcon idleIcon= new ImageIcon( LayoutPanel.class.getResource("/org/autoplot/resources/idle-icon.png" ) );
             
@@ -827,6 +855,9 @@ public class LayoutPanel extends javax.swing.JPanel {
         jTable1 = new javax.swing.JTable();
         dataSourceActionsMenu = new javax.swing.JPopupMenu();
         editMenuItem = new javax.swing.JMenuItem();
+        annotationsActionsMenu = new javax.swing.JPopupMenu();
+        deleteAnnotationsMenuItem = new javax.swing.JMenuItem();
+        editAnnotationsMenuItem = new javax.swing.JMenuItem();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel2 = new javax.swing.JPanel();
         jSplitPane3 = new javax.swing.JSplitPane();
@@ -836,6 +867,14 @@ public class LayoutPanel extends javax.swing.JPanel {
         jScrollPane4 = new javax.swing.JScrollPane();
         dataSourceList = new javax.swing.JList<>();
         jSplitPane2 = new javax.swing.JSplitPane();
+        jPanel3 = new javax.swing.JPanel();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel6 = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        annotationsListComponent = new javax.swing.JList<>();
+        jPanel5 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        bindingListComponent = new javax.swing.JList();
         jPanel1 = new javax.swing.JPanel();
         canvasLayoutPanel1 = new org.autoplot.util.CanvasLayoutPanel();
         tallerButton = new javax.swing.JButton();
@@ -845,9 +884,6 @@ public class LayoutPanel extends javax.swing.JPanel {
         fixLayoutButton = new javax.swing.JButton();
         deletePlotButton = new javax.swing.JButton();
         selectedPlotLabel = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        bindingListComponent = new javax.swing.JList();
 
         plotMenu.setText("Plot");
 
@@ -970,6 +1006,24 @@ public class LayoutPanel extends javax.swing.JPanel {
         });
         dataSourceActionsMenu.add(editMenuItem);
 
+        annotationsActionsMenu.setToolTipText("Binding actions");
+
+        deleteAnnotationsMenuItem.setText("Delete Selected Annotations");
+        deleteAnnotationsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteAnnotationsMenuItemActionPerformed(evt);
+            }
+        });
+        annotationsActionsMenu.add(deleteAnnotationsMenuItem);
+
+        editAnnotationsMenuItem.setText("Edit Annotation(s)");
+        editAnnotationsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editAnnotationsMenuItemActionPerformed(evt);
+            }
+        });
+        annotationsActionsMenu.add(editAnnotationsMenuItem);
+
         jSplitPane1.setDividerLocation(330);
         jSplitPane1.setResizeWeight(0.5);
 
@@ -1037,6 +1091,66 @@ public class LayoutPanel extends javax.swing.JPanel {
         jSplitPane2.setDividerLocation(370);
         jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPane2.setResizeWeight(0.5);
+
+        jPanel3.setToolTipText("List of connections between DOM properties");
+
+        annotationsListComponent.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane5.setViewportView(annotationsListComponent);
+
+        org.jdesktop.layout.GroupLayout jPanel6Layout = new org.jdesktop.layout.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE)
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Annotations", jPanel6);
+
+        bindingListComponent.setFont(bindingListComponent.getFont().deriveFont(bindingListComponent.getFont().getSize()-2f));
+        bindingListComponent.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane2.setViewportView(bindingListComponent);
+
+        org.jdesktop.layout.GroupLayout jPanel5Layout = new org.jdesktop.layout.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 322, Short.MAX_VALUE)
+            .add(jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 168, Short.MAX_VALUE)
+            .add(jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Bindings", jPanel5);
+
+        org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jTabbedPane1)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jTabbedPane1)
+        );
+
+        jSplitPane2.setRightComponent(jPanel3);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Plots [?]"));
         jPanel1.setToolTipText("<html>Layout of plots on the canvas<br>Click for help");
@@ -1117,7 +1231,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
-                .add(canvasLayoutPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
+                .add(canvasLayoutPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(selectedPlotLabel)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -1133,30 +1247,6 @@ public class LayoutPanel extends javax.swing.JPanel {
         );
 
         jSplitPane2.setTopComponent(jPanel1);
-
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Bindings [?]"));
-        jPanel3.setToolTipText("List of connections between DOM properties");
-
-        bindingListComponent.setFont(bindingListComponent.getFont().deriveFont(bindingListComponent.getFont().getSize()-2f));
-        bindingListComponent.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
-        jScrollPane2.setViewportView(bindingListComponent);
-
-        org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 82, Short.MAX_VALUE)
-        );
-
-        jSplitPane2.setRightComponent(jPanel3);
 
         jSplitPane1.setLeftComponent(jSplitPane2);
 
@@ -1538,32 +1628,67 @@ public class LayoutPanel extends javax.swing.JPanel {
 
     }//GEN-LAST:event_setHeightMIActionPerformed
 
+    private void deleteAnnotationsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteAnnotationsMenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
+        Object[] annotations= annotationsListComponent.getSelectedValues();
+        for ( Object o:annotations ) {
+            Annotation a= (Annotation)o;
+            dom.getController().deleteAnnotation(a);
+        }
+    }//GEN-LAST:event_deleteAnnotationsMenuItemActionPerformed
+
+    private void editAnnotationsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editAnnotationsMenuItemActionPerformed
+        Object[] annotations= annotationsListComponent.getSelectedValues();
+        PropertyEditor edit;
+        switch (annotations.length) {
+            case 0:
+                return;
+            case 1:
+                edit = new PropertyEditor(annotations[0]);
+                break;
+            default:
+                Annotation[] peers= new Annotation[annotations.length];
+                System.arraycopy( annotations, 0, peers, 0, annotations.length );
+                edit= PropertyEditor.createPeersEditor( annotationsListComponent.getSelectedValue(), peers );
+                break;
+        }
+        edit.showDialog(LayoutPanel.this);
+    }//GEN-LAST:event_editAnnotationsMenuItemActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem addHiddenMenuItem;
     private javax.swing.JMenuItem addPlotsBelowMenuItem;
     private javax.swing.JButton addPlotsButton;
+    private javax.swing.JPopupMenu annotationsActionsMenu;
+    private javax.swing.JList<String> annotationsListComponent;
     private javax.swing.JMenuItem biggerMI;
     private javax.swing.JPopupMenu bindingActionsMenu;
     private javax.swing.JList bindingListComponent;
     private org.autoplot.util.CanvasLayoutPanel canvasLayoutPanel1;
     private javax.swing.JPopupMenu dataSourceActionsMenu;
     private javax.swing.JList<String> dataSourceList;
+    private javax.swing.JMenuItem deleteAnnotationsMenuItem;
     private javax.swing.JMenuItem deleteBindingsMenuItem;
     private javax.swing.JMenuItem deleteMenuItem;
     private javax.swing.JButton deletePlotButton;
+    private javax.swing.JMenuItem editAnnotationsMenuItem;
     private javax.swing.JMenuItem editMenuItem;
     private javax.swing.JButton fixLayoutButton;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JSplitPane jSplitPane3;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JPopupMenu plotActionsMenu;
     private javax.swing.JList plotElementListComponent;
