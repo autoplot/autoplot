@@ -1250,8 +1250,6 @@ public class AutoplotUtil {
                             Units u3= (Units) bundle1.property(QDataSet.UNITS,bundle1.length()-1);
                             if ( UnitsUtil.isOrdinalMeasurement(u3) ) {
                                 spec= RenderType.digital;
-                            } else {
-                                spec = RenderType.series;
                             }
                         }
                     } else {
