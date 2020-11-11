@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Ecobee report files have $Y-$m-$d-to-$(Y;end)-$m-$d used to show coverage.
+        <p><small>Apache Math Bisection Solver used to find zero-crossing in <a href="https://github.com/autoplot/dev/blob/master/demos/2020/20201030/findZeroCrossingInFunction.jy">this script</a>.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2020-11-07 r25260):</p>
         <ul>
+            <li>rte_1637324209: occasional runtime error when loading vap, associated with new error bar controls.  Thanks, Bill!
             <li>2300: script plot command toggles through invalid intermediate state, experiments with reset. 
             <li>multi-line string used with setScriptDescription would cause parse error.
             <li>In Mathematica to Jython, properly handle "2754 2^(2/3)"
@@ -61,7 +62,7 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>add annotations list on the layout tab.
+            <li>add annotations list on the layout tab.  Thanks, Kristoff!
             <li>rfe363: check version of Javadoc when deciding how to create link.
             <li>rfe363: finally "addToSearchPath"'s Javadoc argument is used for Javadoc completions. (To be shown at 2020 AGU.)
             <li>rfe363: first batch of new icons showing Java static method vs instance method, properly filter by context.
