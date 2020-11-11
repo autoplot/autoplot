@@ -492,12 +492,25 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 sdsb.setQube( new int[] { bundle[1]-bundle[0], 0 } );
                 String[] names= parser.getFieldNames();
                 String[] labels= parser.getFieldLabels();
-                for ( int i=bundle[0]; i<bundle[1]; i++ ) {
-                    sdsb.putProperty( QDataSet.NAME, i, names[i] );
-                    sdsb.putProperty( QDataSet.LABEL, i, labels[i] );
-                    sdsb.putProperty( QDataSet.UNITS, i, parser.getUnits(i) );
+                String[] sunits= parser.getFieldUnits();
+                boolean nothingAdded= true;
+                for ( int i=0; nothingAdded && i<names.length; i++ ) {
+                    if ( !("field"+i).equals(names[i]) ) nothingAdded= false;
+                    if ( !("field"+i).equals(labels[i]) ) nothingAdded= false;
+                    if ( sunits[i]!=null ) nothingAdded= false;
                 }
-                mds.putProperty(QDataSet.BUNDLE_1, sdsb.getDataSet() );
+                nothingAdded= false;
+                if ( nothingAdded ) {
+                    mds.putProperty(QDataSet.BUNDLE_1, null );
+                } else {
+                    for ( int i=bundle[0]; i<bundle[1]; i++ ) {
+                        int index= i-bundle[0];
+                        sdsb.putProperty( QDataSet.NAME, index, names[i] );
+                        sdsb.putProperty( QDataSet.LABEL, index, labels[i] );
+                        sdsb.putProperty( QDataSet.UNITS, index, parser.getUnits(i) );
+                    }
+                    mds.putProperty(QDataSet.BUNDLE_1, sdsb.getDataSet() );
+                }
             }
 
             if ( depend1Label!=null ) {
