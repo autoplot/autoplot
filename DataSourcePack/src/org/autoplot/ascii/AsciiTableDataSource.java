@@ -500,17 +500,14 @@ public class AsciiTableDataSource extends AbstractDataSource {
                     if ( sunits[i]!=null ) nothingAdded= false;
                 }
                 nothingAdded= false;
-                if ( nothingAdded ) {
-                    mds.putProperty(QDataSet.BUNDLE_1, null );
-                } else {
-                    for ( int i=bundle[0]; i<bundle[1]; i++ ) {
-                        int index= i-bundle[0];
-                        sdsb.putProperty( QDataSet.NAME, index, names[i] );
-                        sdsb.putProperty( QDataSet.LABEL, index, labels[i] );
-                        sdsb.putProperty( QDataSet.UNITS, index, parser.getUnits(i) );
-                    }
-                    mds.putProperty(QDataSet.BUNDLE_1, sdsb.getDataSet() );
+                logger.log(Level.FINER, "nothing added={0}", nothingAdded);
+                for ( int i=bundle[0]; i<bundle[1]; i++ ) {
+                    int index= i-bundle[0];
+                    sdsb.putProperty( QDataSet.NAME, index, names[i] );
+                    sdsb.putProperty( QDataSet.LABEL, index, labels[i] );
+                    sdsb.putProperty( QDataSet.UNITS, index, parser.getUnits(i) );
                 }
+                mds.putProperty(QDataSet.BUNDLE_1, sdsb.getDataSet() );
             }
 
             if ( depend1Label!=null ) {
