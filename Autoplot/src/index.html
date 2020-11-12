@@ -28,13 +28,14 @@
         
         <p>Bugfixes (2020-11-07 r25260):</p>
         <ul>
+            <li>2302: File->Open Vap file breaks when remote URI is in address bar.  Thanks, Ivar!
             <li>rte_1637324209: occasional runtime error when loading vap, associated with new error bar controls.  Thanks, Bill!
             <li>2300: script plot command toggles through invalid intermediate state, experiments with reset. 
             <li>multi-line string used with setScriptDescription would cause parse error.
             <li>In Mathematica to Jython, properly handle "2754 2^(2/3)"
             <li>medianFilter would fail if there was too much fill data.  Thanks, Kristoff!
         </ul>
-        <p>Older Bugfixes (2020-09-30 r25152):</p>
+        <p>Older Bugfixes (2020-10-22 r25232):</p>
         <ul>
             <li>NegativeArraySizeException in intermediate state of SeriesRenderer, when log axis is used and plot has not been sized.  Thanks, Jon N!
             <li>2290: unbundle filter GUI contained bug which would insert extra quote in the argument.
