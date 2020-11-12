@@ -70,17 +70,16 @@ public class DataSetSelectorSupport {
         boolean isLocal= initialSelection==null || initialSelection.isEmpty() || !isRemote;
         
         JFileChooser chooser=null;
-        if ( isLocal ) {
-            chooser= new JFileChooser(currentDirectory);
-            
-            if ( currentFile.length()>0 ) {
-                chooser.setSelectedFile( new File( currentFile ) );
-            }
-            if ( initialSelection!=null ) {
-                URISplit split= URISplit.parse(initialSelection);
-                if ( split.file!=null && "vap".equals(split.ext) ) {
-                    chooser.setSelectedFile( new File( split.file ));
-                }
+        
+        chooser= new JFileChooser(currentDirectory);
+
+        if ( currentFile.length()>0 ) {
+            chooser.setSelectedFile( new File( currentFile ) );
+        }
+        if ( initialSelection!=null && isLocal ) {
+            URISplit split= URISplit.parse(initialSelection);
+            if ( split.file!=null && "vap".equals(split.ext) ) {
+                chooser.setSelectedFile( new File( split.file ));
             }
         }
         
