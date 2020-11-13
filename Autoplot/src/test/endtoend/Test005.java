@@ -13,6 +13,7 @@ import org.autoplot.dom.Axis;
 import org.autoplot.dom.Column;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSetURI.CompletionResult;
+import org.das2.util.filesystem.FileSystem;
 
 /**
  * Test Autoplot's demo bookmarks
@@ -131,6 +132,9 @@ public class Test005 {
             Thread.sleep(1000); // it's probably because the app isn't locked properly.
             writeToPng("test005_demo12.png");
 
+            //https://satdat.ngdc.noaa.gov started sending 429 (Too many requests), so I'll test offline mode.
+            FileSystem.settings().setOffline( true );
+            
             xxx("demo12");
 
             //TODO: why does this not reset with the plot command below?  This only occurs in testing server.
