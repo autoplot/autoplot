@@ -17,7 +17,7 @@
         </p>
 
         <p>This is the Autoplot v2020a branch.  This is an update to the production version containing bugfixes and minor new features.
-            Java 7 is now required.  Java 8 will be required sometime soon.
+            Java 8 is now required.
         </p>
 
         <p>Run with 4GB of memory (64-bit Java only): <a href="autoplot_4GB.jnlp">autoplot_4GB.jnlp</a></p>
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-11-07 r25260):</p>
+        <p>Bugfixes (2020-11-12 r25302):</p>
         <ul>
+            <li>2303: histogram filter didn't properly handle decimal arguments.
             <li>2302: File->Open Vap file breaks when remote URI is in address bar.  Thanks, Ivar!
             <li>rte_1637324209: occasional runtime error when loading vap, associated with new error bar controls.  Thanks, Bill!
             <li>2300: script plot command toggles through invalid intermediate state, experiments with reset. 
@@ -63,6 +64,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>referenceX and referenceY allow list of datums to point at or mark with symbol in annotations.
+            <li>anchorBackground property allows regions to be highlighted in annotations.
+            <li>rfe734: bundle URI keyword for ASCII files should return bundle descriptor
             <li>add annotations list on the layout tab.  Thanks, Kristoff!
             <li>rfe363: check version of Javadoc when deciding how to create link.
             <li>rfe363: finally "addToSearchPath"'s Javadoc argument is used for Javadoc completions. (To be shown at 2020 AGU.)
