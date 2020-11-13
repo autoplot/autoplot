@@ -22,9 +22,11 @@ import java.net.URLEncoder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -257,7 +259,10 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             
             int iinterval10= (int)(dsec*10);
             if ( iinterval10<1 ) iinterval10= 1;
-            String sinterval= URLEncoder.encode( String.format( "%.1f", iinterval10/10. ), "US-ASCII");
+            
+            //String test= new Formatter().format( Locale.US, "%.1f", iinterval10 / 10. ).toString();
+            String ifmt= String.format( "%d.%d", iinterval10 / 10, iinterval10 % 10 );
+            String sinterval= URLEncoder.encode( ifmt, "US-ASCII");
             
             params2.put("interval",sinterval);
             params2.remove("resolution");
