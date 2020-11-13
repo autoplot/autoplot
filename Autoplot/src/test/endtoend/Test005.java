@@ -13,6 +13,7 @@ import org.autoplot.dom.Axis;
 import org.autoplot.dom.Column;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSetURI.CompletionResult;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 
 /**
@@ -31,6 +32,8 @@ public class Test005 {
     public static void main(String[] args)  {
         try {
 
+            LoggerManager.readConfiguration("/home/jbf/autoplot_data/config/logging.properties");
+            
             Column mc= getDocumentModel().getCanvases(0).getMarginColumn();
             System.err.println("margin column: "+ mc.getId() + " " + mc.getLeft() + " " + mc.getRight() );
             
@@ -132,14 +135,15 @@ public class Test005 {
             Thread.sleep(1000); // it's probably because the app isn't locked properly.
             writeToPng("test005_demo12.png");
 
-            //https://satdat.ngdc.noaa.gov started sending 429 (Too many requests), so I'll test offline mode.
-            FileSystem.settings().setOffline( true );
-            
             xxx("demo12");
 
             //TODO: why does this not reset with the plot command below?  This only occurs in testing server.
             getDocumentModel().getDataSourceFilters(0).setFilters("");
 
+            //https://satdat.ngdc.noaa.gov started sending 429 (Too many requests), so I'll test offline mode.
+            FileSystem.settings().setOffline( true );
+            FileSystem.reset();
+            
             plot("https://satdat.ngdc.noaa.gov/sem/goes/data/avg/$Y/$m/goes10/csv/g10_eps_5m_$Y$m$d_$(Y,end)$m$d.csv?column=field1&depend0=field0&skip=456&timerange=Dec+2004");
             writeToPng("test005_demo14.png");
             xxx("demo14");
