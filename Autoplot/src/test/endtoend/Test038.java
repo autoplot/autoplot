@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.das2.util.LoggerManager;
 import org.python.util.PythonInterpreter;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.JythonUtil.Param;
@@ -57,6 +56,7 @@ public class Test038 {
             String scrip= SimplifyScriptSupport.simplifyScriptToCompletions(script);
 
             File f= new File(file);
+            //String fout= "./test038_completions_"+testId+"_"+f.getName();
             String fout= "./test038_completions_"+f.getName();
             try (FileWriter fw = new FileWriter(fout)) {
                 fw.append(scrip);
@@ -83,6 +83,7 @@ public class Test038 {
             String script= JythonUtil.readScript( new FileReader(file) );
             String scrip= org.autoplot.jythonsupport.JythonUtil.simplifyScriptToGetParams(script,true);
             File f= new File(file);
+            //String fout= "./test038_params_"+testId+"_"+f.getName();
             String fout= "./test038_params_"+f.getName();
             try (FileWriter fw = new FileWriter(fout)) {
                 fw.append(scrip);
@@ -133,6 +134,8 @@ public class Test038 {
     public static int testGetParams() {
         int t=0;
         t= Math.max( t, doTests("009","/home/jbf/ct/hudson/script/test038/jydsCommentBug.jyds") );  // Chris has a newline before the closing ).
+        t= Math.max( t, doTests("010","/home/jbf/ct/hudson/script/test038/addPointDigitizer.jy") );
+        t= Math.max( t, doTests("002","/home/jbf/ct/hudson/script/test038/demoParms1.jy") );
         t= Math.max( t, doTests("008","/home/jbf/ct/hudson/script/test038/jedi_l3_valid_tofxe_events.jyds") );
         t= Math.max( t, doTests("000","/home/jbf/ct/hudson/script/test038/trivial.jy") );
         t= Math.max( t, doTests("001","/home/jbf/ct/hudson/script/test038/demoParms0.jy") );
