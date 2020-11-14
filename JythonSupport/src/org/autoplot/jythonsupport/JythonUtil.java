@@ -996,7 +996,7 @@ public class JythonUtil {
      * @param iline
      * @return 
      */
-    private static int handleContinue( String[] lines, int iline ) {
+    protected static int handleContinue( String[] lines, int iline ) {
         if ( iline==lines.length-1 ) {
             return iline;
         }

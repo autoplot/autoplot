@@ -91,7 +91,7 @@ public class SimplifyScriptSupport {
          
          String[] ss1= (script).split("\n");
          String[] ss= new String[ss1.length+1];
-         ss[0]= "# EMPTY";
+         ss[0]= "# simplifyScriptToGetCompletions";
          System.arraycopy( ss1, 0, ss, 1, ss1.length );
          
          int lastLine= ss.length-1;
@@ -213,18 +213,29 @@ public class SimplifyScriptSupport {
       * @return the simplified script
       * @see JythonUtil#simplifyScriptToGetParams(java.lang.String[], org.python.parser.ast.stmtType[], java.util.HashSet, int, int, int) 
       */
-     public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stmts, 
+public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stmts, 
              HashSet variableNames, int beginLine, int lastLine, int depth  ) {
+        //String spaces= "                              "
+        //        + "                              "
+        //        + "                              ";
          if ( lastLine>=ss.length ) {
              throw new IllegalArgumentException("lastLine is >= number of lines");
          }
-         int acceptLine= -1;  // first line to accept
-         int currentLine= beginLine; // current line we are writing (0 is first line).
-         StringBuilder result= new StringBuilder();
-         for ( int istatement=0; istatement<stmts.length; istatement++ ) {
+        if ( !ss[0].equals("# simplifyScriptToGetCompletions") ) {
+            throw new IllegalArgumentException("first line must be '# simplifyScriptToGetCompletions'");
+        }
+        int acceptLine= -1; // first line to accept
+        int currentLine= beginLine; // current line we are writing (0 is first line).
+        StringBuilder result= new StringBuilder();
+        for (int istatement=0; istatement<stmts.length; istatement++) {
              stmtType o= stmts[istatement];
              String theLine= getSourceForStatement( ss, o );
              int lineCount= theLine.split("\n",-2).length;
+            
+             if ( depth==0 ) {
+                logger.finest(theLine); //breakpoint here.
+                //System.err.println(theLine);
+             }
              logger.log( Level.FINER, "line {0}: {1}", new Object[] { o.beginLine, theLine } );
              if ( o.beginLine>0 ) {
                  if ( beginLine<0 && istatement==0 ) acceptLine= o.beginLine;
@@ -248,34 +259,38 @@ public class SimplifyScriptSupport {
                  }
              }
                
-             if ( o instanceof org.python.parser.ast.If ) {
-                 if ( acceptLine>-1 ) {
-                    for ( int i=acceptLine; i<beginLine; i++ ) {
-                        appendToResult( result,ss[i]).append("\n");
+            if (o instanceof org.python.parser.ast.If) {
+                if (acceptLine > -1) {
+                    for (int i = acceptLine; i < beginLine; i++) {
+                        appendToResult(result, ss[i]).append("\n");
                     }
                  }
-                 If iff= (If)o;
+                If iff = (If) o;
                  boolean includeBlock;
-                 if ( simplifyScriptToGetCompletionsCanResolve( iff.test, variableNames ) ) {
-                     for ( int i=beginLine; i<iff.body[0].beginLine; i++ ) {
-                         if ( i>0 && i<ss.length ) {
-                            result.append(ss[i]).append("\n");
-                         }
+                 if (simplifyScriptToGetCompletionsCanResolve( iff.test, variableNames )) {
+                     for ( int i=beginLine; i<iff.body[0].beginLine; i++) {
+                         result.append(ss[i]).append("\n");
                      } // write out the 'if' part
                      includeBlock= true;
                  } else {
                      includeBlock= false;
                  }
                  int lastLine1;  //lastLine1 is the last line of the "if" clause.
+                 int elseLine=-1;                 
                  if ( iff.orelse!=null && iff.orelse.length>0 ) {
                      if ( iff.orelse[0].beginLine>0 ) {
                          lastLine1= iff.orelse[0].beginLine-1;  // -1 is for the "else:" part.
                          if ( ss[lastLine1].trim().startsWith("else") ) {
+                             elseLine= lastLine1;
                              lastLine1=lastLine1-1;
+                        } else if ( ss[lastLine1].trim().startsWith("elif") ) {
+                            elseLine= lastLine1;
+                            lastLine1=lastLine1-1;
                          }
                      } else {
                          if ( iff.orelse[0] instanceof If ) {
-                             lastLine1= ((If)iff.orelse[0]).test.beginLine-1;
+                            elseLine = ((If) iff.orelse[0]).test.beginLine;
+                            lastLine1= elseLine-1;
                          } else {
                              logger.warning("failure to deal with another day...");
                              throw new RuntimeException("this case needs to be dealt with...");
@@ -347,9 +362,10 @@ public class SimplifyScriptSupport {
              }
          }
          if ( acceptLine>-1 ) {
-             int thisLine= lastLine;
-             for ( int i=acceptLine; i<=thisLine; i++ ) {
-                 appendToResult( result,ss[i]).append("\n");
+             lastLine= JythonUtil.handleContinue( ss, lastLine );
+             int thisLine = lastLine;
+             for (int i = acceptLine; i <= thisLine; i++) {
+                appendToResult(result, ss[i]).append("\n");
              }
          }
          return result.toString();         
