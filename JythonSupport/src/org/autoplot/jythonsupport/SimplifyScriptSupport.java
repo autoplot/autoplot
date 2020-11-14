@@ -89,21 +89,12 @@ public class SimplifyScriptSupport {
          
          if ( script.trim().length()==0 ) return script;
          
-         String[] ss= script.split("\n");
+         String[] ss1= (script).split("\n");
+         String[] ss= new String[ss1.length+1];
+         ss[0]= "# EMPTY";
+         System.arraycopy( ss1, 0, ss, 1, ss1.length );
          
-         int lastLine= ss.length;
-         
-         // check for continuation in last getParam call.
-         while ( ss.length>lastLine+1 && ss[lastLine].trim().length()>0 && Character.isWhitespace( ss[lastLine].charAt(0) ) ) {
-             lastLine++;
-         }
-         // Chris showed that a closing bracket or paren doesn't need to be indented.  See test038/jydsCommentBug.jyds
-         if ( lastLine<ss.length ) {
-             String closeParenCheck= ss[lastLine].trim();
-             if ( closeParenCheck.equals(")") || closeParenCheck.equals("]") ) {
-                 lastLine++;
-             }
-         }
+         int lastLine= ss.length-1;
          
          HashSet variableNames= new HashSet();
          variableNames.add("getParam");  // this is what allows the getParam calls to be included.
@@ -148,7 +139,7 @@ public class SimplifyScriptSupport {
          }
      }
      
-     private static String getIfBlock( String[] ss, If iff, stmtType[] body, HashSet variableNames, 
+     private static String getIfBlock( String[] ss, stmtType[] body, HashSet variableNames, 
              int firstLine, int lastLine1, int depth) {
         StringBuilder result= new StringBuilder();
         String ss1= simplifyScriptToGetCompletions(ss, body, variableNames, firstLine, lastLine1, depth+1 );
@@ -160,7 +151,7 @@ public class SimplifyScriptSupport {
 //                line= ss[iff.beginLine];
 //            }
             Pattern p= Pattern.compile("(\\s*)(\\S*).*");
-            Matcher m= p.matcher(ss[firstLine-1]);
+            Matcher m= p.matcher(ss[firstLine]);
             String indent;
             if ( m.matches() ) {
                 indent= m.group(1);
@@ -184,14 +175,18 @@ public class SimplifyScriptSupport {
       * @return 
       */
      public static String getSourceForStatement( String[] ss, stmtType o ) {
-         String theLine= o.beginLine>0 ? ss[o.beginLine-1] : "(bad line number)";
+         if ( o.beginLine==0 ) {
+             return "(bad line number";
+         }
+         String theLine= ss[o.beginLine];
+         
          String tripleQuotes="'''";
          int i1= theLine.indexOf(tripleQuotes);
          if ( i1>-1 ) {
              int i0= theLine.lastIndexOf(tripleQuotes,i1-3);
              if ( i0==-1 ) {
-                 int lastLine= o.beginLine-1;
-                 int firstLine= lastLine-1;
+                 int lastLine= o.beginLine;
+                 int firstLine= lastLine;
                  while ( firstLine>=0 ) {
                      theLine= ss[firstLine]+"\n"+theLine;
                      if ( ss[firstLine].contains(tripleQuotes) ) {
@@ -209,7 +204,7 @@ public class SimplifyScriptSupport {
       * Extracts the parts of the program that get parameters or take a trivial amount of time to execute.  
       * This may call itself recursively when if blocks are encountered.
       * See test038.
-      * @param ss the entire script.
+      * @param ss the entire script, with a null at index 0.
       * @param stmts statements being processed.
       * @param variableNames variable names that have been resolved.
       * @param beginLine first line of the script being processed, or -1 to use stmts[0].beginLine
@@ -220,6 +215,9 @@ public class SimplifyScriptSupport {
       */
      public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stmts, 
              HashSet variableNames, int beginLine, int lastLine, int depth  ) {
+         if ( lastLine>=ss.length ) {
+             throw new IllegalArgumentException("lastLine is >= number of lines");
+         }
          int acceptLine= -1;  // first line to accept
          int currentLine= beginLine; // current line we are writing (0 is first line).
          StringBuilder result= new StringBuilder();
@@ -253,15 +251,15 @@ public class SimplifyScriptSupport {
              if ( o instanceof org.python.parser.ast.If ) {
                  if ( acceptLine>-1 ) {
                     for ( int i=acceptLine; i<beginLine; i++ ) {
-                        appendToResult( result,ss[i-1]).append("\n");
+                        appendToResult( result,ss[i]).append("\n");
                     }
                  }
                  If iff= (If)o;
                  boolean includeBlock;
                  if ( simplifyScriptToGetCompletionsCanResolve( iff.test, variableNames ) ) {
                      for ( int i=beginLine; i<iff.body[0].beginLine; i++ ) {
-                         if ( i>0 && i-1<ss.length ) {
-                            result.append(ss[i-1]).append("\n");
+                         if ( i>0 && i<ss.length ) {
+                            result.append(ss[i]).append("\n");
                          }
                      } // write out the 'if' part
                      includeBlock= true;
@@ -272,6 +270,9 @@ public class SimplifyScriptSupport {
                  if ( iff.orelse!=null && iff.orelse.length>0 ) {
                      if ( iff.orelse[0].beginLine>0 ) {
                          lastLine1= iff.orelse[0].beginLine-1;  // -1 is for the "else:" part.
+                         if ( ss[lastLine1].trim().startsWith("else") ) {
+                             lastLine1=lastLine1-1;
+                         }
                      } else {
                          if ( iff.orelse[0] instanceof If ) {
                              lastLine1= ((If)iff.orelse[0]).test.beginLine-1;
@@ -286,7 +287,7 @@ public class SimplifyScriptSupport {
                      lastLine1= lastLine;
                  }
                  if ( includeBlock ) {
-                     String ss1= getIfBlock(ss, iff, iff.body, variableNames, beginLine+1, lastLine1, depth+1 );
+                     String ss1= getIfBlock(ss, iff.body, variableNames, beginLine+1, lastLine1, depth+1 );
                      appendToResult( result,ss1);
                      if ( iff.orelse!=null ) {
                          if ( (istatement+1)>=stmts.length ) {
@@ -297,12 +298,12 @@ public class SimplifyScriptSupport {
                          if ( iff.orelse[0].beginLine==0 ) {
                              result.append("\n");
                          } else {
-                             if ( iff.orelse[0].beginLine>0 && ss[iff.orelse[0].beginLine-2].trim().startsWith("else:") ) {
-                                 result.append(ss[iff.orelse[0].beginLine-2]).append("\n");
-                                 ss1= getIfBlock(ss, iff, iff.orelse, variableNames, beginLine+1, lastLine1, depth+1 );
+                             if ( iff.orelse[0].beginLine>0 && ss[iff.orelse[0].beginLine-1].trim().startsWith("else:") ) {
+                                 result.append(ss[iff.orelse[0].beginLine-1]).append("\n");
+                                 ss1= getIfBlock(ss, iff.orelse, variableNames, iff.orelse[0].beginLine, lastLine1, depth+1 );
                                  appendToResult( result,ss1);
                              } else {
-                                 result.append(ss[iff.orelse[0].beginLine-1]).append("\n");
+                                 result.append(ss[iff.orelse[0].beginLine]).append("\n");
                              }
                          }
                          
@@ -331,10 +332,10 @@ public class SimplifyScriptSupport {
                          int thisLine= beginLine;
                          for ( int i=acceptLine; i<=thisLine; i++ ) {
                              if ( i<thisLine ) {
-                                 appendToResult(result,ss[i-1]).append("\n");
+                                 appendToResult(result,ss[i]).append("\n");
                              } else {
-                                 if ( ss[i-1].length()>0 && Character.isWhitespace(ss[i-1].charAt(0) ) ) {
-                                     appendToResult(result,ss[i-1]).append("\n");
+                                 if ( ss[i].length()>0 && Character.isWhitespace(ss[i].charAt(0) ) ) {
+                                     appendToResult(result,ss[i]).append("\n");
                                  }
                              }
                          }
@@ -348,7 +349,7 @@ public class SimplifyScriptSupport {
          if ( acceptLine>-1 ) {
              int thisLine= lastLine;
              for ( int i=acceptLine; i<=thisLine; i++ ) {
-                 appendToResult( result,ss[i-1]).append("\n");
+                 appendToResult( result,ss[i]).append("\n");
              }
          }
          return result.toString();         

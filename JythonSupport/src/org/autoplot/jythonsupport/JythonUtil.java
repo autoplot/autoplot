@@ -977,7 +977,48 @@ public class JythonUtil {
             result.append("sort_.append( \'").append(v).append("\')\n");
         }
     }
+    
+    /**
+     * return the indentation string (spaces or tabs or empty) for the line.
+     * @param line a line of Jython code.
+     * @return the indentation 
+     */
+    protected static String indentForLine( String line ) {
+        String[] ss2 = line.split("\\S", -2);
+        String indent = ss2[0];
+        return indent;
+    }
 
+    /**
+     * handle where a line continues on to the next line because of indent,
+     * and then where a closeing parenthesis might be found as well.
+     * @param lines
+     * @param iline
+     * @return 
+     */
+    private static int handleContinue( String[] lines, int iline ) {
+        if ( iline==lines.length-1 ) {
+            return iline;
+        }
+        String theLine= lines[iline];
+        int i= theLine.indexOf("#");
+        if ( i>-1 )  theLine= theLine.substring(0,i);
+        if ( theLine.trim().endsWith(":") ) {
+            logger.finer("line opens to block");
+        }
+        String thisIndent= indentForLine(theLine);
+        String nextIndent= indentForLine(lines[iline+1]);
+        while ( iline<lines.length && nextIndent.startsWith(thisIndent) && nextIndent.length()>thisIndent.length() ) {
+            iline++;
+            nextIndent= indentForLine(lines[iline+1]);
+        }
+        if ( iline<lines.length-1 && lines[iline+1].trim().startsWith(")" ) ) {
+            iline++;
+        }
+        return iline;
+    
+    }
+    
     private static StringBuilder appendToResult(StringBuilder result, String line) {
         //if ( line.contains("sTimeBinSeconds") ) {
         //    System.err.println("heresTimeBinSeconds");
@@ -988,10 +1029,15 @@ public class JythonUtil {
 
     /**
      * Extracts the parts of the program that get parameters or take a trivial
-     * amount of time to execute. This may call itself recursively when if
-     * blocks are encountered. See test038.
+     * amount of time to execute.  This may call itself recursively when if
+     * blocks are encountered. 
+     * 
+     * This scans through, where acceptLine is the first line we'll accept
+     * to the currentLine, copying over script from acceptLine to currentLine.
+     * 
+     * See test038 (https://jfaden.net/jenkins/job/autoplot-test038/)
      *
-     * @param ss the entire script.
+     * @param ss the entire script, ss[0] is empty string so that ss[1] is the first line of the script.
      * @param stmts statements being processed.
      * @param variableNames variable names that have been resolved.
      * @param beginLine first line of the script being processed.
@@ -1004,13 +1050,24 @@ public class JythonUtil {
         String spaces= "                              "
                 + "                              "
                 + "                              ";
-        int acceptLine = -1;  // first line to accept
-        int currentLine = 0; // current line we are writing (0 is first line).
+        if ( lastLine>=ss.length ) {
+            throw new IllegalArgumentException("lastLine is >= number of lines");
+        }
+        if ( !ss[0].equals("# simplifyScriptToGetParams") ) {
+            throw new IllegalArgumentException("first line must be '# simplifyScriptToGetParams'");
+        }
+        int acceptLine = -1; // first line to accept
+        int currentLine = 1; // current line we are writing (1 is first line).
         StringBuilder result = new StringBuilder();
         for (int istatement = 0; istatement < stmts.length; istatement++) {
             stmtType o = stmts[istatement];
             String theLine= SimplifyScriptSupport.getSourceForStatement( ss, o );
             int lineCount= theLine.split("\n",-2).length;
+            
+            if ( depth==0 ) {
+                logger.finest(theLine); //breakpoint here.
+                //System.err.println(theLine);
+            }
             logger.log( Level.FINER, "line {0}: {1}", new Object[] { o.beginLine, theLine } );
             if ( o.beginLine>0 ) {
                  if ( beginLine<0 && istatement==0 ) acceptLine= o.beginLine;
@@ -1028,26 +1085,35 @@ public class JythonUtil {
             if (o instanceof org.python.parser.ast.If) {
                 if (acceptLine > -1) {
                     for (int i = acceptLine; i < beginLine; i++) {
-                        appendToResult(result, ss[i - 1]).append("\n");
+                        appendToResult(result, ss[i]).append("\n");
                     }
                 }
                 If iff = (If) o;
                 boolean includeBlock;
                 if (simplifyScriptToGetParamsCanResolve(iff.test, variableNames)) {
                     for (int i = beginLine; i < iff.body[0].beginLine; i++) {
-                        result.append(ss[i - 1]).append("\n");
+                        result.append(ss[i]).append("\n");
                     } // write out the 'if' part
                     includeBlock = true;
                 } else {
                     includeBlock = false;
                 }
                 int lastLine1;  //lastLine1 is the last line of the "if" clause.
+                int elseLine=-1;
                 if (iff.orelse != null && iff.orelse.length > 0) {
                     if (iff.orelse[0].beginLine > 0) {
-                        lastLine1 = iff.orelse[0].beginLine - 2;  // -2 is for the "else:" part.
+                        lastLine1 = iff.orelse[0].beginLine - 1;  // -1 is for the "else:" part.
+                        if ( ss[lastLine1].trim().startsWith("else") ) {
+                            elseLine= lastLine1;
+                            lastLine1=lastLine1-1;
+                        } else if ( ss[lastLine1].trim().startsWith("elif") ) {
+                            elseLine= lastLine1;
+                            lastLine1=lastLine1-1;
+                        }
                     } else {
                         if (iff.orelse[0] instanceof If) {
-                            lastLine1 = ((If) iff.orelse[0]).test.beginLine - 1;
+                            elseLine = ((If) iff.orelse[0]).test.beginLine;
+                            lastLine1= elseLine-1;
                         } else {
                             logger.warning("failure to deal with another day...");
                             throw new RuntimeException("this case needs to be dealt with...");
@@ -1060,39 +1126,37 @@ public class JythonUtil {
                 }
                 if (includeBlock) {
                     String ss1 = simplifyScriptToGetParams(ss, iff.body, variableNames, -1, lastLine1, depth + 1);
-                    if (ss1.length() == 0) {
+                    if (ss1.trim().length() == 0) {
                         String line;
-                        if (iff.beginLine == 0 && beginLine > 0 && iff.body[0].beginLine > 0) {
-                            line = ss[iff.body[0].beginLine - 1];
+                        if ( iff.body[0].beginLine > 0) {
+                            line = ss[iff.body[0].beginLine];
                         } else {
                             line = ss[iff.beginLine];
                         }
-                        String[] ss2 = line.split("\\S", -2);
-                        String indent = ss2[0];
-                        result.append(indent).append("pass\n");
+                        String indent = indentForLine( line );
+                        result.append(indent).append("pass  # ").append(line).append("\n");
                         logger.fine("things have probably gone wrong...");
                     } else {
                         appendToResult(result, ss1);
                     }
                     if (iff.orelse != null) {
-                        appendToResult(result, ss[lastLine1]);
+                        appendToResult(result, ss[elseLine]);
                         int lastLine2;
                         if ((istatement + 1) < stmts.length) {
                             lastLine2 = stmts[istatement + 1].beginLine - 1;
                         } else {
                             lastLine2 = lastLine;
                         }
-                        String ss2 = simplifyScriptToGetParams(ss, iff.orelse, variableNames, lastLine1 + 2, lastLine2, depth + 1);
+                        String ss2 = simplifyScriptToGetParams(ss, iff.orelse, variableNames, elseLine + 1, lastLine2, depth + 1);
                         if (ss2.length() > 0) {
                             result.append("\n");
                         }
                         appendToResult(result, ss2);
                         if (ss2.length() == 0) { // we didn't add anything...
                             String line;
-                            line = ss[iff.orelse[0].beginLine - 1];
-                            String[] ss3 = line.split("\\S", -2);
-                            String indent = ss3[0];
-                            result.append("\n").append(indent).append("pass\n");
+                            line = ss[iff.orelse[0].beginLine];
+                            String indent =  indentForLine( line );
+                            result.append("\n").append(indent).append("pass  # ").append(line).append("\n");
                         } else {
                             result.append("\n");  // write of the else or elif line
                         }
@@ -1104,9 +1168,10 @@ public class JythonUtil {
                     if (acceptLine < 0) {
                         acceptLine = beginLine;
                         for (int i = currentLine; i < acceptLine; i++) {
+                            String indent= indentForLine( ss[i] );
                             int icomment= ss[i].indexOf("#");
                             if ( icomment>=0 ) {
-                                String line= spaces.substring(0,icomment)+ss[i].substring(icomment);
+                                String line= indent + spaces.substring(indent.length(),icomment)+ss[i].substring(icomment);
                                 result.append(line).append("\n");
                             }
                             currentLine = acceptLine;
@@ -1122,21 +1187,27 @@ public class JythonUtil {
                     }
                 } else {
                     if (acceptLine > -1) {
-                        int thisLine = beginLine;
+                        int thisLine = o.beginLine;
+                        String indent= indentForLine( ss[acceptLine] );
                         for (int i = acceptLine; i < thisLine; i++) {
-                            appendToResult(result, ss[i - 1]).append("\n");
+                            if ( ss[i].contains("getDataSet") ) {
+                                appendToResult(result, indent + "pass  #1139  "+ ss[i]).append("\n"); // TODO: kludge--how did this work before???
+                            } else {
+                                appendToResult(result, ss[i]).append("\n");
+                            }
                         }
                         appendToResult(result, "\n");
                         currentLine = thisLine;
                         acceptLine = -1;
-                    }
+                    } 
                 }
             }
         }
         if (acceptLine > -1) {
+            lastLine= handleContinue( ss, lastLine );
             int thisLine = lastLine;
             for (int i = acceptLine; i <= thisLine; i++) {
-                appendToResult(result, ss[i - 1]).append("\n");
+                appendToResult(result, ss[i]).append("\n");
             }
         }
         return result.toString();
@@ -1216,31 +1287,34 @@ public class JythonUtil {
      * @see SimplifyScriptSupport#simplifyScriptToCompletions(java.lang.String) 
      */
     public static String simplifyScriptToGetParams(String script, boolean addSort) throws PySyntaxError {
-        String[] ss = script.split("\n");
+        String[] ss1 = script.split("\n");
+        String[] ss= new String[ss1.length+1];
+        System.arraycopy( ss1, 0, ss, 1, ss1.length );
+        ss[0]= "# simplifyScriptToGetParams";
 
         int lastLine = -1;
         boolean withinTripleQuote= false;
-        for (int i = 0; i < ss.length; i++) {
+        for (int i = 1; i < ss.length; i++) {
             String line = ss[i];
             int ich = line.indexOf('#');
             if (ich > -1) {
                 line = line.substring(0, ich);
             }
             if (line.contains("getParam")) {
-                lastLine = i + 1;
+                lastLine = i;
             } else if (line.contains("setScriptTitle")) {
-                lastLine = i + 1;
+                lastLine = i;
             } else if (line.contains("setScriptDescription")) {
-                lastLine = i + 1;
+                lastLine = i;
             } else if (line.contains("setScriptLabel")) {
-                lastLine = i + 1;
+                lastLine = i;
             } else if (line.contains("setScriptIcon")) {
-                lastLine = i + 1;
+                lastLine = i;
             }
             if ( line.contains("'''") ) {
                 if ( withinTripleQuote ) {
                     if ( !Character.isWhitespace(line.charAt(0)) ) {
-                        lastLine = i + 1;
+                        lastLine = i;
                     }
                 }
                 if ( withinTripleQuote ) {
