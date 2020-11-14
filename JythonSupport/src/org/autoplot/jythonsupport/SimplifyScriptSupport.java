@@ -53,7 +53,8 @@ public class SimplifyScriptSupport {
      * @see #simplifyScriptToCompletions(java.lang.String) 
      */
     public static String removeSideEffects( String script ) {
-         String[] ss= script.split("\n");
+         String[] ss= JythonUtil.splitCodeIntoLines( "# simplifyScriptToGetCompletions", script );
+
          String lastLine= ss[ss.length-1].trim();
          if ( lastLine.endsWith(":") ) {
              ss= Arrays.copyOf(ss,ss.length-1);
@@ -61,7 +62,7 @@ public class SimplifyScriptSupport {
          }
          Module n= (Module)org.python.core.parser.parse( script, "exec" );
          HashSet variableNames= new HashSet();
-         int ilastLine= ss.length;
+         int ilastLine= ss.length-1;
          return simplifyScriptToGetCompletions( ss, n.body, variableNames, 1, ilastLine, 0 );
     }
     
@@ -89,10 +90,7 @@ public class SimplifyScriptSupport {
          
          if ( script.trim().length()==0 ) return script;
          
-         String[] ss1= (script).split("\n");
-         String[] ss= new String[ss1.length+1];
-         ss[0]= "# simplifyScriptToGetCompletions";
-         System.arraycopy( ss1, 0, ss, 1, ss1.length );
+         String[] ss= JythonUtil.splitCodeIntoLines( "# simplifyScriptToGetCompletions", script );
          
          int lastLine= ss.length-1;
          

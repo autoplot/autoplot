@@ -1026,6 +1026,24 @@ public class JythonUtil {
         result.append(line);
         return result;
     }
+    
+    /**
+     * one-stop place for splitting a script into lines for simplifyScriptToGetParams
+     * This was all motivated by a busy number of lineNumber-1's in the code
+     * that would handle the refactorings.
+     * @param zerothLine the line to use for the first element in the array.
+     * @param script
+     * @return the script with the first line of the script in array[1].
+     * @see #simplifyScriptToGetParams(java.lang.String[], org.python.parser.ast.stmtType[], java.util.HashSet, int, int, int) 
+     * @see SimplifyScriptSupport#simplifyScriptToGetCompletions(java.lang.String[], org.python.parser.ast.stmtType[], java.util.HashSet, int, int, int) 
+     */
+    public static String[] splitCodeIntoLines( String zerothLine, String script ) {
+        String[] ss1= script.split("\n");
+        String[] ss= new String[ss1.length+1];
+        ss[0]= zerothLine;
+        System.arraycopy( ss1, 0, ss, 1, ss1.length );
+        return ss;
+    }
 
     /**
      * Extracts the parts of the program that get parameters or take a trivial
