@@ -9,7 +9,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Formatter;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import javax.swing.DefaultComboBoxModel;
 import org.das2.graph.Renderer;
@@ -89,7 +91,7 @@ public final class ContourStylePanel extends javax.swing.JPanel implements PlotS
         Map<String,String> controls= new LinkedHashMap();
         controls.put( ContoursRenderer.CONTROL_KEY_LEVELS, levelsTextField.getText() );
         controls.put( ContoursRenderer.CONTROL_KEY_LABELS, Renderer.encodeBooleanControl( drawLabelsCheckBox.isSelected() ) );
-        controls.put( Renderer.CONTROL_KEY_LINE_THICK, String.format("%.1f",lineThickSpinner.getValue()) );
+        controls.put( Renderer.CONTROL_KEY_LINE_THICK, new Formatter().format( Locale.US, "%.1f",lineThickSpinner.getValue()).toString() );
         controls.put( ContoursRenderer.CONTROL_KEY_LABEL_CADENCE, labelCadenceComboBox.getSelectedItem().toString() );
         controls.put( Renderer.CONTROL_KEY_COLOR, Renderer.encodeColorControl( (Color)colorEditor1.getValue() ) );
         controls.put( ContoursRenderer.CONTROL_KEY_FORMAT, formatComboBox.getSelectedItem().toString() );

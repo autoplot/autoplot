@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Formatter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -595,7 +596,8 @@ public class StatePersistence {
                             InputStream xsl = StatePersistence.class.getResourceAsStream(fname);
                             if ( xsl==null ) {                            
                                 // Unable to find the file 'fname'
-                                throw new RuntimeException("Unable to read .vap file version "+String.format("%.2f",srcVersion)+".  Upgrade to a newer version of Autoplot.");
+                                String vv= new Formatter().format( Locale.US, "%.2f",srcVersion ).toString() ;
+                                throw new RuntimeException("Unable to read .vap file version "+vv+".  Upgrade to a newer version of Autoplot.");
                             }
                             TransformerFactory factory = TransformerFactory.newInstance();
                             Transformer tr = factory.newTransformer(new StreamSource(xsl));
