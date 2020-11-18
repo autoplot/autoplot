@@ -269,8 +269,10 @@ public class PlotElementController extends DomNodeController {
     };
     
     private void resetRenderTypeImp( RenderType oldRenderType, RenderType newRenderType ) {
+        logger.entering( "PlotElementController", "resetRenderTypeImp", new Object[] { oldRenderType, newRenderType } );
         PlotElement parentEle= getParentPlotElement();
         if (parentEle != null) {
+            logger.finest("parentEle!=null branch");
             if ( parentEle.getRenderType().equals(newRenderType) ) {
                 if ( plotElement.getPlotId().length()>0 ) {  //https://sourceforge.net/p/autoplot/bugs/1038/
                     doResetRenderTypeInt(newRenderType);
@@ -281,6 +283,7 @@ public class PlotElementController extends DomNodeController {
             }
         } else {
             if ( axisDimensionsChange(oldRenderType, newRenderType) ) {
+                logger.finest("axisDimensionsChange branch");
                 resetRanges= true;
                 if ( plotElement.getComponent().equals("") ) {
                     resetPlotElement(getDataSourceFilter().getController().getFillDataSet(), plotElement.getRenderType(), "");
@@ -296,11 +299,13 @@ public class PlotElementController extends DomNodeController {
                 }
                 updateDataSet();
             } else {
+                logger.finest("axis dimensions don't change, just reset render type.");
                 doResetRenderType(newRenderType);
                 updateDataSet();
             }
             setResetPlotElement(false);
         }
+        logger.exiting("PlotElementController", "resetRenderTypeImp" );
     }
 
     PropertyChangeListener parentComponentListener= new PropertyChangeListener() {
@@ -1181,13 +1186,17 @@ public class PlotElementController extends DomNodeController {
         } else if ( newRenderType==RenderType.spectrogram || newRenderType==RenderType.nnSpectrogram ) {
             return true;
         } else {
-            if ( oldRenderType==RenderType.spectrogram || oldRenderType==RenderType.nnSpectrogram ) {
-                return true;
+            if ( newRenderType==RenderType.eventsBar ) {
+                return false;
             } else {
-                if ( oldRenderType==RenderType.scatter || oldRenderType==RenderType.series ) {
+                if ( oldRenderType==RenderType.spectrogram || oldRenderType==RenderType.nnSpectrogram ) {
                     return true;
                 } else {
-                    return false;
+                    if ( oldRenderType==RenderType.scatter || oldRenderType==RenderType.series ) {
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
             }
         }
