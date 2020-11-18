@@ -46,10 +46,12 @@ public final class JLinkyLabel extends JLabel {
         return new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                try {
-                    Desktop.getDesktop().browse( uri );
-                } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                if ( uri!=null ) {
+                    try {
+                        Desktop.getDesktop().browse( uri );
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
                 }
             }
 
@@ -65,12 +67,18 @@ public final class JLinkyLabel extends JLabel {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                JLinkyLabel.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                if ( uri!=null ) {
+                    JLinkyLabel.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    setToolTipText( uri.toString() );
+                }
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                JLinkyLabel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                if ( uri!=null ) {
+                    JLinkyLabel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    setToolTipText( null );
+                }
             }
             
         };
