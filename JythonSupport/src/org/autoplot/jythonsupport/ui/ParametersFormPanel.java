@@ -48,6 +48,7 @@ import org.autoplot.jythonsupport.JythonUtil.Param;
 import static org.autoplot.jythonsupport.ui.Util.getParams;
 import org.das2.util.ColorUtil;
 import java.awt.Color;
+import java.net.URL;
 import javax.swing.JColorChooser;
 import org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor;
 
@@ -314,7 +315,12 @@ public class ParametersFormPanel {
                 hasMeta= true;
             }
             if ( sd.getDescription().length()>0 ) {
-                paramsPanel.add( new JLabel("<html><div width=600>"+sd.getDescription()+"</div></html>") );
+                Object opwd= env.get("PWD");
+                URL context= null;
+                if ( opwd!=null ) {
+                    context= new URL( String.valueOf( opwd ) );
+                }
+                paramsPanel.add( new JLinkyLabel( context,"<html><div width=600>"+sd.getDescription()+"</div></html>") );
                 hasMeta= true;
             }
             if ( !hasMeta ) {
