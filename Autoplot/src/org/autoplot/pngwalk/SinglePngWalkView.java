@@ -32,7 +32,7 @@ import org.das2.qds.QDataSet;
  * An implementation of PngWalkView to display a single image.
  * @author Ed Jackson
  */
-public class SinglePngWalkView extends PngWalkView {
+public final class SinglePngWalkView extends PngWalkView {
 
 //    private boolean sizeValid = false;
     private transient BufferedImage cacheImage;
@@ -46,7 +46,13 @@ public class SinglePngWalkView extends PngWalkView {
     transient ClickDigitizer clickDigitizer;
     int clickDigitizerSelect= -1;
     
+    private PngWalkTool viewer=null;
+    
     public SinglePngWalkView(WalkImageSequence s) {
+        this( s, null );
+    }    
+    
+    public SinglePngWalkView(WalkImageSequence s, PngWalkTool viewer ) {
         super(s);
         clickDigitizer= new ClickDigitizer( this );
         
@@ -184,8 +190,19 @@ public class SinglePngWalkView extends PngWalkView {
         addMouseListener( ma );
         addMouseMotionListener( ma );
         this.setPreferredSize( new Dimension(300,300) );  
+        
+        setViewer( viewer );
     }
     
+    /**
+     * set the pngwalkTool using this view.
+     * @param viewer 
+     */
+    protected void setViewer( PngWalkTool viewer ) {
+        this.viewer= viewer;
+        this.clickDigitizer.setViewer(viewer);
+    }
+       
     /**
      * return the position in the image's coordinates.
      * @param x the x location in the component.
@@ -331,11 +348,20 @@ public class SinglePngWalkView extends PngWalkView {
                 Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        
+        if ( viewer!=null && i!=null ) {
+                Rectangle lrect= imageLocation;
+                if ( imageLocation==null ) return;
+                int w= i.getWidth();
+                double factor = (double) lrect.getWidth() / (double) w;
+                AffineTransform at1= AffineTransform.getTranslateInstance( lrect.x, lrect.y );
+                at1.scale(factor, factor);
+                g2.transform(at1);
+                viewer.decorators.forEach((p) -> {
+                    p.paint(g2);
+                });
 
-        //if ( imageLocation!=null ) {
-        //    imageLocation= transformRect(imageLocation);
-        //    System.err.println("234: " + imageLocation);
-        //}
+        }
         
     }
 }

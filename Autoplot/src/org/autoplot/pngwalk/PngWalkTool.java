@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -141,6 +142,7 @@ import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.Plot;
+import org.das2.graph.Painter;
 import org.xml.sax.SAXException;
 
 /**
@@ -1114,13 +1116,11 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
         views[0]= new GridPngWalkView( null );
         views[1]= new RowPngWalkView( null );
-        views[2]= new SinglePngWalkView( null );
-        views[3]= new SinglePngWalkView( null );
+        views[2]= new SinglePngWalkView( null, this );
+        views[3]= new SinglePngWalkView( null, this );
         views[4]= new CoversWalkView( null );
-        views[5]= new SinglePngWalkView( null );
+        views[5]= new SinglePngWalkView( null, this );
         views[6]= new ContextFlowView(null);
-        
-        ((SinglePngWalkView)views[2]).clickDigitizer.setViewer(this);
         
         final int SCROLLBAR_HEIGHT = (int) Math.round( new JScrollPane().getHorizontalScrollBar().getPreferredSize().getHeight() );
 
@@ -1823,6 +1823,46 @@ public final class PngWalkTool extends javax.swing.JPanel {
         this.revalidate();
     }
     
+    List<Painter> decorators= new LinkedList<>();
+    
+    /**
+     * add a decorator to the PngWalkTool, which is drawn on single-image
+     * views.  Note this is draw in the coordinate system of the image, pixel
+     * coordinates with the origin (0,0) at the top left.
+     * @param p 
+     */
+    public void addTopDecorator( Painter p ) {
+        if ( !decorators.contains(p) ) {
+            decorators.add( p );
+        }
+        repaint();
+    }
+    
+    /**
+     * remove a decorator to the PngWalkTool, which is drawn on single-image
+     * views.  If the decorator is not found, no error is thrown.
+     * @param p 
+     */
+    public void removeTopDecorator( Painter p ) {
+        decorators.remove( p );
+        repaint();
+    }
+    
+    /**
+     * remove all decorators from the PngWalkTool.
+     */
+    public void removeTopDecorators() {
+        decorators.clear( );
+        repaint();
+    }
+    
+    /**
+     * returns true if there are any top decorators.
+     * @return true if there are any decorators.
+     */
+    public boolean hasTopDecorators() {
+        return ! decorators.isEmpty();
+    }
     /**
      * set a new component for the bottom left panel, where by default the 
      * navigation panel resides.
