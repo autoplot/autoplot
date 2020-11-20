@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Apache Math Bisection Solver used to find zero-crossing in <a href="https://github.com/autoplot/dev/blob/master/demos/2020/20201030/findZeroCrossingInFunction.jy">this script</a>.
+        <p><small>New work on rfe501 allows more <a href='https://github.com/autoplot/dev/tree/master/demos/2020/20201119'>customized applications</a> to be build on the PNG Walk Tool.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,7 @@
         
         <p>Bugfixes (2020-11-14 r25311):</p>
         <ul>
+            <li>2305: doAxisDimensionsChange returned false, causing reset which resulted in using old dataset for axis labels.
             <li>1636: corrections to Jython code refactoring (simplification of script to get params or for completions) after it was discovered that test server was failing to notify.  Simplification of codes.
             <li>2304: Another round of localization checks is needed, das2server check.  Thanks, Corentin!
             <li>2303: histogram filter didn't properly handle decimal arguments.
@@ -66,6 +67,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe501: allow custom mouse event handler and topDecorator to be added to the PNGWalkTool.
+            <li>rfe704: setScriptDescription can have a clickable link.
             <li>referenceX and referenceY allow list of datums to point at or mark with symbol in annotations.
             <li>anchorBackground property allows regions to be highlighted in annotations.
             <li>rfe734: bundle URI keyword for ASCII files should return bundle descriptor
