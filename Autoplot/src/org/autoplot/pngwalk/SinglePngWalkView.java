@@ -58,15 +58,12 @@ public final class SinglePngWalkView extends PngWalkView {
         
         setShowCaptions(true);
         
-        addMouseWheelListener( new MouseWheelListener() {
-            @Override
-            public void mouseWheelMoved(MouseWheelEvent e) {
-                if ( ( e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK )==KeyEvent.CTRL_DOWN_MASK ) {
-                    affineTransform.scale( 1-(.04*e.getWheelRotation()), 1-(.04*e.getWheelRotation()) );
-                    repaint();
-                } else {
-                    delegate.mouseWheelMoved(e);
-                }
+        addMouseWheelListener((MouseWheelEvent e) -> {
+            if ( ( e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK )==KeyEvent.CTRL_DOWN_MASK ) {
+                affineTransform.scale( 1-(.04*e.getWheelRotation()), 1-(.04*e.getWheelRotation()) );
+                SinglePngWalkView.this.repaint();
+            } else {
+                delegate.mouseWheelMoved(e);
             }
         });
         
@@ -79,7 +76,7 @@ public final class SinglePngWalkView extends PngWalkView {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             affineTransform= new AffineTransform();
-                            repaint();
+                            SinglePngWalkView.this.repaint();
                         }
                     } ) );
                     m.show(e.getComponent(),e.getX(), e.getY());
@@ -94,7 +91,7 @@ public final class SinglePngWalkView extends PngWalkView {
                     MouseEvent ep= new MouseEvent( e.getComponent(), e.getID(), e.getWhen(), e.getModifiers(), p.x, p.y, e.getClickCount(), e.isPopupTrigger(), e.getButton() );
                     ep.setSource(img);
                     ma.mousePressed( ep );
-                    repaint();
+                    SinglePngWalkView.this.repaint();
                     return;
                 }
                 if ( ( e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK ) == KeyEvent.CTRL_DOWN_MASK ) {
@@ -144,7 +141,7 @@ public final class SinglePngWalkView extends PngWalkView {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             affineTransform= new AffineTransform();
-                            repaint();
+                            SinglePngWalkView.this.repaint();
                         }
                     } ) );
                     m.show(e.getComponent(),e.getX(), e.getY());
@@ -158,7 +155,7 @@ public final class SinglePngWalkView extends PngWalkView {
                     MouseEvent ep= new MouseEvent( e.getComponent(), e.getID(), e.getWhen(), e.getModifiers(), p.x, p.y, e.getClickCount(), e.isPopupTrigger(), e.getButton() );
                     ep.setSource(img);
                     ma.mouseReleased( ep );
-                    repaint();
+                    SinglePngWalkView.this.repaint();
                     return;
                 }
                 
@@ -203,7 +200,7 @@ public final class SinglePngWalkView extends PngWalkView {
                         affineTransform.translate( (p.x-mousePressPoint.x) / affineTransform.getScaleX(),
                             ( p.y-mousePressPoint.y ) / affineTransform.getScaleY() );
                         mousePressPoint= p;
-                        repaint();
+                        SinglePngWalkView.this.repaint();
                     }
                 }
                 Point p= getImagePosition( e.getX(), e.getY() );
@@ -213,7 +210,7 @@ public final class SinglePngWalkView extends PngWalkView {
                     MouseEvent ep= new MouseEvent( e.getComponent(), e.getID(), e.getWhen(), e.getModifiers(), p.x, p.y, e.getClickCount(), e.isPopupTrigger(), e.getButton() );
                     ep.setSource(img);
                     ma.mouseDragged(ep );
-                    repaint();
+                    SinglePngWalkView.this.repaint();
                 }
             }
             
