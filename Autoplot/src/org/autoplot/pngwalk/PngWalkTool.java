@@ -1567,6 +1567,24 @@ public final class PngWalkTool extends javax.swing.JPanel {
         firePropertyChange(PROP_MOUSERELEASELOCATION, oldMouseReleaseLocation, mouseReleaseLocation);
     }
 
+    private MouseAdapter imageMouseAdapter = null;
+
+    public static final String PROP_IMAGEMOUSEADAPTER = "imageMouseAdapter";
+
+    public MouseAdapter getImageMouseAdapter() {
+        return imageMouseAdapter;
+    }
+
+    /**
+     * add a mouse event handler, which will get events in the coordinate frame
+     * of the image.  This can be set to null to clear the adapter.
+     * @param imageMouseAdapter 
+     */
+    public void setImageMouseAdapter(MouseAdapter imageMouseAdapter) {
+        MouseAdapter oldImageMouseAdapter = this.imageMouseAdapter;
+        this.imageMouseAdapter = imageMouseAdapter;
+        firePropertyChange(PROP_IMAGEMOUSEADAPTER, oldImageMouseAdapter, imageMouseAdapter);
+    }
 
     transient PropertyChangeListener seqTimeRangeListener= new PropertyChangeListener() {
         @Override

@@ -86,13 +86,22 @@ public final class SinglePngWalkView extends PngWalkView {
                     return;
                 }
                 mousePressPoint= e.getPoint();
+                Point p= getImagePosition( e.getX(), e.getY() );
+                
+                MouseAdapter ma= viewer!=null ? viewer.getImageMouseAdapter() : null;
+                if ( ma!=null ) {
+                    String img= seq.getSelectedName();
+                    MouseEvent ep= new MouseEvent( e.getComponent(), e.getID(), e.getWhen(), e.getModifiers(), p.x, p.y, e.getClickCount(), e.isPopupTrigger(), e.getButton() );
+                    ep.setSource(img);
+                    ma.mousePressed( ep );
+                    return;
+                }
                 if ( ( e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK ) == KeyEvent.CTRL_DOWN_MASK ) {
                     return;
                 }
                 if ( e.getButton()!=MouseEvent.BUTTON1 ) {
                     return;
                 }
-                Point p= getImagePosition( e.getX(), e.getY() );
                 if ( p!=null ) try {
                     clickDigitizerSelect= clickDigitizer.maybeSelect(p);
                 } catch (IOException | ParseException ex) {
@@ -120,7 +129,9 @@ public final class SinglePngWalkView extends PngWalkView {
                         Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                
+                if ( viewer!=null && p!=null ) {
+                    viewer.firePropertyChange( PngWalkTool.PROP_MOUSEPRESSLOCATION, null, p );
+                }
             }
 
             @Override
@@ -138,6 +149,17 @@ public final class SinglePngWalkView extends PngWalkView {
                     m.show(e.getComponent(),e.getX(), e.getY());
                     return;
                 }
+                
+                Point p= getImagePosition( e.getX(), e.getY() );
+                MouseAdapter ma= viewer!=null ? viewer.getImageMouseAdapter() : null;
+                if ( ma!=null ) {
+                    String img= seq.getSelectedName();
+                    MouseEvent ep= new MouseEvent( e.getComponent(), e.getID(), e.getWhen(), e.getModifiers(), p.x, p.y, e.getClickCount(), e.isPopupTrigger(), e.getButton() );
+                    ep.setSource(img);
+                    ma.mouseReleased( ep );
+                    return;
+                }
+                
                 if ( e.getButton()!=MouseEvent.BUTTON1 ) {
                     return;
                 }                
@@ -182,9 +204,15 @@ public final class SinglePngWalkView extends PngWalkView {
                         repaint();
                     }
                 }
+                Point p= getImagePosition( e.getX(), e.getY() );
+                MouseAdapter ma= viewer!=null ? viewer.getImageMouseAdapter() : null;
+                if ( ma!=null ) {
+                    String img= seq.getSelectedName();
+                    MouseEvent ep= new MouseEvent( e.getComponent(), e.getID(), e.getWhen(), e.getModifiers(), p.x, p.y, e.getClickCount(), e.isPopupTrigger(), e.getButton() );
+                    ep.setSource(img);
+                    ma.mouseDragged(ep );
+                }
             }
-            
-            
             
         };
         addMouseListener( ma );
