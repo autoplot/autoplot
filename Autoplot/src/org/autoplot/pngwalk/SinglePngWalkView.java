@@ -94,6 +94,7 @@ public final class SinglePngWalkView extends PngWalkView {
                     MouseEvent ep= new MouseEvent( e.getComponent(), e.getID(), e.getWhen(), e.getModifiers(), p.x, p.y, e.getClickCount(), e.isPopupTrigger(), e.getButton() );
                     ep.setSource(img);
                     ma.mousePressed( ep );
+                    repaint();
                     return;
                 }
                 if ( ( e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK ) == KeyEvent.CTRL_DOWN_MASK ) {
@@ -157,6 +158,7 @@ public final class SinglePngWalkView extends PngWalkView {
                     MouseEvent ep= new MouseEvent( e.getComponent(), e.getID(), e.getWhen(), e.getModifiers(), p.x, p.y, e.getClickCount(), e.isPopupTrigger(), e.getButton() );
                     ep.setSource(img);
                     ma.mouseReleased( ep );
+                    repaint();
                     return;
                 }
                 
@@ -211,6 +213,7 @@ public final class SinglePngWalkView extends PngWalkView {
                     MouseEvent ep= new MouseEvent( e.getComponent(), e.getID(), e.getWhen(), e.getModifiers(), p.x, p.y, e.getClickCount(), e.isPopupTrigger(), e.getButton() );
                     ep.setSource(img);
                     ma.mouseDragged(ep );
+                    repaint();
                 }
             }
             
