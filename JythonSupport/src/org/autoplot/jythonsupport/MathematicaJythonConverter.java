@@ -7,6 +7,8 @@ import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
@@ -193,26 +195,83 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String m= mathematicaEditorPane.getText();
+        String jython= convertMathematicaToJython(m);
+        jythonEditorPane.setText(jython);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    /**
+     * Sqrt[(-(1836/(fce-fr))+1/(fci+fr))/fr]
+     * @param sb the output
+     * @param stack the stack of unhandled tokens
+     * @param t the next token
+     * @return true if the token has been handled.
+     */
+    private static boolean checkPop(StringBuilder sb, Stack<String> stack, String t) {
+        if ( !stack.empty() ) {
+            String s= stack.peek();
+            if ( t.equals("]") ) {
+                List<String> ss= new LinkedList<>();
+                ss.add(t);
+                while ( stack.size()>0 && !s.equals("[") ) {
+                    s= stack.pop();
+                    ss.add(0,s);
+                }
+                if ( !s.equals("[") ) {
+                    throw new IllegalArgumentException("opening bracket ([) not found");
+                }
+                if ( ss.size()==3 && ss.get(1).equals("Sqrt") ) {
+                    sb.append("sqrt");
+                } else {
+                    for ( String ss1: ss ) {
+                        char c= ss1.charAt(0);
+                        switch (c) {
+                            case '[':
+                                sb.append('(');
+                                break;
+                            case ']':
+                                sb.append(')');
+                                break;
+                            default:
+                                sb.append(ss1);
+                                break;
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+    
+        
+    /**
+     * quick-n-dirty converter for converting Mathematica code to Jython code.
+     * @param m
+     * @return 
+     */
+    public static String convertMathematicaToJython(String m) {
         int assign= m.indexOf("->");
         if ( assign>-1 ) {
             m= m.substring(0,assign)+"=" + m.substring(assign+2);
         }
-
         m= m.replaceAll("\\\\\\[", "[");
-        
         StringTokenizer st= new StringTokenizer( m, "{-> (/[]+-^=)}", true );
-        
         Stack<String> stack= new Stack();
-        
         StringBuilder sb= new StringBuilder();
-        
         boolean lastNameOrConstant= false;
-        
         String lastToken="";
         Pattern intPattern= Pattern.compile("\\d+");
-        
         while ( st.hasMoreTokens() ) {
             String t= st.nextToken();
+            if ( checkPop( sb, stack, t ) ) {
+                continue;
+            }
+            
+            if ( stack.size()>0 ) {
+                stack.add(t);
+                continue;
+            }
+            
             if ( t.equals(" ") ) {
                 if ( !lastNameOrConstant ) {
                     sb.append(t);
@@ -242,10 +301,14 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
                         sb.append('(').append(lastt).append(')');
                         lastNameOrConstant= true;
                     }
+                } else {
+                    sb.append(")");
                 }
             } else if ( t.equals("(") ) {
                 if ( lastToken.equals(")") ) {
                     sb.append(" * ");
+                } else if ( lastToken.equals("[") ) {
+                    sb.append("(");
                 } else if ( lastNameOrConstant ) {
                     sb.append("* ");
                 }
@@ -281,7 +344,7 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
                         sb.append(t).append(".");
                     } else {
                         sb.append(t);
-                    } 
+                    }
                     lastNameOrConstant= true;
                 }
             } else {
@@ -303,10 +366,9 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
             //System.out.print( t );
             lastToken= t;
         }
-
         String jython= sb.toString();
-        jythonEditorPane.setText(jython);
-    }//GEN-LAST:event_jButton1ActionPerformed
+        return jython;
+    }
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -347,6 +409,8 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
 "                408 fci^3 + 1834 fce fpe^2 - 3671 fci fpe^2)^2))^(\n" +
 "       1/3))}";
         
+        String src3= "{fpe->(6 Sqrt[51])/Sqrt[(-(1836/(fce-fr))+1/(fci+fr))/fr]}";
+        
         String src= src2;
         
         cc.mathematicaEditorPane.setText(src);
@@ -378,4 +442,5 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
     public void setJavaSource(String doThis) {
         mathematicaEditorPane.setText(doThis);
     }
+
 }
