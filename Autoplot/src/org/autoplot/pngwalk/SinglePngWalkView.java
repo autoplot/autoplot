@@ -87,9 +87,8 @@ public final class SinglePngWalkView extends PngWalkView {
                 
                 MouseAdapter ma= viewer!=null ? viewer.getImageMouseAdapter() : null;
                 if ( ma!=null ) {
-                    String img= seq.getSelectedName();
                     MouseEvent ep= new MouseEvent( e.getComponent(), e.getID(), e.getWhen(), e.getModifiers(), p.x, p.y, e.getClickCount(), e.isPopupTrigger(), e.getButton() );
-                    ep.setSource(img);
+                    ep.setSource(SinglePngWalkView.this);
                     ma.mousePressed( ep );
                     SinglePngWalkView.this.repaint();
                     return;
@@ -151,9 +150,8 @@ public final class SinglePngWalkView extends PngWalkView {
                 Point p= getImagePosition( e.getX(), e.getY() );
                 MouseAdapter ma= viewer!=null ? viewer.getImageMouseAdapter() : null;
                 if ( ma!=null ) {
-                    String img= seq.getSelectedName();
                     MouseEvent ep= new MouseEvent( e.getComponent(), e.getID(), e.getWhen(), e.getModifiers(), p.x, p.y, e.getClickCount(), e.isPopupTrigger(), e.getButton() );
-                    ep.setSource(img);
+                    ep.setSource(SinglePngWalkView.this);
                     ma.mouseReleased( ep );
                     SinglePngWalkView.this.repaint();
                     return;
@@ -220,6 +218,14 @@ public final class SinglePngWalkView extends PngWalkView {
         this.setPreferredSize( new Dimension(300,300) );  
         
         setViewer( viewer );
+    }
+    
+    /**
+     * return the digitizer for the images.
+     * @return the digitizer for the images.
+     */
+    public ClickDigitizer getClickDigitizer() {
+        return this.clickDigitizer;
     }
     
     /**
