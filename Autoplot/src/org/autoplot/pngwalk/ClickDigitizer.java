@@ -83,6 +83,53 @@ public class ClickDigitizer {
         return null;
     }
     
+//    /**
+//     * invTransform from data space to pixel space.
+//     * returns rank 0 datum, with SCALE_TYPE and LABEL set.
+//     * @param axis the axis
+//     * @param d the data location
+//     * @param smaller the location of the smaller pixel row/column (e.g. "top" or "right" )
+//     * @param bigger the location of the bigger pixel row/column (e.g. "bottom" or "left" )
+//     * @return rank 0 dataset containing the point, and labels and scale type.
+//     */
+//    private QDataSet invInverseTransform( JSONObject axis, QDataSet d, String smaller, String bigger ) throws JSONException, ParseException {
+//        boolean log= axis.get("type").equals("log");
+//        DatumRange range;
+//
+//        if ( "UTC".equals( axis.getString("units") ) ) {
+//            range= DatumRangeUtil.parseISO8601Range( axis.getString("min")+"/"+axis.getString("max") );
+//
+//        } else {
+//            String sunits;
+//            sunits= axis.getString("units"); 
+//            Units units= Units.lookupUnits(sunits);
+//            range= new DatumRange(units.parse(axis.getString("min")),
+//                  units.parse(axis.getString("max")) );
+//            
+//        }
+//        
+//        DatumRangeUtil.rescaleInverse( range, d )
+//        
+//        double nn= ( ( p + 0.5 ) - axis.getInt(smaller) ) / ((double) ( axis.getInt(bigger) - axis.getInt(smaller) ) );
+//        
+//        Datum result;
+//        if ( log ) {
+//            DatumRange rr= DatumRangeUtil.rescaleLog( range, nn, nn );
+//            result= rr.min();
+//        } else {
+//            DatumRange rr= DatumRangeUtil.rescale( range, nn, nn );
+//            result= rr.min();            
+//        }
+//        QDataSet r= DataSetUtil.asDataSet(result);
+//        r= Ops.putProperty( r, QDataSet.LABEL, axis.getString("label") );
+//        r= Ops.putProperty( r, QDataSet.SCALE_TYPE, log ? "log" : "linear" );
+//        
+//        return r;
+//        
+//        
+//    }
+//    
+
     /**
      * invTransform from pixel space to data space.
      * returns rank 0 datum, with SCALE_TYPE and LABEL set.
@@ -263,6 +310,46 @@ public class ClickDigitizer {
     }
 
     /**
+     * return the coordinates for the click in data coordinates if the JSON
+     * Rich PNG metadata is available, or just the pixel coordinates if it
+     * is not.  The dataset returned will have the property PlotNumber which
+     * will be an integer equal -1 if the rich png metadata is not found,
+     * or zero or positive int for valid clicks.
+     * @param x
+     * @param y
+     * @return null or 
+     * @throws IOException
+     * @throws ParseException 
+     */
+    public QDataSet pixelToDataTransform( int x, int y ) throws IOException, ParseException {
+        if ( view==null ) {
+            throw new IllegalArgumentException("view is not attached");
+        }
+        URI uri= view.seq.imageAt( view.seq.getIndex() ).getUri();
+        File file = DataSetURI.getFile( uri, new AlertNullProgressMonitor("get image file") ); // assume it's local.
+        String json= ImageUtil.getJSONMetadata( file );
+        return doTransformPoint( json, x, y );
+    }
+    
+    /**
+     * return the pixel coordinates for a given data coordinates.
+     * @param iplot the plot number
+     * @param p bundle of x and y data coordinates.
+     * @return int[2] for the x and y pixel coordinates (0,0 is upper left).
+     * @throws IOException
+     * @throws ParseException 
+     */
+    public int[] dataToPixelTransform( int iplot, QDataSet p ) throws IOException, ParseException {
+        if ( view==null ) {
+            throw new IllegalArgumentException("view is not attached");
+        }
+        URI uri= view.seq.imageAt( view.seq.getIndex() ).getUri();
+        File file = DataSetURI.getFile( uri, new AlertNullProgressMonitor("get image file") ); // assume it's local.
+        String json= ImageUtil.getJSONMetadata( file );
+        return doInvTransformPoint( json, iplot, p );
+    }
+    
+    /**
      * 
      * @param json null or the JSON
      * @param x x in the canvas frame.
@@ -283,7 +370,13 @@ public class ClickDigitizer {
                     QDataSet xx= invTransform( xaxis, x, "left", "right" );
                     JSONObject yaxis= plot.getJSONObject("yaxis");
                     QDataSet yy= invTransform( yaxis, y, "bottom", "top" );
-                    return Ops.bundle( xx, yy );
+                    QDataSet result= Ops.bundle( xx, yy );
+                    for ( int i=0; i<plots.length(); i++ ) {
+                        if ( plots.getJSONObject(i)==plot ) {
+                            result= Ops.putProperty( result, "PlotNumber",  i );
+                        }
+                    }
+                    return result;
                 } else {
                     return null;
                 }
@@ -292,13 +385,56 @@ public class ClickDigitizer {
                 int h= view.seq.imageAt( view.seq.getIndex() ).getImage().getHeight();
                 Datum xx= Units.dimensionless.createDatum(x);
                 Datum yy= Units.dimensionless.createDatum(h-y);
-                return  Ops.bundle( Ops.dataset(xx), Ops.dataset(yy) );
+                QDataSet result= Ops.bundle( Ops.dataset(xx), Ops.dataset(yy) );
+                result= Ops.putProperty( result, "PlotNumber",  -1 );
+                return result;
              }
         } else {
             int h= view.seq.imageAt( view.seq.getIndex() ).getImage().getHeight();
             Datum xx= Units.dimensionless.createDatum(x);
             Datum yy= Units.dimensionless.createDatum(h-y);
             return Ops.bundle( Ops.dataset(xx), Ops.dataset(yy) );
+        }
+    }
+    
+    /**
+     * 
+     * @param json null or the JSON
+     * @param iplot the plot number
+     * @param x x in the canvas frame.
+     * @param y y in the canvas frame.
+     * @return rank 1 bundle x,y.
+     * @throws IOException
+     * @throws ParseException 
+     */
+    private int[] doInvTransformPoint( String json, int iplot, QDataSet ds ) throws IOException, ParseException {
+        if ( json!=null ) {
+            try {
+                JSONObject jo = new JSONObject( json );
+                JSONArray plots= jo.getJSONArray("plots");
+                Object o= ds.property("PlotNumber");
+                JSONObject plot= plots.getJSONObject(iplot);
+                if ( plot!=null ) {
+                    JSONObject xaxis= plot.getJSONObject("xaxis");
+                    int ii= transform1D( xaxis, Ops.datum(ds.slice(0)), "left", "right" );
+                    JSONObject yaxis= plot.getJSONObject("yaxis");
+                    int jj= transform1D( yaxis, Ops.datum(ds.slice(1)), "bottom", "top" );
+                    return new int[] { ii, jj };
+                } else {
+                    return null;
+                }
+             } catch (JSONException ex) {
+                Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
+                int h= view.seq.imageAt( view.seq.getIndex() ).getImage().getHeight();
+                Datum xx= Units.dimensionless.createDatum(ds.value(0));
+                Datum yy= Units.dimensionless.createDatum(h-ds.value(1));
+                return new int[] { (int)xx.value(), (int)yy.value() };
+             }
+        } else {
+            int h= view.seq.imageAt( view.seq.getIndex() ).getImage().getHeight();
+            Datum xx= Units.dimensionless.createDatum(ds.value(0));
+            Datum yy= Units.dimensionless.createDatum(h-ds.value(1));
+            return new int[] { (int)xx.value(), (int)yy.value() };
         }
     }
             
