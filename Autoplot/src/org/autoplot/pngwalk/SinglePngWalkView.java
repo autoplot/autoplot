@@ -126,9 +126,6 @@ public final class SinglePngWalkView extends PngWalkView {
                         Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                if ( viewer!=null && p!=null ) {
-                    viewer.firePropertyChange( PngWalkTool.PROP_MOUSEPRESSLOCATION, null, p );
-                }
             }
 
             @Override
