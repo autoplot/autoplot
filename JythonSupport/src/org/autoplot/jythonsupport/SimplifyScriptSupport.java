@@ -61,6 +61,15 @@ public class SimplifyScriptSupport {
              script= JythonUtil.join( ss, "\n" );
          }
          Module n= (Module)org.python.core.parser.parse( script, "exec" );
+         
+         if ( n.body[0].beginLine > n.beginLine ) {
+             logger.fine("shifting line numbers!");
+             int shift= n.body[0].beginLine - n.beginLine;
+             // strange bug here.
+             for ( stmtType s: n.body ) {
+                 s.beginLine-= shift;
+             }
+         }
          HashSet variableNames= new HashSet();
          int ilastLine= ss.length-1;
          return simplifyScriptToGetCompletions( ss, n.body, variableNames, 1, ilastLine, 0 );
@@ -174,7 +183,7 @@ public class SimplifyScriptSupport {
       */
      public static String getSourceForStatement( String[] ss, stmtType o ) {
          if ( o.beginLine==0 ) {
-             return "(bad line number";
+             return "(bad line number)";
          }
          String theLine= ss[o.beginLine];
          
