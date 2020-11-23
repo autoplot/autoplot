@@ -312,7 +312,8 @@ public class ClickDigitizer {
     /**
      * return the coordinates for the click in data coordinates if the JSON
      * Rich PNG metadata is available, or just the pixel coordinates if it
-     * is not.  The dataset returned will have the property PlotNumber which
+     * is not, with the property "PlotNumber" indicating which plot number
+     * in the JSON is used.  The property "PlotNumber" 
      * will be an integer equal -1 if the rich png metadata is not found,
      * or zero or positive int for valid clicks.
      * @param x
@@ -350,7 +351,7 @@ public class ClickDigitizer {
     }
     
     /**
-     * 
+     * "PlotNumber" will indicate which plot
      * @param json null or the JSON
      * @param x x in the canvas frame.
      * @param y y in the canvas frame.
