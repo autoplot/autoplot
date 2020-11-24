@@ -13,7 +13,6 @@ import org.python.parser.ast.If;
 import org.python.parser.ast.Module;
 import org.python.parser.ast.stmtType;
 import org.das2.util.LoggerManager;
-import org.python.core.PyJavaClass;
 import org.python.parser.SimpleNode;
 import org.python.parser.ast.Assert;
 import org.python.parser.ast.Assign;
