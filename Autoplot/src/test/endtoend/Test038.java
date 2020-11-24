@@ -29,6 +29,7 @@ import org.das2.jythoncompletion.CompletionSupport;
 import org.das2.jythoncompletion.JythonCompletionTask;
 import org.das2.jythoncompletion.ui.CompletionImpl;
 import org.das2.jythoncompletion.ui.CompletionResultSetImpl;
+import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
 import org.das2.util.filesystem.FileSystem;
@@ -178,10 +179,10 @@ public class Test038 {
         } else {
             throw new IllegalStateException("at least one of the tests failed.");
         }
-
+        System.exit(0);
     }
 
-    public static int[] getCompletionsCount( final String ss, int[] positions ) {
+    public static QDataSet getCompletionsCount( final String ss, int[] positions ) {
         
         final JTextArea tc=new JTextArea();
 
@@ -195,19 +196,31 @@ public class Test038 {
         final CompletionResultSetImpl rs= CompletionImpl.get().createTestResultSet(null,0);
         
         final DasProgressPanel mon=DasProgressPanel.createFramed("checking completions");
-
-        int[] result= new int[positions.length];
         
+        DataSetBuilder dsb= new DataSetBuilder(2,100,3);
         for ( int i=0; i<positions.length; i++ ) {
             
+            int ip= positions[i];
+            int irow,i0,icol;
             if ( mon.isCancelled() ) break;
-            tc.setCaretPosition(positions[i]);
 
+            tc.setCaretPosition(ip);
             try {
+                irow= tc.getLineOfOffset(ip);
+                i0= tc.getLineStartOffset(irow);
+            } catch (BadLocationException ex) {
+                Logger.getLogger(Test038.class.getName()).log(Level.SEVERE, null, ex);
+                continue;
+            }
+            
+            icol= ip-i0;
+            
+            try {
+                
                 CompletionContext cc= CompletionSupport.getCompletionContext(tc);
                 if ( cc!=null ) {
                     int count= jct.doQuery( cc, rs.getResultSet() );
-                    result[i]= count;
+                    dsb.nextRecord( new Object[] { irow+1,icol,count } );
                 }
             } catch ( Exception e ) {
                 e.printStackTrace();
@@ -218,12 +231,12 @@ public class Test038 {
                 //} catch (BadLocationException ex) {
                 //    Logger.getLogger(Test038.class.getName()).log(Level.SEVERE, null, ex);
                 //}
-                result[i]= -99;
+                dsb.nextRecord( new Object[] { irow+1,icol,-99 } );
             }
         }
         d.setVisible( false );
         d.dispose();
-        return result;
+        return dsb.getDataSet();
     }
 
     
@@ -244,13 +257,21 @@ public class Test038 {
             for ( int i=0; i<positions.length; i++ ) {
                 positions[i]= script.length()*i/positions.length;
             }
-            int[] rr= getCompletionsCount(script,positions);
+            QDataSet rr= getCompletionsCount(script,positions);
+            ScriptContext.formatDataSet( Ops.slice1(rr,0), "test038."+f.getName()+".cdf?linenum" );
+            ScriptContext.formatDataSet( Ops.slice1(rr,1), "test038."+f.getName()+".cdf?column&append=T" );
+            ScriptContext.formatDataSet( Ops.slice1(rr,2), "test038."+f.getName()+".cdf?count&append=T" );
             
-            ScriptContext.plot( Ops.dataset(rr) );
+            ScriptContext.plot( Ops.slice1(rr,0), Ops.slice1(rr,1), Ops.slice1(rr,2) );
+            
             ScriptContext.waitUntilIdle();
-            ScriptContext.setRenderStyle("fillToZero");
+            ScriptContext.setRenderStyle("digital");
+            ScriptContext.getDocumentModel().getPlotElements(0).setRenderControl("format=%d&fontSize=0.6em");
+            
             ScriptContext.getDocumentModel().getPlots(0).getYaxis().setRange( 
-                    DatumRange.newDatumRange( -99, 120, Units.dimensionless ) );
+                    DatumRange.newDatumRange( -1, 160, Units.dimensionless ) );
+            ScriptContext.getDocumentModel().getPlots(0).getXaxis().setLog(false);
+            
             ScriptContext.setTitle( "completions count for "+f.getName() );
             
             String fout= "test038_completions_"+f.getName()+".png";
