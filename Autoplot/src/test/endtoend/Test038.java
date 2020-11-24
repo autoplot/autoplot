@@ -92,96 +92,6 @@ public class Test038 {
 
     }
     
-    private static int doTestsGetParams( String testId, String file ) {
-        long t0= System.currentTimeMillis();
-        System.err.println("== test "+testId+": "+ file + " ==" );
-        
-        try {
-            String script= JythonUtil.readScript( new FileReader(file) );
-            String scrip= org.autoplot.jythonsupport.JythonUtil.simplifyScriptToGetParams(script,true);
-            File f= new File(file);
-            //String fout= "./test038_params_"+testId+"_"+f.getName();
-            String fout= "./test038_params_"+f.getName();
-            try (FileWriter fw = new FileWriter(fout)) {
-                fw.append(scrip);
-            }
-            List<Param> parms= org.autoplot.jythonsupport.JythonUtil.getGetParams( script );
-            for ( Param p: parms ) {
-                System.err.println(p);
-            }
-            System.err.println( String.format( "read params in %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
-            return 0;
-        } catch ( IOException | PyException ex ) {
-            ex.printStackTrace();
-            System.err.println( String.format( "failed within %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
-            return 1;
-        }
-
-    }
-    
-    /**
-     * this allows us to make a list of tests with an external file.
-     * @param f 
-     * @return 0 for all success, nonzero otherwise
-     */
-    public static int doTestMany( String f ) {
-        System.err.println("Reading tests from file: "+f);
-        int t=0;
-        try ( BufferedReader in= new BufferedReader( new FileReader(f) ) ) {
-            String s= in.readLine();
-            int i=s.indexOf("#");
-            if ( i>0 ) s= s.substring(0,i);
-            s= s.trim();
-            String[] ss= s.split(" ",-2);
-            if ( ss.length==2 ) {
-                t= Math.max( t, doTests( ss[0], ss[1] ) );
-            }
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Test038.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Test038.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return t;
-    }
-    
-    /**
-     * Autoplot reduces jython scripts to get not much more than the getParam calls so the
-     * script can be executed quickly.
-     */
-    public static int testGetParams() {
-        int t=0;
-        t= Math.max( t, doTests("009","/home/jbf/ct/hudson/script/test038/jydsCommentBug.jyds") );  // Chris has a newline before the closing ).
-        t= Math.max( t, doTests("010","/home/jbf/ct/hudson/script/test038/addPointDigitizer.jy") );
-        t= Math.max( t, doTests("002","/home/jbf/ct/hudson/script/test038/demoParms1.jy") );
-        t= Math.max( t, doTests("008","/home/jbf/ct/hudson/script/test038/jedi_l3_valid_tofxe_events.jyds") );
-        t= Math.max( t, doTests("000","/home/jbf/ct/hudson/script/test038/trivial.jy") );
-        t= Math.max( t, doTests("001","/home/jbf/ct/hudson/script/test038/demoParms0.jy") );
-        t= Math.max( t, doTests("002","/home/jbf/ct/hudson/script/test038/demoParms1.jy") );
-        t= Math.max( t, doTests("003","/home/jbf/ct/hudson/script/test038/demoParms.jy") );
-        t= Math.max( t, doTests("004","/home/jbf/ct/hudson/script/test038/rbsp/emfisis/background_removal_wfr.jyds") );
-        t= Math.max( t, doTests("005","/home/jbf/ct/hudson/script/test038/demoParms2.jy") );
-        t= Math.max( t, doTests("006","/home/jbf/ct/hudson/script/test038/fce_A.jyds") );
-        t= Math.max( t, doTests("007","/home/jbf/ct/hudson/script/test038/fce_A_2.jyds") );
-        t= Math.max( t, doTests("010","/home/jbf/ct/hudson/script/test038/addPointDigitizer.jy") );
-        t= Math.max( t, doTestMany("/home/jbf/ct/hudson/script/test038/test038.txt") );
-        return t;
-    }
-    
-    public static void main( String[] args ) throws IOException {
-    
-        long t0= System.currentTimeMillis();
-        PythonInterpreter interp= JythonUtil.createInterpreter(true);
-        interp.eval("1+2");
-        System.err.println( String.format( "== first initialize in %d millis\n", System.currentTimeMillis()-t0 ) );
-        
-        if ( testGetParams()==0 ) {
-            System.err.println("ALL OKAY!");
-        } else {
-            throw new IllegalStateException("at least one of the tests failed.");
-        }
-        System.exit(0);
-    }
-
     public static QDataSet getCompletionsCount( final String ss, int[] positions ) {
         
         final JTextArea tc=new JTextArea();
@@ -283,7 +193,96 @@ public class Test038 {
             System.err.println( String.format( "failed within %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
             return 1;
         }
-
+    }
+    
+    private static int doTestsGetParams( String testId, String file ) {
+        long t0= System.currentTimeMillis();
+        System.err.println("== test "+testId+": "+ file + " ==" );
+        
+        try {
+            String script= JythonUtil.readScript( new FileReader(file) );
+            String scrip= org.autoplot.jythonsupport.JythonUtil.simplifyScriptToGetParams(script,true);
+            File f= new File(file);
+            //String fout= "./test038_params_"+testId+"_"+f.getName();
+            String fout= "./test038_params_"+f.getName();
+            try (FileWriter fw = new FileWriter(fout)) {
+                fw.append(scrip);
+            }
+            List<Param> parms= org.autoplot.jythonsupport.JythonUtil.getGetParams( script );
+            for ( Param p: parms ) {
+                System.err.println(p);
+            }
+            System.err.println( String.format( "read params in %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
+            return 0;
+        } catch ( IOException | PyException ex ) {
+            ex.printStackTrace();
+            System.err.println( String.format( "failed within %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
+            return 1;
+        }
 
     }
+    
+    /**
+     * this allows us to make a list of tests with an external file.
+     * @param f 
+     * @return 0 for all success, nonzero otherwise
+     */
+    public static int doTestMany( String f ) {
+        System.err.println("Reading tests from file: "+f);
+        int t=0;
+        try ( BufferedReader in= new BufferedReader( new FileReader(f) ) ) {
+            String s= in.readLine();
+            int i=s.indexOf("#");
+            if ( i>0 ) s= s.substring(0,i);
+            s= s.trim();
+            String[] ss= s.split(" ",-2);
+            if ( ss.length==2 ) {
+                t= Math.max( t, doTests( ss[0], ss[1] ) );
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Test038.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Test038.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return t;
+    }
+    
+    /**
+     * Autoplot reduces jython scripts to get not much more than the getParam calls so the
+     * script can be executed quickly.
+     */
+    public static int testGetParams() {
+        int t=0;
+        t= Math.max( t, doTests("009","/home/jbf/ct/hudson/script/test038/jydsCommentBug.jyds") );  // Chris has a newline before the closing ).
+        t= Math.max( t, doTests("010","/home/jbf/ct/hudson/script/test038/addPointDigitizer.jy") );
+        t= Math.max( t, doTests("002","/home/jbf/ct/hudson/script/test038/demoParms1.jy") );
+        t= Math.max( t, doTests("008","/home/jbf/ct/hudson/script/test038/jedi_l3_valid_tofxe_events.jyds") );
+        t= Math.max( t, doTests("000","/home/jbf/ct/hudson/script/test038/trivial.jy") );
+        t= Math.max( t, doTests("001","/home/jbf/ct/hudson/script/test038/demoParms0.jy") );
+        t= Math.max( t, doTests("002","/home/jbf/ct/hudson/script/test038/demoParms1.jy") );
+        t= Math.max( t, doTests("003","/home/jbf/ct/hudson/script/test038/demoParms.jy") );
+        t= Math.max( t, doTests("004","/home/jbf/ct/hudson/script/test038/rbsp/emfisis/background_removal_wfr.jyds") );
+        t= Math.max( t, doTests("005","/home/jbf/ct/hudson/script/test038/demoParms2.jy") );
+        t= Math.max( t, doTests("006","/home/jbf/ct/hudson/script/test038/fce_A.jyds") );
+        t= Math.max( t, doTests("007","/home/jbf/ct/hudson/script/test038/fce_A_2.jyds") );
+        t= Math.max( t, doTests("010","/home/jbf/ct/hudson/script/test038/addPointDigitizer.jy") );
+        t= Math.max( t, doTestMany("/home/jbf/ct/hudson/script/test038/test038.txt") );
+        return t;
+    }
+    
+    public static void main( String[] args ) throws IOException {
+    
+        long t0= System.currentTimeMillis();
+        PythonInterpreter interp= JythonUtil.createInterpreter(true);
+        interp.eval("1+2");
+        System.err.println( String.format( "== first initialize in %d millis\n", System.currentTimeMillis()-t0 ) );
+        
+        if ( testGetParams()==0 ) {
+            System.err.println("ALL OKAY!");
+        } else {
+            throw new IllegalStateException("at least one of the tests failed.");
+        }
+        System.exit(0);
+    }
+
 }
