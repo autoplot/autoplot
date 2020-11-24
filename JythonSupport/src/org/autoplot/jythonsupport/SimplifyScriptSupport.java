@@ -597,7 +597,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
          "ones,", "zeros,", 
          "linspace,", "logspace,",
          "dblarr,", "fltarr,", "strarr,", "intarr,", "bytarr,",
-         "ripples,", "split,", 
+         "ripples,", 
          "color,", "colorFromString,", "isinstance,"  };
      private static final Set<String> okaySet= new HashSet<>();
      static {
