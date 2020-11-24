@@ -28,13 +28,13 @@ public class JavadocLookup {
         if ( instance==null ) {
             instance= new JavadocLookup();
             // note the order is important, so that org.w3c.dom is matched before org.
-            instance.setLinkForJavaSignature("javax","http://docs.oracle.com/javase/8/docs/api/");  // Java 7 docs look terrible in the popup, so there's work to be done.
-            instance.setLinkForJavaSignature("java","http://docs.oracle.com/javase/8/docs/api/");
-            instance.setLinkForJavaSignature("org/w3c/dom","http://docs.oracle.com/javase/8/docs/api/");
-            instance.setLinkForJavaSignature("org/xml/sax","http://docs.oracle.com/javase/8/docs/api/");
-            instance.setLinkForJavaSignature("org/jdesktop","http://docs.oracle.com/javase/8/docs/api/");
-            instance.setLinkForJavaSignature("org/apache/commons/math3", "http://commons.apache.org/proper/commons-math/javadocs/api-3.6/" );
-            instance.setLinkForJavaSignature("org/apache/commons/math", "http://commons.apache.org/proper/commons-math/javadocs/api-2.0/" );
+            instance.setLinkForJavaSignature("javax","https://docs.oracle.com/javase/8/docs/api/");  // Java 7 docs look terrible in the popup, so there's work to be done.
+            instance.setLinkForJavaSignature("java","https://docs.oracle.com/javase/8/docs/api/");
+            instance.setLinkForJavaSignature("org/w3c/dom","https://docs.oracle.com/javase/8/docs/api/");
+            instance.setLinkForJavaSignature("org/xml/sax","https://docs.oracle.com/javase/8/docs/api/");
+            instance.setLinkForJavaSignature("org/jdesktop","https://docs.oracle.com/javase/8/docs/api/");
+            instance.setLinkForJavaSignature("org/apache/commons/math3", "https://commons.apache.org/proper/commons-math/javadocs/api-3.6/" );
+            instance.setLinkForJavaSignature("org/apache/commons/math", "https://commons.apache.org/proper/commons-math/javadocs/api-2.0/" );
             instance.setLinkForJavaSignature("gov/nasa/gsfc/spdf/cdfj", "https://jfaden.net/~jbf/autoplot/cdf/doc/" );
             instance.setLinkForJavaSignature("org/autoplot", JythonCompletionProvider.getInstance().settings.getDocHome() );
             instance.setLinkForJavaSignature("org/das2", JythonCompletionProvider.getInstance().settings.getDocHome() );
