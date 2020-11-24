@@ -265,7 +265,8 @@ public class Test038 {
         t= Math.max( t, doTests("005","/home/jbf/ct/hudson/script/test038/demoParms2.jy") );
         t= Math.max( t, doTests("006","/home/jbf/ct/hudson/script/test038/fce_A.jyds") );
         t= Math.max( t, doTests("007","/home/jbf/ct/hudson/script/test038/fce_A_2.jyds") );
-        t= Math.max( t, doTests("010","/home/jbf/ct/hudson/script/test038/addPointDigitizer.jy") );
+        t= Math.max( t, doTests("110","/home/jbf/ct/hudson/script/test038/addPointDigitizer.jy") );
+        t= Math.max( t, doTests("111","/home/jbf/ct/hudson/script/test038/rewriteF_L0.jy") );
         t= Math.max( t, doTestMany("/home/jbf/ct/hudson/script/test038/test038.txt") );
         return t;
     }
