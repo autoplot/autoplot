@@ -13,10 +13,25 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
+import javax.swing.JTextArea;
+import javax.swing.text.BadLocationException;
+import org.autoplot.ScriptContext;
 import org.python.util.PythonInterpreter;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.JythonUtil.Param;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
+import org.das2.components.DasProgressPanel;
+import org.das2.datum.DatumRange;
+import org.das2.datum.Units;
+import org.das2.jythoncompletion.CompletionContext;
+import org.das2.jythoncompletion.CompletionSupport;
+import org.das2.jythoncompletion.JythonCompletionTask;
+import org.das2.jythoncompletion.ui.CompletionImpl;
+import org.das2.jythoncompletion.ui.CompletionResultSetImpl;
+import org.das2.qds.ops.Ops;
+import org.das2.qds.util.DataSetBuilder;
+import org.das2.util.filesystem.FileSystem;
 import org.python.core.PyException;
 
 /**
@@ -37,6 +52,7 @@ public class Test038 {
     private static int doTests( String testId, String file ) {
         int t1= doTestsGetParams(testId,file);
         int t2= doTestsGetCompletions(testId,file);
+        int t3= doTestsCountCompletions(testId,file);
         return t1!=0 ? t1 : t2;
     }
     
@@ -162,6 +178,90 @@ public class Test038 {
         } else {
             throw new IllegalStateException("at least one of the tests failed.");
         }
+
+    }
+
+    public static int[] getCompletionsCount( final String ss, int[] positions ) {
+        
+        final JTextArea tc=new JTextArea();
+
+        tc.setText(ss);
+        JDialog d= new JDialog();
+        d.getContentPane().add(tc);
+        d.pack();
+        d.setVisible( true );
+        
+        final JythonCompletionTask jct=new JythonCompletionTask(tc);
+        final CompletionResultSetImpl rs= CompletionImpl.get().createTestResultSet(null,0);
+        
+        final DasProgressPanel mon=DasProgressPanel.createFramed("checking completions");
+
+        int[] result= new int[positions.length];
+        
+        for ( int i=0; i<positions.length; i++ ) {
+            
+            if ( mon.isCancelled() ) break;
+            tc.setCaretPosition(positions[i]);
+
+            try {
+                CompletionContext cc= CompletionSupport.getCompletionContext(tc);
+                if ( cc!=null ) {
+                    int count= jct.doQuery( cc, rs.getResultSet() );
+                    result[i]= count;
+                }
+            } catch ( Exception e ) {
+                e.printStackTrace();
+                //CompletionContext cc;
+                //try {
+                    //cc = CompletionSupport.getCompletionContext(tc);
+                    //jct.doQuery( cc, rs.getResultSet() );
+                //} catch (BadLocationException ex) {
+                //    Logger.getLogger(Test038.class.getName()).log(Level.SEVERE, null, ex);
+                //}
+                result[i]= -99;
+            }
+        }
+        d.setVisible( false );
+        return result;
+    }
+
+    
+    private static int doTestsCountCompletions(String testId, String file) {
+        long t0= System.currentTimeMillis();
+        System.err.println("== test "+testId+": "+ file + " ==" );
+        
+        FileSystem.settings().setOffline(true);
+        
+        try {
+            String script= JythonUtil.readScript( new FileReader(file) );
+                        
+            File f= new File(file);
+            //String fout= "./test038_completions_"+testId+"_"+f.getName();
+            
+            int n= script.length();
+            int[] positions= new int[Math.min(100,n)];
+            for ( int i=0; i<positions.length; i++ ) {
+                positions[i]= script.length()*i/positions.length;
+            }
+            int[] rr= getCompletionsCount(script,positions);
+            
+            ScriptContext.plot( Ops.dataset(rr) );
+            ScriptContext.waitUntilIdle();
+            ScriptContext.setRenderStyle("fillToZero");
+            ScriptContext.getDocumentModel().getPlots(0).getYaxis().setRange( 
+                    DatumRange.newDatumRange( -99, 120, Units.dimensionless ) );
+            ScriptContext.setTitle( "completions count for "+f.getName() );
+            
+            String fout= "test038_completions_"+f.getName()+".png";
+            ScriptContext.writeToPng( fout );
+            return 0;
+            
+        } catch ( Exception ex ) {
+            ex.printStackTrace();
+            System.err.println( String.format( "failed within %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
+            return 1;
+        }
+
 
     }
 }
