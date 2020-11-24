@@ -222,6 +222,7 @@ public class Test038 {
             }
         }
         d.setVisible( false );
+        d.dispose();
         return result;
     }
 
