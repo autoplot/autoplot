@@ -133,6 +133,13 @@ public class Test038 {
                     dsb.nextRecord( new Object[] { irow+1,icol,count } );
                 }
             } catch ( Exception e ) {
+                //try {
+                //    CompletionContext cc= CompletionSupport.getCompletionContext(tc);
+                //    jct.doQuery( cc, rs.getResultSet() );
+                //} catch ( Exception e2 ) {
+                //    
+                //}
+                
                 e.printStackTrace();
                 //CompletionContext cc;
                 //try {

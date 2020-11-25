@@ -718,6 +718,28 @@ public class JythonCompletionTask implements CompletionTask {
         interp.exec( ss2  );
     }
     
+    /**
+     * introduced to see if we can pop a little code from the end, in case we
+     * are within a triple-quoted string.
+     * @param script the script
+     * @return the script, possibly with a few fewer lines.
+     */
+    public static String trimLinesToMakeValid( String script ) {
+        String[] ss= script.split("\'\'\'",-2);
+        if ( ss.length%2==0 ) {
+            String[] ss2= new String[(ss.length/2)*2];
+            System.arraycopy( ss, 0, ss2, 0, ss2.length );
+            script= String.join( "\'\'\'", ss2 );
+        }
+        ss= script.split("\"\"\"",-2);
+        if ( ss.length%2==0 ) {
+            String[] ss2= new String[ss.length-1];
+            System.arraycopy( ss, 0, ss2, 0, ss2.length );
+            script= String.join( "\"\"\"", ss2 );
+        }
+        return script;
+    }
+    
     private int queryNames(CompletionContext cc, CompletionResultSet rs) throws BadLocationException {
         logger.fine("queryNames");
         int count=0;
@@ -734,6 +756,7 @@ public class JythonCompletionTask implements CompletionTask {
         String eval;
         int eolnCarot= Utilities.getRowStart(editor, editor.getCaretPosition());
         eval= editor.getText(0, eolnCarot);
+        eval= trimLinesToMakeValid( eval );
         if ( eolnCarot>0 ) {
             int startLastLine= Utilities.getRowStart(editor, eolnCarot-1 );
             String lastLine= editor.getText( startLastLine, eolnCarot-startLastLine );
