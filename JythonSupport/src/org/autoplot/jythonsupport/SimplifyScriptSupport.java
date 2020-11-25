@@ -257,10 +257,17 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                  continue;
              }
              if ( o instanceof Assign && !simplifyScriptToGetCompletionsOkay( o, variableNames ) ) {
+                 // check for method calls where we know the type.
                  Assign a= (Assign)o;
                  String cl= maybeIdentifyType( a );
                  if ( cl!=null ) {
-                     result.append(cl);
+                     if ( acceptLine>-1 ) {
+                         for (int i = acceptLine; i < beginLine; i++) {
+                            appendToResult(result, ss[i]).append("\n");
+                         }
+                     }
+                     appendToResult(result,cl);
+                     acceptLine= -1;
                      continue;
                  }
              }
@@ -270,7 +277,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                     for (int i = acceptLine; i < beginLine; i++) {
                         appendToResult(result, ss[i]).append("\n");
                     }
-                 }
+                }
                 If iff = (If) o;
                  boolean includeBlock;
                  if (simplifyScriptToGetCompletionsCanResolve( iff.test, variableNames )) {
@@ -669,7 +676,13 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
      /**
       * if we recognize the function that is called, then go ahead and keep track
       * of the type.  This is a quick and cheesy implementation that just looks
-      * for a few names.
+      * for a few names.  For example,<ul>
+      * <li>x= getApplication() -- x is an AutoplotUI
+      * <li>x= getApplicationModel() -- x is a ApplicationModel
+      * <li>x= getDataSource() -- x is a DataSource
+      * <li>x= PngWalkTool.start() -- x is a PngWalkTool
+      * </ul>
+      * 
       * @param a
       * @return 
       */
@@ -689,6 +702,15 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                             return "from org.autoplot import ApplicationModel\n" + id + "__class=ApplicationModel\n";
                         } else if ( funcName.equals("getDataSource") ) {
                             return "from org.autoplot.datasource import DataSource\n" + id + "__class=DataSource\n";
+                        }
+                    } else if ( c.func instanceof Attribute ) {
+                        // p=PngWalkTool.start(...)
+                        Attribute at= (Attribute)c.func;
+                        if ( at.value instanceof Name ) {
+                            String attrName= ((Name)at.value).id;
+                            if ( attrName.equals("PngWalkTool") && at.attr.equals("start") ) {
+                                return "from org.autoplot.pngwalk import PngWalkTool\n" + id + "__class=PngWalkTool\n";
+                            }
                         }
                     }
                 }
