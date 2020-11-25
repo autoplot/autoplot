@@ -257,6 +257,7 @@ public class JythonCompletionTask implements CompletionTask {
             lcontext = interp.eval(cc.contextString);
         } catch (PyException ex) {
             try {
+                // check to see if we have identified the class of the symbol.
                 PyObject occ= interp.eval(cc.contextString+"__class");
                 if ( occ!=null && occ instanceof PyJavaClass ) {
                     lcontextClass= (PyJavaClass)occ;
@@ -316,7 +317,13 @@ public class JythonCompletionTask implements CompletionTask {
                             icon= getIconFor(m);
                             args = methodArgs(m);
                         } else {
-                            continue;
+                            if ( lcontext==lcontextClass ) { // whoops, we have an instance of a class here
+                                signature = methodSignature(m);
+                                icon= getIconFor(m);
+                                args = methodArgs(m);
+                            } else {
+                                continue;
+                            }
                         }
                     } else if ( po instanceof PyString || po instanceof PyInteger || po instanceof PyJavaInstance) {
                         Class c= new PyClassPeeker((PyJavaClass) lcontext).getJavaClass();
