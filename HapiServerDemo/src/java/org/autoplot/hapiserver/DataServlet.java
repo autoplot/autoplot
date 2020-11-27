@@ -249,7 +249,7 @@ public class DataServlet extends HttpServlet {
                     }
                     logger.log(Level.FINE, "If-Modified-Since allows 304 response: {0}", can304);
                     if ( can304 ) {
-                        response.setStatus(304);
+                        response.setStatus( HttpServletResponse.SC_NOT_MODIFIED ); //304
                         out.close();
                         return;
                     }
@@ -259,6 +259,8 @@ public class DataServlet extends HttpServlet {
 
             }
         }
+        
+        response.setStatus( HttpServletResponse.SC_OK );
         
         try {
             if ( dsiter!=null ) dsiter.constrainDepend0(dr);
