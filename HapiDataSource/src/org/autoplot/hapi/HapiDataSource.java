@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -1201,7 +1200,7 @@ public final class HapiDataSource extends AbstractDataSource {
                 httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
                 httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
                 httpConnect.setRequestProperty( "Accept-Encoding", "gzip" );
-                httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect);
+                httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect); // There's a problem, because it looks like the entire response is read here.
                 httpConnect.connect();
                 loggerUrl.log(Level.FINE, "--> {0} {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
             }
@@ -1313,19 +1312,17 @@ public final class HapiDataSource extends AbstractDataSource {
                             }
                         }
                     }
-                }
                 
-                if ( !currentDay.contains(xx) ) {
-                    if ( !warnings.containsKey( WARNING_TIME_ORDER ) ) {
-                        logger.log(Level.INFO, "something's gone wrong, perhaps out-of-order timetags: {0}", xx);
-                        warnings.put( WARNING_TIME_ORDER, 1 );
-                    } else {
-                        warnings.put( WARNING_TIME_ORDER, warnings.get( WARNING_TIME_ORDER ) + 1 );
+                    if ( !currentDay.contains(xx) ) {
+                        if ( !warnings.containsKey( WARNING_TIME_ORDER ) ) {
+                            logger.log(Level.INFO, "something's gone wrong, perhaps out-of-order timetags: {0}", xx);
+                            warnings.put( WARNING_TIME_ORDER, 1 );
+                        } else {
+                            warnings.put( WARNING_TIME_ORDER, warnings.get( WARNING_TIME_ORDER ) + 1 );
+                        }
+                        completeDay= false;
                     }
-                    completeDay= false;
-                }
-                
-                if ( writeDataToCache ) {
+
                     if ( completeDay ) {
                         if ( pds[0].modifiedDateMillis==0 || xx.doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
                             writeToCsvCachedData(cacheLocation, pds, xx, ss, false );
@@ -1863,17 +1860,17 @@ public final class HapiDataSource extends AbstractDataSource {
     private static AbstractLineReader calculateCsvCacheReader( File[][] files ) {
         
         ConcatenateBufferedReader cacheReader= new ConcatenateBufferedReader();
-        for ( int i=0; i<files.length; i++ ) {
+        for (File[] file1 : files) {
             boolean haveAllForDay= true;
-            if ( haveAllForDay ) {
+            if (haveAllForDay) {
                 PasteBufferedReader r1= new PasteBufferedReader();
                 r1.setDelim(',');
-                for ( int j=0; j<files[i].length; j++ ) {
+                for (File file : file1) {
                     try {
-                        FileInputStream fin= new FileInputStream(files[i][j]);
+                        FileInputStream fin = new FileInputStream(file);
                         InputStreamReader read= new InputStreamReader(fin,HapiServer.UTF8);
                         BufferedReader buff= new BufferedReader(read);
-                        r1.pasteBufferedReader( 
+                        r1.pasteBufferedReader(
                                 new SingleFileBufferedReader( 
                                         buff ) );
                     }catch ( IOException ex ) {
@@ -1881,7 +1878,7 @@ public final class HapiDataSource extends AbstractDataSource {
                         return null;
                     }
                 }
-                cacheReader.concatenateBufferedReader(r1);                
+                cacheReader.concatenateBufferedReader(r1);
             }   
         }
         return cacheReader;
@@ -1890,19 +1887,18 @@ public final class HapiDataSource extends AbstractDataSource {
     private static AbstractBinaryRecordReader calculateBinaryCacheReader( File[][] files ) {
         
         ConcatenateBinaryRecordReader cacheReader= new ConcatenateBinaryRecordReader();
-        for ( int i=0; i<files.length; i++ ) {
+        for (File[] file : files) {
             boolean haveAllForDay= true;
-            if ( haveAllForDay ) {
+            if (haveAllForDay) {
                 PasteBinaryRecordReader r1= new PasteBinaryRecordReader();
-                for ( int j=0; j<files[i].length; j++ ) {
-                    File oneDayOneParam= files[i][j];
+                for (File oneDayOneParam : file) {
                     try {
                         r1.pasteBufferedReader( new SingleFileBinaryReader( oneDayOneParam ) );
                     } catch (FileNotFoundException ex) {
                         Logger.getLogger(HapiDataSource.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                cacheReader.concatenateReader(r1);                
+                cacheReader.concatenateReader(r1);
             }   
         }
         return cacheReader;
