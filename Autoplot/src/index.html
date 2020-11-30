@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New work on rfe501 allows more <a href='https://github.com/autoplot/dev/tree/master/demos/2020/20201119'>customized applications</a> to be built on the PNG Walk Tool.
+        <p><small>Power plant database read directly from Github with this <a href="http://autoplot.org/autoplot.jnlp?uri=https://github.com/wri/global-power-plant-database/blob/master/source_databases_csv/database_USA.csv?depend0=longitude&column=latitude&where=primary_fuel.eq(Solar)">URI</a>.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-11-14 r25311):</p>
+        <p>Bugfixes (2020-11-30 r25347):</p>
         <ul>
+            <li>Datums backed by Long but not Units.cdfTT2000 would cause runtime error when printed.
             <li>2305: doAxisDimensionsChange returned false, causing reset which resulted in using old dataset for axis labels.
             <li>1636: corrections to Jython code refactoring (simplification of script to get params or for completions) after it was discovered that test server was failing to notify.  Simplification of codes.
             <li>2304: Another round of localization checks is needed, das2server check.  Thanks, Corentin!
