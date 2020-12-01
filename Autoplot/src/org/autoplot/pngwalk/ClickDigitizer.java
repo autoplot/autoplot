@@ -315,10 +315,11 @@ public class ClickDigitizer {
      * is not, with the property "PlotNumber" indicating which plot number
      * in the JSON is used.  The property "PlotNumber" 
      * will be an integer equal -1 if the rich png metadata is not found,
-     * or zero or positive int for valid clicks.
+     * or zero or positive int for valid clicks.  If the x and y are not within
+     * a plot, then null (None) is returned.
      * @param x
      * @param y
-     * @return null or 
+     * @return null, -1 or the plot number.
      * @throws IOException
      * @throws ParseException 
      */
@@ -379,7 +380,9 @@ public class ClickDigitizer {
                     }
                     return result;
                 } else {
-                    return null;
+                    QDataSet result= Ops.replicate( Double.NaN, 2, 2 );
+                    result= Ops.putProperty( result, "PlotNumber",  -1 );
+                    return result;
                 }
              } catch (JSONException ex) {
                 Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
