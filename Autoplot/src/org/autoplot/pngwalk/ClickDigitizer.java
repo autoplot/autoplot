@@ -330,7 +330,32 @@ public class ClickDigitizer {
         URI uri= view.seq.imageAt( view.seq.getIndex() ).getUri();
         File file = DataSetURI.getFile( uri, new AlertNullProgressMonitor("get image file") ); // assume it's local.
         String json= ImageUtil.getJSONMetadata( file );
-        return doTransformPoint( json, x, y );
+        return doTransformPoint(json, -1, x, y );
+    }
+    
+    /**
+     * return the coordinates for the click in data coordinates if the JSON
+     * Rich PNG metadata is available, or just the pixel coordinates if it
+     * is not, with the property "PlotNumber" indicating which plot number
+     * in the JSON is used.  The property "PlotNumber" 
+     * will be an integer equal -1 if the rich png metadata is not found,
+     * or zero or positive int for valid clicks.  If the x and y are not within
+     * a plot, then null (None) is returned.
+     * @param iplot the plot number, or -1 to indicate whichever plot x and y are within.
+     * @param x the horizontal position
+     * @param y the vertical position, with 0 being the top of the plot.
+     * @return null, -1 or the plot number.
+     * @throws IOException
+     * @throws ParseException 
+     */
+    public QDataSet pixelToDataTransform( int iplot, int x, int y ) throws IOException, ParseException {
+        if ( view==null ) {
+            throw new IllegalArgumentException("view is not attached");
+        }
+        URI uri= view.seq.imageAt( view.seq.getIndex() ).getUri();
+        File file = DataSetURI.getFile( uri, new AlertNullProgressMonitor("get image file") ); // assume it's local.
+        String json= ImageUtil.getJSONMetadata( file );
+        return doTransformPoint(json, iplot, x, y );
     }
     
     /**
@@ -360,13 +385,18 @@ public class ClickDigitizer {
      * @throws IOException
      * @throws ParseException 
      */
-    private QDataSet doTransformPoint( String json, int x, int y ) throws IOException, ParseException {
+    private QDataSet doTransformPoint( String json, int iplot, int x, int y) throws IOException, ParseException {
 
         if ( json!=null ) {
             try {
                 JSONObject jo = new JSONObject( json );
                 JSONArray plots= jo.getJSONArray("plots");
-                JSONObject plot= getPlotContaining( plots, x, y );
+                JSONObject plot;
+                if ( iplot==-1 ) {
+                    plot= getPlotContaining( plots, x, y );
+                } else {
+                    plot= plots.getJSONObject( iplot );
+                }
                 if ( plot!=null ) {
                     JSONObject xaxis= plot.getJSONObject("xaxis");
                     QDataSet xx= invTransform( xaxis, x, "left", "right" );
@@ -519,8 +549,8 @@ public class ClickDigitizer {
         URI uri= view.seq.imageAt( view.seq.getIndex() ).getUri();
         File file = DataSetURI.getFile( uri, new AlertNullProgressMonitor("get image file") ); // assume it's local.
         String json= ImageUtil.getJSONMetadata( file );
-        QDataSet ds1= doTransformPoint(json, p.x-2, p.y-2 );
-        QDataSet ds2= doTransformPoint(json, p.x+2, p.y+2 );
+        QDataSet ds1= doTransformPoint(json, -1, p.x-2, p.y-2 );
+        QDataSet ds2= doTransformPoint(json, -1, p.x+2, p.y+2 );
         if ( ds1==null ) return -1;
         
         DatumRange xrange= DatumRangeUtil.union( DataSetUtil.asDatum(ds1.slice(0)), DataSetUtil.asDatum(ds2.slice(0)) );
