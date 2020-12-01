@@ -36,6 +36,7 @@ public class JavadocLookup {
             instance.setLinkForJavaSignature("org/apache/commons/math3", "https://commons.apache.org/proper/commons-math/javadocs/api-3.6/" );
             instance.setLinkForJavaSignature("org/apache/commons/math", "https://commons.apache.org/proper/commons-math/javadocs/api-2.0/" );
             instance.setLinkForJavaSignature("gov/nasa/gsfc/spdf/cdfj", "https://jfaden.net/~jbf/autoplot/cdf/doc/" );
+            instance.setLinkForJavaSignature("org/json", "https://stleary.github.io/JSON-java/" );
             instance.setLinkForJavaSignature("org/autoplot", JythonCompletionProvider.getInstance().settings.getDocHome() );
             instance.setLinkForJavaSignature("org/das2", JythonCompletionProvider.getInstance().settings.getDocHome() );
             instance.setLinkForJavaSignature("com/matio", JythonCompletionProvider.getInstance().settings.getDocHome() );
