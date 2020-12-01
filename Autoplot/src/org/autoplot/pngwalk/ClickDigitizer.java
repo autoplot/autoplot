@@ -316,10 +316,11 @@ public class ClickDigitizer {
      * in the JSON is used.  The property "PlotNumber" 
      * will be an integer equal -1 if the rich png metadata is not found,
      * or zero or positive int for valid clicks.  If the x and y are not within
-     * a plot, then null (None) is returned.
-     * @param x
-     * @param y
-     * @return null, -1 or the plot number.
+     * a plot, then -1 is returned for the plot number.
+     * @param x the horizontal pixel coordinate
+     * @param y the vertical pixel coordinate, with 0 at the top.
+     * @return two-element bundle QDataSet with PlotNumber property.  -1 
+     *   indicates no plot found at the location, and -99 means no rich png data.
      * @throws IOException
      * @throws ParseException 
      */
@@ -344,7 +345,8 @@ public class ClickDigitizer {
      * @param iplot the plot number, or -1 to indicate whichever plot x and y are within.
      * @param x the horizontal position
      * @param y the vertical position, with 0 being the top of the plot.
-     * @return null, -1 or the plot number.
+     * @return two-element bundle QDataSet with PlotNumber property.  -1 
+     *   indicates no plot found at the location, and -99 means no rich png data.
      * @throws IOException
      * @throws ParseException 
      */
@@ -377,8 +379,17 @@ public class ClickDigitizer {
     }
     
     /**
-     * "PlotNumber" will indicate which plot
+     * This will transform the point x,y to data coordinates.  If iplot is
+     * -1, then the x and y coordinates will pick the first plot which contains,
+     * otherwise the plot number is used.  The result is a two-element bundle
+     * QDataSet with the property "PlotNumber" which will indicate the plot 
+     * number used.  If iplot is -1 and x and y are not within a plot, then 
+     * the PlotNumber will be -1.  If the richPng metadata is not available
+     * (null passed in for json), then -99 is returned for the plot number and
+     * the pixel coordinate is returned.
+     * 
      * @param json null or the JSON
+     * @param iplot -1 or the plot number.
      * @param x x in the canvas frame.
      * @param y y in the canvas frame.
      * @return rank 1 bundle x,y.
@@ -410,7 +421,7 @@ public class ClickDigitizer {
                     }
                     return result;
                 } else {
-                    QDataSet result= Ops.replicate( Double.NaN, 2, 2 );
+                    QDataSet result= Ops.replicate( Double.NaN, 2 );
                     result= Ops.putProperty( result, "PlotNumber",  -1 );
                     return result;
                 }
@@ -427,7 +438,9 @@ public class ClickDigitizer {
             int h= view.seq.imageAt( view.seq.getIndex() ).getImage().getHeight();
             Datum xx= Units.dimensionless.createDatum(x);
             Datum yy= Units.dimensionless.createDatum(h-y);
-            return Ops.bundle( Ops.dataset(xx), Ops.dataset(yy) );
+            QDataSet result= Ops.bundle( Ops.dataset(xx), Ops.dataset(yy) );
+            result= Ops.putProperty( result, "PlotNumber",  -99 );
+            return result;
         }
     }
     
