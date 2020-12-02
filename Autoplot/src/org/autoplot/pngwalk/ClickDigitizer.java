@@ -198,16 +198,22 @@ public class ClickDigitizer {
             
         }        
         
-        if ( range.getUnits().isConvertibleTo(datum.getUnits()) && range.contains(datum) ) {
+        if ( range.getUnits().isConvertibleTo(datum.getUnits()) ) {
+            double d;
             if ( log ) {
-                double d= DatumRangeUtil.normalizeLog( range, datum );
-                return (int)( axis.getInt(smaller) + d * (axis.getInt(bigger)-axis.getInt(smaller)) );
+                d= DatumRangeUtil.normalizeLog( range, datum );
             } else {
-                double d= DatumRangeUtil.normalize( range, datum );
-                return (int)( axis.getInt(smaller) + d * (axis.getInt(bigger)-axis.getInt(smaller)) );
+                d= DatumRangeUtil.normalize( range, datum );
             }
+            int result= (int)( axis.getInt(smaller) + d * (axis.getInt(bigger)-axis.getInt(smaller)) );
+            if ( result<-10000 ) {
+                result= -10000;
+            } else if ( result>10000 ) {
+                result= 10000;
+            }
+            return result;
         } else {
-            return Integer.MAX_VALUE;
+            return axis.getInt(smaller);
         }
         
     }
