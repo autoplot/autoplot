@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Power plant database read directly from Github with this <a href="http://autoplot.org/autoplot.jnlp?uri=https://github.com/wri/global-power-plant-database/blob/master/source_databases_csv/database_USA.csv?depend0=longitude&column=latitude&where=primary_fuel.eq(Solar)">URI</a>.
+        <p><small>Run Batch tool is used to run a script with different parameters.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-11-30 r25347):</p>
+        <p>Bugfixes (2020-12-02 r25360):</p>
         <ul>
+            <li>PNGWalkTool data-to-pixel transform had discontinuity at axis edge.  Now there is an output limit of -10000 to 10000, which is consistent with the DasAxis object.
             <li>Datums backed by Long but not Units.cdfTT2000 would cause runtime error when printed.
             <li>2305: doAxisDimensionsChange returned false, causing reset which resulted in using old dataset for axis labels.
             <li>1636: corrections to Jython code refactoring (simplification of script to get params or for completions) after it was discovered that test server was failing to notify.  Simplification of codes.
