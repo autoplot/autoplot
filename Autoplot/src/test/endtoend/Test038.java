@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package test.endtoend;
 
 import java.io.BufferedReader;
@@ -42,6 +39,8 @@ import org.python.core.PyException;
 public class Test038 {
     
     static final Logger logger= Logger.getLogger("autoplot");
+    
+    public static final int COMPLETION_ERROR = -99;
 
     /**
      * test the getGetParams for a script, seeing if we can reduce 
@@ -54,7 +53,7 @@ public class Test038 {
         int t1= doTestsGetParams(testId,file);
         int t2= doTestsGetCompletions(testId,file);
         int t3= doTestsCountCompletions(testId,file);
-        return t1!=0 ? t1 : t2;
+        return t1!=0 ? t1 : ( t2!=0 ? t2 : t3 );
     }
     
     /**
@@ -148,14 +147,13 @@ public class Test038 {
                 //} catch (BadLocationException ex) {
                 //    Logger.getLogger(Test038.class.getName()).log(Level.SEVERE, null, ex);
                 //}
-                dsb.nextRecord( new Object[] { irow+1,icol,-99 } );
+                dsb.nextRecord(new Object[] { irow+1,icol, COMPLETION_ERROR} );
             }
         }
         d.setVisible( false );
         d.dispose();
         return dsb.getDataSet();
     }
-
     
     private static int doTestsCountCompletions(String testId, String file) {
         long t0= System.currentTimeMillis();
@@ -179,14 +177,14 @@ public class Test038 {
             ScriptContext.formatDataSet( Ops.slice1(rr,1), "test038."+f.getName()+".cdf?column&append=T" );
             ScriptContext.formatDataSet( Ops.slice1(rr,2), "test038."+f.getName()+".cdf?count&append=T" );
             
-            ScriptContext.plot( Ops.slice1(rr,0), Ops.slice1(rr,1), Ops.lesserOf( Ops.slice1(rr,2), 99 ) );
+            ScriptContext.plot(Ops.slice1(rr,0), Ops.slice1(rr,1), Ops.lesserOf(Ops.slice1(rr,2), MAX_COMPLETION_COUNT) );
             
             ScriptContext.waitUntilIdle();
             ScriptContext.setRenderStyle("digital");
             ScriptContext.getDocumentModel().getPlotElements(0).setRenderControl("format=%d&fontSize=0.6em");
             
             ScriptContext.getDocumentModel().getPlots(0).getYaxis().setRange( 
-                    DatumRange.newDatumRange( -1, 160, Units.dimensionless ) );
+                    DatumRange.newDatumRange( -1, 120, Units.dimensionless ) );
             ScriptContext.getDocumentModel().getPlots(0).getXaxis().setLog(false);
             
             ScriptContext.setTitle( "completions count for "+f.getName() );
@@ -201,6 +199,7 @@ public class Test038 {
             return 1;
         }
     }
+    public static final int MAX_COMPLETION_COUNT = 77;
     
     private static int doTestsGetParams( String testId, String file ) {
         long t0= System.currentTimeMillis();
@@ -244,7 +243,9 @@ public class Test038 {
             s= s.trim();
             String[] ss= s.split(" ",-2);
             if ( ss.length==2 ) {
+                
                 t= Math.max( t, doTests( ss[0], ss[1] ) );
+                
             }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Test038.class.getName()).log(Level.SEVERE, null, ex);
