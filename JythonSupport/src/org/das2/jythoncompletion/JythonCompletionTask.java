@@ -130,7 +130,7 @@ public class JythonCompletionTask implements CompletionTask {
     }
 
     /**
-     * perform the completions query.
+     * perform the completions query.  This is the heart of Jython completions.
      * @param cc
      * @param resultSet
      * @return the count
