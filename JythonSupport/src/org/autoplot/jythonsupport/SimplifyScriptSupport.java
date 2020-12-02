@@ -207,6 +207,16 @@ public class SimplifyScriptSupport {
      }
      
      /**
+      * return the indent for a line, for example the "    " in "    continue "
+      * @param line 
+      * @return the indent
+      */
+     public static String getIndent( String line ) {
+         String s= line.trim();
+         return line.substring(0,line.indexOf(s));
+     }
+     
+     /**
       * Extracts the parts of the program that get parameters or take a trivial amount of time to execute.  
       * This may call itself recursively when if blocks are encountered.
       * See test038.
@@ -379,6 +389,10 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
              int thisLine = lastLine;
              for (int i = acceptLine; i <= thisLine; i++) {
                 appendToResult(result, ss[i]).append("\n");
+             }
+             String slastLine= ss[thisLine].trim();
+             if ( slastLine.endsWith(":") ) {
+                 appendToResult( result, getIndent(slastLine)+"    pass" );
              }
          }
          return result.toString();         
