@@ -46,6 +46,8 @@ public final class SinglePngWalkView extends PngWalkView {
     transient ClickDigitizer clickDigitizer;
     int clickDigitizerSelect= -1;
     
+    long reportedExceptionTime= 0;
+    
     private PngWalkTool viewer=null;
     
     public SinglePngWalkView(WalkImageSequence s) {
@@ -381,16 +383,25 @@ public final class SinglePngWalkView extends PngWalkView {
         }
         
         if ( viewer!=null && i!=null ) {
-                Rectangle lrect= imageLocation;
-                if ( imageLocation==null ) return;
-                int w= i.getWidth();
-                double factor = (double) lrect.getWidth() / (double) w;
-                AffineTransform at1= AffineTransform.getTranslateInstance( lrect.x, lrect.y );
-                at1.scale(factor, factor);
-                g2.transform(at1);
-                viewer.decorators.forEach((p) -> {
+            Rectangle lrect= imageLocation;
+            if ( imageLocation==null ) return;
+            int w= i.getWidth();
+            double factor = (double) lrect.getWidth() / (double) w;
+            AffineTransform at1= AffineTransform.getTranslateInstance( lrect.x, lrect.y );
+            at1.scale(factor, factor);
+            g2.transform(at1);
+            viewer.decorators.forEach((p) -> {
+                try {
                     p.paint(g2);
-                });
+                } catch ( Exception ex ) {
+                    long t= System.currentTimeMillis();
+                    if ( (t-reportedExceptionTime)>1000 ) {
+                        ex.printStackTrace();
+                        reportedExceptionTime= t;
+                    }
+                    g2.drawString(ex.getMessage(), 0, 16 );
+                }
+            });
 
         }
         
