@@ -991,10 +991,10 @@ public class JythonUtil {
 
     /**
      * handle where a line continues on to the next line because of indent,
-     * and then where a closeing parenthesis might be found as well.
+     * and then where a closing parenthesis might be found as well.
      * @param lines
      * @param iline
-     * @return 
+     * @return the new line number
      */
     protected static int handleContinue( String[] lines, int iline ) {
         if ( iline==lines.length-1 ) {
@@ -1008,7 +1008,7 @@ public class JythonUtil {
         }
         String thisIndent= indentForLine(theLine);
         String nextIndent= indentForLine(lines[iline+1]);
-        while ( iline<lines.length && nextIndent.startsWith(thisIndent) && nextIndent.length()>thisIndent.length() ) {
+        while ( iline<lines.length-2 && nextIndent.startsWith(thisIndent) && nextIndent.length()>thisIndent.length() ) {
             iline++;
             nextIndent= indentForLine(lines[iline+1]);
         }
