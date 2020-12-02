@@ -14,6 +14,8 @@ import javax.swing.JDialog;
 import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 import org.autoplot.ScriptContext;
+import org.autoplot.dom.Annotation;
+import org.autoplot.dom.Application;
 import org.python.util.PythonInterpreter;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.JythonUtil.Param;
@@ -173,11 +175,22 @@ public class Test038 {
                 positions[i]= script.length()*i/positions.length;
             }
             QDataSet rr= getCompletionsCount(script,positions);
-            ScriptContext.formatDataSet( Ops.slice1(rr,0), "test038."+f.getName()+".cdf?linenum" );
-            ScriptContext.formatDataSet( Ops.slice1(rr,1), "test038."+f.getName()+".cdf?column&append=T" );
-            ScriptContext.formatDataSet( Ops.slice1(rr,2), "test038."+f.getName()+".cdf?count&append=T" );
+            QDataSet line= Ops.slice1(rr,0);
+            QDataSet column= Ops.slice1(rr,1);
+            QDataSet count= Ops.slice1(rr,2);
+            ScriptContext.formatDataSet( line, "test038."+f.getName()+".cdf?linenum" );
+            ScriptContext.formatDataSet( column, "test038."+f.getName()+".cdf?column&append=T" );
+            ScriptContext.formatDataSet( count, "test038."+f.getName()+".cdf?count&append=T" );
             
             ScriptContext.plot(Ops.slice1(rr,0), Ops.slice1(rr,1), Ops.lesserOf(Ops.slice1(rr,2), MAX_COMPLETION_COUNT) );
+            QDataSet r= Ops.where( Ops.eq( count, -99 ) );
+            
+            if ( r.length()>0 ) {
+                Application dom= ScriptContext.getDocumentModel();
+                int i= (int)r.value(0);
+                String s= String.format("Fail @ %d<br>line=%d col=%d", positions[i], (int)line.value(i), (int)column.value(i) );
+                dom.getController().addAnnotation( dom.getPlots(0), s );
+            }
             
             ScriptContext.waitUntilIdle();
             ScriptContext.setRenderStyle("digital");
@@ -191,7 +204,7 @@ public class Test038 {
             
             String fout= "test038_completions_"+f.getName()+".png";
             ScriptContext.writeToPng( fout );
-            return 0;
+            return r.length();
             
         } catch ( Exception ex ) {
             ex.printStackTrace();
