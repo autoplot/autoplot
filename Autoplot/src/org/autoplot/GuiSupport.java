@@ -151,6 +151,7 @@ import org.autoplot.renderer.BoundsStylePanel;
 import org.autoplot.renderer.InternalStylePanel;
 import org.autoplot.util.GraphicsUtil;
 import org.xml.sax.SAXException;
+import sun.security.pkcs11.P11TlsKeyMaterialGenerator;
 
 /**
  * Extra methods to support AutoplotUI.
@@ -1900,12 +1901,24 @@ public class GuiSupport {
             controller.performingChange( app, lockObject );
 
             List<PlotElement> pes= controller.getPlotElementsFor(newP);
-            for ( PlotElement pe: pes ) {
+            pes.forEach((pe) -> {
                 controller.deletePlotElement(pe);
-            }
+            });
 
             Plot p= state.getPlots(0);
-            newP.syncTo(p,Arrays.asList("id","rowId","columnId") );
+            newP.syncTo( p,Arrays.asList(Plot.PROP_ID,Plot.PROP_ROWID,Plot.PROP_COLUMNID,Plot.PROP_TICKS_URI) );
+            newP.setTicksURI("");
+            
+            // if everything else is bound, then bind this one too.
+            Application dom= controller.getApplication();
+            boolean doBindX= dom.getController().findBindings( dom, Application.PROP_TIMERANGE ).size()>0 &&
+                    dom.getController().findBindings( newP, Plot.PROP_CONTEXT ).isEmpty() &&
+                    UnitsUtil.isTimeLocation( newP.getXaxis().getRange().getUnits() );
+            if ( doBindX ) {
+                newP.getXaxis().setRange( dom.getTimeRange() );
+                controller.getApplication().getController().bind( dom, Application.PROP_TIMERANGE, newP.getXaxis(), Axis.PROP_RANGE );
+            }
+            
             Map<String,String> nameMap= new HashMap<>();
             nameMap.put( p.getId(), newP.getId() );
             //List<DataSourceFilter> unresolved= new ArrayList<>();
