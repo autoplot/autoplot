@@ -914,6 +914,9 @@ public class DataSetURI {
      * @see FileSystemUtil#doDownload(java.lang.String, org.das2.util.monitor.ProgressMonitor) 
      */
     public static File getFile( String suri, boolean allowHtml, ProgressMonitor mon) throws IOException {
+        
+        if ( mon==null ) mon= new AlertNullProgressMonitor("loading "+suri);
+                
         URISplit split = URISplit.parse( suri );
 
         URL url= isUrl( split.resourceUri ) ? split.resourceUri.toURL() : null;
