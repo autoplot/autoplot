@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Run Batch tool is used to run a script with different parameters.
+        <p><small>Fun with custom renderer, script <a href='https://github.com/autoplot/dev/blob/master/demos/2020/20201204/demoCustomRenderer.jy'>here</a>.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-12-02 r25360):</p>
+        <p>Bugfixes (2020-12-04 r25364):</p>
+        <ul>
+            <li>2309: DataPointRecorder units change when emptied.  Thanks, Ivar!
+            <li>1779: copy/paste plot is more aggressive about trying to bind the pasted plot's x-axis to the timerange.  Thanks, Bill!
+        </ul>
+        <p>Older Bugfixes (2020-12-02 r25360):</p>
         <ul>
             <li>PNGWalkTool data-to-pixel transform had discontinuity at axis edge.  Now there is an output limit of -10000 to 10000, which is consistent with the DasAxis object.
             <li>Datums backed by Long but not Units.cdfTT2000 would cause runtime error when printed.
@@ -41,33 +46,10 @@
             <li>In Mathematica to Jython, properly handle "2754 2^(2/3)"
             <li>medianFilter would fail if there was too much fill data.  Thanks, Kristoff!
         </ul>
-        <p>Older Bugfixes (2020-10-22 r25232):</p>
-        <ul>
-            <li>NegativeArraySizeException in intermediate state of SeriesRenderer, when log axis is used and plot has not been sized.  Thanks, Jon N!
-            <li>2290: unbundle filter GUI contained bug which would insert extra quote in the argument.
-            <li>recent change to pngWalkTool didn't consider one of the initialization modes.
-            <li>datumRange constructor which took two long-backed cdf_tt2000 datums would convert the end datum unnecessarily, introducing numerical noise.
-            <li>correction to FTP so that user:pass is only requested once, anonymous ftp is dropped.
-            <li>HAPI server transactions should use UTF-8 and not the system default encoding.  Thanks, Vincent and Benjamin!
-            <li>Tooltip on progress monitor, which is never truncated, shows transfer rate.
-            <li>2295: improvements to automatic variable name selection.
-            <li>improve support for huge CDF files (&gt;2G), by removing a check which assumed that the ByteBuffer was a mapping of the entire file. Improve feedback.
-            <li>When PNGWalk has roughly the expected number of files, don't count off intervals, which causes problems when 10-day plots start at year boundaries.
-            <li>Yearly update of digital signature for JNLP.
-            <li>2292: bugfix in DataSourceUtil.trimScatterToTimeRange, which didn't find the timetags when three timeseries datasets were bundled.  Thanks, Allison!
-            <li>2292: correction to the timerange used in the resultant dataset.  
-            <li>2292: mashup tool now puts current list of URIs into the recent URIs, for easier to create URIs of that other datasets from the same file.  Thanks, Allison!
-            <li>2292: mashup tool now removes timerange from each URI, which was cluttered and confusing.  
-            <li>rfe425: in MashUp tool, use new guessNameFor which guarantees unique names.
-            <li>rfe425: in MashUp tool, leave tree branch unfolded when inserting an operation, to minimize changes.
-            <li>graphical ProgressMonitor shows rate in tooltip as well as the status.
-            <li>there was a path where the keychain file would get a file for credentials, not the folder the file is within.
-            <li>correction to "show error bars" binding, the initial setting should be disabled.
-            <li>bugfix: SerializeDelegate was not added for ErrorBarType
-            <li>rte_1611550558: index out of bounds in misformatted time resulted in poor error feedback.  Thanks dphartley!
-            <li>rte_1611550558: old $x for localized m/d/Y or d.m.Y was leftover in old code, which could be confusing.
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>rfe501: allow custom mouse event handler and topDecorator to be added to the PNGWalkTool.
             <li>rfe704: setScriptDescription can have a clickable link.
@@ -78,12 +60,6 @@
             <li>rfe363: check version of Javadoc when deciding how to create link.
             <li>rfe363: finally "addToSearchPath"'s Javadoc argument is used for Javadoc completions. (To be shown at 2020 AGU.)
             <li>rfe363: first batch of new icons showing Java static method vs instance method, properly filter by context.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>create pngwalk shows processing rate based on last 20 images, not the whole run, so that parallel processing is improved.
-            <li>Jython editor has new developer->"Convert Mathematica code to Jython" tool.
-            <li>create pngwalk checks for lockfile, so that multiple processes can work on pngwalk in concert.
         </ul>
         <p>Known issues:</p>
         <ul>
