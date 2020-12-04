@@ -67,6 +67,7 @@ import org.das2.datum.HttpUtil;
 import org.das2.qds.ops.Ops;
 import org.das2.util.Base64;
 import org.das2.util.filesystem.KeyChain;
+import org.das2.util.monitor.AlertNullProgressMonitor;
 import org.das2.util.monitor.CancelledOperationException;
 
 /**
@@ -796,12 +797,14 @@ public class DataSetURI {
      * TODO: why is there both getFile(url,mon) and getFile( suri, allowHtml, mon )???
      * 
      * @param url the URL of the file.
-     * @param mon progress monitor
+     * @param mon progress monitor or null.  If null then AlertProgressMonitor is used to show when the download time is not trivial.
      * @return the File
      * @throws java.io.IOException
      * @see #getFile(java.lang.String, boolean, org.das2.util.monitor.ProgressMonitor) 
      */
     public static File getFile(URL url, ProgressMonitor mon) throws IOException {
+        
+        if ( mon==null ) mon= new AlertNullProgressMonitor("loading "+url);
 
         URISplit split = URISplit.parse(url.toString());
 
