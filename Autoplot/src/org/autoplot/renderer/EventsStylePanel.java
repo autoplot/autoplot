@@ -65,6 +65,7 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
         jLabel3 = new javax.swing.JLabel();
         lineStylePanel = new javax.swing.JPanel();
         lineThickComboBox = new javax.swing.JComboBox<>();
+        opaqueCheckBox = new javax.swing.JCheckBox();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Events Bar"));
 
@@ -137,6 +138,14 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
             }
         });
 
+        opaqueCheckBox.setText("Opaque");
+        opaqueCheckBox.setToolTipText("By default events are drawn with some transparency, this instead makes them opaque.");
+        opaqueCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                opaqueCheckBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -158,7 +167,8 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel3)
-                            .addComponent(jLabel10))
+                            .addComponent(jLabel10)
+                            .addComponent(opaqueCheckBox))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lineStylePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -182,15 +192,19 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(colorPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(colorCB, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addGap(4, 4, 4)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lineStylePanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(2, 2, 2)
+                .addComponent(opaqueCheckBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(lineStylePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(9, 9, 9)
+                        .addComponent(jLabel10)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(lineThickComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(53, Short.MAX_VALUE))
+                .addContainerGap(30, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -228,6 +242,10 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
         update();
     }//GEN-LAST:event_lineThickComboBoxFocusLost
 
+    private void opaqueCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_opaqueCheckBoxActionPerformed
+        update();
+    }//GEN-LAST:event_opaqueCheckBoxActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox colorCB;
@@ -239,6 +257,7 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel lineStylePanel;
     private javax.swing.JComboBox<String> lineThickComboBox;
+    private javax.swing.JCheckBox opaqueCheckBox;
     private javax.swing.JCheckBox orbitModeCB;
     private javax.swing.JCheckBox showLabelsCB;
     // End of variables declaration//GEN-END:variables
@@ -280,6 +299,7 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
         if ( colorCB.isSelected() ) {
             controls.put( Renderer.CONTROL_KEY_COLOR, Renderer.encodeColorControl( (Color)colorEditor1.getValue() ) );
         }
+        controls.put("opaque", Renderer.encodeBooleanControl( opaqueCheckBox.isSelected() ) );
         String c= Renderer.formatControl(controls);
         this.control= c;
         firePropertyChange( Renderer.PROP_CONTROL, oldValue, c );
@@ -293,6 +313,7 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
         showLabelsCB.setSelected( renderer.getBooleanControl("showLabels", false) );
         orbitModeCB.setSelected( renderer.getBooleanControl("orbitMode", false ) );
         ganttModeCB.setSelected( renderer.getBooleanControl("ganttMode", false ) );
+        opaqueCheckBox.setSelected( renderer.getBooleanControl("opaque",false) );
         if ( renderer.hasControl( Renderer.CONTROL_KEY_COLOR ) ) {
             colorCB.setSelected(true);
             colorEditor1.setValue( renderer.getColorControl( Renderer.CONTROL_KEY_COLOR, Color.BLACK ) );
