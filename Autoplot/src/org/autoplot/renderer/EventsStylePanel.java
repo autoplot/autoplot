@@ -5,6 +5,7 @@
  */
 package org.autoplot.renderer;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -18,6 +19,8 @@ import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
 import org.autoplot.PlotStylePanel.StylePanel;
 import org.autoplot.dom.PlotElement;
+import org.das2.components.propertyeditor.EnumerationEditor;
+import org.das2.graph.PsymConnector;
 
 /**
  *
@@ -25,6 +28,8 @@ import org.autoplot.dom.PlotElement;
  */
 public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
 
+    EnumerationEditor lineEditor;
+     
     /**
      * Creates new form EventsStylePanel
      */
@@ -33,12 +38,16 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
         colorEditor1= new ColorEditor();
         colorEditor1.setValue(Color.BLACK);
         colorPanel.add( colorEditor1.getSmallEditor() );
-        colorEditor1.addPropertyChangeListener( new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                update();
-            }
+        colorEditor1.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+            update();
         });
+        lineEditor = new EnumerationEditor();
+        lineEditor.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+            update();
+        });
+        lineEditor.setValue( PsymConnector.SOLID );
+        lineStylePanel.add(lineEditor.getCustomEditor(), BorderLayout.CENTER);
+        
     }
 
     /**
@@ -57,6 +66,10 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
         ganttModeCB = new javax.swing.JCheckBox();
         colorPanel = new javax.swing.JPanel();
         colorCB = new javax.swing.JCheckBox();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        lineStylePanel = new javax.swing.JPanel();
+        lineThickComboBox = new javax.swing.JComboBox<>();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Events Bar"));
 
@@ -69,6 +82,7 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
         });
 
         jLabel1.setText("Font Size:");
+        jLabel1.setToolTipText("font size like \"16pt\" or where 0.5em is half the size of the parent font.");
 
         fontSizeTF.setText("1em");
         fontSizeTF.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -107,6 +121,27 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
             }
         });
 
+        jLabel10.setText("Line Style:");
+        jLabel10.setToolTipText("style of the plot trace, or none");
+
+        jLabel3.setText("Line Thickness:");
+        jLabel3.setToolTipText("thickness of the plot trace");
+
+        lineStylePanel.setLayout(new java.awt.BorderLayout());
+
+        lineThickComboBox.setEditable(true);
+        lineThickComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "", "1pt", "0.5em", "1%" }));
+        lineThickComboBox.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                lineThickComboBoxFocusLost(evt);
+            }
+        });
+        lineThickComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lineThickComboBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -117,16 +152,23 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
                     .addComponent(showLabelsCB)
                     .addComponent(orbitModeCB)
                     .addComponent(ganttModeCB)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addComponent(colorCB)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(colorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addComponent(jLabel1)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(fontSizeTF, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(215, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(colorCB)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(colorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(fontSizeTF, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel10))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lineStylePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lineThickComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(123, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -141,14 +183,19 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
                 .addComponent(orbitModeCB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(ganttModeCB)
+                .addGap(6, 6, 6)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(11, 11, 11)
-                        .addComponent(colorCB))
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(colorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(106, Short.MAX_VALUE))
+                    .addComponent(colorPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(colorCB, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addGap(4, 4, 4)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lineStylePanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(lineThickComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(53, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -178,6 +225,14 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
         update();
     }//GEN-LAST:event_colorCBActionPerformed
 
+    private void lineThickComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lineThickComboBoxActionPerformed
+        update();
+    }//GEN-LAST:event_lineThickComboBoxActionPerformed
+
+    private void lineThickComboBoxFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_lineThickComboBoxFocusLost
+        update();
+    }//GEN-LAST:event_lineThickComboBoxFocusLost
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox colorCB;
@@ -185,6 +240,10 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
     private javax.swing.JTextField fontSizeTF;
     private javax.swing.JCheckBox ganttModeCB;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel lineStylePanel;
+    private javax.swing.JComboBox<String> lineThickComboBox;
     private javax.swing.JCheckBox orbitModeCB;
     private javax.swing.JCheckBox showLabelsCB;
     // End of variables declaration//GEN-END:variables
@@ -221,6 +280,8 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
         controls.put( "showLabels", Renderer.encodeBooleanControl( showLabelsCB.isSelected() ) );
         controls.put( "orbitMode", Renderer.encodeBooleanControl( orbitModeCB.isSelected() ) );
         controls.put( "ganttMode", Renderer.encodeBooleanControl( ganttModeCB.isSelected() ) );
+        controls.put( Renderer.CONTROL_KEY_LINE_STYLE, Renderer.encodePlotSymbolConnectorControl( (PsymConnector) lineEditor.getCellEditorValue() ) );
+        controls.put("lineThick", lineThickComboBox.getSelectedItem().toString() );
         if ( colorCB.isSelected() ) {
             controls.put( Renderer.CONTROL_KEY_COLOR, Renderer.encodeColorControl( (Color)colorEditor1.getValue() ) );
         }
@@ -232,6 +293,8 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
     private void updateGUI( Renderer renderer ) {
         this.control= renderer.getControl();
         fontSizeTF.setText( renderer.getControl("fontSize", "1em") );
+        lineThickComboBox.setSelectedItem( renderer.getControl("lineThick","") );
+        lineEditor.setAsText( renderer.getControl( Renderer.CONTROL_KEY_LINE_STYLE, lineEditor.getValue().toString() ) );
         showLabelsCB.setSelected( renderer.getBooleanControl("showLabels", false) );
         orbitModeCB.setSelected( renderer.getBooleanControl("orbitMode", false ) );
         ganttModeCB.setSelected( renderer.getBooleanControl("ganttMode", false ) );
