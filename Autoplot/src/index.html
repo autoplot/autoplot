@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Fun with custom renderer, script <a href='https://github.com/autoplot/dev/blob/master/demos/2020/20201204/demoCustomRenderer.jy'>here</a>.
+        <p><small>lineStyle and lineThick property added to the eventsBar style.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,7 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-12-04 r25364):</p>
+        <p>Bugfixes (2020-12-04 r25368):</p>
         <ul>
             <li>2309: DataPointRecorder units change when emptied.  Thanks, Ivar!
             <li>1779: copy/paste plot is more aggressive about trying to bind the pasted plot's x-axis to the timerange.  Thanks, Bill!
@@ -48,6 +48,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>events bar supports lineStyle and lineThick properties, new opaque property disables transparency.  Thanks, Ali!
+            <li>getFile can have null passed in for the monitor, when the developer knows the load will be quick.
         </ul>
         <p>Less recent features:</p>
         <ul>
