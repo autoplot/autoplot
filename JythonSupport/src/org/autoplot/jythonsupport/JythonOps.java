@@ -269,6 +269,26 @@ public class JythonOps {
     }
     
     /**
+     * coerce two python objects to DatumRange
+     * @param arg0 Python object, one of rank 0 dataset, int, float, or String.
+     * @param arg1 Python object, one of rank 0 dataset, int, float, or String.
+     * @throws IllegalArgumentException if the argument cannot be parsed or converted.
+     * @return DatumRange
+     */    
+    public static DatumRange datumRange( PyObject arg0, PyObject arg1 ) {
+        if ( arg1 instanceof PyJavaInstance ) {
+            Units u= (Units) ((PyJavaInstance)arg1).__tojava__(Units.class);
+            if ( u!=null ) {
+                return datumRange( arg0, u );
+            }
+        }
+        Datum d1= datum( arg0 );
+        Datum d2= datum( arg1 );
+        
+        return new DatumRange( d1, d2 );
+    }
+    
+    /**
      * coerce python objects to DatumRange, when the units are known.
      * 
      * @param arg0 PyQDataSet, String, array or List.
