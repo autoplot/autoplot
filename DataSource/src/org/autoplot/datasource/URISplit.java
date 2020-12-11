@@ -624,7 +624,7 @@ public class URISplit {
             surl= surl+"/";
         }
         
-        // finally, kludge for Unix ~.  TODO: Get this working some time...
+        // finally, kludge for Unix ~/.  
         if ( surl.startsWith("~/") ) {
             surl= System.getProperty("user.home") + surl.substring(1);
             caretPos += ( System.getProperty("user.home").length() -1 );
