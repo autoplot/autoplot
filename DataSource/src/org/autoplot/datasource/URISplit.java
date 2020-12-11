@@ -623,12 +623,12 @@ public class URISplit {
             if ( caretPos==surl.length() ) caretPos++;
             surl= surl+"/";
         }
-
-//        // finally, kludge for Unix ~.  TODO: Get this working some time...
-//        if ( surl.startsWith("~") ) {
-//            surl= System.getProperty("user.home") + surl.substring(1);
-//            caretPos += ( System.getProperty("user.home").length() -1 );
-//        }
+        
+        // finally, kludge for Unix ~.  TODO: Get this working some time...
+        if ( surl.startsWith("~/") ) {
+            surl= System.getProperty("user.home") + surl.substring(1);
+            caretPos += ( System.getProperty("user.home").length() -1 );
+        }
 
         if ( surl.startsWith("http://autoplot.org/autoplot.jnlp?") ) {
             String[] popFront= new String[] { "http://autoplot.org/autoplot.jnlp?version=devel&", "http://autoplot.org/autoplot.jnlp?"  };
