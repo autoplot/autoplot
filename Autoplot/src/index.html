@@ -26,9 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-12-04 r25368):</p>
+        <p>Bugfixes (2020-12-11 r25373):</p>
         <ul>
-            <li>2309: DataPointRecorder units change when emptied.  Thanks, Ivar!
+            <li>always support "~/..." as a shortcut for home directory.
+            <li>2309: correction to DataPointRecorder units change when emptied.  Thanks, Ivar!
             <li>1779: copy/paste plot is more aggressive about trying to bind the pasted plot's x-axis to the timerange.  Thanks, Bill!
         </ul>
         <p>Older Bugfixes (2020-12-02 r25360):</p>
@@ -48,7 +49,8 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>events bar supports lineStyle and lineThick properties, new opaque property disables transparency.  Thanks, Ali!
+            <li>support datumRange(5,10) in scripts.  Thanks, Ivar!
+            <li>events bar supports lineStyle and lineThick properties, new opaque property disables default transparency.  Thanks, Ali!
             <li>getFile can have null passed in for the monitor, when the developer knows the load will be quick.
         </ul>
         <p>Less recent features:</p>
