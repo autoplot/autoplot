@@ -9,21 +9,60 @@ import java.awt.AWTPermission;
 import java.io.FileDescriptor;
 import java.net.InetAddress;
 import java.security.Permission;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.autoplot.datasource.AutoplotSettings;
-import org.das2.util.LoggerManager;
 
 /**
- *
+ * Security Manager which allows Autoplot access to:<ul>
+ * <li>read and write files under HOME/autoplot_data
+ * <li>read and write files under HOME/.java/.userprefs
+ * </ul>
  * @author jbf
  */
 public class Sandbox {
 
     private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.security");        
     
-    public static SecurityManager getSandboxManager() {
+    /**
+     * return a security manager with reasonable settings.
+     * @return 
+     */
+    public static SecurityManager getSandboxManager( ) {
+
+        List<String> readWriteList= new ArrayList<>();
+        readWriteList.add( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) );
+        readWriteList.add( System.getProperty("user.home")+"/.java/.userPrefs/" );
+        readWriteList.add( "/tmp/imageio" );
         
+        ArrayList<String> readOnlyList= new ArrayList<>(readWriteList);
+        String path= System.getProperty("java.class.path");
+        readOnlyList.addAll(Arrays.asList(path.split(":")));
+        readOnlyList.add( System.getProperty("java.home") );
+        readOnlyList.add( "/usr/share/fonts/" );
+        readOnlyList.add( System.getProperty("user.home")+"/.das2rc" );
+        
+        return getSandboxManager( readWriteList, readOnlyList );
+    }
+    
+    /**
+     * return a security manager which allows read and write from a list
+     * of areas, and read from another list.
+     * @param okayHome
+     * @param roOkayHome
+     * @return 
+     */
+    public static SecurityManager getSandboxManager( List<String> okayHome, List<String> roOkayHome ) {
+        
+        final List<String> lokayHome= Collections.unmodifiableList(okayHome);
+        final List<String> lroOkayHome= Collections.unmodifiableList(roOkayHome);
+        
+        final String jreHome= System.getProperty("java.home");
+                
         SecurityManager limitedSecurityManager = new SecurityManager() {
             @Override
             public ThreadGroup getThreadGroup() {
@@ -32,7 +71,15 @@ public class Sandbox {
 
             @Override
             public void checkSecurityAccess(String target) {
-                logger.fine( "checkSecurityAccess(target)");
+                if ( target.equals("putProviderProperty.SunRsaSign") ) {
+                    logger.fine( "checkSecurityAccess(SynRsaSign)");
+                } else if ( target.equals("putProviderProperty.SUN") ) {
+                    logger.fine( "checkSecurityAccess(SUN)");
+                } else if ( target.startsWith("putProviderProperty.Sun") ) {
+                    logger.fine( "checkSecurityAccess(SUN)");
+                } else {
+                    logger.fine( "checkSecurityAccess(target)");
+                }
             }
 
             @Override
@@ -86,31 +133,65 @@ public class Sandbox {
                 logger.fine( "checkConnect(host, port)");
             }
 
+            /**
+             * return true if the file is within a sandboxed filesystem.
+             * @param file
+             * @return 
+             */
+            private boolean whitelistFile( String file ) {
+                return lokayHome.stream().anyMatch((s) -> ( file.startsWith(s) ));
+            }
+            
+            /**
+             * return true if the file is within a sandboxed filesystem.
+             * @param file
+             * @return 
+             */
+            private boolean readOnlyWhitelistFile( String file ) {
+                return lroOkayHome.stream().anyMatch((s) -> ( file.startsWith(s) ));
+            }
+            
             @Override
             public void checkDelete(String file) {
-                logger.fine( "checkDelete(file)");
+                if ( whitelistFile(file) ) {
+                    logger.fine( "checkDelete(AP)");
+                } else {
+                    logger.fine( "checkDelete(file)");
+                }
+
             }
 
             @Override
             public void checkWrite(String file) {
-                logger.fine( "checkWrite(file)");
+                if ( whitelistFile(file) ) {
+                    logger.fine( "checkWrite(AP)");
+                } else {
+                    logger.fine( "checkWrite(file)");
+                }
             }
 
             @Override
-            public void checkWrite(FileDescriptor fd) {
+            public void checkWrite(FileDescriptor fd) { // stdin, stdout, stderr
                 logger.fine( "checkWrite(fd)");
             }
 
             @Override
             public void checkRead(String file, Object context) {
-                logger.fine( "checkRead(file, context)");
+                if ( readOnlyWhitelistFile(file) ) {
+                    logger.fine( "checkRead(file, context)");
+                } else {
+                    super.checkRead(file);
+                    logger.fine( "checkRead(file)");
+                }                    
             }
 
             @Override
             public void checkRead(String file) {
-                String autoplotData= AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA );
-                if ( !file.startsWith( autoplotData ) ) {
+                if ( readOnlyWhitelistFile(file) ) {
+                    logger.fine( "checkRead(AP)");
+                } else {
                     super.checkRead(file);
+                    logger.fine( "checkRead(file)");
                 }
             }
 
@@ -127,6 +208,7 @@ public class Sandbox {
             @Override
             public void checkExec(String cmd) {
                 logger.fine( "checkExec(cmd)");
+                throw new SecurityException("checkExec(cmd)");
             }
 
             @Override
