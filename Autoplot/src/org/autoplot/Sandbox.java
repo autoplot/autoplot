@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot;
 
 import java.awt.AWTPermission;
@@ -22,6 +18,7 @@ import org.autoplot.datasource.AutoplotSettings;
  * <li>read and write files under HOME/autoplot_data
  * <li>read and write files under HOME/.java/.userprefs
  * </ul>
+ * TODO: check what happens with /home/jbf/autoplot_data/../
  * @author jbf
  */
 public class Sandbox {
@@ -61,8 +58,6 @@ public class Sandbox {
         final List<String> lokayHome= Collections.unmodifiableList(okayHome);
         final List<String> lroOkayHome= Collections.unmodifiableList(roOkayHome);
         
-        final String jreHome= System.getProperty("java.home");
-                
         SecurityManager limitedSecurityManager = new SecurityManager() {
             @Override
             public ThreadGroup getThreadGroup() {
