@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New properties including lineStyle and lineThick added to the events bar plot style.
+        <p><small><a href='https://github.com/autoplot/dev/blob/master/demos/2020/20201213/windlistener.jy'>Script</a> reads wind speed and direction broadcast by <a href='https://weatherflow.com/tempest-weather-system/'>Tempest</a> weather system.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-12-11 r25373):</p>
+        <p>Bugfixes (2020-12-15 r25376):</p>
         <ul>
+            <li>2309: correction to DataPointRecorder when reading a file.  Thanks, Sadie!
             <li>always support "~/..." as a shortcut for home directory.
             <li>2309: correction to DataPointRecorder units change when emptied.  Thanks, Ivar!
             <li>1779: copy/paste plot is more aggressive about trying to bind the pasted plot's x-axis to the timerange.  Thanks, Bill!
