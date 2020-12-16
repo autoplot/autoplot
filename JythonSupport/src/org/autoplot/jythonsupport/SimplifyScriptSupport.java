@@ -227,7 +227,7 @@ public class SimplifyScriptSupport {
              int i0= theLine.lastIndexOf(tripleQuotes,i1-3);
              if ( i0==-1 ) {
                  int lastLine= o.beginLine;
-                 int firstLine= lastLine;
+                 int firstLine= lastLine-1;
                  while ( firstLine>=0 ) {
                      theLine= ss[firstLine]+"\n"+theLine;
                      if ( ss[firstLine].contains(tripleQuotes) ) {
