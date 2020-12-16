@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.jythoncompletion.JythonCompletionTask;
 import org.python.core.PySyntaxError;
 import org.python.parser.ast.If;
 import org.python.parser.ast.Module;
@@ -43,6 +44,32 @@ public class SimplifyScriptSupport {
         "    'return a dataset for the given URI'\n" +
         "    return dataset(0)\n\n";
     
+    
+    /**
+     * eat away at the end of the script until it can be parsed.
+     * @param script a Jython script.
+     * @return the script with lines at the end removed such that the script can compile.
+     * @see JythonCompletionTask#trimLinesToMakeValid(java.lang.String) 
+     */
+    public static String alligatorParse( String script ) {
+        logger.entering( "SimplifyScriptSupport", "alligatorParse");
+        String[] ss= JythonUtil.splitCodeIntoLines( "# simplifyScriptToGetCompletions", script );
+        String scri=script;
+        int lastLine= ss.length;
+        while ( lastLine>0 ) {
+            scri= JythonUtil.join( Arrays.copyOfRange( ss, 0, lastLine ), "\n" );
+            try {
+                org.python.core.parser.parse( scri, "exec" );
+                break;
+            } catch ( Exception e ) {
+                logger.finest("fail to parse, no worries.");
+            }
+            lastLine--;
+        }
+        logger.exiting( "SimplifyScriptSupport", "alligatorParse" );
+        return scri;
+    }
+    
     /**
      * Remove parts of the script which are expensive so that the script can
      * be run and completions offered.
@@ -52,14 +79,18 @@ public class SimplifyScriptSupport {
      * @see #simplifyScriptToCompletions(java.lang.String) 
      */
     public static String removeSideEffects( String script ) {
+        
+         script= alligatorParse(script);
+         
          String[] ss= JythonUtil.splitCodeIntoLines( "# simplifyScriptToGetCompletions", script );
 
-         String lastLine= ss[ss.length-1].trim();
-         if ( lastLine.endsWith(":") ) {
-             ss= Arrays.copyOf(ss,ss.length-1);
-             script= JythonUtil.join( ss, "\n" );
+         Module n;
+         try {
+            n = (Module)org.python.core.parser.parse( script, "exec" );
+         } catch ( Exception ex ) {
+             // do it again so we can debug.
+            n = (Module)org.python.core.parser.parse( script, "exec" );
          }
-         Module n= (Module)org.python.core.parser.parse( script, "exec" );
          
          if ( n.body[0].beginLine > n.beginLine ) {
              logger.fine("shifting line numbers!");
@@ -87,7 +118,10 @@ public class SimplifyScriptSupport {
      
     /**
      * extracts the parts of the program that are quickly executed, generating a
-     * code which can be run and then queried for completions.
+     * code which can be run and then queried for completions.  This uses a
+     * Jython syntax tree (AST), so the code must be free of syntax errors. 
+     * This will remove lines from the end of the code until the code compiles,
+     * in case the script has a partially defined def or class.
      *
      * @param script the entire python program
      * @return the python program with lengthy calls removed.
@@ -97,6 +131,7 @@ public class SimplifyScriptSupport {
      public static String simplifyScriptToCompletions( String script ) throws PySyntaxError {
          
          if ( script.trim().length()==0 ) return script;
+         script= alligatorParse(script);
          
          String[] ss= JythonUtil.splitCodeIntoLines( "# simplifyScriptToGetCompletions", script );
          
@@ -325,7 +360,8 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                      lastLine1= lastLine;
                  }
                  if ( includeBlock ) {
-                     String ss1= getIfBlock(ss, iff.body, variableNames, beginLine+1, lastLine1, depth+1 );
+                     String ss1= getIfBlock(ss, iff.body, variableNames, 
+                             Math.min(beginLine+1, lastLine1), lastLine1, depth+1 );
                      appendToResult( result,ss1);
                      if ( iff.orelse!=null ) {
                          if ( (istatement+1)>=stmts.length ) {

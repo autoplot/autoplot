@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -136,7 +137,7 @@ public class JythonCompletionTask implements CompletionTask {
      * @return the count
      */
     public int doQuery( CompletionContext cc, CompletionResultSet resultSet ) {
-         int c=0;
+        int c=0;
         try {
             switch (cc.contextType) {
                 case CompletionContext.MODULE_NAME:
@@ -718,26 +719,37 @@ public class JythonCompletionTask implements CompletionTask {
         interp.exec( ss2  );
     }
     
+    public static String getLastLine( String script ) {
+        int i = script.lastIndexOf("\n");
+        if ( i==-1 ) return script; // just one line
+        String l= script.substring(i+1); // +1 is for the new line
+        String s= l.trim();
+        if ( s.length()==0 ) return ""; // on an empty line
+        LinkedList<String> lastLine= new LinkedList<>();
+        int i1= script.indexOf(s,i);
+        String indent= script.substring(i+1,i1);
+        lastLine.add( 0, l );
+        int i2= script.lastIndexOf("\n",i-1);
+        String l2= script.substring(i2+1,i);
+        lastLine.add( 0, l2 );
+        while ( l2.startsWith(indent) ) {
+            i= i2;
+            i2= script.lastIndexOf("\n",i-1);
+            l2= script.substring(i2+1,i);
+            lastLine.add( 0, l2 );
+        }
+        return String.join( "\n",lastLine );
+    }
+    
     /**
      * introduced to see if we can pop a little code from the end, in case we
      * are within a triple-quoted string.
      * @param script the script
      * @return the script, possibly with a few fewer lines.
+     * @see SimplifyScriptSupport#alligatorParse(java.lang.String) 
      */
     public static String trimLinesToMakeValid( String script ) {
-        String[] ss= script.split("\'\'\'",-2);
-        if ( ss.length%2==0 ) {
-            String[] ss2= new String[(ss.length/2)*2];
-            System.arraycopy( ss, 0, ss2, 0, ss2.length );
-            script= String.join( "\'\'\'", ss2 );
-        }
-        ss= script.split("\"\"\"",-2);
-        if ( ss.length%2==0 ) {
-            String[] ss2= new String[ss.length-1];
-            System.arraycopy( ss, 0, ss2, 0, ss2.length );
-            script= String.join( "\"\"\"", ss2 );
-        }
-        return script;
+        return SimplifyScriptSupport.alligatorParse(script);
     }
     
     private int queryNames(CompletionContext cc, CompletionResultSet rs) throws BadLocationException {
@@ -769,7 +781,14 @@ public class JythonCompletionTask implements CompletionTask {
         }
         
         if ( JythonCompletionProvider.getInstance().settings().isSafeCompletions() ) {
-            eval= sanitizeLeaveImports( eval );
+            try {
+                eval= sanitizeLeaveImports( eval );
+            } catch ( Exception ex ) {
+                // adding __dummy__ didn't work, so start removing lines at the end.
+                eval= editor.getText(0, eolnCarot);
+                eval= trimLinesToMakeValid( eval );
+                eval= sanitizeLeaveImports( eval );
+            }
         } 
         
         try {
@@ -958,30 +977,34 @@ public class JythonCompletionTask implements CompletionTask {
             return 0;
         }
 
-        PyObject po= interp.eval(method);
-        PyObject doc= interp.eval(method+".__doc__");
-         if ( po instanceof PyFunction ) {
-            method= getPyFunctionSignature((PyFunction)po);
-            String signature= makeInlineSignature( po, doc );
-            result.addItem( new MessageCompletionItem( method, signature ) );
-        } else if ( po instanceof PyReflectedFunction ) {
-            PyReflectedFunction prf = (PyReflectedFunction) po;
-            List<String> labels= new ArrayList();
-            List<String> signatures= new ArrayList();
-            List<String> argss= new ArrayList();
-            doPyReflectedFunction(eval, prf, labels, signatures, argss );    
-            for ( int jj=0; jj<labels.size(); jj++ ) {
-                String signature= signatures.get(jj);
-                if ( signature==null ) continue; // I don't this this happens, but findbugs pointed out inconsistent code.
-                String link = getLinkForJavaSignature(signature);
-                DefaultCompletionItem item = new DefaultCompletionItem( method, 0, signature, labels.get(jj), link );
-                item.setReferenceOnly(true);
-                result.addItem( item );
-                //result.addItem( new MessageCompletionItem( method + labels.get(jj), signatures.get(jj) ) );
+        try {
+            PyObject po= interp.eval(method);
+            PyObject doc= interp.eval(method+".__doc__");
+             if ( po instanceof PyFunction ) {
+                method= getPyFunctionSignature((PyFunction)po);
+                String signature= makeInlineSignature( po, doc );
+                result.addItem( new MessageCompletionItem( method, signature ) );
+            } else if ( po instanceof PyReflectedFunction ) {
+                PyReflectedFunction prf = (PyReflectedFunction) po;
+                List<String> labels= new ArrayList();
+                List<String> signatures= new ArrayList();
+                List<String> argss= new ArrayList();
+                doPyReflectedFunction(eval, prf, labels, signatures, argss );    
+                for ( int jj=0; jj<labels.size(); jj++ ) {
+                    String signature= signatures.get(jj);
+                    if ( signature==null ) continue; // I don't this this happens, but findbugs pointed out inconsistent code.
+                    String link = getLinkForJavaSignature(signature);
+                    DefaultCompletionItem item = new DefaultCompletionItem( method, 0, signature, labels.get(jj), link );
+                    item.setReferenceOnly(true);
+                    result.addItem( item );
+                    //result.addItem( new MessageCompletionItem( method + labels.get(jj), signatures.get(jj) ) );
+                }
+            } else {
+                String signature= makeInlineSignature( po, doc );
+                result.addItem( new MessageCompletionItem( method, signature ) );
             }
-        } else {
-            String signature= makeInlineSignature( po, doc );
-            result.addItem( new MessageCompletionItem( method, signature ) );
+        } catch ( RuntimeException ex ) {
+            return 0;
         }
         //logger.fine( "DefaultCompletionItem("+ss+","+cc.completable.length()+",\n" + ss + argss.get(jj)+",\n"+label+",\n"+link+")");
                                             
