@@ -60,7 +60,6 @@ import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
-import org.autoplot.jythonsupport.ui.ScriptPanelSupport;
 import org.python.core.PyTuple;
 
 /**
@@ -79,7 +78,7 @@ public class JythonUtil {
      * <li> QDataSets are wrapped so that operators are overloaded.
      * <li> a standard set of names are imported.
      * </ul>
-     * This also adds things to the python search path (see
+     * This also adds things to the Jython search path (see
      * getLocalJythonAutoplotLib) so imports will find them.
      *
      * @param sandbox limit symbols to safe symbols for server.
@@ -242,7 +241,7 @@ public class JythonUtil {
      * copy everything out to autoplot_data/jython without going to web again.
      * The old code showed issues where autoplot.org could not be resolved.
      *
-     * @return the item to add to the python search path.
+     * @return the item to add to the Jython search path.
      * @throws IOException
      */
     private static String getLocalJythonLib() throws IOException {
@@ -268,10 +267,10 @@ public class JythonUtil {
                 String s = r.readLine();
                 while (s != null) {
                     File ff5 = new File(ff3, s);
-                    logger.log(Level.FINER, "copy to local folder python code: {0}", s);
+                    logger.log(Level.FINER, "copy to local folder Jython code: {0}", s);
                     InputStream in = JythonUtil.class.getResourceAsStream("/" + s);
                     if (in == null) {
-                        throw new IllegalArgumentException("unable to find jython code which should be embedded in application: " + s);
+                        throw new IllegalArgumentException("unable to find Jython code which should be embedded in application: " + s);
                     }
                     if (s.contains("/")) {
                         if (!makeHomeFor(ff5)) {
@@ -302,7 +301,7 @@ public class JythonUtil {
      * copy all the app stuff to autoplot_data/jython without going to web
      * again.
      *
-     * @return the item to add to the python search path.
+     * @return the item to add to the Jython search path.
      * @throws IOException
      */
     private static String getLocalJythonAutoplotAppLib() throws IOException {
@@ -335,7 +334,7 @@ public class JythonUtil {
                     s = s.trim();
                     if (s.length() > 0) {
                         File ff5 = new File(ff3, s);
-                        logger.log(Level.FINER, "copy to local folder python code: {0}", s);
+                        logger.log(Level.FINER, "copy to local folder Jython code: {0}", s);
                         if (s.contains("/")) {
                             if (!makeHomeFor(ff5)) {
                                 throw new IOException("Unable to makeHomeFor " + ff5);
@@ -373,11 +372,11 @@ public class JythonUtil {
     }
 
     /**
-     * copy the two python files specific to Autoplot into the user's
+     * copy the two Jython files specific to Autoplot into the user's
      * autoplot_data/jython folder. This reads the version from the first line
      * of the autoplot2017.py.
      *
-     * @return the item to add to the python search path.
+     * @return the item to add to the Jython search path.
      * @throws IOException
      */
     private static String getLocalJythonAutoplotLib() throws IOException {
@@ -1303,10 +1302,10 @@ public class JythonUtil {
     /**
      * extracts the parts of the program that get parameters.
      *
-     * @param script the entire python program
+     * @param script the entire Jython program
      * @param addSort if true, add parameters to keep track of the order that
      * getParam was called. This has no effect now.
-     * @return the python program with expensive calls removed, up to the last
+     * @return the Jython program with expensive calls removed, up to the last
      * getParam call.
      * @see SimplifyScriptSupport#simplifyScriptToCompletions(java.lang.String) 
      */
@@ -2174,7 +2173,7 @@ public class JythonUtil {
     }
 
     /**
-     * return a Java Map for a Python dictionary.
+     * return a Java Map for a Jython dictionary.
      *
      * @param pd
      * @return
@@ -2260,7 +2259,7 @@ public class JythonUtil {
     }
 
     /**
-     * return python code that is equivalent, except it has no side-effects like
+     * return Jython code that is equivalent, except it has no side-effects like
      * plotting. This code is not exact, for example (a,b)= (1,2) is not
      * supported. This code is run to support completions.
      *
