@@ -1306,7 +1306,7 @@ public class JythonUtil {
      * @param script the entire python program
      * @param addSort if true, add parameters to keep track of the order that
      * getParam was called. This has no effect now.
-     * @return the python program with lengthy calls removed, up to the last
+     * @return the python program with expensive calls removed, up to the last
      * getParam call.
      * @see SimplifyScriptSupport#simplifyScriptToCompletions(java.lang.String) 
      */
@@ -1316,7 +1316,7 @@ public class JythonUtil {
         System.arraycopy( ss1, 0, ss, 1, ss1.length );
         ss[0]= "# simplifyScriptToGetParams";
 
-        int lastLine = -1;
+        int lastLine = -1; // the last line we need to include
         boolean withinTripleQuote= false;
         for (int i = 1; i < ss.length; i++) {
             String line = ss[i];
