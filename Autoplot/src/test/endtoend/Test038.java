@@ -14,7 +14,6 @@ import javax.swing.JDialog;
 import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 import org.autoplot.ScriptContext;
-import org.autoplot.dom.Annotation;
 import org.autoplot.dom.Application;
 import org.python.util.PythonInterpreter;
 import org.autoplot.jythonsupport.JythonUtil;
@@ -31,6 +30,7 @@ import org.das2.jythoncompletion.ui.CompletionResultSetImpl;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.python.core.PyException;
 
@@ -80,12 +80,12 @@ public class Test038 {
                 fw.append(scrip);
             }
             List<Param> parms= org.autoplot.jythonsupport.JythonUtil.getGetParams( script );
-            for ( Param p: parms ) {
+            parms.forEach((p) -> {
                 System.err.println(p);
-            }
+            });
             System.err.println( String.format( "read params in %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
             return 0;
-        } catch ( Exception ex ) {
+        } catch ( IOException | PyException ex ) {
             ex.printStackTrace();
             System.err.println( String.format( "failed within %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
             return 1;
@@ -111,44 +111,40 @@ public class Test038 {
         DataSetBuilder dsb= new DataSetBuilder(2,100,3);
         for ( int i=0; i<positions.length; i++ ) {
             
-            int ip= positions[i];
-            int irow,i0,icol;
-            if ( mon.isCancelled() ) break;
+            int irow=-99,i0,icol=-99;
+            
+            try {
 
-            tc.setCaretPosition(ip);
-            try {
-                irow= tc.getLineOfOffset(ip);
-                i0= tc.getLineStartOffset(irow);
-            } catch (BadLocationException ex) {
-                Logger.getLogger(Test038.class.getName()).log(Level.SEVERE, null, ex);
-                continue;
-            }
-            
-            icol= ip-i0;
-            
-            try {
+                int ip= positions[i];
                 
+                if ( mon.isCancelled() ) break;
+
+                tc.setCaretPosition(ip);
+                try {
+                    irow= tc.getLineOfOffset(ip);
+                    i0= tc.getLineStartOffset(irow);
+                } catch (BadLocationException ex) {
+                    Logger.getLogger(Test038.class.getName()).log(Level.SEVERE, null, ex);
+                    continue;
+                }
+            
+                icol= ip-i0;
+                            
                 CompletionContext cc= CompletionSupport.getCompletionContext(tc);
                 if ( cc!=null ) {
                     int count= jct.doQuery( cc, rs.getResultSet() );
                     dsb.nextRecord( new Object[] { irow+1,icol,count } );
                 }
-            } catch ( Exception e ) {
-                //try {
-                //    CompletionContext cc= CompletionSupport.getCompletionContext(tc);
-                //    jct.doQuery( cc, rs.getResultSet() );
-                //} catch ( Exception e2 ) {
-                //    
-                //}
+            } catch ( RuntimeException | BadLocationException e ) {
                 
                 e.printStackTrace();
-                //CompletionContext cc;
-                //try {
-                    //cc = CompletionSupport.getCompletionContext(tc);
-                    //jct.doQuery( cc, rs.getResultSet() );
-                //} catch (BadLocationException ex) {
-                //    Logger.getLogger(Test038.class.getName()).log(Level.SEVERE, null, ex);
-                //}
+                CompletionContext cc;
+                try {
+                    cc = CompletionSupport.getCompletionContext(tc);
+                    jct.doQuery( cc, rs.getResultSet() );
+                } catch (BadLocationException ex) {
+                    Logger.getLogger(Test038.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 dsb.nextRecord(new Object[] { irow+1,icol, COMPLETION_ERROR} );
             }
         }
@@ -228,9 +224,9 @@ public class Test038 {
                 fw.append(scrip);
             }
             List<Param> parms= org.autoplot.jythonsupport.JythonUtil.getGetParams( script );
-            for ( Param p: parms ) {
+            parms.forEach((p) -> {
                 System.err.println(p);
-            }
+            });
             System.err.println( String.format( "read params in %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
             return 0;
         } catch ( IOException | PyException ex ) {
@@ -274,6 +270,7 @@ public class Test038 {
      */
     public static int testGetParams() {
         int t=0;
+        t= Math.max( t, doTests("112","/home/jbf/ct/hudson/script/test038/windlistener.jy") );
         t= Math.max( t, doTests("009","/home/jbf/ct/hudson/script/test038/jydsCommentBug.jyds") );  // Chris has a newline before the closing ).
         t= Math.max( t, doTests("010","/home/jbf/ct/hudson/script/test038/addPointDigitizer.jy") );
         t= Math.max( t, doTests("002","/home/jbf/ct/hudson/script/test038/demoParms1.jy") );
