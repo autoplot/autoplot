@@ -255,6 +255,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
     private String initialBookmarksUrl= null;
     
     String applicationName= "";
+    
+    private String apversion=null;
+    
     void setApplicationName(String id) {
         this.applicationName= id;
         if ( DomUtil.getElementById(dom, id)==null ) { // make sure there are no other nodes with this id.
@@ -359,7 +362,15 @@ public final class AutoplotUI extends javax.swing.JFrame {
      * @param model the legacy model that backs the application.
      */
     public AutoplotUI(ApplicationModel model) {
-        
+                     
+        apversion= APSplash.getVersion();
+        if ( apversion.equals("untagged_version") ) {
+            apversion= "(dev)";
+        }
+        if ( apversion.equals("(dev)") ) {
+            apversion= "(dev"+getProcessId("")+")";
+        }
+
         setIconImage( AutoplotUtil.getAutoplotIcon() );
         
         APSplash.checkTime("init 0");
@@ -4488,14 +4499,7 @@ public static String getProcessId(final String fallback) {
 private void updateFrameTitle() {
     final String suri= applicationModel.getVapFile();
 
-    String v= APSplash.getVersion();
-    if ( v.equals("untagged_version") ) {
-        v= "(dev)";
-    }
-    if ( v.equals("(dev)") ) {
-        v= "(dev"+getProcessId("")+")";
-    }
-    final String title0= "Autoplot "+v;
+    final String title0= "Autoplot "+apversion;
     final String isoffline= FileSystem.settings().isOffline() ? " (offline)" : "";
 
     final String server= rlistener==null ? "" : ( " (port="+rlistener.getPort()+")" );
@@ -4917,7 +4921,7 @@ private void updateFrameTitle() {
 
         String tag;
         try {
-            tag = AboutUtil.getReleaseTag(APSplash.class);
+            tag = AboutUtil.getReleaseTag(APSplash.class);            
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
             tag= "???";
