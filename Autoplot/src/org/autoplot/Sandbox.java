@@ -2,9 +2,11 @@
 package org.autoplot;
 
 import java.awt.AWTPermission;
-import java.io.FileDescriptor;
+import java.io.FilePermission;
 import java.net.InetAddress;
+import java.net.NetPermission;
 import java.net.URLPermission;
+import java.security.AllPermission;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,8 +45,9 @@ public final class Sandbox {
 
         List<String> readWriteList= new ArrayList<>();
         readWriteList.add( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) );
-        readWriteList.add( System.getProperty("user.home")+"/.java/.userPrefs/" );
-        readWriteList.add( "/tmp/imageio" );
+        readWriteList.add( System.getProperty("user.home")+"/.java/.userPrefs" );
+        //readWriteList.add( "/tmp/imageio" );
+        readWriteList.add( "/tmp" );
 
         String hapiData= HapiDataSource.getHapiCache();
         readWriteList.add( hapiData );
@@ -52,8 +55,11 @@ public final class Sandbox {
         ArrayList<String> readOnlyList= new ArrayList<>(readWriteList);
         String path= System.getProperty("java.class.path");
         readOnlyList.addAll(Arrays.asList(path.split(":")));
+        //TODO: Windows, Mac.
         readOnlyList.add( System.getProperty("java.home") );
         readOnlyList.add( "/usr/share/fonts/" );
+        readOnlyList.add( System.getProperty("user.home")+"/.fonts/" );
+        readOnlyList.add( "__classpath__");
         readOnlyList.add( System.getProperty("user.home")+"/.das2rc" );
         
         return getSandboxManager( readWriteList, readOnlyList );
@@ -68,8 +74,16 @@ public final class Sandbox {
      */
     public static SecurityManager getSandboxManager( List<String> okayHome, List<String> roOkayHome ) {
         
-        final List<String> lokayHome= Collections.unmodifiableList(okayHome);
-        final List<String> lroOkayHome= Collections.unmodifiableList(roOkayHome);
+        final List<String> f_okayHome= Collections.unmodifiableList(okayHome);
+        final List<String> f_roOkayHome= Collections.unmodifiableList(roOkayHome);
+        
+        Set<String> roBlacklist= new HashSet<>();
+        roBlacklist.add( "/etc" );
+        roBlacklist.add( "/sys" );
+        roBlacklist.add( "/boot" );
+        roBlacklist.add( "/proc" );
+        roBlacklist.add( "/dev" );
+        Set<String> f_roBlacklist= Collections.unmodifiableSet(roBlacklist);
         
         Set<String> okayProps= new HashSet<>();
         okayProps.add( "sun.awt.disablegrab" );
@@ -80,24 +94,38 @@ public final class Sandbox {
         okayProps.add( "line.separator" );
         okayProps.add( "os.name" );
         okayProps.add( "os.arch" );
+        okayProps.add( "user.dir" );
         okayProps.add( "user.home" );
         okayProps.add( "java.home" );
+        okayProps.add( "java.version" );
         okayProps.add( "proxyHost" );
         okayProps.add( "socksProxyHost" );
         okayProps.add( "https.proxyHost" );
+        okayProps.add( "http.agent" );
         okayProps.add( "enableReferenceCache" );
         okayProps.add( "sun.awt.noerasebackground" );
         okayProps.add( "HAPI_DATA" );
         okayProps.add( "AUTOPLOT_DATA" );
+        okayProps.add( "cdawebHttps" );        
+        okayProps.add( "python.cachedir" ); // this one is odd, because Autoplot writes to it, but we probably don't want others to write to it.
         Set<String> f_okayProps= Collections.unmodifiableSet(okayProps);
         
         Set<String> okayPermissions= new HashSet<>();
         okayPermissions.add("accessClipboard");
         okayPermissions.add("AWTPermission");
         okayPermissions.add("suppressAccessChecks");
+        okayPermissions.add("accessDeclaredMembers");
         Set<String> f_okayPermissions= Collections.unmodifiableSet(okayPermissions);
         
+        Set<String> okaySecurityAccessTargets= new HashSet<>();
+        okaySecurityAccessTargets.add("putProviderProperty.SunRsaSign");
+        okaySecurityAccessTargets.add("putProviderProperty.SUN");
+        okaySecurityAccessTargets.add("putProviderProperty.Sun");
+        okaySecurityAccessTargets.add("putProviderProperty.XMLD");
+        Set<String> f_okaySecurityAccessTargets= Collections.unmodifiableSet(okaySecurityAccessTargets);
+        
         SecurityManager limitedSecurityManager = new SecurityManager() {
+            
             @Override
             public ThreadGroup getThreadGroup() {
                 return super.getThreadGroup(); 
@@ -105,15 +133,13 @@ public final class Sandbox {
 
             @Override
             public void checkSecurityAccess(String target) {
-                if ( target.equals("putProviderProperty.SunRsaSign") ) {
-                    logger.fine( "checkSecurityAccess(SynRsaSign)");
-                } else if ( target.equals("putProviderProperty.SUN") ) {
-                    logger.fine( "checkSecurityAccess(SUN)");
-                } else if ( target.startsWith("putProviderProperty.Sun") ) {
-                    logger.fine( "checkSecurityAccess(SUN)");
-                } else {
-                    logger.fine( "checkSecurityAccess(target)");
-                }
+                for ( String s : f_okaySecurityAccessTargets ) {
+                    if ( target.startsWith(s) ) {
+                        logger.log(Level.FINER, "checkSecurityAccess({0})", s);
+                        return;
+                    }
+                };
+                logger.log(Level.FINE, "checkSecurityAccess({0})", target);
             }
 
             @Override
@@ -129,7 +155,7 @@ public final class Sandbox {
 
             @Override
             public void checkPrintJobAccess() {
-                logger.fine( "checkPrintJobAccess" );
+                logger.finer( "checkPrintJobAccess" );
             }
 
             @Override
@@ -137,13 +163,8 @@ public final class Sandbox {
                 if ( f_okayProps.contains(key) ) {
                     logger.log(Level.FINER, "checkPropertyAccess({0}) OK", key);
                 } else {
-                    logger.log(Level.FINE, "checkPropertyAccess({0})", key);
+                    logger.log(Level.FINER, "checkPropertyAccess({0}) (All properties are okay)", key); 
                 }
-            }
-
-            @Override
-            public void checkPropertiesAccess() {
-                logger.fine( "checkPropertiesAccess()");
             }
 
             @Override
@@ -177,7 +198,7 @@ public final class Sandbox {
              * @return 
              */
             private boolean whitelistFile( String file ) {
-                return lokayHome.stream().anyMatch((s) -> ( file.startsWith(s) ));
+                return f_okayHome.stream().anyMatch((s) -> ( file.startsWith(s) ));
             }
             
             /**
@@ -186,9 +207,19 @@ public final class Sandbox {
              * @return 
              */
             private boolean readOnlyWhitelistFile( String file ) {
-                return lroOkayHome.stream().anyMatch((s) -> ( file.startsWith(s) ));
+                return f_roOkayHome.stream().anyMatch((s) -> ( file.startsWith(s) ));
             }
             
+            /**
+             * return true if the file has been blacklisted for reading, for example
+             * /etc, /boot
+             * @param file
+             * @return 
+             */
+            private boolean readOnlyBlacklistFile( String file ) {
+                return f_roBlacklist.stream().anyMatch((s) -> ( file.startsWith(s) ));
+            }
+                        
             @Override
             public void checkDelete(String file) {
                 if ( whitelistFile(file) ) {
@@ -209,16 +240,15 @@ public final class Sandbox {
             }
 
             @Override
-            public void checkWrite(FileDescriptor fd) { // stdin, stdout, stderr
-                logger.fine( "checkWrite(fd)");
-            }
-
-            @Override
             public void checkRead(String file, Object context) {
                 if ( readOnlyWhitelistFile(file) ) {
                     logger.log( Level.FINER, "checkRead({0}, {1}) WHITELIST", new Object[]{file, context});
                 } else {
-                    super.checkRead(file);
+                    if ( readOnlyBlacklistFile(file) ) {
+                        throw new SecurityException( String.format( "checkRead( (%s) BLACKLIST", file) );
+                    } else {
+                        logger.log(Level.FINER, "checkRead({0}, {1})", new Object[]{file, context});
+                    }
                     logger.log(Level.FINE, "checkRead({0}, {1})", new Object[]{file, context});
                 }                    
             }
@@ -228,87 +258,77 @@ public final class Sandbox {
                 if ( readOnlyWhitelistFile(file) ) {
                     logger.log(Level.FINER, "checkRead({0}) WHITELIST", file);
                 } else {
-                    super.checkRead(file);
-                    logger.log(Level.FINE, "checkRead({0})", file);
+                    if ( readOnlyBlacklistFile(file) ) {
+                        throw new SecurityException( String.format( "checkRead( (%s) BLACKLIST", file) );
+                    } else {
+                        logger.log(Level.FINER, "checkRead({0})", file);
+                    }
                 }
-            }
-
-            @Override
-            public void checkRead(FileDescriptor fd) {
-                logger.fine( "checkRead(fd)");
-            }
-
-            @Override
-            public void checkLink(String lib) {
-                logger.fine( "checkLink(lib)");
-            }
-
-            @Override
-            public void checkExec(String cmd) {
-                logger.fine( "checkExec(cmd)");
-                throw new SecurityException("checkExec(cmd)");
-            }
-
-            @Override
-            public void checkExit(int status) {
-                logger.fine( "checkExit(status)");
-            }
-
-            @Override
-            public void checkAccess(ThreadGroup g) {
-                logger.log(Level.FINER, "checkAccess({0}) OK", g);
-            }
-
-            @Override
-            public void checkAccess(Thread t) {
-                logger.log(Level.FINER, "checkAccess({0}) OK", t);
-            }
-
-            @Override
-            public void checkCreateClassLoader() {
-                logger.fine( "checkCreateClassLoader()");
             }
 
             @Override
             public void checkPermission(Permission perm, Object context) {
                 logger.log(Level.FINE, "checkPermission( {0}, {1})", new Object[]{perm.getName(), context}); //super.checkPermission(perm); 
+                checkPermission( perm );
             }
 
             @Override
             public void checkPermission(Permission perm) {
                 if ( perm instanceof PropertyPermission ) {
                     String name= perm.getName();
+                    String actions= perm.getActions();
                     if ( f_okayProps.contains(name) ) {
-                        logger.log(Level.FINER, "checkPropertyPermission( {0} ) OK", new Object[]{name});
+                        logger.log(Level.FINER, "checkPermission( PropertyPermission {0} ) OK", new Object[]{name});
                     } else {
-                        logger.log(Level.FINE, "checkPropertyPermission( {0} )", new Object[]{name}); 
+                        if ( "*".equals(name) && "read,write".equals(actions) ) {
+                            logger.log(Level.FINER, "checkPermission( PropertyPermission * read,write ) okay for Beans", new Object[]{name}); 
+                        } else if ( "read".equals(actions) ) {
+                            logger.log(Level.FINER, "checkPermission( PropertyPermission read ) OK" ); 
+                        } else {
+                            logger.log(Level.FINE, "checkPermission( PropertyPermission {0} )", new Object[]{name}); 
+                        }
                     }
                 } else if ( perm instanceof LoggingPermission ) {
-                    logger.log(Level.FINER, "checkLoggingPermission( {0} ) OK", new Object[]{perm});
+                    logger.log(Level.FINER, "checkPermission( LoggingPermission {0} ) OK", new Object[]{perm});
                 } else if ( perm instanceof AWTPermission ) {
-                    logger.log(Level.FINER, "checkAWTPermission( {0} ) OK", new Object[]{perm});
+                    logger.log(Level.FINER, "checkPermission( AWTPermission {0} ) OK", new Object[]{perm});
                 } else if ( perm instanceof URLPermission ) {
-                    logger.log(Level.FINER, "checkURLPermission( {0} ) OK", new Object[]{perm});
+                    logger.log(Level.FINER, "checkPermission( URLPermission {0} ) OK", new Object[]{perm});
+                } else if ( perm instanceof FilePermission ) {
+                    String name= perm.getName();
+                    String action= perm.getActions();
+                    if ( "read".equals(action) ) {
+                        String file= name;
+                        if ( readOnlyWhitelistFile(file) ) {
+                            logger.log(Level.FINER, "checkPermission( FilePermission({0}) WHITELIST", file);
+                        } else {
+                            if ( readOnlyBlacklistFile(file) ) {
+                                throw new SecurityException( String.format( "checkPermission( FilePermission(%s) BLACKLIST", file) );
+                            } else {
+                                logger.log(Level.FINER, "checkPermission( FilePermission({0})", file);
+                            }
+                        }
+                    } else {
+                        super.checkPermission(perm);
+                    }
+                } else if ( perm instanceof RuntimePermission ) {
+                    String name= perm.getName();
+                    logger.log(Level.FINER, "checkPermission( RuntimePermission {0} ) OK", new Object[]{name});
+                } else if ( perm instanceof AllPermission ) {
+                    // there's code in the FileSystem codes that detects applet using this.
+                    logger.log(Level.FINER, "checkPermission( AllPermission ) FileSystem calls so OK" );
+                } else if ( perm instanceof NetPermission ) {
+                    logger.log(Level.FINER, "checkPermission( NetPermission ) OK, but this should be studied more." );
                 } else {
                     String name= perm.getName();
                     if ( f_okayPermissions.contains(name) ) {
                         logger.log(Level.FINER, "checkPermission( {0} ) OK", new Object[]{name});
                     } else {
-                        logger.log(Level.FINE, "checkPermission( {0} )", new Object[]{name}); 
+                        logger.log(Level.FINE, "checkPermission( {0} {1} )", new Object[]{perm.getActions(),name}); 
                     }
                 }
             }
 
-            @Override
-            public Object getSecurityContext() {
-                return super.getSecurityContext(); 
-            }
-
-            @Override
-            protected Class[] getClassContext() {
-                return super.getClassContext(); 
-            }
-            
         };
         return limitedSecurityManager;
     }
