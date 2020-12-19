@@ -180,12 +180,12 @@ public final class Sandbox {
 
             @Override
             public void checkAccept(String host, int port) {
-                logger.log(Level.FINE, "checkAccept({0}, {1})", new Object[]{host, port}); 
+                logger.log(Level.FINER, "checkAccept({0}, {1})", new Object[]{host, port}); 
             }
 
             @Override
             public void checkListen(int port) {
-                logger.log(Level.FINE, "checkListen({0})", port);
+                logger.log(Level.FINER, "checkListen({0})", port);
             }
 
             @Override
