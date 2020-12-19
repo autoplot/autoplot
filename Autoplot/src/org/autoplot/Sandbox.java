@@ -44,51 +44,62 @@ public final class Sandbox {
     private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.security");        
     
     /**
-     * return a security manager with reasonable settings.
+     * return a security manager which allows:<ul>
+     * <li>read from anywhere besides a blacklist
+     * <li>write to anywhere in whitelist
+     * <li>any network activity
+     * <li>any property read
+     * </ul>
+     * This is likely to change from the implementation as things develop, so
+     * please review this code if you must know precisely, or perform 
+     * experiments until you are satisfied with its operation.
      * @return 
      */
     public static SecurityManager getSandboxManager( ) {
-
+        
+        boolean linux= System.getProperty("os.name").equals("Linux");
+        boolean notWindows= !System.getProperty("os.name").equals("Windows");
+        
         List<String> readWriteList= new ArrayList<>();
         readWriteList.add( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) );
-        readWriteList.add( System.getProperty("user.home")+"/.java/.userPrefs" );
-        //readWriteList.add( "/tmp/imageio" );
-        readWriteList.add( "/tmp" );
+        if ( linux ) {
+            readWriteList.add( System.getProperty("user.home")+"/.java/.userPrefs" );
+        }
+        
+        if ( notWindows ) {
+            readWriteList.add( "/tmp" );
+        }
 
         String hapiData= HapiDataSource.getHapiCache();
         readWriteList.add( hapiData );
         
         ArrayList<String> readOnlyList= new ArrayList<>(readWriteList);
         String path= System.getProperty("java.class.path");
-        readOnlyList.addAll(Arrays.asList(path.split(":")));
-        //TODO: Windows, Mac.
+        
+        if ( linux ) {
+            readOnlyList.addAll(Arrays.asList(path.split(":")));
+        }
+        
         readOnlyList.add( System.getProperty("java.home") );
-        readOnlyList.add( "/usr/share/fonts/" );
-        readOnlyList.add( System.getProperty("user.home")+"/.fonts/" );
-        readOnlyList.add( "__classpath__");
+        if ( linux ) {
+            readOnlyList.add( "/usr/share/fonts/" );
+            readOnlyList.add( System.getProperty("user.home")+"/.fonts/" );
+        }
+        
+        readOnlyList.add( "__classpath__"); // files on Jython classpath show this.
         readOnlyList.add( System.getProperty("user.home")+"/.das2rc" );
-        
-        return getSandboxManager( readWriteList, readOnlyList );
-    }
-    
-    /**
-     * return a security manager which allows read and write from a list
-     * of areas, and read from another list.
-     * @param okayHome
-     * @param roOkayHome
-     * @return 
-     */
-    public static SecurityManager getSandboxManager( List<String> okayHome, List<String> roOkayHome ) {
-        
-        final List<String> f_rwOkayHome= Collections.unmodifiableList(okayHome);
-        final List<String> f_roOkayHome= Collections.unmodifiableList(roOkayHome);
+                
+        final List<String> f_rwOkayHome= Collections.unmodifiableList(readWriteList);
+        final List<String> f_roOkayHome= Collections.unmodifiableList(readOnlyList);
         
         Set<String> roBlacklist= new HashSet<>();
-        roBlacklist.add( "/etc" );
-        roBlacklist.add( "/sys" );
-        roBlacklist.add( "/boot" );
-        roBlacklist.add( "/proc" );
-        roBlacklist.add( "/dev" );
+        if ( notWindows ) {
+            roBlacklist.add( "/etc" );
+            roBlacklist.add( "/sys" );
+            roBlacklist.add( "/boot" );
+            roBlacklist.add( "/proc" );
+            roBlacklist.add( "/dev" );
+        }
         Set<String> f_roBlacklist= Collections.unmodifiableSet(roBlacklist);
         
         Set<String> okayProps= new HashSet<>();
