@@ -3,7 +3,6 @@ package org.autoplot;
 
 import java.awt.AWTPermission;
 import java.io.FilePermission;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetPermission;
 import java.net.URLPermission;
@@ -28,7 +27,12 @@ import org.autoplot.hapi.HapiDataSource;
  * <li>read and write files under HOME/autoplot_data
  * <li>read and write files under HOME/.java/.userprefs
  * </ul>
- * TODO: check what happens with /home/jbf/autoplot_data/../
+ * 
+ * Imagined attacks which are still possible:<ul>
+ * <li> this does nothing to prevent a non-blacklisted file 
+ * (for example /home/jbf/.profile) and then a post to send the data to
+ * a remote site.
+ * </ul>
  * 
  * Presently this just logs access.  Level FINER implies that the property 
  * access would be okay, and FINE implied this needs to be studied more.
