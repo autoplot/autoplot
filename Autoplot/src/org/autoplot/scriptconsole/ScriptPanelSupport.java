@@ -731,10 +731,15 @@ public class ScriptPanelSupport {
         ProgressMonitor mon= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(panel), "running script");
 
         try {
-            if (file != null && ( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) {
-                if ( panel.isDirty() ) {
-                    save();
+            try {
+                if (file != null && ( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) {
+                    if ( panel.isDirty() ) {
+                        save();
+                    }
                 }
+            } catch ( SecurityException ex ) {
+                // this is fine, we just can't save a modified version.
+            } finally {
                 applicationController.getApplicationModel().addRecent("script:"+file.toURI().toString());
             }
             InteractiveInterpreter interp = null;
