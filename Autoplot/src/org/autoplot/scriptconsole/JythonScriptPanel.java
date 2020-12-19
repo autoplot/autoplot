@@ -345,7 +345,12 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             getEditorPanel().setEditable(true);
         } else {
             File lfile= new File(filename);
-            boolean writable= lfile.canWrite() && !FileUtil.isParent( FileSystem.settings().getLocalCacheDir(), lfile );
+            boolean writable;
+            try {
+                writable = lfile.canWrite() && !FileUtil.isParent( FileSystem.settings().getLocalCacheDir(), lfile );
+            } catch ( SecurityException ex ) {
+                writable = false;
+            }
             getEditorPanel().setEditable(writable);
             fileNameTextField.setText( filename + ( writable ? "" : " (read only)" ) + ( dirty ? " *" : "" ) + ( containsTabs ? " TAB" : "" ) ) ;
         }
