@@ -3,6 +3,7 @@ package org.autoplot;
 
 import java.awt.AWTPermission;
 import java.io.FilePermission;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetPermission;
 import java.net.URLPermission;
@@ -144,19 +145,8 @@ public final class Sandbox {
             }
 
             @Override
-            public void checkSetFactory() {
-                logger.fine( "checkSetFactory()");
-            }
-
-            @Override
             public void checkPackageDefinition(String pkg) {
                 logger.log(Level.FINE, "checkPackageDefinition({0})", pkg);
-            }
-
-
-            @Override
-            public void checkPrintJobAccess() {
-                logger.finer( "checkPrintJobAccess" );
             }
 
             @Override
@@ -201,6 +191,9 @@ public final class Sandbox {
              * @return 
              */
             private boolean whitelistFile( String file ) {
+                if ( file.contains("..") ) {
+                    return false;
+                }
                 return f_rwOkayHome.stream().anyMatch((s) -> ( file.startsWith(s) ));
             }
             
@@ -211,6 +204,9 @@ public final class Sandbox {
              * @return 
              */
             private boolean readOnlyWhitelistFile( String file ) {
+                if ( file.contains("..") ) {
+                    return false;
+                }
                 return f_roOkayHome.stream().anyMatch((s) -> ( file.startsWith(s) ));
             }
             
@@ -221,6 +217,9 @@ public final class Sandbox {
              * @return 
              */
             private boolean readOnlyBlacklistFile( String file ) {
+                if ( file.contains("..") ) {
+                    return false;
+                }
                 return f_roBlacklist.stream().anyMatch((s) -> ( file.startsWith(s) ));
             }
                         
