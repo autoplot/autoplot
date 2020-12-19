@@ -6,6 +6,7 @@ import java.io.FilePermission;
 import java.net.InetAddress;
 import java.net.NetPermission;
 import java.net.URLPermission;
+import java.nio.file.LinkPermission;
 import java.security.AllPermission;
 import java.security.Permission;
 import java.util.ArrayList;
@@ -329,6 +330,8 @@ public final class Sandbox {
                     } else {
                         super.checkPermission(perm);
                     }
+                } else if ( perm instanceof LinkPermission ) {
+                    throw new SecurityException( String.format( "sandbox disallows making filesystem links." ) );
                 } else if ( perm instanceof RuntimePermission ) {
                     String name= perm.getName();
                     logger.log(Level.FINER, "checkPermission( RuntimePermission {0} ) OK", new Object[]{name});
@@ -344,7 +347,7 @@ public final class Sandbox {
                     if ( f_okayPermissions.contains(name) ) {
                         logger.log(Level.FINER, "checkPermission( {0} ) OK", new Object[]{name});
                     } else {
-                        logger.log(Level.FINE, "checkPermission( {0} {1} )", new Object[]{perm.getActions(),name}); 
+                        throw new SecurityException( String.format( "unrecognized permission: {0}", name ) ); 
                     }
                 }
             }
