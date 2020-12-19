@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LoggingPermission;
+import javax.sound.sampled.AudioPermission;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.hapi.HapiDataSource;
 
@@ -74,7 +75,7 @@ public final class Sandbox {
      */
     public static SecurityManager getSandboxManager( List<String> okayHome, List<String> roOkayHome ) {
         
-        final List<String> f_okayHome= Collections.unmodifiableList(okayHome);
+        final List<String> f_rwOkayHome= Collections.unmodifiableList(okayHome);
         final List<String> f_roOkayHome= Collections.unmodifiableList(roOkayHome);
         
         Set<String> roBlacklist= new HashSet<>();
@@ -193,16 +194,19 @@ public final class Sandbox {
             }
 
             /**
-             * return true if the file is within a sandboxed filesystem.
+             * return true if the file is within a sandboxed filesystem where
+             * Autoplot can write files as well as read them.
+             * 
              * @param file
              * @return 
              */
             private boolean whitelistFile( String file ) {
-                return f_okayHome.stream().anyMatch((s) -> ( file.startsWith(s) ));
+                return f_rwOkayHome.stream().anyMatch((s) -> ( file.startsWith(s) ));
             }
             
             /**
-             * return true if the file is within a sandboxed filesystem.
+             * return true if the file is within a sandboxed filesystem where
+             * writing is allowed.
              * @param file
              * @return 
              */
@@ -225,7 +229,7 @@ public final class Sandbox {
                 if ( whitelistFile(file) ) {
                     logger.log(Level.FINER, "checkDelete({0}) WHITELIST", file );
                 } else {
-                    logger.log(Level.FINE, "checkDelete({0})", file);
+                    throw new SecurityException("sandbox disallows delete of "+file);
                 }
 
             }
@@ -235,7 +239,7 @@ public final class Sandbox {
                 if ( whitelistFile(file) ) {
                     logger.log(Level.FINER, "checkWrite({0}) WHITELIST", file);
                 } else {
-                    logger.log(Level.FINE, "checkWrite({0})", file);
+                    throw new SecurityException("sandbox disallows write of "+file);
                 }
             }
 
@@ -245,7 +249,7 @@ public final class Sandbox {
                     logger.log( Level.FINER, "checkRead({0}, {1}) WHITELIST", new Object[]{file, context});
                 } else {
                     if ( readOnlyBlacklistFile(file) ) {
-                        throw new SecurityException( String.format( "checkRead( (%s) BLACKLIST", file) );
+                        throw new SecurityException( String.format( "sandbox disallows read from "+ file) );
                     } else {
                         logger.log(Level.FINER, "checkRead({0}, {1})", new Object[]{file, context});
                     }
@@ -319,6 +323,8 @@ public final class Sandbox {
                     logger.log(Level.FINER, "checkPermission( AllPermission ) FileSystem calls so OK" );
                 } else if ( perm instanceof NetPermission ) {
                     logger.log(Level.FINER, "checkPermission( NetPermission ) OK, but this should be studied more." );
+                } else if ( perm instanceof AudioPermission ) {
+                    throw new SecurityException( String.format( "checkPermission( AudioPermission(%s) )", perm.getName() ) );
                 } else {
                     String name= perm.getName();
                     if ( f_okayPermissions.contains(name) ) {
