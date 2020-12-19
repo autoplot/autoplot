@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-12-15 r25376):</p>
+        <p>Bugfixes (2020-12-19 r25392):</p>
         <ul>
+            <li>1687: scripts with first line was a multi-line setScriptDescription couldn't be run from the address bar.
+            <li>1310: --sandbox command line option limits writes to ~/AUTOPLOT_DATA and /tmp.
             <li>2309: correction to DataPointRecorder when reading a file.  Thanks, Sadie!
             <li>always support "~/..." as a shortcut for home directory.
             <li>2309: correction to DataPointRecorder units change when emptied.  Thanks, Ivar!
@@ -50,6 +52,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rebundle command allows subsetting and resorting of bundle datasets.
             <li>support datumRange(5,10) in scripts.  Thanks, Ivar!
             <li>events bar supports lineStyle and lineThick properties, new opaque property disables default transparency.  Thanks, Ali!
             <li>getFile can have null passed in for the monitor, when the developer knows the load will be quick.
