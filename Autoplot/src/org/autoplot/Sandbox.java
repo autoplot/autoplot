@@ -347,7 +347,7 @@ public final class Sandbox {
                     if ( f_okayPermissions.contains(name) ) {
                         logger.log(Level.FINER, "checkPermission( {0} ) OK", new Object[]{name});
                     } else {
-                        throw new SecurityException( String.format( "unrecognized permission: {0}", name ) ); 
+                        throw new SecurityException( String.format( "unrecognized permission: (%s)", name ) ); 
                     }
                 }
             }
