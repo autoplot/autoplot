@@ -841,8 +841,14 @@ public class ScriptPanelSupport {
                     if ( file!=null ) {
                         char[] cc= code.toCharArray();
                         boolean warning= false;
+                        int ioffs=0;
                         for ( char c: cc ) {
-                            if ( c>128 ) warning= true;
+                            ioffs++;
+                            if ( c>128 ) {
+                                int ic= (int)c;
+                                logger.log(Level.INFO, "non-ASCII character ({0}) at character offset {1}", new Object[] { ic, ioffs });
+                                warning= true;
+                            }
                         }
                         if ( warning ) {
                             System.err.println("code contains data that will not be represented properly!");
