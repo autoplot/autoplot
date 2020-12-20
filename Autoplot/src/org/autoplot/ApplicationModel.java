@@ -113,6 +113,21 @@ public final class ApplicationModel {
         return this.applet;
     }
     
+    private boolean sandboxed= false;
+    
+    /**
+     * mark that the app is running in sandboxed mode.
+     * @param sandboxed 
+     */
+    public void setSandboxed( boolean sandboxed ) {
+        if ( sandboxed!=true ) throw new IllegalArgumentException("sandboxed can only be set to true");
+        this.sandboxed= sandboxed;
+    }
+    
+    public boolean isSandboxed() {
+        return this.sandboxed;
+    }
+    
     /**
      * Return true if this is running as an application.
      * @return true if this is running as an application.

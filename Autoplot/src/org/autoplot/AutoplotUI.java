@@ -389,7 +389,11 @@ public final class AutoplotUI extends javax.swing.JFrame {
         }
         
         if ( System.getProperty( "noCheckCertificate","true").equals("true") ) {
-            AutoplotUtil.disableCertificates();
+            if ( model.isSandboxed() ) {
+                logger.warning( "unable to disbable certificates because of sandbox");
+            } else {
+                AutoplotUtil.disableCertificates();
+            }
         }
 
         // Initialize help system now so it's ready for components to register IDs with
@@ -4958,6 +4962,11 @@ private void updateFrameTitle() {
         System.err.println(welcome);
         logger.info(welcome);
         final ApplicationModel model = new ApplicationModel();
+        
+        if ( alm.getBooleanValue("sandbox") ) {
+            model.setSandboxed(true);
+        }
+                
         String initialURL;
         final String bookmarks;
         
