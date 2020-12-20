@@ -721,6 +721,13 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             ele.appendChild( doc.createTextNode( getStringData( data, APP_COUNT ) ) );
             e.appendChild(ele);
             
+            if ( data.get(INCLDOM)==null || (Boolean)data.get( INCLDOM ) ) {
+                ApplicationModel appModel= (ApplicationModel) data.get( APP_MODEL );
+                ele= doc.createElement("sandbox");
+                ele.appendChild( doc.createTextNode( appModel.isSandboxed() ? "true" : "false" ) );
+                e.appendChild(ele);
+            }
+            
             formatException( doc, e, t );
 
             formatBuildInfos( doc, e, bis );
@@ -745,7 +752,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                     try {
                         vap.setAttribute( "appVersionTag", AboutUtil.getReleaseTag() );
                     } catch ( IOException ex ) {
-                        vap.setAttribute(  "appVersionTag", ex.getMessage() );
+                        vap.setAttribute( "appVersionTag", ex.getMessage() );
                     }
 
                     Element dom= doc.createElement("dom");
