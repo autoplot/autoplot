@@ -59,7 +59,6 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -94,7 +93,6 @@ import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.jython.JythonDataSource;
 import org.autoplot.datasource.jython.JythonDataSourceFactory;
 import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
-import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 
 /**
