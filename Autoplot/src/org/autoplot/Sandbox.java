@@ -69,8 +69,8 @@ public final class Sandbox {
 
     private static SecurityManager createSandboxManager() {
         boolean linux= System.getProperty("os.name").equals("Linux");
-        boolean notWindows= !System.getProperty("os.name").equals("Windows");
-        
+        boolean windows= System.getProperty("os.name").startsWith("Windows");
+        boolean notWindows= !windows;
         List<String> readWriteList= new ArrayList<>();
         readWriteList.add( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) );
         if ( linux ) {
@@ -89,7 +89,7 @@ public final class Sandbox {
         ArrayList<String> readOnlyList= new ArrayList<>(readWriteList);
         String path= System.getProperty("java.class.path");
         
-        if ( linux ) {
+        if ( !windows ) {
             readOnlyList.addAll(Arrays.asList(path.split(":")));
         } else {
             readOnlyList.addAll(Arrays.asList(path.split(";")));
@@ -102,7 +102,11 @@ public final class Sandbox {
         }
         
         readOnlyList.add( "__classpath__"); // files on Jython classpath show this.
-        readOnlyList.add( System.getProperty("user.home")+"/.das2rc" );
+        if ( windows ) {
+            readOnlyList.add( System.getProperty("user.home")+"\\.das2rc" );
+        } else {
+            readOnlyList.add( System.getProperty("user.home")+"/.das2rc" );
+        }
                 
         final List<String> f_rwOkayHome= Collections.unmodifiableList(readWriteList);
         final List<String> f_roOkayHome= Collections.unmodifiableList(readOnlyList);
