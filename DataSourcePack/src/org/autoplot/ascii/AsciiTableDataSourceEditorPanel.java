@@ -123,7 +123,6 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         int last = cols[cols.length-1];
         String slast= columnsMap.get(last);
         if (slast == null) {
-            slast = "" + slast;
             haveColumnNames = false;
         }
         StringBuilder sb= new StringBuilder();
