@@ -82,15 +82,16 @@ public class ServletInfo extends HttpServlet {
                 out.println("<h2>You do not have access to see all information.\n</h2>");
             }            
             
+            ApplicationModel appmodel = new ApplicationModel();
+
             if ( isHostPrivileged ) {
-                String st= AutoplotUtil.getAboutAutoplotHtml();
+                String st= AutoplotUtil.getAboutAutoplotHtml(appmodel);
                 out.println(st);
             } else {
                 
             }
 
             out.println("<h2>Options</h2>");
-            ApplicationModel appmodel = new ApplicationModel();
             Application dom = appmodel.getDocumentModel();
             out.println("displayLogLevel: "+dom.getOptions().getDisplayLogLevel());
             out.println("<br>printingLogLevel: "+dom.getOptions().getPrintingLogLevel());
