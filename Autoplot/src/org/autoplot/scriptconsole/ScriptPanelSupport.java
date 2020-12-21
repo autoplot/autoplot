@@ -738,7 +738,9 @@ public class ScriptPanelSupport {
             } catch ( SecurityException ex ) {
                 // this is fine, we just can't save a modified version.
             } finally {
-                applicationController.getApplicationModel().addRecent("script:"+file.toURI().toString());
+                if ( file!=null ) {
+                    applicationController.getApplicationModel().addRecent("script:"+file.toURI().toString());
+                }
             }
             InteractiveInterpreter interp = null;
             try {
