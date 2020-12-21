@@ -44,6 +44,8 @@ public final class Sandbox {
 
     private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.security");        
     
+    private static SecurityManager instance=null;
+    
     /**
      * return a security manager which allows:<ul>
      * <li>read from anywhere besides a blacklist
@@ -56,8 +58,15 @@ public final class Sandbox {
      * experiments until you are satisfied with its operation.
      * @return 
      */
-    public static SecurityManager getSandboxManager( ) {
+    public static synchronized SecurityManager getSandboxManager( ) {
         
+        if ( instance==null ) {
+            instance= createSandboxManager();
+        }
+        return instance;
+    }   
+
+    private static SecurityManager createSandboxManager() {
         boolean linux= System.getProperty("os.name").equals("Linux");
         boolean notWindows= !System.getProperty("os.name").equals("Windows");
         

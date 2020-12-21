@@ -1725,7 +1725,8 @@ public class AutoplotUtil {
     
     /**
      * return an HTML page showing the current system environment.
-     * @return
+     * @param model
+     * @return string containing HTML
      * @throws IOException 
      */
     public static String getAboutAutoplotHtml( ApplicationModel model) throws IOException {
@@ -1809,6 +1810,22 @@ public class AutoplotUtil {
         String autoplotData= AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA );
         String fscache= AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_FSCACHE );
         
+        String sandbox;
+        if ( model.isSandboxed() ) {
+            SecurityManager sm= System.getSecurityManager();
+            if ( sm!=null ) {
+                if ( sm==Sandbox.getSandboxManager() ) {
+                    sandbox= "true";
+                } else {
+                    sandbox= "true, but not sandbox security manager.";
+                }
+            } else {
+                sandbox= "true, BUT NO SECURITY MANAGER IS PRESENT";
+            }
+        } else {
+            sandbox= "";
+        }
+        
         String aboutContent = "<ul>" +
             "<li>Java version: " + javaVersion + " " + javaVersionWarning + 
             memWarning +    
@@ -1817,7 +1834,7 @@ public class AutoplotUtil {
             "<li>total memory (MB): " + tmem + " (amount allocated to the process)" +
             "<li>free memory (MB): " + fmem + " (amount available before more must be allocated)" + 
             "<li>native memory limit (MB): " + nmem + " (amount of native memory available to the process)" +
-            "<li>sandbox: " + model.isSandboxed() +
+            "<li>sandbox: " + sandbox +
             "<li>arch: " + arch +
             "<li>" + bits + " bit Java " + bitsWarning  +
             "<li>hostname: "+ host +
