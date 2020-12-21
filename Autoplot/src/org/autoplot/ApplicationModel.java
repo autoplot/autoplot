@@ -116,7 +116,8 @@ public final class ApplicationModel {
     private boolean sandboxed= false;
     
     /**
-     * mark that the app is running in sandboxed mode.
+     * mark that the app is running in sandboxed mode, though note that
+     * this does not add the security manager.
      * @param sandboxed 
      */
     public void setSandboxed( boolean sandboxed ) {

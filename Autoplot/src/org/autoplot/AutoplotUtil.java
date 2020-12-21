@@ -1723,7 +1723,12 @@ public class AutoplotUtil {
         return fallback;
     }
     
-    public static String getAboutAutoplotHtml() throws IOException {
+    /**
+     * return an HTML page showing the current system environment.
+     * @return
+     * @throws IOException 
+     */
+    public static String getAboutAutoplotHtml( ApplicationModel model) throws IOException {
         StringBuilder buffy = new StringBuilder();
 
         buffy.append("<html>\n");
@@ -1812,6 +1817,7 @@ public class AutoplotUtil {
             "<li>total memory (MB): " + tmem + " (amount allocated to the process)" +
             "<li>free memory (MB): " + fmem + " (amount available before more must be allocated)" + 
             "<li>native memory limit (MB): " + nmem + " (amount of native memory available to the process)" +
+            "<li>sandbox: " + model.isSandboxed() +
             "<li>arch: " + arch +
             "<li>" + bits + " bit Java " + bitsWarning  +
             "<li>hostname: "+ host +

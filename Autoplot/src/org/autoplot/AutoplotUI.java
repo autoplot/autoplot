@@ -3759,7 +3759,7 @@ APSplash.checkTime("init 52.9");
         org.das2.util.LoggerManager.logGuiEvent(evt);
         try {
 
-            String bufStr= AutoplotUtil.getAboutAutoplotHtml();
+            String bufStr= AutoplotUtil.getAboutAutoplotHtml( this.applicationModel );
 
             JTextPane jtp= new JTextPane();
             jtp.setContentType("text/html");
