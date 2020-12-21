@@ -91,8 +91,8 @@ public class SimplifyScriptSupport {
              // do it again so we can debug.
             n = (Module)org.python.core.parser.parse( script, "exec" );
          }
-         
-         if ( n.body[0].beginLine > n.beginLine ) {
+
+         if ( n.body.length>0 && n.body[0].beginLine > n.beginLine ) {
              logger.fine("shifting line numbers!");
              int shift= n.body[0].beginLine - n.beginLine;
              // strange bug here.
