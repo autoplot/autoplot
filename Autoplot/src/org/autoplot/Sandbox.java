@@ -2,6 +2,7 @@
 package org.autoplot;
 
 import java.awt.AWTPermission;
+import java.io.File;
 import java.io.FilePermission;
 import java.net.InetAddress;
 import java.net.NetPermission;
@@ -78,6 +79,8 @@ public final class Sandbox {
         
         if ( notWindows ) {
             readWriteList.add( "/tmp" );
+        } else {
+            readWriteList.add( System.getProperty("user.home")+"\\AppData\\Local\\Temp" );
         }
 
         String hapiData= HapiDataSource.getHapiCache();
@@ -88,6 +91,8 @@ public final class Sandbox {
         
         if ( linux ) {
             readOnlyList.addAll(Arrays.asList(path.split(":")));
+        } else {
+            readOnlyList.addAll(Arrays.asList(path.split(";")));
         }
         
         readOnlyList.add( System.getProperty("java.home") );
@@ -247,9 +252,14 @@ public final class Sandbox {
                 }
                 return f_roBlacklist.stream().anyMatch((s) -> ( file.startsWith(s) ));
             }
+            
+            private String getCanonicalFile( String file ) {
+                return new File(file).getAbsolutePath();
+            }
                         
             @Override
             public void checkDelete(String file) {
+                file= getCanonicalFile(file);
                 if ( whitelistFile(file) ) {
                     logger.log(Level.FINER, "checkDelete({0}) WHITELIST", file );
                 } else {
@@ -260,6 +270,7 @@ public final class Sandbox {
 
             @Override
             public void checkWrite(String file) {
+                file= getCanonicalFile(file);
                 if ( whitelistFile(file) ) {
                     logger.log(Level.FINER, "checkWrite({0}) WHITELIST", file);
                 } else {
@@ -269,6 +280,7 @@ public final class Sandbox {
 
             @Override
             public void checkRead(String file, Object context) {
+                file= getCanonicalFile(file);
                 if ( readOnlyWhitelistFile(file) ) {
                     logger.log( Level.FINER, "checkRead({0}, {1}) WHITELIST", new Object[]{file, context});
                 } else {
@@ -283,6 +295,7 @@ public final class Sandbox {
 
             @Override
             public void checkRead(String file) {
+                file= getCanonicalFile(file);
                 if ( readOnlyWhitelistFile(file) ) {
                     logger.log(Level.FINER, "checkRead({0}) WHITELIST", file);
                 } else {
