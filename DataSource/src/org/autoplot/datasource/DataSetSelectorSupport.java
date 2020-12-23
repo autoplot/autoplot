@@ -69,12 +69,20 @@ public class DataSetSelectorSupport {
                 || initialSelection.startsWith("sftp:/") );
         boolean isLocal= initialSelection==null || initialSelection.isEmpty() || !isRemote;
         
-        JFileChooser chooser=null;
+        JFileChooser chooser;
         
-        chooser= new JFileChooser(currentDirectory);
-
+        chooser= new JFileChooser();
+        try {
+            chooser.setCurrentDirectory( new File( currentDirectory ) );
+        } catch ( SecurityException ex ) {
+            logger.info("unable to set current directory");
+        }
         if ( currentFile.length()>0 ) {
-            chooser.setSelectedFile( new File( currentFile ) );
+            try {
+                chooser.setSelectedFile( new File( currentFile ) );
+            } catch ( SecurityException ex ) {
+                logger.info("unable to set current file");
+            }
         }
         if ( initialSelection!=null && isLocal ) {
             URISplit split= URISplit.parse(initialSelection);
