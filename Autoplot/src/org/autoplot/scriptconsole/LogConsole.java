@@ -297,7 +297,7 @@ public class LogConsole extends javax.swing.JPanel {
         } else {
             searchTextPattern = null;
         }
-        jLabel2.setToolTipText(null);
+        apLabel.setToolTipText(null);
         update();
         firePropertyChange(PROP_SEARCHTEXT, oldSearchText, searchText);
     }
@@ -437,7 +437,7 @@ public class LogConsole extends javax.swing.JPanel {
                                 sb.append(s1).append("<br>");
                             }
                             sb.append("</html>");
-                            jLabel2.setToolTipText(sb.toString());
+                            apLabel.setToolTipText(sb.toString());
                         } catch (UnsupportedEncodingException ex) {
                             logger.log( Level.WARNING, ex.getMessage(), ex );
                         }
@@ -687,7 +687,7 @@ public class LogConsole extends javax.swing.JPanel {
         clearButton = new javax.swing.JButton();
         saveButton = new javax.swing.JButton();
         copyButton = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
+        apLabel = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         commandLineTextPane1 = new org.autoplot.scriptconsole.CommandLineTextPane();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -745,7 +745,7 @@ public class LogConsole extends javax.swing.JPanel {
                 .add(copyButton))
         );
 
-        jLabel2.setText("AP>");
+        apLabel.setText("AP>");
 
         commandLineTextPane1.setToolTipText("enter jython commands here to control the application, for example \"plot(dataset([1,2,3]))\"");
         commandLineTextPane1.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -778,7 +778,7 @@ public class LogConsole extends javax.swing.JPanel {
                         .add(jButton1))
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
-                        .add(jLabel2)
+                        .add(apLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)))
                 .addContainerGap())
@@ -791,7 +791,7 @@ public class LogConsole extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
                         .add(8, 8, 8)
-                        .add(jLabel2))
+                        .add(apLabel))
                     .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
@@ -906,11 +906,11 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel actionsPanel;
+    private javax.swing.JLabel apLabel;
     private javax.swing.JButton clearButton;
     private org.autoplot.scriptconsole.CommandLineTextPane commandLineTextPane1;
     private javax.swing.JButton copyButton;
     private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextPane logTextArea;
