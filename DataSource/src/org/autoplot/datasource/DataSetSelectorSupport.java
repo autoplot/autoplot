@@ -190,7 +190,12 @@ public class DataSetSelectorSupport {
         String currentDirectory = prefs.get(AutoplotSettings.PREF_LAST_OPEN_FOLDER, userHome().toString());
         final HashMap<String,Object> exts = DataSourceRegistry.getInstance().dataSourcesByExt;
         
-        JFileChooser chooser = new JFileChooser(currentDirectory);
+        JFileChooser chooser = new JFileChooser();
+        try {
+            chooser.setCurrentDirectory( new File(currentDirectory) );
+        } catch ( SecurityException ex ) {
+            logger.info("unable to set current directory because of security");
+        }
 
         final boolean isAutoplotApp;
         if ( parent instanceof DataSetSelector ) {
