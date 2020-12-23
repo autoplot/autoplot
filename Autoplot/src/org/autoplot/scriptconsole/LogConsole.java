@@ -297,6 +297,7 @@ public class LogConsole extends javax.swing.JPanel {
         } else {
             searchTextPattern = null;
         }
+        logTextArea.setToolTipText(null);
         apLabel.setToolTipText(null);
         update();
         firePropertyChange(PROP_SEARCHTEXT, oldSearchText, searchText);
@@ -431,13 +432,14 @@ public class LogConsole extends javax.swing.JPanel {
                         try {
                             String s= (baos.toString("US-ASCII"));
                             String[] ss= s.split("\n");
-                            StringBuilder sb= new StringBuilder();
-                            sb.append("<html>");
+                            StringBuilder sb= new StringBuilder("<html><b>Stack trace at last highlite match:</b>");
                             for ( String s1: ss ) {
                                 sb.append(s1).append("<br>");
                             }
                             sb.append("</html>");
-                            apLabel.setToolTipText(sb.toString());
+                            String msg= sb.toString();
+                            logTextArea.setToolTipText(msg);
+                            apLabel.setToolTipText(msg);
                         } catch (UnsupportedEncodingException ex) {
                             logger.log( Level.WARNING, ex.getMessage(), ex );
                         }
