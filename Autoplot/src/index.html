@@ -9,7 +9,7 @@
 
         <img alt="screenshot"  src="screen.png">
         <p><small>
-                <a href='https://github.com/autoplot/dev/blob/master/demos/2020/20201221/addPointDigitizer.jy'>Script</a> records sugar cube type at click location.  Happy holidays!
+                Autoplot is used to study internet download speeds.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,8 +27,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-12-19 r25392):</p>
+        <p>Bugfixes (2020-12-29 r25415):</p>
         <ul>
+            <li>improve transparency of local files used with ro_cache.txt, where local files can be used to resolve remote files.
+            <li>1310: --sandbox mode with "open vap file" now works on a Mac, which checked to see if the read-only folder was writable.
             <li>1687: scripts with first line was a multi-line setScriptDescription couldn't be run from the address bar.
             <li>1310: --sandbox command line option limits writes to ~/AUTOPLOT_DATA and /tmp.
             <li>2309: correction to DataPointRecorder when reading a file.  Thanks, Sadie!
