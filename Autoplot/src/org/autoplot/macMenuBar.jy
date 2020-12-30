@@ -1,7 +1,7 @@
 
 setScriptDescription('add special mac stuff.  This is used because classes are used which only exist on Macs')
 
-from com.apple.mrj import MRJAboutHandler,MRJApplicationUtils
+from com.apple.mrj import MRJAboutHandler,MRJQuitHandler,MRJApplicationUtils
 #from com.apple.mrj import MacOSXController
 
 from org.autoplot import AppManager
@@ -10,7 +10,7 @@ class MyMRJAboutHandler(MRJAboutHandler):
     def handleAbout(evt):
         getApplication().about()
 
-class MyMRJQuitHandler(MRJAboutHandler):
+class MyMRJQuitHandler(MRJQuitHandler):
     def handleQuit(evt):
         AppManager.getInstance().quit()
 
