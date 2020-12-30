@@ -1,0 +1,18 @@
+
+setScriptDescription('add special mac stuff')
+
+from com.apple.mrj import MRJAboutHandler,MRJApplicationUtils
+#from com.apple.mrj import MacOSXController
+
+from org.autoplot import AutoplotUI
+from org.autoplot import AppManager
+
+class MyMRJAboutHandler(MRJAboutHandler):
+    def handleAbout(evt):
+        getApplication().about()
+
+class MyMRJQuitHandler(MRJAboutHandler):
+    def handleQuit(evt):
+        AppManager.instance.quit()
+
+MRJApplicationUtils.registerAboutHandler(MyMRJAboutHandler())
