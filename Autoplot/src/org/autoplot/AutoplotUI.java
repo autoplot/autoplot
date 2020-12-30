@@ -225,6 +225,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
     private static void setupMacMenuBarSoon() {
         Runnable run= () -> {
             try {
+                logger.info("adding additional actions for mac menu bar.");
                 PythonInterpreter interp= JythonUtil.createInterpreter( false, false );
                 InputStream ins= AutoplotUI.class.getResourceAsStream("macMenuBar.jy");
                 interp.execfile(ins,"macMenuBar.jy");
