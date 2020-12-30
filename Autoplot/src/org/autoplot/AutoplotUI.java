@@ -5048,8 +5048,10 @@ private void updateFrameTitle() {
         if ( alm.getBooleanValue("macUseScreenMenuBar") ) {
             logger.fine("use Mac menu bar");
             System.setProperty("apple.laf.useScreenMenuBar", "true");
-            System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Autoplot");
             nativeLAF= true;
+        }
+        
+        if ( System.getProperty("os.name").startsWith("Mac") ) {
             URL r= AutoplotUI.class.getResource("macMenuBar.jy");
             logger.log(Level.INFO, "running soon: {0}", r);
             setupMacMenuBarSoon();
