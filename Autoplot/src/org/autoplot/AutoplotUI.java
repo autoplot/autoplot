@@ -3761,15 +3761,23 @@ APSplash.checkTime("init 52.9");
 
     private void aboutAutoplotMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutAutoplotMenuItemActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
-        try {
+        about( );
+    }//GEN-LAST:event_aboutAutoplotMenuItemActionPerformed
 
+    /**
+     * show the about dialog, which has version information.
+     */
+    public void about() {
+        String releaseTag="?";
+        
+        JTextPane jtp= new JTextPane();
+        try {
+            releaseTag = AboutUtil.getReleaseTag();
             String bufStr= AutoplotUtil.getAboutAutoplotHtml( this.applicationModel );
 
-            JTextPane jtp= new JTextPane();
             jtp.setContentType("text/html");
             jtp.read(new StringReader(bufStr), null);
             jtp.setEditable(false);
-
             jtp.addHyperlinkListener( new HyperlinkListener() {
                 @Override
                 public void hyperlinkUpdate(HyperlinkEvent e) {
@@ -3799,19 +3807,16 @@ APSplash.checkTime("init 52.9");
                     }
                 }
             });
-
-            //JLabel label= new JLabel(buffy.toString());
-            JScrollPane pane= new JScrollPane(jtp,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
-            pane.getVerticalScrollBar().setUnitIncrement( 12 );
-            pane.setPreferredSize(new java.awt.Dimension( 640 + 50,480));
-
-            AutoplotUtil.showMessageDialog(this, pane, "About Autoplot "+AboutUtil.getReleaseTag(), JOptionPane.INFORMATION_MESSAGE );
-
-        } catch (IOException ex) {
-            logger.log( Level.SEVERE, ex.getMessage(), ex );
+        } catch ( IOException ex ) {
+            jtp.setText(ex.getMessage());
         }
-
-    }//GEN-LAST:event_aboutAutoplotMenuItemActionPerformed
+        //JLabel label= new JLabel(buffy.toString());
+        JScrollPane pane= new JScrollPane(jtp,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
+        pane.getVerticalScrollBar().setUnitIncrement( 12 );
+        pane.setPreferredSize(new java.awt.Dimension( 640 + 50,480));
+        AutoplotUtil.showMessageDialog(this, pane, "About Autoplot "+releaseTag, JOptionPane.INFORMATION_MESSAGE );
+        
+    }
 
     private void aboutDas2MenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutDas2MenuItemActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
@@ -3901,11 +3906,8 @@ private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     JDialog dia = new JDialog(this, "Manage Cache", true);
     dia.add(panel);
     dia.pack();
-    RequestProcessor.invokeLater( new Runnable() {
-        @Override
-        public void run() {
-            panel.scan( new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_FSCACHE ) ) );
-        }
+    RequestProcessor.invokeLater(() -> {
+        panel.scan( new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_FSCACHE ) ) );
     });
     dia.setLocationRelativeTo( this );
     dia.setVisible(true);
@@ -4863,6 +4865,7 @@ private void updateFrameTitle() {
         alm.addBooleanSwitchArgument("scriptPanel", null, "scriptPanel", "enable script panel");
         alm.addBooleanSwitchArgument("logConsole", "l", "logConsole", "enable log console");
         alm.addOptionalSwitchArgument("nativeLAF", "n", "nativeLAF", ArgumentList.TRUE, "use the system look and feel (T or F)");
+        alm.addOptionalSwitchArgument("macUseScreenMenuBar",null,"macUseScreenMenuBar",ArgumentList.FALSE, "use Mac menu bar (T or F)");
         alm.addOptionalSwitchArgument("open", "o", "open", null, "open this URI (to support javaws)");
         alm.addOptionalSwitchArgument("print", null, "print", "", "print this URI (to support javaws)");
         alm.addOptionalSwitchArgument("script", "s", "script", "", "run this script after starting.  " +
@@ -4939,9 +4942,9 @@ private void updateFrameTitle() {
             System.err.println("Autoplot version "+tag );
             return;
         }
-        
+                
         if ( alm.getBooleanValue("sandbox") ) {
-            logger.warning("sandbox does not add any restrictions, currently.");
+            logger.warning("sandbox is still experimental and may be further restricted.");
             Sandbox.enterSandbox();
         }
         
@@ -5024,8 +5027,16 @@ private void updateFrameTitle() {
 
         logger.fine("add shutdown hook");
         Runtime.getRuntime().addShutdownHook(getShutdownHook(model));
-                
-        if ( !headless && alm.getBooleanValue("nativeLAF")) {
+
+        boolean nativeLAF= alm.getBooleanValue("nativeLAF");
+        if ( alm.getBooleanValue("macUseScreenMenuBar") ) {
+            logger.fine("use Mac menu bar");
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+            System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Autoplot");
+            nativeLAF= true;
+        }
+        
+        if ( !headless && nativeLAF ) {
             logger.fine("nativeLAF");
             try {
                 String s= javax.swing.UIManager.getSystemLookAndFeelClassName();
