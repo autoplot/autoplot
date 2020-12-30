@@ -47,7 +47,7 @@
         <property name="sun.java2d.d3d" value="false" />  <!-- bug 953 -->
         <property name="java.util.Arrays.useLegacyMergeSort" value="true" /> <!-- bug 1159 -->
         <property name="http.agent" value="Autoplot-#{tag}" />
-        <property name="com.apple.mrj.application.apple.menu.about.name" value="Autoplot" />
+        <property name="com.apple.mrj.application.apple.menu.about.name" value="Autoplot" /> <!-- bug 2312 -->
 
     </resources> 
 
