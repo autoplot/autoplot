@@ -487,7 +487,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
         expertMenuItems.add( aggregateMenuItem );
         expertMenuItems.add( decodeURLItem );
 
-        jMenuBar1.add( Box.createHorizontalGlue() );
+        if ( !"true".equals( System.getProperty("apple.laf.useScreenMenuBar") ) ) {
+            jMenuBar1.add( Box.createHorizontalGlue() );
+        }
         expertMenu= new JMenu("Expert");
         JMenuItem mi;
         mi= new JMenuItem( new AbstractAction( "Basic Mode") {
@@ -513,7 +515,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
         mi.setToolTipText("Expert allows composing new products and scripting");
         expertMenu.add( mi );
         expertMenu.setToolTipText("<html>Toggle between expert and basic mode.<br>Basic mode allows for browsing products composed by data providers<br>Expert allows composing new products and scripting");
-        jMenuBar1.add( expertMenu );
+        if ( !"true".equals( System.getProperty("apple.laf.useScreenMenuBar") ) ) {
+            jMenuBar1.add( expertMenu );
+        }
 
         KeyChain.getDefault().setParentGUI(this);
         
