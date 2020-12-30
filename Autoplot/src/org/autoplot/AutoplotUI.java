@@ -5050,6 +5050,8 @@ private void updateFrameTitle() {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
             System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Autoplot");
             nativeLAF= true;
+            URL r= AutoplotUI.class.getResource("macMenuBar.jy");
+            logger.log(Level.INFO, "running soon: {0}", r);
             setupMacMenuBarSoon();
         }
         
