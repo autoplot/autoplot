@@ -12,6 +12,6 @@ class MyMRJAboutHandler(MRJAboutHandler):
 
 class MyMRJQuitHandler(MRJAboutHandler):
     def handleQuit(evt):
-        AppManager.instance.quit()
+        AppManager.getInstance().quit()
 
 MRJApplicationUtils.registerAboutHandler(MyMRJAboutHandler())
