@@ -175,6 +175,8 @@ import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.layout.LayoutConstants;
 import org.autoplot.state.StatePersistence;
 import org.autoplot.util.PlotDataMashupResolver;
+import org.python.core.FileUtil;
+import org.python.util.PythonInterpreter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -218,6 +220,19 @@ public final class AutoplotUI extends javax.swing.JFrame {
             }
         };
         return new Thread( run, "apshutdown" );
+    }
+
+    private static void setupMacMenuBarSoon() {
+        Runnable run= () -> {
+            try {
+                PythonInterpreter interp= JythonUtil.createInterpreter( false, false );
+                InputStream ins= AutoplotUI.class.getResourceAsStream("macMenuBar.jy");
+                interp.execfile(ins,"macMenuBar.jy");
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        };
+        new Thread(run).start();
     }
 
     final String TAB_TOOLTIP_CANVAS = "<html>Canvas tab contains the plot and plot elements.<br>Click on plot elements to select.<br>%s</html>";
@@ -5034,6 +5049,7 @@ private void updateFrameTitle() {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
             System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Autoplot");
             nativeLAF= true;
+            setupMacMenuBarSoon();
         }
         
         if ( !headless && nativeLAF ) {
