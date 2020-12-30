@@ -1,10 +1,9 @@
 
-setScriptDescription('add special mac stuff')
+setScriptDescription('add special mac stuff.  This is used because classes are used which only exist on Macs')
 
 from com.apple.mrj import MRJAboutHandler,MRJApplicationUtils
 #from com.apple.mrj import MacOSXController
 
-from org.autoplot import AutoplotUI
 from org.autoplot import AppManager
 
 class MyMRJAboutHandler(MRJAboutHandler):
