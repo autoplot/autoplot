@@ -5051,7 +5051,7 @@ private void updateFrameTitle() {
             nativeLAF= true;
         }
         
-        if ( System.getProperty("os.name").startsWith("Mac") ) {
+        if ( alm.getBooleanValue("macUseScreenMenuBar") && System.getProperty("os.name").startsWith("Mac") ) {
             URL r= AutoplotUI.class.getResource("macMenuBar.jy");
             logger.log(Level.INFO, "running soon: {0}", r);
             setupMacMenuBarSoon();
