@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="AudioSystemDataSource/src"/>
+	<classpathentry kind="src" path="HapiDataSource/src"/>
 	<classpathentry kind="src" path="CdfJavaDataSource/src"/>
 	<classpathentry kind="src" path="CDAWebDataSource/src"/>
 	<classpathentry kind="src" path="dasCoreUtil/src"/>
@@ -60,6 +61,6 @@
 	<classpathentry kind="lib" path="APLibs/lib/jemmy-2.2.7.5.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/cdfjava.3.3.2.tt2000.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/commons-math-2.1.jar"/>
-        <classpathentry kind="lib" path="APLibs/lib/jsyntaxpane-1.1.7.jar"/>
+	<classpathentry kind="lib" path="APLibs/lib/jsyntaxpane-1.1.7.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
