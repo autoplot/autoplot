@@ -97,7 +97,7 @@ public class DatasetCommand extends PyObject {
     public PyObject __call__(PyObject[] args, String[] keywords) {
 
         FunctionSupport fs= new FunctionSupport( "dataset", 
-            new String[] { "ds", "ds1", "ds2", "ds3", 
+            new String[] { "ds", "ds1", "ds2", "ds3", "ds4",
             "title", "label", "name",
             "units", "format", "cadence", 
             "fillValue", "validMin", "validMax", "typicalMin", "typicalMax",
@@ -105,7 +105,7 @@ public class DatasetCommand extends PyObject {
             "renderType", "bins1", "bins0", "cacheTag", "userProperties",
             "deltaPlus", "deltaMinus", "binPlus", "binMinus", "binMin", "binMax",
         },
-        new PyObject[] { Py.None, Py.None, Py.None, Py.None,
+        new PyObject[] { Py.None, Py.None, Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None, Py.None, Py.None,
@@ -149,13 +149,23 @@ public class DatasetCommand extends PyObject {
                 result= Ops.link( xds, yds, result );
                 break;
             }
-            case 4:        
+            case 4: {
                 result= JythonOps.dataset( args[3] );
                 QDataSet ds0= JythonOps.dataset( args[0] );
                 QDataSet ds1= JythonOps.dataset( args[1] );
                 QDataSet ds2= JythonOps.dataset( args[2] );
                 result= Ops.link( ds0, ds1, ds2, result );
                 break;
+            }
+            case 5: {
+                result= JythonOps.dataset( args[4] );
+                QDataSet ds0= JythonOps.dataset( args[0] );
+                QDataSet ds1= JythonOps.dataset( args[1] );
+                QDataSet ds2= JythonOps.dataset( args[2] );
+                QDataSet ds3= JythonOps.dataset( args[3] );
+                result= Ops.link( ds0, ds1, ds2, ds3, result );
+                break;
+            }
             default:
                 throw new IllegalArgumentException("dataset needs between one and four parameters.");
         }
