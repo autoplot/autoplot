@@ -490,6 +490,8 @@ public class CdfDataSource extends AbstractDataSource {
         //Pattern p= Pattern.compile( "[a-z]+(\\[(0-9:)+\\])?"); TODO: how to match?
         
         String constraint = null;
+        List<String> constraints= new ArrayList<>();
+        
         int ibracket = svariable.indexOf("[");
         if (ibracket != -1) {
             String newSvariable;
@@ -498,14 +500,17 @@ public class CdfDataSource extends AbstractDataSource {
             int i2= constraint.indexOf(";");
             if ( i2>-1 ) {
                 constraint= constraint.substring(0,i2);
+                constraints.add( constraint );
                 i2= svariable.indexOf(";");
                 int i3= svariable.indexOf(";",i2+1);
                 while ( i3>-1 ) {
                     int i4= svariable.indexOf("[",i2+1);
                     if ( i4==-1 ) {
                         newSvariable+= ";"+svariable.substring(i2+1,i3);
+                        constraints.add( "" );
                     } else {
                         newSvariable+= ";"+svariable.substring(i2+1,i4);
+                        constraints.add( svariable.substring(i4,i3) );
                     }
                     i2= i3;
                     i3= svariable.indexOf(";",i3+1);
@@ -513,8 +518,10 @@ public class CdfDataSource extends AbstractDataSource {
                 int i4= svariable.indexOf("[",i2+1);
                 if ( i4==-1 ) {
                     newSvariable+= ";"+svariable.substring(i2+1);
+                    constraints.add( "" );
                 } else {
                     newSvariable+= ";"+svariable.substring(i2+1,i4);
+                    constraints.add( svariable.substring(i4) );
                 }
             }
             svariable = newSvariable;
@@ -561,9 +568,11 @@ public class CdfDataSource extends AbstractDataSource {
                 throw new IllegalArgumentException("slice is not supported for multi-variable reads");
             } else {
                 QDataSet result0=null;
-                for ( String s: svariables ) {
+                for ( int i=0; i<svariables.length; i++ ) {
+                    String s= svariables[i];
+                    String c= constraints.get(i);
                     HashMap<String,Object> attrs1 = readAttributes(cdf, s, 0);
-                    QDataSet result1= loadVariableAndDependents(cdf, s, constraint, false, doDep, attrs1, -1, mon.getSubtaskMonitor("reading "+s+" from CDF file") );
+                    QDataSet result1= loadVariableAndDependents(cdf, s, c, false, doDep, attrs1, -1, mon.getSubtaskMonitor("reading "+s+" from CDF file") );
                     result0= Ops.bundle( result0, result1 );
                 }
                 result= Ops.maybeCopy(result0);
