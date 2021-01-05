@@ -570,7 +570,7 @@ public class CdfDataSource extends AbstractDataSource {
                 QDataSet result0=null;
                 for ( int i=0; i<svariables.length; i++ ) {
                     String s= svariables[i];
-                    String c= constraints.get(i);
+                    String c= constraints.isEmpty() ? "" : constraints.get(i);
                     HashMap<String,Object> attrs1 = readAttributes(cdf, s, 0);
                     QDataSet result1= loadVariableAndDependents(cdf, s, c, false, doDep, attrs1, -1, mon.getSubtaskMonitor("reading "+s+" from CDF file") );
                     result0= Ops.bundle( result0, result1 );
