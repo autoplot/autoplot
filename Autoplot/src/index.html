@@ -8,8 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>
-                Autoplot is used to study internet download speeds.
+        <p><small>When smooth is used with an even-sized boxcar, the time tags are not affected and must be manually recalculated.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,7 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2020-12-29 r25415):</p>
+        <p>Bugfixes (2021-01-06 r25429):</p>
+        <ul>
+            <li>"slices" filter GUI would reset improperly when the string was edited, causing flickering and occasional failure.  Thanks, Shing!
+            <li>correction to support for CDF file psp_fld_l2_mag_RTN_1min[:,0];psp_fld_l2_mag_RTN_1min[:,1];psp_fld_l2_mag_RTN_1min[:,2], where slice is not implemented.  Thanks, Jon N!
+        </ul>
+        <p>Older Bugfixes (2020-12-29 r25415):</p>
         <ul>
             <li>improve transparency of local files used with ro_cache.txt, where local files can be used to resolve remote files.
             <li>1310: --sandbox mode with "open vap file" now works on a Mac, which checked to see if the read-only folder was writable.
@@ -38,40 +42,17 @@
             <li>2309: correction to DataPointRecorder units change when emptied.  Thanks, Ivar!
             <li>1779: copy/paste plot is more aggressive about trying to bind the pasted plot's x-axis to the timerange.  Thanks, Bill!
         </ul>
-        <p>Older Bugfixes (2020-12-02 r25360):</p>
-        <ul>
-            <li>PNGWalkTool data-to-pixel transform had discontinuity at axis edge.  Now there is an output limit of -10000 to 10000, which is consistent with the DasAxis object.
-            <li>Datums backed by Long but not Units.cdfTT2000 would cause runtime error when printed.
-            <li>2305: doAxisDimensionsChange returned false, causing reset which resulted in using old dataset for axis labels.
-            <li>1636: corrections to Jython code refactoring (simplification of script to get params or for completions) after it was discovered that test server was failing to notify.  Simplification of codes.
-            <li>2304: Another round of localization checks is needed, das2server check.  Thanks, Corentin!
-            <li>2303: histogram filter didn't properly handle decimal arguments.
-            <li>2302: File->Open Vap file breaks when remote URI is in address bar.  Thanks, Ivar!
-            <li>rte_1637324209: occasional runtime error when loading vap, associated with new error bar controls.  Thanks, Bill!
-            <li>2300: script plot command toggles through invalid intermediate state, experiments with reset. 
-            <li>multi-line string used with setScriptDescription would cause parse error.
-            <li>In Mathematica to Jython, properly handle "2754 2^(2/3)"
-            <li>medianFilter would fail if there was too much fill data.  Thanks, Kristoff!
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>add rank 4 link command.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>add --macUseScreenMenuBar, which uses a conventional screen menu bar on Macs.
             <li>rebundle command allows subsetting and resorting of bundle datasets.
             <li>support datumRange(5,10) in scripts.  Thanks, Ivar!
             <li>events bar supports lineStyle and lineThick properties, new opaque property disables default transparency.  Thanks, Ali!
             <li>getFile can have null passed in for the monitor, when the developer knows the load will be quick.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>rfe501: allow custom mouse event handler and topDecorator to be added to the PNGWalkTool.
-            <li>rfe704: setScriptDescription can have a clickable link.
-            <li>referenceX and referenceY allow list of datums to point at or mark with symbol in annotations.
-            <li>anchorBackground property allows regions to be highlighted in annotations.
-            <li>rfe734: bundle URI keyword for ASCII files should return bundle descriptor
-            <li>add annotations list on the layout tab.  Thanks, Kristoff!
-            <li>rfe363: check version of Javadoc when deciding how to create link.
-            <li>rfe363: finally "addToSearchPath"'s Javadoc argument is used for Javadoc completions. (To be shown at 2020 AGU.)
-            <li>rfe363: first batch of new icons showing Java static method vs instance method, properly filter by context.
         </ul>
         <p>Known issues:</p>
         <ul>
