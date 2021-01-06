@@ -570,15 +570,17 @@ public class CdfDataSource extends AbstractDataSource {
                 QDataSet result0=null;
                 for ( int i=0; i<svariables.length; i++ ) {
                     String s= svariables[i];
-                    String c= constraints.isEmpty() ? "" : constraints.get(i);
+                    String c= constraints.isEmpty() ? null : constraints.get(i);
                     HashMap<String,Object> attrs1 = readAttributes(cdf, s, 0);
                     QDataSet result1= loadVariableAndDependents(cdf, s, c, false, doDep, attrs1, -1, mon.getSubtaskMonitor("reading "+s+" from CDF file") );
                     Pattern p= Pattern.compile("\\[\\:\\,(\\d+)\\]");
-                    Matcher m= p.matcher(c);
-                    QDataSet labels= (QDataSet)attrs1.get("slice1_labels");
-                    if ( m.matches() && labels!=null ) {
-                        int i2= Integer.parseInt(m.group(1));
-                        result1= Ops.putProperty( result1, QDataSet.LABEL, labels.slice(i2).svalue() );
+                    if ( c!=null ) {
+                        Matcher m= p.matcher(c);
+                        QDataSet labels= (QDataSet)attrs1.get("slice1_labels");
+                        if ( m.matches() && labels!=null ) {
+                            int i2= Integer.parseInt(m.group(1));
+                            result1= Ops.putProperty( result1, QDataSet.LABEL, labels.slice(i2).svalue() );
+                        }
                     }
                     result0= Ops.bundle( result0, result1 );
                 }
