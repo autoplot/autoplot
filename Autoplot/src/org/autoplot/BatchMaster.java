@@ -298,7 +298,7 @@ public class BatchMaster extends javax.swing.JPanel {
         });
         jPopupMenu1.add(loadUriMenuItem);
 
-        loadFromFileMI.setText("Load from File");
+        loadFromFileMI.setText("Load from File...");
         loadFromFileMI.setToolTipText("Load lines from file into this text area");
         loadFromFileMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -788,7 +788,7 @@ public class BatchMaster extends javax.swing.JPanel {
         if ( s!=null ) {
             chooser.setSelectedFile(new File(s));
         }
-        if ( JFileChooser.APPROVE_OPTION==chooser.showSaveDialog( this ) ) {
+        if ( JFileChooser.APPROVE_OPTION==chooser.showOpenDialog( this ) ) {
             readFromFile(chooser,paramValues);
         }
     }

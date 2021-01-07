@@ -53,7 +53,7 @@
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="loadFromFileMI">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Load from File"/>
+            <Property name="text" type="java.lang.String" value="Load from File..."/>
             <Property name="toolTipText" type="java.lang.String" value="Load lines from file into this text area"/>
           </Properties>
           <Events>
