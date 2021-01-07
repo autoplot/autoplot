@@ -790,6 +790,7 @@ public class BatchMaster extends javax.swing.JPanel {
         }
         if ( JFileChooser.APPROVE_OPTION==chooser.showOpenDialog( this ) ) {
             readFromFile(chooser,paramValues);
+            prefs.put("textfile",chooser.getSelectedFile().toString());
         }
     }
     
