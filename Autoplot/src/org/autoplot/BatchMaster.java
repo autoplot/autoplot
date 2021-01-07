@@ -204,9 +204,9 @@ public class BatchMaster extends javax.swing.JPanel {
         if ( dom.getController()!=null ) { // support testing.
             Pattern p= Pattern.compile(".*\\.jy(\\?.*)?");
             Map<String,String> recentJy= dom.getController().getApplicationModel().getRecent(p,20);
-            for ( Entry<String,String> recentItem : recentJy.entrySet() ) {
+            recentJy.entrySet().forEach((recentItem) -> {
                 recentUris.add( recentItem.getKey() );
-            }
+            });
         }
         dataSetSelector1.setRecent( recentUris );
         
@@ -567,16 +567,13 @@ public class BatchMaster extends javax.swing.JPanel {
             return;
         }
         goButton.setEnabled(false);
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String scriptName= dataSetSelector1.getValue();
-                    dom.getController().getApplicationModel().addRecent(scriptName);
-                    doIt();
-                } catch (IOException ex) {
-                    messageLabel.setText(ex.getMessage());
-                }
+        Runnable run= () -> {
+            try {
+                String scriptName= dataSetSelector1.getValue();
+                dom.getController().getApplicationModel().addRecent(scriptName);
+                doIt();
+            } catch (IOException ex) {
+                messageLabel.setText(ex.getMessage());
             }
         };
         new Thread(run,"runBatch").start();
@@ -693,13 +690,11 @@ public class BatchMaster extends javax.swing.JPanel {
         if ( JFileChooser.APPROVE_OPTION==chooser.showOpenDialog( this ) ) {
             final File f= chooser.getSelectedFile();
             prefs.put("batch", f.toString() );
-            Runnable run= new Runnable() {
-                public void run() {
-                    try {
-                        loadFile( f );
-                    } catch (IOException|JSONException ex) {
-                        JOptionPane.showMessageDialog( BatchMaster.this, "Unable to open file. "+ex.getMessage() );
-                    }
+            Runnable run= () -> {
+                try {
+                    loadFile( f );
+                } catch (IOException|JSONException ex) {
+                    JOptionPane.showMessageDialog( BatchMaster.this, "Unable to open file. "+ex.getMessage() );
                 }
             };
             new Thread(run).start();
@@ -723,13 +718,11 @@ public class BatchMaster extends javax.swing.JPanel {
             final File f= ff;
             
             prefs.put("batch", f.toString() );
-            Runnable run= new Runnable() {
-                public void run() {
-                    try {
-                        saveFile( f );
-                    } catch (IOException|JSONException ex) {
-                        JOptionPane.showMessageDialog( BatchMaster.this, "Unable to save file. "+ex.getMessage() );
-                    }
+            Runnable run= () -> {
+                try {
+                    saveFile( f );
+                } catch (IOException|JSONException ex) {
+                    JOptionPane.showMessageDialog( BatchMaster.this, "Unable to save file. "+ex.getMessage() );
                 }
             };
             new Thread(run).start();
@@ -759,17 +752,14 @@ public class BatchMaster extends javax.swing.JPanel {
                 return;
             }
             prefs.put("export", f.toString() );
-            Runnable run= new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        exportResults( f );
-                        JOptionPane.showMessageDialog( BatchMaster.this, "data saved to "+f );
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog( BatchMaster.this, "Unable to save file. "+ex.getMessage() );
-                    } catch (JSONException ex) {
-                        JOptionPane.showMessageDialog( BatchMaster.this, "Unable to save file because of JSON exception "+ex.getMessage() );
-                    }
+            Runnable run= () -> {
+                try {
+                    exportResults( f );
+                    JOptionPane.showMessageDialog( BatchMaster.this, "data saved to "+f );
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog( BatchMaster.this, "Unable to save file. "+ex.getMessage() );
+                } catch (JSONException ex) {
+                    JOptionPane.showMessageDialog( BatchMaster.this, "Unable to save file because of JSON exception "+ex.getMessage() );
                 }
             };
             new Thread(run).start();
@@ -818,11 +808,8 @@ public class BatchMaster extends javax.swing.JPanel {
         } catch ( IOException ex ) {
             logger.log( Level.WARNING, null, ex );
         }
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                paramValues.setText(b.toString());
-            }
+        Runnable run= () -> {
+            paramValues.setText(b.toString());
         };
         SwingUtilities.invokeLater(run);
             
@@ -844,14 +831,11 @@ public class BatchMaster extends javax.swing.JPanel {
         params.put( "param2", jo.getString("param2"));
         params.put( "param1Values", jo.getString("param1Values"));
         params.put( "param2Values", jo.getString("param2Values"));                
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                BatchMaster.this.param1NameCB.setSelectedItem(params.get("param1"));
-                BatchMaster.this.param2NameCB.setSelectedItem(params.get("param2"));
-                BatchMaster.this.param1Values.setText(params.get("param1Values"));
-                BatchMaster.this.param2Values.setText(params.get("param2Values"));                
-            }
+        Runnable run= () -> {
+            BatchMaster.this.param1NameCB.setSelectedItem(params.get("param1"));
+            BatchMaster.this.param2NameCB.setSelectedItem(params.get("param2"));
+            BatchMaster.this.param1Values.setText(params.get("param1Values"));
+            BatchMaster.this.param2Values.setText(params.get("param2Values"));
         };
         try {
             SwingUtilities.invokeAndWait(run);
@@ -1280,13 +1264,13 @@ public class BatchMaster extends javax.swing.JPanel {
             
             ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
             pfp.doVariables( env, scriptFile, params, null );
-            for ( Entry<String,String> ent: params.entrySet() ) {
+            params.entrySet().forEach((ent) -> {
                 try {
                     pfp.getFormData().implement( interp, ent.getKey(), ent.getValue() );
                 } catch (ParseException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
-            }
+            });
 
             if ( writeCheckBox.isSelected() ) {
                 String template= writeFilenameCB.getSelectedItem().toString();
