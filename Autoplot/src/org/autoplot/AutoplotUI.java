@@ -175,7 +175,6 @@ import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.layout.LayoutConstants;
 import org.autoplot.state.StatePersistence;
 import org.autoplot.util.PlotDataMashupResolver;
-import org.python.core.FileUtil;
 import org.python.util.PythonInterpreter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -192,31 +191,28 @@ public final class AutoplotUI extends javax.swing.JFrame {
     private static final String TAB_CONSOLE = "console";
 
     private static Thread getShutdownHook( final ApplicationModel model ) {
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                logger.fine("shutting down");
-                if ( model.isHeadless() ) {
-                    return;
+        Runnable run= () -> {
+            logger.fine("shutting down");
+            if ( model.isHeadless() ) {
+                return;
+            }
+            File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "log/" );
+            if ( !f2.exists() ) {
+                boolean ok= f2.mkdirs();
+                if ( !ok ) {
+                    logger.log(Level.WARNING, "unable to create folder {0}", f2);
                 }
-                File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "log/" );
-                if ( !f2.exists() ) {
-                    boolean ok= f2.mkdirs();
-                    if ( !ok ) {
-                        logger.log(Level.WARNING, "unable to create folder {0}", f2);
-                    }
-                }
-                File f= new File( f2, "last.vap" );
-                //f.setWritable( true, true );
-                try {
-                    StatePersistence.saveState( f, model.createState(true), "");
-                    if ( !f.setReadable( false, false ) ) logger.info("setReadable failed");
-                    if ( !f.setReadable( true, true ) ) logger.info("setReadable failed");
-                    if ( !f.setWritable( false, false ) ) logger.info("setWritable failed");
-                    if ( !f.setWritable( true, true ) ) logger.info("setWritable failed");
-                } catch (IOException ex) {
-                    logger.log(Level.WARNING, "error while writing  {0}: {1}", new Object[] { f2, ex.toString() } );
-                }
+            }
+            File f= new File( f2, "last.vap" );
+            //f.setWritable( true, true );
+            try {
+                StatePersistence.saveState( f, model.createState(true), "");
+                if ( !f.setReadable( false, false ) ) logger.info("setReadable failed");
+                if ( !f.setReadable( true, true ) ) logger.info("setReadable failed");
+                if ( !f.setWritable( false, false ) ) logger.info("setWritable failed");
+                if ( !f.setWritable( true, true ) ) logger.info("setWritable failed");
+            } catch (IOException ex) {
+                logger.log(Level.WARNING, "error while writing  {0}: {1}", new Object[] { f2, ex.toString() } );
             }
         };
         return new Thread( run, "apshutdown" );
@@ -441,41 +437,24 @@ public final class AutoplotUI extends javax.swing.JFrame {
 
         applicationModel = model;
         undoRedoSupport = new UndoRedoSupport(applicationModel);
-        undoRedoSupport.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                SwingUtilities.invokeLater( 
-                    new Runnable() { 
-                        @Override
-                        public void run() { 
-                            refreshUndoRedoLabel(); 
-                        } 
-                    } 
-                );
-            }
+        undoRedoSupport.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+            SwingUtilities.invokeLater(() -> {
+                refreshUndoRedoLabel();
+            });
         });
 
-        applicationModel.addPropertyChangeListener( ApplicationModel.PROP_VAPFILE, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                updateFrameTitle();
-            }
+        applicationModel.addPropertyChangeListener(ApplicationModel.PROP_VAPFILE, (PropertyChangeEvent evt) -> {
+            updateFrameTitle();
         });
 
-        undoRedoSupport.addPropertyChangeListener( UndoRedoSupport.PROP_DEPTH, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                updateFrameTitle();
-            }
-        } );
+        undoRedoSupport.addPropertyChangeListener(UndoRedoSupport.PROP_DEPTH, (PropertyChangeEvent evt) -> {
+            updateFrameTitle();
+        });
 
         APSplash.checkTime("init 20");
 
-        FileSystem.settings().addPropertyChangeListener( FileSystemSettings.PROP_OFFLINE, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                updateFrameTitle();
-            }
+        FileSystem.settings().addPropertyChangeListener(FileSystemSettings.PROP_OFFLINE, (PropertyChangeEvent evt) -> {
+            updateFrameTitle();
         });
         
         if ( model.getExceptionHandler() instanceof GuiExceptionHandler ) {
@@ -591,40 +570,31 @@ public final class AutoplotUI extends javax.swing.JFrame {
         timeRangeEditor.setAlternatePeer("Switch to Data Set Selector", CARD_DATA_SET_SELECTOR );
         dataSetSelector.setAlternatePeer("Switch to Time Range Editor", CARD_TIME_RANGE_SELECTOR );
         dataSetSelector.setCardSelected(true);
-        timeRangeEditor.addPropertyChangeListener( TimeRangeEditor.PROP_CARDSELECTED, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ( evt.getNewValue().equals(Boolean.TRUE) ) {
-                    setEditorCard( CARD_TIME_RANGE_SELECTOR );
-                    dataSetSelector.setCardSelected( false );
-                } else {
-                    setEditorCard( CARD_DATA_SET_SELECTOR );
-                    dataSetSelector.setCardSelected( true );
-                }
+        timeRangeEditor.addPropertyChangeListener(TimeRangeEditor.PROP_CARDSELECTED, (PropertyChangeEvent evt) -> {
+            if ( evt.getNewValue().equals(Boolean.TRUE) ) {
+                setEditorCard( CARD_TIME_RANGE_SELECTOR );
+                dataSetSelector.setCardSelected( false );
+            } else {
+                setEditorCard( CARD_DATA_SET_SELECTOR );
+                dataSetSelector.setCardSelected( true );
             }
         });
-        dataSetSelector.addPropertyChangeListener( DataSetSelector.PROP_CARDSELECTED, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ( evt.getNewValue().equals(Boolean.TRUE) ) {
-                    setEditorCard( CARD_DATA_SET_SELECTOR );
-                    timeRangeEditor.setCardSelected( false );
-                } else {
-                    setEditorCard( CARD_TIME_RANGE_SELECTOR );
-                    timeRangeEditor.setCardSelected( true );
-                }
+        dataSetSelector.addPropertyChangeListener(DataSetSelector.PROP_CARDSELECTED, (PropertyChangeEvent evt) -> {
+            if ( evt.getNewValue().equals(Boolean.TRUE) ) {
+                setEditorCard( CARD_DATA_SET_SELECTOR );
+                timeRangeEditor.setCardSelected( false );
+            } else {
+                setEditorCard( CARD_TIME_RANGE_SELECTOR );
+                timeRangeEditor.setCardSelected( true );
             }
         });
-        uriTimeRangeToggleButton1.addPropertyChangeListener( UriTimeRangeToggleButton.PROP_POSITION, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ( evt.getNewValue().equals(1) ) {
-                    setEditorCard( CARD_DATA_SET_SELECTOR );
-                    timeRangeEditor.setCardSelected( false );
-                } else {
-                    setEditorCard( CARD_TIME_RANGE_SELECTOR );
-                    timeRangeEditor.setCardSelected( true );                    
-                }
+        uriTimeRangeToggleButton1.addPropertyChangeListener(UriTimeRangeToggleButton.PROP_POSITION, (PropertyChangeEvent evt) -> {
+            if ( evt.getNewValue().equals(1) ) {
+                setEditorCard( CARD_DATA_SET_SELECTOR );
+                timeRangeEditor.setCardSelected( false );
+            } else {
+                setEditorCard( CARD_TIME_RANGE_SELECTOR );
+                timeRangeEditor.setCardSelected( true );
             }
         });
 
@@ -654,30 +624,26 @@ public final class AutoplotUI extends javax.swing.JFrame {
             @Override
             public void actionPerformed( final ActionEvent ev ) {
                 org.das2.util.LoggerManager.logGuiEvent(ev);
-                Runnable run = new Runnable() {
-                    @Override
-                    public void run() {
-                        String bookmarksFile= dataSetSelector.getValue().substring("bookmarks:".length());
-                        if ( bookmarksFile.endsWith("/") || bookmarksFile.endsWith(".")) { // normally reject method would trigger another completion
-                            DataSetSelector source= (DataSetSelector)ev.getSource();
-                            source.showFileSystemCompletions( true, false, "[^\\s]+[^\\s]+(\\.(?i)(xml)|(xml\\.gz))$" );
-                        } else {
-                            while ( getBookmarksManager()==null || getBookmarksManager().getModel()==null || getBookmarksManager().getModel().getList()==null ) {
-                                logger.fine("waiting for bookmarks manager to be initialized");
-                                try {
-                                    Thread.sleep(100);
-                                } catch (InterruptedException ex) {
-                                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                                }   
-                            }
-                            if ( ! getBookmarksManager().haveRemoteBookmark(bookmarksFile) ) {
-                                support.importBookmarks( bookmarksFile );
-                                applicationModel.addRecent(dataSetSelector.getValue());
-                            } else {
-                                setStatus( "remote bookmarks file is already imported"  );
+                Runnable run = () -> {
+                    String bookmarksFile= dataSetSelector.getValue().substring("bookmarks:".length());
+                    if ( bookmarksFile.endsWith("/") || bookmarksFile.endsWith(".")) { // normally reject method would trigger another completion
+                        DataSetSelector source= (DataSetSelector)ev.getSource();
+                        source.showFileSystemCompletions( true, false, "[^\\s]+[^\\s]+(\\.(?i)(xml)|(xml\\.gz))$" );
+                    } else {
+                        while ( getBookmarksManager()==null || getBookmarksManager().getModel()==null || getBookmarksManager().getModel().getList()==null ) {
+                            logger.fine("waiting for bookmarks manager to be initialized");
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException ex) {
+                                logger.log(Level.SEVERE, ex.getMessage(), ex);   
                             }
                         }
-
+                        if ( ! getBookmarksManager().haveRemoteBookmark(bookmarksFile) ) {
+                            support.importBookmarks( bookmarksFile );
+                            applicationModel.addRecent(dataSetSelector.getValue());
+                        } else {
+                            setStatus( "remote bookmarks file is already imported"  );
+                        }
                     }
                 };
                 new Thread( run, "bookmarksUri" ).start();
@@ -751,12 +717,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 } else {
                     newValue= "vap+hapi:";
                 }
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        dataSetSelector.setValue(newValue);
-                        dataSetSelector.maybePlot( ev.getModifiers() );
-                    }
+                Runnable run= () -> {
+                    dataSetSelector.setValue(newValue);
+                    dataSetSelector.maybePlot( ev.getModifiers() );
                 };
                 SwingUtilities.invokeLater(run);
             }
@@ -780,12 +743,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 } else {
                     newValue= "vap+hapi:";
                 }               
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        dataSetSelector.setValue(newValue);
-                        dataSetSelector.maybePlot( ev.getModifiers() );
-                    }
+                Runnable run= () -> {
+                    dataSetSelector.setValue(newValue);
+                    dataSetSelector.maybePlot( ev.getModifiers() );
                 };
                 SwingUtilities.invokeLater(run);
             }
@@ -808,12 +768,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 split.vapScheme= "vap+hapi";
                 split.params= URISplit.formatParams(params);
                 final String newValue= URISplit.format(split);
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        dataSetSelector.setValue(newValue);
-                        dataSetSelector.maybePlot( ev.getModifiers() );
-                    }
+                Runnable run= () -> {
+                    dataSetSelector.setValue(newValue);
+                    dataSetSelector.maybePlot( ev.getModifiers() );
                 };
                 SwingUtilities.invokeLater(run);
             }
@@ -837,12 +794,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 split.vapScheme= "vap+hapi";
                 split.params= URISplit.formatParams(params);
                 final String newValue= URISplit.format(split);
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        dataSetSelector.setValue(newValue);
-                        dataSetSelector.maybePlot( ev.getModifiers() );
-                    }
+                Runnable run= () -> {
+                    dataSetSelector.setValue(newValue);
+                    dataSetSelector.maybePlot( ev.getModifiers() );
                 };
                 SwingUtilities.invokeLater(run);
             }
@@ -964,29 +918,26 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     DataSetSelector source= (DataSetSelector)ev.getSource();
                     source.showFileSystemCompletions( false, true, "[^\\s]+\\.jy" );
                 } else {
-                    Runnable run= new Runnable() {
-                        @Override
-                        public void run() {
-                            applicationModel.addRecent(dataSetSelector.getValue());
-                            InputStream in=null;
-                            try {
-                                if ( vapfile.startsWith("http:") || vapfile.startsWith("https:") ) {
-                                    in= new URL(vapfile).openStream();
-                                } else {
-                                    in = DataSetURI.getInputStream( DataSetURI.toUri( vapfile ), new NullProgressMonitor() );
-                                }
-                                applicationModel.doOpenVap( in, null );
-                            } catch ( IOException ex ) {
-                                JOptionPane.showMessageDialog( AutoplotUI.this, "Unable to load: \n"+vapfile+"\n"+ex );
-                            } finally {
-                                try {
-                                    if ( in!=null ) in.close();
-                                } catch ( IOException ex2 ) {
-                                    logger.log(Level.WARNING,null,ex2);
-                                }
+                    Runnable run= () -> {
+                        applicationModel.addRecent(dataSetSelector.getValue());
+                        InputStream in=null;
+                        try {
+                            if ( vapfile.startsWith("http:") || vapfile.startsWith("https:") ) {
+                                in= new URL(vapfile).openStream();
+                            } else {
+                                in = DataSetURI.getInputStream( DataSetURI.toUri( vapfile ), new NullProgressMonitor() );
                             }
-                            dom.getController().setFocusUri(ApplicationController.VALUE_BLUR_FOCUS);
+                            applicationModel.doOpenVap( in, null );
+                        } catch ( IOException ex ) {
+                            JOptionPane.showMessageDialog( AutoplotUI.this, "Unable to load: \n"+vapfile+"\n"+ex );
+                        } finally {
+                            try {
+                                if ( in!=null ) in.close();
+                            } catch ( IOException ex2 ) {
+                                logger.log(Level.WARNING,null,ex2);
+                            }
                         }
+                        dom.getController().setFocusUri(ApplicationController.VALUE_BLUR_FOCUS);
                     };
                     RequestProcessor.invokeLater(run);
                 }
@@ -1021,33 +972,24 @@ public final class AutoplotUI extends javax.swing.JFrame {
 
         final ApplicationController appController= applicationModel.getDocumentModel().getController();
 
-        appController.addDas2PeerChangeListener( new PropertyChangeListener() {
-            @Override
-            public void propertyChange( PropertyChangeEvent e ) {
-                PlotController plotController= (PlotController) e.getNewValue();
-                ApplicationController controller= plotController.getApplication().getController();
-                GuiSupport.addPlotContextMenuItems( AutoplotUI.this, controller, plotController.getDasPlot(), plotController, plotController.getPlot() );
-                GuiSupport.addAxisContextMenuItems(  controller,  plotController.getDasPlot(), plotController,  plotController.getPlot(), plotController.getPlot().getXaxis());
-                GuiSupport.addAxisContextMenuItems( controller,  plotController.getDasPlot(), plotController,  plotController.getPlot(), plotController.getPlot().getYaxis());
-                GuiSupport.addAxisContextMenuItems(  controller,  plotController.getDasPlot(), plotController,  plotController.getPlot(), plotController.getPlot().getZaxis());
-            }
-        } );
+        appController.addDas2PeerChangeListener((PropertyChangeEvent e) -> {
+            PlotController plotController= (PlotController) e.getNewValue();
+            ApplicationController controller= plotController.getApplication().getController();
+            GuiSupport.addPlotContextMenuItems( AutoplotUI.this, controller, plotController.getDasPlot(), plotController, plotController.getPlot() );
+            GuiSupport.addAxisContextMenuItems(  controller,  plotController.getDasPlot(), plotController,  plotController.getPlot(), plotController.getPlot().getXaxis());
+            GuiSupport.addAxisContextMenuItems( controller,  plotController.getDasPlot(), plotController,  plotController.getPlot(), plotController.getPlot().getYaxis());
+            GuiSupport.addAxisContextMenuItems(  controller,  plotController.getDasPlot(), plotController,  plotController.getPlot(), plotController.getPlot().getZaxis());
+        });
 
-        appController.addPropertyChangeListener( ApplicationController.PROP_FOCUSURI, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                SwingUtilities.invokeLater( new Runnable() { 
-                    @Override
-                    public void run() {
-                        if ( pendingVap==null ) { // non-null means we are loading something.
-                            if ( !isBasicMode() ) {
-                                dataSetSelector.setValue( appController.getFocusUri() );
-                            }
-                        }
-                    } 
-                } );
-            }
-        } );
+        appController.addPropertyChangeListener(ApplicationController.PROP_FOCUSURI, (PropertyChangeEvent evt) -> {
+            SwingUtilities.invokeLater(() -> {
+                if ( pendingVap==null ) { // non-null means we are loading something.
+                    if ( !isBasicMode() ) {
+                        dataSetSelector.setValue( appController.getFocusUri() );
+                    }
+                }
+            });
+        });
         dataSetSelector.setValue( dom.getController().getFocusUri() );
         
         appController.addPropertyChangeListener( ApplicationController.PROP_STATUS, new PropertyChangeListener() {
@@ -1087,12 +1029,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
 
         this.setName("autoplot");
         AppManager.getInstance().addApplication(this);
-        AppManager.getInstance().addCloseCallback( this, "recordPositionSize", new AppManager.CloseCallback() {
-            @Override
-            public boolean checkClose() {
-                WindowManager.getInstance().recordWindowSizePosition(AutoplotUI.this);
-                return true;
-            }
+        AppManager.getInstance().addCloseCallback(this, "recordPositionSize", () -> {
+            WindowManager.getInstance().recordWindowSizePosition(AutoplotUI.this);
+            return true;
         });
         this.addWindowListener( AppManager.getInstance().getWindowListener(this,new AbstractAction("close") {
             @Override
@@ -1143,39 +1082,26 @@ public final class AutoplotUI extends javax.swing.JFrame {
             
         });
         
-        applicationModel.addPropertyChangeListener( ApplicationModel.PROP_VAPFILE, new PropertyChangeListener() {
-            @Override
-            public void propertyChange( PropertyChangeEvent e ) {
-                stateSupport.setCurrentFile( (String)e.getNewValue() );
-            }
+        applicationModel.addPropertyChangeListener(ApplicationModel.PROP_VAPFILE, (PropertyChangeEvent e) -> {
+            stateSupport.setCurrentFile( (String)e.getNewValue() );
         });
 
-        applicationModel.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                switch (evt.getPropertyName()) {
-                    case ApplicationModel.PROPERTY_RECENT:
-                        final List<Bookmark> recent = applicationModel.getRecent();
-                        SwingUtilities.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    org.autoplot.bookmarks.Util.setRecent( dataSetSelector, recent );
-                                    //dataSetSelector.setRecent(urls);
-                                }
-                            } );
-                        break;
-                    case ApplicationModel.PROPERTY_BOOKMARKS:
-                        SwingUtilities.invokeLater(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    updateBookmarks();
-                                }
-                            } );
-                        break;
-                    default:
-                        logger.finer( "no action needed near line 940: "+evt.getPropertyName() );
-                }
+        applicationModel.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+            switch (evt.getPropertyName()) {
+                case ApplicationModel.PROPERTY_RECENT:
+                    final List<Bookmark> recent = applicationModel.getRecent();
+                    SwingUtilities.invokeLater(() -> {
+                        org.autoplot.bookmarks.Util.setRecent( dataSetSelector, recent );
+                        //dataSetSelector.setRecent(urls);
+            });
+                    break;
+                case ApplicationModel.PROPERTY_BOOKMARKS:
+                    SwingUtilities.invokeLater(() -> {
+                        updateBookmarks();
+            });
+                    break;
+                default:
+                    logger.log(Level.FINER, "no action needed near line 940: {0}", evt.getPropertyName());
             }
         });
         
@@ -1183,11 +1109,8 @@ public final class AutoplotUI extends javax.swing.JFrame {
         APSplash.checkTime("init 55");
         APSplash.checkTime("init 60");
 
-        dataSetSelector.addPropertyChangeListener(DataSetSelector.PROPERTY_MESSAGE, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent e) {
-                setStatus(dataSetSelector.getMessage());
-            }
+        dataSetSelector.addPropertyChangeListener(DataSetSelector.PROPERTY_MESSAGE, (PropertyChangeEvent e) -> {
+            setStatus(dataSetSelector.getMessage());
         });
 
         tabs = new TearoffTabbedPane();
@@ -1226,9 +1149,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
         List<Bookmark> recent = applicationModel.getRecent();
         APSplash.checkTime("init 80");
 
-        for (Bookmark b : recent) {
+        recent.forEach((b) -> {
             uris.add(((Bookmark.Item) b).getUri());
-        }
+        });
         dataSetSelector.setRecent(uris);
         //some other bug had been preventing this code from working.  I actually like the bug behavior better, where the value is
         //not the most recent one, so I'm commenting this out to restore this behavior.
@@ -1239,23 +1162,16 @@ public final class AutoplotUI extends javax.swing.JFrame {
 //        }
 
         //since bookmarks can contain remote folder, get these after making the gui.
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                updateBookmarks();
-                dataSetSelector.setPromptText("Enter data location or select a bookmark");
-            }
+        Runnable run= () -> {
+            updateBookmarks();
+            dataSetSelector.setPromptText("Enter data location or select a bookmark");
         };
         invokeLater( 1000, true, run );
         APSplash.checkTime("init 90");
 
-        SwingUtilities.invokeLater(
-            new Runnable() { 
-                @Override
-                public void run() {
-                    addTools();
-                }
-        } );
+        SwingUtilities.invokeLater(() -> {
+            addTools();
+        });
         
         addBindings();
 
@@ -1290,62 +1206,55 @@ public final class AutoplotUI extends javax.swing.JFrame {
     }
 
     private Runnable addAxes() {
-        return new Runnable() {
-            @Override
-            public void run() {
-  APSplash.checkTime("addAxes in");
-                final JScrollPane sp= new JScrollPane();
-                tabs.insertTab("axes", null, sp,
-                        String.format(  TAB_TOOLTIP_AXES, TABS_TOOLTIP), 1);
-                invokeLater( 2500, true, new Runnable() {
-                    @Override
-                    public String toString() { return "addAxesRunnable"; }
-                    @Override
-                    public void run() {
-  APSplash.checkTime("addAxes1 in");
-                        final JComponent c= new AxisPanel(applicationModel);
-                        SwingUtilities.invokeLater( new Runnable() {
-                            @Override
-                            public void run( ) { sp.setViewportView(c); }
-                        } );
-  APSplash.checkTime("addAxes1 out");
-                    }
-                });
-  APSplash.checkTime("addAxes out");
-            }
+        return () -> {
+            APSplash.checkTime("addAxes in");
+            final JScrollPane sp= new JScrollPane();
+            tabs.insertTab("axes", null, sp,
+                    String.format(  TAB_TOOLTIP_AXES, TABS_TOOLTIP), 1);
+            invokeLater( 2500, true, new Runnable() {
+                @Override
+                public String toString() { return "addAxesRunnable"; }
+                @Override
+                public void run() {
+                    APSplash.checkTime("addAxes1 in");
+                    final JComponent c= new AxisPanel(applicationModel);
+                    SwingUtilities.invokeLater( new Runnable() {
+                        @Override
+                        public void run( ) { sp.setViewportView(c); }
+                    } );
+                    APSplash.checkTime("addAxes1 out");
+                }
+            });
+            APSplash.checkTime("addAxes out");
         };
     }
 
     private Runnable addStyle() {
-        return new Runnable() {
-            @Override
-            public void run() {
-  APSplash.checkTime("addStyle in");
-                final JScrollPane sp= new JScrollPane();
-                try {
-                    loadMyColors();
-                } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
-                }
-                tabs.insertTab("style", null, sp,
-                        String.format(  TAB_TOOLTIP_STYLE, TABS_TOOLTIP), 2);
-                invokeLater( 2500, true, new Runnable() {
-                    @Override
-                    public String toString() { return "addStyle"; }
-                    @Override                    
-                    public void run() {
-  APSplash.checkTime("addStyle1 in");
-                        final JComponent c= new PlotStylePanel(applicationModel);
-                        SwingUtilities.invokeLater( new Runnable() {
-                            @Override                    
-                            public void run( ) { sp.setViewportView(c); }
-                        } );
-                        
-  APSplash.checkTime("addStyle1 out");
-                    }
-                } );
-  APSplash.checkTime("addStyle out");
+        return () -> {
+            APSplash.checkTime("addStyle in");
+            final JScrollPane sp= new JScrollPane();
+            try {
+                loadMyColors();
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, null, ex);
             }
+            tabs.insertTab("style", null, sp,
+                    String.format(  TAB_TOOLTIP_STYLE, TABS_TOOLTIP), 2);
+            invokeLater( 2500, true, new Runnable() {
+                @Override
+                public String toString() { return "addStyle"; }
+                @Override
+                public void run() {
+                    APSplash.checkTime("addStyle1 in");
+                    final JComponent c= new PlotStylePanel(applicationModel);
+                    SwingUtilities.invokeLater(() -> {
+                        sp.setViewportView(c);
+                    });
+                    
+                    APSplash.checkTime("addStyle1 out");
+                }
+            } );
+            APSplash.checkTime("addStyle out");
         };
     }
 
@@ -4370,13 +4279,10 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
     private void runBatchMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runBatchMenuItemActionPerformed
         BatchMaster mmm= new BatchMaster(dom);
         final JDialog dia= new JDialog( this, "Run Batch" );
-        dia.getRootPane().registerKeyboardAction( new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                org.das2.util.LoggerManager.logGuiEvent(e);        
-                dia.setVisible(false);
-                dia.dispose();
-            }
+        dia.getRootPane().registerKeyboardAction((ActionEvent e) -> {
+            org.das2.util.LoggerManager.logGuiEvent(e);
+            dia.setVisible(false);
+            dia.dispose();
         }, KeyStroke.getKeyStroke( KeyEvent.VK_ESCAPE, 0 ), JComponent.WHEN_IN_FOCUSED_WINDOW );       
 
         dia.setJMenuBar( mmm.getMenuBar() );
