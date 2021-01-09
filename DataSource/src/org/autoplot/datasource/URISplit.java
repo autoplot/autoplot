@@ -878,8 +878,9 @@ public class URISplit {
         for ( Entry<String,String> e: parms.entrySet() ) {
             String key = (String) e.getKey();
             if (key.startsWith("arg_")) {
-                if (!e.getValue().equals("")) {
-                    result.append("&").append(e.getValue());
+                String value= e.getValue();
+                if ( value!=null && !value.equals("")) {
+                    result.append("&").append(value);
                 }
             } else {
                 String value = (String) e.getValue();
