@@ -105,7 +105,8 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "byte") );
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ubyte") );
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "nybble", "four-bit integers") );
-                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "time24", "ISO8601 time in 24 ASCII characters") );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "time24", "ISO8601 time in 24 ASCII characters (16-24 allowed)") );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ascii8", "Formatted number in 8 ASCII characters (1-24 allowed)") );
                     return result;
                 }
                 case "depend0":
@@ -124,7 +125,8 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ushort") );
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "byte") );
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ubyte") );
-                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "time24", "ISO8601 time in 24 ASCII characters") );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "time24", "ISO8601 time in 24 ASCII characters (16-24 allowed)") );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ascii8", "Formatted number in 8 ASCII characters (1-24 allowed)") );
                     return result;
                 }
                 case "depend0Units":
