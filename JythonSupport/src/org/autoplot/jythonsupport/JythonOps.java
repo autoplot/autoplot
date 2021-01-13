@@ -352,7 +352,8 @@ public class JythonOps {
     
     /**
      * download the jar file resource, unpack it, and add it to the search path.  Note
-     * such scripts will not work with Webstart releases!
+     * such scripts will not work with Webstart releases!  The code is only
+     * loaded once per session, so Autoplot must be restarted if the library is updated.
      *
      * Here is an example use:
      * <blockquote><pre><small>{@code
@@ -382,7 +383,8 @@ public class JythonOps {
     
     /**
      * download the jar file resource, unpack it, and add it to the search path.  Note
-     * such scripts will not work with Webstart releases!
+     * such scripts will not work with Webstart releases!  The code is only
+     * loaded once per session, so Autoplot must be restarted if the library is updated.
      *
      * Here is an example use:
      * <blockquote><pre><small>{@code
@@ -403,7 +405,7 @@ public class JythonOps {
      * @param docPath the path containing javadocs, useful programmatically for completions.
      * @param mon monitor for the download.
      * @return the name of the folder or jar file added.
-     * @see https://sourceforge.net/p/autoplot/feature-requests/584/, which shows example use.
+     * @see https://sourceforge.net/p/autoplot/feature-requests/584/ which shows example use.
      * @throws IOException
      * @throws URISyntaxException 
      */
