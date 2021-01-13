@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import org.autoplot.datasource.DataSetURI;
+import org.das2.jythoncompletion.JavadocLookup;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.parser.SimpleNode;
@@ -81,13 +82,27 @@ public class JythonToJavaConverter {
                 logger.log(Level.SEVERE, null, ex);
             }
         }
-        return packages.get(clas);
+
+        String result= packages.get(clas);
+        
+        if ( result==null ) {
+            List<String> sss= JavadocLookup.getInstance().searchForSignature(clas);
+            for ( int i=0; i<sss.size(); i++ ) {
+                String s= sss.get(i);
+                int idx= s.lastIndexOf(".");
+                if ( s.substring(idx+1).equals(clas) ) {
+                    result= s.substring(0,idx);
+                }
+            }
+        }
+
+        return result;
     }
     
     /**
      * return a list of classes which are reasonable completions for the class
      * provided. For example, "JP" would result in "JPanel" and "JPasswordField"
-     *
+     * TODO: what if this were to run through all the known JavaDoc
      * @param clas
      * @return list of completions.
      */
@@ -118,6 +133,15 @@ public class JythonToJavaConverter {
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
+        List<String> sss= JavadocLookup.getInstance().searchForSignature(clas);
+        for ( int i=0; i<sss.size(); i++ ) {
+            String s= sss.get(i);
+            int idx= s.lastIndexOf(".");
+            if ( idx>-1 ) {
+                result.add(s.substring(idx+1));
+            }
+        }
+        
         return result;
     }
     

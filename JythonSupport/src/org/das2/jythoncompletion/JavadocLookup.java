@@ -3,7 +3,9 @@ package org.das2.jythoncompletion;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -140,6 +142,23 @@ public class JavadocLookup {
             
         } catch ( IOException | CancelledOperationException ex ) {
             
+        }
+    }
+
+    /**
+     * given a class name, what are fully-qualified class names which match?
+     * 
+     * @param clas
+     * @return 
+     */
+    public List<String> searchForSignature(String clas) {
+        if ( clas.startsWith("URIT") ) {
+            return Collections.singletonList("org.hapiserver.URITemplate");
+        } else {
+            for ( Entry<String,String> e: lookups.entrySet() ) {
+                // look for list file that has all classnames in each library.
+            }
+            return Collections.emptyList();
         }
     }
 }
