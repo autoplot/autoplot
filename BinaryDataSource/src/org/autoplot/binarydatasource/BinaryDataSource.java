@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.binarydatasource;
 
 import java.io.File;
@@ -18,7 +15,6 @@ import org.das2.qds.AbstractRank1DataSet;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
-import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.AbstractDataSource;
 
 /**
