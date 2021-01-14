@@ -24,9 +24,9 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class XMLTypeCheck extends DefaultHandler {
 
-    protected static final Object TYPE_HELM = "HELM";
-    protected static final Object TYPE_SPASE = "SPASE";
-    protected static final Object TYPE_VOTABLE = "VOTABLE";
+    public static final Object TYPE_HELM = "HELM";
+    public static final Object TYPE_SPASE = "SPASE";
+    public static final Object TYPE_VOTABLE = "VOTABLE";
 
     private Object type;
     
@@ -64,6 +64,8 @@ public class XMLTypeCheck extends DefaultHandler {
     /**
      * use a sax parser to get the type.  Return
      * TYPE_VOTABLE, TYPE_HELM, TYPE_SPASE
+     * @param f
+     * @return 
      */
     public Object calculateType( File f ) throws IOException, SAXException {
 

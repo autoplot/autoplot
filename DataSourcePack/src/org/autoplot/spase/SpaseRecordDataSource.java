@@ -80,8 +80,6 @@ public class SpaseRecordDataSource extends AbstractDataSource {
      */
     DataSource delegate;
 
-    Object type;
-
     /** Creates a new instance of SpaseRecordDataSource */
     public SpaseRecordDataSource( URI uri ) throws IllegalArgumentException, IOException, SAXException, Exception {
         super(uri);
@@ -125,20 +123,15 @@ public class SpaseRecordDataSource extends AbstractDataSource {
         
     }
     
-    
+    @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
         mon.started();
         mon.setProgressMessage( "parse xml file");
         
-        File f= DataSetURI.getFile( uri, mon.getSubtaskMonitor("get file") );
-        type= new XMLTypeCheck().calculateType(f);
+        DataSetURI.getFile( uri, mon.getSubtaskMonitor("get file") );
         
-        if ( type!=XMLTypeCheck.TYPE_VOTABLE ) {  // this type uses a SAX parser.
-            readXML(mon.getSubtaskMonitor("readXML")); // creates the document object...
-        } else {
-            document= null;
-        }
+        readXML(mon.getSubtaskMonitor("readXML")); // creates the document object...
 
         String surl=null;
 
@@ -147,140 +140,25 @@ public class SpaseRecordDataSource extends AbstractDataSource {
             XPathFactory factory= XPathFactory.newInstance();
             XPath xpath= factory.newXPath();
 
-            if ( type==XMLTypeCheck.TYPE_SPASE ) {
-                surl= (String) xpath.evaluate( "//Spase/NumericalData/AccessInformation/AccessURL/URL/text()", document );
-                //surl= findSurl();
-                
+            surl= (String) xpath.evaluate( "//Spase/NumericalData/AccessInformation/AccessURL/URL/text()", document );
+            //surl= findSurl();
+
+            if ( surl.trim().length()==0 ) {
+                surl= (String) xpath.evaluate( "//Spase/Granule/Source/URL/text()", document );
                 if ( surl.trim().length()==0 ) {
-                    surl= (String) xpath.evaluate( "//Spase/Granule/Source/URL/text()", document );
-                    if ( surl.trim().length()==0 ) {
-                        throw new IllegalArgumentException("Expected to find URI in //Spase/Granule/Source/URL/text()");
-                    } else {
-                        throw new IllegalArgumentException("Granule is found at: "+surl+", unable to read" );
-                    }
-                }
-                
-                delegate= DataSetURI.getDataSource( DataSetURI.getURIValid( surl ) );
-
-                mon.setProgressMessage("reading "+delegate.getURI() );
-                
-                QDataSet result= delegate.getDataSet(mon.getSubtaskMonitor("get delegate"));
-
-                return result;
-
-            } else if ( type==XMLTypeCheck.TYPE_HELM ) {
-
-                NodeList nl= (NodeList) xpath.evaluate( "//Eventlist/Event", document, XPathConstants.NODESET );
-
-                DataSetBuilder timespans= new DataSetBuilder(2,100,2);
-                DataSetBuilder description= new DataSetBuilder(1,100);
-
-                EnumerationUnits eu= EnumerationUnits.create("eventDesc");
-
-                description.putProperty(QDataSet.UNITS,eu );
-                timespans.putProperty(QDataSet.UNITS, Units.us2000 );
-                timespans.putProperty(QDataSet.BINS_1,"min,max");
-
-                mon.setTaskSize(nl.getLength());
-                mon.setProgressMessage( "reading events" );
-
-                for ( int j=0; j<nl.getLength(); j++ ) {
-                    Node item= nl.item(j);
-                    mon.setTaskProgress(j);
-                    if ( mon.isCancelled() ) throw new CancelledOperationException("User pressed cancel");
-
-                    String desc= (String) xpath.evaluate( "Description/text()", item, XPathConstants.STRING );
-
-                    String startDate= (String) xpath.evaluate( "TimeSpan/StartDate/text()", item, XPathConstants.STRING );
-                    String stopDate= (String) xpath.evaluate( "TimeSpan/StopDate/text()", item, XPathConstants.STRING );
-                    if ( startDate.compareTo(stopDate)>0 ) {
-                        //throw new IllegalArgumentException("startDate is after stopDate");
-                        Exception e= new IllegalArgumentException("StartDate is after StopDate: "+startDate );
-                        e.printStackTrace();
-                        timespans.putValue(j, 0, Units.us2000.parse(startDate).doubleValue(Units.us2000) );
-                        timespans.putValue(j, 1, Units.us2000.parse(startDate).doubleValue(Units.us2000) );
-                        description.putValue(j,eu.createDatum(e.getMessage()).doubleValue(eu) );
-                        continue;
-                    }
-                    description.putValue(j,eu.createDatum( desc ).doubleValue(eu) );
-                    timespans.putValue(j, 0, Units.us2000.parse(startDate).doubleValue(Units.us2000) );
-                    timespans.putValue(j, 1, Units.us2000.parse(stopDate).doubleValue(Units.us2000) );
-                }
-
-                DDataSet dd= description.getDataSet();
-                dd.putProperty( QDataSet.DEPEND_0, timespans.getDataSet() );
-
-                String title= (String)xpath.evaluate("//Eventlist/ResourceHeader/Description", document, XPathConstants.STRING );
-                dd.putProperty( QDataSet.TITLE,title );
-                
-                return dd;
-
-            } else if ( type==XMLTypeCheck.TYPE_VOTABLE ) {
-
-                VOTableReader r= new VOTableReader();
-                
-                QDataSet result= r.readTable( f.toString(), mon.getSubtaskMonitor("read votable") );
-                
-                QDataSet bds= (QDataSet) result.property(QDataSet.BUNDLE_1);
-                
-                QDataSet ttag;
-                QDataSet data= null;
-                
-                // allow for the second column to be the timetags.
-                Units u0= (Units) bds.property(QDataSet.UNITS,0);
-                Units u1= null;
-                if ( bds.length()>0 ) {
-                    u1= (Units) bds.property(QDataSet.UNITS,1);
-                }
-                
-                int ii= 0;
-                if ( ( u0==null || !UnitsUtil.isTimeLocation( u0 ) ) && ( u1!=null && UnitsUtil.isTimeLocation(u1) ) ) {
-                    if ( bds.length()>1 ) {
-                        ii=1;
-                        u0= u1;
-                        if ( bds.length()>2 ) {
-                            u1= (Units)bds.property(QDataSet.UNITS,2 );
-                        }
-                    }
-                }
-                
-                if ( bds.length()>1 ) {
-                    if ( u0!=null && u1!=null && UnitsUtil.isTimeLocation(u0) && UnitsUtil.isTimeLocation(u1) ) {
-                        MutablePropertyDataSet wttag= DataSetOps.applyIndex( result, 1, Ops.linspace(ii,ii+1,2), false );
-                        wttag.putProperty(QDataSet.BINS_1,QDataSet.VALUE_BINS_MIN_MAX);
-                        wttag.putProperty(QDataSet.BUNDLE_1,null); // TODO: Really, I have to delete this???
-                        wttag.putProperty(QDataSet.UNITS,u0);
-                        
-                        ttag= wttag;
-                        if ( bds.length()==(ii+2) ) {
-                            EnumerationUnits eu= EnumerationUnits.create("eventDesc");
-                            MutablePropertyDataSet mdata= Ops.replicate( eu.createDatum("").doubleValue(eu), ttag.length() );
-                            mdata.putProperty(QDataSet.UNITS,eu);
-                            data= mdata;
-                        }
-                    } else {
-                        ttag= DataSetOps.unbundle( result,0 );
-                    }
+                    throw new IllegalArgumentException("Expected to find URI in //Spase/Granule/Source/URL/text()");
                 } else {
-                    ttag= DataSetOps.unbundle( result,0 );
+                    throw new IllegalArgumentException("Granule is found at: "+surl+", unable to read" );
                 }
-                
-                if ( data==null ) {
-                    URISplit split= URISplit.parse(this.uri);
-                    Map<String,String> args= URISplit.parseParams(split.params);
-                    String arg0= args.get(URISplit.PARAM_ARG_0);
-                    if ( arg0==null ) {
-                        data= DataSetOps.unbundle( result, result.length(0)-1 );
-                    } else {
-                        data= DataSetOps.unbundle( result, args.get(URISplit.PARAM_ARG_0) ); // typical route
-                    }
-                }
-                
-                return Ops.link( ttag, data );
-
-            } else {
-                throw new IllegalArgumentException( "Unsupported XML type, root node should be Spase or Eventlist"); // see else above
             }
+
+            delegate= DataSetURI.getDataSource( DataSetURI.getURIValid( surl ) );
+
+            mon.setProgressMessage("reading "+delegate.getURI() );
+
+            QDataSet result= delegate.getDataSet(mon.getSubtaskMonitor("get delegate"));
+
+            return result;
 
         } catch ( XPathExpressionException ex) {
             throw new IllegalArgumentException("unable to get /Spase/NumericalData/AccessInformation/AccessURL/URL(): "+ex.getMessage() );
@@ -307,22 +185,11 @@ public class SpaseRecordDataSource extends AbstractDataSource {
             throw new RuntimeException(ex);
         }
         File f= DataSetURI.getFile( uri, mon );
-        InputStream in= new FileInputStream(f);
         
-        try {
+        try (InputStream in = new FileInputStream(f)) {
             InputSource source = new InputSource( in );
             document = builder.parse(source);
 
-            //Node n= document.getDocumentElement();
-
-            //String localName= n.getNodeName();
-            //int i= localName.indexOf(":");
-            //if ( i>-1  ) {
-            //    localName= localName.substring(i+1);
-            //}
-
-        } finally {
-            in.close();
         } 
         
     }
@@ -330,9 +197,7 @@ public class SpaseRecordDataSource extends AbstractDataSource {
     @Override
     public Map<String,Object> getMetadata( ProgressMonitor mon ) throws Exception {
 
-        if ( type.equals(XMLTypeCheck.TYPE_VOTABLE) ) {
-            return new HashMap<String, Object>();
-        } else if ( document==null ) {
+        if ( document==null ) {
             readXML(mon);
         }
 
@@ -341,6 +206,7 @@ public class SpaseRecordDataSource extends AbstractDataSource {
         DocumentTraversal traversal = (DocumentTraversal)document;
         
         NodeFilter filter = new NodeFilter() {
+            @Override
             public short acceptNode(Node n) {
                 if (n.getNodeType() == Node.TEXT_NODE) {
                     // Use trim() to strip off leading and trailing space.
@@ -379,11 +245,7 @@ public class SpaseRecordDataSource extends AbstractDataSource {
 
     @Override
     public MetadataModel getMetadataModel() {
-        if ( type==XMLTypeCheck.TYPE_SPASE ) {
-            return new SpaseMetadataModel();
-        } else {
-            return null;
-        }
+        return new SpaseMetadataModel();
     }
     
     
