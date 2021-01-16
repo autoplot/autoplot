@@ -1,3 +1,1 @@
-org.autoplot.ascii.AsciiTableDataSourceFactory
 org.autoplot.das2Stream.Das2StreamDataSourceFactory application/x-das2stream
-org.autoplot.spase.SpaseRecordDataSourceFactory

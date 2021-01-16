@@ -38,7 +38,7 @@ public class XmlFileDataSourceFactory extends AbstractDataSourceFactory implemen
     
     @Override
     public DataSource getDataSource(URI uri) throws Exception {
-        return new SpaseRecordDataSource(uri);
+        return new XmlfileDataSource(uri);
     }
     
     @Override
