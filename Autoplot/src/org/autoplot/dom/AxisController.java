@@ -286,6 +286,7 @@ public class AxisController extends DomNodeController {
         ac.bind(axis, Axis.PROP_FLIPPED, dasAxis, DasAxis.PROP_FLIPPED );
         ac.bind(axis, Axis.PROP_VISIBLE, dasAxis, "visible" );
         ac.bind(axis, Axis.PROP_OPPOSITE, dasAxis, "orientation", getOppositeConverter(axis,dasAxis) );
+        ac.bind(axis, Axis.PROP_OPPOSITEAXISVISIBLE, dasAxis, DasAxis.PROP_OPPOSITE_AXIS_VISIBLE );
         ac.bind(axis, Axis.PROP_TICKVALUES, dasAxis, DasAxis.PROP_TICKVALUES );
         ac.bind(axis, Axis.PROP_REFERENCE, dasAxis, DasAxis.PROP_REFERENCE );
         column= dasAxis.getColumn();
