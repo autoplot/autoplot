@@ -239,6 +239,20 @@ public final class Options extends DomNode {
         propertyChangeSupport.firePropertyChange( PROP_COLORTABLE, oldVal, this.colortable );
     }    
 
+    private boolean oppositeAxisVisible = false;
+
+    public static final String PROP_OPPOSITEAXISVISIBLE = "oppositeAxisVisible";
+
+    public boolean isOppositeAxisVisible() {
+        return oppositeAxisVisible;
+    }
+
+    public void setOppositeAxisVisible(boolean oppositeAxisVisible) {
+        boolean oldOppositeAxisVisible = this.oppositeAxisVisible;
+        this.oppositeAxisVisible = oppositeAxisVisible;
+        propertyChangeSupport.firePropertyChange(PROP_OPPOSITEAXISVISIBLE, oldOppositeAxisVisible, oppositeAxisVisible);
+    }
+    
     protected String ticklen = "0.66em";
     public static final String PROP_TICKLEN = "ticklen";
 
@@ -673,6 +687,7 @@ public final class Options extends DomNode {
         if ( !exclude.contains(PROP_USE_TIME_RANGE_EDITOR) ) this.setUseTimeRangeEditor(that.isUseTimeRangeEditor());
         if ( !exclude.contains(PROP_FLIPCOLORBARLABEL) ) this.setFlipColorbarLabel(that.isFlipColorbarLabel());
         if ( !exclude.contains(PROP_TICKLEN) ) this.setTicklen( that.getTicklen() );
+        if ( !exclude.contains(PROP_OPPOSITEAXISVISIBLE ) ) this.setOppositeAxisVisible( that.isOppositeAxisVisible() );
         if ( !exclude.contains(PROP_LINE_THICKNESS) ) this.setLineThickness( that.getLineThickness() );
         if ( !exclude.contains(PROP_SCANENABLED) ) this.setScanEnabled( that.isScanEnabled() );
     }
@@ -710,6 +725,8 @@ public final class Options extends DomNode {
         b = that.getTicklen().equals(this.getTicklen() );
         if (!b) result.add(new PropertyChangeDiff(PROP_TICKLEN, that.getTicklen(), this.getTicklen()));
         b = that.getLineThickness().equals(this.getLineThickness() );
+        if (!b) result.add(new PropertyChangeDiff(PROP_OPPOSITEAXISVISIBLE, that.isOppositeAxisVisible(), this.isOppositeAxisVisible() ));
+        b = that.getLineThickness().equals(this.getLineThickness() );
         if (!b) result.add(new PropertyChangeDiff(PROP_LINE_THICKNESS, that.getLineThickness(), this.getLineThickness()));
         b = that.isScanEnabled()== this.isScanEnabled();
         if (!b) result.add(new PropertyChangeDiff(PROP_SCANENABLED, that.isScanEnabled(), this.isScanEnabled() ));
@@ -745,6 +762,7 @@ public final class Options extends DomNode {
         that.setUseTimeRangeEditor( this.isUseTimeRangeEditor() );
         that.setFlipColorbarLabel( this.isFlipColorbarLabel() );
         that.setTicklen( this.getTicklen() );
+        that.setOppositeAxisVisible( this.isOppositeAxisVisible() );
         that.setLineThickness( this.getLineThickness() );
         that.setScanEnabled( this.isScanEnabled() );
         return that;

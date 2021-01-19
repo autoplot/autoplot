@@ -190,20 +190,6 @@ public class Axis extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_OPPOSITE, oldOpposite, opposite);
     }
 
-    private boolean oppositeAxisVisible = false;
-
-    public static final String PROP_OPPOSITEAXISVISIBLE = "oppositeAxisVisible";
-
-    public boolean isOppositeAxisVisible() {
-        return oppositeAxisVisible;
-    }
-
-    public void setOppositeAxisVisible(boolean oppositeAxisVisible) {
-        boolean oldOppositeAxisVisible = this.oppositeAxisVisible;
-        this.oppositeAxisVisible = oppositeAxisVisible;
-        propertyChangeSupport.firePropertyChange(PROP_OPPOSITEAXISVISIBLE, oldOppositeAxisVisible, oppositeAxisVisible);
-    }
-
     /**
      * false indicates the component will not be drawn.  Note the x and y axes
      * are only drawn if the plot is drawn, and the colorbar may be drawn
@@ -357,7 +343,6 @@ public class Axis extends DomNode {
             if ( !exclude.contains( PROP_LOG ) ) this.setLog(that.isLog());
             if ( !exclude.contains( PROP_FLIPPED ) ) this.setFlipped(that.isFlipped());
             if ( !exclude.contains( PROP_OPPOSITE ) ) this.setOpposite(that.isOpposite());
-            if ( !exclude.contains( PROP_OPPOSITEAXISVISIBLE ) ) this.setOppositeAxisVisible(that.isOppositeAxisVisible());
             if ( !exclude.contains( PROP_RANGE ) ) this.setRange(that.getRange());
             if ( !exclude.contains( PROP_SCALE ) ) this.setScale(that.getScale());
             if ( !exclude.contains( PROP_LABEL ) ) this.setLabel(that.getLabel());
@@ -394,8 +379,6 @@ public class Axis extends DomNode {
         if ( !b ) result.add( new PropertyChangeDiff( PROP_FLIPPED , that.flipped, this.flipped) );
         b=  that.opposite==this.opposite;
         if ( !b ) result.add( new PropertyChangeDiff( PROP_OPPOSITE, that.opposite, this.opposite) );
-        b=  that.range.equals(this.range) ;
-        if ( !b ) result.add( new PropertyChangeDiff( PROP_OPPOSITEAXISVISIBLE, that.oppositeAxisVisible, this.oppositeAxisVisible) );
         b=  that.range.equals(this.range) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_RANGE, that.range , this.range ) );
         b=  that.scale.equals(this.scale) ;

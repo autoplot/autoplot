@@ -678,6 +678,8 @@ public final class PlotController extends DomNodeController {
         ac.bind(application.getOptions(), Options.PROP_TICKLEN, dasPlot1.getXAxis(), "tickLength");
         ac.bind(application.getOptions(), Options.PROP_TICKLEN, dasPlot1.getYAxis(), "tickLength");
         ac.bind(application.getOptions(), Options.PROP_TICKLEN, colorbar, "tickLength");
+        ac.bind(application.getOptions(), Options.PROP_OPPOSITEAXISVISIBLE, dasPlot1.getXAxis(), DasAxis.PROP_OPPOSITE_AXIS_VISIBLE );
+        ac.bind(application.getOptions(), Options.PROP_OPPOSITEAXISVISIBLE, dasPlot1.getYAxis(), DasAxis.PROP_OPPOSITE_AXIS_VISIBLE );
         ac.bind(application.getOptions(), Options.PROP_LINE_THICKNESS, dasPlot1.getXAxis(), DasAxis.PROP_LINETHICKNESS );
         ac.bind(application.getOptions(), Options.PROP_LINE_THICKNESS, dasPlot1.getYAxis(), DasAxis.PROP_LINETHICKNESS );
         ac.bind(application.getOptions(), Options.PROP_LINE_THICKNESS, colorbar, DasAxis.PROP_LINETHICKNESS );
@@ -1958,6 +1960,8 @@ public final class PlotController extends DomNodeController {
         ac.unbind(dom.options, Options.PROP_TICKLEN, p.getXAxis(), "tickLength");
         ac.unbind(dom.options, Options.PROP_TICKLEN, p.getYAxis(), "tickLength");
         ac.unbind(dom.options, Options.PROP_TICKLEN, this.dasColorBar, "tickLength");
+        ac.unbind(dom.options, Options.PROP_OPPOSITEAXISVISIBLE, p.getXAxis(), DasAxis.PROP_OPPOSITE_AXIS_VISIBLE);
+        ac.unbind(dom.options, Options.PROP_OPPOSITEAXISVISIBLE, p.getYAxis(), DasAxis.PROP_OPPOSITE_AXIS_VISIBLE);
         ac.unbind(dom.options, Options.PROP_LINE_THICKNESS, p.getXAxis(), DasAxis.PROP_LINETHICKNESS );
         ac.unbind(dom.options, Options.PROP_LINE_THICKNESS, p.getYAxis(), DasAxis.PROP_LINETHICKNESS );
         ac.unbind(dom.options, Options.PROP_LINE_THICKNESS, this.dasColorBar, DasAxis.PROP_LINETHICKNESS );
