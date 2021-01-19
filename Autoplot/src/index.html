@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Photo of a woodpecker feeding through window screen has the effect of discretizing image.
+        <p><small>OppositeAxisVisible property is now stored in the DOM options, for those who prefer.  Hidden plot binds all x and y axes together.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,7 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-01-06 r25429):</p>
+        <p>Bugfixes (2021-01-19 r25477):</p>
         <ul>
             <li>ASCII files where header is parsed as data would cause noise as incorrect error was printed.</li>
             <li>clarify documentation for synchronizeNN that dss must each have monotonic timetags.
@@ -48,6 +48,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>OppositeAxisVisible property requests that axes be drawn on both sides of the plot.  Thanks, Bill!
+            <li>Orbit plot tickStyle control allows ticks to be drawn on both sides of line.  Thanks, Bill!
             <li>Units.nominal() introduced to avoid explicit use of EnumerationUnits: print Units.nominal().createDatum('Chicago')
             <li>rfe681: handle 404 when creating filesystem where filesystem does not exist.  404 will return an error immediately, while 403 is allowed, assuming there will be no listing requested.
             <li>das2 DasAxis and DasPlot have new opaqueBackground property, to study handling of label collisions.
