@@ -66,6 +66,7 @@ public final class OptionsPrefsController {
         }
         prefs.putBoolean( Options.PROP_FLIPCOLORBARLABEL, options.isFlipColorbarLabel() );
         prefs.put( Options.PROP_TICKLEN, options.getTicklen() );
+        prefs.putBoolean( Options.PROP_OPPOSITEAXISVISIBLE, options.isOppositeAxisVisible() );
         prefs.put( Options.PROP_LINE_THICKNESS, options.getLineThickness() );
         prefs.putFloat( Options.PROP_MULTILINETEXTALIGNMENT, options.getMultiLineTextAlignment() );
         prefs.put( Options.PROP_PRINTINGTAG, options.getPrintingTag() );
@@ -165,6 +166,7 @@ public final class OptionsPrefsController {
         }
         options.setFlipColorbarLabel( prefs.getBoolean(Options.PROP_FLIPCOLORBARLABEL,options.flipColorbarLabel ) );
         options.setTicklen( prefs.get(Options.PROP_TICKLEN, options.ticklen ) );
+        options.setOppositeAxisVisible( prefs.getBoolean( Options.PROP_OPPOSITEAXISVISIBLE, options.isOppositeAxisVisible() ));
         options.setLineThickness( prefs.get(Options.PROP_LINE_THICKNESS, options.lineThickness ) );
         options.setMultiLineTextAlignment( prefs.getFloat( Options.PROP_MULTILINETEXTALIGNMENT, options.multiLineTextAlignment ) );
         options.setPrintingTag( prefs.get(Options.PROP_PRINTINGTAG, options.printingTag ) );
@@ -222,6 +224,7 @@ public final class OptionsPrefsController {
         }
         options.flipColorbarLabel= prefs.getBoolean(Options.PROP_FLIPCOLORBARLABEL,options.flipColorbarLabel );
         options.ticklen= prefs.get(Options.PROP_TICKLEN, options.ticklen );
+        options.oppositeAxisVisible=prefs.getBoolean(Options.PROP_OPPOSITEAXISVISIBLE,options.oppositeAxisVisible );
         options.lineThickness= prefs.get(Options.PROP_LINE_THICKNESS, options.lineThickness );
         options.multiLineTextAlignment= prefs.getFloat(Options.PROP_MULTILINETEXTALIGNMENT, options.multiLineTextAlignment );
         options.printingTag= prefs.get(Options.PROP_PRINTINGTAG, options.printingTag );

@@ -239,7 +239,7 @@ public final class Options extends DomNode {
         propertyChangeSupport.firePropertyChange( PROP_COLORTABLE, oldVal, this.colortable );
     }    
 
-    private boolean oppositeAxisVisible = false;
+    protected boolean oppositeAxisVisible = false;
 
     public static final String PROP_OPPOSITEAXISVISIBLE = "oppositeAxisVisible";
 
