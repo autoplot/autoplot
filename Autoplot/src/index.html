@@ -26,9 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-01-19 r25477):</p>
+        <p>Bugfixes (2021-01-21 r25482):</p>
         <ul>
-            <li>ASCII files where header is parsed as data would cause noise as incorrect error was printed.</li>
+            <li>clarify security warning that the scientist has run a particular script version already.
+            <li>fix old off-by-one errors in DasAxis and DasPlot codes, producing a cleaner output.
+            <li>ASCII files where header is parsed as data would cause noise as incorrect error was printed.
             <li>clarify documentation for synchronizeNN that dss must each have monotonic timetags.
             <li>rte 472115488: NetCDF editor panel had a path where positional parameter could end up null, causing RTE.  Thanks, Shing!
             <li>Run Batch "Load From File" action uses open dialog, not save dialog.
