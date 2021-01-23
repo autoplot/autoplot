@@ -351,7 +351,7 @@ public class JythonUtil {
             if ( isScriptOkayed( file.toString(), theScript ) ) {
                 tp.setSelectedIndex(1);
                 p.add( Box.createGlue() );
-                JLabel l= new JLabel("You have run this script before.");
+                JLabel l= new JLabel("You have run this version of the script before.");
                 l.setAlignmentX( 0.0f );
                 p.add( l );
             } else {
