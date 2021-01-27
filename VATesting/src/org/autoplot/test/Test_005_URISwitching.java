@@ -59,6 +59,7 @@ public class Test_005_URISwitching implements Scenario {
             new JTextFieldOperator( dss.getEditor() ).setText("https://cdaweb.gsfc.nasa.gov/pub/data/omni/low_res_omni/omni2_1963.dat?column=field17");
             new JButtonOperator( dss.getGoButton() ).clickMouse();
             Util.waitUntilBusy(500,app.getDom());
+            ScriptContext.waitUntilIdle();
             
             writeToPng( "Test_005_URISwitching.demo007.png" );
             
