@@ -1258,10 +1258,12 @@ public final class PngWalkTool extends javax.swing.JPanel {
             String item= seq.currentImage().getUri().toString();
 
             for ( int i=0; i<actionEnablers.size(); i++ ) {
-                boolean actionEnabled= actionEnablers.get(i).isActionEnabled(item);
-                actionButtons.get(i).setEnabled(actionEnabled);
-                if ( actionEnabled ) {
-                   actionButtons.get(i).setActionCommand(actionCommand+" "+item);
+                if ( actionEnablers.get(i)!=null ) {
+                    boolean actionEnabled= actionEnablers.get(i).isActionEnabled(item);
+                    actionButtons.get(i).setEnabled(actionEnabled);
+                    if ( actionEnabled ) {
+                       actionButtons.get(i).setActionCommand(actionCommand+" "+item);
+                    }
                 }
             }
             firePropertyChange( PROP_SELECTED_NAME, null, seq.getSelectedName() );
