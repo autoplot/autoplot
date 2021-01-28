@@ -207,7 +207,7 @@ public class JythonUtil {
     }
 
     /**
-     * invoke the python script on another thread.
+     * invoke the Jython script on another thread.
      * @param url the address of the script.
      * @throws java.io.IOException
      * @deprecated use invokeScriptSoon with URI.
@@ -217,7 +217,7 @@ public class JythonUtil {
     }
 
     /**
-     * invoke the python script on another thread.
+     * invoke the Jython script on another thread.
      * @param uri the address of the script.
      * @throws java.io.IOException
      */
@@ -227,7 +227,7 @@ public class JythonUtil {
 
     
     /**
-     * invoke the python script on another thread.
+     * invoke the Jython script on another thread.
      * @param url the address of the script.
      * @param dom if null, then null is passed into the script and the script must not use dom.
      * @param mon monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
@@ -239,7 +239,7 @@ public class JythonUtil {
     }
     
     /**
-     * invoke the python script on another thread.
+     * invoke the Jython script on another thread.
      * @param uri the address of the script, possibly having parameters.
      * @param dom if null, then null is passed into the script and the script must not use dom.
      * @param mon monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
@@ -385,7 +385,7 @@ public class JythonUtil {
             
             
     /**
-     * invoke the python script on another thread.  Script parameters can be passed in, and the user can be 
+     * invoke the Jython script on another thread.  Script parameters can be passed in, and the user can be 
      * provided a dialog to set the parameters.  Note this will return before the script is actually
      * executed, and monitor should be used to detect that the script is finished.
      * @param url the address of the script.
@@ -408,7 +408,7 @@ public class JythonUtil {
     }            
     
     /**
-     * invoke the python script on another thread.  Script parameters can be passed in, and the user can be 
+     * invoke the Jython script on another thread.  Script parameters can be passed in, and the user can be 
      * provided a dialog to set the parameters.  Note this will return before the script is actually
      * executed, and monitor should be used to detect that the script is finished.
      * @param uri the address of the script.
@@ -430,7 +430,7 @@ public class JythonUtil {
     }       
     
     /**
-     * invoke the python script on another thread.  Script parameters can be passed in, and the user can be 
+     * invoke the Jython script on another thread.  Script parameters can be passed in, and the user can be 
      * provided a dialog to set the parameters.  Note this will return before the script is actually
      * executed, and monitor should be used to detect that the script is finished.
      * @param url the address of the script.
@@ -461,7 +461,7 @@ public class JythonUtil {
     }
     
     /**
-     * invoke the python script on another thread.  Script parameters can be passed in, and the user can be 
+     * invoke the Jython script on another thread.  Script parameters can be passed in, and the user can be 
      * provided a dialog to set the parameters.  Note this will return before the script is actually
      * executed, and monitor should be used to detect that the script is finished.
      * @param uri the resource URI of the script (without parameters).
@@ -574,7 +574,7 @@ public class JythonUtil {
     }
     
     /**
-     * invoke the python script on another thread.  Script parameters can be passed in, and the user can be 
+     * invoke the Jython script on another thread.  Script parameters can be passed in, and the user can be 
      * provided a dialog to set the parameters.  Note this will return before the script is actually
      * executed, and monitor should be used to detect that the script is finished.
      * This should be called from the event thread!
