@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>OppositeAxisVisible property is now stored in the DOM options, for those who prefer.  Hidden plot binds all x and y axes together.
+        <p><small>More than 400 testing artifacts were reviewed quickly after one-pixel tweaks to the graphics.  This is done quickly with <a href='https://github.com/autoplot/dev/blob/master/demos/2021/20210122/jenkinsReview.jy'>jenkinsReview.jy</a> script.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-01-21 r25482):</p>
+        <p>Bugfixes (2021-01-28 r25489):</p>
         <ul>
+            <li>Jython positional parameters were in the wrong location, where arg_1 is the first argument, not arg_0.
+            <li>correction to ASCII file parsing, where minor bugfix broke things for more common use.
             <li>clarify security warning that the scientist has run a particular script version already.
             <li>fix old off-by-one errors in DasAxis and DasPlot codes, producing a cleaner output.
             <li>ASCII files where header is parsed as data would cause noise as incorrect error was printed.
