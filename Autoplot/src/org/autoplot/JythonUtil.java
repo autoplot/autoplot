@@ -138,7 +138,7 @@ public class JythonUtil {
      * @param model provides the dom to the environment.
      * @param in stream containing script. This will be left open.
      * @param name the name of the file for human reference, or null.
-     * @param argv parameters passed into the script, each should be name=value.
+     * @param argv parameters passed into the script, each should be name=value, or positional.  The name of the script should not be the zeroth element.
      * @param pwd the present working directory, if available.  Note this is a String because pwd can be a remote folder.
      * @throws IOException
      */
@@ -151,13 +151,20 @@ public class JythonUtil {
      * @param dom provides the dom to the environment.
      * @param in stream containing script. This will be left open.
      * @param name the name of the file for human reference, or null.
-     * @param argv parameters passed into the script, each should be name=value.
+     * @param argv parameters passed into the script, each should be name=value, or positional.  The name of the script should not be the zeroth element.
      * @param pwd the present working directory, if available.  Note this is a String because pwd can be a remote folder.
      * @throws IOException
      */
     public static void runScript( Application dom, InputStream in, String name, String[] argv, String pwd ) throws IOException {    
-        if ( argv==null ) argv= new String[] {""};
-        PySystemState.initialize( PySystemState.getBaseProperties(), null, argv ); // legacy support sys.argv. now we use getParam
+        
+        if ( argv==null ) argv= new String[] {};
+        
+        String[] pyInitArgv= new String[ argv.length+1 ];
+        pyInitArgv[0]= name;
+        System.arraycopy(argv, 0, pyInitArgv, 1, argv.length);
+        
+        PySystemState.initialize( PySystemState.getBaseProperties(), null, pyInitArgv ); // legacy support sys.argv. now we use getParam
+        
         PythonInterpreter interp = JythonUtil.createInterpreter(true, false, dom, new NullProgressMonitor() );
         if ( pwd!=null ) {
             pwd= URISplit.format( URISplit.parse(pwd) ); // sanity check against injections
@@ -165,7 +172,7 @@ public class JythonUtil {
         }
 
         interp.exec("import autoplot2017 as autoplot");// JythonRefactory okay
-        int iargv=0;  // skip the zeroth one, it is the name of the script
+        int iargv=1;  // skip the zeroth one, it is the name of the script
         for (String s : argv ) {
             int ieq= s.indexOf('=');
             if ( ieq>0 ) {
@@ -186,13 +193,8 @@ public class JythonUtil {
                     System.err.println("bad parameter: "+ snam);
                 }
             } else {
-                if ( iargv>=0 ) {
-                    interp.exec("autoplot.params['arg_" + iargv + "']='" + s +"'" );// JythonRefactory okay
-                    iargv++;
-                } else {
-                    //System.err.println("skipping parameter" + s );
-                    iargv++;
-                }
+                interp.exec("autoplot.params['arg_" + iargv + "']='" + s +"'" );// JythonRefactory okay
+                iargv++;
             }
         }
         
