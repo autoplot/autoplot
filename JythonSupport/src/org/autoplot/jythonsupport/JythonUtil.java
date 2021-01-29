@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -60,6 +61,7 @@ import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
+import org.python.core.PyStringMap;
 import org.python.core.PyTuple;
 
 /**
@@ -1236,21 +1238,72 @@ public class JythonUtil {
         return result.toString();
     }
 
+    private static Map<String,SimpleNode> definedNamesApp= new HashMap<>();
+    
+    static {
+        try {
+            definedNamesApp.put("None",null);
+            definedNamesApp.put("unbundle",null);
+            InteractiveInterpreter interp= JythonUtil.createInterpreter(true);
+            PyObject po= interp.getLocals();
+            if ( po instanceof PyStringMap ) {
+                PyStringMap psm= (PyStringMap)po;
+                PyList k= psm.keys();
+                for ( int i=0; i<k.__len__(); i++ ) {
+                    definedNamesApp.put( k.get(i).toString(), null );
+                }
+            }
+            
+        } catch (IOException ex) {
+            Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     private static class VisitNamesVisitorBase<R> extends VisitorBase {
 
         String name;
+        
+        /**
+         * list containing nodes where name is found.
+         */
         List<SimpleNode> names;
+        
+        Map<String,SimpleNode> assignButNotRead;
+        Map<String,SimpleNode> readButNotAssigned;
+        Map<String,SimpleNode> definedNames;
 
         VisitNamesVisitorBase(String name) {
+            if ( name==null ) throw new NullPointerException("set to empty string not null");
             this.name = name;
             names = new ArrayList();
+            assignButNotRead= new LinkedHashMap<>();
+            readButNotAssigned= new LinkedHashMap<>();
+            definedNames= new HashMap<>(definedNamesApp);
+        }
+        
+        /**
+         * add a name which is known to be valid, like PWD.
+         * @param name 
+         */
+        public void addName( String name ) {
+            definedNames.put( name, null );
         }
 
         @Override
         public Object visitName(Name node) throws Exception {
-            if (name.equals(node.id)) {
+            if ( name.equals(node.id)) {
                 names.add(node);
             }
+            
+            if ( node.ctx==Name.Store ) {
+                assignButNotRead.put(node.id, node);
+                definedNames.put(node.id, node);
+            } else if ( node.ctx==Name.Load ) {
+                assignButNotRead.remove(node.id);
+                if ( !definedNames.containsKey( node.id ) ) {
+                    readButNotAssigned.put(node.id,node);
+                }
+            }
+            
             return super.visitName(node); //To change body of generated methods, choose Tools | Templates.
         }
 
@@ -1277,8 +1330,67 @@ public class JythonUtil {
         public List<SimpleNode> getNames() {
             return names;
         }
+        
+        /**
+         * return the nodes where a value is assigned but then never read.
+         * @return 
+         */
+        public List<SimpleNode> getAssignedButNotRead() {
+            return new ArrayList<>( assignButNotRead.values() );
+        }
+        
+        /**
+         * return the nodes which contain a symbol which has not been assigned.
+         * @return 
+         */
+        public List<SimpleNode> getReadButNotAssigned() {
+            return new ArrayList<>( this.readButNotAssigned.values() );
+        }
     }
 
+    /**
+     * return any node where a variable is assigned but then not later read.  This is 
+     * not an error, but is a nice way to flag suspicious code.
+     * @param script the script code (not the filename).
+     * @return 
+     */
+    public static List<SimpleNode> showWriteWithoutRead(String script) {
+        Module n = (Module) org.python.core.parser.parse(script, "exec");
+        VisitNamesVisitorBase vb = new VisitNamesVisitorBase("");
+        for (stmtType st : n.body) {
+            try {
+                st.traverse(vb);
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+        return vb.getAssignedButNotRead();
+    }
+
+    /**
+     * return any node where a name is read but has not been assigned.  This is an
+     * error which would show when the code is run.
+     * @param script the script code (not the filename).
+     * @param appContext true if application codes are loaded
+     * @param pwd null or the value of the working directory.
+     * @return 
+     */
+    public static List<SimpleNode> showReadButNotAssigned(String script, boolean appContext, String pwd ) {
+        Module n = (Module) org.python.core.parser.parse(script, "exec");
+        VisitNamesVisitorBase vb = new VisitNamesVisitorBase("");
+        if ( pwd!=null ) {
+            vb.addName("PWD");
+        }
+        for (stmtType st : n.body) {
+            try {
+                st.traverse(vb);
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+        return vb.getReadButNotAssigned();
+    }
+    
     /**
      * get the nodes where the symbol is used.
      *
