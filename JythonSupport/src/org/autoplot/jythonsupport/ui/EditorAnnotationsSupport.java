@@ -367,16 +367,22 @@ public class EditorAnnotationsSupport {
                 SimpleMarker mark;
                 Object highlightInfo=null;
                 
-                if ( name.equals(ANNO_WARNING) ) {    
-                    mark= new SimpleMarker( lightBackground ? Color.YELLOW : new Color(120,120,0) );
-                } else if ( name.equals(ANNO_USAGE) ) {
-                    mark= new SimpleMarker( lightBackground ? Color.GREEN.brighter() : new Color(0,100,0) );
-                } else if ( name.equals(ANNO_ERROR) ) {
-                    mark= new SimpleMarker( lightBackground ? Color.PINK : new Color(120,80,80));
-                } else if ( name.equals(ANNO_PROGRAM_COUNTER) ){
-                    mark=  new SimpleMarker( lightBackground ? new Color( 0,255,0,80 ) :  new Color( 0,200,0,80 ) );
-                } else {
-                    mark=  new SimpleMarker(Color.GRAY );
+                switch (name) {
+                    case ANNO_WARNING:
+                        mark= new SimpleMarker( lightBackground ? Color.YELLOW : new Color(120,120,0) );
+                        break;
+                    case ANNO_USAGE:
+                        mark= new SimpleMarker( lightBackground ? Color.GREEN.brighter() : new Color(0,100,0) );
+                        break;
+                    case ANNO_ERROR:
+                        mark= new SimpleMarker( lightBackground ? Color.PINK : new Color(120,80,80));
+                        break;
+                    case ANNO_PROGRAM_COUNTER:
+                        mark=  new SimpleMarker( lightBackground ? new Color( 0,255,0,80 ) :  new Color( 0,200,0,80 ) );
+                        break;
+                    default:
+                        mark=  new SimpleMarker(Color.GRAY );
+                        break;
                 }
                 
                 if (  name.equals(ANNO_ERROR) ) {
