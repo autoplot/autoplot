@@ -63,6 +63,10 @@ import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
 import org.python.core.PyStringMap;
 import org.python.core.PyTuple;
+import org.python.parser.ast.FunctionDef;
+import org.python.parser.ast.Import;
+import org.python.parser.ast.ImportFrom;
+import org.python.parser.ast.aliasType;
 
 /**
  * Utilities to support Jython scripting.
@@ -1243,7 +1247,10 @@ public class JythonUtil {
     static {
         try {
             definedNamesApp.put("None",null);
-            definedNamesApp.put("unbundle",null);
+            definedNamesApp.put("len",null);
+            definedNamesApp.put("open",null);
+            definedNamesApp.put("str",null);
+            //TODO: more are needed, this is still experimental!
             InteractiveInterpreter interp= JythonUtil.createInterpreter(true);
             PyObject po= interp.getLocals();
             if ( po instanceof PyStringMap ) {
@@ -1322,6 +1329,36 @@ public class JythonUtil {
             sn.traverse(this);
         }
 
+        @Override
+        public Object visitImport(Import node) throws Exception {
+            for ( aliasType a: node.names ) {
+                if ( a.asname!=null ) {
+                    definedNames.containsKey( a.asname );
+                } else {
+                    definedNames.containsKey( a.name );
+                }
+            }
+            return super.visitImport(node); 
+        }
+
+        @Override
+        public Object visitImportFrom(ImportFrom node) throws Exception {
+            for ( aliasType a: node.names ) {
+                if ( a.asname!=null ) {
+                    definedNames.containsKey( a.asname );
+                } else {
+                    definedNames.containsKey( a.name );
+                }
+            }
+            return super.visitImportFrom(node); 
+        }
+
+        @Override
+        public Object visitFunctionDef(FunctionDef node) throws Exception {
+            return super.visitFunctionDef(node); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        
         /**
          * return the nodes where the name is used.
          *
@@ -1383,6 +1420,25 @@ public class JythonUtil {
         }
         for (stmtType st : n.body) {
             try {
+                if ( st instanceof ImportFrom ) {
+                    for ( aliasType a: ((ImportFrom) st).names ) {
+                        if ( a.asname!=null ) {
+                            vb.addName( a.asname );
+                        } else {
+                            vb.addName( a.name );
+                        }
+                    }
+                } else if ( st instanceof Import ) {
+                    for ( aliasType a: ((Import) st).names ) {
+                        if ( a.asname!=null ) {
+                            vb.addName( a.asname );
+                        } else {
+                            vb.addName( a.name );
+                        }
+                    }
+                } else if ( st instanceof FunctionDef ) {
+                    vb.addName( ((FunctionDef)st).name );
+                }
                 st.traverse(vb);
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, null, ex);
