@@ -29,8 +29,6 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -79,6 +77,7 @@ import org.autoplot.jythonsupport.PyQDataSet;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
 import org.das2.qstream.StreamException;
 import org.python.core.PySyntaxError;
+import org.python.parser.ast.Name;
 
 /**
  * Special editor for Jython scripts, adding undo and redo actions, bigger/smaller
@@ -365,8 +364,37 @@ public class EditorTextPane extends JEditorPane {
         for ( SimpleNode n: usages ) {
             support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+var.length(), EditorAnnotationsSupport.ANNO_USAGE, var, null );
         }
+        showWriteWithoutRead();
+        showReadButNotAssigned();
     }
     
+    protected void showWriteWithoutRead() {
+        String script= getText();
+        //support.clearAnnotations();
+        setSelectionEnd( getSelectionStart() ); // clear the selection.
+        List<SimpleNode> writeWithoutRead= JythonUtil.showWriteWithoutRead(script);
+        for ( SimpleNode n: writeWithoutRead ) {
+            int len=1;
+            if ( n instanceof Name ) {
+                len= ((Name)n).id.length();
+            }
+            support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+len, EditorAnnotationsSupport.ANNO_WARNING, "assigned but not read", null );
+        }
+    }
+    
+    protected void showReadButNotAssigned() {
+        String script= getText();
+        //support.clearAnnotations();
+        setSelectionEnd( getSelectionStart() ); // clear the selection.
+        List<SimpleNode> writeWithoutRead= JythonUtil.showReadButNotAssigned(script,true,"");
+        for ( SimpleNode n: writeWithoutRead ) {
+            int len=1;
+            if ( n instanceof Name ) {
+                len= ((Name)n).id.length();
+            }
+            support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+len, EditorAnnotationsSupport.ANNO_ERROR, "name not assigned", null );
+        }
+    }
     
     /**
      * offer possible imports and insert an import for the Java class
