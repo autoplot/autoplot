@@ -1282,7 +1282,7 @@ public class JythonUtil {
         
         Map<String,SimpleNode> assignButNotReadWarning;
         List<SimpleNode> reassignedBeforeReadWarning;
-        Map<String,SimpleNode> readButNotAssigned;
+        Map<String,SimpleNode> readButNotAssignedError;
         Map<String,SimpleNode> definedNames;
 
         VisitNamesVisitorBase(String name) {
@@ -1291,7 +1291,7 @@ public class JythonUtil {
             names = new ArrayList();
             assignButNotReadWarning= new LinkedHashMap<>();
             reassignedBeforeReadWarning= new ArrayList<>();
-            readButNotAssigned= new LinkedHashMap<>();
+            readButNotAssignedError= new LinkedHashMap<>();
             definedNames= new HashMap<>(definedNamesApp);
             //definedNames= new HashMap<>();
         }
@@ -1395,7 +1395,7 @@ public class JythonUtil {
             } else if ( node.ctx==Name.Load ) {
                 assignButNotReadWarning.remove(node.id);
                 if ( !definedNames.containsKey( node.id ) ) {
-                    readButNotAssigned.put(node.id,node);
+                    readButNotAssignedError.put(node.id,node);
                 }
             }
             
@@ -1453,7 +1453,7 @@ public class JythonUtil {
          * @return 
          */
         public List<SimpleNode> getReadButNotAssigned() {
-            return new ArrayList<>( this.readButNotAssigned.values() );
+            return new ArrayList<>( this.readButNotAssignedError.values() );
         }
     }
 
