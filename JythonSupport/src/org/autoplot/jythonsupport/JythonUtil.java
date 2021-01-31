@@ -63,6 +63,7 @@ import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
 import org.python.core.PyStringMap;
 import org.python.core.PyTuple;
+import org.python.parser.ast.ClassDef;
 import org.python.parser.ast.FunctionDef;
 import org.python.parser.ast.Import;
 import org.python.parser.ast.ImportFrom;
@@ -1248,8 +1249,14 @@ public class JythonUtil {
             definedNamesApp.put("len",null);
             definedNamesApp.put("open",null);
             definedNamesApp.put("str",null);
+            
+            // TODO: how to add applicaton names?
+            definedNamesApp.put("setStatus",null);
+            definedNamesApp.put("formatDataSet",null);
+            
             //TODO: more are needed, this is still experimental!
             InteractiveInterpreter interp= JythonUtil.createInterpreter(true);
+            
             PyObject po= interp.getLocals();
             if ( po instanceof PyStringMap ) {
                 PyStringMap psm= (PyStringMap)po;
@@ -1296,6 +1303,75 @@ public class JythonUtil {
             definedNames.put( name, null );
         }
 
+        private void handleStmtType( stmtType st ) {
+            logger.log(Level.FINER, "handleStmtType line{0}", st.beginLine);
+            try {
+                if ( st instanceof ImportFrom ) {
+                    for ( aliasType a: ((ImportFrom) st).names ) {
+                        if ( a.asname!=null ) {
+                            this.addName( a.asname );
+                        } else {
+                            this.addName( a.name );
+                        }
+                    }
+                    st.traverse(this);
+                } else if ( st instanceof Import ) {
+                    for ( aliasType a: ((Import) st).names ) {
+                        if ( a.asname!=null ) {
+                            this.addName( a.asname );
+                        } else {
+                            this.addName( a.name );
+                        }
+                    }
+                    st.traverse(this);
+                } else if ( st instanceof FunctionDef ) {
+                    FunctionDef fd= (FunctionDef)st;
+                    this.addName( fd.name );
+                    for ( exprType att : fd.args.args ) {
+                        if ( att instanceof Name ) {
+                            this.addName( ((Name) att).id ); // TODO: This is silly, since we need to remove the name after the function.
+                        }
+                    }
+                    for ( stmtType sst : fd.body ) {
+                        handleStmtType(sst);
+                    }
+                } else if ( st instanceof ClassDef ) {
+                    ClassDef cld= (ClassDef)st;                    
+                    this.addName( cld.name );
+
+                } else if ( st instanceof Assign ) {
+                    Assign ast= ((Assign) st);
+                    ast.value.traverse(this); // This should clear it.
+                    logger.log(Level.FINE, "assignButNotRead={0}", this.assignButNotRead);
+                    logger.log(Level.FINE, "reassignedBeforeRead={0}", this.reassignedBeforeRead);
+                    for ( exprType t: ast.targets ) {
+                        //t.traverse(vb);
+                        if ( t instanceof Name ) {
+                            String n= ((Name)t).id;
+                            this.addName( n ); //  !!!! Why must I do this manually?!?!?
+                            SimpleNode notRead= (SimpleNode)this.assignButNotRead.get(n);
+                            if ( notRead!=null ) {
+                                this.reassignedBeforeRead.add( notRead );
+                            }
+                            this.assignButNotRead.put( n, t );
+                        } else {
+                            t.traverse(this);
+                        }
+                    }
+                } else if ( st instanceof If ) {
+                    If ist= ((If) st);
+                    ist.test.traverse(this);
+                    for ( stmtType sst: ist.body ) {
+                        handleStmtType(sst);
+                    }
+                } else {
+                    st.traverse(this);
+                }
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+        
         @Override
         public Object visitName(Name node) throws Exception {
             
@@ -1317,7 +1393,7 @@ public class JythonUtil {
                 }
             }
             
-            return super.visitName(node); //To change body of generated methods, choose Tools | Templates.
+            return node;
         }
 
         @Override
@@ -1337,25 +1413,13 @@ public class JythonUtil {
 
         @Override
         public Object visitImport(Import node) throws Exception {
-            for ( aliasType a: node.names ) {
-                if ( a.asname!=null ) {
-                    definedNames.containsKey( a.asname );
-                } else {
-                    definedNames.containsKey( a.name );
-                }
-            }
+            handleStmtType(node);
             return super.visitImport(node); 
         }
 
         @Override
         public Object visitImportFrom(ImportFrom node) throws Exception {
-            for ( aliasType a: node.names ) {
-                if ( a.asname!=null ) {
-                    definedNames.containsKey( a.asname );
-                } else {
-                    definedNames.containsKey( a.name );
-                }
-            }
+            handleStmtType(node);
             return super.visitImportFrom(node); 
         }
         
@@ -1398,30 +1462,7 @@ public class JythonUtil {
         VisitNamesVisitorBase vb = new VisitNamesVisitorBase("");
         for (stmtType st : n.body) {
             logger.log(Level.FINE, "line{0}", st.beginLine);
-            try {
-                if ( st instanceof Assign ) {
-                    Assign ast= ((Assign) st);
-                    ast.value.traverse(vb); // This should clear it.
-                    logger.log(Level.FINE, "assignButNotRead={0}", vb.assignButNotRead);
-                    logger.log(Level.FINE, "reassignedBeforeRead={0}", vb.reassignedBeforeRead);
-                    for ( exprType t: ast.targets ) {
-                        t.traverse(vb);
-                        if ( t instanceof Name ) {
-                            String name= ((Name)t).id;
-                            vb.addName( name ); //  !!!! Why must I do this manually?!?!?
-                            SimpleNode notRead= (SimpleNode)vb.assignButNotRead.get(name);
-                            if ( notRead!=null ) {
-                                vb.reassignedBeforeRead.add( notRead );
-                            }
-                            vb.assignButNotRead.put( name, t );
-                        }                        
-                    }
-                } else {
-                    st.traverse(vb);
-                }
-            } catch (Exception ex) {
-                logger.log(Level.SEVERE, null, ex);
-            }
+            vb.handleStmtType( st );
         }
         return vb.getAssignedButNotRead();
     }
@@ -1441,46 +1482,7 @@ public class JythonUtil {
             vb.addName("PWD");
         }
         for (stmtType st : n.body) {
-            try {
-                if ( st instanceof ImportFrom ) {
-                    for ( aliasType a: ((ImportFrom) st).names ) {
-                        if ( a.asname!=null ) {
-                            vb.addName( a.asname );
-                        } else {
-                            vb.addName( a.name );
-                        }
-                    }
-                    st.traverse(vb);
-                } else if ( st instanceof Import ) {
-                    for ( aliasType a: ((Import) st).names ) {
-                        if ( a.asname!=null ) {
-                            vb.addName( a.asname );
-                        } else {
-                            vb.addName( a.name );
-                        }
-                    }
-                    st.traverse(vb);
-                } else if ( st instanceof FunctionDef ) {
-                    vb.addName( ((FunctionDef)st).name );
-                    st.traverse(vb);
-                } else if ( st instanceof Assign ) {
-                    Assign ast= ((Assign) st);
-                    ast.value.traverse(vb);
-                    logger.log(Level.FINE, "assignButNotRead={0}", vb.assignButNotRead);
-                    logger.log(Level.FINE, "reassignedBeforeRead={0}", vb.reassignedBeforeRead);
-                    for ( exprType t: ast.targets ) {
-                        t.traverse(vb);
-                        if ( t instanceof Name ) {
-                            vb.addName( ((Name)t).id ); //  !!!! Why must I do this manually?!?!?
-                        }
-                    }
-                } else {
-                    st.traverse(vb);
-                }
-
-            } catch (Exception ex) {
-                logger.log(Level.SEVERE, null, ex);
-            }
+            vb.handleStmtType(st);
         }
         return vb.getReadButNotAssigned();
     }
