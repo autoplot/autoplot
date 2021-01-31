@@ -143,8 +143,6 @@ public class JythonUtil {
                 }
                 InputStream in = imports.openStream(); // note this stream will load in another stream.
                 byte[] bimports = FileUtil.readBytes(in);
-                String simports = new String(bimports);
-                logger.log(Level.FINE, simports);
                 //InputStream in = imports.openStream();
                 try {
                     interp.execfile(new ByteArrayInputStream(bimports), "/imports2017.py");
@@ -1275,6 +1273,7 @@ public class JythonUtil {
         List<SimpleNode> names;
         
         Map<String,SimpleNode> assignButNotRead;
+        List<SimpleNode> reassignedBeforeRead;
         Map<String,SimpleNode> readButNotAssigned;
         Map<String,SimpleNode> definedNames;
 
@@ -1283,8 +1282,10 @@ public class JythonUtil {
             this.name = name;
             names = new ArrayList();
             assignButNotRead= new LinkedHashMap<>();
+            reassignedBeforeRead= new ArrayList<>();
             readButNotAssigned= new LinkedHashMap<>();
             definedNames= new HashMap<>(definedNamesApp);
+            //definedNames= new HashMap<>();
         }
         
         /**
@@ -1297,11 +1298,16 @@ public class JythonUtil {
 
         @Override
         public Object visitName(Name node) throws Exception {
+            
+            logger.log(Level.FINE, "visitName line{0} {1} {2}", new Object[]{node.beginLine, node.id, Name.expr_contextTypeNames[node.ctx] });
             if ( name.equals(node.id)) {
                 names.add(node);
             }
             
             if ( node.ctx==Name.Store ) {
+                if ( assignButNotRead.containsKey( node.id ) ) {
+                    reassignedBeforeRead.add( assignButNotRead.get(node.id) );
+                }
                 assignButNotRead.put(node.id, node);
                 definedNames.put(node.id, node);
             } else if ( node.ctx==Name.Load ) {
@@ -1352,12 +1358,6 @@ public class JythonUtil {
             }
             return super.visitImportFrom(node); 
         }
-
-        @Override
-        public Object visitFunctionDef(FunctionDef node) throws Exception {
-            return super.visitFunctionDef(node); //To change body of generated methods, choose Tools | Templates.
-        }
-
         
         /**
          * return the nodes where the name is used.
@@ -1365,7 +1365,7 @@ public class JythonUtil {
          * @return
          */
         public List<SimpleNode> getNames() {
-            return names;
+            return this.names;
         }
         
         /**
@@ -1373,7 +1373,9 @@ public class JythonUtil {
          * @return 
          */
         public List<SimpleNode> getAssignedButNotRead() {
-            return new ArrayList<>( assignButNotRead.values() );
+            ArrayList<SimpleNode> result= new ArrayList<>( this.reassignedBeforeRead );
+            result.addAll( this.assignButNotRead.values() ); 
+            return result;
         }
         
         /**
@@ -1395,8 +1397,28 @@ public class JythonUtil {
         Module n = (Module) org.python.core.parser.parse(script, "exec");
         VisitNamesVisitorBase vb = new VisitNamesVisitorBase("");
         for (stmtType st : n.body) {
+            logger.log(Level.FINE, "line{0}", st.beginLine);
             try {
-                st.traverse(vb);
+                if ( st instanceof Assign ) {
+                    Assign ast= ((Assign) st);
+                    ast.value.traverse(vb); // This should clear it.
+                    logger.log(Level.FINE, "assignButNotRead={0}", vb.assignButNotRead);
+                    logger.log(Level.FINE, "reassignedBeforeRead={0}", vb.reassignedBeforeRead);
+                    for ( exprType t: ast.targets ) {
+                        t.traverse(vb);
+                        if ( t instanceof Name ) {
+                            String name= ((Name)t).id;
+                            vb.addName( name ); //  !!!! Why must I do this manually?!?!?
+                            SimpleNode notRead= (SimpleNode)vb.assignButNotRead.get(name);
+                            if ( notRead!=null ) {
+                                vb.reassignedBeforeRead.add( notRead );
+                            }
+                            vb.assignButNotRead.put( name, t );
+                        }                        
+                    }
+                } else {
+                    st.traverse(vb);
+                }
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
@@ -1428,6 +1450,7 @@ public class JythonUtil {
                             vb.addName( a.name );
                         }
                     }
+                    st.traverse(vb);
                 } else if ( st instanceof Import ) {
                     for ( aliasType a: ((Import) st).names ) {
                         if ( a.asname!=null ) {
@@ -1436,10 +1459,25 @@ public class JythonUtil {
                             vb.addName( a.name );
                         }
                     }
+                    st.traverse(vb);
                 } else if ( st instanceof FunctionDef ) {
                     vb.addName( ((FunctionDef)st).name );
+                    st.traverse(vb);
+                } else if ( st instanceof Assign ) {
+                    Assign ast= ((Assign) st);
+                    ast.value.traverse(vb);
+                    logger.log(Level.FINE, "assignButNotRead={0}", vb.assignButNotRead);
+                    logger.log(Level.FINE, "reassignedBeforeRead={0}", vb.reassignedBeforeRead);
+                    for ( exprType t: ast.targets ) {
+                        t.traverse(vb);
+                        if ( t instanceof Name ) {
+                            vb.addName( ((Name)t).id ); //  !!!! Why must I do this manually?!?!?
+                        }
+                    }
+                } else {
+                    st.traverse(vb);
                 }
-                st.traverse(vb);
+
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, null, ex);
             }

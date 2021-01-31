@@ -368,6 +368,15 @@ public class EditorTextPane extends JEditorPane {
         showReadButNotAssigned();
     }
     
+    /**
+     * do static analysis on code and highlite results.
+     */
+    void doStaticAnalysis() {
+        support.clearAnnotations();
+        showWriteWithoutRead();
+        showReadButNotAssigned();
+    }
+    
     protected void showWriteWithoutRead() {
         String script= getText();
         //support.clearAnnotations();

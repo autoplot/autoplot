@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -44,9 +45,12 @@ import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.jythonsupport.JavaJythonConverter;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
+import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.MathematicaJythonConverter;
 import static org.das2.jythoncompletion.JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
+import org.python.parser.SimpleNode;
+import org.python.parser.ast.Name;
 
 /**
  *
@@ -821,7 +825,18 @@ public class EditorContextMenu {
             settingsMenu.add( mi );
             
             menu.add( settingsMenu );
-
+            
+            menu.addSeparator();
+            
+            mi = new JMenuItem(new AbstractAction("Static Code Analysis") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);
+                    editor.doStaticAnalysis();
+                }
+            } );
+            menu.add( mi );
+            
             menu.addSeparator();
             JMenuItem cutItem = menu.add(new DefaultEditorKit.CutAction());
             cutItem.setText("Cut");
