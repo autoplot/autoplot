@@ -65,6 +65,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyTuple;
 import org.python.parser.ast.ClassDef;
 import org.python.parser.ast.FunctionDef;
+import org.python.parser.ast.Global;
 import org.python.parser.ast.Import;
 import org.python.parser.ast.ImportFrom;
 import org.python.parser.ast.aliasType;
@@ -1279,8 +1280,8 @@ public class JythonUtil {
          */
         List<SimpleNode> names;
         
-        Map<String,SimpleNode> assignButNotRead;
-        List<SimpleNode> reassignedBeforeRead;
+        Map<String,SimpleNode> assignButNotReadWarning;
+        List<SimpleNode> reassignedBeforeReadWarning;
         Map<String,SimpleNode> readButNotAssigned;
         Map<String,SimpleNode> definedNames;
 
@@ -1288,8 +1289,8 @@ public class JythonUtil {
             if ( name==null ) throw new NullPointerException("set to empty string not null");
             this.name = name;
             names = new ArrayList();
-            assignButNotRead= new LinkedHashMap<>();
-            reassignedBeforeRead= new ArrayList<>();
+            assignButNotReadWarning= new LinkedHashMap<>();
+            reassignedBeforeReadWarning= new ArrayList<>();
             readButNotAssigned= new LinkedHashMap<>();
             definedNames= new HashMap<>(definedNamesApp);
             //definedNames= new HashMap<>();
@@ -1324,6 +1325,11 @@ public class JythonUtil {
                         }
                     }
                     st.traverse(this);
+                } else if ( st instanceof Global ) {
+                    Global gst= (Global)st;
+                    for ( String s: gst.names ) {
+                        this.addName( s );
+                    }
                 } else if ( st instanceof FunctionDef ) {
                     FunctionDef fd= (FunctionDef)st;
                     this.addName( fd.name );
@@ -1342,18 +1348,18 @@ public class JythonUtil {
                 } else if ( st instanceof Assign ) {
                     Assign ast= ((Assign) st);
                     ast.value.traverse(this); // This should clear it.
-                    logger.log(Level.FINE, "assignButNotRead={0}", this.assignButNotRead);
-                    logger.log(Level.FINE, "reassignedBeforeRead={0}", this.reassignedBeforeRead);
+                    logger.log(Level.FINE, "assignButNotRead={0}", this.assignButNotReadWarning);
+                    logger.log(Level.FINE, "reassignedBeforeRead={0}", this.reassignedBeforeReadWarning);
                     for ( exprType t: ast.targets ) {
                         //t.traverse(vb);
                         if ( t instanceof Name ) {
                             String n= ((Name)t).id;
                             this.addName( n ); //  !!!! Why must I do this manually?!?!?
-                            SimpleNode notRead= (SimpleNode)this.assignButNotRead.get(n);
+                            SimpleNode notRead= (SimpleNode)this.assignButNotReadWarning.get(n);
                             if ( notRead!=null ) {
-                                this.reassignedBeforeRead.add( notRead );
+                                this.reassignedBeforeReadWarning.add( notRead );
                             }
-                            this.assignButNotRead.put( n, t );
+                            this.assignButNotReadWarning.put( n, t );
                         } else {
                             t.traverse(this);
                         }
@@ -1381,13 +1387,13 @@ public class JythonUtil {
             }
             
             if ( node.ctx==Name.Store ) {
-                if ( assignButNotRead.containsKey( node.id ) ) {
-                    reassignedBeforeRead.add( assignButNotRead.get(node.id) );
+                if ( assignButNotReadWarning.containsKey( node.id ) ) {
+                    reassignedBeforeReadWarning.add( assignButNotReadWarning.get(node.id) );
                 }
-                assignButNotRead.put(node.id, node);
+                assignButNotReadWarning.put(node.id, node);
                 definedNames.put(node.id, node);
             } else if ( node.ctx==Name.Load ) {
-                assignButNotRead.remove(node.id);
+                assignButNotReadWarning.remove(node.id);
                 if ( !definedNames.containsKey( node.id ) ) {
                     readButNotAssigned.put(node.id,node);
                 }
@@ -1437,8 +1443,8 @@ public class JythonUtil {
          * @return 
          */
         public List<SimpleNode> getAssignedButNotRead() {
-            ArrayList<SimpleNode> result= new ArrayList<>( this.reassignedBeforeRead );
-            result.addAll( this.assignButNotRead.values() ); 
+            ArrayList<SimpleNode> result= new ArrayList<>( this.reassignedBeforeReadWarning );
+            result.addAll( this.assignButNotReadWarning.values() ); 
             return result;
         }
         
