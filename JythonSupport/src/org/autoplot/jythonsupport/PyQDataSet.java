@@ -682,6 +682,15 @@ public class PyQDataSet extends PyJavaInstance {
 
             QDataSet dep0= null;
             
+            Number n= (Number) that.property(QDataSet.VALID_MAX);
+            if ( n!=null ) {
+                double in= n.doubleValue();
+                if ( in-(int)in!=0.0 ) {
+                    logger.info("VALID_MAX should be an integer for a set of indices.  Is this a set of indices?");
+                } else if ( ((Number)n).intValue()!=rods.length() ) {
+                    logger.info("VALID_MAX implies that this dataset may index a different array");
+                }
+            }
             if ( that.rank()>1 && ( SemanticOps.isBundle(that) || SemanticOps.isLegacyBundle(that) ) ) {
                 for ( int j=0; j<that.length(0); j++ ) {
                     QDataSet that1= DataSetOps.unbundle(that,j);
