@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>More than 400 testing artifacts were reviewed quickly after one-pixel tweaks to the graphics.  This is done quickly with <a href='https://github.com/autoplot/dev/blob/master/demos/2021/20210122/jenkinsReview.jy'>jenkinsReview.jy</a> script.
+        <p><small>Experimental testing of new warnings, like when result of where is used on array of different length.  See <a href='https://github.com/autoplot/dev/blob/master/rfe/sf/737/indices.jy'>indices.jy</a>.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -53,6 +53,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add sortInTime function which sorts the data based on DEPEND_0.
+            <li>737: VALID_MAX is used to hint when result of where is used on the wrong array.
             <li>737: issue warning when real numbers are used to index an array.  Thanks, Sadie!
             <li>737: introduce static analysis of scripts.
             <li>OppositeAxisVisible property requests that axes be drawn on both sides of the plot.  Thanks, Bill!
