@@ -10,6 +10,7 @@ import org.autoplot.jythonsupport.ui.EditorContextMenu;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
@@ -20,6 +21,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
@@ -31,6 +34,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 import jsyntaxpane.SyntaxDocument;
@@ -578,6 +582,31 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
      */
     public EditorTextPane getEditorPanel() {
         return textArea;
+    }
+    
+    Pattern jythonRefPattern = Pattern.compile("\\s*((\\S+\\.jy(ds)?)\\:(\\d+))");
+
+    /**
+     * return action listener listening for action commands containing source:linenum
+     * @return 
+     */
+    public ActionListener getConsoleListener() {
+        return (ActionEvent e) -> {
+            Matcher jythonMatcher= jythonRefPattern.matcher(e.getActionCommand());
+            if ( jythonMatcher.find() ) {
+                String jythonRef= jythonMatcher.group(1);
+                
+                if ( this.filename.endsWith(jythonMatcher.group(2)) ) {
+                    int line= Integer.parseInt(jythonMatcher.group(4));
+                    try {
+                        this.support.annotationsSupport.annotateLine( line, EditorAnnotationsSupport.ANNO_WARNING, e.getActionCommand() );
+                    } catch (BadLocationException ex) {
+                        
+                    }
+                }
+                jythonRef=null;
+            }
+        };
     }
     
     /**
