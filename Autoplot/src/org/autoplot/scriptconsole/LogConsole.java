@@ -47,6 +47,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.swing.AbstractAction;
@@ -232,7 +233,7 @@ public class LogConsole extends javax.swing.JPanel {
         Toolkit tk= Toolkit.getDefaultToolkit();
         this.logTextArea.getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_EQUALS, tk.getMenuShortcutKeyMask() ), "biggerFont" );
         this.logTextArea.getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_MINUS, tk.getMenuShortcutKeyMask() ), "smallerFont" );
-
+        
     }
 
     private void maybeInitializeInterpreter( ) throws IOException {
@@ -424,6 +425,14 @@ public class LogConsole extends javax.swing.JPanel {
                         // no message.  
                         int i=0;
                     }
+                    
+                    if ( consoleListeners.size()>0 && recMsg!=null ) {
+                        ActionEvent actionEvent= new ActionEvent( this, recMsg.hashCode(), recMsg );
+                        consoleListeners.forEach((al) -> {
+                            al.actionPerformed(actionEvent);
+                        });
+                    }
+                    
                     if ( searchTextPattern!=null && searchTextPattern.matcher(recMsg).find() ) {
                         ByteArrayOutputStream baos= new ByteArrayOutputStream();
                         try (PrintWriter pw = new PrintWriter(baos)) {
@@ -919,4 +928,14 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     private javax.swing.JButton saveButton;
     // End of variables declaration//GEN-END:variables
 
+    private List<ActionListener> consoleListeners= new ArrayList<>();
+    
+    /**
+     * add method for listening to the console messages.  Note this
+     * may change!
+     * @param listener 
+     */
+    public void addConsoleListener( ActionListener listener ) {
+        this.consoleListeners.add( listener );
+    }
 }
