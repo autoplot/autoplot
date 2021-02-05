@@ -2156,7 +2156,9 @@ APSplash.checkTime("init 52.9");
     private JPanel initLogConsole() throws SecurityException {
         logConsole = new LogConsole();
         logConsole.setScriptContext( Collections.singletonMap( "dom", (Object)applicationModel.dom ) ); // must cast or javac complains
-        logConsole.addConsoleListener( scriptPanel.getConsoleListener() );
+        if ( scriptPanel!=null ) {
+            logConsole.addConsoleListener( scriptPanel.getConsoleListener() );
+        }
         logConsole.turnOffConsoleHandlers();
         logConsole.logConsoleMessages(); // stderr, stdout logged to Logger "console"
 
@@ -3765,6 +3767,9 @@ private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
     if (scriptPanelMenuItem.isSelected() && jythonScriptPanel == null) {
         jythonScriptPanel= new JPanel( new BorderLayout() );
         scriptPanel = new JythonScriptPanel( AutoplotUI.this, this.dataSetSelector);        
+        if ( logConsole!=null ) {
+            logConsole.addConsoleListener( scriptPanel.getConsoleListener() );
+        }
         addEditorCustomActions( scriptPanel );
         jythonScriptPanel.add(scriptPanel, BorderLayout.CENTER );
         tabs.insertTab(TAB_SCRIPT, null, jythonScriptPanel,
