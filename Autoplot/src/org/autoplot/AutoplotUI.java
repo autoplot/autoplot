@@ -2156,6 +2156,7 @@ APSplash.checkTime("init 52.9");
     private JPanel initLogConsole() throws SecurityException {
         logConsole = new LogConsole();
         logConsole.setScriptContext( Collections.singletonMap( "dom", (Object)applicationModel.dom ) ); // must cast or javac complains
+        logConsole.addConsoleListener( scriptPanel.getConsoleListener() );
         logConsole.turnOffConsoleHandlers();
         logConsole.logConsoleMessages(); // stderr, stdout logged to Logger "console"
 
