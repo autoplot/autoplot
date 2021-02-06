@@ -597,10 +597,18 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
             if ( jythonMatcher.find() ) {
                 String jythonRef= jythonMatcher.group(1);
                 String currentFilename= this.filename==null ? "<string>" : this.filename;
-                if ( currentFilename.endsWith(jythonMatcher.group(2)) ) {
+                String messageSource= jythonMatcher.group(2);
+                if ( messageSource.contains("/") ) {
+                    int iff= messageSource.lastIndexOf("/");
+                    if ( currentFilename.endsWith( messageSource.substring(iff) ) ) {
+                        File ff= DataSetURI.getCacheFilename(DataSetURI.getResourceURI(messageSource));
+                        messageSource= ff.toString();
+                    }
+                }
+                if ( currentFilename.endsWith(messageSource) ) {
                     int line= Integer.parseInt(jythonMatcher.group(4));
                     try {
-                        this.support.annotationsSupport.annotateLine( line, EditorAnnotationsSupport.ANNO_WARNING, printline );
+                        this.support.annotationsSupport.annotateLine( line, EditorAnnotationsSupport.ANNO_CODE_HINT, printline );
                     } catch (BadLocationException ex) {
                         
                     }
