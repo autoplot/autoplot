@@ -387,7 +387,7 @@ public class EditorTextPane extends JEditorPane {
             if ( n instanceof Name ) {
                 len= ((Name)n).id.length();
             }
-            support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+len, EditorAnnotationsSupport.ANNO_WARNING, "assigned but not read", null );
+            support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+len, EditorAnnotationsSupport.ANNO_CODE_HINT, "assigned but not read", null );
         }
     }
     
@@ -401,7 +401,7 @@ public class EditorTextPane extends JEditorPane {
             if ( n instanceof Name ) {
                 len= ((Name)n).id.length();
             }
-            support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+len, EditorAnnotationsSupport.ANNO_ERROR, "name not assigned", null );
+            support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+len, EditorAnnotationsSupport.ANNO_WARNING, "name not assigned", null );
         }
     }
     
@@ -440,7 +440,7 @@ public class EditorTextPane extends JEditorPane {
     
     
     /**
-     * plot the selected expression, assuming that it is defined where the interpretter is stopped.
+     * plot the selected expression, assuming that it is defined where the interpreter is stopped.
      */
     protected void plotItem() {
         String doThis= getSelectedText();
