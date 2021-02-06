@@ -584,7 +584,7 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
         return textArea;
     }
     
-    Pattern jythonRefPattern = Pattern.compile("\\s*((\\S+\\.jy(ds)?)\\:(\\d+))");
+    Pattern jythonRefPattern = Pattern.compile("\\s*((\\S+\\.jy(ds)?|\\<string\\>)\\:(\\d+))");
 
     /**
      * return action listener listening for action commands containing source:linenum
@@ -592,14 +592,15 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
      */
     public ActionListener getConsoleListener() {
         return (ActionEvent e) -> {
-            Matcher jythonMatcher= jythonRefPattern.matcher(e.getActionCommand());
+            String printline= e.getActionCommand();
+            Matcher jythonMatcher= jythonRefPattern.matcher(printline);
             if ( jythonMatcher.find() ) {
                 String jythonRef= jythonMatcher.group(1);
-                
-                if ( this.filename.endsWith(jythonMatcher.group(2)) ) {
+                String currentFilename= this.filename==null ? "<string>" : this.filename;
+                if ( currentFilename.endsWith(jythonMatcher.group(2)) ) {
                     int line= Integer.parseInt(jythonMatcher.group(4));
                     try {
-                        this.support.annotationsSupport.annotateLine( line, EditorAnnotationsSupport.ANNO_WARNING, e.getActionCommand() );
+                        this.support.annotationsSupport.annotateLine( line, EditorAnnotationsSupport.ANNO_WARNING, printline );
                     } catch (BadLocationException ex) {
                         
                     }
