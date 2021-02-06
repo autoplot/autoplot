@@ -7,8 +7,6 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -22,7 +20,6 @@ import javax.swing.text.Document;
 import javax.swing.text.Element;
 import jsyntaxpane.components.Markers;
 import jsyntaxpane.components.Markers.SimpleMarker;
-import org.das2.util.ColorUtil;
 import org.python.core.PyException;
 import org.python.core.PyInteger;
 import org.python.core.PyJavaInstance;
@@ -55,6 +52,11 @@ public class EditorAnnotationsSupport {
      * warning in the code
      */
     public static final String ANNO_WARNING = "warning";
+
+    /**
+     * warning in the code
+     */
+    public static final String ANNO_CODE_HINT = "codeHint";
 
     /**
      * usage of a symbol in the code
@@ -189,7 +191,7 @@ public class EditorAnnotationsSupport {
 
         int annoOffset;
         SortedMap<Integer, Annotation> head = annotations.headMap(offset);
-        if (head.size() == 0) {
+        if (head.isEmpty()) {
             return null;
         } else {
             annoOffset = head.lastKey();
@@ -370,6 +372,9 @@ public class EditorAnnotationsSupport {
                 switch (name) {
                     case ANNO_WARNING:
                         mark= new SimpleMarker( lightBackground ? Color.YELLOW : new Color(120,120,0) );
+                        break;
+                    case ANNO_CODE_HINT:
+                        mark= new SimpleMarker( lightBackground ? new Color(255,255,0,80) : new Color(120,120,0,80) );
                         break;
                     case ANNO_USAGE:
                         mark= new SimpleMarker( lightBackground ? Color.GREEN.brighter() : new Color(0,100,0) );
