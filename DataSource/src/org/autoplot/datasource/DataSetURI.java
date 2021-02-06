@@ -66,6 +66,7 @@ import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.datum.HttpUtil;
 import org.das2.qds.ops.Ops;
 import org.das2.util.Base64;
+import org.das2.util.filesystem.GitHubFileSystem;
 import org.das2.util.filesystem.KeyChain;
 import org.das2.util.monitor.AlertNullProgressMonitor;
 import org.das2.util.monitor.CancelledOperationException;
@@ -883,7 +884,13 @@ public class DataSetURI {
             try {
                 URI root= new URI( split.file ); // from WebFileSystem.
                 File local = FileSystem.settings().getLocalCacheDir();
-
+                
+                //TODO: Experimental GitHub code
+                if ( null!=GitHubFileSystem.isGithubFileSystem( root.getHost(), root.getPath() ) ) {
+                    String file= split.file.substring( split.path.length() );
+                    return new File( GitHubFileSystem.getLocalRoot( DataSetURI.getResourceURI(split.path) ), file );
+                }
+                
                 logger.log( Level.FINE, "WFS localRoot={0}", local);
            
                 String s = root.getScheme() + "/" + root.getHost() + "/" + root.getPath(); //TODO: check getPath
