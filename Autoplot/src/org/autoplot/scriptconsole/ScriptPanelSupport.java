@@ -698,7 +698,7 @@ public class ScriptPanelSupport {
                         String doc= ss[1];
                         doc= doc.replaceAll("<", "&lt;");
                         doc= doc.replaceAll(">", "&gt;");
-                        esa.annotateLine(Integer.parseInt(ss[0]), EditorAnnotationsSupport.ANNO_WARNING, "Variable name is already used before execution: " + doc + "<br>Consider using a different name");
+                        esa.annotateLine(Integer.parseInt(ss[0]), EditorAnnotationsSupport.ANNO_CODE_HINT, "Variable name is already used before execution: " + doc + "<br>Consider using a different name");
                     } catch (BadLocationException ex) {
                         logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
