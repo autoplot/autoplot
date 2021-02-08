@@ -1246,17 +1246,34 @@ public class JythonUtil {
     
     static {
         try {
+            
+            //TODO: this is silly.  Figure out how to do this correctly:
             definedNamesApp.put("None",null);
             definedNamesApp.put("len",null);
             definedNamesApp.put("open",null);
             definedNamesApp.put("str",null);
-            
-            // TODO: how to add applicaton names?
-            definedNamesApp.put("setStatus",null);
-            definedNamesApp.put("formatDataSet",null);
-            
+            definedNamesApp.put("range",null);
+            definedNamesApp.put("xrange",null);
+            definedNamesApp.put("int",null);
+                        
             //TODO: more are needed, this is still experimental!
             InteractiveInterpreter interp= JythonUtil.createInterpreter(true);
+            
+            if ( org.autoplot.jythonsupport.Util.isLegacyImports() ) {
+                boolean appContext= true;
+                if ( appContext ) {
+                    try ( InputStream in = JythonUtil.class.getResource("/appContextImports2017.py").openStream() ) {
+                        interp.execfile( in, "/appContextImports2017.py" ); // JythonRefactory okay
+                    }
+                }
+            }
+            
+            definedNamesApp.put( "dom", null );
+            definedNamesApp.put( "monitor", null );
+            definedNamesApp.put( "plotx", null );
+            definedNamesApp.put( "plot", null );
+            definedNamesApp.put( "dataset", null );
+            definedNamesApp.put( "annotation", null );
             
             PyObject po= interp.getLocals();
             if ( po instanceof PyStringMap ) {
