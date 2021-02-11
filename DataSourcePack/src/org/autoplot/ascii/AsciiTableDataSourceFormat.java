@@ -458,6 +458,13 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         QDataSet bundleDesc= (QDataSet) data.property(QDataSet.BUNDLE_1);
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
 
+        if ( dep0!=null && dep0.length()>0 ) {
+            if ( Ops.equivalent( dep0, Ops.unbundle(data, 0) ) ) {
+                logger.fine("depend0 is also found in the first column, ignoring");
+                dep0= null;
+            }            
+        }
+        
         String head= getParam( "header", "" ); // could be "rich"
 
         boolean haveRich= false;
