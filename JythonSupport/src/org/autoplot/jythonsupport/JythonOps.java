@@ -506,7 +506,9 @@ public class JythonOps {
      * return the current line in the Jython script as &lt;filename&gt;:&lt;linenum&gt;
      * or ??? if this cannot be done.  Note calls to this will collect a stack
      * trace and will affect performance.
+     * 
      * @return the current line or ???
+     * @see QubeDataSetIterator#currentJythonLine() 
      */
     public static String currentLine() {
         StackTraceElement[] sts= new Exception().getStackTrace();
