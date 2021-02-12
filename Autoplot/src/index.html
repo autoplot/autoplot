@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New mouse action allows averaging data over a interval in Y.
+        <p><small>New "sortInTime" operation will sort data to ensure its tags are monotonically increasing.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,13 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-02-06 r25519):</p>
+        <p>Bugfixes (2021-02-12 r25529):</p>
         <ul> 
+            <li>1816: tweak string representation of a QDataSet for bundles.
+            <li>1816: allow bundle to have times for column 0 and DEPEND_0, and not format the column twice to an ASCII file.
+        </ul>
+        <p>Older Bugfixes (2021-02-06 r25519):</p>
+        <ul>
             <li>Script editor USAGES should be green, not yellow, so that yellow can be used for warnings.
             <li>Jython positional parameters were in the wrong location, where arg_1 is the first argument, not arg_0.
             <li>correction to ASCII file parsing, where minor bugfix broke things for more common use.
@@ -40,18 +45,11 @@
             <li>"slices" filter GUI would reset improperly when the string was edited, causing flickering and occasional failure.  Thanks, Shing!
             <li>correction to support for CDF file psp_fld_l2_mag_RTN_1min[:,0];psp_fld_l2_mag_RTN_1min[:,1];psp_fld_l2_mag_RTN_1min[:,2], where slice is not implemented.  Thanks, Jon N!
         </ul>
-        <p>Older Bugfixes (2020-12-29 r25415):</p>
-        <ul>
-            <li>improve transparency of local files used with ro_cache.txt, where local files can be used to resolve remote files.
-            <li>1310: --sandbox mode with "open vap file" now works on a Mac, which checked to see if the read-only folder was writable.
-            <li>1687: scripts with first line was a multi-line setScriptDescription couldn't be run from the address bar.
-            <li>1310: --sandbox command line option limits writes to ~/AUTOPLOT_DATA and /tmp.
-            <li>2309: correction to DataPointRecorder when reading a file.  Thanks, Sadie!
-            <li>always support "~/..." as a shortcut for home directory.
-            <li>2309: correction to DataPointRecorder units change when emptied.  Thanks, Ivar!
-            <li>1779: copy/paste plot is more aggressive about trying to bind the pasted plot's x-axis to the timerange.  Thanks, Bill!
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>add averager for range in y.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>add sortInTime function which sorts the data based on DEPEND_0.
             <li>737: VALID_MAX is used to hint when result of where is used on the wrong array.
@@ -68,14 +66,6 @@
             <li>rank0 labelsDataSet command should be used where old code would use dataset('Chicago'), which was allowed briefly.
             <li>Run Batch now keeps track of the last file location (preference) with "Load From File" action, speeding up repeated runs.
             <li>add rank 4 link command.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>add --macUseScreenMenuBar, which uses a conventional screen menu bar on Macs.
-            <li>rebundle command allows subsetting and resorting of bundle datasets.
-            <li>support datumRange(5,10) in scripts.  Thanks, Ivar!
-            <li>events bar supports lineStyle and lineThick properties, new opaque property disables default transparency.  Thanks, Ali!
-            <li>getFile can have null passed in for the monitor, when the developer knows the load will be quick.
         </ul>
         <p>Known issues:</p>
         <ul>
