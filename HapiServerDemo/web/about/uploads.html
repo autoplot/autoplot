@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Server ingest of data</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <p>This server also supports experimental data ingest.  If the server
+        configuration at HAPI_HOME/keys/ contains a key for a data product,
+        then this allows post requests to insert data into the server.
+        For example, the scientist if digitizing data and this allows the data
+        to be stored in a common location.
+        </p>
+        <p>A multipart upload is needed to push data.  This should contain the
+            firstly "key" which secures the server.  This is a unique string
+            known to the server implementation and to the client using it.  
+            (Presently this is an 8-digit number.)  Second, the post contains
+            the csv-formatted data in "data".</p>
+        <p>This Python code shows how to push data.  Suppose you have a chicken
+            coop with a Raspberry PI and a temperature sensor.  We wish to 
+            regularly store the temperature of the chicken coop by pushing data
+            into a HAPI server.  Here is the Python code:
+            <br><code><pre>
+import requests 
+data = {'key':'12345678', 
+        'data':'2021-01-01T00:00Z,-4.4\n2021-01-01T01:00Z,-4.6\n'} 
+r = requests.post(url = 'http://localhost:8084/HapiServerDemo/hapi/data?id=chickens', data = data)  
+                </pre></code><br>
+Note the server is able to get the key from the post part of the request.                
+        <p>wget can be used to insert a record as well:
+            <br><code><pre>
+wget --post-data='data=2002-02-02T00:00Z,4.56' 'http://localhost:8084/HapiServerDemo/hapi/data?id=chickens&key=12345678&data=2002-02-02T00:00Z,4.56'       
+                </pre></code><br>
+    </body>
+</html>
