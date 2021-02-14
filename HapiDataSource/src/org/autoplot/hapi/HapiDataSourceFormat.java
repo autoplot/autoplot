@@ -10,17 +10,27 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
+import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
+import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.das2.datum.DatumRange;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
@@ -54,6 +64,56 @@ public class HapiDataSourceFormat implements DataSourceFormat {
     
     private static final Logger logger= LoggerManager.getLogger("apdss.hapi");
     
+    private void upload( String uri, QDataSet data, ProgressMonitor mon ) throws Exception { 
+        URISplit split= URISplit.parse(uri);
+        Map<String,String> params= URISplit.parseParams(split.params);
+        
+        String key= params.get("key");
+        if ( key==null ) {
+            throw new IllegalArgumentException("missing key");
+        }
+        if ( data.rank()!=2 ) {
+            throw new IllegalArgumentException("data must be rank 2 bundle");
+        }
+        
+        StringBuilder dataBuilder= new StringBuilder();
+        for ( int i=0; i<data.length(); i++ ) {
+            QDataSet slice=data.slice(i);
+            for ( int j=0; j<data.length(i); j++ ) {
+                if ( j>0 ) dataBuilder.append(',');
+                dataBuilder.append( slice.slice(j).svalue() );
+            }
+            dataBuilder.append("\n");  //TODO: what should this be?
+        }
+        
+        HttpClient client = new HttpClient();
+        client.getHttpConnectionManager().getParams().setConnectionTimeout(3000);
+        PostMethod postMethod = new PostMethod(split.file + "?" + URISplit.formatParams(params) );
+        
+        Charset ch= Charset.forName("UTF-8");                
+        byte[] dataBytes= dataBuilder.toString().getBytes(ch);
+        
+        Part[] parts= {
+            new StringPart( "key", key ),
+            new FilePart( "data", new ByteArrayPartSource( "data", dataBytes ), "text/csv", ch.name() ),
+        };
+
+        postMethod.setRequestEntity(
+            new MultipartRequestEntity( parts, postMethod.getParams() ) );
+        
+        try {
+            int statusCode1 = client.executeMethod(postMethod);
+            if ( statusCode1==200 ) {
+                postMethod.releaseConnection();
+            } else {
+                postMethod.releaseConnection();
+                throw new IllegalAccessException( postMethod.getStatusLine().toString() );
+            }
+        } catch ( IOException | IllegalAccessException ex ) {
+            throw ex;
+        }
+    }
+            
     @Override
     public void formatData(String uri, QDataSet data, ProgressMonitor mon) throws Exception {
         // file:///home/jbf/hapi?id=mydata
@@ -65,7 +125,8 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         if ( s.startsWith("file://") ) {
             s= s.substring(7);
         } else {
-            throw new IllegalArgumentException("uri must start with file://");
+            upload( uri, data, mon );
+            return;
         }
         int ix= s.lastIndexOf(".hapi");
         if ( ix==-1 ) {
