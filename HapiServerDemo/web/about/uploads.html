@@ -22,16 +22,20 @@
             coop with a Raspberry PI and a temperature sensor.  We wish to 
             regularly store the temperature of the chicken coop by pushing data
             into a HAPI server.  Here is the Python code:
-            <br><code><pre>
+            <code><pre>
 import requests 
 data = {'key':'12345678', 
         'data':'2021-01-01T00:00Z,-4.4\n2021-01-01T01:00Z,-4.6\n'} 
 r = requests.post(url = 'http://localhost:8084/HapiServerDemo/hapi/data?id=chickens', data = data)  
-                </pre></code><br>
+                </pre></code>
 Note the server is able to get the key from the post part of the request.                
         <p>wget can be used to insert a record as well:
-            <br><code><pre>
-wget --post-data='data=2002-02-02T00:00Z,4.56' 'http://localhost:8084/HapiServerDemo/hapi/data?id=chickens&key=12345678&data=2002-02-02T00:00Z,4.56'       
-                </pre></code><br>
+            <code><pre>
+wget --post-data='data=2002-02-02T00:00Z,4.56' 'http://localhost:8084/HapiServerDemo/hapi/data?id=chickens&key=12345678'
+</pre></code>
+            or to avoid having the key appear in server logs:
+<code><pre>
+wget --post-data='key=12345678&data=2002-02-02T00:00Z,4.56' 'http://localhost:8084/HapiServerDemo/hapi/data?id=chickens'
+                </pre></code>
     </body>
 </html>
