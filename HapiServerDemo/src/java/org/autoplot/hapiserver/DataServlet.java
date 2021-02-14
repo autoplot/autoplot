@@ -14,10 +14,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,6 +33,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.output.TeeOutputStream;
+import org.apache.tomcat.util.http.fileupload.FileItem;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
+import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
+import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
+import org.apache.tomcat.util.http.fileupload.servlet.ServletRequestContext;
 import org.das2.datum.Datum;
 import org.autoplot.datasource.RecordIterator;
 import org.das2.datum.DatumRange;
@@ -43,6 +51,7 @@ import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.util.filesystem.FileSystem;
 import org.json.JSONArray;
+import org.python.core.FileUtil;
 
 /**
  * Servlet for data responses.  
@@ -396,7 +405,7 @@ public class DataServlet extends HttpServlet {
 
     /**
      * Handles the HTTP <code>POST</code> method.
-     *
+     * @see https://jfaden.net/git/jbfaden/workblog/blob/master/2021/hapi/20210213_upload.md
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -426,15 +435,57 @@ public class DataServlet extends HttpServlet {
             
         File dataFileHome= new File( Util.getHapiHome(), "data" );
         File dataFile= new File( dataFileHome, id+".csv" );
+
+        int maxMemSize = 5000 * 1024;
         
-        try ( BufferedReader r = new BufferedReader( new InputStreamReader( request.getInputStream() ) );
-              BufferedWriter fout= new BufferedWriter( new FileWriter(dataFile) ) ) { //TODO: merge
-            String s;
-            while ( (s=r.readLine())!=null ) {
-                fout.write(s);
-                fout.write("\n");
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+
+        factory.setSizeThreshold(maxMemSize);
+        
+        ServletFileUpload upload = new ServletFileUpload(factory);
+        try {
+            request.getContentType();
+            // wget --post-data='data=2002-02-02T00:00Z,4.56' 'http://localhost:8084/HapiServerDemo/hapi/data?id=chickens&key=12345678'
+            if ( request.getContentType().equals( "application/x-www-form-urlencoded" ) ) {
+                String data= request.getParameter("data");
+                try ( BufferedReader r = new BufferedReader( new StringReader(data) );
+                            BufferedWriter fout= new BufferedWriter( new FileWriter(dataFile,true) ) ) { //TODO: merge
+                    String s;
+                    while ( (s=r.readLine())!=null ) {
+                        fout.write(s);
+                        fout.write("\n");
+                    }
+                }
+            } else {
+                ServletRequestContext xxx= new ServletRequestContext(request);
+                List fileItems = upload.parseRequest(xxx);
+
+                Iterator i = fileItems.iterator();
+                while ( i.hasNext() ) {
+                    FileItem fi = (FileItem) i.next();
+                    String fieldName = fi.getFieldName();
+                    if ( fieldName.equals("key") ) {
+                        String skey= new String( fi.get(), "UTF-8" );
+                        if ( !skey.equals(key) ) {
+                            logger.warning("different key used!");
+                        }
+                    } else if ( fieldName.equals("data") ) {
+                        try ( BufferedReader r = new BufferedReader( new InputStreamReader( fi.getInputStream() ) );
+                            BufferedWriter fout= new BufferedWriter( new FileWriter(dataFile,true) ) ) { //TODO: merge
+                            String s;
+                            while ( (s=r.readLine())!=null ) {
+                                fout.write(s);
+                                fout.write("\n");
+                            }
+                        }
+                    }
+
+                }
             }
+        } catch (FileUploadException ex) {
+            Logger.getLogger(DataServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
+
         
     }
 
