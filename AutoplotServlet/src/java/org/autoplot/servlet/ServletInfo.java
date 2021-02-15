@@ -101,13 +101,15 @@ public class ServletInfo extends HttpServlet {
             out.println("servlet version: "+version+"<br>");
             out.println("servlet uptime: "+getDurationForHumans(getAgeMillis())+"<br>");
             if ( isHostPrivileged ) {
-                out.println("<br>user.name: "+ System.getProperty("user.name") + "\n"); // TODO: security concerns
-                out.println("<br>java.home: "+ System.getProperty("java.home") + "\n"); // TODO: security concerns
-                out.println("<br>user.home: "+ System.getProperty("user.home") + "\n"); // TODO: security concerns
+                out.println("<br>user.name: "+ System.getProperty("user.name") + "\n");
+                out.println("<br>java.home: "+ System.getProperty("java.home") + "\n");
+                out.println("<br>user.home: "+ System.getProperty("user.home") + "\n");
 
                 out.println("<p>PWD: "+ ( new File(".").getAbsolutePath() ) +"\n" );
-                out.println("<br>Servlet Home: "+ServletUtil.getServletHome() + "\n"); // TODO: security concerns
+                out.println("<br>Servlet Home: "+ServletUtil.getServletHome() + "\n"); 
                 File sd= ServletUtil.getServletHome();
+                out.println("<br>Cache Directory: " +getCacheDirectory() +"\n" );
+
                 File ff= new File( sd, "whitelist.txt" );
                 out.println("<h2>Whitelist File</h2>\n");
                 out.println("Whitelist File: "+ff+"<br>");
