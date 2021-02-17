@@ -1296,6 +1296,48 @@ public class JythonCompletionTask implements CompletionTask {
         }
 
     }
+    
+    /**
+     * At some point we decided all the methods would take Object as well as QDataSet, and then convert
+     * to these.  This should be discouraged, and hide these in the popups.
+     * @param m1
+     * @param m2
+     * @return 
+     */
+    private static boolean methodIsSuperset( String m1, String m2 ) {
+        Pattern p0= Pattern.compile("([a-zA-Z0-9/]*\\.html)#([a-zA-Z0-9]*)\\((([a-zA-Z0-9\\.\\[\\]]+)?(,([a-zA-Z0-9\\.\\[\\]]+)*))\\)" );
+        Matcher m8= p0.matcher(m1);
+        Matcher m9= p0.matcher(m2);
+        if ( m8.matches() && m9.matches() ) {
+            String s1= m8.group(3);
+            String s2= m9.group(3);
+            String[] s8= s1.split(",",-2);
+            String[] s9= s2.split(",",-2);
+            if ( s8.length==s9.length ) {
+                boolean superSet= true;
+                for ( int i=0; i<s8.length; i++ ) {
+                    if ( !s8[i].equals("java.lang.Object") && !s8[i].equals(s9[i]) ) {
+                        superSet=false;
+                    }
+                }
+                return superSet;
+            }
+        }
+        return false;
+    }
+    
+    public static void reduceObject( List<String> signatures, List<String> labels, List<String> argss ) {
+        if ( signatures.size()>1 ) {
+            for ( int i=1; i<signatures.size(); i++ ) {
+                if ( methodIsSuperset( signatures.get(0), signatures.get(i) ) ) {
+                    signatures.remove(0);
+                    labels.remove(0);
+                    argss.remove(0);
+                    break;
+                }
+            }
+        }
+    }
 
     public static List<DefaultCompletionItem> getLocalsCompletions(PythonInterpreter interp, CompletionContext cc) {
         
@@ -1398,9 +1440,16 @@ public class JythonCompletionTask implements CompletionTask {
                 
                 if ( !signatures.isEmpty() ) {
                     
+                    String objectRemoved= "";
+                    int n= signatures.size();
+                    reduceObject( signatures, labels, argss );
+                    if ( signatures.size()!=n ) {
+                        objectRemoved= "*";
+                    }
+                    
                     for ( int jj= 0; jj<signatures.size(); jj++ ) {
                         signature= signatures.get(jj);
-                        label= labels.get(jj);
+                        label= labels.get(jj)+objectRemoved;
                         String link = null;
                         if (signature != null) {
                             link= getLinkForJavaSignature(signature);  // TODO: inner class like Rectangle.Double is only Double
