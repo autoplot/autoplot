@@ -62,6 +62,11 @@ for i in ../../APLibs/lib/netCDF/*.jar; do
    ${JAVA_HOME}/bin/jar xf $i
 done
 
+for i in ../../APLibs/lib/pds/*.jar; do
+   echo ${JAVA_HOME}/bin/jar xf $i
+   ${JAVA_HOME}/bin/jar xf $i
+done
+
 for i in ../../APLibs/lib/commons/*.jar; do
    echo ${JAVA_HOME}/bin/jar xf $i
    ${JAVA_HOME}/bin/jar xf $i
