@@ -4,19 +4,25 @@ package org.autoplot.pds;
 import gov.nasa.pds.label.Label;
 import gov.nasa.pds.label.object.ArrayObject;
 import gov.nasa.pds.label.object.FieldDescription;
+import gov.nasa.pds.label.object.FieldType;
 import gov.nasa.pds.label.object.TableObject;
 import gov.nasa.pds.label.object.TableRecord;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.text.ParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
+import org.das2.datum.TimeParser;
 import org.das2.datum.Units;
 import org.das2.qds.ArrayDataSet;
 import org.das2.qds.DDataSet;
 import org.das2.qds.QDataSet;
+import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -31,16 +37,64 @@ public class PdsDataSource extends AbstractDataSource {
         super(uri);
     }
 
-    private ArrayDataSet getFromTable( TableObject t, String columnName ) throws IOException {
-        TableRecord r= t.readNext();
-        int icol= -1;
-        if ( r!=null ) {
-            icol= r.findColumn(columnName);
+    /**
+     * bootstrap routine for getting data from fields of a TableObject.  TODO: rewrite so that
+     * multiple fields are read at once.
+     * @param t
+     * @param columnName
+     * @return
+     * @throws IOException 
+     */
+    private QDataSet getFromTable( TableObject t, String[] columnNames ) throws IOException {
+        
+        int ncols= columnNames.length;
+        int[] icols= new int[ncols];
+        
+        DataSetBuilder dsb= new DataSetBuilder(2,100,ncols);
+        
+        for ( int i=0; i<ncols; i++ ) {
+            int icol= -1;
+            FieldDescription[] fields= t.getFields();
+            for ( int j=0; j<fields.length; j++ ) {
+                if ( fields[j].getName().equals(columnNames[i]) ) {
+                    icol= j;
+                    break;
+                }
+            }
+            //TODO: what is returned when column isn't found?
+            icols[i]= icol;
+            FieldDescription fieldDescription= t.getFields()[icol];
+            dsb.setName( i, fieldDescription.getName() );
+            dsb.setLabel( i, fieldDescription.getName() );
+            //TODO: Larry has nice descriptions.  How to get at those? https://space.physics.uiowa.edu/pds/cassini-rpws-electron_density/data/2006/rpws_fpe_2006-141_v1.xml
+            switch (fieldDescription.getType()) {
+                case ASCII_DATE:
+                case ASCII_DATE_DOY:
+                case ASCII_DATE_TIME_DOY_UTC:
+                case ASCII_DATE_TIME_UTC:
+                case ASCII_DATE_TIME_DOY:
+                case ASCII_DATE_TIME_YMD:
+                case ASCII_DATE_TIME_YMD_UTC:
+                    dsb.setUnits(i, Units.us2000);
+                    break;
+                    //TODO: create timeparser 
+                default:
+                    dsb.setUnits(i, Units.dimensionless ); // TODO: how to get "unit" from label
+            }
         }
-        DataSetBuilder dsb= new DataSetBuilder(1,100);
-        while ( (r=t.readNext())!=null ) {
-            dsb.nextRecord( (double)r.getDouble(icol) );
+        
+        TableRecord r;
+        while ( ( r= t.readNext())!=null ) {
+            for ( int i=0; i<ncols; i++ ) {
+                try {
+                    dsb.putValue( -1, i, r.getString(icols[i]+1) );
+                } catch (ParseException ex) {
+                    dsb.putValue( -1, i, dsb.getUnits(i).getFillDatum() );
+                }
+            }
+            dsb.nextRecord();
         }
+        
         return dsb.getDataSet();
     }
     
@@ -72,10 +126,9 @@ public class PdsDataSource extends AbstractDataSource {
         for ( TableObject t : label.getObjects( TableObject.class) ) {
             
             for ( FieldDescription fd: t.getFields() ) {
-                if ( name.endsWith( fd.getName() ) ) { // TODO: weak
-                    ArrayDataSet result= getFromTable( t, fd.getName() );
-                    result.putProperty( QDataSet.NAME, fd.getName() );
-                    return result;
+                if ( name.equals( fd.getName() ) ) { 
+                    QDataSet result= getFromTable( t, new String[] { fd.getName() } );
+                    return Ops.unbundle(result, 0);
                 }
             }
         }

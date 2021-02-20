@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -116,8 +115,9 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
         Label label = Label.open( url ); // this works
         
         for ( TableObject t : label.getObjects( TableObject.class) ) {
+            //TODO: can there be more than one table?
             for ( FieldDescription fd: t.getFields() ) {
-                result.put( "" + "." + fd.getName(), fd.getName() );
+                result.put( fd.getName(), fd.getName() );
             }
         }
         
