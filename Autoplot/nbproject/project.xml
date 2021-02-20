@@ -165,6 +165,14 @@
                 <id>jar</id>
             </reference>
             <reference>
+                <foreign-project>PDSDataSource</foreign-project>
+                <artifact-type>jar</artifact-type>
+                <script>build.xml</script>
+                <target>jar</target>
+                <clean-target>clean</clean-target>
+                <id>jar</id>
+            </reference>
+            <reference>
                 <foreign-project>PDSPPIDataSource</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
