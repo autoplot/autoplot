@@ -62,6 +62,7 @@ for i in ../../APLibs/lib/netCDF/*.jar; do
    ${JAVA_HOME}/bin/jar xf $i
 done
 
+echo "including new 2021 stuff for PDS library"
 for i in ../../APLibs/lib/pds/*.jar; do
    echo ${JAVA_HOME}/bin/jar xf $i
    ${JAVA_HOME}/bin/jar xf $i
@@ -145,3 +146,5 @@ set -x
 echo "pack the jar file..."
 $JAVA_HOME/bin/pack200 dist/AutoplotStable.jar.pack.gz dist/AutoplotStable.jar
 #echo "done packing."
+
+echo "Done!"
