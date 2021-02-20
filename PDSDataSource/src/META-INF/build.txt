@@ -1,0 +1,4 @@
+build.timestamp: 
+build.user.name: 
+build.svnurl: $URL: svn+ssh://jbfaden@svn.code.sf.net/p/autoplot/code/autoplot/trunk/PdsDataSource/src/META-INF/build.txt $
+build.svnrevision: $Revision: 595 $

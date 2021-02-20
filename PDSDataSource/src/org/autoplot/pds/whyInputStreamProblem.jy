@@ -1,0 +1,15 @@
+from java.io import File
+
+from gov.nasa.pds.label import Label
+
+f= File( '/home/jbf/eg/java/pds4parser/pds4parser/vg1pws_lr_19800101_v5.10.xml' )
+label = Label.open( f )
+
+u= f.toURI().toURL()
+label = Label.open( u )
+
+u= URL('file:/tmp/vg2pws_lr_19800101_v5.10.xml')
+#u= URL('file:/home/jbf/autoplot_data/fscache/https/space.physics.uiowa.edu/voyager/data/voyager-2-pws-sa/data/1980/vg2pws_lr_19800101_v5.10.xml')
+c= u.openConnection()
+ins= c.getInputStream()
+
