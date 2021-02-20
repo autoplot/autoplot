@@ -14,6 +14,7 @@ import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
 import org.das2.datum.Units;
+import org.das2.qds.ArrayDataSet;
 import org.das2.qds.DDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.util.DataSetBuilder;
@@ -30,15 +31,14 @@ public class PdsDataSource extends AbstractDataSource {
         super(uri);
     }
 
-    private QDataSet getFromTable( TableObject t, String columnName ) throws IOException {
+    private ArrayDataSet getFromTable( TableObject t, String columnName ) throws IOException {
         TableRecord r= t.readNext();
         int icol= -1;
         if ( r!=null ) {
             icol= r.findColumn(columnName);
         }
         DataSetBuilder dsb= new DataSetBuilder(1,100);
-        while ( r!=null ) {
-            r= t.readNext();
+        while ( (r=t.readNext())!=null ) {
             dsb.nextRecord( (double)r.getDouble(icol) );
         }
         return dsb.getDataSet();
@@ -65,17 +65,16 @@ public class PdsDataSource extends AbstractDataSource {
             
         URL fileUrl= PdsDataSourceFactory.getFileResource( split.resourceUri.toURL(), mon );
         File xmlfile = DataSetURI.getFile( split.resourceUri.toURL() ,new NullProgressMonitor());
-        File datfile = DataSetURI.getFile(fileUrl,mon );
+        DataSetURI.getFile(fileUrl,mon );
                     
-        QDataSet result;
-        
         Label label = Label.open( xmlfile.toURI().toURL() ); 
         
         for ( TableObject t : label.getObjects( TableObject.class) ) {
             
             for ( FieldDescription fd: t.getFields() ) {
-                if ( name.startsWith( fd.getName() ) ) {
-                    result= getFromTable( t, name.substring(fd.getLength()+1) );
+                if ( name.endsWith( fd.getName() ) ) { // TODO: weak
+                    ArrayDataSet result= getFromTable( t, fd.getName() );
+                    result.putProperty( QDataSet.NAME, fd.getName() );
                     return result;
                 }
             }
