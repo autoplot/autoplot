@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New "sortInTime" operation will sort data to ensure its tags are monotonically increasing.
+        <p><small>New HAPI data source shows how Autoplot-based HAPI Data Server allows Raspberry PI to push data into the server.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-02-12 r25529):</p>
+        <p>Bugfixes (2021-02-20 r25555):</p>
         <ul> 
+            <li>Jython completions don't show (Object,Object) version of command that takes (QDataSet,QDataSet).
+            <li>1816: bundle subset propagates bundle properties.
             <li>1816: tweak string representation of a QDataSet for bundles.
             <li>1816: allow bundle to have times for column 0 and DEPEND_0, and not format the column twice to an ASCII file.
         </ul>
@@ -47,6 +49,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>729: initial support for PDS4 data using pds4-jparser.
+            <li>Autoplot-based HAPI server has experimental support for packet ingest.
             <li>add averager for range in y.
         </ul>
         <p>Less recent features:</p>
