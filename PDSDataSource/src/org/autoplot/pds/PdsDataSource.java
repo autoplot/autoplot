@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.autoplot.datasource.AbstractDataSource;
@@ -122,34 +124,91 @@ public class PdsDataSource extends AbstractDataSource {
         DataSetURI.getFile(fileUrl,mon );
                     
         Label label = Label.open( xmlfile.toURI().toURL() ); 
+
+        List<String> names= new ArrayList<>();
+        String X= getParam("X","");
+        if ( !X.equals("") ) {
+            names.add(X);
+        }
+        String Y= getParam("Y","");
+        if ( !Y.equals("") ) {
+            names.add(Y);
+        }
         
-        for ( TableObject t : label.getObjects( TableObject.class) ) {
+        String Z= getParam("Z","");
+        if ( !Z.equals("") ) {
+            names.add(Z);
+        }
+
+        if ( !name.equals("") ) {
+            names.add(name);
+        }
             
-            for ( FieldDescription fd: t.getFields() ) {
-                if ( name.equals( fd.getName() ) ) { 
-                    QDataSet result= getFromTable( t, new String[] { fd.getName() } );
-                    return Ops.unbundle(result, 0);
+        QDataSet result=null;
+        QDataSet[] results= new QDataSet[names.size()];
+        
+        // see which parameters will come from tables.
+        for ( TableObject t : label.getObjects( TableObject.class) ) {
+            List<String> tableColumnNames= new ArrayList<>();
+            List<Integer> datasetColumnIndexes= new ArrayList<>();
+            
+            for ( int i=0; i<names.size(); i++ ) {
+                name= names.get(i);
+                for ( FieldDescription fd: t.getFields() ) {
+                    if ( name.equals( fd.getName() ) ) { 
+                        tableColumnNames.add( fd.getName() );
+                        datasetColumnIndexes.add(i);
+                    }
+                }
+            }
+            if ( tableColumnNames.size()>0 ) {
+                QDataSet bresults= getFromTable( t, tableColumnNames.toArray(new String[tableColumnNames.size()]) );
+                int iresults= 0;
+                for ( int i:datasetColumnIndexes ) {
+                    results[i]= Ops.unbundle( bresults, iresults );
+                    iresults++;                    
                 }
             }
         }
         
-        for ( ArrayObject a: label.getObjects(ArrayObject.class) ) {
-            if ( a.getName().equals(name) ) {
-                if ( a.getAxes()==2 ) {
-                    double[][] dd= a.getElements2D();
-                    double[] rank1= flatten(dd);
-                    int[] qube= new int[] { dd.length, dd[0].length };
-                    return DDataSet.wrap( rank1, qube );
-                } else if ( a.getAxes()==1 ) {
-                    double[] dd= a.getElements1D();
-                    int[] qube= new int[] { dd.length };
-                    DDataSet ddresult= DDataSet.wrap( dd, qube );
-                    if ( name.equals("Epoch") ) {
-                        logger.info("Epoch kludge results in CDF_TT2000 units");
-                        ddresult.putProperty( QDataSet.UNITS, Units.cdfTT2000 );
+        for ( int i=0; i<names.size(); i++ ) {
+            if ( results[i]!=null ) continue;
+            name= names.get(i);
+            for ( ArrayObject a: label.getObjects(ArrayObject.class) ) {
+
+                if ( a.getName().equals(name) ) {
+                    if ( a.getAxes()==2 ) {
+                        double[][] dd= a.getElements2D();
+                        double[] rank1= flatten(dd);
+                        int[] qube= new int[] { dd.length, dd[0].length };
+                        results[i]= DDataSet.wrap( rank1, qube );
+                    } else if ( a.getAxes()==1 ) {
+                        double[] dd= a.getElements1D();
+                        int[] qube= new int[] { dd.length };
+                        DDataSet ddresult= DDataSet.wrap( dd, qube );
+                        if ( name.equals("Epoch") ) {
+                            logger.info("Epoch kludge results in CDF_TT2000 units");
+                            ddresult.putProperty( QDataSet.UNITS, Units.cdfTT2000 );
+                        }
+                        results[i]= ddresult;
                     }
-                    return ddresult;
                 }
+            }
+        }
+                
+        if ( result==null ) {
+            for ( int i=0; i<names.size(); i++ ) {
+                name= names.get(i);
+            }
+            switch (results.length) {
+                case 1:
+                    return results[0];
+                case 2:
+                    return Ops.link( results[0], results[1] );
+                case 3:
+                    return Ops.link( results[0], results[1], results[2] );
+                default:
+                    break;
             }
         }
         return null;

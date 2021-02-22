@@ -82,6 +82,9 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
             
             String id= params.get("arg_0");
             if ( id==null ) id= params.get("id");
+            if ( id==null ) id= params.get("X");
+            if ( id==null ) id= params.get("Y");
+            if ( id==null ) id= params.get("Z");
             
             URL fileUrl= getFileResource( split.resourceUri.toURL(), mon );
             File xmlfile = DataSetURI.getFile( split.resourceUri.toURL() ,new NullProgressMonitor());
@@ -109,10 +112,15 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
      * @param f
      * @return 
      */
-    private Map<String,String> getDataObjectNames( URL url ) throws Exception {
+    private Map<String,String> getDataObjectNames( URL url, ProgressMonitor mon) throws Exception {
+        
+        URL fileUrl= getFileResource( url, mon );
+        File xmlfile = DataSetURI.getFile( url,new NullProgressMonitor());
+        File datfile = DataSetURI.getFile( fileUrl,mon );
+            
         Map<String,String> result= new LinkedHashMap<>();
         
-        Label label = Label.open( url ); // this works
+        Label label = Label.open( xmlfile.toURI().toURL() ); // this works
         
         for ( TableObject t : label.getObjects( TableObject.class) ) {
             //TODO: can there be more than one table?
@@ -156,24 +164,33 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
             File xmlfile = DataSetURI.getFile(cc.resourceURI.toURL(),new NullProgressMonitor());
             File datfile = DataSetURI.getFile(fileUrl,mon );
              
-            Map<String,String> result= getDataObjectNames(xmlfile.toURI().toURL());
+            Map<String,String> result= getDataObjectNames(xmlfile.toURI().toURL(), mon);
             
             List<CompletionContext> ccresult= new ArrayList<>();
+            ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "", this, "arg_0", "", null, true ) );
             for ( java.util.Map.Entry<String,String> e:result.entrySet() ) {
                 String key= e.getKey();
                 CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, key, this, "arg_0", e.getValue(), null, true );
                 ccresult.add(cc1);
             }
+            ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "X=",
+                    "values typically displayed in horizontal dimension"));
+            ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "Y=",
+                    "values typically displayed in vertical dimension"));
+            ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "Z=",
+                    "values typically color coded"));
+            
             
             return ccresult;
             
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             String parmname= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
-            if ( parmname.equals("id") || parmname.equals("x") || parmname.equals("y") ) {
-                
-                Map<String,String> result= getDataObjectNames(cc.resourceURI.toURL());
+            if ( parmname.equals("id") || parmname.equals("X") || parmname.equals("Y") || parmname.equals("Z") ) {
+
+                Map<String,String> result= getDataObjectNames(cc.resourceURI.toURL(), mon);
             
                 List<CompletionContext> ccresult= new ArrayList<>();
+                ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "", this, "arg_0", "", null, true ) );
                 for ( java.util.Map.Entry<String,String> e:result.entrySet() ) {
                     String key= e.getKey();
                     CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, key, this, "arg_0", e.getValue(), null, true );
