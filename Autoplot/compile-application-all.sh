@@ -103,7 +103,8 @@ for i in \
   NetCdfDataSource CefDataSource \
   WavDataSource ImageDataSource ExcelDataSource \
   FitsDataSource OpenDapDataSource \
-  CdfJavaDataSource CDAWebDataSource PDSPPIDataSource HapiDataSource \
+  CdfJavaDataSource CDAWebDataSource PDSPPIDataSource PDSDataSource \
+  HapiDataSource \
   Autoplot; do
     echo $RSYNC -a --exclude .svn ../${i}/src/ temp-src/
     $RSYNC -a --exclude .svn ../${i}/src/ temp-src/
