@@ -18,6 +18,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +26,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -601,8 +601,15 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
                 if ( messageSource.contains("/") ) {
                     int iff= messageSource.lastIndexOf("/");
                     if ( currentFilename.endsWith( messageSource.substring(iff) ) ) {
-                        File ff= DataSetURI.getCacheFilename(DataSetURI.getResourceURI(messageSource));
-                        messageSource= ff.toString();
+                        int i2= messageSource.indexOf("(http");
+                        if ( i2>0 ) {
+                            messageSource= messageSource.substring(i2+1);
+                        }
+                        URI uri= DataSetURI.getResourceURI(messageSource);
+                        if ( uri!=null ) {
+                            File ff= DataSetURI.getCacheFilename(uri);
+                            messageSource= ff.toString();
+                        }
                     }
                 }
                 if ( currentFilename.endsWith(messageSource) ) {
