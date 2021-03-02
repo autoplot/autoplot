@@ -1242,7 +1242,7 @@ public class JythonUtil {
         return result.toString();
     }
 
-    private static Map<String,SimpleNode> definedNamesApp= new HashMap<>();
+    private static final Map<String,SimpleNode> definedNamesApp= new HashMap<>();
     
     static {
         try {
@@ -1258,6 +1258,7 @@ public class JythonUtil {
             definedNamesApp.put("xrange",null);
             definedNamesApp.put("int",null);
             definedNamesApp.put("float",null);
+            definedNamesApp.put("Exception",null);
             
             //TODO: more are needed, this is still experimental!
             InteractiveInterpreter interp= JythonUtil.createInterpreter(true);
