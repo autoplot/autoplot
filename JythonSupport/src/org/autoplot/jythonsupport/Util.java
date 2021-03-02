@@ -18,7 +18,6 @@ import java.nio.channels.WritableByteChannel;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -56,7 +55,6 @@ import org.das2.qds.ops.Ops;
 import org.das2.util.monitor.CancelledOperationException;
 import org.python.core.Py;
 import org.python.core.PyFunction;
-import org.python.core.PyObject;
 
 /**
  * Utilities for Jython scripts in both the datasource and application contexts.
@@ -65,7 +63,8 @@ import org.python.core.PyObject;
 public class Util {
 
     private static final Logger logger= LoggerManager.getLogger("jython.script");
-
+    private static final Logger dslogger= LoggerManager.getLogger("jython.script.ds");
+    
     /**
      * this returns a double indicating the current scripting version, found
      * at the top of autoplot2017.py in AUTOPLOT_DATA/jython/autoplot2017.py.  Do
@@ -185,7 +184,7 @@ public class Util {
      */
     public static QDataSet getDataSet( String suri, DatumRange timeRange, ProgressMonitor monitor ) throws Exception {
         long t0= System.currentTimeMillis();
-        logger.log( Level.FINE, "getDataSet(\"{0}\",DatumRangeUtil.parseTimeRange({1}),monitor)", new Object[]{suri, timeRange} );
+        dslogger.log( Level.FINE, "getDataSet(\"{0}\",DatumRangeUtil.parseTimeRange({1}),monitor)", new Object[]{suri, timeRange} );
         URI uri = DataSetURI.getURI(suri);
         DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
         DataSource result = factory.getDataSource( uri );
@@ -258,7 +257,7 @@ public class Util {
      */
     public static QDataSet getDataSet(String suri, ProgressMonitor mon) throws Exception {
         long t0= System.currentTimeMillis();
-        logger.log( Level.FINE, "getDataSet(\"{0}\",monitor)", suri );
+        dslogger.log( Level.FINE, "getDataSet(\"{0}\",monitor)", suri );
         URI uri = DataSetURI.getURIValid(suri);
         DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor()); //TODO: NullProgressMonitor
         if ( factory==null ) throw new IllegalArgumentException("unsupported extension: "+suri);
