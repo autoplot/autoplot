@@ -161,6 +161,10 @@ public final class SeriesStylePanel extends javax.swing.JPanel implements PlotSt
                 }
                 if ( ds.property(QDataSet.DELTA_PLUS)!=null ) {
                     errorsEnabled= true;
+                } else if ( ds.property(QDataSet.BIN_PLUS)!=null ) {
+                    errorsEnabled= true;
+                } else if ( ds.property(QDataSet.BIN_MAX)!=null ) {
+                    errorsEnabled= true;
                 }
             }
             showLimitsCheckBox.setEnabled(limitsEnabled);
