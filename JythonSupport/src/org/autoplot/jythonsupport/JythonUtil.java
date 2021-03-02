@@ -1249,13 +1249,16 @@ public class JythonUtil {
             
             //TODO: this is silly.  Figure out how to do this correctly:
             definedNamesApp.put("None",null);
+            definedNamesApp.put("True",null);
+            definedNamesApp.put("False",null);
             definedNamesApp.put("len",null);
             definedNamesApp.put("open",null);
             definedNamesApp.put("str",null);
             definedNamesApp.put("range",null);
             definedNamesApp.put("xrange",null);
             definedNamesApp.put("int",null);
-                        
+            definedNamesApp.put("float",null);
+            
             //TODO: more are needed, this is still experimental!
             InteractiveInterpreter interp= JythonUtil.createInterpreter(true);
             
