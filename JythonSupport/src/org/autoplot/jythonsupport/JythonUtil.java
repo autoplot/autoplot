@@ -1348,11 +1348,13 @@ public class JythonUtil {
                         }
                     }
                     st.traverse(this);
+                    
                 } else if ( st instanceof Global ) {
                     Global gst= (Global)st;
                     for ( String s: gst.names ) {
                         this.addName( s );
                     }
+                    
                 } else if ( st instanceof FunctionDef ) {
                     FunctionDef fd= (FunctionDef)st;
                     this.addName( fd.name );
@@ -1364,28 +1366,24 @@ public class JythonUtil {
                     for ( stmtType sst : fd.body ) {
                         handleStmtType(sst);
                     }
+                    
                 } else if ( st instanceof ClassDef ) {
                     ClassDef cld= (ClassDef)st;                    
                     this.addName( cld.name );
-
+                    for ( exprType t : cld.bases ) {
+                        handleExprTypeRead(t);
+                    }
+                    for ( stmtType sst : cld.body ) {
+                        handleStmtType(sst);
+                    }
+                    
                 } else if ( st instanceof Assign ) {
                     Assign ast= ((Assign) st);
                     ast.value.traverse(this); // This should clear it.
                     logger.log(Level.FINE, "assignButNotRead={0}", this.assignButNotReadWarning);
                     logger.log(Level.FINE, "reassignedBeforeRead={0}", this.reassignedBeforeReadWarning);
                     for ( exprType t: ast.targets ) {
-                        //t.traverse(vb);
-                        if ( t instanceof Name ) {
-                            String n= ((Name)t).id;
-                            this.addName( n ); //  !!!! Why must I do this manually?!?!?
-                            SimpleNode notRead= (SimpleNode)this.assignButNotReadWarning.get(n);
-                            if ( notRead!=null ) {
-                                this.reassignedBeforeReadWarning.add( notRead );
-                            }
-                            this.assignButNotReadWarning.put( n, t );
-                        } else {
-                            t.traverse(this);
-                        }
+                        handleExprTypeAssign(t);
                     }
                 } else if ( st instanceof If ) {
                     If ist= ((If) st);
@@ -1400,6 +1398,29 @@ public class JythonUtil {
                 logger.log(Level.SEVERE, null, ex);
             }
         }
+
+        private void handleExprTypeRead( exprType t ) throws Exception {
+            if ( t instanceof Name ) {
+                visitName((Name)t);
+            } else {
+                t.traverse(this);
+            }
+        }
+        
+        private void handleExprTypeAssign( exprType t ) throws Exception {
+            if ( t instanceof Name ) {
+                String n= ((Name)t).id;
+                this.addName( n ); //  !!!! Why must I do this manually?!?!?
+                SimpleNode notRead= (SimpleNode)this.assignButNotReadWarning.get(n);
+                if ( notRead!=null ) {
+                    this.reassignedBeforeReadWarning.add( notRead );
+                }
+                this.assignButNotReadWarning.put( n, t );
+            } else {
+                t.traverse(this);
+            }
+        }
+        
         
         @Override
         public Object visitName(Name node) throws Exception {
