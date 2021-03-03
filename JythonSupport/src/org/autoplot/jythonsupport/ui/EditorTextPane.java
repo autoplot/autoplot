@@ -78,6 +78,7 @@ import org.autoplot.jythonsupport.SimplifyScriptSupport;
 import org.das2.qstream.StreamException;
 import org.python.core.PySyntaxError;
 import org.python.parser.ast.Name;
+import org.python.parser.ast.aliasType;
 
 /**
  * Special editor for Jython scripts, adding undo and redo actions, bigger/smaller
@@ -386,8 +387,18 @@ public class EditorTextPane extends JEditorPane {
             int len=1;
             if ( n instanceof Name ) {
                 len= ((Name)n).id.length();
+                support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+len, EditorAnnotationsSupport.ANNO_CODE_HINT, "assigned but not read", null );
+            } else if ( n instanceof aliasType ) {
+                aliasType a= ((aliasType)n);
+                if ( a.asname!=null ) {
+                    len= a.asname.length();
+                } else {
+                    len= a.name.length();
+                }
+                support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+len, EditorAnnotationsSupport.ANNO_CODE_HINT, "import not used", null );
+            } else {
+                support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+len, EditorAnnotationsSupport.ANNO_CODE_HINT, "assigned but not read", null );
             }
-            support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+len, EditorAnnotationsSupport.ANNO_CODE_HINT, "assigned but not read", null );
         }
     }
     

@@ -1332,8 +1332,10 @@ public class JythonUtil {
                     for ( aliasType a: ((ImportFrom) st).names ) {
                         if ( a.asname!=null ) {
                             this.addName( a.asname );
+                            this.assignButNotReadWarning.put( a.asname, a );
                         } else {
                             this.addName( a.name );
+                            this.assignButNotReadWarning.put( a.name, a );
                         }
                     }
                     st.traverse(this);
