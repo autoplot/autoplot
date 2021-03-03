@@ -1305,7 +1305,7 @@ public class JythonCompletionTask implements CompletionTask {
      * @return 
      */
     private static boolean methodIsSuperset( String m1, String m2 ) {
-        Pattern p0= Pattern.compile("([a-zA-Z0-9/]*\\.html)#([a-zA-Z0-9]*)\\((([a-zA-Z0-9\\.\\[\\]]+)?(,([a-zA-Z0-9\\.\\[\\]]+)*))\\)" );
+        Pattern p0= Pattern.compile("([a-zA-Z0-9/]*\\.html)#([a-zA-Z0-9]*)\\((([a-zA-Z0-9\\.\\[\\]]+)?(,([a-zA-Z0-9\\.\\[\\]]+))*)\\)" );
         Matcher m8= p0.matcher(m1);
         Matcher m9= p0.matcher(m2);
         if ( m8.matches() && m9.matches() ) {
