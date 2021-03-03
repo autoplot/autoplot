@@ -28,7 +28,8 @@
         
         <p>Bugfixes (2021-03-02 r25568):</p>
         <ul> 
-            <li>corrections to error bars, where BIN_PLUS, BIN_MINUS, BIN_MAX, and BIN_MIN are handled with Series Renderer error bars.
+            <li>ascii file containing datum column headers with units would cause runtime error.  Thanks, Sadie!
+            <li>corrections to error bars, where BIN_PLUS, BIN_MINUS, BIN_MAX, and BIN_MIN are handled with Series Renderer error bars.  Thanks, Chris!
             <li>rfe373: more Python reserved words are recognized.
             <li>runtime error when script editor is up and it crashes, because line number was not properly extracted.
             <li>Corrections to PDSDataSource, where it was missing libraries.
@@ -53,6 +54,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>738: bundles with references to bundled DELTA_PLUS, BIN_MAX, etc.  Thanks, Chris!
+            <li>das2stream parser supports error bars.  Thanks, Chris!
             <li>Jython getDataSet calls are logged to logger "jython.script.ds" for easier access.
             <li>729: initial support for PDS4 data using pds4-jparser.
             <li>Autoplot-based HAPI server has experimental support for packet ingest.
