@@ -1379,7 +1379,7 @@ public class JythonUtil {
                     
                 } else if ( st instanceof Assign ) {
                     Assign ast= ((Assign) st);
-                    ast.value.traverse(this); // This should clear it.
+                    handleExprTypeRead(ast.value);
                     logger.log(Level.FINE, "assignButNotRead={0}", this.assignButNotReadWarning);
                     logger.log(Level.FINE, "reassignedBeforeRead={0}", this.reassignedBeforeReadWarning);
                     for ( exprType t: ast.targets ) {
