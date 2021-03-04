@@ -1,11 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot;
 
-import org.autoplot.AppManager;
 import java.awt.AWTEvent;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
@@ -37,7 +32,7 @@ import org.autoplot.datasource.AutoplotSettings;
  * See org.das2.util.awt.LoggingEventQueue, which was a similar experiment from 2005.
  * This now monitors the event thread for hung events.
  *
- * Bugs found: http://sourceforge.net/p/autoplot/bugs/863/
+ * Bugs found: https://sourceforge.net/p/autoplot/bugs/863/
  *
  * @author jbf
  */
@@ -126,15 +121,12 @@ public final class EventThreadResponseMonitor {
      * @return the runnable.
      */
     private Runnable maybeCreateEventThreadRunnable() {
-        return new Runnable() {
-            @Override
-            public void run() {
-                synchronized ( EventThreadResponseMonitor.this ) {
-                    if ( pleasePostEvent ) {
-                        pleasePostEvent= false;
-                        lastPost= System.currentTimeMillis();
-                        SwingUtilities.invokeLater( responseRunnable("") );
-                    }
+        return () -> {
+            synchronized ( EventThreadResponseMonitor.this ) {
+                if ( pleasePostEvent ) {
+                    pleasePostEvent= false;
+                    lastPost= System.currentTimeMillis();
+                    SwingUtilities.invokeLater( responseRunnable("") );
                 }
             }
         };
@@ -146,26 +138,23 @@ public final class EventThreadResponseMonitor {
      * @return a Runnable.
      */
     private Runnable responseRunnable( final String pending ) {
-        return new Runnable() {
-            @Override
-            public void run() {
-                response= System.currentTimeMillis();
-                long levelms= response-lastPost;
-                eventQueue= Thread.currentThread();
-                if ( levelms>WARN_LEVEL_MILLIS ) {
-                    logger.log(Level.FINE, "CURRENT EVENT QUEUE CLEAR TIME: {0} sec\n", levelms/1000);
-                    if ( pending!=null ) {
-                        logger.log(Level.FINE, "events pending:\n");
-                        logger.log(Level.FINE, pending );
-                    }
-                } else {
-                    //System.err.printf( "current event queue clear time: %5.3f sec\n", levelms/1000. );
+        return () -> {
+            response= System.currentTimeMillis();
+            long levelms= response-lastPost;
+            eventQueue= Thread.currentThread();
+            if ( levelms>WARN_LEVEL_MILLIS ) {
+                logger.log(Level.FINE, "CURRENT EVENT QUEUE CLEAR TIME: {0} sec\n", levelms/1000);
+                if ( pending!=null ) {
+                    logger.log(Level.FINE, "events pending:\n");
+                    logger.log(Level.FINE, pending );
                 }
-                pleasePostEvent= true;
-                logger.log(Level.FINER, "eventQueue clear time: {0}", levelms);
-                //pending= dumpPendingEvents();
-                //TODO: this would be the correct time to dumpPendingEvents.
+            } else {
+                //System.err.printf( "current event queue clear time: %5.3f sec\n", levelms/1000. );
             }
+            pleasePostEvent= true;
+            logger.log(Level.FINER, "eventQueue clear time: {0}", levelms);
+            //pending= dumpPendingEvents();
+            //TODO: this would be the correct time to dumpPendingEvents.
         };
     }
 
@@ -176,77 +165,68 @@ public final class EventThreadResponseMonitor {
      * @return the Runnable
      */
     private Runnable checkEventThreadRunnable() {
-        return new Runnable() {
-            @Override
-            public void run() {
-
-                EventQueue instance= Toolkit.getDefaultToolkit().getSystemEventQueue();
-                AWTEvent test= instance.peekEvent(); // Ed says: one peekEvent for every getSystemEventQueue.
-                if ( currentEvent!=null && test==currentEvent ) { // we should have processed this event by now.
-                    logger.log(Level.FINE, "====  long job to process ====");
-                    logger.log(Level.FINE, test.toString() );
-                    logger.log(Level.FINE, "====  end, long job to process ====");
-
-                    String eventId= test.toString();
-                    boolean hungProcess= System.currentTimeMillis()-lastPost > ERROR_LEVEL_MILLIS;
-                    if ( hungProcess && ! eventId.equals(reportedEventId) ) {
-
-                        logger.log(Level.INFO, "PATHOLOGICAL EVENT QUEUE CLEAR TIME, WRITING REPORT TO autoplot_data/log/...\n" );
-
-                        Date now= new Date();
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-                        String timeStamp= sdf.format( now );
-
-                        if ( !DasApplication.hasAllPermission() ) {
+        return () -> {
+            EventQueue instance= Toolkit.getDefaultToolkit().getSystemEventQueue();
+            AWTEvent test= instance.peekEvent(); // Ed says: one peekEvent for every getSystemEventQueue.
+            if ( currentEvent!=null && test==currentEvent ) { // we should have processed this event by now.
+                logger.log(Level.FINE, "====  long job to process ====");
+                logger.log(Level.FINE, test.toString() );
+                logger.log(Level.FINE, "====  end, long job to process ====");
+                
+                String eventId= test.toString();
+                boolean hungProcess= System.currentTimeMillis()-lastPost > ERROR_LEVEL_MILLIS;
+                if ( hungProcess && ! eventId.equals(reportedEventId) ) {
+                    
+                    logger.log(Level.INFO, "PATHOLOGICAL EVENT QUEUE CLEAR TIME, WRITING REPORT TO autoplot_data/log/...\n" );
+                    
+                    Date now= new Date();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+                    String timeStamp= sdf.format( now );
+                    
+                    if ( !DasApplication.hasAllPermission() ) {
+                        return;
+                    }
+                    
+                    String id= System.getProperty("user.name");
+                    
+                    map.put( GuiExceptionHandler.USER_ID, id );
+                    
+                    try {
+                        List<String> bis = AboutUtil.getBuildInfos();
+                        map.put( GuiExceptionHandler.BUILD_INFO, bis );
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
+                    }
+                    int appCount= AppManager.getInstance().getApplicationCount();
+                    map.put( GuiExceptionHandler.APP_COUNT, appCount );
+                    
+                    String s= GuiExceptionHandler.formatReport( map, false, "Autoplot detected hang" );
+                    int hash= eventQueue==null ? 1 : GuiExceptionHandler.hashCode( eventQueue.getStackTrace() );
+                    
+                    String fname= String.format("hang_%010d_%s_%s.xml", hash, timeStamp, id.replaceAll(" ","_") );
+                    
+                    File logdir= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "log" );
+                    if ( !logdir.exists() ) {
+                        if ( !logdir.mkdirs() ) {
                             return;
                         }
-
-                        String id= System.getProperty("user.name");
-
-                        map.put( GuiExceptionHandler.USER_ID, id );
-
-                        try {
-                            List<String> bis = AboutUtil.getBuildInfos();
-                            map.put( GuiExceptionHandler.BUILD_INFO, bis );
-                        } catch (IOException ex) {
-                            logger.log(Level.SEVERE, ex.getMessage(), ex);
-                        }
-                        int appCount= AppManager.getInstance().getApplicationCount();
-                        map.put( GuiExceptionHandler.APP_COUNT, appCount );
-
-                        String s= GuiExceptionHandler.formatReport( map, false, "Autoplot detected hang" );
-                        int hash= eventQueue==null ? 1 : GuiExceptionHandler.hashCode( eventQueue.getStackTrace() );
-
-                        String fname= String.format("hang_%010d_%s_%s.xml", Integer.valueOf(hash), timeStamp, id.replaceAll(" ","_") );
-
-                        File logdir= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "log" );
-                        if ( !logdir.exists() ) {
-                            if ( !logdir.mkdirs() ) {
-                                return;
-                            }
-                        }
-
-                        File f= new File( logdir, fname );
-                        PrintWriter out=null;
-                        try {
-                            out= new PrintWriter( new FileOutputStream(f) );
-                            out.write(s);
-                        } catch ( IOException ex ) {
-                            logger.log( Level.WARNING, null, ex );
-                        } finally {
-                            if ( out!=null ) out.close();
-                        }
-
-                        reportedEventId= eventId;
-
-                        currentEvent= null;
-
                     }
-                } 
-
-                currentEvent=  test;
-
+                    
+                    File f= new File( logdir, fname );
+                    try (PrintWriter out = new PrintWriter( new FileOutputStream(f) )) {
+                        out.write(s);
+                    } catch ( IOException ex ) {
+                        logger.log( Level.WARNING, null, ex );
+                    }
+                    
+                    reportedEventId= eventId;
+                    
+                    currentEvent= null;
+                    
+                }
             }
+            
+            currentEvent=  test;
         };
     }
 
