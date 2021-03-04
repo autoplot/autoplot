@@ -835,6 +835,7 @@ public class EditorContextMenu {
                     editor.doStaticAnalysis();
                 }
             } );
+            mi.setToolTipText("Run Static Code Analysis, looking for unused symbols which might hint at a semmantic error.");
             menu.add( mi );
             
             menu.addSeparator();
