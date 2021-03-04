@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Series Renderer properly handled BIN_MIN and BIN_MAX to support errors.
+        <p><small>Series Renderer properly handles BIN_MIN and BIN_MAX to support errors.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,7 +28,7 @@
         
         <p>Bugfixes (2021-03-02 r25568):</p>
         <ul> 
-            <li>ascii file containing datum column headers with units would cause runtime error.  Thanks, Sadie!
+            <li>ASCII file containing datum column headers with units would cause runtime error.  Thanks, Sadie!
             <li>corrections to error bars, where BIN_PLUS, BIN_MINUS, BIN_MAX, and BIN_MIN are handled with Series Renderer error bars.  Thanks, Chris!
             <li>rfe373: more Python reserved words are recognized.
             <li>runtime error when script editor is up and it crashes, because line number was not properly extracted.
