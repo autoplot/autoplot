@@ -1389,10 +1389,13 @@ public class JythonUtil {
                     }
                 } else if ( st instanceof If ) {
                     If ist= ((If) st);
-                    ist.test.traverse(this);
+                    handleExprTypeRead(ist.test);
                     for ( stmtType sst: ist.body ) {
                         handleStmtType(sst);
                     }
+                    //for ( stmtType sst: ist.orelse ) {
+                    //    handleStmtType(sst);
+                    //}
                 } else if ( st instanceof For ) {
                     For fst= ((For) st);
                     handleExprTypeRead(fst.iter);
