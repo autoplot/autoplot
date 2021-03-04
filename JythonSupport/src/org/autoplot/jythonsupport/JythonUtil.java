@@ -64,10 +64,12 @@ import org.autoplot.datasource.DataSetURI;
 import org.python.core.PyStringMap;
 import org.python.core.PyTuple;
 import org.python.parser.ast.ClassDef;
+import org.python.parser.ast.For;
 import org.python.parser.ast.FunctionDef;
 import org.python.parser.ast.Global;
 import org.python.parser.ast.Import;
 import org.python.parser.ast.ImportFrom;
+import org.python.parser.ast.While;
 import org.python.parser.ast.aliasType;
 
 /**
@@ -1389,6 +1391,19 @@ public class JythonUtil {
                     If ist= ((If) st);
                     ist.test.traverse(this);
                     for ( stmtType sst: ist.body ) {
+                        handleStmtType(sst);
+                    }
+                } else if ( st instanceof For ) {
+                    For fst= ((For) st);
+                    handleExprTypeRead(fst.iter);
+                    handleExprTypeAssign(fst.target);
+                    for ( stmtType sst: fst.body ) {
+                        handleStmtType(sst);
+                    }
+                } else if ( st instanceof While ) {
+                    While fst= ((While) st);
+                    handleExprTypeRead(fst.test);
+                    for ( stmtType sst: fst.body ) {
                         handleStmtType(sst);
                     }
                 } else {
