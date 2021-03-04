@@ -1406,6 +1406,7 @@ public class JythonUtil {
                     for ( stmtType sst: fst.body ) {
                         handleStmtType(sst);
                     }
+                    handleExprTypeRead(fst.test);
                 } else {
                     st.traverse(this);
                 }
