@@ -76,35 +76,23 @@ public class AxisPanel extends javax.swing.JPanel {
         this.dom = applicationModel.dom;
         this.applicationController= this.dom.getController();
         dom.addPropertyChangeListener( Application.PROP_BINDINGS, timeRangeContextControllerEnabler );
-        this.applicationController.addPropertyChangeListener( ApplicationController.PROP_PLOT, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(final PropertyChangeEvent evt) {
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        Plot oldPlot= (Plot)evt.getOldValue();
-                        if ( oldPlot!=null ) {
-                            oldPlot.getXaxis().removePropertyChangeListener( timeRangeAxisControllerEnabler );
-                        }
-                        doPlotBindings();
-                    }
-                };
-                SwingUtilities.invokeLater(run);
-            }
+        this.applicationController.addPropertyChangeListener(ApplicationController.PROP_PLOT, (final PropertyChangeEvent evt) -> {
+            Runnable run= () -> {
+                Plot oldPlot= (Plot)evt.getOldValue();
+                if ( oldPlot!=null ) {
+                    oldPlot.getXaxis().removePropertyChangeListener( timeRangeAxisControllerEnabler );
+                }
+                doPlotBindings();
+            };
+            SwingUtilities.invokeLater(run);
         });
 
         APSplash.checkTime("in axispanel 15");
-        this.applicationController.addPropertyChangeListener( ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        doPlotElementBindings();
-                    }
-                };
-                SwingUtilities.invokeLater(run);
-            }
+        this.applicationController.addPropertyChangeListener(ApplicationController.PROP_PLOT_ELEMENT, (PropertyChangeEvent evt) -> {
+            Runnable run= () -> {
+                doPlotElementBindings();
+            };
+            SwingUtilities.invokeLater(run);
         });
             // there's a strange delay here on a mac.  We work around this be delaying construction on gui.
         APSplash.checkTime("in axispanel 17");
@@ -133,29 +121,31 @@ public class AxisPanel extends javax.swing.JPanel {
         zAxisRangePanel.add(zredit, BorderLayout.CENTER);
         APSplash.checkTime("in axispanel 30");
 
-        xredit.addPropertyChangeListener( new PropertyChangeListener() {
-           @Override
-           public void propertyChange(PropertyChangeEvent ev ) {
-               DatumRange dr= (DatumRange)xredit.getValue();
-               xLog.setEnabled( UnitsUtil.isRatioMeasurement(dr.getUnits() ) );
-               if ( !xLog.isEnabled() ) xLog.setSelected(false);
-           }
+        xredit.addPropertyChangeListener( (PropertyChangeEvent ev) -> {
+            DatumRange dr= (DatumRange)xredit.getValue();
+            Runnable run= () -> {
+                xLog.setEnabled( UnitsUtil.isRatioMeasurement(dr.getUnits() ) );
+                if ( !xLog.isEnabled() ) xLog.setSelected(false);
+            };
+            SwingUtilities.invokeLater(run);
         });
-        yredit.addPropertyChangeListener( new PropertyChangeListener() {
-           @Override
-           public void propertyChange(PropertyChangeEvent ev ) {
-               DatumRange dr= (DatumRange)yredit.getValue();
-               yLog.setEnabled( UnitsUtil.isRatioMeasurement(dr.getUnits() ) );
-               if ( !yLog.isEnabled() ) yLog.setSelected(false);
-           }
+        
+        yredit.addPropertyChangeListener( (PropertyChangeEvent ev) -> {
+            DatumRange dr= (DatumRange)yredit.getValue();
+            Runnable run= () -> {
+                yLog.setEnabled( UnitsUtil.isRatioMeasurement(dr.getUnits() ) );
+                if ( !yLog.isEnabled() ) yLog.setSelected(false);
+            };
+            SwingUtilities.invokeLater(run);
         });
-        zredit.addPropertyChangeListener( new PropertyChangeListener() {
-           @Override
-           public void propertyChange(PropertyChangeEvent ev ) {
-               DatumRange dr= (DatumRange)zredit.getValue();
-               zLog.setEnabled( UnitsUtil.isRatioMeasurement(dr.getUnits() ) );
-               if ( !zLog.isEnabled() ) zLog.setSelected(false);
-           }
+        
+        zredit.addPropertyChangeListener( (PropertyChangeEvent ev) -> {
+            DatumRange dr= (DatumRange)zredit.getValue();
+            Runnable run= () -> {
+                zLog.setEnabled( UnitsUtil.isRatioMeasurement(dr.getUnits() ) );
+                if ( !zLog.isEnabled() ) zLog.setSelected(false);
+            };
+            SwingUtilities.invokeLater(run);
         });
 
         timeRangeEditor1.setNoOneListeningRange( Application.DEFAULT_TIME_RANGE );
