@@ -113,38 +113,39 @@ public class Test017 {
         //Autoplot gets confused about the escaping. "vap+das2server" turns into "vap das2server" and the das2Server file part is removed. This probably has something to do with its TimeSeriesBrowse capability.
 
         // Autoranging fails here, look into this sometime:
-        "006 vap+das2server:http://www-wbd.physics.uiowa.edu/das/das2Server?dataset=das2_1/cluster/wbd/r_wbd&start_time=2007-04-17T08:40Z&end_time=2007-04-17T08:50Z&spacecraft=c1&mode=DSN&antenna=Any&frequencyOffset=Any&fftSize=1024",
+        //"006 vap+das2server:http://www-wbd.physics.uiowa.edu/das/das2Server?dataset=das2_1/cluster/wbd/r_wbd&start_time=2007-04-17T08:40Z&end_time=2007-04-17T08:50Z&spacecraft=c1&mode=DSN&antenna=Any&frequencyOffset=Any&fftSize=1024",
         //Fails to use log for z-axis:
 
-        "007 vap+das2server:http://www-wbd.physics.uiowa.edu/das/das2Server?dataset=das2_1/cluster/wbd/r_wbd&start_time=2007-04-17T08:40Z&end_time=2007-04-17T08:50Z&spacecraft=c1&mode=DSN&antenna=Ey&frequencyOffset=Any&fftSize=1024",
+        //"007 vap+das2server:http://www-wbd.physics.uiowa.edu/das/das2Server?dataset=das2_1/cluster/wbd/r_wbd&start_time=2007-04-17T08:40Z&end_time=2007-04-17T08:50Z&spacecraft=c1&mode=DSN&antenna=Ey&frequencyOffset=Any&fftSize=1024",
         //TEST DATA SOURCE TYPE: 3 CDF
 
-        "008 http://cdaweb.gsfc.nasa.gov/istp_public/data/canopus/mari_mag/1994/cn_k0_mari_19940122_v01.cdf?Epoch",
-        "009 http://cdaweb.gsfc.nasa.gov/istp_public/data/canopus/bars/%Y/cn_k0_bars_%Y%m%d_v...cdf?E_vel&timerange=1993-01-02+through+1993-01-14",
-        "010 CC ftp://cdaweb.gsfc.nasa.gov/pub/data/imp/imp8/mag/mag_15sec_cdaweb/1973/i8_15sec_mag_19731030_v03.cdf",
+        "008 https://cdaweb.gsfc.nasa.gov/istp_public/data/canopus/mari_mag/1994/cn_k0_mari_19940122_v01.cdf?Epoch",
+        "009 https://cdaweb.gsfc.nasa.gov/istp_public/data/canopus/bars/%Y/cn_k0_bars_%Y%m%d_v...cdf?E_vel&timerange=1993-01-02+through+1993-01-14",
+        "010 CC https://cdaweb.gsfc.nasa.gov/istp_public/data/imp/imp8/mag/mag_15sec_cdaweb/1973/i8_15sec_mag_19731030_v03.cdf",
         //No data is drawn:
         //this data no longer exists: "011 ftp://cdaweb.gsfc.nasa.gov/pub/data/themis/tha/l2/fgm/2007/tha_l2_fgm_20070224_v01.cdf?tha_fgh_gse",
         //IndexOutOfBoundsException:
-        "012 http://cdaweb.gsfc.nasa.gov/istp_public/data/cluster/c2/pp/cis/2003/c2_pp_cis_20030104_v02.cdf?N_p__C2_PP_CIS",
+        "012 https://cdaweb.gsfc.nasa.gov/istp_public/data/cluster/c2/pp/cis/2003/c2_pp_cis_20030104_v02.cdf?N_p__C2_PP_CIS",
         //Suspect problem identifying valid data: "" +
         //"013 http://cdaweb.gsfc.nasa.gov/istp_public/data/cluster/c2/pp/fgm/2003/c2_pp_fgm_20030114_v01.cdf?Epoch__C2_PP_FGM",
         //Fails to guess cadence:
-        "014 ftp://cdaweb.gsfc.nasa.gov/pub/data/imp/imp8/mag/mag_15sec_cdaweb/2000/i8_15sec_mag_20000101_v03.cdf?F1_Average_B_15s",
+        //"014 ftp://cdaweb.gsfc.nasa.gov/pub/data/imp/imp8/mag/mag_15sec_cdaweb/2000/i8_15sec_mag_20000101_v03.cdf?F1_Average_B_15s",
+        "014  https://cdaweb.gsfc.nasa.gov/istp_public/data/imp/imp8/mag/mag_15sec_cdaweb/2000/i8_15sec_mag_20000101_v03.cdf?F1_Average_B_15s",
         //Strange message:
 
         //java.lang.RuntimeException: java.lang.IllegalArgumentException: not supported: Lo E PD
         //at org.virbo.autoplot.ApplicationModel.resetDataSetSourceURL(ApplicationModel.java:249)
 
-        "015 ftp://cdaweb.gsfc.nasa.gov/pub/data/lanl/97_spa/2005/l7_k0_spa_20050405_v01.cdf?spa_p_dens",
+        "015 https://cdaweb.gsfc.nasa.gov/istp_public/data/lanl/97_spa/2005/l7_k0_spa_20050405_v01.cdf?spa_p_dens",
         //This is described in bug https://sourceforge.net/tracker2/index.php?func=detail&aid=2620088&group_id=199733&atid=970682",
 
         //No data is displayed:
-        "016 ftp://cdaweb.gsfc.nasa.gov/pub/data/themis/tha/l2/fgm/2007/tha_l2_fgm_20070224_v01.cdf?tha_fgh_gse", // This is corrected and will be released soon. The problem was the "COMPONENT_0" conventions used for Themis lead to the timetags being interpretted as invalid.
+        "016 https://cdaweb.gsfc.nasa.gov/istp_public/data/themis/tha/l2/fgm/2007/tha_l2_fgm_20070224_v01.cdf?tha_fgh_gse", // This is corrected and will be released soon. The problem was the "COMPONENT_0" conventions used for Themis lead to the timetags being interpretted as invalid.
 
         //Vectors plotted as spectrogram:
-        "017 ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/orbit/def_or/1995/ge_or_def_19950101_v02.cdf?GSE_POS",
+        "017 https://cdaweb.gsfc.nasa.gov/istp_public/data/geotail/orbit/def_or/1995/ge_or_def_19950101_v02.cdf?GSE_POS",
         //Works fine, but nicely demonstrates AutoHistogram's robust statistics and the potential to indentify fill values automatically:
-        "018 ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/mgf/mgf_k0/1998/ge_k0_mgf_19980102_v01.cdf?IB",
+        "018 https://cdaweb.gsfc.nasa.gov/istp_public/data/geotail/mgf/mgf_k0/1998/ge_k0_mgf_19980102_v01.cdf?IB",
         //TEST DATA SOURCE TYPE: 4 OpenDAP
 
         //Rank 2 spectrogram over OpenDAP:
@@ -184,7 +185,7 @@ public class Test017 {
         //High resolution OMNI data:
 
         
-        "028 vap+dat:ftp://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min200101.asc?time=field0&column=field14&timeFormat=$Y+$j+$H+$M&validMax=9999",
+        //"028 vap+dat:ftp://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min200101.asc?time=field0&column=field14&timeFormat=$Y+$j+$H+$M&validMax=9999",
        // "028 vap+dat:ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/high_res_omni/monthly_1min/omni_min200101.asc?time=field0&column=field14&timeFormat=$Y+$j+$H+$M&validMax=9999",
         //Comment parameter used:
 
