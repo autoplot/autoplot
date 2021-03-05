@@ -9,7 +9,6 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
@@ -111,7 +110,7 @@ public class Util {
      * @return the server implementation version. 
      */
     public static final String serverVersion() {
-        return "20210214.0924";
+        return "20210305.0741";
     }
     
     static boolean isKey(String key) {
@@ -217,6 +216,21 @@ public class Util {
         }
         dest.close();
         src.close();
+    }
+    
+    /**
+     * return true if this is valid JSON, false otherwise, and log the exception at SEVERE.
+     * @param json
+     * @return 
+     */
+    public static boolean validateJSON( String json ) {
+        try {
+            new JSONObject( json );
+            return true;
+        } catch (JSONException ex) {
+            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
     }
     
     /**

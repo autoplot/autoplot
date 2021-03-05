@@ -1,10 +1,12 @@
 
 package org.autoplot.hapiserver;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -12,15 +14,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.das2.util.FileUtil;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Generate the HAPI server capabilities
  * @author jbf
  */
-public class CapabilitiesServlet extends HttpServlet {
+public class AboutServlet extends HttpServlet {
     
     private static final Logger logger= Logger.getLogger("hapi");    
     
@@ -70,31 +69,26 @@ public class CapabilitiesServlet extends HttpServlet {
         response.setHeader("Access-Control-Allow-Methods","GET" );
         response.setHeader("Access-Control-Allow-Headers","Content-Type" );
         
-        File capFile= new File( Util.getHapiHome(), "capabilities.json" );
-        if ( capFile.exists() ) {
-            String s= FileUtil.readFileToString(capFile);
+        File aboutFile= new File( Util.getHapiHome(), "about.json" );
+        if ( aboutFile.exists() ) {
+            String s= FileUtil.readFileToString(aboutFile);
             if ( !Util.validateJSON(s) ) {
                 throw new ServletException("Internal error, JSON file for capabilities does not parse.");
             }
-            logger.log(Level.FINE, "using cached capabilities file {0}", capFile);
-            Util.transfer( new FileInputStream(capFile), response.getOutputStream() );
-            return;
-        }
-        try (PrintWriter out = response.getWriter()) {
-            JSONObject jo= new JSONObject();
-            jo.put("HAPI",Util.hapiVersion());
-            JSONArray outputFormats= new JSONArray();
-            outputFormats.put( 0, "csv" );
-            outputFormats.put( 1, "binary" );
-            jo.put( "outputFormats", outputFormats );
-            out.write( jo.toString(4) );
-            JSONObject status= new JSONObject();
-            status.put( "code", 1200 );
-            status.put( "message", "OK request successful");
-            jo.put( "status", status );
-            
-        } catch ( JSONException ex ) {
-            throw new ServletException(ex);
+            logger.log(Level.FINE, "using cached about file {0}", aboutFile);
+            Util.transfer( new ByteArrayInputStream(s.getBytes("UTF-8")), response.getOutputStream() );
+        } else {
+            synchronized ( this ) {
+                if ( !aboutFile.exists() ) { // double-check in synchronized block
+                    InputStream in= AboutServlet.class.getResourceAsStream("/templates/about.json");
+                    File tmpFile= File.createTempFile( "aboutServlet", ".json" );
+                    Util.transfer( in, new FileOutputStream(tmpFile) );
+                    tmpFile.renameTo(aboutFile);
+                    logger.log(Level.FINE, "wrote cached about file {0}", aboutFile);
+                }
+                logger.log(Level.FINE, "using cached about file {0}", aboutFile);
+                Util.transfer( new FileInputStream(aboutFile), response.getOutputStream() );
+            }
         }
     }
 
