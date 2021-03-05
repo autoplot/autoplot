@@ -75,6 +75,7 @@ import org.autoplot.jythonsupport.JythonToJavaConverter;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.PyQDataSet;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
+import org.autoplot.jythonsupport.StaticCodeAnalysis;
 import org.das2.qstream.StreamException;
 import org.python.core.PySyntaxError;
 import org.python.parser.ast.Name;
@@ -361,7 +362,7 @@ public class EditorTextPane extends JEditorPane {
         }
         support.clearAnnotations();
         setSelectionEnd( getSelectionStart() ); // clear the selection.
-        List<SimpleNode> usages= JythonUtil.showUsage( script,var );
+        List<SimpleNode> usages= StaticCodeAnalysis.showUsage( script,var );
         for ( SimpleNode n: usages ) {
             support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+var.length(), EditorAnnotationsSupport.ANNO_USAGE, var, null );
         }
@@ -382,7 +383,7 @@ public class EditorTextPane extends JEditorPane {
         String script= getText();
         //support.clearAnnotations();
         setSelectionEnd( getSelectionStart() ); // clear the selection.
-        List<SimpleNode> writeWithoutRead= JythonUtil.showWriteWithoutRead(script);
+        List<SimpleNode> writeWithoutRead= StaticCodeAnalysis.showWriteWithoutRead(script);
         for ( SimpleNode n: writeWithoutRead ) {
             int len=1;
             if ( n instanceof Name ) {
@@ -406,7 +407,7 @@ public class EditorTextPane extends JEditorPane {
         String script= getText();
         //support.clearAnnotations();
         setSelectionEnd( getSelectionStart() ); // clear the selection.
-        List<SimpleNode> writeWithoutRead= JythonUtil.showReadButNotAssigned(script,true,"");
+        List<SimpleNode> writeWithoutRead= StaticCodeAnalysis.showReadButNotAssigned(script,true,"");
         for ( SimpleNode n: writeWithoutRead ) {
             int len=1;
             if ( n instanceof Name ) {
