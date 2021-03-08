@@ -16,6 +16,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -238,26 +239,37 @@ public class AxisPanel extends javax.swing.JPanel {
 
     }
     
-    private class TimeAxisPropertyChangeListener implements PropertyChangeListener {
+    private void runOnEventThread( Runnable run ) {
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            run.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(run);
+            } catch (InterruptedException | InvocationTargetException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    private Runnable timeAxisChangeRunnable= new Runnable() {
         @Override
-        public void propertyChange(PropertyChangeEvent evt) {
+        public void run() {
             Plot p= applicationController.getPlot();
             if ( p!=currentPlot || timeRangeBindingType.equals("xaxis") != UnitsUtil.isTimeLocation( p.getXaxis().getRange().getUnits() ) ) {
                 doCheckTimeRangeControllerEnable();
             }
-        }  
-    }
-    
-    private PropertyChangeListener timeRangeAxisControllerEnabler= new TimeAxisPropertyChangeListener();
-
+        }
+    };
+            
+    private PropertyChangeListener timeRangeAxisControllerEnabler= (PropertyChangeEvent evt ) -> {
+        runOnEventThread( timeAxisChangeRunnable );
+    };
+            
     /**
      * this listens for binding changes to the plot context property.
      */
-    private final PropertyChangeListener timeRangeContextControllerEnabler= new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-            doCheckTimeRangeControllerEnable();
-        }
+    private final PropertyChangeListener timeRangeContextControllerEnabler= (PropertyChangeEvent evt) -> {
+        runOnEventThread( () -> { doCheckTimeRangeControllerEnable(); } );
     };
 
     
@@ -309,13 +321,14 @@ public class AxisPanel extends javax.swing.JPanel {
             }
         }
     };
-            
+    
     /**
      * do the somewhat expensive check to see if the timerange controller needs
      * to be bound.
      */
     private void doCheckTimeRangeControllerEnable( ) {
-        
+      
+        assertEventThread("doCheckTimeRangeControllerEnable");
         String type;
         
         Plot p= applicationController.getPlot();
