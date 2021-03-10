@@ -22,7 +22,7 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <Component id="dataSetSelector" pref="386" max="32767" attributes="0"/>
+              <Component id="dataSetSelectorComboBox" pref="386" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="plotItButton" linkSize="5" min="-2" pref="26" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -34,7 +34,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Component id="plotItButton" linkSize="6" alignment="0" max="32767" attributes="0"/>
           <Component id="inspectButton" linkSize="6" alignment="0" min="-2" pref="20" max="-2" attributes="0"/>
-          <Component id="dataSetSelector" linkSize="6" alignment="0" max="32767" attributes="0"/>
+          <Component id="dataSetSelectorComboBox" linkSize="6" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -87,7 +87,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="plotItButtonActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JComboBox" name="dataSetSelector">
+    <Component class="javax.swing.JComboBox" name="dataSetSelectorComboBox">
       <Properties>
         <Property name="editable" type="boolean" value="true"/>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
@@ -107,8 +107,8 @@
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="popupMenuWillBecomeInvisible" listener="javax.swing.event.PopupMenuListener" parameters="javax.swing.event.PopupMenuEvent" handler="dataSetSelectorPopupMenuWillBecomeInvisible"/>
-        <EventHandler event="popupMenuCanceled" listener="javax.swing.event.PopupMenuListener" parameters="javax.swing.event.PopupMenuEvent" handler="dataSetSelectorPopupMenuCanceled"/>
+        <EventHandler event="popupMenuWillBecomeInvisible" listener="javax.swing.event.PopupMenuListener" parameters="javax.swing.event.PopupMenuEvent" handler="dataSetSelectorComboBoxPopupMenuWillBecomeInvisible"/>
+        <EventHandler event="popupMenuCanceled" listener="javax.swing.event.PopupMenuListener" parameters="javax.swing.event.PopupMenuEvent" handler="dataSetSelectorComboBoxPopupMenuCanceled"/>
       </Events>
     </Component>
   </SubComponents>

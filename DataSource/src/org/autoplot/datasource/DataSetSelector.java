@@ -141,12 +141,12 @@ public class DataSetSelector extends javax.swing.JPanel {
     /** Creates new form DataSetSelector */
     public DataSetSelector() {
         initComponents(); // of the 58milliseconds it takes to create the GUI, 52 are spent in here.
-        dataSetSelector.setEditor( new PromptComboBoxEditor("Enter data location") );
+        dataSetSelectorComboBox.setEditor( new PromptComboBoxEditor("Enter data location") );
         plotItButton.setActionCommand("doplot");
         inspectButton.setActionCommand("inspect");
         
-        editor = ((JTextField) dataSetSelector.getEditor().getEditorComponent());        
-        dataSetSelector.addActionListener( new ActionListener() {
+        editor = ((JTextField) dataSetSelectorComboBox.getEditor().getEditorComponent());        
+        dataSetSelectorComboBox.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ev) {
                 keyModifiers= ev.getModifiers();
@@ -405,8 +405,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                 carotpos = surl.lastIndexOf('/', carotpos - 1);
                 if (carotpos != -1) {
                     String sval= surl.substring(0, carotpos + 1);
-                    dataSetSelector.getEditor().setItem(sval);
-                    dataSetSelector.setSelectedItem(sval);
+                    dataSetSelectorComboBox.getEditor().setItem(sval);
+                    dataSetSelectorComboBox.setSelectedItem(sval);
                     editor.setCaretPosition(carotpos+1);
                     setTextInternal(sval);
                     maybePlotImmediately();
@@ -768,7 +768,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      * @param problems we're entering this GUI because of problems with the URI, so mark these problems.  See DataSourceFactory.reject.
      */
     public void browseSourceType( final List<String> problems ) {
-        String surl = ((String) dataSetSelector.getEditor().getItem()).trim();
+        String surl = ((String) dataSetSelectorComboBox.getEditor().getItem()).trim();
 
         logger.log(Level.FINE, "browseSourceType {0}", surl);
         
@@ -795,7 +795,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                 //JOptionPane.showMessageDialog( this, "<html>Unable to create editor for URI:<br>"+surl );
                 //return;
                 edit= null;
-                wasRejected= true;                
+                wasRejected= true;          
+                logger.log(Level.FINE, "wasRejected= true" );
             }
             if ( edit!=null ) {
                 try {
@@ -877,11 +878,16 @@ public class DataSetSelector extends javax.swing.JPanel {
                     try {
                         ProgressMonitor mon= getMonitor("download file", "downloading file and preparing editor",window);
                         proceed = fedit.prepare(surl, window, mon );
-                        if ( !proceed ) return;
+                        if ( !proceed ) {
+                            logger.finer("proceed=false");
+                            return;
+                        }
                     } catch ( java.io.InterruptedIOException ex ) {
                         setMessage( "download cancelled" );  //TODO: check FTP
+                        logger.finer("download cancelled");
                         return;
                     } catch (Exception ex) {
+                        logger.log(Level.FINER, "exception in prepare: {0}", ex.getMessage());
                         if ( !maybeHandleException(ex) ) {
                             throw new RuntimeException(ex);
                         }
@@ -988,8 +994,10 @@ public class DataSetSelector extends javax.swing.JPanel {
                 
                 if (!dialog.isCancelled()) {
                     String surl= fedit.getURI();                                
-                    logger.log( Level.FINE, "dataSetSelector.setSelectedItem(\"{0}\");", surl );
-                    dataSetSelector.setSelectedItem(surl);
+                    logger.log( Level.FINE, "dataSetSelectorComboBox.setSelectedItem(\"{0}\");", surl );
+                    dataSetSelectorComboBox.setSelectedItem(surl);
+                    logger.log( Level.FINE, "dataSetSelectorComboBox.getEditor().setItem(\"{0}\");", surl );
+                    dataSetSelectorComboBox.getEditor().setItem(surl);
 
                     boolean bug1098= false; //TODO finish off this change.
                     if ( bug1098 ) {
@@ -1023,7 +1031,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      * show completions, as if the scientist had hit tab
      */
     public void showCompletions() {
-        JTextField tf= ((JTextField) dataSetSelector.getEditor().getEditorComponent());
+        JTextField tf= ((JTextField) dataSetSelectorComboBox.getEditor().getEditorComponent());
         final String surl = tf.getText();
         int carotpos = tf.getCaretPosition();
         setMessage("busy: getting completions");
@@ -1200,10 +1208,10 @@ public class DataSetSelector extends javax.swing.JPanel {
                     int xpos = xpos2 - model.getValue();
                     xpos = Math.min(model.getExtent(), xpos);
 
-                    if ( dataSetSelector.isShowing() ) {
-                        completionsPopupMenu.show(dataSetSelector, xpos, dataSetSelector.getHeight());
+                    if ( dataSetSelectorComboBox.isShowing() ) {
+                        completionsPopupMenu.show(dataSetSelectorComboBox, xpos, dataSetSelectorComboBox.getHeight());
                     } else {
-                        JOptionPane.showMessageDialog( dataSetSelector, "<html>Completions for "+getValue()+"<br>are not available when the data set selector is not showing.</html>");
+                        JOptionPane.showMessageDialog(dataSetSelectorComboBox, "<html>Completions for "+getValue()+"<br>are not available when the data set selector is not showing.</html>");
                     }
                     completionsRunnable = null;
                     
@@ -1558,15 +1566,15 @@ public class DataSetSelector extends javax.swing.JPanel {
      */
     public final void addCompletionKeys() {
 
-        ActionMap map = dataSetSelector.getActionMap();
+        ActionMap map = dataSetSelectorComboBox.getActionMap();
         map.put("complete", new AbstractAction("completionsPopup") {
             @Override
             public void actionPerformed(ActionEvent ev) {
                 org.das2.util.LoggerManager.logGuiEvent(ev);
-                String context= (String) dataSetSelector.getEditor().getItem();
-                //String context = (String) dataSetSelector.getSelectedItem();  // This is repeated code.  See browseButtonActionPerformed.
+                String context= (String) dataSetSelectorComboBox.getEditor().getItem();
+                //String context = (String) dataSetSelectorComboBox.getSelectedItem();  // This is repeated code.  See browseButtonActionPerformed.
                 if ( context==null ) context= "";
-                Component c= dataSetSelector.getEditor().getEditorComponent();
+                Component c= dataSetSelectorComboBox.getEditor().getEditorComponent();
                 if ( c instanceof JTextField ) { // which it is...
                     int i= ((JTextField)c).getCaretPosition();
                     context= context.substring(0,i);
@@ -1596,13 +1604,13 @@ public class DataSetSelector extends javax.swing.JPanel {
             }
         });
 
-        dataSetSelector.setActionMap(map);
-        final JTextField tf = (JTextField) dataSetSelector.getEditor().getEditorComponent();
+        dataSetSelectorComboBox.setActionMap(map);
+        final JTextField tf = (JTextField) dataSetSelectorComboBox.getEditor().getEditorComponent();
         tf.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ev) {
                 org.das2.util.LoggerManager.logGuiEvent(ev);                
-                dataSetSelector.setSelectedItem(tf.getText());
+                dataSetSelectorComboBox.setSelectedItem(tf.getText());
                 keyModifiers = ev.getModifiers();
                 try {
                     setValue(getEditor().getText());
@@ -1617,7 +1625,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         setFocusTraversalKeys( KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, trav );
         setFocusTraversalKeys( KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, trav );
 
-        InputMap imap = SwingUtilities.getUIInputMap(dataSetSelector, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        InputMap imap = SwingUtilities.getUIInputMap(dataSetSelectorComboBox, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_MASK), "complete");
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0 ), "complete");
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK), "plot");
@@ -1713,7 +1721,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         inspectButton = new javax.swing.JButton();
         plotItButton = new javax.swing.JButton();
-        dataSetSelector = new javax.swing.JComboBox();
+        dataSetSelectorComboBox = new javax.swing.JComboBox();
 
         setMaximumSize(new java.awt.Dimension(1000, 27));
 
@@ -1742,20 +1750,20 @@ public class DataSetSelector extends javax.swing.JPanel {
             }
         });
 
-        dataSetSelector.setEditable(true);
-        dataSetSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(application will put recent items here)" }));
-        dataSetSelector.setToolTipText("Enter data source address");
-        dataSetSelector.setMaximumSize(new java.awt.Dimension(2000, 27));
-        dataSetSelector.setMinimumSize(new java.awt.Dimension(100, 27));
-        dataSetSelector.setPreferredSize(new java.awt.Dimension(300, 27));
-        dataSetSelector.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
+        dataSetSelectorComboBox.setEditable(true);
+        dataSetSelectorComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(application will put recent items here)" }));
+        dataSetSelectorComboBox.setToolTipText("Enter data source address");
+        dataSetSelectorComboBox.setMaximumSize(new java.awt.Dimension(2000, 27));
+        dataSetSelectorComboBox.setMinimumSize(new java.awt.Dimension(100, 27));
+        dataSetSelectorComboBox.setPreferredSize(new java.awt.Dimension(300, 27));
+        dataSetSelectorComboBox.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
             public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {
             }
             public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {
-                dataSetSelectorPopupMenuWillBecomeInvisible(evt);
+                dataSetSelectorComboBoxPopupMenuWillBecomeInvisible(evt);
             }
             public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
-                dataSetSelectorPopupMenuCanceled(evt);
+                dataSetSelectorComboBoxPopupMenuCanceled(evt);
             }
         });
 
@@ -1764,7 +1772,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(dataSetSelector, 0, 386, Short.MAX_VALUE)
+                .add(dataSetSelectorComboBox, 0, 386, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(plotItButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 26, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -1777,10 +1785,10 @@ public class DataSetSelector extends javax.swing.JPanel {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(plotItButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(inspectButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-            .add(dataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(dataSetSelectorComboBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        layout.linkSize(new java.awt.Component[] {dataSetSelector, inspectButton, plotItButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
+        layout.linkSize(new java.awt.Component[] {dataSetSelectorComboBox, inspectButton, plotItButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
         inspectButton.getAccessibleContext().setAccessibleDescription("inspect contents of file or directory");
     }// </editor-fold>//GEN-END:initComponents
@@ -1798,7 +1806,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
     private void inspectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inspectButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);            
-        String context = ((String) dataSetSelector.getEditor().getItem()).trim();
+        String context = ((String) dataSetSelectorComboBox.getEditor().getItem()).trim();
         if ( context.startsWith("vap ") ) context= "vap+"+context.substring(4);
         String ext = DataSetURI.getExt(context);
         final String fcontext= context;
@@ -1880,7 +1888,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                             setValue(suri);
                             maybePlot(false);
 
-                            //dataSetSelector.setSelectedItem(suri);
+                            //dataSetSelectorComboBox.setSelectedItem(suri);
                         }
                     } else {
                         showCompletions();
@@ -1895,7 +1903,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     }//GEN-LAST:event_inspectButtonActionPerformed
     private boolean popupCancelled = false;
 
-private void dataSetSelectorPopupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_dataSetSelectorPopupMenuWillBecomeInvisible
+private void dataSetSelectorComboBoxPopupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_dataSetSelectorComboBoxPopupMenuWillBecomeInvisible
     if (popupCancelled == false) {
         if ( (keyModifiers&KeyEvent.ALT_MASK ) == KeyEvent.ALT_MASK ) {
             browseSourceType();
@@ -1904,20 +1912,20 @@ private void dataSetSelectorPopupMenuWillBecomeInvisible(javax.swing.event.Popup
         }
     }
     popupCancelled = false;
-}//GEN-LAST:event_dataSetSelectorPopupMenuWillBecomeInvisible
+}//GEN-LAST:event_dataSetSelectorComboBoxPopupMenuWillBecomeInvisible
 
-private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_dataSetSelectorPopupMenuCanceled
+private void dataSetSelectorComboBoxPopupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_dataSetSelectorComboBoxPopupMenuCanceled
     popupCancelled = true;
-}//GEN-LAST:event_dataSetSelectorPopupMenuCanceled
+}//GEN-LAST:event_dataSetSelectorComboBoxPopupMenuCanceled
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox dataSetSelector;
+    private javax.swing.JComboBox dataSetSelectorComboBox;
     private javax.swing.JButton inspectButton;
     private javax.swing.JButton plotItButton;
     // End of variables declaration//GEN-END:variables
 
     /**
-     * this returns the value of the datasetselector, rather than what is pending in the editor.  The problem is pending
+     * this returns the value of the dataSetSelectorComboBox, rather than what is pending in the editor.  The problem is pending
      * operations in the text editor will cause the value to be clobbered.
      * @return
      */
@@ -1933,8 +1941,8 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
      * @return Value of property value.
      */
     public String getValue() {
-        String val= (String)this.dataSetSelector.getEditor().getItem(); //TODO why not use this if selectedItem is null?
-        //String val= (String)this.dataSetSelector.getSelectedItem(); //TODO: check this vs getEditor().getItem() on different platforms
+        String val= (String)this.dataSetSelectorComboBox.getEditor().getItem(); //TODO why not use this if selectedItem is null?
+        //String val= (String)this.dataSetSelectorComboBox.getSelectedItem(); //TODO: check this vs getEditor().getItem() on different platforms
         if ( val==null ) {
             return "";
         } else {
@@ -2095,7 +2103,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
             }
         }
         Collections.reverse(r);
-        dataSetSelector.setModel(new DefaultComboBoxModel(r.toArray()));
+        dataSetSelectorComboBox.setModel(new DefaultComboBoxModel(r.toArray()));
         //editor.setText(value); // don't show most recent one.
         support.refreshRecentFilesMenu();
         firePropertyChange( PROP_RECENT, oldRecent, recent);
@@ -2160,7 +2168,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     }
 
     /**
-     * This is how we allow .vap files to be in the datasetSelector.  We register
+     * This is how we allow .vap files to be in the dataSetSelector.  We register
      * a pattern for which an action is invoked.
      * @param regex regular expression for the trigger.
      * @param action the action to take.
@@ -2186,7 +2194,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     }
 
     /**
-     * allows the dataSetSelector to be used to select files.
+     * allows the dataSetSelectorComboBox to be used to select files.
      * @param b
      */
     public void setDisableDataSources(boolean b) {
@@ -2321,7 +2329,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
 
         JMenu fontMenu= new JMenu( "Font Size" );
 
-        fontMenu.add( new AbstractAction( "Big" ) {
+        fontMenu.add(new AbstractAction( "Big" ) {
             @Override
             public void actionPerformed(ActionEvent ev) {
                 org.das2.util.LoggerManager.logGuiEvent(ev);            
@@ -2329,12 +2337,12 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
                 int size= 16;
                 if ( size>4 && size<18 ) {
                     Font nf= f.deriveFont( (float)size );
-                    dataSetSelector.setFont(nf);
+                    dataSetSelectorComboBox.setFont(nf);
                 }
             }
         });
 
-        fontMenu.add( new AbstractAction( "Normal" ) {
+        fontMenu.add(new AbstractAction( "Normal" ) {
             @Override
             public void actionPerformed(ActionEvent ev) {
                 org.das2.util.LoggerManager.logGuiEvent(ev);            
@@ -2342,12 +2350,12 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
                 int size= getParent().getFont().getSize();
                 if ( size>4 && size<18 ) {
                     Font nf= f.deriveFont( (float)size );
-                    dataSetSelector.setFont(nf);
+                    dataSetSelectorComboBox.setFont(nf);
                 }
             }
         });
 
-        fontMenu.add( new AbstractAction( "Small" ) {
+        fontMenu.add(new AbstractAction( "Small" ) {
             @Override
             public void actionPerformed(ActionEvent ev) {
                 org.das2.util.LoggerManager.logGuiEvent(ev);            
@@ -2355,7 +2363,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
                 int size= 8;
                 if ( size>4 && size<18 ) {
                     Font nf= f.deriveFont( (float)size );
-                    dataSetSelector.setFont(nf);
+                    dataSetSelectorComboBox.setFont(nf);
                 }
             }
         });
@@ -2435,7 +2443,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
 
     @Override
     public void setEnabled(boolean enabled) {
-        dataSetSelector.setEnabled(enabled);
+        dataSetSelectorComboBox.setEnabled(enabled);
         plotItButton.setEnabled(enabled);
         inspectButton.setEnabled(enabled);
         super.setEnabled(enabled); //To change body of generated methods, choose Tools | Templates.
