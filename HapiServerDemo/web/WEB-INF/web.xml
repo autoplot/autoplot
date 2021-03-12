@@ -9,6 +9,11 @@
         <url-pattern>/hapi/data</url-pattern>
     </filter-mapping>
     <servlet>
+        <description>Provides the server about response.</description>
+        <servlet-name>AboutServlet</servlet-name>
+        <servlet-class>org.autoplot.hapiserver.AboutServlet</servlet-class>
+    </servlet>
+    <servlet>
         <description>Provides the server catalog.</description>
         <servlet-name>CatalogServlet</servlet-name>
         <servlet-class>org.autoplot.hapiserver.CatalogServlet</servlet-class>
@@ -32,6 +37,10 @@
         <servlet-name>SetLogLevel</servlet-name>
         <servlet-class>org.autoplot.hapiserver.SetLogLevel</servlet-class>
     </servlet>
+    <servlet-mapping>
+        <servlet-name>AboutServlet</servlet-name>
+        <url-pattern>/hapi/about</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CatalogServlet</servlet-name>
         <url-pattern>/hapi/catalog</url-pattern>

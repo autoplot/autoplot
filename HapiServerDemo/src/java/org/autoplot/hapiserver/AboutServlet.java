@@ -79,12 +79,16 @@ public class AboutServlet extends HttpServlet {
             Util.transfer( new ByteArrayInputStream(s.getBytes("UTF-8")), response.getOutputStream() );
         } else {
             synchronized ( this ) {
-                if ( !aboutFile.exists() ) { // double-check in synchronized block
+                if ( !aboutFile.exists() ) { // double-check within synchronized block
                     InputStream in= AboutServlet.class.getResourceAsStream("/templates/about.json");
-                    File tmpFile= File.createTempFile( "aboutServlet", ".json" );
+                    File tmpFile= new File( Util.getHapiHome(), "_about.json" );
                     Util.transfer( in, new FileOutputStream(tmpFile) );
-                    tmpFile.renameTo(aboutFile);
-                    logger.log(Level.FINE, "wrote cached about file {0}", aboutFile);
+                    if ( !tmpFile.renameTo(aboutFile) ) {
+                        logger.log(Level.SEVERE, "Unable to write to {0}", aboutFile);
+                        throw new IllegalArgumentException("unable to write about file");
+                    } else {
+                        logger.log(Level.FINE, "wrote cached about file {0}", aboutFile);
+                    }
                 }
                 logger.log(Level.FINE, "using cached about file {0}", aboutFile);
                 Util.transfer( new FileInputStream(aboutFile), response.getOutputStream() );

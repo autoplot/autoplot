@@ -3,6 +3,6 @@
     "status": { "code": 1200, "message": "OK"},
     "id":"Jeremy-Demo-Server",
     "title":"Demo Server",
-    "contact":"Jeremy Faden <faden@cottagessystems.com>",
+    "contact":"Jeremy Faden <faden@cottagesystems.com>",
     "description":"This server is used to quickly demonstrate new parts of the API so that clients can be coded and tested.  This contains no data of value."
 }
