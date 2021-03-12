@@ -1131,7 +1131,7 @@ public class JythonUtil {
                             lastLine1= elseLine-1;
                         } else {
                             lastLine1= elseLine+1;
-                            logger.warning("failure to deal with another day...");
+                            logger.fine("failure to deal with another day...");
                             //throw new RuntimeException("this case needs to be dealt with...");
                         }
                     }
@@ -1160,7 +1160,7 @@ public class JythonUtil {
                             appendToResult(result, ss[elseLine]);
                         } else {
                             //appendToResult(result, ss[iff.orelse[0].beginLine]);
-                            logger.warning("failure #2 to deal with another day...");
+                            logger.fine("failure #2 to deal with another day...");
                         }
                         int lastLine2;
                         if ((istatement + 1) < stmts.length) {
