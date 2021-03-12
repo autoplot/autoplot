@@ -55,6 +55,7 @@
         <h3>Some example requests:</h3>
         <a href="catalog">Catalog</a> <i>Show the catalog of available data sets.</i><br>
         <a href="capabilities">Capabilities</a> <i>Capabilities of the server. For example, can it use binary streams to transfer data?</i><br>
+        <a href="about">About</a> <i>More about this server, like contact info.</i><br>
         <br>
         <%
             try {
