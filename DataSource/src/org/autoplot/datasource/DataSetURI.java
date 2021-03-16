@@ -1879,11 +1879,6 @@ public class DataSetURI {
         } else {
             // Since FileSystem.create can't throw IOExceptions, the error is hidden in an IllegalArgumentException.
             // Until this is cleaned up, do this kludge.
-            if ( surlDir.startsWith("file:/") && !( surlDir.contains(".zip/") || surlDir.contains(".ZIP/" ) ) ) {
-                if ( !new File( new URL( split.path ).getPath() ).exists() ) {
-                    throw new FileNotFoundException("directory does not exist: "+split.path );
-                }
-            }
             fs = FileSystem.create( surlDir, mon );
             s = fs.listDirectory("/");
         }
