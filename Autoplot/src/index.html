@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>SSCWeb <a href="http://hapi-server.org/servers/SSCWeb/hapi">HAPI Server</a> returns ephemeris for RBSP mission.
+        <p><small>Annotations are used to document events on plot of the garden house pool temperature.  Spring is coming!
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-03-10 r25599):</p>
+        <p>Bugfixes (2021-03-16 r25599):</p>
+        <ul>
+            <li>GitLabs support handles space-physics/juno/ap-script/-/blob/, where three path elements are found before.
+            <li>change "failure #2 to deal with another day" message to fine, as it apparently doesn't cause any problems.
+        </ul>
+        <p>Older Bugfixes (2021-02-06 r25519):</p>
         <ul>
             <li>bug 2318: reject stuck in loop because dataSetSelector is not reset properly. 
             <li>hang_1409362814: correction where overzealous code would create condition which could hang Autoplot GUI.
@@ -41,21 +46,13 @@
             <li>1816: tweak string representation of a QDataSet for bundles.
             <li>1816: allow bundle to have times for column 0 and DEPEND_0, and not format the column twice to an ASCII file.
         </ul>
-        <p>Older Bugfixes (2021-02-06 r25519):</p>
-        <ul>
-            <li>Script editor USAGES should be green, not yellow, so that yellow can be used for warnings.
-            <li>Jython positional parameters were in the wrong location, where arg_1 is the first argument, not arg_0.
-            <li>correction to ASCII file parsing, where minor bugfix broke things for more common use.
-            <li>clarify security warning that the scientist has run a particular script version already.
-            <li>fix old off-by-one errors in DasAxis and DasPlot codes, producing a cleaner output.
-            <li>ASCII files where header is parsed as data would cause noise as incorrect error was printed.
-            <li>clarify documentation for synchronizeNN that dss must each have monotonic timetags.
-            <li>rte 472115488: NetCDF editor panel had a path where positional parameter could end up null, causing RTE.  Thanks, Shing!
-            <li>Run Batch "Load From File" action uses open dialog, not save dialog.
-            <li>"slices" filter GUI would reset improperly when the string was edited, causing flickering and occasional failure.  Thanks, Shing!
-            <li>correction to support for CDF file psp_fld_l2_mag_RTN_1min[:,0];psp_fld_l2_mag_RTN_1min[:,1];psp_fld_l2_mag_RTN_1min[:,2], where slice is not implemented.  Thanks, Jon N!
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>GitLabs support checks for login redirect and throws meaningful error message.
+            <li>expose DasAxis labelOffset property, since it is useful to the scientists.
+            <li>refactor zip support to treat .kmz files as zip files, more to come.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>737: Jython Static Code Analysis detects unused imports.
             <li>738: bundles with references to bundled DELTA_PLUS, BIN_MAX, etc.  Thanks, Chris!
@@ -64,24 +61,6 @@
             <li>729: initial support for PDS4 data using pds4-jparser.
             <li>Autoplot-based HAPI server has experimental support for packet ingest.
             <li>add averager for range in y.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>add sortInTime function which sorts the data based on DEPEND_0.
-            <li>737: VALID_MAX is used to hint when result of where is used on the wrong array.
-            <li>737: issue warning when real numbers are used to index an array.  Thanks, Sadie!
-            <li>737: introduce static analysis of scripts.
-            <li>OppositeAxisVisible property requests that axes be drawn on both sides of the plot.  Thanks, Bill!
-            <li>Orbit plot tickStyle control allows ticks to be drawn on both sides of line.  Thanks, Bill!
-            <li>Units.nominal() introduced to avoid explicit use of EnumerationUnits: print Units.nominal().createDatum('Chicago')
-            <li>rfe681: handle 404 when creating filesystem where filesystem does not exist.  404 will return an error immediately, while 403 is allowed, assuming there will be no listing requested.
-            <li>das2 DasAxis and DasPlot have new opaqueBackground property, to study handling of label collisions.
-            <li>new whereSequence command quickly finds sequences occurring in rank 1 datasets, for use with file magic numbers.
-            <li>SpaseDataSource refactored to XMLDataSource delegate, to make way for improved PDS support.
-            <li>BufferDataSet now has AsciiDataSet, for numbers encoded within binary source using ASCII, useful with PDS data.
-            <li>rank0 labelsDataSet command should be used where old code would use dataset('Chicago'), which was allowed briefly.
-            <li>Run Batch now keeps track of the last file location (preference) with "Load From File" action, speeding up repeated runs.
-            <li>add rank 4 link command.
         </ul>
         <p>Known issues:</p>
         <ul>
