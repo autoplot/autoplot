@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +36,6 @@ import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.URISplit;
 import org.das2.jythoncompletion.JavadocLookup;
-import org.das2.qds.filters.CollapseFilterEditorPanel;
 import org.das2.qds.ops.Ops;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
@@ -186,9 +184,7 @@ public class JythonOps {
         } else if ( arg0 instanceof PyString ) {
             try {
                 return DataSetUtil.asDataSet( u.parse(arg0.toString()) );
-            } catch ( ParseException ex ) {
-                throw Py.SyntaxError( "unable to parse string: "+arg0 );
-            } catch (IllegalArgumentException ex) {
+            } catch ( ParseException | IllegalArgumentException ex ) {
                 throw Py.SyntaxError( "unable to parse string: "+arg0 );
             }
         } else if ( arg0 instanceof PyNone ) {
@@ -423,9 +419,9 @@ public class JythonOps {
             syspath.insert( 0, new PyString(destDir.toString()) );
             if ( docPath!=null ) {
                 List<String> paths= findJavaPathRoots( FileSystem.create(destDir.toURI()) );
-                for ( String p: paths ) {
+                paths.forEach((p) -> {
                     JavadocLookup.getInstance().setLinkForJavaSignature(p,docPath);
-                }
+                });
             }
             return destDir.toString();
         } else {
@@ -446,15 +442,15 @@ public class JythonOps {
         if ( args!=null ) {
             if ( args instanceof PyDictionary ) {
                 PyDictionary pd= (PyDictionary)args;
-                for ( Object k: pd.keys() ) {
+                pd.keys().forEach((k) -> {
                     jargs.put( String.valueOf(k), String.valueOf( pd.get(  new PyString( String.valueOf(k) ) ) ) ); // TODO: surely there's an easier way
-                }
+                });
                 
             } else if ( args instanceof Map ) {
                 Map m= (Map)args;
-                for ( Object k: ((Map)args).keySet() ) {
+                ((Map)args).keySet().forEach((k) -> {
                     jargs.put( String.valueOf(k), m.get( k ) );
-                }
+                });
             } else {
                 throw new IllegalArgumentException("args cannot be converted to Map");
             }
@@ -480,10 +476,8 @@ public class JythonOps {
      * @param func a jython callable.
      */
     public static void invokeSometime( final PyObject func ) {
-        Runnable run= new Runnable() {
-            public void run() {
-                func.__call__();
-            }
+        Runnable run= () -> {
+            func.__call__();
         };
         new Thread(run).start();
     }
@@ -494,10 +488,8 @@ public class JythonOps {
      * @param arg an object to pass to the callable as an argument
      */
     public static void invokeSometime( final PyObject func, final PyObject arg ) {
-        Runnable run= new Runnable() {
-            public void run() {
-                func.__call__(arg);
-            }
+        Runnable run= () -> {
+            func.__call__(arg);
         };
         new Thread(run).start();
     }
@@ -529,7 +521,7 @@ public class JythonOps {
      * @return list of packages.
      */
     public static List<String> findJavaPathRoots(FileSystem destDir) {
-        return findJavaPathRoots(destDir,"/",new ArrayList<String>() );
+        return findJavaPathRoots(destDir,"/",new ArrayList<>() );
     }
     
     private static List<String> findJavaPathRoots( FileSystem destDir, String prefix, List<String> result) {
@@ -537,7 +529,7 @@ public class JythonOps {
             String[] roots= destDir.listDirectory("/");
             for ( String r: roots ) {
                 if ( r.length()==0 || Character.isUpperCase( r.charAt(0) ) ) {
-                    logger.finer("skipping "+r); //META-INF, Class names...
+                    logger.log(Level.FINER, "skipping {0}", r); //META-INF, Class names...
                 } else {
                     if ( destDir.getFileObject(r).isFolder() ) {
                         try {
