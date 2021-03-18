@@ -77,6 +77,7 @@ public class SimplifyScriptSupport {
      * @param script Jython script
      * @return simplified version of the script.
      * @see #simplifyScriptToCompletions(java.lang.String) 
+     * @see https://github.com/autoplot/dev/tree/master/bugs/sf/1687
      */
     public static String removeSideEffects( String script ) {
         
@@ -92,7 +93,7 @@ public class SimplifyScriptSupport {
             n = (Module)org.python.core.parser.parse( script, "exec" );
          }
 
-         if ( n.body.length>0 && n.body[0].beginLine > n.beginLine ) {
+         if ( false && n.body.length>0 && n.body[0].beginLine > n.beginLine ) {
              logger.fine("shifting line numbers!");
              int shift= n.body[0].beginLine - n.beginLine;
              // strange bug here.
