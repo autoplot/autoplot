@@ -41,12 +41,6 @@ import org.python.parser.ast.exprType;
 public class SimplifyScriptSupport {
     
     private static final Logger logger= LoggerManager.getLogger("jython.simplify");
-        
-    private static final String GETDATASET_CODE= 
-        "def getDataSet( uri, timerange='', monitor='' ):\n" +
-        "    'return a dataset for the given URI'\n" +
-        "    return dataset(0)\n\n";
-    
     
     /**
      * eat away at the end of the script until it can be parsed.
@@ -143,7 +137,7 @@ public class SimplifyScriptSupport {
          
          HashSet variableNames= new HashSet();
          variableNames.add("getParam");  // this is what allows the getParam calls to be included.
-         variableNames.add("getDataSet"); // this will be replaced with a trivial call for completions.
+         //variableNames.add("getDataSet"); // new class lookup is cleaner method for this.
          variableNames.add("str");  // include casts.
          variableNames.add("int");
          variableNames.add("long");
@@ -175,7 +169,7 @@ public class SimplifyScriptSupport {
              if ( n==null ) throw ex0;
 
              String s= simplifyScriptToGetCompletions( ss, n.body, variableNames, 1, lastLine, 0 );
-             s= GETDATASET_CODE + s;
+             //s= GETDATASET_CODE + s;
              s= "PWD='file:/tmp/'\n"+s;
              return s;
              
@@ -659,7 +653,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
       * TODO: update this after Python upgrade.  
       */
      private static final String[] okay= new String[] { "range,", "xrange,", "irange,", 
-         "getParam,", "getDataSet,", "lower,", "upper,", "URI,", "URL,", 
+         "getParam,", "lower,", "upper,", "URI,", "URL,", 
          "setScriptDescription", "setScriptTitle", "setScriptLabel", "setScriptIcon",
          "DatumRangeUtil,", "TimeParser,",
          "str,", "int,", "long,", "float,", "datum,", "datumRange,", "dataset,",
@@ -780,16 +774,23 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
             String funcName= ((Name)c.func).id;
             switch (funcName) {
                 case "getApplication":
-                    return "from org.autoplot import AutoplotUI\n" + id + JythonCompletionTask.__CLASSTYPE +"=AutoplotUI\n";
+                    return "from org.autoplot import AutoplotUI\n" + id + JythonCompletionTask.__CLASSTYPE +" = AutoplotUI\n";
                 case "getApplicationModel":
-                    return "from org.autoplot import ApplicationModel\n" + id + JythonCompletionTask.__CLASSTYPE + "=ApplicationModel\n";
+                    return "from org.autoplot import ApplicationModel\n" + id + JythonCompletionTask.__CLASSTYPE + " = ApplicationModel\n";
                 case "getDataSource":
-                    return "from org.autoplot.datasource import DataSource\n" + id + JythonCompletionTask.__CLASSTYPE + "=DataSource\n";
+                    return "from org.autoplot.datasource import DataSource\n" + id + JythonCompletionTask.__CLASSTYPE + " = DataSource\n";
+                case "getDataSet":
+                case "xtags":
+                case "ytags":
+                case "findgen":
+                case "linspace":
+                case "fftPower":
+                    return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet\n";
                 default:
                     break;
             }
             if ( isConstructor(funcName,importedNames) ) {
-                return id + JythonCompletionTask.__CLASSTYPE + "=" + funcName + "\n";
+                return id + JythonCompletionTask.__CLASSTYPE + " = " + funcName + "  # isConstructor\n";
             }
         } else if ( c.func instanceof Attribute ) {
             // p=PngWalkTool.start(...)
@@ -797,7 +798,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
             if ( at.value instanceof Name ) {
                 String attrName= ((Name)at.value).id;
                 if ( attrName.equals("PngWalkTool") && at.attr.equals("start") ) {
-                    return "from org.autoplot.pngwalk import PngWalkTool\n" + id + JythonCompletionTask.__CLASSTYPE + "=PngWalkTool\n";
+                    return "from org.autoplot.pngwalk import PngWalkTool\n" + id + JythonCompletionTask.__CLASSTYPE + "= PngWalkTool\n";
                 } else if ( importedNames.containsKey(attrName) ) {
                     Class claz= getClassFor( attrName, importedNames );
                     if ( claz==null ) return null;
@@ -805,7 +806,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                     String methodName= at.attr; 
                     for ( Method m: mm ) {
                         if ( m.getName().equals( methodName ) ) { //&& m.getGenericParameterTypes().length ) {
-                            return  id + JythonCompletionTask.__CLASSTYPE + "= "+m.getReturnType().getSimpleName();
+                            return  id + JythonCompletionTask.__CLASSTYPE + " = "+m.getReturnType().getSimpleName();
                         }
                     }
                     return null;
@@ -821,7 +822,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                             Class rclz= m.getReturnType();
                             String rclzn= rclz.getSimpleName();
                             return "from " + rclz.getPackage().getName() + " import " + rclzn+"\n" + 
-                                    id + JythonCompletionTask.__CLASSTYPE + "= "+rclzn;
+                                    id + JythonCompletionTask.__CLASSTYPE + " = "+rclzn;
                         } catch (NoSuchMethodException | SecurityException ex) {
                             logger.log(Level.SEVERE, null, ex);
                         }

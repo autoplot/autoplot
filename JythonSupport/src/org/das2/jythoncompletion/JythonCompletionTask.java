@@ -1363,7 +1363,7 @@ public class JythonCompletionTask implements CompletionTask {
                     if ( !ss.startsWith(cc.completable) ){
                         continue;
                     } else {
-                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss, "Local Variable "+ss, null, 1, LOCALVARICON ) );
+                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss, ss, null, 1, LOCALVARICON ) );
                         continue;
                     }
                 }
