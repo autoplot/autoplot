@@ -54,6 +54,7 @@ import org.autoplot.jythonsupport.JythonOps;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
+import org.das2.util.FileUtil;
 import org.python.core.PyFloat;
 
 /**
@@ -111,6 +112,7 @@ public class JythonCompletionTask implements CompletionTask {
 
     @Override
     public void query(CompletionResultSet arg0) throws PyException {
+        //this is the heart of completions.  Search for "heart" when looking for a place to put a breakpoint.
         try {
             JythonCompletionProvider.getInstance().setMessage("busy: getting completions");
             CompletionContext cc = CompletionSupport.getCompletionContext(editor);
@@ -232,6 +234,7 @@ public class JythonCompletionTask implements CompletionTask {
         try {
             interp.exec(JythonRefactory.fixImports(eval));
         } catch ( PyException ex ) {
+            // something bad has happened, remove side effects (we might have done this already) and try again.
             eval = editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
             String eval1 = SimplifyScriptSupport.removeSideEffects( eval );
             //String eval2 = JythonUtil.removeSideEffects( eval );
