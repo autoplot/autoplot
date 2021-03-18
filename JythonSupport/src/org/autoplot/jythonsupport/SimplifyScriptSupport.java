@@ -1,8 +1,11 @@
 
 package org.autoplot.jythonsupport;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -276,7 +279,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
         if ( !ss[0].equals("# simplifyScriptToGetCompletions") ) {
             throw new IllegalArgumentException("first line must be '# simplifyScriptToGetCompletions'");
         }
-        HashSet<String> importedNames= new HashSet<>();
+        Map<String,String> importedNames= new LinkedHashMap<>();
         
         int acceptLine= -1; // first line to accept
         int currentLine= beginLine; // current line we are writing (0 is first line).
@@ -320,15 +323,10 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                  }
              }
               
-            if ( o instanceof org.python.parser.ast.Import ) {
-                org.python.parser.ast.Import i= (org.python.parser.ast.Import)o;
-                for ( aliasType n: i.names ) {
-                    importedNames.add( n.name );
-                }
-            } else if ( o instanceof org.python.parser.ast.ImportFrom ) {
+            if ( o instanceof org.python.parser.ast.ImportFrom ) {
                 org.python.parser.ast.ImportFrom i= (org.python.parser.ast.ImportFrom)o;
                 for ( aliasType n: i.names ) {
-                    importedNames.add( n.name );
+                    importedNames.put( n.name, i.module );
                 }
             } 
             
@@ -745,13 +743,28 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
       * @param name
       * @return true if the name is known to be a constructor call.
       */
-     private static boolean isConstructor( String name, Set<String> importedNames ) {
-         if ( importedNames.contains(name) ) {
+     private static boolean isConstructor( String name,  Map<String,String> importedNames ) {
+         if ( importedNames.containsKey(name) ) {
              return name.length()>2 && Character.isUpperCase(name.charAt(0)) && Character.isLowerCase(name.charAt(1));
          } else {
              return false;
          }
         
+     }
+     
+     /**
+      * return the class for the name.
+      * @param name
+      * @param importedNames
+      * @return 
+      */
+     private static Class getClassFor( String name,  Map<String,String> importedNames ) {
+         String path= importedNames.get(name);
+        try {
+            return Class.forName(path + "." + name );
+        } catch (ClassNotFoundException ex) {
+            return null;
+        }
      }
      
      /**
@@ -761,7 +774,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
       * @param importedNames
       * @return 
       */
-     private static String maybeIdentifyReturnType( String id, Call c, Set<String> importedNames ) {
+     private static String maybeIdentifyReturnType( String id, Call c, Map<String,String> importedNames ) {
         if ( c.func instanceof Name ) {
             String funcName= ((Name)c.func).id;
             switch (funcName) {
@@ -784,6 +797,30 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                 String attrName= ((Name)at.value).id;
                 if ( attrName.equals("PngWalkTool") && at.attr.equals("start") ) {
                     return "from org.autoplot.pngwalk import PngWalkTool\n" + id + JythonCompletionTask.__CLASSTYPE + "=PngWalkTool\n";
+                } else if ( importedNames.containsKey(attrName) ) {
+                    String p= importedNames.get(attrName);
+                    return  id + JythonCompletionTask.__CLASSTYPE + "= "+p+"." + attrName;
+                }
+            } else if ( at.value instanceof Call ) {
+                String x= maybeIdentifyReturnType( "x", (Call)at.value, importedNames );
+                if ( x!=null ) {
+                    int i= x.indexOf("=");
+                    try {
+                        Class clz= Class.forName(x.substring(i+1).trim());
+                        try {
+                            Method m = clz.getMethod( at.attr ); //TODO: this is only single-argument calls
+                            Class rclz= m.getReturnType();
+                            String rclzn= rclz.getSimpleName();
+                            return "from " + rclz.getPackage().getName() + " import " + rclzn+"\n" + 
+                                    id + JythonCompletionTask.__CLASSTYPE + "= "+rclzn;
+                        } catch (NoSuchMethodException | SecurityException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                    } catch (ClassNotFoundException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                        return null; // shouldn't happen
+                    }
+                    return null;
                 }
             }
         }
@@ -803,7 +840,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
       * @param a the assignment
       * @return the Jython code to insert.
       */
-     private static String maybeIdentifyType(Assign a, Set<String> importedNames ) {
+     private static String maybeIdentifyType(Assign a, Map<String,String> importedNames ) {
         if ( a.targets.length==1 ) {
             exprType target= a.targets[0];
             exprType et = (exprType) target;

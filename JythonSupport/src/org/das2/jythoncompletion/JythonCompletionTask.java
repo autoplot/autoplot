@@ -1359,8 +1359,11 @@ public class JythonCompletionTask implements CompletionTask {
             List<String> argss= new ArrayList();
             if (ss.startsWith(cc.completable)) {
                 if ( ss.endsWith(__CLASSTYPE) ) {
-                    ss= ss.substring(0,ss.length()-7);
+                    ss= ss.substring(0,ss.length()-__CLASSTYPE.length());
                     if ( !ss.startsWith(cc.completable) ){
+                        continue;
+                    } else {
+                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss, "Local Variable "+ss, null, 1, LOCALVARICON ) );
                         continue;
                     }
                 }
