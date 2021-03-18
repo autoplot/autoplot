@@ -276,6 +276,8 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
         if ( !ss[0].equals("# simplifyScriptToGetCompletions") ) {
             throw new IllegalArgumentException("first line must be '# simplifyScriptToGetCompletions'");
         }
+        HashSet<String> importedNames= new HashSet<>();
+        
         int acceptLine= -1; // first line to accept
         int currentLine= beginLine; // current line we are writing (0 is first line).
         StringBuilder result= new StringBuilder();
@@ -305,7 +307,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
              if ( o instanceof Assign && !simplifyScriptToGetCompletionsOkay( o, variableNames ) ) {
                  // check for method calls where we know the type.
                  Assign a= (Assign)o;
-                 String cl= maybeIdentifyType( a );
+                 String cl= maybeIdentifyType( a, importedNames );
                  if ( cl!=null ) {
                      if ( acceptLine>-1 ) {
                          for (int i = acceptLine; i < beginLine; i++) {
@@ -317,7 +319,19 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                      continue;
                  }
              }
-               
+              
+            if ( o instanceof org.python.parser.ast.Import ) {
+                org.python.parser.ast.Import i= (org.python.parser.ast.Import)o;
+                for ( aliasType n: i.names ) {
+                    importedNames.add( n.name );
+                }
+            } else if ( o instanceof org.python.parser.ast.ImportFrom ) {
+                org.python.parser.ast.ImportFrom i= (org.python.parser.ast.ImportFrom)o;
+                for ( aliasType n: i.names ) {
+                    importedNames.add( n.name );
+                }
+            } 
+            
             if (o instanceof org.python.parser.ast.If) {
                 if (acceptLine > -1) {
                     for (int i = acceptLine; i < beginLine; i++) {
@@ -501,7 +515,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                         if ( a1 instanceof Name ) {
                             exprType a2= cc.args[1];
                             if ( a2 instanceof Name && variableNames.contains(((Name)a2).id)) {
-                                return String.format( "%s__class=%s # inserted by maybeModelAssert", ((Name)a1).id, ((Name)a2).id );
+                                return String.format( "%s"+JythonCompletionTask.__CLASSTYPE+"=%s # inserted by maybeModelAssert", ((Name)a1).id, ((Name)a2).id );
                             }
                         }
                     }
@@ -562,7 +576,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                          String id = ((Name) target).id;
                          variableNames.add(id);
                          logger.log(Level.FINEST, "assign to variable {0}", id);
-                         //TODO: can we identify type?  Insert <id>__type=... for completions.
+                         //TODO: can we identify type?  Insert <id>__CLASSTYPE=... for completions.
                      } else if ( et instanceof Attribute ) {
                          Attribute at= (Attribute)et;
                          while ( at.value instanceof Attribute || at.value instanceof Subscript ) {
@@ -724,6 +738,22 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
          }
      }
 
+     /** 
+      * placeholder for code which identifies constructors.  This is fragile and
+      * misguided code, which looks for the Java convention of uppercase 
+      * letter starting.
+      * @param name
+      * @return true if the name is known to be a constructor call.
+      */
+     private static boolean isConstructor( String name, Set<String> importedNames ) {
+         if ( importedNames.contains(name) ) {
+             return name.length()>2 && Character.isUpperCase(name.charAt(0)) && Character.isLowerCase(name.charAt(1));
+         } else {
+             return false;
+         }
+        
+     }
+     
      /**
       * if we recognize the function that is called, then go ahead and keep track
       * of the type.  This is a quick and cheesy implementation that just looks
@@ -733,11 +763,11 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
       * <li>x= getDataSource() -- x is a DataSource
       * <li>x= PngWalkTool.start() -- x is a PngWalkTool
       * </ul>
-      * 
-      * @param a
-      * @return 
+      * See bug https://sourceforge.net/p/autoplot/bugs/2319/ for some discussion on this.
+      * @param a the assignment
+      * @return the Jython code to insert.
       */
-     private static String maybeIdentifyType(Assign a) {
+     private static String maybeIdentifyType(Assign a, Set<String> importedNames ) {
         if ( a.targets.length==1 ) {
             exprType target= a.targets[0];
             exprType et = (exprType) target;
@@ -747,12 +777,18 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                     Call c= (Call)a.value;
                     if ( c.func instanceof Name ) {
                         String funcName= ((Name)c.func).id;
-                        if ( funcName.equals("getApplication") ) {
-                            return "from org.autoplot import AutoplotUI\n" + id + "__class=AutoplotUI\n";
-                        } else if ( funcName.equals("getApplicationModel") ) {
-                            return "from org.autoplot import ApplicationModel\n" + id + "__class=ApplicationModel\n";
-                        } else if ( funcName.equals("getDataSource") ) {
-                            return "from org.autoplot.datasource import DataSource\n" + id + "__class=DataSource\n";
+                        switch (funcName) {
+                            case "getApplication":
+                                return "from org.autoplot import AutoplotUI\n" + id + JythonCompletionTask.__CLASSTYPE +"AutoplotUI\n";
+                            case "getApplicationModel":
+                                return "from org.autoplot import ApplicationModel\n" + id + JythonCompletionTask.__CLASSTYPE + "=ApplicationModel\n";
+                            case "getDataSource":
+                                return "from org.autoplot.datasource import DataSource\n" + id + JythonCompletionTask.__CLASSTYPE + "=DataSource\n";
+                            default:
+                                break;
+                        }
+                        if ( isConstructor(funcName,importedNames) ) {
+                            return id + JythonCompletionTask.__CLASSTYPE + "=" + funcName + "\n";
                         }
                     } else if ( c.func instanceof Attribute ) {
                         // p=PngWalkTool.start(...)
@@ -760,7 +796,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                         if ( at.value instanceof Name ) {
                             String attrName= ((Name)at.value).id;
                             if ( attrName.equals("PngWalkTool") && at.attr.equals("start") ) {
-                                return "from org.autoplot.pngwalk import PngWalkTool\n" + id + "__class=PngWalkTool\n";
+                                return "from org.autoplot.pngwalk import PngWalkTool\n" + id + JythonCompletionTask.__CLASSTYPE + "=PngWalkTool\n";
                             }
                         }
                     }

@@ -112,7 +112,6 @@ public class JythonCompletionTask implements CompletionTask {
 
     @Override
     public void query(CompletionResultSet arg0) throws PyException {
-        //this is the heart of completions.  Search for "heart" when looking for a place to put a breakpoint.
         try {
             JythonCompletionProvider.getInstance().setMessage("busy: getting completions");
             CompletionContext cc = CompletionSupport.getCompletionContext(editor);
@@ -262,7 +261,7 @@ public class JythonCompletionTask implements CompletionTask {
         } catch (PyException ex) {
             try {
                 // check to see if we have identified the class of the symbol.
-                PyObject occ= interp.eval(cc.contextString+"__class");
+                PyObject occ= interp.eval(cc.contextString+__CLASSTYPE);
                 if ( occ!=null && occ instanceof PyJavaClass ) {
                     lcontextClass= (PyJavaClass)occ;
                 } else {
@@ -474,6 +473,7 @@ public class JythonCompletionTask implements CompletionTask {
         }
         return count;
     }
+    public static final String __CLASSTYPE = "__CLASSTYPE";
 
     /**
      * 
@@ -1358,7 +1358,7 @@ public class JythonCompletionTask implements CompletionTask {
             List<String> signatures= new ArrayList();
             List<String> argss= new ArrayList();
             if (ss.startsWith(cc.completable)) {
-                if ( ss.endsWith("__class") ) {
+                if ( ss.endsWith(__CLASSTYPE) ) {
                     ss= ss.substring(0,ss.length()-7);
                     if ( !ss.startsWith(cc.completable) ){
                         continue;
