@@ -755,6 +755,42 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
      }
      
      /**
+      * return the line of code needed to use the result, or null.
+      * @param id
+      * @param c
+      * @param importedNames
+      * @return 
+      */
+     private static String maybeIdentifyReturnType( String id, Call c, Set<String> importedNames ) {
+        if ( c.func instanceof Name ) {
+            String funcName= ((Name)c.func).id;
+            switch (funcName) {
+                case "getApplication":
+                    return "from org.autoplot import AutoplotUI\n" + id + JythonCompletionTask.__CLASSTYPE +"=AutoplotUI\n";
+                case "getApplicationModel":
+                    return "from org.autoplot import ApplicationModel\n" + id + JythonCompletionTask.__CLASSTYPE + "=ApplicationModel\n";
+                case "getDataSource":
+                    return "from org.autoplot.datasource import DataSource\n" + id + JythonCompletionTask.__CLASSTYPE + "=DataSource\n";
+                default:
+                    break;
+            }
+            if ( isConstructor(funcName,importedNames) ) {
+                return id + JythonCompletionTask.__CLASSTYPE + "=" + funcName + "\n";
+            }
+        } else if ( c.func instanceof Attribute ) {
+            // p=PngWalkTool.start(...)
+            Attribute at= (Attribute)c.func;
+            if ( at.value instanceof Name ) {
+                String attrName= ((Name)at.value).id;
+                if ( attrName.equals("PngWalkTool") && at.attr.equals("start") ) {
+                    return "from org.autoplot.pngwalk import PngWalkTool\n" + id + JythonCompletionTask.__CLASSTYPE + "=PngWalkTool\n";
+                }
+            }
+        }
+        return null;
+     }
+     
+     /**
       * if we recognize the function that is called, then go ahead and keep track
       * of the type.  This is a quick and cheesy implementation that just looks
       * for a few names.  For example,<ul>
@@ -775,31 +811,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                 String id = ((Name) target).id;
                 if ( a.value instanceof Call ) {
                     Call c= (Call)a.value;
-                    if ( c.func instanceof Name ) {
-                        String funcName= ((Name)c.func).id;
-                        switch (funcName) {
-                            case "getApplication":
-                                return "from org.autoplot import AutoplotUI\n" + id + JythonCompletionTask.__CLASSTYPE +"AutoplotUI\n";
-                            case "getApplicationModel":
-                                return "from org.autoplot import ApplicationModel\n" + id + JythonCompletionTask.__CLASSTYPE + "=ApplicationModel\n";
-                            case "getDataSource":
-                                return "from org.autoplot.datasource import DataSource\n" + id + JythonCompletionTask.__CLASSTYPE + "=DataSource\n";
-                            default:
-                                break;
-                        }
-                        if ( isConstructor(funcName,importedNames) ) {
-                            return id + JythonCompletionTask.__CLASSTYPE + "=" + funcName + "\n";
-                        }
-                    } else if ( c.func instanceof Attribute ) {
-                        // p=PngWalkTool.start(...)
-                        Attribute at= (Attribute)c.func;
-                        if ( at.value instanceof Name ) {
-                            String attrName= ((Name)at.value).id;
-                            if ( attrName.equals("PngWalkTool") && at.attr.equals("start") ) {
-                                return "from org.autoplot.pngwalk import PngWalkTool\n" + id + JythonCompletionTask.__CLASSTYPE + "=PngWalkTool\n";
-                            }
-                        }
-                    }
+                    return maybeIdentifyReturnType( id, c, importedNames );
                 }
             }
         }
