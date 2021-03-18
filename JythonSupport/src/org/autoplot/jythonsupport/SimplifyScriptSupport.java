@@ -280,6 +280,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
             throw new IllegalArgumentException("first line must be '# simplifyScriptToGetCompletions'");
         }
         Map<String,String> importedNames= new LinkedHashMap<>();
+        importedNames.put( "Color", "java.awt" );
         
         int acceptLine= -1; // first line to accept
         int currentLine= beginLine; // current line we are writing (0 is first line).
@@ -798,8 +799,16 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                 if ( attrName.equals("PngWalkTool") && at.attr.equals("start") ) {
                     return "from org.autoplot.pngwalk import PngWalkTool\n" + id + JythonCompletionTask.__CLASSTYPE + "=PngWalkTool\n";
                 } else if ( importedNames.containsKey(attrName) ) {
-                    String p= importedNames.get(attrName);
-                    return  id + JythonCompletionTask.__CLASSTYPE + "= "+p+"." + attrName;
+                    Class claz= getClassFor( attrName, importedNames );
+                    if ( claz==null ) return null;
+                    Method[] mm= claz.getMethods();
+                    String methodName= at.attr; 
+                    for ( Method m: mm ) {
+                        if ( m.getName().equals( methodName ) ) { //&& m.getGenericParameterTypes().length ) {
+                            return  id + JythonCompletionTask.__CLASSTYPE + "= "+m.getReturnType().getSimpleName();
+                        }
+                    }
+                    return null;
                 }
             } else if ( at.value instanceof Call ) {
                 String x= maybeIdentifyReturnType( "x", (Call)at.value, importedNames );
