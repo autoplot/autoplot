@@ -48,7 +48,7 @@ public class DefaultCompletionItem implements CompletionItem  {
      * @param text used for sort and insert prefix.  Typically same as complete.
      * @param offset number of chars already typed.
      * @param complete complete.substring(offset) is inserted.
-     * @param label the human readable presentation of this, maybe with html.
+     * @param label the human readable presentation of this, maybe with html.  Note an arrow "->" will split the label to the left and right.
      * @param link handed over to DefaultDocumentationItem, if non null.  May be "inline:&lt;html&gt;..."
      * @param sortPriority 1 is default.
      * @param icon the icon to show next to this completion.
@@ -58,6 +58,10 @@ public class DefaultCompletionItem implements CompletionItem  {
         if ( complete.length()<offset ) {
             throw new IllegalArgumentException("completion offset is less than length");
         }
+        //
+        //if ( label!=null && label.contains("plotx") ) {
+        //    System.err.println("here we stop for completions");
+        //}
         this.text= text;
         this.offset= offset;
         this.complete= complete;
