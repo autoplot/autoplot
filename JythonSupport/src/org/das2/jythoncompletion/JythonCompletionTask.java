@@ -54,8 +54,8 @@ import org.autoplot.jythonsupport.JythonOps;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
-import org.das2.util.FileUtil;
 import org.python.core.PyFloat;
+import org.python.core.PyReflectedField;
 
 /**
  * Completions for Jython code.  The completion task is created with the
@@ -71,10 +71,22 @@ public class JythonCompletionTask implements CompletionTask {
     private static final ImageIcon LOCALVARICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/localVariable.png") );
     private static final ImageIcon JAVA_CLASS_ICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/javaClass.png") );
     private static final ImageIcon JYTHONCOMMANDICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/jythonCommand.png") );
+    private static final ImageIcon JAVA_JYTHON_METHOD_ICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/javaJythonMethod.png") );
     private static final ImageIcon JAVA_FIELD_ICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/javaStaticField.png") );
     private static final ImageIcon JAVA_METHOD_ICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/javaMethod.png") );
     private static final ImageIcon JAVA_STATIC_METHOD_ICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/javaStaticMethod.png") );
     private static final ImageIcon JAVA_CONSTRUCTOR_ICON= new ImageIcon( JythonCompletionTask.class.getResource("ui/javaConstructor.png") );
+    
+    private static final int JYTHONCOMMAND_SORT = 2;
+    private static final int JAVAMETHOD_SORT = 1;
+    private static final int JAVACLASS_SORT = 1;
+    private static final int PYREFLECTEDFIELD_SORT = 3;
+    private static final int PYCLASS_SORT = 3;
+    private static final int LOCALVAR_SORT = -10;
+    private static final int AUTOVAR_SORT = -3;
+    private static final int AUTOCOMMAND_SORT = -2;
+    private static final int AUTOVARHIDE_SORT = 9;
+    private static final int JAVASTATICFIELD_SORT=1;
     
     public static final String CLIENT_PROPERTY_INTERPRETER_PROVIDER = "JYTHON_INTERPRETER_PROVIDER";
     JTextComponent editor;
@@ -380,7 +392,7 @@ public class JythonCompletionTask implements CompletionTask {
                                 label= ss + args;
                                 icon= getIconFor(jm);
                                 String link = getLinkForJavaSignature(signature);
-                                rs.addItem( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, 1, icon ) );
+                                rs.addItem( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, JAVAMETHOD_SORT, icon ) );
                                 count++;
                                 notAlreadyAdded= false;
                             }
@@ -461,9 +473,9 @@ public class JythonCompletionTask implements CompletionTask {
                     } else {
                         String link = getLinkForJavaSignature(signature);
                         if ( icon==null ) {
-                            rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
+                            rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, JAVAMETHOD_SORT, null ) );
                         } else {
-                            rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, 1, icon ) );
+                            rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, JAVAMETHOD_SORT, icon ) );
                         }
                         
                     }
@@ -761,7 +773,7 @@ public class JythonCompletionTask implements CompletionTask {
         String[] keywords = new String[]{ "def", "elif", "except", "from", "for", "finally", "import", "while", "print", "raise"}; //TODO: not complete
         for (String kw : keywords) {
             if (kw.startsWith(cc.completable)) {
-                if ( rs!=null ) rs.addItem(new DefaultCompletionItem(kw, cc.completable.length(), kw, kw, null, 0, JYTHONCOMMANDICON));
+                if ( rs!=null ) rs.addItem(new DefaultCompletionItem(kw, cc.completable.length(), kw, kw, null, JYTHONCOMMAND_SORT, JYTHONCOMMANDICON));
                 count++;
             }
         }
@@ -1464,7 +1476,7 @@ public class JythonCompletionTask implements CompletionTask {
                             link= "http://autoplot.org/developer.scripting#DOM";
                         }
                         logger.log(Level.FINER, "DefaultCompletionItem({0},{1},\n{2}{3},\n{4},\n{5})", new Object[]{ss, cc.completable.length(), ss, argss.get(jj), label, link});
-                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + argss.get(jj), label, link, 1, icon ) );
+                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + argss.get(jj), label, link, JAVAMETHOD_SORT, icon ) );
                     }
                 } else {
                     String link = null;
@@ -1478,15 +1490,31 @@ public class JythonCompletionTask implements CompletionTask {
                         link= getLinkForJavaSignature( getPyJavaClassSignature( (PyJavaClass)po ) );
                     }
                     if ( po instanceof PyString ) {
-                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label+" -> "+po+"", link) );
+                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label+" -> "+po+"", link, JAVASTATICFIELD_SORT, null ) );
                     } else {
                         if ( allStatic ) {
-                            result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args + ".", label, link) );
+                            result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args + ".", label, link, JAVACLASS_SORT, JAVA_CLASS_ICON) );
                         } else {
                             if ( po instanceof PyJavaClass ) {
-                                result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, 1, JAVA_CONSTRUCTOR_ICON ) );
+                                result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, JAVACLASS_SORT, JAVA_CONSTRUCTOR_ICON ) );
+                            } else if ( po.getType().toString().contains("Command") ) { // TODO: FIX THIS
+                                if ( ss.equals("plotx") ) continue;
+                                result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, AUTOCOMMAND_SORT, JAVA_JYTHON_METHOD_ICON ) );
+                            } else if ( po instanceof PyFunction ) {
+                                result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, AUTOCOMMAND_SORT, JAVA_JYTHON_METHOD_ICON ) );
+                            } else if ( po instanceof PyClass ) {
+                                result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, PYCLASS_SORT, JAVA_JYTHON_METHOD_ICON ) );
+                            } else if ( po instanceof PyReflectedField ) {
+                                result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, PYREFLECTEDFIELD_SORT, JAVA_JYTHON_METHOD_ICON ) );
                             } else {
-                                result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, 1, LOCALVARICON ) );
+                                if ( ss.equals("monitor") || ss.equals("dom") || ss.equals("PI") || ss.equals("TAU") || ss.equals("E") ) {
+                                    result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, AUTOVAR_SORT, LOCALVARICON ) );
+                                } else if ( ss.equals("params") || ss.equals("outputParams") || ss.equals("__doc__") ) {
+                                    //things I don't want developers to see
+                                    result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, AUTOVARHIDE_SORT, LOCALVARICON ) );
+                                } else {
+                                    result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, LOCALVAR_SORT, LOCALVARICON ) );
+                                }
                             }
                         }
                     }
