@@ -170,7 +170,7 @@ public class SimplifyScriptSupport {
 
              String s= simplifyScriptToGetCompletions( ss, n.body, variableNames, 1, lastLine, 0 );
              //s= GETDATASET_CODE + s;
-             s= "PWD='file:/tmp/'\n"+s;
+             //s= "PWD='file:/tmp/'\n"+s;
              return s;
              
          } catch ( PySyntaxError ex ) {
