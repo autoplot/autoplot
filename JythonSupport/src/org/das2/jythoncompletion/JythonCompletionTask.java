@@ -239,8 +239,6 @@ public class JythonCompletionTask implements CompletionTask {
         if (eval.endsWith(":\n")) {
             eval = eval + "  pass\n";
         }
-
-        putInGetDataSetStub( interp );
         
         try {
             interp.exec(JythonRefactory.fixImports(eval));
@@ -255,7 +253,6 @@ public class JythonCompletionTask implements CompletionTask {
             }
             try {
                 eval= sanitizeLeaveImports(eval);
-                interp.exec("PWD=file:/tmp/\n");
                 interp.exec(eval);
             } catch (PyException ex2 ) {            
                 rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex2.toString()));
