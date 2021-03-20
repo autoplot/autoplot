@@ -72,6 +72,10 @@ public class CompletionSettings {
     protected boolean safeCompletions = true;
     public static final String PROP_SAFE_COMPLETIONS = "safeCompletions";
 
+    /**
+     * completions should be based on a refactored code which avoids slow commands like "getDataSet".
+     * @return 
+     */
     public boolean isSafeCompletions() {
         return safeCompletions;
     }
