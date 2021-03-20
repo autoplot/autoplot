@@ -255,6 +255,7 @@ public class JythonCompletionTask implements CompletionTask {
             }
             try {
                 eval= sanitizeLeaveImports(eval);
+                interp.exec("PWD=file:/tmp/\n");
                 interp.exec(eval);
             } catch (PyException ex2 ) {            
                 rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex2.toString()));
@@ -807,6 +808,7 @@ public class JythonCompletionTask implements CompletionTask {
         } 
         
         try {
+            interp.exec("PWD='file:/tmp/'");
             interp.exec( JythonRefactory.fixImports(eval) );
         } catch ( PyException ex ) {
             if ( rs!=null ) rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
@@ -986,6 +988,7 @@ public class JythonCompletionTask implements CompletionTask {
         } 
         
         try {
+            interp.exec("PWD=file:/tmp/\n");
             interp.exec(eval);
         } catch ( PyException ex ) {
             result.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
@@ -1453,7 +1456,7 @@ public class JythonCompletionTask implements CompletionTask {
                 } else {
                     logger.log(Level.FINE, "skipping {0}", ss);
                 }
-                    
+                   
                 keySort( signatures, signatures, labels, argss );
                 
                 if ( !signatures.isEmpty() ) {
@@ -1490,7 +1493,11 @@ public class JythonCompletionTask implements CompletionTask {
                         link= getLinkForJavaSignature( getPyJavaClassSignature( (PyJavaClass)po ) );
                     }
                     if ( po instanceof PyString ) {
-                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label+" -> "+po+"", link, JAVASTATICFIELD_SORT, null ) );
+                        if ( !ss.equals("__name__") ) {
+                            result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label+" -> "+po+"", link, LOCALVAR_SORT, LOCALVARICON ) );
+                        } else {
+                            result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label+" -> "+po+"", link, JAVASTATICFIELD_SORT, null ) );
+                        }
                     } else {
                         if ( allStatic ) {
                             result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args + ".", label, link, JAVACLASS_SORT, JAVA_CLASS_ICON) );
@@ -1507,13 +1514,23 @@ public class JythonCompletionTask implements CompletionTask {
                             } else if ( po instanceof PyReflectedField ) {
                                 result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, PYREFLECTEDFIELD_SORT, JAVA_JYTHON_METHOD_ICON ) );
                             } else {
-                                if ( ss.equals("monitor") || ss.equals("dom") || ss.equals("PI") || ss.equals("TAU") || ss.equals("E") ) {
-                                    result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, AUTOVAR_SORT, LOCALVARICON ) );
-                                } else if ( ss.equals("params") || ss.equals("outputParams") || ss.equals("__doc__") ) {
-                                    //things I don't want developers to see
-                                    result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, AUTOVARHIDE_SORT, LOCALVARICON ) );
-                                } else {
-                                    result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, LOCALVAR_SORT, LOCALVARICON ) );
+                                switch (ss) {
+                                    case "monitor":
+                                    case "dom":
+                                    case "PI":
+                                    case "TAU":
+                                    case "E":
+                                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, AUTOVAR_SORT, LOCALVARICON ) );
+                                        break;
+                                    case "params":
+                                    case "outputParams":
+                                    case "__doc__":
+                                        //things I don't want developers to see
+                                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, AUTOVARHIDE_SORT, LOCALVARICON ) );
+                                        break;
+                                    default:
+                                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, LOCALVAR_SORT, LOCALVARICON ) );
+                                        break;
                                 }
                             }
                         }
