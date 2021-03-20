@@ -312,7 +312,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                             appendToResult(result, ss[i]).append("\n");
                          }
                      }
-                     appendToResult(result,cl);
+                     appendToResult(result,getIndent(theLine)+cl);
                      acceptLine= -1;
                      continue;
                  }
@@ -785,12 +785,13 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                 case "findgen":
                 case "linspace":
                 case "fftPower":
-                    return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet\n";
+                case "magnitude":
+                    return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet    # return type from " + funcName + " (line789)\n";
                 default:
                     break;
             }
             if ( isConstructor(funcName,importedNames) ) {
-                return id + JythonCompletionTask.__CLASSTYPE + " = " + funcName + "  # isConstructor\n";
+                return id + JythonCompletionTask.__CLASSTYPE + " = " + funcName + "  # isConstructor (line794)\n";
             }
         } else if ( c.func instanceof Attribute ) {
             // p=PngWalkTool.start(...)
@@ -798,7 +799,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
             if ( at.value instanceof Name ) {
                 String attrName= ((Name)at.value).id;
                 if ( attrName.equals("PngWalkTool") && at.attr.equals("start") ) {
-                    return "from org.autoplot.pngwalk import PngWalkTool\n" + id + JythonCompletionTask.__CLASSTYPE + "= PngWalkTool\n";
+                    return "from org.autoplot.pngwalk import PngWalkTool\n" + id + JythonCompletionTask.__CLASSTYPE + "= PngWalkTool #(line802)\n";
                 } else if ( importedNames.containsKey(attrName) ) {
                     Class claz= getClassFor( attrName, importedNames );
                     if ( claz==null ) return null;
@@ -806,7 +807,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                     String methodName= at.attr; 
                     for ( Method m: mm ) {
                         if ( m.getName().equals( methodName ) ) { //&& m.getGenericParameterTypes().length ) {
-                            return  id + JythonCompletionTask.__CLASSTYPE + " = "+m.getReturnType().getSimpleName();
+                            return  id + JythonCompletionTask.__CLASSTYPE + " = "+m.getReturnType().getSimpleName() + "  # (line810)\n";
                         }
                     }
                     return null;
@@ -822,7 +823,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                             Class rclz= m.getReturnType();
                             String rclzn= rclz.getSimpleName();
                             return "from " + rclz.getPackage().getName() + " import " + rclzn+"\n" + 
-                                    id + JythonCompletionTask.__CLASSTYPE + " = "+rclzn;
+                                    id + JythonCompletionTask.__CLASSTYPE + " = "+rclzn  + "   # (line826)";
                         } catch (NoSuchMethodException | SecurityException ex) {
                             logger.log(Level.SEVERE, null, ex);
                         }
