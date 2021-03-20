@@ -223,7 +223,7 @@ public class JythonCompletionTask implements CompletionTask {
         logger.fine("queryMethods");
         PythonInterpreter interp;
 
-            interp = getInterpreter();
+        interp = getInterpreter();
 
         String eval;
         if ( JythonCompletionProvider.getInstance().settings().isSafeCompletions() ) {
@@ -805,7 +805,6 @@ public class JythonCompletionTask implements CompletionTask {
         } 
         
         try {
-            interp.exec("PWD='file:/tmp/'");
             interp.exec( JythonRefactory.fixImports(eval) );
         } catch ( PyException ex ) {
             if ( rs!=null ) rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
@@ -985,7 +984,6 @@ public class JythonCompletionTask implements CompletionTask {
         } 
         
         try {
-            interp.exec("PWD=file:/tmp/\n");
             interp.exec(eval);
         } catch ( PyException ex ) {
             result.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
@@ -1044,6 +1042,7 @@ public class JythonCompletionTask implements CompletionTask {
                     interp.execfile(in,"imports2017.py");
                 }
             }
+            interp.set("PWD","file:/tmp/");
             return interp;
         } catch (IOException ex) {
             throw new RuntimeException(ex);
