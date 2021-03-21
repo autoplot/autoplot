@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Annotations are used to document events on plot of the garden house pool temperature.  Spring is coming!
+        <p><small>The garden pool is uncovered and running, and crocus flowers are poking up.  Happy Spring!
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-03-16 r25599):</p>
+        <p>Bugfixes (2021-03-20 r25632):</p>
         <ul>
+            <li>2321: correction to Webstart release, after I failed to properly update the JNLP files.  Thanks, Darrell!
+            <li>mechanism for identifing Javadoc version used by each package was slow, so redo it so that each jar IDs version just once.
             <li>GitLabs support handles space-physics/juno/ap-script/-/blob/, where three path elements are found before.
             <li>change "failure #2 to deal with another day" message to fine, as it apparently doesn't cause any problems.
         </ul>
@@ -48,6 +50,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>improvements to Jython completions allows variable completions on assignments to functions.
             <li>GitLabs support checks for login redirect and throws meaningful error message.
             <li>expose DasAxis labelOffset property, since it is useful to the scientists.
             <li>refactor zip support to treat .kmz files as zip files, more to come.
