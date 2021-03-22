@@ -26,10 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-03-20 r25632):</p>
+        <p>Bugfixes (2021-03-22 r25638):</p>
         <ul>
+            <li>bugfix: lanlNNSpectrogram's use of samePopulation would crash if ds1 or ds2 was constant, causing "width is zero" message.
             <li>2321: correction to Webstart release, after I failed to properly update the JNLP files.  Thanks, Darrell!
-            <li>mechanism for identifing Javadoc version used by each package was slow, so redo it so that each jar IDs version just once.
+            <li>mechanism for identifying Javadoc version used by each package was slow, so redo it so that each jar IDs version just once.
             <li>GitLabs support handles space-physics/juno/ap-script/-/blob/, where three path elements are found before.
             <li>change "failure #2 to deal with another day" message to fine, as it apparently doesn't cause any problems.
         </ul>
@@ -50,6 +51,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>check cadence when displaying timetags, and use more digits to show cadence.  Thanks, Jolene!
             <li>improvements to Jython completions allows variable completions on assignments to functions.
             <li>GitLabs support checks for login redirect and throws meaningful error message.
             <li>expose DasAxis labelOffset property, since it is useful to the scientists.
