@@ -53,15 +53,20 @@ public class SimplifyScriptSupport {
         String[] ss = JythonUtil.splitCodeIntoLines(null, script);
         String scri = script;
         int lastLine = ss.length;
+        boolean parseOkay= false;
         while (lastLine > 0) {
             scri = JythonUtil.join(Arrays.copyOfRange(ss, 0, lastLine), "\n");
             try {
                 org.python.core.parser.parse(scri, "exec");
+                parseOkay= true;
                 break;
             } catch (Exception e) {
                 logger.finest("fail to parse, no worries.");
             }
             lastLine--;
+        }
+        if ( parseOkay==false ) {
+            scri= "";
         }
         logger.exiting("SimplifyScriptSupport", "alligatorParse");
         return scri;
