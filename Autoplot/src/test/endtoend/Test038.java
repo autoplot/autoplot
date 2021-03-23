@@ -49,6 +49,7 @@ public class Test038 {
      * and run the script within interactive time.
      * 
      * @param file
+     * @return the number of problems encountered.
      * @throws Exception 
      */
     private static int doTests( String testId, String file ) {
@@ -87,7 +88,7 @@ public class Test038 {
             return 0;
         } catch ( IOException | PyException ex ) {
             ex.printStackTrace();
-            System.err.println( String.format( "failed within %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
+            System.err.println( String.format( "*** failed within %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
             return 1;
         }
 
@@ -204,7 +205,7 @@ public class Test038 {
             
         } catch ( Exception ex ) {
             ex.printStackTrace();
-            System.err.println( String.format( "failed within %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
+            System.err.println( String.format( "*** failed within %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
             return 1;
         }
     }
@@ -231,7 +232,7 @@ public class Test038 {
             return 0;
         } catch ( IOException | PyException ex ) {
             ex.printStackTrace();
-            System.err.println( String.format( "failed within %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
+            System.err.println( String.format( "*** failed within %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
             return 1;
         }
 
@@ -296,7 +297,8 @@ public class Test038 {
         interp.eval("1+2");
         System.err.println( String.format( "== first initialize in %d millis\n", System.currentTimeMillis()-t0 ) );
         
-        if ( testGetParams()==0 ) {
+        int t= testGetParams();
+        if ( t==0 ) {
             System.err.println("ALL OKAY!");
         } else {
             throw new IllegalStateException("at least one of the tests failed.");
