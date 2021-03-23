@@ -8,7 +8,9 @@ import gov.nasa.pds.label.object.FieldType;
 import gov.nasa.pds.label.object.TableObject;
 import gov.nasa.pds.label.object.TableRecord;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.text.ParseException;
@@ -16,18 +18,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
 import org.das2.datum.TimeParser;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.qds.ArrayDataSet;
 import org.das2.qds.DDataSet;
+import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -113,6 +125,31 @@ public class PdsDataSource extends AbstractDataSource {
         return rank1;
     }
     
+    
+     /**
+     *
+     * @param monitor the value of monitor
+     * @throws IOException
+     * @throws SAXException
+     */
+    private Document readXML( File f ) throws IOException, SAXException {
+        DocumentBuilder builder= null;
+        try {
+            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        } catch (ParserConfigurationException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        Document document;
+        
+        try (InputStream in = new FileInputStream(f)) {
+            InputSource source = new InputSource( in );
+            document = builder.parse(source);
+        }     
+        
+        return document;
+    }
+    
     @Override
     public org.das2.qds.QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         String name= getParam("arg_0","");
@@ -124,7 +161,9 @@ public class PdsDataSource extends AbstractDataSource {
         DataSetURI.getFile(fileUrl,mon );
                     
         Label label = Label.open( xmlfile.toURI().toURL() ); 
-
+        
+        Document doc= readXML(xmlfile);
+                
         List<String> names= new ArrayList<>();
         String X= getParam("X","");
         if ( !X.equals("") ) {
@@ -175,7 +214,7 @@ public class PdsDataSource extends AbstractDataSource {
             if ( results[i]!=null ) continue;
             name= names.get(i);
             for ( ArrayObject a: label.getObjects(ArrayObject.class) ) {
-
+                Units units=null;
                 if ( a.getName().equals(name) ) {
                     if ( a.getAxes()==2 ) {
                         double[][] dd= a.getElements2D();
@@ -188,9 +227,26 @@ public class PdsDataSource extends AbstractDataSource {
                         DDataSet ddresult= DDataSet.wrap( dd, qube );
                         if ( name.equals("Epoch") ) {
                             logger.info("Epoch kludge results in CDF_TT2000 units");
-                            ddresult.putProperty( QDataSet.UNITS, Units.cdfTT2000 );
+                            units= Units.cdfTT2000;
+                            ddresult.putProperty( QDataSet.UNITS, units );
                         }
                         results[i]= ddresult;
+                    }
+                    
+                    XPathFactory factory= XPathFactory.newInstance();
+                    XPath xpath= factory.newXPath();
+
+                    if ( doc!=null ) {
+                        if ( units==null || !UnitsUtil.isTimeLocation(units) ) {
+                            String labl=      (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/name/text()", doc );
+                            if ( labl.length()==0 ) labl= name;
+                            ((MutablePropertyDataSet)results[i]).putProperty( QDataSet.LABEL, labl );
+                            String title= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/description/text()", doc );
+                            if ( title.length()>0 ) {
+                                ((MutablePropertyDataSet)results[i]).putProperty( QDataSet.TITLE, title.trim() );
+                            }
+                        }
+                        
                     }
                 }
             }
