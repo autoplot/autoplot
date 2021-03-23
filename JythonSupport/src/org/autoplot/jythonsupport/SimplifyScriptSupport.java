@@ -43,14 +43,14 @@ public class SimplifyScriptSupport {
     private static final Logger logger= LoggerManager.getLogger("jython.simplify");
     
     /**
-     * eat away at the end of the script until it can be parsed.
+     * eat away at the end of the script until it can be parsed
      * @param script a Jython script.
      * @return the script with lines at the end removed such that the script can compile.
      * @see JythonCompletionTask#trimLinesToMakeValid(java.lang.String) 
      */
     public static String alligatorParse( String script ) {
         logger.entering( "SimplifyScriptSupport", "alligatorParse");
-        String[] ss= JythonUtil.splitCodeIntoLines( "# simplifyScriptToGetCompletions", script );
+        String[] ss= JythonUtil.splitCodeIntoLines( null, script );
         String scri=script;
         int lastLine= ss.length;
         while ( lastLine>0 ) {
@@ -277,7 +277,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
         importedNames.put( "Color", "java.awt" );
         
         int acceptLine= -1; // first line to accept
-        int currentLine= beginLine; // current line we are writing (0 is first line).
+        int currentLine= beginLine; // current line we are writing.
         StringBuilder result= new StringBuilder();
         for (int istatement=0; istatement<stmts.length; istatement++) {
              stmtType o= stmts[istatement];
@@ -341,7 +341,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                  } else {
                      includeBlock= false;
                  }
-                 int lastLine1;  //lastLine1 is the last line of the "if" clause.
+                 int lastLine1;  //lastLine1 is the last line of the "if" clause. (inclusive)
                  int elseLine=-1;                 
                  if ( iff.orelse!=null && iff.orelse.length>0 ) {
                      if ( iff.orelse[0].beginLine>0 ) {
@@ -400,7 +400,7 @@ public static String simplifyScriptToGetCompletions( String[] ss, stmtType[] stm
                      currentLine= acceptLine;
                  }
     
-             } else {
+             } else { // Assign, etc
                  if ( simplifyScriptToGetCompletionsOkay( o, variableNames ) ) {
                      if ( acceptLine<0 ) {
                          acceptLine= beginLine;
