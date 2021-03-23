@@ -237,6 +237,11 @@ public class PdsDataSource extends AbstractDataSource {
                     XPath xpath= factory.newXPath();
 
                     if ( doc!=null ) {
+                        String sunits= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Element_Array/unit/text()", doc );
+                        sunits= sunits.trim();
+                        if ( sunits.length()>0 ) {
+                            ((MutablePropertyDataSet)results[i]).putProperty( QDataSet.UNITS, Units.lookupUnits(sunits) );
+                        }
                         if ( units==null || !UnitsUtil.isTimeLocation(units) ) {
                             String labl=      (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/name/text()", doc );
                             if ( labl.length()==0 ) labl= name;
