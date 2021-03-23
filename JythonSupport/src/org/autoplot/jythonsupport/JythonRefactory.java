@@ -283,7 +283,7 @@ public class JythonRefactory {
                                 fullNameMap.put( p+cl, n+cl );
                             }
                             writer.println();                            
-                            if ( !p.equals(n) ) {
+                            if ( !p.equals(n) && !( p.equals("autoplot")) ) {  // allow "import autoplot as A" to pass.
                                 logger.log(Level.FINER, "affected line {0} of {2}: {1}", new Object[]{reader.getLineNumber(), line, name});
                                 affected= true;
                             }
