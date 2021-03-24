@@ -15,13 +15,16 @@ import java.net.URI;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
@@ -38,6 +41,8 @@ import org.das2.qds.util.DataSetBuilder;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -182,6 +187,10 @@ public class PdsDataSource extends AbstractDataSource {
         if ( !name.equals("") ) {
             names.add(name);
         }
+        
+        //TODO: Call a routine which scans through the document looking for
+        //dependencies.  See vap+pds:https://space.physics.uiowa.edu/voyager/data/voyager-2-pws-wf/data/1987/vg2_pws_wf_1987-04-21T17_v0.9.xml?Waveform
+        //which shows where the time and time offset arrays can be identified for Waveform.
             
         QDataSet result=null;
         QDataSet[] results= new QDataSet[names.size()];
@@ -209,10 +218,10 @@ public class PdsDataSource extends AbstractDataSource {
                 }
             }
         }
-        
+
         for ( int i=0; i<names.size(); i++ ) {
             if ( results[i]!=null ) continue;
-            name= names.get(i);
+            name= names.get(i);            
             for ( ArrayObject a: label.getObjects(ArrayObject.class) ) {
                 Units units=null;
                 if ( a.getName().equals(name) ) {
@@ -232,14 +241,14 @@ public class PdsDataSource extends AbstractDataSource {
                         }
                         results[i]= ddresult;
                     }
-                    
-                    XPathFactory factory= XPathFactory.newInstance();
-                    XPath xpath= factory.newXPath();
 
                     if ( doc!=null ) {
+                        XPathFactory factory= XPathFactory.newInstance();
+                        XPath xpath= factory.newXPath();
+
                         String sunits= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Element_Array/unit/text()", doc );
                         sunits= sunits.trim();
-                        if ( sunits.length()>0 ) {
+                        if ( sunits.length()>0 && units==null ) {
                             ((MutablePropertyDataSet)results[i]).putProperty( QDataSet.UNITS, Units.lookupUnits(sunits) );
                         }
                         if ( units==null || !UnitsUtil.isTimeLocation(units) ) {
@@ -256,7 +265,7 @@ public class PdsDataSource extends AbstractDataSource {
                 }
             }
         }
-                
+        
         if ( result==null ) {
             for ( int i=0; i<names.size(); i++ ) {
                 name= names.get(i);
