@@ -155,6 +155,23 @@ public class PdsDataSource extends AbstractDataSource {
         return document;
     }
     
+    /**
+     * look through the PDS label document to see if dependencies can be 
+     * identified.  Presently, this is simply one other dataset with the 
+     * same axis (as in sample_offset) or the same axis name as something
+     * that has a time unit (Epoch).  
+     * @see https://space.physics.uiowa.edu/voyager/data/voyager-2-pws-wf/data/1987/vg2_pws_wf_1987-04-21T17_v0.9.xml
+     * @param doc the parsed document for the label XML
+     * @param depend the name of the data for the dependant variable, e.g. Waveform
+     * @return ( Epoch, sample_offset, Waveform ) 
+     */
+    public static List<String> seekDependencies( Document doc, List<String> depend ) {
+        XPathFactory factory= XPathFactory.newInstance();
+        XPath xpath= factory.newXPath();
+        
+        return depend;
+    }
+            
     @Override
     public org.das2.qds.QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         String name= getParam("arg_0","");
@@ -187,7 +204,9 @@ public class PdsDataSource extends AbstractDataSource {
         if ( !name.equals("") ) {
             names.add(name);
         }
-        
+
+        names= seekDependencies(doc, names );
+
         //TODO: Call a routine which scans through the document looking for
         //dependencies.  See vap+pds:https://space.physics.uiowa.edu/voyager/data/voyager-2-pws-wf/data/1987/vg2_pws_wf_1987-04-21T17_v0.9.xml?Waveform
         //which shows where the time and time offset arrays can be identified for Waveform.
