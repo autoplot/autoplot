@@ -86,8 +86,12 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
             if ( id==null ) id= params.get("Y");
             if ( id==null ) id= params.get("Z");
             
-            URL fileUrl= getFileResource( split.resourceUri.toURL(), mon );
             File xmlfile = DataSetURI.getFile( split.resourceUri.toURL() ,new NullProgressMonitor());
+            if ( !xmlfile.getAbsolutePath().toLowerCase().endsWith(".xml") ) {
+                problems.add("reference should be to the xml label file");
+                return true;
+            }
+            URL fileUrl= getFileResource( split.resourceUri.toURL(), mon );
             File datfile = DataSetURI.getFile(fileUrl,mon );
             
             if ( id==null ) {
@@ -160,8 +164,13 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
             
             logger.log(Level.FINE, "getCompletions {0}", cc.resourceURI);
             
-            URL fileUrl= getFileResource( cc.resourceURI.toURL(), mon );
             File xmlfile = DataSetURI.getFile(cc.resourceURI.toURL(),new NullProgressMonitor());
+            if ( !xmlfile.getAbsolutePath().toLowerCase().endsWith(".xml") ) {
+                List<CompletionContext> ccresult= new ArrayList<>();
+                ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "point to the xml file" ) );
+                return ccresult;
+            }
+            URL fileUrl= getFileResource( cc.resourceURI.toURL(), mon );
             File datfile = DataSetURI.getFile(fileUrl,mon );
              
             Map<String,String> result= getDataObjectNames(xmlfile.toURI().toURL(), mon);
