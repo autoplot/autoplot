@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The garden pool is uncovered and running, and crocus flowers are poking up.  Happy Spring!
+        <p><small>Delaunay triangulation of purple flowers in garden.  Here's <a href='https://github.com/autoplot/dev/blob/master/demos/2021/20210324/crocusDigitizer.jy'>the script</a>. Happy Spring!
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,10 +26,13 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-03-22 r25638):</p>
+        <p>Bugfixes (2021-03-25 r25652):</p>
         <ul>
+            <li>2324: check the number of bytes transferred over HTTP against what was expected.  Thanks, Jon N.!
+            <li>2320: getDeltaPlusMinus carelessly checked variable lengths, so 48x48 dataset DELTA_PLUS triggered a bug.  Thanks, Jon N.!
+            <li>2323: consider timetags cadence when picking resolution for display of timetags in metadata tab.  Thanks, Jolene and Larry!
             <li>bugfix: lanlNNSpectrogram's use of samePopulation would crash if ds1 or ds2 was constant, causing "width is zero" message.
-            <li>2321: correction to Webstart release, after I failed to properly update the JNLP files.  Thanks, Darrell!
+            <li>2321: correction to Webstart release, was not properly updated after PDS4 file introduction.  Thanks, Darrell and Пользователь!
             <li>mechanism for identifying Javadoc version used by each package was slow, so redo it so that each jar IDs version just once.
             <li>GitLabs support handles space-physics/juno/ap-script/-/blob/, where three path elements are found before.
             <li>change "failure #2 to deal with another day" message to fine, as it apparently doesn't cause any problems.
@@ -51,7 +54,9 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>check cadence when displaying timetags, and use more digits to show cadence.  Thanks, Jolene!
+            <li>QDataSet FORMAT can now have time templates like $Y-$m-$dT$H:$M:$S for times.
+            <li>PDS Data Source gets labels from the XML.
+            <li>check cadence when displaying timetags, and use more digits to show cadence.  Thanks, Jolene and Larry!
             <li>improvements to Jython completions allows variable completions on assignments to functions.
             <li>GitLabs support checks for login redirect and throws meaningful error message.
             <li>expose DasAxis labelOffset property, since it is useful to the scientists.
