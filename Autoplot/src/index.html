@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Delaunay triangulation of purple flowers in garden.  Here's <a href='https://github.com/autoplot/dev/blob/master/demos/2021/20210324/crocusDigitizer.jy'>the script</a>. Happy Spring!
+        <p><small>CADENCE property is used to detect when microseconds or nanoseconds should be displayed in the metadata tab.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-03-25 r25652):</p>
+        <p>Bugfixes (2021-03-28 r25653):</p>
+        <ul>
+            <li>Grabbing ctrl+C or cmd+C on Mac is difficult, so just make "C" trigger copy to clipboard.
+        </ul>
+        <p>Older Bugfixes (2021-03-25 r25652):</p>
         <ul>
             <li>2324: check the number of bytes transferred over HTTP against what was expected.  Thanks, Jon N.!
             <li>2320: getDeltaPlusMinus carelessly checked variable lengths, so 48x48 dataset DELTA_PLUS triggered a bug.  Thanks, Jon N.!
@@ -37,22 +41,10 @@
             <li>GitLabs support handles space-physics/juno/ap-script/-/blob/, where three path elements are found before.
             <li>change "failure #2 to deal with another day" message to fine, as it apparently doesn't cause any problems.
         </ul>
-        <p>Older Bugfixes (2021-02-06 r25519):</p>
-        <ul>
-            <li>bug 2318: reject stuck in loop because dataSetSelector is not reset properly. 
-            <li>hang_1409362814: correction where overzealous code would create condition which could hang Autoplot GUI.
-            <li>rfe737: "for" and "while" handled properly in static code analysis.
-            <li>ASCII file containing datum column headers with units would cause runtime error.  Thanks, Sadie!
-            <li>corrections to error bars, where BIN_PLUS, BIN_MINUS, BIN_MAX, and BIN_MIN are handled with Series Renderer error bars.  Thanks, Chris!
-            <li>rfe737: more Python reserved words are recognized.
-            <li>runtime error when script editor is up and it crashes, because line number was not properly extracted.
-            <li>Corrections to PDSDataSource, where it was missing libraries.
-            <li>Jython completions don't show (Object,Object) version of command that takes (QDataSet,QDataSet).
-            <li>1816: bundle subset propagates bundle properties.
-            <li>1816: tweak string representation of a QDataSet for bundles.
-            <li>1816: allow bundle to have times for column 0 and DEPEND_0, and not format the column twice to an ASCII file.
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>QDataSet FORMAT can now have time templates like $Y-$m-$dT$H:$M:$S for times.
             <li>PDS Data Source gets labels from the XML.
@@ -61,16 +53,6 @@
             <li>GitLabs support checks for login redirect and throws meaningful error message.
             <li>expose DasAxis labelOffset property, since it is useful to the scientists.
             <li>refactor zip support to treat .kmz files as zip files, more to come.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>737: Jython Static Code Analysis detects unused imports.
-            <li>738: bundles with references to bundled DELTA_PLUS, BIN_MAX, etc.  Thanks, Chris!
-            <li>das2stream parser supports error bars.  Thanks, Chris!
-            <li>Jython getDataSet calls are logged to logger "jython.script.ds" for easier access.
-            <li>729: initial support for PDS4 data using pds4-jparser.
-            <li>Autoplot-based HAPI server has experimental support for packet ingest.
-            <li>add averager for range in y.
         </ul>
         <p>Known issues:</p>
         <ul>
