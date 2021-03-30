@@ -5,7 +5,6 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -320,6 +319,7 @@ public class DomOps {
      */
     public static void fixLayout( Application dom ) {
         Logger logger= LoggerManager.getLogger("autoplot.dom.layout");
+        logger.fine( "enter fixLayout" );
                 
         Canvas canvas= dom.getCanvases(0);
 
