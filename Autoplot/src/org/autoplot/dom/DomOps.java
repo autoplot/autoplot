@@ -435,10 +435,10 @@ public class DomOps {
         double position=0;
 
         for ( int i=0; i<nrow; i++ ) {
-            String newTop=  String.format( Locale.US, "%.2f%%%+.1fem", 100*position, MaxUp[i] * pixelsToEm );
+            String newTop=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, MaxUp[i] * pixelsToEm );
             rows[i].setTop( newTop );
             position+= normalPlotHeight[i];
-            String newBottom= String.format( Locale.US, "%.2f%%%+.1fem", 100*position, -1 * MaxDown[i] * pixelsToEm );
+            String newBottom= String.format( Locale.US, "%.2f%%%+.2fem", 100*position, -1 * MaxDown[i] * pixelsToEm );
             rows[i].setBottom( newBottom );
             DasRow dasRow= rows[i].getController().dasRow;
             logger.log(Level.FINE, "row {0}: {1},{2} ({3} pixels)", new Object[]{i, newTop, newBottom, dasRow.getHeight() });
