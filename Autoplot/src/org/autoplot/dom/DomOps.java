@@ -288,7 +288,7 @@ public class DomOps {
      * @return
      */
     private static int lineCount( String s ) {
-        String[] ss= s.split("![cC]");
+        String[] ss= s.split("(\\!c|\\!C|\\<br\\>)");
         int emptyLines=0;
         while ( emptyLines<ss.length && ss[emptyLines].trim().length()==0 ) {
             emptyLines++;
@@ -385,7 +385,8 @@ public class DomOps {
             double MaxDownPx;
             for ( Plot plotj : plots ) {
                 String title= plotj.getTitle();
-                boolean addLines= plotj.isDisplayTitle() && title.replaceAll("\\!c", " ").replaceAll("<br>", " ").trim().length()>0;
+                String content= title.replaceAll("(\\!c|\\!C|\\<br\\>)", " ");
+                boolean addLines= plotj.isDisplayTitle() && content.trim().length()>0;
                 int lc= lineCount(title);
                 MaxUpJEm= addLines ? Math.max( 2, lc ) : 0.;
                 logger.log(Level.FINE, "{0} addLines: {1}  isDiplayTitle: {2}  lineCount(title): {3}", 
