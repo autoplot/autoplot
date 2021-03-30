@@ -354,15 +354,10 @@ public class DomOps {
         nrow= rows.length;
  
         // sort rows, which is a refactoring.
-        Arrays.sort( rows, new Comparator<Object>() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                Row r1= (Row)o1;
-                Row r2= (Row)o2;
-                int d1= r1.getController().getDasRow().getDMinimum();
-                int d2= r2.getController().getDasRow().getDMinimum();
-                return d1-d2;
-            }
+        Arrays.sort( rows, (Row r1, Row r2) -> {
+            int d1= r1.getController().getDasRow().getDMinimum();
+            int d2= r2.getController().getDasRow().getDMinimum();
+            return d1-d2;
         });
         
         double totalPlotHeightPixels= 0;
@@ -390,7 +385,9 @@ public class DomOps {
             double MaxDownPx;
             for ( Plot plotj : plots ) {
                 String title= plotj.getTitle();
-                MaxUpJEm= plotj.isDisplayTitle() ? Math.max( 2, lineCount(title) ) : 0.;
+                int lc= lineCount(title);
+                MaxUpJEm= plotj.isDisplayTitle() ? Math.max( 2, lc ) : 0.;
+                logger.log(Level.FINE, "{0} isDiplayTitle: {1}  lineCount(title): {2}", new Object[]{plotj.getId(), plotj.isDisplayTitle(), lc});
                 //if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
                 MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
                 Rectangle plot= plotj.getController().getDasPlot().getBounds();
