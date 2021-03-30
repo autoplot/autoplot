@@ -385,9 +385,11 @@ public class DomOps {
             double MaxDownPx;
             for ( Plot plotj : plots ) {
                 String title= plotj.getTitle();
+                boolean addLines= plotj.isDisplayTitle() && title.replaceAll("\\!c", " ").replaceAll("<br>", " ").trim().length()>0;
                 int lc= lineCount(title);
-                MaxUpJEm= plotj.isDisplayTitle() ? Math.max( 2, lc ) : 0.;
-                logger.log(Level.FINE, "{0} isDiplayTitle: {1}  lineCount(title): {2}", new Object[]{plotj.getId(), plotj.isDisplayTitle(), lc});
+                MaxUpJEm= addLines ? Math.max( 2, lc ) : 0.;
+                logger.log(Level.FINE, "{0} addLines: {1}  isDiplayTitle: {2}  lineCount(title): {3}", 
+                        new Object[]{plotj.getId(), addLines, plotj.isDisplayTitle(), lc});
                 //if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
                 MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
                 Rectangle plot= plotj.getController().getDasPlot().getBounds();
