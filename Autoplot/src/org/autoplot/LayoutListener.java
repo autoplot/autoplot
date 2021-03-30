@@ -52,17 +52,17 @@ public class LayoutListener implements PropertyChangeListener {
         final DasCanvas dasCanvas= cc.getDasCanvas();
         
         if (model.dom.getOptions().isAutolayout() && dasCanvas.getWidth()>0 ) {
-            logger.log(Level.FINE, "property change: {0}", evt.getPropertyName());
+            logger.log(Level.FINER, "property change: {0}", evt.getPropertyName());
             if (evt.getSource() instanceof Component &&
                     ((Component) evt.getSource()).isVisible()) {
                 if (t == null) {
-                    logger.fine("create timer ");
+                    logger.finer("create timer ");
                     t = new Timer(100, new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             synchronized ( LayoutListener.this ) {
                                 if ( model.dom.getOptions().isAutolayout() ) { //bug 3034795 (now 411)
-                                    logger.fine("do autolayout");
+                                    logger.finer("do autolayout");
                                     ApplicationController applicationController= model.getDocumentModel().getController();
                                     cc.performingChange(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
                                     dasCanvas.performingChange(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
@@ -97,7 +97,7 @@ public class LayoutListener implements PropertyChangeListener {
                 
                 synchronized ( LayoutListener.this ) {
                     if ( dasCanvas.isPendingChanges(PENDING_CHANGE_AUTOLAYOUT) ) {
-                        logger.fine("autolayout is already pending");
+                        logger.finer("autolayout is already pending");
                     } else {
                         cc.registerPendingChange(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
                         dasCanvas.registerPendingChange(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
