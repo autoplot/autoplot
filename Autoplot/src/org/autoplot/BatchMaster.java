@@ -145,54 +145,7 @@ public class BatchMaster extends javax.swing.JPanel {
             @Override
             public void actionPerformed( ActionEvent ev ) {
                 org.das2.util.LoggerManager.logGuiEvent(ev); 
-                state= STATE_LOADING;                  
-                try {
-                    String scriptName= dataSetSelector1.getValue();
-                    URISplit split= URISplit.parse(scriptName);
-                    if ( !split.file.endsWith(".jy") ) {
-                        JOptionPane.showMessageDialog( BatchMaster.this, "script must end in .jy: "+scriptName );
-                        return;
-                    }
-
-                    pwd= split.path;
-
-                    //Map<String,String> params= URISplit.parseParams(split.params);  //TODO: support these.
-                    Map<String,Object> env= new HashMap<>();
-
-                    DasProgressPanel monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(BatchMaster.this), "download script");
-                    File scriptFile= DataSetURI.getFile( split.file, monitor );
-                    String script= readScript( scriptFile );
-
-                    env.put( "dom", dom );
-                    env.put( "PWD", split.path );
-                    
-                    Map<String,org.autoplot.jythonsupport.JythonUtil.Param> parms= Util.getParams( env, script, URISplit.parseParams(split.params), new NullProgressMonitor() );
-
-                    String[] items= new String[parms.size()+1];
-                    int i=0;
-                    items[0]="";
-                    for ( Entry<String,org.autoplot.jythonsupport.JythonUtil.Param> p: parms.entrySet() ) {
-                        items[i+1]= p.getKey();
-                        i=i+1;
-                    }
-                    ComboBoxModel m1= new DefaultComboBoxModel(Arrays.copyOfRange(items,1,items.length));
-                    param1NameCB.setModel(m1);
-                    generateButton1.setEnabled( items.length>1 );
-                    ComboBoxModel m2= new DefaultComboBoxModel(items);
-                    param2NameCB.setModel(m2);
-                    
-                    param1Values.setText("");
-                    param2Values.setText("");
-                    
-                    messageLabel.setText("Load up those parameters and hit Go!");
-                    jScrollPane3.getViewport().setView(param1Values);
-                    
-                    
-                } catch (IOException ex) {
-                    Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
-                } finally {
-                    state= STATE_READY;
-                }
+                doPlayButton();
             }
         });
         
@@ -213,6 +166,61 @@ public class BatchMaster extends javax.swing.JPanel {
         jScrollPane3.getVerticalScrollBar().setUnitIncrement(jScrollPane3.getFont().getSize());
         jScrollPane1.getVerticalScrollBar().setUnitIncrement(jScrollPane1.getFont().getSize());
         
+        
+    }
+    
+    /**
+     * do the stuff to do when the play button is pressed.
+     */
+    private void doPlayButton() {
+        state= STATE_LOADING;                  
+        try {
+            String scriptName= dataSetSelector1.getValue();
+            URISplit split= URISplit.parse(scriptName);
+            if ( !split.file.endsWith(".jy") ) {
+                JOptionPane.showMessageDialog( BatchMaster.this, "script must end in .jy: "+scriptName );
+                return;
+            }
+
+            pwd= split.path;
+
+            //Map<String,String> params= URISplit.parseParams(split.params);  //TODO: support these.
+            Map<String,Object> env= new HashMap<>();
+
+            DasProgressPanel monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(BatchMaster.this), "download script");
+            File scriptFile= DataSetURI.getFile( split.file, monitor );
+            String script= readScript( scriptFile );
+
+            env.put( "dom", dom );
+            env.put( "PWD", split.path );
+
+            Map<String,org.autoplot.jythonsupport.JythonUtil.Param> parms= Util.getParams( env, script, URISplit.parseParams(split.params), new NullProgressMonitor() );
+
+            String[] items= new String[parms.size()+1];
+            int i=0;
+            items[0]="";
+            for ( Entry<String,org.autoplot.jythonsupport.JythonUtil.Param> p: parms.entrySet() ) {
+                items[i+1]= p.getKey();
+                i=i+1;
+            }
+            ComboBoxModel m1= new DefaultComboBoxModel(Arrays.copyOfRange(items,1,items.length));
+            param1NameCB.setModel(m1);
+            generateButton1.setEnabled( items.length>1 );
+            ComboBoxModel m2= new DefaultComboBoxModel(items);
+            param2NameCB.setModel(m2);
+
+            param1Values.setText("");
+            param2Values.setText("");
+
+            messageLabel.setText("Load up those parameters and hit Go!");
+            jScrollPane3.getViewport().setView(param1Values);
+
+
+        } catch (IOException ex) {
+            Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            state= STATE_READY;
+        }
         
     }
     
@@ -692,7 +700,7 @@ public class BatchMaster extends javax.swing.JPanel {
             prefs.put("batch", f.toString() );
             Runnable run= () -> {
                 try {
-                    loadFile( f );
+                    loadBatchFile( f );
                 } catch (IOException|JSONException ex) {
                     JOptionPane.showMessageDialog( BatchMaster.this, "Unable to open file. "+ex.getMessage() );
                 }
@@ -823,16 +831,28 @@ public class BatchMaster extends javax.swing.JPanel {
         exportResultsPending( f, results, results.getJSONArray("results"), 0 );
     }
     
-    private void loadFile( File f ) throws IOException, JSONException {
+    private void loadBatchFile( File f ) throws IOException, JSONException {
+        if ( SwingUtilities.isEventDispatchThread() ) throw new IllegalArgumentException("don't call from event thread");
         String src= FileUtil.readFileToString(f);
         JSONObject jo= new JSONObject(src);
         final Map<String,String> params= new HashMap();
-        params.put( "script", jo.getString("script") );
+        final String scriptName= jo.getString("script");
+        params.put( "script", scriptName );
+        Runnable run= () -> {
+            BatchMaster.this.dataSetSelector1.setValue(scriptName);
+            doPlayButton();
+        };
+        try {
+            SwingUtilities.invokeAndWait(run);
+        } catch (InterruptedException | InvocationTargetException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        } 
+        
         params.put( "param1", jo.getString("param1"));
         params.put( "param2", jo.getString("param2"));
         params.put( "param1Values", jo.getString("param1Values"));
         params.put( "param2Values", jo.getString("param2Values"));                
-        Runnable run= () -> {
+        run= () -> {
             BatchMaster.this.param1NameCB.setSelectedItem(params.get("param1"));
             BatchMaster.this.param2NameCB.setSelectedItem(params.get("param2"));
             BatchMaster.this.param1Values.setText(params.get("param1Values"));
