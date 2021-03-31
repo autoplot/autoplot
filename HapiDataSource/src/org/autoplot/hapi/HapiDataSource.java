@@ -1254,6 +1254,33 @@ public final class HapiDataSource extends AbstractDataSource {
             
             String line= in.readLine();
             
+            if ( line.startsWith("{") ) {
+                logger.log(Level.WARNING, "data response starts with \"{\", not data!");
+                StringBuilder sb= new StringBuilder();
+                while ( line!=null ) {
+                    sb.append(line);
+                    line= in.readLine();  // TODO: risk of reading entire data response.
+                }
+                String jsonResponse= sb.toString();
+                JSONObject jo= new JSONObject(jsonResponse);
+                if ( !jo.has("HAPI") ) throw new IllegalArgumentException("Expected HAPI version in JSON response");
+                String vers= jo.getString("HAPI");
+                if ( !( vers.startsWith("2") || vers.startsWith("1") ) ) {
+                    String msg= "Only version 1 and 2 servers can have JSON response where CSV was expected";
+                    if ( jsonResponse.length()<400 ) {
+                        msg= msg + ": "+jsonResponse;
+                    }
+                    throw new IllegalArgumentException(msg);
+                }
+                if ( !jo.has("status") ) throw new IllegalArgumentException("Expected status in JSON response");
+                JSONObject status= jo.getJSONObject("status");
+                if ( status.getInt("code")==1201 ) {
+                    throw new NoDataInIntervalException("server responds: "+status.getString("message") );
+                } else {
+                    throw new IllegalArgumentException("unsupported server response "+status.getInt("code")+": "+status.getString("message"));
+                }
+            }
+            
             while ( line!=null ) {
                 
                 linenumber++;
@@ -1557,6 +1584,42 @@ public final class HapiDataSource extends AbstractDataSource {
             ByteBuffer buf = TransferType.allocate( recordLengthBytes,ByteOrder.LITTLE_ENDIAN );
             
             int bytesRead = in.readRecord(buf);
+            
+            if ( bytesRead>0 ) {
+                if ( (char)buf.get(0)=='{' ) {
+                    logger.log(Level.WARNING, "data response starts with \"{\", not data!");
+                    
+                    StringBuilder sb= new StringBuilder();
+                    while ( bytesRead>-1 ) {
+                        if ( buf.position()<buf.limit() ) {
+                            while ( bytesRead>-1 ) {
+                                bytesRead = in.readRecord(buf);
+                            }
+                        }
+                        buf.flip();
+                        sb.append(  new String( buf.array(), 0, buf.limit(), "UTF-8" ) );
+                    }
+                    
+                    String jsonResponse= sb.toString();
+                    JSONObject jo= new JSONObject(jsonResponse);
+                    if ( !jo.has("HAPI") ) throw new IllegalArgumentException("Expected HAPI version in JSON response");
+                    String vers= jo.getString("HAPI");
+                    if ( !( vers.startsWith("2") || vers.startsWith("1") ) ) {
+                        String msg= "Only version 1 and 2 servers can have JSON response where CSV was expected";
+                        if ( jsonResponse.length()<400 ) {
+                            msg= msg + ": "+jsonResponse;
+                        }
+                        throw new IllegalArgumentException(msg);
+                    }
+                    if ( !jo.has("status") ) throw new IllegalArgumentException("Expected status in JSON response");
+                        JSONObject status= jo.getJSONObject("status");
+                    if ( status.getInt("code")==1201 ) {
+                        throw new NoDataInIntervalException("server responds: "+status.getString("message") );
+                    } else {
+                        throw new IllegalArgumentException("unsupported server response "+status.getInt("code")+": "+status.getString("message"));
+                    }
+                }
+            }
             
             while (bytesRead != -1) {
                 
