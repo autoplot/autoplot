@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -507,7 +508,11 @@ public class HapiServer {
         } catch ( IOException ex ) {
             if ( urlc instanceof HttpURLConnection ) {
                 StringBuilder builder2= new StringBuilder();
-                try ( BufferedReader in2= new BufferedReader( new InputStreamReader( ((HttpURLConnection)urlc).getErrorStream(), UTF8 ) ) ) {
+                InputStream err= ((HttpURLConnection)urlc).getErrorStream();
+                if ( err==null ) {
+                    throw ex;
+                }
+                try ( BufferedReader in2= new BufferedReader( new InputStreamReader( err, UTF8 ) ) ) {
                     String line= in2.readLine();
                     while ( line!=null ) {
                         builder2.append(line);
