@@ -163,8 +163,8 @@ public class BatchMaster extends javax.swing.JPanel {
         }
         dataSetSelector1.setRecent( recentUris );
         
-        jScrollPane3.getVerticalScrollBar().setUnitIncrement(jScrollPane3.getFont().getSize());
-        jScrollPane1.getVerticalScrollBar().setUnitIncrement(jScrollPane1.getFont().getSize());
+        param1ScrollPane.getVerticalScrollBar().setUnitIncrement(param1ScrollPane.getFont().getSize());
+        param2ScrollPane.getVerticalScrollBar().setUnitIncrement(param2ScrollPane.getFont().getSize());
         
         
     }
@@ -213,7 +213,7 @@ public class BatchMaster extends javax.swing.JPanel {
             param2Values.setText("");
 
             messageLabel.setText("Load up those parameters and hit Go!");
-            jScrollPane3.getViewport().setView(param1Values);
+            param1ScrollPane.getViewport().setView(param1Values);
 
 
         } catch (IOException ex) {
@@ -265,10 +265,11 @@ public class BatchMaster extends javax.swing.JPanel {
         exportResultsMenuItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
         showHelpMenuItem = new javax.swing.JMenuItem();
+        jPanel1 = new javax.swing.JPanel();
         goButton = new javax.swing.JButton();
-        jScrollPane3 = new javax.swing.JScrollPane();
+        param1ScrollPane = new javax.swing.JScrollPane();
         param1Values = new javax.swing.JTextArea();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        param2ScrollPane = new javax.swing.JScrollPane();
         param2Values = new javax.swing.JTextArea();
         dataSetSelector1 = new org.autoplot.datasource.DataSetSelector();
         messageLabel = new javax.swing.JLabel();
@@ -280,6 +281,7 @@ public class BatchMaster extends javax.swing.JPanel {
         generateButton2 = new javax.swing.JButton();
         writeCheckBox = new javax.swing.JCheckBox();
         writeFilenameCB = new javax.swing.JComboBox<>();
+        progressPanel = new javax.swing.JPanel();
 
         jList2.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -410,6 +412,17 @@ public class BatchMaster extends javax.swing.JPanel {
 
         menuBar.add(helpMenu);
 
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+
         goButton.setText("Go!");
         goButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -430,7 +443,7 @@ public class BatchMaster extends javax.swing.JPanel {
                 param1ValuesMouseClicked(evt);
             }
         });
-        jScrollPane3.setViewportView(param1Values);
+        param1ScrollPane.setViewportView(param1Values);
 
         param2Values.setColumns(20);
         param2Values.setRows(5);
@@ -445,7 +458,7 @@ public class BatchMaster extends javax.swing.JPanel {
                 param2ValuesMouseClicked(evt);
             }
         });
-        jScrollPane1.setViewportView(param2Values);
+        param2ScrollPane.setViewportView(param2Values);
 
         messageLabel.setText("Load up those parameters and hit Go!");
 
@@ -499,6 +512,17 @@ public class BatchMaster extends javax.swing.JPanel {
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, writeCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), writeFilenameCB, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
+        javax.swing.GroupLayout progressPanelLayout = new javax.swing.GroupLayout(progressPanel);
+        progressPanel.setLayout(progressPanelLayout);
+        progressPanelLayout.setHorizontalGroup(
+            progressPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 509, Short.MAX_VALUE)
+        );
+        progressPanelLayout.setVerticalGroup(
+            progressPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 51, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -506,12 +530,7 @@ public class BatchMaster extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap(544, Short.MAX_VALUE)
-                        .addComponent(cancelButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(goButton, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(dataSetSelector1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 682, Short.MAX_VALUE)
+                    .addComponent(dataSetSelector1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -520,21 +539,29 @@ public class BatchMaster extends javax.swing.JPanel {
                                 .addComponent(generateButton1))
                             .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jScrollPane3)))
+                                .addComponent(param1ScrollPane)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1)
+                            .addComponent(param2ScrollPane)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(param2NameCB, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(generateButton2))))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(messageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 401, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addContainerGap(446, Short.MAX_VALUE)
                         .addComponent(writeCheckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(writeFilenameCB, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(writeFilenameCB, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(messageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 401, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(progressPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(cancelButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(goButton, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {generateButton1, generateButton2});
@@ -553,17 +580,23 @@ public class BatchMaster extends javax.swing.JPanel {
                     .addComponent(generateButton2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1))
+                    .addComponent(param1ScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
+                    .addComponent(param2ScrollPane))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(messageLabel)
-                    .addComponent(writeCheckBox)
-                    .addComponent(writeFilenameCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(writeCheckBox, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(writeFilenameCB, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(goButton)
-                    .addComponent(cancelButton))
+                .addComponent(messageLabel)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(32, 32, 32)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(goButton)
+                            .addComponent(cancelButton)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(progressPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -675,7 +708,8 @@ public class BatchMaster extends javax.swing.JPanel {
     private void param1NameCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_param1NameCBItemStateChanged
         if ( evt.getStateChange()==ItemEvent.SELECTED ) {
             generateButton1.setEnabled( param1NameCB.getSelectedItem().toString().trim().length()>0 );
-            jScrollPane3.getViewport().setView(param1Values);
+            param1ScrollPane.getViewport().setView(param1Values);
+            param2ScrollPane.getViewport().setView(param2Values);
             messageLabel.setText("Load up those parameters and hit Go!");
         }
     }//GEN-LAST:event_param1NameCBItemStateChanged
@@ -1048,7 +1082,7 @@ public class BatchMaster extends javax.swing.JPanel {
                     for ( String s: ss ) b.append(s).append("\n");
                     ta.setText( b.toString() );
                     messageLabel.setText("Load up those parameters and hit Go!");
-                    jScrollPane3.getViewport().setView(param1Values);
+                    param1ScrollPane.getViewport().setView(param1Values);
                 }
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog( this, "bad parameter name" );
@@ -1205,54 +1239,68 @@ public class BatchMaster extends javax.swing.JPanel {
         }
     }
     
+    private static final Icon queued= new ImageIcon(BatchMaster.class.getResource("/resources/grey.gif"));
+    private static final Icon working= new ImageIcon(BatchMaster.class.getResource("/resources/blue_anime.gif"));
+    private static final Icon okay= new ImageIcon(BatchMaster.class.getResource("/resources/blue.gif"));
+    private static final Icon prob= new ImageIcon(BatchMaster.class.getResource("/resources/red.gif"));    
+
+    private JPanel switchListToIconLabels( List<JLabel> jobs1, String[] ff1 ) {
+        JPanel p= new JPanel();
+            
+        p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
+        for ( String f: ff1 ) {
+            JLabel l= new JLabel(f);
+            l.setIcon(queued);
+            p.add( l );
+            jobs1.add(l);
+        }
+
+        p.addMouseListener( new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                messageLabel.setText("Load up those parameters and hit Go!");
+                param1ScrollPane.getViewport().setView(param1Values);
+                param2ScrollPane.getViewport().setView(param2Values);
+            }
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                messageLabel.setText("Load up those parameters and hit Go!");
+                param1ScrollPane.getViewport().setView(param1Values);
+                param2ScrollPane.getViewport().setView(param2Values);
+            }
+        });
+
+        JScrollPane scrollp= new JScrollPane(p);
+        scrollp.getVerticalScrollBar().setUnitIncrement( scrollp.getFont().getSize());
+        scrollp.setPreferredSize( new Dimension(640,640));
+        scrollp.setMaximumSize( new Dimension(640,640));
+            
+            messageLabel.setText("Running jobs, click on labels above to edit.");
+            return p;
+    }
+    
     /**
      * run the batch process.  The
      * @throws IOException 
      */
     public void doIt() throws IOException {
-        final ProgressMonitor monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(this), "Run Batch");
+        final DasProgressPanel monitor= DasProgressPanel.createComponent( "" );
+        progressPanel.add( monitor.getComponent() );
 
-        Icon queued= new ImageIcon(BatchMaster.class.getResource("/resources/grey.gif"));
-        Icon working= new ImageIcon(BatchMaster.class.getResource("/resources/blue_anime.gif"));
-        Icon okay= new ImageIcon(BatchMaster.class.getResource("/resources/blue.gif"));
-        Icon prob= new ImageIcon(BatchMaster.class.getResource("/resources/red.gif"));    
-        
-        List<JLabel> jobs;
+        List<JLabel> jobs1= new ArrayList<>();
+        List<JLabel> jobs2= new ArrayList<>();
         
         {
             String[] ff1= param1Values.getText().split("\n");
-            JPanel p= new JPanel();
-            jobs= new ArrayList<>();
-            p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
-            for ( String f: ff1 ) {
-                JLabel l= new JLabel(f);
-                l.setIcon(queued);
-                p.add( l );
-                jobs.add(l);
-            }
-            
-            p.addMouseListener( new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    messageLabel.setText("Load up those parameters and hit Go!");
-                    jScrollPane3.getViewport().setView(param1Values);
-                }
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    messageLabel.setText("Load up those parameters and hit Go!");
-                    jScrollPane3.getViewport().setView(param1Values);
-                }
-            });
-
-            JScrollPane scrollp= new JScrollPane(p);
-            scrollp.getVerticalScrollBar().setUnitIncrement( scrollp.getFont().getSize());
-            scrollp.setPreferredSize( new Dimension(640,640));
-            scrollp.setMaximumSize( new Dimension(640,640));
-            
-            messageLabel.setText("Running jobs, click on labels above to edit.");
-            jScrollPane3.getViewport().setView(p);
-            
+            JPanel p= switchListToIconLabels( jobs1, ff1 );
+            param1ScrollPane.getViewport().setView(p);   
         }
+               
+        {
+            String[] ff1= param2Values.getText().split("\n");
+            JPanel p= switchListToIconLabels( jobs2, ff1 );
+            param2ScrollPane.getViewport().setView(p);   
+        } 
         
         try {
             String scriptName= dataSetSelector1.getValue();
@@ -1306,7 +1354,6 @@ public class BatchMaster extends javax.swing.JPanel {
             
             jo.put( "results", ja );
              
-            
             String param1= param1NameCB.getSelectedItem()!=null ? 
                     param1NameCB.getSelectedItem().toString().trim() :
                     "";
@@ -1340,7 +1387,7 @@ public class BatchMaster extends javax.swing.JPanel {
                         continue;
                     }
 
-                    jobs.get(i1).setIcon(working);
+                    jobs1.get(i1).setIcon(working);
                     //interp.set( "monitor", monitor.getSubtaskMonitor(f1) );
                     interp.set( "monitor", new NullProgressMonitor() {
                         @Override
@@ -1367,14 +1414,14 @@ public class BatchMaster extends javax.swing.JPanel {
                             if ( writeCheckBox.isSelected() ) {
                                 runResults.put( "writeFile", doWrite( f1, "" ) );
                             }
-                            jobs.get(i1).setIcon(okay);
-                            jobs.get(i1).setToolTipText(null);
+                            jobs1.get(i1).setIcon(okay);
+                            jobs1.get(i1).setToolTipText(null);
                         } catch ( IOException | JSONException ex ) {
                             runResults.put("executionTime", System.currentTimeMillis()-t0);                            
                             String msg= ex.toString();
                             runResults.put("result",msg);
-                            jobs.get(i1).setIcon(prob);
-                            jobs.get(i1).setToolTipText(ex.toString());
+                            jobs1.get(i1).setIcon(prob);
+                            jobs1.get(i1).setToolTipText(ex.toString());
                         }
                         JSONObject copy = new JSONObject(runResults, JSONObject.getNames(runResults));
                         ja.put( icount, copy );
@@ -1382,8 +1429,14 @@ public class BatchMaster extends javax.swing.JPanel {
                         
                     } else {
                         String[] ff2= param2Values.getText().split("\n");
+
+                        for ( int i2=0; i2<jobs2.size(); i2++ ) {
+                            jobs2.get(i2).setIcon(queued);
+                        }
+                        
                         int i2=0;
                         String problemMessage= null;
+                        
                         for ( String f2: ff2 ) {
                             if ( f2.trim().length()==0 ) continue;
                             if ( monitor.isCancelled() ) {
@@ -1393,20 +1446,23 @@ public class BatchMaster extends javax.swing.JPanel {
                             try {
                                 paramName= param2NameCB.getSelectedItem().toString();
                                 runResults.put(paramName,f2);
+                                jobs2.get(i2).setIcon( working );
                                 setParam( interp, parms.get(paramName), paramName, f2 );
                                 interp.execfile(  JythonRefactory.fixImports(new FileInputStream(scriptFile)), scriptFile.getName() );
                                 runResults.put("executionTime", System.currentTimeMillis()-t0);
-                                i2=i2+f2.length()+1;
                                 if ( writeCheckBox.isSelected() ) {
                                     runResults.put( "writeFile", doWrite( f1,f2 ) );
                                 }
+                                jobs2.get(i2).setIcon(okay);
                                 runResults.put("result","");
+                                i2=i2+1;
                             } catch ( IOException | JSONException | RuntimeException ex ) {
                                 runResults.put("executionTime", System.currentTimeMillis()-t0);
                                 String msg= ex.toString();
                                 runResults.put("result",msg);
-                                jobs.get(i1).setIcon(prob);
-                                jobs.get(i1).setToolTipText(ex.toString());
+                                jobs1.get(i1).setIcon(prob);
+                                jobs2.get(i2).setIcon(prob); // this will only show briefly, but it is still helpful.
+                                jobs1.get(i1).setToolTipText(ex.toString());
                                 problemMessage= msg;
                             }
                             JSONObject copy = new JSONObject(runResults, JSONObject.getNames(runResults));
@@ -1414,14 +1470,14 @@ public class BatchMaster extends javax.swing.JPanel {
                             icount++;
                         }
                         if ( problemMessage==null ) {
-                            jobs.get(i1).setIcon(okay);
-                            jobs.get(i1).setToolTipText(null);
+                            jobs1.get(i1).setIcon(okay);
+                            jobs1.get(i1).setToolTipText(null);
                         }
                     }
                 } catch (IOException | RuntimeException | JSONException ex) {
                     Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
-                    jobs.get(i1).setIcon(prob);
-                    jobs.get(i1).setToolTipText(ex.toString());
+                    jobs1.get(i1).setIcon(prob);
+                    jobs1.get(i1).setToolTipText(ex.toString());
                 }
                 i1=i1+1;
                 
@@ -1479,20 +1535,22 @@ public class BatchMaster extends javax.swing.JPanel {
     private javax.swing.JList<String> jList2;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JPopupMenu jPopupMenu2;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JMenuItem loadFromFileMI;
     private javax.swing.JMenuItem loadFromFileMI2;
     private javax.swing.JMenuItem loadUriMenuItem;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JLabel messageLabel;
     private javax.swing.JComboBox<String> param1NameCB;
+    private javax.swing.JScrollPane param1ScrollPane;
     private javax.swing.JTextArea param1Values;
     private javax.swing.JComboBox<String> param2NameCB;
+    private javax.swing.JScrollPane param2ScrollPane;
     private javax.swing.JTextArea param2Values;
+    private javax.swing.JPanel progressPanel;
     private javax.swing.JMenuItem showHelpMenuItem;
     private javax.swing.JComboBox<String> timeFormatComboBox;
     private javax.swing.JComboBox<String> timeRangeComboBox;
