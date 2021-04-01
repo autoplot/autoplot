@@ -944,7 +944,10 @@ public class BatchMaster extends javax.swing.JPanel {
         String src= FileUtil.readFileToString(f);
         JSONObject jo= new JSONObject(src);
         final Map<String,String> params= new HashMap();
-        final String scriptName= jo.getString("script");
+        String scriptName1= jo.getString("script");
+        scriptName1= scriptName1.replaceAll("\\%\\{PWD\\}",f.getParentFile().getCanonicalPath() );
+        final String scriptName= scriptName1;
+        
         params.put( "script", scriptName );
         Runnable run= () -> {
             BatchMaster.this.dataSetSelector1.setValue(scriptName);
@@ -1430,7 +1433,7 @@ public class BatchMaster extends javax.swing.JPanel {
             param1ScrollPane.getViewport().setView(p);   
         }
                
-        {
+        if ( param2Values.getText().trim().length()>0 ) {
             String[] ff1= param2Values.getText().split("\n");
             JPanel p= switchListToIconLabels( jobs2, ff1 );
             param2ScrollPane.getViewport().setView(p);   
