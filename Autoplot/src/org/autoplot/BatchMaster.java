@@ -292,6 +292,7 @@ public class BatchMaster extends javax.swing.JPanel {
         writeCheckBox = new javax.swing.JCheckBox();
         writeFilenameCB = new javax.swing.JComboBox<>();
         progressPanel = new javax.swing.JPanel();
+        editParamsButton = new javax.swing.JButton();
 
         jList2.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -542,30 +543,46 @@ public class BatchMaster extends javax.swing.JPanel {
         progressPanel.setLayout(progressPanelLayout);
         progressPanelLayout.setHorizontalGroup(
             progressPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 509, Short.MAX_VALUE)
+            .addGap(0, 497, Short.MAX_VALUE)
         );
         progressPanelLayout.setVerticalGroup(
             progressPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 51, Short.MAX_VALUE)
         );
 
+        editParamsButton.setText("Edit Params");
+        editParamsButton.setEnabled(false);
+        editParamsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editParamsButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(progressPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(cancelButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(goButton, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(editParamsButton, javax.swing.GroupLayout.Alignment.TRAILING)))
                     .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(dataSetSelector1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(param1NameCB, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(param1NameCB, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(generateButton1))
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(param1ScrollPane)))
+                            .addComponent(param1ScrollPane))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(param2ScrollPane)
@@ -574,20 +591,14 @@ public class BatchMaster extends javax.swing.JPanel {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(generateButton2))))
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap(446, Short.MAX_VALUE)
+                        .addGap(0, 434, Short.MAX_VALUE)
                         .addComponent(writeCheckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(writeFilenameCB, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(writeFilenameCB, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(messageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 389, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(messageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 401, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(progressPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(cancelButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(goButton, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {generateButton1, generateButton2});
@@ -612,15 +623,17 @@ public class BatchMaster extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(writeCheckBox, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(writeFilenameCB, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(messageLabel)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(32, 32, 32)
+                        .addGap(22, 22, 22)
+                        .addComponent(editParamsButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(goButton)
                             .addComponent(cancelButton)))
                     .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(messageLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(progressPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
@@ -868,6 +881,11 @@ public class BatchMaster extends javax.swing.JPanel {
             logger.log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_pasteMenuItem2ActionPerformed
+
+    private void editParamsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editParamsButtonActionPerformed
+        switchToEditableList();
+        editParamsButton.setEnabled(false);
+    }//GEN-LAST:event_editParamsButtonActionPerformed
 
     private void doLoadFromFile( JTextArea paramValues ) {
         JFileChooser chooser= new JFileChooser();
@@ -1292,6 +1310,12 @@ public class BatchMaster extends javax.swing.JPanel {
     private static final Icon okay= new ImageIcon(BatchMaster.class.getResource("/resources/blue.gif"));
     private static final Icon prob= new ImageIcon(BatchMaster.class.getResource("/resources/red.gif"));    
 
+    private void switchToEditableList() {
+        messageLabel.setText("Load up those parameters and hit Go!");
+        param1ScrollPane.getViewport().setView(param1Values);
+        param2ScrollPane.getViewport().setView(param2Values);
+    }
+    
     private JPanel switchListToIconLabels( List<JLabel> jobs1, String[] ff1 ) {
         JPanel p= new JPanel();
             
@@ -1303,28 +1327,13 @@ public class BatchMaster extends javax.swing.JPanel {
             jobs1.add(l);
         }
 
-        p.addMouseListener( new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                messageLabel.setText("Load up those parameters and hit Go!");
-                param1ScrollPane.getViewport().setView(param1Values);
-                param2ScrollPane.getViewport().setView(param2Values);
-            }
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                messageLabel.setText("Load up those parameters and hit Go!");
-                param1ScrollPane.getViewport().setView(param1Values);
-                param2ScrollPane.getViewport().setView(param2Values);
-            }
-        });
-
         JScrollPane scrollp= new JScrollPane(p);
         scrollp.getVerticalScrollBar().setUnitIncrement( scrollp.getFont().getSize());
         scrollp.setPreferredSize( new Dimension(640,640));
         scrollp.setMaximumSize( new Dimension(640,640));
             
-            messageLabel.setText("Running jobs, click on labels above to edit.");
-            return p;
+        messageLabel.setText("Running jobs, click on labels above to edit.");
+        return p;
     }
     
     /**
@@ -1337,6 +1346,8 @@ public class BatchMaster extends javax.swing.JPanel {
 
         List<JLabel> jobs1= new ArrayList<>();
         List<JLabel> jobs2= new ArrayList<>();
+        
+        editParamsButton.setEnabled(true);
         
         {
             String[] ff1= param1Values.getText().split("\n");
@@ -1571,6 +1582,7 @@ public class BatchMaster extends javax.swing.JPanel {
     private javax.swing.JMenuItem SaveAsMenuItem;
     private javax.swing.JButton cancelButton;
     private org.autoplot.datasource.DataSetSelector dataSetSelector1;
+    private javax.swing.JButton editParamsButton;
     private javax.swing.JMenuItem exportResultsMenuItem;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JButton generateButton1;
