@@ -3,7 +3,11 @@ package org.autoplot;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
@@ -247,17 +251,19 @@ public class BatchMaster extends javax.swing.JPanel {
         jScrollPane2 = new javax.swing.JScrollPane();
         jList2 = new javax.swing.JList<>();
         jPopupMenu1 = new javax.swing.JPopupMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        generateMenuItem = new javax.swing.JMenuItem();
         loadUriMenuItem = new javax.swing.JMenuItem();
         loadFromFileMI = new javax.swing.JMenuItem();
+        pasteMenuItem = new javax.swing.JMenuItem();
         timeRangesPanel = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         timeRangeComboBox = new javax.swing.JComboBox<>();
         timeFormatComboBox = new javax.swing.JComboBox<>();
         jLabel3 = new javax.swing.JLabel();
         jPopupMenu2 = new javax.swing.JPopupMenu();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        generateMenuItem2 = new javax.swing.JMenuItem();
         loadFromFileMI2 = new javax.swing.JMenuItem();
+        pasteMenuItem2 = new javax.swing.JMenuItem();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         OpenMenuItem = new javax.swing.JMenuItem();
@@ -290,14 +296,14 @@ public class BatchMaster extends javax.swing.JPanel {
         });
         jScrollPane2.setViewportView(jList2);
 
-        jMenuItem1.setText("Generate...");
-        jMenuItem1.setToolTipText("Generate items for list");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        generateMenuItem.setText("Generate...");
+        generateMenuItem.setToolTipText("Generate items for list");
+        generateMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                generateMenuItemActionPerformed(evt);
             }
         });
-        jPopupMenu1.add(jMenuItem1);
+        jPopupMenu1.add(generateMenuItem);
 
         loadUriMenuItem.setText("Load Events File...");
         loadUriMenuItem.setToolTipText("Load a list of time ranges from an events file.");
@@ -316,6 +322,14 @@ public class BatchMaster extends javax.swing.JPanel {
             }
         });
         jPopupMenu1.add(loadFromFileMI);
+
+        pasteMenuItem.setText("Paste");
+        pasteMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pasteMenuItemActionPerformed(evt);
+            }
+        });
+        jPopupMenu1.add(pasteMenuItem);
 
         jLabel2.setText("Time Range:");
 
@@ -355,13 +369,13 @@ public class BatchMaster extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jMenuItem2.setText("Generate...");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+        generateMenuItem2.setText("Generate...");
+        generateMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
+                generateMenuItem2ActionPerformed(evt);
             }
         });
-        jPopupMenu2.add(jMenuItem2);
+        jPopupMenu2.add(generateMenuItem2);
 
         loadFromFileMI2.setText("Load from File");
         loadFromFileMI2.setToolTipText("Load lines from file into this text area");
@@ -371,6 +385,14 @@ public class BatchMaster extends javax.swing.JPanel {
             }
         });
         jPopupMenu2.add(loadFromFileMI2);
+
+        pasteMenuItem2.setText("Paste");
+        pasteMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pasteMenuItem2ActionPerformed(evt);
+            }
+        });
+        jPopupMenu2.add(pasteMenuItem2);
 
         fileMenu.setText("File");
 
@@ -382,7 +404,7 @@ public class BatchMaster extends javax.swing.JPanel {
         });
         fileMenu.add(OpenMenuItem);
 
-        SaveAsMenuItem.setText("Save As...");
+        SaveAsMenuItem.setText("Save Batch File As...");
         SaveAsMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 SaveAsMenuItemActionPerformed(evt);
@@ -638,9 +660,9 @@ public class BatchMaster extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_param1ValuesMouseReleased
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void generateMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateMenuItemActionPerformed
         doGenerate( param1NameCB, param1Values );
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }//GEN-LAST:event_generateMenuItemActionPerformed
 
     private void param2ValuesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_param2ValuesMouseClicked
         if ( evt.isPopupTrigger() ) {
@@ -648,9 +670,9 @@ public class BatchMaster extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_param2ValuesMouseClicked
 
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+    private void generateMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateMenuItem2ActionPerformed
         doGenerate( param2NameCB, param2Values );
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
+    }//GEN-LAST:event_generateMenuItem2ActionPerformed
 
     private void param2ValuesMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_param2ValuesMousePressed
         if ( evt.isPopupTrigger() ) {
@@ -820,6 +842,24 @@ public class BatchMaster extends javax.swing.JPanel {
     private void loadFromFileMI2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadFromFileMI2ActionPerformed
         doLoadFromFile(param2Values);
     }//GEN-LAST:event_loadFromFileMI2ActionPerformed
+
+    private void pasteMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pasteMenuItemActionPerformed
+        try {
+            String pasteMe= (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+            param1Values.setText(pasteMe);
+        } catch (UnsupportedFlavorException | IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_pasteMenuItemActionPerformed
+
+    private void pasteMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pasteMenuItem2ActionPerformed
+        try {
+            String pasteMe= (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+            param2Values.setText(pasteMe);
+        } catch (UnsupportedFlavorException | IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_pasteMenuItem2ActionPerformed
 
     private void doLoadFromFile( JTextArea paramValues ) {
         JFileChooser chooser= new JFileChooser();
@@ -1527,14 +1567,14 @@ public class BatchMaster extends javax.swing.JPanel {
     private javax.swing.JMenu fileMenu;
     private javax.swing.JButton generateButton1;
     private javax.swing.JButton generateButton2;
+    private javax.swing.JMenuItem generateMenuItem;
+    private javax.swing.JMenuItem generateMenuItem2;
     private javax.swing.JButton goButton;
     private javax.swing.JMenu helpMenu;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JList<String> jList2;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JPopupMenu jPopupMenu2;
@@ -1550,6 +1590,8 @@ public class BatchMaster extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> param2NameCB;
     private javax.swing.JScrollPane param2ScrollPane;
     private javax.swing.JTextArea param2Values;
+    private javax.swing.JMenuItem pasteMenuItem;
+    private javax.swing.JMenuItem pasteMenuItem2;
     private javax.swing.JPanel progressPanel;
     private javax.swing.JMenuItem showHelpMenuItem;
     private javax.swing.JComboBox<String> timeFormatComboBox;
