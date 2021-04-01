@@ -1606,7 +1606,6 @@ public class BatchMaster extends javax.swing.JPanel {
                                 }
                                 jobs2.get(i2).setIcon(okay);
                                 runResults.put("result","");
-                                i2=i2+1;
                             } catch ( IOException | JSONException | RuntimeException ex ) {
                                 String msg= ex.toString();
                                 runResults.put("result",msg);
@@ -1620,7 +1619,7 @@ public class BatchMaster extends javax.swing.JPanel {
                                 errbaos.close();
                                 outbaos.close();
                             }
-                            if ( jobs1.get(i1).getIcon()==okay ) {
+                            if ( jobs1.get(i1).getIcon()!=prob ) {
                                 jobs2.get(i2).setToolTipText( htmlize(runResults.getString("stdout"),runResults.getString("stderr")));
                             } else {
                                 String s= htmlize(runResults.getString("stdout"),runResults.getString("result"));
@@ -1629,6 +1628,7 @@ public class BatchMaster extends javax.swing.JPanel {
                             }
                             JSONObject copy = new JSONObject(runResults, JSONObject.getNames(runResults));
                             ja.put( icount, copy );
+                            i2=i2+1;
                             icount++;
                         }
                         if ( problemMessage==null ) {
