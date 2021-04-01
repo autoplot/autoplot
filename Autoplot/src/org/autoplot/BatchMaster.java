@@ -106,6 +106,9 @@ public class BatchMaster extends javax.swing.JPanel {
     public BatchMaster( final Application dom ) {
         initComponents();
         generateButton1.setEnabled(false);
+        generateButton2.setEnabled(false);
+        generateMenuItem1.setEnabled(false);
+        generateMenuItem2.setEnabled(false);
         this.dom= dom;
         this.state= STATE_READY;
         
@@ -210,6 +213,7 @@ public class BatchMaster extends javax.swing.JPanel {
             ComboBoxModel m1= new DefaultComboBoxModel(Arrays.copyOfRange(items,1,items.length));
             param1NameCB.setModel(m1);
             generateButton1.setEnabled( items.length>1 );
+            generateMenuItem1.setEnabled( items.length>1 );
             ComboBoxModel m2= new DefaultComboBoxModel(items);
             param2NameCB.setModel(m2);
 
@@ -251,7 +255,7 @@ public class BatchMaster extends javax.swing.JPanel {
         jScrollPane2 = new javax.swing.JScrollPane();
         jList2 = new javax.swing.JList<>();
         jPopupMenu1 = new javax.swing.JPopupMenu();
-        generateMenuItem = new javax.swing.JMenuItem();
+        generateMenuItem1 = new javax.swing.JMenuItem();
         loadUriMenuItem = new javax.swing.JMenuItem();
         loadFromFileMI = new javax.swing.JMenuItem();
         pasteMenuItem = new javax.swing.JMenuItem();
@@ -296,14 +300,14 @@ public class BatchMaster extends javax.swing.JPanel {
         });
         jScrollPane2.setViewportView(jList2);
 
-        generateMenuItem.setText("Generate...");
-        generateMenuItem.setToolTipText("Generate items for list");
-        generateMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        generateMenuItem1.setText("Generate...");
+        generateMenuItem1.setToolTipText("Generate items for list");
+        generateMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                generateMenuItemActionPerformed(evt);
+                generateMenuItem1ActionPerformed(evt);
             }
         });
-        jPopupMenu1.add(generateMenuItem);
+        jPopupMenu1.add(generateMenuItem1);
 
         loadUriMenuItem.setText("Load Events File...");
         loadUriMenuItem.setToolTipText("Load a list of time ranges from an events file.");
@@ -660,9 +664,9 @@ public class BatchMaster extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_param1ValuesMouseReleased
 
-    private void generateMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateMenuItemActionPerformed
+    private void generateMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateMenuItem1ActionPerformed
         doGenerate( param1NameCB, param1Values );
-    }//GEN-LAST:event_generateMenuItemActionPerformed
+    }//GEN-LAST:event_generateMenuItem1ActionPerformed
 
     private void param2ValuesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_param2ValuesMouseClicked
         if ( evt.isPopupTrigger() ) {
@@ -729,7 +733,9 @@ public class BatchMaster extends javax.swing.JPanel {
 
     private void param1NameCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_param1NameCBItemStateChanged
         if ( evt.getStateChange()==ItemEvent.SELECTED ) {
-            generateButton1.setEnabled( param1NameCB.getSelectedItem().toString().trim().length()>0 );
+            boolean present= param1NameCB.getSelectedItem().toString().trim().length()>0;
+            generateButton1.setEnabled( present );
+            generateMenuItem1.setEnabled( present );
             param1ScrollPane.getViewport().setView(param1Values);
             param2ScrollPane.getViewport().setView(param2Values);
             messageLabel.setText("Load up those parameters and hit Go!");
@@ -738,7 +744,9 @@ public class BatchMaster extends javax.swing.JPanel {
 
     private void param2NameCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_param2NameCBItemStateChanged
         if ( evt.getStateChange()==ItemEvent.SELECTED ) {
-            generateButton2.setEnabled( param2NameCB.getSelectedItem().toString().trim().length()>0 );
+            boolean present= param2NameCB.getSelectedItem().toString().trim().length()>0;
+            generateButton2.setEnabled( present );
+            generateMenuItem2.setEnabled( present );
         }
     }//GEN-LAST:event_param2NameCBItemStateChanged
 
@@ -1567,7 +1575,7 @@ public class BatchMaster extends javax.swing.JPanel {
     private javax.swing.JMenu fileMenu;
     private javax.swing.JButton generateButton1;
     private javax.swing.JButton generateButton2;
-    private javax.swing.JMenuItem generateMenuItem;
+    private javax.swing.JMenuItem generateMenuItem1;
     private javax.swing.JMenuItem generateMenuItem2;
     private javax.swing.JButton goButton;
     private javax.swing.JMenu helpMenu;

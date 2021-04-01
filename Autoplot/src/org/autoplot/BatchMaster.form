@@ -33,13 +33,13 @@
         <Property name="useNullLayout" type="boolean" value="true"/>
       </Layout>
       <SubComponents>
-        <MenuItem class="javax.swing.JMenuItem" name="generateMenuItem">
+        <MenuItem class="javax.swing.JMenuItem" name="generateMenuItem1">
           <Properties>
             <Property name="text" type="java.lang.String" value="Generate..."/>
             <Property name="toolTipText" type="java.lang.String" value="Generate items for list"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="generateMenuItemActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="generateMenuItem1ActionPerformed"/>
           </Events>
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="loadUriMenuItem">
