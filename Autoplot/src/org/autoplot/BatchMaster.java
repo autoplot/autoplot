@@ -13,6 +13,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -825,7 +826,7 @@ public class BatchMaster extends javax.swing.JPanel {
         }
         if ( JFileChooser.APPROVE_OPTION==chooser.showSaveDialog( this ) ) {
             File ff= chooser.getSelectedFile();
-            if ( !ff.getName().endsWith(".csv") ) {
+            if ( !(ff.getName().endsWith(".csv")||ff.getName().endsWith(".json")) ) {
                 ff= new File( ff.getAbsolutePath()+".csv");
             }
             final File f= ff;
@@ -928,7 +929,12 @@ public class BatchMaster extends javax.swing.JPanel {
         if ( results==null ) {
             return;
         }
-        exportResultsPending( f, results, results.getJSONArray("results"), 0 );
+        if ( f.getName().endsWith(".json") ) {
+            String sresults= results.toString(3);
+            FileUtil.writeStringToFile( f, sresults );
+        } else {
+            exportResultsPendingCSV( f, results, results.getJSONArray("results"), 0 );
+        }
     }
     
     private void loadBatchFile( File f ) throws IOException, JSONException {
@@ -1336,6 +1342,17 @@ public class BatchMaster extends javax.swing.JPanel {
         return p;
     }
     
+    private static String htmlize( String txt ) {
+        String[] ss= txt.split("\n");
+        StringBuilder sb= new StringBuilder("<html>\n");
+        for ( String s: ss ) {
+            sb.append( s );
+            sb.append( "<br>\n");
+        }
+        sb.append("</html>");
+        return sb.toString();
+    }
+    
     /**
      * run the batch process.  The
      * @throws IOException 
@@ -1468,7 +1485,16 @@ public class BatchMaster extends javax.swing.JPanel {
                     if ( param2NameCB.getSelectedItem().toString().trim().length()==0 ) {
                         long t0= System.currentTimeMillis();
                         try {
+                            param1ScrollPane.scrollRectToVisible( jobs1.get(i1).getBounds() );
+                            ByteArrayOutputStream baos= new ByteArrayOutputStream();
+                            ByteArrayOutputStream errbaos= new ByteArrayOutputStream();
+                            interp.setOut(baos);
+                            interp.setErr(errbaos);
                             interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile),scriptFile.getName()), scriptFile.getName() );
+                            errbaos.close();
+                            baos.close();
+                            runResults.put("stdout", new String(baos.toByteArray(),"US-ASCII") );
+                            runResults.put("stderr", new String(errbaos.toByteArray(),"US-ASCII") );
                             runResults.put("executionTime", System.currentTimeMillis()-t0);
                             if ( writeCheckBox.isSelected() ) {
                                 runResults.put( "writeFile", doWrite( f1, "" ) );
@@ -1536,13 +1562,17 @@ public class BatchMaster extends javax.swing.JPanel {
                 } catch (IOException | RuntimeException | JSONException ex) {
                     Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
                     jobs1.get(i1).setIcon(prob);
-                    jobs1.get(i1).setToolTipText(ex.toString());
+                    jobs1.get(i1).setToolTipText(htmlize(ex.toString()));
                 }
                 i1=i1+1;
                 
                 if ( resultsFile!=null ) {
-                    File pendingResultsFile= new File( resultsFile.getAbsolutePath()+".pending" );
-                    exportResultsPending( pendingResultsFile, jo, ja, exportResultsWritten );
+                    if ( resultsFile.getName().endsWith(".json") ) {
+                        
+                    } else {
+                        File pendingResultsFile= new File( resultsFile.getAbsolutePath()+".pending" );
+                        exportResultsPendingCSV( pendingResultsFile, jo, ja, exportResultsWritten );
+                    }
                     exportResultsWritten= icount;
                 }
                 
@@ -1622,7 +1652,11 @@ public class BatchMaster extends javax.swing.JPanel {
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
-    private static void exportResultsPending( File pendingFile, JSONObject results, JSONArray resultsArray, int recordsWrittenAlready ) throws FileNotFoundException, IOException {
+    private static void exportResultsPendingJSON( File pendingFile, JSONObject results, JSONArray resultsArray, int recordsWrittenAlready ) throws FileNotFoundException, IOException, JSONException {        
+    
+    }
+    
+    private static void exportResultsPendingCSV( File pendingFile, JSONObject results, JSONArray resultsArray, int recordsWrittenAlready ) throws FileNotFoundException, IOException {
         
         boolean header= recordsWrittenAlready==0;
         
