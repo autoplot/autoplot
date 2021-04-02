@@ -460,7 +460,9 @@ public class EditorAnnotationsSupport {
                         int i= msg.lastIndexOf("?\n");
                         if ( i>-1 ) msg= msg.substring(i+2).trim();
                     }
-                    return new PyString("<html>highlite an expression<br>"+msg);
+                    msg= msg.replaceAll("\n","<br>\n");
+                    //msg= "<b>"+expr+"</b><br>\n" + msg;
+                    return new PyString("<html>highlite an expression:<br>"+msg);
                 }
             }
         };
