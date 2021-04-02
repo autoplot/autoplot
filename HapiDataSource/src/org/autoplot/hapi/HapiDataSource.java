@@ -1254,7 +1254,7 @@ public final class HapiDataSource extends AbstractDataSource {
             
             String line= in.readLine();
             
-            if ( line.startsWith("{") ) {
+            if ( line!=null && line.startsWith("{") ) {
                 logger.log(Level.WARNING, "data response starts with \"{\", not data!");
                 StringBuilder sb= new StringBuilder();
                 while ( line!=null ) {
