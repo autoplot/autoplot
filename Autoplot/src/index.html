@@ -26,8 +26,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-03-28 r25653):</p>
+        <p>Bugfixes (2021-04-02 r25679):</p>
         <ul>
+            <li>James caught place where rarely-used code would have been stuck in endless loop.  Thanks James!
+            <li>correction to export of qstream, where format is "%.2f", causing runtime error because there was field width.
+            <li>tooltip to evaluate expression properly html-izes output, replacing newlines with &lt;br&gt;.
             <li>HAPI 2.0 JSON no-data response is supported.
             <li>Grabbing ctrl+C or cmd+C on Mac is difficult, so just make "C" trigger copy to clipboard.
         </ul>
@@ -44,6 +47,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add new eventsComplement which returns the intervals which are not in the input.
+            <li>tickValues can now be *10/2,3,4,5,6,7,8,9 for log axes.  Thanks, Ali!
             <li>Revisit the "Run Batch" dialog, and keep track of stdout for each run.
         </ul>
         <p>Less recent features:</p>
