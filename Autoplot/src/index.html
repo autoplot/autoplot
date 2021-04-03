@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Autoplot grabs data from GitHub area studying Taylor Swift songs.  See <a href="https://arxiv.org/abs/2103.16737">the original paper</a> and <a href="https://github.com/meganmansfield/taylorswift/blob/master/Grades.csv">the data</a>.
+        <p><small>The "Run Batch" tool now stores stdout and more provide ways to explore results.  See <a href='https://github.com/autoplot/dev/blob/master/rfe/sf/545/'>these examples</a>.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -29,10 +29,10 @@
         <p>Bugfixes (2021-04-02 r25679):</p>
         <ul>
             <li>James caught place where rarely-used code would have been stuck in endless loop.  Thanks James!
-            <li>correction to export of qstream, where format is "%.2f", causing runtime error because there was field width.
-            <li>tooltip to evaluate expression properly html-izes output, replacing newlines with &lt;br&gt;.
+            <li>correction to export of qstream, where format is "%.2f", causing runtime error because there was no field width.
+            <li>tooltip to evaluate Jython expression properly html-izes output, replacing newlines with &lt;br&gt;.
             <li>HAPI 2.0 JSON no-data response is supported.
-            <li>Grabbing ctrl+C or cmd+C on Mac is difficult, so just make "C" trigger copy to clipboard.
+            <li>Grabbing ctrl+C or cmd+C on Mac is difficult, so just make "C" trigger copy crosshair coordinates to clipboard.
         </ul>
         <p>Older Bugfixes (2021-03-25 r25652):</p>
         <ul>
@@ -48,7 +48,7 @@
         <p>Features:</p>
         <ul>
             <li>add new eventsComplement which returns the intervals which are not in the input.
-            <li>tickValues can now be *10/2,3,4,5,6,7,8,9 for log axes.  Thanks, Ali!
+            <li>tickValues can now be *10/2,3,4,5,6,7,8,9 or *100 for log axes.  Thanks, Ali!
             <li>Revisit the "Run Batch" dialog, and keep track of stdout for each run.
         </ul>
         <p>Less recent features:</p>
