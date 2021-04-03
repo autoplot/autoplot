@@ -1,6 +1,7 @@
 
 package org.autoplot;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -36,6 +37,7 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -54,6 +56,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.autoplot.bookmarks.Bookmark;
 import org.autoplot.datasource.DataSetSelector;
@@ -99,6 +102,8 @@ public class BatchMaster extends javax.swing.JPanel {
     private JSONObject results=null;
     private JSONObject resultsPending=null;
     private File resultsFile=null;
+    
+    private JLabel[] param1JLabels= null;
     
     public static final int HTML_LINE_LIMIT = 50;
     
@@ -222,6 +227,8 @@ public class BatchMaster extends javax.swing.JPanel {
 
             param1Values.setText("");
             param2Values.setText("");
+            
+            switchToEditableList();
 
             messageLabel.setText("Load up those parameters and hit Go!");
             param1ScrollPane.getViewport().setView(param1Values);
@@ -1327,6 +1334,17 @@ public class BatchMaster extends javax.swing.JPanel {
         param2ScrollPane.getViewport().setView(param2Values);
     }
     
+    private void selectRecord( int irec ) {
+        for ( int i=0; i<param1JLabels.length; i++ ) {
+            param1JLabels[i].setBackground(Color.white);
+            param1JLabels[i].setBorder(BorderFactory.createEmptyBorder());
+        }
+        if ( irec>-1 ) {
+            param1JLabels[irec].setBackground(Color.GRAY);
+            param1JLabels[irec].setBorder(BorderFactory.createLineBorder(Color.black));
+        }
+    }
+    
     private JPanel switchListToIconLabels( List<JLabel> jobs1, String[] ff1 ) {
         JPanel p= new JPanel();
             
@@ -1422,14 +1440,62 @@ public class BatchMaster extends javax.swing.JPanel {
         final DasProgressPanel monitor= DasProgressPanel.createComponent( "" );
         progressPanel.add( monitor.getComponent() );
 
-        List<JLabel> jobs1= new ArrayList<>();
-        List<JLabel> jobs2= new ArrayList<>();
+        final List<JLabel> jobs1= new ArrayList<>();
+        final List<JLabel> jobs2= new ArrayList<>();
         
         editParamsButton.setEnabled(true);
         
         {
             String[] ff1= param1Values.getText().split("\n");
             JPanel p= switchListToIconLabels( jobs1, ff1 );
+
+            for ( int i=0; i<jobs1.size(); i++ ) {
+                final int fi= i;
+                jobs1.get(i).addMouseListener( new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        selectRecord(fi);
+                        String param1= (String)BatchMaster.this.param1NameCB.getSelectedItem();
+                        if ( BatchMaster.this.results!=null ) {
+                            String s= jobs1.get(fi).getText();
+                            List<JSONObject> thisRow= new ArrayList<>();
+                            try {
+                                JSONObject jo= BatchMaster.this.results;
+                                JSONArray ja= jo.getJSONArray("results");
+                                for ( int j=0; j<ja.length(); j++ ) {
+                                    JSONObject jo1= ja.getJSONObject(j);
+                                    if ( jo1.getString(param1).equals(s) ) {
+                                        thisRow.add( jo1 );
+                                    }
+                                }
+                                if ( jobs2.size()==thisRow.size() ) {
+                                    for ( int i=0; i<thisRow.size(); i++ ) {
+                                        JSONObject runResults= thisRow.get(i);
+                                        String except= thisRow.get(i).getString("result");
+                                        if ( except.length()>0 ) {
+                                            jobs2.get(i).setIcon(prob);
+                                        } else {
+                                            jobs2.get(i).setIcon(okay);
+                                        }
+                                        if ( jobs2.get(i).getIcon()==okay ) {
+                                            jobs2.get(i).setToolTipText( htmlize(runResults.getString("stdout")) );
+                                        } else {
+                                            jobs2.get(i).setToolTipText( htmlize(runResults.getString("stdout"),runResults.getString("result")));
+                                        }
+                                    }
+                                } else {
+                                    System.err.println("one should never code on Saturday mornings");
+                                }
+                                
+                            } catch (JSONException ex) {
+                                Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                });
+            }
+
+            param1JLabels= jobs1.toArray( new JLabel[jobs1.size()] );
             param1ScrollPane.getViewport().setView(p);   
         }
                
@@ -1546,11 +1612,9 @@ public class BatchMaster extends javax.swing.JPanel {
                     if ( param2NameCB.getSelectedItem().toString().trim().length()==0 ) {
                         long t0= System.currentTimeMillis();
                         ByteArrayOutputStream outbaos= new ByteArrayOutputStream();
-                        ByteArrayOutputStream errbaos= new ByteArrayOutputStream();
                         try {
                             param1ScrollPane.scrollRectToVisible( jobs1.get(i1).getBounds() );
                             interp.setOut(outbaos);
-                            interp.setErr(errbaos);
                             interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile),scriptFile.getName()), scriptFile.getName() );
                             if ( writeCheckBox.isSelected() ) {
                                 runResults.put( "writeFile", doWrite( f1, "" ) );
@@ -1561,14 +1625,13 @@ public class BatchMaster extends javax.swing.JPanel {
                             runResults.put("result",msg);
                             jobs1.get(i1).setIcon(prob);
                         } finally {
-                            runResults.put("stdout", new String(outbaos.toByteArray(),"US-ASCII") );
-                            runResults.put("stderr", new String(errbaos.toByteArray(),"US-ASCII") );
-                            runResults.put("executionTime", System.currentTimeMillis()-t0);                            
-                            errbaos.close();
                             outbaos.close();
+                            runResults.put("stdout", new String(outbaos.toByteArray(),"US-ASCII") );
+                            runResults.put("executionTime", System.currentTimeMillis()-t0);                            
+                            System.out.println(runResults.getString("stdout"));
                         }
                         if ( jobs1.get(i1).getIcon()==okay ) {
-                            jobs1.get(i1).setToolTipText( htmlize(runResults.getString("stdout"),runResults.getString("stderr")));
+                            jobs1.get(i1).setToolTipText( htmlize(runResults.getString("stdout")) );
                         } else {
                             jobs1.get(i1).setToolTipText( htmlize(runResults.getString("stdout"),runResults.getString("result")));
                         }
@@ -1595,14 +1658,12 @@ public class BatchMaster extends javax.swing.JPanel {
                             }
                             long t0= System.currentTimeMillis();
                             ByteArrayOutputStream outbaos= new ByteArrayOutputStream();
-                            ByteArrayOutputStream errbaos= new ByteArrayOutputStream();
                             try {
                                 paramName= param2NameCB.getSelectedItem().toString();
                                 runResults.put(paramName,f2);
                                 jobs2.get(i2).setIcon( working );
                                 setParam( interp, parms.get(paramName), paramName, f2 );
                                 interp.setOut(outbaos);
-                                interp.setErr(errbaos);                
                                 interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile), scriptFile.getName()), scriptFile.getName() );
                                 if ( writeCheckBox.isSelected() ) {
                                     runResults.put( "writeFile", doWrite( f1,f2 ) );
@@ -1617,13 +1678,12 @@ public class BatchMaster extends javax.swing.JPanel {
                                 problemMessage= msg;
                             } finally {
                                 runResults.put("stdout", new String(outbaos.toByteArray(),"US-ASCII") );
-                                runResults.put("stderr", new String(errbaos.toByteArray(),"US-ASCII") );                                 
                                 runResults.put("executionTime", System.currentTimeMillis()-t0);
-                                errbaos.close();
                                 outbaos.close();
+                                System.out.println(runResults.getString("stdout"));
                             }
                             if ( jobs1.get(i1).getIcon()!=prob ) {
-                                jobs2.get(i2).setToolTipText( htmlize(runResults.getString("stdout"),runResults.getString("stderr")));
+                                jobs2.get(i2).setToolTipText( htmlize(runResults.getString("stdout")) );
                             } else {
                                 String s= htmlize(runResults.getString("stdout"),runResults.getString("result"));
                                 jobs2.get(i2).setToolTipText( s );
