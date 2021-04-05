@@ -36,7 +36,6 @@ import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.LoggerManager;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.util.PythonInterpreter;
@@ -45,7 +44,6 @@ import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.WindowManager;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.JythonUtil.Param;
-import static org.autoplot.jythonsupport.ui.Util.getParams;
 import org.das2.util.ColorUtil;
 import java.awt.Color;
 import java.net.URL;
@@ -65,7 +63,7 @@ public class ParametersFormPanel {
         fd= new FormData();
     }   
 
-    private static final Logger logger= LoggerManager.getLogger("jython");
+    private static final Logger logger= LoggerManager.getLogger("jython.form");
 
     private static boolean isBoolean( List<Object> parms ) {
         return parms.size()==2 && ( parms.contains("T") && parms.contains("F") || parms.contains(0) && parms.contains(1) );
@@ -292,6 +290,7 @@ public class ParametersFormPanel {
         if ( params==null ) params= Collections.emptyMap();
         this.params= new HashMap(params);
 
+        logger.entering( "ParametersFormPanel", "doVariables", new Object[] { env, src, params } );
         boolean hasVars;
         fd.tflist= new ArrayList();
         fd.paramsList= new ArrayList();
