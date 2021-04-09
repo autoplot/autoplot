@@ -962,26 +962,34 @@ public final class HapiDataSource extends AbstractDataSource {
             if ( subsetPds.length==2 && subsetPds[1].size.length>0 ) {
                 // Oooh, it's a spectrogram.  Maybe it has time-varying DEPEND_1.
                 String dependName= null;
+                String[] dependNames= null;
                 if ( subsetPds[1].dependName!=null ) {
-                    dependName= subsetPds[1].dependName[0];
+                    dependNames= new String[subsetPds[1].dependName.length];
+                    for ( int i=0; i<subsetPds[1].dependName.length; i++ ) {
+                        dependNames[i]= subsetPds[1].dependName[i];
+                    }
                 } else {
                     logger.warning("depend name missing!");
                 }
-                if ( dependName!=null ) {
+                if ( dependNames!=null ) {
                     
-                    ParamDescription[] subsetPds1= new ParamDescription[3];
-                    
-                    System.arraycopy(subsetPds, 0, subsetPds1, 0, 2);
-                    
-                    int k= indexOfParameter( pds, dependName );
-                    if ( k==-1 ) {
-                        logger.log(Level.WARNING, "unable to find parameter: {0}", dependName);
-                    } else {
-                        subsetPds1[2]= pds[k];
-                        subsetPds= subsetPds1;
-                        pp= pp+","+dependName;
+                    List<ParamDescription> subsetPds1= new ArrayList<>();
+                    for ( int i=0; i<subsetPds.length; i++ ) {
+                        subsetPds1.add( subsetPds[i] );
                     }
                     
+                    for ( int i=0; i<dependNames.length; i++ ) {
+                        if ( dependNames[i]!=null ) {
+                            int k= indexOfParameter( pds, dependNames[i] );
+                            if ( k==-1 ) {
+                                logger.log(Level.WARNING, "unable to find parameter: {0}", dependName);
+                            } else {
+                                subsetPds1.add(pds[k]);
+                                pp= pp+","+dependNames[i];
+                            }
+                        }
+                    }
+                    subsetPds= subsetPds1.toArray( new ParamDescription[subsetPds1.size()] );
                 }
             }
             
@@ -2584,6 +2592,11 @@ public final class HapiDataSource extends AbstractDataSource {
             return ds;
             
         } else if ( combineRank2Depend1 ) {
+            MutablePropertyDataSet theScienceDs= Ops.maybeCopy( Ops.trim1( ds, 1, 1+pds[1].nFields ) );
+            if ( pds[1].size.length>1 ) {
+                theScienceDs= Ops.maybeCopy( Ops.reform( theScienceDs, theScienceDs.length(), pds[1].size ) );
+            }
+            
             // we need to remove Epoch to DEPEND_0.
             SparseDataSetBuilder[] sdsbs= new SparseDataSetBuilder[pds.length];
             int ifield=1;
@@ -2604,9 +2617,12 @@ public final class HapiDataSource extends AbstractDataSource {
                         if ( pds[i].size.length!=pds[i].depend.length ) throw new IllegalArgumentException("pds[i].size.length!=pds[i].depend.length");
                         for ( int j=0; j<pds[i].size.length; j++ ) {
                             if ( pds[i].dependName[j]!=null ) {
-                                // wait
+                                // wait until code below
                             } else {
                                 sdsb.putProperty( "DEPEND_"+(j+1), startIndex, pds[i].depend[j]);
+                                if ( i==1 ) {
+                                    theScienceDs.putProperty( "DEPEND_"+(j+1), pds[i].depend[j]) ;
+                                }
                             }
                         }
                     }
@@ -2637,15 +2653,15 @@ public final class HapiDataSource extends AbstractDataSource {
             }
             
             int start= 1;
-            MutablePropertyDataSet wds= Ops.copy( Ops.trim1( ds, start, start+length1 ) );
             start= start+length1;
-            wds.putProperty( QDataSet.DEPEND_0, depend0 );
-            wds.putProperty( QDataSet.BUNDLE_1, sdsbs[1].getDataSet() );
-            wds= copyProperties( wds, pds[1] );
+            theScienceDs.putProperty( QDataSet.DEPEND_0, depend0 );
+            //theScienceDs.putProperty( QDataSet.BUNDLE_1, sdsbs[1].getDataSet() );
+            theScienceDs= copyProperties( theScienceDs, pds[1] );
             
             for ( int i=1; i<pds.length; i++ ) { // only works for rank2!!!
                 if ( pds[i].dependName!=null ) {
-                    for (String dependName : pds[i].dependName) {
+                    for ( int j=0; j<pds[i].dependName.length; j++ ) {
+                        String dependName= pds[i].dependName[j];
                         if (dependName != null) {
                             int k;
                             for (k=1; k<pds.length; k++) {
@@ -2659,14 +2675,18 @@ public final class HapiDataSource extends AbstractDataSource {
                                 depds.putProperty( QDataSet.BUNDLE_1, sdsbs[k].getDataSet() );    
                                 depds= copyProperties( depds, pds[k] );
                                 start= start+length1;
-                                wds.putProperty( "DEPEND_"+i, depds );
+                                if ( pds[k].size.length>1 ) {
+                                    theScienceDs.putProperty( "DEPEND_"+(j+1), Ops.reform( depds, depds.length(), pds[k].size ) );
+                                } else {
+                                    theScienceDs.putProperty( "DEPEND_"+(j+1), depds );
+                                }
                             }
                         }
                     }
                 }
             }
             
-            ds= wds;            
+            ds= theScienceDs;            
             
         } else {
             // we need to remove Epoch to DEPEND_0.
