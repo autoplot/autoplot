@@ -350,7 +350,7 @@ public class ParametersFormPanel {
                         for ( Object o: parm.enums ) {
                             if ( parm.deft.equals(o) ) okay=true;
                         }
-                        if ( !okay ) logger.log(Level.WARNING, "parameter enumeration does contain the default for \"{0}\"", vname);
+                        if ( !okay ) logger.log(Level.WARNING, "parameter enumeration does not contain the default for \"{0}\"", vname);
                     }
                 }
                         
@@ -610,7 +610,11 @@ public class ParametersFormPanel {
                                     throw new IllegalArgumentException("param should be a string: "+vname);
                                 }
                             } else {
-                                val= String.valueOf( parm.deft );
+                                if ( isBool && parm.deft instanceof Integer ) {
+                                    val= ( ((Integer)parm.deft)==0 ) ? "F" : "T";
+                                } else {
+                                    val= String.valueOf( parm.deft );
+                                }
                                 params.put( vname, val );
                             }       
                             if ( values!=null && values.size()>0 ) {
@@ -700,9 +704,10 @@ public class ParametersFormPanel {
 
                 boolean shortLabel= ( parm.type=='R' || String.valueOf(parm.deft).length()>22 ) ;
                 final String fdeft= shortLabel ? "default" : String.valueOf(parm.deft);
-                final String fvalue= String.valueOf(parm.deft);
+                
+                final String fvalue= ( isBool && parm.deft instanceof Integer ) ? ( parm.deft.equals(0) ? "F" : "T" ) :  String.valueOf(parm.deft);
                 final JComponent ftf= ctf;
-                JButton defaultButton= new JButton( new AbstractAction( fdeft ) {
+                JButton defaultButton= new JButton( new AbstractAction(  isBool ? fvalue : fdeft ) {
                     @Override
                     public void actionPerformed( ActionEvent e ) {
                         if ( ftf instanceof DataSetSelector ) {
@@ -722,7 +727,7 @@ public class ParametersFormPanel {
                                 }
                             }
                         } else if ( ftf instanceof JCheckBox ) {
-                            ((JCheckBox)ftf).setSelected( fvalue.equals("T") );
+                            ((JCheckBox)ftf).setSelected( fvalue.startsWith("T") );
                         } else {
                             ((JTextField)ftf).setText(fvalue);
                         }
