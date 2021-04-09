@@ -164,10 +164,20 @@ public class RecordIterator implements Iterator<QDataSet>  {
                     }                    
                 } else if ( ds.rank()>2 ) { // flatten the rank>2 to rank=2.
                     int[] qube= DataSetUtil.qubeDims(ds.slice(0));
-                    ds= Ops.reform( ds, ds.length(), new int[] { DataSetUtil.product(qube) } );
+                    QDataSet dep2= (QDataSet) ds.property(QDataSet.DEPEND_2);
+                    if ( dep2!=null && dep2.rank()==3 ) {
+                        dep2= Ops.reform( dep2, dep2.length(), new int[] { DataSetUtil.product(qube) } );                                                
+                    } 
+                    ds= Ops.reform( ds, ds.length(), new int[] { DataSetUtil.product(qube) } );                    
                     this.src= Ops.bundle( dep0, Ops.slice1(ds,0) );
                     for ( int i=1; i<ds.length(0); i++ ) {
                         this.src= Ops.bundle( this.src, Ops.slice1(ds,i) );
+                    }
+                    if ( dep2!=null ) {
+                        this.src= Ops.bundle( this.src, Ops.slice1(dep2,0) );
+                        for ( int i=1; i<dep2.length(0); i++ ) {
+                            this.src= Ops.bundle( this.src, Ops.slice1(dep2,i) );
+                        }
                     }
                 }
             } else {
