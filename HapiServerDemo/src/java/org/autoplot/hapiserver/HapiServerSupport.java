@@ -167,6 +167,7 @@ public class HapiServerSupport {
      * @throws JSONException 
      */
     public static JSONObject readJSON( File jsonFile ) throws FileNotFoundException, IOException, JSONException {
+        logger.entering( "HapiServerSupport", "readJSON", jsonFile );
         StringBuilder builder= new StringBuilder();
         try ( BufferedReader in= new BufferedReader( new FileReader( jsonFile ) ) ) {
             String line= in.readLine();
@@ -184,6 +185,8 @@ public class HapiServerSupport {
         } catch ( JSONException ex ) {
             logger.log( Level.WARNING, "Exception encountered when reading "+jsonFile, ex );
             throw ex;
+        } finally {
+            logger.exiting( "HapiServerSupport", "readJSON" );
         }
     }
     
