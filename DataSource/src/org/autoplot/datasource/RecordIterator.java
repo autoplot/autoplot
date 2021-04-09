@@ -173,7 +173,7 @@ public class RecordIterator implements Iterator<QDataSet>  {
                     for ( int i=1; i<ds.length(0); i++ ) {
                         this.src= Ops.bundle( this.src, Ops.slice1(ds,i) );
                     }
-                    if ( dep2!=null ) {
+                    if ( dep2!=null && dep2.rank()>1 ) {
                         this.src= Ops.bundle( this.src, Ops.slice1(dep2,0) );
                         for ( int i=1; i<dep2.length(0); i++ ) {
                             this.src= Ops.bundle( this.src, Ops.slice1(dep2,i) );
