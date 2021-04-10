@@ -385,7 +385,7 @@ public class DomOps {
             double MaxDownPx;
             for ( Plot plotj : plots ) {
                 String title= plotj.getTitle();
-                String content= title.replaceAll("(\\!c|\\!C|\\<br\\>)", " ");
+                String content= title; // title.replaceAll("(\\!c|\\!C|\\<br\\>)", " ");
                 boolean addLines= plotj.isDisplayTitle() && content.trim().length()>0;
                 int lc= lineCount(title);
                 MaxUpJEm= addLines ? Math.max( 2, lc ) : 0.;
