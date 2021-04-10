@@ -166,6 +166,10 @@ public class Test_031_MultiPanelPlot implements Scenario {
             new JButtonOperator(domProps, "OK").clickMouse();
             
             ScriptContext.waitUntilIdle();
+            
+            ScriptContext.fixLayout();
+            ScriptContext.waitUntilIdle();
+            
             while ( domProps.isVisible() ) {
                 Thread.sleep(100);  // Why does the press take so long???
             }
