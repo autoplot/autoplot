@@ -1401,13 +1401,24 @@ addBottomDecoration( dom.canvases[0], paint )
      * @return
      */
     public static BufferedImage writeToBufferedImage( Application applicationIn ) {
+        for ( DataSourceFilter dsf : applicationIn.getDataSourceFilters() ) {
+            if ( dsf.getUri().equals("vap+internal:") ) {
+                logger.fine("copy over vap+internal datasets.");
+            }
+        }
         ApplicationModel appmodel= new ApplicationModel();
         appmodel.addDasPeersToAppAndWait();
         appmodel.getDocumentModel().syncTo(applicationIn);
 
+        for ( int i=0; i<applicationIn.getDataSourceFilters().length; i++ ) {
+            if ( applicationIn.getDataSourceFilters(i).getUri().equals("vap+internal:") ) {
+                QDataSet ds= applicationIn.getDataSourceFilters(i).getController().getFillDataSet();
+                appmodel.getDocumentModel().getDataSourceFilters(i).getController().setDataSetInternal(ds);
+            }
+        }
         int height= applicationIn.getCanvases(0).getHeight();
         int width= applicationIn.getCanvases(0).getWidth();
-
+        
         BufferedImage image= appmodel.getCanvas().getImage(width, height);
         
         return image;
