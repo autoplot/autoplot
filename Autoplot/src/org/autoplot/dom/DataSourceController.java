@@ -511,6 +511,10 @@ public class DataSourceController extends DomNodeController {
         }
     }
 
+    /**
+     * set the dataset for the DataSourceFilter.
+     * @param ds the dataset
+     */
     public void setDataSetInternal(QDataSet ds) {
         setDataSetInternal(ds, null, this.dom.controller.isValueAdjusting());
     }
