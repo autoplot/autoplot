@@ -1395,10 +1395,8 @@ addBottomDecoration( dom.canvases[0], paint )
     /**
      * creates a BufferedImage from the provided DOM.  This blocks until the
      * image is ready.
-     * TODO: this has issues with the size.  See writeToPng(filename).  It looks
-     *   like this might be handled here
      * @param applicationIn
-     * @return
+     * @return the image
      */
     public static BufferedImage writeToBufferedImage( Application applicationIn ) {
         for ( DataSourceFilter dsf : applicationIn.getDataSourceFilters() ) {
