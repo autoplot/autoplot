@@ -885,6 +885,7 @@ public class GuiSupport {
             throw new RuntimeException(ex);
         }
         model.dom.syncTo( parent.applicationModel.dom );
+        DomUtil.copyOverInternalData( parent.applicationModel.dom, model.dom );
         return model;
     }
     

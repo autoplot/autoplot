@@ -35,6 +35,7 @@ import org.jdesktop.beansbinding.Converter;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.state.StatePersistence;
 import org.das2.components.propertyeditor.Displayable;
+import org.das2.qds.QDataSet;
 import org.das2.util.ColorUtil;
 
 /**
@@ -1415,5 +1416,31 @@ public class DomUtil {
             }
         }
         return problems;
+    }
+
+    /**
+     * copy over "vap+internal:" data, where data is found in the controller but no URI represents it.
+     * This is to support https://sourceforge.net/p/autoplot/bugs/2332/, where we now copy over any data
+     * we find as well.
+     * @param srcdom the src dom with controllers and possibly internal data.
+     * @param dstdom the dst dom with controllers.
+     */
+    public static void copyOverInternalData(Application srcdom, Application dstdom) {
+        DataSourceFilter[] srcdsfs= srcdom.getDataSourceFilters();
+        DataSourceFilter[] dstdsfs= dstdom.getDataSourceFilters();
+        if ( srcdsfs.length!=dstdsfs.length ) {
+            throw new IllegalArgumentException("src and dest doms must be the same length.");
+        }
+        if ( dstdsfs.length>0 && dstdsfs[0].getController()==null ) {
+            logger.warning("destination does not have controllers, internal data in src will be ignored.");
+            return;
+        }
+        for ( int i=0; i<srcdsfs.length; i++ ) {
+            if ( srcdsfs[i].getUri().equals("vap+internal:") && srcdsfs[i].getController()!=null ) {
+                QDataSet ds= srcdsfs[i].getController().getFillDataSet();
+                dstdsfs[i].getController().setDataSetInternal(ds);
+            }
+        }
+        
     }
 }

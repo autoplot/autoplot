@@ -1408,12 +1408,8 @@ addBottomDecoration( dom.canvases[0], paint )
         appmodel.addDasPeersToAppAndWait();
         appmodel.getDocumentModel().syncTo(applicationIn);
 
-        for ( int i=0; i<applicationIn.getDataSourceFilters().length; i++ ) {
-            if ( applicationIn.getDataSourceFilters(i).getUri().equals("vap+internal:") ) {
-                QDataSet ds= applicationIn.getDataSourceFilters(i).getController().getFillDataSet();
-                appmodel.getDocumentModel().getDataSourceFilters(i).getController().setDataSetInternal(ds);
-            }
-        }
+        DomUtil.copyOverInternalData( applicationIn, appmodel.getDocumentModel() );
+
         int height= applicationIn.getCanvases(0).getHeight();
         int width= applicationIn.getCanvases(0).getWidth();
         
