@@ -610,11 +610,7 @@ public class ParametersFormPanel {
                                     throw new IllegalArgumentException("param should be a string: "+vname);
                                 }
                             } else {
-                                if ( isBool && parm.deft instanceof Integer ) {
-                                    val= ( ((Integer)parm.deft)==0 ) ? "F" : "T";
-                                } else {
-                                    val= String.valueOf( parm.deft );
-                                }
+                                val= String.valueOf( parm.deft );
                                 params.put( vname, val );
                             }       
                             if ( values!=null && values.size()>0 ) {
