@@ -1361,7 +1361,7 @@ public class BatchMaster extends javax.swing.JPanel {
         scrollp.setPreferredSize( new Dimension(640,640));
         scrollp.setMaximumSize( new Dimension(640,640));
             
-        messageLabel.setText("Running jobs, click on labels above to edit.");
+        messageLabel.setText("Running jobs, mouse over to view tooltip containing standard output.");
         return p;
     }
     
