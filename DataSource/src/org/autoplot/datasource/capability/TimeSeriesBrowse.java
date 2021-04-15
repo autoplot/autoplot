@@ -30,18 +30,20 @@ import org.das2.datum.DatumRange;
 public interface TimeSeriesBrowse {
     /**
      * set the time range for the desired view of the timeseries.
+     * @param dr the new time range.
      */
     void setTimeRange( DatumRange dr );
     
     /**
      * get the time range for the current view of the timeseries.  Note this 
      * may not be the same as getTimeRange
-     * @return
+     * @return the current time range.
      */
     DatumRange getTimeRange();
     
     /**
      * set the resolution for the desired view of the timeseries.
+     * @param d the time resolution
      */
     void setTimeResolution( Datum d );
         
@@ -49,6 +51,7 @@ public interface TimeSeriesBrowse {
      * get the resolution for the current view of the timeseries.  Note this
      * may not be the same as setTimeResolution.  Also, this may be null, indicating
      * the native resolution is used.
+     * @return the resolution for the current view of the timeseries.
      */
     Datum getTimeResolution();
         
@@ -56,13 +59,14 @@ public interface TimeSeriesBrowse {
      * return the URI for the current time range and resolution.  This is also
      * used to identify the dataset, so the same urls returned from here must
      * return the same dataset!
+     * @return the URI to load this data.
      */
     String getURI( );
 
     /**
      * return the URI without the timeSeriesBrowse settings, for use in .vap files and where the 
      * timerange is set elsewhere.
-     * @return 
+     * @return the URI simplified by removing the timerange and resolution.
      */
     String blurURI( );
     
@@ -71,6 +75,7 @@ public interface TimeSeriesBrowse {
      * allows the timerange part of the URI to be set without having to understand the rest of it.
      * set the URI, and possibly the timerange part.
      * @param suri
+     * @throws ParseException if the uri cannot be parsed.
      */
     public void setURI( String suri ) throws ParseException ;
 
