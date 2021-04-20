@@ -10,12 +10,12 @@
 #
 # This should be run from the folder "Autoplot"
 #
-# Used by: autoplot-release on Hudson.
+# Used by: autoplot-release on Jenkins.
 #
 
 # set JAVA_HOME
 if [ "" = "$JAVA_HOME" ]; then
-    JAVA_HOME=/usr/local/jdk1.7.0_80/
+    JAVA_HOME=/usr/local/jdk1.8/
 fi
 
 if [[ $JAVA_HOME != */ ]]; then
@@ -104,7 +104,7 @@ if [ "" = "$CODEBASE" ]; then
 fi
 
 if [ "" = "$HUDSON_URL" ]; then
-    HUDSON_URL="http://apps-pw.physics.uiowa.edu/hudson"
+    HUDSON_URL="http://ci-pw.physics.uiowa.edu/"
 fi
 
 if [ "" = "$WGET" ]; then
@@ -155,8 +155,9 @@ echo $plugins
 
 echo "copy sources..."
 for i in \
-  dasCore dasCoreUtil dasCoreDatum \
-  QDataSet QStream DataSource \
+  das2java/dasCore das2java/dasCoreUtil das2java/dasCoreDatum \
+  das2java/QDataSet das2java/QStream \
+  DataSource \
   JythonSupport \
   AutoplotHelp \
   IdlMatlabSupport \
