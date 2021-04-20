@@ -91,8 +91,9 @@ echo "done copy jar file classes."
 
 echo "copy sources..."
 for i in \
-  dasCore dasCoreUtil dasCoreDatum \
-  QDataSet QStream  DataSource \
+  das2java/dasCore das2java/dasCoreUtil das2java/dasCoreDatum \
+  das2java/QDataSet das2java/QStream \
+  DataSource \
   JythonSupport \
   AutoplotHelp \
   IdlMatlabSupport \
