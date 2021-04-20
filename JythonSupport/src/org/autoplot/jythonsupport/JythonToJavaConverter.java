@@ -20,6 +20,8 @@ import org.autoplot.datasource.DataSetURI;
 import org.das2.jythoncompletion.JavadocLookup;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.python.core.PyFloat;
+import org.python.core.PyInteger;
 import org.python.parser.SimpleNode;
 import org.python.parser.ast.Assign;
 import org.python.parser.ast.Attribute;
@@ -32,6 +34,7 @@ import org.python.parser.ast.For;
 import org.python.parser.ast.FunctionDef;
 import org.python.parser.ast.If;
 import org.python.parser.ast.ImportFrom;
+import org.python.parser.ast.Index;
 import org.python.parser.ast.Name;
 import org.python.parser.ast.Num;
 import org.python.parser.ast.Print;
@@ -416,7 +419,54 @@ public class JythonToJavaConverter {
         sb.append(b);
         return sb.toString();
     }
+    
+    /**
+     * return the Java type to use for the list.
+     * @param list
+     * @return 
+     */
+    public static String getJavaListType(  org.python.parser.ast.List list ) {
+        if ( list.elts.length==0 ) {
+            return "new Object[]";
+        } else {
+            Object o= list.elts[0];
+            for ( int i=1; i<list.elts.length; i++ ) {
+                if ( list.elts[i].getClass()!=o.getClass() ) {
+                    return "new Object[]";
+                } 
+            }
+            if ( o instanceof Num ) {
+                Num n= (Num)o;
+                if ( n.n instanceof PyInteger ) {
+                    return "new int[]";
+                } else if ( n.n instanceof PyFloat ) {
+                    return "new double[]";
+                } else {
+                    return "new Number[]";
+                }
+            } else if ( o instanceof Str ) {
+                return "new String[]";
+            } else {
+                return "new Object[]";
+            }
+        }
+    }
 
+    private static String getJavaExprType(exprType iter) {
+        if ( iter instanceof Call ) {
+            Call cc= (Call)iter;
+            if ( cc.func instanceof Name ) {
+                Name n= (Name)cc.func;
+                if ( n.id.equals("range") ) {
+                    return "int";
+                } else if ( n.id.equals("xrange") ) {
+                    return "int";
+                }
+            }
+        }
+        return "Object";
+    }
+    
     private static class MyVisitorBase<R> extends VisitorBase {
 
         boolean looksOkay = true;
@@ -551,9 +601,9 @@ public class JythonToJavaConverter {
                     }
                     traverse("", as.targets[i], false);
                 }
-                this.builder.append("=");
+                this.builder.append(" = ");
                 traverse("", as.value, false);
-
+                
             } else if (sn instanceof Name) {
                 this.builder.append(((Name) sn).id);
             } else if (sn instanceof Call) {
@@ -576,18 +626,23 @@ public class JythonToJavaConverter {
                     this.builder.append(";\n");
                     lineNumber++;
                 }
-
+            } else if ( sn instanceof Index ) {
+                Index id= (Index)sn;
+                traverse("", id.value, true);
+                
             } else if (sn instanceof For) {
                 For ff = (For) sn;
-                this.builder.append(indent).append("for ( Object ");
-                traverse("", ff.target, false);
+                String typeOf= getJavaExprType( ff.iter );
+                this.builder.append(indent).append("for ( ").append(typeOf).append(" ");
+                traverse("", ff.target, true);
                 this.builder.append(" : ");
-                traverse("", ff.iter, false);
+                traverse("", ff.iter, true);
                 this.builder.append(" ) {\n");
                 lineNumber++;
+                String thisIndent = "    "+ indent;
                 for (int i = 0; i < ff.body.length; i++) {
                     this.builder.append(indent).append(indent);
-                    traverse(indent + indent, ff.body[i], false);
+                    traverse(thisIndent, ff.body[i], false);
                 }
                 this.builder.append(indent).append("}\n");
                 lineNumber++;
@@ -618,6 +673,23 @@ public class JythonToJavaConverter {
                 traverse("", at.value, false);
                 this.builder.append(".");
                 this.builder.append(at.attr);
+            } else if ( sn instanceof org.python.parser.ast.List ) {
+                org.python.parser.ast.List ll = ((org.python.parser.ast.List) sn);
+                String open= getJavaListType( ll );
+                this.builder.append(open);
+                this.builder.append(" { ");
+                
+                for ( int i=0; i<ll.elts.length; i++ ) {
+                    if ( i>0 ) this.builder.append(",");
+                    traverse("", ll.elts[i], false);
+                }
+                this.builder.append(" } ");
+            } else if ( sn instanceof org.python.parser.ast.Subscript ) {
+                org.python.parser.ast.Subscript ss= (org.python.parser.ast.Subscript)sn;
+                traverse( "", ss.value, false );
+                this.builder.append("[");
+                traverse( "", ss.slice, false );
+                this.builder.append("]");
             } else {
                 this.builder.append(sn.toString()).append("\n");
                 lineNumber++;
@@ -636,6 +708,7 @@ public class JythonToJavaConverter {
         public boolean visitNameFail() {
             return visitNameFail;
         }
+
     }
 
     public static String convert(String script) throws Exception {

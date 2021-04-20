@@ -1,33 +1,57 @@
 
 package org.autoplot.jythonsupport;
 
+import java.awt.Component;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
+import javax.swing.JOptionPane;
 import jsyntaxpane.DefaultSyntaxKit;
 
 /**
- *
+ * Convenient tool for converting Java code found on-line into Jython
+ * code which can be tinkered with.
  * @author jbf
  */
 public class JavaJythonConverter extends javax.swing.JPanel {
 
+    public JavaJythonConverter( JEditorPane editor ) {
+        this(editor, DIR_JAVA_TO_JYTHON);
+    }
     /**
      * Creates new form JavaJythonConverter
      * @param editor editor from which preferences come
+     * @param direction
      */
-    public JavaJythonConverter( JEditorPane editor ) {
+    public JavaJythonConverter( JEditorPane editor, int direction ) {
         initComponents();
+        
+        this.direction= direction;
+        
         DefaultSyntaxKit.initKit();
         javaEditorPane.setContentType("text/java");
 
         DefaultSyntaxKit.initKit();
         jythonEditorPane.setContentType("text/python");
+        
+        if ( direction==DIR_JAVA_TO_JYTHON ) {
+            
+        } else {
+            Component _1= jSplitPane1.getLeftComponent();
+            Component _2= jSplitPane1.getRightComponent();
+            jSplitPane1.setLeftComponent(_2);
+            jSplitPane1.setRightComponent(_1);
+            jSplitPane1.revalidate();
+            jButton1.setText("Convert Jython to Java");
+            jButton2.setText("Copy Java to Clipboard");
+        }
 
         if ( editor!=null ) {
             javaEditorPane.setBackground( editor.getBackground() );
@@ -38,7 +62,11 @@ public class JavaJythonConverter extends javax.swing.JPanel {
             jythonEditorPane.setFont(editor.getFont());
         }
     }
+    public static final int DIR_JAVA_TO_JYTHON = 1;
+    public static final int DIR_JYTHON_TO_JAVA = 2;
 
+    private int direction;
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -182,9 +210,19 @@ public class JavaJythonConverter extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String java= javaEditorPane.getText();
-        String jython= JythonToJavaConverter.convertReverse(java);
-        jythonEditorPane.setText(jython);
+        if ( direction==DIR_JAVA_TO_JYTHON ) {
+            String java= javaEditorPane.getText();
+            String jython= JythonToJavaConverter.convertReverse(java);
+            jythonEditorPane.setText(jython);
+        } else if ( direction==DIR_JYTHON_TO_JAVA ) {
+            try {
+                String jython= jythonEditorPane.getText();
+                String java= JythonToJavaConverter.convert(jython);
+                javaEditorPane.setText(java);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this,ex.toString());
+            }
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -251,5 +289,9 @@ public class JavaJythonConverter extends javax.swing.JPanel {
 
     public void setJavaSource(String doThis) {
         javaEditorPane.setText(doThis);
+    }
+    
+    public void setPythonSource(String doThis) {
+        jythonEditorPane.setText(doThis);
     }
 }

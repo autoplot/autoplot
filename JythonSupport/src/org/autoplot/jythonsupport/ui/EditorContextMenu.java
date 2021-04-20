@@ -555,17 +555,10 @@ public class EditorContextMenu {
                         doThis= editor.getText();
                     }
                     try {
-                        String java= JythonToJavaConverter.convert(doThis);
-                        JEditorPane a= new JEditorPane();
-                        a.setBackground( editor.getBackground() );
-                        a.setForeground( editor.getForeground() );                        
-                        DefaultSyntaxKit.initKit();
-                        a.setContentType("text/java");
-                        a.setText(java);
+                        JavaJythonConverter cc= new JavaJythonConverter(editor,JavaJythonConverter.DIR_JYTHON_TO_JAVA);
+                        cc.setPythonSource(doThis);
                         JDialog d= new JDialog();
-                        a.setMinimumSize( new Dimension(400,400) );
-                        a.setPreferredSize( new Dimension(400,400) );
-                        d.getContentPane().add(new JScrollPane(a));
+                        d.setContentPane(cc);
                         d.pack();
                         d.setVisible(true);
                     } catch ( Exception ex ) {
