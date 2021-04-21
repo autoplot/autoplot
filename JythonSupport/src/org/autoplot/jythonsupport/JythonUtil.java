@@ -60,6 +60,7 @@ import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.URISplit;
 import org.python.core.PyTuple;
 
 /**
@@ -550,7 +551,7 @@ public class JythonUtil {
 
     /**
      * scrape through the script looking for documentation declarations returns
-     * an array, possibly containing:<ul>
+     * an map, possibly containing:<ul>
      * <li>LABEL few words
      * <li>TITLE sentence
      * <li>DESCRIPTION short paragraph
@@ -562,9 +563,31 @@ public class JythonUtil {
      * 
      * @param reader, open and ready to read, which will be closed.
      * @return the documentation found.
+     * @see #getDocumentation(java.io.BufferedReader, java.net.URI) 
+     * @throws java.io.IOException
+     */    
+    public static Map<String, String> getDocumentation(BufferedReader reader ) throws IOException {
+        return getDocumentation( reader, null );
+    }
+    
+    /**
+     * scrape through the script looking for documentation declarations returns
+     * an map, possibly containing:<ul>
+     * <li>LABEL few words
+     * <li>TITLE sentence
+     * <li>DESCRIPTION short paragraph
+     * </ul>
+     * This would originally look for lines like:<br>
+     * # TITLE: Text Recombinator<br>
+     * but this has been deprecated and scripts should use setScriptTitle 
+     * and setScriptDescription
+     * 
+     * @param reader, open and ready to read, which will be closed.
+     * @param resourceURI the location of the script to define PWD.
+     * @return the documentation found.
      * @throws java.io.IOException
      */
-    public static Map<String, String> getDocumentation(BufferedReader reader) throws IOException {
+    public static Map<String, String> getDocumentation(BufferedReader reader, URI resourceURI ) throws IOException {
 
         String line = reader.readLine();
         StringBuilder scriptBuilder= new StringBuilder();
@@ -574,7 +597,14 @@ public class JythonUtil {
         }
 
         String script= scriptBuilder.toString();
-        ScriptDescriptor sd= org.autoplot.jythonsupport.JythonUtil.describeScript( script, new HashMap<String, String>() );
+        Map<String,Object> env= new HashMap<>();
+        
+        if ( resourceURI!=null ) {
+            URISplit split= URISplit.parse(resourceURI.toString());
+            env.put( "PWD", split.path );
+        }
+                
+        ScriptDescriptor sd= org.autoplot.jythonsupport.JythonUtil.describeScript( env, script, null );
         
         Map<String, String> result = new HashMap<>();
         if ( sd.getDescription().length()>0 ) result.put( "DESCRIPTION", sd.getDescription() );
