@@ -1,8 +1,6 @@
 
 package org.autoplot;
 
-import java.awt.Canvas;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.util.logging.Level;
@@ -36,7 +34,6 @@ import java.util.concurrent.locks.Lock;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -88,10 +85,13 @@ import org.das2.util.filesystem.FileSystem;
 
 /**
  * ScriptContext provides the API to perform abstract functions with 
- * the application.  For example, <tt>
- *   ScriptContext.load('http://autoplot.org/data/somedata.dat')
- *   ScriptContext.writeToPdf('/tmp/foo.pdf')
- * </tt>
+ * the application.  For example, 
+ * 
+ *<blockquote><pre><small>{@code
+ ScriptContext.load('http://autoplot.org/data/somedata.dat')
+ ScriptContext.writeToPdf('/tmp/foo.pdf')
+ *}</small></pre></blockquote>
+ * 
  * @author jbf
  */
 public class ScriptContext extends PyJavaInstance {
