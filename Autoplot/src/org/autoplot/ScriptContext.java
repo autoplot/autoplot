@@ -1004,6 +1004,7 @@ addTopDecoration( dom.canvases[0], paint )
      * decorations.
      *<blockquote><pre><small>{@code
 def paint(g):
+    g.color= Color.BLUE
     for i in xrange(0,1000,100):
         g.drawOval(500-i/2,500-i/2,i,i)
 
