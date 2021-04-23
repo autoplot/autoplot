@@ -809,6 +809,7 @@ public class EditorContextMenu {
                             + "<tr><td>SHIFT-F6</td><td> Execute with Parameters Dialog<br></td> </tr>"
                             + "<tr><td>CRTL-SHIFT-F12</td><td> Used for script editor development<br></td> </tr>"
                             + "<tr><td>CTRL-SPACE</td><td> Show completions<br></td> </tr>"
+                            + "<tr><td>CTRL-F</td><td> Show Search bar<br></td> </tr>"
                             + "</table></html>";
                             
                     JOptionPane.showMessageDialog( actionsMenu, msg );
@@ -830,6 +831,17 @@ public class EditorContextMenu {
             } );
             mi.setToolTipText("Run Static Code Analysis, looking for unused symbols which might hint at a semmantic error.");
             menu.add( mi );
+            
+            menu.addSeparator();
+            mi = new JMenuItem(new AbstractAction("Search...") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);
+                    JOptionPane.showMessageDialog(menu,"Ctrl-F is Search");
+                }
+            } );
+            JMenuItem searchItem = menu.add(mi);
+            searchItem.setText("Find"); 
             
             menu.addSeparator();
             JMenuItem cutItem = menu.add(new DefaultEditorKit.CutAction());
