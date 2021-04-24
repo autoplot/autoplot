@@ -370,6 +370,7 @@ public class JythonOps {
      * @param mon monitor for the download.
      * @return the name of the folder or jar file added.
      * @see https://sourceforge.net/p/autoplot/feature-requests/584/, which shows example use.
+     * @see #findJavaPathRoots(org.das2.util.filesystem.FileSystem) 
      * @throws IOException
      * @throws URISyntaxException 
      */    
@@ -402,6 +403,7 @@ public class JythonOps {
      * @param mon monitor for the download.
      * @return the name of the folder or jar file added.
      * @see https://sourceforge.net/p/autoplot/feature-requests/584/ which shows example use.
+     * @see #findJavaPathRoots(org.das2.util.filesystem.FileSystem) 
      * @throws IOException
      * @throws URISyntaxException 
      */
@@ -516,9 +518,13 @@ public class JythonOps {
 
     /**
      * search the folder for the names of packages.  This could trivially
-     * return "edu", but instead navigate to find a more precise name, or names.
-     * @param destDir
+     * return "org", but instead navigate to find a more precise name, or names
+     * like "org.autoplot" and "org.das2".  Note this is a bit like a recursive
+     * find command, but note that some Java assumptions like classnames being
+     * capitalized and packages being lower case are encoded.
+     * @param destDir root to start the search.
      * @return list of packages.
+     * @see #addToSearchPath(org.python.core.PyList, java.lang.String, org.das2.util.monitor.ProgressMonitor) 
      */
     public static List<String> findJavaPathRoots(FileSystem destDir) {
         return findJavaPathRoots(destDir,"/",new ArrayList<>() );
