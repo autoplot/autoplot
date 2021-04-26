@@ -821,7 +821,7 @@ public class SimplifyScriptSupport {
                 case "linspace":
                 case "fftPower":
                 case "magnitude":
-                    return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet    # return type from " + funcName + " (line789)\n";
+                    return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet    # return type from " + funcName + " (spot line789)\n";
                 default:
                     break;
             }
@@ -834,7 +834,7 @@ public class SimplifyScriptSupport {
             if (at.value instanceof Name) {
                 String attrName = ((Name) at.value).id;
                 if (attrName.equals("PngWalkTool") && at.attr.equals("start")) {
-                    return "from org.autoplot.pngwalk import PngWalkTool\n" + id + JythonCompletionTask.__CLASSTYPE + "= PngWalkTool #(line802)\n";
+                    return "from org.autoplot.pngwalk import PngWalkTool\n" + id + JythonCompletionTask.__CLASSTYPE + "= PngWalkTool #(spot line802)\n";
                 } else if (importedNames.containsKey(attrName)) {
                     Class claz = getClassFor(attrName, importedNames);
                     if (claz == null) {
@@ -844,7 +844,10 @@ public class SimplifyScriptSupport {
                     String methodName = at.attr;
                     for (Method m : mm) {
                         if (m.getName().equals(methodName)) { //&& m.getGenericParameterTypes().length ) {
-                            return id + JythonCompletionTask.__CLASSTYPE + " = " + m.getReturnType().getSimpleName() + "  # (line810)\n";
+                            Class rclz = m.getReturnType();
+                            String rclzn = rclz.getSimpleName();
+                            return "from " + rclz.getPackage().getName() + " import " + rclzn + "\n"
+                                 + id + JythonCompletionTask.__CLASSTYPE + " = " + rclzn + "  # (spot line810)\n";
                         }
                     }
                     return null;
@@ -860,7 +863,7 @@ public class SimplifyScriptSupport {
                             Class rclz = m.getReturnType();
                             String rclzn = rclz.getSimpleName();
                             return "from " + rclz.getPackage().getName() + " import " + rclzn + "\n"
-                                    + id + JythonCompletionTask.__CLASSTYPE + " = " + rclzn + "   # (line826)";
+                                    + id + JythonCompletionTask.__CLASSTYPE + " = " + rclzn + "   # (spot line826)";
                         } catch (NoSuchMethodException | SecurityException ex) {
                             logger.log(Level.SEVERE, null, ex);
                         }

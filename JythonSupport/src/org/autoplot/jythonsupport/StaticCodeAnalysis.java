@@ -108,6 +108,8 @@ public class StaticCodeAnalysis {
         List<SimpleNode> reassignedBeforeReadWarning;
         Map<String,SimpleNode> readButNotAssignedError;
         Map<String,SimpleNode> definedNames;
+        Map<String,SimpleNode> reassignedFunctionCalls; // the things that have been reassigned.
+        List<SimpleNode> reassignedFunctionCallWarning; // the things reassigned and then used as functions.
 
         VisitNamesVisitorBase(String name) {
             if ( name==null ) throw new NullPointerException("set to empty string not null");
@@ -115,6 +117,8 @@ public class StaticCodeAnalysis {
             names = new ArrayList();
             assignButNotReadWarning= new LinkedHashMap<>();
             reassignedBeforeReadWarning= new ArrayList<>();
+            reassignedFunctionCalls= new LinkedHashMap<>();
+            reassignedFunctionCallWarning= new ArrayList<>();
             readButNotAssignedError= new LinkedHashMap<>();
             definedNames= new HashMap<>(definedNamesApp);
             //definedNames= new HashMap<>();
@@ -230,15 +234,19 @@ public class StaticCodeAnalysis {
         private void handleExprTypeAssign( exprType t ) throws Exception {
             if ( t instanceof Name ) {
                 String n= ((Name)t).id;
+                if ( definedNames.containsKey(n) ) {
+                    logger.finer("reassign name");
+                    this.reassignedFunctionCalls.put(n,t);
+                }
                 this.addName( n ); //  !!!! Why must I do this manually?!?!?
                 SimpleNode notRead= (SimpleNode)this.assignButNotReadWarning.get(n);
                 if ( notRead!=null ) {
                     this.reassignedBeforeReadWarning.add( notRead );
                 }
                 this.assignButNotReadWarning.put( n, t );
-            } else {
-                t.traverse(this);
-            }
+              
+            } 
+            t.traverse(this);
         }
         
         
@@ -268,6 +276,13 @@ public class StaticCodeAnalysis {
 
         @Override
         public Object visitCall(Call node) throws Exception {
+            if ( node.func instanceof Name ) {
+                String name= ((Name)node.func).id;
+                if ( reassignedFunctionCalls.containsKey(name) ) {
+                    reassignedFunctionCallWarning.add(reassignedFunctionCalls.get(name));
+                    reassignedFunctionCallWarning.add(node);
+                }
+            }
             return super.visitCall(node); //To change body of generated methods, choose Tools | Templates.
         }
 
@@ -319,8 +334,31 @@ public class StaticCodeAnalysis {
         public List<SimpleNode> getReadButNotAssigned() {
             return new ArrayList<>( this.readButNotAssignedError.values() );
         }
+
+        private List<SimpleNode> getReassignedFunctionCalls() {
+            return new ArrayList<>( this.reassignedFunctionCallWarning );
+        }
     }
 
+    /**
+     * return any name which is used as a function call but has been reassigned.
+     * @param script the script code (not the filename).
+     * @param appContext true if application codes are loaded
+     * @param pwd null or the value of the working directory.
+     * @return 
+     */
+    public static List<SimpleNode> showReassignFunctionCall(String script, boolean appContext, String pwd ) {
+        Module n = (Module) org.python.core.parser.parse(script, "exec");
+        VisitNamesVisitorBase vb = new VisitNamesVisitorBase("");
+        if ( pwd!=null ) {
+            vb.addName("PWD");
+        }
+        for (stmtType st : n.body) {
+            vb.handleStmtType(st);
+        }
+        return vb.getReassignedFunctionCalls();
+    }
+    
     /**
      * return any node where a variable is assigned but then not later read.  This is 
      * not an error, but is a nice way to flag suspicious code.

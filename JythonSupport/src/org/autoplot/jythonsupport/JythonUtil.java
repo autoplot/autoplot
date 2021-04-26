@@ -464,32 +464,30 @@ public class JythonUtil {
      * @throws java.io.IOException
      */
     public static boolean pythonLint(LineNumberReader reader, List<String> errs) throws IOException {
-        String vnarg = "(\\s*)([a-zA-Z_][a-zA-Z0-9_]*)\\s*"; // any variable name  VERIFIED
 
-        Pattern assign = Pattern.compile(vnarg + "=.*");
-
-        InteractiveInterpreter interp = createInterpreter(true);
-
-        String line = reader.readLine();
-        while (line != null) {
-            Matcher m = assign.matcher(line);
-            if (m.matches()) {
-                String vname = m.group(2);
-                String indent= m.group(1);
-                try {
-                    if ( vname.equals("xrange") && indent.length()>0 ) {
-                        logger.fine("this is just xrange keyword in plot");
-                    } else {
-                        PyObject po = interp.eval(vname);
-                        errs.add("" + reader.getLineNumber() + ": " + vname + "=" + po.__repr__());
-                    }
-                } catch (PyException ex) {
-                    // this is what we want
+        StringBuilder build= new StringBuilder();
+        String line;
+        while ( ( line= reader.readLine() )!=null ) {
+            build.append(line).append("\n");  
+        }
+        
+        List<SimpleNode> ll= StaticCodeAnalysis.showReassignFunctionCall( build.toString(), true, null );
+        
+        for ( int i=0; i<ll.size(); i++ ) {
+            SimpleNode n= ll.get(i);
+            if ( n instanceof Name ) {
+                errs.add( String.format( "%d:%s", n.beginLine, ((Name)n).id ) );
+            } else {
+                exprType f=  ((Call)n).func ;
+                if ( f instanceof Name ) {
+                    errs.add( String.format( "%d:%s", n.beginLine, ((Name)f).id) );
+                } else {
+                    errs.add( String.format( "%d:%s", n.beginLine, f.toString() ) );
                 }
             }
-            line = reader.readLine();
         }
-
+        
+        
         return errs.size() > 0;
 
     }
