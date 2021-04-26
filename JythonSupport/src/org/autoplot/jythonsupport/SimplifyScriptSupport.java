@@ -720,21 +720,27 @@ public class SimplifyScriptSupport {
     private static boolean trivialFunctionCall(SimpleNode sn) {
         if (sn instanceof Call) {
             Call c = (Call) sn;
-            boolean klugdyOkay = false;
-            String ss = c.func.toString(); // we just want "DatumRangeUtil" of the Attribute
-            //String ss= getFunctionName(c.func);
-            for (String s : okay) {
-                if (ss.contains(s)) {
-                    klugdyOkay = true;
+            if ( c.func instanceof Attribute ) {
+                return true;
+                
+            } else {
+            
+                boolean klugdyOkay = false;
+                String ss = c.func.toString(); // we just want "DatumRangeUtil" of the Attribute
+                //String ss= getFunctionName(c.func);
+                for (String s : okay) {
+                    if (ss.contains(s)) {
+                        klugdyOkay = true;
+                    }
                 }
-            }
-            if (klugdyOkay == false) {
-                if (ss.contains("TimeUtil") && ss.contains("now")) {
-                    klugdyOkay = true;
+                if (klugdyOkay == false) {
+                    if (ss.contains("TimeUtil") && ss.contains("now")) {
+                        klugdyOkay = true;
+                    }
                 }
+                logger.log(Level.FINER, "trivialFunctionCall={0} for {1}", new Object[]{klugdyOkay, c.func.toString()});
+                return klugdyOkay;
             }
-            logger.log(Level.FINER, "trivialFunctionCall={0} for {1}", new Object[]{klugdyOkay, c.func.toString()});
-            return klugdyOkay;
         } else {
             return false;
         }
