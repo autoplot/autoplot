@@ -61,6 +61,7 @@ import org.python.util.PythonInterpreter;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
 import org.python.core.PyTuple;
 
 /**
@@ -471,7 +472,9 @@ public class JythonUtil {
             build.append(line).append("\n");  
         }
         
-        List<SimpleNode> ll= StaticCodeAnalysis.showReassignFunctionCall( build.toString(), true, null );
+        String script= build.toString();
+        
+        List<SimpleNode> ll= StaticCodeAnalysis.showReassignFunctionCall( script, true, null );
         
         for ( int i=0; i<ll.size(); i++ ) {
             SimpleNode n= ll.get(i);
