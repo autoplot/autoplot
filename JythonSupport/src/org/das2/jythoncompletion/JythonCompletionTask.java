@@ -152,7 +152,7 @@ public class JythonCompletionTask implements CompletionTask {
     public int doQuery( CompletionContext cc, CompletionResultSet resultSet ) {
         int c=0;
         try {
-            switch (cc.contextType) {
+                switch (cc.contextType) {
                 case CompletionContext.MODULE_NAME:
                     c= queryModules(cc, resultSet);
                     break;
@@ -789,7 +789,11 @@ public class JythonCompletionTask implements CompletionTask {
             if ( m.matches() ) {
                 int i= m.group(1).length();
                 String indent= lastLine.substring(0,i);
-                eval= eval + indent + "__dummy__=1\n";
+                if ( !eval.endsWith("\n") ) {
+                    eval= eval + "\n" + indent + "__dummy__=1\n";
+                } else {
+                    eval= eval + indent + "__dummy__=1\n";
+                }
             }
         }
         
