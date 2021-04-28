@@ -1823,7 +1823,7 @@ public class AutoplotUtil {
                 sandbox= "true, BUT NO SECURITY MANAGER IS PRESENT";
             }
         } else {
-            sandbox= "";
+            sandbox= "false";
         }
         
         String aboutContent = "<ul>" +
@@ -1835,6 +1835,7 @@ public class AutoplotUtil {
             "<li>free memory (MB): " + fmem + " (amount available before more must be allocated)" + 
             "<li>native memory limit (MB): " + nmem + " (amount of native memory available to the process)" +
             "<li>sandbox: " + sandbox +
+            "<li>noCheckCertificates: " + ( HttpsURLConnection.getDefaultHostnameVerifier()==allHostsValid ) +
             "<li>arch: " + arch +
             "<li>" + bits + " bit Java " + bitsWarning  +
             "<li>hostname: "+ host +
@@ -1850,41 +1851,49 @@ public class AutoplotUtil {
 
     }
     
+    private static final TrustManager[] trustAllCerts = new TrustManager[]{
+        new X509TrustManager() {
+            @Override
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return new java.security.cert.X509Certificate[0];
+            }
+            @Override
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {  }
+            @Override
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {  }
+            @Override
+            public String toString() {
+                return "AutoplotTrustAllTrustManager";
+            }
+        }
+    };
+    
+    // Create all-trusting host name verifier
+    private static final HostnameVerifier allHostsValid = new HostnameVerifier() {
+        @Override
+        public boolean verify(String hostname, SSLSession session) {
+            return true;
+        }
+        @Override
+        public String toString() {
+            return "AutoplotTrustAllHostnamesHostnameManager";
+        }
+    };
+            
     /**
-     * disable certificate checking.
+     * disable certificate checking.  A TrustManager and HostnameVerifier which trusts all
+     * names and certs is installed.
      */
     public static void disableCertificates() {
         logger.info("disabling HTTP certificate checks.");
         try {
-            TrustManager[] trustAllCerts = new TrustManager[]{
-                new X509TrustManager() {
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                        return new java.security.cert.X509Certificate[0];
-                    }
-                    
-                    public void checkClientTrusted(X509Certificate[] certs, String authType) {  }
-                    
-                    public void checkServerTrusted(X509Certificate[] certs, String authType) {  }
-                    
-                }
-            };
             
             SSLContext sc = SSLContext.getInstance("SSL");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            
-            // Create all-trusting host name verifier
-            HostnameVerifier allHostsValid = new HostnameVerifier() {
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-            };
-            
             HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
             
-        } catch (NoSuchAlgorithmException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        } catch ( KeyManagementException ex) {
+        } catch (NoSuchAlgorithmException | KeyManagementException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
     }
