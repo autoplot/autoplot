@@ -402,7 +402,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         
         if ( System.getProperty( "noCheckCertificate","true").equals("true") ) {
             if ( model.isSandboxed() ) {
-                logger.warning( "unable to disbable certificates because of sandbox");
+                logger.warning( "unable to disable certificates because of sandbox");
             } else {
                 AutoplotUtil.disableCertificates();
             }
