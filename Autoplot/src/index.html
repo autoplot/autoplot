@@ -28,6 +28,8 @@
         
         <p>Bugfixes (2021-04-17 r25709):</p>
         <ul>
+            <li>2338: if an aggregation granule dataset doesn't validate, don't mix it into the aggregation.
+            <li>2339: report when noCheckCertificates is set in about and runtime submissions.
             <li>2210: create screenshot hangs on a Mac.
             <li>2335: runtime error with ~/Downloa&lt;T&gt; when Downloads folder contains file with single paren.
             <li>2333: rte1830566714 shows where TCA result can be null and was not handled.
@@ -48,6 +50,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>installTool correctly sets PWD now, so that it can be used in argument lists
+            <li>740: warnings about redefining symbols like "plot" or "total" is too noisy, be more careful to only show when there is a problem.
 	    <li>Jython to Java converter improvements.
             <li>739: DasCore moved to GitHub, along with QDataSet
         </ul>
