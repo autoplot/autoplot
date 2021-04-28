@@ -587,6 +587,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         for ( String p: problems ) {
                             System.err.println("problem with aggregation element "+ss[i]+": "+p);
                             logger.log(Level.WARNING, "problem with aggregation element {0}: {1}", new Object[]{ss[i], p});
+                            throw new RuntimeException("dataset doesn't validate for " + delegateUri );
                         }
                     }
 
