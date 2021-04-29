@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-04-17 r25709):</p>
+        <p>Bugfixes (2021-04-28 r25745):</p>
         <ul>
+            <li>2335: new runtime error caused when quoted block contains a / and is split.
             <li>2338: if an aggregation granule dataset doesn't validate, don't mix it into the aggregation.
             <li>2339: report when noCheckCertificates is set in about and runtime submissions.
             <li>2210: create screenshot hangs on a Mac.
@@ -50,6 +51,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>NybbleDataSet putValue now works.  Support for rank 2.
             <li>installTool correctly sets PWD now, so that it can be used in argument lists
             <li>740: warnings about redefining symbols like "plot" or "total" is too noisy, be more careful to only show when there is a problem.
 	    <li>Jython to Java converter improvements.
