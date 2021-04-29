@@ -154,6 +154,7 @@ public class SimplifyScriptSupport {
         variableNames.add("URI");
         variableNames.add("URL");
         variableNames.add("PWD");
+        variableNames.add("dom"); // TODO: only true for .jy scripts.
 
         try {
             Module n = null;
@@ -541,6 +542,7 @@ public class SimplifyScriptSupport {
      * return true if we can include this in the script without a huge performance penalty.
      *
      * @param o the statement, for example an import or an assignment
+     * @param variableNames known symbol names
      * @return true if we can include this in the script without a huge performance penalty.
      */
     private static boolean simplifyScriptToGetCompletionsOkay(stmtType o, HashSet<String> variableNames) {
@@ -569,8 +571,21 @@ public class SimplifyScriptSupport {
         }
         if ((o instanceof org.python.parser.ast.Expr)) {
             Expr e = (Expr) o;
-            if ((e.value instanceof Call) && trivialFunctionCall((Call) e.value)) {
-                return true;
+            if ((e.value instanceof Call) ) {
+                if ( trivialFunctionCall((Call) e.value) ) {
+                    return true;
+                } else {
+                    Call c= (Call) e.value;
+                    if ( c.func instanceof Attribute ) {
+                        Attribute aa= (Attribute)c.func;
+                        if ( aa.value instanceof Name ) {
+                            Name naa= (Name)aa.value;
+                            if ( variableNames.contains(naa.id) ) {
+                                return true;
+                            }
+                        }
+                    }
+                }
             }
         }
         if ((o instanceof org.python.parser.ast.ClassDef)) {
@@ -720,27 +735,21 @@ public class SimplifyScriptSupport {
     private static boolean trivialFunctionCall(SimpleNode sn) {
         if (sn instanceof Call) {
             Call c = (Call) sn;
-            if ( c.func instanceof Attribute ) {
-                return true;
-                
-            } else {
-            
-                boolean klugdyOkay = false;
-                String ss = c.func.toString(); // we just want "DatumRangeUtil" of the Attribute
-                //String ss= getFunctionName(c.func);
-                for (String s : okay) {
-                    if (ss.contains(s)) {
-                        klugdyOkay = true;
-                    }
+            boolean klugdyOkay = false;
+            String ss = c.func.toString(); // we just want "DatumRangeUtil" of the Attribute
+            //String ss= getFunctionName(c.func);
+            for (String s : okay) {
+                if (ss.contains(s)) {
+                    klugdyOkay = true;
                 }
-                if (klugdyOkay == false) {
-                    if (ss.contains("TimeUtil") && ss.contains("now")) {
-                        klugdyOkay = true;
-                    }
-                }
-                logger.log(Level.FINER, "trivialFunctionCall={0} for {1}", new Object[]{klugdyOkay, c.func.toString()});
-                return klugdyOkay;
             }
+            if (klugdyOkay == false) {
+                if (ss.contains("TimeUtil") && ss.contains("now")) {
+                    klugdyOkay = true;
+                }
+            }
+            logger.log(Level.FINER, "trivialFunctionCall={0} for {1}", new Object[]{klugdyOkay, c.func.toString()});
+            return klugdyOkay;
         } else {
             return false;
         }
