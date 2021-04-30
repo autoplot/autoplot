@@ -125,8 +125,8 @@
                             sb.append("&format=image%2Fpng");
                             sb.append("&width=70");
                             sb.append("&height=16");
-                            sb.append("&row=0%2C100%25");
-                            sb.append("&column=0%2C100%25");
+                            sb.append("&row=0%25-1px%2C100%25");
+                            sb.append("&column=0%25-1px%2C100%25");
                             sb.append("&timerange="+URLEncoder.encode(exampleRange.toString()) );
                             out.print( "<a href='"+autoplotServer+"/thin/zoom/demo.jsp?"+sb.toString()+"' target='top'>");
                             out.print( "<img src='"+autoplotServer+"/SimpleServlet?"+sb.toString()+"'>" );
