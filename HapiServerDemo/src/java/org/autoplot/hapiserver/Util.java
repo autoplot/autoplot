@@ -102,7 +102,7 @@ public class Util {
      * @return the HAPI protocol version.
      */
     public static final String hapiVersion() {
-        return "2.1";
+        return "3.0";
     }
     
     /**
@@ -110,7 +110,7 @@ public class Util {
      * @return the server implementation version. 
      */
     public static final String serverVersion() {
-        return "20210409.0710";
+        return "20210430.1221";
     }
     
     static boolean isKey(String key) {
