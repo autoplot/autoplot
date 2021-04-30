@@ -146,7 +146,7 @@ public class ScreenshotsTool extends EventQueue {
         JPanel p= new JPanel();
         p.setLayout( new BoxLayout(p,BoxLayout.PAGE_AXIS ) );
 
-        p.add( new JLabel( "<html>This will automatically take screenshots, recording them to a folder.<br><br>Hold Ctrl and press Shift twice to stop recording." ), JLabel.LEFT_ALIGNMENT );
+        p.add( new JLabel( "<html>This will automatically take screenshots, recording them to a folder.<br><br>Hold Ctrl and press Shift twice to stop recording, <br>or Hold Alt and press Shift twice." ), JLabel.LEFT_ALIGNMENT );
 
         JPanel folderPanel= new JPanel();
         folderPanel.setLayout( new FlowLayout() );
@@ -1141,26 +1141,28 @@ public class ScreenshotsTool extends EventQueue {
         }
 
         // 400 401 402 are Key events.
-        if ( theEvent.getID()==Event.MOUSE_MOVE || theEvent.getID()==400 
-                || theEvent.getID()==401 || theEvent.getID()==402 ) {
+        if ( theEvent.getID()==Event.MOUSE_MOVE 
+                || theEvent.getID()==Event.KEY_PRESS 
+                || theEvent.getID()==Event.KEY_RELEASE
+                || theEvent.getID()==400 ) {
             tickleTimer.tickle( String.valueOf(theEvent.getID()) );
         }
 
-        if ( theEvent.getID()==401 && theEvent instanceof KeyEvent) {
-            if ( ((KeyEvent)theEvent).getKeyCode()==KeyEvent.VK_CONTROL ) {
+        if ( theEvent.getID()==Event.KEY_PRESS && theEvent instanceof KeyEvent ) {
+            int keyCode= ((KeyEvent)theEvent).getKeyCode();
+            System.err.println( "keyEscape: "+keyEscape + " theEvent: " + theEvent  );
+            if ( keyCode ==KeyEvent.VK_CONTROL || keyCode ==KeyEvent.VK_ALT ) {
                 keyEscape=2;
             } else if ( ((KeyEvent)theEvent).getKeyCode()==KeyEvent.VK_SHIFT ) {
                 keyEscape--;
                 if ( keyEscape==0 ) {
                     pop();
-
-                    Runnable run= new Runnable() {
-                        @Override
-                        public void run() {
-                            finishUp();
-                        }
+                    Runnable run= () -> {
+                        finishUp();
                     };
                     new Thread(run).start();
+                } else if ( keyEscape<0 ) {
+                    keyEscape= 0;
                 }
             }
         } else if ( theEvent.getID()==402 && theEvent instanceof KeyEvent ) {
@@ -1211,7 +1213,7 @@ public class ScreenshotsTool extends EventQueue {
 
                 }
             }
-            PngWalkTool tool= PngWalkTool.start( "file:"+outLocationFolder+ "/*.png", null );
+            PngWalkTool tool= PngWalkTool.start( "file:"+outLocationFolder+ "/$Y$m$d_$H$M$S_$(subsec;places=3)_$x.png", null );
             if ( !PngWalkTool.isQualityControlEnabled() ) {
                 tool.startQC();
             }
