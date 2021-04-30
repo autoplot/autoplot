@@ -6,6 +6,7 @@
 package org.autoplot;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -181,6 +182,10 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
         ann.setAnchorType( pointAtCB.isSelected() ? AnchorType.PLOT : AnchorType.CANVAS );
         ann.setAnchorPosition((AnchorPosition) anchorPositionEnumEditor.getValue());
         ann.setBorderType((BorderType) borderTypeEnumEditor.getValue());
+        if ( ann.getBorderType()==BorderType.NONE ) {
+            ann.setBackground( new Color( 0, 0, 0, 0  ) );
+            ann.setOverrideColors(true);
+        } 
         if ( pointAtCB.isSelected() ) {
             try {
                 Datum x= this.x.getUnits().parse( xDatumField.getText()) ;
