@@ -698,6 +698,24 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 PngWalkTool.start( pngwalk, AutoplotUI.this);
             }
         });
+        dataSetSelector.registerActionTrigger( ".*\\$x.*\\.(png|jpg|gif)", new AbstractAction( "pngwalk") {
+            @Override
+            public void actionPerformed( ActionEvent ev ) { // TODO: underimplemented
+                org.das2.util.LoggerManager.logGuiEvent(ev);                
+                applicationModel.addRecent(dataSetSelector.getValue());
+                String pngwalk= dataSetSelector.getValue();
+                PngWalkTool.start( pngwalk, AutoplotUI.this);
+            }
+        });
+        dataSetSelector.registerActionTrigger( ".*\\$x.*\\$x\\.(png|jpg|gif)", new AbstractAction( "pngwalk") {
+            @Override
+            public void actionPerformed( ActionEvent ev ) { // TODO: underimplemented
+                org.das2.util.LoggerManager.logGuiEvent(ev);                
+                applicationModel.addRecent(dataSetSelector.getValue());
+                String pngwalk= dataSetSelector.getValue();
+                PngWalkTool.start( pngwalk, AutoplotUI.this);
+            }
+        });
         
         dataSetSelector.registerActionTrigger( "http.*/hapi(/info\\?.*)?", new AbstractAction( "hapiServer") {
             @Override
