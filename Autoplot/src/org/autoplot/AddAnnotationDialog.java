@@ -15,6 +15,7 @@ import org.das2.graph.AnchorType;
 import org.autoplot.dom.Annotation;
 import org.das2.components.propertyeditor.EnumerationEditor;
 import org.das2.graph.AnchorPosition;
+import org.das2.graph.BorderType;
 
 /**
  *
@@ -24,7 +25,7 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
 
     private static Logger logger= Logger.getLogger("autoplot.gui");
      
-    EnumerationEditor edit;
+    EnumerationEditor anchorPositionEnumEditor;
     
     /**
      * Creates new form AddAnnotationDialog
@@ -32,11 +33,14 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
     public AddAnnotationDialog() {
         initComponents();
         
-        edit = new EnumerationEditor();
-        edit.setValue( AnchorPosition.NE );
+        anchorPositionEnumEditor = new EnumerationEditor();
+        anchorPositionEnumEditor.setValue( AnchorPosition.NE );
         anchorPositionPanel.setLayout( new BorderLayout() );
-        anchorPositionPanel.add( edit.getCustomEditor(), BorderLayout.CENTER);
+        anchorPositionPanel.add(anchorPositionEnumEditor.getCustomEditor(), BorderLayout.CENTER);
 
+        borderTypeEnumEditor.setValue( BorderType.ROUNDED_RECTANGLE );
+        borderTypePanel.add( borderTypeEnumEditor.getCustomEditor() );
+                
         validate();
         
     }
@@ -55,6 +59,7 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
     private void initComponents() {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
+        borderTypeEnumEditor = new org.das2.components.propertyeditor.EnumerationEditor();
         jTextField1 = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         pointAtCB = new javax.swing.JCheckBox();
@@ -62,6 +67,8 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
         yDatumField = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         anchorPositionPanel = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        borderTypePanel = new javax.swing.JPanel();
 
         jTextField1.setText("Annotation 1");
 
@@ -90,6 +97,10 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
             .addGap(0, 15, Short.MAX_VALUE)
         );
 
+        jLabel3.setText("Border Type:");
+
+        borderTypePanel.setLayout(new java.awt.BorderLayout());
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -113,7 +124,11 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
                                 .addComponent(jLabel1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(anchorPositionPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addGap(0, 12, Short.MAX_VALUE)))
+                        .addGap(0, 12, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(borderTypePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -132,7 +147,11 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(anchorPositionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(79, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(borderTypePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(97, Short.MAX_VALUE))
         );
 
         bindingGroup.bind();
@@ -141,8 +160,11 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel anchorPositionPanel;
+    private org.das2.components.propertyeditor.EnumerationEditor borderTypeEnumEditor;
+    private javax.swing.JPanel borderTypePanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JCheckBox pointAtCB;
     private javax.swing.JTextField xDatumField;
@@ -150,10 +172,15 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * make the settings of the Annotation consistent with the settings of this dialog.
+     * @param ann 
+     */
     void configure(Annotation ann) {
         ann.setText(jTextField1.getText());
         ann.setAnchorType( pointAtCB.isSelected() ? AnchorType.PLOT : AnchorType.CANVAS );
-        ann.setAnchorPosition((AnchorPosition) edit.getValue());
+        ann.setAnchorPosition((AnchorPosition) anchorPositionEnumEditor.getValue());
+        ann.setBorderType((BorderType) borderTypeEnumEditor.getValue());
         if ( pointAtCB.isSelected() ) {
             try {
                 Datum x= this.x.getUnits().parse( xDatumField.getText()) ;

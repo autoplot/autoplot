@@ -2462,7 +2462,6 @@ public class GuiSupport {
                     Annotation ann= controller.addAnnotation( domPlot, dia.getText() );
                     dia.configure(ann);
                     ann.setAnchorOffset("1em,1em");
-                    ann.setBorderType(BorderType.ROUNDED_RECTANGLE);
                     ann.setFontSize("1.4em");
                 }
             }
