@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small><a href="https://github.com/autoplot/dev/blob/master/demos/2021/20210428/percentileDemo.jy">Here's a code</a> highliting the points above the 95th percentile.
+        <p><small>Happy May Day!
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-04-28 r25745):</p>
+        <p>Bugfixes (2021-05-01 r25754):</p>
         <ul>
+            <li>2236: $x_$x.png works to trigger the PngWalkTool, so results of Run Batch are more easily viewed.  Start screenshots launches into PngWalk with timetags.
+            <li>alt-shift-shift can be used to stop screenshots, since some machines grab control keystroke event.
             <li>2335: new runtime error caused when quoted block contains a / and is split.
             <li>2338: if an aggregation granule dataset doesn't validate, don't mix it into the aggregation.
             <li>2339: report when noCheckCertificates is set in about and runtime submissions.
@@ -51,6 +53,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Add annotation dialog controls background color and border, making it easier to add text comments without a box.
             <li>NybbleDataSet putValue now works.  Support for rank 2.
             <li>installTool correctly sets PWD now, so that it can be used in argument lists
             <li>740: warnings about redefining symbols like "plot" or "total" is too noisy, be more careful to only show when there is a problem.
