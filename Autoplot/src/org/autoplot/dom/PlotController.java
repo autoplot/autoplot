@@ -1846,14 +1846,6 @@ public final class PlotController extends DomNodeController {
             }
             shouldBindX= shouldBindX(newSettings.getXaxis());
         }
-
-        if ( shouldBindX && !plot.getColumnId().equals( dom.getCanvases(0).getMarginColumn().getId() ) ) {
-            logger.log(Level.FINER, "not binding because plot is not attached to marginRow: {0}", plot.getXaxis());
-            //TODO: Reiner has a two-column canvas that has each plot bound.  It might be
-            //  nice to support this.
-            shouldBindX= false;
-            dom.getController().setStatus("not binding axis because plot is not attached to marginRow");
-        }
         
         if ( bm==null && shouldBindX ) {
             logger.log(Level.FINER, "add binding: {0}", plot.getXaxis());
