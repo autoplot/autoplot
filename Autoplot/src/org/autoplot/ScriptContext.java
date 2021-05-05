@@ -1146,23 +1146,45 @@ addBottomDecoration( dom.canvases[0], paint )
      *    throws IllegalArgumentException
      *    in: file://tmp/data/autoplot.xls?sheet=sheet1
      *   out: /tmp/data/autoplot.xls?sheet=sheet1
+     *    in: /tmp/has spaces.png
+     *   out: /tmp/has spaces.png
+     *    in: C:\Users\Documents and Settings\
+     *   out: C:\Users\Documents and Settings\
      *}</small></pre></blockquote>
-     * @param filename like "file://tmp/data/autoplot.png"
+     * @param filename like "file:/tmp/data/autoplot.png"
      * @return  "/tmp/data/autoplot.png"
      * @throws IllegalArgumentException if the filename reference is not a local reference.
      */
     private static String getLocalFilename( String filename ) {
+        String fp;
+        String qp=null; // query part
+        int iq= filename.indexOf('?');
+        if ( iq>-1 ) {
+            fp = filename.substring(0,iq);
+            qp= filename.substring(iq);
+        } else {
+            fp= filename;
+        }
+
         if ( filename.contains("/") || filename.contains("\\") ) {
             URISplit split= URISplit.parse(filename);
             if ( !split.scheme.equals("file") ) {
                 throw new IllegalArgumentException("cannot write to "+filename+ " because it must be local file");
             }
-            filename= split.file.substring(split.scheme.length()+1); //TODO: this is sloppy.
-            if ( split.params!=null ) {
-                filename= filename + "?"+ split.params;
+            if ( fp.startsWith("file:") ) {
+                filename= split.file.substring(split.scheme.length()+1); //TODO: this is sloppy.
+                if ( split.params!=null ) {
+                    filename= filename + "?"+ split.params;
+                }
+                if ( filename.startsWith("///" ) ) filename= filename.substring(2);
+                return filename;
+            } else {
+                if ( qp!=null ) {
+                    return fp + qp;
+                } else {
+                    return fp;
+                }
             }
-            if ( filename.startsWith("///" ) ) filename= filename.substring(2);
-            return filename;
         } else {
             String pwd= new File("").getAbsolutePath();
             return pwd + File.separator + filename;
