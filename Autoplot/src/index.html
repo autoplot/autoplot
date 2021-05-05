@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Happy May Day!
+        <p><small>Contours labeling needs some work, but note that you can now use "*10" for logarithmic contours.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-05-01 r25754):</p>
+        <p>Bugfixes (2021-05-05 r25758):</p>
         <ul>
+            <li>2343: writeToPng would not allow a filename with spaces in it.
+            <li>2341: automatic bind-to-app-timerange fails to bind when 3 rows and 2 columns.
             <li>2236: $x_$x.png works to trigger the PngWalkTool, so results of Run Batch are more easily viewed.  Start screenshots launches into PngWalk with timetags.
             <li>alt-shift-shift can be used to stop screenshots, since some machines grab control keystroke event.
             <li>2335: new runtime error caused when quoted block contains a / and is split.
@@ -53,6 +55,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>USER_PROPERTIES can have map with another nested map.
+            <li>rfe406: support &lt;sub&gt; and &lt;sup&gt; in text strings.
+            <li>new axis/controller/dasAxis/axisOffset property will allow for multiple axis on the left side of one plot.
             <li>Add annotation dialog controls background color and border, making it easier to add text comments without a box.
             <li>NybbleDataSet putValue now works.  Support for rank 2.
             <li>installTool correctly sets PWD now, so that it can be used in argument lists
