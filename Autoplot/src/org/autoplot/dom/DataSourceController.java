@@ -639,17 +639,20 @@ public class DataSourceController extends DomNodeController {
 
             doDimensionNames();
 
-            if ( ds.rank()<=QDataSet.MAX_RANK && DataSetUtil.totalLength(ds) < 200000 && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(ds)) ) {
+            if ( ds.rank()<=QDataSet.MAX_RANK && DataSetUtil.totalLength(ds) < LIMIT_STATS_COUNT && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(ds)) ) {
                 setStatus("busy: do statistics on the data...");
                 try {
                     if ( DataSetUtil.totalLength(ds)>0 ) {
+                        logger.fine("do statistics on the data");
                         setHistogram(new AutoHistogram().doit(ds, null));
+                        logger.fine("done with statistics on the data");
                     }
                 } catch ( RuntimeException ex ) {
                     logger.warning("runtime error during histogram usually means invalid data in data set.");
                     setHistogram(null);
                 }
             } else {
+                logger.fine("skipping stats because there is too much data");
                 setHistogram(null);
             }
 
@@ -676,6 +679,11 @@ public class DataSourceController extends DomNodeController {
 
         }
     }
+    
+    /**
+     * this is the maximum number of points which we will perform stats on.
+     */
+    protected static final int LIMIT_STATS_COUNT = 200000000;
 
     DataSourceFilter[] parentSources;
     
