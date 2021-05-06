@@ -1710,12 +1710,23 @@ public class DataSourceController extends DomNodeController {
         propertyChangeSupport.firePropertyChange(PROP_EXCEPTION, oldException, exception);
     }
     protected QDataSet histogram = null;
+    
+    /**
+     * @deprecated this function will be removed and put into the metadata tab.
+     */
     public static final String PROP_HISTOGRAM = "histogram";
 
+    /**
+     * @deprecated this function will be removed and put into the metadata tab.
+     */
     public QDataSet getHistogram() {
         return histogram;
     }
 
+    /**
+     * @deprecated this function will be removed and put into the metadata tab.
+     * @param histogram 
+     */
     public void setHistogram(QDataSet histogram) {
         QDataSet oldHistogram = this.histogram;
         this.histogram = histogram;
