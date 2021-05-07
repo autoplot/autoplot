@@ -28,22 +28,23 @@
         
         <p>Bugfixes (2021-05-05 r25758):</p>
         <ul>
-            <li>2343: writeToPng would not allow a filename with spaces in it.
-            <li>2341: automatic bind-to-app-timerange fails to bind when 3 rows and 2 columns.
+            <li>2348: grid is now drawn under the data, not over.  Let me know if this bugs you and I'll add a control.  Thanks, Ali and others!
+            <li>2343: writeToPng would not allow a filename with spaces in it.  Thanks, Kristoff!
+            <li>2341: automatic bind-to-app-timerange fails to bind when 3 rows and 2 columns.  Thanks, Ivar!
             <li>2236: $x_$x.png works to trigger the PngWalkTool, so results of Run Batch are more easily viewed.  Start screenshots launches into PngWalk with timetags.
             <li>alt-shift-shift can be used to stop screenshots, since some machines grab control keystroke event.
             <li>2335: new runtime error caused when quoted block contains a / and is split.
             <li>2338: if an aggregation granule dataset doesn't validate, don't mix it into the aggregation.
             <li>2339: report when noCheckCertificates is set in about and runtime submissions.
-            <li>2210: create screenshot hangs on a Mac.
-            <li>2335: runtime error with ~/Downloa&lt;T&gt; when Downloads folder contains file with single paren.
+            <li>2210: create screenshot hangs on a Mac.  Thanks, Joe!
+            <li>2335: runtime error with ~/Downloa&lt;T&gt; when Downloads folder contains file with single paren.  Thanks, Brian!
             <li>2333: rte1830566714 shows where TCA result can be null and was not handled.
             <li>start to correct Java 7 complaints in QDataSet.
         </ul>
         <p>Older Bugfixes (2021-03-25 r25652):</p>
         <ul>
             <li>2332: copy over the data when copying a DOM (.vap), so that 'vap+internal:' data is copied as well.
-            <li>2102: fix layout would allocate space even when "displayTitle" is false.
+            <li>2102: fix layout would allocate space even when "displayTitle" is false.  Thanks, Ali!
             <li>2329: default button for True/False param is "1" not "True"
             <li>2330: under-implementation of rfe670 rank3 depend2 in slice0.
             <li>SeriesRenderer, when in reduce-data mode, now reduces colors as well, culling a dot which is later covered by another.  Before data would suddenly turn black.
@@ -55,15 +56,16 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>increase the number of points limit when calculating stats to 200000000.  Thanks, Ivar!
             <li>USER_PROPERTIES can have map with another nested map.
             <li>rfe406: support &lt;sub&gt; and &lt;sup&gt; in text strings.
             <li>new axis/controller/dasAxis/axisOffset property will allow for multiple axis on the left side of one plot.
             <li>Add annotation dialog controls background color and border, making it easier to add text comments without a box.
             <li>NybbleDataSet putValue now works.  Support for rank 2.
             <li>installTool correctly sets PWD now, so that it can be used in argument lists
-            <li>740: warnings about redefining symbols like "plot" or "total" is too noisy, be more careful to only show when there is a problem.
+            <li>740: warnings about redefining symbols like "plot" or "total" is too noisy, be more careful to only show when there is a problem.  Thanks, Sadie!
 	    <li>Jython to Java converter improvements.
-            <li>739: DasCore moved to GitHub, along with QDataSet
+            <li>739: DasCore moved to GitHub, along with QDataSet.  Thanks, Chris!
         </ul>
         <p>Less recent features:</p>
         <ul>
