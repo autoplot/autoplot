@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-05-05 r25758):</p>
+        <p>Bugfixes (2021-05-07 r25763):</p>
         <ul>
+            <li>670: applyIndex didn't handle rank 3 depend 2.
             <li>2348: grid is now drawn under the data, not over.  Let me know if this bugs you and I'll add a control.  Thanks, Ali and others!
             <li>2343: writeToPng would not allow a filename with spaces in it.  Thanks, Kristoff!
             <li>2341: automatic bind-to-app-timerange fails to bind when 3 rows and 2 columns.  Thanks, Ivar!
@@ -57,6 +58,7 @@
         <p>Features:</p>
         <ul>
             <li>increase the number of points limit when calculating stats to 200000000.  Thanks, Ivar!
+            <li>Add constants to ColorUtil for 140 named web colors like "CADET_BLUE" to encourage use in scripts.
             <li>USER_PROPERTIES can have map with another nested map.
             <li>rfe406: support &lt;sub&gt; and &lt;sup&gt; in text strings.
             <li>new axis/controller/dasAxis/axisOffset property will allow for multiple axis on the left side of one plot.
