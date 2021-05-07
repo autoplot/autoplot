@@ -588,7 +588,8 @@ public final class PlotController extends DomNodeController {
         final DasPlot dasPlot1 = new DasPlot(xaxis, yaxis);
 
         dasPlot1.setPreviewEnabled(true);
-
+        dasPlot1.setDrawGridOver(false);
+        
         DatumRange colorRange = new DatumRange(0, 100, Units.dimensionless);
         DasColorBar colorbar = new DasColorBar(colorRange.min(), colorRange.max(), false);
         colorbar.addFocusListener(application.controller.focusAdapter);
