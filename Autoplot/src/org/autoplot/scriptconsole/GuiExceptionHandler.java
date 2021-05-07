@@ -388,10 +388,20 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             errorMessage= errorMessage + "\n\nThe wiki page at \"http://autoplot.org/outOfMemory\" might be helpful in resolving this issue.";
         }
 
+        
+        
+        
+        
+        
         if ( dia1==null ) {
-            dia1= createDialog( t, isUncaught );
+            dia1= createDialog( t, isUncaught );  // https://sourceforge.net/p/autoplot/bugs/2347/
         }
 
+        
+        
+        
+        
+        
         final JDialog dialog = dia1.dialog;
 
         dialogs.put( hash, dia1 );
