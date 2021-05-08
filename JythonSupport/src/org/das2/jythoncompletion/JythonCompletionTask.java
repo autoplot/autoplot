@@ -1,5 +1,6 @@
 package org.das2.jythoncompletion;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
@@ -54,6 +56,7 @@ import org.autoplot.jythonsupport.JythonOps;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
+import org.das2.graph.GraphUtil;
 import org.python.core.PyFloat;
 import org.python.core.PyReflectedField;
 
@@ -1585,6 +1588,12 @@ public class JythonCompletionTask implements CompletionTask {
         } else if ( jm instanceof java.lang.reflect.Field ) { 
             Field m= (Field)jm;
             if ( Modifier.isStatic(m.getModifiers()) ) {
+                try {
+                    Color testColor= (Color) m.get(java.awt.Color.class);
+                    return GraphUtil.colorImageIcon( testColor, 16, 16 );
+                } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    Logger.getLogger(JythonCompletionTask.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 icon= JAVA_FIELD_ICON;
             } else {
                 icon= JAVA_FIELD_ICON;
