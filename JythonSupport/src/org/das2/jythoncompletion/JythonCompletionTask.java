@@ -1589,12 +1589,17 @@ public class JythonCompletionTask implements CompletionTask {
             Field m= (Field)jm;
             if ( Modifier.isStatic(m.getModifiers()) ) {
                 try {
-                    Color testColor= (Color) m.get(java.awt.Color.class);
-                    return GraphUtil.colorImageIcon( testColor, 16, 16 );
+                    Object o= m.get(java.awt.Color.class);
+                    if ( o instanceof Color ) {
+                        Color testColor= (Color) o;
+                        return GraphUtil.colorImageIcon( testColor, 16, 16 );
+                    } else {
+                        return JAVA_FIELD_ICON;
+                    }
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
-                    Logger.getLogger(JythonCompletionTask.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log( Level.FINE, null, ex );
+                    return JAVA_FIELD_ICON;
                 }
-                icon= JAVA_FIELD_ICON;
             } else {
                 icon= JAVA_FIELD_ICON;
             }
