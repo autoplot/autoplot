@@ -68,12 +68,60 @@ public class ImageDataSource extends AbstractDataSource {
     }
 
     /**
+     * return the grayscale for each pixel,
+     * with values between 0 and 255, using the mapping
+     * 0.3 * r + 0.59 * g + 0.11 * b.
+     */
+    public static ImageDataSet.ColorOp GRAYSCALE_OP= new ImageDataSet.ColorOp() {
+        @Override
+        public double value(int rgb) {
+            int r = rgb & 0xFF0000 >> 16;
+            int g = rgb & 0x00FF00 >> 8;
+            int b = rgb &     0xFF;
+            return 0.3 * r + 0.59 * g + 0.11 * b;
+        }
+    };
+    
+    /**
+     * return the hue (as in Hue-Saturation-Value) for each pixel,
+     * with values between 0 and 360.
+     */
+    public static ImageDataSet.ColorOp HUE_OP= new ImageDataSet.ColorOp() {
+        @Override
+        public double value(int rgb) {
+            return toHSV(rgb, CHANNEL_HUE);
+        }
+    };
+    
+    /**
+     * return the saturation (as in Hue-Saturation-Value) for each pixel,
+     * with values between 0 and 100.
+     */
+    public static ImageDataSet.ColorOp SATURATION_OP= new ImageDataSet.ColorOp() {
+        @Override
+        public double value(int rgb) {
+            return toHSV(rgb, CHANNEL_SATURATION);
+        }
+    };
+    
+    /**
+     * return the value (as in Hue-Saturation-Value) for each pixel, with
+     * values between 0 and 100.
+     */
+    public static ImageDataSet.ColorOp VALUE_OP=new ImageDataSet.ColorOp() {
+        @Override
+        public double value(int rgb) {
+            return toHSV(rgb, CHANNEL_VALUE);
+        }
+    };
+    
+    /**
      * convert the rgb value to HSV.  Only one H, S, or V is returned.
      * @param rgb the integer rgb value.
      * @param channel
      * @return value (0-100), saturation (0-100), or hue (0-360)
      */
-    private double toHSV(int rgb, int channel) {
+    private static double toHSV(int rgb, int channel) {
         double r = (rgb & 0xFF0000) >> 16;
         double g = (rgb & 0x00FF00) >> 8;
         double b = (rgb &     0xFF);
@@ -250,36 +298,17 @@ public class ImageDataSource extends AbstractDataSource {
                 ds.putProperty( QDataSet.LABEL, "alpha" );
                 return ds;
             } else if (channel.equals("greyscale")) {
-                op = new ImageDataSet.ColorOp() {
-
-                    public double value(int rgb) {
-                        int r = rgb & 0xFF0000 >> 16;
-                        int g = rgb & 0x00FF00 >> 8;
-                        int b = rgb &     0xFF;
-                        return 0.3 * r + 0.59 * g + 0.11 * b;
-                    }
-                };
+                op = GRAYSCALE_OP;
+                
             } else if (channel.equals("hue")) {
-                op = new ImageDataSet.ColorOp() {
-
-                    public double value(int rgb) {
-                        return toHSV(rgb, CHANNEL_HUE);
-                    }
-                };
+                op = HUE_OP;
+                
             } else if (channel.equals("saturation")) {
-                op = new ImageDataSet.ColorOp() {
-
-                    public double value(int rgb) {
-                        return toHSV(rgb, CHANNEL_SATURATION);
-                    }
-                };
+                op = SATURATION_OP;
+                
             } else if (channel.equals("value")) {
-                op = new ImageDataSet.ColorOp() {
-
-                    public double value(int rgb) {
-                        return toHSV(rgb, CHANNEL_VALUE);
-                    }
-                };
+                op = VALUE_OP;
+                
             } else {
                 throw new IllegalArgumentException("unsupported channel: "+channel );
             }
