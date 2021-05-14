@@ -180,7 +180,7 @@ public class ParametersFormPanel {
                 }
                 int i= value.indexOf(':');
                 if ( i>-1 ) {
-                    if ( fd.typesList.get(j).equals('T') ) { //TODO: jupiter: 2029-02-02T00:00 to  2029-02-12T00:00 
+                    if ( fd.typesList.get(j).equals('T') ) { //TODO: jupiter: 2029-02-02T00:00 to  2029-02-12T00:00  
                         value= value.trim();
                     } else {
                         value= value.substring(0,i).trim();
