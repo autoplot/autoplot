@@ -48,7 +48,9 @@ import org.das2.util.ColorUtil;
 import java.awt.Color;
 import java.net.URL;
 import javax.swing.JColorChooser;
+import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor;
+import org.das2.datum.TimeUtil;
 
 /**
  * GUI component for controlling script parameters.  
@@ -150,7 +152,7 @@ public class ParametersFormPanel {
                 }
                 
             }
-            
+
             logger.log(Level.WARNING, "unable to find variable ''{0}''", param);
         }
     }
@@ -173,9 +175,16 @@ public class ParametersFormPanel {
                 value= ((DataSetSelector)jc).getValue();
             } else if ( jc instanceof JComboBox ) {
                 value= String.valueOf( ((JComboBox)jc).getSelectedItem() );
+                if ( jc instanceof RecentComboBox ) {
+                    ((RecentComboBox)jc).addToRecent(value); //TODO: why must I manually do this???
+                }
                 int i= value.indexOf(':');
                 if ( i>-1 ) {
-                    value= value.substring(0,i).trim();
+                    if ( fd.typesList.get(j).equals('T') ) { //TODO: jupiter: 2029-02-02T00:00 to  2029-02-12T00:00 
+                        value= value.trim();
+                    } else {
+                        value= value.substring(0,i).trim();
+                    }
                 }
             } else if ( jc instanceof JCheckBox ) {
                 value= ((JCheckBox)jc).isSelected() ? "T" : "F";
@@ -462,28 +471,29 @@ public class ParametersFormPanel {
                                 val= String.valueOf( parm.deft );
                                 params.put( vname, val );
                             }       
-                            final JTextField tf= new JTextField();
-                            Dimension x= tf.getPreferredSize();
+                            final RecentComboBox tcb= new RecentComboBox();
+                            tcb.setPreferenceNode("timerange");
+                            Dimension x= tcb.getPreferredSize();
                             x.width= Integer.MAX_VALUE;
-                            tf.setMaximumSize(x);
-                            tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-                            tf.setText( val );
-                            ctf= tf;
+                            tcb.setMaximumSize(x);
+                            tcb.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                            tcb.setText( val );
+                            ctf= tcb;
                             Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/autoplot/datasource/calendar.png"));
                             JButton button= new JButton( fileIcon );
                             button.addActionListener( new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
                                     TimeRangeTool tt= new TimeRangeTool();
-                                    tt.setSelectedRange(tf.getText());
+                                    tt.setSelectedRange(tcb.getSelectedItem().toString());
                                     int r= WindowManager.showConfirmDialog( paramsPanel, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
                                     if ( r==JOptionPane.OK_OPTION) {
-                                        tf.setText(tt.getSelectedRange());
+                                        tcb.setSelectedItem(tt.getSelectedRange());
                                     }
                                 }
                             });     
                             button.setToolTipText("Time Range Tool");
-                            valuePanel.add( ctf );
+                            valuePanel.add( tcb );
                             button.setAlignmentX( JComponent.LEFT_ALIGNMENT );
                             valuePanel.add( button );
                             break;
