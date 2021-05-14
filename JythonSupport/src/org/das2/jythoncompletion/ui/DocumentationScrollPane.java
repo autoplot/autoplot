@@ -227,6 +227,8 @@ public class DocumentationScrollPane extends JScrollPane {
         //        myScrollToRef( currentDocumentation.getURL().getRef() );
         //    }
         //}));
+        
+        toolbar.add( new JLabel("<html><em>press escape to dismiss") );
         setColumnHeaderView(toolbar);
     }
 
