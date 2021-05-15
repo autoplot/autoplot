@@ -265,7 +265,7 @@ public class RecentComboBox extends JComboBox {
                         logger.log( Level.WARNING, null, ex );
                     }
                 }
-                items.add(s);
+                items.add(s); 
                 Collections.reverse(items);
                 saveRecent(items);
                 if ( reload ) loadRecent();        
