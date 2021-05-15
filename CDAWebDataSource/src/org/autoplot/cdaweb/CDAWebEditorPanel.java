@@ -151,7 +151,9 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                 new Runnable() { 
                     @Override
                     public void run() { 
-                        timeRangeComboBox.setText(ftr);
+                        if ( !timeRangeComboBox.isDirty() ) {
+                            timeRangeComboBox.setText(ftr);
+                        }
                         DefaultComboBoxModel m= new DefaultComboBoxModel(new String[] { "Example Time Ranges",timeDflt } );
                         exampleTimeRangesCB.setModel(m);
                     }
