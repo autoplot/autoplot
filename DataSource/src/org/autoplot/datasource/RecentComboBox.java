@@ -1,6 +1,7 @@
 
 package org.autoplot.datasource;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -42,7 +43,7 @@ public class RecentComboBox extends JComboBox {
 
     public static final String PREF_NODE_TIMERANGE="timerange";
     
-    private final static Logger logger= LoggerManager.getLogger("apdss.uri");
+    private final static Logger logger= LoggerManager.getLogger("apdss.uri.recent");
     
     public RecentComboBox() {
         setEditable(true);
@@ -51,7 +52,9 @@ public class RecentComboBox extends JComboBox {
             public void itemStateChanged(ItemEvent e) {
                 if ( e.getStateChange()==ItemEvent.SELECTED ) {
                     if ( RecentComboBox.this.preferenceNode.length()>0 ) {
+                        logger.finer("set dirty=true");
                         dirty= true;
+                        //setBackground( Color.blue );
                     }
                     //TODO: too bad this doesn't work properly!
 //                    String item= (String) e.getItem();
@@ -77,6 +80,7 @@ public class RecentComboBox extends JComboBox {
         this.preferenceNode= pref;
         recentFile= new File( bookmarksFolder, "recent."+pref+".txt" );
         dirty= false;
+        //setBackground( Color.WHITE );
         Runnable run= new Runnable() {
             @Override
             public void run() {
@@ -101,11 +105,22 @@ public class RecentComboBox extends JComboBox {
     }
 
     /**
+     * check if the human has made modifications to this value.
+     * @return true if modifications have been made.
+     */
+    public boolean isDirty() {
+        return this.dirty;
+    }
+    
+    /**
      * to make it easier to convert GUIs with JTextFields to RecentComboBoxes, setText is available.
      * @param text 
      */
     public void setText( String text ) {
+        logger.log(Level.FINER, "setText({0})", text);
         setSelectedItem(text);
+        this.dirty= false;
+        //setBackground( Color.WHITE );
     }
     
     /**
@@ -122,6 +137,7 @@ public class RecentComboBox extends JComboBox {
             if ( dirty ) {
                 addToRecent(s);
             }
+            logger.log(Level.FINER, "getText()->{0}", s);
             return s;
         }
     }
