@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Contours labeling needs some work, but note that you can now use "*10" for logarithmic contours.
+        <p><small>140 web colors are added as static fields of ColorUtil, and completions show colors.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-05-07 r25763):</p>
+        <p>Bugfixes (2021-05-15 r25775):</p>
         <ul>
+            <li>2350: limits to interpolation in X was different than Y in spectrograms.
+            <li>2342: corrections to contours rendering.
+            <li>add note about how to dismiss popup documentation.
+            <li>1871: code to keep track of recent times never worked properly, and it should be useful now.
             <li>670: applyIndex didn't handle rank 3 depend 2.
             <li>2348: grid is now drawn under the data, not over.  Let me know if this bugs you and I'll add a control.  Thanks, Ali and others!
             <li>2343: writeToPng would not allow a filename with spaces in it.  Thanks, Kristoff!
@@ -57,6 +61,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Show color icon in completions.
             <li>increase the number of points limit when calculating stats to 200000000.  Thanks, Ivar!
             <li>Add constants to ColorUtil for 140 named web colors like "CADET_BLUE" to encourage use in scripts.
             <li>USER_PROPERTIES can have map with another nested map.
