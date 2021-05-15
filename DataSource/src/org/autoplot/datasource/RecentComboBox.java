@@ -26,7 +26,7 @@ import org.das2.datum.LoggerManager;
  * decorate a comboBox so that it remembers recent entries.  This listens for ActionEvents from a JComboBox
  * and adds valid items to its droplist.  The recent entries are stored in the bookmarks folder in the file
  * "recent.PREF.txt" where PREF is a string assigned to this object identifying the theme, such as "timerange".
- * Specifically, the event is validated and recorded into the file, then the file is loaded, sorted and saved
+ * Specifically, the event is validated and recorded into the file, then the file is loaded, sorted, and saved
  * again.
  * 
  * @author jbf
@@ -38,6 +38,7 @@ public class RecentComboBox extends JComboBox {
     File bookmarksFolder= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "bookmarks" );
     File recentFile;
     String preferenceNode= "";
+    boolean dirty= false;
 
     public static final String PREF_NODE_TIMERANGE="timerange";
     
@@ -49,7 +50,9 @@ public class RecentComboBox extends JComboBox {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if ( e.getStateChange()==ItemEvent.SELECTED ) {
-
+                    if ( RecentComboBox.this.preferenceNode.length()>0 ) {
+                        dirty= true;
+                    }
                     //TODO: too bad this doesn't work properly!
 //                    String item= (String) e.getItem();
 //                    List<String> items= new ArrayList( RECENT_SIZE+2 );
@@ -73,6 +76,7 @@ public class RecentComboBox extends JComboBox {
     public void setPreferenceNode( String pref ) {
         this.preferenceNode= pref;
         recentFile= new File( bookmarksFolder, "recent."+pref+".txt" );
+        dirty= false;
         Runnable run= new Runnable() {
             @Override
             public void run() {
@@ -106,13 +110,19 @@ public class RecentComboBox extends JComboBox {
     
     /**
      * get the string value, which is also the getSelectedItem.
+     * This will also push a changed value to the recent entries.
      * @return 
      */
     public String getText() {
-        if ( getSelectedItem()==null ) {
+        Object o= getSelectedItem();
+        String s= o==null ? "" : o.toString();
+        if ( s==null ) {
             return "";
         } else {
-            return getSelectedItem().toString();
+            if ( dirty ) {
+                addToRecent(s);
+            }
+            return s;
         }
     }
     
@@ -172,7 +182,8 @@ public class RecentComboBox extends JComboBox {
     }
 
     /**
-     * save the recent items to the disk.  items.get(0) is the most recent item, and will be saved last on the disk.
+     * save the recent items to the disk.  items.get(0) is the most recent item, 
+     * and will be the last line of the recent file on the disk.
      * @param items
      */
     private void saveRecent( List<String> items ) {
@@ -227,7 +238,8 @@ public class RecentComboBox extends JComboBox {
     }
     
     /**
-     * add the item to the list of recent entries.  
+     * add the item to the list of recent entries. 
+     * The recent file will have the most recent item at the end of the file.
      * @param s the item
      * @param reload if true then reload the file.
      */
@@ -243,7 +255,6 @@ public class RecentComboBox extends JComboBox {
             @Override
             public void run() {
                 List<String> items= new ArrayList<>();
-                items.add(s);
                 if ( recentFile!=null ) {
                     try ( BufferedReader r= new BufferedReader(new FileReader(recentFile)) ) {
                         String l;
@@ -254,6 +265,8 @@ public class RecentComboBox extends JComboBox {
                         logger.log( Level.WARNING, null, ex );
                     }
                 }
+                items.add(s);
+                Collections.reverse(items);
                 saveRecent(items);
                 if ( reload ) loadRecent();        
             }
