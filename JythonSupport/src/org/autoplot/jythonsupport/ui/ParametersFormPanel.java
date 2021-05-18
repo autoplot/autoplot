@@ -472,7 +472,7 @@ public class ParametersFormPanel {
                                 params.put( vname, val );
                             }       
                             final RecentComboBox tcb= new RecentComboBox();
-                            tcb.setPreferenceNode("timerange");
+                            tcb.setPreferenceNode( RecentComboBox.PREF_NODE_TIMERANGE );
                             Dimension x= tcb.getPreferredSize();
                             x.width= Integer.MAX_VALUE;
                             tcb.setMaximumSize(x);
