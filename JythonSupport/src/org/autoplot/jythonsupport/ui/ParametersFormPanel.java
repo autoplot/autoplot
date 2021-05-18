@@ -3,7 +3,6 @@ package org.autoplot.jythonsupport.ui;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -50,7 +49,6 @@ import java.net.URL;
 import javax.swing.JColorChooser;
 import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor;
-import org.das2.datum.TimeUtil;
 
 /**
  * GUI component for controlling script parameters.  
@@ -481,15 +479,12 @@ public class ParametersFormPanel {
                             ctf= tcb;
                             Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/autoplot/datasource/calendar.png"));
                             JButton button= new JButton( fileIcon );
-                            button.addActionListener( new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    TimeRangeTool tt= new TimeRangeTool();
-                                    tt.setSelectedRange(tcb.getSelectedItem().toString());
-                                    int r= WindowManager.showConfirmDialog( paramsPanel, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
-                                    if ( r==JOptionPane.OK_OPTION) {
-                                        tcb.setSelectedItem(tt.getSelectedRange());
-                                    }
+                            button.addActionListener((ActionEvent e) -> {
+                                TimeRangeTool tt= new TimeRangeTool();
+                                tt.setSelectedRange(tcb.getSelectedItem().toString());
+                                int r= WindowManager.showConfirmDialog( paramsPanel, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
+                                if ( r==JOptionPane.OK_OPTION) {
+                                    tcb.setSelectedItem(tt.getSelectedRange());
                                 }
                             });     
                             button.setToolTipText("Time Range Tool");
@@ -549,11 +544,8 @@ public class ParametersFormPanel {
                                     logger.fine("uh-oh.");
                                 }
                                 ctf= jcb;
-                                jcb.addActionListener( new ActionListener() {
-                                    @Override
-                                    public void actionPerformed(ActionEvent e) {
-                                        redoVariables( env, src, ParametersFormPanel.this.params, zparamsPanel );
-                                    }
+                                jcb.addActionListener((ActionEvent e) -> {
+                                    redoVariables( env, src, ParametersFormPanel.this.params, zparamsPanel );
                                 });
                                 Dimension x= ctf.getPreferredSize();
                                 x.width= Integer.MAX_VALUE;
@@ -575,30 +567,27 @@ public class ParametersFormPanel {
                             if ( values==null || values.isEmpty() ) {
                                 Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/autoplot/datasource/calendar.png"));
                                 JButton button= new JButton( fileIcon );
-                                button.addActionListener( new ActionListener() {
-                                    @Override
-                                    public void actionPerformed(ActionEvent e) {
-                                        Color c;
-                                        String t;
+                                button.addActionListener((ActionEvent e) -> {
+                                    Color c;
+                                    String t;
+                                    if ( fjcf instanceof JComboBox ) {
+                                        t= (String)(((JComboBox)fjcf).getSelectedItem());
+                                    } else {
+                                        t= ((JTextField)fjcf).getText();
+                                    }
+                                    try {
+                                        c= ColorUtil.decodeColor( t );
+                                    } catch ( IllegalArgumentException ex ) {
+                                        c= Color.GRAY;
+                                    }
+                                    c = JColorChooser.showDialog( paramsPanel, "color", c );
+                                    if ( c!=null ) {
                                         if ( fjcf instanceof JComboBox ) {
-                                            t= (String)(((JComboBox)fjcf).getSelectedItem());
+                                            ((JComboBox)fjcf).setSelectedItem(ColorUtil.encodeColor(c));
                                         } else {
-                                            t= ((JTextField)fjcf).getText();
+                                            ((JTextField)fjcf).setText( ColorUtil.encodeColor(c) );
                                         }
-                                        try {
-                                            c= ColorUtil.decodeColor( t );
-                                        } catch ( IllegalArgumentException ex ) {
-                                            c= Color.GRAY;
-                                        }
-                                        c = JColorChooser.showDialog( paramsPanel, "color", c );
-                                        if ( c!=null ) {
-                                            if ( fjcf instanceof JComboBox ) {
-                                                ((JComboBox)fjcf).setSelectedItem(ColorUtil.encodeColor(c));
-                                            } else {
-                                                ((JTextField)fjcf).setText( ColorUtil.encodeColor(c) );
-                                            }
 
-                                        }
                                     }
                                 });     
                                 button.setToolTipText("Colorpicker");
@@ -627,11 +616,8 @@ public class ParametersFormPanel {
                                 if ( isBool ) {
                                     JCheckBox jcb= new JCheckBox( label );
                                     jcb.setSelected( val.equals("T") || val.equals("1") || val.equals("True") );
-                                    jcb.addActionListener( new ActionListener() {
-                                        @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            redoVariables( env, src, ParametersFormPanel.this.params, zparamsPanel );
-                                        }
+                                    jcb.addActionListener((ActionEvent e) -> {
+                                        redoVariables( env, src, ParametersFormPanel.this.params, zparamsPanel );
                                     });
                                     ctf= jcb;
                                 } else {
@@ -681,11 +667,8 @@ public class ParametersFormPanel {
                                         logger.fine("uh-oh.");
                                     }
                                     ctf= jcb;                                    
-                                    jcb.addActionListener( new ActionListener() {
-                                        @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            redoVariables( env, src, ParametersFormPanel.this.params, zparamsPanel );
-                                        }
+                                    jcb.addActionListener((ActionEvent e) -> {
+                                        redoVariables( env, src, ParametersFormPanel.this.params, zparamsPanel );
                                     });
                                     Dimension x= ctf.getPreferredSize();
                                     x.width= Integer.MAX_VALUE;
