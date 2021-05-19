@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>140 web colors are added as static fields of ColorUtil, and completions show colors.
+        <p><small><a href="https://github.com/autoplot/dev/blob/master/demos/2021/20210519/poolTempVsAir.jy">Jython script</a> for studying time lag between pool temperature and air temperature.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-05-15 r25775):</p>
+        <p>Bugfixes (2021-05-19 r25778):</p>
         <ul>
+            <li>1848: Das2Server credentials are persistent between sessions.
             <li>2350: limits to interpolation in X was different than Y in spectrograms.
             <li>2342: corrections to contours rendering.
             <li>add note about how to dismiss popup documentation.
@@ -61,6 +62,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Parker Solar Probe orbit time intervals added.
             <li>Show color icon in completions.
             <li>increase the number of points limit when calculating stats to 200000000.  Thanks, Ivar!
             <li>Add constants to ColorUtil for 140 named web colors like "CADET_BLUE" to encourage use in scripts.
