@@ -72,7 +72,7 @@ public class ImageDataSource extends AbstractDataSource {
      * with values between 0 and 255, using the mapping
      * 0.3 * r + 0.59 * g + 0.11 * b.
      */
-    public static ImageDataSet.ColorOp GRAYSCALE_OP= new ImageDataSet.ColorOp() {
+    public static final ImageDataSet.ColorOp GRAYSCALE_OP= new ImageDataSet.ColorOp() {
         @Override
         public double value(int rgb) {
             int r = rgb & 0xFF0000 >> 16;
@@ -86,7 +86,7 @@ public class ImageDataSource extends AbstractDataSource {
      * return the hue (as in Hue-Saturation-Value) for each pixel,
      * with values between 0 and 360.
      */
-    public static ImageDataSet.ColorOp HUE_OP= new ImageDataSet.ColorOp() {
+    public static final ImageDataSet.ColorOp HUE_OP= new ImageDataSet.ColorOp() {
         @Override
         public double value(int rgb) {
             return toHSV(rgb, CHANNEL_HUE);
@@ -97,7 +97,7 @@ public class ImageDataSource extends AbstractDataSource {
      * return the saturation (as in Hue-Saturation-Value) for each pixel,
      * with values between 0 and 100.
      */
-    public static ImageDataSet.ColorOp SATURATION_OP= new ImageDataSet.ColorOp() {
+    public static final ImageDataSet.ColorOp SATURATION_OP= new ImageDataSet.ColorOp() {
         @Override
         public double value(int rgb) {
             return toHSV(rgb, CHANNEL_SATURATION);
@@ -108,7 +108,7 @@ public class ImageDataSource extends AbstractDataSource {
      * return the value (as in Hue-Saturation-Value) for each pixel, with
      * values between 0 and 100.
      */
-    public static ImageDataSet.ColorOp VALUE_OP=new ImageDataSet.ColorOp() {
+    public static final ImageDataSet.ColorOp VALUE_OP=new ImageDataSet.ColorOp() {
         @Override
         public double value(int rgb) {
             return toHSV(rgb, CHANNEL_VALUE);
