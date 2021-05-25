@@ -388,6 +388,7 @@ public class EditorTextPane extends JEditorPane {
             int len=1;
             if ( n instanceof Name ) {
                 len= ((Name)n).id.length();
+                if ( len==1 && ((Name)n).id.equals("_") ) continue;
                 support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+len, EditorAnnotationsSupport.ANNO_CODE_HINT, "assigned but not read", null );
             } else if ( n instanceof aliasType ) {
                 aliasType a= ((aliasType)n);
