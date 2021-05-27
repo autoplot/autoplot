@@ -293,6 +293,24 @@ public class Plot extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_TICKS_URI, old, ticksURI );
     }
 
+    private String ephemerisLabels="";
+
+    public static final String PROP_EPHEMERIS_LABELS = "ephemerisLabels";
+
+    public String getEphemerisLabels() {
+        return ephemerisLabels;
+    }
+
+    /**
+     * explicitly set the label for each line of ephemeris
+     * @param ephemerisLabels 
+     */
+    public void setEphemerisLabels(String ephemerisLabels) {
+        String oldEphemerisLabels = this.ephemerisLabels;
+        this.ephemerisLabels = ephemerisLabels;
+        propertyChangeSupport.firePropertyChange(PROP_EPHEMERIS_LABELS, oldEphemerisLabels, ephemerisLabels);
+    }
+
     protected PlotController controller;
 
     public PlotController getController() {
@@ -311,7 +329,7 @@ public class Plot extends DomNode {
 
     @Override
     public void syncTo(DomNode n) {
-        syncTo( n, new ArrayList<String>() );
+        syncTo( n, new ArrayList<>() );
     }
 
     @Override
@@ -331,6 +349,7 @@ public class Plot extends DomNode {
         if (!exclude.contains(PROP_VISIBLE)) this.setVisible(that.isVisible());
         if (!exclude.contains(PROP_CONTEXT)) this.setContext(that.getContext());
         if (!exclude.contains(PROP_TICKS_URI)) this.setTicksURI(that.getTicksURI());
+        if (!exclude.contains(PROP_EPHEMERIS_LABELS)) this.setEphemerisLabels(that.getEphemerisLabels());
         if (!exclude.contains(PROP_LEGENDPOSITION)) this.setLegendPosition(that.getLegendPosition());
         if (!exclude.contains(PROP_FONTSIZE) ) this.setFontSize(that.getFontSize());
         if (!exclude.contains(PROP_DISPLAYLEGEND)) this.setDisplayLegend(that.isDisplayLegend());
@@ -381,6 +400,8 @@ public class Plot extends DomNode {
         if (!b) result.add(new PropertyChangeDiff(PROP_CONTEXT, that.context, this.context));
         b= that.ticksURI.equals(this.ticksURI);
         if (!b) result.add(new PropertyChangeDiff(PROP_TICKS_URI, that.ticksURI, this.ticksURI));
+        b= that.ephemerisLabels.equals(this.ephemerisLabels);
+        if (!b) result.add(new PropertyChangeDiff(PROP_EPHEMERIS_LABELS, that.ephemerisLabels, this.ephemerisLabels));
         b= that.legendPosition.equals(this.legendPosition);
         if (!b) result.add(new PropertyChangeDiff(PROP_LEGENDPOSITION, that.legendPosition, this.legendPosition ));
         b= that.displayLegend==this.displayLegend;        

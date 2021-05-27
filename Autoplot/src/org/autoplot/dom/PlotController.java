@@ -102,7 +102,7 @@ public final class PlotController extends DomNodeController {
         this.dom = dom;
         this.plot = plot;
         this.plot.addPropertyChangeListener( Plot.PROP_TITLE, labelListener );
-        this.plot.addPropertyChangeListener( Plot.PROP_TICKS_URI, ticksURIListener );
+        this.plot.addPropertyChangeListener(Plot.PROP_TICKS_URI, ticksURIListener );
         this.plot.addPropertyChangeListener( Plot.PROP_ID, idListener );
         this.plot.getXaxis().addPropertyChangeListener( autorangeListener );
         this.plot.getYaxis().addPropertyChangeListener( autorangeListener );
@@ -1930,6 +1930,7 @@ public final class PlotController extends DomNodeController {
         this.plot.addPropertyChangeListener(plotListener);
         ac.bind( this.plot, Plot.PROP_CONTEXT, p, DasPlot.PROP_CONTEXT, plotContextConverter );
         ac.bind( this.plot, Plot.PROP_BACKGROUND, p, DasPlot.PROP_DRAWBACKGROUND );
+        ac.bind(this.plot, Plot.PROP_EPHEMERIS_LABELS, p.getXAxis(), DasAxis.PROP_TCALABELS );
         
     }
 
@@ -1946,19 +1947,19 @@ public final class PlotController extends DomNodeController {
 //        ac.unbind( this.plot, Plot.PROP_DISPLAYTITLE, p, DasPlot.PROP_DISPLAYTITLE );
 //        ac.unbind( this.plot, Plot.PROP_DISPLAYLEGEND, p, DasPlot.PROP_DISPLAYLEGEND );
         //int i= dom.options.boundCount();
-        ac.unbind(dom.options, Options.PROP_DRAWGRID, p, "drawGrid");
-        ac.unbind(dom.options, Options.PROP_DRAWMINORGRID, p, "drawMinorGrid");
-        ac.unbind(dom.options, Options.PROP_FLIPCOLORBARLABEL, this.plot.getZaxis().getController().dasAxis, "flipLabel");
-        ac.unbind(dom.options, Options.PROP_FLIPCOLORBARLABEL, this.plot.getYaxis().getController().dasAxis, "flipLabel");
-        ac.unbind(dom.options, Options.PROP_TICKLEN, p.getXAxis(), "tickLength");
-        ac.unbind(dom.options, Options.PROP_TICKLEN, p.getYAxis(), "tickLength");
-        ac.unbind(dom.options, Options.PROP_TICKLEN, this.dasColorBar, "tickLength");
-        ac.unbind(dom.options, Options.PROP_OPPOSITEAXISVISIBLE, p.getXAxis(), DasAxis.PROP_OPPOSITE_AXIS_VISIBLE);
-        ac.unbind(dom.options, Options.PROP_OPPOSITEAXISVISIBLE, p.getYAxis(), DasAxis.PROP_OPPOSITE_AXIS_VISIBLE);
-        ac.unbind(dom.options, Options.PROP_LINE_THICKNESS, p.getXAxis(), DasAxis.PROP_LINETHICKNESS );
-        ac.unbind(dom.options, Options.PROP_LINE_THICKNESS, p.getYAxis(), DasAxis.PROP_LINETHICKNESS );
-        ac.unbind(dom.options, Options.PROP_LINE_THICKNESS, this.dasColorBar, DasAxis.PROP_LINETHICKNESS );
-        ac.unbind(dom.options, Options.PROP_LINE_THICKNESS, p, DasAxis.PROP_LINETHICKNESS );
+        ac.unbind( dom.options, Options.PROP_DRAWGRID, p, "drawGrid");
+        ac.unbind( dom.options, Options.PROP_DRAWMINORGRID, p, "drawMinorGrid");
+        ac.unbind( dom.options, Options.PROP_FLIPCOLORBARLABEL, this.plot.getZaxis().getController().dasAxis, "flipLabel");
+        ac.unbind( dom.options, Options.PROP_FLIPCOLORBARLABEL, this.plot.getYaxis().getController().dasAxis, "flipLabel");
+        ac.unbind( dom.options, Options.PROP_TICKLEN, p.getXAxis(), "tickLength");
+        ac.unbind( dom.options, Options.PROP_TICKLEN, p.getYAxis(), "tickLength");
+        ac.unbind( dom.options, Options.PROP_TICKLEN, this.dasColorBar, "tickLength");
+        ac.unbind( dom.options, Options.PROP_OPPOSITEAXISVISIBLE, p.getXAxis(), DasAxis.PROP_OPPOSITE_AXIS_VISIBLE);
+        ac.unbind( dom.options, Options.PROP_OPPOSITEAXISVISIBLE, p.getYAxis(), DasAxis.PROP_OPPOSITE_AXIS_VISIBLE);
+        ac.unbind( dom.options, Options.PROP_LINE_THICKNESS, p.getXAxis(), DasAxis.PROP_LINETHICKNESS );
+        ac.unbind( dom.options, Options.PROP_LINE_THICKNESS, p.getYAxis(), DasAxis.PROP_LINETHICKNESS );
+        ac.unbind( dom.options, Options.PROP_LINE_THICKNESS, this.dasColorBar, DasAxis.PROP_LINETHICKNESS );
+        ac.unbind( dom.options, Options.PROP_LINE_THICKNESS, p, DasAxis.PROP_LINETHICKNESS );
         ac.unbind( dom.options, Options.PROP_MULTILINETEXTALIGNMENT, p, DasPlot.PROP_MULTILINETEXTALIGNMENT );
         ac.unbind( dom.options, Options.PROP_PRINTINGLOGLEVEL, p, DasPlot.PROP_PRINTINGLOGLEVEL );
         ac.unbind( dom.options, Options.PROP_DISPLAYLOGLEVEL, p, DasPlot.PROP_LOG_LEVEL );
@@ -1975,6 +1976,7 @@ public final class PlotController extends DomNodeController {
         this.plot.getZaxis().removePropertyChangeListener( autorangeListener );
         this.plot.removePropertyChangeListener( Plot.PROP_TITLE, labelListener );
         this.plot.removePropertyChangeListener( Plot.PROP_TICKS_URI, ticksURIListener );
+        this.plot.removePropertyChangeListener( Plot.PROP_EPHEMERIS_LABELS, ticksURIListener );
         this.plot.removePropertyChangeListener( Plot.PROP_ID, idListener );
         this.plot.removePropertyChangeListener( Plot.PROP_ROWID, rowColListener );
         this.plot.removePropertyChangeListener( Plot.PROP_COLUMNID, rowColListener );

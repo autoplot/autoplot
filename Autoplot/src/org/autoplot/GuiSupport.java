@@ -1907,8 +1907,9 @@ public class GuiSupport {
             });
 
             Plot p= state.getPlots(0);
-            newP.syncTo( p,Arrays.asList(Plot.PROP_ID,Plot.PROP_ROWID,Plot.PROP_COLUMNID,Plot.PROP_TICKS_URI) );
+            newP.syncTo( p,Arrays.asList(Plot.PROP_ID,Plot.PROP_ROWID,Plot.PROP_COLUMNID,Plot.PROP_TICKS_URI,Plot.PROP_EPHEMERIS_LABELS) );
             newP.setTicksURI("");
+            newP.setEphemerisLabels("");
             
             // if everything else is bound, then bind this one too.
             Application dom= controller.getApplication();

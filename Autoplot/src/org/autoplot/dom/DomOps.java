@@ -52,7 +52,12 @@ public class DomOps {
         String ticksUriA= a.getTicksURI();
         String ticksUriB= b.getTicksURI();
         a.setTicksURI( ticksUriB );
-        b.setTicksURI( ticksUriA );        
+        b.setTicksURI( ticksUriA ); 
+        String ticksUriALabels= a.getEphemerisLabels();
+        String ticksUriBLabels= b.getEphemerisLabels();
+        a.setTicksURI( ticksUriBLabels );
+        b.setTicksURI( ticksUriALabels ); 
+        
         a.setRowId(b.getRowId());
         a.setColumnId(b.getColumnId());
         a.getXaxis().setDrawTickLabels(b.getXaxis().isDrawTickLabels());

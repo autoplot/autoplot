@@ -2644,17 +2644,22 @@ public class PlotElementController extends DomNodeController {
 
             QDataSet yds = (QDataSet) fillDs.property(QDataSet.DEPEND_1);
             if (yds == null) {
-                if ( fillDs.property(QDataSet.JOIN_0)!=null && fillDs.length()>0 ) {
+                if ( fillDs.property(QDataSet.JOIN_0)!=null 
+                        && fillDs.length()>0 ) {
                     QDataSet yds1= (QDataSet)fillDs.property(QDataSet.DEPEND_1,0);
-                    JoinDataSet ds= new JoinDataSet(yds1.rank()+1);
-                    for ( int i=0; i<fillDs.length(); i++ ) {
-                        yds1= (QDataSet)fillDs.property(QDataSet.DEPEND_1,i);
-                        if ( yds1==null ) {
-                            yds1= Ops.linspace( 0, fillDs.length(i,0)-1, fillDs.length(i,0) );
+                    if ( yds1!=null ) {
+                        JoinDataSet ds= new JoinDataSet(yds1.rank()+1);
+                        for ( int i=0; i<fillDs.length(); i++ ) {
+                            yds1= (QDataSet)fillDs.property(QDataSet.DEPEND_1,i);
+                            if ( yds1==null ) {
+                                yds1= Ops.linspace( 0, fillDs.length(i,0)-1, fillDs.length(i,0) );
+                            }
+                            ds.join(yds1);
                         }
-                        ds.join(yds1);
+                        yds = ds;
+                    } else {
+                        yds= Ops.indgen(fillDs.slice(0).length());
                     }
-                    yds = ds;
                 } else if ( fillDs.property(QDataSet.JOIN_0)==null
                         && fillDs.length()>0
                         && fillDs.property(QDataSet.DEPEND_0,0)!=null ) {
