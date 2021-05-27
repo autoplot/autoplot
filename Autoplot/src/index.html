@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small><a href="https://github.com/autoplot/dev/blob/master/demos/2021/20210519/poolTempVsAir.jy">Jython script</a> for studying time lag between pool temperature and air temperature.
+        <p><small>New binData function sorts rank 1 data into bins identified by an initial range.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,12 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-05-22 r25778):</p>
+        <p>Bugfixes (2021-05-26 r25784):</p>
+        <ul>
+            <li>don't mark the Jython variable "_" as unread, so that it can be used in loops to assert that the loop variable is not used.
+            <li>remove old warning when das2stream used something besides Units.us2000 for timetags, this was fixed years ago.  Thanks, Chris!
+        </ul>
+        <p>Older Bugfixes (2021-05-22 r25778):</p>
         <ul>
             <li>1848: Das2Server credentials are persistent between sessions.
             <li>2350: limits to interpolation in X was different than Y in spectrograms.
@@ -47,20 +52,11 @@
             <li>2333: rte1830566714 shows where TCA result can be null and was not handled.
             <li>start to correct Java 7 complaints in QDataSet.
         </ul>
-        <p>Older Bugfixes (2021-04-17 r25709):</p>
-        <ul>
-            <li>2332: copy over the data when copying a DOM (.vap), so that 'vap+internal:' data is copied as well.
-            <li>2102: fix layout would allocate space even when "displayTitle" is false.  Thanks, Ali!
-            <li>2329: default button for True/False param is "1" not "True"
-            <li>2330: under-implementation of rfe670 rank3 depend2 in slice0.
-            <li>SeriesRenderer, when in reduce-data mode, now reduces colors as well, culling a dot which is later covered by another.  Before data would suddenly turn black.
-            <li>James caught place where rarely-used code would have been stuck in endless loop.  Thanks James!
-            <li>correction to export of qstream, where format is "%.2f", causing runtime error because there was no field width.
-            <li>tooltip to evaluate Jython expression properly html-izes output, replacing newlines with &lt;br&gt;.
-            <li>HAPI 2.0 JSON no-data response is supported.
-            <li>Grabbing ctrl+C or cmd+C on Mac is difficult, so just make "C" trigger copy crosshair coordinates to clipboard.
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>normalize(ds,1) function added.  Thanks, Kristoff!
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>add binData function, which sorts rank 1 data into rank 2 data with sorted into bins.
             <li>Das2Server credentials dialog keeps track of password.  Thanks, Chris!
@@ -77,14 +73,6 @@
             <li>740: warnings about redefining symbols like "plot" or "total" is too noisy, be more careful to only show when there is a problem.  Thanks, Sadie!
 	    <li>Jython to Java converter improvements.
             <li>739: DasCore moved to GitHub, along with QDataSet.  Thanks, Chris!
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>RecordIterator supports rank 3 depend 2, to support demo data set in HapiServerDemo.
-            <li>.batch files for the run batch tool support %{PWD} in script reference, to improve portability.
-            <li>add new eventsComplement which returns the intervals which are not in the input.
-            <li>tickValues can now be *10/2,3,4,5,6,7,8,9 or *100 for log axes.  Thanks, Ali!
-            <li>Revisit the "Run Batch" dialog, and keep track of stdout for each run.
         </ul>
         <p>Known issues:</p>
         <ul>
