@@ -382,7 +382,7 @@ public final class PlotController extends DomNodeController {
      */
     private void updateNextPrevious( final DatumRange dr0, QDataSet ds ) {
 
-        logger.log(Level.FINE, "updateRadius: {0}", dr0);
+        logger.log(Level.FINE, "updateNextPrevious: {0}", dr0);
         if ( ds!=null && SemanticOps.isBundle(ds) ) {
             logger.log(Level.FINE, "unbundling: {0}", ds);
             QDataSet xds= SemanticOps.xtagsDataSet(ds);
@@ -394,8 +394,15 @@ public final class PlotController extends DomNodeController {
             ds= Ops.link( xds, ds );
         }
         
-        scanNextRange= DataSetUtil.getNextInterval(ds, dr0);
-        scanPrevRange= DataSetUtil.getPreviousInterval(ds, dr0);
+        if ( ds!=null && ds.length()>10000000 ) {
+            logger.fine("simple next and previous used because data is very large");
+            scanNextRange= dr0.next();
+            scanPrevRange= dr0.previous();
+            
+        } else {
+            scanNextRange= DataSetUtil.getNextInterval(ds, dr0);
+            scanPrevRange= DataSetUtil.getPreviousInterval(ds, dr0);
+        }
         
         double rescaleFactor;
         rescaleFactor= scanNextRange.width().divide(dr0.width()).value();
