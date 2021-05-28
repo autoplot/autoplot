@@ -92,7 +92,7 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
                 return true;
             }
             URL fileUrl= getFileResource( split.resourceUri.toURL(), mon );
-            File datfile = DataSetURI.getFile(fileUrl,mon );
+            DataSetURI.getFile(fileUrl,mon );
             
             if ( id==null ) {
                 return true;
@@ -120,7 +120,7 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
         
         URL fileUrl= getFileResource( url, mon );
         File xmlfile = DataSetURI.getFile( url,new NullProgressMonitor());
-        File datfile = DataSetURI.getFile( fileUrl,mon );
+        DataSetURI.getFile( fileUrl,mon );
             
         Map<String,String> result= new LinkedHashMap<>();
         
@@ -171,7 +171,7 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
                 return ccresult;
             }
             URL fileUrl= getFileResource( cc.resourceURI.toURL(), mon );
-            File datfile = DataSetURI.getFile(fileUrl,mon );
+            DataSetURI.getFile(fileUrl,mon );
              
             Map<String,String> result= getDataObjectNames(xmlfile.toURI().toURL(), mon);
             

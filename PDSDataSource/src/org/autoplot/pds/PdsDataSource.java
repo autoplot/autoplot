@@ -166,8 +166,8 @@ public class PdsDataSource extends AbstractDataSource {
      * @return ( Epoch, sample_offset, Waveform ) 
      */
     public static List<String> seekDependencies( Document doc, List<String> depend ) {
-        XPathFactory factory= XPathFactory.newInstance();
-        XPath xpath= factory.newXPath();
+        //XPathFactory factory= XPathFactory.newInstance();
+        //XPath xpath= factory.newXPath();
         
         return depend;
     }
