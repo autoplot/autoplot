@@ -4,7 +4,6 @@ package org.autoplot.idlsupport;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -15,8 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -314,6 +311,10 @@ public class ReadIDLSav {
         int ndims;
         int nmax;
         int[] dims;
+        @Override
+        public String toString() {
+            return "ArrayDesc"+nbytes+" " +nelements+ " " +ndims + " "+nmax;
+        }
     }
 
     public static class TagDesc {
@@ -324,6 +325,10 @@ public class ReadIDLSav {
          * for convenience, keep track of the total length of the descriptor within the IDLSAV file.
          */
         int _lengthBytes;
+        @Override
+        public String toString() {
+            return "tagdesc "+offset+ " " +tagflags;
+        }
     }
     
     private TagDesc readTagDesc( ByteBuffer rec ) {
@@ -342,10 +347,10 @@ public class ReadIDLSav {
         String[] tagnames;
         ArrayDesc[] arrTable;
         StructDesc[] structTable;
-        String className;
-        int nsupClasses;
-        String[] supClassNames;
-        StructDesc[] supClassTable;
+        //String className;
+        //int nsupClasses;
+        //String[] supClassNames;
+        //StructDesc[] supClassTable;
     }
     
     private static class TypeDescArray extends TypeDesc {
