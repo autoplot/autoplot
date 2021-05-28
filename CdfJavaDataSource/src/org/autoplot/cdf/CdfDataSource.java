@@ -1520,6 +1520,7 @@ public class CdfDataSource extends AbstractDataSource {
                         if (DataSetUtil.isMonotonic(depDs)) {
                             depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
                         } else {
+                            depDs.putProperty(QDataSet.MONOTONIC, Boolean.FALSE);
 //                            if (sidep == 0) {
 //                                logger.info("sorting dep0 to make depend0 monotonic");
 //                                QDataSet sort = org.virbo.dataset.DataSetOps.sort(depDs);
