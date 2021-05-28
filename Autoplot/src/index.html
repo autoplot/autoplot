@@ -26,8 +26,9 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
         
-        <p>Bugfixes (2021-05-26 r25784):</p>
+        <p>Bugfixes (2021-05-28 r25784):</p>
         <ul>
+            <li>2352: cache MONOTONIC=FALSE, before we would only cache MONOTONIC=TRUE, but determining it is false can be expensive for some data.
             <li>don't mark the Jython variable "_" as unread, so that it can be used in loops to assert that the loop variable is not used.
             <li>remove old warning when das2stream used something besides Units.us2000 for timetags, this was fixed years ago.  Thanks, Chris!
         </ul>
