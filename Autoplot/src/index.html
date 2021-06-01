@@ -5,10 +5,25 @@
     </head>
     <body>
         <H3>Autoplot Application (#{tag})</H3>
-        <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
+        <table style="border-width: 4px">
+            <tr>
+                <td>WebStart</td>
+                <td>Single-Jar</td>
+                <td>Mac</td>
+                <td>Windows</td>
+            </tr>
+            <tr style="vertical-align: top">
+                <td style="width: 100px;"><a href="autoplot.jnlp"><img style="vertical-align: middle;" alt="launch" src="https://das2.org/autoplot/icon/webstart.png"> jnlp</a></td>
+                <td style="width: 100px;"><a href="autoplot.jar"><img style="vertical-align: middle;" alt="mac dmg" src="https://das2.org/autoplot/icon/singlejar.png" height="28"> jar</a></td>
+                <td style="width: 100px;"><a href="http://das2.org/autoplot/build/mac/Autoplot-dev.dmg"><img style="vertical-align: middle;" alt="mac dmg" src="https://das2.org/autoplot/icon/apple_32.png" height="28"> dmg</a></td></td>
+                <td style="width: 100px;"><a href="http://das2.org/autoplot/build/windows/Autoplot.exe"><img style="vertical-align: middle;" alt="winder exe" src="https://das2.org/autoplot/icon/windows.png" height="28"> exe</a></td>
+            </tr>
+        </table>
+        <p>
         <img alt="screenshot"  src="screen.png">
-        <p><small>New binData function sorts rank 1 data into bins identified by an initial range.
+        </p>
+        <p><small>ephemerisLabels property allows the ephemeris labels to be manually set.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -20,14 +35,11 @@
             Java 8 is now required.
         </p>
 
-        <p>Run with 4GB of memory (64-bit Java only): <a href="autoplot_4GB.jnlp">autoplot_4GB.jnlp</a></p>
-        
-        <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
-
-        <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available. 
-        
-        <p>Bugfixes (2021-05-28 r25784):</p>
+        <p>Run with 1GB of memory to support 32-bit java versions: <a href="autoplot.jnlp">autoplot.jnlp</a></p>
+                
+        <p>Bugfixes (2021-06-01 r25784):</p>
         <ul>
+            <li><a href="https://github.com/das-developers/das2java/issues/12">0012</a>: series render data reduction can make all data invalid.
             <li>2352: cache MONOTONIC=FALSE, before we would only cache MONOTONIC=TRUE, but determining it is false can be expensive for some data.
             <li>don't mark the Jython variable "_" as unread, so that it can be used in loops to assert that the loop variable is not used.
             <li>remove old warning when das2stream used something besides Units.us2000 for timetags, this was fixed years ago.  Thanks, Chris!
