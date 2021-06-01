@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <jnlp 
     spec="1.0+"
-    codebase="http://autoplot.org/jnlp/devel/"
+    codebase="https://das2.org/autoplot/jnlp/devel/"
     href="autoplot_4GB.jnlp"> 
    
     <information> 
