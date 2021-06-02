@@ -394,7 +394,7 @@ public final class PlotController extends DomNodeController {
             ds= Ops.link( xds, ds );
         }
         
-        if ( ds!=null && ds.length()>10000000 ) {
+        if ( ds!=null && ( ds.rank()==0 || ds.length()>10000000 ) ) {
             logger.fine("simple next and previous used because data is very large");
             scanNextRange= dr0.next();
             scanPrevRange= dr0.previous();
