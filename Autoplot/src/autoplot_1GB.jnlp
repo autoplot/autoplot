@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <jnlp 
     spec="1.0+"
-    codebase="https://das2.org/autoplot/jnlp/devel/"
-    href="autoplot.jnlp">
+    codebase="#{codebase}"
+    href="autoplot_1GB.jnlp">
    
     <information> 
         <title>Autoplot (#{tag})</title>
@@ -34,7 +34,7 @@
     </security>
 
     <resources> 
-        <j2se version="1.8+" initial-heap-size="96m" max-heap-size="1024m" 
+        <j2se version="1.8+" initial-heap-size="96m" max-heap-size="1G" 
               href="http://java.sun.com/products/autodl/j2se" >
         </j2se>
 
