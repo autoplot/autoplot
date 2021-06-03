@@ -326,10 +326,13 @@ public class RowPngWalkView extends PngWalkView {
                 if (PngWalkTool.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
                     paintQualityControlIcon( i, g2, imgX, imgY, true );
                 }
+                
+                // draw a little trangle indicating 
                 int ds=6;
-                if ( drs!=null && i>=0 && i<seq.size()-1
-                        && wimage.getDatumRange()!=null && seq.imageAt(i+1).getDatumRange()!=null
-                        && seq.imageAt(i+1).getDatumRange().min().subtract(wimage.getDatumRange().max()).doubleValue(Units.seconds)>0 ) {
+                DatumRange thisDr= seq.imageAt(i).getDatumRange();
+                DatumRange nextDr= i<seq.size()-1 ? seq.imageAt(i+1).getDatumRange() : null;
+                DatumRange prevDr= i>0 ?  seq.imageAt(i-1).getDatumRange() : null;
+                if ( drs!=null && thisDr!=null && nextDr!=null && !nextDr.equals(thisDr.next()) ) {
                     g2.setColor(Color.GRAY);
                     int cx = i*cellSize + ( cellSize ) - ds;
                     int cy = ( cellSize ) - fm.getHeight() - 3;
@@ -337,17 +340,16 @@ public class RowPngWalkView extends PngWalkView {
                     //g2.clip(new Rectangle(cx, cellSize, cellSize, cellSize));
                     g2.fillPolygon( new int[] { cx, cx+ds, cx+ds, cx }, new int[] { cy, cy-ds, cy, cy }, 4 );
                     g2.setClip(oldClip);
-                }       
-                if ( drs!=null && i>0 && i<seq.size()-2
-                        && wimage.getDatumRange()!=null  && seq.imageAt(i+1).getDatumRange()!=null && seq.imageAt(i-1).getDatumRange()!=null
-                        && seq.imageAt(i).getDatumRange().min().subtract(seq.imageAt(i-1).getDatumRange().max()).doubleValue(Units.seconds)>0 ) {
+                }
+                
+                if ( drs!=null && thisDr!=null && prevDr!=null && !prevDr.equals(thisDr.previous()) ) {
                     g2.setColor(Color.GRAY);
                     int cx = i*cellSize;
                     int cy = ( cellSize ) - fm.getHeight() - 3;
                     Shape oldClip = g2.getClip();
                     //g2.clip(new Rectangle(cx, cellSize, cellSize, cellSize));
                     g2.fillPolygon( new int[] { cx, cx, cx+ds, cx }, new int[] { cy, cy-ds, cy, cy }, 4 );
-                    g2.setClip(oldClip);
+                    g2.setClip(oldClip);                    
                 }
                 
                 if (showCaptions && wimage.getCaption()!=null) {
