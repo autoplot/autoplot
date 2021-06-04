@@ -36,6 +36,7 @@ EQ_PP_EPI	x	%Y/eq_pp_epi_%Y%m%d_?%(v,sep).cdf
 EQ_SP_SFD	x	%Y/eq_sp_sfd_%Y%m%d_?%(v,sep).cdf
 FA_K0_ACF	x	%Y/fa_k0_acf_%Y%m%d_?%(v,sep).cdf
 FM_K0_KILP	x	%Y/fm_k0_kilp_%Y%m%d_?%(v,sep).cdf
+FORMOSAT5_AIP_IDN   x   %Y/formosat5_aip_idn_%Y%m%dt%(H;delta=12)%M%S_v%v.nc
 G0_K0_EP8	x	%Y/g0_k0_ep8_%Y%m%d_?%(v,sep).cdf
 G0_K0_MAG	x	%Y/g0_k0_mag_%Y%m%d_?%(v,sep).cdf
 G7_K1_MAG	x	g7_k1_mag_%Y%m%d_?%(v,sep).cdf

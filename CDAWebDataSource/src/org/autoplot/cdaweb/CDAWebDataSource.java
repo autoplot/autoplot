@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.autoplot.cdf.CdfDataSource;
+import org.autoplot.cdf.CdfUtil;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.CacheTag;
 import org.das2.datum.Datum;
@@ -44,6 +45,7 @@ import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
 import org.autoplot.metatree.IstpMetadataModel;
+import org.autoplot.netCDF.NetCDFDataSource;
 
 /**
  * Special data source for reading time series from NASA Goddard's CDAWeb
@@ -96,10 +98,11 @@ public class CDAWebDataSource extends AbstractDataSource {
      * return the DataSourceFactory that will read the CDF files.  This was once
      * the binary CDF library, and now is the java one.  Either way, it must
      * use the spec: <file>?<id>
-     * @return
+     * @param ext the file extention, .cdf or .nc
+     * @return the factory producing readers for this type.
      */
-    private DataSourceFactory getDelegateFactory() {
-        DataSourceFactory cdfFileDataSourceFactory= DataSourceRegistry.getInstance().getSource("cdfj");
+    private DataSourceFactory getDelegateFactory(String ext) {
+        DataSourceFactory cdfFileDataSourceFactory= DataSourceRegistry.getInstance().getSource(ext);
         return cdfFileDataSourceFactory;
     }
 
@@ -172,7 +175,17 @@ public class CDAWebDataSource extends AbstractDataSource {
 
             }
             
-            DataSourceFactory cdfFileDataSourceFactory= getDelegateFactory();
+            String ext;
+            if ( files.length==0 ) {
+                ext= ".cdf";
+            } else {
+                String s= files[0];
+                int i= s.indexOf("|");
+                if ( i>-1 ) s= s.substring(0,i);
+                URISplit split= URISplit.parse(s);
+                ext= split.ext;
+            }
+            DataSourceFactory fileDataSourceFactory= getDelegateFactory(ext);
 
             mon.setTaskSize(files.length*10+10);
             if ( mon.isCancelled() ) {
@@ -224,7 +237,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                                 URI file1;
                                 file1= DataSetURI.getURI(  file + "?" + URISplit.formatParams(fileParams) );
                                 logger.log(Level.FINER, "loading component for virtual variable: {0}", file1);
-                                DataSource dataSource= cdfFileDataSourceFactory.getDataSource( file1 );
+                                DataSource dataSource= fileDataSourceFactory.getDataSource( file1 );
                                 try {
                                     ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1.getSubtaskMonitor("load "+comp) );
                                 } catch ( Exception ex ) {
@@ -262,13 +275,28 @@ public class CDAWebDataSource extends AbstractDataSource {
                         file1= DataSetURI.getURI( file + "?" + URISplit.formatParams(fileParams) );
 
                         logger.log( Level.FINE, "loading {0}", file1);
-                        CdfDataSource dataSource= (CdfDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
-                        try {
-                            ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
-                        } catch ( IllegalArgumentException ex ) {
-                            String p= params.get(PARAM_ID);
-                            logger.log(Level.INFO, "parameter not found for interval: {0}", p );
-                            throw new NoDataInIntervalException("parameter not found for interval: "+p );
+                        
+                        if ( file.endsWith(".nc") ) {
+                            NetCDFDataSource dataSource= (NetCDFDataSource)fileDataSourceFactory.getDataSource( file1 );
+                            try {
+                                ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1 ); //,metadata );
+                                CdfUtil.doApplyAttributes( metadata, ds1, null, null ); // assumes no slice1
+                                ds1.putProperty( QDataSet.METADATA, metadata );
+                                ds1.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
+                            } catch ( IllegalArgumentException ex ) {
+                                String p= params.get(PARAM_ID);
+                                logger.log(Level.INFO, "parameter not found for interval: {0}", p );
+                                throw new NoDataInIntervalException("parameter not found for interval: "+p );
+                            }
+                        } else { // typical case for 99.9% of data -- CDF files.
+                            CdfDataSource dataSource= (CdfDataSource)fileDataSourceFactory.getDataSource( file1 );
+                            try {
+                                ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
+                            } catch ( IllegalArgumentException ex ) {
+                                String p= params.get(PARAM_ID);
+                                logger.log(Level.INFO, "parameter not found for interval: {0}", p );
+                                throw new NoDataInIntervalException("parameter not found for interval: "+p );
+                            }
                         }
                         
                     }
@@ -337,7 +365,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                 if ( dep1p!=null && dep1p.containsKey("NAME") && result.rank()>1 ) {
                     String dep1= (String)dep1p.get("NAME");
                     String master= db.getMasterFile( ds.toUpperCase(), new NullProgressMonitor() );
-                    DataSource masterSource= cdfFileDataSourceFactory.getDataSource( DataSetURI.getURI( master+"?"+dep1+"[0]&doDep=no" ) );
+                    DataSource masterSource= fileDataSourceFactory.getDataSource( DataSetURI.getURI( master+"?"+dep1+"[0]&doDep=no" ) );
                     QDataSet ds1= (MutablePropertyDataSet)masterSource.getDataSet( new NullProgressMonitor() );
                     result= Ops.putProperty( result, QDataSet.DEPEND_1, ds1 );
                 }
@@ -353,7 +381,8 @@ public class CDAWebDataSource extends AbstractDataSource {
                 }
                 if ( labels==null && labelVar!=null ) {
                     String master= db.getMasterFile( ds.toLowerCase(), mon.getSubtaskMonitor("get master file") );
-                    DataSource labelDss= getDelegateFactory().getDataSource( DataSetURI.getURI(master+"?"+labelVar) );
+                    URISplit split= URISplit.parse(master);
+                    DataSource labelDss= getDelegateFactory(split.ext).getDataSource( DataSetURI.getURI(master+"?"+labelVar) );
                     QDataSet labelDs= (MutablePropertyDataSet)labelDss.getDataSet( new NullProgressMonitor() );
                     if ( labelDs!=null ) {
                         if ( labelDs.rank()>1 && labelDs.length()==1 ) labelDs= labelDs.slice(0);
@@ -370,7 +399,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                 String labelVar= (String)metadata.get( "LABL_PTR_1");
                 if ( labelVar!=null ) {
                     String master= db.getMasterFile( ds.toLowerCase(), mon.getSubtaskMonitor("get master file")  );
-                    DataSource labelDss= getDelegateFactory().getDataSource( DataSetURI.getURI(master+"?"+labelVar) );
+                    DataSource labelDss= getDelegateFactory(ext).getDataSource( DataSetURI.getURI(master+"?"+labelVar) );
                     QDataSet labelDs= (MutablePropertyDataSet)labelDss.getDataSet( new NullProgressMonitor() );
                     if ( labelDs!=null ) {
                         if ( labelDs.rank()>1 && labelDs.length()==1 ) labelDs= labelDs.slice(0);
@@ -442,12 +471,13 @@ public class CDAWebDataSource extends AbstractDataSource {
             CDAWebDB db= CDAWebDB.getInstance();
 
             String master= db.getMasterFile( ds.toLowerCase(), mon.getSubtaskMonitor("getMasterFile") );
+            URISplit split= URISplit.parse(master);
             master= master+"?"+id;
             String x= getParam("x",null);
             String y= getParam("y",null);
             if ( x!=null ) master+="&x="+x;
             if ( y!=null ) master+="&y="+y;
-            DataSource cdf= getDelegateFactory().getDataSource( DataSetURI.getURI(master) );
+            DataSource cdf= getDelegateFactory(split.ext).getDataSource( DataSetURI.getURI(master) );
 
             metadata= cdf.getMetadata(mon.getSubtaskMonitor("getMetadata")); // note this is a strange branch, because usually we have read data first.
 
@@ -457,7 +487,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                 String labelVar= (String)metadata.get("LABL_PTR_1");
                 if ( labelVar!=null ) {
                     String master1= db.getMasterFile( ds.toLowerCase(), mon.getSubtaskMonitor("getMasterFile") );
-                    DataSource labelDss= getDelegateFactory().getDataSource( DataSetURI.getURI(master1+"?"+labelVar) );
+                    DataSource labelDss= getDelegateFactory(split.ext).getDataSource( DataSetURI.getURI(master1+"?"+labelVar) );
                     QDataSet labelDs= (MutablePropertyDataSet)labelDss.getDataSet( new NullProgressMonitor() );
                     if ( labelDs!=null ) {
                         if ( labelDs.rank()>1 && labelDs.length()==1 ) labelDs= labelDs.slice(0);

@@ -843,8 +843,15 @@ public class CDAWebDB {
                                 String desc= getDescription(node);
                                 //String sid=attrs.getNamedItem("ID").getTextContent();
                                 result.put(s,desc);
+                            } else if ( filenaming.endsWith(".nc" ) ) {
+                                if ( !name.contains("FORMOSAT") ) { // GOLD_L2_ON2 missing visad library -- not sure why.
+                                    logger.log(Level.FINE, "ignoring {0} because .nc file is not supported", s);
+                                }
+                                String desc= getDescription(node);
+                                //String sid=attrs.getNamedItem("ID").getTextContent();
+                                result.put(s,desc);                                
                             } else {
-                                logger.log(Level.FINE, "ignoring {0} because files do not end in .cdf", s);
+                                logger.log(Level.FINE, "ignoring {0} because files do not end in .cdf or .nc", s);
                             }
                         }
                     }
