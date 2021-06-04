@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>ephemerisLabels property allows the ephemeris labels to be manually set.
+        <p><small>ephemerisLabels property "X;Y;Z" allows the ephemeris labels to be manually set.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -29,8 +29,9 @@
                 
         <p>Bugfixes (2021-06-01 r25784):</p>
         <ul>
-            <li><a href="https://github.com/das-developers/das2java/issues/12">0012</a>: series render data reduction can make all data invalid.
-            <li>2352: cache MONOTONIC=FALSE, before we would only cache MONOTONIC=TRUE, but determining it is false can be expensive for some data.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2354/">2354</a>: gaps in pngwalk sequence incorrectly marked for orbit files.  Thanks, Kris!
+            <li><a href="https://github.com/das-developers/das2java/issues/12">0012</a>: series render data reduction can make all data invalid.  Thanks, Ivar!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2352">2352</a>: cache MONOTONIC=FALSE, before we would only cache MONOTONIC=TRUE, but determining it is false can be expensive for some data.
             <li>don't mark the Jython variable "_" as unread, so that it can be used in loops to assert that the loop variable is not used.
             <li>remove old warning when das2stream used something besides Units.us2000 for timetags, this was fixed years ago.  Thanks, Chris!
         </ul>
@@ -57,6 +58,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>within allows second argument to be a list of events (not just a single event), so that a script can easily remove a set of events.  Thanks Ivar!
+            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/743/'>743</a>: Initial support for NetCDF files at CDAWeb, including Formosat-5 files.  
             <li>ephemerisLabels property of each plot allows the ephemeris channels to be manually labeled.
             <li>normalize(ds,1) function added.  Thanks, Kristoff!
         </ul>
