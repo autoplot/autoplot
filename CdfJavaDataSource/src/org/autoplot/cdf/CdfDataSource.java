@@ -677,14 +677,14 @@ public class CdfDataSource extends AbstractDataSource {
         if (!"no".equals(interpMeta)) {
 
             if ( svariables==null ) {
-                doApplyAttributes(attr1, result, (String)map.get(PARAM_SLICE1), constraint);
+                CdfUtil.doApplyAttributes(attr1, result, (String)map.get(PARAM_SLICE1), constraint);
                 if ( sy!=null || sx!=null ) {
                     result.putProperty( QDataSet.RENDER_TYPE, null );
                 }
             } else {
                 for ( int j=0; j<svariables.length; j++ ) {
                     HashMap<String,Object> attrs1 = readAttributes(cdf, svariables[j], 0);
-                    doApplyAttributes(attrs1, 
+                    CdfUtil.doApplyAttributes(attrs1, 
                             (MutablePropertyDataSet)result.slice(j), 
                             (String)map.get(PARAM_SLICE1), 
                             constraint );
@@ -738,88 +738,6 @@ public class CdfDataSource extends AbstractDataSource {
         
         return result;
 
-    }
-
-    private void doApplyAttributes(Map<String, Object> attr1, MutablePropertyDataSet result, String os1, String constraint) {
-        
-        Map<String, Object> istpProps;
-        MetadataModel model = new IstpMetadataModel();
-        istpProps= model.properties(attr1);
-        CdfUtil.maybeAddValidRange(istpProps, result);
-        Number n= (Number)istpProps.get(QDataSet.FILL_VALUE);
-        if ( result instanceof BufferDataSet ) {
-            Class c= ((BufferDataSet)result).getCompatibleComponentType();
-            if ( n instanceof Double ) {
-                if ( c==float.class ) {
-                    istpProps.put( QDataSet.FILL_VALUE, (float)n.doubleValue() );
-                }
-            }
-        }
-        result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
-        result.putProperty(QDataSet.LABEL, istpProps.get(QDataSet.LABEL)  );
-        result.putProperty(QDataSet.TITLE, istpProps.get(QDataSet.TITLE)  );
-        result.putProperty(QDataSet.DESCRIPTION, istpProps.get(QDataSet.DESCRIPTION) );
-        String renderType= (String)istpProps.get(QDataSet.RENDER_TYPE);
-        if ( renderType!=null && renderType.equals( "time_series" ) ) {
-            // kludge for rbsp-a_WFR-waveform_emfisis-L2_20120831_v1.2.1.cdf.  This is actually a waveform.
-            // Note Seth (RBSP/ECT Team) has a file with 64 channels.  Dan's file rbsp-a_HFR-spectra_emfisis-L2_20120831_v1.2.3.cdf has 82 channels.
-            if ( result.rank()>1 && result.length(0)>QDataSet.MAX_UNIT_BUNDLE_COUNT ) {
-                logger.log(Level.FINE, "result.length(0)>QDataSet.MAX_UNIT_BUNDLE_COUNT={0}, this cannot be treated as a time_series", QDataSet.MAX_UNIT_BUNDLE_COUNT);
-                renderType=null;
-            }
-        }
-        if ( renderType !=null && renderType.startsWith("image") ) {
-            logger.fine("renderType=image not supported in CDF files");
-            renderType= null;
-        }
-        if ( UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(result)) ) {
-            renderType= "eventsbar";
-        }
-        
-        if ( constraint!=null ) {
-            logger.finer("dropping render type because of constraint");
-        } else if ( os1!=null && os1.length()>0 ) {
-            logger.finer("dropping render type because of slice1");
-            for ( int i1=1; i1<result.rank()+1; i1++ ) {
-                istpProps.put( "DEPEND_"+i1, istpProps.get( "DEPEND_"+(i1+1) ) );
-            }
-        } else {
-            result.putProperty(QDataSet.RENDER_TYPE, renderType );
-        }
-        if ( UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(result)) ) {
-            if ( result.property(QDataSet.DEPEND_0)==null ) {
-                result.putProperty(QDataSet.RENDER_TYPE, QDataSet.VALUE_RENDER_TYPE_DIGITAL );
-            } else {
-                result.putProperty(QDataSet.RENDER_TYPE, QDataSet.VALUE_RENDER_TYPE_EVENTS_BAR );
-            }
-        } else {
-            if ( result.rank()<3 ) { // POLAR_H0_CEPPAD_20010117_V-L3-1-20090811-V.cdf?FEDU is "time_series"
-                if ( result.rank()==2 && result.length()>0 && result.length(0)<QDataSet.MAX_UNIT_BUNDLE_COUNT ) { //allow time_series for [n,16]
-                    String rt= (String)istpProps.get("RENDER_TYPE" );
-                    if ( rt!=null ) result.putProperty(QDataSet.RENDER_TYPE, rt );
-                    if ( istpProps.get("RENDER_TYPE")==null ) { //goes11_k0s_mag
-                        if ( result.property("DEPEND_1")==null ) {
-                            result.putProperty(QDataSet.RENDER_TYPE, "time_series" );
-                        }
-                    }
-                }
-            }
-        }
-        for ( int j=0; j<result.rank(); j++ ) {
-            MutablePropertyDataSet depds= (MutablePropertyDataSet) result.property("DEPEND_"+j);
-            Map<String,Object> depProps= (Map<String, Object>) istpProps.get("DEPEND_"+j);
-            if ( depds!=null && depProps!=null ) {
-                CdfUtil.maybeAddValidRange( depProps, depds );
-                Map<String, Object> istpProps2 = model.properties(depProps);
-                depds.putProperty(QDataSet.FILL_VALUE, istpProps2.get(QDataSet.FILL_VALUE));
-                if ( !UnitsUtil.isTimeLocation( SemanticOps.getUnits(depds) ) ) {
-                    depds.putProperty(QDataSet.LABEL, istpProps2.get(QDataSet.LABEL) );
-                    depds.putProperty(QDataSet.TITLE, istpProps2.get(QDataSet.TITLE) );
-                }
-            }
-        }
-        result.putProperty( QDataSet.METADATA, attr1 );
-        result.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
     }
 
     /**
