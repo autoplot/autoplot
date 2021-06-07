@@ -18,13 +18,15 @@
         <icon href="resources/logo128.png" width="128" height="128" />
         <icon href="splash.png" kind="splash" />
         <offline-allowed/>
-        <shortcut online="true">
+        <shortcut online="false" install="true"> 
             <desktop />
             <menu submenu="autoplot" />
         </shortcut>
         <association mime-type="application/autoplot+xml" extensions="vap"/>
         <association mime-type="application/x-cdf" extensions="cdf"/>        
         <association mime-type="application/x-pngwalk" extensions="pngwalk"/> 
+        <association mime-type="application/vnd.autoplot.pngwalk" extensions="pngwalk"/>
+        <association mime-type="application/vnd.autoplot.vap+xml" extensions="vap"/>         
     </information>
     
     <security>
@@ -39,17 +41,13 @@
         <jar href="AutoplotVolatile.jar" />
         <jar href="*" />
 
-        <extension name="cdf" href="*" />
-
         <property name="jnlp.packEnabled" value="true"/>
-        <!-- this no longer has any effect: <property name="deployment.security.authenticator" value="false"/>-->
 
         <property name="jnlp.autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" />
         <property name="sun.java2d.d3d" value="false" />  <!-- bug 953 -->
         <property name="java.util.Arrays.useLegacyMergeSort" value="true" /> <!-- bug 1159 -->
         <property name="http.agent" value="*" />
-        
-        <package name="gsfc.nssdc" part="cdf"  recursive="true" />
+        <property name="com.apple.mrj.application.apple.menu.about.name" value="*" /> <!-- bug 2312 -->
         
     </resources> 
 
@@ -58,3 +56,4 @@
         <argument>*</argument>  <!-- this is to support the jnlp-server, which can insert a starting value -->
     </application-desc>
 </jnlp> 
+
