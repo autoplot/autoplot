@@ -232,6 +232,7 @@ public class ScriptPanelSupport {
                         panel.getEditorPanel().getEditorKit();
                         MutableAttributeSet att= new SimpleAttributeSet();
                         StyleConstants.setItalic( att, true);
+                        ScriptPanelSupport.this.file= null;
                         panel.getEditorPanel().getDocument().remove( 0, panel.getEditorPanel().getDocument().getLength() );
                         panel.getEditorPanel().getDocument().insertString( 0, "loading "+fsfile, att );
                     } catch ( BadLocationException ex ) {
