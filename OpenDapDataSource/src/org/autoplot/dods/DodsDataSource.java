@@ -119,7 +119,7 @@ public class DodsDataSource extends AbstractDataSource {
     public DodsDataSource(URI uri) throws IOException {
 
         super(uri);
-        logger.entering( "org.virbo.dods.DodsDataSource", "DodsDataSource {0}", uri );
+        logger.entering( "org.autoplot.dods.DodsDataSource", "DodsDataSource {0}", uri );
 
         // remove the .dds (or .html) extension.
         String surl = uri.getRawSchemeSpecificPart();
@@ -159,7 +159,7 @@ public class DodsDataSource extends AbstractDataSource {
         } catch (MalformedURLException ex) {
             throw new RuntimeException(ex);
         }
-        logger.exiting( "org.virbo.dods.DodsDataSource", "DodsDataSource {0}", uri );
+        logger.exiting( "org.autoplot.dods.DodsDataSource", "DodsDataSource {0}", uri );
     }
 
     private String getIstpConstraint(DodsAdapter da, Map meta, MyDDSParser parser, String variable) throws DDSException {
@@ -269,7 +269,7 @@ public class DodsDataSource extends AbstractDataSource {
     public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, MalformedURLException, 
         IOException, ParseException, DDSException, CancelledOperationException, DASException, InvalidParameterException, DAP2Exception {
 
-        logger.entering( "org.virbo.dods.DodsDataSource", "getDataSet" );
+        logger.entering( "org.autoplot.dods.DodsDataSource", "getDataSet" );
         mon.setTaskSize(-1);
         mon.started();
 
@@ -424,7 +424,7 @@ public class DodsDataSource extends AbstractDataSource {
             return ds;
             
         } finally {
-            logger.exiting( "org.virbo.dods.DodsDataSource", "getDataSet" );
+            logger.exiting( "org.autoplot.dods.DodsDataSource", "getDataSet" );
             mon.finished();
 
         }
