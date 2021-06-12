@@ -38,10 +38,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
-import opendap.dap.Attribute;
-import opendap.dap.AttributeTable;
 import opendap.dap.DAP2Exception;
-import opendap.dap.DASException;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.qds.DDataSet;
 import org.das2.qds.QDataSet;
@@ -83,11 +80,11 @@ public class DodsAdapter {
      * @param variable the variable to read, like TerrainReflectivity
      */
     public DodsAdapter(URL source, String variable) {
-        logger.entering("org.virbo.dods.DodsAdapter", "DodsAdapter" );
+        logger.entering("org.autoplot.dods.DodsAdapter", "DodsAdapter" );
         this.source = source;
         this.variable = variable;
         properties = new HashMap<>();
-        logger.exiting("org.virbo.dods.DodsAdapter", "DodsAdapter" );
+        logger.exiting("org.autoplot.dods.DodsAdapter", "DodsAdapter" );
     }
 
     void setVariable(String variable) {
@@ -152,7 +149,7 @@ public class DodsAdapter {
 
     private long calcSize( Map<String,Object> attr ) throws MalformedURLException, IOException, ParseException {
         try {
-            logger.entering("org.virbo.dods.DodsAdapter", "calcSize" );
+            logger.entering("org.autoplot.dods.DodsAdapter", "calcSize" );
             
             DDS ldds = new DDS();
             
@@ -241,7 +238,7 @@ public class DodsAdapter {
                 logger.log(Level.FINE, "calcSize {0}: {1}", new Object[]{n, size});
             }
             
-            logger.exiting("org.virbo.dods.DodsAdapter", "calcSize" );
+            logger.exiting("org.autoplot.dods.DodsAdapter", "calcSize" );
             
             return size;
         } catch (DDSException e) {
@@ -291,7 +288,7 @@ public class DodsAdapter {
             IOException, ParseException, DDSException, DDSException,
             CancelledOperationException, DAP2Exception {
 
-        logger.entering("org.virbo.dods.DodsAdapter", "loadDataset" );
+        logger.entering("org.autoplot.dods.DodsAdapter", "loadDataset" );
         
         if ( constraint==null ) {
             constraint="";
@@ -329,7 +326,7 @@ public class DodsAdapter {
 
         } finally {
             if ( !mon.isFinished() ) mon.finished();
-            logger.exiting("org.virbo.dods.DodsAdapter", "loadDataset" );
+            logger.exiting("org.autoplot.dods.DodsAdapter", "loadDataset" );
             
         }
        
@@ -346,7 +343,7 @@ public class DodsAdapter {
     public QDataSet getDataSet(Map<String, Object> attributes) {
         MutablePropertyDataSet zds;
 
-        logger.entering("org.virbo.dods.DodsAdapter", "getDataSet" );
+        logger.entering("org.autoplot.dods.DodsAdapter", "getDataSet" );
         if (attributes == null) attributes = new HashMap<>();
         BaseType btvar;
         try {
@@ -500,7 +497,7 @@ public class DodsAdapter {
             throw new RuntimeException(ex);
             
         } finally {
-            logger.exiting("org.virbo.dods.DodsAdapter", "getDataSet" );
+            logger.exiting("org.autoplot.dods.DodsAdapter", "getDataSet" );
         }
 
         QDataSet ds = zds;

@@ -83,7 +83,7 @@ public class DodsDataSourceFactory extends AbstractDataSourceFactory implements 
 
     private List<CompletionContext> getVars( String file ) throws DDSException, IOException, MalformedURLException, ParseException {
         
-        logger.entering("org.virbo.dods.DodsDataSourceFactory", "getVars {0}", file );
+        logger.entering("org.autoplot.dods.DodsDataSourceFactory", "getVars {0}", file );
         
         List<CompletionContext> result= new ArrayList<>();
         
@@ -119,7 +119,7 @@ public class DodsDataSourceFactory extends AbstractDataSourceFactory implements 
             }
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, var, this, "arg_0", null, label.toString(), true));
         }
-        logger.exiting("org.virbo.dods.DodsDataSourceFactory", "getVars {0}", file );
+        logger.exiting("org.autoplot.dods.DodsDataSourceFactory", "getVars {0}", file );
         
         return result;
     }
