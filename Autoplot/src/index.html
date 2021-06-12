@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>ephemerisLabels property "X;Y;Z" allows the ephemeris labels to be manually set.
+        <p><small>Data from GOLD mission can be used from https site at CDAWeb, and soon via the CDAWeb source.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,8 +27,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions: <a href="autoplot.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-06-01 r25784):</p>
+        <p>Bugfixes (2021-06-12 r25816):</p>
         <ul>
+            <li><a href="https://github.com/das-developers/das2java/issues/14">0014</a>: for 2-dataset bundle of startTime and stopTime, don't use the last dataset (stopTime) as the data attached to each event.  This confuses the automatic choosing of renderType.
+            <li>new mime types in jnlp files.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2357/">2357</a>: script editor clears old script filename before using editor to display "loading" message, since it was possible to clobber the old script.  Thanks, Ivar!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2354/">2354</a>: gaps in pngwalk sequence incorrectly marked for orbit files.  Thanks, Kris!
             <li><a href="https://github.com/das-developers/das2java/issues/12">0012</a>: series render data reduction can make all data invalid.  Thanks, Ivar!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2352">2352</a>: cache MONOTONIC=FALSE, before we would only cache MONOTONIC=TRUE, but determining it is false can be expensive for some data.
