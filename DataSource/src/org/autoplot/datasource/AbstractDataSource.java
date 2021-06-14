@@ -70,7 +70,7 @@ public abstract class AbstractDataSource implements DataSource {
         URISplit split = URISplit.parse(s);
 
         if ( split.params!=null && split.params.contains("?") ) {
-            if ( !"vap+inline".equals(split.vapScheme) ) {
+            if ( !"vap+inline".equals(split.vapScheme) && !"vap+jyds".equals(split.vapScheme) ) {
                 logger.log(Level.WARNING, "URI contains two question marks:{0}", uri);
             }
         }
