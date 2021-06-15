@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Data from GOLD mission can be used from https site at CDAWeb, and soon via the CDAWeb source.
+        <p><small>Without and within functions now accept a list of events, useful for culling data.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,10 +27,13 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions: <a href="autoplot.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-06-12 r25816):</p>
+        <p>Bugfixes (2021-06-15 r25820):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2359/">2359</a>: .vap.zip control added for embedding data which is already available over http.
+            <li>suppress double question mark URI warning for vap+jyds arguments.  Thanks, Ivar!
+            <li>don't print empty field warning when the last field is the empty field.  This happens often when exporting .csv's from spreadsheets.
             <li><a href="https://github.com/das-developers/das2java/issues/14">0014</a>: for 2-dataset bundle of startTime and stopTime, don't use the last dataset (stopTime) as the data attached to each event.  This confuses the automatic choosing of renderType.
-            <li>new mime types in jnlp files.
+            <li>new mime types in jnlp files.  Thanks, Chris!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2357/">2357</a>: script editor clears old script filename before using editor to display "loading" message, since it was possible to clobber the old script.  Thanks, Ivar!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2354/">2354</a>: gaps in pngwalk sequence incorrectly marked for orbit files.  Thanks, Kris!
             <li><a href="https://github.com/das-developers/das2java/issues/12">0012</a>: series render data reduction can make all data invalid.  Thanks, Ivar!
@@ -61,10 +64,10 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>within allows second argument to be a list of events (not just a single event), so that a script can easily remove a set of events.  Thanks Ivar!
+            <li>within and without allow second argument to be a list of events (not just a single event), so that a script can easily remove a set of events.  Thanks Ivar!
             <li><a href='https://sourceforge.net/p/autoplot/feature-requests/743/'>743</a>: Initial support for NetCDF files at CDAWeb, including Formosat-5 files.  
             <li>ephemerisLabels property of each plot allows the ephemeris channels to be manually labeled.
-            <li>normalize(ds,1) function added.  Thanks, Kristoff!
+            <li>normalize(ds,1) function added so you can normalize along an index.  Thanks, Kristoff!
         </ul>
         <p>Less recent features:</p>
         <ul>
