@@ -18,7 +18,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -231,10 +234,14 @@ public class PersistentStateSupport {
             addToRecent(getCurrentFile());
 
             String v= vapVersion.getScheme();
+            Map<String,Object> optionsMap= new HashMap<>();
+            if ( vapVersion.isEmbedData() ) optionsMap.put( "embedData", true );
+            if ( vapVersion.isOnlyEmbedLocal() ) optionsMap.put( "onlyEmbedLocal", true );
+            
             if ( v.length()>0 ) {
-                save( new File( getCurrentFile()), v, vapVersion.isEmbedData() );
+                save(new File( getCurrentFile()), v, optionsMap );
             } else {
-                save( new File( getCurrentFile()), "", vapVersion.isEmbedData() );
+                save(new File( getCurrentFile()), "", optionsMap );
             }
         }
 
@@ -279,63 +286,70 @@ public class PersistentStateSupport {
         }
     }
     
-    private void save( final File file, final String scheme, final boolean embedData ) {
+    /**
+     * <ul>
+     * <li> embedData -- Boolean.TRUE means create a zip and embed the data
+     * <li> onlyEmbedLocal -- Boolean.TRUE means only embed local files, because remote files can be loaded on other computers.
+     * </ul>
+     * @param file the file
+     * @param scheme the version of .vap to create
+     * @param saveOptions map containing options
+     */
+    private void save( final File file, final String scheme, Map<String,Object> saveOptions ) {
         setSaving(true);
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    File f= file;
-                    if ( component instanceof AutoplotUI ) {
-                        ((AutoplotUI)component).setStatus("busy: writing to "+file);
-                    }
-                    
-                    if ( embedData ) {
-                        if ( !f.getName().endsWith("zip") ) f= new File( f.getPath()+"zip" );                        
-                    } else {
-                        if ( !f.getName().endsWith(ext) ) f= new File( f.getPath()+ext );
-                    }
-
-                    if ( f.exists() ) {
-                        if ( !f.canWrite() ) {
-                            throw new IOException("Unable to write to file: "+f );
-                        }
-                    } else {
-                        String osName = AutoplotUtil.getProperty("os.name", "applet");
-                        if ( !f.getParentFile().canWrite() && !osName.startsWith("Windows") ) { //bug 3099076
-                            throw new IOException("Unable to write to directory: "+f.getParentFile() );
-                        }
-                    }
-                    
-                    if ( embedData ) {
-                        if ( component instanceof AutoplotUI ) {
-                            Application dom= ((AutoplotUI)component).getDom();
-                            EmbedDataExperiment.save( dom, f );
-                        } else {
-                            throw new IllegalArgumentException("Unable to embed data, please submit this error so the problem can be corrected");
-                        }
-                    } else {
-                        saveImpl(f,scheme);
-                    }
-                    
-                    Preferences prefs= AutoplotSettings.settings().getPreferences( AutoplotSettings.class);
-                    prefs.put( AutoplotSettings.PREF_LAST_OPEN_VAP_FILE, new File( getCurrentFile() ).getAbsolutePath() );
-                    prefs.put( AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, new File( getCurrentFile() ).getParent() );
-                    setSaving( false );
-                    setDirty( false );
-                    if ( component instanceof AutoplotUI ) {
-                        ((AutoplotUI)component).setStatus("wrote "+file);
-                    }
-                    update();
-                } catch ( IOException ex ) {
-                    String mess;
-                    if ( ex.getMessage().equals("") ) mess= ex.toString(); else mess= ex.getMessage();
-                    JOptionPane.showMessageDialog( PersistentStateSupport.this.component, mess, "I/O Error", JOptionPane.WARNING_MESSAGE );
-                } catch ( ParserConfigurationException ex ) {
-                    throw new RuntimeException(ex);
-                } catch ( Exception ex) {
-                    throw new RuntimeException(ex);
+        Runnable run= () -> {
+            try {
+                File f= file;
+                if ( component instanceof AutoplotUI ) {
+                    ((AutoplotUI)component).setStatus("busy: writing to "+file);
                 }
+                
+                if ( saveOptions.containsKey("embedData") ) {
+                    if ( !f.getName().endsWith("zip") ) f= new File( f.getPath()+"zip" );
+                } else {
+                    if ( !f.getName().endsWith(ext) ) f= new File( f.getPath()+ext );
+                }
+                
+                if ( f.exists() ) {
+                    if ( !f.canWrite() ) {
+                        throw new IOException("Unable to write to file: "+f );
+                    }
+                } else {
+                    String osName = AutoplotUtil.getProperty("os.name", "applet");
+                    if ( !f.getParentFile().canWrite() && !osName.startsWith("Windows") ) { //bug 3099076
+                        throw new IOException("Unable to write to directory: "+f.getParentFile() );
+                    }
+                }
+                
+                boolean embedData= Boolean.TRUE.equals( saveOptions.get("embedData") );
+                if ( embedData ) {
+                    if ( component instanceof AutoplotUI ) {
+                        Application dom= ((AutoplotUI)component).getDom();
+                        EmbedDataExperiment.save( dom, f, Boolean.TRUE.equals( saveOptions.get("onlyEmbedLocal")) );
+                    } else {
+                        throw new IllegalArgumentException("Unable to embed data, please submit this error so the problem can be corrected");
+                    }
+                } else {
+                    saveImpl(f,scheme);
+                }
+                
+                Preferences prefs= AutoplotSettings.settings().getPreferences( AutoplotSettings.class);
+                prefs.put( AutoplotSettings.PREF_LAST_OPEN_VAP_FILE, new File( getCurrentFile() ).getAbsolutePath() );
+                prefs.put( AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, new File( getCurrentFile() ).getParent() );
+                setSaving( false );
+                setDirty( false );
+                if ( component instanceof AutoplotUI ) {
+                    ((AutoplotUI)component).setStatus("wrote "+file);
+                }
+                update();
+            } catch ( IOException ex ) {
+                String mess;
+                if ( ex.getMessage().equals("") ) mess= ex.toString(); else mess= ex.getMessage();
+                JOptionPane.showMessageDialog( PersistentStateSupport.this.component, mess, "I/O Error", JOptionPane.WARNING_MESSAGE );
+            } catch ( ParserConfigurationException ex ) {
+                throw new RuntimeException(ex);
+            } catch ( Exception ex) {
+                throw new RuntimeException(ex);
             }
         };
         new Thread( run, "PersistentStateSupport.save" ).start();
@@ -356,7 +370,7 @@ public class PersistentStateSupport {
                             setCurrentFile(child.toString());
                             saveAs();
                         } else {
-                            save(new File(getCurrentFile()),"",false);
+                            save(new File(getCurrentFile()),"", Collections.emptyMap());
                         }
                     } catch (IOException ex) {
                         logger.log(Level.SEVERE, ex.getMessage(), ex);

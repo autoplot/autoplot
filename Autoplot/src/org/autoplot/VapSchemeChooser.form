@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<Form version="1.3" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+<Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
     <Component class="javax.swing.ButtonGroup" name="buttonGroup1">
     </Component>
@@ -20,14 +20,18 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <EmptySpace min="21" pref="21" max="-2" attributes="0"/>
+                      <Component id="onlyEmbedLocalCB" min="-2" max="-2" attributes="0"/>
+                  </Group>
                   <Component id="currentVersionCB" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="embedDataCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="v1_09CB" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="29" max="32767" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -38,9 +42,10 @@
               <Component id="currentVersionCB" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="v1_09CB" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="114" max="32767" attributes="0"/>
+              <EmptySpace pref="109" max="32767" attributes="0"/>
               <Component id="embedDataCheckBox" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="onlyEmbedLocalCB" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -58,7 +63,7 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="embedDataCheckBox">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Embed local data within .vap file"/>
+        <Property name="text" type="java.lang.String" value="Embed data within .vap.zip file"/>
         <Property name="toolTipText" type="java.lang.String" value="Create zip file containing dom configuration in default.vap, as well as file resources used."/>
       </Properties>
     </Component>
@@ -69,6 +74,15 @@
         </Property>
         <Property name="text" type="java.lang.String" value="v1.09 (Autoplot 2017)"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="onlyEmbedLocalCB">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Only embed local data"/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Only embed data from file references, not data from http or ftp."/>
+      </Properties>
+      <BindingProperties>
+        <BindingProperty name="enabled" source="embedDataCheckBox" sourcePath="${selected}" target="onlyEmbedLocalCB" targetPath="enabled" updateStrategy="0" immediately="false"/>
+      </BindingProperties>
     </Component>
   </SubComponents>
 </Form>

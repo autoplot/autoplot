@@ -50,6 +50,14 @@ public class VapSchemeChooser extends javax.swing.JPanel {
         return this.embedDataCheckBox.isSelected();
     }
     
+    /**
+     * return true if the scientist only wants the local data to be embedded.
+     * @return 
+     */
+    public boolean isOnlyEmbedLocal() {
+        return this.onlyEmbedLocalCB.isSelected();
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -58,22 +66,30 @@ public class VapSchemeChooser extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         currentVersionCB = new javax.swing.JRadioButton();
         embedDataCheckBox = new javax.swing.JCheckBox();
         v1_09CB = new javax.swing.JRadioButton();
+        onlyEmbedLocalCB = new javax.swing.JCheckBox();
 
         buttonGroup1.add(currentVersionCB);
         currentVersionCB.setSelected(true);
         currentVersionCB.setText("Save as current version");
         currentVersionCB.setToolTipText("Save as v1.07 by default.");
 
-        embedDataCheckBox.setText("Embed local data within .vap file");
+        embedDataCheckBox.setText("Embed data within .vap.zip file");
         embedDataCheckBox.setToolTipText("Create zip file containing dom configuration in default.vap, as well as file resources used.");
 
         buttonGroup1.add(v1_09CB);
         v1_09CB.setText("v1.09 (Autoplot 2017)");
+
+        onlyEmbedLocalCB.setText("Only embed local data");
+        onlyEmbedLocalCB.setToolTipText("<html>Only embed data from file references, not data from http or ftp.");
+
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, embedDataCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), onlyEmbedLocalCB, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -82,10 +98,13 @@ public class VapSchemeChooser extends javax.swing.JPanel {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createSequentialGroup()
+                        .add(21, 21, 21)
+                        .add(onlyEmbedLocalCB))
                     .add(currentVersionCB)
                     .add(embedDataCheckBox)
                     .add(v1_09CB))
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -94,10 +113,13 @@ public class VapSchemeChooser extends javax.swing.JPanel {
                 .add(currentVersionCB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(v1_09CB)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 114, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 109, Short.MAX_VALUE)
                 .add(embedDataCheckBox)
-                .add(18, 18, 18))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(onlyEmbedLocalCB))
         );
+
+        bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
 
 
@@ -105,7 +127,9 @@ public class VapSchemeChooser extends javax.swing.JPanel {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JRadioButton currentVersionCB;
     private javax.swing.JCheckBox embedDataCheckBox;
+    private javax.swing.JCheckBox onlyEmbedLocalCB;
     private javax.swing.JRadioButton v1_09CB;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
 }

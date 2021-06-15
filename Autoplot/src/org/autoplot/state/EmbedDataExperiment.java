@@ -222,6 +222,15 @@ public class EmbedDataExperiment {
     }
     
     /**
+     * return true if the URI is only resolved on the local machine.
+     * @param uri the uri
+     * @return true if the URI is only resolved on the local machine.
+     */
+    public static boolean isLocal( URI uri ) {
+        return uri.getScheme().equals("file");
+    }
+    
+    /**
      * save the application, but embed data file resources within the 
      * zip, along with the .vap.  The vap is saved with the name default.vap.
      * When the data source contains a dataset that was created internally (with
@@ -234,6 +243,22 @@ public class EmbedDataExperiment {
      * @throws IOException 
      */
     public static void save( Application dom3, File f ) throws FileNotFoundException, IOException {
+        save( dom3, f, false );
+    }    
+    /**
+     * save the application, but embed data file resources within the 
+     * zip, along with the .vap.  The vap is saved with the name default.vap.
+     * When the data source contains a dataset that was created internally (with
+     * the Jython plot command, for example), it will be formatted as a QStream and 
+     * embedded within the vap.
+     * 
+     * @param dom3 the state to save.
+     * @param f the zip file output name.
+     * @param onlyLocal if true, then don't embed data from remote references.
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
+    public static void save( Application dom3, File f, boolean onlyLocal ) throws FileNotFoundException, IOException {        
         // too bad I have to do this...  but it doesn't work otherwise...
         Application dom = dom3.getController().getApplicationModel().createState(false);
         QDataSet[] datasets= new QDataSet[dom.getDataSourceFilters().length];
@@ -245,6 +270,17 @@ public class EmbedDataExperiment {
         
         // try to find common path for local file references, so local references aren't embedded.
         Set<URI> uris= getResources(dom);
+        
+        if ( onlyLocal ) {
+            Set<URI> localUris= new HashSet<>();
+            for ( URI uri : uris ) {
+                if ( isLocal(uri) ) {
+                    localUris.add(uri);
+                }
+            }
+            uris= localUris;
+        }
+        
         String commonPath= null;
         for ( URI uri: uris ) {
             if ( uri.getScheme().equals("file") ) {
@@ -273,7 +309,7 @@ public class EmbedDataExperiment {
         ZipOutputStream out=null;
         try {
             out= new ZipOutputStream( fout );
-            for ( URI uri: getResources(dom) ) { // resolve aggregations, etc.
+            for ( URI uri: uris ) { // resolve aggregations, etc.
                 String name= makeRelativeName(commonPath,uri);
                 File file1= DataSetURI.getFile(uri,new NullProgressMonitor());
                 writeToZip( out, name, file1 );
