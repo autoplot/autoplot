@@ -857,12 +857,14 @@ public class DataSourceUtil {
      * 
      * Examples:
      * <ul>
-     * <li>[::1,:]
-     * <li>[:,2]
+     * <li>[::1,:] -> { 0:[0,l0,1], 1:[1,l1,1] }
+     * <li>[:,2]   -> { 0:[0,l0,1], 1:[2,-1,-1] } //TODO: verify
      * </ul>
+     * 
+     * This returns a map from dimension (0,1,...,rank-1) to [ start, stop, stride ].
      * @param constraint, such as "[0:100:2]" for even records between 0 and 100, non-inclusive.
      * @param qubeDims the dimension of the data.
-     * @return the [startRecord,stopRecordExclusive,stride]
+     * @return the [startRecord,stopRecordExclusive,stride] for each index.
      * @throws java.text.ParseException when the constraint cannot be parsed.
      */
     public static Map<Integer,long[]> parseConstraint(String constraint, long[] qubeDims ) throws ParseException {
