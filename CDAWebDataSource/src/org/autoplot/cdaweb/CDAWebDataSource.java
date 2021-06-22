@@ -39,6 +39,7 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.DataSourceRegistry;
+import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.MetadataModel;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
@@ -258,6 +259,9 @@ public class CDAWebDataSource extends AbstractDataSource {
                             if ( !missingComponent ) {
                                 try {
                                     ds1= (MutablePropertyDataSet)CdfVirtualVars.execute( metadata, function, comps, t1 );
+                                    // check for slice        
+                                    String id_= getParams().get("id");
+                                    ds1= maybeImplementSlice( id_,ds1 );
                                 } catch (IllegalArgumentException ex ){
                                     throw new IllegalArgumentException("The virtual variable " + id + " cannot be plotted because the function is not supported: "+function, ex);
                                 }
@@ -573,5 +577,41 @@ public class CDAWebDataSource extends AbstractDataSource {
         CDAWebDataSource dss= new CDAWebDataSource( new URI( "vap+cdaweb:file:///foo.xml?ds=cl_sp_fgm&id=B_mag&timerange=2001-10-10") );
         QDataSet ds= dss.getDataSet( new NullProgressMonitor() );
         logger.fine(ds.toString());
+    }
+
+    /**
+     * This additional code for implementing slice is needed to implement virtual variables.  This
+     * checks to see if the slice spec is present and implements.
+     * @param id_ the name of the dataset and possibly name[:,2].
+     * @param ds1 the dataset (for example ds[1440,3])
+     * @return the dataset possibly sliced.  (for example ds[1440])
+     */
+    private static MutablePropertyDataSet maybeImplementSlice( String id_, MutablePropertyDataSet ds1) {
+        int i= id_.lastIndexOf('[');
+        if ( i>-1 ) {
+            String subset= id_.substring(i);
+            long[] lqubeDims= new long[ds1.rank()];
+            int[] iqubeDims= DataSetUtil.qubeDims(ds1);
+            for ( int i2=0; i2<lqubeDims.length; i2++ ) {
+                lqubeDims[i2]= iqubeDims[i2];
+            }
+            try {
+                Map<Integer,long[]> mc= DataSourceUtil.parseConstraint( subset, lqubeDims );
+                long[] constr= mc.get(0);
+                if ( constr[0]==0 && constr[1]==lqubeDims[0] && constr[2]==1 ) {
+                    constr= mc.get(1);
+                    if ( constr!=null && ( constr[1]==-1 && constr[2]==-1 ) ) {
+                        ds1= Ops.maybeCopy( Ops.slice1( ds1, (int)constr[0] ) );
+                    }
+                }
+                return ds1;
+            } catch (ParseException ex) {
+                logger.log( Level.WARNING, "parse exception", ex );
+                return ds1;
+            }
+        } else {
+            return ds1;
+        }
+
     }
 }
