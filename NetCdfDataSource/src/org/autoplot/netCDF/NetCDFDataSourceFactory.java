@@ -251,6 +251,9 @@ public class NetCDFDataSourceFactory extends AbstractDataSourceFactory implement
             
             String svariable= (String)params.get("arg_0");
             
+            if ( svariable==null ) {
+                svariable= (String)params.get( NetCDFDataSource.PARAM_Y );
+            }
 
             if ( svariable!=null ) {
                 int ic= svariable.indexOf("[");

@@ -196,7 +196,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
 
                 String[] cc= constraints.split(",");
                 List<Range> ranges= new ArrayList( v.getRanges() );
-                for ( int i=0; i<cc.length; i++ ) {
+                for ( int i=0; i<Math.min(ranges.size(),cc.length); i++ ) {
                     long[] ir= parseConstraint( cc[i],ranges.get(i).last()+1 );
                     if ( ir[1]==-1 ) {
                         ranges.set( i, new Range((int)ir[0],(int)ir[0]) );

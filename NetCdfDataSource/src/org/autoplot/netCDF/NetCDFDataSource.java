@@ -50,8 +50,8 @@ public class NetCDFDataSource extends AbstractDataSource {
     private static final Logger logger= LoggerManager.getLogger("apdss.netcdf");
     
     protected static final String PARAM_WHERE = "where";
-    protected static final String PARAM_X = "x";
-    protected static final String PARAM_Y = "y";
+    protected static final String PARAM_X = "X";
+    protected static final String PARAM_Y = "Y";
         
     private Variable variable;
     
@@ -116,6 +116,18 @@ public class NetCDFDataSource extends AbstractDataSource {
             } else {
                 svariable= (String) p.get("arg_0"); 
             }
+
+            swhereVariable= p.get( PARAM_WHERE );  // may be null, typically is null.
+            sxVariable= p.get( PARAM_X ); // may be null, typically is null.
+            if ( sxVariable==null ) sxVariable= p.get( "x" );
+            syVariable= p.get( PARAM_Y ); // may be null, typically is null.
+            if ( syVariable==null ) syVariable= p.get( "y" );
+
+            if ( svariable==null && syVariable!=null ) {
+                svariable= syVariable;
+                syVariable= null;
+            }
+            
             if ( svariable!=null ) {
                 svariable= svariable.replaceAll(" ","+");
                 int ic= svariable.indexOf("[");
@@ -126,10 +138,7 @@ public class NetCDFDataSource extends AbstractDataSource {
                     constraint= null;
                 }
             }
-            
-            swhereVariable= p.get( PARAM_WHERE );  // may be null, typically is null.
-            sxVariable= p.get( PARAM_X ); // may be null, typically is null.
-            syVariable= p.get( PARAM_Y ); // may be null, typically is null.
+                        
         }
     }
     
@@ -367,7 +376,9 @@ public class NetCDFDataSource extends AbstractDataSource {
                         }
                     }
                 }
-                if ( yVariable==null ) throw new IllegalArgumentException("y refers to unresolved variable: "+syVariable );
+                if ( yVariable==null ) {
+                    throw new IllegalArgumentException("Y refers to unresolved variable: "+syVariable );
+                }
             }            
         } finally {
             mon.finished();

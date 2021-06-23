@@ -194,7 +194,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("x", jPanel1);
+        jTabbedPane1.addTab("X", jPanel1);
 
         jPanel3.setAlignmentX(0.0F);
 
@@ -227,7 +227,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("y", jPanel3);
+        jTabbedPane1.addTab("Y", jPanel3);
 
         jSplitPane1.setLeftComponent(jTabbedPane1);
 
