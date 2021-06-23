@@ -70,8 +70,8 @@ public class CdfDataSource extends AbstractDataSource {
     protected static final String PARAM_DODEP = "doDep";
     protected static final String PARAM_WHERE = "where";
     protected static final String PARAM_DEPEND0 = "depend0"; // do not use.
-    protected static final String PARAM_X = "x";
-    protected static final String PARAM_Y = "y";
+    protected static final String PARAM_X = "X";
+    protected static final String PARAM_Y = "Y";
     protected static final String PARAM_INTERPMETA = "interpMeta";
     protected static final String PARAM_ID = "id";
     protected static final String PARAM_SLICE1 = "slice1";
@@ -605,6 +605,7 @@ public class CdfDataSource extends AbstractDataSource {
         }
         
         String sx= (String)map.get(PARAM_X);
+        if ( sx==null ) sx= (String)map.get("x");
         if ( sx!=null && sx.length()>0 ) {
             String constraint1;
             int k = sx.indexOf("[");
@@ -622,6 +623,7 @@ public class CdfDataSource extends AbstractDataSource {
         }
 
         String sy= (String)map.get(PARAM_Y);
+        if ( sy==null ) sy= (String)map.get("y");
         if ( sy!=null && sy.length()>0 ) {
             String constraint1;
             int k = sy.indexOf("[");
