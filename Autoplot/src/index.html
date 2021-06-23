@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Without and within functions now accept a list of events, useful for culling data.  Happy Summer!
+        <p><small>Prairie at Maquoketa Caves State Park.  Happy Summer!
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -29,6 +29,8 @@
                 
         <p>Bugfixes (2021-06-22 r25825):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2363">2363</a>: NetCDF source supports capitalized X for consistency, and just X and Y arguments.  Thanks, Sadie!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2363">2363</a>: ASCII source supports just X and Y arguments, as well as X,Y and Z.  CDF supports capitalized X for consistency.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2361">2361</a>: CDAWeb virtual variables properly implement data[:,3].  Thanks, Sadie!
             <li><a href="https://github.com/das-developers/das2java/issues/16">0016</a>: check for roundoff error when exporting to das2stream from horizontal slicer "dump data" action.  Thanks, Sadie!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2359/">2359</a>: .vap.zip control added for embedding data which is already available over http.  Thanks, Ivar!
