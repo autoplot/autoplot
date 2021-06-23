@@ -177,6 +177,9 @@
               <Properties>
                 <Property name="toolTipText" type="java.lang.String" value="&quot;plot&quot; selects the dependent parameter for plotting.  &quot;x&quot; allows specification of an independent parameter upon which the &quot;plot&quot; parameter depends."/>
               </Properties>
+              <Events>
+                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jTabbedPane1StateChanged"/>
+              </Events>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">
                   <JSplitPaneConstraints position="left"/>

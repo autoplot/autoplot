@@ -154,6 +154,11 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         jSplitPane1.setRightComponent(advancedPanel);
 
         jTabbedPane1.setToolTipText("\"plot\" selects the dependent parameter for plotting.  \"x\" allows specification of an independent parameter upon which the \"plot\" parameter depends.");
+        jTabbedPane1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jTabbedPane1StateChanged(evt);
+            }
+        });
 
         parameterTree.setRootVisible(false);
         parameterTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
@@ -282,7 +287,45 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         yCheckBox.setSelected(true);
     }//GEN-LAST:event_yParameterTreeValueChanged
 
+    private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
+        int tab= jTabbedPane1.getSelectedIndex();
+        updateMetadata(tab);
+    }//GEN-LAST:event_jTabbedPane1StateChanged
 
+    /**
+     * make the info area reflect the current tab.
+     * @param tab 
+     */
+    private void updateMetadata( int tab ) {
+        String longName;
+        switch (tab) {
+            case 0:
+                if ( parameter!=null ) {
+                    longName= "<html>"+ parameters.get(parameter) + "<br><em>" + allParameterInfo.get(parameter) + "</em>";
+                    parameterInfoLabel.setText( longName );
+                }
+                break;
+            case 1:
+                TreePath tp= xParameterTree.getSelectionPath();
+                String xparameter= String.valueOf(tp.getPathComponent(1));
+                if ( xparameter!=null ) {
+                    longName="<html>"+ parameters.get(xparameter) + "<br><em>" + allParameterInfo.get(xparameter) + "</em>";
+                    parameterInfoLabel.setText( longName );
+                } 
+                break;
+            case 2:
+                tp= yParameterTree.getSelectionPath();
+                String yparameter= String.valueOf(tp.getPathComponent(1));
+                if ( yparameter!=null ) {
+                    longName="<html>"+ parameters.get(yparameter) + "<br><em>" + allParameterInfo.get(yparameter) + "</em>";
+                    parameterInfoLabel.setText( longName );
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel advancedPanel;
     private javax.swing.JLabel jLabel5;
@@ -506,13 +549,15 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             fillTree( this.parameterTree, parameters, param );
             
             xParameterTree.setModel( this.parameterTree.getModel() );
-            String sx= params.get( "x" );
+            String sx= params.get( "X" );
+            if ( sx==null ) sx= params.get( "x" );
             if ( sx!=null ) {
                 fillTree( this.xParameterTree, parameters, sx ); //TODO: tree is filled twice.
             }
             
             yParameterTree.setModel( this.parameterTree.getModel() );
-            String sy= params.get( "y" );
+            String sy= params.get( "Y" );
+            if ( sy==null ) sy= params.get( "y" );
             if ( sy!=null ) {
                 fillTree( this.yParameterTree, parameters, sy ); //TODO: tree is filled twice.
             }
