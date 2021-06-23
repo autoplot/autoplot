@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Without and within functions now accept a list of events, useful for culling data.
+        <p><small>Without and within functions now accept a list of events, useful for culling data.  Happy Summer!
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -29,17 +29,17 @@
                 
         <p>Bugfixes (2021-06-22 r25825):</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2361">2361</a>: CDAWeb virtual variables properly implement data[:,3].
-            <li><a href="https://github.com/das-developers/das2java/issues/16">0016</a>: check for roundoff error when exporting to das2stream from horizontal slicer "dump data" action.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2359/">2359</a>: .vap.zip control added for embedding data which is already available over http.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2361">2361</a>: CDAWeb virtual variables properly implement data[:,3].  Thanks, Sadie!
+            <li><a href="https://github.com/das-developers/das2java/issues/16">0016</a>: check for roundoff error when exporting to das2stream from horizontal slicer "dump data" action.  Thanks, Sadie!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2359/">2359</a>: .vap.zip control added for embedding data which is already available over http.  Thanks, Ivar!
             <li>suppress double question mark URI warning for vap+jyds arguments.  Thanks, Ivar!
-            <li>don't print empty field warning when the last field is the empty field.  This happens often when exporting .csv's from spreadsheets.
+            <li>don't print empty field warning when the last field is the empty field.  This happens often when exporting .csv's from spreadsheets.  Thanks, Ivar!
             <li><a href="https://github.com/das-developers/das2java/issues/14">0014</a>: for 2-dataset bundle of startTime and stopTime, don't use the last dataset (stopTime) as the data attached to each event.  This confuses the automatic choosing of renderType.
             <li>new mime types in jnlp files.  Thanks, Chris!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2357/">2357</a>: script editor clears old script filename before using editor to display "loading" message, since it was possible to clobber the old script.  Thanks, Ivar!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2354/">2354</a>: gaps in pngwalk sequence incorrectly marked for orbit files.  Thanks, Kris!
             <li><a href="https://github.com/das-developers/das2java/issues/12">0012</a>: series render data reduction can make all data invalid.  Thanks, Ivar!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2352">2352</a>: cache MONOTONIC=FALSE, before we would only cache MONOTONIC=TRUE, but determining it is false can be expensive for some data.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2352">2352</a>: cache MONOTONIC=FALSE, before we would only cache MONOTONIC=TRUE, but determining it is false can be expensive for some data.  Thanks, Ivar!
             <li>don't mark the Jython variable "_" as unread, so that it can be used in loops to assert that the loop variable is not used.
             <li>remove old warning when das2stream used something besides Units.us2000 for timetags, this was fixed years ago.  Thanks, Chris!
         </ul>
@@ -67,8 +67,8 @@
         <p>Features:</p>
         <ul>
             <li>within and without allow second argument to be a list of events (not just a single event), so that a script can easily remove a set of events.  Thanks Ivar!
-            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/743/'>743</a>: Initial support for NetCDF files at CDAWeb, including Formosat-5 files.  
-            <li>ephemerisLabels property of each plot allows the ephemeris channels to be manually labeled.
+            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/743/'>743</a>: Initial support for NetCDF files at CDAWeb, including Formosat-5 files.  Thanks, Bobby!
+            <li>ephemerisLabels property of each plot allows the ephemeris channels to be manually labeled.  Thanks, Chris!
             <li>normalize(ds,1) function added so you can normalize along an index.  Thanks, Kristoff!
         </ul>
         <p>Less recent features:</p>
