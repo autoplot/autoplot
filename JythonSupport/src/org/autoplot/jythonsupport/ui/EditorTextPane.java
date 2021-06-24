@@ -613,7 +613,10 @@ public class EditorTextPane extends JEditorPane {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 } catch (IOException ex) {
                     if ( ex instanceof ConnectException ) {
-                        JOptionPane.showMessageDialog(this,"<html>Unable to connect to socket 12345.  Start a second Autoplot and enable the Server feature.</html>");
+                        JOptionPane.showMessageDialog(this,"<html>Unable to connect to socket 12345."
+                                + "<br>Start a second Autoplot and"
+                                + "<br>enable the Server feature using"
+                                + "<br>[Menubar]&rarr;Options&rarr;Enable Feature&rarr;Server</html>");
                         return;
                     }
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
