@@ -465,6 +465,8 @@ cd ..
 ${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
 ${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_1GB.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
 ${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_4GB.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
+${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_prod_1GB.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
+${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_prod_4GB.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
 ${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/index.html '#{tag}' $TAG '#{codebase}' $CODEBASE
 
 # if these are needed.
