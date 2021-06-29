@@ -471,73 +471,9 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             if (item == null || item.equals("")) {
                 result = DataSetAdapter.create(ds); //TODO: danger if it has TCA planes, it will return bundle.  Probably not what we want.
             } else {
-                DataSet das2ds;
-                das2ds = ds.getPlanarView(item);
-                //TODO: there's a bug where item=x shows where the 0th item label is always used.
-                if (das2ds == null) {
-                    if (item.contains(",")) {
-                        BundleDataSet bds = null;
-                        String[] ss = item.split(",");
-                        for (String s : ss) {
-                            das2ds = ds.getPlanarView(s);
-                            if (das2ds == null) {
-                                int iitem = Integer.parseInt(s);
-                                if (iitem == 0) {
-                                    das2ds = ds.getPlanarView("");
-                                } else {
-                                    das2ds = ds.getPlanarView("plane_" + iitem);
-                                }
-                            }
-                            QDataSet bds1 = DataSetAdapter.create(das2ds);
-                            bds = (BundleDataSet) Ops.bundle(bds, bds1);
-                        }
-                        result = bds;
-                    } else {
-                        try {
-                            int iitem = Integer.parseInt(item);
-                            if (iitem == 0) {
-                                das2ds = ds.getPlanarView("");
-                            } else {
-                                das2ds = ds.getPlanarView("plane_" + iitem);
-                            }
-                            if (das2ds == null) {
-                                String[] ss = ds.getPlaneIds();
-                                das2ds = ds.getPlanarView(ss[iitem]);
-                            }
-                            if (das2ds == null) {
-                                throw new IllegalArgumentException("no such plane, looking for " + item);
-                            }
-                            result = DataSetAdapter.create(das2ds); // fragile                
-                        } catch (NumberFormatException ex) {
-                            throw new IllegalArgumentException("unable to find component \"" + item + "\"");
-                        }
-                    }
-                } else {
-                    result = DataSetAdapter.create(das2ds); // fragile
-                }
+                result = unbundleTCAItem(ds, item, tcaDesc );
             }
-            
-            if (tcaDesc != null && tcaDesc.size() > 0) {
-                MutablePropertyDataSet mpds;
-                mpds= Ops.maybeCopy(result);
-                if (item == null || item.equals("") || item.equals("0")) {
-                    QDataSet bds = (QDataSet) result.property(QDataSet.BUNDLE_1);
-                    if (bds != null && bds instanceof BundleDescriptor) {
-                        BundleDescriptor bds1 = (BundleDescriptor) bds;
-                        for (int i = 0; i < bds1.length(); i++) {
-                            bds1.putProperty(QDataSet.LABEL, i, tcaDesc.get(i));
-                        }
-                    } else {
-                        mpds.putProperty(QDataSet.LABEL, tcaDesc.get(0));
-                    }
-                } else {
-                    if (!item.contains(",")) {
-                        mpds.putProperty(QDataSet.LABEL, tcaDesc.get(Integer.parseInt(item)));
-                    }
-                }
-                result= mpds;
-            }            
-            
+                        
             result1= result;
             
         } else {
@@ -593,74 +529,12 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             }
 
             QDataSet result;
-            if (item == null || item.equals("")) {
-                result = ds; 
+            if ( tcaDesc!=null && tcaDesc.size()>0 ) {
+                result= unbundleTCAItemQDS( ds, item, tcaDesc );
             } else {
-                QDataSet das2ds;
-                das2ds = tryUnbundle(ds,item);
-                //TODO: there's a bug where item=x shows where the 0th item label is always used.
-                if (das2ds == null) {
-                    if (item.contains(",")) {
-                        BundleDataSet bds = null;
-                        String[] ss = item.split(",");
-                        for (String s : ss) {
-                            das2ds = tryUnbundle(ds,s);
-                            if (das2ds == null) {
-                                int iitem = Integer.parseInt(s);
-                                if (iitem == 0) {
-                                    das2ds = tryUnbundle( ds,"");//TODO: check on this
-                                } else {
-                                    das2ds = tryUnbundle(ds, "plane_" + iitem );
-                                }
-                            }
-                            QDataSet bds1 = das2ds;
-                            bds = (BundleDataSet) Ops.bundle(bds, bds1);
-                        }
-                        result = bds;
-                    } else {
-                        try {
-                            int iitem = Integer.parseInt(item);
-                            if (iitem == 0) {
-                                das2ds = tryUnbundle( ds, "" ); //TODO: check on this
-                            } else {
-                                das2ds = tryUnbundle( ds, "plane_" + iitem);
-                            }
-                            if (das2ds == null) {
-                                das2ds = Ops.unbundle( ds, iitem );
-                            }
-                            if (das2ds == null) {
-                                throw new IllegalArgumentException("no such plane, looking for " + item);
-                            }
-                            result = das2ds;
-                        } catch (NumberFormatException ex) {
-                            throw new IllegalArgumentException("unable to find component \"" + item + "\"");
-                        }
-                    }
-                } else {
-                    result = das2ds;
-                }
+                result= ds;
             }
 
-            if (tcaDesc != null && tcaDesc.size() > 0) {
-                MutablePropertyDataSet mpds;
-                mpds= Ops.maybeCopy(result);
-                if (item == null || item.equals("") || item.equals("0")) {
-                    QDataSet bds = (QDataSet) result.property(QDataSet.BUNDLE_1);
-                    if (bds != null && bds instanceof BundleDescriptor) {
-                        BundleDescriptor bds1 = (BundleDescriptor) bds;
-                        for (int i = 0; i < bds1.length(); i++) {
-                            bds1.putProperty(QDataSet.LABEL, i, tcaDesc.get(i));
-                        }
-                    } else {
-                        mpds.putProperty(QDataSet.LABEL, tcaDesc.get(0));
-                    }
-                } else {
-                    if (!item.contains(",")) {
-                        mpds.putProperty(QDataSet.LABEL, tcaDesc.get(Integer.parseInt(item)));
-                    }
-                }
-                result= mpds;
-            }
             result1 = result;
 
         }
@@ -701,6 +575,143 @@ public final class Das2ServerDataSource extends AbstractDataSource {
         }
         return result1;
 
+    }
+
+    /**
+     * implement the logic that extracts based on name, "plane_i", or "i".
+     * @param ds
+     * @param item the item name, plane_i, or "i"
+     * @param tcaDesc descriptions found in the DSDF describing each channel.
+     * @return the plane or null.
+     * @throws IllegalArgumentException 
+     */
+    protected MutablePropertyDataSet unbundleTCAItem( DataSet ds, String item, List<String> tcaDesc ) throws IllegalArgumentException {
+        MutablePropertyDataSet result;
+        DataSet das2ds;
+        das2ds = ds.getPlanarView(item);
+        //TODO: there's a bug where item=x shows where the 0th item label is always used.
+        if (das2ds == null) {
+            if (item.contains(",")) {
+                BundleDataSet bds = null;
+                String[] ss = item.split(",");
+                for (String s : ss) {
+                    int iitem= -1;
+                    das2ds = ds.getPlanarView(s);
+                    if (das2ds == null) {
+                        iitem = Integer.parseInt(s);
+                        if (iitem == 0) {
+                            das2ds = ds.getPlanarView("");
+                        } else {
+                            das2ds = ds.getPlanarView("plane_" + iitem);
+                        }
+                    }
+                    QDataSet bds1 = DataSetAdapter.create(das2ds);
+                    if ( iitem>-1 ) {
+                        bds1= Ops.putProperty( bds1, QDataSet.LABEL, tcaDesc.get(iitem) );
+                    }
+                    bds = (BundleDataSet) Ops.bundle(bds, bds1);
+                }
+                result = bds;
+            } else {
+                try {
+                    int iitem = Integer.parseInt(item);
+                    if (iitem == 0) {
+                        das2ds = ds.getPlanarView("");
+                    } else {
+                        das2ds = ds.getPlanarView("plane_" + iitem);
+                    }
+                    if (das2ds == null) {
+                        String[] ss = ds.getPlaneIds();
+                        das2ds = ds.getPlanarView(ss[iitem]);
+                    }
+                    if (das2ds == null) {
+                        throw new IllegalArgumentException("no such plane, looking for " + item);
+                    }
+                    result = DataSetAdapter.create(das2ds); // fragile
+                } catch (NumberFormatException ex) {
+                    throw new IllegalArgumentException("unable to find component \"" + item + "\"");
+                }
+            }
+        } else {
+            result = DataSetAdapter.create(das2ds); // fragile
+        }
+        return result;
+    }
+
+    private static QDataSet unbundleOrNull( QDataSet ds, String item ) {
+        try {
+            return Ops.unbundle( ds, item );        
+        } catch ( IllegalArgumentException ex ) {
+            return null;
+        }
+    }
+    /**
+     * implement the logic that extracts based on name, "plane_i", or "i".
+     * @param ds
+     * @param item the item name, plane_i, or "i"
+     * @param tcaDesc descriptions found in the DSDF describing each channel.
+     * @return the plane or null.
+     * @throws IllegalArgumentException 
+     */
+    protected QDataSet unbundleTCAItemQDS( QDataSet ds, String item, List<String> tcaDesc ) throws IllegalArgumentException {
+        
+        if ( tcaDesc!=null && ( item==null || item.equals("") ) ) {
+            StringBuilder sitem= new StringBuilder("0");
+            for ( int i=1; i<tcaDesc.size(); i++ ) {
+                sitem.append(",").append(String.valueOf(i));
+            }
+            item= sitem.toString();
+        }
+        
+        QDataSet result= unbundleOrNull( ds, item );
+        
+        if (result == null) {
+            if (item.contains(",")) {
+                BundleDataSet bds = null;
+                String[] ss = item.split(",");
+                for (String s : ss) {
+                    result = unbundleOrNull( ds, s );
+                    if (result == null) {
+                        int iitem = Integer.parseInt(s);
+                        if (iitem == 0) {
+                            result = Ops.unbundle( ds, 0 );
+                        } else {
+                            result = Ops.unbundle( ds, "plane_" + iitem );
+                        }
+                        if ( result.property(QDataSet.LABEL)==null ) {
+                            result= Ops.putProperty( result, QDataSet.LABEL, tcaDesc.get(iitem) );
+                        }
+                    }
+                    bds = (BundleDataSet) Ops.bundle(bds, result);
+                }
+                result = bds;
+            } else {
+                try {
+                    int iitem = Integer.parseInt(item);
+                    if (iitem == 0) {
+                        result = Ops.unbundle( ds, 0 );
+                    } else {
+                        result = Ops.unbundle( ds, "plane_" + iitem );
+                    }
+                    if (result == null) {
+                        throw new IllegalArgumentException("no such plane, looking for " + item);
+                    }
+                    if ( result.property(QDataSet.LABEL)==null ) {
+                       result= Ops.putProperty( result, QDataSet.LABEL, tcaDesc.get(iitem) );
+                    }
+                } catch (NumberFormatException ex) {
+                    throw new IllegalArgumentException("unable to find component \"" + item + "\"");
+                }
+            }
+        } else {
+            if ( item.startsWith("plane_") ) {
+                int iitem= Integer.parseInt(item.substring(6));
+                if ( result.property(QDataSet.LABEL)==null ) {
+                    result= Ops.putProperty( result, QDataSet.LABEL, tcaDesc.get(iitem) );
+                }
+            }
+        }
+        return result;
     }
     
     /**
