@@ -655,6 +655,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         if ( r==JFileChooser.APPROVE_OPTION ) {
             prefs.put( PngWalkTool.PREF_RECENT, chooser.getSelectedFile().getParent() );
             try {
+                if ( !src.exists() ) throw new IllegalArgumentException("Image file no longer exists: "+src);
                 if ( r60.isSelected() ) {
                     BufferedImage im= ImageIO.read(src);
                     int size= (int)Math.sqrt( im.getWidth()*im.getWidth() + im.getHeight()*im.getHeight() );
