@@ -269,6 +269,11 @@ public final class JythonDataSource extends AbstractDataSource implements Cachin
                     if (!s.equals("arg_0") && !s.equals("script") ) {
                         String sval= e.getValue();
                         if ( sval.length()>0 ) {
+                            int iq= sval.indexOf('?');
+                            int ie= sval.indexOf('=');
+                            if ( iq>-1 && ie>-1 && iq<ie ) {
+                                throw new IllegalArgumentException("double question mark detected in URI");
+                            }
                             sval= JythonUtil.maybeQuoteString( sval );
                             logger.log(Level.FINE, "autoplot.params[''{0}'']={1}", new Object[]{s, sval});
                             interp.exec("autoplot.params['" + s + "']=" + sval);
