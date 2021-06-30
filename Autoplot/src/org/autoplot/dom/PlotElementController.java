@@ -3133,7 +3133,7 @@ public class PlotElementController extends DomNodeController {
                                 ExportDataPanel p= new ExportDataPanel();
                                 p.setDataSet(ds);
                                 if ( AutoplotUtil.showConfirmDialog2( parent, p, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-                                    final String f= p.getFilename();
+                                    final String f= p.getDataSourceFormatEditorPanel().getURI();
                                     String ext= p.getExtension();
                                     final DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext); //OKAY
                                     if (format == null) {
