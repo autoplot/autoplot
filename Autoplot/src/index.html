@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Prairie at Maquoketa Caves State Park.  Happy Summer!
+        <p><small>Covid rates still remain low in Johnson County.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,11 @@
         <p>Run with 1GB of memory to support 32-bit Java versions: <a href="autoplot.jnlp">autoplot_1GB.jnlp</a></p>
                 
         <p>Bugfixes (2021-06-22 r25825):</p>
+        <ul>
+            <li>detect two question marks in .jyds URIs, which has a confusing result.
+            <li>Das2Server source didn't allow single channels of ephemeris source to be selected from older Das2 Servers.
+        </ul>
+        <p>Older Bugfixes (2021-06-22 r25825):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2363">2363</a>: NetCDF source supports capitalized X for consistency, and just X and Y arguments.  Thanks, Sadie!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2363">2363</a>: ASCII source supports just X and Y arguments, as well as X,Y and Z.  CDF supports capitalized X for consistency.
@@ -45,51 +50,16 @@
             <li>don't mark the Jython variable "_" as unread, so that it can be used in loops to assert that the loop variable is not used.
             <li>remove old warning when das2stream used something besides Units.us2000 for timetags, this was fixed years ago.  Thanks, Chris!
         </ul>
-        <p>Older Bugfixes (2021-05-22 r25778):</p>
-        <ul>
-            <li>1848: Das2Server credentials are persistent between sessions.
-            <li>2350: limits to interpolation in X was different than Y in spectrograms.
-            <li>2342: corrections to contours rendering.
-            <li>add note about how to dismiss popup documentation.
-            <li>1871: code to keep track of recent times never worked properly, and it should be useful now.
-            <li>670: applyIndex didn't handle rank 3 depend 2.
-            <li>2348: grid is now drawn under the data, not over.  Let me know if this bugs you and I'll add a control.  Thanks, Ali and others!
-            <li>2343: writeToPng would not allow a filename with spaces in it.  Thanks, Kristoff!
-            <li>2341: automatic bind-to-app-timerange fails to bind when 3 rows and 2 columns.  Thanks, Ivar!
-            <li>2236: $x_$x.png works to trigger the PngWalkTool, so results of Run Batch are more easily viewed.  Start screenshots launches into PngWalk with timetags.
-            <li>alt-shift-shift can be used to stop screenshots, since some machines grab control keystroke event.
-            <li>2335: new runtime error caused when quoted block contains a / and is split.
-            <li>2338: if an aggregation granule dataset doesn't validate, don't mix it into the aggregation.
-            <li>2339: report when noCheckCertificates is set in about and runtime submissions.
-            <li>2210: create screenshot hangs on a Mac.  Thanks, Joe!
-            <li>2335: runtime error with ~/Downloa&lt;T&gt; when Downloads folder contains file with single paren.  Thanks, Brian!
-            <li>2333: rte1830566714 shows where TCA result can be null and was not handled.
-            <li>start to correct Java 7 complaints in QDataSet.
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>added Units.us1970, microseconds since 1970.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>within and without allow second argument to be a list of events (not just a single event), so that a script can easily remove a set of events.  Thanks Ivar!
             <li><a href='https://sourceforge.net/p/autoplot/feature-requests/743/'>743</a>: Initial support for NetCDF files at CDAWeb, including Formosat-5 files.  Thanks, Bobby!
             <li>ephemerisLabels property of each plot allows the ephemeris channels to be manually labeled.  Thanks, Chris!
             <li>normalize(ds,1) function added so you can normalize along an index.  Thanks, Kristoff!
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>add binData function, which sorts rank 1 data into rank 2 data with sorted into bins.
-            <li>Das2Server credentials dialog keeps track of password.  Thanks, Chris!
-            <li>Parker Solar Probe orbit time intervals added.  Thanks, Kristoff!
-            <li>Show color icon in completions.
-            <li>increase the number of points limit when calculating stats to 200000000.  Thanks, Ivar!
-            <li>Add constants to ColorUtil for 140 named web colors like "CADET_BLUE" to encourage use in scripts.
-            <li>USER_PROPERTIES can have map with another nested map.
-            <li>rfe406: support &lt;sub&gt; and &lt;sup&gt; in text strings.
-            <li>new axis/controller/dasAxis/axisOffset property will allow for multiple axis on the left side of one plot.
-            <li>Add annotation dialog controls background color and border, making it easier to add text comments without a box.
-            <li>NybbleDataSet putValue now works.  Support for rank 2.
-            <li>installTool correctly sets PWD now, so that it can be used in argument lists
-            <li>740: warnings about redefining symbols like "plot" or "total" is too noisy, be more careful to only show when there is a problem.  Thanks, Sadie!
-	    <li>Jython to Java converter improvements.
-            <li>739: DasCore moved to GitHub, along with QDataSet.  Thanks, Chris!
         </ul>
         <p>Known issues:</p>
         <ul>
