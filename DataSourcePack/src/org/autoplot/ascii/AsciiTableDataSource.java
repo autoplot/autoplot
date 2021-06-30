@@ -442,7 +442,20 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 }
             }
             vds= (MutablePropertyDataSet)Ops.bundle( xds, yds, zds );
-        }
+        } else if ( y!=null ) {
+            QDataSet yds= ArrayDataSet.copy( DataSetOps.unbundle( ds, parser.getFieldIndex(y) ) );
+            QDataSet xds;
+            if ( x!=null ) {
+                xds= ArrayDataSet.copy( DataSetOps.unbundle( ds, parser.getFieldIndex(x) ) );
+            } else {
+                if ( dep0!=null ) {
+                    xds= dep0;
+                } else {
+                    throw new IllegalArgumentException("expected param X"); 
+                }
+            }
+            vds= (MutablePropertyDataSet)Ops.link( xds, yds );
+        } 
         
         
         if ( bundle!=null ) {
