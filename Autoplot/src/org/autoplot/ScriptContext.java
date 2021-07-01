@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -62,6 +63,7 @@ import org.jdesktop.beansbinding.Converter;
 import org.python.core.Py;
 import org.python.core.PyFunction;
 import org.autoplot.ApplicationModel.ResizeRequestListener;
+import org.autoplot.datasource.AnonymousDataSource;
 import org.autoplot.dom.DomNode;
 import org.autoplot.dom.DomUtil;
 import org.autoplot.dom.Plot;
@@ -69,10 +71,12 @@ import org.autoplot.dom.PlotElement;
 import org.autoplot.state.StatePersistence;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.GuiUtil;
 import org.autoplot.datasource.URISplit;
+import org.das2.components.DataPointRecorder;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.Painter;
 import org.das2.qds.DataSetOps;
@@ -1038,6 +1042,34 @@ addBottomDecoration( dom.canvases[0], paint )
             };
             c.getController().getDasCanvas().addBottomDecorator(thep);
         }
+    }
+    
+    /**
+     * return a component which can be used to accumulate data.  This is typically
+     * inserted into its own tab with the addTab command.  This is set to
+     * sort data in X as it comes in, and this can be disabled with setSorted(False)
+     *<blockquote><pre><small>{@code
+     *dpr= createDataPointRecorder()
+     *addTab( 'digitizer', dpr )
+     *}</small></pre></blockquote>
+     * 
+     * @return a new DataPointRecorder.
+     * @see DataPointRecorder
+     * @see 
+     * 
+     */
+    public static DataPointRecorder createDataPointRecorder(  ) {
+        DataPointRecorder result= new DataPointRecorder(true);
+        JButton button= new JButton( "Export Data...");
+        DataSource dss= new AnonymousDataSource() {
+            @Override
+            public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
+                return result.getDataPoints();
+            }
+        };
+        button.setAction( ExportDataPanel.createExportDataAction( result, dss ) );
+        result.addAccessory( button );
+        return result;
     }
     
     /**
