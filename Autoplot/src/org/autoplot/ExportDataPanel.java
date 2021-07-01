@@ -551,7 +551,11 @@ public class ExportDataPanel extends javax.swing.JPanel {
         return editorPanel;
     }
 
-    void setFile(String currentFileString) {
+    /**
+     * set the current file.
+     * @param currentFileString 
+     */
+    public void setFile(String currentFileString) {
         URISplit split= URISplit.parse(currentFileString);
         this.filenameTF.setText(split.file);
         formatDLActionPerformed(null);
