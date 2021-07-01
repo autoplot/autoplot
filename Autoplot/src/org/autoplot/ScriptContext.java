@@ -1055,7 +1055,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * 
      * @return a new DataPointRecorder.
      * @see DataPointRecorder
-     * @see 
+     * @see https://github.com/autoplot/dev/blob/master/demos/digitizers/createDataPointRecorder.jy
      * 
      */
     public static DataPointRecorder createDataPointRecorder(  ) {
