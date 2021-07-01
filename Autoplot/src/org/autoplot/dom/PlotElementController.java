@@ -76,7 +76,10 @@ import org.autoplot.AutoplotUtil;
 import static org.autoplot.AutoplotUtil.SERIES_SIZE_LIMIT;
 import org.autoplot.ExportDataPanel;
 import org.autoplot.RenderTypeUtil;
+import org.autoplot.datasource.AbstractDataSource;
+import org.autoplot.datasource.AnonymousDataSource;
 import org.autoplot.datasource.AutoplotSettings;
+import org.autoplot.datasource.DataSource;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.layout.LayoutConstants;
 import org.autoplot.util.RunLaterListener;
@@ -100,6 +103,7 @@ import org.das2.event.DataRangeSelectionListener;
 import org.das2.event.HorizontalDragRangeSelectorMouseModule;
 import org.das2.graph.BoundsRenderer;
 import org.das2.graph.PolarPlotRenderer;
+import org.das2.util.monitor.AlertNullProgressMonitor;
 
 /**
  * PlotElementController manages the PlotElement, for example resolving the datasource and loading the dataset.
@@ -2973,6 +2977,94 @@ public class PlotElementController extends DomNodeController {
     }
     
     /**
+     * create an Action to export the data from the data source.  It is assumed that
+     * the data source will be a trivial data source wrapping some DataSet.  Only
+     * getDataSet with a null monitor is called.
+     * @param parent the component providing the context for the operation.
+     * @param source the source of the data, only getDataSet is called.
+     * @return 
+     */
+    public static Action createExportDataAction( final Component parent, final DataSource source ) {
+        return new AbstractAction("Export Data...") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
+                final QDataSet ds;
+                try {
+                    ds = source.getDataSet( new AlertNullProgressMonitor("retrieve data") );
+                } catch (Exception ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                    return;
+                }
+                ExportDataPanel edp= new ExportDataPanel();
+                Preferences prefs= AutoplotSettings.getPreferences(AutoplotUI.class);
+                String currentFileString = prefs.get("ExportDataCurrentFile", "");
+                String currentExtString = prefs.get("ExportDataCurrentExt", ".txt");
+                if ( !currentExtString.equals("") ) {
+                    edp.getFormatDL().setSelectedItem(currentExtString);
+                }
+                if ( !currentFileString.equals("") ) {
+                    URISplit split= URISplit.parse(currentFileString);
+                    edp.getFilenameTF().setText(split.file);
+                    edp.getFormatDL().setSelectedItem( "." + split.ext );
+                    if ( currentFileString.contains("/") && ( currentFileString.startsWith("file:") || currentFileString.startsWith("/") ) ) {
+                        edp.setFile( currentFileString );
+                        if ( split.params!=null && edp.getDataSourceFormatEditorPanel()!=null ) {
+                            edp.getDataSourceFormatEditorPanel().setURI(currentFileString);
+                        }
+                    }
+                }                                
+                edp.setDataSet(ds);
+                if ( AutoplotUtil.showConfirmDialog2( parent, edp, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                    final String opts= edp.getDataSourceFormatEditorPanel().getURI();            
+                    String name= edp.getFilename();
+                    if ( opts!=null ) {
+                        URISplit splitopts= URISplit.parse(opts); //TODO: it's a shame that we have repeat code, see GuiSupport.java line 676.
+                        if ( splitopts.params!=null && splitopts.params.length()==0 ) {
+                            splitopts.params= null;
+                        }
+                        URISplit splits= URISplit.parse(edp.getFilename());
+                        splitopts.file= splits.file;
+                        String s= URISplit.format(splitopts); 
+                        name= DataSourceUtil.unescape(s);
+                    }
+                    String ext= edp.getExtension();
+                    final DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext); //OKAY
+                    if (format == null) {
+                        JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
+                        return;
+                    }
+                    final String f= name;
+                    prefs.put("ExportDataCurrentFile", name );
+                    prefs.put("ExportDataCurrentExt", ext );
+                    try {
+                        format.formatData( f, ds, DasProgressPanel.createFramed("export slice data") );
+                        JPanel panel= new JPanel();
+                        panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
+                        panel.add( new JLabel( "<html>Data formatted to<br>" + f ) );
+                        panel.add( new JButton( new AbstractAction("Copy filename to clipboard") {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                StringSelection stringSelection = new StringSelection( f );
+                                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                                clipboard.setContents(stringSelection, new ClipboardOwner() {
+                                    @Override
+                                    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+                                    }
+                                } );
+                            }
+                        } ) );
+                        JOptionPane.showMessageDialog(parent, panel );
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(parent, "Exception while formatting: " + ex.getMessage() );
+                    }
+                }
+            }
+        };
+    }
+        
+    
+    /**
      * create the peer that will actually do the painting.  This may be called from either the event thread or off the event thread,
      * but work will be done on the event thread in either case using SwingUtilities.invokeAndWait.
      *
@@ -3128,81 +3220,24 @@ public class PlotElementController extends DomNodeController {
                                 });
                             }
                         });
-                        hmm.getSlicer().addAction( new AbstractAction("Export Data...") {
+                        DataSource dss= new AnonymousDataSource() {
                             @Override
-                            public void actionPerformed(ActionEvent e) {
-                                org.das2.util.LoggerManager.logGuiEvent(e);
-                                final QDataSet ds= hmm.getSlicer().getDataSet();
-                                ExportDataPanel edp= new ExportDataPanel();
-                                Preferences prefs= AutoplotSettings.settings().getPreferences(AutoplotUI.class);
-                                String currentFileString = prefs.get("ExportDataCurrentFile", "");
-                                String currentExtString = prefs.get("ExportDataCurrentExt", ".txt");
-                                if ( !currentExtString.equals("") ) {
-                                    edp.getFormatDL().setSelectedItem(currentExtString);
-                                }
-                                if ( !currentFileString.equals("") ) {
-                                    URISplit split= URISplit.parse(currentFileString);
-                                    edp.getFilenameTF().setText(split.file);
-                                    edp.getFormatDL().setSelectedItem( "." + split.ext );
-                                    if ( currentFileString.contains("/") && ( currentFileString.startsWith("file:") || currentFileString.startsWith("/") ) ) {
-                                        edp.setFile( currentFileString );
-                                        if ( split.params!=null && edp.getDataSourceFormatEditorPanel()!=null ) {
-                                            edp.getDataSourceFormatEditorPanel().setURI(currentFileString);
-                                        }
-                                    }
-                                }                                
-                                edp.setDataSet(ds);
-                                if ( AutoplotUtil.showConfirmDialog2( parent, edp, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-                                    final String opts= edp.getDataSourceFormatEditorPanel().getURI();            
-                                    String name= edp.getFilename();
-                                    if ( opts!=null ) {
-                                        URISplit splitopts= URISplit.parse(opts); //TODO: it's a shame that we have repeat code, see GuiSupport.java line 676.
-                                        if ( splitopts.params!=null && splitopts.params.length()==0 ) {
-                                            splitopts.params= null;
-                                        }
-                                        URISplit splits= URISplit.parse(edp.getFilename());
-                                        splitopts.file= splits.file;
-                                        String s= URISplit.format(splitopts); 
-                                        name= DataSourceUtil.unescape(s);
-                                    }
-                                    String ext= edp.getExtension();
-                                    final DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext); //OKAY
-                                    if (format == null) {
-                                        JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
-                                        return;
-                                    }
-                                    final String f= name;
-                                    prefs.put("ExportDataCurrentFile", name );
-                                    prefs.put("ExportDataCurrentExt", ext );
-                                    try {
-                                        format.formatData( f, ds, DasProgressPanel.createFramed("export slice data") );
-                                        JPanel panel= new JPanel();
-                                        panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
-                                        panel.add( new JLabel( "<html>Data formatted to<br>" + f ) );
-                                        panel.add( new JButton( new AbstractAction("Copy filename to clipboard") {
-                                            @Override
-                                            public void actionPerformed(ActionEvent e) {
-                                                StringSelection stringSelection = new StringSelection( f );
-                                                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                                                clipboard.setContents(stringSelection, new ClipboardOwner() {
-                                                    @Override
-                                                    public void lostOwnership(Clipboard clipboard, Transferable contents) {
-                                                    }
-                                                } );
-                                            }
-                                        } ) );
-                                        JOptionPane.showMessageDialog(parent, panel );
-                                    } catch (Exception ex) {
-                                        JOptionPane.showMessageDialog(parent, "Exception while formatting: " + ex.getMessage() );
-                                    }
-                                }
+                            public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
+                                return hmm.getSlicer().getDataSet();
                             }
-                        });
+                        };
+                        hmm.getSlicer().addAction( createExportDataAction( parent, dss ) );
                     }
                     mm= plot.getDasMouseInputAdapter().getModuleByLabel("Vertical Slice");
                     final VerticalSlicerMouseModule vmm= ((VerticalSlicerMouseModule)mm);
                     if ( vmm!=null ) { // for example in headless mode
-                        vmm.getSlicer().addAction( getExportDataAction( parent, vmm.getSlicer() ) );
+                        DataSource dss= new AnonymousDataSource() {
+                            @Override
+                            public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
+                                return vmm.getSlicer().getDataSet();
+                            }
+                        };
+                        vmm.getSlicer().addAction( createExportDataAction( parent, dss ) );
                     }
                     mm= plot.getDasMouseInputAdapter().getModuleByLabel("Interval Average");
                     final HorizontalDragRangeSelectorMouseModule vsa= ((HorizontalDragRangeSelectorMouseModule)mm);
@@ -3210,10 +3245,10 @@ public class PlotElementController extends DomNodeController {
                         if ( vsa.getDataRangeSelectionListenerCount()>0 ) {
                             DataRangeSelectionListener ddr= vsa.getDataRangeSelectionListener(0);
                             if ( ddr instanceof VerticalSpectrogramAverager ) {
-                                ((VerticalSpectrogramAverager)ddr).addAction( getExportDataAction( parent, ddr ) );
+                                ((VerticalSpectrogramAverager)ddr).addAction( getExportDataAction( parent, ddr ) );  //TODO
                             }
                         }
-                        
+
                     }
                 }
             };
