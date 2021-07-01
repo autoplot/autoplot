@@ -70,6 +70,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.Converter;
 import org.autoplot.ApplicationModel;
 import org.autoplot.AutoRangeUtil;
+import org.autoplot.AutoplotUI;
 import org.autoplot.RenderType;
 import org.autoplot.AutoplotUtil;
 import static org.autoplot.AutoplotUtil.SERIES_SIZE_LIMIT;
@@ -88,6 +89,8 @@ import org.das2.qds.SemanticOps;
 import org.das2.qds.examples.Schemes;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.DataSourceRegistry;
+import org.autoplot.datasource.DataSourceUtil;
+import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
 import org.autoplot.metatree.MetadataUtil;
@@ -3130,16 +3133,47 @@ public class PlotElementController extends DomNodeController {
                             public void actionPerformed(ActionEvent e) {
                                 org.das2.util.LoggerManager.logGuiEvent(e);
                                 final QDataSet ds= hmm.getSlicer().getDataSet();
-                                ExportDataPanel p= new ExportDataPanel();
-                                p.setDataSet(ds);
-                                if ( AutoplotUtil.showConfirmDialog2( parent, p, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-                                    final String f= p.getDataSourceFormatEditorPanel().getURI();
-                                    String ext= p.getExtension();
+                                ExportDataPanel edp= new ExportDataPanel();
+                                Preferences prefs= AutoplotSettings.settings().getPreferences(AutoplotUI.class);
+                                String currentFileString = prefs.get("ExportDataCurrentFile", "");
+                                String currentExtString = prefs.get("ExportDataCurrentExt", ".txt");
+                                if ( !currentExtString.equals("") ) {
+                                    edp.getFormatDL().setSelectedItem(currentExtString);
+                                }
+                                if ( !currentFileString.equals("") ) {
+                                    URISplit split= URISplit.parse(currentFileString);
+                                    edp.getFilenameTF().setText(split.file);
+                                    edp.getFormatDL().setSelectedItem( "." + split.ext );
+                                    if ( currentFileString.contains("/") && ( currentFileString.startsWith("file:") || currentFileString.startsWith("/") ) ) {
+                                        edp.setFile( currentFileString );
+                                        if ( split.params!=null && edp.getDataSourceFormatEditorPanel()!=null ) {
+                                            edp.getDataSourceFormatEditorPanel().setURI(currentFileString);
+                                        }
+                                    }
+                                }                                
+                                edp.setDataSet(ds);
+                                if ( AutoplotUtil.showConfirmDialog2( parent, edp, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                                    final String opts= edp.getDataSourceFormatEditorPanel().getURI();            
+                                    String name= edp.getFilename();
+                                    if ( opts!=null ) {
+                                        URISplit splitopts= URISplit.parse(opts); //TODO: it's a shame that we have repeat code, see GuiSupport.java line 676.
+                                        if ( splitopts.params!=null && splitopts.params.length()==0 ) {
+                                            splitopts.params= null;
+                                        }
+                                        URISplit splits= URISplit.parse(edp.getFilename());
+                                        splitopts.file= splits.file;
+                                        String s= URISplit.format(splitopts); 
+                                        name= DataSourceUtil.unescape(s);
+                                    }
+                                    String ext= edp.getExtension();
                                     final DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext); //OKAY
                                     if (format == null) {
                                         JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
                                         return;
                                     }
+                                    final String f= name;
+                                    prefs.put("ExportDataCurrentFile", name );
+                                    prefs.put("ExportDataCurrentExt", ext );
                                     try {
                                         format.formatData( f, ds, DasProgressPanel.createFramed("export slice data") );
                                         JPanel panel= new JPanel();
