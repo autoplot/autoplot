@@ -7,6 +7,12 @@
 package org.autoplot;
 
 import java.awt.Component;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.io.File;
 import java.io.IOException;
@@ -17,12 +23,17 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
 import org.autoplot.datasource.AutoplotSettings;
 import org.das2.util.LoggerManager;
@@ -30,12 +41,15 @@ import org.autoplot.dom.Application;
 import org.autoplot.dom.DataSourceController;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.DataSourceFormatEditorPanel;
 import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.URISplit;
+import org.das2.components.DasProgressPanel;
+import org.das2.util.monitor.AlertNullProgressMonitor;
 
 /**
  * GUI for specifying how data should be output to a file.
@@ -52,6 +66,93 @@ public class ExportDataPanel extends javax.swing.JPanel {
     public ExportDataPanel() {
         initComponents();
         warningMessageLabel.setText(" "); // clients may call setTsb, which will reset this.
+    }
+
+    /**
+     * create an Action to export the data from the data source.  It is assumed that
+     * the data source will be a trivial data source wrapping some DataSet.  Only
+     * getDataSet with a null monitor is called.
+     * @param parent the component providing the context for the operation.
+     * @param source the source of the data, only getDataSet is called.
+     * @return 
+     */
+    public static Action createExportDataAction( final Component parent, final DataSource source ) {
+        return new AbstractAction("Export Data...") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
+                final QDataSet ds;
+                try {
+                    ds = source.getDataSet( new AlertNullProgressMonitor("retrieve data") );
+                } catch (Exception ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                    return;
+                }
+                ExportDataPanel edp= new ExportDataPanel();
+                Preferences prefs= AutoplotSettings.getPreferences(AutoplotUI.class);
+                String currentFileString = prefs.get("ExportDataCurrentFile", "");
+                String currentExtString = prefs.get("ExportDataCurrentExt", ".txt");
+                if ( !currentExtString.equals("") ) {
+                    edp.getFormatDL().setSelectedItem(currentExtString);
+                }
+                if ( !currentFileString.equals("") ) {
+                    URISplit split= URISplit.parse(currentFileString);
+                    edp.getFilenameTF().setText(split.file);
+                    edp.getFormatDL().setSelectedItem( "." + split.ext );
+                    if ( currentFileString.contains("/") && ( currentFileString.startsWith("file:") || currentFileString.startsWith("/") ) ) {
+                        edp.setFile( currentFileString );
+                        if ( split.params!=null && edp.getDataSourceFormatEditorPanel()!=null ) {
+                            edp.getDataSourceFormatEditorPanel().setURI(currentFileString);
+                        }
+                    }
+                }                                
+                edp.setDataSet(ds);
+                if ( AutoplotUtil.showConfirmDialog2( parent, edp, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                    final String opts= edp.getDataSourceFormatEditorPanel().getURI();            
+                    String name= edp.getFilename();
+                    if ( opts!=null ) {
+                        URISplit splitopts= URISplit.parse(opts); //TODO: it's a shame that we have repeat code, see GuiSupport.java line 676.
+                        if ( splitopts.params!=null && splitopts.params.length()==0 ) {
+                            splitopts.params= null;
+                        }
+                        URISplit splits= URISplit.parse(edp.getFilename());
+                        splitopts.file= splits.file;
+                        String s= URISplit.format(splitopts); 
+                        name= DataSourceUtil.unescape(s);
+                    }
+                    String ext= edp.getExtension();
+                    final DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext); //OKAY
+                    if (format == null) {
+                        JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
+                        return;
+                    }
+                    final String f= name;
+                    prefs.put("ExportDataCurrentFile", name );
+                    prefs.put("ExportDataCurrentExt", ext );
+                    try {
+                        format.formatData( f, ds, DasProgressPanel.createFramed("export slice data") );
+                        JPanel panel= new JPanel();
+                        panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
+                        panel.add( new JLabel( "<html>Data formatted to<br>" + f ) );
+                        panel.add( new JButton( new AbstractAction("Copy filename to clipboard") {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                StringSelection stringSelection = new StringSelection( f );
+                                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                                clipboard.setContents(stringSelection, new ClipboardOwner() {
+                                    @Override
+                                    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+                                    }
+                                } );
+                            }
+                        } ) );
+                        JOptionPane.showMessageDialog(parent, panel );
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(parent, "Exception while formatting: " + ex.getMessage() );
+                    }
+                }
+            }
+        };
     }
 
     public void setDataSet(Application model) {
