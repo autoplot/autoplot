@@ -673,12 +673,7 @@ public class GuiSupport {
                         final DataSourceFormat formata= DataSetURI.getDataSourceFormat( new URI(s) );
                         
                         DataSourceFormatEditorPanel opts= edp.getDataSourceFormatEditorPanel();
-                        if ( opts!=null ) {
-//                            try {
-//                                opts.getURI();
-//                            } catch ( NullPointerException ex ) {
-//                                System.err.println("here bug 1975");
-//                            }
+                        if ( opts!=null ) { // See PlotElementController.java line 3141, where this code is repeated.
                             URISplit splitopts= URISplit.parse(opts.getURI());
                             if ( splitopts.params!=null && splitopts.params.length()==0 ) {
                                 splitopts.params= null;
