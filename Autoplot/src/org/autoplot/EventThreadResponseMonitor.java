@@ -34,6 +34,9 @@ import org.autoplot.datasource.AutoplotSettings;
  *
  * Bugs found: https://sourceforge.net/p/autoplot/bugs/863/
  *
+ * If the file HOME/autoplot_data/log/request_dump.txt is found, this will trigger a heap dump
+ * and the file will be deleted.
+ * 
  * @author jbf
  */
 public final class EventThreadResponseMonitor {
@@ -50,7 +53,10 @@ public final class EventThreadResponseMonitor {
     private static final int WARN_LEVEL_MILLIS= 500; // acceptable millisecond delay in processing
     private static final int ERROR_LEVEL_MILLIS= 10000; // unacceptable delay in processing, and an error is submitted.
     private static final int WATCH_INTERVAL_MILLIS = 1000;
-
+    
+    private static final File LOG_DIR= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "log" );
+    private static final File REQUEST_DUMP_FILE= new File( LOG_DIR, "request_dump.txt" );
+            
     ScheduledThreadPoolExecutor exec;
     
     AWTEvent currentEvent= null;    
@@ -159,6 +165,15 @@ public final class EventThreadResponseMonitor {
     }
 
     /**
+     * check that a request has been made by touching the file REQUEST_DUMP_FILE.
+     * @return 
+     */
+    private boolean checkRequestDump() {
+        if ( !LOG_DIR.exists() ) return false;
+        return REQUEST_DUMP_FILE.exists();                    
+    }
+    
+    /**
      * the watchEventThreadRunnable watches the current event on the event thread, and if it doesn't change within a given
      * interval (WATCH_INTERVAL_MILLIS) start printing errors and eventually (ERROR_LEVEL_MILLIS) log an error because the thread appears to
      * be hung.
@@ -168,16 +183,32 @@ public final class EventThreadResponseMonitor {
         return () -> {
             EventQueue instance= Toolkit.getDefaultToolkit().getSystemEventQueue();
             AWTEvent test= instance.peekEvent(); // Ed says: one peekEvent for every getSystemEventQueue.
-            if ( currentEvent!=null && test==currentEvent ) { // we should have processed this event by now.
+            boolean dumpRequested= checkRequestDump();
+                    
+            if ( dumpRequested || ( currentEvent!=null && test==currentEvent ) ) { // we should have processed this event by now.
                 logger.log(Level.FINE, "====  long job to process ====");
-                logger.log(Level.FINE, test.toString() );
+                logger.log(Level.FINE, test==null ? "NULL" : test.toString() );
                 logger.log(Level.FINE, "====  end, long job to process ====");
                 
-                String eventId= test.toString();
+                if ( dumpRequested ) {
+                    if ( !REQUEST_DUMP_FILE.delete() ) {
+                        logger.log(Level.WARNING, "unable to delete {0}", REQUEST_DUMP_FILE);
+                        dumpRequested= false; // don't write out an xml file every four seconds.
+                    } else {
+                        logger.log(Level.INFO, "found {0}, dumping", REQUEST_DUMP_FILE);
+                    }
+                }
+                
+                
+                String eventId= test==null ? "000" : test.toString();
                 boolean hungProcess= System.currentTimeMillis()-lastPost > ERROR_LEVEL_MILLIS;
-                if ( hungProcess && ! eventId.equals(reportedEventId) ) {
+                if ( dumpRequested || ( hungProcess && ! eventId.equals(reportedEventId) ) ) {
                     
-                    logger.log(Level.INFO, "PATHOLOGICAL EVENT QUEUE CLEAR TIME, WRITING REPORT TO autoplot_data/log/...\n" );
+                    if ( dumpRequested ) {
+                        logger.log(Level.INFO, "DUMP REQUESTED, WRITING REPORT TO autoplot_data/log/...\n" );
+                    } else {
+                        logger.log(Level.INFO, "PATHOLOGICAL EVENT QUEUE CLEAR TIME, WRITING REPORT TO autoplot_data/log/...\n" );
+                    }
                     
                     Date now= new Date();
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
@@ -205,7 +236,7 @@ public final class EventThreadResponseMonitor {
                     
                     String fname= String.format("hang_%010d_%s_%s.xml", hash, timeStamp, id.replaceAll(" ","_") );
                     
-                    File logdir= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "log" );
+                    File logdir= LOG_DIR;
                     if ( !logdir.exists() ) {
                         if ( !logdir.mkdirs() ) {
                             return;
@@ -217,6 +248,16 @@ public final class EventThreadResponseMonitor {
                         out.write(s);
                     } catch ( IOException ex ) {
                         logger.log( Level.WARNING, null, ex );
+                    }
+                    if ( f.setReadable( false, false ) ) {                        
+                        if ( !f.setReadable( true ) ) {
+                            logger.info("unable to set read permissions to owner only");
+                        }
+                    }
+                    if ( f.setWritable( false, false ) ) {                        
+                        if ( !f.setWritable( true ) ) {
+                            logger.info("unable to set read permissions to owner only");
+                        }
                     }
                     
                     reportedEventId= eventId;
