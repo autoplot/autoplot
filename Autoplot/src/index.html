@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Covid rates still remain low in Johnson County.
+        <p><small>createDataPointRecorder() command creates an table component for digitizing which can export data to CDF and other formats.  See <a href='https://github.com/autoplot/dev/blob/master/demos/digitizers/createDataPointRecorder.jy'>the script</a>.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,9 +27,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions: <a href="autoplot.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-06-30 r25825):</p>
+        <p>Bugfixes (2021-07-06 r25854):</p>
         <ul>
-            <li>export from slicer allow Autoplot to format the data, but the options were ignored.  Thanks, George!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/1043/">1043</a>: don't throw error when double question marks found, just issue warning.
+            <li>export from slicer allows Autoplot to format the data, but the options were ignored.  Thanks, George!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2363">2363</a>: ASCII file with X and Y arguments still didn't work because I forgot to commit a bit of code.
             <li>detect two question marks in .jyds URIs, which has a confusing result, and print a warning for now.
             <li>Das2Server source didn't allow single channels of ephemeris source to be selected from older Das2 Servers.  Thanks, Sadie!
