@@ -272,7 +272,7 @@ public final class JythonDataSource extends AbstractDataSource implements Cachin
                             int iq= sval.indexOf('?');
                             int ie= sval.indexOf('=');
                             if ( iq>-1 && ie>-1 && iq<ie ) {
-                                throw new IllegalArgumentException("double question mark detected in URI");
+                                logger.log(Level.INFO, "double question mark detected in URI: {0}", suri);
                             }
                             sval= JythonUtil.maybeQuoteString( sval );
                             logger.log(Level.FINE, "autoplot.params[''{0}'']={1}", new Object[]{s, sval});
