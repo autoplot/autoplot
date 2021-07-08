@@ -16,6 +16,7 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.URISplit;
+import org.das2.qds.ops.Ops;
 
 /**
  * Format data to CSV (comma separated values) file.
@@ -69,13 +70,23 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
                 lwdss.add( DataSetUtil.weightsDataSet((QDataSet) data.property(QDataSet.DEPEND_0) ) );
                 col++;
             }
-            ldss.add(data);
-            lwdss.add(DataSetUtil.weightsDataSet(data));
             switch (data.rank()) {
                 case 1:
+                    ldss.add(data);
+                    lwdss.add(DataSetUtil.weightsDataSet(data));
                     col++;
                     break;
                 case 2:
+                    if ( SemanticOps.isBundle(data) ) {
+                        for ( int k=0; k<data.length(0); k++ ) {
+                            QDataSet d1= Ops.unbundle(data, k);
+                            ldss.add( d1 );
+                            lwdss.add(DataSetUtil.weightsDataSet(d1));
+                        }
+                    } else {
+                        ldss.add(data); // spectrogram
+                        lwdss.add(DataSetUtil.weightsDataSet(data));
+                    }
                     col+= data.length(0);
                     break;
                 default:
