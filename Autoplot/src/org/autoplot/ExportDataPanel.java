@@ -108,7 +108,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
                 }                                
                 edp.setDataSet(ds);
                 if ( AutoplotUtil.showConfirmDialog2( parent, edp, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-                    final String opts= edp.getDataSourceFormatEditorPanel().getURI();            
+                    final String opts= edp.getDataSourceFormatEditorPanel()==null ? null : edp.getDataSourceFormatEditorPanel().getURI();            
                     String name= edp.getFilename();
                     if ( opts!=null ) {
                         URISplit splitopts= URISplit.parse(opts); //TODO: it's a shame that we have repeat code, see GuiSupport.java line 676.
