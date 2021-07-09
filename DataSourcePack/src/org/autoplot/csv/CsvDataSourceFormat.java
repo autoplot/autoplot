@@ -16,6 +16,7 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.URISplit;
+import org.das2.datum.UnitsUtil;
 import org.das2.qds.ops.Ops;
 
 /**
@@ -101,15 +102,24 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
             {
                 col= 0;
                 for ( int ids=0; ids<dss.length; ids++ ) {
-                    String u= (String)dss[ids].property(QDataSet.LABEL);
-                    if ( u==null ) {
-                        u=  (String)dss[ids].property(QDataSet.NAME);
+                    String name= (String)dss[ids].property(QDataSet.LABEL);
+                    if ( name==null ) {
+                        name=  (String)dss[ids].property(QDataSet.NAME);
                     }
-                    if ( u==null ) {
-                        u= "data"+ids;
+                    if ( name==null ) {
+                        name= "data"+ids;
+                    }
+                    String sunits;
+                    Units units= SemanticOps.getUnits(dss[ids]);
+                    if ( UnitsUtil.isTimeLocation(units) ) {
+                        sunits= "UTC";
+                    } else if ( units.isConvertibleTo(Units.dimensionless) ) {
+                        sunits= null;
+                    } else {
+                        sunits= String.valueOf(units);
                     }
                     if ( dss[ids].rank()==1 ) {
-                        labels[col++]= u;
+                        labels[col++]= sunits==null ? name : name+" ("+sunits+")";
                     } else {
                         QDataSet dep1= (QDataSet) dss[ids].property(QDataSet.DEPEND_1);
                         if (dep1!=null && dep1.rank()==1) {
@@ -119,7 +129,7 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
                             }
                         } else {
                             for ( int j=0;j<dss[ids].length(0); j++ ) {
-                                labels[col++]= u+" " +j;
+                                labels[col++]= name+" " +j+" ("+sunits+")";
                             }
                         }
                     }
