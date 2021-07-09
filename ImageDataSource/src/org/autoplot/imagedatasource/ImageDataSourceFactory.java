@@ -89,6 +89,7 @@ public class ImageDataSourceFactory extends AbstractDataSourceFactory implements
                 case "clip":
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "T", "clip to the axes in plotInfo or xaxis and yaxis") );
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "F", "don't clip") );
+                    break;
                 default:
                     break;
             }
