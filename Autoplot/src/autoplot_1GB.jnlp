@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <jnlp 
     spec="1.0+"
-    codebase="https://das2.org/autoplot/devel/"
+    <!-- codebase="https://das2.org/autoplot/devel/" -->
+    codebase="https://das2.org/autoplot/#{tag}/"
     href="autoplot_1GB.jnlp">
    
     <information> 
