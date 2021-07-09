@@ -316,7 +316,7 @@ public class ScriptContext extends PyJavaInstance {
         } );
         return result;
     }
-    
+
     /**
      * create a new window.
      * @param id identifier for the window
@@ -1072,6 +1072,29 @@ addBottomDecoration( dom.canvases[0], paint )
         return result;
     }
     
+    /**
+     * return a new dom in a minimal Autoplot application.  Use result.getCanvas()
+     * to get the DasCanvas which can be added to other components.
+     *<blockquote><pre><small>{@code
+     *report= createApplicationModel()
+     *addTab( 'report', report.canvas )
+     *report.setDataSet(linspace(0,1,101))
+     *}</small></pre></blockquote>
+     * @param id
+     * @return 
+     */
+    public static ApplicationModel createApplicationModel( final String id ) {
+        ApplicationModel result= applets.get(id);
+        if ( result==null ) {
+            result= new ApplicationModel();
+            result.addDasPeersToApp();
+            result.setName(id);
+            applets.put(id,result);
+        }
+        
+        return result;
+    }
+        
     /**
      * set the Autoplot status bar string.  Use the prefixes "busy:", "warning:"
      * and "error:" to set icons.
