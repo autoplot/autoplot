@@ -2,7 +2,7 @@
 <jnlp 
     spec="1.0+"    
     <!-- codebase="https://das2.org/autoplot/devel/" -->
-    codebase="https://das2.org/autoplot/#{tag}/"
+    codebase="https://ci-pw.physics.uiowa.edu/job/autoplot-release/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/"
     href="autoplot_4GB.jnlp">
    
     <information> 
