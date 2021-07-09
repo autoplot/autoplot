@@ -1409,12 +1409,23 @@ public final class ApplicationModel {
     
     /**
      * return the dom containing the state of this application
-     * @return 
+     * @deprecated 
+     * @return the dom for this application.
+     * @see #getDom() 
      */
     public Application getDocumentModel() {
         return dom;
     }
 
+    /**
+     * return the dom containing the state of this application
+     * @return the dom for this application.
+     * @see #getDocumentModel() 
+     */
+    public Application getDom() {
+        return dom;
+    }
+    
     /**
      * see ScriptPanelSupport
      * @return
