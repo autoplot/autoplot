@@ -115,7 +115,7 @@ public class ScreenshotsTool extends EventQueue {
     
     File outLocationFolder;
     BufferedWriter logFile;
-    TimeParser tp = TimeParser.create("$Y$m$d_$H$M$S_$(subsec,places=3)");
+    TimeParser tp = TimeParser.create("$Y$m$d_$H$M$S_$(milli)");
     TickleTimer tickleTimer;
     
     private static void checkFolderContents( String text, JCheckBox deleteFilesCheckBox ) {
