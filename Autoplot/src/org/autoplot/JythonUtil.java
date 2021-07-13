@@ -4,6 +4,7 @@ package org.autoplot;
 import external.AnnotationCommand;
 import external.PlotCommand;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -34,6 +35,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.border.LineBorder;
 import javax.swing.text.BadLocationException;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.jythonsupport.JythonRefactory;
@@ -299,13 +301,14 @@ public class JythonUtil {
         if ( !EventQueue.isDispatchThread() ) {
             System.err.println("*** called from off of event thread!!!");
         }
-        JPanel p= new JPanel();
-        p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
+        JPanel paramsPanel= new JPanel();
+        paramsPanel.setLayout( new BoxLayout(paramsPanel,BoxLayout.Y_AXIS) );
+        paramsPanel.setAlignmentX(0.0f);
         
         ParametersFormPanel fpf= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
         ParametersFormPanel.FormData fd;
         try {
-            fd=  fpf.doVariables( env, file, fparams, p );
+            fd=  fpf.doVariables( env, file, fparams, paramsPanel );
         } catch ( PySyntaxError ex ) {
             System.err.println("pse: "+ex);
             fd= new ParametersFormPanel.FormData();
@@ -317,7 +320,7 @@ public class JythonUtil {
         }
         
         JPanel scriptPanel= new JPanel( new BorderLayout() );
-        JTabbedPane tp= new JTabbedPane();
+        JTabbedPane tabbedPane= new JTabbedPane();
         org.autoplot.jythonsupport.ui.EditorTextPane textArea= new EditorTextPane();
         
         String theScript= EditorTextPane.loadFileToString( file ) ;
@@ -338,36 +341,41 @@ public class JythonUtil {
         script.setPreferredSize( new Dimension(640,380) );
         scriptPanel.add( script, BorderLayout.CENTER );
         scriptPanel.add( new JLabel("<html>Run the script:<br>"+file ), BorderLayout.NORTH );
-        MakeToolPanel makeToolPanel= new MakeToolPanel();
-        if ( makeTool ) {
-            scriptPanel.add( makeToolPanel, BorderLayout.SOUTH );
-        }
         
-        tp.add( scriptPanel, "script" );
+        tabbedPane.add( scriptPanel, "script" );
         
-        JScrollPane params= new JScrollPane(p); // TODO: why do I need this?
+        JScrollPane params= new JScrollPane(paramsPanel); // TODO: why do I need this?
         params.setMinimumSize( new Dimension(640,480) );
-        tp.add( params, "params" );
+        tabbedPane.add( params, "params" );
+
+        final boolean scriptOkay= isScriptOkayed( file.toString(), theScript );
         
         if ( makeTool ) {
-            if ( isScriptOkayed( file.toString(), theScript ) ) {
-                tp.setSelectedIndex(1);
-                p.add( Box.createGlue() );
-                JLabel l= new JLabel("You have run this version of the script before.");
-                l.setAlignmentX( 0.0f );
-                p.add( l );
+            if ( scriptOkay ) {
+                tabbedPane.setSelectedIndex(1);
             } else {
-                tp.setSelectedIndex(0);
+                tabbedPane.setSelectedIndex(0);
             }
         } else {
-            tp.setSelectedIndex(1);
+            tabbedPane.setSelectedIndex(1);
+        }
+        
+        JPanel theP= new JPanel(new BorderLayout());
+        theP.add( tabbedPane, BorderLayout.CENTER );
+        MakeToolPanel makeToolPanel=null;
+        if ( makeTool ) {
+            makeToolPanel= new MakeToolPanel(scriptOkay);
+            theP.add( makeToolPanel, BorderLayout.SOUTH );
+        } else {
+            theP.add( new JLabel("Make sure this script does not contain malicious code.") );
         }
                 
-        int result= AutoplotUtil.showConfirmDialog2( parent, tp, "Run Script "+file.getName(), JOptionPane.OK_CANCEL_OPTION );
+        int result= AutoplotUtil.showConfirmDialog2( parent, theP, "Run Script "+file.getName(), JOptionPane.OK_CANCEL_OPTION );
         if ( result==JOptionPane.OK_OPTION ) {
             fd=  fpf.getFormData();
             org.autoplot.jythonsupport.ui.ParametersFormPanel.resetVariables( fd, fparams );
             if ( makeTool ) {
+                assert makeToolPanel!=null;
                 if ( makeToolPanel.isInstall() ) { // the user has requested that the script be installed.
                     Window w= ScriptContext.getViewWindow();
                     if ( w instanceof AutoplotUI ) {

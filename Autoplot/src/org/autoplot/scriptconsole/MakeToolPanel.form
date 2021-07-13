@@ -23,7 +23,7 @@
                       <EmptySpace min="12" pref="12" max="12" attributes="0"/>
                       <Component id="toolsCB" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="jLabel2" alignment="0" pref="455" max="32767" attributes="0"/>
+                  <Component id="trustedScriptLabel" alignment="0" pref="455" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -35,7 +35,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="toolsCB" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="11" max="-2" attributes="1"/>
-              <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+              <Component id="trustedScriptLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
@@ -48,7 +48,7 @@
         <Property name="toolTipText" type="java.lang.String" value="The script will be added to the Autoplot &quot;Tools&quot; menu"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel2">
+    <Component class="javax.swing.JLabel" name="trustedScriptLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Make sure the script does not contain malicious code."/>
         <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Scripts are run with your privileges, so be careful &lt;br&gt;&#xa;to make sure scripts are coming from a trusted source &lt;br&gt;&#xa;and do not contain code that would harm your files."/>

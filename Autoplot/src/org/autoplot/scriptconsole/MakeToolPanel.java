@@ -1,8 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.scriptconsole;
+
+import org.autoplot.AutoplotUI;
 
 /**
  * little panel with "install in tools folder" prompt
@@ -12,9 +11,20 @@ public class MakeToolPanel extends javax.swing.JPanel {
 
     /**
      * Creates new form MakeToolPanel
+     * @param scriptOkay if true, indicate the scientist has run the script before, otherwise they should check for malicious code.
      */
-    public MakeToolPanel() {
+    public MakeToolPanel(boolean scriptOkay) {
         initComponents();
+        //Icon okay= new ImageIcon(MakeToolPanel.class.getResource("/resources/blue.gif"));
+        //Icon prob= new ImageIcon(MakeToolPanel.class.getResource("/resources/red.gif"));
+        if ( scriptOkay ) {
+            trustedScriptLabel.setText("You have run this version of the script before.");
+            //trustedScriptLabel.setIcon( okay );
+        } else {
+            trustedScriptLabel.setText("Make sure the script does not contain malicious code.");
+            trustedScriptLabel.setIcon(AutoplotUI.WARNING_ICON);
+            //trustedScriptLabel.setIcon( prob );
+        }
     }
 
     /**
@@ -35,13 +45,13 @@ public class MakeToolPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         toolsCB = new javax.swing.JCheckBox();
-        jLabel2 = new javax.swing.JLabel();
+        trustedScriptLabel = new javax.swing.JLabel();
 
         toolsCB.setText("Add to Tools menu");
         toolsCB.setToolTipText("The script will be added to the Autoplot \"Tools\" menu");
 
-        jLabel2.setText("Make sure the script does not contain malicious code.");
-        jLabel2.setToolTipText("<html>Scripts are run with your privileges, so be careful <br>\nto make sure scripts are coming from a trusted source <br>\nand do not contain code that would harm your files.");
+        trustedScriptLabel.setText("Make sure the script does not contain malicious code.");
+        trustedScriptLabel.setToolTipText("<html>Scripts are run with your privileges, so be careful <br>\nto make sure scripts are coming from a trusted source <br>\nand do not contain code that would harm your files.");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -53,7 +63,7 @@ public class MakeToolPanel extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(12, 12, 12)
                         .addComponent(toolsCB))
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE))
+                    .addComponent(trustedScriptLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -62,12 +72,12 @@ public class MakeToolPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(toolsCB)
                 .addGap(11, 11, 11)
-                .addComponent(jLabel2)
+                .addComponent(trustedScriptLabel)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JCheckBox toolsCB;
+    private javax.swing.JLabel trustedScriptLabel;
     // End of variables declaration//GEN-END:variables
 }
