@@ -82,6 +82,7 @@ import org.autoplot.layout.LayoutConstants;
 import org.autoplot.renderer.AnnotationEditorPanel;
 import org.autoplot.util.RunLaterListener;
 import org.das2.graph.DasLabelAxis;
+import org.das2.qds.QDataSet;
 import org.das2.system.DefaultMonitorFactory;
 import org.das2.system.DefaultMonitorFactory.MonitorEntry;
 
@@ -712,6 +713,39 @@ public class ApplicationController extends DomNodeController implements RunLater
             assert lock!=null;
             lock.unlock();
         }
+    }
+    
+    /**
+     * provide method for plotting a URI without any axis resetting, at a 
+     * given position.
+     * @param position plot the URI at the position
+     * @param suri the URI to plot
+     * @param resetPlot 
+     */
+    public void plotUri( final int position, final String suri, final boolean resetPlot ) {
+        DomLock lock=null;
+        if ( !resetPlot ) {
+            lock= application.controller.changesSupport.mutatorLock();
+            lock.lock("plotUriWithoutChanges");
+        }
+        DataSourceFilter dsf= application.getDataSourceFilters(position);
+        dsf.getController().setSuri(suri, new NullProgressMonitor() );
+        dsf.getController().update(true);
+        if ( !resetPlot ) {
+            assert lock!=null;
+            lock.unlock();
+        }
+    }
+    
+    /**
+     * provide method for plotting a dataset without any axis resetting, at a 
+     * given position.
+     * @param position plot the URI at the position
+     * @param ds the URI to plot
+     * @param resetPlot 
+     */
+    public void plotUri( final int position, final QDataSet ds, final boolean resetPlot ) {
+        model.setDataSet(position, null, ds, resetPlot);
     }
     
     /**
