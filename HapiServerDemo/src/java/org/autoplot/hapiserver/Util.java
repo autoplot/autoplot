@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -14,6 +17,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
@@ -110,12 +114,41 @@ public class Util {
      * @return the server implementation version. 
      */
     public static final String serverVersion() {
-        return "20210430.1221";
+        return "20210715.1246";
     }
     
     static boolean isKey(String key) {
         Pattern p= Pattern.compile("\\d{8}+");
         return p.matcher(key).matches();
+    }
+    
+    /**
+     * convert IDs and NAMEs into safe names which will work on all platforms.
+     * If the name is modified, it will start with an _. 
+     * <li>poolTemperature -> poolTemperature
+     * <li>Iowa City Conditions -> _Iowa+City+Conditions
+     * @param s
+     * @return 
+     */
+    public static final String fileSystemSafeName( String s ) {
+        Pattern p= Pattern.compile("[a-zA-Z0-9\\-\\+\\*\\._]+");
+        Matcher m= p.matcher(s);
+        if ( m.matches() ) {
+            return s;
+        } else {
+            String s1= s.replaceAll("\\+","2B");
+            s1= s1.replaceAll(" ","\\+");
+            if ( p.matcher(s1).matches() ) {
+                return "_" + s1;
+            } else {
+                byte[] bb= s.getBytes( Charset.forName("UTF-8") );
+                StringBuilder sb= new StringBuilder("_");
+                for ( byte b: bb ) {
+                    sb.append( String.format("%02X", b) );
+                }
+                return sb.toString();
+            }
+        }
     }
     
     /**
@@ -130,7 +163,7 @@ public class Util {
         }
         File keyFile= new File( getHapiHome(), "keys" );
         if ( !keyFile.exists() ) return false;
-        keyFile= new File( keyFile, id + ".json" );
+        keyFile= new File( keyFile, fileSystemSafeName(id) + ".json" );
         if ( !keyFile.exists() ) return false;
         try {
             JSONObject jo= HapiServerSupport.readJSON(keyFile);
@@ -157,7 +190,7 @@ public class Util {
         }
         File keyFile= new File( getHapiHome(), "keys" );
         if ( !keyFile.exists() ) return false;
-        keyFile= new File( keyFile, id + ".json" );
+        keyFile= new File( keyFile, fileSystemSafeName(id) + ".json" );
         if ( !keyFile.exists() ) return false;
         try {
             JSONObject jo= HapiServerSupport.readJSON(keyFile);
@@ -184,7 +217,7 @@ public class Util {
         }
         File keyFile= new File( getHapiHome(), "keys" );
         if ( !keyFile.exists() ) return false;
-        keyFile= new File( keyFile, id + ".json" );
+        keyFile= new File( keyFile, fileSystemSafeName(id) + ".json" );
         if ( !keyFile.exists() ) return false;
         try {
             JSONObject jo= HapiServerSupport.readJSON(keyFile);
@@ -256,6 +289,32 @@ public class Util {
             
         } catch (JSONException ex) {
             throw new RuntimeException(ex);
+        }
+    }
+    
+    /**
+     * send a "bad id" response to the client.
+     * @param id the id.
+     * @param ex an exception
+     * @param response the response object
+     * @param out the print writer for the response object.
+     */
+    public static void raiseMisconfiguration(String id, Exception ex, HttpServletResponse response, final PrintWriter out) {
+        try {
+            JSONObject jo= new JSONObject();
+            jo.put("HAPI",Util.hapiVersion());
+            jo.put("createdAt",String.format("%tFT%<tRZ",Calendar.getInstance(TimeZone.getTimeZone("Z"))));
+            JSONObject status= new JSONObject();
+            status.put( "code", 1500 );
+            String msg= "unrecognized id: "+id + "error: "+ ex.getMessage();
+            status.put( "message", msg );
+            jo.put("status",status);
+            String s= jo.toString(4);
+            response.setStatus(200);
+            response.setContentType("application/json;charset=UTF-8");
+            out.write(s);
+        } catch (JSONException jex) {
+            throw new RuntimeException(jex);
         }
     }
     

@@ -81,7 +81,11 @@
                     title= id;
                 }
                 
-                File infoFile= new File( new File( Util.getHapiHome(), "info" ), id+".json" );
+                File infoFile= new File( new File( Util.getHapiHome(), "info" ), Util.fileSystemSafeName(id)+".json" );
+                if ( !infoFile.exists() ) {
+                    out.println( "<p style=\"background-color: #e0e0e0;\">misconfigured: "+id+" ("+Util.fileSystemSafeName(id)+")</p>\n" );
+                    continue;
+                }
                 JSONObject info= HapiServerSupport.readJSON( infoFile );
                 
                 DatumRange availableRange= HapiServerSupport.getRange(info);
@@ -142,6 +146,7 @@
             }
             } catch ( JSONException ex ) {
                 out.print("<br><br><b>Something has gone wrong, see logs or send an email to faden at cottagesystems.com</b>");
+                out.println("<br>"+ex.getMessage());
                 out.println("<br>"+out.toString());
             }
         %>

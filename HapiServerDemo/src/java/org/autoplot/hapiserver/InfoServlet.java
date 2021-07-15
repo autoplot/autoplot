@@ -51,7 +51,11 @@ public class InfoServlet extends HttpServlet {
         JSONArray parameters= new JSONArray();
 
         File infoFileHome= new File( Util.getHapiHome(), "info" );
-        File infoFile= new File( infoFileHome, id+".json" );
+        File infoFile= new File( infoFileHome, Util.fileSystemSafeName(id)+".json" );
+        
+        if ( !infoFile.exists() ) {
+            throw new FileNotFoundException("Server misconfiguration, expected to find file for "+id+" ("+Util.fileSystemSafeName(id)+")" );
+        }
         
         JSONObject o= HapiServerSupport.readJSON(infoFile);
         
@@ -102,7 +106,7 @@ public class InfoServlet extends HttpServlet {
         status.put( "message", "OK request successful");
                 
         o.put( "status", status );
-        o.put( "x_infoVersion__", "20190120.1" );
+        o.put( "x_infoVersion__", "20210715.1" );
         return o;
 
     }
@@ -144,7 +148,9 @@ public class InfoServlet extends HttpServlet {
                String s= jo.toString(4);
                out.write(s);
            } catch ( IllegalArgumentException ex ) {
-                Util.raiseBadId(id, response, out);
+               Util.raiseBadId(id, response, out);
+           } catch ( FileNotFoundException ex ) {
+               Util.raiseMisconfiguration( id, ex, response, out );
            }
         } catch ( JSONException ex ) {
             throw new ServletException(ex);
@@ -195,7 +201,7 @@ public class InfoServlet extends HttpServlet {
         }
         
         File dataFileHome= new File( Util.getHapiHome(), "info" );
-        File dataFile= new File( dataFileHome, id+".json" );
+        File dataFile= new File( dataFileHome, Util.fileSystemSafeName(id)+".json" );
         
         ByteArrayOutputStream out= new ByteArrayOutputStream(2000);
         

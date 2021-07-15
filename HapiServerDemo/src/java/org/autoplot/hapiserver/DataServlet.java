@@ -187,7 +187,7 @@ public class DataServlet extends HttpServlet {
         boolean allowCache= false; //dataFormatter instanceof CsvDataFormatter;
         if ( allowCache ) {
             File dataFileHome= new File( Util.getHapiHome(), "cache" );
-            dataFileHome= new File( dataFileHome, id );
+            dataFileHome= new File( dataFileHome, Util.fileSystemSafeName(id) );
             if ( dataFileHome.exists() ) {
                 FileStorageModel fsm= FileStorageModel.create( FileSystem.create(dataFileHome.toURI()), "$Y/$m/$Y$m$d.csv.gz" );
                 File[] files= fsm.getFilesFor(dr); 
@@ -216,7 +216,7 @@ public class DataServlet extends HttpServlet {
                 logger.log(Level.FINER, "done checkAutoplotSource at {0} ms.", System.currentTimeMillis()-t0);
                 if ( dsiter==null ) {
                     File dataFileHome= new File( Util.getHapiHome(), "data" );
-                    File dataFile= new File( dataFileHome, id+".csv" );
+                    File dataFile= new File( dataFileHome, Util.fileSystemSafeName(id)+".csv" );
                     if ( dataFile.exists() ) {
                         dataFiles= new File[] { dataFile };
                     } else {
@@ -500,7 +500,7 @@ public class DataServlet extends HttpServlet {
     }// </editor-fold>
 
     private RecordIterator checkAutoplotSource(String id, DatumRange dr, boolean allowStream) throws IOException, JSONException, Exception {
-        File configFile= new File( new File( Util.getHapiHome().toString(), "info" ), id+".json" );
+        File configFile= new File( new File( Util.getHapiHome().toString(), "info" ), Util.fileSystemSafeName(id)+".json" );
         if ( !configFile.exists() ) {
             return null;
         }
