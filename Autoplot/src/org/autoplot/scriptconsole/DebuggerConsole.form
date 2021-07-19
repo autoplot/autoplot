@@ -154,7 +154,7 @@
     <Component class="javax.swing.JButton" name="stepButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Step"/>
-        <Property name="toolTipText" type="java.lang.String" value="Execute the current line stepping to the next line or into a function."/>
+        <Property name="toolTipText" type="java.lang.String" value="Run the current line stepping to the next line or into a function."/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>

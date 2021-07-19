@@ -267,7 +267,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
         jSplitPane1.setRightComponent(jScrollPane2);
 
         stepButton.setText("Step");
-        stepButton.setToolTipText("Execute the current line stepping to the next line or into a function.");
+        stepButton.setToolTipText("Run the current line stepping to the next line or into a function.");
         stepButton.setEnabled(false);
         stepButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

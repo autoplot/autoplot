@@ -17,10 +17,10 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <Component id="executeButton" min="-2" pref="124" max="-2" attributes="0"/>
+              <Component id="executeButton" min="-2" pref="121" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="interruptButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="saveAsButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="openButton" min="-2" max="-2" attributes="0"/>
@@ -34,7 +34,7 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="caretPositionLabel" min="-2" pref="99" max="-2" attributes="0"/>
           </Group>
-          <Component id="jScrollPane2" alignment="0" max="32767" attributes="0"/>
+          <Component id="jScrollPane2" alignment="0" pref="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -49,7 +49,7 @@
                   <Component id="interruptButton" linkSize="1" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="jScrollPane2" pref="280" max="32767" attributes="0"/>
+              <Component id="jScrollPane2" pref="279" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="caretPositionLabel" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -65,8 +65,8 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/org/autoplot/go.png"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Execute"/>
-        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Execute script.  &lt;br&gt;Alt modifier enters editor GUI.  &lt;br&gt;Ctrl modifier attempts to trace program location.  &lt;br&gt;Shift modifier will being up parameters gui."/>
+        <Property name="text" type="java.lang.String" value="Run"/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Run the script.  &lt;br&gt;Alt enters editor GUI.  &lt;br&gt;Ctrl attempts to trace program location.  &lt;br&gt;Shift will being up parameters gui."/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="executeButtonActionPerformed"/>
@@ -74,6 +74,11 @@
     </Component>
     <Component class="javax.swing.JButton" name="saveAsButton">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
+          <FontInfo relative="true">
+            <Font component="saveAsButton" property="font" relativeSize="true" size="0"/>
+          </FontInfo>
+        </Property>
         <Property name="text" type="java.lang.String" value="Save As..."/>
         <Property name="toolTipText" type="java.lang.String" value="Save the buffer to a local file."/>
       </Properties>

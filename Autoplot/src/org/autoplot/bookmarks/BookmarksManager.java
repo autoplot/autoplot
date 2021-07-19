@@ -151,8 +151,8 @@ public class BookmarksManager extends javax.swing.JDialog {
         if ( name.equals("Tools") ) {
             overplotButton.setVisible(false);
             plotBelowButton.setVisible(false);
-            plotButton.setText("Execute");
-            plotButton.setToolTipText("Execute");
+            plotButton.setText("Run");
+            plotButton.setToolTipText("Run the script");
         }
         this.setLocationRelativeTo(parent);
         this.model = new BookmarksManagerModel();

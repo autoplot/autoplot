@@ -103,7 +103,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
      * Creates new form JythonScriptPanel 
      * 
      * @param app the app with which we'll register the close callback.
-     * @param selector the selector which might receive jyds URIs when "execute" is pressed.
+     * @param selector the selector which might receive jyds URIs when "run" is pressed.
      */
     public JythonScriptPanel( AutoplotUI app, final DataSetSelector selector) {
         initComponents();
@@ -411,14 +411,15 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         fileNameTextField = new javax.swing.JTextField();
 
         executeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/go.png"))); // NOI18N
-        executeButton.setText("Execute");
-        executeButton.setToolTipText("<html>Execute script.  <br>Alt modifier enters editor GUI.  <br>Ctrl modifier attempts to trace program location.  <br>Shift modifier will being up parameters gui.");
+        executeButton.setText("Run");
+        executeButton.setToolTipText("<html>Run the script.  <br>Alt enters editor GUI.  <br>Ctrl attempts to trace program location.  <br>Shift will being up parameters gui.");
         executeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 executeButtonActionPerformed(evt);
             }
         });
 
+        saveAsButton.setFont(saveAsButton.getFont());
         saveAsButton.setText("Save As...");
         saveAsButton.setToolTipText("Save the buffer to a local file.");
         saveAsButton.addActionListener(new java.awt.event.ActionListener() {
@@ -480,10 +481,10 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(executeButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 124, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(executeButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 121, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(interruptButton)
-                .add(7, 7, 7)
+                .add(18, 18, 18)
                 .add(saveAsButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(openButton)
@@ -495,7 +496,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                 .add(fileNameTextField)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 99, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(jScrollPane2)
+            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -508,7 +509,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                     .add(newScriptButton)
                     .add(interruptButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(caretPositionLabel)
