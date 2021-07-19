@@ -983,7 +983,7 @@ public class ScriptPanelSupport {
                 panel.setRunningScript(null);
 
             } else if (panel.getContext() == JythonScriptPanel.CONTEXT_APPLICATION) {
-                applicationController.setStatus("busy: executing application script");
+                applicationController.setStatus("busy: running application script");
                 Runnable run = new Runnable() {
                     @Override
                     public void run() {
