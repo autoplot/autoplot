@@ -1739,7 +1739,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         });
 
         plotItButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/go.png"))); // NOI18N
-        plotItButton.setToolTipText("<html>Plot this data location, or URI.<br>\nCtrl modifier: plot the dataset by adding a new plot<br>\nShift modifier: plot the dataset as an overplot<br>\nAlt modifier: inspect this resource.<br>");
+        plotItButton.setToolTipText("<html>Play button plots this data location, or URI<br>\nThis may also load a .vap file or run a script, depending on the text entered.<br>\nCtrl modifier: plot the dataset by adding a new plot<br>\nShift modifier: plot the dataset as an overplot<br>\nAlt modifier: inspect this resource.<br>");
         plotItButton.setMaximumSize(new java.awt.Dimension(27, 27));
         plotItButton.setMinimumSize(new java.awt.Dimension(27, 27));
         plotItButton.setName("go"); // NOI18N
