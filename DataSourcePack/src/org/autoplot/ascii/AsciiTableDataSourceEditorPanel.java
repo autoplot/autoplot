@@ -1263,7 +1263,7 @@ private boolean isIso8601TimeField0() {
 }
 
 /**
- * 
+ * @param example used to get delimiters
  * @param column the table column
  * @param current TimeUtil.YEAR, etc.
  * @param template the template where we add $Y etc.
@@ -1281,49 +1281,55 @@ private int guessTimeFormatColumn( String example, int column, int current, Stri
     int min=999999999;
     for ( ; i<nl; i+=step ) {
         String s= String.valueOf( this.jTable1.getValueAt( i, column ) );
-        if ( this.model.isRecord( i ) ) {
-            if ( s.length()>digits ) digits= s.length();
-        }
+        int slen= s.length();
+        boolean isNumber= false;
         try {
             int value= (int)Double.parseDouble(s);
+            isNumber= true;
             if ( value>max ) max= value;
             if ( value<min ) min= value;
         } catch ( NumberFormatException ex ) {
         }
+        if ( this.model.isRecord( i ) ) {
+            if ( slen>digits ) {
+                if ( isNumber ) digits= slen;
+            }
+        }
     }
     switch (current) {
         case TimeUtil.YEAR:
-            if ( digits==2 ) {
-                template.append("$y");
-                return TimeUtil.MONTH;
-            } else if ( digits==4 ) {
-                template.append("$Y");
-                return TimeUtil.MONTH;
-            } else if ( digits==5 ) {
-                template.append("$Y$j");
-                return TimeUtil.HOUR;
-            } else if ( digits==6 ) {
-                template.append("$y$m$d");
-                return TimeUtil.HOUR;
-            } else if ( digits==8 ) {
-                if ( !Character.isDigit( example.charAt(4) ) ) {
-                    template.append("$Y").append(example.charAt(4)).append("$j");
+            switch (digits) {
+                case 2:
+                    template.append("$y");
+                    return TimeUtil.MONTH;
+                case 4:
+                    template.append("$Y");
+                    return TimeUtil.MONTH;
+                case 5:
+                    template.append("$Y$j");
                     return TimeUtil.HOUR;
-                } else {
-                    template.append("$Y$m$d");
+                case 6:
+                    template.append("$y$m$d");
                     return TimeUtil.HOUR;
-                }
-            } else if ( digits==10 ) {
-                if ( !Character.isDigit( example.charAt(4) ) ) {
-                    template.append("$Y").append(example.charAt(4)).append("$m").append(example.charAt(7)).append("$d");
-                    return TimeUtil.HOUR;
-                } else {
+                case 8:
+                    if ( !Character.isDigit( example.charAt(4) ) ) {
+                        template.append("$Y").append(example.charAt(4)).append("$j");
+                        return TimeUtil.HOUR;
+                    } else {
+                        template.append("$Y$m$d");
+                        return TimeUtil.HOUR;
+                    }
+                case 10:
+                    if ( !Character.isDigit( example.charAt(4) ) ) {
+                        template.append("$Y").append(example.charAt(4)).append("$m").append(example.charAt(7)).append("$d");
+                        return TimeUtil.HOUR;
+                    } else {
+                        template.append("$X");
+                        return current;
+                    }
+                default:
                     template.append("$X");
                     return current;
-                }
-            } else {
-                template.append("$X");
-                return current;
             }
         case TimeUtil.MONTH:
             if ( min==999999999 ) {
