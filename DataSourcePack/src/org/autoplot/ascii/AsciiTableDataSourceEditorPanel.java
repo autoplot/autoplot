@@ -1263,6 +1263,12 @@ private boolean isIso8601TimeField0() {
 }
 
 /**
+ * This scans through a column, looking for the maximum value and the number
+ * of digits.  Given the current digits it has already then guesses what the format
+ * would be for this column. For example, if it already knows the year and finds
+ * the column has three-digit numbers varying from 0 to 365, it will guess that this 
+ * column is $j (day of year).  This guess is added to the template and the new
+ * current digit is returned.
  * @param example used to get delimiters
  * @param column the table column
  * @param current TimeUtil.YEAR, etc.
