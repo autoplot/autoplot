@@ -5498,7 +5498,9 @@ APSplash.checkTime("init 240");
                         rhandler.handleRequest(socket.getInputStream(), model, socket.getOutputStream(), rlistener);
                         org.das2.util.LoggerManager.getLogger("autoplot.server").log(Level.INFO, "disconnect @ {0}", new Date( System.currentTimeMillis() ));
                         serverCheckBoxMenuItem.setSelected(false);
-                        stopServer();
+                        if ( rlistener!=null && !rlistener.isListening() ) {
+                            stopServer();
+                        }
                     }
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
