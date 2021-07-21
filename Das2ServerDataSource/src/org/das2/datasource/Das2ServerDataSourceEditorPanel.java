@@ -351,6 +351,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     
     private final Map<String,String> readerParams= new HashMap(); // from dataset url to params.
             
+    private final Map<String,String> otherParams= new HashMap(); // other params which are not supported by this dialog, like qubeSubset
+    
     private String userTimeRange= null;
     
     private final Map<String,String> tcaItem= new HashMap(); // from ID to selected TCA item.
@@ -1158,6 +1160,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             itemsComboBox.setSelectedItem(item);
             tcaItem.put( "" + serverURL + "?server=dsdf&dataset=" + dataSetId, item );
         }
+        
+        otherParams.put( "qubeSubset", params.remove("qubeSubset") );
+                
         StringBuilder paramsStr= new StringBuilder();
         for ( Entry<String,String> e: params.entrySet() ) {
             if ( e.getKey().startsWith("arg_") ) {
@@ -1375,6 +1380,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         
         if ( params.length()>0 ) result.append("&").append(params.toString());
         
+        if ( otherParams.get("qubeSubset")!=null ) {
+            result.append("&qubeSubset=").append(otherParams.get("qubeSubset"));
+        }
         
         return result.toString();
     }

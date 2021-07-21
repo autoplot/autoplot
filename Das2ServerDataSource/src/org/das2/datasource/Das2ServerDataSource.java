@@ -196,6 +196,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
         otherParams.remove("_res");      // =0.0 means use native resolution
         otherParams.remove("intrinsic"); // =true means use native resolution
         otherParams.remove("useOldD2sParser");
+        otherParams.remove("qubeSubset");
         
         String item = (String) otherParams.remove("item");
         interval = (String) otherParams.remove("interval");
@@ -537,6 +538,19 @@ public final class Das2ServerDataSource extends AbstractDataSource {
 
             result1 = result;
 
+        }
+        
+        boolean qubeSubset= getParam( "qubeSubset", "F" ).equals("T");
+        if ( qubeSubset ) {
+            if ( result1.rank()==3 && !DataSetUtil.isQube(result1) ) {
+                result1= DataSetUtil.qubeSubset( result1, result1.length(0,0) );
+            } else {
+                if ( DataSetUtil.isQube(result1) ) {
+                    logger.info("data is already a qube, qubeSubset has no effect");
+                } else {
+                    logger.info("data is rank 2, qubeSubset is not supported");
+                }
+            }
         }
 
         logger.fine("  done. ");
