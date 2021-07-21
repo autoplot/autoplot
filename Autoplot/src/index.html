@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Using pngwalk tool to pick Autoplot screenshot on a mac.</a>.
+        <p><small>Jython script is used to define a box-n-whisker plot.  See <a href="https://abbith.physics.uiowa.edu/jbf/juno/-/blob/master/u/sadie/2019/20191022/boxAndWhiskerTest.jy">the script</a>.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,9 +27,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-07-15 r25854):</p>
+        <p>Bugfixes (2021-07-21 r25854):</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2369/">ASCII file reader treats non-breaking spaces, from copying data in email, as whitespace.</a> 
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2364/">2364</a>code which closed Autoplot back-end server removed, so that multiple commands can be sent.</a>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2367/">2367</a>guess time format mistook four-character "time" for $H$M field.</a> 
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2369/">2369</a>ASCII file reader treats non-breaking spaces, from copying data in email, as whitespace.</a> 
             <li><a href="https://sourceforge.net/p/autoplot/bugs/1043/">1043</a>: don't throw error when double question marks found, just issue warning.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2367/">2367</a>export from slicer allows Autoplot to format the data, but the options were ignored.  Thanks, George!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2363/">2363</a>: ASCII file with X and Y arguments still didn't work because I forgot to commit a bit of code.
@@ -56,6 +58,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Introduce new qubeSubset which will throw out data until the non-qube can be represented as a qube, to assist with the Das2Server.
+            <li><a href="https://github.com/autoplot/documentation/issues/1">1</a>use "run" where "execute" is unnecessarily used.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/748">748</a>: second plot window in scripts
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/747">747</a>: event thread response monitor allows manually triggering of thread dump.  Thanks, Sadie!
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/746">746</a>: digitizer should be able to export data to CDF and other formats Autoplot knows.
