@@ -113,7 +113,7 @@ public class EditorTextPane extends JEditorPane {
             public void run() {
 
                 final UndoManager undo = new UndoManager();
-
+                
                 getActionMap().put( "undo", new AbstractAction( undo.getUndoPresentationName() ) {
                     @Override
                     public void actionPerformed( ActionEvent e ) {

@@ -38,6 +38,8 @@ import jsyntaxpane.SyntaxStyle;
 import jsyntaxpane.SyntaxStyles;
 import jsyntaxpane.actions.ActionUtils;
 import jsyntaxpane.actions.IndentAction;
+import jsyntaxpane.actions.RedoAction;
+import jsyntaxpane.actions.UndoAction;
 import org.das2.jythoncompletion.CompletionSettings;
 import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.util.LoggerManager;
@@ -839,9 +841,12 @@ public class EditorContextMenu {
                     LoggerManager.logGuiEvent(e);
                     JOptionPane.showMessageDialog(menu,"Ctrl-F is Search");
                 }
-            } );
-            JMenuItem searchItem = menu.add(mi);
-            searchItem.setText("Find"); 
+            } );           
+            JMenu editMenu= new JMenu("Edit");
+            editMenu.add( new UndoAction() ).setText("Undo");
+            editMenu.add( new RedoAction() ).setText("Redo");
+            editMenu.add( mi ).setText("Find");
+            menu.add( editMenu );
             
             menu.addSeparator();
             JMenuItem cutItem = menu.add(new DefaultEditorKit.CutAction());

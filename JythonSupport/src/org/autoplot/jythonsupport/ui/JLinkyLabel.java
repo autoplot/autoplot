@@ -17,7 +17,8 @@ import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.HtmlUtil;
 
 /**
- * check for links in label.
+ * check for links in label.  Note presently only the first
+ * link is active.
  * @author jbf
  */
 public final class JLinkyLabel extends JLabel {
