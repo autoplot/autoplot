@@ -480,13 +480,26 @@ public class PlotCommand extends PyObject {
                         Renderer oldRenderer= element.getController().getRenderer();
                         String control= oldRenderer.getControl();
                         r = (Renderer) val.__tojava__(Renderer.class);
-                        QDataSet ds= oldRenderer.getDataSet();
+                        QDataSet ds1=null;
+                        switch (nargs) {
+                            case 1:
+                                ds1= qargs[0];
+                                break;
+                            case 2:
+                                ds1= Ops.link( qargs[0], qargs[1] );
+                                break;
+                            case 3:
+                                ds1= Ops.link( qargs[0], qargs[1], qargs[2] );
+                                break;
+                            default:
+                                break;
+                        }
                         PyObject doAuto= val.__findattr__( "doAutorange" );
                         if ( doAuto==null ) {
                             doAuto= val.__findattr__( "autorange" );
                         }
-                        if ( doAuto!=null && doAuto!=Py.None && ds!=null ) {
-                            PyObject range= ((PyMethod)doAuto).__call__(new PyQDataSetAdapter().adapt(ds));
+                        if ( doAuto!=null && doAuto!=Py.None && ds1!=null ) {
+                            PyObject range= ((PyMethod)doAuto).__call__(new PyQDataSetAdapter().adapt(ds1));
                             QDataSet rangeds= (QDataSet) range.__tojava__(QDataSet.class);
                             plot.getXaxis().setRange( DataSetUtil.asDatumRange(rangeds.slice(0) ) );
                             if ( rangeds.length()>1 ) plot.getYaxis().setRange( DataSetUtil.asDatumRange(rangeds.slice(1) ) );
@@ -494,7 +507,7 @@ public class PlotCommand extends PyObject {
                         }
                         plot.getController().getDasPlot().removeRenderer(oldRenderer);
                         plot.getController().getDasPlot().addRenderer(r);
-                        r.setDataSet(ds);
+                        r.setDataSet(ds1);
                         r.setColorBar((DasColorBar) plot.getZaxis().getController().getDasAxis());
                         element.getController().setRenderer(r);
                         element.setRenderType(RenderType.internal);
