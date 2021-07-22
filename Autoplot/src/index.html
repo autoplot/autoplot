@@ -29,49 +29,30 @@
                 
         <p>Bugfixes (2021-07-21 r25854):</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2364/">2364</a>code which closed Autoplot back-end server removed, so that multiple commands can be sent.</a>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2367/">2367</a>guess time format mistook four-character "time" for $H$M field.</a> 
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2369/">2369</a>ASCII file reader treats non-breaking spaces, from copying data in email, as whitespace.</a> 
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2364/">2364</a>: code which closed Autoplot back-end server removed, so that multiple commands can be sent.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2367/">2367</a>: guess time format mistook four-character "time" for $H$M field.  Thanks, Sadie!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2369/">2369</a>: ASCII file reader treats non-breaking spaces, from copying data in email, as whitespace.  Thanks, Sadie!
+        </ul>
+        <p>Older Bugfixes (2021-06-22 r25825):</p>
+        <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/1043/">1043</a>: don't throw error when double question marks found, just issue warning.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2367/">2367</a>export from slicer allows Autoplot to format the data, but the options were ignored.  Thanks, George!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2367/">2367</a>: export from slicer allows Autoplot to format the data, but the options were ignored.  Thanks, George!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2363/">2363</a>: ASCII file with X and Y arguments still didn't work because I forgot to commit a bit of code.
             <li>detect two question marks in .jyds URIs, which has a confusing result, and print a warning for now.
             <li>Das2Server source didn't allow single channels of ephemeris source to be selected from older Das2 Servers.  Thanks, Sadie!
         </ul>
-        <p>Older Bugfixes (2021-06-22 r25825):</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2363">2363</a>: NetCDF source supports capitalized X for consistency, and just X and Y arguments.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2363">2363</a>: ASCII source supports just X and Y arguments, as well as X,Y and Z.  CDF supports capitalized X for consistency.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2361">2361</a>: CDAWeb virtual variables properly implement data[:,3].  Thanks, Sadie!
-            <li><a href="https://github.com/das-developers/das2java/issues/16">0016</a>: check for roundoff error when exporting to das2stream from horizontal slicer "dump data" action.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2359/">2359</a>: .vap.zip control added for embedding data which is already available over http.  Thanks, Ivar!
-            <li>suppress double question mark URI warning for vap+jyds arguments.  Thanks, Ivar!
-            <li>don't print empty field warning when the last field is the empty field.  This happens often when exporting .csv's from spreadsheets.  Thanks, Ivar!
-            <li><a href="https://github.com/das-developers/das2java/issues/14">0014</a>: for 2-dataset bundle of startTime and stopTime, don't use the last dataset (stopTime) as the data attached to each event.  This confuses the automatic choosing of renderType.
-            <li>new mime types in jnlp files.  Thanks, Chris!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2357/">2357</a>: script editor clears old script filename before using editor to display "loading" message, since it was possible to clobber the old script.  Thanks, Ivar!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2354/">2354</a>: gaps in pngwalk sequence incorrectly marked for orbit files.  Thanks, Kris!
-            <li><a href="https://github.com/das-developers/das2java/issues/12">0012</a>: series render data reduction can make all data invalid.  Thanks, Ivar!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2352">2352</a>: cache MONOTONIC=FALSE, before we would only cache MONOTONIC=TRUE, but determining it is false can be expensive for some data.  Thanks, Ivar!
-            <li>don't mark the Jython variable "_" as unread, so that it can be used in loops to assert that the loop variable is not used.
-            <li>remove old warning when das2stream used something besides Units.us2000 for timetags, this was fixed years ago.  Thanks, Chris!
-        </ul>
         <p>Features:</p>
         <ul>
-            <li>Introduce new qubeSubset which will throw out data until the non-qube can be represented as a qube, to assist with the Das2Server.
-            <li><a href="https://github.com/autoplot/documentation/issues/1">1</a>use "run" where "execute" is unnecessarily used.
+            <li>Introduce new qubeSubset which will throw out data until the non-qube can be represented as a qube, to assist with the Das2Server.  Thanks, Terry!
+            <li><a href="https://github.com/autoplot/documentation/issues/1">1</a>: use "run" where "execute" is unnecessarily used.
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/748">748</a>: second plot window in scripts
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/747">747</a>: event thread response monitor allows manually triggering of thread dump.  Thanks, Sadie!
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/746">746</a>: digitizer should be able to export data to CDF and other formats Autoplot knows.
             <li>added Units.us1970, microseconds since 1970.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>within and without allow second argument to be a list of events (not just a single event), so that a script can easily remove a set of events.  Thanks Ivar!
-            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/743/'>743</a>: Initial support for NetCDF files at CDAWeb, including Formosat-5 files.  Thanks, Bobby!
-            <li>ephemerisLabels property of each plot allows the ephemeris channels to be manually labeled.  Thanks, Chris!
-            <li>normalize(ds,1) function added so you can normalize along an index.  Thanks, Kristoff!
-        </ul>
+s        </ul>
         <p>Known issues:</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/?limit=1000">see Source Forge</a>
