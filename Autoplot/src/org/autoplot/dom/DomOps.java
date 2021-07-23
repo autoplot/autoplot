@@ -261,15 +261,26 @@ public class DomOps {
                 pmin= p;
             }
         }
-        return new Plot[] { pmax, pmin };
+        return new Plot[] { pmax, pmin }; // note backwards because bottom is the max.
     }
-
+    
+    /**
+     * return the bottom-most and top-most plot of a list of plots.  
+     * This does use controllers.
+     * @param dom
+     * @param plots
+     * @return
+     */
+    public static Plot[] bottomAndTopMostPlot( Application dom, Plot[] plots ) {
+        return bottomAndTopMostPlot( dom, Arrays.asList(plots) );
+    }
+    
     /**
      * return the left-most and right-most plot of a list of plots.  
      * This does use controllers.
      * @param dom
      * @param plots
-     * @return
+     * @return two-element array of leftmost and rightmost plot.
      */
     public static Plot[] leftAndRightMostPlot( Application dom, List<Plot> plots ) {
         Plot pmax=plots.get(0);
@@ -288,7 +299,18 @@ public class DomOps {
                 pmin= p;
             }
         }
-        return new Plot[] { pmax, pmin };
+        return new Plot[] { pmin, pmax };
+    }
+    
+    /**
+     * return the left-most and right-most plot of a list of plots.  
+     * This does use controllers.
+     * @param dom
+     * @param plots
+     * @return two-element array of leftmost and rightmost plot.
+     */
+    public static Plot[] leftAndRightMostPlot( Application dom, Plot[] plots ) {
+        return leftAndRightMostPlot( dom, Arrays.asList(plots) );
     }
     
     /**
