@@ -52,7 +52,7 @@ public class CanvasLayoutPanel extends JLabel {
     private JComponent target;
     private ClassMap<Color> types;
     private Timer timer;
-    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.layout");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.layout.panel");
     private Rectangle cursor= null; // initial click for range select.
 
     public CanvasLayoutPanel() {
@@ -337,7 +337,7 @@ public class CanvasLayoutPanel extends JLabel {
 
     @Override
     protected void paintComponent(Graphics g1) {
-        logger.log(Level.FINE, "paintComponent target={0}", target);
+        logger.log(Level.FINER, "paintComponent target={0}", target);
         if (target == null) {
             return;
         }
@@ -461,7 +461,7 @@ public class CanvasLayoutPanel extends JLabel {
     private final transient PropertyChangeListener repaintListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            logger.fine("canvas was painted, get a screenshot.");
+            logger.finer("canvas was painted, get a screenshot.");
             if ( itsme ) {
                 logger.finer("its me...");
             } else {
