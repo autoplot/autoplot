@@ -73,6 +73,7 @@ import org.autoplot.util.CanvasLayoutPanel;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.DataSourceEditorPanelUtil;
 import org.autoplot.dom.Annotation;
+import org.autoplot.dom.DomNode;
 
 /**
  * LayoutPanel shows all the plots and plot elements on the canvas.  
@@ -147,6 +148,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                         break;
                 }
                 selectedPlotLabel.setText(selectText);
+                dom.getController().setSelectedPlotsArray( selectedPlots.toArray( new Plot[ selectedPlots.size() ] ) );
             }
         });
         
@@ -605,12 +607,17 @@ public class LayoutPanel extends javax.swing.JPanel {
         if ( plot!=null ) {
             dasPlot = plot.getController().getDasPlot();
             selected.add(dasPlot);
-            List<DataSourceFilter> dsfs= new ArrayList();
+            List<DataSourceFilter> dsfs= new ArrayList<>();
+            List<Plot> plots= new ArrayList<>();
             for ( int i=0; i<iindices.length; i++ ) {
                 try {
                     PlotElementController pec= peles[iindices[i]].getController();
                     selected.add( pec.getRenderer() );
                     dsfs.add( (DataSourceFilter)DomUtil.getElementById( dom, pec.getPlotElement().getDataSourceFilterId() ) );
+                    Plot pp= (Plot)DomUtil.getElementById( dom, pec.getPlotElement().getPlotId() );
+                    if ( !plots.contains(pp) ) {
+                        plots.add( pp );
+                    }
                     if ( dsfs.size()>0 ) {
                         dataSourceList.setSelectedValue( dsfs.get(0), true);        
                     }
@@ -619,6 +626,9 @@ public class LayoutPanel extends javax.swing.JPanel {
                     System.err.println("harmless indexOutOfBoundsException needs to be fixed sometime");
                 }
             }
+            dom.getController().setSelectedPlotsArray( plots.toArray( new Plot[ plots.size() ] ) );
+        } else {
+            dom.getController().setSelectedPlots("");
         }
 
         updateDataSourceList();
