@@ -3216,6 +3216,59 @@ public class ApplicationController extends DomNodeController implements RunLater
         this.plot = plot;
         propertyChangeSupport.firePropertyChange(PROP_PLOT, oldPlot, plot);
     }
+    
+    /**
+     * a comma-delimited list of plot ids.
+     */
+    protected String selectedPlots= "";
+    
+    public String getSelectedPlots() {
+        return selectedPlots;
+    }
+    
+    public void setSelectedPlots( String selectedPlots ) {
+        this.selectedPlots= selectedPlots;
+    }
+    
+    /**
+     * convenient method for setting the selected plots
+     * @param selectedPlots 
+     */
+    public void setSelectedPlotsArray( Plot[] selectedPlots ) {
+        if ( selectedPlots.length==0 ) {
+            setSelectedPlots("");
+        } else {
+            StringBuilder sb= new StringBuilder(selectedPlots[0].id);
+            for ( int i=1; i<selectedPlots.length; i++ ) {
+                sb.append(",").append(selectedPlots[i].id);
+            }
+            setSelectedPlots(sb.toString());
+        }
+    }
+    
+    /**
+     * convenient method for setting the selected plots
+     * @return the plots
+     * @throws IllegalArgumentException if a plot cannot be found
+     */
+    public Plot[] getSelectedPlotsArray( ) {
+        if ( selectedPlots.length()==0 ) {
+            return new Plot[0];
+        } else {
+            String[] ss= selectedPlots.split(",");
+            Plot[] result= new Plot[ss.length];
+            for ( int i=0; i<ss.length; i++ ) {
+                DomNode n= DomUtil.getElementById( application, ss[i] );
+                if ( n!=null && n instanceof Plot ) {
+                    result[i]= (Plot)n;
+                } else {
+                    throw new IllegalArgumentException("unable to find plot with ID "+ss[i]);
+                }
+            }
+            return result;
+        }
+    }
+    
     /**
      * focus canvas.
      */
