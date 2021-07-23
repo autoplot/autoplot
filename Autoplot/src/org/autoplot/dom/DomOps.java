@@ -238,7 +238,7 @@ public class DomOps {
     }
 
     /**
-     * return the bottom and top most plot of a list of plots.  
+     * return the bottom-most and top-most plot of a list of plots.  
      * This does use controllers.
      * @param dom
      * @param plots
@@ -264,6 +264,33 @@ public class DomOps {
         return new Plot[] { pmax, pmin };
     }
 
+    /**
+     * return the left-most and right-most plot of a list of plots.  
+     * This does use controllers.
+     * @param dom
+     * @param plots
+     * @return
+     */
+    public static Plot[] leftAndRightMostPlot( Application dom, List<Plot> plots ) {
+        Plot pmax=plots.get(0);
+        Plot pmin=plots.get(0);
+        Column r= (Column) DomUtil.getElementById( dom.getCanvases(0), pmax.getColumnId() );
+        Column rmax= r;
+        Column rmin= r;
+        for ( Plot p: plots ) {
+            r= (Column) DomUtil.getElementById( dom.getCanvases(0), p.getColumnId() );
+            if ( r.getController().getDasColumn().getDMaximum()>rmax.getController().getDasColumn().getDMaximum() ) {
+                rmax= r;
+                pmax= p;
+            }
+            if ( r.getController().getDasColumn().getDMinimum()<rmin.getController().getDasColumn().getDMinimum() ) {
+                rmin= r;
+                pmin= p;
+            }
+        }
+        return new Plot[] { pmax, pmin };
+    }
+    
     /**
      * return a list of the plots using the given row.
      * This does not use controllers.
