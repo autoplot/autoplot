@@ -27,10 +27,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-07-21 r25854):</p>
+        <p>Bugfixes (2021-07-25 r25889):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2364/">2364</a>: code which closed Autoplot back-end server removed, so that multiple commands can be sent.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2367/">2367</a>: guess time format mistook four-character "time" for $H$M field.  Thanks, Sadie!
+            <li>if series color scatter data zunits were not convertible to colorbar units, the data was not displayed and no warning message was printed.  Thanks, Sadie!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2369/">2369</a>: ASCII file reader treats non-breaking spaces, from copying data in email, as whitespace.  Thanks, Sadie!
         </ul>
         <p>Older Bugfixes (2021-06-22 r25825):</p>
@@ -43,6 +44,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Introduce dom.controller.selectedPlots property.  See <a href='https://github.com/autoplot/dev/blob/master/demos/tools/layout/joinPlots.jy'>joinPlots.jy</a> for example use.
             <li>Introduce new qubeSubset which will throw out data until the non-qube can be represented as a qube, to assist with the Das2Server.  Thanks, Terry!
             <li><a href="https://github.com/autoplot/documentation/issues/1">1</a>: use "run" where "execute" is unnecessarily used.
         </ul>
