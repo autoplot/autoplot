@@ -256,11 +256,8 @@ public class DataMashUp extends javax.swing.JPanel {
         TreePath tp= new TreePath( ( (DefaultMutableTreeNode) expressionTree.getModel().getRoot() ).getPath() );
         doDrop(data,tp);
         
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                backFromFile();
-            }
+        Runnable run= () -> {
+            backFromFile();
         };
         new Thread(run).start();
     }
@@ -534,12 +531,9 @@ public class DataMashUp extends javax.swing.JPanel {
                         resolvePending.put( uri, "" );
                     }
                 }
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        getDataSet( value ); // call back on a different thread.
-                        expressionTree.treeDidChange();
-                    }
+                Runnable run= () -> {
+                    getDataSet( value ); // call back on a different thread.
+                    expressionTree.treeDidChange();
                 };
                 new Thread(run).start(); 
             }
@@ -581,13 +575,10 @@ public class DataMashUp extends javax.swing.JPanel {
                         imagePending.put( qds, "" );                    
                     }
                 }
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        if ( qds!=null ) {
-                            getImage( qds );
-                            expressionTree.treeDidChange();
-                        }
+                Runnable run= () -> {
+                    if ( qds!=null ) {
+                        getImage( qds );
+                        expressionTree.treeDidChange();
                     }
                 };
                 new Thread(run).start();
@@ -617,50 +608,47 @@ public class DataMashUp extends javax.swing.JPanel {
     }
     
     private TreeCellRenderer getCellRenderer( ) {
-        return new TreeCellRenderer() {
-            @Override
-            public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-                String s= value.toString();
-                Icon icon=null;
-                if ( resolver!=null ) {
-                    QDataSet ds= getDataSet( (TreeNode)value );
-                    if ( ds!=null ) {
-                        s= "<html>" + s + " <span color='gray'>" +ds.toString() + "</span>";
-                        BufferedImage im= getImage( ds );
-                        if ( im!=null ) {
-                            icon= new ImageIcon(im);
-                        }
-                    }
-                    
-                } else {
-                    if ( !((DefaultMutableTreeNode)value).isLeaf() && tree.isCollapsed( row ) ) {
-                        //DefaultMutableTreeNode n= (DefaultMutableTreeNode)value;
-                        String jy=  getJython( (DefaultTreeModel)tree.getModel(), value );
-                            //getAsJythonInline(n);
-                        s= "<html>" + s + " <span color='gray'>" +jy + "</span>";
-                    }
-                }
-                JLabel result= new JLabel( s );
-                if ( icon!=null ) {
-                    result.setIcon(icon);
-                    Dimension d= new Dimension( icon.getIconWidth(), icon.getIconHeight() );
-                    result.setMinimumSize(d);
-                    result.setPreferredSize( new Dimension( 600, icon.getIconHeight() ) );
-                } else {
-                    if ( resolver!=null ) {
-                        BufferedImage im= new BufferedImage(60,60,BufferedImage.TYPE_INT_ARGB);
-                        Graphics2D g= (Graphics2D)im.getGraphics();
-                        g.setColor(Color.lightGray);
-                        g.drawRect( 0,0, im.getWidth()-1, im.getHeight()-1 );
-                        result.setIcon( new ImageIcon(im) );
-                        Dimension d= new Dimension( 60, 60 );
-                        result.setMinimumSize(d);
-                        result.setPreferredSize( new Dimension( 600, 60 ) );
+        return (JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) -> {
+            String s= value.toString();
+            Icon icon=null;
+            if ( resolver!=null ) {
+                QDataSet ds= getDataSet( (TreeNode)value );
+                if ( ds!=null ) {
+                    s= "<html>" + s + " <span color='gray'>" +ds.toString() + "</span>";
+                    BufferedImage im= getImage( ds );
+                    if ( im!=null ) {
+                        icon= new ImageIcon(im);
                     }
                 }
                 
-                return result;
+            } else {
+                if ( !((DefaultMutableTreeNode)value).isLeaf() && tree.isCollapsed( row ) ) {
+                    //DefaultMutableTreeNode n= (DefaultMutableTreeNode)value;
+                    String jy=  getJython( (DefaultTreeModel)tree.getModel(), value );
+                    //getAsJythonInline(n);
+                    s= "<html>" + s + " <span color='gray'>" +jy + "</span>";
+                }
             }
+            JLabel result= new JLabel( s );
+            if ( icon!=null ) {
+                result.setIcon(icon);
+                Dimension d= new Dimension( icon.getIconWidth(), icon.getIconHeight() );
+                result.setMinimumSize(d);
+                result.setPreferredSize( new Dimension( 600, icon.getIconHeight() ) );
+            } else {
+                if ( resolver!=null ) {
+                    BufferedImage im= new BufferedImage(60,60,BufferedImage.TYPE_INT_ARGB);
+                    Graphics2D g= (Graphics2D)im.getGraphics();
+                    g.setColor(Color.lightGray);
+                    g.drawRect( 0,0, im.getWidth()-1, im.getHeight()-1 );
+                    result.setIcon( new ImageIcon(im) );
+                    Dimension d= new Dimension( 60, 60 );
+                    result.setMinimumSize(d);
+                    result.setPreferredSize( new Dimension( 600, 60 ) );
+                }
+            }
+            
+            return result;
         };     
     }
     
@@ -670,7 +658,7 @@ public class DataMashUp extends javax.swing.JPanel {
         try {
             n= (Module)org.python.core.parser.parse( "x="+expr, "exec" );
         } catch ( PyException ex ) {
-            ex.printStackTrace();
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
             n= (Module)org.python.core.parser.parse( "x='error'", "exec" ); // x=and(ds1,ds2)
             expr="error "+expr;
         }
@@ -885,7 +873,7 @@ public class DataMashUp extends javax.swing.JPanel {
                     setIds(ids);
                     setUris(uris);
                 }
-                fillTree(s, ids, new ArrayList<String>() );
+                fillTree(s, ids, new ArrayList<>() );
             }
         }
         synchronizeCB.setSelected(synch);
@@ -1009,22 +997,19 @@ public class DataMashUp extends javax.swing.JPanel {
             model.insertNodeInto( newBranch, parent, index );
         }
 
-        SwingUtilities.invokeLater( new Runnable() {
-            @Override
-            public void run() {
-                TreePath newTreePath= getPath(newBranch);
-                expressionTree.expandPath( newTreePath );
-                for ( TreePath tp1 : expandedDescendants ) {
-                    Object[] path= tp1.getPath();
-                    Object[] newPath= insertElement( path, tp.getPathCount()-1, newBranch );
-
-                    TreePath mtp1= new TreePath(newPath);
-                    expressionTree.expandPath(mtp1);
-                }
-                imaged.clear();
-                resolved.clear();
-                expressionTree.treeDidChange();
+        SwingUtilities.invokeLater(() -> {
+            TreePath newTreePath= getPath(newBranch);
+            expressionTree.expandPath( newTreePath );
+            for ( TreePath tp1 : expandedDescendants ) {
+                Object[] path= tp1.getPath();
+                Object[] newPath= insertElement( path, tp.getPathCount()-1, newBranch );
+                
+                TreePath mtp1= new TreePath(newPath);
+                expressionTree.expandPath(mtp1);
             }
+            imaged.clear();
+            resolved.clear();
+            expressionTree.treeDidChange();
         });        
     }
     
@@ -1442,14 +1427,13 @@ public class DataMashUp extends javax.swing.JPanel {
             resolver.interactivePlot( showMe );
         } else {
             if ( resolver!=null ) {
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        TreePath tp= expressionTree.getSelectionPath();
-                        if ( tp==null ) return;
-                        QDataSet showMe= resolver.getDataSet( getAsJythonInline( (TreeNode)tp.getLastPathComponent() ) );
-                        resolver.interactivePlot( showMe );
+                Runnable run= () -> {
+                    TreePath tp1 = expressionTree.getSelectionPath();
+                    if (tp1 == null) {
+                        return;
                     }
+                    QDataSet showMe1 = resolver.getDataSet(getAsJythonInline((TreeNode) tp1.getLastPathComponent()));
+                    resolver.interactivePlot(showMe1);
                 };
                 new Thread(run).start();
             } else {
@@ -1640,11 +1624,8 @@ public class DataMashUp extends javax.swing.JPanel {
      */
     private void checkForTSB() {        
         if ( SwingUtilities.isEventDispatchThread() ) {
-            Runnable run= new Runnable() {
-                @Override
-                public void run() {
-                    checkForTSBImmediately();
-                }
+            Runnable run= () -> {
+                checkForTSBImmediately();
             };
             new Thread(run,"checkForTSB").start();
         } else {
@@ -1687,16 +1668,14 @@ public class DataMashUp extends javax.swing.JPanel {
         }
         final String ftimerange= timerange;
         final boolean fhaveTsb= haveTsb;
-        Runnable run= new Runnable() {
-            public void run() {
-                if ( fhaveTsb ) {
-                    timeRangeRecentComboBox.setEnabled(true);
-                    timeRangeLabel.setEnabled(true);
-                    timeRangeRecentComboBox.setText( ftimerange );
-                } else {
-                    timeRangeRecentComboBox.setEnabled(false);
-                    timeRangeLabel.setEnabled(false);
-                }
+        Runnable run= () -> {
+            if ( fhaveTsb ) {
+                timeRangeRecentComboBox.setEnabled(true);
+                timeRangeLabel.setEnabled(true);
+                timeRangeRecentComboBox.setText( ftimerange );
+            } else {
+                timeRangeRecentComboBox.setEnabled(false);
+                timeRangeLabel.setEnabled(false);
             }
         };
         SwingUtilities.invokeLater(run);
@@ -1715,11 +1694,8 @@ public class DataMashUp extends javax.swing.JPanel {
         }
         dlm.remove(index);
         scratchList.setModel(dlm);
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                backToFile();
-            }
+        Runnable run= () -> {
+            backToFile();
         };
         new Thread( run ).start();
     }
@@ -1731,12 +1707,9 @@ public class DataMashUp extends javax.swing.JPanel {
     private void addToScratch(String expression) {
         final String text0= directionsLabel.getText();
         directionsLabel.setText("Replaced expression is added to my functions.");
-        Timer t= new Timer( 1500, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                directionsLabel.setText(text0);
-            }
-        } );
+        Timer t= new Timer( 1500, (ActionEvent e) -> {
+            directionsLabel.setText(text0);
+        });
         t.setRepeats(false);
         t.start();
         
@@ -1760,11 +1733,8 @@ public class DataMashUp extends javax.swing.JPanel {
         dlm.add( dlm.getSize(), expression );
         
         scratchList.setModel(dlm);
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                backToFile();
-            }
+        Runnable run= () -> {
+            backToFile();
         };
         new Thread( run ).start();
         
@@ -1802,11 +1772,8 @@ public class DataMashUp extends javax.swing.JPanel {
                         dlm.addElement(s);
                     }
                 }
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        scratchList.setModel(dlm);
-                    }
+                Runnable run= () -> {
+                    scratchList.setModel(dlm);
                 };
                 SwingUtilities.invokeLater(run);
             }
@@ -1915,37 +1882,31 @@ public class DataMashUp extends javax.swing.JPanel {
     }
 
     final DragGestureListener createDragGestureListener() {
-        return new DragGestureListener() {
-
-            @Override
-            public void dragGestureRecognized(DragGestureEvent dge) {
-                String s=null;
-                
-                boolean replaceArgs= false;
-                if ( dge.getComponent() instanceof JList ) {
-                    s= (String)((JList)dge.getComponent()).getSelectedValue();
-                    replaceArgs= true;
-                } else if  ( dge.getComponent()==expressionTree ) {
-                    if ( expressionTree.getSelectionCount()==1 ) {
-                        TreePath tp= expressionTree.getSelectionPath();
-                        if ( tp==null ) return;
-                        DefaultMutableTreeNode n= (DefaultMutableTreeNode)tp.getLastPathComponent();
-                        s= getJython( (DefaultTreeModel)expressionTree.getModel(), n );
-                    }
-                } else if  ( dge.getComponent()==namedURIListTool1 ) {
-                    logger.fine("here where dge.getComponent()==namedURIListTool1");
+        return (DragGestureEvent dge) -> {
+            String s=null;
+            
+            boolean replaceArgs= false;
+            if ( dge.getComponent() instanceof JList ) {
+                s= (String)((JList)dge.getComponent()).getSelectedValue();
+                replaceArgs= true;
+            } else if  ( dge.getComponent()==expressionTree ) {
+                if ( expressionTree.getSelectionCount()==1 ) {
+                    TreePath tp= expressionTree.getSelectionPath();
+                    if ( tp==null ) return;
+                    DefaultMutableTreeNode n= (DefaultMutableTreeNode)tp.getLastPathComponent();
+                    s= getJython( (DefaultTreeModel)expressionTree.getModel(), n );
                 }
-                if ( s!=null ) {
-                    if ( s.contains(": ") ) {
-                        int i= s.lastIndexOf(": ");
-                        s= s.substring(0,i).trim();
-                    }
-                    if ( replaceArgs ) s= s + REPLACEARGSFLAG;
-                    dge.startDrag(null, new StringSelection(s) ) ;
-                }
+            } else if  ( dge.getComponent()==namedURIListTool1 ) {
+                logger.fine("here where dge.getComponent()==namedURIListTool1");
             }
-            
-            
+            if ( s!=null ) {
+                if ( s.contains(": ") ) {
+                    int i= s.lastIndexOf(": ");
+                    s= s.substring(0,i).trim();
+                }
+                if ( replaceArgs ) s= s + REPLACEARGSFLAG;
+                dge.startDrag(null, new StringSelection(s) ) ;
+            }
         };
     };
     
@@ -1971,7 +1932,7 @@ public class DataMashUp extends javax.swing.JPanel {
             }
 
         });
-        dmu.fillTree("add(a,b)", Collections.singletonList("z"), new ArrayList<String>() );
+        dmu.fillTree("add(a,b)", Collections.singletonList("z"), new ArrayList<>() );
         JOptionPane.showConfirmDialog( null, dmu );
         System.err.println( dmu.getAsJythonInline() );
     }
