@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Jython script is used to define a box-n-whisker plot.  See <a href="https://github.com/autoplot/dev/blob/master/demos/2021/20210722/boxAndWhiskerTest.jy">the script</a>.
+        <p><small>New qubeSetset Das2Server keyword drops records which would prevent the data from being a qube.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,8 +27,12 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-07-25 r25889):</p>
+        <p>Bugfixes (2021-07-27 r25899):</p>
         <ul>
+            <li>add @see flattenWaveform to synchronizeNN documentation, since the scientist would typically need to flatten the data first.
+            <li>Binary data source can read huge binary files (>2GB), though only 2GB at a time.  Thanks, Darrelle!
+            <li>Initial Bookmarks GUI would allow the description and title to be modified, even though no bookmark was selected, causing confusion.
+            <li>Data Mash-up tool supports "None" as a parameter, allowing "fftPower" function to be used.  Thanks, Andrei!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2364/">2364</a>: code which closed Autoplot back-end server removed, so that multiple commands can be sent.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2367/">2367</a>: guess time format mistook four-character "time" for $H$M field.  Thanks, Sadie!
             <li>if series color scatter data zunits were not convertible to colorbar units, the data was not displayed and no warning message was printed.  Thanks, Sadie!
