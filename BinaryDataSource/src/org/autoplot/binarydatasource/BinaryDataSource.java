@@ -36,6 +36,12 @@ public class BinaryDataSource extends AbstractDataSource {
         return result;
     }
 
+    private long getLongParameter(String name, long deflt) {
+        String sval = params.get(name);
+        long result = sval == null ? deflt : Long.parseLong(sval);
+        return result;
+    }
+
     private String getParameter(String name, String deflt) {
         String sval = params.get(name);
         String result = sval == null ? deflt : sval;
@@ -130,10 +136,10 @@ public class BinaryDataSource extends AbstractDataSource {
 
         FileChannel fc = new FileInputStream(f).getChannel();
 
-        final int offset = getIntParameter("byteOffset", 0);
+        final long offset = getLongParameter("byteOffset", 0);
 
-        int defLen= (int) f.length() - offset;
-        int length = getIntParameter("byteLength", defLen );
+        long defLen= f.length() - offset;
+        long length= getLongParameter("byteLength", defLen );
 
         if ( length == defLen && ( f.length()-(long)offset ) > Integer.MAX_VALUE ) {
             throw new IllegalArgumentException("default length (entire file) is bigger than 2G, which is not supported.");
