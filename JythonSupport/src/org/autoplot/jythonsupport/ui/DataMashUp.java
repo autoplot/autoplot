@@ -19,7 +19,6 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -98,7 +97,7 @@ import org.python.parser.ast.BinOp;
  */
 public class DataMashUp extends javax.swing.JPanel {
 
-    private static final Logger logger = LoggerManager.getLogger("jython.dashup");
+    private static final Logger logger = LoggerManager.getLogger("jython.mashup");
 
     private static final String LABEL_DIRECTIONS = "Double-click on the name to set the data set.  Shift-click for popup plot.";
     
@@ -1027,9 +1026,9 @@ public class DataMashUp extends javax.swing.JPanel {
     }
     
     /**
-     * return true if the script conforms to the jython dashup requirements.
+     * return true if the script conforms to the Jython mashup requirements.
      * @param jython script.
-     * @return true if the script conforms to the jython dashup requirements.
+     * @return true if the script conforms to the Jython mashup requirements.
      */
     public static boolean isDataMashupJythonInline( String jython ) {
         try {
