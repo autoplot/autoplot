@@ -1289,7 +1289,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             @Override
             public void actionPerformed( ActionEvent e ) {
                 org.das2.util.LoggerManager.logGuiEvent(e);        
-                String s = JOptionPane.showInputDialog( BookmarksManager.this, "Bookmark URL:");
+                String s = JOptionPane.showInputDialog( BookmarksManager.this, "Bookmark URI:");
                 if (s != null && !s.equals("")) {
                     String x= maybeGetRemoteBookmarkUrl( null, model, jTree1.getModel(), jTree1.getSelectionPath() );
                     if ( x.length()==0 ) {
