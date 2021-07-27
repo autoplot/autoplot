@@ -702,6 +702,9 @@ public class NamedURIListTool extends JPanel {
                     butts[iexpr].setSelected(true);
                 }
             }
+        } else if ( id.equals("None") ) {
+            literalTF.setText( id );
+            butts[ilit].setSelected(true);
         }
         dsSelector.add( exprTF, c );
         

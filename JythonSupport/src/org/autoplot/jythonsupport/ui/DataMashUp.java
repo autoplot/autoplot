@@ -313,7 +313,7 @@ public class DataMashUp extends javax.swing.JPanel {
      * return the Jython expression for this tree.
      * @param m the tree
      * @param n the node, typically the root of the tree (maybe always)?
-     * @return the jython code for the tree.
+     * @return the Jython code for the tree.
      */
     private String getJython( DefaultTreeModel m, Object n ) {
         if ( m.isLeaf(n) ) {
@@ -414,7 +414,7 @@ public class DataMashUp extends javax.swing.JPanel {
     private void fillTreeExprType( exprType et, MutableTreeNode parent, int i, List<String> datasets, List<String> usedDatasets) {
         if ( et instanceof Name ) {
             String name= ((Name)et).id;
-            if ( datasets.contains(name) || datasets.isEmpty() ) {
+            if ( datasets.contains(name) || datasets.isEmpty() || name.equals("None") ) {
                 parent.insert( new DefaultMutableTreeNode( name ), i );
             } else {
                 parent.insert( new DefaultMutableTreeNode( datasets.get(0) ), i );
@@ -679,7 +679,7 @@ public class DataMashUp extends javax.swing.JPanel {
         Assign assign= (Assign)n.body[0];
         if ( assign.value instanceof Name ) {
             String name= ((Name)assign.value).id;
-            if ( datasets.contains(name) || datasets.isEmpty() ) {
+            if ( datasets.contains(name) || datasets.isEmpty() || name.equals("None") ) {
                 root= new DefaultMutableTreeNode( name );
             } else {
                 root= new DefaultMutableTreeNode( datasets.get(datasets.size()-1) );
@@ -984,7 +984,7 @@ public class DataMashUp extends javax.swing.JPanel {
         
         MutableTreeNode parent= (MutableTreeNode)oldBranch.getParent();
         
-        final MutableTreeNode newBranch= getTreeNode(data, namedURIListTool1.ids, new ArrayList<String>() );
+        final MutableTreeNode newBranch= getTreeNode(data, namedURIListTool1.ids, new ArrayList<>() );
         
         int index= -1;
         String arg0= null;
