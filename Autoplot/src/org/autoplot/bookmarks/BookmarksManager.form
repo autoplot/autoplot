@@ -144,7 +144,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="URILabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="URLTextField" pref="652" max="32767" attributes="0"/>
+                      <Component id="uriTextField" pref="652" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
@@ -185,7 +185,7 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="URILabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="URLTextField" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="uriTextField" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -230,13 +230,14 @@
         <Property name="toolTipText" type="java.lang.String" value="Location of the data (often the URL), or remote folder location"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="URLTextField">
+    <Component class="javax.swing.JTextField" name="uriTextField">
       <Properties>
+        <Property name="editable" type="boolean" value="false"/>
         <Property name="toolTipText" type="java.lang.String" value=""/>
       </Properties>
       <Events>
-        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="URLTextFieldFocusLost"/>
-        <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="URLTextFieldKeyTyped"/>
+        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="uriTextFieldFocusLost"/>
+        <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="uriTextFieldKeyTyped"/>
       </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="titleLabel">
@@ -246,9 +247,12 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="titleTextField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+      </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="titleTextFieldActionPerformed"/>
         <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="titleTextFieldFocusLost"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="titleTextFieldActionPerformed"/>
         <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="titleTextFieldPropertyChange"/>
         <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="titleTextFieldKeyTyped"/>
       </Events>
@@ -261,6 +265,7 @@
     </Component>
     <Component class="javax.swing.JTextField" name="descriptionTextField">
       <Properties>
+        <Property name="editable" type="boolean" value="false"/>
         <Property name="toolTipText" type="java.lang.String" value="Up to a short paragraph describing the data"/>
       </Properties>
       <Events>
