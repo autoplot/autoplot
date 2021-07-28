@@ -26,7 +26,7 @@
 #    chmod 755 autoplot.jar
 #    wget -O sayHello.jy http://autoplot.org/data/script/sayHello.jy
 #    export APDEBUG=1
-#    ./autoplot.jar -J-Xmx8G -h --script=sayHello.jy  # note this should result in: java -Xmx4G -Djava.awt.headless=true -jar autoplot.jar org.virbo.autoplot.AutoplotUI  --script=sayHello.jy
+#    ./autoplot.jar -J-Xmx8G -h --script=sayHello.jy  # note this should result in: java -Xmx4G -Djava.awt.headless=true -jar autoplot.jar org.autoplot.AutoplotUI  --script=sayHello.jy
 #  
 
 JAVA_ARGS=""
