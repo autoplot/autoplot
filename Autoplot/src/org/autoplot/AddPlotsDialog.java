@@ -1,26 +1,19 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * AddPlotsDialog.java
- *
- * Created on Jun 4, 2009, 1:12:53 PM
- */
 
 package org.autoplot;
 
-import java.awt.event.ItemEvent;
+import java.util.logging.Logger;
 import javax.swing.JSpinner;
 import org.autoplot.layout.LayoutConstants;
 
 /**
- *
+ * Dialog asking for number of rows and columns of plots to add, and where
+ * to put them.
  * @author jbf
  */
 public class AddPlotsDialog extends javax.swing.JPanel {
 
+    private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.gui");
+    
     /** Creates new form AddPlotsDialog */
     public AddPlotsDialog() {
         initComponents();
@@ -104,15 +97,7 @@ public class AddPlotsDialog extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jComboBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBox1ItemStateChanged
-        if ( evt.getStateChange()==ItemEvent.SELECTED && evt.getItem()==jComboBox1.getModel().getElementAt(1) ) {
-            numberOfRowsSpinner.setValue(1);
-            numberOfRowsSpinner.setEnabled(false);
-        } else {
-            if ( !numberOfRowsSpinner.isEnabled() ) {
-                numberOfRowsSpinner.setValue(1);
-                numberOfRowsSpinner.setEnabled(true);
-            }
-        }
+        logger.finer("itemStateChanged");
     }//GEN-LAST:event_jComboBox1ItemStateChanged
 
     /**
@@ -120,12 +105,13 @@ public class AddPlotsDialog extends javax.swing.JPanel {
      * @return
      */
     public Object getDirection() {
-        if ( jComboBox1.getSelectedIndex()==0 ) {
-            return LayoutConstants.ABOVE;
-        } else if ( jComboBox1.getSelectedIndex()==2 ) {
-            return LayoutConstants.BELOW;
-        } else {
-            return null; // in the place of
+        switch (jComboBox1.getSelectedIndex()) {
+            case 0:
+                return LayoutConstants.ABOVE;
+            case 2:
+                return LayoutConstants.BELOW;
+            default:
+                return null; // in the place of
         }
     }
     
