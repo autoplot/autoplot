@@ -373,7 +373,7 @@ public class EditorTextPane extends JEditorPane {
     /**
      * do static analysis on code and highlite results.
      */
-    void doStaticAnalysis() {
+    void doStaticCodeAnalysis() {
         support.clearAnnotations();
         showWriteWithoutRead();
         showReadButNotAssigned();

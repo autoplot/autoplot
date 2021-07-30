@@ -828,7 +828,7 @@ public class EditorContextMenu {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);
-                    editor.doStaticAnalysis();
+                    editor.doStaticCodeAnalysis();
                 }
             } );
             mi.setToolTipText("Run Static Code Analysis, looking for unused symbols which might hint at a semmantic error.");
