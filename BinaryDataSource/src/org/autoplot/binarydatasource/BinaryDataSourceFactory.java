@@ -36,7 +36,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "column=", "byte offset into each record based on field type" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "type=") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "depend0=") );
-            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "depend0Offset=", "byte offset into each record for dep0") );
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "depend0Offset=", "byte offset into each record for dep0.  If the first 8 bytes is the timetag, then this would be zero (which is also the default).") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "depend0Type=") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "depend0Units=", "support timetags like 'seconds since 2001-001'" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "validMin=") );
@@ -44,7 +44,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "fillValue=", "value indicating invalid data.") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "units=", "indicating unit type, like cmps or TT2000.") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "byteOrder=", "endianess of the data" ) );
-            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "reportOffset=yes", "depend0 is byte offset into file, this is the legacy (2010) behavior"));
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "reportOffset=T", "depend0 is byte offset into file, this is the legacy (2010) behavior"));
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "format=", "specify format"));
             return result;
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {

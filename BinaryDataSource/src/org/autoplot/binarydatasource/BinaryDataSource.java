@@ -286,7 +286,8 @@ public class BinaryDataSource extends AbstractDataSource {
             }
             ds.putProperty(QDataSet.DEPEND_0, dep0ds);
         } else {
-            boolean reportOffset= !( getParameter( "reportOffset", "no" ).equals("no") );
+            String ro= getParameter( "reportOffset", "F" );            
+            boolean reportOffset= !( ro.startsWith("F") || ro.equals("no") );
             if ( reportOffset ) {
                 final int finalRecSizeBytes= recSizeBits/8;
                 final int finalRecOffset= recOffset;
