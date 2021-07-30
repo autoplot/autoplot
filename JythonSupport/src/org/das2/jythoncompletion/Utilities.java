@@ -13,7 +13,7 @@ import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 
 /**
- *
+ * Utilties for the editor.
  * @author jbf
  */
 public class Utilities {
@@ -86,5 +86,31 @@ public class Utilities {
         while ( caretEnd<d.getLength() && !Character.isWhitespace( d.getText(caretEnd,1).charAt(0) ) ) caretEnd++;
         return d.getText( caret, caretEnd-caret );
     }
+    
+    /**
+     * return the index of the start and end of the selection, rounded out
+     * to complete lines.
+     * @param editor the editor
+     * @param carotPos the carot position within the editor.
+     * @return [start,len] where start is the index of the first character and len is the number of characters.
+     */
+    public static int[] getLinePosition( JTextPane editor, int carotPos ) {
+        int i= carotPos;
+        int j= carotPos;
+        try {
+            int limit= editor.getText().length();
+            
+            while ( i>0 && !editor.getText(i,1).equals("\n") ) i--;
+            if ( i>=0 && i<limit-1 && editor.getText(i,1).equals("\n") && !editor.getText(i+1,1).equals("\n") ) i++;
+            while ( j<limit && !editor.getText(j,1).equals("\n" ) ) j++;
+                        
+            return new int[] { i, j-i };
+            
+        } catch (BadLocationException ex) {
+            throw new RuntimeException(ex);
+        }
+        
+    }
+        
         
 }

@@ -364,6 +364,8 @@ public class EditorTextPane extends JEditorPane {
         setSelectionEnd( getSelectionStart() ); // clear the selection.
         List<SimpleNode> usages= StaticCodeAnalysis.showUsage( script,var );
         for ( SimpleNode n: usages ) {
+            //int start= Utilities.getRowEnd( this, Utilities.getLineNumberForOffset( this, n.beginColumn  ) ); // BACKWARDS!!! have line, need offset.
+            //String thisLine= Utilities.getLinePosition( this, Utilities.getRowStart( n.
             support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+var.length(), EditorAnnotationsSupport.ANNO_USAGE, var, null );
         }
         showWriteWithoutRead();
