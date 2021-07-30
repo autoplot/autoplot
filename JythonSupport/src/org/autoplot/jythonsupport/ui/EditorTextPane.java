@@ -372,7 +372,7 @@ public class EditorTextPane extends JEditorPane {
                 String theWord= theLine.substring( n.beginColumn-1, (n.beginColumn-1)+var.length() );
                 if ( !theWord.equals(var) ) {
                     logger.info("That bug with the parens has happened");
-                    int shift= theWord.indexOf(var.charAt(0));
+                    int shift= theLine.indexOf(var,n.beginColumn-1) - (n.beginColumn-1);
                     if ( shift>0 ) n.beginColumn += shift;
                 }
                 
