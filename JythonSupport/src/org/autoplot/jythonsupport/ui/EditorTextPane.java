@@ -38,6 +38,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
@@ -72,7 +73,6 @@ import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
-import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.PyQDataSet;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
 import org.autoplot.jythonsupport.StaticCodeAnalysis;
@@ -364,7 +364,21 @@ public class EditorTextPane extends JEditorPane {
         setSelectionEnd( getSelectionStart() ); // clear the selection.
         List<SimpleNode> usages= StaticCodeAnalysis.showUsage( script,var );
         for ( SimpleNode n: usages ) {
-            //int start= Utilities.getRowEnd( this, Utilities.getLineNumberForOffset( this, n.beginColumn  ) ); // BACKWARDS!!! have line, need offset.
+            int start= Utilities.getOffsetForLineNumber( this, n.beginLine-1 ); 
+            int stop= Utilities.getOffsetForLineNumber( this, n.beginLine );
+            
+            try {
+                String theLine= this.getText( start, stop-start );
+                String theWord= theLine.substring( n.beginColumn-1, (n.beginColumn-1)+var.length() );
+                if ( !theWord.equals(var) ) {
+                    logger.info("That bug with the parens has happened");
+                    int shift= theWord.indexOf(var.charAt(0));
+                    if ( shift>0 ) n.beginColumn += shift;
+                }
+                
+            } catch (BadLocationException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
             //String thisLine= Utilities.getLinePosition( this, Utilities.getRowStart( n.
             support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+var.length(), EditorAnnotationsSupport.ANNO_USAGE, var, null );
         }
