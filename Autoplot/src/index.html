@@ -27,8 +27,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-07-27 r25899):</p>
+        <p>Bugfixes (2021-07-31 r25911):</p>
         <ul>
+            <li>StaticCodeAnalysis.showUsage corrects incorrect offsets when cos((myvar)) is used, where the double parens show bug in Jython.
+            <li>Binary data source reportOffset uses T and F now, to match other data sources.
             <li>add @see flattenWaveform to synchronizeNN documentation, since the scientist would typically need to flatten the data first.
             <li>Binary data source can read huge binary files (>2GB), though only 2GB at a time.  Thanks, Darrelle!
             <li>Initial Bookmarks GUI would allow the description and title to be modified, even though no bookmark was selected, causing confusion.
@@ -48,6 +50,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://github.com/das-developers/das2java/issues/17">17</a>: Support for &lt;b&gt; for bold (&lt;/b&gt; to turn off) and &lt;i&gt; for italics in labels.
             <li>add plots with multiple rows finally supports replace current.
             <li>Introduce dom.controller.selectedPlots property.  See <a href='https://github.com/autoplot/dev/blob/master/demos/tools/layout/joinPlots.jy'>joinPlots.jy</a> for example use.
             <li>Introduce new qubeSubset which will throw out data until the non-qube can be represented as a qube, to assist with the Das2Server.  Thanks, Terry!
