@@ -13,7 +13,7 @@ import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 
 /**
- * Utilties for the editor.
+ * Utilities for the editor.
  * @author jbf
  */
 public class Utilities {
@@ -49,6 +49,7 @@ public class Utilities {
      * @param offset
      * @return the line number, zero is the first line.
      * @throws javax.swing.text.BadLocationException
+     * @see JTextArea#getLineOfOffset(int) 
      */
     public static int getLineNumberForOffset(JTextArea a, int offset) throws BadLocationException {
         int line = 0;
@@ -59,6 +60,22 @@ public class Utilities {
             line++;
         }
         return line;
+    }
+    
+    /**
+     * given a line number, where zero is the first line, what is the offset?
+     * @param a the text editor
+     * @param line, the line number, where zero is the first line
+     * @return the character offset of the line.
+     */
+    public static int getOffsetForLineNumber( JTextComponent a, int line ) {
+        String text= a.getText();
+        String[] ss= text.split("\n");
+        int index= 0;
+        for ( int i=0; i<line; i++ ) {
+            index+= ss[i].length() + 1; // TODO: assumes Linux or Mac!
+        }
+        return index;
     }
     
     public static int getRowStart( JTextArea a, int offset) throws BadLocationException {
