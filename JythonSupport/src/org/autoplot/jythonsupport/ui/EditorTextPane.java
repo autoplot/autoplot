@@ -350,7 +350,7 @@ public class EditorTextPane extends JEditorPane {
         }
         super.setDocument(doc); //To change body of generated methods, choose Tools | Templates.
     }
-    
+        
     /**
      * highlite the places where a variable name is used.
      */
@@ -363,24 +363,8 @@ public class EditorTextPane extends JEditorPane {
         support.clearAnnotations();
         setSelectionEnd( getSelectionStart() ); // clear the selection.
         List<SimpleNode> usages= StaticCodeAnalysis.showUsage( script,var );
-        for ( SimpleNode n: usages ) {
-            int start= Utilities.getOffsetForLineNumber( this, n.beginLine-1 ); 
-            int stop= Utilities.getOffsetForLineNumber( this, n.beginLine );
-            
-            try {
-                String theLine= this.getText( start, stop-start );
-                String theWord= theLine.substring( n.beginColumn-1, (n.beginColumn-1)+var.length() );
-                if ( !theWord.equals(var) ) {
-                    logger.info("That bug with the parens has happened");
-                    int shift= theLine.indexOf(var,n.beginColumn-1) - (n.beginColumn-1);
-                    if ( shift>0 ) n.beginColumn += shift;
-                }
-                
-            } catch (BadLocationException ex) {
-                logger.log(Level.SEVERE, null, ex);
-            }
-            //String thisLine= Utilities.getLinePosition( this, Utilities.getRowStart( n.
-            support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+var.length(), EditorAnnotationsSupport.ANNO_USAGE, var, null );
+        for ( SimpleNode use: usages ) {
+            support.annotateChars( use.beginLine, use.beginColumn, use.beginColumn+var.length(), EditorAnnotationsSupport.ANNO_USAGE, var, null );
         }
         showWriteWithoutRead();
         showReadButNotAssigned();

@@ -64,18 +64,28 @@ public class Utilities {
     
     /**
      * given a line number, where zero is the first line, what is the offset?
-     * @param a the text editor
+     * @param text the text document
      * @param line, the line number, where zero is the first line
      * @return the character offset of the line.
      */
-    public static int getOffsetForLineNumber( JTextComponent a, int line ) {
-        String text= a.getText();
+    public static int getOffsetForLineNumber( String text, int line ) {
         String[] ss= text.split("\n");
-        int index= 0;
-        for ( int i=0; i<line; i++ ) {
-            index+= ss[i].length() + 1; // TODO: assumes Linux or Mac!
+        if ( ss.length==1 ) {
+            return 0;
+        } else {
+            int firstNewLine= ss[0].length();
+            int newlineLength=1;
+            if ( text.length()>firstNewLine+2 ) {
+                if ( (int)text.charAt(firstNewLine)==13 && (int)text.charAt(firstNewLine+1)==10 ) {
+                    newlineLength=2;
+                }
+            }
+            int index= 0;
+            for ( int i=0; i<line; i++ ) {
+                index+= ss[i].length() + newlineLength; 
+            }
+            return index;
         }
-        return index;
     }
     
     public static int getRowStart( JTextArea a, int offset) throws BadLocationException {

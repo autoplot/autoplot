@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.text.BadLocationException;
+import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
+import org.das2.jythoncompletion.Utilities;
 import org.das2.util.LoggerManager;
 import org.python.core.PyList;
 import org.python.core.PyObject;
@@ -399,7 +402,7 @@ public class StaticCodeAnalysis {
      * get the nodes where the symbol is used.
      *
      * @param script the jython script which is parsed.
-     * @param symbol the symbol to look for.
+     * @param symbol the symbol to look for, a Jython name
      * @return the AST nodes which contain location information.
      */
     public static List<SimpleNode> showUsage(String script, String symbol) {
@@ -412,7 +415,23 @@ public class StaticCodeAnalysis {
                 logger.log(Level.SEVERE, null, ex);
             }
         }
-        return vb.getNames();
+        List<SimpleNode> usages= vb.getNames();
+        usages.forEach((use) -> {
+            int start= Utilities.getOffsetForLineNumber( script, use.beginLine-1 ); 
+            int stop= Utilities.getOffsetForLineNumber( script, use.beginLine );
+            String theLine= script.substring( start, stop );
+            String theWord= theLine.substring( use.beginColumn-1, (use.beginColumn-1)+symbol.length() );
+            if (!theWord.equals(symbol)) {
+                logger.info("That bug with the parens has happened");
+                int shift= theLine.indexOf(symbol,use.beginColumn-1) - (use.beginColumn-1);
+                if (shift>0) {
+                    use.beginColumn += shift;
+                }
+            }
+        });
+        
+        return usages;
+        
     }
 
 }
