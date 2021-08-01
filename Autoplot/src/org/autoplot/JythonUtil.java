@@ -285,7 +285,7 @@ public class JythonUtil {
      * @param env 
      * @param file file containing the script.
      * @param fparams parameters for the script.
-     * @param makeTool the dialog is always shown and the user can have the script installed as a tool.
+     * @param makeTool the dialog is always shown and the scientist can have the script installed as a tool.
      * @param resourceUri when the user decides to make a tool, we need the source location.
      * @return JOptionPane.OK_OPTION or JOptionPane.CANCEL_OPTION if the user cancels.
      * @throws java.io.IOException
