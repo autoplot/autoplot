@@ -286,8 +286,8 @@ public class JythonUtil {
      * @param file file containing the script.
      * @param fparams parameters for the script.
      * @param makeTool the dialog is always shown and the scientist can have the script installed as a tool.
-     * @param resourceUri when the user decides to make a tool, we need the source location.
-     * @return JOptionPane.OK_OPTION or JOptionPane.CANCEL_OPTION if the user cancels.
+     * @param resourceUri when the scientist decides to make a tool, we need the source location.
+     * @return JOptionPane.OK_OPTION or JOptionPane.CANCEL_OPTION if the scientist cancels.
      * @throws java.io.IOException
      */
     public static int showScriptDialog( 
@@ -382,7 +382,7 @@ public class JythonUtil {
             org.autoplot.jythonsupport.ui.ParametersFormPanel.resetVariables( fd, fparams );
             if ( makeTool ) {
                 assert makeToolPanel!=null;
-                if ( makeToolPanel.isInstall() ) { // the user has requested that the script be installed.
+                if ( makeToolPanel.isInstall() ) { // the scientist has requested that the script be installed.
                     Window w= ScriptContext.getViewWindow();
                     if ( w instanceof AutoplotUI ) {
                         ((AutoplotUI)w).installTool( file, resourceUri );
@@ -399,13 +399,13 @@ public class JythonUtil {
             
             
     /**
-     * invoke the Jython script on another thread.  Script parameters can be passed in, and the user can be 
+     * invoke the Jython script on another thread.  Script parameters can be passed in, and the scientist can be 
      * provided a dialog to set the parameters.  Note this will return before the script is actually
      * executed, and monitor should be used to detect that the script is finished.
      * @param url the address of the script.
      * @param dom if null, then null is passed into the script and the script must not use dom.
      * @param params values for parameters, or null.
-     * @param askParams if true, query the user for parameter settings.
+     * @param askParams if true, query the scientist for parameter settings.
      * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
      * @param mon1 monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
      * @return JOptionPane.OK_OPTION of the script is invoked.
@@ -422,13 +422,13 @@ public class JythonUtil {
     }            
     
     /**
-     * invoke the Jython script on another thread.  Script parameters can be passed in, and the user can be 
+     * invoke the Jython script on another thread.  Script parameters can be passed in, and the scientist can be 
      * provided a dialog to set the parameters.  Note this will return before the script is actually
      * executed, and monitor should be used to detect that the script is finished.
      * @param uri the address of the script.
      * @param dom if null, then null is passed into the script and the script must not use dom.
      * @param vars values for parameters, or null.
-     * @param askParams if true, query the user for parameter settings.
+     * @param askParams if true, query the scientist for parameter settings.
      * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
      * @param mon1 monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
      * @return JOptionPane.OK_OPTION of the script is invoked.
@@ -444,13 +444,13 @@ public class JythonUtil {
     }       
     
     /**
-     * invoke the Jython script on another thread.  Script parameters can be passed in, and the user can be 
+     * invoke the Jython script on another thread.  Script parameters can be passed in, and the scientist can be 
      * provided a dialog to set the parameters.  Note this will return before the script is actually
      * executed, and monitor should be used to detect that the script is finished.
      * @param url the address of the script.
      * @param dom if null, then null is passed into the script and the script must not use dom.
      * @param params values for parameters, or null.
-     * @param askParams if true, query the user for parameter settings.
+     * @param askParams if true, query the scientist for parameter settings.
      * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
      * @param scriptPanel null or place to mark error messages and to mark as running a script.
      * @param mon1 monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
@@ -475,13 +475,13 @@ public class JythonUtil {
     }
     
     /**
-     * invoke the Jython script on another thread.  Script parameters can be passed in, and the user can be 
+     * invoke the Jython script on another thread.  Script parameters can be passed in, and the scientist can be 
      * provided a dialog to set the parameters.  Note this will return before the script is actually
      * executed, and monitor should be used to detect that the script is finished.
      * @param uri the resource URI of the script (without parameters).
      * @param dom if null, then null is passed into the script and the script must not use dom.
      * @param params values for parameters, or null.
-     * @param askParams if true, query the user for parameter settings.
+     * @param askParams if true, query the scientist for parameter settings.
      * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
      * @param scriptPanel null or place to mark error messages and to mark as running a script.
      * @param mon1 monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
@@ -588,7 +588,7 @@ public class JythonUtil {
     }
     
     /**
-     * invoke the Jython script on another thread.  Script parameters can be passed in, and the user can be 
+     * invoke the Jython script on another thread.  Script parameters can be passed in, and the scientist can be 
      * provided a dialog to set the parameters.  Note this will return before the script is actually
      * executed, and monitor should be used to detect that the script is finished.
      * This should be called from the event thread!
@@ -596,7 +596,7 @@ public class JythonUtil {
      * @param file the file which has been downloaded.
      * @param dom if null, then null is passed into the script and the script must not use dom.
      * @param params values for parameters, or null.
-     * @param askParams if true, query the user for parameter settings.
+     * @param askParams if true, query the scientist for parameter settings.
      * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
      * @param scriptPanel null or place to mark error messages and to mark as running a script.
      * @param mon1 monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
