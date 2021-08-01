@@ -367,9 +367,15 @@ public class JythonUtil {
             makeToolPanel= new MakeToolPanel(scriptOkay);
             theP.add( makeToolPanel, BorderLayout.SOUTH );
         } else {
-            theP.add( new JLabel("Make sure this script does not contain malicious code.") );
+            if ( scriptOkay ) {
+                theP.add( new JLabel("You have run this version of the script before."), BorderLayout.SOUTH );
+            } else {
+                JLabel trustedScriptLabel= new JLabel("Make sure this script does not contain malicious code.");
+                trustedScriptLabel.setIcon(AutoplotUI.WARNING_ICON);
+                theP.add( trustedScriptLabel, BorderLayout.SOUTH );
+            }
         }
-                
+        
         int result= AutoplotUtil.showConfirmDialog2( parent, theP, "Run Script "+file.getName(), JOptionPane.OK_CANCEL_OPTION );
         if ( result==JOptionPane.OK_OPTION ) {
             fd=  fpf.getFormData();
