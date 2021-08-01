@@ -229,7 +229,7 @@ public class ParametersFormPanel {
      * @param env environment variables such as PWD and dom.
      * @param f the file containing the script.
      * @param params map containing any settings for the variables.
-     * @param paramsPanel 
+     * @param paramsPanel JPanel to populate with the GUI items. (Can be null.)
      * @return the FormData from the initial view, since some clients will not show a GUI when there are no parameters.
      * @throws java.io.IOException when reading the file.
      */
