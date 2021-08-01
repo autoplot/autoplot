@@ -29,7 +29,8 @@
                 
         <p>Bugfixes (2021-07-31 r25911):</p>
         <ul>
-            <li>StaticCodeAnalysis.showUsage corrects incorrect offsets when cos((myvar)) is used, where the double parens show bug in Jython.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2375/">2375</a>: new code to show "add tool" checkbox on script parameters tab broke GUI in one case.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2374/">2374</a>: StaticCodeAnalysis.showUsage corrects incorrect offsets when cos((myvar)) is used, where the double parens show bug in Jython.
             <li>Binary data source reportOffset uses T and F now, to match other data sources.
             <li>add @see flattenWaveform to synchronizeNN documentation, since the scientist would typically need to flatten the data first.
             <li>Binary data source can read huge binary files (>2GB), though only 2GB at a time.  Thanks, Darrelle!
