@@ -176,6 +176,7 @@ public class RunScriptPanel extends javax.swing.JPanel {
         scriptFilename.setText("<html><i>script filename ");
 
         jLabel2.setText("Make sure the script does not contain malicious code.");
+        jLabel2.setToolTipText("<html>Autoplot keeps track of what scripts you have run, and when <br>things change with a script you will be asked to verify<br>the script.  Scripts can be made which delete files, so be<br>sure to only run scripts from people you trust.\n");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);

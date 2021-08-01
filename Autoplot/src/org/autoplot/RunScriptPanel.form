@@ -80,6 +80,7 @@
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>
         <Property name="text" type="java.lang.String" value="Make sure the script does not contain malicious code."/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Autoplot keeps track of what scripts you have run, and when &lt;br&gt;things change with a script you will be asked to verify&lt;br&gt;the script.  Scripts can be made which delete files, so be&lt;br&gt;sure to only run scripts from people you trust.&#xa;"/>
       </Properties>
     </Component>
   </SubComponents>
