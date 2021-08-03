@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>New qubeSubset Das2Server keyword drops records which would prevent the data from being a qube.
+        <p><small>Unpushed change which caused a bug in the ASCII reader was pushed unknowingly.  Jenkins caught it but wasn't sending emails.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,8 +27,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-07-31 r25911):</p>
+        <p>Bugfixes (2021-08-03 r25919):</p>
         <ul>
+            <li>Unpushed change which caused a bug in the ASCII reader was pushed unknowingly and was never tested in last devel release.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2375/">2375</a>: new code to show "add tool" checkbox on script parameters tab broke GUI in one case.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2374/">2374</a>: StaticCodeAnalysis.showUsage corrects incorrect offsets when cos((myvar)) is used, where the double parens show bug in Jython.
             <li>Binary data source reportOffset uses T and F now, to match other data sources.
