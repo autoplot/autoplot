@@ -31,9 +31,9 @@
         <ul>
             <li>Unpushed change which caused a bug in the ASCII reader was pushed unknowingly and was never tested in last devel release.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2375/">2375</a>: new code to show "add tool" checkbox on script parameters tab broke GUI in one case.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2374/">2374</a>: StaticCodeAnalysis.showUsage corrects incorrect offsets when cos((myvar)) is used, where the double parens show bug in Jython.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2374/">2374</a>: StaticCodeAnalysis.showUsage corrects incorrect offsets when cos((myvar)) is used, where the double parens show bug in Jython.  Thanks, Sadie!
             <li>Binary data source reportOffset uses T and F now, to match other data sources.
-            <li>add @see flattenWaveform to synchronizeNN documentation, since the scientist would typically need to flatten the data first.
+            <li>add @see flattenWaveform to synchronizeNN documentation, since the scientist would typically need to flatten the data first.  Thanks, Sadie!
             <li>Binary data source can read huge binary files (>2GB), though only 2GB at a time.  Thanks, Darrelle!
             <li>Initial Bookmarks GUI would allow the description and title to be modified, even though no bookmark was selected, causing confusion.
             <li>Data Mash-up tool supports "None" as a parameter, allowing "fftPower" function to be used.  Thanks, Andrei!
@@ -42,7 +42,7 @@
             <li>if series color scatter data zunits were not convertible to colorbar units, the data was not displayed and no warning message was printed.  Thanks, Sadie!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2369/">2369</a>: ASCII file reader treats non-breaking spaces, from copying data in email, as whitespace.  Thanks, Sadie!
         </ul>
-        <p>Older Bugfixes (2021-06-22 r25825):</p>
+        <p>Older Bugfixes (2021-07-06 r25854):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/1043/">1043</a>: don't throw error when double question marks found, just issue warning.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2367/">2367</a>: export from slicer allows Autoplot to format the data, but the options were ignored.  Thanks, George!
@@ -52,8 +52,8 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li><a href="https://github.com/das-developers/das2java/issues/17">17</a>: Support for &lt;b&gt; for bold (&lt;/b&gt; to turn off) and &lt;i&gt; for italics in labels.
-            <li>add plots with multiple rows finally supports replace current.
+            <li><a href="https://github.com/das-developers/das2java/issues/17">17</a>: Support for &lt;b&gt; for bold (&lt;/b&gt; to turn off) and &lt;i&gt; for italics in labels.  Thanks, Chris!
+            <li>add plots with multiple rows finally supports replace current.  Thanks, Ivar!
             <li>Introduce dom.controller.selectedPlots property.  See <a href='https://github.com/autoplot/dev/blob/master/demos/tools/layout/joinPlots.jy'>joinPlots.jy</a> for example use.
             <li>Introduce new qubeSubset which will throw out data until the non-qube can be represented as a qube, to assist with the Das2Server.  Thanks, Terry!
             <li><a href="https://github.com/autoplot/documentation/issues/1">1</a>: use "run" where "execute" is unnecessarily used.
