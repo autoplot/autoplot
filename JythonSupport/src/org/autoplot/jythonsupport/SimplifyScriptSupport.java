@@ -693,8 +693,10 @@ public class SimplifyScriptSupport {
      * there are a number of functions which take a trivial amount of time to execute and are needed for some scripts, such as the
      * string.upper() function. The commas are to guard against the id being a subset of another id ("lower," does not match
      * "lowercase"). TODO: update this after Python upgrade.
+     * @see JythonUtil#okay
      */
-    private static final String[] okay = new String[]{"range,", "xrange,", "irange,",
+    private static final String[] okay = new String[]{
+        "range,", "xrange,", "irange,","map,","join,",
         "getParam,", "lower,", "upper,", "URI,", "URL,",
         "setScriptDescription", "setScriptTitle", "setScriptLabel", "setScriptIcon",
         "DatumRangeUtil,", "TimeParser,",
@@ -703,8 +705,9 @@ public class SimplifyScriptSupport {
         "ones,", "zeros,",
         "linspace,", "logspace,",
         "dblarr,", "fltarr,", "strarr,", "intarr,", "bytarr,",
-        "ripples,",
+        "ripples,","split,", 
         "color,", "colorFromString,", "isinstance,"};
+ 
     private static final Set<String> okaySet = new HashSet<>();
 
     static {
