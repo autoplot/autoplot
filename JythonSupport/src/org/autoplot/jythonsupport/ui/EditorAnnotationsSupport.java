@@ -374,7 +374,7 @@ public class EditorAnnotationsSupport {
                         mark= new SimpleMarker( lightBackground ? Color.YELLOW : new Color(120,120,0) );
                         break;
                     case ANNO_CODE_HINT:
-                        mark= new SimpleMarker( lightBackground ? new Color(255,255,0,80) : new Color(120,120,0,80) );
+                        mark= new SimpleMarker( lightBackground ? new Color(255,255,0,80) : new Color(255,255,0,80) );
                         break;
                     case ANNO_USAGE:
                         mark= new SimpleMarker( lightBackground ? Color.GREEN.brighter() : new Color(0,100,0) );
