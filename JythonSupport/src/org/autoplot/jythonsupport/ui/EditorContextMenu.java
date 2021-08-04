@@ -56,8 +56,9 @@ public class EditorContextMenu {
     private DataSetSelector dataSetSelector;
     private JMenu examplesMenu;
     private JMenu jumpToMenu;
-    private int jumpToMenuPosition;
     private JMenu actionsMenu;
+    private JMenu settingsMenu;
+    private int jumpToMenuPosition;
     private int menuInsertIndex= 0;
     private int menuInsertCount= 0;
     
@@ -113,6 +114,14 @@ public class EditorContextMenu {
     
     /**
      * add the menu or menuitem to the actions menu.
+     * @param menuitem
+     */
+    public void addSettingsMenuItem( JMenuItem menuitem ) {        
+        settingsMenu.add(menuitem);
+    }
+    
+    /**
+     * add the menu or menuitem to the menu. separators will be added.
      * @param menuitem
      */
     public void addMenuItem( JMenuItem menuitem ) {
@@ -729,7 +738,7 @@ public class EditorContextMenu {
             
             menu.add( actionsMenu );
             
-            JMenu settingsMenu= new JMenu("Settings");
+            settingsMenu= new JMenu("Settings");
             mi= new JMenuItem( new AbstractAction("Edit Settings") {
                 @Override
                 public void actionPerformed(ActionEvent e) {

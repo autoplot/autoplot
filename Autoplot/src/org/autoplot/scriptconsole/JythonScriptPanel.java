@@ -725,6 +725,14 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
      * add the menu or menu item to the editor context menu.
      * @param menu 
      */
+    public void addSettingsMenuItem( JMenuItem menu ) {
+        this.menu.addSettingsMenuItem(menu);
+    }    
+    
+    /**
+     * add the menu or menu item to the editor context menu.
+     * @param menu 
+     */
     public void addMenuItem( JMenuItem menu ) {
         this.menu.addMenuItem(menu);
     }

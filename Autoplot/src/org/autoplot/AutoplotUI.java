@@ -6438,11 +6438,13 @@ APSplash.checkTime("init 240");
                     BookmarksManager bm= new BookmarksManager(AutoplotUI.this,true,"editor");
                     bm.setPrefNode("editor");
                     bm.setVisible(true);
+                    
+                    System.err.println("----");
                 }
             } );
         mi.setToolTipText( "add scripts for editor actions" );
 
-        scriptPanel.addMenuItem( mi );
+        scriptPanel.addSettingsMenuItem( mi );
         
         File f= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "bookmarks" );
         f= new File( f.toString(), "editor.xml" );
