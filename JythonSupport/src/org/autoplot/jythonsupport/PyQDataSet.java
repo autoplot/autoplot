@@ -902,13 +902,6 @@ public class PyQDataSet extends PyJavaInstance {
             fill= -1e38;
         }
         double dfill= fill.doubleValue();
-
-        UnitsConverter uc;
-        try {
-            uc= SemanticOps.getUnits(val).getConverter(units);
-        } catch ( InconvertibleUnitsException ex ) {
-            uc= UnitsConverter.IDENTITY;
-        }
                 
         // see org.das2.qds.ops.CoerceUtil, make version that makes iterators.
         if ( val.rank()==0 ) {
