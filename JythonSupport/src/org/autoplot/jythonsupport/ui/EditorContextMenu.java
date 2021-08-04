@@ -69,6 +69,10 @@ public class EditorContextMenu {
     private JMenu jumpToMenu;
     private int jumpToMenuPosition;
     private JMenu actionsMenu;
+    private int menuInsertIndex= 0;
+    private int menuInsertCount= 0;
+    
+    private static int BASE_INSERT_INDEX=5;
     
     public EditorContextMenu( EditorTextPane edit  ) {
         this.editor = edit;
@@ -129,7 +133,13 @@ public class EditorContextMenu {
      * @param menuitem
      */
     public void addMenuItem( JMenuItem menuitem ) {
-        actionsMenu.add(menuitem);
+        //actionsMenu.add(menuitem);
+        if ( menuInsertCount==0 ) {
+            menu.add( new javax.swing.JSeparator(), BASE_INSERT_INDEX);
+        }
+        menu.add(menuitem, BASE_INSERT_INDEX+menuInsertIndex);
+        menuInsertIndex++;
+        menuInsertCount++;
     }
     
     private void doRebuildJumpToMenu() {
