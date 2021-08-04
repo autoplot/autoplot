@@ -1271,6 +1271,30 @@ public class PyQDataSet extends PyJavaInstance {
         return this.rods.rank()==0;
     }
 
+    private void putValue( WritableDataSet ds, int i, double v, Units u ) {
+        Units dsu= SemanticOps.getUnits(ds.slice(i));
+        UnitsConverter uc= u.getConverter( dsu );
+        ds.putValue( i, uc.convert(v) );
+    }
+
+    private void putValue( WritableDataSet ds, int i, int j, double v, Units u ) {
+        Units dsu= SemanticOps.getUnits(ds.slice(i).slice(j));
+        UnitsConverter uc= u.getConverter( dsu );
+        ds.putValue( i, j, uc.convert(v) );
+    }
+    
+    private void putValue( WritableDataSet ds, int i, int j, int k, double v, Units u ) {
+        Units dsu= SemanticOps.getUnits(ds.slice(i).slice(j).slice(k));
+        UnitsConverter uc= u.getConverter( dsu );
+        ds.putValue( i, j, k, uc.convert(v) );
+    }
+    
+    private void putValue( WritableDataSet ds, int i, int j, int k, int l, double v, Units u ) {
+        Units dsu= SemanticOps.getUnits(ds.slice(i).slice(j).slice(k).slice(l) );
+        UnitsConverter uc= u.getConverter( dsu );
+        ds.putValue( i, j, k, l, uc.convert(v) );
+    }
+
     /**
      * handle special case where rank 1 datasets are used to index a rank N array.
      * @param lists datasets of rank 0 or rank 1
@@ -1287,7 +1311,7 @@ public class PyQDataSet extends PyJavaInstance {
             lists[0]= ll[0];
             lists[i]= ll[1];
         }
-        for ( int i=1; i<lists.length; i++) {
+        for ( int i=1; i<lists.length; i++) {  // TODO: I suspect SVN merge duplicated this code.
             ll[1]= lists[i];
             CoerceUtil.coerce( ll[0], ll[1], false, ll );
             lists[0]= ll[0];
@@ -1295,33 +1319,37 @@ public class PyQDataSet extends PyJavaInstance {
         }
         CoerceUtil.coerce( ll[0], val, false, ll );
         val= ll[1];
+        
+        Units valUnits= SemanticOps.getUnits(val);
+        
         QubeDataSetIterator it = new QubeDataSetIterator( val );
-
+                
         switch (lists[0].rank()) {  // all datasets in lists[] will have the same rank.
             case 0:
                 switch (ds.rank()) {
                     case 1:
                         it.next();
-                        ds.putValue( (int)lists[0].value(), it.getValue(val));
+                        putValue( ds, (int)lists[0].value(), it.getValue(val), valUnits );
                         break;
                     case 2:
                         it.next();
-                        ds.putValue( (int)lists[0].value(), (int)lists[1].value(), it.getValue(val));
+                        ds.value(  (int)lists[0].value(), (int)lists[1].value() );
+                        putValue( ds, (int)lists[0].value(), (int)lists[1].value(), it.getValue(val), valUnits );
                         break;
                     case 3: 
                         it.next();
-                        ds.putValue(
+                        putValue( ds,
                             (int)lists[0].value(),
                             (int)lists[1].value(),
-                            (int)lists[2].value(), it.getValue(val));
+                            (int)lists[2].value(), it.getValue(val), valUnits );
                         break;
                     case 4:
                         it.next();
-                        ds.putValue( 
+                        putValue(ds, 
                             (int)lists[0].value(),
                             (int)lists[1].value(),
                             (int)lists[2].value(),
-                            (int)lists[3].value(), it.getValue(val));
+                            (int)lists[3].value(), it.getValue(val), valUnits );
                         break;
                     default:
                         break;
@@ -1332,32 +1360,32 @@ public class PyQDataSet extends PyJavaInstance {
                     case 1:
                         for ( int i=0;i<n;i++ ) {
                             it.next();
-                            ds.putValue( (int)lists[0].value(i), it.getValue(val));
+                            putValue( ds, (int)lists[0].value(i), it.getValue(val), valUnits );
                         }
                         break;
                     case 2:
                         for ( int i=0;i<n;i++ ) {
                             it.next();
-                            ds.putValue( (int)lists[0].value(i), (int)lists[1].value(i), it.getValue(val));
+                            putValue( ds, (int)lists[0].value(i), (int)lists[1].value(i), it.getValue(val), valUnits );
                         }
                         break;
                     case 3:
                         for ( int i=0;i<n;i++ ) {
                             it.next();
-                            ds.putValue( 
+                            putValue( ds, 
                                 (int)lists[0].value(i),
                                 (int)lists[1].value(i),
-                                (int)lists[2].value(i), it.getValue(val));
+                                (int)lists[2].value(i), it.getValue(val), valUnits );
                         }
                         break;
                     case 4:
                         for ( int i=0;i<n;i++ ) {
                             it.next();
-                            ds.putValue( 
+                            putValue( ds,
                                 (int)lists[0].value(i),
                                 (int)lists[1].value(i),
                                 (int)lists[2].value(i),
-                                (int)lists[3].value(i), it.getValue(val));
+                                (int)lists[3].value(i), it.getValue(val), valUnits );
                         }
                         break;
                     default:
@@ -1370,39 +1398,37 @@ public class PyQDataSet extends PyJavaInstance {
                         while ( it.hasNext() ) {
                             it.next();
                             iter.next();
-                            double d= it.getValue(val);
-                            ds.putValue( (int)iter.getValue( lists[0] ), d );
+                            putValue( ds, (int)iter.getValue( lists[0] ), it.getValue(val), valUnits );
                         }
                         break;
                     case 2:
                         while ( it.hasNext() ) {
                             it.next();
                             iter.next();
-                            double d= it.getValue(val);
-                            ds.putValue( (int)iter.getValue( lists[0] ), (int)iter.getValue( lists[1] ), d );
+                            putValue( ds, 
+                                (int)iter.getValue( lists[0] ), 
+                                (int)iter.getValue( lists[1] ), it.getValue(val), valUnits );
                         }
                         break;
                     case 3:
                         while ( it.hasNext() ) {
                             it.next();
                             iter.next();
-                            double d= it.getValue(val);
-                            ds.putValue(
+                            putValue( ds,
                                 (int)iter.getValue( lists[0] ),
                                 (int)iter.getValue( lists[1] ), 
-                                (int)iter.getValue( lists[2] ), d );
+                                (int)iter.getValue( lists[2] ), it.getValue(val), valUnits );
                         }
                         break;
                     case 4:
                         while ( it.hasNext() ) {
                             it.next();
                             iter.next();
-                            double d= it.getValue(val);
-                            ds.putValue(
+                            putValue( ds,
                                 (int)iter.getValue(lists[0]), 
                                 (int)iter.getValue(lists[1]),
                                 (int)iter.getValue(lists[2]), 
-                                (int)iter.getValue(lists[3]), d );
+                                (int)iter.getValue(lists[3]), it.getValue(val), valUnits );
                         }
                         break;
                 }   break;
