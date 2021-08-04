@@ -1235,14 +1235,15 @@ public class JythonCompletionTask implements CompletionTask {
     private static void doPyReflectedFunction( String ss, PyReflectedFunction prf, List<String> labels, List<String> signatures, List<String> argss ) {
         PyReflectedFunctionPeeker peek = new PyReflectedFunctionPeeker(prf);
         for ( int jj=0; jj<peek.getArgsCount(); jj++ ) {
-            String signature = methodSignature(peek.getMethod(jj));
-            String args = methodArgs(peek.getMethod(jj));
+            Method method1= peek.getMethod(jj);
+            String signature = methodSignature(method1);
+            String args = methodArgs(method1);
             int j= signature.indexOf("#");
             String label= ss + "() JAVA";
             if ( j>-1 ) {
                 label= signature.substring(j+1);
                 label= hideJavaPaths( label );
-                Class ret= peek.getMethod(0).getReturnType();
+                Class ret= method1.getReturnType();
                 label= label + "->" + hideJavaPaths( ret.getCanonicalName() );
             }
             signatures.add(signature);
