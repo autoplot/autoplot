@@ -931,7 +931,7 @@ public class PyQDataSet extends PyJavaInstance {
                     iter.putValue(ds, dfill);
                     resultHasFill= true;
                 } else {
-                    iter.putRank0Value( ds, val );
+                    iter.putRank0Value( ds, it.getRank0Value(val) );
                 }
             }
             if ( iter.hasNext() ) {
