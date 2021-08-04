@@ -919,10 +919,9 @@ public class PyQDataSet extends PyJavaInstance {
                     resultHasFill= true;
                 }
             } else {
-                double d = uc.convert(val.value());
                 while (iter.hasNext()) {
                     iter.next();
-                    iter.putValue(ds, d);
+                    iter.putRank0Value(ds, val );
                 }
             }
         } else if ( val.rank()!=iter.rank() ) {
@@ -936,12 +935,10 @@ public class PyQDataSet extends PyJavaInstance {
                 iter.next();
                 double w = it.getValue(wds);
                 if ( w==0 ) {
-                    double d = dfill;
-                    iter.putValue(ds, d);
+                    iter.putValue(ds, dfill);
                     resultHasFill= true;
                 } else {
-                    double d = uc.convert(it.getValue(val));
-                    iter.putValue(ds, d);
+                    iter.putRank0Value( ds, val );
                 }
             }
             if ( iter.hasNext() ) {
@@ -1333,7 +1330,6 @@ public class PyQDataSet extends PyJavaInstance {
                         break;
                     case 2:
                         it.next();
-                        ds.value(  (int)lists[0].value(), (int)lists[1].value() );
                         putValue( ds, (int)lists[0].value(), (int)lists[1].value(), it.getValue(val), valUnits );
                         break;
                     case 3: 
