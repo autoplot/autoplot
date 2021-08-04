@@ -250,7 +250,7 @@ public class Util {
      * load the data specified by URL into Autoplot's internal data model.  This will
      * block until the load is complete, and a ProgressMonitor object can be used to
      * monitor the load.
-     * @param suri the data address to load.
+     * @param suri the URI of the dataset, such as "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
      * @param mon a progress monitor to monitor the load, or null (None in Jython)
      * @return the dataset, or null.
      * @throws java.lang.Exception plug-in readers can throw exception.
@@ -523,7 +523,7 @@ public class Util {
     /**
      * load the data specified by URI into Autoplot's internal data model.  This will
      * block until the load is complete.
-     * @param suri the data address to load.
+     * @param suri the URI of the dataset, such as "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
      * @return null or dataset for the URI.
      * @throws Exception depending on data source.
      */
@@ -534,7 +534,7 @@ public class Util {
     /**
      * load the data specified by URI into Autoplot's internal data model.  This will
      * block until the load is complete.
-     * @param suri data URI like "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
+     * @param suri the URI of the dataset, such as "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
      * @param stimerange timerange like "2012-02-02/2012-02-03"
      * @return null or data set for the URI.
      * @throws Exception depending on data source.
@@ -546,7 +546,7 @@ public class Util {
     /**
      * load the data specified by URI into Autoplot's internal data model.  This will
      * block until the load is complete.
-     * @param suri data URI like "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
+     * @param suri the URI of the dataset, such as "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
      * @param timerange timerange object
      * @return null or data set for the URI.
      * @throws Exception depending on data source.
