@@ -2,38 +2,31 @@
 package org.autoplot.jythonsupport.ui;
 
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
-import java.awt.Dimension;
 import java.awt.Font;
 import org.das2.components.propertyeditor.PropertyEditor;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Element;
-import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.SyntaxStyle;
 import jsyntaxpane.SyntaxStyles;
 import jsyntaxpane.actions.ActionUtils;
@@ -46,13 +39,9 @@ import org.das2.util.LoggerManager;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.jythonsupport.JavaJythonConverter;
-import org.autoplot.jythonsupport.JythonToJavaConverter;
-import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.MathematicaJythonConverter;
 import static org.das2.jythoncompletion.JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
-import org.python.parser.SimpleNode;
-import org.python.parser.ast.Name;
 
 /**
  *
@@ -72,58 +61,52 @@ public class EditorContextMenu {
     private int menuInsertIndex= 0;
     private int menuInsertCount= 0;
     
-    private static int BASE_INSERT_INDEX=5;
+    private static final int BASE_INSERT_INDEX=5;
     
     public EditorContextMenu( EditorTextPane edit  ) {
         this.editor = edit;
         maybeCreateMenu();
 
-        JythonCompletionProvider.getInstance().settings().addPropertyChangeListener( new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                switch (evt.getPropertyName()) {
-                    case CompletionSettings.PROP_EDITORFONT:
-                        editor.setFont( Font.decode((String)evt.getNewValue() ) );
-                        break;
-                    case CompletionSettings.PROP_TABISSPACES:
-                        {
-                            boolean tabIsSpaces= (Boolean)evt.getNewValue();
-                            Action get = ActionUtils.getAction( editor, IndentAction.class );
-                            if ( get==null ) {
-                                logger.warning("Expected to find IndentAction");
-                            } else {
-                                ((IndentAction)get).setInsertTab(!tabIsSpaces);
-                            }       break;
-                        }
-                    case CompletionSettings.PROP_TAB_IS_COMPLETION:
-                        {
-                            boolean tabIsCompletion= (Boolean)evt.getNewValue();
-                            Action get = ActionUtils.getAction( editor, IndentAction.class );
-                            if ( get==null ) {
-                                logger.warning("Expected to find IndentAction");
-                            } else {
-                                ((IndentAction)get).setInsertTab(!tabIsCompletion);
-                            }       break;
-                        }
-                    case CompletionSettings.PROP_SHOWTABS:
-                        SyntaxStyle deflt= SyntaxStyles.getInstance().getStyle(null);
-                        boolean value= (Boolean)evt.getNewValue();
-                        deflt.setDrawTabs(value);
-                        editor.repaint();
-                        break;
-                    default:
-                        break;
+        JythonCompletionProvider.getInstance().settings().addPropertyChangeListener((PropertyChangeEvent evt) -> {
+            switch (evt.getPropertyName()) {
+                case CompletionSettings.PROP_EDITORFONT:
+                    editor.setFont( Font.decode((String)evt.getNewValue() ) );
+                    break;
+                case CompletionSettings.PROP_TABISSPACES:
+                {
+                    boolean tabIsSpaces= (Boolean)evt.getNewValue();
+                    Action get = ActionUtils.getAction( editor, IndentAction.class );
+                    if ( get==null ) {
+                        logger.warning("Expected to find IndentAction");
+                    } else {
+                        ((IndentAction)get).setInsertTab(!tabIsSpaces);
+                    }       break;
                 }
-            } 
+                case CompletionSettings.PROP_TAB_IS_COMPLETION: 
+                {
+                    boolean tabIsCompletion= (Boolean)evt.getNewValue();
+                    Action get = ActionUtils.getAction( editor, IndentAction.class );
+                    if ( get==null ) {
+                        logger.warning("Expected to find IndentAction");
+                    } else {
+                        ((IndentAction)get).setInsertTab(!tabIsCompletion);
+                    }       break;
+                }
+                case CompletionSettings.PROP_SHOWTABS:
+                    SyntaxStyle deflt= SyntaxStyles.getInstance().getStyle(null);
+                    boolean value= (Boolean)evt.getNewValue();
+                    deflt.setDrawTabs(value);
+                    editor.repaint();
+                    break;
+                default:
+                    break;
+            }
         });
 
         editor.setComponentPopupMenu(menu); // override the default popup for the editor.
         
-        menu.addPropertyChangeListener( "visible", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                doRebuildJumpToMenu();
-            }
+        menu.addPropertyChangeListener("visible", (PropertyChangeEvent evt) -> {
+            doRebuildJumpToMenu();
         });
 
     }
@@ -170,12 +153,9 @@ public class EditorContextMenu {
 
             } ) );
         }
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                actionsMenu.remove(jumpToMenuPosition);
-                actionsMenu.add( tree, jumpToMenuPosition );
-            }
+        Runnable run= () -> {
+            actionsMenu.remove(jumpToMenuPosition);
+            actionsMenu.add( tree, jumpToMenuPosition );
         };
         run.run();
 
@@ -503,56 +483,46 @@ public class EditorContextMenu {
 
             JMenuItem printMenuItem= new JMenuItem( "Print" );
             printMenuItem.setToolTipText("Print to printer");
-            printMenuItem.addActionListener( new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        editor.print();
-                    } catch (PrinterException ex) {
-                        Logger.getLogger(EditorContextMenu.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+            printMenuItem.addActionListener((ActionEvent e) -> {
+                try {
+                    editor.print();
+                } catch (PrinterException ex) {
+                    Logger.getLogger(EditorContextMenu.class.getName()).log(Level.SEVERE, null, ex);
                 }
             });
             actionsMenu.add(printMenuItem);
 
             JMenuItem runMenuItem= new JMenuItem( "Run Selected" );
             runMenuItem.setToolTipText("Run Selected Commands");
-            runMenuItem.addActionListener( new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    final String doThis= editor.getSelectedText();
-                    if ( doThis==null ) {
-                        JOptionPane.showMessageDialog( editor, "Select portion of the code to execute");
-                        return;
-                    }
-                    String[] sss= doThis.split("\n");
-                    for ( String s: sss ) {
-                        if ( s.length()>0 && Character.isWhitespace(s.charAt(0)) ) {
-                            JOptionPane.showMessageDialog( menu, "Sorry no indents" );
-                            return;
-                        }
-                    }
-                    final JythonInterpreterProvider pp =
-                            (JythonInterpreterProvider) editor.getClientProperty(CLIENT_PROPERTY_INTERPRETER_PROVIDER);
-                    if ( pp==null ) {
-                        JOptionPane.showMessageDialog( menu, "Sorry no Jython session to run commands" );
-                        return;
-                    }
-
-                    Runnable run= new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                pp.createInterpreter().exec(doThis);
-                            } catch (IOException ex) {
-                                logger.log(Level.SEVERE, null, ex);
-                            }
-                        }                            
-                    };
-
-                    new Thread(run).start();
-
+            runMenuItem.addActionListener((ActionEvent e) -> {
+                final String doThis= editor.getSelectedText();
+                if ( doThis==null ) {
+                    JOptionPane.showMessageDialog( editor, "Select portion of the code to execute");
+                    return;
                 }
+                String[] sss= doThis.split("\n");
+                for ( String s: sss ) {
+                    if ( s.length()>0 && Character.isWhitespace(s.charAt(0)) ) {
+                        JOptionPane.showMessageDialog( menu, "Sorry no indents" );
+                        return;
+                    }
+                }
+                final JythonInterpreterProvider pp =
+                        (JythonInterpreterProvider) editor.getClientProperty(CLIENT_PROPERTY_INTERPRETER_PROVIDER);
+                if ( pp==null ) {
+                    JOptionPane.showMessageDialog( menu, "Sorry no Jython session to run commands" );
+                    return;
+                }
+                
+                Runnable run= () -> {
+                    try {
+                        pp.createInterpreter().exec(doThis);
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                };
+                
+                new Thread(run).start();
             });
             actionsMenu.add(runMenuItem);
             
