@@ -1301,7 +1301,7 @@ public class PyQDataSet extends PyJavaInstance {
             lists[0]= ll[0];
             lists[i]= ll[1];
         }
-        for ( int i=1; i<lists.length; i++) {  // TODO: I suspect SVN merge duplicated this code.
+        for ( int i=1; i<lists.length; i++) {  // This repeat code is intentional, I believe in the case where coerce happens later.
             ll[1]= lists[i];
             CoerceUtil.coerce( ll[0], ll[1], false, ll );
             lists[0]= ll[0];
