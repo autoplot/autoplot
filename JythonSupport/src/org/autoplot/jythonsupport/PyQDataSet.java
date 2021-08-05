@@ -51,14 +51,14 @@ import org.das2.qds.ops.CoerceUtil;
  *
  * @author jbf
  */
-public class PyQDataSet extends PyJavaInstance {
+public final class PyQDataSet extends PyJavaInstance {
 
     private static final Logger logger= Logger.getLogger("jython");
 
     WritableDataSet ds;
     MutablePropertyDataSet mpds;
     QDataSet rods; // read-only dataset
-    Units units; // indicates if the units have been set.
+    Units units; // indicates if the units have been set.  If the data is a bundle, this should not be set.
     int serialNumber;
     
     private static final AtomicInteger _seq= new AtomicInteger(1000);
@@ -745,6 +745,21 @@ public class PyQDataSet extends PyJavaInstance {
     }
 
     /**
+     * returns null if the data does not have a bundle, otherwise the bundle is returned.
+     * @return 
+     */
+    private QDataSet getBundle() {
+        QDataSet bds;
+        if ( this.ds.rank()==1 ) {
+            bds = (QDataSet) this.ds.property(QDataSet.BUNDLE_0);
+        } else {
+            bds = (QDataSet) this.ds.property(QDataSet.BUNDLE_1);
+        }
+        return bds;
+        
+    }
+    
+    /**
      * Assign the values to the indeces specified.  
      * Note, if the value has units and the PyQDataSet does not yet have units, 
      * then the units are assigned.
@@ -831,10 +846,21 @@ public class PyQDataSet extends PyJavaInstance {
                 if (units == null) { // see repeat code below.  Return requires repetition.
                     logger.fine("resetting units based on values assigned");
                     Units u = SemanticOps.getUnits(val);
-                    if (u != Units.dimensionless) {
-                        this.ds.putProperty(QDataSet.UNITS, u);
+                    if ( u!=Units.dimensionless ) {
+                        if ( getBundle()==null ) {
+                            this.ds.putProperty(QDataSet.UNITS, u);
+                            units = u;
+                        } else {
+                            MutablePropertyDataSet bds= (MutablePropertyDataSet) getBundle();
+                            if ( bds!=null && ds.rank()==2 ) {
+                                int column= (int)lists[1].value() ;
+                                Units columnUnits= (Units)bds.property( QDataSet.UNITS, column );
+                                if ( columnUnits==null ) {
+                                    bds.putProperty( QDataSet.UNITS, column, u );
+                                }
+                            }
+                        }
                     }
-                    units = u;
                 }
                 setItemAllLists(lists, val);
 
@@ -883,8 +909,10 @@ public class PyQDataSet extends PyJavaInstance {
         if ( units==null ) { // see repeat code above.
             logger.fine("resetting units based on values assigned");
             Units u= SemanticOps.getUnits(val);
-            if ( u!=Units.dimensionless ) this.ds.putProperty(QDataSet.UNITS,u);
-            units= u;
+            if ( getBundle()==null && u!=Units.dimensionless ) {
+                this.ds.putProperty(QDataSet.UNITS,u);
+                units= u;
+            }
         }
         
         // figure out what the fill value will be.
@@ -1129,7 +1157,7 @@ public class PyQDataSet extends PyJavaInstance {
                         } else {
                             // do not attempt to interpret this with is dataset's units because it might be intentionally dimensionless.
                             return DataSetUtil.asDataSet(DatumUtil.parse(arg0.toString()));
-                        }
+                        }  
                     } else {
                         return DataSetUtil.asDataSet(DatumUtil.parse(arg0.toString()));
                     }
@@ -1311,7 +1339,7 @@ public class PyQDataSet extends PyJavaInstance {
         val= ll[1];
         
         Units valUnits= SemanticOps.getUnits(val);
-        
+                
         QubeDataSetIterator it = new QubeDataSetIterator( val );
                 
         switch (lists[0].rank()) {  // all datasets in lists[] will have the same rank.
