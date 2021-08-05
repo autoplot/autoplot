@@ -828,7 +828,6 @@ public class PyQDataSet extends PyJavaInstance {
             if (allLists) {
                 QDataSet val = coerceDsInternal(arg1);
                 lists = checkIndexBundle(lists);
-                setItemAllLists(lists, val);
                 if (units == null) { // see repeat code below.  Return requires repetition.
                     logger.fine("resetting units based on values assigned");
                     Units u = SemanticOps.getUnits(val);
@@ -837,6 +836,7 @@ public class PyQDataSet extends PyJavaInstance {
                     }
                     units = u;
                 }
+                setItemAllLists(lists, val);
 
                 return;
 
