@@ -28,6 +28,9 @@ import org.autoplot.datasource.DefaultTimeSeriesBrowse;
 import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.das2.datum.Datum;
+import org.das2.datum.TimeUtil;
+import org.das2.datum.Units;
 
 /**
  * Create a CDAWebDataSource.  The source contains knowledge of the CDAWeb database, knowing
@@ -75,26 +78,16 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
                             ds= ds.toUpperCase();
                             CDAWebDB db= CDAWebDB.getInstance();
                             
-                            String tr= db.getTimeRange(ds);
-                            
-                            String tmpl= db.getNaming(ds);
-                            String base= db.getBaseUrl(ds);
-                            
-                            FileSystem fs= FileSystem.create( new URI( base ) );
-                            FileStorageModel fsm= FileStorageModel.create( fs, tmpl );
-                            
-                            DatumRange dr= DatumRangeUtil.parseTimeRangeValid(tr);
-                            String[] names= fsm.getNamesFor(dr);  //TODO: this could be slow
-                            String name= names.length>1 ? names[1] : names[0];
-                            DatumRange one= fsm.getRangeFor(name);
+                            String tr= db.getSampleTime(ds);
                             
                             List<CompletionContext> ccresult= new ArrayList<>();
-                            String key= one.toString().replaceAll(" ","+");
+                            String key= tr.replaceAll(" ","+");
                             CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, key, this, null, key, key, true  );
                             ccresult.add(cc1);
                             return ccresult;
                             
-                        }       break;
+                        }       
+                        break;
                     }
                 case "id":
                     {
