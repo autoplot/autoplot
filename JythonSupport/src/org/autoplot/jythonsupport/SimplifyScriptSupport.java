@@ -22,6 +22,7 @@ import org.python.parser.ast.Assign;
 import org.python.parser.ast.Attribute;
 import org.python.parser.ast.BinOp;
 import org.python.parser.ast.Call;
+import org.python.parser.ast.Compare;
 import org.python.parser.ast.Expr;
 import org.python.parser.ast.Index;
 import org.python.parser.ast.Name;
@@ -474,8 +475,7 @@ public class SimplifyScriptSupport {
                 logger.finest(String.format("%04d canResolve->false: %s", o.beginLine, o.toString()));
                 return false;
             }
-        }
-        if (o instanceof Attribute) {
+        } else if (o instanceof Attribute) {
             Attribute at = (Attribute) o;
             while (at.value instanceof Attribute || at.value instanceof Subscript) {
                 if (at.value instanceof Attribute) {
@@ -489,12 +489,34 @@ public class SimplifyScriptSupport {
                     }
                 }
             }
-            if (at.value instanceof Name) {
-                Name n = (Name) at.value;
-                if (!variableNames.contains(n.id)) {
+            if ( !simplifyScriptToGetCompletionsCanResolve( at.value, variableNames ) ) {
+                return false;
+            }
+        } else if ( o instanceof Compare ) {
+            Compare c = (Compare)o;
+            if ( simplifyScriptToGetCompletionsCanResolve( c.left, variableNames ) ) {
+                for ( exprType e : c.comparators ) {
+                    if ( ! simplifyScriptToGetCompletionsCanResolve( e, variableNames ) ) {
+                        return false;
+                    }
+                }
+                return true;
+            } else {
+                return false;
+            }
+                  
+        } else if ( o instanceof Call ) {
+            Call c = (Call)o;
+            if ( !simplifyScriptToGetCompletionsCanResolve( c.func, variableNames ) ) {
+                return false;
+            }
+            for ( exprType e : c.args ) {
+                if ( ! simplifyScriptToGetCompletionsCanResolve( e, variableNames ) ) {
                     return false;
                 }
             }
+
+              
         }
         MyVisitorBase vb = new MyVisitorBase(variableNames);
         try {
@@ -705,7 +727,7 @@ public class SimplifyScriptSupport {
         "ones,", "zeros,",
         "linspace,", "logspace,",
         "dblarr,", "fltarr,", "strarr,", "intarr,", "bytarr,",
-        "ripples,","split,", 
+        "ripples,",//"split,", // remove split because it is confused with the URISplit.
         "color,", "colorFromString,", "isinstance,"};
  
     private static final Set<String> okaySet = new HashSet<>();
