@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Unpushed change which caused a bug in the ASCII reader was pushed unknowingly.  Jenkins caught it but wasn't sending emails.
+        <p><small>Editor bookmarks allow custom actions to be added to the editor.  Here, an experimental "rename variable" refactoring is provided in the script <a href="https://github.com/autoplot/dev/blob/master/demos/tools/editor/renameVariable.jy">here</a>.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,8 +27,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-08-04 r25919):</p>
+        <p>Bugfixes (2021-08-07 r25939):</p>
         <ul>
+            <li>timerange completions corrected for CDAWeb source, to support scripting.
+            <li>GitHubFileSystem supports listings from GitHub, before you could only access files if the name was known already.  GitLabs still needs work.
+            <li>return type of the function call was sometimes mis-reported in Jython completions, as in convertUnitsTo.
             <li><a href='https://sourceforge.net/p/autoplot/bugs/2376/'>2376</a>: some of the set item methods in Jython mishandled the units.  Thanks, Ivar!
             <li>Unpushed change which caused a bug in the ASCII reader was pushed unknowingly and was never tested in last devel release.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2375/">2375</a>: new code to show "add tool" checkbox on script parameters tab broke GUI in one case.
@@ -53,6 +56,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>DataSetIterator now has getRank0Value and putRank0Value (as well as double access), making it easier to write correct code.
+            <li>Custom Jython editor actions now appear one level higher.
             <li><a href="https://github.com/das-developers/das2java/issues/17">17</a>: Support for &lt;b&gt; for bold (&lt;/b&gt; to turn off) and &lt;i&gt; for italics in labels.  Thanks, Chris!
             <li>add plots with multiple rows finally supports replace current.  Thanks, Ivar!
             <li>Introduce dom.controller.selectedPlots property.  See <a href='https://github.com/autoplot/dev/blob/master/demos/tools/layout/joinPlots.jy'>joinPlots.jy</a> for example use.
