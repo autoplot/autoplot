@@ -61,5 +61,8 @@
                 <id>jar</id>
             </reference>
         </references>
+        <spellchecker-wordlist xmlns="http://www.netbeans.org/ns/spellchecker-wordlist/1">
+            <word>Jython</word>
+        </spellchecker-wordlist>
     </configuration>
 </project>
