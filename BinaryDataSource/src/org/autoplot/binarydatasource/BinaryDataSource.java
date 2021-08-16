@@ -148,6 +148,11 @@ public class BinaryDataSource extends AbstractDataSource {
         int fieldCount = getIntParameter("fieldCount", params.get("depend0") == null ? 1 : 2);
 
         int recCount= getIntParameter("recCount", Integer.MAX_VALUE );
+        
+        if ( f.length()<(offset+length) ) {
+            String info= String.format( "(byteOffset=%d byteLength=%d file.length=%d)", offset, length, f.length() );
+            throw new IllegalArgumentException("byteLength and byteOffset parameters would read past the end of the file. "+info );
+        }
                 
         ByteBuffer buf = fc.map(MapMode.READ_ONLY, offset, length);
 
