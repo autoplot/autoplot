@@ -145,7 +145,7 @@ public class JythonUtil {
      * @throws IOException
      */
     protected static void runScript( ApplicationModel model, InputStream in, String name, String[] argv, String pwd ) throws IOException {
-        runScript( model.getDocumentModel(), in, name, argv, pwd );
+        runScript( model.getDom(), in, name, argv, pwd );
     }
     
     /**
