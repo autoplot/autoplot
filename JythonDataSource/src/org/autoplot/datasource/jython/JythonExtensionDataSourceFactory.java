@@ -38,10 +38,10 @@ public class JythonExtensionDataSourceFactory extends AbstractDataSourceFactory 
         }
         switch (scheme) {
             case "vap+sps":
-                script= "https://saturn.physics.uiowa.edu/svn/earth/public/jyds/readTypeSps.jyds";
+                script= "https://github.com/autoplot/scripts/blob/master/formats/sps/readTypeSps.jyds";
                 break;
             case "vap+spd":
-                script= "https://saturn.physics.uiowa.edu/svn/earth/public/jyds/readTypeSpd.jyds";
+                script= "https://github.com/autoplot/scripts/blob/master/formats/sps/readTypeSpd.jyds";
                 break;
             case "vap+wdc":
                 script= "https://raw.githubusercontent.com/autoplot/jyds/master/wdc_kp_ap.jyds";
