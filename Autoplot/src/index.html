@@ -29,6 +29,10 @@
                 
         <p>Bugfixes (2021-08-17 r25944):</p>
         <ul>
+            <li>Vertical Spectrogram Averager was broken for the rank 2 (Z[X,Y]) case.
+        </ul>
+        <p>Older Bugfixes (2021-07-06 r25854):</p>
+        <ul>
             <li>BinaryDataSource throws a more actionable error message when it is instructed to read past the end of a file.
             <li>.sps and .spd Jython extensions moved from server at U. Iowa to <a href="https://github.com/autoplot/scripts/tree/master/formats/sps">GitHub</a>
             <li>timerange completions corrected for CDAWeb source, to support scripting.
@@ -48,15 +52,10 @@
             <li>if series color scatter data zunits were not convertible to colorbar units, the data was not displayed and no warning message was printed.  Thanks, Sadie!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2369/">2369</a>: ASCII file reader treats non-breaking spaces, from copying data in email, as whitespace.  Thanks, Sadie!
         </ul>
-        <p>Older Bugfixes (2021-07-06 r25854):</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/1043/">1043</a>: don't throw error when double question marks found, just issue warning.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2367/">2367</a>: export from slicer allows Autoplot to format the data, but the options were ignored.  Thanks, George!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2363/">2363</a>: ASCII file with X and Y arguments still didn't work because I forgot to commit a bit of code.
-            <li>detect two question marks in .jyds URIs, which has a confusing result, and print a warning for now.
-            <li>Das2Server source didn't allow single channels of ephemeris source to be selected from older Das2 Servers.  Thanks, Sadie!
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>DataSetIterator now has getRank0Value and putRank0Value (as well as double access), making it easier to write correct code.
             <li>Custom Jython editor actions now appear one level higher.
@@ -65,13 +64,6 @@
             <li>Introduce dom.controller.selectedPlots property.  See <a href='https://github.com/autoplot/dev/blob/master/demos/tools/layout/joinPlots.jy'>joinPlots.jy</a> for example use.
             <li>Introduce new qubeSubset which will throw out data until the non-qube can be represented as a qube, to assist with the Das2Server.  Thanks, Terry!
             <li><a href="https://github.com/autoplot/documentation/issues/1">1</a>: use "run" where "execute" is unnecessarily used.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/748">748</a>: second plot window in scripts
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/747">747</a>: event thread response monitor allows manually triggering of thread dump.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/746">746</a>: digitizer should be able to export data to CDF and other formats Autoplot knows.
-            <li>added Units.us1970, microseconds since 1970.
         </ul>
         <p>Known issues:</p>
         <ul>
