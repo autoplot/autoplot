@@ -50,6 +50,19 @@ public class JythonOps {
     
     private static final Logger logger= Logger.getLogger("jython");
     
+    /**
+     * Apply the Python function, typically a lambda function, to each
+     * element of the dataset.  For example: 
+     * <pre>
+     * xx= dindgen( 6 ) 
+     * yy= applyLambda( xx, lambda x : x**2 )
+     * plot( xx, yy )
+     * </pre>
+     * 
+     * @param ds the dataset to which the function is applied
+     * @param f the function
+     * @return the dataset with the function applied
+     */
     public static QDataSet applyLambda(QDataSet ds, PyFunction f ) {
         QubeDataSetIterator it = new QubeDataSetIterator(ds);
         DDataSet result = DDataSet.create(DataSetUtil.qubeDims(ds));
@@ -62,6 +75,21 @@ public class JythonOps {
         return result;
     }
       
+    /**
+     * Apply the Python function, typically a two-argument lambda function, to each
+     * element of the dataset.  For example: 
+     * <pre>
+     * xx= dindgen( 6 ) 
+     * yy= ones( 6 )
+     * yy= applyLambda( xx, yy, lambda x,y : x+y )
+     * plot( xx, yy )
+     * </pre>
+     * 
+     * @param ds1 the dataset to which the function is applied
+     * @param ds2 the dataset to which the function is applied
+     * @param f the function
+     * @return the dataset with the function applied
+     */    
     public static QDataSet applyLambda( QDataSet ds1, QDataSet ds2, PyFunction f ) {
         QubeDataSetIterator it = new QubeDataSetIterator(ds1);
         DDataSet result = DDataSet.create(DataSetUtil.qubeDims(ds1));
@@ -75,6 +103,22 @@ public class JythonOps {
         return result;
     }
     
+    /**
+     * Apply the Python function, typically a three-argument lambda function, to each
+     * element of the dataset.  For example: 
+     * <pre>
+     * xx= dindgen( 6 ) 
+     * yy= ones( 6 )
+     * yy= applyLambda( xx, yy, lambda x,y : x+y )
+     * plot( xx, yy )
+     * </pre>
+     * 
+     * @param ds1 the dataset to which the function is applied
+     * @param ds2 the dataset to which the function is applied
+     * @param ds3 the dataset to which the function is applied
+     * @param f the function
+     * @return the dataset with the function applied
+     */        
     public static QDataSet applyLambda( QDataSet ds1, QDataSet ds2, QDataSet ds3, PyFunction f ) {
         QubeDataSetIterator it = new QubeDataSetIterator(ds1);
         DDataSet result = DDataSet.create(DataSetUtil.qubeDims(ds1));
