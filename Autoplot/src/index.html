@@ -29,6 +29,7 @@
                 
         <p>Bugfixes (2021-08-17 r25944):</p>
         <ul>
+            <li>Safety check on putProperty UNITS on FDataSet for TimeLocationUnits didn't consider that None (null) is a valid setting.  Thanks, Sadie!
             <li>Vertical Spectrogram Averager was broken for the rank 2 (Z[X,Y]) case.
         </ul>
         <p>Older Bugfixes (2021-07-06 r25854):</p>
@@ -54,6 +55,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>OperationsProcessor.process(ds,str) introduced to correct order of operands (dataset should come first, conventionally).
+            <li>sps and spd reading scripts now come from github.com/autoplot/scripts/blob/master/formats/sps/
         </ul>
         <p>Less recent features:</p>
         <ul>
