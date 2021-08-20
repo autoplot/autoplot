@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Autoplot used to look at an ASCII file using the binary data source and using %c to format the data.
+        <p><small>Contour line based on pixels of an image.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,8 +27,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-08-17 r25944):</p>
+        <p>Bugfixes (2021-08-20 r25944):</p>
         <ul>
+            <li>round of fingbugs cleanup to get down to 80 flagged issues.
+            <li>2380: aggregation creates invalid result with two cdf files.  Thanks, Andrei!
             <li>Safety check on putProperty UNITS on FDataSet for TimeLocationUnits didn't consider that None (null) is a valid setting.  Thanks, Sadie!
             <li>Vertical Spectrogram Averager was broken for the rank 2 (Z[X,Y]) case.
         </ul>
