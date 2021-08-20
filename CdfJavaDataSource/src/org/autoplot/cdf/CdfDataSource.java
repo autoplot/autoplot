@@ -494,9 +494,9 @@ public class CdfDataSource extends AbstractDataSource {
         
         int ibracket = svariable.indexOf("[");
         if (ibracket != -1) {
-            String newSvariable;
+            StringBuilder newSvariableBuilder;
             constraint = svariable.substring(ibracket);
-            newSvariable = svariable.substring(0, ibracket);
+            newSvariableBuilder = new StringBuilder( svariable.substring(0, ibracket) );
             int i2= constraint.indexOf(";");
             if ( i2>-1 ) {
                 constraint= constraint.substring(0,i2);
@@ -506,10 +506,10 @@ public class CdfDataSource extends AbstractDataSource {
                 while ( i3>-1 ) {
                     int i4= svariable.indexOf("[",i2+1);
                     if ( i4==-1 ) {
-                        newSvariable+= ";"+svariable.substring(i2+1,i3);
+                        newSvariableBuilder.append(";").append(svariable.substring(i2+1,i3));
                         constraints.add( "" );
                     } else {
-                        newSvariable+= ";"+svariable.substring(i2+1,i4);
+                        newSvariableBuilder.append(";").append(svariable.substring(i2+1,i4));
                         constraints.add( svariable.substring(i4,i3) );
                     }
                     i2= i3;
@@ -517,14 +517,14 @@ public class CdfDataSource extends AbstractDataSource {
                 }
                 int i4= svariable.indexOf("[",i2+1);
                 if ( i4==-1 ) {
-                    newSvariable+= ";"+svariable.substring(i2+1);
+                    newSvariableBuilder.append(";").append(svariable.substring(i2+1));
                     constraints.add( "" );
                 } else {
-                    newSvariable+= ";"+svariable.substring(i2+1,i4);
+                    newSvariableBuilder.append(";").append(svariable.substring(i2+1,i4));
                     constraints.add( svariable.substring(i4) );
                 }
             }
-            svariable = newSvariable;
+            svariable = newSvariableBuilder.toString();
         }
 
         String[] svariables;
