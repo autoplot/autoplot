@@ -254,6 +254,7 @@ public final class JythonDataSource extends AbstractDataSource implements Cachin
                     interp.set("monitor", mon);
                 } catch ( ConcurrentModificationException ex ) {
                     logger.warning("avoiding strange concurrent modification bug that occurs within Jython on the server...");
+                    Thread.yield();
                     interp.set("monitor", mon);
                     logger.warning("done.");
                 }
