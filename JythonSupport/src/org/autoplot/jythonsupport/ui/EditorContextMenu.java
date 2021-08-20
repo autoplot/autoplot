@@ -325,7 +325,7 @@ public class EditorContextMenu {
         return s;
     }
     
-    private synchronized void maybeCreateMenu() {
+    private void maybeCreateMenu() {
         if ( menu==null ) {
             menu= new JPopupMenu();
             Action a;
