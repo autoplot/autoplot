@@ -1,6 +1,7 @@
 
 package org.autoplot.jythonsupport;
 
+import java.util.Objects;
 import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
@@ -13,7 +14,6 @@ import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.das2.qds.DataSetUtil;
-import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 
 /**
@@ -390,5 +390,23 @@ public class PyDatum extends PyJavaInstance {
     @Override
     public PyString __str__( ) {
         return new PyString( datum.toString() );
+    }
+
+    @Override
+    public int hashCode() {
+        return this.datum.hashCode();
+    }
+        
+    @Override
+    public boolean equals(Object ob_other) {
+        if ( ob_other instanceof PyDatum ) {
+            return equals( (PyDatum)ob_other );
+        } else {
+            return super.equals(ob_other);
+        }
+    }
+
+    public boolean equals(PyDatum ob_other) {
+        return this.datum.equals( ob_other.datum );
     }
 }

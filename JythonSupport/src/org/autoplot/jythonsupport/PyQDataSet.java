@@ -1588,4 +1588,22 @@ public final class PyQDataSet extends PyJavaInstance {
         
     }
 
+
+    @Override
+    public int hashCode() {
+        return this.ds.hashCode();
+    }
+        
+    @Override
+    public boolean equals(Object ob_other) {
+        if ( ob_other instanceof PyQDataSet ) {
+            return equals( (PyQDataSet)ob_other );
+        } else {
+            return super.equals(ob_other);
+        }
+    }
+
+    public boolean equals(PyQDataSet ob_other) {
+        return this.ds.equals( ob_other.ds );
+    }    
 }
