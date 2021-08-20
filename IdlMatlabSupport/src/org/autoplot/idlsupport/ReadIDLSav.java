@@ -313,7 +313,7 @@ public class ReadIDLSav {
         int[] dims;
         @Override
         public String toString() {
-            return "ArrayDesc"+nbytes+" " +nelements+ " " +ndims + " "+nmax;
+            return "ArrayDesc nbytes:"+nbytes+" nelements:" +nelements+ " ndims:" +ndims + " nmax:"+nmax + " nbytesEl:"+ nbytesEl;
         }
     }
 
@@ -351,6 +351,11 @@ public class ReadIDLSav {
         //int nsupClasses;
         //String[] supClassNames;
         //StructDesc[] supClassTable;
+        
+        @Override
+        public String toString() {
+            return "predef: "+ predef + " ntags:"+ntags+ " nbytes:"+nbytes;
+        }
     }
     
     private static class TypeDescArray extends TypeDesc {
