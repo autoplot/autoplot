@@ -133,7 +133,6 @@ public class CDAWebDataSource extends AbstractDataSource {
             } catch ( IOException ex ) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
                 mon.setProgressMessage("unable to connect via ftp");
-                Thread.sleep(1000);
                 throw ex;
             }
 
