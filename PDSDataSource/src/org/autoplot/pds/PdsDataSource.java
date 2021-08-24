@@ -4,7 +4,6 @@ package org.autoplot.pds;
 import gov.nasa.pds.label.Label;
 import gov.nasa.pds.label.object.ArrayObject;
 import gov.nasa.pds.label.object.FieldDescription;
-import gov.nasa.pds.label.object.FieldType;
 import gov.nasa.pds.label.object.TableObject;
 import gov.nasa.pds.label.object.TableRecord;
 import java.io.File;
@@ -15,24 +14,17 @@ import java.net.URI;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
-import org.das2.datum.TimeParser;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
-import org.das2.qds.ArrayDataSet;
 import org.das2.qds.DDataSet;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
@@ -41,13 +33,12 @@ import org.das2.qds.util.DataSetBuilder;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * PDS4 file source.  This is pointed at PDS4 xml files and will return data
+ * they describe.
  * @author jbf
  */
 public class PdsDataSource extends AbstractDataSource {
@@ -286,21 +277,26 @@ public class PdsDataSource extends AbstractDataSource {
         }
         
         if ( result==null ) {
-            for ( int i=0; i<names.size(); i++ ) {
-                name= names.get(i);
-            }
             switch (results.length) {
                 case 1:
-                    return results[0];
+                    result= results[0];
+                    break;
                 case 2:
-                    return Ops.link( results[0], results[1] );
+                    result= Ops.link( results[0], results[1] );
+                    break;
                 case 3:
-                    return Ops.link( results[0], results[1], results[2] );
+                    result= Ops.link( results[0], results[1], results[2] );
+                    break;
                 default:
                     break;
             }
         }
-        return null;
+        
+        if ( result instanceof MutablePropertyDataSet ) {
+            ((MutablePropertyDataSet)result).makeImmutable();
+        }
+        
+        return result;
     }
     
 }
