@@ -14,11 +14,16 @@ import java.net.URI;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
@@ -33,6 +38,8 @@ import org.das2.qds.util.DataSetBuilder;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -146,6 +153,42 @@ public class PdsDataSource extends AbstractDataSource {
         return document;
     }
     
+    private static void addAxisArray( Node n,  Map<Integer,String> axisNames ) throws XPathExpressionException {
+        XPathFactory factory= XPathFactory.newInstance();
+        XPath xpath= factory.newXPath();
+        String name =   (String)xpath.evaluate( "axis_name", n, XPathConstants.STRING );
+        Double sequence_number = (Double)xpath.evaluate( "sequence_number", n, XPathConstants.NUMBER );
+        axisNames.put( sequence_number.intValue(), name );
+    }
+    
+    /**
+     * return the name of the independent parameter that works in this axis.
+     * This currently assumes the first node with this axisName is the 
+     * independent axis.
+     * 
+     * For example, with https://space.physics.uiowa.edu/voyager/data/voyager-2-pws-wf/data/1987/vg2_pws_wf_1987-04-21T17_v0.9.xml,
+     * if axisName=='time' then the result will be "Epoch"
+     * 
+     * @param axisName the axis name
+     * @return the independent variable for the axis.
+     */
+    private static String resolveIndependentAxis( Document doc, String axisName ) throws XPathExpressionException {
+            
+        XPathFactory factory= XPathFactory.newInstance();
+        XPath xpath= factory.newXPath();
+
+        String s=  "Product_Observational/File_Area_Observational/Array[Axis_Array/axis_name='"+axisName +"']";
+        NodeList oo=   (NodeList) xpath.evaluate( s, doc, XPathConstants.NODESET );
+
+        if ( oo.getLength()>0 ) {
+            Node o = oo.item(0);
+            String name = (String)xpath.evaluate( "name", o, XPathConstants.STRING );
+            return name;
+        }
+
+        return null;
+    }
+    
     /**
      * look through the PDS label document to see if dependencies can be 
      * identified.  Presently, this is simply one other dataset with the 
@@ -156,9 +199,40 @@ public class PdsDataSource extends AbstractDataSource {
      * @param depend the name of the data for the dependant variable, e.g. Waveform
      * @return ( Epoch, sample_offset, Waveform ) 
      */
-    public static List<String> seekDependencies( Document doc, List<String> depend ) {
-        //XPathFactory factory= XPathFactory.newInstance();
-        //XPath xpath= factory.newXPath();
+    public static List<String> seekDependencies( Document doc, List<String> depend ) throws XPathExpressionException {
+        if ( depend.size()==1 ) { // always will have one element.
+        
+            XPathFactory factory= XPathFactory.newInstance();
+            XPath xpath= factory.newXPath();
+        
+            String name= depend.get(0);
+            
+            Map<Integer,String> axisNames= new LinkedHashMap<>();
+            
+            NodeList oo= (NodeList) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Axis_Array", doc, XPathConstants.NODESET );
+            
+            for ( int i=0; i<oo.getLength(); i++ ) {
+                Node n = oo.item(i);
+                addAxisArray( n, axisNames );
+            }
+            
+            if ( axisNames.get(2)!=null ) {
+                String n1= resolveIndependentAxis( doc, axisNames.get(1) );
+                String n2= resolveIndependentAxis( doc, axisNames.get(2) );
+                depend= new LinkedList<>(depend);
+                depend.add(0,n1);
+                if ( !n2.equals(name) ) {
+                    depend.add(1,n2);
+                }
+            } else if ( axisNames.get(1)!=null ) {
+                String n1= resolveIndependentAxis( doc, axisNames.get(1) );
+                depend= new LinkedList<>(depend);
+                if ( !n1.equals(name) ) {
+                    depend.add(0,n1);
+                }
+            }
+            
+        }
         
         return depend;
     }
