@@ -173,12 +173,14 @@ public class DataContainer {
                 if (!Arrays.equals(aa.getDimensions(), dcheck)) {
                     StringBuffer sbe = new StringBuffer();
                     for (int i = 0; i < dcheck.length; i++) {
-                        sbe.append("," + dcheck[i]);
+                        if ( i>0 ) sbe.append(",");
+                        sbe.append( dcheck[i] );
                     }
                     StringBuffer sbf = new StringBuffer("");
                     int[] fdim = aa.getDimensions();
                     for (int i = 0; i < fdim.length; i++) {
-                        sbf.append("," + fdim[i]);
+                        if ( i>0 ) sbf.append(",");
+                        sbf.append( fdim[i]);
                     }
                     throw new Throwable("Dimension mismatch, expected: " +
                         sbe + " found " + sbf + ".");
