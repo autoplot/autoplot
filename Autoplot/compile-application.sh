@@ -447,6 +447,7 @@ fi
 rm dist/AutoplotVolatile_pack_gz.jar
 
 echo "=== create jnlp file for build..."
+cp src/autoplot.jnlp dist
 cp src/autoplot_4GB.jnlp dist
 cp src/autoplot_1GB.jnlp dist
 cp src/autoplot_prod_4GB.jnlp dist
