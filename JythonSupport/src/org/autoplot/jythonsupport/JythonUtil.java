@@ -1287,40 +1287,60 @@ public class JythonUtil {
      * @see SimplifyScriptSupport#simplifyScriptToCompletions(java.lang.String) 
      */
     public static String simplifyScriptToGetParams(String script, boolean addSort) throws PySyntaxError {
+        
+        Logger llogger= LoggerManager.getLogger("jython.simplify");
+        
         String[] ss1 = script.split("\n");
         String[] ss= new String[ss1.length+1];
         System.arraycopy( ss1, 0, ss, 1, ss1.length );
         ss[0]= "# simplifyScriptToGetParams";
 
         int lastLine = -1; // the last line we need to include
+        
+        boolean withinSimplifyLine= false;
+        
         boolean withinTripleQuote= false;
-        for (int i = 1; i < ss.length; i++) {
-            String line = ss[i];
+        for (int ilineNum = 1; ilineNum < ss.length; ilineNum++) {
+            String line = ss[ilineNum];
             int ich = line.indexOf('#');
             if (ich > -1) {
                 line = line.substring(0, ich);
             }
             if (line.contains("getParam")) {
-                lastLine = i;
+                llogger.log(Level.FINER, "getParam at line {0}", ilineNum);
+                lastLine = ilineNum;
+                withinSimplifyLine= true;
             } else if (line.contains("setScriptTitle")) {
-                lastLine = i;
+                llogger.log(Level.FINER, "setScriptTitle at line {0}", ilineNum);
+                lastLine = ilineNum;
+                withinSimplifyLine= true;
             } else if (line.contains("setScriptDescription")) {
-                lastLine = i;
+                llogger.log(Level.FINER, "setScriptDescription at line {0}", ilineNum);
+                lastLine = ilineNum;
+                withinSimplifyLine= true;
             } else if (line.contains("setScriptLabel")) {
-                lastLine = i;
+                llogger.log(Level.FINER, "setScriptLabel at line {0}", ilineNum);
+                lastLine = ilineNum;
+                withinSimplifyLine= true;
             } else if (line.contains("setScriptIcon")) {
-                lastLine = i;
+                llogger.log(Level.FINER, "setScriptIcon at line {0}", ilineNum);
+                lastLine = ilineNum;
+                withinSimplifyLine= true;
+            } else {
+                if ( !withinTripleQuote ) {
+                    withinSimplifyLine= false;
+                }
             }
             if ( line.contains("'''") ) {
                 if ( withinTripleQuote ) {
-                    if ( !Character.isWhitespace(line.charAt(0)) ) {
-                        lastLine = i;
+                    if ( !Character.isWhitespace(line.charAt(0)) && withinSimplifyLine ) {
+                        lastLine = ilineNum;
                     }
                 }
                 if ( withinTripleQuote ) {
-                    logger.log(Level.FINE, "close triple quote at line {0}", i);
+                    llogger.log(Level.FINER, "close triple quote at line {0}", ilineNum);
                 } else {
-                    logger.log(Level.FINE, "open triple quote at line {0}", i);
+                    llogger.log(Level.FINER, "open triple quote at line {0}", ilineNum);
                 }
                 withinTripleQuote= !withinTripleQuote;
             } 
@@ -1500,6 +1520,8 @@ public class JythonUtil {
             return errorScriptDescriptor(ex);
         }
 
+        org.das2.util.FileUtil.writeStringToFile( new File("/home/jbf/tmp/simplified.jy"), prog );
+        
         logger.log(Level.FINER, "Simplified script: {0}", prog);
 
         PythonInterpreter interp;
