@@ -49,6 +49,7 @@ import java.net.URL;
 import javax.swing.JColorChooser;
 import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor;
+import org.das2.util.FileUtil;
 
 /**
  * GUI component for controlling script parameters.  
@@ -234,21 +235,9 @@ public class ParametersFormPanel {
      * @throws java.io.IOException when reading the file.
      */
     public FormData doVariables( Map<String,Object> env, File f, Map<String,String> params, final JPanel paramsPanel ) throws IOException {
-        StringBuilder build= new StringBuilder();
-        BufferedReader r;
-        r = new BufferedReader( new FileReader(f) );
-        try {    
-            String line= r.readLine();
-            while ( line!=null ) {
-                build.append(line).append("\n");
-                line= r.readLine();
-            }
-        } finally {
-            r.close();
-        }
-        return doVariables( env, build.toString(),params,paramsPanel);
+        String src= FileUtil.readFileToString(f);
+        return doVariables( env, src, params,paramsPanel);
     }
-    
     
     /**
      * Repopulates the JPanel with options, to be used when the parameters can change the params that are read in.
