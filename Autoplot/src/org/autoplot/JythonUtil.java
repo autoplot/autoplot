@@ -645,8 +645,10 @@ public class JythonUtil {
             try {
                 fd=  pfp.doVariables( env, file, params, paramPanel );
             } catch ( PySyntaxError ex ) {
-                
-                AutoplotUtil.showMessageDialog( dom.getController().getDasCanvas(), "The script has a syntax error which prevents use in the address bar.", "Syntax Error", JOptionPane.OK_OPTION );
+                AutoplotUtil.showMessageDialog( dom.getController().getDasCanvas(), 
+                        "<html>The script has a syntax error which prevents use in the address bar.<br>"+
+                                "(Note Autoplot runs a subset of the code and may introduce problems.)", 
+                        "Syntax Error", JOptionPane.OK_OPTION );
                 
                 return JOptionPane.CANCEL_OPTION;
             }
