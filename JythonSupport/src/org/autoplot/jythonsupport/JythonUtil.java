@@ -1520,7 +1520,7 @@ public class JythonUtil {
             return errorScriptDescriptor(ex);
         }
 
-        org.das2.util.FileUtil.writeStringToFile( new File("/home/jbf/tmp/simplified.jy"), prog );
+        //org.das2.util.FileUtil.writeStringToFile( new File("/home/jbf/tmp/simplified.jy"), prog );
         
         logger.log(Level.FINER, "Simplified script: {0}", prog);
 
