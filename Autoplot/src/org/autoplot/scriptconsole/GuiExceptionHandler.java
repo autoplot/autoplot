@@ -942,7 +942,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
         String report= formatReport( t, bis, recs, map, uncaught, "USER COMMENTS" );
 
-        String url = "https://jfaden.net/RTEReceiver/LargeUpload.jsp";
+        String url = "http://jfaden.net/RTEReceiver/LargeUpload.jsp";
 
         GuiExceptionHandlerSubmitForm form= new GuiExceptionHandlerSubmitForm();
         form.setGuiExceptionHandler( this );
