@@ -1626,6 +1626,10 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @return a list of the newly added plots.
      */
     public List<Plot> addPlots( int nrow, int ncol, Object dir ) {        
+        boolean isMarginColumn= plot.getColumnId().equals(application.controller.canvas.marginColumn.id) ;
+        if ( ! isMarginColumn && ( dir==LayoutConstants.LEFT || dir==LayoutConstants.RIGHT ) ) {
+            throw new IllegalArgumentException("addPlots can only be done with original margin column when dir is "+dir);
+        }
         DomLock lock = mutatorLock();
         lock.lock( String.format("addPlots(%d,%d,%s)",nrow,ncol,dir) );
         try {
@@ -1633,7 +1637,12 @@ public class ApplicationController extends DomNodeController implements RunLater
             List<Column> cols;
             final CanvasController ccontroller = getCanvas().getController();
             if ( dir==LayoutConstants.RIGHT || dir==LayoutConstants.LEFT ) {
-                cols = ccontroller.addColumns(ncol+1);
+                if ( isMarginColumn ) {
+                    cols = ccontroller.addColumns(ncol+1);
+                } else {
+                    cols = ccontroller.addColumns(ncol);
+                    //TODO:  ccontroller.addColumns(ncol,'LEFT')
+                }
             } else {
                 if (ncol > 1) {
                     cols = ccontroller.addColumns(ncol);
@@ -1671,10 +1680,12 @@ public class ApplicationController extends DomNodeController implements RunLater
                     addPlotElement(p, null);
                 }
             }
-            if ( dir==LayoutConstants.RIGHT ) {
-                plot.setColumnId(cols.get(0).id);
-            } else if ( dir==LayoutConstants.LEFT ) {
-                plot.setColumnId(cols.get(ncol).id);
+            if ( isMarginColumn ) {
+                if ( dir==LayoutConstants.RIGHT ) {
+                    plot.setColumnId(cols.get(0).id);
+                } else if ( dir==LayoutConstants.LEFT ) {
+                    plot.setColumnId(cols.get(ncol).id);
+                }
             }
             return result;
         } finally {
