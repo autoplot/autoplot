@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 import org.das2.graph.DasRow;
 import org.das2.util.LoggerManager;
 import org.autoplot.datasource.DataSourceUtil;
+import org.das2.graph.DasColumn;
 
 /**
  * Many operations are defined within the DOM object controllers that needn't
@@ -336,6 +337,28 @@ public class DomOps {
     }
 
     /**
+     * return a list of the plots using the given row.
+     * This does not use controllers.
+     * @param dom a dom
+     * @param column the column to search for.
+     * @param visible  if true, then the plot must also be visible.  (Note its colorbar visible is ignored.)
+     * @return a list of plots.
+     */
+    public static List<Plot> getPlotsFor( Application dom, Column column, boolean visible ) {
+        ArrayList<Plot> result= new ArrayList();
+        for ( Plot p: dom.getPlots() ) {
+            if ( p.getColumnId().equals(column.getId()) ) {
+                if ( visible ) {
+                    if ( p.isVisible() ) result.add(p);
+                } else {
+                    result.add(p);
+                }
+            }
+        }
+        return result;
+    }
+    
+    /**
      * count the number of lines in the string, breaking on "!c"
      * @param s
      * @return
@@ -498,9 +521,155 @@ public class DomOps {
             logger.log(Level.FINE, "row {0}: {1},{2} ({3} pixels)", new Object[]{i, newTop, newBottom, dasRow.getHeight() });
         }
 
-
+        fixHorizontalLayout( dom );
     }
 
+    /**
+     * This is the new layout mechanism (fixLayout), but changed from vertical layout to horizontal.  This one:<ul>
+     * <li> Removes extra whitespace
+     * <li> Preserves relative size weights.
+     * <li> Preserves em heights, to support components which should not be rescaled. (Not yet supported.)
+     * <li> Preserves space taken by strange objects, to support future canvas components.
+     * <li> Renormalizes the margin row, so it is nice. (Not yet supported.  This should consider font size, where large fonts don't need so much space.)
+     * </ul>
+     * This should also be idempotent, where calling this a second time should have no effect.
+     * @param dom an application state, with controller nodes. TODO: remove dependence on controller nodes.
+     * @see #fixLayout(org.autoplot.dom.Application) 
+     */
+    public static void fixHorizontalLayout( Application dom ) {
+        Logger logger= LoggerManager.getLogger("autoplot.dom.layout");
+        logger.fine( "enter fixHorizontalLayout" );
+                
+        Canvas canvas= dom.getCanvases(0);
+
+        double emToPixels= java.awt.Font.decode(dom.getCanvases(0).font).getSize();
+        double pixelsToEm= 1/emToPixels;
+
+        Column[] columns= canvas.getColumns();
+        
+        int ncolumn= columns.length;
+
+        //kludge: check for duplicate names of rows.  Use the first one found.
+        Map<String,Column> columnCheck= new HashMap();
+        List<Column> rm= new ArrayList<>();
+        for ( int i=0; i<ncolumn; i++ ) {           
+           List<Plot> plots= DomOps.getPlotsFor( dom, columns[i], true );
+
+           if ( plots.size()>0 ) {
+               if ( columnCheck.containsKey(columns[i].getId()) ) {
+                   logger.log(Level.FINE, "duplicate row id: {0}", columns[i].getId());
+                   rm.add( columns[i] );
+               } else {
+                   columnCheck.put( columns[i].getId(), columns[i] );
+               }
+            } else {
+               logger.log(Level.FINE, "unused row: {0}", columns[i]);
+               rm.add( columns[i] );
+           }
+        }
+        rm.forEach((r) -> {
+            canvas.getController().deleteColumn(r);
+        });
+        columns= canvas.getColumns();
+        ncolumn= columns.length;
+ 
+        // sort rows, which is a refactoring.
+        Arrays.sort( columns, (Column r1, Column r2) -> {
+            int d1= r1.getController().getDasColumn().getDMinimum();
+            int d2= r2.getController().getDasColumn().getDMinimum();
+            return d1-d2;
+        });
+        
+        double totalPlotSizePixels= 0;
+        for ( int i=0; i<ncolumn; i++ ) {           
+           List<Plot> plots= DomOps.getPlotsFor( dom, columns[i], true );
+
+           if ( plots.size()>0 ) {
+               DasColumn dasColumn= columns[i].getController().dasColumn;
+               totalPlotSizePixels= totalPlotSizePixels + dasColumn.getWidth();
+           }
+        }
+        
+        double [] maxLeft= new double[ ncolumn ];
+        double [] maxRight= new double[ ncolumn ];
+
+//        double[] emHeight= new double[ nrow ];
+//        for ( int i=0; i<nrow; i++ ) {
+//            DasRow dasRow= rows[i].getController().dasRow;
+//            emHeight[i]= ( dasRow.getEmMaximum() - dasRow.getEmMinimum() );
+//        }// I know there's some check we can do with this to preserve 1-em high plots.
+        
+        for ( int i=0; i<ncolumn; i++ ) {
+            List<Plot> plots= DomOps.getPlotsFor( dom, columns[i], true );
+            double maxLeftPx;
+            double maxRightPx;
+            for ( Plot plotj : plots ) {
+                String title= plotj.getTitle();
+                String content= title; // title.replaceAll("(\\!c|\\!C|\\<br\\>)", " ");
+                boolean addLines= true;
+                int lc= lineCount(plotj.yaxis.label);
+                if ( plotj.zaxis.isVisible() ) {
+                    lc+=2+lineCount(plotj.zaxis.getLabel());
+                }
+                maxLeftPx= ( addLines ? Math.max( 2, lc ) : 0. ) * emToPixels;
+                logger.log(Level.FINE, "{0} addLines: {1}  isDiplayTitle: {2}  lineCount(title): {3}", 
+                        new Object[]{plotj.getId(), addLines, plotj.isDisplayTitle(), lc});
+                //if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
+                maxLeft[i]= Math.max( maxLeft[i], maxLeftPx );
+                Rectangle plot= plotj.getController().getDasPlot().getBounds();
+                Rectangle axis= plotj.getZaxis().getController().getDasAxis().getBounds();
+                maxRightPx= ( ( axis.getX() + axis.getWidth() ) - ( plot.getX() + plot.getWidth() ) + 1 * emToPixels );
+                maxRight[i]= Math.max( maxRight[i], maxRightPx );
+            }
+        }
+
+        double [] relativePlotHeight= new double[ ncolumn ];
+        for ( int i=0; i<ncolumn; i++ ) {
+            DasColumn dasColumn= columns[i].getController().dasColumn;
+            relativePlotHeight[i]= 1.0 * dasColumn.getWidth() / totalPlotSizePixels;
+        }
+        
+        double newPlotTotalWidthPixels= canvas.width;
+        for ( int i=0; i<ncolumn; i++ ) {
+            newPlotTotalWidthPixels = newPlotTotalWidthPixels - maxLeft[i] - maxRight[i];
+        }
+
+        double [] newPlotWidth= new double[ ncolumn ];
+        for ( int i=0; i<ncolumn; i++ ) {
+            newPlotWidth[i]= newPlotTotalWidthPixels * relativePlotHeight[i];
+        }
+
+        double[] normalPlotSize= new double[ ncolumn ];
+
+        double width= dom.getCanvases(0).getMarginColumn().getController().getDasColumn().getWidth();
+        
+        double marginHeightPixels= 
+                ( dom.getCanvases(0).getMarginColumn().getController().getDasColumn().getEmMinimum() -
+                dom.getCanvases(0).getMarginColumn().getController().getDasColumn().getEmMaximum() ) * emToPixels ;
+        
+        if ( ncolumn==1 ) {
+            normalPlotSize[0]= ( newPlotWidth[0] + maxLeft[0] + maxRight[0] ) / ( width + marginHeightPixels );
+        } else {
+            for ( int i=0; i<ncolumn; i++ ) {
+                 normalPlotSize[i]= ( newPlotWidth[i] + maxLeft[i] + maxRight[i] ) / ( width + marginHeightPixels );
+            }
+        }
+
+        double position=0;
+
+        for ( int i=0; i<ncolumn; i++ ) {
+            String newTop=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, maxLeft[i] * pixelsToEm );
+            columns[i].setLeft( newTop );
+            position+= normalPlotSize[i];
+            String newBottom= String.format( Locale.US, "%.2f%%%+.2fem", 100*position, -1 * maxRight[i] * pixelsToEm );
+            columns[i].setRight( newBottom );
+            DasColumn dasRow= columns[i].getController().dasColumn;
+            logger.log(Level.FINE, "row {0}: {1},{2} ({3} pixels)", new Object[]{i, newTop, newBottom, dasRow.getWidth() });
+        }
+
+
+    }
+    
     /**
      * aggregate all the URIs within the dom.
      * @param dom
