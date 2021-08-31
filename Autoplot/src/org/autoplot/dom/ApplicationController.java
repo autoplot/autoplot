@@ -1625,17 +1625,21 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param dir LayoutConstants.ABOVE or LayoutConstants.BELOW or null.  Null means use the current row.
      * @return a list of the newly added plots.
      */
-    public List<Plot> addPlots( int nrow, int ncol, Object dir ) {
+    public List<Plot> addPlots( int nrow, int ncol, Object dir ) {        
         DomLock lock = mutatorLock();
         lock.lock( String.format("addPlots(%d,%d,%s)",nrow,ncol,dir) );
         try {
             List<Plot> result= new ArrayList<>(nrow*ncol);
             List<Column> cols;
             final CanvasController ccontroller = getCanvas().getController();
-            if (ncol > 1) {
-                cols = ccontroller.addColumns(ncol);
+            if ( dir==LayoutConstants.RIGHT || dir==LayoutConstants.LEFT ) {
+                cols = ccontroller.addColumns(ncol+1);
             } else {
-                cols = Collections.singletonList(getCanvas().getMarginColumn());
+                if (ncol > 1) {
+                    cols = ccontroller.addColumns(ncol);
+                } else {
+                    cols = Collections.singletonList(getCanvas().getMarginColumn());
+                }
             }
             List<Row> rows;
             if ( dir==null && nrow==1 ) {
@@ -1644,15 +1648,33 @@ public class ApplicationController extends DomNodeController implements RunLater
                 if ( dir==null ) {
                     rows = ccontroller.addRows(nrow,LayoutConstants.BELOW);
                 } else {
-                    rows = ccontroller.addRows(nrow,dir);
+                    if ( dir==LayoutConstants.RIGHT || dir==LayoutConstants.LEFT ) {
+                        rows = ccontroller.addRows(nrow,dir);
+                        CanvasController.removeGapsAndOverlaps( application, rows, null, false );
+                    } else {
+                        rows = ccontroller.addRows(nrow,dir);
+                    }
                 }
             }
             for (int i = 0; i < nrow; i++) {
                 for (int j = 0; j < ncol; j++) {
-                    Plot p = addPlot(rows.get(i), cols.get(j));
+                    Column col;
+                    if ( dir==LayoutConstants.ABOVE || dir==LayoutConstants.BELOW || dir==LayoutConstants.LEFT ) {
+                        col= cols.get(j);
+                    } else if ( dir==LayoutConstants.RIGHT ) {
+                        col= cols.get(j+1);
+                    } else {
+                        throw new IllegalStateException("code not finished");
+                    }
+                    Plot p = addPlot(rows.get(i), col);
                     result.add(p);
                     addPlotElement(p, null);
                 }
+            }
+            if ( dir==LayoutConstants.RIGHT ) {
+                plot.setColumnId(cols.get(0).id);
+            } else if ( dir==LayoutConstants.LEFT ) {
+                plot.setColumnId(cols.get(ncol).id);
             }
             return result;
         } finally {

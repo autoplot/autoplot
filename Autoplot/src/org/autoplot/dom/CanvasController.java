@@ -302,9 +302,13 @@ public class CanvasController extends DomNodeController {
 
     /**
      * reset this stack of rows, trying to preserve weights.
+     * TODO: why--it would be nice if the dom and controller, and the DasRows is uses wasn't necessary.
+     * @param dom the application, which must have a controller.  
      * @param rows the rows.
+     * @param newRow used with preserveOverlaps
+     * @param preserveOverlaps if true, then leave overlapping plots overlapping
      */
-    private static void removeGapsAndOverlaps( Application dom, List<Row> rows, Row newRow, boolean preserveOverlaps) {
+    public static void removeGapsAndOverlaps( Application dom, List<Row> rows, Row newRow, boolean preserveOverlaps) {
 
         if ( rows.isEmpty() ) return;
         
@@ -552,7 +556,7 @@ public class CanvasController extends DomNodeController {
             new RowController(row).createDasPeer(this.canvas, canvas.getMarginRow().getController().getDasRow());
 
             this.dom.getController().assignId(row);
-            if (trow != null) {
+            if (trow != null && ( position==LayoutConstants.ABOVE || position==LayoutConstants.BELOW ) ) {
                 insertGapFor(row, trow, position);
             }
 
@@ -656,10 +660,13 @@ public class CanvasController extends DomNodeController {
 
     /**
      * add columns to the current plot.
-     * @param count number of columns to add
+     * @param count number of columns to add, must be &gt; 1.
      * @return a list of the new Columns.
      */
     public List<Column> addColumns(int count) {
+        
+        if ( count<2 ) throw new IllegalArgumentException("count must be greater than 1");
+        
         List<Column> result = new ArrayList();
 
         DomLock lock = changesSupport.mutatorLock();

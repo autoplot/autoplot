@@ -45,8 +45,7 @@ public class AddPlotsDialog extends javax.swing.JPanel {
         numberOfColumnsSpinner.setToolTipText("Number of plots per row.");
         numberOfColumnsSpinner.setValue(1);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "above current", "replace current", "below current" }));
-        jComboBox1.setSelectedIndex(2);
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "replace current", "above current", "below current", "to the left of current", "to the right of current", " " }));
         jComboBox1.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jComboBox1ItemStateChanged(evt);
@@ -106,10 +105,14 @@ public class AddPlotsDialog extends javax.swing.JPanel {
      */
     public Object getDirection() {
         switch (jComboBox1.getSelectedIndex()) {
-            case 0:
+            case 1:
                 return LayoutConstants.ABOVE;
             case 2:
                 return LayoutConstants.BELOW;
+            case 3:
+                return LayoutConstants.LEFT;
+            case 4:
+                return LayoutConstants.RIGHT;
             default:
                 return null; // in the place of
         }

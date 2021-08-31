@@ -94,13 +94,15 @@
     <Component class="javax.swing.JComboBox" name="jComboBox1">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="3">
-            <StringItem index="0" value="above current"/>
-            <StringItem index="1" value="replace current"/>
+          <StringArray count="6">
+            <StringItem index="0" value="replace current"/>
+            <StringItem index="1" value="above current"/>
             <StringItem index="2" value="below current"/>
+            <StringItem index="3" value="to the left of current"/>
+            <StringItem index="4" value="to the right of current"/>
+            <StringItem index="5" value=" "/>
           </StringArray>
         </Property>
-        <Property name="selectedIndex" type="int" value="2"/>
       </Properties>
       <Events>
         <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="jComboBox1ItemStateChanged"/>
