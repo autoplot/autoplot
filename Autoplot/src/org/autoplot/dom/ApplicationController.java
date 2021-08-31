@@ -1622,7 +1622,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * is added for each plot as well.
      * @param nrow number of rows
      * @param ncol number of columns
-     * @param dir LayoutConstants.ABOVE or LayoutConstants.BELOW or null.  Null means use the current row.
+     * @param dir LayoutConstants.ABOVE, LayoutConstants.BELOW or null.  Null means use the current row.  RIGHT and LEFT for the margin column.
      * @return a list of the newly added plots.
      */
     public List<Plot> addPlots( int nrow, int ncol, Object dir ) {        
@@ -1673,7 +1673,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                     } else if ( dir==LayoutConstants.RIGHT ) {
                         col= cols.get(j+1);
                     } else {
-                        throw new IllegalStateException("code not finished");
+                        col= cols.get(j);
                     }
                     Plot p = addPlot(rows.get(i), col);
                     result.add(p);
