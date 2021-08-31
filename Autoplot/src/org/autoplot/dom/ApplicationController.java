@@ -16,8 +16,6 @@ import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -75,13 +73,10 @@ import org.autoplot.AutoplotUtil;
 import org.autoplot.ColumnColumnConnectorMouseModule;
 import org.autoplot.GuiSupport;
 import org.autoplot.LayoutListener;
-import org.autoplot.ScriptContext;
-import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.layout.LayoutConstants;
 import org.autoplot.renderer.AnnotationEditorPanel;
 import org.autoplot.util.RunLaterListener;
-import org.das2.graph.DasLabelAxis;
 import org.das2.qds.QDataSet;
 import org.das2.system.DefaultMonitorFactory;
 import org.das2.system.DefaultMonitorFactory.MonitorEntry;
@@ -444,12 +439,9 @@ public class ApplicationController extends DomNodeController implements RunLater
                 fp= null;
             }
 
-            Runnable run= new Runnable() {
-                @Override
-                public void run() {
-                    setPlot(fdomPlot);
-                    if ( fp!=null ) setPlotElement(fp);
-                }
+            Runnable run= () -> {
+                setPlot(fdomPlot);
+                if ( fp!=null ) setPlotElement(fp);
             };
             new Thread(run,"focusPlot").start();
             
@@ -532,20 +524,20 @@ public class ApplicationController extends DomNodeController implements RunLater
                 LoggerManager.logGuiEvent(e);
                 if (application.getPlots().length > 1) {
                     List<PlotElement> plotElements = getPlotElementsFor(domPlot);
-                    for (PlotElement pele : plotElements) {
+                    plotElements.forEach((pele) -> {
                         if (application.getPlotElements().length > 1) {
                             deletePlotElement(pele);
                         } else {
                             setStatus("warning: the last plot element may not be deleted");
                         }
-                    }
+                    });
                     deletePlot(domPlot);
                 } else {
                     ArrayList<PlotElement> pes= new ArrayList( getPlotElementsFor(domPlot) );
                     Collections.reverse(pes);
-                    for ( PlotElement pe: pes ) {
+                    pes.forEach((pe) -> {
                         deletePlotElement(pe);
-                    }
+                    });
                     domPlot.syncTo( new Plot(), Arrays.asList( "id", "rowId", "columnId" ) );
                 }
             }
@@ -810,40 +802,34 @@ public class ApplicationController extends DomNodeController implements RunLater
         });
         
         // automatically enable layout plotElement when there are multiple plotElements.
-        this.application.addPropertyChangeListener( Application.PROP_PLOT_ELEMENTS, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                LoggerManager.logPropertyChangeEvent(evt);  
-                if ( application.getPlotElements().length>1 ) {
-                    application.options.setLayoutVisible(true);
-                }
+        this.application.addPropertyChangeListener(Application.PROP_PLOT_ELEMENTS, (PropertyChangeEvent evt) -> {
+            LoggerManager.logPropertyChangeEvent(evt);
+            if ( application.getPlotElements().length>1 ) {
+                application.options.setLayoutVisible(true);
             }
         });
 
-        this.application.addPropertyChangeListener( Application.PROP_BINDINGS, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                LoggerManager.logPropertyChangeEvent(evt);  
-                if ( isValueAdjusting() ) {
-                    return;
+        this.application.addPropertyChangeListener(Application.PROP_BINDINGS, (PropertyChangeEvent evt) -> {
+            LoggerManager.logPropertyChangeEvent(evt);
+            if ( isValueAdjusting() ) {
+                return;
+            }
+            
+            //List<String> ss= new ArrayList<String>();
+            
+            // is anyone listening to timerange?
+            boolean noOneListening= true;
+            BindingModel[] bms= application.getBindings();
+            for (BindingModel bm : bms) {
+                if (bm.getSrcId().equals(application.getId()) && bm.srcProperty.equals(Application.PROP_TIMERANGE)) {
+                    noOneListening= false;
+                    //ss.add( bms[i].getDstId() );
                 }
-
-                //List<String> ss= new ArrayList<String>();
-
-                // is anyone listening to timerange?
-                boolean noOneListening= true;
-                BindingModel[] bms= application.getBindings();
-                for (BindingModel bm : bms) {
-                    if (bm.getSrcId().equals(application.getId()) && bm.srcProperty.equals(Application.PROP_TIMERANGE)) {
-                        noOneListening= false;
-                        //ss.add( bms[i].getDstId() );
-                    }
-                }
-
-                if ( noOneListening ) {
-                    logger.fine("we used to reset application to default time range");
-                    //application.setTimeRange( Application.DEFAULT_TIME_RANGE );
-                }
+            }
+            
+            if ( noOneListening ) {
+                logger.fine("we used to reset application to default time range");
+                //application.setTimeRange( Application.DEFAULT_TIME_RANGE );
             }
         });
     }
@@ -1522,11 +1508,8 @@ public class ApplicationController extends DomNodeController implements RunLater
             final Column fcol= domColumn;
             final Row frow= domRow;
 
-            Runnable run= new Runnable() { 
-                @Override
-                public void run() {
-                    new PlotController(application, domPlot).createDasPeer(c, frow ,fcol );
-                } 
+            Runnable run= () -> {
+                new PlotController(application, domPlot).createDasPeer(c, frow ,fcol ); 
             };
             if ( SwingUtilities.isEventDispatchThread() ) {
                 run.run();
@@ -1888,7 +1871,8 @@ public class ApplicationController extends DomNodeController implements RunLater
                 dsfnew.controller.resetDataSource(true,dsfsrc.controller.getDataSource());
                 dsfnew.controller.setDataSetNeedsLoading( false );
                 dsfnew.controller.setResetDimensions(false);
-                dsfnew.controller.setDataSetInternal(dsfsrc.controller.getDataSet(),dsfsrc.controller.getRawProperties(),isValueAdjusting()); // fire off data event.
+                dsfnew.controller.setDataSetInternal(dsfsrc.controller.getDataSet(),
+                        dsfsrc.controller.getRawProperties(),isValueAdjusting()); // fire off data event.
                 dsfnew.controller.setProperties(dsfsrc.controller.getProperties());
                 dsfnew.setFilters( dsfsrc.getFilters() );
             }
@@ -2006,14 +1990,11 @@ public class ApplicationController extends DomNodeController implements RunLater
                 deleteKids.add( cb );
                 deleteKids.add( domPlot.controller.getDasPlot().getXAxis() );
                 deleteKids.add( domPlot.controller.getDasPlot().getYAxis() );
-                SwingUtilities.invokeLater( new Runnable() { // see https://sourceforge.net/tracker/index.php?func=detail&aid=3471016&group_id=199733&atid=970682
-                    @Override
-                    public void run() {
-                        for ( Component c: deleteKids ) {
-                            lcanvas.remove(c);
-                        }
+                SwingUtilities.invokeLater(() -> {
+                    for ( Component c: deleteKids ) {
+                        lcanvas.remove(c);
                     }
-                } );
+                } ); // see https://sourceforge.net/tracker/index.php?func=detail&aid=3471016&group_id=199733&atid=970682
                 cb.getColumn().removeListeners();
                 
                 domPlot.xaxis.controller.removeReferences();
