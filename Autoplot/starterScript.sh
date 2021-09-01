@@ -55,7 +55,7 @@ done
 AP_ARGS=${AP_ARGS:1}
 
 if [ $memIsImplicit == "1" ]; then 
-   JAVA_ARGS="${JAVA_ARGS} -Xmx4G ";
+   JAVA_ARGS="${JAVA_ARGS} -Xmx4G -Dautoplot.release.type=singlejar";
 fi
 
 if [ "$APDEBUG" == "1" ]; then 
