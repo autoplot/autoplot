@@ -565,6 +565,8 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         formatSysProp( doc, p, "os.arch" );
         formatSysProp( doc, p, "os.version" );
         formatSysProp( doc, p, "javawebstart.version" );
+        formatSysProp( doc, p, AutoplotUI.SYSPROP_AUTOPLOT_RELEASE_TYPE );
+        formatSysProp( doc, p, AutoplotUI.SYSPROP_AUTOPLOT_DISABLE_CERTS );
         
         DecimalFormat nf = new DecimalFormat("0.0");
         String mem = nf.format(Runtime.getRuntime().maxMemory() / (1024 * 1024));
@@ -585,6 +587,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         parent.appendChild(p);
 
     }
+    public static final String AUTOPLOTRELEASETYPE = "autoplot.release.type";
 
     /**
      * format thread states and stack traces.
