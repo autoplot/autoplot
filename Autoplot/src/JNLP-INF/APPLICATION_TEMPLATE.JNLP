@@ -33,8 +33,8 @@
         <all-permissions/>
     </security>
 
-    <resources> 
-        <j2se version="*" initial-heap-size="96m" max-heap-size="*" 
+    <resources arch="*"> 
+        <j2se version="*" initial-heap-size="*" max-heap-size="*" 
               href="http://java.sun.com/products/autodl/j2se" >
         </j2se>
 
@@ -48,7 +48,7 @@
         <property name="java.util.Arrays.useLegacyMergeSort" value="true" /> <!-- bug 1159 -->
         <property name="http.agent" value="*" />
         <property name="com.apple.mrj.application.apple.menu.about.name" value="*" /> <!-- bug 2312 -->
-        
+        <property name="autoplot.release.type" value="*" /> <!-- bug 2383 -->
     </resources> 
 
     <application-desc  main-class="org.autoplot.AutoplotUI">
