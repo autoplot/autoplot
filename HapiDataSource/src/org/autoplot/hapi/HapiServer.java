@@ -43,6 +43,7 @@ import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.HttpUtil;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.util.filesystem.FileSystem;
@@ -495,6 +496,7 @@ public class HapiServer {
         }
         loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );
         URLConnection urlc= url.openConnection();
+        urlc= HttpUtil.checkRedirect(urlc);
         urlc.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() );
         urlc.setReadTimeout( FileSystem.settings().getReadTimeoutMs() );
         StringBuilder builder= new StringBuilder();
