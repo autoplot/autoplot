@@ -1888,7 +1888,7 @@ public class AutoplotUtil {
     public static void disableCertificates() {
         logger.info("disabling HTTP certificate checks.");
         try {
-            
+            System.setProperty(AutoplotUI.SYSPROP_AUTOPLOT_DISABLE_CERTS, String.valueOf(true) );
             SSLContext sc = SSLContext.getInstance("SSL");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
