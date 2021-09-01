@@ -1825,7 +1825,7 @@ public class AutoplotUtil {
         } else {
             sandbox= "false";
         }
-        
+                        
         String aboutContent = "<ul>" +
             "<li>Java version: " + javaVersion + " " + javaVersionWarning + 
             memWarning +    
@@ -1837,6 +1837,7 @@ public class AutoplotUtil {
             "<li>sandbox: " + sandbox +
             "<li>noCheckCertificates: " + ( HttpsURLConnection.getDefaultHostnameVerifier()==allHostsValid ) +
             "<li>arch: " + arch +
+            "<li>release type: " + System.getProperty( AutoplotUI.SYSPROP_AUTOPLOT_RELEASE_TYPE,"???") +
             "<li>" + bits + " bit Java " + bitsWarning  +
             "<li>hostname: "+ host +
             "<li>pid: " + pid +

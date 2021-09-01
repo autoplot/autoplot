@@ -402,9 +402,13 @@ public final class AutoplotUI extends javax.swing.JFrame {
         if ( System.getProperty( "noCheckCertificate","true").equals("true") ) {
             if ( model.isSandboxed() ) {
                 logger.warning( "unable to disable certificates because of sandbox");
+                System.setProperty(SYSPROP_AUTOPLOT_DISABLE_CERTS, String.valueOf(false) );
             } else {
                 AutoplotUtil.disableCertificates();
+                System.setProperty(SYSPROP_AUTOPLOT_DISABLE_CERTS, String.valueOf(true) );
             }
+        } else {
+            System.setProperty(SYSPROP_AUTOPLOT_DISABLE_CERTS, String.valueOf(false) );
         }
 
         // Initialize help system now so it's ready for components to register IDs with
@@ -1221,7 +1225,20 @@ public final class AutoplotUI extends javax.swing.JFrame {
         };
         invokeLater( 10000, false, run );
     }
-
+    
+    /**
+     * true indicates that certificate checking has been disabled.
+     * @see https://sourceforge.net/p/autoplot/bugs/2383/
+     */
+    public static final String SYSPROP_AUTOPLOT_DISABLE_CERTS = "autoplot.disable.certs";
+    
+    /**
+     * the release type, either non for unknown, or javaws, singlejar, exe, or dmg.
+     * This should be set at the command line when java is started.
+     * @see https://sourceforge.net/p/autoplot/bugs/2383/
+     */
+    public static final String SYSPROP_AUTOPLOT_RELEASE_TYPE = "autoplot.release.type";
+            
     private Runnable addAxes() {
         return () -> {
             APSplash.checkTime("addAxes in");
