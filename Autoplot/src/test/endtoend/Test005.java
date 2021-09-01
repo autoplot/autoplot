@@ -7,6 +7,7 @@ package test.endtoend;
 import java.io.PrintWriter;
 import java.util.List;
 import org.autoplot.AutoplotUI;
+import org.autoplot.AutoplotUtil;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import static org.autoplot.ScriptContext.*;
@@ -38,6 +39,7 @@ public class Test005 {
             Column mc= getDocumentModel().getCanvases(0).getMarginColumn();
             System.err.println("margin column: "+ mc.getId() + " " + mc.getLeft() + " " + mc.getRight() );
             
+            AutoplotUtil.disableCertificates();
             System.err.println( AutoplotUI.SYSPROP_AUTOPLOT_DISABLE_CERTS + ": " + System.getProperty( AutoplotUI.SYSPROP_AUTOPLOT_DISABLE_CERTS ) );
             
             setCanvasSize(800, 600);
