@@ -145,14 +145,17 @@ public class Test005 {
             //TODO: why does this not reset with the plot command below?  This only occurs in testing server.
             getDocumentModel().getDataSourceFilters(0).setFilters("");
 
+            //OFFLINE MODE vvv
             //https://satdat.ngdc.noaa.gov started sending 429 (Too many requests), so I'll test offline mode.
+            System.err.println("*** MANUALLY SETTING OFFLINE MODE ***");
             FileSystem.settings().setOffline( true );
             FileSystem.reset();
             
             plot("https://satdat.ngdc.noaa.gov/sem/goes/data/avg/$Y/$m/goes10/csv/g10_eps_5m_$Y$m$d_$(Y,end)$m$d.csv?column=field1&depend0=field0&skip=456&timerange=Dec+2004");
             writeToPng("test005_demo14.png");
             xxx("demo14");
-
+            //OFFLINE MODE ^^^
+            
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex) {
             ex.printStackTrace();
