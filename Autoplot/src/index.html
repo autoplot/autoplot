@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Custom renderer shows importance of points by exaggerating points with many neighbors.  See <a href="https://github.com/autoplot/dev/blob/master/demos/2021/20210827/proxPlot1.jy">the script</a>.
+        <p><small><a href='https://github.com/autoplot/dev/blob/master/demos/2021/20210827/demoModifyCDF.jy'>Script</a> demonstrates that a CDF file can be opened and modified by Autoplot.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,18 +27,19 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-09-02 r25999):</p>
+        <p>Bugfixes (2021-09-03 r26000):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2385/">2385</a>: question marks in all.xml meant multiple things weren't plottable.
             <li>Ivar pointed out that draw grid caused lineplots to have transparency to them.  Thanks Ivar!
             <li>Remove temporarily use http for runtime errors, not https, since jfaden.net https certificate is fixed.
-            <li>2383: exception reports and about menu show launch mechanism used.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2383/">2383</a>: exception reports and about menu show launch mechanism used.
             <li>"fix layout" will also remove gaps horizontally when multiple columns are used.  Thanks, Ivar!
             <li>Temporarily use http for runtime errors, not https, since jfaden.net https certificate is broken.
             <li>triple quoted strings would always move the lastLine pointer, sometimes preventing the GUI creation from the address bar.
             <li>Ephemeris lines are limited to 32 lines, was 10.  Thanks, James!
-            <li>2378: add setDepend0Cadence, setDepend1Cadence, and setValidRange so these are accessible in scripts.  Thanks, Sadie!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2378/">2378</a>: add setDepend0Cadence, setDepend1Cadence, and setValidRange so these are accessible in scripts.  Thanks, Sadie!
             <li>round of Findbugs cleanup to get down to 80 flagged issues.
-            <li>2380: Correction to append, used with aggregation, when "where" is used with rank 2 CDF datasets.  Thanks, Andrei!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2380/">2380</a>: Correction to append, used with aggregation, when "where" is used with rank 2 CDF datasets.  Thanks, Andrei!
             <li>Safety check on putProperty UNITS on FDataSet for TimeLocationUnits didn't consider that None (null) is a valid setting.  Thanks, Sadie!
             <li>Vertical Spectrogram Averager was broken for the rank 2 (Z[X,Y]) case.
         </ul>
