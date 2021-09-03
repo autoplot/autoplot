@@ -201,6 +201,7 @@ public class CDAWebDB {
                             String[] sss= ss.split("\\s+");
                             String naming= sss[2];
                             naming= naming.replaceAll("\\%", "\\$");
+                            naming= naming.replaceAll("\\?","."); //TODO: this . happens to match one character.  This may change.
                             tmpls.put( sss[0], naming );
                             if ( sss[1].length()>1 ) bases.put( sss[0], sss[1] );
                         }
