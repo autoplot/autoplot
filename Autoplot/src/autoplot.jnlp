@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <jnlp 
     spec="1.0+"
-    codebase="https://ci-pw.physics.uiowa.edu/job/autoplot-release/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/"
+    codebase="https://das2.org/autoplot/devel/"
     href="autoplot.jnlp">
    
     <information> 
