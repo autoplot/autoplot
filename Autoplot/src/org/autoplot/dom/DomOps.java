@@ -521,7 +521,7 @@ public class DomOps {
             logger.log(Level.FINE, "row {0}: {1},{2} ({3} pixels)", new Object[]{i, newTop, newBottom, dasRow.getHeight() });
         }
 
-        fixHorizontalLayout( dom );
+        //fixHorizontalLayout( dom );
     }
 
     /**
