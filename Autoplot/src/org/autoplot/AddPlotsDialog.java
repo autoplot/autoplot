@@ -46,6 +46,7 @@ public class AddPlotsDialog extends javax.swing.JPanel {
         numberOfColumnsSpinner.setValue(1);
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "replace current", "above current", "below current", "to the left of current", "to the right of current", " " }));
+        jComboBox1.setSelectedIndex(2);
         jComboBox1.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jComboBox1ItemStateChanged(evt);
