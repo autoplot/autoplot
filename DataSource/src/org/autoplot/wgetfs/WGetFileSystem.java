@@ -206,20 +206,16 @@ public class WGetFileSystem extends WebFileSystem {
         }
         
         Map<String,DirectoryEntry> result;
-        if ( isListingCached(directory) ) {
+        if ( isListingCached(directory) ) {  // function checks timeout LISTING_TIMEOUT_MS
             logger.log(Level.FINE, "using cached listing for {0}", directory);
 
             File listing= listingFile(directory);
             
             URL[] list=null;
-            FileInputStream fin=null;
-            try {
-                fin= new FileInputStream(listing);
+            try (FileInputStream fin = new FileInputStream(listing)) {
                 list = HtmlUtil.getDirectoryListing(getURL(directory), fin );
             } catch (CancelledOperationException ex) {
                 throw new IllegalArgumentException(ex); // shouldn't happen since it's local
-            } finally {
-                if ( fin!=null ) fin.close();
             }
             
             assert list!=null;
