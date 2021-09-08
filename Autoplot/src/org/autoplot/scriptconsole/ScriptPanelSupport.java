@@ -123,12 +123,9 @@ public class ScriptPanelSupport {
         this.panel = panel;
         this.annotationsSupport = panel.getEditorPanel().getEditorAnnotationsSupport();
 
-        applicationController.addPropertyChangeListener(ApplicationController.PROP_FOCUSURI, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ( panel.runningScript==null ) {
-                    maybeDisplayDataSourceScript();
-                }
+        applicationController.addPropertyChangeListener(ApplicationController.PROP_FOCUSURI, (PropertyChangeEvent evt) -> {
+            if ( panel.runningScript==null ) {
+                maybeDisplayDataSourceScript();
             }
         });
 
@@ -225,19 +222,16 @@ public class ScriptPanelSupport {
             }
             
             //TODO: why can't we have a DasProgressPanel on any component?
-            Runnable swrun= new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        panel.getEditorPanel().getEditorKit();
-                        MutableAttributeSet att= new SimpleAttributeSet();
-                        StyleConstants.setItalic( att, true);
-                        ScriptPanelSupport.this.file= null;
-                        panel.getEditorPanel().getDocument().remove( 0, panel.getEditorPanel().getDocument().getLength() );
-                        panel.getEditorPanel().getDocument().insertString( 0, "loading "+fsfile, att );
-                    } catch ( BadLocationException ex ) {
-                        logger.log(Level.SEVERE, null, ex);
-                    }
+            Runnable swrun= () -> {
+                try {
+                    panel.getEditorPanel().getEditorKit();
+                    MutableAttributeSet att= new SimpleAttributeSet();
+                    StyleConstants.setItalic( att, true);
+                    ScriptPanelSupport.this.file= null;
+                    panel.getEditorPanel().getDocument().remove( 0, panel.getEditorPanel().getDocument().getLength() );
+                    panel.getEditorPanel().getDocument().insertString( 0, "loading "+fsfile, att );
+                } catch ( BadLocationException ex ) {
+                    logger.log(Level.SEVERE, null, ex);
                 }
             };
             if ( SwingUtilities.isEventDispatchThread() ) {
@@ -249,17 +243,14 @@ public class ScriptPanelSupport {
                     logger.log(Level.SEVERE, null, ex);
                 }
             }
-            Runnable run= new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        file = DataSetURI.getFile( fsfile, new NullProgressMonitor() );
-                        loadFile(file);
-                        panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
-                        panel.setFilename(file.toString());    
-                    } catch (IOException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    }
+            Runnable run= () -> {
+                try {
+                    file = DataSetURI.getFile( fsfile, new NullProgressMonitor() );
+                    loadFile(file);
+                    panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
+                    panel.setFilename(file.toString());
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             };
             new Thread( run, "load script thread" ).start();
@@ -375,21 +366,18 @@ public class ScriptPanelSupport {
             panel.setDirty(false);
             
             final File ffile= file;
-            Runnable run= new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        logger.fine("pausing before restarting watcher");
-                        Thread.sleep(10000);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    try {
-                        logger.fine("restarting watcher");
-                        restartWatcher(ffile);
-                    } catch (IOException ex) {
-                        Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+            Runnable run= () -> {
+                try {
+                    logger.fine("pausing before restarting watcher");
+                    Thread.sleep(10000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                try {
+                    logger.fine("restarting watcher");
+                    restartWatcher(ffile);
+                } catch (IOException ex) {
+                    Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
                 }
             };
             new Thread(run).start();
@@ -403,63 +391,60 @@ public class ScriptPanelSupport {
     WatchService watcher;
     
     private void watcherRunnable( final WatchService watch, final Path fpath ) {
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                Path parent= fpath.getParent();
-                logger.log(Level.FINER, "start watch event loop on {0}", new Object[]{parent});
-                while ( true ) {
-                    try {
-                        WatchKey key= watcher.take();
-                        for ( WatchEvent e : key.pollEvents() ) {
+        Runnable run= () -> {
+            Path parent= fpath.getParent();
+            logger.log(Level.FINER, "start watch event loop on {0}", new Object[]{parent});
+            while ( true ) {
+                try {
+                    WatchKey key= watcher.take();
+                    for ( WatchEvent e : key.pollEvents() ) {
+                        
+                        WatchEvent<Path> ev = (WatchEvent<Path>) e;
+                        Path name = ev.context();
+                        logger.log(Level.FINER, "watch event {0} {1}", new Object[]{ev.kind(), ev.context()});
+                        if ( parent.resolve(name).equals(fpath) ) {
                             
-                            WatchEvent<Path> ev = (WatchEvent<Path>) e;
-                            Path name = ev.context();
-                            logger.log(Level.FINER, "watch event {0} {1}", new Object[]{ev.kind(), ev.context()});
-                            if ( parent.resolve(name).equals(fpath) ) {
-                                
-                                String newContents;
-                                
-                                try ( InputStream in = new FileInputStream( ScriptPanelSupport.this.file ) ) {
-                                    newContents= new String( FileUtil.readBytes( in ) );
-                                    String currentf= panel.getEditorPanel().getText();
-                                    currentf= currentf.trim(); // there's a strange bug where newContents has a newline at the end that current doesn't.
-                                    newContents= newContents.trim();
-                                    if ( currentf.equals(newContents) ) {
-                                        logger.fine("timestamp changed but contents are the same.");
-                                        break;
-                                    }
-                                    
-                                } catch ( IOException ex ) {
+                            String newContents;
+                            
+                            try ( InputStream in = new FileInputStream( ScriptPanelSupport.this.file ) ) {
+                                newContents= new String( FileUtil.readBytes( in ) );
+                                String currentf= panel.getEditorPanel().getText();
+                                currentf= currentf.trim(); // there's a strange bug where newContents has a newline at the end that current doesn't.
+                                newContents= newContents.trim();
+                                if ( currentf.equals(newContents) ) {
+                                    logger.fine("timestamp changed but contents are the same.");
                                     break;
                                 }
                                 
-                                if ( JOptionPane.OK_OPTION== 
-                                    JOptionPane.showConfirmDialog( panel, 
-                                    "File changed on disk.  Do you want to reload?", 
-                                    "File Changed on Disk",
-                                    JOptionPane.OK_CANCEL_OPTION ) ) {
-                                    try {
-                                        loadFile( ScriptPanelSupport.this.file );
-                                    } catch (IOException ex) {
-                                        logger.log(Level.SEVERE, null, ex);
-                                    }
-                                } else {
-                                    ScriptPanelSupport.this.panel.setDirty(true);
-                                }
+                            } catch ( IOException ex ) {
+                                break;
                             }
-                        }   
-                        if ( !key.reset() ) {
-                            logger.log(Level.FINER, "watch key could not be reset: {0}", key);
-                            return;
+                            
+                            if ( JOptionPane.OK_OPTION==
+                                    JOptionPane.showConfirmDialog( panel,
+                                            "File changed on disk.  Do you want to reload?",
+                                            "File Changed on Disk",
+                                            JOptionPane.OK_CANCEL_OPTION ) ) {
+                                try {
+                                    loadFile( ScriptPanelSupport.this.file );
+                                } catch (IOException ex) {
+                                    logger.log(Level.SEVERE, null, ex);
+                                }
+                            } else {
+                                ScriptPanelSupport.this.panel.setDirty(true);
+                            }
                         }
-                    } catch ( ClosedWatchServiceException ex ) {
-                        logger.log(Level.FINER, "watch service was closed: {0}", watch);
-                        return;
-                        
-                    } catch (InterruptedException ex) {
-                        logger.log(Level.SEVERE, null, ex);
                     }
+                    if ( !key.reset() ) {
+                        logger.log(Level.FINER, "watch key could not be reset: {0}", key);
+                        return;
+                    }
+                } catch ( ClosedWatchServiceException ex ) {
+                    logger.log(Level.FINER, "watch service was closed: {0}", watch);
+                    return;
+                    
+                } catch (InterruptedException ex) {
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }            
         };
@@ -524,28 +509,25 @@ public class ScriptPanelSupport {
                 lineNum++;
             }
             final String fs= buf.toString();
-            Runnable run= new Runnable() {
-                @Override
-                public void run() {
+            Runnable run= () -> {
+                try {
+                    annotationsSupport.clearAnnotations();
+                    Document d = panel.getEditorPanel().getDocument();
+                    d.remove(0, d.getLength());
+                    d.insertString(0, fs, null);
+                    panel.setDirty(false);
+                    panel.resetUndo();
+                } catch ( NullPointerException ex ) {
                     try {
-                        annotationsSupport.clearAnnotations();
                         Document d = panel.getEditorPanel().getDocument();
                         d.remove(0, d.getLength());
                         d.insertString(0, fs, null);
                         panel.setDirty(false);
-                        panel.resetUndo();
-                    } catch ( NullPointerException ex ) {
-                        try {
-                            Document d = panel.getEditorPanel().getDocument();
-                            d.remove(0, d.getLength());
-                            d.insertString(0, fs, null);
-                            panel.setDirty(false);
-                        } catch ( BadLocationException ex2 ) {
-                            
-                        }
-                    } catch ( BadLocationException ex ) {
+                    } catch ( BadLocationException ex2 ) {
                         
                     }
+                } catch ( BadLocationException ex ) {
+                    
                 }
             };
             SwingUtilities.invokeLater(run);
@@ -644,20 +626,16 @@ public class ScriptPanelSupport {
             }
             final int fline= line;
             final JEditorPane textArea= panel.getEditorPanel();
-            SwingUtilities.invokeLater( new Runnable() { 
-                @Override
-                public void run() {
-                    Element element= textArea.getDocument().getDefaultRootElement().getElement(Math.max(0,fline-5)); // 5 lines of context.
-                    if ( element!=null ) textArea.setCaretPosition(element.getStartOffset()); 
-                    SwingUtilities.invokeLater( new Runnable() { 
-                        @Override
-                        public void run() {
-                            Element element= textArea.getDocument().getDefaultRootElement().getElement(fline); // 5 lines of context.
-                            if ( element!=null ) textArea.setCaretPosition(element.getStartOffset()); 
-                        } 
-                    } );
-                } 
-            } );
+            SwingUtilities.invokeLater(() -> {
+                Element element= textArea.getDocument().getDefaultRootElement().getElement(Math.max(0,fline-5)); // 5 lines of context.
+                if ( element!=null ) textArea.setCaretPosition(element.getStartOffset());
+                SwingUtilities.invokeLater(() -> {
+                    Element element1 = textArea.getDocument().getDefaultRootElement().getElement(fline); // 5 lines of context.
+                    if (element1 != null) {
+                        textArea.setCaretPosition(element1.getStartOffset());
+                    }
+                });
+            });
         }
     }
 
@@ -830,13 +808,9 @@ public class ScriptPanelSupport {
                         final DebuggerConsole dc= DebuggerConsole.getInstance(panel);
                         dc.setInterp(interp);
                         interp.setOut(getOutput(dc));
-                        EditorAnnotationsSupport.setExpressionLookup( new EditorAnnotationsSupport.ExpressionLookup() {
-                            @Override
-                            public PyObject lookup( final String expr ) {
-                                return dc.setEval(expr);
-                                //return dc.getEval();                                                
-                            }
-                        });
+                        EditorAnnotationsSupport.setExpressionLookup( 
+                            (final String expr) -> dc.setEval(expr) //return dc.getEval();
+                        );
                     }
                     String code= panel.getEditorPanel().getText();
                     if ( file!=null ) {
@@ -924,13 +898,10 @@ public class ScriptPanelSupport {
                         uri = new URI("vap+jyds:" + file.toURI().toString()); // bug 3055130 okay
                         JythonDataSourceFactory factory = (JythonDataSourceFactory) DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor());
                         if (factory != null) {
-                            factory.addExeceptionListener(new ExceptionListener() {
-                                @Override
-                                public void exceptionThrown(Exception e) {
-                                    if (e instanceof PyException) {
-                                        PyException ex= (PyException)e;
-                                        annotateError(ex, 0, null );
-                                    }
+                            factory.addExeceptionListener((Exception e) -> {
+                                if (e instanceof PyException) {
+                                    PyException ex= (PyException)e;
+                                    annotateError(ex, 0, null );
                                 }
                             });
                         }
@@ -984,11 +955,8 @@ public class ScriptPanelSupport {
 
             } else if (panel.getContext() == JythonScriptPanel.CONTEXT_APPLICATION) {
                 applicationController.setStatus("busy: running application script");
-                Runnable run = new Runnable() {
-                    @Override
-                    public void run() {
-                        executeScriptImmediately(mode);
-                    }
+                Runnable run = () -> {
+                    executeScriptImmediately(mode);
                 };
                 new Thread(run,"sessionRunScriptThread").start();
             }
@@ -1280,64 +1248,52 @@ public class ScriptPanelSupport {
         final JList p= new JList(waitModel);
         p.setFont( p.getFont().deriveFont(10.f) );
         
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                Map<String,String> recent= model.getRecent(filter,10*limit);
-
-                final DefaultListModel mm= new DefaultListModel();
-                
-                List<String> ss= new ArrayList( recent.keySet() );
-                int count=0;
-                for ( int i=ss.size()-1; i>=0; i-- ) {
-                    String s= ss.get(i);
-                    if ( s.startsWith("script:") ) s= s.substring(7);
-                    if ( s.startsWith("vap+jyds:") ) s= s.substring(9);
-                    if ( s.startsWith("vap+jy:") ) s= s.substring(7);
-                    int iscript= s.indexOf("script=");
-                    if ( iscript>-1 ) {
-                        s= s.substring(iscript+"script=".length());
-                    }
-                    if ( s.startsWith("file:") ) {
-                        if ( s.startsWith("file://") ) s= s.substring(7);
-                        if ( s.startsWith("file:") ) s= s.substring(5);
-                        int iq= s.indexOf('?');
-                        if ( iq>-1 ) {
-                            s= s.substring(0,iq);
-                        }
-                        if ( mm.contains(s) ) {
-                            continue;
-                        }
-                        mm.addElement(s);
-                        count++;
-                        if ( count==limit ) break;
-                    }
+        Runnable run= () -> {
+            Map<String,String> recent= model.getRecent(filter,10*limit);
+            final DefaultListModel mm= new DefaultListModel();
+            List<String> ss= new ArrayList( recent.keySet() );
+            int count=0;
+            for ( int i=ss.size()-1; i>=0; i-- ) {
+                String s= ss.get(i);
+                if ( s.startsWith("script:") ) s= s.substring(7);
+                if ( s.startsWith("vap+jyds:") ) s= s.substring(9);
+                if ( s.startsWith("vap+jy:") ) s= s.substring(7);
+                int iscript= s.indexOf("script=");
+                if ( iscript>-1 ) {
+                    s= s.substring(iscript+"script=".length());
                 }
-                
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        p.setModel( mm );
+                if ( s.startsWith("file:") ) {
+                    if ( s.startsWith("file://") ) s= s.substring(7);
+                    if ( s.startsWith("file:") ) s= s.substring(5);
+                    int iq= s.indexOf('?');
+                    if ( iq>-1 ) {
+                        s= s.substring(0,iq);
                     }
-                };
-                SwingUtilities.invokeLater(run);
+                    if ( mm.contains(s) ) {
+                        continue;
+                    }
+                    mm.addElement(s);
+                    count++;
+                    if ( count==limit ) break;
+                }
             }
+            Runnable run1 = () -> {
+                p.setModel( mm );
+            };
+            SwingUtilities.invokeLater(run1);
         } ;
         new Thread(run).start();
-        p.addListSelectionListener( new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if ( !e.getValueIsAdjusting() ){
-                    if ( p.getSelectedValue().equals(msgWait) ) {
-                        
-                    } else {
-                        String s=  (String)p.getSelectedValue();
-                        File ff= new File(s); //TODO: still can't figure out mac bug where select doesn't work
-                        c.setSelectedFile( ff );
-                    }
+        p.addListSelectionListener((ListSelectionEvent e) -> {
+            if ( !e.getValueIsAdjusting() ){
+                if ( p.getSelectedValue().equals(msgWait) ) {
+                    
+                } else {
+                    String s=  (String)p.getSelectedValue();
+                    File ff= new File(s); //TODO: still can't figure out mac bug where select doesn't work
+                    c.setSelectedFile( ff );
                 }
             }
-        } );
+        });
         
         
         JScrollPane scrollPane= new JScrollPane(p);
