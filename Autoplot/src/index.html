@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small><a href='https://github.com/autoplot/dev/blob/master/demos/2021/20210827/demoModifyCDF.jy'>Script</a> demonstrates that a CDF file can be opened and modified by Autoplot.
+        <p><small>Autoplot script uses FileSystems to study which files have been loaded into CDAWeb.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,8 +27,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-09-03 r26000):</p>
+        <p>Bugfixes (2021-09-08 r26009):</p>
         <ul>
+            <li><a href='https://sourceforge.net/p/autoplot/bugs/2386/'>2386</a>: case where SortDataSet didn't support empty list to index empty dataset.
+            <li>default setting of "add plots" dialog should be "below current" to minimize changes.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2385/">2385</a>: question marks in all.xml meant multiple things weren't plottable.
             <li>Ivar pointed out that draw grid caused lineplots to have transparency to them.  Thanks Ivar!
             <li>Remove temporarily use http for runtime errors, not https, since jfaden.net https certificate is fixed.
@@ -66,6 +68,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/753/'>753</a>: leave fscache .listing files in place to support offline mode and file availability.
             <li>eventsDiff function introduced to show differences in lists and inserts, deletes, and changes.  Thanks, Ivar!
             <li>"add plots" dialog now allows stack of plots to be added to the right or left.  Thanks, Ivar!
             <li>introduce <a href='http://www-pw.physics.uiowa.edu/~jbf/autoplot/javadoc2018/org/das2/qds/ops/Ops.html#triangulate-org.das2.qds.QDataSet-org.das2.qds.QDataSet-'>triangulate</a> routine to expose this internal functionality.
