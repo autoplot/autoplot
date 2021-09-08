@@ -1289,7 +1289,7 @@ public class ScriptPanelSupport {
                 
                 List<String> ss= new ArrayList( recent.keySet() );
                 int count=0;
-                for ( int i=ss.size()-1; i>0; i-- ) {
+                for ( int i=ss.size()-1; i>=0; i-- ) {
                     String s= ss.get(i);
                     if ( s.startsWith("script:") ) s= s.substring(7);
                     if ( s.startsWith("vap+jyds:") ) s= s.substring(9);
@@ -1306,7 +1306,7 @@ public class ScriptPanelSupport {
                             s= s.substring(0,iq);
                         }
                         if ( mm.contains(s) ) {
-                            mm.removeElement(s);
+                            continue;
                         }
                         mm.addElement(s);
                         count++;
