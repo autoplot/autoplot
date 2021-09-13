@@ -91,6 +91,34 @@ public class Plot extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_FONTSIZE, oldFontSize, fontSize);
     }
     
+    /**
+     * font size for the legend.  This can be "" or "1em" meaning that the
+     * plot's font size should be used.
+     */
+    private String legendFontSize = "1em";
+
+    public static final String PROP_LEGENDFONTSIZE = "legendFontSize";
+
+    public String getLegendFontSize() {
+        return legendFontSize;
+    }
+
+    /**
+     * set the font size for the legend, using the conventions where 1em is
+     * the plot's font size:<ul>
+     * <li>1em same as plot font.
+     * <li>2em twice  plot font.
+     * <li>1em+2pt two points bigger than plot font.
+     * </ul>
+     * @see #setFontSize(java.lang.String) 
+     * @param legendFontSize 
+     */
+    public void setLegendFontSize(String legendFontSize) {
+        String oldLegendFontSize = this.legendFontSize;
+        this.legendFontSize = legendFontSize;
+        propertyChangeSupport.firePropertyChange(PROP_LEGENDFONTSIZE, oldLegendFontSize, legendFontSize);
+    }
+    
     private Color background = new Color( 0, 0, 0, 0 );
 
     public static final String PROP_BACKGROUND = "background";
@@ -352,6 +380,7 @@ public class Plot extends DomNode {
         if (!exclude.contains(PROP_EPHEMERIS_LABELS)) this.setEphemerisLabels(that.getEphemerisLabels());
         if (!exclude.contains(PROP_LEGENDPOSITION)) this.setLegendPosition(that.getLegendPosition());
         if (!exclude.contains(PROP_FONTSIZE) ) this.setFontSize(that.getFontSize());
+        if (!exclude.contains(PROP_LEGENDFONTSIZE) ) this.setLegendFontSize(that.getLegendFontSize());
         if (!exclude.contains(PROP_DISPLAYLEGEND)) this.setDisplayLegend(that.isDisplayLegend());
         if (!exclude.contains(PROP_DISPLAYTITLE)) this.setDisplayTitle(that.isDisplayTitle());
         if (!exclude.contains(PROP_BACKGROUND)) this.setBackground(that.getBackground());
@@ -408,6 +437,8 @@ public class Plot extends DomNode {
         if (!b) result.add(new PropertyChangeDiff(PROP_DISPLAYLEGEND, that.displayLegend, this.displayLegend ));
         b=  that.fontSize.equals(this.fontSize) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_FONTSIZE, that.fontSize , this.fontSize ) );        
+        b=  that.legendFontSize.equals(this.legendFontSize) ;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_LEGENDFONTSIZE, that.legendFontSize , this.legendFontSize ) );        
         b= that.displayTitle==this.displayTitle;
         if (!b) result.add(new PropertyChangeDiff(PROP_DISPLAYTITLE, that.displayTitle, this.displayTitle ));
         b= that.background.equals(this.background);

@@ -677,6 +677,7 @@ public final class PlotController extends DomNodeController {
         ac.bind( this.plot, Plot.PROP_DISPLAYTITLE, dasPlot1, DasPlot.PROP_DISPLAYTITLE );
         ac.bind( this.plot, Plot.PROP_DISPLAYLEGEND, dasPlot1, DasPlot.PROP_DISPLAYLEGEND );
         ac.bind( this.plot, Plot.PROP_FONTSIZE, dasPlot1, DasPlot.PROP_FONTSIZE );        
+        ac.bind( this.plot, Plot.PROP_LEGENDFONTSIZE, dasPlot1, DasPlot.PROP_LEGENDFONTSIZE );        
         
         ac.bind(application.getOptions(), Options.PROP_LOGMESSAGETIMEOUTSEC, dasPlot1, DasPlot.PROP_LOG_TIMEOUT_SEC );
         ac.bind(application.getOptions(), Options.PROP_DRAWGRID, dasPlot1, "drawGrid");
