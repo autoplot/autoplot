@@ -405,6 +405,7 @@ public class DomOps {
 
         Row[] rows= canvas.getRows();
         int nrow= rows.length;
+        boolean[] doAdjust= new boolean[nrow];
 
         //kludge: check for duplicate names of rows.  Use the first one found.
         Map<String,Row> rowsCheck= new HashMap();
@@ -461,19 +462,24 @@ public class DomOps {
             double MaxUpJEm;
             double MaxDownPx;
             for ( Plot plotj : plots ) {
-                String title= plotj.getTitle();
-                String content= title; // title.replaceAll("(\\!c|\\!C|\\<br\\>)", " ");
-                boolean addLines= plotj.isDisplayTitle() && content.trim().length()>0;
-                int lc= lineCount(title);
-                MaxUpJEm= addLines ? Math.max( 2, lc ) : 0.;
-                logger.log(Level.FINE, "{0} addLines: {1}  isDiplayTitle: {2}  lineCount(title): {3}", 
-                        new Object[]{plotj.getId(), addLines, plotj.isDisplayTitle(), lc});
-                //if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
-                MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
-                Rectangle plot= plotj.getController().getDasPlot().getBounds();
-                Rectangle axis= plotj.getXaxis().getController().getDasAxis().getBounds();
-                MaxDownPx= ( ( axis.getY() + axis.getHeight() ) - ( plot.getY() + plot.getHeight() ) + 1 * emToPixels );
-                MaxDown[i]= Math.max( MaxDown[i], MaxDownPx );
+                if ( plotj.getColumnId().equals( dom.getCanvases(0).getMarginColumn().getId() ) ) {
+                    String title= plotj.getTitle();
+                    String content= title; // title.replaceAll("(\\!c|\\!C|\\<br\\>)", " ");
+                    boolean addLines= plotj.isDisplayTitle() && content.trim().length()>0;
+                    int lc= lineCount(title);
+                    MaxUpJEm= addLines ? Math.max( 2, lc ) : 0.;
+                    logger.log(Level.FINE, "{0} addLines: {1}  isDiplayTitle: {2}  lineCount(title): {3}", 
+                            new Object[]{plotj.getId(), addLines, plotj.isDisplayTitle(), lc});
+                    //if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
+                    MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
+                    Rectangle plot= plotj.getController().getDasPlot().getBounds();
+                    Rectangle axis= plotj.getXaxis().getController().getDasAxis().getBounds();
+                    MaxDownPx= ( ( axis.getY() + axis.getHeight() ) - ( plot.getY() + plot.getHeight() ) + 1 * emToPixels );
+                    MaxDown[i]= Math.max( MaxDown[i], MaxDownPx );
+                    doAdjust[i]= true;
+                } else {
+                    doAdjust[i]= false;
+                }
             }
         }
 
@@ -512,13 +518,17 @@ public class DomOps {
         double position=0;
 
         for ( int i=0; i<nrow; i++ ) {
-            String newTop=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, MaxUp[i] * pixelsToEm );
-            rows[i].setTop( newTop );
-            position+= normalPlotHeight[i];
-            String newBottom= String.format( Locale.US, "%.2f%%%+.2fem", 100*position, -1 * MaxDown[i] * pixelsToEm );
-            rows[i].setBottom( newBottom );
-            DasRow dasRow= rows[i].getController().dasRow;
-            logger.log(Level.FINE, "row {0}: {1},{2} ({3} pixels)", new Object[]{i, newTop, newBottom, dasRow.getHeight() });
+            if ( doAdjust[i] ) {
+                String newTop=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, MaxUp[i] * pixelsToEm );
+                rows[i].setTop( newTop );
+                position+= normalPlotHeight[i];
+                String newBottom= String.format( Locale.US, "%.2f%%%+.2fem", 100*position, -1 * MaxDown[i] * pixelsToEm );
+                rows[i].setBottom( newBottom );
+                DasRow dasRow= rows[i].getController().dasRow;
+                logger.log(Level.FINE, "row {0}: {1},{2} ({3} pixels)", new Object[]{i, newTop, newBottom, dasRow.getHeight() });
+            } else {
+                logger.log(Level.FINE, "row {0} is not adjusted", i );
+            }
         }
 
         fixHorizontalLayout( dom ); //comment while fixing jenkins tests
