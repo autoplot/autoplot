@@ -2062,7 +2062,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * A plotElement is added for each plot as well. 
      * @param nrows number of rows
      * @param ncolumns number of columns
-     * @param dir below or above, or null (None in Jython) to replace the current plot.
+     * @param dir below, above, right, or left, or null (None in Jython) to replace the current plot.
      * @return the new plots.
      */
     public static List<Plot> addPlots( int nrows, int ncolumns, String dir ) {
