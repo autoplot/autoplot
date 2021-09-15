@@ -1735,10 +1735,13 @@ public class AutoplotUtil {
         buffy.append("<html>\n");
         URL aboutHtml = AutoplotUI.class.getResource("aboutAutoplot.html");
 
+        String releaseTag= AboutUtil.getReleaseTag();
+        
         if ( aboutHtml!=null ) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(aboutHtml.openStream()))) {
                 String s = reader.readLine();
                 while (s != null) {
+                    s= s.replaceAll( "\\#\\{tag\\}", releaseTag );
                     buffy.append(s);
                     s = reader.readLine();
                 }
