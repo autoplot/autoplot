@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Autoplot script uses FileSystems to study which files have been loaded into CDAWeb.
+        <p><small>You can now add plots to the right or left of a single plot.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,10 @@
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
         <p>Bugfixes (2021-09-14 r26012):</p>
+        <ul>
+            <li>Corrections to add plots and fix layout.  Now only plots attached to the marginColumn are used for the layout.
+        </ul>
+        <p>Older Bugfixes (2021-07-06 r25854):</p>
         <ul>
             <li><a href='https://sourceforge.net/p/autoplot/bugs/2386/'>2386</a>: case where SortDataSet didn't support empty list to index empty dataset.
             <li>default setting of "add plots" dialog should be "below current" to minimize changes.
@@ -45,28 +49,10 @@
             <li>Safety check on putProperty UNITS on FDataSet for TimeLocationUnits didn't consider that None (null) is a valid setting.  Thanks, Sadie!
             <li>Vertical Spectrogram Averager was broken for the rank 2 (Z[X,Y]) case.
         </ul>
-        <p>Older Bugfixes (2021-07-06 r25854):</p>
-        <ul>
-            <li>BinaryDataSource throws a more actionable error message when it is instructed to read past the end of a file.
-            <li>.sps and .spd Jython extensions moved from server at U. Iowa to <a href="https://github.com/autoplot/scripts/tree/master/formats/sps">GitHub</a>
-            <li>timerange completions corrected for CDAWeb source, to support scripting.
-            <li>GitHubFileSystem supports listings from GitHub, before you could only access files if the name was known already.  GitLabs still needs work.
-            <li>return type of the function call was sometimes mis-reported in Jython completions, as in convertUnitsTo.
-            <li><a href='https://sourceforge.net/p/autoplot/bugs/2376/'>2376</a>: some of the set item methods in Jython mishandled the units.  Thanks, Ivar!
-            <li>Unpushed change which caused a bug in the ASCII reader was pushed unknowingly and was never tested in last devel release.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2375/">2375</a>: new code to show "add tool" checkbox on script parameters tab broke GUI in one case.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2374/">2374</a>: StaticCodeAnalysis.showUsage corrects incorrect offsets when cos((myvar)) is used, where the double parens show bug in Jython.  Thanks, Sadie!
-            <li>Binary data source reportOffset uses T and F now, to match other data sources.
-            <li>add @see flattenWaveform to synchronizeNN documentation, since the scientist would typically need to flatten the data first.  Thanks, Sadie!
-            <li>Binary data source can read huge binary files (>2GB), though only 2GB at a time.  Thanks, Darrelle!
-            <li>Initial Bookmarks GUI would allow the description and title to be modified, even though no bookmark was selected, causing confusion.
-            <li>Data Mash-up tool supports "None" as a parameter, allowing "fftPower" function to be used.  Thanks, Andrei!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2364/">2364</a>: code which closed Autoplot back-end server removed, so that multiple commands can be sent.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2367/">2367</a>: guess time format mistook four-character "time" for $H$M field.  Thanks, Sadie!
-            <li>if series color scatter data zunits were not convertible to colorbar units, the data was not displayed and no warning message was printed.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2369/">2369</a>: ASCII file reader treats non-breaking spaces, from copying data in email, as whitespace.  Thanks, Sadie!
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>plots have new legendFontSize property.  Thanks, Ryan and Wouter!
             <li><a href='https://sourceforge.net/p/autoplot/feature-requests/753/'>753</a>: leave fscache .listing files in place to support offline mode and file availability.
@@ -77,16 +63,6 @@
             <li>PDS4 source has experimental logic for resolving dependencies between dependent and independent parameters.
             <li>OperationsProcessor.process(ds,str) introduced to correct order of operands (dataset should come first, conventionally).
             <li>sps and spd reading scripts now come from https://github.com/autoplot/scripts/blob/master/formats/sps/
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>DataSetIterator now has getRank0Value and putRank0Value (as well as double access), making it easier to write correct code.
-            <li>Custom Jython editor actions now appear one level higher.
-            <li><a href="https://github.com/das-developers/das2java/issues/17">17</a>: Support for &lt;b&gt; for bold (&lt;/b&gt; to turn off) and &lt;i&gt; for italics in labels.  Thanks, Chris!
-            <li>add plots with multiple rows finally supports replace current.  Thanks, Ivar!
-            <li>Introduce dom.controller.selectedPlots property.  See <a href='https://github.com/autoplot/dev/blob/master/demos/tools/layout/joinPlots.jy'>joinPlots.jy</a> for example use.
-            <li>Introduce new qubeSubset which will throw out data until the non-qube can be represented as a qube, to assist with the Das2Server.  Thanks, Terry!
-            <li><a href="https://github.com/autoplot/documentation/issues/1">1</a>: use "run" where "execute" is unnecessarily used.
         </ul>
         <p>Known issues:</p>
         <ul>
