@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>You can now add plots to the right or left of a single plot.
+        <p><small>The "Run Batch" tool is used to verify modes of LogLinDomainDivider, which was considered for new logic for picking ticks when only about one cycle is visible.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,8 +27,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-09-16 r26015):</p>
+        <p>Bugfixes (2021-09-18 r26024):</p>
         <ul>
+            <li>"regex mode" for ASCII table parser would clear the units, limiting capabilities.
             <li>Corrections to add plots and fix layout.  Now only plots attached to the marginColumn are used for the layout.
         </ul>
         <p>Older Bugfixes (2021-07-06 r25854):</p>
@@ -51,6 +52,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://github.com/das-developers/das2java/issues/18">18</a>: new logic for log ticks when ~1 cycle is showing.
             <li>"About Autoplot" screen shows the release number, not the marginally useful v2021.
         </ul>
         <p>Less recent features:</p>
