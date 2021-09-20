@@ -154,6 +154,9 @@ public class Test005 {
             plot("https://satdat.ngdc.noaa.gov/sem/goes/data/avg/$Y/$m/goes10/csv/g10_eps_5m_$Y$m$d_$(Y,end)$m$d.csv?column=field1&depend0=field0&skip=456&timerange=Dec+2004");
             writeToPng("test005_demo14.png");
             xxx("demo14");
+            
+            FileSystem.settings().setOffline( false );
+            FileSystem.reset();
             //OFFLINE MODE ^^^
             
             System.exit(0);  // TODO: something is firing up the event thread
