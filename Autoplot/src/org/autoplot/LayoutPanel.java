@@ -74,6 +74,7 @@ import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.DataSourceEditorPanelUtil;
 import org.autoplot.dom.Annotation;
 import org.autoplot.dom.DomNode;
+import org.das2.graph.DasCanvas;
 
 /**
  * LayoutPanel shows all the plots and plot elements on the canvas.  
@@ -652,6 +653,11 @@ public class LayoutPanel extends javax.swing.JPanel {
         updateAnnotationsList();
         updateDataSourceList();
         canvasLayoutPanel1.setContainer(app.getController().getDasCanvas());
+        app.getController().getDasCanvas().addPropertyChangeListener( DasCanvas.PROP_PAINTCOUNT, new PropertyChangeListener() {
+            public void propertyChange( PropertyChangeEvent ev ) {
+                plotElementListComponent.repaint();
+            }
+        });
         canvasLayoutPanel1.addComponentType(DasPlot.class, Color.BLUE);
         app.getController().bind(app.getOptions(), Options.PROP_BACKGROUND, canvasLayoutPanel1, "background");
         app.addPropertyChangeListener(Application.PROP_PLOT_ELEMENTS, plotElementsListener);
