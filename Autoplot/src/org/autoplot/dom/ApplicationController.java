@@ -1713,11 +1713,17 @@ public class ApplicationController extends DomNodeController implements RunLater
             if (srcElements.isEmpty()) {
                 return newPlot;
             }
+            
+            Map<String,String> parentMap= new HashMap<>();
 
             newElements = new ArrayList<>();
             for (PlotElement srcElement : srcElements) {
                 if (!srcElement.getComponent().equals("")) {
                     if ( srcElement.getController().getParentPlotElement()==null ) {
+                        PlotElement newp = copyPlotElement(srcElement, newPlot, dsf);
+                        newElements.add(newp);
+                        parentMap.put( srcElement.getId(), newp.getId() );
+                    } else {
                         PlotElement newp = copyPlotElement(srcElement, newPlot, dsf);
                         newElements.add(newp);
                     }
@@ -1737,6 +1743,13 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
 
             for (PlotElement newp : newElements) {
+                if ( newp.getParent().trim().length()>0 ) {
+                    String oldParent= newp.getParent().trim();
+                    String newParent= parentMap.get(oldParent);
+                    if ( newParent!=null ) {
+                        newp.setParent(newParent);
+                    }
+                }
                 newp.getController().setResetRanges(false);
                 newp.getController().setResetComponent(false);
                 newp.getController().setResetPlotElement(false);
@@ -1822,6 +1835,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param bindy If true, Y axes are bound
      * @param addPlotElement add a plotElement attached to the new plot as well.
      * @return The duplicate plot
+     * @see DomOps#copyPlotAndPlotElements(org.autoplot.dom.Plot, boolean, boolean, boolean, java.lang.Object) 
      */
     public Plot copyPlot(Plot srcPlot, boolean bindx, boolean bindy, boolean addPlotElement) {
         Plot that = addPlot(LayoutConstants.BELOW);
