@@ -1718,27 +1718,10 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             newElements = new ArrayList<>();
             for (PlotElement srcElement : srcElements) {
-                if (!srcElement.getComponent().equals("")) {
-                    if ( srcElement.getController().getParentPlotElement()==null ) {
-                        PlotElement newp = copyPlotElement(srcElement, newPlot, dsf);
-                        newElements.add(newp);
-                        parentMap.put( srcElement.getId(), newp.getId() );
-                    } else {
-                        PlotElement newp = copyPlotElement(srcElement, newPlot, dsf);
-                        newElements.add(newp);
-                    }
-                } else {
-                    PlotElement newp = copyPlotElement(srcElement, newPlot, dsf);
-                    newElements.add(newp);
-                    List<PlotElement> srcKids = srcElement.controller.getChildPlotElements();
-                    DataSourceFilter dsf1 = getDataSourceFilterFor(newp);
-                    for (PlotElement k : srcKids) {
-                        if (srcElements.contains(k)) {
-                            PlotElement kidp = copyPlotElement(k, newPlot, dsf1);
-                            kidp.getController().setParentPlotElement(newp);
-                            newElements.add(kidp);
-                        }
-                    }
+                PlotElement newp = copyPlotElement(srcElement, newPlot, dsf);
+                newElements.add(newp);
+                if ( srcElement.getController().getParentPlotElement()==null ) {
+                    parentMap.put( srcElement.getId(), newp.getId() );
                 }
             }
 
