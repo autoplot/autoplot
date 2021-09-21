@@ -1181,8 +1181,9 @@ public class PlotElementController extends DomNodeController {
      * causes the z axis to become the yaxis.
      * @param oldRenderType
      * @param newRenderType
+     * @return true if the dimensions change.
      */
-    private boolean axisDimensionsChange( RenderType oldRenderType, RenderType newRenderType ) {
+    public static boolean axisDimensionsChange( RenderType oldRenderType, RenderType newRenderType ) {
         if ( oldRenderType==newRenderType ) return false;
         if ( newRenderType==RenderType.pitchAngleDistribution ) return true;
         if ( newRenderType==RenderType.polar ) return true;
@@ -1199,8 +1200,18 @@ public class PlotElementController extends DomNodeController {
                 if ( oldRenderType==RenderType.spectrogram || oldRenderType==RenderType.nnSpectrogram ) {
                     return true;
                 } else {
-                    if ( oldRenderType==RenderType.scatter || oldRenderType==RenderType.series ) {
-                        return true;
+                    if ( oldRenderType==RenderType.scatter 
+                            || oldRenderType==RenderType.series
+                            || oldRenderType==RenderType.fillToZero 
+                            || oldRenderType==RenderType.stairSteps ) {
+                        if ( newRenderType==RenderType.scatter 
+                            || newRenderType==RenderType.series
+                            || newRenderType==RenderType.fillToZero 
+                            || newRenderType==RenderType.stairSteps ) {
+                            return false;
+                        } else {
+                            return true;
+                        }
                     } else {
                         return false;
                     }
