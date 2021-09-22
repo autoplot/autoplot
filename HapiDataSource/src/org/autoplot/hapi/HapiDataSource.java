@@ -2329,6 +2329,26 @@ public final class HapiDataSource extends AbstractDataSource {
         return staleCacheFiles;
     }
     
+    protected static Datum parseTime( String stopDate ) throws ParseException {
+        try {
+            return Units.ms1970.parse(stopDate);
+        } catch ( ParseException ex ) {
+            if ( stopDate.equals("lastday") ) {
+                stopDate= TimeUtil.prevMidnight( TimeUtil.now() ).toString();
+                logger.warning("\"lastday\" is not a valid time, and this should be fixed.");
+            } else if ( stopDate.equals("lasthour") ) {
+                stopDate= TimeUtil.prev( TimeUtil.HOUR, TimeUtil.now() ).toString();
+                logger.warning("\"lasthour\" is not a valid time, and this should be fixed.");
+            } else if ( stopDate.equals("now") ) {
+                stopDate= TimeUtil.now().toString();
+                logger.warning("\"now\" is not a valid time, and this should be fixed.");
+            } else {
+                throw ex;
+            }
+            return TimeUtil.create(stopDate); 
+        }
+    }
+    
     public static ParamDescription[] getParameterDescriptions(JSONObject doc) throws IllegalArgumentException, ParseException, JSONException {
         JSONArray parameters= doc.getJSONArray("parameters");
         int nparameters= parameters.length();
@@ -2336,7 +2356,7 @@ public final class HapiDataSource extends AbstractDataSource {
         long modificationDate= 0L;
         if ( doc.has("modificationDate") ) {
             String s= doc.getString("modificationDate");
-            Datum d= Units.ms1970.parse(s);
+            Datum d= parseTime(s);
             modificationDate= (long)( d.doubleValue(Units.ms1970) );
         }
         
