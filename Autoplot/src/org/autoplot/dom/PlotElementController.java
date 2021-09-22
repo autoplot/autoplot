@@ -493,7 +493,11 @@ public class PlotElementController extends DomNodeController {
         public void propertyChange(PropertyChangeEvent evt) {
             LoggerManager.logPropertyChangeEvent(evt,"parentStyleListener");            
             try {
-                DomUtil.setPropertyValue(plotElement.style, evt.getPropertyName(), evt.getNewValue());
+                if ( evt.getPropertyName().equals("color") ) {
+                    logger.fine("ignoring change of parent color.");
+                } else {
+                    DomUtil.setPropertyValue(plotElement.style, evt.getPropertyName(), evt.getNewValue());
+                }
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
