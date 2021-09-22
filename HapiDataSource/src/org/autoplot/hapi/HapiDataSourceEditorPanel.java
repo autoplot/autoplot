@@ -64,6 +64,7 @@ import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.URISplit;
+import org.das2.datum.TimeParser;
 import org.das2.util.FileUtil;
 
 /**
@@ -111,6 +112,9 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
 				} else {
 					stopDate= null;
 				}
+                if ( stopDate!=null ) {
+                    stopDate= HapiDataSource.parseTime(stopDate).toString();
+                }
                 if ( startDate!=null ) {
                     Datum t1= Units.us2000.parse(startDate);
                     Datum t2= stopDate==null ? myValidTime : Units.us2000.parse(stopDate);
