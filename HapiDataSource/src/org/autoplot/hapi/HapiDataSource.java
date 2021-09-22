@@ -1289,6 +1289,10 @@ public final class HapiDataSource extends AbstractDataSource {
                 }
             }
             
+            if ( line!=null && line.length()>0 && !Character.isDigit( line.charAt(0) ) ) {
+                logger.log(Level.WARNING, "expected first character to be a digit (first of ISO8601 time), but got \"{0}\"", line);
+            }
+            
             while ( line!=null ) {
                 
                 linenumber++;
