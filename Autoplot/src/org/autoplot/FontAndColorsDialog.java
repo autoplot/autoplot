@@ -19,7 +19,7 @@ import org.autoplot.dom.DomUtil;
 import org.autoplot.dom.PlotElement;
 
 /**
- *
+ * Dialog for picking application font and colors.
  * @author  jbf
  */
 public final class FontAndColorsDialog extends javax.swing.JDialog {
@@ -43,12 +43,9 @@ public final class FontAndColorsDialog extends javax.swing.JDialog {
         final Font f = app.getCanvas().getFont();
         fontLabel.setText(DomUtil.encodeFont(f));
         
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                Font f= Font.decode(fontLabel.getText());
-                canEmbedFont(f);
-            }
+        Runnable run= () -> {
+            Font f1 = Font.decode(fontLabel.getText());
+            canEmbedFont(f1);
         };
         new Thread( run, "canEmbedFont" ).start();
         
@@ -229,7 +226,7 @@ public final class FontAndColorsDialog extends javax.swing.JDialog {
             jComboBox1.setSelectedIndex(fores.length);
             backgroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
             app.getCanvas().setBackground(c);
-            app.getDocumentModel().getOptions().setBackground(c);
+            app.getDom().getOptions().setBackground(c);
         }
         
     }//GEN-LAST:event_backgroundColorButtonActionPerformed
@@ -247,8 +244,8 @@ public final class FontAndColorsDialog extends javax.swing.JDialog {
             }
             foregroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
             app.getCanvas().setForeground(c);
-            app.getDocumentModel().getOptions().setForeground(c);
-            app.getDocumentModel().getOptions().setColor(c);
+            app.getDom().getOptions().setForeground(c);
+            app.getDom().getOptions().setColor(c);
         }
     }//GEN-LAST:event_foregroundColorButtonActionPerformed
 
@@ -264,9 +261,9 @@ public final class FontAndColorsDialog extends javax.swing.JDialog {
                     p.getStyle().setColor(fores[i]);
                 }
             }
-            app.getDocumentModel().getOptions().setForeground(fores[i]);
-            app.getDocumentModel().getOptions().setColor(fores[i]);
-            app.getDocumentModel().getOptions().setBackground(backs[i]);
+            app.getDom().getOptions().setForeground(fores[i]);
+            app.getDom().getOptions().setColor(fores[i]);
+            app.getDom().getOptions().setBackground(backs[i]);
         }
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
