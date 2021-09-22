@@ -390,15 +390,12 @@ public class PlotElementController extends DomNodeController {
                 final RenderType newRenderType = (RenderType) evt.getNewValue();
                 final RenderType oldRenderType = (RenderType) evt.getOldValue();
                 changesSupport.registerPendingChange( PlotElementController.this, PENDING_RESET_RENDER_TYPE );
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            changesSupport.performingChange( PlotElementController.this, PENDING_RESET_RENDER_TYPE );
-                            resetRenderTypeImp( oldRenderType, newRenderType ); 
-                        } finally {
-                            changesSupport.changePerformed( PlotElementController.this, PENDING_RESET_RENDER_TYPE );
-                        }
+                Runnable run= () -> {
+                    try {
+                        changesSupport.performingChange( PlotElementController.this, PENDING_RESET_RENDER_TYPE );
+                        resetRenderTypeImp( oldRenderType, newRenderType );
+                    } finally {
+                        changesSupport.changePerformed( PlotElementController.this, PENDING_RESET_RENDER_TYPE );
                     }
                 };
                 if ( SwingUtilities.isEventDispatchThread() ) {
@@ -418,15 +415,12 @@ public class PlotElementController extends DomNodeController {
                         if ( getRenderer()!=null ) getRenderer().setDataSet(null); // transitional state associated with undo.  https://sourceforge.net/tracker/?func=detail&aid=3316754&group_id=199733&atid=970682
                     } else {
                         changesSupport.registerPendingChange( PlotElementController.this, PENDING_RESET_DATASOURCEFILTERID );                
-                        Runnable run= new Runnable() {
-                            @Override
-                            public void run() { 
-                                try {
-                                    changesSupport.performingChange( PlotElementController.this, PENDING_RESET_DATASOURCEFILTERID  );
-                                    updateDataSet();
-                                } finally {
-                                    changesSupport.changePerformed( PlotElementController.this, PENDING_RESET_DATASOURCEFILTERID  );
-                                }
+                        Runnable run= () -> {
+                            try {
+                                changesSupport.performingChange( PlotElementController.this, PENDING_RESET_DATASOURCEFILTERID  );
+                                updateDataSet();
+                            } finally {
+                                changesSupport.changePerformed( PlotElementController.this, PENDING_RESET_DATASOURCEFILTERID  );
                             } 
                         };
                         if ( SwingUtilities.isEventDispatchThread() ) {
@@ -455,27 +449,24 @@ public class PlotElementController extends DomNodeController {
                     return;
                 }
                 changesSupport.registerPendingChange(plotElementListener, PENDING_COMPONENT_OP);
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        if ( changesSupport==null ) {
-                            logger.severe("changesSupport is null!!!");
-                            return;
-                        }
-                        // we reenter this code, so only set lock once.  See test.endtoend.Test015.java
-                        // vap+cef:file:///home/jbf/ct/hudson/data.backup/cef/C1_CP_PEA_CP3DXPH_DNFlux__20020811_140000_20020811_150000_V061018.cef?Data__C1_CP_PEA_CP3DXPH_DNFlux
-                        // bug 1480 insert breakpoint here
-                        changesSupport.performingChange(plotElementListener, PENDING_COMPONENT_OP);
-                        setStatus("busy: update data set");
-                        try {
-                            updateDataSet();
-                            setStatus("done update data set");
-                        } catch ( RuntimeException ex ) {
-                            setStatus("warning: "+ex.toString());
-                            throw ex;
-                        } finally {
-                            changesSupport.changePerformed(plotElementListener, PENDING_COMPONENT_OP);
-                        }
+                Runnable run= () -> {
+                    if ( changesSupport==null ) {
+                        logger.severe("changesSupport is null!!!");
+                        return;
+                    }
+                    // we reenter this code, so only set lock once.  See test.endtoend.Test015.java
+                    // vap+cef:file:///home/jbf/ct/hudson/data.backup/cef/C1_CP_PEA_CP3DXPH_DNFlux__20020811_140000_20020811_150000_V061018.cef?Data__C1_CP_PEA_CP3DXPH_DNFlux
+                    // bug 1480 insert breakpoint here
+                    changesSupport.performingChange(plotElementListener, PENDING_COMPONENT_OP);
+                    setStatus("busy: update data set");
+                    try {
+                        updateDataSet();
+                        setStatus("done update data set");
+                    } catch ( RuntimeException ex ) {
+                        setStatus("warning: "+ex.toString());
+                        throw ex;
+                    } finally {
+                        changesSupport.changePerformed(plotElementListener, PENDING_COMPONENT_OP);
                     }
                 };
                 
@@ -1151,15 +1142,13 @@ public class PlotElementController extends DomNodeController {
         registerPendingChange( this, PENDING_UPDATE_DATASET );
         //TODO: we should hand off the dataset here instead of mucking around with it...  
         if (!dom.controller.isValueAdjusting()) {
-            Runnable run= new Runnable() {
-                @Override
-                public void run() { // java complains about method not override.
-                    try {
-                        updateDataSetImmediately();
-                    } catch ( Exception ex ) {
-                        logger.log( Level.WARNING, ex.getMessage(), ex ); // wrapping somehow didn't show original exception.
-                        throw new IllegalArgumentException(ex);
-                    }
+            Runnable run= () -> {
+                // java complains about method not override.
+                try {
+                    updateDataSetImmediately();
+                } catch ( Exception ex ) {
+                    logger.log( Level.WARNING, ex.getMessage(), ex ); // wrapping somehow didn't show original exception.
+                    throw new IllegalArgumentException(ex);
                 }
             };
             //RequestProcessor.invokeLater(run); // this allows listening PlotElements to each do their stuff.
@@ -3092,11 +3081,8 @@ public class PlotElementController extends DomNodeController {
                                 final boolean above= ( e.getModifiers() & KeyEvent.SHIFT_MASK ) == KeyEvent.SHIFT_MASK;
                                 final QDataSet ds= hmm.getSlicer().getDataSet();
                                 final Datum y= hmm.getSlicer().getSliceY();
-                                RequestProcessor.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        addPlotBelow(ds,y,above);
-                                    }
+                                RequestProcessor.invokeLater( () -> {
+                                    addPlotBelow(ds,y,above);
                                 });
                             }
                         });
