@@ -180,10 +180,10 @@ public class JythonRefactory {
         boolean affected= false;
         
         ByteArrayOutputStream baos;
-        try (LineNumberReader reader = new LineNumberReader( new InputStreamReader(in) )) {
+        try (LineNumberReader reader = new LineNumberReader( new InputStreamReader(in,"UTF-8") )) {
             String line= reader.readLine();
             baos = new ByteArrayOutputStream(10000);
-            PrintStream writer= new PrintStream( baos );
+            PrintStream writer= new PrintStream( baos, false, "UTF-8" );
             while ( line!=null ) {
                 Matcher m;
                 //if ( line.contains( "org.virbo.jythonsupport.ui.Util.FormData" ) ) {
@@ -195,6 +195,11 @@ public class JythonRefactory {
                     line= line.substring(0,ibs) + ".boxSelected" + line.substring(ibs+12);
                     affected= true;
                     logger.log(Level.WARNING, "fixImports found use of old .BoxSelected method" );
+                }
+                
+                if ( line.indexOf( 160 )>-1 ) {
+                    logger.log(Level.WARNING,"non-breaking space found and removed.  This script will not work with Autoplots released before 2021-09-23 and v2021a_10.");
+                    line= line.replace( (char)160, (char)32 ); // Cindy ran into this where someone used a non-breaking space.
                 }
                 
                 m= IMPORT_REGEX.matcher(line);

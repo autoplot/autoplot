@@ -701,7 +701,7 @@ public class JythonUtil {
                             
                             FileUtil.fileCopy( file, lastVersionFile );
                             
-                            interp.execfile( JythonRefactory.fixImports(in,file.getName()), uri.toString());
+                            interp.execfile( JythonRefactory.fixImports(in,file.getName()), uri.toString() );
                             
                         } catch ( PyException ex ) {
                             if ( scriptPanel!=null ) {
