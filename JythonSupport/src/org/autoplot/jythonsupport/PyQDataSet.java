@@ -1,6 +1,7 @@
 
 package org.autoplot.jythonsupport;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -547,19 +548,19 @@ public final class PyQDataSet extends PyJavaInstance {
                 if ( step==null || step.equals(1) ) {
                     if ( start==null ) start= 0;
                     if ( stop==null ) stop= rods.length();
-                    if ( start.intValue()<0 ) start= rods.length() + start.intValue();
+                    if ( start.intValue()<0 ) start= rods.length() + start.intValue(); // support negative indices
                     if ( stop.intValue()<0 ) stop= rods.length() + stop.intValue();
                     return new PyQDataSet( rods.trim( start.intValue(), stop.intValue() ) );
                 } else {
                     TrimStrideWrapper wds= new TrimStrideWrapper(rods);
-                    wds.setTrim( 0, start, stop, step );
+                    wds.setTrim( 0, start, stop, step ); // supports negative indices
                     return new PyQDataSet(wds);
                 }
 
             } else if (arg0.isNumberType()) {
                 int idx = ((Number) arg0.__tojava__(Number.class)).intValue();
                 if ( idx<0 ) {
-                    idx= rods.length()+idx;
+                    idx= rods.length()+idx; // support negative indices
                 }
 
                 QDataSet sds= rods.slice(idx); //TODO: why is this not the writable dataset, or a copy of it?
@@ -571,7 +572,7 @@ public final class PyQDataSet extends PyJavaInstance {
                 if ( slices.__len__()==2 && slices.__getitem__(1) instanceof PyInteger ) { // sf 3473406: optimize for ds[:,0] to use unbundle
                     if ( slices.__getitem__(0) instanceof PySlice ) {
                         int index= ((Number)slices.__getitem__(1).__tojava__( Number.class )).intValue();
-                        if ( index<0 ) index= rods.length(0) + index;
+                        if ( index<0 ) index= rods.length(0) + index; // support negative indices
                         QDataSet unb1= DataSetOps.unbundle( rods, index, false );
                         PySlice slice = (PySlice) slices.__getitem__(0);
                         if ( slice.start instanceof PyNone && slice.stop instanceof PyNone && slice.step instanceof PyNone ) {
@@ -606,7 +607,7 @@ public final class PyQDataSet extends PyJavaInstance {
                         Number start = (Number) getNumber(slice.start); // TODO: for the 0th index and step=1, native trim can be used.
                         Number stop = (Number)  getNumber(slice.stop);
                         Number step = (Number)  getNumber(slice.step);
-                        fit = new QubeDataSetIterator.StartStopStepIteratorFactory(start, stop, step);
+                        fit = new QubeDataSetIterator.StartStopStepIteratorFactory(start, stop, step); // supports negative indices
 
                     } else if ( a instanceof PyQDataSet ) {
                         Object o2 = a.__tojava__(QDataSet.class);
@@ -614,10 +615,10 @@ public final class PyQDataSet extends PyJavaInstance {
                         switch (that.rank()) {
                             case 0:
                                 int idx = (int)(that.value());
-                                fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
+                                fit = new QubeDataSetIterator.SingletonIteratorFactory(idx); // supports negative indices
                                 break;
                             case 1:
-                                fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
+                                fit = new QubeDataSetIterator.IndexListIteratorFactory(that); // supports negative indices
                                 break;
                             default:
                                 betterBeAllLists= true;
@@ -626,7 +627,7 @@ public final class PyQDataSet extends PyJavaInstance {
                         lists[i]= ((PyQDataSet)a).rods;
                     } else if (a.isNumberType()) {
                         int idx = ((Number) getNumber( a )).intValue();
-                        fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
+                        fit = new QubeDataSetIterator.SingletonIteratorFactory(idx); // supports negative indices
                         if ( i==rods.rank()-1 ) {
                             QDataSet bds= (QDataSet) rods.property( "BUNDLE_"+i );
                             if ( bds!=null && rods.property( "DEPEND_"+i )==null ) { // https://sourceforge.net/p/autoplot/bugs/1478/
@@ -636,7 +637,7 @@ public final class PyQDataSet extends PyJavaInstance {
                         lists[i]= DataSetUtil.asDataSet( idx );
                     } else {
                         QDataSet that = coerce_ds(a);
-                        fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
+                        fit = new QubeDataSetIterator.IndexListIteratorFactory(that); // supports negative indices
                         lists[i]= DataSetUtil.asDataSet( that );
                     }
 
@@ -650,7 +651,7 @@ public final class PyQDataSet extends PyJavaInstance {
                 ArrayDataSet result;
                 if ( allLists && lists.length == rods.rank() ) {
                     lists = checkIndexBundle( lists );
-                    result= getItemAllLists( lists );
+                    result= getItemAllLists( lists ); // supports negative indices
                     
                 } else {
 
@@ -1454,7 +1455,7 @@ public final class PyQDataSet extends PyJavaInstance {
     }
     
     /**
-     * handle special case where rank 1 datasets are used to index a rank N array.
+     * handle special case where rank 1 datasets are used to index a rank N array.  Supports negative indices.
      * @param lists datasets of rank 0 or rank 1
      * @return the array extracted.
      */
@@ -1468,7 +1469,14 @@ public final class PyQDataSet extends PyJavaInstance {
             lists[0]= ll[0];
             lists[i]= ll[1];
         }
+
+        int[] qubeDims= DataSetUtil.qubeDims(rods);
         
+        for ( int i=0; i<lists.length; i++ ) {
+            int len= i==0 ? rods.length() : qubeDims[i];
+            lists[i]= Ops.applyUnaryOp( lists[i], (Ops.UnaryOp) (double d1) -> d1<0 ? len+d1 : d1 );
+        }
+                
         ArrayDataSet result;
         switch (lists[0].rank()) {
             case 0:
@@ -1481,7 +1489,7 @@ public final class PyQDataSet extends PyJavaInstance {
                 result= ArrayDataSet.create( ArrayDataSet.guessBackingStore(rods), DataSetUtil.qubeDims( lists[0] ) );
                 break;
         }
-
+        
         switch (lists[0].rank()) { // all datasets in lists[] will have the same rank.
             case 0:
                 switch (rods.rank()) {
