@@ -873,9 +873,10 @@ public class DataSetURI {
      * provide standard logic for identifying the cache location for a file.  The file
      * will not be downloaded, but clients can check to see if such resource has already been loaded.
      * There is one case where this might be slow, and that's when a zip file must be downloaded to get
-     * the location.
+     * the location.  This returns null if the file is not from the cache (e.g. local file references).
      * @param suri the uri like http://autoplot.org/data/autoplot.dat
-     * @return the cache file, like /home/jbf/autoplot_data/fscache/http/autoplot.org/data/autoplot.dat
+     * @return the cache file, like /home/jbf/autoplot_data/fscache/http/autoplot.org/data/autoplot.dat, or null if the file is not 
+     * from the cache.
      */
     public static File getCacheFilename( URI suri ) {
         URISplit split = URISplit.parse( suri );

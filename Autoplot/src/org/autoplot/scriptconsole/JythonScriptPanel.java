@@ -609,7 +609,11 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
                         URI uri= DataSetURI.getResourceURI(messageSource);
                         if ( uri!=null ) {
                             File ff= DataSetURI.getCacheFilename(uri);
-                            messageSource= ff.toString();
+                            if ( ff==null && uri.getScheme().equals("file")) {
+                                messageSource= uri.getPath(); 
+                            } else {
+                                messageSource= ff.toString();   
+                            }
                         }
                     }
                 }
