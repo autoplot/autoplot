@@ -1079,7 +1079,9 @@ public final class PyQDataSet extends PyJavaInstance {
         } 
         
         value= convertPropertyValue( rods, prop.toString(), value );
-
+        if ( sprop.equals(QDataSet.UNITS) ) {
+            this.units= (Units)value;
+        }
         mpds.putProperty(sprop, value);
         
     }
