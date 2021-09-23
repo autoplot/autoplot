@@ -27,8 +27,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-09-21 r26030):</p>
+        <p>Bugfixes (2021-09-23 r26046):</p>
         <ul>
+            <li>correction to where dimension-ful datum is assigned to dimensionless dataset in Jython.
+            <li>Jython scripts encoded in UTF-8 with non-breaking spaces are handled now by replacing with normal spaces.  Thanks, Cindy!
+            <li>1028: ds[x,y,z] where x y and z are rank 1 list of indices didn't allow negative indices.
             <li>2390: correction to logic for copy plot elements down, which would break in some cases.  Thanks, Allison!
             <li>layout tab list of plot elements wouldn't repaint when the legend label was changed.
             <li>revert log/lin ticks logic, which is needing more time than available.
@@ -56,6 +59,7 @@
         <p>Features:</p>
         <ul>
             <li>more accepting of HAPI servers under development, issuing warnings to help find problems.
+            <li>applyIndexAllLists extracted from Jython code and made available to Java codes as well.
             <li>filter editor panel added for expandToFillGaps.  Thanks Bill!
             <li><a href="https://github.com/das-developers/das2java/issues/18">18</a>: new logic for log ticks when ~1 cycle is showing.
             <li>"About Autoplot" screen shows the release number, not the marginally useful v2021.  Thanks Bill!
