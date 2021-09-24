@@ -29,7 +29,7 @@
                 
         <p>Bugfixes (2021-09-24 r26047):</p>
         <ul>
-            <li><a href='https://sourceforge.net/p/autoplot/bugs/2391/'>2391</a>: fixed, and was caused by a overly cautious check for units.
+            <li><a href='https://sourceforge.net/p/autoplot/bugs/2391/'>2391</a>: Jython dataset setItem was overly cautious in its check for units, seriously degrading performance. Thanks, Bill!
             <li>correction to where datum having units is assigned to dimensionless dataset in Jython.
             <li>Jython scripts encoded in UTF-8 with non-breaking spaces are handled now by replacing with normal spaces.  Thanks, Cindy!
             <li><a href='https://sourceforge.net/p/autoplot/bugs/1028/'>1028</a>: ds[x,y,z] where x y and z are rank 1 list of indices didn't allow negative indices.
