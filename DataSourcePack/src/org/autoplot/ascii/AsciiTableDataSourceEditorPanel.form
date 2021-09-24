@@ -265,7 +265,7 @@
             <Component class="javax.swing.JComboBox" name="timeFormatFieldsComboBox">
               <Properties>
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                  <StringArray count="14">
+                  <StringArray count="16">
                     <StringItem index="0" value="select field type..."/>
                     <StringItem index="1" value="$Y: four digit year"/>
                     <StringItem index="2" value="$y: two digit year"/>
@@ -278,8 +278,10 @@
                     <StringItem index="9" value="$S: two-digit second"/>
                     <StringItem index="10" value="$(milli): three-digit milliseconds"/>
                     <StringItem index="11" value="$(micro): three-digit microseconds"/>
-                    <StringItem index="12" value="$(ignore): ignore this field"/>
-                    <StringItem index="13" value="+: field separator"/>
+                    <StringItem index="12" value="$x: ignore this field"/>
+                    <StringItem index="13" value="$(subsec;places=6): microseconds"/>
+                    <StringItem index="14" value="$(subsec;places=9): nanoseconds"/>
+                    <StringItem index="15" value="+: field separator"/>
                   </StringArray>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Use this droplist to select a field type, and the Select button copies the field type to the Time Format text field."/>

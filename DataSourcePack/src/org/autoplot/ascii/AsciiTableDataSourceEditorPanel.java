@@ -570,7 +570,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         jLabel2.setText("Time Format:");
         jLabel2.setToolTipText("<html>Specify the format of time strings, such as \"%Y %m %d.\"<br>\nPluses join adjacent fields, and the droplist to the right<br>\ncan be used to select field types.  The Guess button attempts <br>\nto guess the format of selected fields.</html>\n");
 
-        timeFormatFieldsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "select field type...", "$Y: four digit year", "$y: two digit year", "$m: two-digit month", "$b: month name", "$d: two-digit day of month", "$j: three-digit day of year", "$H: two-digit hour", "$M: two-digit minute", "$S: two-digit second", "$(milli): three-digit milliseconds", "$(micro): three-digit microseconds", "$(ignore): ignore this field", "+: field separator" }));
+        timeFormatFieldsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "select field type...", "$Y: four digit year", "$y: two digit year", "$m: two-digit month", "$b: month name", "$d: two-digit day of month", "$j: three-digit day of year", "$H: two-digit hour", "$M: two-digit minute", "$S: two-digit second", "$(milli): three-digit milliseconds", "$(micro): three-digit microseconds", "$x: ignore this field", "$(subsec;places=6): microseconds", "$(subsec;places=9): nanoseconds", "+: field separator" }));
         timeFormatFieldsComboBox.setToolTipText("Use this droplist to select a field type, and the Select button copies the field type to the Time Format text field.");
         timeFormatFieldsComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
