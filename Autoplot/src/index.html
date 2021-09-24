@@ -27,12 +27,13 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-09-23 r26046):</p>
+        <p>Bugfixes (2021-09-24 r26047):</p>
         <ul>
-            <li>correction to where dimension-ful datum is assigned to dimensionless dataset in Jython.
+            <li><a href='https://sourceforge.net/p/autoplot/bugs/2391/'>2391</a>: fixed, and was caused by a overly cautious check for units.
+            <li>correction to where datum having units is assigned to dimensionless dataset in Jython.
             <li>Jython scripts encoded in UTF-8 with non-breaking spaces are handled now by replacing with normal spaces.  Thanks, Cindy!
-            <li>1028: ds[x,y,z] where x y and z are rank 1 list of indices didn't allow negative indices.
-            <li>2390: correction to logic for copy plot elements down, which would break in some cases.  Thanks, Allison!
+            <li><a href='https://sourceforge.net/p/autoplot/bugs/1028/'>1028</a>: ds[x,y,z] where x y and z are rank 1 list of indices didn't allow negative indices.
+            <li><a href='https://sourceforge.net/p/autoplot/bugs/2390/'>2390</a>: correction to logic for copy plot elements down, which would break in some cases.  Thanks, Allison!
             <li>layout tab list of plot elements wouldn't repaint when the legend label was changed.
             <li>revert log/lin ticks logic, which is needing more time than available.
             <li>"regex mode" for ASCII table parser would clear the units, limiting capabilities.
