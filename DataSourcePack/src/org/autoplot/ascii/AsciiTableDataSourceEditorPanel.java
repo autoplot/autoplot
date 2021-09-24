@@ -1561,7 +1561,9 @@ private void guessTimeFormatButtonAP( int row, int first, int last ) {
                 unitsTF.setText(params.get("units"));
             }
             if ( params.containsKey("depend0Units") ) {
-                depend0unitsCB.setSelectedItem(params.get("depend0Units"));
+                String depend0Units= params.get("depend0Units");
+                depend0Units= depend0Units.replaceAll("\\+", " " );
+                depend0unitsCB.setSelectedItem(depend0Units);
             } else {
                 depend0unitsCB.setSelectedItem("");
             }
@@ -1751,7 +1753,9 @@ private void guessTimeFormatButtonAP( int row, int first, int last ) {
         setParam( params, "label", labelTextField.getText() );
         setParam( params, "units", unitsTF.getText() );
         if ( depend0unitsCB.getSelectedItem()!=null && depend0unitsCB.getSelectedItem().toString().trim().length()>0 ) {
-            setParam( params, "depend0Units", depend0unitsCB.getSelectedItem().toString() );
+            String depend0Units= depend0unitsCB.getSelectedItem().toString();
+            depend0Units= depend0Units.replaceAll(" ", "+");
+            setParam( params, "depend0Units", depend0Units );
         } else {
             params.remove("depend0Units");
         }
