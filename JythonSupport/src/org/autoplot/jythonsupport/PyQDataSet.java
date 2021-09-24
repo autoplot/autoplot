@@ -951,16 +951,43 @@ public final class PyQDataSet extends PyJavaInstance {
         } else {
             QDataSet wds= DataSetUtil.weightsDataSet(val);
             QubeDataSetIterator it = new QubeDataSetIterator(val);
-            while (it.hasNext()) {
-                it.next();
-                if ( !iter.hasNext() ) throw new IllegalArgumentException("assigned dataset has too many elements");
-                iter.next();
-                double w = it.getValue(wds);
-                if ( w==0 ) {
-                    iter.putValue(ds, dfill);
-                    resultHasFill= true;
+            if ( SemanticOps.isBundle(val) ) {
+                while (it.hasNext()) {
+                    it.next();
+                    if ( !iter.hasNext() ) throw new IllegalArgumentException("assigned dataset has too many elements");
+                    iter.next();
+                    double w = it.getValue(wds);
+                    if ( w==0 ) {
+                        iter.putValue(ds, dfill);
+                        resultHasFill= true;
+                    } else {
+                        iter.putRank0Value( ds, it.getRank0Value(val) );
+                    }
+                }
+            } else {
+                UnitsConverter uc;
+                if ( units==null ) { //TODO: how did this work before?
+                    uc= UnitsConverter.IDENTITY;
                 } else {
-                    iter.putRank0Value( ds, it.getRank0Value(val) );
+                    try {
+                        uc= SemanticOps.getUnits(val).getConverter(units);
+                    } catch ( InconvertibleUnitsException ex ) {
+                        uc= UnitsConverter.IDENTITY;
+                    }       
+                }
+                while (it.hasNext()) {
+                    it.next();
+                    if ( !iter.hasNext() ) throw new IllegalArgumentException("assigned dataset has too many elements");
+                    iter.next();
+                    double w = it.getValue(wds);
+                    if ( w==0 ) {
+                        double d = dfill;
+                        iter.putValue(ds, d);
+                        resultHasFill= true;
+                    } else {
+                        double d = uc.convert(it.getValue(val));
+                        iter.putValue(ds, d);
+                    }  
                 }
             }
             if ( iter.hasNext() ) {
@@ -1297,26 +1324,26 @@ public final class PyQDataSet extends PyJavaInstance {
         return this.rods.rank()==0;
     }
 
-    private static void putValue( WritableDataSet ds, int i, double v, Units u ) {
-        Units dsu= SemanticOps.getUnits(ds.slice(i));
+    private void putValue( WritableDataSet ds, int i, double v, Units u ) {
+        Units dsu= this.units!=null ? this.units : SemanticOps.getUnits(ds.slice(i));
         UnitsConverter uc= u.getConverter( dsu );
         ds.putValue( i, uc.convert(v) );
     }
 
-    private static void putValue( WritableDataSet ds, int i, int j, double v, Units u ) {
-        Units dsu= SemanticOps.getUnits(ds.slice(i).slice(j));
+    private void putValue( WritableDataSet ds, int i, int j, double v, Units u ) {
+        Units dsu= this.units!=null ? this.units : SemanticOps.getUnits(ds.slice(i).slice(j));
         UnitsConverter uc= u.getConverter( dsu );
         ds.putValue( i, j, uc.convert(v) );
     }
     
-    private static void putValue( WritableDataSet ds, int i, int j, int k, double v, Units u ) {
-        Units dsu= SemanticOps.getUnits(ds.slice(i).slice(j).slice(k));
+    private void putValue( WritableDataSet ds, int i, int j, int k, double v, Units u ) {
+        Units dsu= this.units!=null ? this.units : SemanticOps.getUnits(ds.slice(i).slice(j).slice(k));
         UnitsConverter uc= u.getConverter( dsu );
         ds.putValue( i, j, k, uc.convert(v) );
     }
     
-    private static void putValue( WritableDataSet ds, int i, int j, int k, int l, double v, Units u ) {
-        Units dsu= SemanticOps.getUnits(ds.slice(i).slice(j).slice(k).slice(l) );
+    private void putValue( WritableDataSet ds, int i, int j, int k, int l, double v, Units u ) {
+        Units dsu= this.units!=null ? this.units : SemanticOps.getUnits(ds.slice(i).slice(j).slice(k).slice(l) );
         UnitsConverter uc= u.getConverter( dsu );
         ds.putValue( i, j, k, l, uc.convert(v) );
     }
@@ -1327,7 +1354,7 @@ public final class PyQDataSet extends PyJavaInstance {
      * @param val the value (or values) to assign.
      * @return the array extracted.
      */
-    private static void setItemAllLists( WritableDataSet ds, QDataSet[] lists, QDataSet val ) {
+    private void setItemAllLists( WritableDataSet ds, QDataSet[] lists, QDataSet val ) {
                 
         QDataSet[] ll= new QDataSet[2];
         ll[0]= lists[0];
