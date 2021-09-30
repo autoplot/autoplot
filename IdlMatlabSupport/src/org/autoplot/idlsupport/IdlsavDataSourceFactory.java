@@ -156,6 +156,9 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
                 root= root.substring(i2+1);
             }
             Object o= reader.readVar( buf, root );
+            if ( o==null ) {
+                return new String[0];
+            }
             Map<String,Object> m= (Map<String,Object>)o;
             for ( Entry<String,Object> e: m.entrySet() ) {
                 if ( e.getValue() instanceof Map ) {
