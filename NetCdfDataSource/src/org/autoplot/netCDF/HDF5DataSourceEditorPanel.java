@@ -307,18 +307,22 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 break;
             case 1:
                 TreePath tp= xParameterTree.getSelectionPath();
-                String xparameter= String.valueOf(tp.getPathComponent(1));
-                if ( xparameter!=null ) {
-                    longName="<html>"+ parameters.get(xparameter) + "<br><em>" + allParameterInfo.get(xparameter) + "</em>";
-                    parameterInfoLabel.setText( longName );
-                } 
+                if ( tp!=null ) {
+                    String xparameter= String.valueOf(tp.getPathComponent(1));
+                    if ( xparameter!=null ) {
+                        longName="<html>"+ parameters.get(xparameter) + "<br><em>" + allParameterInfo.get(xparameter) + "</em>";
+                        parameterInfoLabel.setText( longName );
+                    } 
+                }
                 break;
             case 2:
                 tp= yParameterTree.getSelectionPath();
-                String yparameter= String.valueOf(tp.getPathComponent(1));
-                if ( yparameter!=null ) {
-                    longName="<html>"+ parameters.get(yparameter) + "<br><em>" + allParameterInfo.get(yparameter) + "</em>";
-                    parameterInfoLabel.setText( longName );
+                if ( tp!=null ) {
+                    String yparameter= String.valueOf(tp.getPathComponent(1));
+                    if ( yparameter!=null ) {
+                        longName="<html>"+ parameters.get(yparameter) + "<br><em>" + allParameterInfo.get(yparameter) + "</em>";
+                        parameterInfoLabel.setText( longName );
+                    }
                 }
                 break;
             default:
