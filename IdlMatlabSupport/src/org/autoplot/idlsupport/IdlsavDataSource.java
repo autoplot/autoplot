@@ -12,7 +12,10 @@ import org.autoplot.datasource.AbstractDataSource;
 import org.das2.datum.Units;
 import org.das2.qds.ArrayDataSet;
 import org.das2.qds.DataSetUtil;
+import org.das2.qds.IDataSet;
+import org.das2.qds.LDataSet;
 import org.das2.qds.QDataSet;
+import org.das2.qds.SDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.util.monitor.ProgressMonitor;
 
@@ -61,7 +64,11 @@ public class IdlsavDataSource extends AbstractDataSource {
         
         if ( v instanceof ReadIDLSav.ArrayData ) {
             ReadIDLSav.ArrayData arrayData= (ReadIDLSav.ArrayData)v;
-            return ArrayDataSet.wrap( arrayData.array, arrayData.dims, false );
+            ArrayDataSet result= ArrayDataSet.wrap( arrayData.array, arrayData.dims, false );
+            if ( result instanceof SDataSet || result instanceof IDataSet || result instanceof LDataSet ) {
+                result.putProperty( QDataSet.FORMAT, "%d" );
+            }
+            return result;
         } else if ( v instanceof Map ) { 
             throw new IllegalArgumentException("Map is not supported, select one of its tags");
         } else {
