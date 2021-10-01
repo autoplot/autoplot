@@ -138,6 +138,9 @@ public class ReadIDLSav {
             case TYPECODE_COMPLEX_FLOAT: {
                 return "complex_float";
             }            
+            case TYPECODE_STRUCT: {
+                return "struct";
+            }            
             case TYPECODE_STRING: {
                 return "string";
             }
@@ -1193,7 +1196,9 @@ public class ReadIDLSav {
                             }
                         } else {
                             if ( ( var.getInt(4) & VARFLAG_ARRAY ) == VARFLAG_ARRAY ) {
-                                return readTypeDescArray(var).arrayDesc;
+                                TagDesc dd= readTypeDescArray(var).arrayDesc;
+                                dd.typecode= readTypeDescArray(var).typeCode;
+                                return dd;
                             } else {
                                 return readTagDesc(var);
                             }

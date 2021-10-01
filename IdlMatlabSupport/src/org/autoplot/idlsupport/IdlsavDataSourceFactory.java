@@ -129,7 +129,8 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             
         } else if ( reader.isArray( buf, key ) ) {
             ArrayDesc desc= (ArrayDesc)reader.readTagDesc( buf, key );
-            StringBuilder sqube= new StringBuilder("[").append(String.valueOf(desc.dims[0]));
+            String stype = ReadIDLSav.decodeTypeCode(desc.typecode);
+            StringBuilder sqube= new StringBuilder(stype).append("[").append(String.valueOf(desc.dims[0]));
             for ( int i=1; i<desc.ndims; i++ ) {
                 sqube.append(",").append(String.valueOf(desc.dims[i]));
             }
@@ -139,9 +140,16 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
                     keyn, this, "arg_0", keyn+" " +sqube, "", true );
             ccresult.add(cc1);
         } else {
+            String so= "";
+            try {
+                Object o = reader.readVar( buf, keyn );
+                so= String.valueOf(o);
+            } catch ( IOException ex ) {
+                
+            }
             CompletionContext cc1= new CompletionContext( 
                     CompletionContext.CONTEXT_PARAMETER_NAME,
-                    keyn, this, "arg_0", keyn+" scalar", "", true );
+                    keyn, this, "arg_0", keyn+" scalar (=" + so + ")", "", true );
             ccresult.add(cc1);
         }
 
