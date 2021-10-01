@@ -419,9 +419,23 @@ public class ReadIDLSav {
                     return makeArrayData( result );
                 }
                 case TYPECODE_STRING: {
-                    byte[] result= new byte[arrayDesc.nelements];
+                    String[] result= new String[arrayDesc.nelements];
+                    int offs= offsToArray;
+                    //for ( int i=0; i<buf.limit(); i++ ) {
+                    //    System.err.println( String.format( "%4d: %d",i,buf.get(i) ) );
+                    //}
+                    //System.err.println("");
                     for ( int i=0; i<result.length; i++ ) {
-                        result[i]= buf.get(offsToArray+i);
+                        int len= buf.getInt(offs);
+                        if ( len<0 || len>1024 ) {
+                            throw new IllegalArgumentException("unbelievable len, something has gone wrong.");
+                        }
+                        byte[] bb= new byte[len];
+                        for ( int k=0; k<len; k++ ) {
+                            bb[k]= buf.get(offs+8+k);
+                        }
+                        result[i]= new String( bb );
+                        offs= offs+sizeOfString(result[i])+8;
                     }
                     return makeArrayData( result );
                 }
@@ -1048,8 +1062,8 @@ public class ReadIDLSav {
             logger.log(Level.CONFIG, "RecType: {0} Length: {1}", new Object[]{labelType(type), nextPos-pos});
             switch ( type ) {
                 case RECTYPE_VARIABLE:
-                    logger.config("variable");
                     StringData varName= readString( rec, 20 );
+                    logger.log(Level.CONFIG, "variable {0}", varName);
                     String rest= null;
                     int i= name.indexOf(".");
                     if ( i>-1 ) {
