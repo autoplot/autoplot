@@ -23,14 +23,14 @@ import java.util.logging.Logger;
  * https://cow.physics.wisc.edu/~craigm/idl/savefmt.pdf
  * and https://github.com/scipy/scipy/blob/master/scipy/io/idl.py
  * for reference, and with no involvement from individuals at
- * Harris Geospacial.  No warrenties are implied and this must
+ * Harris Geospacial.  No warranties are implied and this must
  * be used at your own risk.
  * 
  * @author jbf
  */
 public class ReadIDLSav {
         
-    private static final Logger logger= Logger.getLogger("autoplot.idlsav");
+    private static final Logger logger= Logger.getLogger("apdss.idlsav");
             
     private static final int RECTYPE_VARIABLE = 2;
     private static final int RECTYPE_ENDMARKER = 6;
