@@ -445,6 +445,31 @@ public class ReadIDLSav {
             return null;
         }
         
+        public static String decodeTypeCode( int typeCode ) {
+            switch ( typeCode ) {
+                case TYPECODE_INT16: {
+                    return "short";
+                }
+                case TYPECODE_INT32: {
+                    return "int";
+                }
+                case TYPECODE_INT64: {
+                    return "long";
+                }
+                case TYPECODE_FLOAT: {
+                    return "float";
+                }   
+                case TYPECODE_DOUBLE: {
+                    return "double";
+                }
+                case TYPECODE_STRING: {
+                    return "string";
+                }
+                default:
+                    return String.valueOf(typeCode);
+            }
+        }
+        
         @Override
         public String toString() {
             StringBuilder b= new StringBuilder("["+this.arrayDesc.dims[0]);
@@ -452,7 +477,7 @@ public class ReadIDLSav {
                 b.append(",").append(this.arrayDesc.dims[i]);
             }
             b.append("]");
-            return "" + this.typeCode + b.toString();
+            return "" + decodeTypeCode(this.typeCode) + b.toString();
         }
         
     }
@@ -679,7 +704,7 @@ public class ReadIDLSav {
                         Object arr= arr1.readData(data);
                         result.put( tag, arr );
                         iarray= iarray+1;
-                        iptr= iptr + arr1._lengthBytes;
+                        iptr= iptr + arr1.arrayDesc.nbytes;
                     } else { 
                         TypeDescScalar scalarTypeDesc= new TypeDescScalar();
                         scalarTypeDesc.offs= iptr;
@@ -708,7 +733,7 @@ public class ReadIDLSav {
     private static int sizeOfString( String string ) {
         int n= string.length();
         if ( n==0 ) {
-            throw new IllegalArgumentException("string length must be greater than 0");
+            return 4;
         }
         switch ( n%4 ) {
             case 0: return n;
