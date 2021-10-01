@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 import org.autoplot.datasource.AbstractDataSourceFactory;
 import org.autoplot.datasource.CompletionContext;
 import org.autoplot.datasource.DataSetURI;
@@ -17,6 +18,7 @@ import org.autoplot.datasource.URISplit;
 import org.autoplot.idlsupport.ReadIDLSav.ArrayDesc;
 import org.autoplot.idlsupport.ReadIDLSav.StructDesc;
 import org.autoplot.idlsupport.ReadIDLSav.TagDesc;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 
 /**
@@ -25,6 +27,8 @@ import org.das2.util.monitor.ProgressMonitor;
  */
 public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
 
+    private static Logger logger= LoggerManager.getLogger("apdss.idlsav");
+    
     @Override
     public DataSource getDataSource(URI uri) throws Exception {
         return new IdlsavDataSource(uri);
@@ -193,21 +197,25 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
                     root= root.substring(i2+1);
                 }
                 Object o= reader.readVar( buf, root );
-                Map<String,Object> m= (Map<String,Object>)o;
-                for ( Entry<String,Object> e: m.entrySet() ) {
-                    if ( e.getValue() instanceof Map ) {
-                        for ( Entry<String,Object> e2: ((Map<String,Object>)e.getValue()).entrySet() ) {
+                if ( o instanceof Map ) {
+                    Map<String,Object> m= (Map<String,Object>)o;
+                    for ( Entry<String,Object> e: m.entrySet() ) {
+                        if ( e.getValue() instanceof Map ) {
+                            for ( Entry<String,Object> e2: ((Map<String,Object>)e.getValue()).entrySet() ) {
+                                CompletionContext cc1= new CompletionContext( 
+                                    CompletionContext.CONTEXT_PARAMETER_NAME,
+                                    root + "." + e.getKey() + "."+ e2.getKey(), this, "arg_0", root + "." + e.getKey()+ "."+ e2.getKey(), "", true );
+                                ccresult.add(cc1);                        
+                            }
+                        } else {
                             CompletionContext cc1= new CompletionContext( 
                                 CompletionContext.CONTEXT_PARAMETER_NAME,
-                                root + "." + e.getKey() + "."+ e2.getKey(), this, "arg_0", root + "." + e.getKey()+ "."+ e2.getKey(), "", true );
-                            ccresult.add(cc1);                        
+                                root + "." + e.getKey(), this, "arg_0", root + "." + e.getKey(), "", true );
+                            ccresult.add(cc1);
                         }
-                    } else {
-                        CompletionContext cc1= new CompletionContext( 
-                            CompletionContext.CONTEXT_PARAMETER_NAME,
-                            root + "." + e.getKey(), this, "arg_0", root + "." + e.getKey(), "", true );
-                        ccresult.add(cc1);
                     }
+                } else {
+                    logger.fine("not a Map, which was expected");
                 }
             } else {
                 for (String name : names) {
