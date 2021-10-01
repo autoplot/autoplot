@@ -71,11 +71,11 @@ public class IdlsavDataSource extends AbstractDataSource {
         
         if ( v instanceof ReadIDLSav.ArrayData ) {
             ReadIDLSav.ArrayData arrayData= (ReadIDLSav.ArrayData)v;
-            if ( arrayData.dims.length>1 ) {
-                throw new IllegalArgumentException("not supported");
-            }
             Class c= arrayData.array.getClass();
             if ( c.isArray() && c.getComponentType()==String.class ) {
+                if ( arrayData.dims.length>1 ) {
+                    throw new IllegalArgumentException("not supported");
+                }
                 EnumerationUnits u= Units.nominal();
                 ArrayDataSet result= IDataSet.create(arrayData.dims);
                 result.putProperty( QDataSet.UNITS, u );
