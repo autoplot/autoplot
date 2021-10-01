@@ -4,12 +4,15 @@ package org.autoplot.idlsupport;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.reflect.Array;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.autoplot.datasource.AbstractDataSource;
+import org.das2.datum.Datum;
+import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.qds.ArrayDataSet;
 import org.das2.qds.DataSetUtil;
@@ -68,13 +71,31 @@ public class IdlsavDataSource extends AbstractDataSource {
         
         if ( v instanceof ReadIDLSav.ArrayData ) {
             ReadIDLSav.ArrayData arrayData= (ReadIDLSav.ArrayData)v;
-            ArrayDataSet result= ArrayDataSet.wrap( arrayData.array, arrayData.dims, false );
-            if ( result instanceof SDataSet || result instanceof IDataSet || result instanceof LDataSet ) {
-                result.putProperty( QDataSet.FORMAT, "%d" );
+            if ( arrayData.dims.length>1 ) {
+                throw new IllegalArgumentException("not supported");
             }
-            return result;
+            Class c= arrayData.array.getClass();
+            if ( c.isArray() && c.getComponentType()==String.class ) {
+                EnumerationUnits u= Units.nominal();
+                ArrayDataSet result= IDataSet.create(arrayData.dims);
+                result.putProperty( QDataSet.UNITS, u );
+                if ( arrayData.dims.length!=1 ) throw new IllegalArgumentException("multi dimensional not supported");
+                for ( int j=0; j<Array.getLength(arrayData.array); j++ ) {
+                    Datum d= u.createDatum( Array.get( arrayData.array, j ) );
+                    result.putValue( j, d.doubleValue(u) );
+                }
+                return result;
+            } else {
+                ArrayDataSet result= ArrayDataSet.wrap( arrayData.array, arrayData.dims, false );
+                if ( result instanceof SDataSet || result instanceof IDataSet || result instanceof LDataSet ) {
+                    result.putProperty( QDataSet.FORMAT, "%d" );
+                }
+                return result;
+            }
         } else if ( v instanceof Map ) { 
             throw new IllegalArgumentException("Map is not supported, select one of its tags");
+        } else if ( v instanceof String ) {
+            return Ops.dataset( Units.nominal().createDatum(v) );
         } else {
             return Ops.dataset(v);
         }
