@@ -422,7 +422,7 @@ public class ReadIDLSav {
                     String[] result= new String[arrayDesc.nelements];
                     int offs= offsToArray;
                     //for ( int i=0; i<buf.limit(); i++ ) {
-                    //    System.err.println( String.format( "%4d: %d",i,buf.get(i) ) );
+                    //    System.err.println( String.format( "%4d: %3d %c",i,buf.get(i), (char)buf.get(i) ) );
                     //}
                     //System.err.println("");
                     for ( int i=0; i<result.length; i++ ) {
@@ -435,7 +435,11 @@ public class ReadIDLSav {
                             bb[k]= buf.get(offs+8+k);
                         }
                         result[i]= new String( bb );
-                        offs= offs+sizeOfString(result[i])+8;
+                        if ( result[i].length()==0 ) {
+                            offs= offs+4;
+                        } else {
+                            offs= offs+sizeOfString(result[i])+8;
+                        }
                     }
                     return makeArrayData( result );
                 }
@@ -733,7 +737,7 @@ public class ReadIDLSav {
     private static int sizeOfString( String string ) {
         int n= string.length();
         if ( n==0 ) {
-            return 4;
+            return 0;
         }
         switch ( n%4 ) {
             case 0: return n;
