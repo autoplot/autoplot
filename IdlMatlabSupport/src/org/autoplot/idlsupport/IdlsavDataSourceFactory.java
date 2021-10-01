@@ -227,7 +227,30 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
                 }
             } else {
                 for (String name : names) {
-                    addCompletions(reader, null, name, buf, ccresult);
+                    String root= name;
+                    if ( reader.isStructure(buf, name ) ) {
+                        Object o= reader.readVar( buf, name );
+                        if ( o instanceof Map ) {
+                            Map<String,Object> m= (Map<String,Object>)o;
+                            for ( Entry<String,Object> e: m.entrySet() ) {
+                                if ( e.getValue() instanceof Map ) {
+                                    for ( Entry<String,Object> e2: ((Map<String,Object>)e.getValue()).entrySet() ) {
+                                        CompletionContext cc1= new CompletionContext( 
+                                            CompletionContext.CONTEXT_PARAMETER_NAME,
+                                            root + "." + e.getKey() + "."+ e2.getKey(), this, "arg_0", root + "." + e.getKey()+ "."+ e2.getKey(), "", true );
+                                        ccresult.add(cc1);                        
+                                    }
+                                } else {
+                                    CompletionContext cc1= new CompletionContext( 
+                                        CompletionContext.CONTEXT_PARAMETER_NAME,
+                                        root + "." + e.getKey(), this, "arg_0", root + "." + e.getKey(), "", true );
+                                    ccresult.add(cc1);
+                                }
+                            }
+                        }
+                    } else {
+                        addCompletions(reader, null, name, buf, ccresult);
+                    }
                 }
             }
             ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "xunits=", "units for the x values"));
