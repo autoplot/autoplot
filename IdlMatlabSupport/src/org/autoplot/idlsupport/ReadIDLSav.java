@@ -108,6 +108,45 @@ public class ReadIDLSav {
     private static final int TYPECODE_INT64=14;
 
     /**
+     * return a string representing the type code, if supported.
+     * @param typeCode
+     * @return 
+     */
+    public static String decodeTypeCode( int typeCode ) {
+        switch ( typeCode ) {
+            case TYPECODE_BYTE: {
+                return "byte";
+            }
+            case TYPECODE_INT16: {
+                return "short";
+            }
+            case TYPECODE_INT32: {
+                return "int";
+            }
+            case TYPECODE_INT64: {
+                return "long";
+            }
+            case TYPECODE_FLOAT: {
+                return "float";
+            }   
+            case TYPECODE_DOUBLE: {
+                return "double";
+            }
+            case TYPECODE_COMPLEX_DOUBLE: {
+                return "complex_double";
+            }            
+            case TYPECODE_COMPLEX_FLOAT: {
+                return "complex_float";
+            }            
+            case TYPECODE_STRING: {
+                return "string";
+            }
+            default:
+                return String.valueOf(typeCode);
+        }
+    }
+    
+    /**
      * return the size of the IDL data type in bytes.  Note shorts are stored
      * in 4-bytes.
      * @param typeCode
@@ -448,32 +487,7 @@ public class ReadIDLSav {
             }
             return null;
         }
-        
-        public static String decodeTypeCode( int typeCode ) {
-            switch ( typeCode ) {
-                case TYPECODE_INT16: {
-                    return "short";
-                }
-                case TYPECODE_INT32: {
-                    return "int";
-                }
-                case TYPECODE_INT64: {
-                    return "long";
-                }
-                case TYPECODE_FLOAT: {
-                    return "float";
-                }   
-                case TYPECODE_DOUBLE: {
-                    return "double";
-                }
-                case TYPECODE_STRING: {
-                    return "string";
-                }
-                default:
-                    return String.valueOf(typeCode);
-            }
-        }
-        
+                
         @Override
         public String toString() {
             StringBuilder b= new StringBuilder("["+this.arrayDesc.dims[0]);
