@@ -8,6 +8,7 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Map;
+import java.util.logging.Logger;
 import org.autoplot.datasource.AbstractDataSource;
 import org.das2.datum.Units;
 import org.das2.qds.ArrayDataSet;
@@ -17,6 +18,7 @@ import org.das2.qds.LDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.SDataSet;
 import org.das2.qds.ops.Ops;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 
 /**
@@ -25,6 +27,8 @@ import org.das2.util.monitor.ProgressMonitor;
  */
 public class IdlsavDataSource extends AbstractDataSource {
 
+    private static Logger logger= LoggerManager.getLogger("apdss.idlsav");
+    
     public IdlsavDataSource(URI uri) {
         super(uri);
     }
