@@ -8,13 +8,16 @@ import java.lang.reflect.Array;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.text.ParseException;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.autoplot.datasource.AbstractDataSource;
 import org.das2.datum.Datum;
 import org.das2.datum.EnumerationUnits;
+import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.qds.ArrayDataSet;
+import org.das2.qds.DDataSet;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.IDataSet;
 import org.das2.qds.LDataSet;
@@ -124,6 +127,40 @@ public class IdlsavDataSource extends AbstractDataSource {
                     }
                 }
                 break;
+            case 1:
+                Units u= (Units)array.property(QDataSet.UNITS);
+                if ( u instanceof EnumerationUnits ) { // are the strings found actually ISO8601 times?
+                    if ( array.length()>0 ) {
+                        String firstRec= array.slice(0).svalue();
+                        String yr4= firstRec.substring(0,4);
+                        if ( firstRec.length()>10 ) {
+                            int year= Integer.parseUnsignedInt(yr4);
+                            if ( year>1600 && year<2900 ) {
+                                if ( TimeUtil.isValidTime(firstRec) ) {
+                                    boolean useTimes= true;
+                                    DDataSet newTime= DDataSet.createRank1( array.length() );
+                                    Units timeUnits= year>2010 ? Units.us2020 : Units.us2000;
+                                    newTime.putProperty(QDataSet.UNITS, timeUnits);
+                                    newTime.putProperty(name, array.property(QDataSet.NAME) );
+                                    for ( int i=0; i<array.length(); i++ ) {
+                                        try {
+                                            String value= array.slice(i).svalue();
+                                            newTime.putValue( i, timeUnits.parse(value).doubleValue(timeUnits) );
+                                        } catch ( ParseException ex ) {
+                                            useTimes= false;
+                                            break;
+                                        }
+                                    }
+                                    if ( useTimes==false ) {
+                                        return array;
+                                    } else {
+                                        return newTime;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             default:
                 result= array;
                 break;
@@ -146,6 +183,7 @@ public class IdlsavDataSource extends AbstractDataSource {
         while ( bytesRead<fileSize ) {
             bytesRead+= inChannel.read(buffer);
         }
+        buffer.flip();
         
         String x= getParam("X","");
         String y= getParam("Y","");
