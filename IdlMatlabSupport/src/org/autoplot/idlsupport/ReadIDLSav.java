@@ -191,7 +191,7 @@ public class ReadIDLSav {
         while ( rec!=null ) {
             int type= rec.getInt(0);
             int nextPos= rec.getInt(4);
-            logger.log(Level.CONFIG, "RecType: {0} Length: {1}", new Object[]{labelType(type), nextPos-pos});
+            logger.log(Level.CONFIG, "RecType: {0} Length: {1,number,#}", new Object[]{labelType(type), nextPos-pos});
             switch ( type ) {
                 case RECTYPE_VARIABLE:
                     logger.config("variable");
@@ -637,7 +637,7 @@ public class ReadIDLSav {
                             struct1.structArrayDesc= structDesc.arrTable[iarray];
                             struct1.offsetToData= iptr;
                             struct1.isSubstructure= true;
-                            logger.log(Level.CONFIG, "readstruct {0} {1} {2} {3}", new Object[]{data.position(), 0, data.limit(), tag});
+                            logger.log(Level.CONFIG, "readstruct {0} {1,number,#} {2,number,#} {3}", new Object[]{data.position(), 0, data.limit(), tag});
                             Object map1= struct1.readData(data);                        
                             if ( j==0 ) {
                                 Map mapd= (Map)map1;
@@ -659,7 +659,7 @@ public class ReadIDLSav {
                             arr1.offsToArray= iptr;
                             arr1.typeCode= structDesc.tagtable[i].typecode;
                             arr1.varFlags= structDesc.tagtable[i].tagflags;
-                            logger.log(Level.CONFIG, "readarray {0} {1} {2} {3}", new Object[]{data.position(), 0, data.limit(), tag});
+                            logger.log(Level.CONFIG, "readarray {0} {1,number,#} {2,number,#} {3}", new Object[]{data.position(), 0, data.limit(), tag});
                             Object arr= arr1.readData(data);
                             if ( j==0 && arr instanceof ArrayData ) {
                                 ArrayData ad= (ArrayData)arr;
@@ -681,7 +681,7 @@ public class ReadIDLSav {
                             TypeDescScalar scalarTypeDesc= new TypeDescScalar();
                             scalarTypeDesc.offs= iptr;
                             scalarTypeDesc.typeCode= structDesc.tagtable[i].typecode;
-                            logger.log(Level.CONFIG, "readscalar {0} {1} {2} {3}", new Object[]{data.position(), 0, data.limit(), tag});
+                            logger.log(Level.CONFIG, "readscalar {0} {1,number,#} {2,number,#} {3}", new Object[]{data.position(), 0, data.limit(), tag});
                             Object scalar= scalarTypeDesc.readData(data);                            
                             if ( j==0 ) {
                                 if ( scalar.getClass().isArray() ) throw new IllegalArgumentException("scalar should not be an array");
@@ -726,7 +726,7 @@ public class ReadIDLSav {
                         struct1.structArrayDesc= structDesc.arrTable[iarray];
                         struct1.offsetToData= iptr;
                         struct1.isSubstructure= true;
-                        logger.log(Level.CONFIG, "readstruct_1 {0} {1} {2} {3}", new Object[]{iptr, 0, data.limit(), tag});
+                        logger.log(Level.CONFIG, "readstruct_1 {0} {1,number,#} {2,number,#} {3}", new Object[]{iptr, 0, data.limit(), tag});
                         Object map= struct1.readData(data);
                         result.put( tag, map );
                         iptr= iptr + struct1._lengthBytes;
@@ -739,7 +739,7 @@ public class ReadIDLSav {
                         arr1.offsToArray= iptr;
                         arr1.typeCode= structDesc.tagtable[i].typecode;
                         arr1.varFlags= structDesc.tagtable[i].tagflags;
-                        logger.log(Level.CONFIG, "readarray_1 {0} {1} {2} {3}", new Object[]{iptr, 0, data.limit(), tag});
+                        logger.log(Level.CONFIG, "readarray_1 {0} {1,number,#} {2,number,#} {3}", new Object[]{iptr, 0, data.limit(), tag});
                         Object arr= arr1.readData(data);
                         result.put( tag, arr );
                         iarray= iarray+1;
@@ -748,7 +748,7 @@ public class ReadIDLSav {
                         TypeDescScalar scalarTypeDesc= new TypeDescScalar();
                         scalarTypeDesc.offs= iptr;
                         scalarTypeDesc.typeCode= structDesc.tagtable[i].typecode;
-                        logger.log(Level.CONFIG, "readscalar_1 {0} {1} {2} {3}", new Object[]{iptr, 0, data.limit(), tag});
+                        logger.log(Level.CONFIG, "readscalar_1 {0} {1,number,#} {2,number,#} {3}", new Object[]{iptr, 0, data.limit(), tag});
                         Object scalar= scalarTypeDesc.readData(data);     
                         result.put( tag, scalar );
                         if ( scalarTypeDesc.typeCode==7 ) {
@@ -1060,7 +1060,7 @@ public class ReadIDLSav {
             if ( rec.getInt(8)!=0 ) {
                 throw new IllegalArgumentException("records bigger than 2**32 bytes are not supported.");
             }
-            logger.log(Level.CONFIG, "RecType: {0} Length: {1}", new Object[]{labelType(type), nextPos-pos});
+            logger.log(Level.CONFIG, "RecType: {0} Length: {1,number,#}", new Object[]{labelType(type), nextPos-pos});
             switch ( type ) {
                 case RECTYPE_VARIABLE:
                     logger.config("variable");
@@ -1102,7 +1102,7 @@ public class ReadIDLSav {
         while ( rec!=null ) {
             int type= rec.getInt(0);
             int nextPos= rec.getInt(4);
-            logger.log(Level.CONFIG, "RecType: {0} Length: {1}", new Object[]{labelType(type), nextPos-pos});
+            logger.log(Level.CONFIG, "RecType: {0} Length: {1,number,#}", new Object[]{labelType(type), nextPos-pos});
             switch ( type ) {
                 case RECTYPE_VARIABLE:
                     logger.config("variable");
@@ -1144,7 +1144,7 @@ public class ReadIDLSav {
             logger.warning("magic number is incorrect");
         }
         if ( in.position()==0 ) {
-            logger.log(Level.CONFIG, "readVar {0} buffer size: {1}", new Object[] { name, in.limit() } );
+            logger.log(Level.CONFIG, "readVar {0} buffer size: {1,number,#}", new Object[] { name, in.limit() } );
         }
         int pos= 4;
         String name0= name; // keep name for reference.
@@ -1152,12 +1152,12 @@ public class ReadIDLSav {
         while ( rec!=null ) {
             int type= rec.getInt(0);
             int nextPos= rec.getInt(4);
-            logger.log(Level.CONFIG, "RecType: {0} Length: {1}", new Object[]{labelType(type), nextPos-pos});
+            logger.log(Level.CONFIG, "RecType: {0} Length: {1,number,#}", new Object[]{labelType(type), nextPos-pos});
             switch ( type ) {
                 case RECTYPE_VARIABLE:
                     StringData varName= readString( rec, 20 );
-                    logger.log(Level.CONFIG, "variable {0} {1} {2} {3}", 
-                            new Object[] { type, String.valueOf(pos), String.valueOf(nextPos), varName } );
+                    logger.log(Level.CONFIG, "variable {0} {1,number,#} {2,number,#} {3}", 
+                            new Object[] { type, pos, nextPos, varName } );
                     String rest= null;
                     int i= name.indexOf(".");
                     if ( i>-1 ) {
@@ -1223,7 +1223,7 @@ public class ReadIDLSav {
         while ( rec!=null ) {
             int type= rec.getInt(0);
             int nextPos= rec.getInt(4);
-            logger.log(Level.CONFIG, "RecType: {0} Length: {1}", new Object[]{labelType(type), nextPos-pos});
+            logger.log(Level.CONFIG, "RecType: {0} Length: {1,number,#}", new Object[]{labelType(type), nextPos-pos});
             switch ( type ) {
                 case RECTYPE_VARIABLE:
                     logger.config("variable");
