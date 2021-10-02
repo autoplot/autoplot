@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>X and Y axis scales are bound to preserve the image aspect ratio.  Happy Fall!
+        <p><small>Final round of bug fixes with density files as RBSP mission comes to a close.  Run batch tool is effective at managing things.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,8 +27,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-09-24 r26047):</p>
+        <p>Bugfixes (2021-10-02 r26070):</p>
         <ul>
+            <li>IDL reader support completions are corrected so automatic GUI is fixed.
             <li><a href='https://sourceforge.net/p/autoplot/bugs/2391/'>2391</a>: Jython dataset setItem was overly cautious in its check for units, seriously degrading performance. Thanks, Bill!
             <li>correction to where datum having units is assigned to dimensionless dataset in Jython.
             <li>Jython scripts encoded in UTF-8 with non-breaking spaces are handled now by replacing with normal spaces.  Thanks, Cindy!
@@ -59,6 +60,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>join(extent(),extent()) is properly formatted as two ranges.
+            <li>Introduce Units.us2020, for use when nano-second precision is needed around 2020.
+            <li>IDLSave reader uses %d format for integer data.
+            <li>IDLSave reader corrections to read array of strings, automatically detect ISO8601 data.
             <li>more accepting of HAPI servers under development, issuing warnings to help find problems.
             <li>applyIndexAllLists extracted from Jython code and made available to Java codes as well.
             <li>filter editor panel added for expandToFillGaps.  Thanks Bill!
