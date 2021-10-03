@@ -65,13 +65,32 @@ public class ReadIDLSav {
 
         ch.order( ByteOrder.BIG_ENDIAN );
         
-        int recType= ch.getInt(pos);
+        int type= ch.getInt(pos);
         int endpos= ch.getInt(pos+4);
         
-        if ( recType==RECTYPE_ENDMARKER ) {
+        String stype;
+        if ( type==RECTYPE_ENDMARKER ) {
             return null;
         } else {
-            return slice(ch, pos, endpos, "", "" );
+            switch ( type ) {
+                case RECTYPE_VARIABLE:
+                    stype= "variable";
+                    StringData varName= readString( ch, pos+20 );
+                    return slice(ch, pos, endpos, stype, varName.string );
+                case RECTYPE_VERSION:
+                    stype= "version";
+                    break;
+                case RECTYPE_TIMESTAMP:
+                    stype="timestamp";
+                    break;
+                case RECTYPE_PROMOTE64:
+                    stype="promote64";
+                    break;
+                default:
+                    stype="???";
+                    break;
+            }
+            return slice(ch, pos, endpos, stype, "" );
         }
     }
     
@@ -122,8 +141,8 @@ public class ReadIDLSav {
 
     /**
      * return a string representing the type code, if supported.
-     * @param typeCode
-     * @return 
+     * @param typeCode for example 4 which means float or 7 which means string.
+     * @return "float" or "string" or whatever the code is, or the numeric code if not supported.
      */
     public static String decodeTypeCode( int typeCode ) {
         switch ( typeCode ) {
@@ -372,8 +391,23 @@ public class ReadIDLSav {
         }
     }
 
+    /**
+     * represents a tag within a structure
+     */
     public static class TagDesc {
-        int offset;
+        /**
+         * offset into the structure of the thing described.  When the thing is a structure, the descriptor is the target.
+         */
+        int offset; 
+        
+        /**
+         * offset into the file
+         */
+        int fileOffset;
+        
+        /**
+         * the type of thing pointed to.
+         */
         int typecode;
         int tagflags;
         /**
@@ -389,6 +423,7 @@ public class ReadIDLSav {
     private TagDesc readTagDesc( ByteBuffer rec ) {
         TagDesc result= new TagDesc();
         result.offset= rec.getInt(0);
+        result.fileOffset= bufferOffsets.get(rec) + result.offset;
         result.typecode= rec.getInt(4);
         result.tagflags= rec.getInt(8);
         return result;
@@ -437,6 +472,10 @@ public class ReadIDLSav {
         @Override
         Object readData( ByteBuffer buf ) {
             _lengthBytes= sizeOf(typeCode) * arrayDesc.nelements;
+            
+            int offsetToFile= bufferOffsets.get(buf);
+            logger.log(Level.CONFIG, "readData @ {0,number,#}", offsetToFile+ offsToArray );
+            
             switch (typeCode) {
                 case TYPECODE_INT16: {
                     short[] result= new short[arrayDesc.nelements];
@@ -446,6 +485,7 @@ public class ReadIDLSav {
                     return makeArrayData( result );
                 }
                 case TYPECODE_INT32: {
+                    
                     int[] result= new int[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
                         result[i]= buf.getInt(offsToArray+4*i);
@@ -483,7 +523,7 @@ public class ReadIDLSav {
                     for ( int i=0; i<result.length; i++ ) {
                         int len= buf.getInt(offs);
                         if ( len<0 || len>1024 ) {
-                            throw new IllegalArgumentException("unbelievable len, something has gone wrong.");
+                            throw new IllegalArgumentException("string has unbelievable len, something has gone wrong.");
                         }
                         byte[] bb= new byte[len];
                         for ( int k=0; k<len; k++ ) {
@@ -809,6 +849,7 @@ public class ReadIDLSav {
     }
     
     private TypeDescScalar readTypeDescScalar( ByteBuffer rec ) {
+        logger.log(Level.FINER, "readTypeDescScalar @ {0}", bufferOffsets.get(rec));
         TypeDescScalar result= new TypeDescScalar();
         result.typeCode= rec.getInt(0);
         result.varFlags= rec.getInt(4);
@@ -816,6 +857,7 @@ public class ReadIDLSav {
     }
     
     private ArrayDesc readArrayDesc( ByteBuffer rec ) {
+        logger.log(Level.FINER, "readArrayDesc @ {0}", bufferOffsets.get(rec));
         ArrayDesc result= new ArrayDesc();
         if ( rec.getInt(0)!=8 ) {
             throw new IllegalArgumentException("expected 8 for ARRSTART");
@@ -834,6 +876,7 @@ public class ReadIDLSav {
     }
     
     public StructDesc readStructDesc( ByteBuffer rec ) {
+        logger.log(Level.FINER, "readStructDesc @ {0}", bufferOffsets.get(rec));
         StructDesc result= new StructDesc();
         if ( rec.getInt(0)!=9 ) {
             throw new IllegalArgumentException("expected 9 for STRUCTSTART");
@@ -909,6 +952,7 @@ public class ReadIDLSav {
     }
     
     private TypeDescStructure readTypeDescStructure( ByteBuffer rec ) {
+        logger.log(Level.FINER, "readTypeDescStructure @ {0}", bufferOffsets.get(rec));
         TypeDescStructure result= new TypeDescStructure();
         result.typeCode= rec.getInt(0);
         result.varFlags= rec.getInt(4);
@@ -920,6 +964,7 @@ public class ReadIDLSav {
     }
     
     private TypeDescArray readTypeDescArray( ByteBuffer rec ) {
+        logger.log(Level.FINER, "readTypeDescStructure @ {0}", bufferOffsets.get(rec));
         TypeDescArray result= new TypeDescArray();
         result.typeCode= rec.getInt(0);
         result.varFlags= rec.getInt(4);
@@ -933,6 +978,7 @@ public class ReadIDLSav {
      * @return 
      */
     private TypeDesc readTypeDesc( ByteBuffer typeDescBuf ) {
+        logger.log(Level.FINER, "readTypeDesc @ {0}", bufferOffsets.get(typeDescBuf));
         int typeCode= typeDescBuf.getInt(0);
         if ( typeCode<0 || typeCode>14 ) {
             throw new IllegalArgumentException("expected 0-14 for type code in readTypeDesc");
@@ -951,20 +997,22 @@ public class ReadIDLSav {
      * read the scalar, array, or structure at this position.  An
      * array is returned flattened, and readTypeDesc should be used
      * to unflatten it.  Structures are returned as a LinkedHashMap.
-     * @param rec
+     * @param rec the byte buffer
+     * @param offset offset into rec
      * @param vars map containing read data.
      * @return the read data.
      */
-    private Object variable( ByteBuffer rec, Map<String,Object> vars) {
-        int type= rec.getInt(0);
+    private Object variable( ByteBuffer rec, int offset, Map<String,Object> vars) {
+        logger.log( Level.FINER, "variable @ {0}", bufferOffsets.get(rec) );
+        int type= rec.getInt(0+offset);
         if ( type!=RECTYPE_VARIABLE ) {
             throw new IllegalArgumentException("not a variable");
         }
         //printBuffer(rec);
-        StringData varName= readString( rec, 20 );
+        StringData varName= readString( rec, 20+offset );
         logger.log(Level.FINE, "variable name is {0}", varName );
 
-        int nextField= 20 + varName._lengthBytes;
+        int nextField= 20 + varName._lengthBytes + offset;
 
         ByteBuffer data= slice(rec, nextField, rec.limit(), "typeDesc", "" );
         TypeDesc typeDesc= readTypeDesc( data );
@@ -978,7 +1026,12 @@ public class ReadIDLSav {
         
     }
     
-    private static final Map<ByteBuffer,Integer> offsets= new WeakHashMap<>();
+    private static final Map<ByteBuffer,Integer> bufferOffsets= new HashMap<>();
+    private static final Map<ByteBuffer,String> bufferLabels= new HashMap<>();
+    
+    private String nameFor( ByteBuffer buf ) {
+        return bufferLabels.get(buf);
+    }
     
     /**
      * slice out just the object 
@@ -989,13 +1042,17 @@ public class ReadIDLSav {
      * @return 
      */
     private ByteBuffer slice( ByteBuffer src, int position, int limit, String type, String label ) {
-        Integer offset= offsets.get(src);
+        if ( label==null ) throw new IllegalArgumentException("no label");
+        Integer offset= bufferOffsets.get(src);
         if ( offset!=null ) {
             logger.log(Level.CONFIG, "slice {0} {1,number,#} {2,number,#} {3}", 
                     new Object[]{ type, position+offset, limit+offset, label });
         } else {
             logger.log(Level.CONFIG, "slice {0} {1,number,#} {2,number,#} {3}", new Object[]{ type, position, limit, label });
             offset=0;
+            if ( bufferLabels.get(src)==null ) {
+                bufferLabels.put( src,"file");
+            }
         }
         int position0= src.position();
         int limit0= src.limit();
@@ -1006,7 +1063,9 @@ public class ReadIDLSav {
         r1.flip();
         src.limit(limit0);
         src.position(position0);
-        offsets.put( r1, position+offset );
+        
+        bufferOffsets.put( r1, position+offset );
+        bufferLabels.put( r1, label );
         return r1;
     }
     
@@ -1064,7 +1123,7 @@ public class ReadIDLSav {
             switch ( type ) {
                 case RECTYPE_VARIABLE:
                     logger.config("variable");
-                    variable(rec, result);
+                    variable(rec, 0, result);
                     break;
                 case RECTYPE_VERSION:
                     logger.config("version");
@@ -1141,15 +1200,26 @@ public class ReadIDLSav {
     public Object readVar( ByteBuffer in, String name ) throws IOException {
         int magic= in.getInt(0);
         if ( magic!=1397882884 ) {
-            logger.warning("magic number is incorrect");
+            logger.warning("magic number is incorrect, file should start with should be 1397882884");
+        }
+        if ( in.order()!=ByteOrder.BIG_ENDIAN ) {
+            throw new IllegalArgumentException("buffer must be big endian");
         }
         if ( in.position()==0 ) {
             logger.log(Level.CONFIG, "readVar {0} buffer size: {1,number,#}", new Object[] { name, in.limit() } );
         }
+
+        bufferOffsets.put( in, 0 );
+        bufferLabels.put( in, "<file>" );
+
         int pos= 4;
         String name0= name; // keep name for reference.
         ByteBuffer rec= readRecord( in, pos );
+        
         while ( rec!=null ) {
+    
+            int offset = bufferOffsets.get(rec);
+        
             int type= rec.getInt(0);
             int nextPos= rec.getInt(4);
             logger.log(Level.CONFIG, "RecType: {0} Length: {1,number,#}", new Object[]{labelType(type), nextPos-pos});
@@ -1167,13 +1237,13 @@ public class ReadIDLSav {
                     if ( i==-1 ) {
                         if ( varName.string.equals(name) ) {
                             Map<String,Object> result= new HashMap<>();
-                            variable(rec, result);
+                            variable( in, offset, result);
                             return result.get(name);
                         }
                     } else {
                         if ( varName.string.equals(name) ) {
                             Map<String,Object> result= new HashMap<>();
-                            variable(rec,result);
+                            variable( in, offset, result );
                             Map<String,Object> res= (Map<String,Object>) result.get(name);
                             assert rest!=null;
                             i= rest.indexOf('.');
@@ -1201,6 +1271,8 @@ public class ReadIDLSav {
             }
             pos= nextPos;
             rec= readRecord( in, pos );
+            
+            
         }
         return null;        
         

@@ -7,6 +7,7 @@ import java.io.RandomAccessFile;
 import java.lang.reflect.Array;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.text.ParseException;
 import java.util.Map;
@@ -130,7 +131,7 @@ public class IdlsavDataSource extends AbstractDataSource {
             case 1:
                 Units u= (Units)array.property(QDataSet.UNITS);
                 if ( u instanceof EnumerationUnits ) { // are the strings found actually ISO8601 times?
-                    if ( array.length()>0 ) {
+                    if ( array.length()>8 ) {
                         String firstRec= array.slice(0).svalue();
                         String yr4= firstRec.substring(0,4);
                         if ( firstRec.length()>10 ) {
@@ -184,7 +185,7 @@ public class IdlsavDataSource extends AbstractDataSource {
             bytesRead+= inChannel.read(buffer);
         }
         buffer.flip();
-        
+        buffer.order(ByteOrder.BIG_ENDIAN);
         String x= getParam("X","");
         String y= getParam("Y","");
         String z= getParam("Z","");
