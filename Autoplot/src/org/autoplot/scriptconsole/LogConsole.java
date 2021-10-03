@@ -139,38 +139,33 @@ public class LogConsole extends javax.swing.JPanel {
         }
 
 
-        commandLineTextPane1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                LoggerManager.logGuiEvent(e);        
-                final String s = commandLineTextPane1.getText();
-                RequestProcessor.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            String s1= JythonRefactory.fixImports(s);
-                            System.out.println("AP> " + s1);
-                            maybeInitializeInterpreter();
-                            try {
-                                PyObject po= interp.eval(s1);
-                                if ( !( po instanceof PyNone ) ) interp.exec("print '" + po.__str__() +"'" ); // JythonRefactory okay
-                            } catch (PyException ex ) {
-                                interp.exec(s1);// JythonRefactory okay
-                            }
-                            commandLineTextPane1.setText("");
-                        } catch (IOException ex) {
-                            logger.log(Level.SEVERE, ex.getMessage(), ex);
-                            commandLineTextPane1.setText("");
-                        } catch (PyException ex) {
-                            System.err.println(ex.toString());
-                            commandLineTextPane1.setText("");
-                        }
+        commandLineTextPane1.addActionListener((ActionEvent e) -> {
+            LoggerManager.logGuiEvent(e);
+            final String s = commandLineTextPane1.getText();
+            RequestProcessor.invokeLater(() -> {
+                try {
+                    String s1= maybeRemovePrompts(s);
+                    s1= JythonRefactory.fixImports(s1);
+                    System.out.println("AP> " + s1);
+                    maybeInitializeInterpreter();
+                    try {
+                        PyObject po= interp.eval(s1);
+                        if ( !( po instanceof PyNone ) ) interp.exec("print '" + po.__str__() +"'" ); // JythonRefactory okay
+                    } catch (PyException ex ) {
+                        interp.exec(s1);// JythonRefactory okay
                     }
-                });
-            }
+                    commandLineTextPane1.setText("");
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                    commandLineTextPane1.setText("");
+                } catch (PyException ex) {
+                    System.err.println(ex.toString());
+                    commandLineTextPane1.setText("");
+                }
+            });
         });
 
-
+        
         this.commandLineTextPane1.putClientProperty(JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
             @Override
             public PythonInterpreter createInterpreter() throws java.io.IOException {
@@ -236,6 +231,27 @@ public class LogConsole extends javax.swing.JPanel {
         
     }
 
+    /**
+     * remove prompts which are sometimes copied into mouse buffers.
+     * This detects "AP> ", ">>> ", and "... ".
+     * @param s the text entered.
+     * @return the text without prefix.
+     */
+    public static String maybeRemovePrompts( String s ) {
+        String[] ss= s.split("\n",-2);
+        for ( int i=0; i<ss.length; i++ ) {
+            String s1= ss[i];
+            if ( s1.startsWith("AP> ") ) {
+                ss[i]= s1.substring(4);
+            } else if ( s1.startsWith(">>> ") ) {
+                ss[i]= s1.substring(4);
+            } else if ( s1.startsWith("... ") ) {
+                ss[i]= s1.substring(4);
+            }
+        }
+        return String.join( "\n", ss );
+    }
+    
     private void maybeInitializeInterpreter( ) throws IOException {
         if (interp == null) {
             String s = commandLineTextPane1.getText();

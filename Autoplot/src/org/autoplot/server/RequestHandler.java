@@ -16,6 +16,7 @@ import org.python.util.PythonInterpreter;
 import org.autoplot.ApplicationModel;
 import org.autoplot.JythonUtil;
 import org.autoplot.ScriptContext;
+import org.autoplot.scriptconsole.LogConsole;
 
 /**
  * Handles requests coming in from the server.
@@ -80,6 +81,7 @@ public class RequestHandler {
             while ( (s=reader.readLine())!=null ) {
                 s= untaint(s,out);
                 if ( s!=null ) {
+                    s= LogConsole.maybeRemovePrompts(s);
                     logger.log(Level.FINE, "executing command: \"{0}\"", s);
                     if ( s.equals("quit") || !rlistener.isListening() ) {
                         rlistener.stopListening();
