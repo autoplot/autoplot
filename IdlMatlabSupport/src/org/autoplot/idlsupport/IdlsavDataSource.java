@@ -10,6 +10,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.text.ParseException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.autoplot.datasource.AbstractDataSource;
@@ -50,6 +51,13 @@ public class IdlsavDataSource extends AbstractDataSource {
         }
     }
     
+    private Map<String,Object> getUserProperties( ReadIDLSav.ArrayData arr ) {
+        Map up= new LinkedHashMap();
+        up.put( "fileOffset", arr._fileOffset );
+        up.put( "lengthBytes", arr._lengthBytes );
+        return up;
+    }
+    
     private QDataSet getArray( ReadIDLSav reader, ByteBuffer buffer, String arg ) throws IOException {
         Object v;
         
@@ -88,12 +96,14 @@ public class IdlsavDataSource extends AbstractDataSource {
                     Datum d= u.createDatum( Array.get( arrayData.array, j ) );
                     result.putValue( j, d.doubleValue(u) );
                 }
+                result.putProperty( QDataSet.USER_PROPERTIES, getUserProperties( arrayData ) );
                 return result;
             } else {
                 ArrayDataSet result= ArrayDataSet.wrap( arrayData.array, arrayData.dims, false );
                 if ( result instanceof SDataSet || result instanceof IDataSet || result instanceof LDataSet ) {
                     result.putProperty( QDataSet.FORMAT, "%d" );
                 }
+                result.putProperty( QDataSet.USER_PROPERTIES, getUserProperties( arrayData ) );
                 return result;
             }
         } else if ( v instanceof Map ) { 
@@ -152,10 +162,10 @@ public class IdlsavDataSource extends AbstractDataSource {
                                             break;
                                         }
                                     }
-                                    if ( useTimes==false ) {
-                                        return array;
-                                    } else {
-                                        return newTime;
+                                    if ( useTimes ) {
+                                        newTime.putProperty( QDataSet.USER_PROPERTIES, array.property(QDataSet.USER_PROPERTIES) );
+                                        result= newTime;
+                                        break;
                                     }
                                 }
                             }
