@@ -435,7 +435,7 @@ public class EditorContextMenu {
 
             fragmentsMenu.add( createInsertMenuItem( "raise NoDataInIntervalException", "from org.das2.dataset import NoDataInIntervalException\nraise NoDataInIntervalException('no files found')") );
 
-            fragmentsMenu.add( createInsertMenuItem( "documentation block", "# title: the one-line title\n# label: terse label") );
+            fragmentsMenu.add( createInsertMenuItem( "documentation block", "setScriptDescription('''Multi-line description''')\nsetScriptTitle('One-Line Title')\nsetScriptLabel('Terse Label')\n") );
 
             fragmentsMenu.add( createInsertMenuItem( "multi-argument procedure", "# return a set of datasets which are synchronized to the same timetags.\n" +
 "def mysynchronize( ds1, *dss ):\n" +
