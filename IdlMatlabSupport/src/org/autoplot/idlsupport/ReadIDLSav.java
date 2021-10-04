@@ -493,7 +493,7 @@ public class ReadIDLSav {
                     for ( int i=0; i<result.length; i++ ) {
                         result[i]= (short)buf.getInt(offsToArray+4*i);
                     }
-                    return makeArrayData(result, offsToArray, result.length*4 );
+                    return makeArrayData(result, offsetToFile+ offsToArray, result.length*4 );
                 }
                 case TYPECODE_INT32: {
                     
@@ -501,28 +501,28 @@ public class ReadIDLSav {
                     for ( int i=0; i<result.length; i++ ) {
                         result[i]= buf.getInt(offsToArray+4*i);
                     }
-                    return makeArrayData(result, offsToArray, result.length*4 );
+                    return makeArrayData(result, offsetToFile+ offsToArray, result.length*4 );
                 }
                 case TYPECODE_INT64: {
                     int[] result= new int[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
                         result[i]= buf.getInt(offsToArray+8*i);
                     }
-                    return makeArrayData(result, offsToArray, result.length*8 );
+                    return makeArrayData(result, offsetToFile+ offsToArray, result.length*8 );
                 }
                 case TYPECODE_FLOAT: {
                     float[] result= new float[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
                         result[i]= buf.getFloat(offsToArray+4*i);
                     }
-                    return makeArrayData(result, offsToArray, result.length*4 );
+                    return makeArrayData(result, offsetToFile+ offsToArray, result.length*4 );
                 }   
                 case TYPECODE_DOUBLE: {
                     double[] result= new double[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
                         result[i]= buf.getDouble(offsToArray+8*i);
                     }
-                    return makeArrayData(result, offsToArray, result.length*8 );
+                    return makeArrayData(result, offsetToFile+ offsToArray, result.length*8 );
                 }
                 case TYPECODE_STRING: {
                     String[] result= new String[arrayDesc.nelements];
@@ -547,7 +547,7 @@ public class ReadIDLSav {
                             offs= offs+sizeOfString(result[i])+8;
                         }
                     }
-                    ArrayData adresult= makeArrayData(result, offsToArray, offs-offsToArray );
+                    ArrayData adresult= makeArrayData(result, offsetToFile+ offsToArray, offs-offsToArray );
                     return adresult;
                 }
                 default:
