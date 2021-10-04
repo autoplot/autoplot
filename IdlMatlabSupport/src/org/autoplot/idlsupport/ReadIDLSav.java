@@ -363,6 +363,15 @@ public class ReadIDLSav {
          * number of bytes within the IDLSAV file.
          */
         int _lengthBytes; 
+        /**
+         * offset to the data within the IDLSAV file.
+         */
+        int _fileOffset;
+        
+        public ArrayData() {
+            logger.fine("new ArrayData");
+        }
+        
         @Override
         public String toString() {
             StringBuilder b= new StringBuilder("["+dims[0]);
@@ -453,10 +462,12 @@ public class ReadIDLSav {
         int offsToArray= 76;
         int _lengthBytes; // length of the array.
         
-        private ArrayData makeArrayData( Object array ) {
+        private ArrayData makeArrayData( Object array, int fileOffset, int lengthBytes ) {
             ArrayData result= new ArrayData();
             result.array= array;
             result.dims= arrayDesc.dims;
+            result._fileOffset= fileOffset;
+            result._lengthBytes= lengthBytes;
             return result;
         }
         
@@ -482,7 +493,7 @@ public class ReadIDLSav {
                     for ( int i=0; i<result.length; i++ ) {
                         result[i]= (short)buf.getInt(offsToArray+4*i);
                     }
-                    return makeArrayData( result );
+                    return makeArrayData(result, offsToArray, result.length*4 );
                 }
                 case TYPECODE_INT32: {
                     
@@ -490,28 +501,28 @@ public class ReadIDLSav {
                     for ( int i=0; i<result.length; i++ ) {
                         result[i]= buf.getInt(offsToArray+4*i);
                     }
-                    return makeArrayData( result );
+                    return makeArrayData(result, offsToArray, result.length*4 );
                 }
                 case TYPECODE_INT64: {
                     int[] result= new int[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
                         result[i]= buf.getInt(offsToArray+8*i);
                     }
-                    return makeArrayData( result );
+                    return makeArrayData(result, offsToArray, result.length*8 );
                 }
                 case TYPECODE_FLOAT: {
                     float[] result= new float[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
                         result[i]= buf.getFloat(offsToArray+4*i);
                     }
-                    return makeArrayData( result );
+                    return makeArrayData(result, offsToArray, result.length*4 );
                 }   
                 case TYPECODE_DOUBLE: {
                     double[] result= new double[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
                         result[i]= buf.getDouble(offsToArray+8*i);
                     }
-                    return makeArrayData( result );
+                    return makeArrayData(result, offsToArray, result.length*8 );
                 }
                 case TYPECODE_STRING: {
                     String[] result= new String[arrayDesc.nelements];
@@ -536,7 +547,8 @@ public class ReadIDLSav {
                             offs= offs+sizeOfString(result[i])+8;
                         }
                     }
-                    return makeArrayData( result );
+                    ArrayData adresult= makeArrayData(result, offsToArray, offs-offsToArray );
+                    return adresult;
                 }
                 default:
                     break;
