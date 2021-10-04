@@ -793,9 +793,10 @@ public class ReadIDLSav {
                         arr1.varFlags= structDesc.tagtable[i].tagflags;
                         logger.log(Level.CONFIG, "readarray_1 {0} {1,number,#} {2,number,#} {3}", new Object[]{iptr, 0, data.limit(), tag});
                         Object arr= arr1.readData(data);
+                        int strLenBytes= ((ArrayData)arr)._lengthBytes;
                         result.put( tag, arr );
                         iarray= iarray+1;
-                        iptr= iptr + arr1.arrayDesc.nbytes;
+                        iptr= iptr + strLenBytes;
                     } else { 
                         TypeDescScalar scalarTypeDesc= new TypeDescScalar();
                         scalarTypeDesc.offs= iptr;
