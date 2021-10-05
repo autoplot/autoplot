@@ -37,6 +37,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import org.das2.DasApplication;
 import org.das2.util.awt.PdfGraphicsOutput;
@@ -1128,7 +1129,14 @@ addBottomDecoration( dom.canvases[0], paint )
      * @see #setStatus(java.lang.String) 
      */
     public static void showMessageDialog( String message ) {
-        JOptionPane.showMessageDialog( view, message );
+        if ( message.split("\n").length>15 ) {
+            JScrollPane pane= new JScrollPane( new JTextArea(message) );
+            pane.setPreferredSize( new Dimension(800,600) );
+            pane.setMaximumSize( new Dimension(800,600) );
+            JOptionPane.showMessageDialog( view, pane );
+        } else {
+            JOptionPane.showMessageDialog( view, message );
+        }
     }
 
     
