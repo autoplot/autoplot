@@ -68,6 +68,10 @@ public final class DiffUtils {
 
     /**
      * Computes the difference between the original and revised text.
+     * @param sourceText
+     * @param targetText
+     * @param progress
+     * @return the differences
      */
     public static Patch<String> diff(String sourceText, String targetText,
             DiffAlgorithmListener progress) {
@@ -75,7 +79,18 @@ public final class DiffUtils {
                 Arrays.asList(sourceText.split("\n")),
                 Arrays.asList(targetText.split("\n")), progress);
     }
-
+    
+    /**
+     * Computes the difference between the original and revised text.
+     * @param sourceText
+     * @param targetText
+     * @return the differences
+     */
+    public static Patch<String> diff(String sourceText, String targetText) {
+        return DiffUtils.diff(
+                Arrays.asList(sourceText.split("\n")),
+                Arrays.asList(targetText.split("\n")));
+    }
     /**
      * Computes the difference between the original and revised list of elements
      * with default diff algorithm
