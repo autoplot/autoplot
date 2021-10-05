@@ -95,6 +95,7 @@ public final class DiffUtils {
      * Computes the difference between the original and revised list of elements
      * with default diff algorithm
      *
+     * @param <T>
      * @param source The original text. Must not be {@code null}.
      * @param target The revised text. Must not be {@code null}.
      *
@@ -122,6 +123,7 @@ public final class DiffUtils {
      * Computes the difference between the original and revised list of elements
      * with default diff algorithm
      *
+     * @param <T>
      * @param original The original text. Must not be {@code null}.
      * @param revised The revised text. Must not be {@code null}.
      * @param algorithm The diff algorithm. Must not be {@code null}.
