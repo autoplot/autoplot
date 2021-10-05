@@ -269,6 +269,7 @@ compilef 'org/das2/qds/demos/PlasmaModel.java'
 compilef 'org/virbo/autoplot/*.java' # why is this repeated?
 compilef 'test/Unicode.java'
 compilef 'org/das2/util/Expect.java'
+compilef 'external/AuralizationHandler.java'
 
 cat ../temp-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
