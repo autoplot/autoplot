@@ -2,6 +2,7 @@
 package org.autoplot.scriptconsole;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.HeadlessException;
@@ -420,19 +421,31 @@ public class ScriptPanelSupport {
                                 break;
                             }
                             
-                            if ( JOptionPane.OK_OPTION==
+                            if ( !ScriptPanelSupport.this.panel.isDirty() ) {
+                                try {
+                                    Color color= ScriptPanelSupport.this.panel.getBackground();
+                                    ScriptPanelSupport.this.panel.setBackground(Color.red);
+                                    Thread.sleep(300);
+                                    ScriptPanelSupport.this.panel.setBackground(color);
+                                    loadFile( ScriptPanelSupport.this.file );
+                                } catch ( IOException ex ) {
+                                    ScriptPanelSupport.this.panel.setDirty(true);
+                                }
+                            } else {
+                                if ( JOptionPane.OK_OPTION==
                                     JOptionPane.showConfirmDialog( panel,
                                             "File changed on disk.  Do you want to reload?",
                                             "File Changed on Disk",
                                             JOptionPane.OK_CANCEL_OPTION ) ) {
-                                try {
-                                    loadFile( ScriptPanelSupport.this.file );
-                                } catch (IOException ex) {
-                                    logger.log(Level.SEVERE, null, ex);
+                                    try {
+                                        loadFile( ScriptPanelSupport.this.file );
+                                    } catch (IOException ex) {
+                                        logger.log(Level.SEVERE, null, ex);
+                                    }
+                                } else {
+                                    ScriptPanelSupport.this.panel.setDirty(true);
                                 }
-                            } else {
-                                ScriptPanelSupport.this.panel.setDirty(true);
-                            }
+                            }                            
                         }
                     }
                     if ( !key.reset() ) {
