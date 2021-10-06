@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Final round of bug fixes with density files as RBSP mission comes to a close.  Run batch tool is effective at managing things.
+        <p><small>Bug in IDLSav reader corrected, where structure containing array of strings or the data following could not be read.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -61,11 +61,14 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/727/">private gitlabs projects</a> can be used with ro_cache.txt mechanism.</a>
+            <li><a href="https://blog.jcoglan.com/2017/02/12/the-myers-diff-algorithm-part-1/">Meyers diff</a> introduced to support showing changes between two text files and eventually data sets, using com.github.difflib.
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/456/">456</a>: external changes in script are automatically loaded without confirming this with the scientist.
             <li>"AP> print 'hello'" works at the command line, to support copy-n-paste from references which contain "AP>" prompt.
             <li>join(extent(),extent()) is properly formatted as two ranges.
-            <li>Introduce Units.us2020, for use when microsecond precision is needed around 2020.
+            <li>Introduce Units.us2020, for use when microsecond precision is needed around 2020.  Thanks, Kristoff!
             <li>IDLSave reader uses %d format for integer data.
-            <li>IDLSave reader corrections to read array of strings, automatically detect ISO8601 data.
+            <li>IDLSave reader corrections to read array of strings, automatically detect ISO8601 data.  
             <li>more accepting of HAPI servers under development, issuing warnings to help find problems.
             <li>applyIndexAllLists extracted from Jython code and made available to Java codes as well.
             <li>filter editor panel added for expandToFillGaps.  Thanks Bill!
