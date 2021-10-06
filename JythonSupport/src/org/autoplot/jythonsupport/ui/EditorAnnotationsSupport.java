@@ -31,7 +31,11 @@ import org.python.util.PythonInterpreter;
 /**
  * annotations support for the editor, marking program counter position 
  * and errors.
- * @see ScriptPanelSupport
+ * 
+ * One way to get the support for an editor is 
+ * getApplication().getScriptPanel().getAnnotationsSupport()
+ * 
+ * @see ScriptPanelSupport 
  * @author jbf
  */
 public class EditorAnnotationsSupport {
@@ -63,6 +67,21 @@ public class EditorAnnotationsSupport {
      */
     public static final String ANNO_USAGE = "usage";
 
+    /**
+     * when rendering differences, insertion of text
+     */
+    public static final String ANNO_INSERT = "insert";
+
+    /**
+     * when rendering differences, deletion of text
+     */
+    public static final String ANNO_DELETE = "delete";
+
+    /**
+     * when rendering differences, modification of text
+     */
+    public static final String ANNO_CHANGE = "change";
+    
     /**
      * return the symbol (e.g. variable name) at the caret position, or "".
      * @param editor the code editor
@@ -289,6 +308,8 @@ public class EditorAnnotationsSupport {
      * @return [st,en]
      */
     public int[] getLinePosition( int line ) {
+        if ( line<1 ) throw new IllegalArgumentException("Line number must be one or more");
+        
         Document doc = editorPanel.getDocument();
         Element root = editorPanel.getDocument().getDefaultRootElement();
 
@@ -368,7 +389,6 @@ public class EditorAnnotationsSupport {
                         
                 SimpleMarker mark;
                 Object highlightInfo=null;
-                
                 switch (name) {
                     case ANNO_WARNING:
                         mark= new SimpleMarker( lightBackground ? Color.YELLOW : new Color(120,120,0) );
@@ -385,6 +405,16 @@ public class EditorAnnotationsSupport {
                     case ANNO_PROGRAM_COUNTER:
                         mark=  new SimpleMarker( lightBackground ? new Color( 0,255,0,80 ) :  new Color( 0,200,0,80 ) );
                         break;
+                    case ANNO_INSERT:
+                        mark=  new SimpleMarker( lightBackground ? new Color( 240,255,240,80 ) :  new Color( 0,100,0,80 ) );
+                        break;
+                    case ANNO_DELETE:
+                        mark=  new SimpleMarker( lightBackground ? Color.PINK : new Color(120,80,80) );
+                        break;
+                    case ANNO_CHANGE:
+                        mark=  new SimpleMarker( lightBackground ? new Color( 240,240,255,80 ) :  new Color( 0,0,100,80 ) );
+                        break;
+                        
                     default:
                         mark=  new SimpleMarker(Color.GRAY );
                         break;
