@@ -119,6 +119,9 @@ public class NetCDFDataSourceFactory extends AbstractDataSourceFactory implement
                 result.add( r.getValue() );
             }
 
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "x=", "specify the x variable"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "y=", "specify the y variable"));
+            
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "units=", "override the file units"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "xunits=", "override the units for x"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "where=",
@@ -155,6 +158,16 @@ public class NetCDFDataSourceFactory extends AbstractDataSourceFactory implement
                     }       
                 }
                 return result;
+            } else if ( paramName.equals("x") ) {
+                Map<String,CompletionContext> result1= getParams( cc.resourceURI, mon );
+                for ( Entry<String,CompletionContext> r: result1.entrySet() ) {
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, r.getValue().completable ) );
+                }
+            } else if ( paramName.equals("y") ) {
+                Map<String,CompletionContext> result1= getParams( cc.resourceURI, mon );
+                for ( Entry<String,CompletionContext> r: result1.entrySet() ) {
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, r.getValue().completable ) );
+                }
             }
         }
         
