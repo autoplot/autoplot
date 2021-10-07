@@ -152,6 +152,9 @@ public class Test005 {
             FileSystem.reset();
             
             plot("https://satdat.ngdc.noaa.gov/sem/goes/data/avg/$Y/$m/goes10/csv/g10_eps_5m_$Y$m$d_$(Y,end)$m$d.csv?column=field1&depend0=field0&skip=456&timerange=Dec+2004");
+            
+            Thread.sleep(300); // We shouldn't have to do this.
+            
             writeToPng("test005_demo14.png");
             xxx("demo14");
             
