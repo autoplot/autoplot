@@ -561,7 +561,7 @@ public class JythonToJavaConverter {
                     }
                     traverse("", pr.values[i], false);
                 }
-                this.builder.append(");");
+                this.builder.append(");\n");
             } else if (sn instanceof ImportFrom) {
                 ImportFrom ff = ((ImportFrom) sn);
                 for (int i = 0; i < ff.names.length; i++) {
@@ -571,7 +571,8 @@ public class JythonToJavaConverter {
             } else if (sn instanceof Str) {
                 Str ss = (Str) sn;
                 this.builder.append("\"");
-                this.builder.append(ss.s);
+                String s= ss.s.replaceAll("\n", "\\\\n");
+                this.builder.append(s);
                 this.builder.append("\"");
             } else if (sn instanceof Num) {
                 Num ex = (Num) sn;
@@ -602,7 +603,7 @@ public class JythonToJavaConverter {
                     traverse("", as.targets[i], false);
                 }
                 this.builder.append(" = ");
-                traverse("", as.value, false);
+                traverse("", as.value, true);
                 
             } else if (sn instanceof Name) {
                 this.builder.append(((Name) sn).id);
@@ -610,6 +611,11 @@ public class JythonToJavaConverter {
                 Call cc = (Call) sn;
                 if (cc.func instanceof Name) {
                     if (Character.isUpperCase(((Name) cc.func).id.charAt(0))) {
+                        String ss= this.builder.toString();
+                        int i= ss.lastIndexOf("\n");
+                        if (i==-1 ) i=0;
+                        String insertStr= ((Name) cc.func).id + " ";
+                        this.builder.insert( i + indent.length() + 1, insertStr ); 
                         this.builder.append("new").append(" ");
                     }
                 }
@@ -658,6 +664,15 @@ public class JythonToJavaConverter {
                     this.builder.append(";");
                 }
                 this.builder.append(indent).append("}\n");
+                if ( ff.orelse!=null ) {
+                    this.builder.append(indent).append("else {\n");
+                    for (int i = 0; i < ff.orelse.length; i++) {
+                        this.builder.append(indent);
+                        traverse(indent, ff.orelse[i], false);
+                        this.builder.append(";");
+                    } 
+                    this.builder.append(indent).append("}\n");
+                }
                 lineNumber++;
             } else if (sn instanceof Compare) {
                 Compare cp = (Compare) sn;
@@ -670,7 +685,7 @@ public class JythonToJavaConverter {
                 this.builder.append("continue");
             } else if (sn instanceof Attribute) {
                 Attribute at = ((Attribute) sn);
-                traverse("", at.value, false);
+                traverse("", at.value, true);
                 this.builder.append(".");
                 this.builder.append(at.attr);
             } else if ( sn instanceof org.python.parser.ast.List ) {
