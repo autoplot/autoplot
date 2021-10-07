@@ -403,6 +403,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
             
             boolean avail= getParam( "avail", "F" ).equals("T");
             boolean reduce= getParam( "reduce", "F" ).equals("T");
+            boolean filenameProvidesContext= getParam( "filenameProvidesContext", "F" ).equals("T");
 
             if ( avail ) {
                 logger.log(Level.FINE, "availablility {0} ", new Object[]{ lviewRange});
@@ -566,6 +567,19 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     }
                     
                     QDataSet xds= SemanticOps.xtagsDataSet(ds1);
+                    
+                    if ( xds!=null && filenameProvidesContext ) {
+                        Units tu= SemanticOps.getUnits(xds);
+                        if ( tu.isConvertibleTo(Units.hours) ) {
+                            xds= Ops.add( xds, dr1.min() );
+                            ds1= Ops.link( xds, ds1 );
+                        } else if ( UnitsUtil.isTimeLocation(tu) ) {
+                            logger.fine("timetags already have context");
+                        } else {
+                            logger.log(Level.FINE, "timetags units cannot be added to time locations. (units={0})", tu);
+                        }
+                    }
+                    
                     if ( xds!=null && UnitsUtil.isTimeLocation( SemanticOps.getUnits(xds) )) {
                         if ( SemanticOps.isJoin(xds) ) {
                             //TODO: check Ops.extent(xds), which I don't think handles joins.

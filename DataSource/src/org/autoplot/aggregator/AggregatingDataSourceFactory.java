@@ -317,11 +317,22 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
             result.add(new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "timerange=" ));
-
+            result.add(new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "avail=" ));
+            result.add(new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "reduce=" ));
+            result.add(new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "filenameProvidesContext=" ));
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
             if (paramName.equals("timerange")) {
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<timerange>"));
+            } else if ( paramName.equals("avail") ) {
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "T"));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "F"));
+            } else if ( paramName.equals("reduce") ) {
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "T"));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "F"));
+            } else if ( paramName.equals("filenameProvidesContext") ) {
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "T"));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "F"));
             }
         } else {
         }
