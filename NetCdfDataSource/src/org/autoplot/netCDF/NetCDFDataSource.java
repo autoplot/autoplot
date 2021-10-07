@@ -52,6 +52,7 @@ public class NetCDFDataSource extends AbstractDataSource {
     protected static final String PARAM_WHERE = "where";
     protected static final String PARAM_X = "X";
     protected static final String PARAM_Y = "Y";
+    protected static final String PARAM_X_UNITS = "xunits";
         
     private Variable variable;
     
@@ -154,6 +155,11 @@ public class NetCDFDataSource extends AbstractDataSource {
             
             if ( sxVariable!=null && sxVariable.length()>0 ) {
                 NetCdfVarDataSet xds= NetCdfVarDataSet.create( xVariable, constraint, ncfile, new NullProgressMonitor() );
+            
+                String xunits= getParam( "xunits", "" );
+                if ( !xunits.equals("") ) {
+                    xds.putProperty( QDataSet.UNITS, Units.lookupUnits(xunits) );
+                }
                 result = Ops.link( xds, result );
             }
 

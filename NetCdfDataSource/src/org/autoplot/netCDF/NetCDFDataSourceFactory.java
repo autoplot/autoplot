@@ -120,6 +120,7 @@ public class NetCDFDataSourceFactory extends AbstractDataSourceFactory implement
             }
 
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "units=", "override the file units"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "xunits=", "override the units for x"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "where=",
                     "add constraint by another field's value"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "validMin=",
