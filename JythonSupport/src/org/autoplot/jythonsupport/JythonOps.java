@@ -53,11 +53,11 @@ public class JythonOps {
     /**
      * Apply the Python function, typically a lambda function, to each
      * element of the dataset.  For example: 
-     * <pre>
+     * <blockquote><pre><small>{@code
      * xx= dindgen( 6 ) 
      * yy= applyLambda( xx, lambda x : x**2 )
      * plot( xx, yy )
-     * </pre>
+     *}</small></pre></blockquote>
      * 
      * @param ds the dataset to which the function is applied
      * @param f the function
@@ -78,12 +78,12 @@ public class JythonOps {
     /**
      * Apply the Python function, typically a two-argument lambda function, to each
      * element of the dataset.  For example: 
-     * <pre>
+     * <blockquote><pre><small>{@code
      * xx= dindgen( 6 ) 
      * yy= ones( 6 )
      * yy= applyLambda( xx, yy, lambda x,y : x+y )
      * plot( xx, yy )
-     * </pre>
+     *}</small></pre></blockquote>
      * 
      * @param ds1 the dataset to which the function is applied
      * @param ds2 the dataset to which the function is applied
@@ -106,12 +106,12 @@ public class JythonOps {
     /**
      * Apply the Python function, typically a three-argument lambda function, to each
      * element of the dataset.  For example: 
-     * <pre>
+     * <blockquote><pre><small>{@code
      * xx= dindgen( 6 ) 
      * yy= ones( 6 )
      * yy= applyLambda( xx, yy, lambda x,y : x+y )
      * plot( xx, yy )
-     * </pre>
+     *}</small></pre></blockquote>
      * 
      * @param ds1 the dataset to which the function is applied
      * @param ds2 the dataset to which the function is applied
