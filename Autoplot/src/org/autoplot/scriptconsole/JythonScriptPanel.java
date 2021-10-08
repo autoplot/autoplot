@@ -253,7 +253,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);
-                DataSourceUtil.openBrowser( "https://ci-pw.physics.uiowa.edu/job/autoplot-release/ws/autoplot/Autoplot/src/scripts/" );
+                DataSourceUtil.openBrowser( "https://github.com/autoplot/dev/" );
             }
         });
 
