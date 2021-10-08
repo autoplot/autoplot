@@ -4,6 +4,7 @@ package org.autoplot.jythonsupport.ui;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
@@ -52,11 +53,13 @@ public class DeletePainter extends DefaultHighlighter.DefaultHighlightPainter
 
         Graphics2D g2= (Graphics2D)g;
         g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
-        g.fillPolygon( new int[] { r.x, r.x+5, r.x, r.x }, new int[] { r.y-5, r.y, r.y+5, r.y-5 }, 4 );
+        
+        Shape poly= new Polygon( new int[] { r.x, r.x+5, r.x, r.x }, new int[] { r.y-5, r.y, r.y+5, r.y-5 }, 4 );
+        g.fill( poly ); 
 
 		// Return the drawing area
 
-		return r;
+		return poly;
 	}
 
 
