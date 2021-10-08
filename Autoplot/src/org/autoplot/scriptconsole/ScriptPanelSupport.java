@@ -1,6 +1,13 @@
 
 package org.autoplot.scriptconsole;
 
+import com.github.difflib.UnifiedDiffUtils;
+import com.github.difflib.patch.AbstractDelta;
+import com.github.difflib.patch.ChangeDelta;
+import com.github.difflib.patch.Chunk;
+import com.github.difflib.patch.DeleteDelta;
+import com.github.difflib.patch.InsertDelta;
+import com.github.difflib.patch.Patch;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -38,6 +45,7 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,6 +103,7 @@ import org.autoplot.datasource.jython.JythonDataSource;
 import org.autoplot.datasource.jython.JythonDataSourceFactory;
 import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
+import org.das2.util.filesystem.GitCommand;
 
 /**
  * Error annotations, saveAs, etc.
@@ -1321,6 +1330,55 @@ public class ScriptPanelSupport {
         return recentPanel;
     }
 
+    /**
+     * mark the changes git indicates.
+     * @param support
+     * @param fln
+     * @throws IOException
+     * @throws InterruptedException 
+     */
+    public static void markChanges( EditorAnnotationsSupport support, File fln ) throws IOException, InterruptedException {
+
+        String diffOutput = new GitCommand(fln.getParentFile()).diff(fln);
+                
+        Patch<String> deltas = UnifiedDiffUtils.parseUnifiedDiff( Arrays.asList( diffOutput.split("\n") ) );
+
+        support.clearAnnotations();
+        
+        for ( AbstractDelta<String> d : deltas.getDeltas() ) {
+            Chunk<String> source = d.getSource();
+            List<Integer> ll = source.getChangePosition();
+            List<Integer> ss = d.getTarget().getChangePosition();
+            int[] lp0,lp1;
+            
+            String sourceText = String.join( "\n", d.getSource().getLines() );
+            
+            if ( d instanceof ChangeDelta ) {
+                for ( int i : ss ) {
+                    lp0 = support.getLinePosition(i);    
+                    lp1 = support.getLinePosition(i); 
+                    System.err.println( String.format("change characters %d through %d", lp0[0], lp1[1] ) );
+                    support.annotateChars(lp0[0],lp1[1],EditorAnnotationsSupport.ANNO_CHANGE,sourceText,null);
+                }
+            } else if ( d instanceof DeleteDelta ) {
+                if ( ll.size()==1 ) {
+                    int i= ll.get(0);
+                    lp0 = support.getLinePosition(i);    
+                    lp1 = support.getLinePosition(i); 
+                    support.annotateChars(lp0[0],lp1[1],EditorAnnotationsSupport.ANNO_DELETE,sourceText,null);
+                }
+            } else if ( d instanceof InsertDelta ) {
+                for ( int i : ss ) {
+                    lp0 = support.getLinePosition(i);    
+                    lp1 = support.getLinePosition(i);    
+                    System.err.println(String.format("insert characters %d through %d", lp0[0], lp1[1] ) );
+                    support.annotateChars(lp0[0],lp1[1],EditorAnnotationsSupport.ANNO_INSERT,sourceText,null);
+                }
+            }        
+        }
+    }
+
+    
     protected void open() {
         try {
             if (this.file == null) {

@@ -60,6 +60,7 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
 import org.autoplot.jythonsupport.ui.EditorTextPane;
+import org.autoplot.jythonsupport.ui.Util;
 
 /**
  * GUI for editing and running Jython scripts.
@@ -280,6 +281,28 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
         });
 
+        JMenuItem mi= new JMenuItem( new AbstractAction("Run Git Diff") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);       
+                try {
+                    if ( JythonScriptPanel.this.filename!=null ) {
+                        File f= new File( JythonScriptPanel.this.filename );
+                        support.save(); 
+                        ScriptPanelSupport.markChanges( getEditorPanel().getEditorAnnotationsSupport(), f );
+                    } else {
+                        JOptionPane.showMessageDialog( JythonScriptPanel.this,
+                                "Script must be from a file in a local git repository" );
+                    }
+                    
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog( JythonScriptPanel.this, ex );
+                }
+            }
+            });
+            
+        menu.addMenuItem(  mi);
+                        
         menu.setDataSetSelector(selector);
         
         this.menu= menu;
