@@ -122,7 +122,8 @@ class InvokeLaterRunnable( _Runnable ):
       self.fun( *self.args, **self.kw )
 
 def invokeLater( functn, *args, **kw ):
-   "invoke the function later.  It should be followed by the parameters passed to the function"
+   """invoke the function later.  It should be followed by the parameters 
+   passed to the function.  See also runInParallel"""
    r= InvokeLaterRunnable( functn, args, kw )
    # Ed suggests this use ThreadPoolExecutor
    _Thread(r,'invokeLater').start()
