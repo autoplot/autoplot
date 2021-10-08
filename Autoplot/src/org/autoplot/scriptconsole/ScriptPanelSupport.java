@@ -1361,8 +1361,7 @@ public class ScriptPanelSupport {
                     support.annotateChars(lp0[0],lp1[1],EditorAnnotationsSupport.ANNO_CHANGE,sourceText,null);
                 }
             } else if ( d instanceof DeleteDelta ) {
-                if ( ll.size()==1 ) {
-                    int i= ll.get(0);
+                for ( int i : ll ) {
                     lp0 = support.getLinePosition(i);    
                     lp1 = support.getLinePosition(i); 
                     support.annotateChars(lp0[0],lp1[1],EditorAnnotationsSupport.ANNO_DELETE,sourceText,null);
