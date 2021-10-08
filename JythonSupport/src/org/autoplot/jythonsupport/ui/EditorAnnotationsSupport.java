@@ -406,13 +406,13 @@ public class EditorAnnotationsSupport {
                         mark=  new SimpleMarker( lightBackground ? new Color( 0,255,0,80 ) :  new Color( 0,200,0,80 ) );
                         break;
                     case ANNO_INSERT:
-                        mark=  new SimpleMarker( lightBackground ? new Color( 240,255,240,80 ) :  new Color( 0,100,0,80 ) );
+                        mark=  new SimpleMarker( lightBackground ? new Color( 100,255,100,80 ) :  new Color( 0,100,0,80 ) );
                         break;
                     case ANNO_DELETE:
                         mark=  new SimpleMarker( lightBackground ? Color.PINK : new Color(120,80,80) );
                         break;
                     case ANNO_CHANGE:
-                        mark=  new SimpleMarker( lightBackground ? new Color( 240,240,255,80 ) :  new Color( 0,0,100,80 ) );
+                        mark=  new SimpleMarker( lightBackground ? new Color( 100,100,255,80 ) :  new Color( 0,0,100,80 ) );
                         break;
                         
                     default:
@@ -422,6 +422,13 @@ public class EditorAnnotationsSupport {
                 
                 if (  name.equals(ANNO_ERROR) ) {
                     SquigglePainter red= new SquigglePainter( Color.RED );
+                    try {
+                        highlightInfo= editorPanel.getHighlighter().addHighlight(i0, i1, red);
+                    } catch (BadLocationException ex) {
+                        Logger.getLogger(EditorAnnotationsSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else if ( name.equals( ANNO_DELETE ) ) {
+                    DeletePainter red= new DeletePainter( Color.RED );
                     try {
                         highlightInfo= editorPanel.getHighlighter().addHighlight(i0, i1, red);
                     } catch (BadLocationException ex) {
