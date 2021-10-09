@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Bug in IDLSav reader corrected, where structure containing array of strings or the data following could not be read.
+        <p><small>Newly integrated differences code allows script verification to show changes since the last invocation more precisely.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,8 +27,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-10-04 r26078):</p>
+        <p>Bugfixes (2021-10-09 r26108):</p>
         <ul>
+            <li>correct misspelling of indices in Ops Javadoc.  Thanks, Ivar!
+            <li><a href='https://sourceforge.net/p/autoplot/bugs/2398/'>2398</a>: monotonicSubset sets MONOTONIC to True, working around the problem Kristoff saw.
+            <li><a href='https://sourceforge.net/p/autoplot/bugs/2397/'>2397</a>: New Javadoc, still unpublished, supports extra characters like "Returns <i>e</i><sup>x</sup>&nbsp;-1."
             <li><a href='https://sourceforge.net/p/autoplot/bugs/2394/'>2394</a>: IDL reader properly reads in array of strings and structure data following a string array.  Thanks, Lindsay!
             <li>IDL reader support completions are corrected so automatic GUI is fixed.
             <li><a href='https://sourceforge.net/p/autoplot/bugs/2391/'>2391</a>: Jython dataset setItem was overly cautious in its check for units, seriously degrading performance. Thanks, Bill!
@@ -61,8 +64,11 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/754/">754</a>: aggregation can handle in-context timetags where just hours-since-midnight is in file.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/727/">727</a>: private GitLabs/GitHub projects can be used with ro_cache.txt mechanism.
+            <li>NetCDF provides completions for x= and y= controls.
+            <li>Jython editor has beginnings of annotations for differences.
+            <li>GitCommand introduced to wrap calls to command line git, and native Java git is coming.
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/754/">754</a>: aggregation can handle in-context timetags where just hours-since-midnight is in file.  Thanks, Sadie!
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/727/">727</a>: private GitLabs/GitHub projects can be used with ro_cache.txt mechanism.  Thanks, Sadie!
             <li><a href="https://blog.jcoglan.com/2017/02/12/the-myers-diff-algorithm-part-1/">Meyers diff</a> introduced to support showing changes between two text files and eventually data sets, using com.github.difflib.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/456/">456</a>: external changes in script are automatically loaded without confirming this with the scientist.
             <li>"AP> print 'hello'" works at the command line, to support copy-n-paste from references which contain "AP>" prompt.
