@@ -1,6 +1,8 @@
 
 package org.autoplot;
 
+import com.github.difflib.DiffUtils;
+import com.github.difflib.patch.Patch;
 import external.AnnotationCommand;
 import external.PlotCommand;
 import java.awt.BorderLayout;
@@ -23,6 +25,7 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -278,6 +281,32 @@ public class JythonUtil {
         }
         return contents.equals( okayedContents  );
     }
+    
+    /**
+     * return a Patch showing how the new version compares to the last run version.
+     * @param filename
+     * @param contents
+     * @return 
+     */
+    private static Patch<String> diffToOkayedScript( String filename, String contents ) {
+        String okayedContents= okayed.get(filename);
+        if ( okayedContents==null ) {
+            final File lastVersionDir= Paths.get( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "scripts" ).toFile();
+            final File lastVersionFile= Paths.get( lastVersionDir.toString(), String.format( "%010d.jy", Math.abs( (long)filename.hashCode()) ).trim() ).toFile();
+            if ( lastVersionFile.exists() ) {
+                try {
+                    String lastVersionContents= FileUtil.readFileToString(lastVersionFile);
+                    return DiffUtils.diff( lastVersionContents, contents );
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+            } else {
+                logger.log(Level.FINE, "not been run before: {0}", lastVersionFile);
+                return null;
+            }
+        }
+        return DiffUtils.diff( okayedContents, contents );
+    }
             
     /**
      * show the script and the variables (like we have always done with jyds scripts), and offer to run the script.
@@ -349,6 +378,14 @@ public class JythonUtil {
         tabbedPane.add( params, "params" );
 
         final boolean scriptOkay= isScriptOkayed( file.toString(), theScript );
+        if ( !scriptOkay ) {
+            Patch<String> p= diffToOkayedScript( file.toString(), theScript );
+            textArea.getDocument();
+            Runnable run = () -> {
+                support.annotatePatch(p);
+            };
+            SwingUtilities.invokeLater(run);
+        }
         
         if ( makeTool ) {
             if ( scriptOkay ) {
