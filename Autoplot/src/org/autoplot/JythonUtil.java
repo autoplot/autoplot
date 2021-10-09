@@ -380,11 +380,13 @@ public class JythonUtil {
         final boolean scriptOkay= isScriptOkayed( file.toString(), theScript );
         if ( !scriptOkay ) {
             Patch<String> p= diffToOkayedScript( file.toString(), theScript );
-            textArea.getDocument();
-            Runnable run = () -> {
-                support.annotatePatch(p);
-            };
-            SwingUtilities.invokeLater(run);
+            if ( p!=null ) {
+                textArea.getDocument();
+                Runnable run = () -> {
+                    support.annotatePatch(p);
+                };
+                SwingUtilities.invokeLater(run);
+            }
         }
         
         if ( makeTool ) {
