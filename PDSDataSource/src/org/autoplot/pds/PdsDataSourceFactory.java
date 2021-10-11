@@ -152,7 +152,7 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
         String fname= (String)xp.evaluate( doc, XPathConstants.STRING );
         
         if ( fname.length()==0 ) {
-            throw new IllegalArgumentException("file name is empty / not found");
+            throw new IllegalArgumentException("file name is empty or not found at //Product_Observational/File_Area_Observational/File/file_name/text()");
         }
         URL fnameUrl= new URL( labelFile, fname );
         return fnameUrl;
