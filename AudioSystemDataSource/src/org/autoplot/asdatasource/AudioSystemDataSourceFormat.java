@@ -6,6 +6,8 @@ import org.autoplot.datasource.DataSourceFormat;
 import org.autoplot.datasource.URISplit;
 import org.das2.graph.Auralizor;
 import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
+import org.das2.qds.ops.Ops;
 import org.das2.util.monitor.ProgressMonitor;
 
 /**
@@ -22,6 +24,10 @@ public class AudioSystemDataSourceFormat implements DataSourceFormat {
             throw new IllegalArgumentException( "data is null" );
         }
         
+        if ( SemanticOps.isRank2Waveform(data) ) {
+            data= Ops.flattenWaveform(data);
+        }
+        
         Auralizor auralizor= new Auralizor(data);
         
         URISplit split= URISplit.parse(uri);
@@ -36,7 +42,7 @@ public class AudioSystemDataSourceFormat implements DataSourceFormat {
 
     @Override
     public boolean canFormat(QDataSet ds) {
-        return ds.rank()==1;
+        return ds.rank()==1 || SemanticOps.isRank2Waveform(ds);
     }
 
     @Override
