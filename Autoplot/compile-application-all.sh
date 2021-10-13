@@ -79,6 +79,11 @@ for i in ../../APLibs/lib/commons/*.jar; do
    jar xf $i
 done
 
+for i in ../../APLibs/lib/pds/*.jar; do
+   echo jar xf $i
+   jar xf $i
+done
+
 if [ "" = "$RSYNC" ]; then
     echo "using default rsync, assuming it is on the path"
     RSYNC=rsync
