@@ -74,6 +74,8 @@ public final class TimeRangeTool extends javax.swing.JPanel {
                 return true;
             } catch ( ParseException ex ) {
                 return false;
+            } catch ( IllegalArgumentException ex ) {
+                return false;
             }
         }
     };
