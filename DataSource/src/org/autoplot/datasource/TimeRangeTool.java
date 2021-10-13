@@ -66,7 +66,17 @@ public final class TimeRangeTool extends javax.swing.JPanel {
     private final Preferences prefs;
     private static final String PREF_SPACECRAFT = "spacecraft";
 
-    private final InputVerifier verifier=null; //TODO: review where this was used, since now it is not used.
+    private final InputVerifier verifier= new InputVerifier() {
+        @Override
+        public boolean verify(String value) {
+            try {
+                DatumRangeUtil.parseTimeRange(value);
+                return true;
+            } catch ( ParseException ex ) {
+                return false;
+            }
+        }
+    };
         
     private static String interpretIso8601Range( String range ) {
         int ispace= range.indexOf(' ');
@@ -492,6 +502,7 @@ public final class TimeRangeTool extends javax.swing.JPanel {
                     while ( s!=null ) {
                         if ( verifier!=null ) {
                             if ( !verifier.verify(s) ) {
+                                logger.log(Level.INFO, "invalid time found in recent.timerange.txt, dropping: {0}", s);
                                 s= r.readLine();
                                 continue;
                             }
