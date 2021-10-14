@@ -692,14 +692,14 @@ public class CDAWebDB {
                 dr = DatumRangeUtil.parseTimeRange(avail);
             } catch (ParseException ex1) {
                 logger.log(Level.SEVERE, ex1.getMessage(), ex1);
-                master= fsm.getRepresentativeFile(p);
+                master= fsm.getRepresentativeFile(p.getSubtaskMonitor("get representative file"));
                 dr= fsm.getRangeFor(master);
             }
             //String[] files1= getFilesAndRangesFromWebService( ds, dr );
 
-            String[] files= fsm.getBestNamesFor( dr, p );
+            String[] files= fsm.getBestNamesFor( dr, p.getSubtaskMonitor("get best names for") );
             if ( files.length==0 ) {
-                master= fsm.getRepresentativeFile(p);
+                master= fsm.getRepresentativeFile(p.getSubtaskMonitor("get representative file"));
                 if ( master==null ) {
                     throw new FileNotFoundException("unable to find any files to serve as master file in "+fsm );
                 } else {
