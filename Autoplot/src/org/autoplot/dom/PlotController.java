@@ -52,6 +52,7 @@ import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.tca.DataSourceTcaSource;
 import org.autoplot.util.TickleTimer;
+import org.das2.graph.DasDevicePosition;
 import org.das2.qds.QFunction;
 import org.das2.qds.ops.Ops;
 
@@ -776,8 +777,20 @@ public final class PlotController extends DomNodeController {
     private PropertyChangeListener plotListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            if ( titleConverter==null ) return;
-            dasPlot.setTitle( (String)titleConverter.convertForward(plot.getTitle()) );
+            if ( evt.getPropertyName().equals(Plot.PROP_TITLE) ) {
+                if ( titleConverter==null ) return;
+                dasPlot.setTitle( (String)titleConverter.convertForward(plot.getTitle()) );
+            } else if ( evt.getPropertyName().equals(Plot.PROP_COLORBARCOLUMNPOSITION) ) {
+                try {
+                    DasDevicePosition.parseLayoutStr( dasColorBar.getColumn(), (String)evt.getNewValue() );
+                } catch ( ParseException ex ) {
+                    logger.log(Level.WARNING, "unable to parse value: {0}", evt.getNewValue());
+                    String val= DasDevicePosition.formatLayoutStr( dasColorBar.getColumn() );
+                    if ( !val.equals(evt.getNewValue()) ) {
+                        plot.setColorbarColumnPosition(val);
+                    }
+                }
+            }
         }
     };
             

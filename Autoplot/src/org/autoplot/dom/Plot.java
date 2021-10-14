@@ -258,6 +258,20 @@ public class Plot extends DomNode {
         propertyChangeSupport.firePropertyChange( PROP_COLORTABLE, oldVal, this.colortable );
     }
 
+    private String colorbarColumnPosition = "100%+1em,100%+2em";
+
+    public static final String PROP_COLORBARCOLUMNPOSITION = "colorbarColumnPosition";
+
+    public String getColorbarColumnPosition() {
+        return colorbarColumnPosition;
+    }
+
+    public void setColorbarColumnPosition(String colorbarColumnPosition) {
+        String oldColorbarColumnPosition = this.colorbarColumnPosition;
+        this.colorbarColumnPosition = colorbarColumnPosition;
+        propertyChangeSupport.firePropertyChange(PROP_COLORBARCOLUMNPOSITION, oldColorbarColumnPosition, colorbarColumnPosition);
+    }
+    
     private String rowId="";
     public static final String PROP_ROWID = "rowId";
 
@@ -379,6 +393,7 @@ public class Plot extends DomNode {
         if (!exclude.contains(PROP_TICKS_URI)) this.setTicksURI(that.getTicksURI());
         if (!exclude.contains(PROP_EPHEMERIS_LABELS)) this.setEphemerisLabels(that.getEphemerisLabels());
         if (!exclude.contains(PROP_LEGENDPOSITION)) this.setLegendPosition(that.getLegendPosition());
+        if (!exclude.contains(PROP_COLORBARCOLUMNPOSITION)) this.setColorbarColumnPosition( that.getColorbarColumnPosition() );
         if (!exclude.contains(PROP_FONTSIZE) ) this.setFontSize(that.getFontSize());
         if (!exclude.contains(PROP_LEGENDFONTSIZE) ) this.setLegendFontSize(that.getLegendFontSize());
         if (!exclude.contains(PROP_DISPLAYLEGEND)) this.setDisplayLegend(that.isDisplayLegend());
@@ -433,6 +448,8 @@ public class Plot extends DomNode {
         if (!b) result.add(new PropertyChangeDiff(PROP_EPHEMERIS_LABELS, that.ephemerisLabels, this.ephemerisLabels));
         b= that.legendPosition.equals(this.legendPosition);
         if (!b) result.add(new PropertyChangeDiff(PROP_LEGENDPOSITION, that.legendPosition, this.legendPosition ));
+        b= that.colorbarColumnPosition.equals(this.colorbarColumnPosition);
+        if (!b) result.add(new PropertyChangeDiff(PROP_COLORBARCOLUMNPOSITION, that.colorbarColumnPosition, this.colorbarColumnPosition ));
         b= that.displayLegend==this.displayLegend;        
         if (!b) result.add(new PropertyChangeDiff(PROP_DISPLAYLEGEND, that.displayLegend, this.displayLegend ));
         b=  that.fontSize.equals(this.fontSize) ;
