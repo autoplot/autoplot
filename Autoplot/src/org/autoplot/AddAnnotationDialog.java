@@ -14,6 +14,7 @@ import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.graph.AnchorType;
 import org.autoplot.dom.Annotation;
+import org.autoplot.jythonsupport.ui.JLinkyLabel;
 import org.das2.components.propertyeditor.EnumerationEditor;
 import org.das2.graph.AnchorPosition;
 import org.das2.graph.BorderType;
@@ -41,6 +42,12 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
 
         borderTypeEnumEditor.setValue( BorderType.ROUNDED_RECTANGLE );
         borderTypePanel.add( borderTypeEnumEditor.getCustomEditor() );
+             
+        JLinkyLabel ll= new JLinkyLabel( null,
+                "<html>See <a href='https://github.com/autoplot/documentation/blob/master/docs/annotations.md'>"
+                        + "https://github.com/autoplot/documentation/blob/master/docs/annotations.md</a>");
+        
+        linkyLabelPanel.add( ll, BorderLayout.CENTER );
                 
         validate();
         
@@ -70,6 +77,7 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
         anchorPositionPanel = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         borderTypePanel = new javax.swing.JPanel();
+        linkyLabelPanel = new javax.swing.JPanel();
 
         jTextField1.setText("Annotation 1");
 
@@ -102,6 +110,8 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
 
         borderTypePanel.setLayout(new java.awt.BorderLayout());
 
+        linkyLabelPanel.setLayout(new java.awt.BorderLayout());
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -109,10 +119,15 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(linkyLabelPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextField1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(borderTypePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
@@ -125,16 +140,12 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
                                 .addComponent(jLabel1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(anchorPositionPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addGap(0, 12, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(borderTypePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGap(0, 214, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
@@ -152,7 +163,9 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(borderTypePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(97, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 86, Short.MAX_VALUE)
+                .addComponent(linkyLabelPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         bindingGroup.bind();
@@ -167,6 +180,7 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JPanel linkyLabelPanel;
     private javax.swing.JCheckBox pointAtCB;
     private javax.swing.JTextField xDatumField;
     private javax.swing.JTextField yDatumField;

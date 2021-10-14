@@ -59,7 +59,9 @@ public class AnnotationCommand extends PyObject {
             + " <tr><td> pointAtX </td><td>Y value to point the arrow at or to anchor the annotation.</td></tr>"
             + " <tr><td> rowId </td><td>ID of the row containing for positioning this annotation, sets anchorType=CANVAS<br>(See dom.plots[0].rowId)</td></tr>"
             + " <tr><td> columnId </td><td>ID of the column containing for positioning this annotation, sets anchorType=CANVAS</td></tr>"
-            + "</table></html>");
+            + "</table>" 
+            + "See <a href='https://github.com/autoplot/documentation/blob/master/docs/annotations.md'>https://github.com/autoplot/documentation/blob/master/docs/annotations.md</a>"
+            + "</html>");
 
     private static AnchorPosition anchorPosition( PyObject val ) {
         AnchorPosition c=null;
