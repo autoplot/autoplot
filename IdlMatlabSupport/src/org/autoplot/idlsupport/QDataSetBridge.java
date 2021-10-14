@@ -691,6 +691,7 @@ public abstract class QDataSetBridge {
         if ( datasets.get(name)!=null ) {
             ds1 = datasets.get(name).slice(i);
         } else {
+            System.err.println("No datasets with that name: "+name);
             throw new IllegalArgumentException("did not find dataset name="+name );
         }
         copyValues( ds1, result );
@@ -712,6 +713,7 @@ public abstract class QDataSetBridge {
         if ( datasets.get(name)!=null ) {
             ds1 = datasets.get(name).slice(i);
         } else {
+            System.err.println("No datasets with that name: "+name);
             throw new IllegalArgumentException("did not find dataset name="+name );
         }
         copyValues( ds1, result );
@@ -771,6 +773,10 @@ public abstract class QDataSetBridge {
      */
     public String[] svalues( String name ) {
         QDataSet ds1 = datasets.get(name);
+        if ( ds1==null ) {
+            System.err.println("No datasets with that name: "+name);
+            throw new IllegalArgumentException("No datasets with the name: "+name);
+        }
         String[] result = new String[ds1.length()];
         svalues( name, result );
         return result;
@@ -785,6 +791,7 @@ public abstract class QDataSetBridge {
     public Object values(String name) {
         QDataSet ds1 = datasets.get(name);
         if ( ds1==null ) {
+            System.err.println("No datasets with that name: "+name);
             throw new IllegalArgumentException("No datasets with the name: "+name);
         }
         
@@ -1086,7 +1093,12 @@ public abstract class QDataSetBridge {
      * @return 
      */
     public String propertyAsString(String name, String property) {
-        Object result = datasets.get(name).property(property);
+        QDataSet ds1= datasets.get(name);
+        if ( ds1==null ) {
+            System.err.println("No datasets with that name: "+name);
+            throw new IllegalArgumentException("No datasets with the name: "+name);
+        }
+        Object result = ds1.property(property);
         if ( property.equals("UNITS") ) {
             return String.valueOf( getUnitFor( datasets.get(name) ) );
         } else if (result == null) {
@@ -1097,7 +1109,12 @@ public abstract class QDataSetBridge {
     }
 
     public double propertyAsDouble(String name, String property) {
-        Object result = datasets.get(name).property(property);
+        QDataSet ds1= datasets.get(name);
+        if ( ds1==null ) {
+            System.err.println("No datasets with that name: "+name);
+            throw new IllegalArgumentException("No datasets with the name: "+name);
+        }
+        Object result = ds1.property(property);
         if (result == null) return Double.NaN;
         else return ((Number) result).doubleValue();
     }
@@ -1110,6 +1127,10 @@ public abstract class QDataSetBridge {
      */
     public void valuesAlias(String name, double[] result) {
         QDataSet ds1 = datasets.get(name);
+        if ( ds1==null ) {
+            System.err.println("No datasets with that name: "+name);
+            throw new IllegalArgumentException("No datasets with the name: "+name);
+        }
         QubeDataSetIterator it = new QubeDataSetIterator(ds1);
         int iele = 0;
         while (it.hasNext()) {

@@ -1,6 +1,7 @@
 
 package org.autoplot.idlsupport;
 
+import java.io.IOException;
 import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -22,6 +23,7 @@ import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
+import org.das2.util.AboutUtil;
 
 /**
  * Extension to QDataSetBridge, which supports reading in data from Autoplot URIs.
@@ -46,7 +48,12 @@ public class APDataSet extends QDataSetBridge {
     public APDataSet() {
         super();
         if ( logger.isLoggable(Level.INFO) ) {
-            System.err.println("APDataSet v1.7.0");
+            System.err.println("APDataSet v1.8.0");
+            try {
+                System.err.println("Autoplot Version "+ AboutUtil.getReleaseTag() );
+            } catch ( IOException ex ) {
+                System.err.println("unable to determine Autoplot version." );
+            }
             String j= System.getProperty("java.version");
             System.err.println("Java Version "+j);
             System.err.println("disabling HTTP certificate checks.");
@@ -156,7 +163,10 @@ public class APDataSet extends QDataSetBridge {
         }
         URI uri= DataSetURI.getURI(surl);
         DataSourceFactory f= DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor());
-
+        if ( f==null ) {
+            System.err.println("Unable to find DataSource for handling URI: "+uri);
+            throw new IllegalArgumentException("Unable to find DataSource for handling URI: "+uri);
+        }
         List<String> problems= new ArrayList();
         if ( f.reject( surl, problems, mon.getSubtaskMonitor("check reject") ) ) {
             throw new Exception("URI was rejected by the datasource: "+surl +" rejected by "+ f );
