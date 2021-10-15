@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Newly integrated differences code allows script verification to show changes since the last invocation more precisely.
+        <p><small>Bug where invalid time ranges could get into history is fixed.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,8 +27,16 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-10-09 r26108):</p>
+        <p>Bugfixes (2021-10-15 r26122):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2400/">2400</a>: Don't paint opposite axis if there is a different axis there already.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2195/">2195</a>: LANL NN render mode didn't work when tags were monotonic decreasing.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2134/">2134</a>: support for negative step, useful in scripts to flip over arrays.
+            <li>annotations dialogs have link to documentation. 
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/1659/">1659</a>: in CDAWeb when dataset does not have master file, subTaskMonitor.finished was called twice.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2400/">2400</a>: white-line-on-white-plot still draws to support when a contrasting color is under the plot.  Thanks, Ali!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2400/">2400</a>: manual ticks ignored the minor ticks in "1,5/2,3,4,6,7,8,9".  Thanks, Ali!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2399/">2399</a>: invalid timerange got into history causing confusion.
             <li>correct misspelling of indices in Ops Javadoc.  Thanks, Ivar!
             <li><a href='https://sourceforge.net/p/autoplot/bugs/2398/'>2398</a>: monotonicSubset sets MONOTONIC to True, working around the problem Kristoff saw.
             <li><a href='https://sourceforge.net/p/autoplot/bugs/2397/'>2397</a>: New Javadoc, still unpublished, supports extra characters like "Returns <i>e</i><sup>x</sup>&nbsp;-1."
@@ -46,6 +54,7 @@
         </ul>
         <p>Older Bugfixes (2021-07-06 r25854):</p>
         <ul>
+            <li>Text strings can contain &lt;u&gt; for underlining text.
             <li><a href='https://sourceforge.net/p/autoplot/bugs/2386/'>2386</a>: case where SortDataSet didn't support empty list to index empty dataset.
             <li>default setting of "add plots" dialog should be "below current" to minimize changes.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2385/">2385</a>: question marks in all.xml meant multiple things weren't plottable.
@@ -64,6 +73,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>plot.colorbarColumnPosition property added, so that the colorbar can be pushed over to make room for a second axis.
             <li>NetCDF provides completions for x= and y= controls.
             <li>Jython editor has beginnings of annotations for differences.
             <li>GitCommand introduced to wrap calls to command line git, and native Java git is coming.
