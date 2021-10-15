@@ -120,11 +120,32 @@ public class DatasetCommand extends PyObject {
 
         QDataSet result;
         
+        Units units=null;
+        
+        for ( int i=nparm; i<args.length; i++ ) { //HERE nargs
+            String kw= keywords[i-nparm];
+            PyObject val= args[i];
+
+            String sval= (String) val.__str__().__tojava__(String.class);
+            if ( kw.equals("units") ) {
+                if ( val.__tojava__(Units.class)!= Py.NoConversion ) {
+                    units= (Units)val.__tojava__(Units.class);
+                } else {
+                    String svalue= val.toString();
+                    units= Units.lookupUnits(svalue);
+                }
+            }
+        }
+        
         switch (nparm) {
             case 0:
                 throw new IllegalArgumentException("dataset needs at least one argument");
             case 1:
-                result= JythonOps.dataset( args[0] );
+                if ( units!=null ) {
+                    result= JythonOps.dataset( args[0], units );
+                } else {
+                    result= JythonOps.dataset( args[0] );
+                }
                 break;
             case 2: {
                 if ( args[1] instanceof PyJavaInstance ) { // legacy use allowed the second argument to be a units object.
@@ -132,8 +153,7 @@ public class DatasetCommand extends PyObject {
                     Object o= pji.__tojava__( Units.class );
                     if ( o!=Py.NoConversion ) {
                         logger.info("legacy script uses second argument for units, use units=... instead");
-                        result= JythonOps.dataset( args[0] );
-                        result= Ops.putProperty( result, QDataSet.UNITS, o );
+                        result= Ops.dataset( args[0].__tojava__(Object.class), (Units)o );
                         break;
                     }
                 }

@@ -37,6 +37,7 @@ import org.das2.qds.QDataSet;
 import org.autoplot.datasource.URISplit;
 import org.das2.jythoncompletion.JavadocLookup;
 import org.das2.qds.ops.Ops;
+import org.das2.qds.util.DataSetBuilder;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
 
@@ -211,9 +212,21 @@ public class JythonOps {
         if ( arg0 instanceof PyQDataSet ) {
             return ((PyQDataSet)arg0).rods;
         } else if ( arg0 instanceof PyList ) {
-            return Ops.putProperty( PyQDataSetAdapter.adaptList( (PyList)arg0 ), QDataSet.UNITS, u );
+            PyList pl= (PyList)arg0;
+            DataSetBuilder builder= new DataSetBuilder( 1, pl.__len__() );
+            for ( int i=0; i<pl.__len__(); i++ ) {
+                builder.nextRecord( Ops.dataset( pl.get(i), u ) );
+            }
+            return builder.getDataSet();
         } else if ( arg0 instanceof PyArray ) {
             return Ops.putProperty( PyQDataSetAdapter.adaptArray( (PyArray) arg0 ), QDataSet.UNITS, u );
+        } else if ( arg0 instanceof PyTuple ) {
+            PyTuple pl= (PyTuple)arg0;
+            DataSetBuilder builder= new DataSetBuilder( 1, pl.__len__() );
+            for ( int i=0; i<pl.__len__(); i++ ) {
+                builder.nextRecord( Ops.dataset( pl.get(i), u ) );
+            }
+            return builder.getDataSet();
         } else if ( arg0 instanceof PyInteger ) {
             return DataSetUtil.asDataSet( ((Double)arg0.__tojava__( Double.class )).doubleValue(), u );
         } else if ( arg0 instanceof PyLong ) {
