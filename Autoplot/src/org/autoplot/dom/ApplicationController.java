@@ -3418,6 +3418,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             for ( Plot p: this.application.getPlots() ) {
                 if ( p.getController()!=null ) {
                     //TODO: this is a terrible kludge and I need to figure out how to do this correctly.
+                    // https://sourceforge.net/p/autoplot/feature-requests/757/
                     DasColorBar cb= p.getController().getDasColorBar();
                     String x= DasDevicePosition.formatLayoutStr( cb.getColumn() );
                     if ( !x.equals(p.getColorbarColumnPosition() ) ) {
