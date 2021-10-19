@@ -18,6 +18,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -77,6 +78,7 @@ import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.layout.LayoutConstants;
 import org.autoplot.renderer.AnnotationEditorPanel;
 import org.autoplot.util.RunLaterListener;
+import org.das2.graph.DasDevicePosition;
 import org.das2.qds.QDataSet;
 import org.das2.system.DefaultMonitorFactory;
 import org.das2.system.DefaultMonitorFactory.MonitorEntry;
@@ -3413,6 +3415,21 @@ public class ApplicationController extends DomNodeController implements RunLater
             if ( !exclude.contains("dataSourceFilters") ) syncSupport.syncToDataSourceFilters(that.getDataSourceFilters(), nameMap);
 
             if ( !exclude.contains("plots") ) syncSupport.syncToPlots( that.getPlots(),nameMap );
+            for ( Plot p: this.application.getPlots() ) {
+                if ( p.getController()!=null ) {
+                    //TODO: this is a terrible kludge and I need to figure out how to do this correctly.
+                    DasColorBar cb= p.getController().getDasColorBar();
+                    String x= DasDevicePosition.formatLayoutStr( cb.getColumn() );
+                    if ( !x.equals(p.getColorbarColumnPosition() ) ) {
+                        try {
+                            DasDevicePosition.parseLayoutStr( cb.getColumn(), p.getColorbarColumnPosition() );
+                        } catch (ParseException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    
+                }
+            }
 
             if ( !exclude.contains("plotElements") )  syncSupport.syncToPlotElements(that.getPlotElements(), nameMap);
 
