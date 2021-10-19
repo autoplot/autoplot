@@ -46,7 +46,7 @@ import org.python.util.InteractiveInterpreter;
  */
 public class StaticCodeAnalysis {
     
-    private static final Logger logger = LoggerManager.getLogger("jython");
+    private static final Logger logger = LoggerManager.getLogger("jython.staticcodeanalysis");
 
     private static final Map<String,SimpleNode> definedNamesApp= new HashMap<>();
     
