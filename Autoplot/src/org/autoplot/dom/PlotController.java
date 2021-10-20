@@ -777,10 +777,7 @@ public final class PlotController extends DomNodeController {
     private PropertyChangeListener plotListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            if ( evt.getPropertyName().equals(Plot.PROP_TITLE) ) {
-                if ( titleConverter==null ) return;
-                dasPlot.setTitle( (String)titleConverter.convertForward(plot.getTitle()) );
-            } else if ( evt.getPropertyName().equals(Plot.PROP_COLORBARCOLUMNPOSITION) ) {
+            if ( evt.getPropertyName().equals(Plot.PROP_COLORBARCOLUMNPOSITION) ) {
                 try {
                     DasDevicePosition.parseLayoutStr( dasColorBar.getColumn(), (String)evt.getNewValue() );
                 } catch ( ParseException ex ) {
@@ -791,6 +788,8 @@ public final class PlotController extends DomNodeController {
                     }
                 }
             }
+            if ( titleConverter==null ) return;
+            dasPlot.setTitle( (String)titleConverter.convertForward(plot.getTitle()) );
         }
     };
             
