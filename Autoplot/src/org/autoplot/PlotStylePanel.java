@@ -45,6 +45,7 @@ import org.autoplot.dom.DomUtil;
 import org.autoplot.dom.Options;
 import org.autoplot.dom.PlotElement;
 import org.autoplot.dom.PlotElementStyle;
+import org.das2.datum.Datum;
 
 /**
  *
@@ -115,8 +116,10 @@ public final class PlotStylePanel extends javax.swing.JPanel {
 
         validate();
 
-        doOptionsBindings();
-        doElementBindings();
+        SwingUtilities.invokeLater(() -> {
+            doOptionsBindings();
+            doElementBindings();
+        });
 
         String ff = dom.getController().getCanvas().getFont();
         fontLabel.setText(ff);
@@ -148,6 +151,40 @@ public final class PlotStylePanel extends javax.swing.JPanel {
         }
     }
     
+    private final Converter unitsConverter= new Converter() {
+        @Override
+        public Object convertForward(Object o) {
+            Number s= (Number)o;
+            int i= unitsCB.getSelectedIndex();
+            switch (i) {
+                case 0:
+                    return String.valueOf(s);
+                case 1:
+                    return String.format( "%.2f", s.doubleValue()/72. );
+                case 2:
+                    return String.format( "%.3f", s.doubleValue()/72.*2.54 );
+                default:
+                    throw new IllegalArgumentException("bad value for unitsCB");
+            }
+        }
+        @Override
+        public Object convertReverse(Object t) {
+            double val;
+            val= Double.parseDouble((String)t);
+            int i= unitsCB.getSelectedIndex();
+            switch (i) {
+                case 0:
+                    return (int)val;
+                case 1:
+                    return (int)(val*72.);
+                case 2:
+                    return (int)(val*72./2.54);
+                default:
+                    throw new IllegalArgumentException("bad value for unitsCB");
+            }
+        }            
+    };
+
     private void doOptionsBindings() {
         assertEventThread("doOptionsBindings");
         
@@ -171,26 +208,7 @@ public final class PlotStylePanel extends javax.swing.JPanel {
                 return new Color(rgb);// shouldn't enter here.  But it does! https://sourceforge.net/p/autoplot/bugs/1055/
             }
         };
-//        Converter unitsConverter= new Converter() {
-//            @Override
-//            public Object convertForward(Object s) {
-//                int i= unitsCB.getSelectedIndex();
-//                if ( i==0 ) {
-//                    return s;
-//                } else {
-//                    throw new IllegalArgumentException("not supported");
-//                }
-//            }
-//            @Override
-//            public Object convertReverse(Object t) {
-//                int i= unitsCB.getSelectedIndex();
-//                if ( i==0 ) {
-//                    return t;
-//                } else {
-//                    throw new IllegalArgumentException("not supported");
-//                }
-//            }            
-//        };
+
         b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create(Options.PROP_FOREGROUND), foregroundColorButton, BeanProperty.create("icon"));
         b.setConverter(colorIconConverter);
         bc.addBinding(b);
@@ -202,10 +220,10 @@ public final class PlotStylePanel extends javax.swing.JPanel {
         b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create(Canvas.PROP_FITTED), fittedCB, BeanProperty.create("selected"));
         bc.addBinding(b);
         b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create(Canvas.PROP_HEIGHT), heightTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST"));
-        //b.setConverter(unitsConverter);
+        b.setConverter(unitsConverter);
         bc.addBinding(b);
         b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create(Canvas.PROP_WIDTH), widthTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST"));
-        //b.setConverter(unitsConverter);
+        b.setConverter(unitsConverter);
         bc.addBinding(b);
         bc.bind();
         dom.getCanvases(0).getController().getDasCanvas().addPropertyChangeListener("preferredSize", new PropertyChangeListener() {
@@ -456,6 +474,11 @@ public final class PlotStylePanel extends javax.swing.JPanel {
         widthTextField.setToolTipText("width of fixed size canvas in pixels, and the units \"inch\" or cm\" may be used.");
         widthTextField.setEnabled(false);
         widthTextField.setFocusLostBehavior(javax.swing.JFormattedTextField.COMMIT);
+        widthTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                widthTextFieldFocusLost(evt);
+            }
+        });
         widthTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 widthTextFieldActionPerformed(evt);
@@ -466,6 +489,11 @@ public final class PlotStylePanel extends javax.swing.JPanel {
         heightTextField.setToolTipText("height of fixed size canvas in pixels, and the units inch or cm may be used.");
         heightTextField.setEnabled(false);
         heightTextField.setFocusLostBehavior(javax.swing.JFormattedTextField.COMMIT);
+        heightTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                heightTextFieldFocusLost(evt);
+            }
+        });
         heightTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 heightTextFieldActionPerformed(evt);
@@ -487,7 +515,12 @@ public final class PlotStylePanel extends javax.swing.JPanel {
             }
         });
 
-        unitsCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "in pixels:", "in inches:", "in cm:" }));
+        unitsCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "pixels", "inches", "cm" }));
+        unitsCB.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                unitsCBItemStateChanged(evt);
+            }
+        });
         unitsCB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 unitsCBActionPerformed(evt);
@@ -507,12 +540,12 @@ public final class PlotStylePanel extends javax.swing.JPanel {
                         .add(jLabel4)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(fontLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 191, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 46, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .add(pickFontButton))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, plotPanelLayout.createSequentialGroup()
                         .add(jLabel7)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(fittedCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE))
+                        .add(fittedCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, plotPanelLayout.createSequentialGroup()
                         .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(plotPanelLayout.createSequentialGroup()
@@ -548,10 +581,10 @@ public final class PlotStylePanel extends javax.swing.JPanel {
                             .add(widthTextField))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(sizeLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .add(plotPanelLayout.createSequentialGroup()
-                                .add(unitsCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .add(0, 0, Short.MAX_VALUE))
-                            .add(sizeLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .add(unitsCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 100, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(0, 0, Short.MAX_VALUE)))))
                 .add(12, 12, 12))
         );
 
@@ -595,7 +628,7 @@ public final class PlotStylePanel extends javax.swing.JPanel {
                     .add(heightLabel)
                     .add(heightTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(sizeLabel))
-                .addContainerGap(35, Short.MAX_VALUE))
+                .addContainerGap(55, Short.MAX_VALUE))
         );
 
         jSplitPane2.setRightComponent(plotPanel);
@@ -604,7 +637,7 @@ public final class PlotStylePanel extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 688, Short.MAX_VALUE)
+            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 688, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -684,45 +717,80 @@ public final class PlotStylePanel extends javax.swing.JPanel {
         heightLabel.setEnabled(s);
     }//GEN-LAST:event_fittedCBActionPerformed
 
+    private Units getCanvasSizeUnits() {
+        switch (unitsCB.getSelectedIndex()) {
+            case 0:
+                return Units.typographicPoints;
+            case 1:
+                return Units.inches;
+            case 2:
+                return Units.centimeters;
+            default:
+                throw new IllegalArgumentException("bad unitsCB line 726");
+        }
+    }
     private void updateSize() {
         int wpixels = dom.getCanvases(0).getController().getDasCanvas().getPreferredSize().width;
         int hpixels = dom.getCanvases(0).getController().getDasCanvas().getPreferredSize().height;
-        switch (unitsCB.getSelectedIndex()) {
+        sizeLabel.setText(String.format("w=%d by h=%d pixels", wpixels, hpixels));
+        int i= unitsCB.getSelectedIndex();
+        switch (i) {
             case 0:
-                sizeLabel.setText(String.format("w=%d by h=%d pixels", wpixels, hpixels));
+                widthTextField.setText(String.valueOf(wpixels));
+                heightTextField.setText(String.valueOf(hpixels));
                 break;
             case 1:
-                sizeLabel.setText(String.format( Locale.US, "w=%.2f by h=%.2f inch", wpixels / 72., hpixels / 72.));
+                widthTextField.setText( String.format("%.2f",wpixels/72.) );
+                heightTextField.setText( String.format("%.2f", hpixels/72.) );
+                break;
+            case 2:
+                widthTextField.setText( String.format("%.3f", wpixels / 72. * 2.54) );
+                heightTextField.setText( String.format("%.3f", hpixels / 72. * 2.54) );
                 break;
             default:
-                sizeLabel.setText(String.format( Locale.US, "w=%.1f by h=%.1f cm", wpixels / 72 * 2.54, hpixels / 72 * 2.54));
-                break;
+                throw new IllegalArgumentException("bad value for unitsCB");
         }
     }
 
     private void widthTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_widthTextFieldActionPerformed
         String s= widthTextField.getText();
+        Units u= getCanvasSizeUnits();
         try {
-            dom.getCanvases(0).getController().getDasCanvas().setPreferredWidth( (int)Units.typographicPoints.parse(s).value() );
+            dom.getCanvases(0).getController().getDasCanvas().setPreferredWidth( (int)u.parse(s).doubleValue( Units.typographicPoints ) );
         } catch ( ParseException ex ) {
             logger.log(Level.SEVERE, null, ex);
         }
-        widthTextField.setText( String.valueOf( dom.getCanvases(0).getController().getDasCanvas().getPreferredSize().width ) );
+        s= (String)unitsConverter.convertForward( dom.getCanvases(0).getController().getDasCanvas().getPreferredSize().width );
+        widthTextField.setText( s );
     }//GEN-LAST:event_widthTextFieldActionPerformed
 
     private void heightTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_heightTextFieldActionPerformed
         String s= heightTextField.getText();
+        Units u= getCanvasSizeUnits();
         try {
-            dom.getCanvases(0).getController().getDasCanvas().setPreferredHeight( (int)Units.typographicPoints.parse(s).value());
+            dom.getCanvases(0).getController().getDasCanvas().setPreferredHeight( (int)u.parse(s).doubleValue( Units.typographicPoints ) );
         } catch (ParseException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
-        heightTextField.setText( String.valueOf( dom.getCanvases(0).getController().getDasCanvas().getPreferredSize().height ) );
+        s= (String)unitsConverter.convertForward( dom.getCanvases(0).getController().getDasCanvas().getPreferredSize().height );
+        heightTextField.setText( s );
     }//GEN-LAST:event_heightTextFieldActionPerformed
 
     private void unitsCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_unitsCBActionPerformed
         updateSize();
     }//GEN-LAST:event_unitsCBActionPerformed
+
+    private void widthTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_widthTextFieldFocusLost
+        System.err.println("herefocuslost");
+    }//GEN-LAST:event_widthTextFieldFocusLost
+
+    private void heightTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_heightTextFieldFocusLost
+        System.err.println("herefocuslost");
+    }//GEN-LAST:event_heightTextFieldFocusLost
+
+    private void unitsCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_unitsCBItemStateChanged
+        updateSize();
+    }//GEN-LAST:event_unitsCBItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backgroundColorButton;

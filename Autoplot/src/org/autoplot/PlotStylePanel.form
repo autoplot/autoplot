@@ -76,13 +76,13 @@
                               <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Component id="fontLabel" min="-2" pref="191" max="-2" attributes="0"/>
-                              <EmptySpace pref="46" max="32767" attributes="1"/>
+                              <EmptySpace max="32767" attributes="1"/>
                               <Component id="pickFontButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="fittedCB" pref="252" max="32767" attributes="0"/>
+                              <Component id="fittedCB" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -129,11 +129,11 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="unitsCB" min="-2" max="-2" attributes="0"/>
+                                  <Component id="sizeLabel" max="32767" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <Component id="unitsCB" min="-2" pref="100" max="-2" attributes="0"/>
                                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                                   </Group>
-                                  <Component id="sizeLabel" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -184,7 +184,7 @@
                           <Component id="heightTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="sizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="35" max="32767" attributes="0"/>
+                      <EmptySpace pref="55" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -286,6 +286,7 @@
                 <Property name="focusLostBehavior" type="int" value="0"/>
               </Properties>
               <Events>
+                <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="widthTextFieldFocusLost"/>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="widthTextFieldActionPerformed"/>
               </Events>
             </Component>
@@ -297,6 +298,7 @@
                 <Property name="focusLostBehavior" type="int" value="0"/>
               </Properties>
               <Events>
+                <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="heightTextFieldFocusLost"/>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="heightTextFieldActionPerformed"/>
               </Events>
             </Component>
@@ -326,13 +328,14 @@
               <Properties>
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
                   <StringArray count="3">
-                    <StringItem index="0" value="in pixels:"/>
-                    <StringItem index="1" value="in inches:"/>
-                    <StringItem index="2" value="in cm:"/>
+                    <StringItem index="0" value="pixels"/>
+                    <StringItem index="1" value="inches"/>
+                    <StringItem index="2" value="cm"/>
                   </StringArray>
                 </Property>
               </Properties>
               <Events>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="unitsCBItemStateChanged"/>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="unitsCBActionPerformed"/>
               </Events>
             </Component>
