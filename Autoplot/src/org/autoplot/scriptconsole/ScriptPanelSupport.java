@@ -770,6 +770,14 @@ public class ScriptPanelSupport {
                         while (i1 < script.length() - 1 && Character.isWhitespace(script.charAt(i1 + 1))) {
                             i1 = script.indexOf('\n', i1 + 1);
                         }
+                        if ( script.substring(i0,i1).contains("'''") ) {
+                            i1 = script.indexOf('\n', i0);
+                            int ii = script.indexOf("'''", i0)+3;
+                            while ( i1<script.length() - 1 && !script.substring(ii,i1).contains("'''") ) {
+                                ii = i1+1;
+                                i1 = script.indexOf('\n', ii);
+                            }
+                        }
                         String s;
                         if (i1 != -1) {
                             i1 = i1 + 1;
