@@ -763,20 +763,20 @@ public class ScriptPanelSupport {
 
                 panel.setDirty(dirty0);
                 if ( ( ( mode & Event.CTRL_MASK ) == Event.CTRL_MASK ) ) { // trace
-                    String text = panel.getEditorPanel().getText();
+                    String script = panel.getEditorPanel().getText();
                     int i0 = 0;
-                    while (i0 < text.length()) {
-                        int i1 = text.indexOf('\n', i0);
-                        while (i1 < text.length() - 1 && Character.isWhitespace(text.charAt(i1 + 1))) {
-                            i1 = text.indexOf('\n', i1 + 1);
+                    while (i0 < script.length()) {
+                        int i1 = script.indexOf('\n', i0);
+                        while (i1 < script.length() - 1 && Character.isWhitespace(script.charAt(i1 + 1))) {
+                            i1 = script.indexOf('\n', i1 + 1);
                         }
                         String s;
                         if (i1 != -1) {
                             i1 = i1 + 1;
-                            s = text.substring(i0, i1);
+                            s = script.substring(i0, i1);
                         } else {
-                            s = text.substring(i0);
-                            i1= text.length();
+                            s = script.substring(i0);
+                            i1= script.length();
                         }
                         try {
                             clearAnnotations();
