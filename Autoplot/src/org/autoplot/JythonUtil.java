@@ -64,10 +64,11 @@ import org.python.core.PySyntaxError;
 
 /**
  * Utilities for Jython functions, such as a standard way to initialize
- * an interpreter and invoke a script asynchronously.  See also 1310.
+ * an interpreter and invoke a script asynchronously.
  * TODO: this needs review, since the autoplot.py was added to the imports.
  * 
  * @see org.autoplot.jythonsupport.JythonUtil
+ * @see https://sourceforge.net/p/autoplot/bugs/1310/
  * @author jbf
  */
 public class JythonUtil {
