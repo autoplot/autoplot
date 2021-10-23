@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Shade Error Bar type shows the error envelope as a shaded region.
+        <p><small>Binary reader is used with character format (%c) to find strings within a CDF file.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,7 +27,12 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-10-15 r26125):</p>
+        <p>Bugfixes (2021-10-23 r26141):</p>
+        <ul>
+            <li>Canvas Size GUI on style tab cleaned up, so manual size can be entered in inches or centimeters.
+            <li>Jython script trace run (where it executes line by line for debugging) handles multi-line strings.
+        </ul>
+        <p>Older Bugfixes (2021-10-15 r26125):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2402/">2402</a>: Correction to reducex, where xtags should have been made uniform.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2401/">2401</a>: eq with nominal units produces runtime error.  This is now supported.  Thanks, Ivar!
@@ -54,25 +59,13 @@
             <li>"regex mode" for ASCII table parser would clear the units, limiting capabilities.
             <li>Corrections to add plots and fix layout.  Now only plots attached to the marginColumn are used for the layout.
         </ul>
-        <p>Older Bugfixes (2021-07-06 r25854):</p>
-        <ul>
-            <li><a href='https://sourceforge.net/p/autoplot/bugs/2386/'>2386</a>: case where SortDataSet didn't support empty list to index empty dataset.
-            <li>default setting of "add plots" dialog should be "below current" to minimize changes.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2385/">2385</a>: question marks in all.xml meant multiple things weren't plottable.
-            <li>Ivar pointed out that draw grid caused lineplots to have transparency to them.  Thanks Ivar!
-            <li>Remove temporarily use http for runtime errors, not https, since jfaden.net https certificate is fixed.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2383/">2383</a>: exception reports and about menu show launch mechanism used.
-            <li>"fix layout" will also remove gaps horizontally when multiple columns are used.  Thanks, Ivar!
-            <li>Temporarily use http for runtime errors, not https, since jfaden.net https certificate is broken.
-            <li>triple quoted strings would always move the lastLine pointer, sometimes preventing the GUI creation from the address bar.
-            <li>Ephemeris lines are limited to 32 lines, was 10.  Thanks, James!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2378/">2378</a>: add setDepend0Cadence, setDepend1Cadence, and setValidRange so these are accessible in scripts.  Thanks, Sadie!
-            <li>round of Findbugs cleanup to get down to 80 flagged issues.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2380/">2380</a>: Correction to append, used with aggregation, when "where" is used with rank 2 CDF datasets.  Thanks, Andrei!
-            <li>Safety check on putProperty UNITS on FDataSet for TimeLocationUnits didn't consider that None (null) is a valid setting.  Thanks, Sadie!
-            <li>Vertical Spectrogram Averager was broken for the rank 2 (Z[X,Y]) case.
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">758</a>: introduce editor for Granny Text Strings.
+            <li>allow the connect timeout and read timeout to be reset from default of 5 and 60 seconds.
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/757">757</a>: backgroundThick and fillStyle can be specified in the .vap
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/757">757</a>: plot.colorbarColumnPosition property added, so that the colorbar can be pushed over to make room for a second axis.
             <li>Text strings can contain &lt;u&gt; for underlining text.
@@ -93,18 +86,6 @@
             <li>filter editor panel added for expandToFillGaps.  Thanks Bill!
             <li><a href="https://github.com/das-developers/das2java/issues/18">18</a>: new logic for log ticks when ~1 cycle is showing.
             <li>"About Autoplot" screen shows the release number, not the marginally useful v2021.  Thanks Bill!
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>plots have new legendFontSize property.  Thanks, Ryan and Wouter!
-            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/753/'>753</a>: leave fscache .listing files in place to support offline mode and file availability.
-            <li>eventsDiff function introduced to show differences in lists and inserts, deletes, and changes.  Thanks, Ivar!
-            <li>"add plots" dialog now allows stack of plots to be added to the right or left.  Thanks, Ivar!
-            <li>introduce <a href='http://www-pw.physics.uiowa.edu/~jbf/autoplot/javadoc2018/org/das2/qds/ops/Ops.html#triangulate-org.das2.qds.QDataSet-org.das2.qds.QDataSet-'>triangulate</a> routine to expose this internal functionality.
-            <li>new JNLP file works on both 32 bit and 64 bit machines, giving 4 GB to 64 bit machines.
-            <li>PDS4 source has experimental logic for resolving dependencies between dependent and independent parameters.
-            <li>OperationsProcessor.process(ds,str) introduced to correct order of operands (dataset should come first, conventionally).
-            <li>sps and spd reading scripts now come from https://github.com/autoplot/scripts/blob/master/formats/sps/
         </ul>
         <p>Known issues:</p>
         <ul>
