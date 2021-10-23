@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -43,6 +44,7 @@ import org.autoplot.dom.Plot;
 import org.autoplot.dom.TimeSeriesBrowseController;
 import org.autoplot.datasource.TimeRangeEditor;
 import org.autoplot.dom.DataSourceController;
+import org.das2.util.GrannyTextEditor;
 
 /**
  * Panel for controlling the axes of the current focus plot.
@@ -409,24 +411,29 @@ public class AxisPanel extends javax.swing.JPanel {
         xTitleTextField = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         showXAxisLabelsCB = new javax.swing.JCheckBox();
+        xaxisGTEButton = new javax.swing.JButton();
         zAxisPanel = new javax.swing.JPanel();
         zLog = new javax.swing.JCheckBox();
         zAxisRangePanel = new javax.swing.JPanel();
         zTitleTextField = new javax.swing.JTextField();
         cbVisibleCB = new javax.swing.JCheckBox();
         jLabel3 = new javax.swing.JLabel();
+        colorbarGTEButton = new javax.swing.JButton();
         yAxisPanel = new javax.swing.JPanel();
         yAxisRangePanel = new javax.swing.JPanel();
         yLog = new javax.swing.JCheckBox();
         isotropicCheckBox = new javax.swing.JCheckBox();
         yTitleTextField = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
+        yaxisGTEButton = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         titleTextField = new javax.swing.JTextField();
         legendEnableCheckbox = new javax.swing.JCheckBox();
         legendTextField = new javax.swing.JTextField();
         titleCB = new javax.swing.JCheckBox();
         timeRangeEditor1 = new org.autoplot.datasource.TimeRangeEditor();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         xAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("X Axis [?]"));
         xAxisPanel.setToolTipText("click title for help");
@@ -463,6 +470,13 @@ public class AxisPanel extends javax.swing.JPanel {
             }
         });
 
+        xaxisGTEButton.setText("...");
+        xaxisGTEButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                xaxisGTEButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout xAxisPanelLayout = new org.jdesktop.layout.GroupLayout(xAxisPanel);
         xAxisPanel.setLayout(xAxisPanelLayout);
         xAxisPanelLayout.setHorizontalGroup(
@@ -474,11 +488,14 @@ public class AxisPanel extends javax.swing.JPanel {
                     .add(xAxisPanelLayout.createSequentialGroup()
                         .add(xLog)
                         .add(18, 18, 18)
-                        .add(showXAxisLabelsCB))
+                        .add(showXAxisLabelsCB)
+                        .add(0, 9, Short.MAX_VALUE))
                     .add(xAxisPanelLayout.createSequentialGroup()
                         .add(jLabel1)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(xTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 162, Short.MAX_VALUE)))
+                        .add(xTitleTextField)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(xaxisGTEButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 17, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         xAxisPanelLayout.setVerticalGroup(
@@ -486,14 +503,15 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(xAxisPanelLayout.createSequentialGroup()
                 .add(xAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(xTitleTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel1))
+                    .add(jLabel1)
+                    .add(xaxisGTEButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(xAxisRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(xAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(xLog)
                     .add(showXAxisLabelsCB))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         zAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Colorbar [?]"));
@@ -531,6 +549,13 @@ public class AxisPanel extends javax.swing.JPanel {
         jLabel3.setText("Label:");
         jLabel3.setToolTipText("Colorbar title");
 
+        colorbarGTEButton.setText("...");
+        colorbarGTEButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                colorbarGTEButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout zAxisPanelLayout = new org.jdesktop.layout.GroupLayout(zAxisPanel);
         zAxisPanel.setLayout(zAxisPanelLayout);
         zAxisPanelLayout.setHorizontalGroup(
@@ -538,7 +563,7 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(zAxisPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(zAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 357, Short.MAX_VALUE)
+                    .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(zAxisPanelLayout.createSequentialGroup()
                         .add(zLog)
                         .add(18, 18, 18)
@@ -546,7 +571,9 @@ public class AxisPanel extends javax.swing.JPanel {
                     .add(zAxisPanelLayout.createSequentialGroup()
                         .add(jLabel3)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(zTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE)))
+                        .add(zTitleTextField)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(colorbarGTEButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 17, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         zAxisPanelLayout.setVerticalGroup(
@@ -554,7 +581,8 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(zAxisPanelLayout.createSequentialGroup()
                 .add(zAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(zTitleTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel3))
+                    .add(jLabel3)
+                    .add(colorbarGTEButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -600,6 +628,13 @@ public class AxisPanel extends javax.swing.JPanel {
         jLabel2.setText("Label:");
         jLabel2.setToolTipText("Y axis title");
 
+        yaxisGTEButton.setText("...");
+        yaxisGTEButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                yaxisGTEButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout yAxisPanelLayout = new org.jdesktop.layout.GroupLayout(yAxisPanel);
         yAxisPanel.setLayout(yAxisPanelLayout);
         yAxisPanelLayout.setHorizontalGroup(
@@ -613,7 +648,9 @@ public class AxisPanel extends javax.swing.JPanel {
                     .add(yAxisPanelLayout.createSequentialGroup()
                         .add(jLabel2)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(yTitleTextField)))
+                        .add(yTitleTextField)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(yaxisGTEButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 17, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         yAxisPanelLayout.setVerticalGroup(
@@ -621,7 +658,8 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(yAxisPanelLayout.createSequentialGroup()
                 .add(yAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(yTitleTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel2))
+                    .add(jLabel2)
+                    .add(yaxisGTEButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(yAxisRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -674,6 +712,20 @@ public class AxisPanel extends javax.swing.JPanel {
             }
         });
 
+        jButton1.setText("...");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("...");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -681,15 +733,21 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(timeRangeEditor1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)
                     .add(jPanel1Layout.createSequentialGroup()
-                        .add(titleCB)
+                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jPanel1Layout.createSequentialGroup()
+                                .add(titleCB)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(titleTextField))
+                            .add(jPanel1Layout.createSequentialGroup()
+                                .add(legendEnableCheckbox)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(legendTextField)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(titleTextField))
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .add(legendEnableCheckbox)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(legendTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE))
-                    .add(timeRangeEditor1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(jButton2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 18, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(jButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -697,11 +755,13 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(jPanel1Layout.createSequentialGroup()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(titleTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(titleCB))
+                    .add(titleCB)
+                    .add(jButton1))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(legendEnableCheckbox)
-                    .add(legendTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(legendTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jButton2))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(timeRangeEditor1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(20, Short.MAX_VALUE))
@@ -713,8 +773,8 @@ public class AxisPanel extends javax.swing.JPanel {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(yAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(xAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(xAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(yAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(zAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -791,9 +851,32 @@ public class AxisPanel extends javax.swing.JPanel {
         org.das2.util.LoggerManager.logGuiEvent(evt);
     }//GEN-LAST:event_cbVisibleCBActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        addEditGrannyText(titleTextField);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        addEditGrannyText(legendTextField);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void xaxisGTEButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xaxisGTEButtonActionPerformed
+        addEditGrannyText(xTitleTextField);
+    }//GEN-LAST:event_xaxisGTEButtonActionPerformed
+
+    private void yaxisGTEButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yaxisGTEButtonActionPerformed
+        addEditGrannyText(yTitleTextField);
+    }//GEN-LAST:event_yaxisGTEButtonActionPerformed
+
+    private void colorbarGTEButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_colorbarGTEButtonActionPerformed
+        addEditGrannyText(zTitleTextField);
+    }//GEN-LAST:event_colorbarGTEButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox cbVisibleCB;
+    private javax.swing.JButton colorbarGTEButton;
     private javax.swing.JCheckBox isotropicCheckBox;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -808,10 +891,12 @@ public class AxisPanel extends javax.swing.JPanel {
     private javax.swing.JPanel xAxisRangePanel;
     private javax.swing.JCheckBox xLog;
     private javax.swing.JTextField xTitleTextField;
+    private javax.swing.JButton xaxisGTEButton;
     private javax.swing.JPanel yAxisPanel;
     private javax.swing.JPanel yAxisRangePanel;
     private javax.swing.JCheckBox yLog;
     private javax.swing.JTextField yTitleTextField;
+    private javax.swing.JButton yaxisGTEButton;
     private javax.swing.JPanel zAxisPanel;
     private javax.swing.JPanel zAxisRangePanel;
     private javax.swing.JCheckBox zLog;
@@ -819,6 +904,15 @@ public class AxisPanel extends javax.swing.JPanel {
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
+    private void addEditGrannyText( JTextField titleTextField ) {        
+        GrannyTextEditor gte= new GrannyTextEditor();
+        gte.setValue( titleTextField.getText() );
+        if ( JOptionPane.OK_OPTION==
+                JOptionPane.showConfirmDialog( this, gte, "Granny Text Editor", JOptionPane.OK_CANCEL_OPTION ) ) {
+            titleTextField.setText(gte.getValue());
+        }
+    }
+                
     private JMenuItem createMenuItem( final JTextField componentTextField, final String insert, String doc ) {
         JMenuItem result= new JMenuItem( new AbstractAction( insert ) {
             @Override
