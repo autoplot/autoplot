@@ -3,9 +3,11 @@ package org.autoplot.servlet;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
@@ -31,6 +33,7 @@ import org.autoplot.JythonUtil;
 import org.autoplot.ScriptContext;
 import static org.autoplot.ScriptContext.waitUntilIdle;
 import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.dom.Application;
 import org.autoplot.jythonsupport.JythonRefactory;
@@ -46,6 +49,7 @@ import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
 import org.das2.util.FileUtil;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
 
 /**
@@ -161,7 +165,8 @@ public class ScriptGUIServlet extends HttpServlet {
         
         if ( request.getParameter("img")!=null ) {
             writeOutputImage(scriptURI, response, script, name, aaparams, pwd);
-            
+        } else if ( request.getParameter("text")!=null ) {
+            writeOutputText(scriptURI, response, script, name, aaparams, pwd);
         } else {
             writeParametersForm(response, pwd, script, ssparams, name, request, scriptURI, sparams);
             
@@ -242,6 +247,149 @@ public class ScriptGUIServlet extends HttpServlet {
             try { los1.close(); } catch ( IOException ex ) {}
             try { los2.close(); } catch ( IOException ex ) {}
         }
+    }
+    
+    private void writeOutputText(String scriptURI, 
+            HttpServletResponse response, 
+            String script, 
+            String name, 
+            String[] aaparams, 
+            String pwd) throws IOException, UnknownHostException {
+        // now run the script
+        
+        File scriptLogArea= new File( ServletUtil.getServletHome(), "log" );
+        if ( !scriptLogArea.exists() ) {
+            if ( !scriptLogArea.mkdirs() ) {
+                logger.warning("unable to make log area");
+            }
+        }            
+        File scriptLogFile= new File( scriptLogArea, "ScriptGUIServlet.log" );
+        Datum n= TimeUtil.now();
+        TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
+        String s= tp.format( n ) + "\t" + scriptURI;
+
+        try ( PrintWriter w= new PrintWriter( new FileWriter( scriptLogFile, scriptLogFile.exists() ) ) ) {
+            w.println(s);
+        }
+        
+        org.autoplot.Util.addFonts();
+        
+        ApplicationModel model = new ApplicationModel();
+        model.setExceptionHandler( new DumpRteExceptionHandler() );
+        model.addDasPeersToAppAndWait();
+        Application dom= model.getDocumentModel();
+        
+        logger.log(Level.FINE, "dom: {0}", dom);
+        logger.log(Level.FINE, "dom options: {0}", dom.getOptions());
+        
+        dom.getOptions().setAutolayout(false);
+        
+        PythonInterpreter interp = JythonUtil.createInterpreter( true, true );
+        interp.set("java",null);
+        interp.set("org",null);
+        interp.set("getFile",null);
+        interp.set("dom",dom);
+        interp.set("downloadResourceAsTempFile",null);
+        
+        LoggingOutputStream los1= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO );
+        interp.setOut( los1 );
+        
+        interp.set( "response", response );
+        
+        // To support load balancing, insert the actual host that resolved the request
+        response.setHeader( "X-Served-By", java.net.InetAddress.getLocalHost().getCanonicalHostName() );
+        
+        //TODO: this limits to one user!
+        LoggingOutputStream los2= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO );
+        //ScriptContext._setOutputStream( los2 );
+        
+        script= JythonRefactory.fixImports(script);
+        
+        ScriptContext.setApplicationModel(model); // why must I do this???
+        
+        script= "def showMessageDialog(msg): \n    pass\n" + script;
+        
+        long t0= System.currentTimeMillis();
+        timelogger.log(Level.FINE, "begin runScript {0}", name);
+        
+        ByteArrayOutputStream baos= new ByteArrayOutputStream();
+        
+        runScript( dom,
+                new ByteArrayInputStream(script.getBytes("UTF-8")),
+                baos,
+                name,
+                aaparams,
+                pwd );
+        timelogger.log(Level.FINE, "end runScript {0} ({1}ms)", new Object[]{name, System.currentTimeMillis()-t0});
+                
+        try (OutputStream out = response.getOutputStream()) {
+            byte[] buf= new byte[60000];
+            out.write( baos.toByteArray() );
+            try { los1.close(); } catch ( IOException ex ) {}
+            try { los2.close(); } catch ( IOException ex ) {}
+        }
+    }
+    
+    /**
+     * copy of  JythonUtil.runScript allows the stdout to be gathered.
+     * @param dom
+     * @param in
+     * @param out
+     * @param name
+     * @param argv
+     * @param pwd
+     * @throws IOException 
+     */
+    private void runScript( Application dom, InputStream in, OutputStream out, String name, String[] argv, String pwd ) throws IOException {
+        if ( argv==null ) argv= new String[] {};
+        
+        String[] pyInitArgv= new String[ argv.length+1 ];
+        pyInitArgv[0]= name;
+        System.arraycopy(argv, 0, pyInitArgv, 1, argv.length);
+        
+        PySystemState.initialize( PySystemState.getBaseProperties(), null, pyInitArgv ); // legacy support sys.argv. now we use getParam
+        
+        PythonInterpreter interp = JythonUtil.createInterpreter(true, false, dom, new NullProgressMonitor() );
+        if ( pwd!=null ) {
+            pwd= URISplit.format( URISplit.parse(pwd) ); // sanity check against injections
+            interp.exec("PWD='"+pwd+"'");// JythonRefactory okay
+        }
+
+        interp.exec("import autoplot2017 as autoplot");// JythonRefactory okay
+        interp.setOut(out);
+        
+        int iargv=1;  // skip the zeroth one, it is the name of the script
+        for (String s : argv ) {
+            int ieq= s.indexOf('=');
+            if ( ieq>0 ) {
+                String snam= s.substring(0,ieq).trim();
+                if ( DataSourceUtil.isJavaIdentifier(snam) ) {
+                    String sval= s.substring(ieq+1).trim();
+//                    if ( snam.equals("resourceURI") ) {  // check to see if pwd can be inserted
+//                        URISplit split= URISplit.parse(sval);
+//                        if ( split.path==null ) {
+//                            sval= pwd + sval;
+//                        }
+//                    }
+                    interp.exec("autoplot.params['" + snam + "']='" + sval+"'");// JythonRefactory okay
+                } else {
+                    if ( snam.startsWith("-") ) {
+                        System.err.println("\n!!! Script arguments should not start with -, they should be name=value");
+                    }
+                    System.err.println("bad parameter: "+ snam);
+                }
+            } else {
+                interp.exec("autoplot.params['arg_" + iargv + "']='" + s +"'" );// JythonRefactory okay
+                iargv++;
+            }
+        }
+        
+        if ( name==null ) {
+            interp.execfile(JythonRefactory.fixImports(in));
+        } else {
+            interp.execfile(JythonRefactory.fixImports(in,name),name);
+        }
+
     }
     
     /**
@@ -415,18 +563,19 @@ public class ScriptGUIServlet extends HttpServlet {
                 out.println("<br><br>");
             }
             
-            out.println("<input type='hidden' name='script' value='"+scriptURI+"'>");
-            out.println("<input type='submit' value='Submit'>");
-            out.println("</form>");
-            out.println( "</td>");
-            out.println( "<td valign='top'>");
-            out.println( "<div border=1></div>");
-            out.println( "<img src='ScriptGUIServlet?img=1"+sparams+"' alt='image'>" );
-            out.println( "<div src='ScriptGUIServlet?text=1"+sparams+"' alt='image'>" );
-            out.println( "</td>");
-            out.println( "</tr>");
-            out.println( "</table>");
-            out.println( "<hr>" );
+            out.println("<input type='hidden' name='script' value='"+scriptURI+"'>\n");
+            out.println("<input type='submit' value='Submit'>\n");
+            out.println("</form>\n");
+            out.println("<br>\n");
+            out.println( "<iframe id='stdoutp' src='ScriptGUIServlet?text=1"+sparams+"'></iframe>\n" );
+            out.println( "</td>\n");
+            out.println( "<td valign='top'>\n");
+            out.println( "<div border=1></div>\n");
+            out.println( "<img src='ScriptGUIServlet?img=1"+sparams+"' alt='image'>\n" );
+            out.println( "</td>\n");
+            out.println( "</tr>\n");
+            out.println( "</table>\n");
+            out.println( "<hr>\n" );
             out.println("Running script <a href="+scriptURI+">"+scriptURI+"</a>");
             out.println("Pick <a href='ScriptGUIServletPick'>another</a>...\n");
             out.println("</body>");
