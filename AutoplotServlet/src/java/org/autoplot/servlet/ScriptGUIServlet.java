@@ -490,6 +490,7 @@ public class ScriptGUIServlet extends HttpServlet {
             out.println("<input type='submit' value='Submit'>\n");
             out.println("</form>\n");
             out.println("<br>\n");
+            out.println("Console Output:<br>\n");
             out.println( "<iframe id='stdoutp' src='ScriptGUIServlet?text=1"+sparams+"'></iframe>\n" );
             out.println( "</td>\n");
             out.println( "<td valign='top'>\n");
