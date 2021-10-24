@@ -147,7 +147,7 @@ public class ScriptGUIServlet extends HttpServlet {
         }
         
         if ( !ServletUtil.isWhitelisted(script) ) {
-            throw new IllegalArgumentException("script must come from whitelisted host, contact " +ServletUtil.getServletContact() );
+            throw new IllegalArgumentException("script must come from whitelisted host, contact " +ServletUtil.getServletContact() + " to see if script could be run: "+script );
         }
         
         String scriptURI= script;
