@@ -11,6 +11,7 @@ import java.awt.event.FocusEvent;
 import org.das2.components.DatumRangeEditor;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
+import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
@@ -904,12 +905,19 @@ public class AxisPanel extends javax.swing.JPanel {
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
-    private void addEditGrannyText( JTextField titleTextField ) {        
+    private void addEditGrannyText( JTextField textField ) {        
         GrannyTextEditor gte= new GrannyTextEditor();
-        gte.setValue( titleTextField.getText() );
+        gte.setValue( textField.getText() );
         if ( JOptionPane.OK_OPTION==
                 JOptionPane.showConfirmDialog( this, gte, "Granny Text Editor", JOptionPane.OK_CANCEL_OPTION ) ) {
-            titleTextField.setText(gte.getValue());
+            textField.setText(gte.getValue());
+            for ( java.awt.event.ActionListener al: textField.getActionListeners() ) {
+                try {
+                    al.actionPerformed( null );
+                } catch ( NullPointerException ex ) {
+                    logger.info("getting NullPointerException where this once worked in AxisPanel");
+                }
+            }
         }
     }
                 
