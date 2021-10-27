@@ -167,6 +167,7 @@ import org.autoplot.datasource.SourceTypesBrowser;
 import org.autoplot.datasource.TimeRangeEditor;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
+import org.autoplot.dom.Annotation;
 import org.autoplot.dom.DomUtil;
 import org.das2.qds.filters.AddFilterDialog;
 import org.das2.qds.filters.FiltersChainPanel;
@@ -174,7 +175,10 @@ import org.autoplot.jythonsupport.ui.DataMashUp;
 import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.layout.LayoutConstants;
 import org.autoplot.state.StatePersistence;
+import org.autoplot.util.AutoRangeHintsStringSchemeEditor;
 import org.autoplot.util.PlotDataMashupResolver;
+import org.das2.components.propertyeditor.TickValuesStringSchemeEditor;
+import org.das2.util.GrannyTextEditor;
 import org.python.util.PythonInterpreter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -1192,6 +1196,12 @@ public final class AutoplotUI extends javax.swing.JFrame {
 
         SwingUtilities.invokeLater(() -> {
             addTools();
+            PropertyEditor.addStringEditor("tickValues", new TickValuesStringSchemeEditor() );
+            PropertyEditor.addStringEditor("autoRangeHints", new AutoRangeHintsStringSchemeEditor() );
+            PropertyEditor.addStringEditor("label", new GrannyTextEditor() );
+            PropertyEditor.addStringEditor("title", new GrannyTextEditor() );
+            PropertyEditor.addStringEditor("org.autoplot.dom.Annotation","text", new GrannyTextEditor() ); //TODO: this will surely cause problems...
+            PropertyEditor.addStringEditor("legendLabel", new GrannyTextEditor() ); 
         });
         
         addBindings();
