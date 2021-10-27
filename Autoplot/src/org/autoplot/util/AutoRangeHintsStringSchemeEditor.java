@@ -205,7 +205,11 @@ public class AutoRangeHintsStringSchemeEditor extends javax.swing.JPanel impleme
         return this;
     }
 
-
+    @Override
+    public void setContext(Object o) {
+        
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JCheckBox centerCB;
