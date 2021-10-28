@@ -159,6 +159,13 @@ public class ScriptPanelSupport {
             logger.fine("editor is busy running a script.");
             return false;
         }
+        String existingFile=this.panel.getFilename(); 
+        if ( existingFile!=null ) {
+            URISplit split2= URISplit.parse(existingFile);
+            if ( split2.ext.equals(".jy") ) {
+                return false;
+            }
+        }
 
         return true;
 
@@ -212,6 +219,7 @@ public class ScriptPanelSupport {
         
         try {
             final String sfile=  applicationController.getFocusUri();
+            if ( sfile.trim().isEmpty() ) return false;
             
             final String fsfile;
             URISplit split= URISplit.parse(sfile);
