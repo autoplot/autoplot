@@ -16,9 +16,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -222,6 +224,44 @@ public class JythonCompletionTask implements CompletionTask {
         return count;
     }
     
+    /**
+     * remove getProp and setProp and replace with just "prop"
+     * @param po2
+     * @return 
+     */
+    private List<String> reduceGetterSetters( PyObject lcontext, PyList po2, boolean cullGetterSetters ) {
+        Map<String,String> mm= new LinkedHashMap<>();
+        for (int i = 0; i < po2.__len__(); i++) {
+            PyString s = (PyString) po2.__getitem__(i);
+            mm.put( s.toString(), s.toString() );
+        }
+        
+        if ( cullGetterSetters ) {
+            List<String> ss=  new ArrayList<>( mm.keySet() );
+            for ( String s: ss ) {
+                if ( s.startsWith("set") ) {
+                    String prop= s.substring(3);
+                    if ( mm.get("get"+prop )!=null ) {
+                        String propName= Character.toLowerCase( prop.charAt(0) ) + prop.substring(1);
+                        if ( mm.containsKey(propName) ) {
+                            mm.remove("get"+prop);
+                            mm.remove("set"+prop);                
+                        }
+                    } else if ( mm.get("is"+prop )!=null ) {
+                        String propName= Character.toLowerCase( prop.charAt(0) ) + prop.substring(1);
+                        if ( mm.containsKey(propName) ) {
+                            mm.remove("is"+prop);
+                            mm.remove("set"+prop);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return new ArrayList<>( mm.keySet() );
+                
+    }
+    
     private int queryMethods(CompletionContext cc, CompletionResultSet rs) throws BadLocationException {
         logger.fine("queryMethods");
         PythonInterpreter interp;
@@ -300,16 +340,17 @@ public class JythonCompletionTask implements CompletionTask {
             return 0;
         }
         
+        List<String> po3= reduceGetterSetters( lcontext, po2, lcontext!=lcontextClass );
+                
         int count=0;
-        for (int i = 0; i < po2.__len__(); i++) {
-            PyString s = (PyString) po2.__getitem__(i);
-            String ss = s.toString();
+        for (int i = 0; i < po3.size(); i++) {
+            String ss = po3.get(i);
             logger.log(Level.FINEST, "does {0} start {1}", new Object[] { cc.completable, ss } );
             if (ss.startsWith(cc.completable)) {
                 boolean notAlreadyAdded= true;
                 PyObject po;
                 try {
-                    po = lcontext.__getattr__(s);
+                    po = lcontext.__getattr__(ss);
                 } catch (PyException e) {
                     logger.log(Level.FINE, "PyException from \"{0}\":", ss);
                     logger.log( Level.SEVERE, e.getMessage(), e );
@@ -415,9 +456,9 @@ public class JythonCompletionTask implements CompletionTask {
                             try {
                                 f = dc.getField(label);
                             } catch (NoSuchFieldException ex) {
-                                logger.log(Level.FINEST, "NoSuchFieldException for item {0}", s);
+                                logger.log(Level.FINEST, "NoSuchFieldException for item {0}", ss);
                             } catch (SecurityException ex) {
-                                logger.log(Level.FINEST, "SecurityException for item {0}", s);
+                                logger.log(Level.FINEST, "SecurityException for item {0}", ss);
                             }
                             if (f == null) continue;
                             icon= getIconFor(f);
