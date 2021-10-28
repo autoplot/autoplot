@@ -39,6 +39,7 @@ import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.util.LoggerManager;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSourceUtil;
+import org.autoplot.jythonsupport.ClipboardEditorPanel;
 import org.autoplot.jythonsupport.JavaJythonConverter;
 import org.autoplot.jythonsupport.MathematicaJythonConverter;
 import static org.das2.jythoncompletion.JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER;
@@ -845,6 +846,27 @@ public class EditorContextMenu {
             copyItem.setText("Copy");
             JMenuItem pasteItem = menu.add(new DefaultEditorKit.PasteAction());
             pasteItem.setText("Paste");
+            Action editClipboardAction= new AbstractAction("Edit Clipboard Before Paste") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    ClipboardEditorPanel ep= new ClipboardEditorPanel();
+                    ep.setTextFromClipboard();
+                    if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( editor, ep, "Edit Text Before Paste", JOptionPane.OK_CANCEL_OPTION ) ) {
+                        try {
+                            if ( editor.getSelectionStart()<editor.getSelectionEnd() ) {
+                                editor.getDocument().remove( editor.getSelectionStart(), editor.getSelectionEnd()-editor.getSelectionStart() );
+                            }
+                            editor.getDocument().insertString( editor.getCaretPosition(), ep.getText(), null );
+                        } catch (BadLocationException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+            };
+            JMenuItem editClipboard= new JMenuItem( editClipboardAction );
+            menu.add( editClipboard );
+            
+            
 
         }
     }
