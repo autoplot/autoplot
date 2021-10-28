@@ -27,8 +27,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-10-23 r26141):</p>
+        <p>Bugfixes (2021-10-28 r26156):</p>
         <ul>
+            <li>completions can cull the getters and setters in some cases.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2401/">2401</a>: never replace a saved .jy script with a .jyds. Thanks George and Sadie!
+            <li>simplifyScript wouldn't handle subscripts properly, causing runtime error when completions were triggered.
             <li>Canvas Size GUI on style tab cleaned up, so manual size can be entered in inches or centimeters.
             <li>Jython script trace run (where it executes line by line for debugging) handles multi-line strings.
         </ul>
@@ -61,6 +64,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">758</a>: introduce editors to property editors, and special editor for autoRangeHints.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2405/">2405</a>: option to review and edit code before paste, with variable rename.  Thanks, Sadie for the suggestion!
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">758</a>: introduce editor for Granny Text Strings.
             <li>allow the connect timeout and read timeout to be reset from default of 5 and 60 seconds.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/757">757</a>: backgroundThick and fillStyle can be specified in the .vap
