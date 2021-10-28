@@ -1,5 +1,6 @@
 package org.autoplot.jythonsupport;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -515,7 +516,8 @@ public class SimplifyScriptSupport {
                     return false;
                 }
             }
-
+        } else if ( o instanceof Subscript ) {
+            return false;
               
         }
         MyVisitorBase vb = new MyVisitorBase(variableNames);
@@ -940,6 +942,28 @@ public class SimplifyScriptSupport {
                 if (a.value instanceof Call) {
                     Call c = (Call) a.value;
                     return maybeIdentifyReturnType(id, c, importedNames);
+                } else if ( a.value instanceof Subscript ) {
+                    Subscript s= ((Subscript)a.value);
+                    if ( s.value instanceof Attribute ) {
+                        Attribute att = (Attribute)s.value;
+                        if ( att.value instanceof Name ) {
+                            if ( ((Name)att.value).id.equals("dom") ) {
+                                if ( att.attr.equals("plots") ) {
+                                    String rclzn = "org.autoplot.dom.Plot";
+                                    return "import org.autoplot.dom.Plot\n"
+                                    + id + JythonCompletionTask.__CLASSTYPE + " = " + rclzn + "  # (spot line955)\n";
+                                } else if ( att.attr.equals("canvases") ) {
+                                    String rclzn = "org.autoplot.dom.Canvas";
+                                    return "import org.autoplot.dom.Canvas\n"
+                                    + id + JythonCompletionTask.__CLASSTYPE + " = " + rclzn + "  # (spot line955)\n";
+                                } else if ( att.attr.equals("plotElements") ) {
+                                    String rclzn = "org.autoplot.dom.PlotElement";
+                                    return "import org.autoplot.dom.PlotElement\n"
+                                    + id + JythonCompletionTask.__CLASSTYPE + " = " + rclzn + "  # (spot line955)\n";
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
