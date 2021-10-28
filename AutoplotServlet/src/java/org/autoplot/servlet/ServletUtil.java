@@ -193,7 +193,7 @@ public class ServletUtil {
     
     /**
      * return true if the suri is whitelisted, meaning we trust that 
-     * content from this address will not harm the server.
+     * scripts and other content from from this address will not harm the server.
      * @param suri the uri.
      * @return true if the suri is whitelisted.
      * @throws IOException when the whitelist cannot be read.
