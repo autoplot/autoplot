@@ -21,13 +21,42 @@ public class LayoutStringSchemeEditor extends javax.swing.JPanel implements Stri
     /**
      * Creates new form LayoutStringSchemeEditor
      * @param both true, edit both top and bottom
+     * @param orient "" "H" or "V" "R", "L", "T" "B" to indicate orientation
      */
-    public LayoutStringSchemeEditor(boolean both) {
+    public LayoutStringSchemeEditor(boolean both, String orient) {
         initComponents();
         this.both= both;
+        if ( orient.length()==1 ) {
+            switch (orient) {
+                case "H":
+                    leftTopPositionLabel.setText("Left Position");
+                    rightBottomPositionLabel.setText("Right Position");
+                    break;
+                case "V":
+                    leftTopPositionLabel.setText("Top Position");
+                    rightBottomPositionLabel.setText("Bottom Position");
+                    break;
+                case "T":
+                    leftTopPositionLabel.setText("Top Position");
+                    break;
+                case "B":
+                    leftTopPositionLabel.setText("Bottom Position");
+                    break;
+                case "L":
+                    leftTopPositionLabel.setText("Left Position");
+                    break;
+                case "R":
+                    leftTopPositionLabel.setText("Right Position");
+                    break;
+                default:
+                    break;
+            }
+        }
         if ( !both ) {
             rightBottomPanel.setVisible(false);
+            leftTopPositionLabel.setText("Position:");
         }
+        
         
     }
 
@@ -43,7 +72,7 @@ public class LayoutStringSchemeEditor extends javax.swing.JPanel implements Stri
         jLabel16 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         rightBottomPanel = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
+        rightBottomPositionLabel = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         bottomRightPercent = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
@@ -54,7 +83,7 @@ public class LayoutStringSchemeEditor extends javax.swing.JPanel implements Stri
         bottomRightPx = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        leftTopPositionLabel = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         topLeftPercent = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
@@ -76,7 +105,7 @@ public class LayoutStringSchemeEditor extends javax.swing.JPanel implements Stri
             }
         });
 
-        jLabel2.setText("Right/Bottom Position:");
+        rightBottomPositionLabel.setText("Right/Bottom Position:");
 
         jLabel11.setText("Relative to parent:");
 
@@ -140,14 +169,14 @@ public class LayoutStringSchemeEditor extends javax.swing.JPanel implements Stri
                                         .addComponent(bottomRightPx, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(jLabel10))))))
-                    .addComponent(jLabel2))
+                    .addComponent(rightBottomPositionLabel))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         rightBottomPanelLayout.setVerticalGroup(
             rightBottomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(rightBottomPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel2)
+                .addComponent(rightBottomPositionLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel11)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -169,7 +198,7 @@ public class LayoutStringSchemeEditor extends javax.swing.JPanel implements Stri
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jLabel1.setText("Left/Top Position:");
+        leftTopPositionLabel.setText("Left/Top Position:");
 
         jLabel4.setText("%");
 
@@ -222,7 +251,7 @@ public class LayoutStringSchemeEditor extends javax.swing.JPanel implements Stri
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
+                    .addComponent(leftTopPositionLabel)
                     .addComponent(jLabel3)
                     .addComponent(jLabel5)
                     .addGroup(jPanel2Layout.createSequentialGroup()
@@ -253,7 +282,7 @@ public class LayoutStringSchemeEditor extends javax.swing.JPanel implements Stri
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addComponent(leftTopPositionLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -353,7 +382,7 @@ public class LayoutStringSchemeEditor extends javax.swing.JPanel implements Stri
         try {            
             double[] dd= DasDevicePosition.parseLayoutStr(ss[0]);
             if ( dd[0]!=0 || ( dd[1]==0 && dd[2]==0 ) ) {
-                topLeftPercent.setText(String.format("%.2f",dd[0]));
+                topLeftPercent.setText(String.format("%.2f",dd[0]*100));
             }
             if (dd[1]!=0 ) topLeftEms.setText(String.format("%.1f",dd[1]));
             if (dd[2]!=0 ) topLeftPx.setText(String.format("%d",(int)dd[2]));
@@ -364,7 +393,7 @@ public class LayoutStringSchemeEditor extends javax.swing.JPanel implements Stri
             try {
                 double[] dd= DasDevicePosition.parseLayoutStr(ss[1]);
                 if ( dd[0]!=0 || ( dd[1]==0 && dd[2]==0 ) ) {
-                    bottomRightPercent.setText(String.format("%.2f",dd[0]));
+                    bottomRightPercent.setText(String.format("%.2f",dd[0]*100));
                 }
                 if (dd[1]!=0 ) bottomRightEms.setText(String.format("%.1f",dd[1]));
                 if (dd[2]!=0 ) bottomRightPx.setText(String.format("%d",(int)dd[2]));
@@ -422,7 +451,7 @@ public class LayoutStringSchemeEditor extends javax.swing.JPanel implements Stri
 
 
     public static void main (String[] args ) {
-        LayoutStringSchemeEditor edit= new LayoutStringSchemeEditor(true);
+        LayoutStringSchemeEditor edit= new LayoutStringSchemeEditor(true, "");
         edit.setValue("0%+3em,100%-2em");
         JOptionPane.showMessageDialog( null, edit );
         
@@ -432,7 +461,6 @@ public class LayoutStringSchemeEditor extends javax.swing.JPanel implements Stri
     private javax.swing.JTextField bottomRightEms;
     private javax.swing.JTextField bottomRightPercent;
     private javax.swing.JTextField bottomRightPx;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
@@ -440,7 +468,6 @@ public class LayoutStringSchemeEditor extends javax.swing.JPanel implements Stri
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -450,7 +477,9 @@ public class LayoutStringSchemeEditor extends javax.swing.JPanel implements Stri
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JLabel leftTopPositionLabel;
     private javax.swing.JPanel rightBottomPanel;
+    private javax.swing.JLabel rightBottomPositionLabel;
     private javax.swing.JTextField topLeftEms;
     private javax.swing.JTextField topLeftPercent;
     private javax.swing.JTextField topLeftPx;
