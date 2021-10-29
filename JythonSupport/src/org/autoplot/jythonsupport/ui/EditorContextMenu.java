@@ -846,12 +846,12 @@ public class EditorContextMenu {
             copyItem.setText("Copy");
             JMenuItem pasteItem = menu.add(new DefaultEditorKit.PasteAction());
             pasteItem.setText("Paste");
-            Action editClipboardAction= new AbstractAction("Edit Clipboard Before Paste") {
+            Action editClipboardAction= new AbstractAction("Edit Clipboard before Paste") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     ClipboardEditorPanel ep= new ClipboardEditorPanel();
                     ep.setTextFromClipboard();
-                    if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( editor, ep, "Edit Text Before Paste", JOptionPane.OK_CANCEL_OPTION ) ) {
+                    if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( editor, ep, "Edit Text before Paste", JOptionPane.OK_CANCEL_OPTION ) ) {
                         try {
                             if ( editor.getSelectionStart()<editor.getSelectionEnd() ) {
                                 editor.getDocument().remove( editor.getSelectionStart(), editor.getSelectionEnd()-editor.getSelectionStart() );
