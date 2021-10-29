@@ -888,8 +888,12 @@ public class SimplifyScriptSupport {
                         if (m.getName().equals(methodName)) { //&& m.getGenericParameterTypes().length ) {
                             Class rclz = m.getReturnType();
                             String rclzn = rclz.getSimpleName();
-                            return "from " + rclz.getPackage().getName() + " import " + rclzn + "\n"
-                                 + id + JythonCompletionTask.__CLASSTYPE + " = " + rclzn + "  # (spot line810)\n";
+                            StringBuilder result= new StringBuilder();
+                            if ( rclz.getPackage()!=null ) {
+                                result.append( String.format( "from %s import %s\n", rclz.getPackage().getName(), rclzn ) );
+                            }
+                            result.append( String.format( "%s%s = %s # (line895)\n", id, JythonCompletionTask.__CLASSTYPE, rclzn ) );
+                            return result.toString();
                         }
                     }
                     return null;
