@@ -26,8 +26,12 @@ public class RefactorRenameVariable extends javax.swing.JPanel {
         if ( var==null || var.length()==0 ) {
             var= EditorAnnotationsSupport.getSymbolAt( editor, editor.getCaretPosition() );
         }
-        oldNameTF.setText(var);
-        oldNameTF.setEditable(false);
+        if ( var==null || var.length()==0 ) {
+            oldNameTF.setText("");
+        } else {
+            oldNameTF.setText(var);
+            oldNameTF.setEditable(false);
+        }
     }
 
     public String refactorVarRename( String script, int i, String oldName, String newName ) {
