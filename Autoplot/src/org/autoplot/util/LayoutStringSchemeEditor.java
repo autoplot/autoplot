@@ -1,20 +1,14 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.util;
 
 import java.awt.Component;
 import java.text.ParseException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.das2.graph.DasDevicePosition;
 import org.das2.util.StringSchemeEditor;
 
 /**
- *
+ * for parsing layouts
  * @author jbf
  */
 public class LayoutStringSchemeEditor extends javax.swing.JPanel implements StringSchemeEditor {
