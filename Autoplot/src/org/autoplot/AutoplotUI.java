@@ -1205,11 +1205,11 @@ public final class AutoplotUI extends javax.swing.JFrame {
             PropertyEditor.addStringEditor("title", new GrannyTextEditor() );
             PropertyEditor.addStringEditor("org.autoplot.dom.Annotation","text", new GrannyTextEditor() ); //TODO: this will surely cause problems...
             PropertyEditor.addStringEditor("legendLabel", new GrannyTextEditor() ); 
-            PropertyEditor.addStringEditor("colorbarColumnPosition", new LayoutStringSchemeEditor(true) );
-            PropertyEditor.addStringEditor("top", new LayoutStringSchemeEditor(false) );
-            PropertyEditor.addStringEditor("bottom", new LayoutStringSchemeEditor(false) );
-            PropertyEditor.addStringEditor("right", new LayoutStringSchemeEditor(false) );
-            PropertyEditor.addStringEditor("left", new LayoutStringSchemeEditor(false) );
+            PropertyEditor.addStringEditor("colorbarColumnPosition", new LayoutStringSchemeEditor(true, "H") );
+            PropertyEditor.addStringEditor("top", new LayoutStringSchemeEditor(false, "T") );
+            PropertyEditor.addStringEditor("bottom", new LayoutStringSchemeEditor(false, "B") );
+            PropertyEditor.addStringEditor("right", new LayoutStringSchemeEditor(false, "R") );
+            PropertyEditor.addStringEditor("left", new LayoutStringSchemeEditor(false, "L") );
             PropertyEditor.addStringEditor("font",new FontStringSchemeEditor());
             PropertyEditor.addStringEditor("ticksURI",new DataSetSelectorStringSchemeEditor());
             PropertyEditor.addStringEditor("uri",new DataSetSelectorStringSchemeEditor());
