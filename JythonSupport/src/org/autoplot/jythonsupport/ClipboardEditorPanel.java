@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -60,12 +61,21 @@ public class ClipboardEditorPanel extends javax.swing.JPanel {
                 copyClipButton.setEnabled(true);
             }
         });
-        editorPanel.add( edit, BorderLayout.CENTER );
+        
+        JScrollPane pane= new JScrollPane(edit);
+        editorPanel.add( pane, BorderLayout.CENTER );
         editorPanel.revalidate();
         
         Action renameAction= new AbstractAction("Rename Variable") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                String script= edit.getText();
+                try {
+                    StaticCodeAnalysis.showUsage( script,"x" );
+                } catch ( Exception ex ) {
+                    JOptionPane.showMessageDialog( editorPanel, "Script must be Jython syntax without errors");
+                    return;
+                }
                 RefactorRenameVariable rrv= new RefactorRenameVariable(edit);
                 if ( JOptionPane.OK_OPTION==
                         JOptionPane.showConfirmDialog( editorPanel, rrv, "Rename Variable", JOptionPane.OK_CANCEL_OPTION ) ) {
