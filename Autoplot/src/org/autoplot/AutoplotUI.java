@@ -176,6 +176,9 @@ import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.layout.LayoutConstants;
 import org.autoplot.state.StatePersistence;
 import org.autoplot.util.AutoRangeHintsStringSchemeEditor;
+import org.autoplot.util.DataSetSelectorStringSchemeEditor;
+import org.autoplot.util.FontStringSchemeEditor;
+import org.autoplot.util.LayoutStringSchemeEditor;
 import org.autoplot.util.PlotDataMashupResolver;
 import org.das2.components.propertyeditor.TickValuesStringSchemeEditor;
 import org.das2.util.GrannyTextEditor;
@@ -1202,6 +1205,15 @@ public final class AutoplotUI extends javax.swing.JFrame {
             PropertyEditor.addStringEditor("title", new GrannyTextEditor() );
             PropertyEditor.addStringEditor("org.autoplot.dom.Annotation","text", new GrannyTextEditor() ); //TODO: this will surely cause problems...
             PropertyEditor.addStringEditor("legendLabel", new GrannyTextEditor() ); 
+            PropertyEditor.addStringEditor("colorbarColumnPosition", new LayoutStringSchemeEditor(true) );
+            PropertyEditor.addStringEditor("top", new LayoutStringSchemeEditor(false) );
+            PropertyEditor.addStringEditor("bottom", new LayoutStringSchemeEditor(false) );
+            PropertyEditor.addStringEditor("right", new LayoutStringSchemeEditor(false) );
+            PropertyEditor.addStringEditor("left", new LayoutStringSchemeEditor(false) );
+            PropertyEditor.addStringEditor("font",new FontStringSchemeEditor());
+            PropertyEditor.addStringEditor("ticksURI",new DataSetSelectorStringSchemeEditor());
+            PropertyEditor.addStringEditor("uri",new DataSetSelectorStringSchemeEditor());
+            PropertyEditor.addStringEditor("eventsListUri",new DataSetSelectorStringSchemeEditor());
         });
         
         addBindings();
