@@ -81,8 +81,8 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         yrangePanel.add( yrangeEditor.getCustomEditor() );
         
         JLinkyLabel ll= new JLinkyLabel( null,
-            "<html>See <a href='https://github.com/autoplot/documentation/blob/master/docs/annotations.md'>"
-            + "https://github.com/autoplot/documentation/blob/master/docs/annotations.md</a>");
+            "<html>This <a href='https://github.com/autoplot/documentation/blob/master/docs/annotations.md'>web page</a> "
+                        + "shows how the annotations are controlled.");
         
         linkyLabelPanel.add( ll, BorderLayout.CENTER );
         this.validate();
