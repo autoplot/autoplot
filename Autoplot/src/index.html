@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Specialized editors are coming to support graphically editing Autoplot's many control strings.  See <a href="https://sourceforge.net/p/autoplot/feature-requests/758/">the ticket</a>.
+        <p><small>Whoops, forgot to convert degrees to radians in script.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,8 +27,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-10-28 r26156):</p>
+        <p>Bugfixes (2021-11-01 r26173):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">rfe758</a>: Granny Text Editor button added to "add annotation" dialog.
+            <li>flatten rank 3 join code wasn't pushed into devel release, whoops...
+            <li>data with CDF_EPOCH and CDF_TT2000 timetags could not be concatenated.  Thanks, Sadie!
             <li>completions can cull the getters and setters in some cases.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2401/">2401</a>: never replace a saved .jy script with a .jyds. Thanks George and Sadie!
             <li>simplifyScript wouldn't handle subscripts properly, causing runtime error when completions were triggered.
@@ -64,6 +67,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>GrannyTextEditor shift+unicode char button will insert the unicode character, not the unicode escape sequence.  Thanks, Bob!
             <li>flatten supports rank 3 array of tables, to support Cassini RPWS data.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">758</a>: introduce editors to property editors, and special editor for autoRangeHints.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2405/">2405</a>: option to review and edit code before paste, with variable rename.  Thanks, Sadie for the suggestion!
