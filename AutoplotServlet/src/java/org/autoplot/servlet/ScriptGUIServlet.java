@@ -375,6 +375,12 @@ public class ScriptGUIServlet extends HttpServlet {
         
     }
     
+    private boolean isBoolean( Param p ) {
+        if ( p.enums==null || p.enums.size()!=2 ) return false;
+        if ( p.type=='A' && p.enums.size()==2 && p.enums.contains("T") && p.enums.contains("F") ) return true;
+        if ( p.type=='F' && p.enums.size()==2 && p.enums.contains(0) && p.enums.contains(1) ) return true;
+        return false;
+    }
         
     private void writeParametersForm( HttpServletResponse response, 
             String pwd, 
@@ -392,6 +398,20 @@ public class ScriptGUIServlet extends HttpServlet {
         
         long t0= System.currentTimeMillis();
         timelogger.log(Level.FINE, "begin describeScript {0}", name);
+        org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor sd0= 
+            org.autoplot.jythonsupport.JythonUtil.describeScript( env, script, null );
+        for ( Param p: sd0.getParams() ) {
+            if ( isBoolean(p) ) {
+                String svalue= ssparams.get(p.name);
+                if ( svalue!=null && svalue.equals("on") ) {
+                    if ( p.type=='F' ) {
+                        ssparams.put( p.name, "1" );
+                    } else {
+                        ssparams.put( p.name, "T" );
+                    }
+                }
+            }
+        }
         org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor sd= 
             org.autoplot.jythonsupport.JythonUtil.describeScript( env, script, ssparams );
         timelogger.log(Level.FINE, "end describeScript {0} ({1}ms)", new Object[]{name, System.currentTimeMillis()-t0});
@@ -421,15 +441,15 @@ public class ScriptGUIServlet extends HttpServlet {
                 p.doc= p.doc.trim();
                 Object currentValue= p.value == null ? p.deft : p.value;
                 String andDoc= p.doc.length()>0 ? ( ", <em>"+ p.doc +"</em>" ) : "";
-                boolean isCheckBox= p.enums!=null && p.enums.size()==2 && 
-                        ( ( p.enums.contains("T") && p.enums.contains("F") )
-                        ||  ( p.enums.contains(0) && p.enums.contains(1) ) );
+                boolean isCheckBox= isBoolean(p);
                 if ( !isCheckBox ) {
                     out.println(""+p.name + andDoc +"<br>");
                 }
                 if ( p.enums!=null ) {
                     if ( isCheckBox ) {
                         if ( "T".equals(currentValue) ) {
+                            out.println("<input type='checkbox' name='"+p.name+"' checked>"+p.name + andDoc );
+                        } else if ( currentValue.equals(1) ) {
                             out.println("<input type='checkbox' name='"+p.name+"' checked>"+p.name + andDoc );
                         } else if ( "on".equals(currentValue) ) {
                             out.println("<input type='checkbox' name='"+p.name+"' checked>"+p.name + andDoc );
@@ -500,7 +520,12 @@ public class ScriptGUIServlet extends HttpServlet {
             out.println("</body>");
             out.close();
             
-            String[] ss= sparams.substring(1).split("\\&");
+            String[] ss= new String[ssparams.size()];
+            int i=0;
+            for ( Entry<String,String> e: ssparams.entrySet() ) {
+                ss[i] = e.getKey() + "=" + e.getValue();
+                i++;
+            }
             
             startScript( key, scriptURI, script, name, ss, pwd );
         }
