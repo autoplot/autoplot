@@ -156,7 +156,8 @@ public class ScriptGUIServlet extends HttpServlet {
         }
         
         if ( !ServletUtil.isWhitelisted(script) ) {
-            throw new IllegalArgumentException("script must come from whitelisted host, contact " +ServletUtil.getServletContact() + " to see if script could be run: "+script );
+            throw new IllegalArgumentException("script must come from whitelisted host, contact " +ServletUtil.getServletContact() 
+                    + " to see if script could be run: "+script );
         }
         
         String scriptURI= script;
@@ -171,21 +172,16 @@ public class ScriptGUIServlet extends HttpServlet {
         String key= request.getParameter("key");
         
         if ( request.getParameter("img")!=null ) {
-            writeOutputImage( key, scriptURI, response, script, name, aaparams, pwd);
+            writeOutputImage( key, response );
         } else if ( request.getParameter("text")!=null ) {
-            writeOutputText( key, scriptURI, response, script, name, aaparams, pwd);
+            writeOutputText( key, response );
         } else {
-            writeParametersForm( response, pwd, script, ssparams, name, request, scriptURI, sparams);
+            writeParametersForm(response, pwd, script, ssparams, name, scriptURI, sparams);
             
         }
     }
 
-    private void writeOutputImage( String key, String scriptURI, 
-            HttpServletResponse response, 
-            String script, 
-            String name, 
-            String[] aaparams, 
-            String pwd) throws IOException, UnknownHostException {
+    private void writeOutputImage( String key, HttpServletResponse response ) throws IOException, UnknownHostException {
         // now run the script
         
         File keyFile= getKeyFile( key,".png" );
@@ -206,12 +202,7 @@ public class ScriptGUIServlet extends HttpServlet {
         }
     }
     
-    private void writeOutputText( String key, String scriptURI, 
-            HttpServletResponse response, 
-            String script, 
-            String name, 
-            String[] aaparams, 
-            String pwd) throws IOException, UnknownHostException {
+    private void writeOutputText( String key, HttpServletResponse response ) throws IOException, UnknownHostException {
         // now run the script
         
         File keyFile= getKeyFile( key,".txt" );
@@ -231,88 +222,7 @@ public class ScriptGUIServlet extends HttpServlet {
         }
         
     }
-        
-    private void  writeOutputs( String key, String scriptURI, 
-            HttpServletResponse response, 
-            String script, 
-            String name, 
-            String[] aaparams, 
-            String pwd) throws IOException, UnknownHostException {
-        // now run the script
-        
-        File scriptLogArea= new File( ServletUtil.getServletHome(), "log" );
-        if ( !scriptLogArea.exists() ) {
-            if ( !scriptLogArea.mkdirs() ) {
-                logger.warning("unable to make log area");
-            }
-        }            
-        File scriptLogFile= new File( scriptLogArea, "ScriptGUIServlet.log" );
-        Datum n= TimeUtil.now();
-        TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
-        String s= tp.format( n ) + "\t" + scriptURI;
-
-        try ( PrintWriter w= new PrintWriter( new FileWriter( scriptLogFile, scriptLogFile.exists() ) ) ) {
-            w.println(s);
-        }
-        
-        org.autoplot.Util.addFonts();
-        
-        ApplicationModel model = new ApplicationModel();
-        model.setExceptionHandler( new DumpRteExceptionHandler() );
-        model.addDasPeersToAppAndWait();
-        Application dom= model.getDom();
-        
-        logger.log(Level.FINE, "dom: {0}", dom);
-        logger.log(Level.FINE, "dom options: {0}", dom.getOptions());
-        
-        dom.getOptions().setAutolayout(false);
-        
-        PythonInterpreter interp = JythonUtil.createInterpreter( true, true );
-        interp.set("java",null);
-        interp.set("org",null);
-        interp.set("getFile",null);
-        interp.set("dom",dom);
-        interp.set("downloadResourceAsTempFile",null);
-        
-        LoggingOutputStream los1= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO );
-        interp.setOut( los1 );
-        
-        interp.set( "response", response );
-        
-        // To support load balancing, insert the actual host that resolved the request
-        response.setHeader( "X-Served-By", java.net.InetAddress.getLocalHost().getCanonicalHostName() );
-        
-        //TODO: this limits to one user!
-        LoggingOutputStream los2= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO );
-        //ScriptContext._setOutputStream( los2 );
-        
-        script= JythonRefactory.fixImports(script);
-        
-        ScriptContext.setApplicationModel(model); // why must I do this???
-        
-        script= "def showMessageDialog(msg): \n    pass\n" + script;
-        
-        long t0= System.currentTimeMillis();
-        timelogger.log(Level.FINE, "begin runScript {0}", name);
-        
-        ByteArrayOutputStream baos= new ByteArrayOutputStream();
-        
-        runScript( dom,
-                new ByteArrayInputStream(script.getBytes("UTF-8")),
-                baos,
-                name,
-                aaparams,
-                pwd );
-        timelogger.log(Level.FINE, "end runScript {0} ({1}ms)", new Object[]{name, System.currentTimeMillis()-t0});
-                
-        try (OutputStream out = response.getOutputStream()) {
-            byte[] buf= new byte[60000];
-            out.write( baos.toByteArray() );
-            try { los1.close(); } catch ( IOException ex ) {}
-            try { los2.close(); } catch ( IOException ex ) {}
-        }
-    }
-    
+            
     /**
      * copy of JythonUtil.runScript allows the stdout to be gathered.
      * @param dom
@@ -331,7 +241,8 @@ public class ScriptGUIServlet extends HttpServlet {
         pyInitArgv[0]= name;
         System.arraycopy(argv, 0, pyInitArgv, 1, argv.length);
         
-        PySystemState.initialize( PySystemState.getBaseProperties(), null, pyInitArgv ); // legacy support sys.argv. now we use getParam
+        PySystemState.initialize( PySystemState.getBaseProperties(), null, pyInitArgv ); 
+                // legacy support sys.argv. now we use getParam
         
         PythonInterpreter interp = JythonUtil.createInterpreter(true, false, dom, new NullProgressMonitor() );
         if ( pwd!=null ) {
@@ -428,11 +339,7 @@ public class ScriptGUIServlet extends HttpServlet {
         
         LoggingOutputStream los1= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO );
         interp.setOut( los1 );
-                
-        //TODO: this limits to one user!
-        LoggingOutputStream los2= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO );
-        //ScriptContext._setOutputStream( los2 );
-        
+                        
         script= JythonRefactory.fixImports(script);
         
         ScriptContext.setApplicationModel(model); // why must I do this???
@@ -474,7 +381,6 @@ public class ScriptGUIServlet extends HttpServlet {
             String script, 
             Map<String, String> ssparams, 
             String name, 
-            HttpServletRequest request, 
             String scriptURI, 
             String sparams) throws IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -579,11 +485,11 @@ public class ScriptGUIServlet extends HttpServlet {
             out.println("</form>\n");
             out.println("<br>\n");
             out.println("Console Output:<br>\n");
-            out.println( "<iframe id='stdoutp' src='ScriptGUIServlet?text=1&key="+key+sparams+"'></iframe>\n" );
+            out.println("<iframe id='stdoutp' src='ScriptGUIServlet?text=1&key="+key+sparams+"'></iframe>\n" );
             out.println( "</td>\n");
             out.println( "<td valign='top'>\n");
             out.println( "<div border=1></div>\n");
-            out.println( "<img src='ScriptGUIServlet?img=1&key="+key+sparams+"' alt='image'>\n" );
+            out.println("<img src='ScriptGUIServlet?img=1&key="+key+sparams+"' alt='image'>\n" );
             out.println( "</td>\n");
             out.println( "</tr>\n");
             out.println( "</table>\n");
