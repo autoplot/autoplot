@@ -159,7 +159,6 @@ public class JythonRefactory {
      * @param in the input stream containing Jython code.
      * @return new stream, approximately the same length and same number of lines.
      * @throws IOException 
-     * @deprecated 
      */
     public static InputStream fixImports( InputStream in ) throws IOException {
         return fixImports( in, "<?>");
