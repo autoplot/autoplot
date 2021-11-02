@@ -335,7 +335,7 @@ public class AutoplotDataServer {
     }
 
 
-    private static class D2SMonitor extends AbstractProgressMonitor {
+    public static class D2SMonitor extends AbstractProgressMonitor {
         PrintStream out;
         Set outEmpty;
         D2SMonitor( OutputStream out, Set outEmpty ) {
@@ -363,7 +363,7 @@ public class AutoplotDataServer {
     /**
      * put a comment onto the stream no more often then once per second.
      */
-    private static class QStreamMonitor extends AbstractProgressMonitor {
+    public static class QStreamMonitor extends AbstractProgressMonitor {
         PrintStream out;
         Set outEmpty; // if this is empty then out is empty.
 
