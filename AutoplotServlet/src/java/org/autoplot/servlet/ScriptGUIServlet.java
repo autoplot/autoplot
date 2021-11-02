@@ -54,7 +54,6 @@ import org.das2.util.FileUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
-import sun.nio.ch.ThreadPool;
 
 /**
  * Run a script on the server side, and produce a client-side GUI for the 
@@ -67,7 +66,7 @@ public class ScriptGUIServlet extends HttpServlet {
 
     static final Logger logger= Logger.getLogger("autoplot.servlet.scriptgui");
     
-    static Logger timelogger;
+    static final Logger timelogger;
     
     static {
         timelogger= Logger.getLogger("autoplot.servlet.script.gui.timing");
@@ -152,7 +151,8 @@ public class ScriptGUIServlet extends HttpServlet {
         String[] aaparams= slparams.toArray(new String[slparams.size()]);
         
         if ( script==null ) {
-            script= "https://github.com/autoplot/dev/blob/master/demos/2019/20190726/demoParams.jy";
+            response.sendRedirect( "ScriptGUIServletPick" );
+            return;
         }
         
         if ( !ServletUtil.isWhitelisted(script) ) {
@@ -175,7 +175,7 @@ public class ScriptGUIServlet extends HttpServlet {
         } else if ( request.getParameter("text")!=null ) {
             writeOutputText( key, scriptURI, response, script, name, aaparams, pwd);
         } else {
-            writeParametersForm(response, pwd, script, ssparams, name, request, scriptURI, sparams);
+            writeParametersForm( response, pwd, script, ssparams, name, request, scriptURI, sparams);
             
         }
     }
@@ -323,7 +323,8 @@ public class ScriptGUIServlet extends HttpServlet {
      * @param pwd
      * @throws IOException 
      */
-    private void runScript( Application dom, InputStream in, OutputStream out, String name, String[] argv, String pwd ) throws IOException {
+    private void runScript( Application dom, InputStream in, OutputStream out, String name, String[] argv, String pwd ) 
+            throws IOException {
         if ( argv==null ) argv= new String[] {};
         
         String[] pyInitArgv= new String[ argv.length+1 ];
@@ -468,7 +469,14 @@ public class ScriptGUIServlet extends HttpServlet {
     }
     
         
-    private void writeParametersForm(HttpServletResponse response, String pwd, String script, Map<String, String> ssparams, String name, HttpServletRequest request, String scriptURI, String sparams) throws IOException {
+    private void writeParametersForm( HttpServletResponse response, 
+            String pwd, 
+            String script, 
+            Map<String, String> ssparams, 
+            String name, 
+            HttpServletRequest request, 
+            String scriptURI, 
+            String sparams) throws IOException {
         response.setContentType("text/html;charset=UTF-8");
         
         String key= String.format( "%06d", (int)( Math.random() * 100000 ) );
@@ -507,7 +515,9 @@ public class ScriptGUIServlet extends HttpServlet {
                 p.doc= p.doc.trim();
                 Object currentValue= p.value == null ? p.deft : p.value;
                 String andDoc= p.doc.length()>0 ? ( ", <em>"+ p.doc +"</em>" ) : "";
-                boolean isCheckBox= p.enums!=null && p.enums.size()==2 && p.enums.contains("T") && p.enums.contains("F");
+                boolean isCheckBox= p.enums!=null && p.enums.size()==2 && 
+                        ( ( p.enums.contains("T") && p.enums.contains("F") )
+                        ||  ( p.enums.contains(0) && p.enums.contains(1) ) );
                 if ( !isCheckBox ) {
                     out.println(""+p.name + andDoc +"<br>");
                 }
@@ -580,10 +590,11 @@ public class ScriptGUIServlet extends HttpServlet {
             out.println( "<hr>\n" );
             out.println("Running script <a href="+scriptURI+">"+scriptURI+"</a>");
             out.println("Pick <a href='ScriptGUIServletPick'>another</a>...\n");
+            out.println("<br><small>key="+key+"</small>");
             out.println("</body>");
             out.close();
             
-            String[] ss= URISplit.formatParams(ssparams).split("\\&");
+            String[] ss= sparams.substring(1).split("\\&");
             
             startScript( key, scriptURI, script, name, ss, pwd );
         }
