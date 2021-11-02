@@ -5,6 +5,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +14,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.net.UnknownHostException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -51,6 +54,7 @@ import org.das2.util.FileUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
+import sun.nio.ch.ThreadPool;
 
 /**
  * Run a script on the server side, and produce a client-side GUI for the 
@@ -69,6 +73,7 @@ public class ScriptGUIServlet extends HttpServlet {
         timelogger= Logger.getLogger("autoplot.servlet.script.gui.timing");
         timelogger.setLevel(Level.FINE);
         try {
+            // %h is user.home
             final Handler h= new FileHandler( "%h/log/tomcat/scriptGuiTiming.%g.log" ) {
                 @Override
                 public synchronized void publish(LogRecord record) {
@@ -163,17 +168,19 @@ public class ScriptGUIServlet extends HttpServlet {
         File scriptFile= DataSetURI.getFile( script, new NullProgressMonitor() );
         script= FileUtil.readFileToString(scriptFile);            
         
+        String key= request.getParameter("key");
+        
         if ( request.getParameter("img")!=null ) {
-            writeOutputImage(scriptURI, response, script, name, aaparams, pwd);
+            writeOutputImage( key, scriptURI, response, script, name, aaparams, pwd);
         } else if ( request.getParameter("text")!=null ) {
-            writeOutputText(scriptURI, response, script, name, aaparams, pwd);
+            writeOutputText( key, scriptURI, response, script, name, aaparams, pwd);
         } else {
             writeParametersForm(response, pwd, script, ssparams, name, request, scriptURI, sparams);
             
         }
     }
 
-    private void writeOutputImage(String scriptURI, 
+    private void writeOutputImage( String key, String scriptURI, 
             HttpServletResponse response, 
             String script, 
             String name, 
@@ -181,75 +188,51 @@ public class ScriptGUIServlet extends HttpServlet {
             String pwd) throws IOException, UnknownHostException {
         // now run the script
         
-        File scriptLogArea= new File( ServletUtil.getServletHome(), "log" );
-        if ( !scriptLogArea.exists() ) {
-            if ( !scriptLogArea.mkdirs() ) {
-                logger.warning("unable to make log area");
-            }
-        }            
-        File scriptLogFile= new File( scriptLogArea, "ScriptGUIServlet.log" );
-        Datum n= TimeUtil.now();
-        TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
-        String s= tp.format( n ) + "\t" + scriptURI;
-
-        try ( PrintWriter w= new PrintWriter( new FileWriter( scriptLogFile, scriptLogFile.exists() ) ) ) {
-            w.println(s);
+        File keyFile= getKeyFile( key,".png" );
+        
+        while ( !keyFile.exists() ) {
+            Thread.yield();
         }
-        
-        org.autoplot.Util.addFonts();
-        
-        ApplicationModel model = new ApplicationModel();
-        model.setExceptionHandler( new DumpRteExceptionHandler() );
-        model.addDasPeersToAppAndWait();
-        Application dom= model.getDocumentModel();
-        
-        logger.log(Level.FINE, "dom: {0}", dom);
-        logger.log(Level.FINE, "dom options: {0}", dom.getOptions());
-        
-        dom.getOptions().setAutolayout(false);
-        
-        PythonInterpreter interp = JythonUtil.createInterpreter( true, true );
-        interp.set("java",null);
-        interp.set("org",null);
-        interp.set("getFile",null);
-        interp.set("dom",dom);
-        interp.set("downloadResourceAsTempFile",null);
-        
-        LoggingOutputStream los1= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO );
-        interp.setOut( los1 );
-        
-        interp.set( "response", response );
         
         // To support load balancing, insert the actual host that resolved the request
         response.setHeader( "X-Served-By", java.net.InetAddress.getLocalHost().getCanonicalHostName() );
         
-        //TODO: this limits to one user!
-        LoggingOutputStream los2= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO );
-        //ScriptContext._setOutputStream( los2 );
-        
-        script= JythonRefactory.fixImports(script);
-        
-        ScriptContext.setApplicationModel(model); // why must I do this???
-        
-        script= "def showMessageDialog(msg): \n    pass\n" + script;
-        
-        long t0= System.currentTimeMillis();
-        timelogger.log(Level.FINE, "begin runScript {0}", name);
-        JythonUtil.runScript( dom,
-                new ByteArrayInputStream(script.getBytes("UTF-8")),
-                name,
-                aaparams,
-                pwd );
-        timelogger.log(Level.FINE, "end runScript {0} ({1}ms)", new Object[]{name, System.currentTimeMillis()-t0});
-                
-        try (OutputStream out = response.getOutputStream()) {
-            writeToPng(dom,out);
-            try { los1.close(); } catch ( IOException ex ) {}
-            try { los2.close(); } catch ( IOException ex ) {}
+        try ( InputStream ins= new FileInputStream(keyFile); OutputStream out = response.getOutputStream() ) {
+            byte[] buf= new byte[60000];
+            int i;
+            while ( (i=ins.read(buf))>-1 ) {
+                out.write( buf, 0, i );
+            }
         }
     }
     
-    private void writeOutputText(String scriptURI, 
+    private void writeOutputText( String key, String scriptURI, 
+            HttpServletResponse response, 
+            String script, 
+            String name, 
+            String[] aaparams, 
+            String pwd) throws IOException, UnknownHostException {
+        // now run the script
+        
+        File keyFile= getKeyFile( key,".txt" );
+        
+        while ( !keyFile.exists() ) {
+            Thread.yield();
+        }
+        
+        response.setHeader( "X-Served-By", java.net.InetAddress.getLocalHost().getCanonicalHostName() );
+        
+        try ( InputStream ins= new FileInputStream(keyFile); OutputStream out = response.getOutputStream() ) {
+            byte[] buf= new byte[60000];
+            int i;
+            while ( (i=ins.read(buf))>-1 ) {
+                out.write( buf, 0, i );
+            }
+        }
+        
+    }
+        
+    private void  writeOutputs( String key, String scriptURI, 
             HttpServletResponse response, 
             String script, 
             String name, 
@@ -331,7 +314,7 @@ public class ScriptGUIServlet extends HttpServlet {
     }
     
     /**
-     * copy of  JythonUtil.runScript allows the stdout to be gathered.
+     * copy of JythonUtil.runScript allows the stdout to be gathered.
      * @param dom
      * @param in
      * @param out
@@ -391,9 +374,104 @@ public class ScriptGUIServlet extends HttpServlet {
         }
 
     }
+    
+    private File getKeyFile( String key, String ext ) {
+        File keyhome=  new File( ServletUtil.getServletHome().getAbsolutePath(), "key" );
+        if ( !keyhome.exists() ) {
+            if ( !keyhome.mkdirs() ) {
+                throw new IllegalArgumentException("Unable to make key file folder");
+            }
+        }
+        return new File( keyhome, key+ ext );
+    }
+    
+    private void startScript( String key, String scriptURI, 
+            String script, 
+            String name, 
+            String[] aaparams, 
+            String pwd ) throws IOException {
+        
+        File scriptLogArea= new File( ServletUtil.getServletHome(), "log" );
+        if ( !scriptLogArea.exists() ) {
+            if ( !scriptLogArea.mkdirs() ) {
+                logger.warning("unable to make log area");
+            }
+        }            
+        File scriptLogFile= new File( scriptLogArea, "ScriptGUIServlet.log" );
+        Datum n= TimeUtil.now();
+        TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
+        String s= tp.format( n ) + "\t" + scriptURI;
+
+        try ( PrintWriter w= new PrintWriter( new FileWriter( scriptLogFile, scriptLogFile.exists() ) ) ) {
+            w.println(s);
+        }
+        
+        org.autoplot.Util.addFonts();
+        
+        ApplicationModel model = new ApplicationModel();
+        model.setExceptionHandler( new DumpRteExceptionHandler() );
+        model.addDasPeersToAppAndWait();
+        Application dom= model.getDom();
+        
+        logger.log(Level.FINE, "dom: {0}", dom);
+        logger.log(Level.FINE, "dom options: {0}", dom.getOptions());
+        
+        dom.getOptions().setAutolayout(false);
+        
+        PythonInterpreter interp = JythonUtil.createInterpreter( true, true );
+        interp.set("java",null);
+        interp.set("org",null);
+        interp.set("getFile",null);
+        interp.set("dom",dom);
+        interp.set("downloadResourceAsTempFile",null);
+        
+        LoggingOutputStream los1= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO );
+        interp.setOut( los1 );
+                
+        //TODO: this limits to one user!
+        LoggingOutputStream los2= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO );
+        //ScriptContext._setOutputStream( los2 );
+        
+        script= JythonRefactory.fixImports(script);
+        
+        ScriptContext.setApplicationModel(model); // why must I do this???
+        
+        script= "def showMessageDialog(msg): \n    pass\n" + script;
+        
+        long t0= System.currentTimeMillis();
+        timelogger.log(Level.FINE, "begin runScript {0}", name);
+        
+        File keyFile= getKeyFile( key, ".txt.t" );
+        
+        try ( OutputStream baos= new FileOutputStream( keyFile ) ) {    
+            runScript( dom,
+                new ByteArrayInputStream(script.getBytes("UTF-8")),
+                baos,
+                name,
+                aaparams,
+                pwd );
+        }
+        
+        File imageKeyFile =  getKeyFile( key, ".png.t" );
+        try ( FileOutputStream out= new FileOutputStream(imageKeyFile) ) {
+            writeToPng( dom, out );
+        }
+        if ( !imageKeyFile.renameTo( getKeyFile( key, ".png" ) ) ) {
+            throw new IllegalArgumentException("unable to rename file (.png)");
+        }
+        if ( !keyFile.renameTo( getKeyFile( key, ".txt" ) ) ) {
+            throw new IllegalArgumentException("unable to rename file (.txt)");
+        }
+        
+        timelogger.log(Level.FINE, "end runScript {0} ({1}ms)", new Object[]{name, System.currentTimeMillis()-t0});
+        
+    }
+    
         
     private void writeParametersForm(HttpServletResponse response, String pwd, String script, Map<String, String> ssparams, String name, HttpServletRequest request, String scriptURI, String sparams) throws IOException {
         response.setContentType("text/html;charset=UTF-8");
+        
+        String key= String.format( "%06d", (int)( Math.random() * 100000 ) );
         
         Map<String,Object> env= new HashMap<>();
         env.put( "PWD", pwd );
@@ -491,11 +569,11 @@ public class ScriptGUIServlet extends HttpServlet {
             out.println("</form>\n");
             out.println("<br>\n");
             out.println("Console Output:<br>\n");
-            out.println( "<iframe id='stdoutp' src='ScriptGUIServlet?text=1"+sparams+"'></iframe>\n" );
+            out.println( "<iframe id='stdoutp' src='ScriptGUIServlet?text=1&key="+key+sparams+"'></iframe>\n" );
             out.println( "</td>\n");
             out.println( "<td valign='top'>\n");
             out.println( "<div border=1></div>\n");
-            out.println( "<img src='ScriptGUIServlet?img=1"+sparams+"' alt='image'>\n" );
+            out.println( "<img src='ScriptGUIServlet?img=1&key="+key+sparams+"' alt='image'>\n" );
             out.println( "</td>\n");
             out.println( "</tr>\n");
             out.println( "</table>\n");
@@ -505,6 +583,9 @@ public class ScriptGUIServlet extends HttpServlet {
             out.println("</body>");
             out.close();
             
+            String[] ss= URISplit.formatParams(ssparams).split("\\&");
+            
+            startScript( key, scriptURI, script, name, ss, pwd );
         }
     }
 
