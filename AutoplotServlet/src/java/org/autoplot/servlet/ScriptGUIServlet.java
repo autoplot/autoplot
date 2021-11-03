@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.net.UnknownHostException;
@@ -167,11 +168,19 @@ public class ScriptGUIServlet extends HttpServlet {
         script= FileUtil.readFileToString(scriptFile);            
         
         if ( request.getParameter("img")!=null ) {
+            
             String key= request.getParameter("key");
+            if ( !( getKeyFile( key,".png.t" ).exists() || getKeyFile( key,".png" ).exists() ) ) {
+                throw new IOException( "invalid key: "+key );
+            } 
             writeOutputImage( key, response );
             
         } else if ( request.getParameter("text")!=null ) {
+            
             String key= request.getParameter("key");
+            if ( !( getKeyFile( key,".txt.t" ).exists() || getKeyFile( key,".txt" ).exists() ) ) {
+                throw new IOException( "invalid key: "+key );
+            } 
             writeOutputText( key, response );
             
         } else {
@@ -187,12 +196,18 @@ public class ScriptGUIServlet extends HttpServlet {
                 i++;
             }
             
+            // create empty new files for placeholders.
+            File textKeyFile= getKeyFile( key, ".txt.t" );
+            if ( !textKeyFile.createNewFile() ) throw new IllegalArgumentException("unable to create file: "+textKeyFile);
+            File imageKeyFile =  getKeyFile( key, ".png.t" );
+            if ( !imageKeyFile.createNewFile() ) throw new IllegalArgumentException("unable to create file: "+imageKeyFile);
+        
             startScript( key, scriptURI, script, name, ss, pwd );
         }
     }
 
     /**
-     * park this thread and wait for the image to be output by the other thread.
+     * park this thread and wait for the image to be output by the other thread.  
      * @param key
      * @param response
      * @throws IOException
@@ -344,7 +359,7 @@ public class ScriptGUIServlet extends HttpServlet {
         File scriptLogFile= new File( scriptLogArea, "ScriptGUIServlet.log" );
         Datum n= TimeUtil.now();
         TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
-        String s= tp.format( n ) + "\t" + scriptURI;
+        String s= tp.format( n ) + "\t" + key + "\t" + scriptURI ;
 
         try ( PrintWriter w= new PrintWriter( new FileWriter( scriptLogFile, scriptLogFile.exists() ) ) ) {
             w.println(s);
@@ -383,7 +398,7 @@ public class ScriptGUIServlet extends HttpServlet {
         
         File keyFile= getKeyFile( key, ".txt.t" );
         
-        try ( OutputStream baos= new FileOutputStream( keyFile ) ) {    
+        try ( OutputStream baos= new FileOutputStream( keyFile, true ) ) {
             runScript( dom,
                 new ByteArrayInputStream(script.getBytes("UTF-8")),
                 baos,
@@ -393,7 +408,7 @@ public class ScriptGUIServlet extends HttpServlet {
         }
         
         File imageKeyFile =  getKeyFile( key, ".png.t" );
-        try ( FileOutputStream out= new FileOutputStream(imageKeyFile) ) {
+        try ( FileOutputStream out= new FileOutputStream( imageKeyFile, true ) ) {
             writeToPng( dom, out );
         }
         if ( !imageKeyFile.renameTo( getKeyFile( key, ".png" ) ) ) {
@@ -403,7 +418,14 @@ public class ScriptGUIServlet extends HttpServlet {
             throw new IllegalArgumentException("unable to rename file (.txt)");
         }
         
-        timelogger.log(Level.FINE, "end runScript {0} ({1}ms)", new Object[]{name, System.currentTimeMillis()-t0});
+        long elapsedTime= System.currentTimeMillis()-t0;
+        File keyLogFile= getKeyFile( key, ".stats" );
+        try ( PrintStream outs= new PrintStream( new FileOutputStream( keyLogFile ) ) ) {
+            outs.println( "ExecutionTimeMs: "+ elapsedTime );
+            outs.println( "Script: "+scriptURI + "?"+ String.join("&", aaparams) );
+        }
+        
+        timelogger.log(Level.FINE, "end runScript {0} ({1}ms)", new Object[]{name, elapsedTime });
         
     }
     

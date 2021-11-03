@@ -32,13 +32,13 @@ public class ScriptGUIServletPick extends HttpServlet {
     
     private static File getLog() {
         File scriptLogArea= new File( ServletUtil.getServletHome(), "log" );
-            if ( !scriptLogArea.exists() ) {
-                if ( !scriptLogArea.mkdirs() ) {
-                    logger.warning("unable to make log area");
-                }
+        if ( !scriptLogArea.exists() ) {
+            if ( !scriptLogArea.mkdirs() ) {
+                logger.warning("unable to make log area");
             }
-            File scriptLogFile= new File( scriptLogArea, "ScriptGUIServlet.log" );
-            return scriptLogFile;
+        }
+        File scriptLogFile= new File( scriptLogArea, "ScriptGUIServlet.log" );
+        return scriptLogFile;
     }
     
     private static boolean isWhiteListed( String uri ) throws IOException {
@@ -80,7 +80,8 @@ public class ScriptGUIServletPick extends HttpServlet {
                 try ( BufferedReader r= new BufferedReader( new FileReader(scriptLogFile) ) ) {
                     String s= r.readLine();
                     while ( s!=null ) {
-                        String script= s.substring(25);
+                        String[] ss= s.split("\t");
+                        String script= ss[2];
                         if ( isWhiteListed(script) ) {
                             scripts.remove(script);
                             scripts.add(script);
