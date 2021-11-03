@@ -535,7 +535,7 @@ public class ScriptGUIServlet extends HttpServlet {
                 } else if ( p.type=='T' ) {
                     //TODO: nice timerange GUI
                     Object s= (p.value!=null) ? p.value : p.deft;
-                    out.println("<input name='"+p.name+"' value='"+s+"'></input><br>");
+                    out.println("<input name='"+p.name+"' value='"+s+"' size='34'></input><br>");
                     //out.println("<script language='javascript' src='util.js'></script>");
                     //out.println("<button title='Previous interval' onclick='prevInterval("+p.name+")'>&lt;&lt; PREV</button>");
                     //out.println("<button title='Next interval' onclick='nextInterval("+p.name+")'>NEXT &gt;&gt;</button>");
