@@ -3,7 +3,6 @@ package org.autoplot.servlet;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,7 +13,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.net.UnknownHostException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -89,9 +87,7 @@ public class ScriptGUIServlet extends HttpServlet {
             };
             h.setFormatter( f );
             timelogger.addHandler(h);
-        } catch (IOException ex) {
-            Logger.getLogger(ScriptGUIServlet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
+        } catch (IOException | SecurityException ex) {
             Logger.getLogger(ScriptGUIServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
         
@@ -138,17 +134,14 @@ public class ScriptGUIServlet extends HttpServlet {
         String script= request.getParameter("script");
         Map params= request.getParameterMap();
         Map<String,String> ssparams= new LinkedHashMap<>();
-        ArrayList<String> slparams= new ArrayList<>();
         StringBuilder sbparams= new StringBuilder();
         for ( Object o: params.entrySet() ) {
             Entry e= (Entry)o;
             String value= Array.get(e.getValue(),0).toString();
             ssparams.put( e.getKey().toString(), value );
-            slparams.add( e.getKey().toString() + "=" + value );
             sbparams.append("&").append(e.getKey().toString()).append("=").append(value);
         }
         String sparams= sbparams.toString();
-        String[] aaparams= slparams.toArray(new String[slparams.size()]);
         
         if ( script==null ) {
             response.sendRedirect( "ScriptGUIServletPick" );
@@ -186,7 +179,11 @@ public class ScriptGUIServlet extends HttpServlet {
         
         File keyFile= getKeyFile( key,".png" );
         
+        long t0= System.currentTimeMillis();
         while ( !keyFile.exists() ) {
+            if ( ( System.currentTimeMillis()-t0 )> 60000 ) {
+                throw new IOException("timeout, process takes longer than 60 seconds");
+            }
             Thread.yield();
         }
         
@@ -207,7 +204,11 @@ public class ScriptGUIServlet extends HttpServlet {
         
         File keyFile= getKeyFile( key,".txt" );
         
+        long t0= System.currentTimeMillis();
         while ( !keyFile.exists() ) {
+            if ( ( System.currentTimeMillis()-t0 )> 60000 ) {
+                throw new IOException("timeout, process takes longer than 60 seconds");
+            }
             Thread.yield();
         }
         
