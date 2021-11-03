@@ -13,7 +13,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -65,6 +64,11 @@ public class ScriptGUIServlet extends HttpServlet {
     static final Logger logger= Logger.getLogger("autoplot.servlet.scriptgui");
     
     static final Logger timelogger;
+
+    /**
+     * milliseconds within which script must run
+     */
+    private static final int TIMEOUT_SCRIPT = 60000;
     
     static {
         timelogger= Logger.getLogger("autoplot.servlet.script.gui.timing");
@@ -162,15 +166,28 @@ public class ScriptGUIServlet extends HttpServlet {
         File scriptFile= DataSetURI.getFile( script, new NullProgressMonitor() );
         script= FileUtil.readFileToString(scriptFile);            
         
-        String key= request.getParameter("key");
-        
         if ( request.getParameter("img")!=null ) {
+            String key= request.getParameter("key");
             writeOutputImage( key, response );
-        } else if ( request.getParameter("text")!=null ) {
-            writeOutputText( key, response );
-        } else {
-            writeParametersForm(response, pwd, script, ssparams, name, scriptURI, sparams);
             
+        } else if ( request.getParameter("text")!=null ) {
+            String key= request.getParameter("key");
+            writeOutputText( key, response );
+            
+        } else {
+
+            String key= String.format( "%06d", (int)( Math.random() * 100000 ) );
+
+            writeParametersForm(key, response, pwd, script, ssparams, name, scriptURI, sparams);
+            
+            String[] ss= new String[ssparams.size()];
+            int i=0;
+            for ( Entry<String,String> e: ssparams.entrySet() ) {
+                ss[i] = e.getKey() + "=" + e.getValue();
+                i++;
+            }
+            
+            startScript( key, scriptURI, script, name, ss, pwd );
         }
     }
 
@@ -187,17 +204,18 @@ public class ScriptGUIServlet extends HttpServlet {
         
         long t0= System.currentTimeMillis();
         while ( !keyFile.exists() ) {
-            if ( ( System.currentTimeMillis()-t0 )> 60000 ) {
-                throw new IOException("timeout, process takes longer than 60 seconds");
+            if ( ( System.currentTimeMillis()-t0 )> TIMEOUT_SCRIPT ) {
+                throw new IOException( String.format( "timeout, process takes longer than %d seconds", TIMEOUT_SCRIPT/1000 ) );
             }
             Thread.yield();
         }
         
         // To support load balancing, insert the actual host that resolved the request
         response.setHeader( "X-Served-By", java.net.InetAddress.getLocalHost().getCanonicalHostName() );
+        response.setHeader( "X-ScriptGUIServlet-Key", key );
         
         try ( InputStream ins= new FileInputStream(keyFile); OutputStream out = response.getOutputStream() ) {
-            byte[] buf= new byte[60000];
+            byte[] buf= new byte[48000];
             int i;
             while ( (i=ins.read(buf))>-1 ) {
                 out.write( buf, 0, i );
@@ -218,16 +236,17 @@ public class ScriptGUIServlet extends HttpServlet {
         
         long t0= System.currentTimeMillis();
         while ( !keyFile.exists() ) {
-            if ( ( System.currentTimeMillis()-t0 )> 60000 ) {
-                throw new IOException("timeout, process takes longer than 60 seconds");
+            if ( ( System.currentTimeMillis()-t0 )> TIMEOUT_SCRIPT ) {
+                throw new IOException( String.format( "timeout, process takes longer than %d seconds", TIMEOUT_SCRIPT/1000 ) );
             }
             Thread.yield();
         }
         
         response.setHeader( "X-Served-By", java.net.InetAddress.getLocalHost().getCanonicalHostName() );
+        response.setHeader( "X-ScriptGUIServlet-Key", key );
         
         try ( InputStream ins= new FileInputStream(keyFile); OutputStream out = response.getOutputStream() ) {
-            byte[] buf= new byte[60000];
+            byte[] buf= new byte[48000];
             int i;
             while ( (i=ins.read(buf))>-1 ) {
                 out.write( buf, 0, i );
@@ -395,7 +414,7 @@ public class ScriptGUIServlet extends HttpServlet {
         return false;
     }
         
-    private void writeParametersForm( HttpServletResponse response, 
+    private void writeParametersForm( String key, HttpServletResponse response, 
             String pwd, 
             String script, 
             Map<String, String> ssparams, 
@@ -403,9 +422,7 @@ public class ScriptGUIServlet extends HttpServlet {
             String scriptURI, 
             String sparams) throws IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
-        String key= String.format( "%06d", (int)( Math.random() * 100000 ) );
-        
+                
         Map<String,Object> env= new HashMap<>();
         env.put( "PWD", pwd );
         
@@ -533,15 +550,8 @@ public class ScriptGUIServlet extends HttpServlet {
             out.println("</body>");
             out.close();
             
-            String[] ss= new String[ssparams.size()];
-            int i=0;
-            for ( Entry<String,String> e: ssparams.entrySet() ) {
-                ss[i] = e.getKey() + "=" + e.getValue();
-                i++;
-            }
-            
-            startScript( key, scriptURI, script, name, ss, pwd );
         }
+        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
