@@ -113,6 +113,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     
     public static final Icon BUSY_ICON= new javax.swing.ImageIcon( DataSetSelector.class.getResource("/org/autoplot/aggregator/spinner_16.gif"));
     public static final Icon FILEMAG_ICON= new javax.swing.ImageIcon( DataSetSelector.class.getResource("/org/autoplot/datasource/fileMag.png"));
+    public static final Icon FILEMAG_BUSY_ICON= new javax.swing.ImageIcon( DataSetSelector.class.getResource("/resources/fileMagGray.png"));
     
     private Map<Object,Object> pendingChanges= new HashMap(); // lockObject->Client
     
@@ -840,6 +841,9 @@ public class DataSetSelector extends javax.swing.JPanel {
                 return;
             }
             
+            inspectButton.setIcon( FILEMAG_BUSY_ICON );
+            inspectButton.setEnabled( false );
+            
             Runnable run= new Runnable() {
                 @Override
                 public void run() {
@@ -880,17 +884,20 @@ public class DataSetSelector extends javax.swing.JPanel {
                         proceed = fedit.prepare(surl, window, mon );
                         if ( !proceed ) {
                             logger.finer("proceed=false");
+                            clearBusyIcon();
                             return;
                         }
                     } catch ( java.io.InterruptedIOException ex ) {
                         setMessage( "download cancelled" );  //TODO: check FTP
                         logger.finer("download cancelled");
+                        clearBusyIcon();
                         return;
                     } catch (Exception ex) {
                         logger.log(Level.FINER, "exception in prepare: {0}", ex.getMessage());
                         if ( !maybeHandleException(ex) ) {
                             throw new RuntimeException(ex);
                         }
+                        clearBusyIcon();
                         return;
                     } finally {
                         setCursor( Cursor.getDefaultCursor() );
@@ -967,61 +974,65 @@ public class DataSetSelector extends javax.swing.JPanel {
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                final DataSourceEditorDialog dialog;
-                Window window= SwingUtilities.getWindowAncestor(DataSetSelector.this); 
-                String title = "Editing URI " + fsurl;
-                if (window instanceof Frame) {
-                    dialog = new DataSourceEditorDialog((Frame) window, fedit.getPanel(), true);
-                } else if (window instanceof Dialog) {  // TODO: Java 1.6 ModalityType.
-                    dialog = new DataSourceEditorDialog((Dialog) window, fedit.getPanel(), true);
-                } else {
-                    throw new RuntimeException("parent windowAncestor type is not supported.");
-                }
-                dialog.setTitle(title);
-                dialog.setProblems(problems);
-
-                if ( actionListenerList==null || actionListenerList.isEmpty() || playButton==false ) {
-                    dialog.setPlayButton(false); // nothing is going to happen, so don't show play button.
-                } else {
-                    dialog.setExpertMode(isExpertMode());
-                }
-
-                pendingChanges.put( PENDING_EDIT, DataSetSelector.this );
-                
-                addCancelEscapeKey(dialog);
-                
-                WindowManager.getInstance().showModalDialog(dialog);
-                
-                if (!dialog.isCancelled()) {
-                    String surl= fedit.getURI();                                
-                    logger.log( Level.FINE, "dataSetSelectorComboBox.setSelectedItem(\"{0}\");", surl );
-                    dataSetSelectorComboBox.setSelectedItem(surl);
-                    logger.log( Level.FINE, "dataSetSelectorComboBox.getEditor().setItem(\"{0}\");", surl );
-                    dataSetSelectorComboBox.getEditor().setItem(surl);
-
-                    boolean bug1098= false; //TODO finish off this change.
-                    if ( bug1098 ) {
-                        DataSourceFactory dsf;
-                        try {
-                            dsf = DataSetURI.getDataSourceFactory( DataSetURI.getURI(surl), new NullProgressMonitor());
-                            TimeSeriesBrowse tsb= dsf.getCapability( TimeSeriesBrowse.class );
-                            tsb.setURI(surl);
-                            DatumRange timeRangeNew= tsb.getTimeRange();
-                            if ( !timeRangeNew.equals(timeRange) ) {
-                                logger.log(Level.FINE, "resetting timerange to {0}", timeRangeNew);
-                                timeRange= timeRangeNew;
-                            }
-                        } catch (ParseException | IOException | IllegalArgumentException | URISyntaxException ex) {
-                            logger.log( Level.SEVERE, ex.getMessage(), ex );
-                        }
+                try {
+                    final DataSourceEditorDialog dialog;
+                    Window window= SwingUtilities.getWindowAncestor(DataSetSelector.this); 
+                    String title = "Editing URI " + fsurl;
+                    if (window instanceof Frame) {
+                        dialog = new DataSourceEditorDialog((Frame) window, fedit.getPanel(), true);
+                    } else if (window instanceof Dialog) {  // TODO: Java 1.6 ModalityType.
+                        dialog = new DataSourceEditorDialog((Dialog) window, fedit.getPanel(), true);
+                    } else {
+                        throw new RuntimeException("parent windowAncestor type is not supported.");
                     }
-                    keyModifiers = dialog.getModifiers();
-                    maybePlot(true);
+                    dialog.setTitle(title);
+                    dialog.setProblems(problems);
+
+                    if ( actionListenerList==null || actionListenerList.isEmpty() || playButton==false ) {
+                        dialog.setPlayButton(false); // nothing is going to happen, so don't show play button.
+                    } else {
+                        dialog.setExpertMode(isExpertMode());
+                    }
+
+                    pendingChanges.put( PENDING_EDIT, DataSetSelector.this );
+
+                    addCancelEscapeKey(dialog);
+
+                    WindowManager.getInstance().showModalDialog(dialog);
+
+                    if (!dialog.isCancelled()) {
+                        String surl= fedit.getURI();                                
+                        logger.log( Level.FINE, "dataSetSelectorComboBox.setSelectedItem(\"{0}\");", surl );
+                        dataSetSelectorComboBox.setSelectedItem(surl);
+                        logger.log( Level.FINE, "dataSetSelectorComboBox.getEditor().setItem(\"{0}\");", surl );
+                        dataSetSelectorComboBox.getEditor().setItem(surl);
+
+                        boolean bug1098= false; //TODO finish off this change.
+                        if ( bug1098 ) {
+                            DataSourceFactory dsf;
+                            try {
+                                dsf = DataSetURI.getDataSourceFactory( DataSetURI.getURI(surl), new NullProgressMonitor());
+                                TimeSeriesBrowse tsb= dsf.getCapability( TimeSeriesBrowse.class );
+                                tsb.setURI(surl);
+                                DatumRange timeRangeNew= tsb.getTimeRange();
+                                if ( !timeRangeNew.equals(timeRange) ) {
+                                    logger.log(Level.FINE, "resetting timerange to {0}", timeRangeNew);
+                                    timeRange= timeRangeNew;
+                                }
+                            } catch (ParseException | IOException | IllegalArgumentException | URISyntaxException ex) {
+                                logger.log( Level.SEVERE, ex.getMessage(), ex );
+                            }
+                        }
+                        keyModifiers = dialog.getModifiers();
+                        maybePlot(true);
+                    } else {
+                        setMessage("editor cancelled");
+                    }
+                } finally {
                     pendingChanges.remove( PENDING_EDIT );
-                } else {
-                    setMessage("editor cancelled");
-                    pendingChanges.remove( PENDING_EDIT );
+                    clearBusyIcon();
                 }
+                                
             }
         };
         return run;
@@ -1051,6 +1062,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     
     private void clearBusyIcon() {
         inspectButton.setIcon( FILEMAG_ICON );
+        inspectButton.setEnabled(true);
     }
 
     /**
