@@ -81,7 +81,7 @@ public class ScriptGUIServletPick extends HttpServlet {
                     String s= r.readLine();
                     while ( s!=null ) {
                         String[] ss= s.split("\t");
-                        String script= ss[2];
+                        String script= ss[ss.length-1];
                         if ( isWhiteListed(script) ) {
                             scripts.remove(script);
                             scripts.add(script);
