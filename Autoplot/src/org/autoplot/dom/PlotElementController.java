@@ -2490,6 +2490,7 @@ public class PlotElementController extends DomNodeController {
                 peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
                 peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
                 peleCopy.getPlotDefaults().getYaxis().setAutoRange(false);
+                peleCopy.getPlotDefaults().getYaxis().setVisible(false);
                 peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
             }
         } else if ( spec==RenderType.vectorPlot ) { //TODO: this should be discoverable
