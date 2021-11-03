@@ -1313,6 +1313,13 @@ public final class PlotController extends DomNodeController {
             }
         }
         plot.getZaxis().setVisible(needsColorbar);
+        boolean needsYAxis= false;
+        for (PlotElement p : dom.getController().getPlotElementsFor(plot)) {
+            if ( p.getPlotDefaults().getYaxis().isVisible() ) {
+                needsYAxis= true;
+            }
+        }
+        plot.getYaxis().setVisible(needsYAxis);
     }
 
     void addPlotElement(PlotElement p) {
