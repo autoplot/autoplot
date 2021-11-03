@@ -174,8 +174,14 @@ public class ScriptGUIServlet extends HttpServlet {
         }
     }
 
+    /**
+     * park this thread and wait for the image to be output by the other thread.
+     * @param key
+     * @param response
+     * @throws IOException
+     * @throws UnknownHostException 
+     */
     private void writeOutputImage( String key, HttpServletResponse response ) throws IOException, UnknownHostException {
-        // now run the script
         
         File keyFile= getKeyFile( key,".png" );
         
@@ -199,9 +205,15 @@ public class ScriptGUIServlet extends HttpServlet {
         }
     }
     
+    /**
+     * park this thread and wait for the text to be output by the other thread.
+     * @param key
+     * @param response
+     * @throws IOException
+     * @throws UnknownHostException 
+     */
     private void writeOutputText( String key, HttpServletResponse response ) throws IOException, UnknownHostException {
-        // now run the script
-        
+
         File keyFile= getKeyFile( key,".txt" );
         
         long t0= System.currentTimeMillis();
