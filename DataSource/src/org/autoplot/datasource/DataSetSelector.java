@@ -885,12 +885,14 @@ public class DataSetSelector extends javax.swing.JPanel {
                         if ( !proceed ) {
                             logger.finer("proceed=false");
                             clearBusyIcon();
+                            setCursor( Cursor.getDefaultCursor() );
                             return;
                         }
                     } catch ( java.io.InterruptedIOException ex ) {
                         setMessage( "download cancelled" );  //TODO: check FTP
                         logger.finer("download cancelled");
                         clearBusyIcon();
+                        setCursor( Cursor.getDefaultCursor() );
                         return;
                     } catch (Exception ex) {
                         logger.log(Level.FINER, "exception in prepare: {0}", ex.getMessage());
@@ -898,12 +900,14 @@ public class DataSetSelector extends javax.swing.JPanel {
                             throw new RuntimeException(ex);
                         }
                         clearBusyIcon();
-                        return;
-                    } finally {
                         setCursor( Cursor.getDefaultCursor() );
+                        return;
                     }
 
                     fedit.setURI(surl);
+                    
+                    setCursor( Cursor.getDefaultCursor() );
+                    
                     if ( surl.startsWith("vap+inline" ) ) {
                         // tiny kludge for Autoplot
                         if ( fedit.getClass().getName().equals("org.autoplot.inline.InlineDataSourceEditorPanel") ) {
