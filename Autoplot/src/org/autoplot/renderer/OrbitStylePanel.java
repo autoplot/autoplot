@@ -2,6 +2,7 @@
 package org.autoplot.renderer;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -397,7 +398,8 @@ public final class OrbitStylePanel extends javax.swing.JPanel implements PlotSty
     private void tickValuesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tickValuesButtonActionPerformed
         TickValuesStringSchemeEditor edit= new TickValuesStringSchemeEditor();
         edit.setValue( tickValuesTF.getText() );
-        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, edit, edit.EDITOR_TITLE, JOptionPane.PLAIN_MESSAGE ) ) {
+        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, edit, 
+                TickValuesStringSchemeEditor.EDITOR_TITLE, JOptionPane.PLAIN_MESSAGE ) ) {
             tickValuesTF.setText( edit.getValue() );
         }
     }//GEN-LAST:event_tickValuesButtonActionPerformed
@@ -429,4 +431,5 @@ public final class OrbitStylePanel extends javax.swing.JPanel implements PlotSty
     private javax.swing.JButton tickValuesButton;
     private javax.swing.JTextField tickValuesTF;
     // End of variables declaration//GEN-END:variables
+
 }
