@@ -429,13 +429,53 @@ public class ScriptGUIServlet extends HttpServlet {
         
     }
     
-    private boolean isBoolean( Param p ) {
+    private static boolean isBoolean( Param p ) {
         if ( p.enums==null || p.enums.size()!=2 ) return false;
         if ( p.type=='A' && p.enums.size()==2 && p.enums.contains("T") && p.enums.contains("F") ) return true;
         if ( p.type=='F' && p.enums.size()==2 && p.enums.contains(0) && p.enums.contains(1) ) return true;
         return false;
     }
-        
+
+    /**
+     * go through and convert "on" to "1", etc.  Note doubles will still be Strings, URIs will still be Strings, etc.
+     * ssparams will be modified and a copy is returned.
+     * @param sd0
+     * @param ssparams
+     * @return the map is returned as a string-object version for convenience.
+     */
+    private static Map<String,Object> interpretAsParams( org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor sd0, 
+            Map<String,String> ssparams ) {
+        Map<String,Object> result= new LinkedHashMap<>();
+        // go through and convert "on" to 1, etc.
+        for ( Param p: sd0.getParams() ) {
+            String svalue= ssparams.get(p.name);
+            if ( isBoolean(p) ) {
+                if ( svalue!=null ) {
+                    if ( svalue.equals("on") ) {
+                        if ( p.type=='F' ) {
+                            result.put( p.name, "1" );
+                            ssparams.put( p.name, "1" );
+                        } else {
+                            result.put( p.name, "T" );
+                            ssparams.put( p.name, "T" );
+                        }
+                    } else {
+                        if ( p.type=='F' ) {
+                            result.put( p.name, "0" );
+                            ssparams.put( p.name, "0" );
+                        } else {
+                            result.put( p.name, "F" );
+                            ssparams.put( p.name, "F" );
+                        }
+                    }
+                } 
+            } else {
+                result.put( p.name, svalue );
+            }
+        }
+        return result;
+    }
+    
     private void writeParametersForm( String key, HttpServletResponse response, 
             String pwd, 
             String script, 
@@ -452,22 +492,15 @@ public class ScriptGUIServlet extends HttpServlet {
         timelogger.log(Level.FINE, "begin describeScript {0}", name);
         org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor sd0= 
             org.autoplot.jythonsupport.JythonUtil.describeScript( env, script, null );
-        for ( Param p: sd0.getParams() ) {
-            if ( isBoolean(p) ) {
-                String svalue= ssparams.get(p.name);
-                if ( svalue!=null && svalue.equals("on") ) {
-                    if ( p.type=='F' ) {
-                        ssparams.put( p.name, "1" );
-                    } else {
-                        ssparams.put( p.name, "T" );
-                    }
-                }
-            }
-        }
+        
+        Map<String,Object> params= interpretAsParams( sd0, ssparams );
+        
         org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor sd= 
             org.autoplot.jythonsupport.JythonUtil.describeScript( env, script, ssparams );
         timelogger.log(Level.FINE, "end describeScript {0} ({1}ms)", new Object[]{name, System.currentTimeMillis()-t0});
         
+        String uri= URISplit.format( "vap+jy", scriptURI, params );
+                
         try (PrintWriter out = response.getWriter()) {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -568,7 +601,7 @@ public class ScriptGUIServlet extends HttpServlet {
             out.println( "<hr>\n" );
             out.println("Running script <a href="+scriptURI+">"+scriptURI+"</a>");
             out.println("Pick <a href='ScriptGUIServletPick'>another</a>...\n");
-            out.println("<br><small>key="+key+"</small>");
+            out.println("<br><small>key="+key+" "+uri+"</small> ");
             out.println("</body>");
             out.close();
             
