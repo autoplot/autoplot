@@ -396,9 +396,9 @@ public class ScriptGUIServlet extends HttpServlet {
         long t0= System.currentTimeMillis();
         timelogger.log(Level.FINE, "begin runScript {0}", name);
         
-        File keyFile= getKeyFile( key, ".txt.t" );
+        File consoleKeyFile= getKeyFile( key, ".txt.t" );
         
-        try ( OutputStream baos= new FileOutputStream( keyFile, true ) ) {
+        try ( OutputStream baos= new FileOutputStream( consoleKeyFile, true ) ) {
             runScript( dom,
                 new ByteArrayInputStream(script.getBytes("UTF-8")),
                 baos,
@@ -406,7 +406,7 @@ public class ScriptGUIServlet extends HttpServlet {
                 aaparams,
                 pwd );
         } catch ( Exception ex ) {
-            try ( PrintWriter write= new PrintWriter( new FileWriter( keyFile, true ) ) ) {
+            try ( PrintWriter write= new PrintWriter( new FileWriter( consoleKeyFile, true ) ) ) {
                 ex.printStackTrace(write);
             }
         }
@@ -418,7 +418,7 @@ public class ScriptGUIServlet extends HttpServlet {
         if ( !imageKeyFile.renameTo( getKeyFile( key, ".png" ) ) ) {
             throw new IllegalArgumentException("unable to rename file (.png)");
         }
-        if ( !keyFile.renameTo( getKeyFile( key, ".txt" ) ) ) {
+        if ( !consoleKeyFile.renameTo( getKeyFile( key, ".txt" ) ) ) {
             throw new IllegalArgumentException("unable to rename file (.txt)");
         }
         
