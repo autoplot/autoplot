@@ -27,8 +27,12 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-11-01 r26173):</p>
+        <p>Bugfixes (2021-11-04 r26198):</p>
         <ul>
+            <li>2411: reducexWaveform allows reduction of entire packets and uses BIN_MIN and BIN_MAX.  Thanks, Bill!
+            <li>2410: address bar inspect button becomes insensitive while editing a URI, so that people don't get confused when two editor windows pop up.  The
+            <li>2409: append where two datasets have timetags of cdf_epoch and tt2000 would cause runtime exception.  Thanks, Sadie!
+            <li>changes to support pure-Java Autoplot-based Das2Server.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">rfe758</a>: Granny Text Editor button added to "add annotation" dialog.
             <li>flatten rank 3 join code wasn't pushed into Git for the devel release, whoops...
             <li>data with CDF_EPOCH and CDF_TT2000 timetags could not be concatenated.  Thanks, Sadie!
@@ -67,6 +71,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>AutoplotServlet's ScriptGUIServlet calculates console output as well, progress bar is coming.
             <li>GrannyTextEditor shift+unicode char button will insert the unicode character, not the unicode escape sequence.  Thanks, Bob!
             <li>flatten supports rank 3 array of tables, to support Cassini RPWS data.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">758</a>: introduce editors to property editors, and special editor for autoRangeHints.
