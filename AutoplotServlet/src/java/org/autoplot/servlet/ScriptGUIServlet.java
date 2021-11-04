@@ -405,6 +405,10 @@ public class ScriptGUIServlet extends HttpServlet {
                 name,
                 aaparams,
                 pwd );
+        } catch ( Exception ex ) {
+            try ( PrintWriter write= new PrintWriter( new FileWriter( keyFile, true ) ) ) {
+                ex.printStackTrace(write);
+            }
         }
         
         File imageKeyFile =  getKeyFile( key, ".png.t" );
