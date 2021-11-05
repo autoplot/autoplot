@@ -533,6 +533,8 @@ public class ScriptGUIServlet extends HttpServlet {
                 boolean isCheckBox= isBoolean(p);
                 if ( !isCheckBox ) {
                     out.println(""+p.name + andDoc +"<br>");
+                } else {
+                    out.println("<label>");
                 }
                 if ( p.enums!=null ) {
                     if ( isCheckBox ) {
@@ -581,6 +583,9 @@ public class ScriptGUIServlet extends HttpServlet {
                     //TODO: GUIs for URIs and other parameters.
                     Object s= (p.value!=null) ? p.value : p.deft;
                     out.println("<input name='"+p.name+"' value='"+s+"'></input>");
+                }
+                if ( isCheckBox ) {
+                    out.println("</label>");
                 }
                 out.println("<br><br>");
             }
