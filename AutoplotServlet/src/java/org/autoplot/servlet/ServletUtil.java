@@ -117,6 +117,10 @@ public class ServletUtil {
     private static List<String> whiteList=null;
     private static long whiteListFresh= 0;
     private static long whiteListLastModified= 0;
+
+    private static List<String> blackList=null;
+    private static long blackListFresh= 0;
+    private static long blackListLastModified= 0;
     
     /**
      * return the whitelist, checking no more than once per 5 seconds, and
@@ -190,10 +194,79 @@ public class ServletUtil {
         }
         return whiteList;
     }    
-    
+
+    /**
+     * return the blacklist, checking no more than once per 5 seconds, and
+     * creating the default file if one is not found.  
+     * See HOME/autoplot_data/server/blacklist.txt
+     * @return list of regular expressions to allow.
+     * @throws java.io.IOException when the blacklist.txt cannot be written or read.
+     */
+    public static List<String> getBlackList( ) throws IOException {
+        long currentTimeMillis= System.currentTimeMillis();
+        if ( currentTimeMillis-blackListFresh<5000 ) return blackList;
+        File sd= getServletHome();
+        File ff= new File( sd, "blacklist.txt" );
+        if ( !ff.exists() ) {
+            try (BufferedWriter w = new BufferedWriter( new FileWriter( ff ) )) {
+                w.write("# list of blacklisted URIs regular expressions.  See http://autoplot.org/servlet_guide.\n");
+                w.write("# http://autoplot.org/data.*  # uncomment to allow scripts from autoplot.org\n");                
+            } catch ( IOException ex ) {
+                throw ex;
+            }
+        }
+        
+        // the goal here is to avoid disk access which would slow down the server.  
+        // blackListFresh is the last time we checked the blacklist.
+        long freshNow= ff.lastModified();
+        if ( blackList==null || freshNow!=blackListLastModified  ) {
+            synchronized ( ServletUtil.class ) { // Avoid synchronized block if the file is fresh
+                if ( blackList==null || freshNow!=blackListLastModified  ) { 
+                    List<String> local= new ArrayList(100);
+                    BufferedReader r=null;
+                    try {
+                        logger.log(Level.FINE, "Reading blacklist from {0} ===", ff);
+                        r= new BufferedReader( new FileReader( ff ) );
+                        String s= r.readLine();
+                        while ( s!=null ) {
+                            logger.log(Level.FINE, "{0}", s);
+                            int i= s.indexOf("#");
+                            if ( i>-1 ) s= s.substring(0,i);
+                            s= s.trim();
+                            if ( s.length()>0 ) {
+                                String[] ss= s.split("\\s+");
+                                if ( ss.length!=1 ) {
+                                    System.err.println("skipping malformed line: "+s);
+                                } else {
+                                    local.add(ss[0]);
+                                }
+                            }
+                            s= r.readLine();
+                        }
+                        logger.log(Level.FINE, "Done reading blacklist from {0} ===", ff);
+                    } catch ( IOException ex ) {
+                        throw ex; 
+                    } finally {
+                        if ( r!=null ) r.close();
+                    }
+                    blackList= local;
+                    blackListFresh= freshNow;
+                    blackListLastModified= freshNow;
+                } else {
+                    logger.log(Level.FINE,"No need to read the blacklist, it hasn't been updated (synchronized block).");
+                }
+            }
+        } else {
+            logger.log(Level.FINE,"No need to read the whitelist, it hasn't been updated.");
+        }
+        return blackList;
+    }    
+
     /**
      * return true if the suri is whitelisted, meaning we trust that 
      * scripts and other content from from this address will not harm the server.
+     * This also checks the blacklist, and if the item is in the blacklist, 
+     * then it will not be whitelisted.
      * @param suri the uri.
      * @return true if the suri is whitelisted.
      * @throws IOException when the whitelist cannot be read.
@@ -213,9 +286,46 @@ public class ServletUtil {
                 whiteListed= true;
                 logger.log(Level.FINE, "uri is whitelisted with implicit vap+ext, matching {0}", s);
             }
-        }     
+        }
+        List<String> bl= getBlackList();
+        for ( String s: bl ) {
+            if ( !whiteListed && Pattern.matches( s, suri ) ) {
+                whiteListed= false;
+                logger.log(Level.FINE, "uri is blacklisted, matching {0}", s);
+            }
+            if ( !whiteListed && ext!=null && !ext.equals("vap") && Pattern.matches( "vap\\+"+ext+":"+s, suri ) ) {
+                whiteListed= false;
+                logger.log(Level.FINE, "uri is blacklisted with implicit vap+ext, matching {0}", s);
+            }
+        }
         return whiteListed;
     }
+    
+    /**
+     * return true if the suri is blacklisted, meaning we do not trust that 
+     * scripts and other content from from this address could harm the server.
+     * @param suri the uri.
+     * @return true if the suri is blacklisted.
+     * @throws IOException when the blacklist cannot be read.
+     */
+    public static boolean isBlacklisted(String suri) throws IOException {
+        boolean blackListed= false;
+        URISplit split= URISplit.parse(suri);
+        String ext= split.ext;
+        if ( ext!=null ) ext= ext.substring(1); // remove . in .vap
+        List<String> wl= getBlackList();
+        for ( String s: wl ) {
+            if ( !blackListed && Pattern.matches( s, suri ) ) {
+                blackListed= true;
+                logger.log(Level.FINE, "uri is blacklisted, matching {0}", s);
+            }
+            if ( !blackListed && ext!=null && !ext.equals("vap") && Pattern.matches( "vap\\+"+ext+":"+s, suri ) ) {
+                blackListed= true;
+                logger.log(Level.FINE, "uri is blacklisted with implicit vap+ext, matching {0}", s);
+            }
+        }     
+        return blackListed;
+    }    
     
     /**
      * dump the whitelist to the logger at the given level.
@@ -294,6 +404,8 @@ public class ServletUtil {
                 logger.log(Level.FINE, "uri is not whitelisted: {0}", suri);                    
                 ServletUtil.dumpWhitelistToLogger(Level.FINE);
             }
+            boolean blackListed= ServletUtil.isBlacklisted(suri);
+            if ( blackListed ) throw new IllegalArgumentException( "uri is blacklisted:" + suri); 
         }
         if ( vap!=null ) {
             whiteListed= ServletUtil.isWhitelisted(vap);
