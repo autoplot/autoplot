@@ -51,7 +51,6 @@ import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.util.filesystem.FileSystem;
 import org.json.JSONArray;
-import org.python.core.FileUtil;
 
 /**
  * Servlet for data responses.  

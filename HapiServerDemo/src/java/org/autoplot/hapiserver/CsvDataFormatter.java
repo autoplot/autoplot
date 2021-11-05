@@ -3,7 +3,9 @@ package org.autoplot.hapiserver;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Datum;
@@ -32,9 +34,20 @@ public class CsvDataFormatter implements DataFormatter {
     
     boolean[] unitsFormatter;
     DatumFormatter[] datumFormatter;
+    
+    /**
+     * true if the field needs to be quoted.
+     */
     boolean[] quotes;
+    
+    /**
+     * the lengths of each field, for isotime and string types.
+     */
+    int[] lengths;
     String[] fill;
     Units[] units;
+    
+    private static final Charset CHARSET_UTF8= Charset.forName("UTF-8");
     
     /**
      * @see AsciiTableDataSourceFormat#getDataFormatter
@@ -68,6 +81,7 @@ public class CsvDataFormatter implements DataFormatter {
             unitsFormatter= new boolean[record.length()];
             datumFormatter= new DatumFormatter[record.length()];
             quotes= new boolean[record.length()];
+            lengths= new int[record.length()];
             units= new Units[record.length()];
             fill= new String[record.length()];
             int[] lens= Util.getNumberOfElements(info);
@@ -84,10 +98,22 @@ public class CsvDataFormatter implements DataFormatter {
                     unitsFormatter[i]= true;
                     datumFormatter[i]= TimeDatumFormatter.DEFAULT;
                     quotes[i]= false;
+                    if ( parameter.has("length") ) {
+                        lengths[i]= parameter.getInt("length");
+                    } else {
+                        throw new IllegalStateException("isotime measurement needs length");
+                    }
+                    
                 } else if ( UnitsUtil.isNominalMeasurement(u) ) {
                     unitsFormatter[i]= true;
                     datumFormatter[i]= new EnumerationDatumFormatter();
                     quotes[i]= true;
+                    if ( parameter.has("length") ) {
+                        lengths[i]= parameter.getInt("length");
+                    } else {
+                        throw new IllegalStateException("string measurement needs length");
+                    }
+                    
                 } else {
                     String dfs= (String)field.property(QDataSet.FORMAT);
                     if ( dfs!=null && dfs.trim().length()>0 ) {
@@ -125,6 +151,7 @@ public class CsvDataFormatter implements DataFormatter {
         
     }
 
+    
     @Override
     public void sendRecord(OutputStream out, QDataSet record) throws IOException {
         int n= record.length();
@@ -145,7 +172,11 @@ public class CsvDataFormatter implements DataFormatter {
                 if ( quotes[i] ) {
                     s= s.replaceAll("\"", "\"\""); // See https://github.com/hapi-server/data-specification/issues/99
                 }
-                out.write( s.getBytes() );
+                byte[] bytes= s.getBytes(CHARSET_UTF8);
+                if ( lengths[i]>0 && bytes.length>lengths[i] ) {
+                    bytes= Util.trimUTF8( bytes, lengths[i] );
+                }
+                out.write( bytes );
             }
             if ( quotes[i] ) out.write('"');
             if ( i<n-1 ) out.write(',');

@@ -465,6 +465,25 @@ public class Util {
         }
     }
     
+    /**
+     * properly trim the byte array containing a UTF-8 String to a limit
+     * @param bytes the bytes
+     * @param k the number of bytes
+     * @return 
+     */
+    public static byte[] trimUTF8( byte[] bytes, int k ) {
+        if ( bytes.length==k ) return bytes;
+        int b= bytes[k];
+        if ( b>127 ) { // uh-oh, we are mid-UTF8-extended character.
+            while ( k>0 && b>127 ) {
+                k=k-1;
+                b= bytes[k];
+            }
+        }
+        bytes= Arrays.copyOf( bytes, k );
+        return bytes;
+    }
+    
     public static void main( String[] args ) {
         String line= "a,b,\"c,d\"";
         String[] ss;

@@ -91,14 +91,15 @@ public class BinaryDataFormatter implements DataFormatter {
                         public void write(double d, ByteBuffer buffer) {
                             String s= units.createDatum(d).toString();
                             byte[] bytes= s.getBytes( Charset.forName("UTF-8") );  
-                            if ( bytes.length<len ) {
-                                buffer.put( bytes, 0, Math.min(bytes.length,len) );  //TODO: we could be in the middle of a letter.
+                            if ( bytes.length==len ) {
+                                buffer.put( bytes ); 
+                            } else if ( bytes.length<len ) {
+                                buffer.put( bytes, 0, bytes.length ); 
                                 buffer.put( zeros, bytes.length, len-bytes.length );
                             } else {
-                                // find last full character
-                                int ipos= len-1;
-                                while ( ipos>0 && bytes[ipos]<0 ) ipos--;  // unicode characters > 127 are multi-byte.
-                                buffer.put( bytes, 0, ipos );  //TODO: we could be in the middle of a UTF-8 letter.
+                                bytes= Util.trimUTF8( bytes, len );
+                                buffer.put( bytes, 0, bytes.length );  
+                                buffer.put( zeros, bytes.length, len-bytes.length );
                             }
                         }
                         @Override
