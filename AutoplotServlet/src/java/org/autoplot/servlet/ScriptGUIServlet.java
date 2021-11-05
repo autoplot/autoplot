@@ -597,9 +597,6 @@ public class ScriptGUIServlet extends HttpServlet {
             out.println("<input type='hidden' name='script' value='"+scriptURI+"'>\n");
             out.println("<input type='submit' value='Submit'>\n");
             out.println("</form>\n");
-            out.println("<br>\n");
-            out.println("Console Output:<br>\n");
-            out.println("<iframe id='stdoutp' src='ScriptGUIServlet?text=1&key="+key+sparams+"' width='500'></iframe>\n" );
             out.println( "</td>\n");
             out.println( "<td valign='top'>\n");
             out.println( "<div border=1></div>\n");
@@ -607,6 +604,9 @@ public class ScriptGUIServlet extends HttpServlet {
             out.println( "</td>\n");
             out.println( "</tr>\n");
             out.println( "</table>\n");
+            out.println("<br>\n");
+            out.println("Console Output:<br>\n");
+            out.println("<iframe id='stdoutp' src='ScriptGUIServlet?text=1&key="+key+sparams+"' width='800'></iframe>\n" );
             out.println( "<hr>\n" );
             out.println("Running script <a href="+scriptURI+">"+scriptURI+"</a>");
             out.println("Pick <a href='ScriptGUIServletPick'>another</a>...\n");
