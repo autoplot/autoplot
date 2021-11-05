@@ -78,6 +78,9 @@ import org.das2.util.TimingConsoleFormatter;
  * .vap files and Autoplot URIs.  A simple set of controls is provided
  * to tweak layout when automatic settings are not satisfactory.
  * 
+ * If the URI is not whitelisted, then it will be logged.  If the 
+ * URI or VAP is blacklisted, then it will throw an exception.
+ * 
  * Some known instances:<ul>
  * <li>http://jfaden.net/AutoplotServlet/
  * </ul>
@@ -359,6 +362,9 @@ public class SimpleServlet extends HttpServlet {
                 if ( !whiteListed ) {
                     logger.log(Level.FINE, "uri is not whitelisted: {0}", suri);                    
                     ServletUtil.dumpWhitelistToLogger(Level.FINE);
+                    if ( ServletUtil.isBlacklisted(suri) ) {
+                        throw new IllegalArgumentException("uri is blacklisted: {0}"+ vap);
+                    }
                 }
             }
             if ( vap!=null ) {
@@ -366,6 +372,9 @@ public class SimpleServlet extends HttpServlet {
                 if ( !whiteListed ) {
                     logger.log(Level.FINE, "vap is not whitelisted: {0}", vap);
                     ServletUtil.dumpWhitelistToLogger(Level.FINE);
+                    if ( ServletUtil.isBlacklisted(suri) ) {
+                        throw new IllegalArgumentException("vap is blacklisted: {0}"+ vap);
+                    }
                 }
                 //TODO: there may be a request that the URIs within the vap are 
                 //verified to be whitelisted.  This is not done.
