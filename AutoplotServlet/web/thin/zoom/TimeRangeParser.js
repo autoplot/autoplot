@@ -335,6 +335,141 @@ function parseISO8601Range(stringIn, result) {
 }
 
 /**
+ * returns the time found in the string.  This can be an ISO8601 time 
+ * range string, or four-digit year, or other convenient forms.  
+ * Other examples:
+ * <ul>
+ *   <li> 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z (or any ISO8601 time range)
+ *   <li> 2007
+ *   <li> 2007-12  year, month
+ *   <li> 2007-120  year, day of year
+ *   <li> 2007-12-01  year, month, day
+ *   <li> 20071201 year, month, day
+ *   <li> 2007120 year, day-of-year
+ * </ul>
+ * https://en.wikipedia.org/wiki/ISO_8601#Time_intervals
+ * @param stringIn
+ * @param result if non-null should be an int[14] to provide storage to routine.
+ * @return int[14] with [Y,M,D,H,M,S,NS,Y,M,D,H,M,S,NS]
+ */
+function parseTimeRange(stringIn, result) {
+    parts = stringIn.split("/", 2);
+    ll= stringIn.length;
+    
+    if (parts.length === 1) { // check for Das2 string "to" keyword
+        temp= stringIn.split("to", 2);
+        if ( temp.length===2 ) {
+            temp[0]= temp[0].trim();
+            temp[1]= temp[1].trim();
+            parts= temp;
+            stringIn= parts[0]+"/"+parts[1];
+        }
+    }
+    if (parts.length === 1) {
+        if ( ll === 4) {
+            yr = parseInt(stringIn);
+            return [yr, 1, 1, 0, 0, 0, 0, yr + 1, 1, 1, 0, 0, 0, 0];
+        } else if (ll === 7) {
+            yr = parseInt(stringIn.substring(0, 4));
+            c = stringIn.substring(4, 5);
+            if (c >= '0' && c <= '9') {
+                doy = parseInt(stringIn.substring(4, 7));
+                return [yr, 1, doy, 0, 0, 0, 0, yr, 1, doy + 1, 0, 0, 0, 0];
+
+            } else {
+                month = parseInt(stringIn.substring(5, 7));
+                if (month === 12) {
+                    return [yr, 12, 1, 0, 0, 0, 0, yr + 1, 1, 1, 0, 0, 0, 0];
+                } else {
+                    return [yr, month, 1, 0, 0, 0, 0, yr, month + 1, 1, 0, 0, 0, 0];
+                }
+            }
+        } else if (ll === 8) {
+            yr = parseInt(stringIn.substring(0, 4));
+            c = stringIn.substring(4, 5);
+            if (c >= '0' && c <= '9') {
+                month = parseInt(stringIn.substring(4, 6));
+                day = parseInt(stringIn.substring(6, 8));
+                return [yr, month, day, 0, 0, 0, 0, yr, month, day + 1, 0, 0, 0, 0];
+            } else {
+                doy = parseInt(stringIn.substring(5, 8));
+                return [yr, 1, doy, 0, 0, 0, 0, yr, 1, doy + 1, 0, 0, 0, 0];
+            }
+        } else if (ll === 10) {
+            yr = parseInt(stringIn.substring(0, 4));
+            month = parseInt(stringIn.substring(5, 7));
+            day = parseInt(stringIn.substring(8, 10));
+            return [yr, month, day, 0, 0, 0, 0, yr, month, day + 1, 0, 0, 0, 0];
+        }
+    } else {
+        return parseISO8601Range(stringIn, result);
+    }
+}
+
+function isLeapYear(year) {
+    if (year < 1800 || year > 2400) {
+        alert("year must be between 1800 and 2400");
+    }
+    return (year % 4) === 0 && (year % 400 === 0 || year % 100 !== 0);
+}
+
+DAYS_IN_MONTH = [
+    [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 0],
+    [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 0]
+];
+
+DAY_OFFSET = [
+    [0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365],
+    [0, 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
+];
+
+/**
+ * normalize the decomposed time by expressing day of year and month
+ * and day of month, and moving hour="24" into the next day. This
+ * also handles day increment or decrements, by:<ul>
+ * <li>handle day=0 by decrementing month and adding the days in the new month.
+ * <li>handle day=32 by incrementing month.
+ * </ul>
+ * @param time 14 element array
+ */
+function normalizeTime(time,offset) {
+    if (time[3+offset] === 24) {
+        time[2+offset] += 1;
+        time[3+offset] = 0;
+    }
+    if (time[3+offset] > 24) {
+        throw new IllegalArgumentException("time[3] is greater than 24 (hours)");
+    }
+    if (time[1+offset] > 12) {
+        throw new IllegalArgumentException("time[1] is greater than 12 (months)");
+    }
+    if (time[1+offset] === 12 && time[2+offset] === 32) {
+        time[0+offset] = time[0+offset] + 1;
+        time[1+offset] = 1;
+        time[2+offset] = 1;
+        return;
+    }
+    leap = isLeapYear(time[0+offset]) ? 1 : 0;
+    if (time[2+offset] === 0) {
+        time[1+offset] = time[1+offset] - 1;
+        if (time[1+offset] === 0) {
+            time[0+offset] = time[0+offset] - 1;
+            time[1+offset] = 12;
+        }
+        time[2+offset] = DAYS_IN_MONTH[leap][time[1+offset]];
+    }
+    d = DAYS_IN_MONTH[leap][time[1+offset]];
+    while (time[2+offset] > d) {
+        time[1+offset]++;
+        time[2+offset] -= d;
+        d = DAYS_IN_MONTH[leap][time[1+offset]];
+        if (time[1+offset] > 12) {
+            throw new IllegalArgumentException("time["+(2+offset)+"] is too big");
+        }
+    }
+}
+
+/**
  * javascript doesn't support sprintf style formatting, so support this by hand.
  * @param num zero or positive number
  * @param size total number of digits, must be less than 10.
