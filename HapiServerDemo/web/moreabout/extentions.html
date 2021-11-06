@@ -1,0 +1,37 @@
+<html>
+    <head>
+        <title>About this server's extensions.</title>
+    </head>
+ <body>
+     <h1>x_colorLookup</h1>
+     <p>The goal is to provide a way that colors can be associated with the 
+         nominal data in the stream.  A map is provided from regular expression
+         to web color (color name or #RRGGBB). 
+     </p>
+     <code><pre>
+"x_colorLookup": {
+    "Fair":"SkyBlue",
+    "(?i).*cloud.*":"LightSteelBlue",
+    "(?i)overcast":"LigthGrey",
+    "(?i).*rain.*":"Green",
+    "(?i).*storm.*":"DarkGreen"
+}
+         </pre>
+     </code>
+         
+     <h2>To consider</h2>
+     <p>It might be nice to be able to mark values above or below a threshold,
+     to provide warnings or nominal conditions, as a UNH group has done on MMS.
+     So for this the tests might be instead of regular expressions, something 
+     like:<ul>
+         <li>"gt(100)"
+         <li>"gt(-1).and(le(1))"
+         <li>"eq(0)"
+         <li>"re((?i).*cloud.*)" -- regular expression match
+     </ul>
+     </p>
+    
+ </body>
+</html>
+    
+    
