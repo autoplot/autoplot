@@ -30,6 +30,11 @@ public final class HapiUtil {
     public static final String KEY_UNITS = "units";
     public static final String KEY_TYPE = "type";
     
+    /**
+     * extentions supported follow
+     */
+    public static final String KEY_X_COLOR_LOOKUP = "x_colorLookup";
+    
     private static void resolveRefRecursive( JSONObject definitions, JSONObject param ) throws JSONException {
         Iterator keys= param.keys();
         while ( keys.hasNext() ) {

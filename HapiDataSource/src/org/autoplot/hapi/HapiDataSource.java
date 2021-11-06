@@ -1,6 +1,7 @@
 
 package org.autoplot.hapi;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +37,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import org.das2.qds.buffer.BufferDataSet;
@@ -70,6 +73,8 @@ import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.fsm.FileStorageModel;
+import org.das2.graph.ColorUtil;
+import org.das2.qds.IDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
 import org.das2.qstream.TransferType;
@@ -305,6 +310,8 @@ public final class HapiDataSource extends AbstractDataSource {
          * date the parameter was last modified, or 0 if not known.
          */
         long modifiedDateMillis= 0;
+        
+        JSONObject parameter = null;
         
         /**
          * may contain hint for renderer, such as nnspectrogram
@@ -869,6 +876,21 @@ public final class HapiDataSource extends AbstractDataSource {
         }
         return b.toString();
     }
+    
+    Map<Datum,Color> lookupColorCache= new HashMap<>();
+    
+    private Color lookupColor( Map<Pattern,Color> lookup, Datum d ) {
+        Color c= lookupColorCache.get(d);
+        if ( c!=null ) return c;
+        for ( Entry<Pattern,Color> e: lookup.entrySet() ) {
+            Pattern p= e.getKey();
+            if ( p.matcher(d.toString()).matches() ) {
+                lookupColorCache.put( d, e.getValue() );
+                break;
+            }
+        }
+        return Color.GRAY;
+    }
             
     @Override
     public synchronized QDataSet getDataSet(ProgressMonitor monitor) throws Exception {
@@ -1107,6 +1129,36 @@ public final class HapiDataSource extends AbstractDataSource {
         }
         
         ds = repackage(ds,pds,null);
+        
+        // look up colors for nominal data
+        if ( ds.rank()==1 && ( pds[1].units instanceof EnumerationUnits ) ) {
+            JSONObject paramInfo= pds[1].parameter;
+            if ( paramInfo.has( HapiUtil.KEY_X_COLOR_LOOKUP ) ) {
+                JSONObject colorLookup= paramInfo.getJSONObject( HapiUtil.KEY_X_COLOR_LOOKUP );
+                QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
+                QDataSet dep0Min= Ops.subtract( dep0, cadence.divide(2) );
+                QDataSet dep0Max= Ops.add( dep0, cadence.divide(2) );
+                IDataSet colors= IDataSet.createRank1(ds.length());
+                Iterator iter= colorLookup.keys();
+                Map<Pattern,Color> pelookUp= new HashMap<>();
+                while ( iter.hasNext() ) {
+                    String k= (String)iter.next();
+                    try {
+                        Pattern p= Pattern.compile(k);
+                        pelookUp.put( p, ColorUtil.decodeColor(colorLookup.getString(k)) );
+                    } catch ( PatternSyntaxException e ) {
+                        logger.log( Level.WARNING, e.getMessage(), e );
+                    }
+                }
+                EnumerationUnits eu= (EnumerationUnits)pds[1].units;
+                for ( int i=0; i<ds.length(); i++ ) {
+                    Datum d= eu.createDatum(ds.slice(i).svalue());
+                    Color c= lookupColor( pelookUp, d );
+                    colors.putValue( i, c.getRGB() );
+                }
+                ds= Ops.bundle( dep0Min, dep0Max, colors, ds );
+            }
+        }
         
         Units u= (Units) ds.property(QDataSet.UNITS);
         if ( u!=null && u.toString().trim().length()>0 ) {
@@ -2389,6 +2441,9 @@ public final class HapiDataSource extends AbstractDataSource {
             if ( type.equals("") ) {
                 logger.log(Level.FINE, "type is not defined: {0}", name);
             }
+            
+            pds[i].parameter= jsonObjecti;
+            
             if ( type.equalsIgnoreCase("isotime") ) {
                 if ( !type.equals("isotime") ) {
                     logger.log(Level.WARNING, "isotime should not be capitalized: {0}", type);
