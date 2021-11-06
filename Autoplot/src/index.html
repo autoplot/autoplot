@@ -27,8 +27,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-11-04 r26198):</p>
+        <p>Bugfixes (2021-11-06 r26198):</p>
         <ul>
+            <li>Autoplot-based HAPI server properly formats string data into fixed-width field, trimming UTF-8 encoded Unicode characters.
             <li>2411: reducexWaveform allows reduction of entire packets and uses BIN_MIN and BIN_MAX.  Thanks, Bill!
             <li>2410: address bar inspect button becomes insensitive while editing a URI, so that people don't get confused when two editor windows pop up.  The
             <li>2409: append where two datasets have timetags of cdf_epoch and tt2000 would cause runtime exception.  Thanks, Sadie!
@@ -71,6 +72,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Support for x_colorLookup extension in HAPI support, which looks up color for nominal data.
+            <li>AutoplotServlet has blacklist to block out areas like "file:/var/uploads."
             <li>AutoplotServlet's ScriptGUIServlet calculates console output as well, progress bar is coming.
             <li>GrannyTextEditor shift+unicode char button will insert the unicode character, not the unicode escape sequence.  Thanks, Bob!
             <li>flatten supports rank 3 array of tables, to support Cassini RPWS data.
