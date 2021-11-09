@@ -539,7 +539,7 @@ public class UndoRedoSupport {
     /**
      * returns a label describing the undo operation, or null if the operation
      * doesn't exist.
-     * @return the level
+     * @return the label
      */
     public String getUndoLabel() {
         if ( stateStack.size()<2 ) return null; //first 99%
@@ -571,7 +571,7 @@ public class UndoRedoSupport {
     /**
      * returns a label describing the redo operation, or null if the operation
      * doesn't exist.
-     * @return 
+     * @return the label
      */
     public String getRedoLabel() {
         StateStackElement redo= redoStack.peekFirst();
