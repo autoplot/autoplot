@@ -218,12 +218,10 @@ public class UndoRedoSupport {
             
             StateStackElement elephant;
             
-            synchronized (this){
-                while ( level>0 ) {
-                    elephant = stateStack.removeLast();
-                    redoStack.add( 0, elephant );
-                    level=level-1;
-                }
+            while ( level>0 ) {
+                elephant = stateStack.removeLast();
+                redoStack.add( 0, elephant );
+                level=level-1;
             }
             
             elephant= stateStack.peekLast();
