@@ -524,9 +524,14 @@ public class UndoRedoSupport {
      * @return a human-readable description
      */
     public String getUndoDescription() {
+        if ( stateStack.size()<2 ) return null; //first 99%
         StateStackElement undo= stateStack.peekLast();
         if ( undo!=null ) {
-            return "Undo " + undo.docString;
+            if ( undo.equals(stateStack.peekFirst()) ) {
+                return null; //very unlucky case where another thread emptied stack
+            } else {
+                return "Undo " + undo.docString;
+            }
         } else {
             return null;
         }
@@ -537,9 +542,14 @@ public class UndoRedoSupport {
      * @return the level
      */
     public String getUndoLabel() {
+        if ( stateStack.size()<2 ) return null; //first 99%
         StateStackElement undo= stateStack.peekLast();
         if ( undo!=null ) {
-            return "Undo " + undo.deltaDesc;
+            if ( undo.equals(stateStack.peekFirst()) ) {
+                return null; //very unlucky case where another thread emptied stack
+            } else {
+                return "Undo " + undo.deltaDesc;
+            }
         } else {
             return null;
         }
