@@ -146,7 +146,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 LoggerManager.logPropertyChangeEvent(evt);                
                 if ( evt.getPropertyName().equals("status")
                         && "ready".equals(evt.getNewValue() ) ) {
-                    fireActionEvent( new ActionEvent(this,0,"ready") );
+                    //fireActionEvent( new ActionEvent(this,0,"ready") );
                 }
                 if ( evt.getPropertyName().equals(ChangesSupport.PROP_VALUEADJUSTING) && evt.getNewValue()==null ) { //put in state after atomtic operation
                     String description= (String) evt.getOldValue();

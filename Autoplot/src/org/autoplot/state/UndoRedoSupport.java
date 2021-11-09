@@ -3,8 +3,6 @@
  *
  * Created on August 8, 2007, 7:44 PM
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
  */
 package org.autoplot.state;
 
@@ -79,9 +77,9 @@ public class UndoRedoSupport {
         int lstateStackPos;
         List<StateStackElement> lstateStack;
         synchronized (this) {
-            lstateStackPos= stateStackPos;
             lstateStack= new ArrayList( stateStack );
         }
+        lstateStackPos= lstateStack.size();
 
         for (int i = lstateStackPos - 1; i > Math.max(0, lstateStackPos - 10); i--) {
             StateStackElement prevState = lstateStack.get(i);
@@ -128,12 +126,16 @@ public class UndoRedoSupport {
         }
     }
     
-    LinkedList<StateStackElement> stateStack = new LinkedList<>();
+    /**
+     * this is the stack of states, with the last element being the most recent state
+     */
+    private final LinkedList<StateStackElement> stateStack = new LinkedList<>();
     
     /**
-     * points at the last saved state index + 1;
+     * these are the states which were undone, so that undo can be redone.
      */
-    int stateStackPos = 0;
+    private final LinkedList<StateStackElement> redoStack = new LinkedList<>();
+    
     private String redoLabel = null;
     
     public static final String PROP_REDOLABEL = "redoLabel";
@@ -186,28 +188,37 @@ public class UndoRedoSupport {
      * reset the application to an old state from the state stack.
      * @param level the number of states to undo (1 is jump to the last state).
      */
-    public synchronized void undo(int level) {
+    public void undo(int level) {
         logger.log(Level.FINE, "undo {0}", level);
         String oldRedoLabel= getRedoLabel();
-        int oldDepth= stateStackPos;
-        stateStackPos -= level;
-        if (stateStackPos < 0) {
-            stateStackPos = 0;
-        }
-        if (stateStackPos > 0) {
-            StateStackElement elephant = stateStack.get(stateStackPos - 1);
+        
+        int oldDepth= stateStack.size();
+
+        if ( oldDepth>0 ) {
+            
+            StateStackElement elephant;
+            
+            synchronized (this){
+                while ( level>0 ) {
+                    elephant = stateStack.removeLast();
+                    redoStack.add( 0, elephant );
+                    level=level-1;
+                }
+            }
+            elephant = stateStack.removeLast();
+            
             ignoringUpdates = true;
             applicationModel.setRestoringState(true);
             applicationModel.restoreState(elephant.state);
             applicationModel.setRestoringState(false);
             ignoringUpdates = false;
             RequestProcessor.invokeLater( new Runnable() { public void run() {
-                AutoplotUtil.reloadAll( applicationModel.getDocumentModel() );
+                AutoplotUtil.reloadAll( applicationModel.getDom() );
             } } );
         }
         redoLabel= getRedoLabel();
-        propertyChangeSupport.firePropertyChange(PROP_REDOLABEL, oldRedoLabel, redoLabel);
-        propertyChangeSupport.firePropertyChange( PROP_DEPTH, oldDepth, stateStackPos );
+        propertyChangeSupport.firePropertyChange( PROP_REDOLABEL, oldRedoLabel, redoLabel );
+        propertyChangeSupport.firePropertyChange( PROP_DEPTH, oldDepth, oldDepth+1 );
 
     }
 
@@ -234,25 +245,24 @@ public class UndoRedoSupport {
     /**
      * redo the state change that was undone, popping up the state stack one position.
      */
-    public synchronized void redo() {
+    public void redo() {
         logger.fine("redo");        
         String oldRedoLabel= getRedoLabel();
-        int oldDepth= stateStackPos;
-        if (stateStackPos >= stateStack.size()) {
-            stateStackPos = stateStack.size() - 1;
-        }
-        if (stateStackPos < stateStack.size()) {
-            StateStackElement elephant = stateStack.get(stateStackPos);
+
+        int oldDepth= stateStack.size();
+        
+        if ( !redoStack.isEmpty() ) {
+            StateStackElement elephant = redoStack.pop();
             ignoringUpdates = true;
             applicationModel.setRestoringState(true);
             applicationModel.restoreState(elephant.state);
             applicationModel.setRestoringState(false);
             ignoringUpdates = false;
-            stateStackPos++;
+            stateStack.add(elephant);
         }
         redoLabel= getRedoLabel();
-        propertyChangeSupport.firePropertyChange(PROP_REDOLABEL, oldRedoLabel, redoLabel);
-        propertyChangeSupport.firePropertyChange( PROP_DEPTH, oldDepth, stateStackPos );
+        propertyChangeSupport.firePropertyChange( PROP_REDOLABEL, oldRedoLabel, redoLabel );
+        propertyChangeSupport.firePropertyChange( PROP_DEPTH, oldDepth, stateStack.size() );
     }
 
     /**
@@ -427,11 +437,10 @@ public class UndoRedoSupport {
     /**
      * remove old states from the bottom of the stack, adjusting stateStackPos as well.
      */
-    private synchronized void removeOldStates( ) {
+    private void removeOldStates( ) {
         int len=sizeLimit;
         while ( stateStack.size()>len ) {
             stateStack.remove(0);
-            stateStackPos--;
         }
     }
 
@@ -444,51 +453,46 @@ public class UndoRedoSupport {
         logger.log(Level.FINE, "pushState: {0}", label);
         synchronized ( this ) {
             if (ignoringUpdates) {
+                logger.info("ignoring updates in undo stack");
                 return;
             }
         }
         Application state = applicationModel.createState(false);
         BufferedImage thumb= applicationModel.getThumbnail(50);
-        int oldDepth;
-        int newDepth;
         
-        synchronized (this) {
-            StateStackElement elephant;
+        StateStackElement elephant;
 
-            if (stateStackPos > 0) {
-                elephant = stateStack.get(stateStackPos - 1);
-            } else {
-                elephant = null;
+        elephant = stateStack.peekLast();
+
+        if (elephant != null && state.equals(elephant.state)) {
+            return;
+        }
+        
+        int oldDepth= stateStack.size();
+        
+        String labelStr = "initial";
+        String docString= "initial state of application";
+        StateStackElement element= new StateStackElement( state, labelStr, docString );
+
+        if (elephant != null) {
+            List<Diff> diffss = elephant.state.diffs(state); //TODO: documentation/getDescription seem to be inverses.  All state changes should be described in the forward direction.
+            if ( diffss.isEmpty() ) return;
+            element= describeChanges( diffss, element );
+            if ( label!=null && element.deltaDesc.endsWith(" changes" ) ) {
+                element.deltaDesc= label;
             }
+        }
 
-            if (elephant != null && state.equals(elephant.state)) {
-                return;
-            }
-            String labelStr = "initial";
-            String docString= "initial state of application";
-            StateStackElement element= new StateStackElement( state, labelStr, docString );
+        element.thumb= thumb;
+        stateStack.add( element );
 
-            if (elephant != null) {
-                List<Diff> diffss = elephant.state.diffs(state); //TODO: documentation/getDescription seem to be inverses.  All state changes should be described in the forward direction.
-                if ( diffss.isEmpty() ) return;
-                element= describeChanges( diffss, element );
-                if ( label!=null && element.deltaDesc.endsWith(" changes" ) ) {
-                    element.deltaDesc= label;
-                }
-            }
+        int newDepth= stateStack.size();
+        
+        if ( label!=null ) {
+            redoStack.clear();
+        }
 
-            oldDepth= stateStackPos;
-
-            element.thumb= thumb;
-            stateStack.add(stateStackPos, element );
-
-            while (stateStack.size() > (1 + stateStackPos)) {
-                stateStack.removeLast();
-            }
-            stateStackPos++;
-            newDepth= stateStackPos;
-            removeOldStates();
-        } // synchronized(this)
+        removeOldStates();
 
         if ( saveStateDepth>0 ) {
             long t0= System.currentTimeMillis();
@@ -519,9 +523,10 @@ public class UndoRedoSupport {
      * get the longer description for the action, intended to be used for the tooltip.
      * @return a human-readable description
      */
-    public synchronized String getUndoDescription() {
-        if (stateStackPos > 1) {
-            return stateStack.get(stateStackPos - 1).docString;
+    public String getUndoDescription() {
+        StateStackElement undo= stateStack.peekLast();
+        if ( undo!=null ) {
+            return "Undo " + undo.docString;
         } else {
             return null;
         }
@@ -531,9 +536,10 @@ public class UndoRedoSupport {
      * doesn't exist.
      * @return the level
      */
-    public synchronized String getUndoLabel() {
-        if (stateStackPos > 1) {
-            return "Undo " + stateStack.get(stateStackPos - 1).deltaDesc;
+    public String getUndoLabel() {
+        StateStackElement undo= stateStack.peekLast();
+        if ( undo!=null ) {
+            return "Undo " + undo.deltaDesc;
         } else {
             return null;
         }
@@ -543,9 +549,10 @@ public class UndoRedoSupport {
      * get the longer description for the action, intended to be used for the tooltip.
      * @return
      */
-    public synchronized String getRedoDescription() {
-        if (stateStackPos < stateStack.size()) {
-            return stateStack.get(stateStackPos).docString;
+    public String getRedoDescription() {
+        StateStackElement redo= redoStack.peekFirst();
+        if ( redo!=null ) {
+            return "Redo " + redo.docString;
         } else {
             return null;
         }
@@ -556,9 +563,10 @@ public class UndoRedoSupport {
      * doesn't exist.
      * @return 
      */
-    public synchronized String getRedoLabel() {
-        if (stateStackPos < stateStack.size()) {
-            return "Redo " + stateStack.get(stateStackPos).deltaDesc;
+    public String getRedoLabel() {
+        StateStackElement redo= redoStack.peekFirst();
+        if ( redo!=null ) {
+            return "Redo " + redo.deltaDesc;
         } else {
             return null;
         }
@@ -571,9 +579,9 @@ public class UndoRedoSupport {
     public void resetHistory() {
         int oldDepth;
         synchronized (this) {
-            oldDepth= stateStackPos;
-            stateStack = new LinkedList<>();
-            stateStackPos = 0;
+            oldDepth= stateStack.size();
+            stateStack.clear();
+            redoStack.clear();
         }
         propertyChangeSupport.firePropertyChange( PROP_DEPTH, oldDepth, 0 );
     }
@@ -610,7 +618,7 @@ public class UndoRedoSupport {
      * @return the current depth.
      */
     public synchronized int getDepth() {
-        return stateStackPos;
+        return stateStack.size();
     }
 
     /**
