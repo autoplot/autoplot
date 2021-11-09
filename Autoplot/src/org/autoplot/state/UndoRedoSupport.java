@@ -124,6 +124,22 @@ public class UndoRedoSupport {
         public String toString() {
             return deltaDesc;
         }
+        
+        /**
+         * return the longer description used in tooltips.
+         * @return 
+         */
+        public String getDocString() {
+            return docString;
+        }
+        
+        /**
+         * return the shorter description of the change.
+         * @return 
+         */
+        public String getDeltaDesc() {
+            return deltaDesc;
+        }
     }
     
     /**
@@ -194,6 +210,10 @@ public class UndoRedoSupport {
         
         int oldDepth= stateStack.size();
 
+        if ( level>(oldDepth-1) ) {
+            throw new IllegalArgumentException("cannot undo so many levels");
+        }
+        
         if ( oldDepth>0 ) {
             
             StateStackElement elephant;
@@ -205,7 +225,10 @@ public class UndoRedoSupport {
                     level=level-1;
                 }
             }
-            elephant = stateStack.removeLast();
+            
+            elephant= stateStack.peekLast();
+            
+            assert elephant!=null;
             
             ignoringUpdates = true;
             applicationModel.setRestoringState(true);
