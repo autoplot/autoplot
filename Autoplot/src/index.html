@@ -29,6 +29,7 @@
                 
         <p>Bugfixes (2021-11-09 r26226):</p>
         <ul>
+            <li>GrannyTextRenderer custom painters were not be given the correct font for calculating boundaries.
             <li>Autoplot-based HAPI server properly formats string data into fixed-width field, trimming UTF-8 encoded Unicode characters.
             <li>undo/redo support reworked to avoid synchronized blocks that could hang Autoplot.  Thanks, Sadie!
             <li>2411: reducexWaveform allows reduction of entire packets and uses BIN_MIN and BIN_MAX.  Thanks, Bill!
@@ -73,8 +74,9 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>next expandToFill gaps is more manual and under control.
-            <li>Granny strings allow experimental !(painter;psym) to support drawing the legend with annotations.
+            <li>Granny editor supports psym control strings.
+            <li>expandToFill gaps is more manual and under control.  Thanks, Bill!
+            <li>Granny strings allow experimental !(painter;psym) to support drawing the legend with annotations.  Thanks Sadie and others who have asked for this!
             <li>Support for x_colorLookup extension in HAPI support, which looks up color for nominal data.
             <li>AutoplotServlet has blacklist to block out areas like "file:/var/uploads."
             <li>AutoplotServlet's ScriptGUIServlet calculates console output as well, progress bar is coming.
