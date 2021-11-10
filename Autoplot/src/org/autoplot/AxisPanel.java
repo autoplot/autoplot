@@ -45,6 +45,7 @@ import org.autoplot.dom.Plot;
 import org.autoplot.dom.TimeSeriesBrowseController;
 import org.autoplot.datasource.TimeRangeEditor;
 import org.autoplot.dom.DataSourceController;
+import org.das2.graph.GraphUtil;
 import org.das2.util.GrannyTextEditor;
 
 /**
@@ -906,7 +907,7 @@ public class AxisPanel extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     private void addEditGrannyText( JTextField textField ) {        
-        GrannyTextEditor gte= new GrannyTextEditor();
+        GrannyTextEditor gte= GraphUtil.newGrannyTextEditor();
         gte.setValue( textField.getText() );
         if ( JOptionPane.OK_OPTION==
                 JOptionPane.showConfirmDialog( this, gte, "Granny Text Editor", JOptionPane.OK_CANCEL_OPTION ) ) {
