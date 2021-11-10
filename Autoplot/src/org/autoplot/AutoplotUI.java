@@ -181,6 +181,8 @@ import org.autoplot.util.FontStringSchemeEditor;
 import org.autoplot.util.LayoutStringSchemeEditor;
 import org.autoplot.util.PlotDataMashupResolver;
 import org.das2.components.propertyeditor.TickValuesStringSchemeEditor;
+import org.das2.graph.DasAnnotation;
+import org.das2.graph.GraphUtil;
 import org.das2.util.GrannyTextEditor;
 import org.python.util.PythonInterpreter;
 import org.w3c.dom.Document;
@@ -1201,10 +1203,10 @@ public final class AutoplotUI extends javax.swing.JFrame {
             addTools();
             PropertyEditor.addStringEditor("tickValues", new TickValuesStringSchemeEditor() );
             PropertyEditor.addStringEditor("autoRangeHints", new AutoRangeHintsStringSchemeEditor() );
-            PropertyEditor.addStringEditor("label", new GrannyTextEditor() );
-            PropertyEditor.addStringEditor("title", new GrannyTextEditor() );
-            PropertyEditor.addStringEditor("org.autoplot.dom.Annotation","text", new GrannyTextEditor() ); //TODO: this will surely cause problems...
-            PropertyEditor.addStringEditor("legendLabel", new GrannyTextEditor() ); 
+            PropertyEditor.addStringEditor("label", GraphUtil.newGrannyTextEditor() );
+            PropertyEditor.addStringEditor("title", GraphUtil.newGrannyTextEditor() );
+            PropertyEditor.addStringEditor("org.autoplot.dom.Annotation","text", GraphUtil.newGrannyTextEditor() ); //TODO: this will surely cause problems...
+            PropertyEditor.addStringEditor("legendLabel", GraphUtil.newGrannyTextEditor() ); 
             PropertyEditor.addStringEditor("colorbarColumnPosition", new LayoutStringSchemeEditor(true, "H") );
             PropertyEditor.addStringEditor("top", new LayoutStringSchemeEditor(false, "T") );
             PropertyEditor.addStringEditor("bottom", new LayoutStringSchemeEditor(false, "B") );
