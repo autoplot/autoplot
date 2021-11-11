@@ -29,6 +29,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.system.RequestProcessor;
@@ -89,7 +90,10 @@ public class UndoRedoSupport {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     org.das2.util.LoggerManager.logGuiEvent(e);
-                    undo(ii);
+                    Runnable run= () -> {
+                        undo(ii);
+                    };
+                    new Thread( run, "undoLaterThread" ).start();
                 }
             });
             item.setToolTipText(prevState.docString);
@@ -182,11 +186,8 @@ public class UndoRedoSupport {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        undo();
-                    }
+                Runnable run= () -> {
+                    undo();
                 };
                 new Thread( run, "undoLaterThread" ).start();
             }
@@ -208,6 +209,9 @@ public class UndoRedoSupport {
         logger.log(Level.FINE, "undo {0}", level);
         String oldRedoLabel= getRedoLabel();
         
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            logger.warning("undo called from event thread");
+        }
         int oldDepth= stateStack.size();
 
         if ( level>(oldDepth-1) ) {
@@ -233,9 +237,9 @@ public class UndoRedoSupport {
             applicationModel.restoreState(elephant.state);
             applicationModel.setRestoringState(false);
             ignoringUpdates = false;
-            RequestProcessor.invokeLater( new Runnable() { public void run() {
+            RequestProcessor.invokeLater(() -> {
                 AutoplotUtil.reloadAll( applicationModel.getDom() );
-            } } );
+            });
         }
         redoLabel= getRedoLabel();
         propertyChangeSupport.firePropertyChange( PROP_REDOLABEL, oldRedoLabel, redoLabel );
@@ -252,11 +256,8 @@ public class UndoRedoSupport {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        redo();
-                    }
+                Runnable run= () -> {
+                    redo();
                 };
                 new Thread( run, "redoLaterThread" ).start();
             }
