@@ -3,7 +3,6 @@ package org.autoplot.util;
 
 import java.awt.Component;
 import java.util.Collections;
-import org.das2.qds.filters.CollapseFilterEditorPanel;
 import org.das2.util.StringSchemeEditor;
 
 /**
