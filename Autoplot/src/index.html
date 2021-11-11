@@ -29,12 +29,14 @@
                 
         <p>Bugfixes (2021-11-09 r26226):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2413">2413</a>: RENDER_TYPE in inline URI isn't handled properly.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2409">2409</a>: append where two datasets have different fill values is handled properly.  Thanks, Sadie!
             <li>GrannyTextRenderer custom painters were not given the correct font for calculating boundaries.
             <li>Autoplot-based HAPI server properly formats string data into fixed-width field, trimming UTF-8 encoded Unicode characters.
             <li>undo/redo support reworked to avoid synchronized blocks that could hang Autoplot.  Thanks, Sadie!
-            <li>2411: reducexWaveform allows reduction of entire packets and uses BIN_MIN and BIN_MAX.  Thanks, Bill!
-            <li>2410: address bar inspect button becomes insensitive while editing a URI, so that people don't get confused when two editor windows pop up.  The
-            <li>2409: append where two datasets have timetags of cdf_epoch and tt2000 would cause runtime exception.  Thanks, Sadie!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2411">2411</a>: reducexWaveform allows reduction of entire packets and uses BIN_MIN and BIN_MAX.  Thanks, Bill!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2410">2410</a>: address bar inspect button becomes insensitive while editing a URI, so that people don't get confused when two editor windows pop up.  The
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2409">2409</a>: append where two datasets have timetags of cdf_epoch and tt2000 would cause runtime exception.  Thanks, Sadie!
             <li>changes to support pure-Java Autoplot-based Das2Server.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">rfe758</a>: Granny Text Editor button added to "add annotation" dialog.
             <li>flatten rank 3 join code wasn't pushed into Git for the devel release, whoops...
