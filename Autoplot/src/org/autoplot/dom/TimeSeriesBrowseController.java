@@ -281,8 +281,16 @@ public class TimeSeriesBrowseController {
      */
     protected void setup( boolean valueWasAdjusting ) {
         logger.log(Level.FINE, "setup({0})", valueWasAdjusting);
+        
+        TimeSeriesBrowse tsb= dataSourceController.getTsb();
+        final DatumRange localTimeRange= tsb==null ? null : tsb.getTimeRange();
+                
         if ( p!=null && !valueWasAdjusting ) {
-            this.xAxis.setDatumRange( dataSourceController.getTsb().getTimeRange() );
+            if ( localTimeRange==null ) {
+                logger.warning("localTimeRange is null, leaving");
+                return;
+            }
+            this.xAxis.setDatumRange( localTimeRange );
             this.domPlot.getXaxis().setAutoRange(false);
         }
         
@@ -290,7 +298,7 @@ public class TimeSeriesBrowseController {
         if (setTsbInitialResolution) {
             try {
                 changesSupport.performingChange( TimeSeriesBrowseController.this, PENDING_AXIS_DIRTY );
-                DatumRange tr = dataSourceController.getTsb().getTimeRange();
+                DatumRange tr = localTimeRange;
                 if ( tr==null ) tr= this.domPlot.getXaxis().getRange();
                 this.setTimeRange( tr );
                 if ( this.domPlot.getXaxis().isAutoRange() && !valueWasAdjusting ) {
