@@ -20,7 +20,7 @@ import org.das2.components.propertyeditor.EnumerationEditor;
 import org.das2.graph.AnchorPosition;
 import org.das2.graph.BorderType;
 import org.das2.graph.GraphUtil;
-import org.das2.util.GrannyTextEditor;
+import org.das2.components.GrannyTextEditor;
 
 /**
  *

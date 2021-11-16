@@ -46,7 +46,7 @@ import org.autoplot.dom.TimeSeriesBrowseController;
 import org.autoplot.datasource.TimeRangeEditor;
 import org.autoplot.dom.DataSourceController;
 import org.das2.graph.GraphUtil;
-import org.das2.util.GrannyTextEditor;
+import org.das2.components.GrannyTextEditor;
 
 /**
  * Panel for controlling the axes of the current focus plot.

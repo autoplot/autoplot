@@ -183,7 +183,7 @@ import org.autoplot.util.PlotDataMashupResolver;
 import org.das2.components.propertyeditor.TickValuesStringSchemeEditor;
 import org.das2.graph.DasAnnotation;
 import org.das2.graph.GraphUtil;
-import org.das2.util.GrannyTextEditor;
+import org.das2.components.GrannyTextEditor;
 import org.python.util.PythonInterpreter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
