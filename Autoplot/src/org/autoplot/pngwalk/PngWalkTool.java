@@ -164,10 +164,32 @@ public final class PngWalkTool extends javax.swing.JPanel {
      */
     public static final String PREF_LAST_EXPORT= "pngWalkLastExport";
 
+    private static final String DEFAULT_BOOKMARKS = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><bookmark-list version=\"1.1\">    " +
+            "<bookmark-folder remoteUrl=\"http://autoplot.org/git/pngwalks.xml\">" +
+            "<title>Demos</title>" +
+            "<bookmark-list>" +
+            "    <bookmark>" +
+            "        <title>POLAR/VIS Images</title>" +
+            "        <uri>pngwalk:http://vis.physics.uiowa.edu/survey/1996/04-apr/03/images/VIS_$Y_$m_$d_$H_$M_$S_EC.PNG</uri>" +
+            "        <description>Images from the POLAR/VIS instrument</description>" +
+            "    </bookmark>" +
+            "    <bookmark>" +
+            "        <title>RBSP Emfisis HFR-WFR Orbits</title>" +
+            "        <uri>pngwalk:https://emfisis.physics.uiowa.edu/pngwalk/RBSP-A/HFR-WFR_orbit/product_$(o,id=rbspa-pp).png</uri>" +
+            "    </bookmark>" +
+            "    <bookmark>" +
+            "        <title>RBSP-A MagEIS Combined Spectra</title>" +
+            "        <uri>pngwalk:https://www.rbsp-ect.lanl.gov/data_pub/rbspa/ect/level2/combined-elec/rbspa_ect_L2-elec_$Y$m$d_v.1.0.0.png</uri>" +
+            "    </bookmark>" +
+            "</bookmark-list>" +
+            "</bookmark-folder>" +
+            "</bookmark-list>";
+
+    
     public PngWalkView[] views;
     TearoffTabbedPane tabs;
     
-    transient WalkImageSequence seq;
+    WalkImageSequence seq;
     
     JMenu navMenu;
     
@@ -188,6 +210,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
     private String product; // the product
     private String baseurl; // the base url
+    private String qcturl;  // the url for quality control data.
+    private String pwd=null; // the location of the .pngwalk file, if used, or null.
     
     public static void main(String[] args) {
 
@@ -237,8 +261,10 @@ public final class PngWalkTool extends javax.swing.JPanel {
     /**
      * returns a map containing data from the .pngwalk file.
      * <ul>
-     * <li>product
-     * <li>template
+     * <li>baseurl - the location of the png images
+     * <li>product - the base used to create file names &lt;product&gt;_$Y$m$d.png
+     * <li>template - the template for files, like product_$Y$m$d.png
+     * <li>pwd - the location of the .pngwalk file.
      * </ul>
      * @param template
      * @return the map
@@ -248,6 +274,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
         InputStream in=null;
         String product= "";
         String baseurl= "";
+        String pwd="";
+        String qcturl= "";
         try {
             Properties p= new Properties();
             if ( split.file==null ) {
@@ -259,6 +287,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
             p.load( in );
             String vers= p.getProperty("version");
             if ( vers==null || vers.trim().length()==0 ) vers=""; else vers="_"+vers;
+            
+            pwd= split.path; // pwd is the location of the pngwalk file, which could be different than the template.
+            
             baseurl= p.getProperty("baseurl","."); // baseurl is needed so that pngwalks can be used out-of-context, for example when a browser downloads the file and hands it off to Autoplot.
             if ( !baseurl.equals(".") ) {
                 if ( !baseurl.endsWith("/") ) {
@@ -266,6 +297,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 }
                 split.path=baseurl;
             }
+            
+            qcturl= p.getProperty("qcturl",baseurl); // allow the qc data to come from a different place
+            
             String t;
             if ( !p.getProperty("filePattern","").equals("") ) {
                 // names were specified in the batch file.
@@ -293,6 +327,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
         result.put( "template", template );
         result.put( "product", product );
         result.put( "baseurl", baseurl );
+        result.put( "qcturl", qcturl );
+        result.put( "pwd", pwd );
         return result;
 
     }
@@ -330,6 +366,18 @@ public final class PngWalkTool extends javax.swing.JPanel {
         return baseurl;
     }
     
+    private void loadPngwalkFile( String file ) {
+        Map<String,String> map= readPngwalkFile(file);
+        product= map.get("product");
+        baseurl= map.get("baseurl");
+        qcturl= map.get("qcturl");
+        pwd= map.get("pwd");
+        baseurl= checkRelativeBaseurl( baseurl, file, product );
+        qcturl= checkRelativeBaseurl( qcturl, pwd, product );
+        String template= map.get("template");  
+        this.setTemplate(template); 
+    }
+    
     /**
      * initialize a new PNGWalkTool with the given template.  
      * @param template the template, such as http://autoplot.org/data/pngwalk/product_$Y$m$d.vap
@@ -344,42 +392,20 @@ public final class PngWalkTool extends javax.swing.JPanel {
         if ( template!=null ) {
             URISplit split= URISplit.parse(template);
             if ( split.file.endsWith(".pngwalk") ) {
-                Map<String,String> map= readPngwalkFile(template);
-                tool.product= map.get("product");
-                tool.baseurl= map.get("baseurl");
-                tool.baseurl= checkRelativeBaseurl(tool.baseurl, template, tool.product );
-                template= map.get("template");
+                tool.loadPngwalkFile( template );
             } else {
                 tool.product= "";
                 tool.baseurl= "";
+                tool.pwd= split.path;
+                tool.setTemplate(template);
             }
-            tool.setTemplate(template);
+            
         } else {
             tool.product= "";
             tool.baseurl= "";
         }
 
-        String sdeft= "<?xml version=\"1.0\" encoding=\"UTF-8\"?><bookmark-list version=\"1.1\">    " +
-        "<bookmark-folder remoteUrl=\"http://autoplot.org/git/pngwalks.xml\">" +
-        "<title>Demos</title>" +
-        "<bookmark-list>" +
-        "    <bookmark>" +
-        "        <title>POLAR/VIS Images</title>" +
-        "        <uri>pngwalk:http://vis.physics.uiowa.edu/survey/1996/04-apr/03/images/VIS_$Y_$m_$d_$H_$M_$S_EC.PNG</uri>" +
-        "        <description>Images from the POLAR/VIS instrument</description>" +
-        "    </bookmark>" +
-        "    <bookmark>" +
-        "        <title>RBSP Emfisis HFR-WFR Orbits</title>" +
-        "        <uri>pngwalk:http://emfisis.physics.uiowa.edu/pngwalk/RBSP-A/HFR-WFR_orbit/product_$(o,id=rbspa-pp).png</uri>" +
-        "    </bookmark>" +
-        "    <bookmark>" +
-        "        <title>RBSP-A MagEIS Combined Spectra</title>" +
-        "        <uri>pngwalk:https://www.rbsp-ect.lanl.gov/data_pub/rbspa/ect/level2/combined-elec/rbspa_ect_L2-elec_$Y$m$d_v.1.0.0.png</uri>" +
-        "    </bookmark>" +
-        "</bookmark-list>" +
-    "</bookmark-folder>" +
-"</bookmark-list>";
-
+        String sdeft= DEFAULT_BOOKMARKS;
 
         List<Bookmark> deft=null;
         try {
@@ -416,7 +442,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
         return tool;
     }
-
+    
     private static void addFileEnabler( final PngWalkTool tool, final Window parent ) {
         PngWalkTool.ActionEnabler enabler= new PngWalkTool.ActionEnabler() {
             @Override
@@ -1103,13 +1129,10 @@ public final class PngWalkTool extends javax.swing.JPanel {
             public void actionPerformed( ActionEvent ev ) {
                 String template= dataSetSelector1.getValue();
                 if ( template.endsWith(".pngwalk") ) {
-                    Map<String,String> m= readPngwalkFile(template);
-                    template= m.get("template");
-                    product= m.get("product");
-                    baseurl= m.get("baseurl");
-                    baseurl= checkRelativeBaseurl(baseurl, template, product );
+                    loadPngwalkFile( template );
+                } else {
+                    setTemplate(template);
                 }
-                setTemplate(template);
             }
         });
 
@@ -1184,7 +1207,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         nextButton.requestFocus();
 
         if (isQualityControlEnabled()) {
-            qcPanel = new QualityControlPanel();
+            qcPanel = new QualityControlPanel(this);
             JSplitPane qcPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, tabs, qcPanel);
             qcPane.setResizeWeight(1.0);
             pngsPanel.add(qcPane);
@@ -1485,10 +1508,30 @@ public final class PngWalkTool extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * get the template used to describe the files in the pngwalk.
+     * @return the template used to describe the files in the pngwalk.
+     */
     public String getTemplate() {
         return seq.getTemplate();
     }
+    
+    /**
+     * return the present working directory of the .pngwalk file (if used).
+     * @return the present working directory of the .pngwalk file (if used).
+     */
+    public String getPwd() {
+        return pwd;
+    }
 
+    /**
+     * return the path for the quality control data.
+     * @return 
+     */
+    public String getQCTUrl() {
+        return qcturl;
+    }
+    
     protected int thumbnailSize = 100;
     public static final String PROP_THUMBNAILSIZE = "thumbnailSize";
 
@@ -1655,7 +1698,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
      */
     public void startQC() {
         if ( !isQualityControlEnabled() ) {
-            qcPanel= new QualityControlPanel();
+            qcPanel= new QualityControlPanel(this);
             tabs.add( "Quality Control", qcPanel );
             if ( seq!=null ) {
                 qcPanel.setWalkImageSequece(seq);
@@ -2276,11 +2319,10 @@ public final class PngWalkTool extends javax.swing.JPanel {
         String t= dataSetSelector1.getValue();
         
         if ( t.endsWith(".pngwalk") ) {
-            Map<String,String> m= readPngwalkFile(t);
-            t= m.get("template");
-            baseurl= checkRelativeBaseurl(baseurl, t, m.get("product") );
+            loadPngwalkFile(t);
+        } else {
+            setTemplate( t );
         }
-        setTemplate( t );
         nextButton.requestFocus();
     }//GEN-LAST:event_dataSetSelector1ActionPerformed
 

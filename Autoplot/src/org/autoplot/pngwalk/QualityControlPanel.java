@@ -34,7 +34,7 @@ import org.autoplot.datasource.DataSetURI;
 import org.das2.util.LoggerManager;
 
 /**
- *
+ * Panel and the facility for adding annotations to images.
  * @author Ed Jackson
  */
 public class QualityControlPanel extends javax.swing.JPanel {
@@ -43,11 +43,16 @@ public class QualityControlPanel extends javax.swing.JPanel {
     public static final String KEY_QUALITY_CONTROL_URI = "QualityControlURI";
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.pngwalk");
-    
-    /** Creates new form QualityControlPanel */
-    public QualityControlPanel() {
-        initComponents();
 
+    private final PngWalkTool tool;
+    
+    /** Creates new form QualityControlPanel
+     * @param tool the PngWalkTool using this panel.
+     */
+    public QualityControlPanel( PngWalkTool tool ) {
+        initComponents();
+        this.tool= tool;
+        
         // Since we're supporting JRE 1.5, we can't use ButtonGroup.clearSelection()
         // 1.5 and earlier don't allow you to clear a button group, so we hack it with an invisible button
         nullRadioButton = new JRadioButton();
@@ -161,9 +166,14 @@ public class QualityControlPanel extends javax.swing.JPanel {
             try {
                 Properties sequenceProperties;
                 sequenceProperties = new Properties();
-                String template= walkImageSequence.getTemplate();
-                int i= WalkUtil.splitIndex(template);
-                String path= template.substring(0,i);
+                String path;
+                if ( tool==null ) {
+                    String template= walkImageSequence.getTemplate();
+                    int i= WalkUtil.splitIndex(template);
+                    path= template.substring(0,i);
+                } else {
+                    path= tool.getQCTUrl();
+                }
                 URI fsRoot = DataSetURI.getResourceURI(path);
                 FileSystem tfs = FileSystem.create(fsRoot);
                 FileObject propsFile = tfs.getFileObject("sequence.properties");
@@ -231,39 +241,6 @@ public class QualityControlPanel extends javax.swing.JPanel {
             }
         }
     }
-//
-//    else if (e.getPropertyName().equals(WalkImage.PROP_BADGE_CHANGE)) {
-//            switch( (QualityControlRecord.Status)e.getOldValue()) {
-//                case OK:
-//                    qcOK--;
-//                    break;
-//                case PROBLEM:
-//                    qcProb--;
-//                    break;
-//                case IGNORE:
-//                    qcIgn--;
-//                    break;
-//                case UNKNOWN:
-//                    qcUnknown--;
-//                    break;
-//            }
-//
-//            switch( (QualityControlRecord.Status)e.getNewValue()) {
-//                case OK:
-//                    qcOK++;
-//                    break;
-//                case PROBLEM:
-//                    qcProb++;
-//                    break;
-//                case IGNORE:
-//                    qcIgn++;
-//                    break;
-//                case UNKNOWN:
-//                    qcUnknown++;
-//                    break;
-//            }
-//            pcs.firePropertyChange(PROP_BADGE_CHANGE, -1, displayImages.indexOf(e.getSource()));
-//        }
 
     /* This is temporary for testing */
     public void setPreviousCommentText(String txt) {
@@ -635,7 +612,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
 
     public static void main(String[] args) {
         JFrame f = new JFrame();
-        f.add(new QualityControlPanel());
+        f.add(new QualityControlPanel(null));
         f.pack();
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setVisible(true);
