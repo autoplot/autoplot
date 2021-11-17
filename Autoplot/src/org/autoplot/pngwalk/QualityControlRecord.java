@@ -398,6 +398,9 @@ public class QualityControlRecord {
                 serializer.write(doc, output);
 
                 out.close();
+                
+                write.commit( "Autoplot PNGWalkTool update" );
+                
             } else {
                 throw new IOException("file system is not writable: "+recordFile);
             }
@@ -408,6 +411,7 @@ public class QualityControlRecord {
                 if ( !oldCap.delete() ) {
                     System.err.println("here 123545");
                 }
+                oldCap.commit("status changed");
             }
 
         } catch(RuntimeException ex) {
