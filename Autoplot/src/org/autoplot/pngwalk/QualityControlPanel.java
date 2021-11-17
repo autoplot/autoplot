@@ -173,6 +173,11 @@ public class QualityControlPanel extends javax.swing.JPanel {
                     path= template.substring(0,i);
                 } else {
                     path= tool.getQCTUrl();
+                    if ( path==null ) {
+                        String template= walkImageSequence.getTemplate();
+                        int i= WalkUtil.splitIndex(template);
+                        path= template.substring(0,i);
+                    }
                 }
                 URI fsRoot = DataSetURI.getResourceURI(path);
                 FileSystem tfs = FileSystem.create(fsRoot);
