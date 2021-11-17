@@ -27,8 +27,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-11-13 r26226):</p>
+        <p>Bugfixes (2021-11-16 rr26241):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2409">2409</a>: Old bug where append( trim, trim ) wouldn't account for offsets post-trim is fixed.  Thanks, Sadie!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/143/">0143</a>: account for timetag cadence in metadata tab, so rapid MMS timetags can be distinguished.  Thanks, Ivar!
             <li><a href="https://github.com/das-developers/das2java/issues/22">22</a>: Annotation "point at" mouse drag action didn't paint properly.  Thanks, Ali!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2413">2413</a>: RENDER_TYPE in inline URI isn't handled properly.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2409">2409</a>: append where two datasets have different fill values is handled properly.  Thanks, Sadie!
@@ -77,6 +79,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>experiment allowing writes with GitHub-based FileSystems with a local clone.
+            <li>qcturl property allows the Quality Control files to be written to another place, so that read-only pngwalks can be annotated.
             <li>OdlParser matured to start supporting .sts files.
             <li>Granny editor supports img control strings for inserting images.
             <li>Granny editor supports psym control strings for creating legends.
