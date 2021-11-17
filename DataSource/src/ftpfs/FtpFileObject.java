@@ -126,6 +126,12 @@ public class FtpFileObject extends WebFileObject {
             }
             return FtpFileObject.this.ftpfs.delete(FtpFileObject.this);
         }
+
+        @Override
+        public boolean commit(String message) throws IOException {
+            logger.info("commit has no effect");
+            return true;
+        }
     };
 
     @Override
