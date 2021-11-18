@@ -1001,9 +1001,6 @@ public final class PngWalkTool extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);        
                 JOptionPane.showMessageDialog( tool, "This has been moved to Tools menu" );
-                if ( !PngWalkTool.isQualityControlEnabled() ) {
-                    tool.startQC();
-                }
             }
         });
         qc0.setToolTipText("Quality Control Tool has been moved to the Tools menu.");
@@ -1029,9 +1026,6 @@ public final class PngWalkTool extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);        
                 JOptionPane.showMessageDialog( tool, "This has been moved to Tools menu" );
-                if ( !tool.isDigitizerEnabled() ) {
-                    tool.startDigitizer();
-                }
             }
         });
         dg0.setToolTipText("Start up the Digitizer that receives pairs from the single view.  See http://autoplot.org/richPng.");
