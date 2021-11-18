@@ -66,7 +66,7 @@
                   <Group type="103" groupAlignment="1" attributes="0">
                       <Component id="saveButton" min="-2" pref="69" max="-2" attributes="0"/>
                       <Group type="102" alignment="1" attributes="0">
-                          <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                          <Component id="okSaveNextButton" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="loginButton" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -87,7 +87,7 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="okRadioButton" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="loginButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="okSaveNextButton" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="problemRadioButton" min="-2" max="-2" attributes="0"/>
@@ -109,11 +109,7 @@
             <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="OK"/>
             <Property name="toolTipText" type="java.lang.String" value="Submit for further processing"/>
-            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="okRadioButtonActionPerformed"/>
-          </Events>
         </Component>
         <Component class="javax.swing.JRadioButton" name="problemRadioButton">
           <Properties>
@@ -124,9 +120,6 @@
             <Property name="toolTipText" type="java.lang.String" value="Send back for reprocessing"/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="problemRadioButtonActionPerformed"/>
-          </Events>
         </Component>
         <Component class="javax.swing.JRadioButton" name="ignoreRadioButton">
           <Properties>
@@ -137,9 +130,6 @@
             <Property name="toolTipText" type="java.lang.String" value="Do nothing further"/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ignoreRadioButtonActionPerformed"/>
-          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="saveButton">
           <Properties>
@@ -171,16 +161,16 @@
             <Property name="toolTipText" type="java.lang.String" value="reading sequence.properties..."/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JButton" name="jButton1">
+        <Component class="javax.swing.JButton" name="okSaveNextButton">
           <Properties>
             <Property name="text" type="java.lang.String" value="OK Save Next"/>
             <Property name="toolTipText" type="java.lang.String" value="Mark as OK, Save, and advance to next image.  Ctrl+Enter can be used as well."/>
           </Properties>
           <BindingProperties>
-            <BindingProperty name="enabled" source="okRadioButton" sourcePath="${enabled}" target="jButton1" targetPath="enabled" updateStrategy="0" immediately="false"/>
+            <BindingProperty name="enabled" source="okRadioButton" sourcePath="${enabled}" target="okSaveNextButton" targetPath="enabled" updateStrategy="0" immediately="false"/>
           </BindingProperties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="okSaveNextButtonActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>

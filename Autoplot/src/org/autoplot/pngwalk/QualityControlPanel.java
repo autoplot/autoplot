@@ -57,14 +57,11 @@ public class QualityControlPanel extends javax.swing.JPanel {
         // 1.5 and earlier don't allow you to clear a button group, so we hack it with an invisible button
         nullRadioButton = new JRadioButton();
         statusButtonGroup.add(nullRadioButton);  //add to button group, but not to UI
-        ItemListener l= new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if ( okRadioButton.isSelected() || problemRadioButton.isSelected() || ignoreRadioButton.isSelected() ) {
-                    saveButton.setEnabled(true);
-                } else {
-                    saveButton.setEnabled(false);
-                }
+        ItemListener l= (ItemEvent e) -> {
+            if ( okRadioButton.isSelected() || problemRadioButton.isSelected() || ignoreRadioButton.isSelected() ) {
+                saveButton.setEnabled(true);
+            } else {
+                saveButton.setEnabled(false);
             }
         };
         nullRadioButton.addItemListener(l);
@@ -73,13 +70,10 @@ public class QualityControlPanel extends javax.swing.JPanel {
         ignoreRadioButton.addItemListener(l);
         statusButtonGroup.setSelected(nullRadioButton.getModel(), true);
         
-        previousCommentEditorPane.addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent e) {
-                if ( e.getEventType()==HyperlinkEvent.EventType.ACTIVATED ) {
-                    String t= qcRecord.doCopyLink(e);
-                    newCommentTextArea.insert( t, newCommentTextArea.getCaretPosition() );
-                }
+        previousCommentEditorPane.addHyperlinkListener((HyperlinkEvent e) -> {
+            if ( e.getEventType()==HyperlinkEvent.EventType.ACTIVATED ) {
+                String t= qcRecord.doCopyLink(e);
+                newCommentTextArea.insert( t, newCommentTextArea.getCaretPosition() );
             }
         });
 
@@ -242,7 +236,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
                 
 
             } catch (CancelledOperationException ex) {
-                return;
+                logger.log( Level.INFO, ex.getMessage(), ex );
             }
         }
     }
@@ -272,7 +266,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
         saveButton = new javax.swing.JButton();
         loginButton = new javax.swing.JButton();
         sequencePropertiesHost = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        okSaveNextButton = new javax.swing.JButton();
         commentSplitPane = new javax.swing.JSplitPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         previousCommentEditorPane = new javax.swing.JEditorPane();
@@ -291,32 +285,16 @@ public class QualityControlPanel extends javax.swing.JPanel {
         okRadioButton.setSelected(true);
         okRadioButton.setText("OK");
         okRadioButton.setToolTipText("Submit for further processing");
-        okRadioButton.setEnabled(false);
-        okRadioButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                okRadioButtonActionPerformed(evt);
-            }
-        });
 
         statusButtonGroup.add(problemRadioButton);
         problemRadioButton.setText("Problem");
         problemRadioButton.setToolTipText("Send back for reprocessing");
         problemRadioButton.setEnabled(false);
-        problemRadioButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                problemRadioButtonActionPerformed(evt);
-            }
-        });
 
         statusButtonGroup.add(ignoreRadioButton);
         ignoreRadioButton.setText("Ignore");
         ignoreRadioButton.setToolTipText("Do nothing further");
         ignoreRadioButton.setEnabled(false);
-        ignoreRadioButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ignoreRadioButtonActionPerformed(evt);
-            }
-        });
 
         saveButton.setText("Save");
         saveButton.setToolTipText("Save the record to disk");
@@ -339,15 +317,15 @@ public class QualityControlPanel extends javax.swing.JPanel {
         sequencePropertiesHost.setText("reading sequence.properties...");
         sequencePropertiesHost.setToolTipText("reading sequence.properties...");
 
-        jButton1.setText("OK Save Next");
-        jButton1.setToolTipText("Mark as OK, Save, and advance to next image.  Ctrl+Enter can be used as well.");
+        okSaveNextButton.setText("OK Save Next");
+        okSaveNextButton.setToolTipText("Mark as OK, Save, and advance to next image.  Ctrl+Enter can be used as well.");
 
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, okRadioButton, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), jButton1, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, okRadioButton, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), okSaveNextButton, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        okSaveNextButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                okSaveNextButtonActionPerformed(evt);
             }
         });
 
@@ -365,7 +343,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(saveButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 69, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jPanel1Layout.createSequentialGroup()
-                        .add(jButton1)
+                        .add(okSaveNextButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(loginButton)))
                 .addContainerGap())
@@ -382,7 +360,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                             .add(okRadioButton)
                             .add(loginButton)
-                            .add(jButton1))
+                            .add(okSaveNextButton))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(problemRadioButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -474,18 +452,6 @@ public class QualityControlPanel extends javax.swing.JPanel {
         bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void okRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okRadioButtonActionPerformed
-
-    }//GEN-LAST:event_okRadioButtonActionPerformed
-
-    private void problemRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_problemRadioButtonActionPerformed
-
-    }//GEN-LAST:event_problemRadioButtonActionPerformed
-
-    private void ignoreRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ignoreRadioButtonActionPerformed
-
-    }//GEN-LAST:event_ignoreRadioButtonActionPerformed
-
     protected transient WalkImageSequence walkImageSequence = null;
 
     public synchronized WalkImageSequence getWalkImageSequece() {
@@ -514,25 +480,22 @@ public class QualityControlPanel extends javax.swing.JPanel {
 
         if ( walkImageSequence!=null ) {
             loginButton.setEnabled(false);
-            Runnable run= new Runnable() {
-                @Override
-                public void run() {
-                    initQualitySequeuce();
-                    URI uri= walkImageSequence.getQCFolder();
-                    sequencePropertiesHost.setText(uri.toString());
-                    sequencePropertiesHost.setToolTipText(uri.toString());
-                    loginButton.setEnabled(true);
-                    int index= walkImageSequence.getIndex();
-                    if ( index>=0 ) {
-                        QualityControlSequence qseq= walkImageSequence.getQualityControlSequence();
-                        if ( qseq==null || qseq.getQualityControlRecord(index)!=null ) {
-                            saveButton.setEnabled(true);
-                            setStateButtonedEnabled(true);
-                        }                    
+            Runnable run= () -> {
+                initQualitySequeuce();
+                URI uri= walkImageSequence.getQCFolder();
+                sequencePropertiesHost.setText(uri.toString());
+                sequencePropertiesHost.setToolTipText(uri.toString());
+                loginButton.setEnabled(true);
+                int index= walkImageSequence.getIndex();
+                if ( index>=0 ) {
+                    QualityControlSequence qseq= walkImageSequence.getQualityControlSequence();
+                    if ( qseq==null || qseq.getQualityControlRecord(index)!=null ) {
+                        saveButton.setEnabled(true);
+                        setStateButtonedEnabled(true);                    
                     }
-                    if ( uri.getScheme().equals("file") ) {  // log in automatically if it's not restricted
-                       login();
-                    }
+                }
+                if ( uri.getScheme().equals("file") ) {  // log in automatically if it's not restricted
+                    login();
                 }
             };
             new Thread( run ).start();
@@ -575,12 +538,12 @@ public class QualityControlPanel extends javax.swing.JPanel {
         login();
     }//GEN-LAST:event_loginButtonActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void okSaveNextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okSaveNextButtonActionPerformed
         LoggerManager.logGuiEvent(evt);
         okRadioButton.setSelected(true);
         saveButtonActionPerformed(evt);
         walkImageSequence.next();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_okSaveNextButtonActionPerformed
 
     private void newCommentTextAreaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_newCommentTextAreaKeyTyped
         if ( evt.isControlDown() && evt.getKeyChar()=='\n' ) {
@@ -595,7 +558,6 @@ public class QualityControlPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSplitPane commentSplitPane;
     private javax.swing.JRadioButton ignoreRadioButton;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
@@ -606,6 +568,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
     private javax.swing.JButton loginButton;
     private javax.swing.JTextArea newCommentTextArea;
     private javax.swing.JRadioButton okRadioButton;
+    private javax.swing.JButton okSaveNextButton;
     private javax.swing.JEditorPane previousCommentEditorPane;
     private javax.swing.JRadioButton problemRadioButton;
     private javax.swing.JButton saveButton;
