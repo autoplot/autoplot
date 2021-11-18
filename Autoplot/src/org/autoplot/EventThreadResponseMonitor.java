@@ -170,7 +170,9 @@ public final class EventThreadResponseMonitor {
         return () -> {
             response= System.currentTimeMillis();
             long levelms= response-lastPost;
-            outs.println( String.format( "%16d %d", response, levelms ) );
+            if ( outs!=null ) {
+                outs.println( String.format( "%16d %d", response, levelms ) );
+            }
             eventQueue= Thread.currentThread();
             if ( levelms>WARN_LEVEL_MILLIS ) {
                 logger.log(Level.FINE, "CURRENT EVENT QUEUE CLEAR TIME: {0} sec\n", levelms/1000);
