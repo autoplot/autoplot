@@ -35,6 +35,7 @@ if [ "" = "$DO_HIDE" ]; then
     DO_HIDE="true"
 fi
 
+echo "JAVA_HOME=${JAVA_HOME}"
 echo "DO_HIDE=${DO_HIDE}  # if false then show passwords etc for debugging."
 
 JAVAC=${JAVA_HOME}/bin/javac
