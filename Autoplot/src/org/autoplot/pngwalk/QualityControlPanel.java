@@ -8,7 +8,6 @@ package org.autoplot.pngwalk;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
@@ -24,7 +23,6 @@ import javax.swing.AbstractButton;
 import javax.swing.JFrame;
 import javax.swing.JRadioButton;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.KeyChain;
