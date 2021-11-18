@@ -5,8 +5,10 @@ import java.awt.AWTEvent;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -63,9 +65,12 @@ public final class EventThreadResponseMonitor {
     String reportedEventId= "";      // toString showing the last reported error.
     boolean pleasePostEvent= true;   // another event ought to be posted.
     
+    PrintStream outs;
+   
     public EventThreadResponseMonitor( ) {
         this.map= new HashMap();
         lastPost= System.currentTimeMillis();
+        outs= null;
     }
 
     public void start() {
@@ -78,6 +83,24 @@ public final class EventThreadResponseMonitor {
         exec.scheduleAtFixedRate( checkEventThreadRunnable(), 4000, WATCH_INTERVAL_MILLIS, TimeUnit.MILLISECONDS );
     }
     
+    /**
+     * set to the name of a file where event thread response times will be logged.
+     * This should be a folder local to the machine.
+     * @param f 
+     */
+    public void setLogFile( File f ) {
+        if ( outs!=null ) {
+            outs.close();
+        }
+        if ( f!=null ) {
+            try {
+                outs= new PrintStream( new FileOutputStream( f ) );
+            } catch (FileNotFoundException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+            
     /**
      * add to the information.
      * @param key see GuiExceptionManager
@@ -147,6 +170,7 @@ public final class EventThreadResponseMonitor {
         return () -> {
             response= System.currentTimeMillis();
             long levelms= response-lastPost;
+            outs.println( String.format( "%16d %d", response, levelms ) );
             eventQueue= Thread.currentThread();
             if ( levelms>WARN_LEVEL_MILLIS ) {
                 logger.log(Level.FINE, "CURRENT EVENT QUEUE CLEAR TIME: {0} sec\n", levelms/1000);
