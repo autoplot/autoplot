@@ -9,6 +9,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.text.CharacterIterator;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.text.StringCharacterIterator;
 import java.util.Date;
@@ -24,6 +25,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -32,6 +34,7 @@ import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.WriteCapability;
 import org.autoplot.dom.DebugPropertyChangeSupport;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -102,8 +105,8 @@ public class QualityControlRecord {
             schema = factory.newSchema(schemaURL);
             validator = schema.newValidator();
         } catch(SAXException ex) {
-            System.err.println("Error initializing QC XML schema");
-            ex.printStackTrace();
+            logger.log(Level.SEVERE,
+                            "Error initializing QC XML schema", ex);
         }
     }
 
@@ -162,11 +165,11 @@ public class QualityControlRecord {
         } catch (RuntimeException ex) {
             throw (ex);
         } catch (SAXException ex) {
-            System.err.println("XML failed to validate: " + recordFile.toString());
-            ex.printStackTrace();
-        } catch (Exception ex) {
-            System.err.println("Error when loading quality control record from XML");
-            ex.printStackTrace();
+            logger.log(Level.SEVERE,
+                            "XML failed to validate: " + recordFile.toString(), ex);
+        } catch (IOException | ParseException | ParserConfigurationException ex) {
+            logger.log(Level.SEVERE,
+                            "Error when loading quality control record from XML", ex);
         }
 
         initialized = true;
@@ -315,9 +318,7 @@ public class QualityControlRecord {
                 comments.add(newComment);
                 newComment = null;
             }
-            Iterator i = comments.iterator();
-            while (i.hasNext()) {
-                ReviewComment c = (ReviewComment)i.next();
+            for (ReviewComment c : comments) {
                 Element e = doc.createElementNS(XMLNS, "reviewComment");
                 e.setAttribute("reviewer", c.reviewer);
                 e.setAttribute("date", xmlFormattedDate(c.commentDate));
@@ -327,9 +328,9 @@ public class QualityControlRecord {
                 root.appendChild(e);
             }
             
-        } catch (Exception ex) {
-            System.err.println("Exception while building XML");
-            ex.printStackTrace();
+        } catch (ParserConfigurationException | DOMException ex) {
+            logger.log(Level.SEVERE,
+                            "Exception while building XML", ex);
         }
 
         // Just to be safe, validate.  If an exception occurs here, it's a serious bug
@@ -337,7 +338,9 @@ public class QualityControlRecord {
             if ( validator!=null ) validator.validate(new DOMSource(doc));
         } catch (RuntimeException ex) {
             throw(ex);
-        } catch (Exception ex) {
+        } catch (IOException | SAXException ex) {
+            logger.log(Level.SEVERE,
+                            "I/O error while opening quality control folder", ex);
             throw new RuntimeException("Internally generated XML failed to validate!", ex);
         }
 
@@ -385,19 +388,17 @@ public class QualityControlRecord {
                 output.setEncoding("UTF-8");
 
                 write.delete();
-                OutputStream out= write.getOutputStream();
-
-                output.setByteStream( out );
-                try {
-                    if (serializer.getDomConfig().canSetParameter("format-pretty-print", Boolean.TRUE)) {
-                        serializer.getDomConfig().setParameter("format-pretty-print", Boolean.TRUE);
+                try (OutputStream out = write.getOutputStream()) {
+                    output.setByteStream( out );
+                    try {
+                        if (serializer.getDomConfig().canSetParameter("format-pretty-print", Boolean.TRUE)) {
+                            serializer.getDomConfig().setParameter("format-pretty-print", Boolean.TRUE);
+                        }
+                    } catch (Error e2) {
+                        logger.log( Level.WARNING, e2.getMessage(), e2 );
                     }
-                } catch (Error e2) {
-                    e2.printStackTrace();
+                    serializer.write(doc, output);
                 }
-                serializer.write(doc, output);
-
-                out.close();
                 
                 write.commit( "Autoplot PNGWalkTool update" );
                 
