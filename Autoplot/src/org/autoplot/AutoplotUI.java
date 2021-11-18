@@ -278,6 +278,16 @@ public final class AutoplotUI extends javax.swing.JFrame {
     
     private String apversion=null;
     
+    private EventThreadResponseMonitor responseMonitor;
+    
+    /**
+     * return the monitor, if enabled, so that logging can be enabled.
+     * @return 
+     */
+    public EventThreadResponseMonitor getResponseMonitor() {
+        return responseMonitor;
+    }
+    
     void setApplicationName(String id) {
         this.applicationName= id;
         if ( DomUtil.getElementById(dom, id)==null ) { // make sure there are no other nodes with this id.
@@ -4862,7 +4872,6 @@ private void updateFrameTitle() {
         alm.addOptionalSwitchArgument("autoLayout",null,"autoLayout",ArgumentList.TRUE,"turn on/off initial autolayout setting");
         alm.addOptionalSwitchArgument("mode","m","mode","expert","start in basic (browse,reduced) mode or expert mode" );
         //alm.addOptionalSwitchArgument("exit", null, "exit", "0", "exit after running script" );
-        alm.addBooleanSwitchArgument( "eventThreadMonitor", null, "eventThreadMonitor", "monitor the event thread for long unresponsive pauses (deprecated, use enableResponseMonitor)");
         alm.addBooleanSwitchArgument( "enableResponseMonitor", null, "enableResponseMonitor", "monitor the event thread for long unresponsive pauses");
         alm.addBooleanSwitchArgument( "samp", null, "samp", "enable SAMP connection for use with European Space Agency applications and websites");
         alm.addOptionalSwitchArgument( "server", null, "server", "-1", "start server at the given port listening to commands. (Replaces port)");
@@ -5186,13 +5195,14 @@ APSplash.checkTime("init 220");
                     //SwingUtilities.invokeLater(repaintRunnable);
 
                     if ( System.getProperty("enableResponseMonitor","false").equals("true")
-                            || alm.getBooleanValue("eventThreadMonitor") || alm.getBooleanValue("enableResponseMonitor") ) {
+                            || alm.getBooleanValue("enableResponseMonitor") ) {
                         EventThreadResponseMonitor emon= new EventThreadResponseMonitor();
                         if ( app!=null ) {
                             emon.addToMap( GuiExceptionHandler.UNDO_REDO_SUPPORT, app.undoRedoSupport );
                             emon.addToMap( GuiExceptionHandler.APP_MODEL, app.applicationModel );
                         }
                         emon.start();
+                        app.responseMonitor= emon;
                     }
                     
                     logger.fine("UI is visible");
