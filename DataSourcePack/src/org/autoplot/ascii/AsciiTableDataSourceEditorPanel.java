@@ -843,7 +843,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         jLabel13.setToolTipText("Units of the depend0 column (typically x-axis), such as \"seconds\" or \"nanoseconds since 2000-01-01T12:00\"  Droplist shows examples.");
 
         depend0unitsCB.setEditable(true);
-        depend0unitsCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "seconds since 2010-01-01T00:00", "nanoseconds since 2000-01-01T12:00", "days since 1999-12-31T00:00", "seconds", "hr", "mjd", " " }));
+        depend0unitsCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "seconds since 2010-01-01T00:00", "seconds since 1970-01-01T00:00", "ms since 1970-01-01T00:00", "nanoseconds since 2000-01-01T12:00", "days since 1999-12-31T00:00", "seconds", "hr", "mjd", " " }));
         depend0unitsCB.setToolTipText("units used to interpret the x tags (depends on)");
 
         org.jdesktop.layout.GroupLayout jPanel4Layout = new org.jdesktop.layout.GroupLayout(jPanel4);
