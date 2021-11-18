@@ -88,6 +88,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -995,17 +996,18 @@ public final class PngWalkTool extends javax.swing.JPanel {
         final JCheckBoxMenuItem qcmi= new JCheckBoxMenuItem("Show Only Quality Control Records",false);
         tool.qcFilterMenuItem= qcmi;
         
-        final JMenuItem qc= new JMenuItem( new AbstractAction( "Start Quality Control Tool (QC)" ) {
+        final JMenuItem qc0= new JMenuItem( new AbstractAction( "<html><strike>Start Quality Control Tool (QC)</strike>" ) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);        
+                JOptionPane.showMessageDialog( tool, "This has been moved to Tools menu" );
                 if ( !PngWalkTool.isQualityControlEnabled() ) {
                     tool.startQC();
                 }
             }
         });
-        qc.setToolTipText("Start up the Quality Control tool that adds documentation to images.");
-        optionsMenu.add( qc );
+        qc0.setToolTipText("Quality Control Tool has been moved to the Tools menu.");
+        optionsMenu.add( qc0 );
         
         qcmi.addActionListener( new AbstractAction(  ) {
             @Override
@@ -1022,6 +1024,35 @@ public final class PngWalkTool extends javax.swing.JPanel {
         
         optionsMenu.add(qcmi);
         
+        final JMenuItem dg0= new JMenuItem( new AbstractAction( "<html><strike>Start Digitizer</strike>" ) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);        
+                JOptionPane.showMessageDialog( tool, "This has been moved to Tools menu" );
+                if ( !tool.isDigitizerEnabled() ) {
+                    tool.startDigitizer();
+                }
+            }
+        });
+        dg0.setToolTipText("Start up the Digitizer that receives pairs from the single view.  See http://autoplot.org/richPng.");
+        optionsMenu.add( dg0 );
+        
+        result.add( optionsMenu );
+
+        final JMenu toolsMenu= new JMenu("Tools");
+        
+        final JMenuItem qc= new JMenuItem( new AbstractAction( "Start Quality Control Tool (QC)" ) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);        
+                if ( !PngWalkTool.isQualityControlEnabled() ) {
+                    tool.startQC();
+                }
+            }
+        });
+        qc.setToolTipText("Start up the Quality Control tool that adds documentation to images.");
+        toolsMenu.add( qc );
+        
         final JMenuItem dg= new JMenuItem( new AbstractAction( "Start Digitizer" ) {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1032,11 +1063,10 @@ public final class PngWalkTool extends javax.swing.JPanel {
             }
         });
         dg.setToolTipText("Start up the Digitizer that receives pairs from the single view.  See http://autoplot.org/richPng.");
-        optionsMenu.add( dg );
+        toolsMenu.add( dg );
         
-        result.add( optionsMenu );
-
-        final JMenu toolsMenu= new JMenu("Tools");
+        toolsMenu.add( new JSeparator() );
+        
         final JMenuItem writePdf= new JMenuItem( new AbstractAction( "Write to PDF..." ) {
             @Override
             public void actionPerformed(ActionEvent e) {
