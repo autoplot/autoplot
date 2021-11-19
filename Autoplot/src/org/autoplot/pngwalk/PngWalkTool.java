@@ -1235,7 +1235,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
             JSplitPane qcPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, tabs, qcPanel);
             qcPane.setResizeWeight(1.0);
             pngsPanel.add(qcPane);
-            qcPanel.setWalkImageSequece(seq);
+            qcPanel.setWalkImageSequence(seq);
         } else {
             pngsPanel.add( tabs );
         }
@@ -1407,7 +1407,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 qcFilterMenuItem.setSelected(false);
             }
             if ( qcPanel!=null ) {
-                qcPanel.setWalkImageSequece(seq);
+                qcPanel.setWalkImageSequence(seq);
             }
             
         } catch ( Exception ex ) {
@@ -1517,7 +1517,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         } else {
             indexListener.propertyChange( null );
             if (qcPanel != null ) {
-                qcPanel.setWalkImageSequece(seq);
+                qcPanel.setWalkImageSequence(seq);
                 if ( seq.getIndex()<seq.size() ) {
                     if ( seq.getQualityControlSequence()!=null ) {
                         QualityControlRecord rec= seq.getQualityControlSequence().getQualityControlRecord(seq.getIndex());
@@ -1725,7 +1725,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
             qcPanel= new QualityControlPanel(this);
             tabs.add( "Quality Control", qcPanel );
             if ( seq!=null ) {
-                qcPanel.setWalkImageSequece(seq);
+                qcPanel.setWalkImageSequence(seq);
                 seq.addPropertyChangeListener(WalkImageSequence.PROP_BADGE_CHANGE, qcStatusListener);
             }
             ENABLE_QUALITY_CONTROL= true;
