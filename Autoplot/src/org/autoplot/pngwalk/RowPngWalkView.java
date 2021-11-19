@@ -257,7 +257,7 @@ public class RowPngWalkView extends PngWalkView {
         }
 
         @Override
-        public synchronized void paintComponent(Graphics g1) {
+        public void paintComponent(Graphics g1) {
             super.paintComponent(g1);
             Graphics2D g2 = (Graphics2D) g1;
 
