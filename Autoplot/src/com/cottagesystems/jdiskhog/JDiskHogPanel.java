@@ -5,6 +5,7 @@
  */
 package com.cottagesystems.jdiskhog;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
@@ -27,6 +28,7 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -41,6 +43,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.AutoplotUI;
 import org.autoplot.datasource.AutoplotSettings;
+import org.das2.util.filesystem.WebFileSystem;
 
 /**
  * Tool for cleaning up files in a local filesystem.  This has minor customizations 
@@ -314,11 +317,15 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
 
                     String outsideName= outsideName(f.toString());
                     String[] nn= null;
+                    File localCache=null; // the local root if set already
+                    
                     if ( outsideName!=null ) {
                         try {
                             FileSystem fs = FileSystem.create(outsideName);
                             nn= fs.listDirectory("/");
-
+                            if ( fs instanceof WebFileSystem ) {
+                                localCache= ((WebFileSystem)fs).getReadOnlyCache();
+                            }
                         } catch ( IOException ex ) {
                             logger.log(Level.SEVERE, ex.getMessage(), ex);
                         }
@@ -332,12 +339,18 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
                         for ( int i=1; i<6; i++ ) {
                             if ( nn.length>i ) s.append( "<br>").append( nn[i] );
                         }
-                        final JLabel label= new JLabel("<html>Target should contain the files:<br>"+ s.toString() );
-                        choose.setAccessory( label );
+                        final JLabel label= new JLabel("<html><u>Target should contain:</u><br>"+ s.toString() );
+                        JPanel p= new JPanel();
+                        p.setLayout( new BorderLayout() );
+                        p.add( label, BorderLayout.NORTH );
+                        choose.setAccessory( p );
                     }
 
                     choose.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
-                    
+                    if ( localCache!=null ) {
+                        choose.setSelectedFile( localCache );
+                        choose.setCurrentDirectory( localCache );
+                    }
                     if ( choose.showOpenDialog(jtree)==JFileChooser.APPROVE_OPTION ) {
                         try {
                             File ff= choose.getSelectedFile();
