@@ -99,7 +99,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
      */
     public void displayRecord(QualityControlRecord rec) {
         if ( rec==null ) {
-            previousCommentEditorPane.setText("");
+            previousCommentEditorPane.setText("<html><i>(no record!)");
             newCommentTextArea.setText("");
             statusButtonGroup.setSelected(okRadioButton.getModel(), false);
             setStatus( 0,0,0,0 );
@@ -180,7 +180,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
                     in.close();
                 }
                 walkImageSequence.setQCFolder( DataSetURI.getResourceURI(sequenceProperties.getProperty(KEY_QUALITY_CONTROL_URI, path)) );
-
+                
                 QualityControlSequence qseq= walkImageSequence.getQualityControlSequence();
                 int index= walkImageSequence.getIndex(); // DANGER: see repeat code
                 if ( qseq==null || qseq.getQualityControlRecord(index)!=null ) {
@@ -452,11 +452,37 @@ public class QualityControlPanel extends javax.swing.JPanel {
 
     protected transient WalkImageSequence walkImageSequence = null;
 
+    /**
+     * @return 
+     * @deprecated see getWalkImageSequence
+     * @see #getWalkImageSequence() 
+     */
     public synchronized WalkImageSequence getWalkImageSequece() {
         return walkImageSequence;
     }
 
+    /**
+     * get the walkImageSequence associated with this panel.
+     * @return the walkImageSequence associated with this panel.
+     */
+    public synchronized WalkImageSequence getWalkImageSequence() {
+        return walkImageSequence;
+    }
+
+    /**
+     * @param walkImageSequence
+     * @deprecated see setWalkImageSequence
+     * @see #setWalkImageSequence(org.autoplot.pngwalk.WalkImageSequence) 
+     */
     public synchronized void setWalkImageSequece(final WalkImageSequence walkImageSequence) {
+        setWalkImageSequence(walkImageSequence);
+    }
+    
+    /**
+     * set the walkImageSequence associated with this QC panel.
+     * @param walkImageSequence 
+     */
+    public synchronized void setWalkImageSequence(final WalkImageSequence walkImageSequence) {
         if ( this.walkImageSequence!=null ) {
             this.walkImageSequence.removePropertyChangeListener(pc);
         }
