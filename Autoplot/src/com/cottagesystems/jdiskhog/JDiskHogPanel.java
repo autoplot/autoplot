@@ -16,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -27,8 +28,10 @@ import javax.swing.Action;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -43,6 +46,10 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.AutoplotUI;
 import org.autoplot.datasource.AutoplotSettings;
+import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
+import org.das2.util.filesystem.GitCommand;
+import org.das2.util.filesystem.GitHubFileObject;
+import org.das2.util.filesystem.GitHubFileSystem;
 import org.das2.util.filesystem.WebFileSystem;
 
 /**
@@ -293,6 +300,61 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
         return true;
     }
     
+    Action getLocalPullAction( final File path) {
+        return new AbstractAction("Pull Remote Changes") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
+                
+                try {
+                    int status= new GitCommand(path).pull();
+                    if ( status==0 ) {
+                        JOptionPane.showMessageDialog( app, "git pull was successful.");
+                    } else {
+                        JOptionPane.showMessageDialog( app, "git pull was unsuccessful with exit code "+status + 
+                        ".  See console for messages" );
+                        
+                    }
+                } catch (IOException | InterruptedException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+                
+            }
+        };
+    }
+    
+    protected void maybeAddGitPullAction( JPopupMenu popup ) {
+        FSTreeModel model = (FSTreeModel) jTree1.getModel();
+
+        TreePath path = jTree1.getSelectionPath();
+        if ( path==null ) return;
+
+        File f = model.getFile(path);
+        String outsideName= outsideName(f.toString());
+        String[] nn= null;
+        File localCache=null; // the local root if set already
+
+        if ( outsideName!=null ) {
+            try {
+                FileSystem fs = FileSystem.create(outsideName);
+                if ( fs instanceof GitHubFileSystem ) {
+                    File localROCache= ((GitHubFileSystem)fs).getReadOnlyCache();
+                    if ( localROCache!=null ) {
+                        JMenuItem mi= new JMenuItem( getLocalPullAction(localROCache) );
+                        mi.setToolTipText( "Pull changes from the remote repository to the local RO cache." );
+                        popup.add(mi);       
+                        return;
+                    }
+                }
+            } catch ( FileSystemOfflineException | UnknownHostException | FileNotFoundException ex ) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+        JMenuItem mi= new JMenuItem( getLocalPullAction(null) );
+        mi.setEnabled(false);
+        popup.add(mi);  // always add the option, even if it is disabled.
+    }
+                        
     Action getLocalROCacheAction(final JTree jtree) {
         return new AbstractAction("Link to Local Read-Only Cache...") {
             @Override
