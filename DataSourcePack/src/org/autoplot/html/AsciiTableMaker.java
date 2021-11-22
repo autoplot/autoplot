@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.html;
 
 import java.text.ParseException;
@@ -16,10 +13,12 @@ import org.das2.qds.AbstractDataSet;
 import org.das2.qds.DDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
+import org.das2.qds.util.AsciiParser;
+import org.das2.qds.util.AsciiParser.FieldParser;
 import org.das2.qds.util.DataSetBuilder;
 
 /**
- * Generic class for converting a table of ascii strings to datums.
+ * Generic class for converting a table of ASCII strings to datums.
  * @author jbf
  */
 public class AsciiTableMaker {
@@ -31,6 +30,7 @@ public class AsciiTableMaker {
     List<String> labels = null;
     List<String> names = null;
     List<String> format= null;
+    List<AsciiParser.FieldParser> fieldParsers= null;
     
     int fieldCount= -1;
     boolean initializedFields= false;
@@ -55,39 +55,51 @@ public class AsciiTableMaker {
                 Logger.getLogger(AsciiTableMaker.class.getName()).log(Level.SEVERE, null, ex);
             }
             if ( units.get(i)==null ) {
-                if ( field.contains("$") ) {
-                    units.set(i,Units.dollars);
-                    format.set(i,"%.2f");
-                } else if ( field.endsWith("%") ) {
-                    units.set(i,Units.percent);
-                    format.set(i,null);
-                } else if ( isTime ) {
+                if ( isTime ) {
                     units.set(i,Units.us2000);
                     format.set(i,null);
                 } else {
-                    try {
-                        Integer.parseInt(field);
-                        units.set(i,Units.dimensionless);
-                        format.set(i,"%d");
-                    } catch ( NumberFormatException ex ) {
+                    if ( field.contains("$") ) {
+                        units.set(i,Units.dollars);
+                        format.set(i,"%.2f");
+                    } else if ( field.endsWith("%") ) {
+                        units.set(i,Units.percent);
+                        format.set(i,null);                                    
+                    } else {
                         try {
-                            Double.parseDouble(field);
+                            Integer.parseInt(field);
                             units.set(i,Units.dimensionless);
-                            format.set(i,null);
-                        } catch ( NumberFormatException ex2 ) {
-                            String[] ss= field.split("\\s",-2);  // "3.4 sec"
-                            if ( ss.length>1 ) {
-                                try {
-                                    Double.parseDouble(ss[0]);
-                                    units.set(i,Units.lookupUnits( field.substring( ss[0].length() ).trim() ) );
-                                    format.set(i,null);
-                                } catch ( NumberFormatException ex3 ) {
-                                    units.set( i, new EnumerationUnits("default") );
-                                    format.set(i,null);
-                                }
-                            } else {
-                                units.set( i, new EnumerationUnits("default") );
+                            format.set(i,"%d");
+                        } catch ( NumberFormatException ex ) {
+                            try {
+                                Double.parseDouble(field);
+                                units.set(i,Units.dimensionless);
                                 format.set(i,null);
+                            } catch ( NumberFormatException ex2 ) {
+                                String[] ss= field.split("\\s",-2);  // "3.4 sec"
+                                if ( ss.length>1 ) {
+                                    try {
+                                        Double.parseDouble(ss[0]);
+                                        units.set(i,Units.lookupUnits( field.substring( ss[0].length() ).trim() ) );
+                                        format.set(i,null);
+                                    } catch ( NumberFormatException ex3 ) {
+                                        units.set( i, new EnumerationUnits("default") );
+                                        format.set(i,null);
+                                    }
+                                } else {
+                                    if ( field.contains(",") && !field.endsWith(",") ) {
+                                        try { 
+                                            double d= Double.parseDouble(field.replace(",","" ) );
+                                            this.fieldParsers.set( i, getCommaFieldParser(Units.dimensionless) );
+                                        } catch ( NumberFormatException ex4 ) {
+                                            units.set( i, new EnumerationUnits("default") );
+                                            format.set(i,null);
+                                        }
+                                    } else {
+                                        units.set( i, new EnumerationUnits("default") );
+                                        format.set(i,null);
+                                    }
+                                }
                             }
                         }
                     }
@@ -96,6 +108,20 @@ public class AsciiTableMaker {
         }
     }
     
+    /**
+     * FieldParser removes the comma to parse things like "1,234" to 1234.
+     * @param uu
+     * @return 
+     */
+    FieldParser getCommaFieldParser( final Units uu ) {
+        return new FieldParser() {
+            @Override
+            public double parseField(String field, int columnIndex) throws ParseException {
+                return uu.parse( field.replaceAll(",","") ).doubleValue(uu); // sorry, rest of world
+            }
+        };
+    }
+
     void addRecord(List<String> values) {
         if ( fieldCount==-1 ) {
             return;
@@ -120,7 +146,24 @@ public class AsciiTableMaker {
                     if ( u instanceof EnumerationUnits ) {
                         d= ((EnumerationUnits)u).createDatum(field).doubleValue(u);
                     } else {
-                        d= u.parse( field ).doubleValue( u );
+                        FieldParser p= fieldParsers.get(i);
+                        if ( p!=null ) {
+                            d= p.parseField(field, i);
+                        } else {
+                            try {
+                                d= u.parse( field ).doubleValue( u );
+                            } catch (ParseException ex ) {
+                                final Units uu= u;
+                                p= new FieldParser() {
+                                    @Override
+                                    public double parseField(String field, int columnIndex) throws ParseException {
+                                        return uu.parse( field.replaceAll(",","") ).doubleValue(uu); // sorry, rest of world
+                                    }
+                                };
+                                fieldParsers.set( i, p );
+                                d= p.parseField(field, i);
+                            }
+                        }
                     }
                     builder.putValue(-1, i, d);
                 } catch (ParseException ex) {
@@ -135,19 +178,21 @@ public class AsciiTableMaker {
         fieldCount = values.size();
 
         builder = new DataSetBuilder(2, 100, fieldCount);
-        units = new ArrayList<Units>(fieldCount);
+        units = new ArrayList<>(fieldCount);
         for (int i = 0; i < fieldCount; i++) {
             units.add(i, defaultUnits ); // null here means we can reset.
         }
-        format= new ArrayList<String>(fieldCount);
+        format= new ArrayList<>(fieldCount);
+        fieldParsers= new ArrayList<>(fieldCount);
         
-        labels = new ArrayList<String>(fieldCount);
-        names = new ArrayList<String>(fieldCount);
+        labels = new ArrayList<>(fieldCount);
+        names = new ArrayList<>(fieldCount);
         if (labels.isEmpty()) {
             for (int i = 0; i < fieldCount; i++) {
                 labels.add(i, values.get(i));
                 names.add(i, Ops.safeName(values.get(i)));
                 format.add("");
+                fieldParsers.add(null);
             }
         }
 
