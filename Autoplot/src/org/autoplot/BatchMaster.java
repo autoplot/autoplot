@@ -560,7 +560,7 @@ public class BatchMaster extends javax.swing.JPanel {
             .addGap(0, 51, Short.MAX_VALUE)
         );
 
-        editParamsButton.setText("Edit Params");
+        editParamsButton.setText("Edit Parameter Values");
         editParamsButton.setEnabled(false);
         editParamsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

@@ -83,7 +83,7 @@
         <Component class="javax.swing.JButton" name="okayButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/org/autoplot/datasource/go.png"/>
+              <Image iconType="3" name="/resources/go.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Plot"/>
             <Property name="toolTipText" type="java.lang.String" value="Plot, replacing any previous plot."/>

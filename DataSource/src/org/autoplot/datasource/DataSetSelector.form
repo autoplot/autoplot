@@ -42,7 +42,7 @@
     <Component class="javax.swing.JButton" name="inspectButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/org/autoplot/datasource/fileMag.png"/>
+          <Image iconType="3" name="/resources/fileMag.png"/>
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Inspect this resource.&lt;br&gt;&#xa;For folder names, this enters the file system browser, or shows a list of remote folders.&lt;br&gt;&#xa;For files, this will enter an editor panel for the resource, or show a list of parameter options.&lt;br&gt;&#xa;&lt;/html&gt;&#xa;&#xa;"/>
         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
@@ -69,7 +69,7 @@
     <Component class="javax.swing.JButton" name="plotItButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/org/autoplot/datasource/go.png"/>
+          <Image iconType="3" name="/resources/go.png"/>
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Play button plots this data location, or URI&lt;br&gt;&#xa;This may also load a .vap file or run a script, depending on the text entered.&lt;br&gt;&#xa;Ctrl modifier: plot the dataset by adding a new plot&lt;br&gt;&#xa;Shift modifier: plot the dataset as an overplot&lt;br&gt;&#xa;Alt modifier: inspect this resource.&lt;br&gt;"/>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">

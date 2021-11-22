@@ -22,7 +22,7 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <Component id="recentComboBox" pref="196" max="32767" attributes="0"/>
+              <Component id="recentComboBox" pref="202" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="timeRangeToolButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -48,7 +48,7 @@
     <Component class="javax.swing.JButton" name="prevButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/org/autoplot/datasource/prevPrev.png"/>
+          <Image iconType="3" name="/resources/prevPrev.png"/>
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="Step to the previous interval"/>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -68,7 +68,7 @@
     <Component class="javax.swing.JButton" name="nextButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/org/autoplot/datasource/nextNext.png"/>
+          <Image iconType="3" name="/resources/nextNext.png"/>
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="Step to the next interval"/>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -88,7 +88,7 @@
     <Component class="javax.swing.JButton" name="browseButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/org/autoplot/datasource/fileMag.png"/>
+          <Image iconType="3" name="/resources/fileMag.png"/>
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="Inspect data source"/>
         <Property name="enabled" type="boolean" value="false"/>
@@ -125,7 +125,7 @@
     <Component class="javax.swing.JButton" name="timeRangeToolButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/org/autoplot/datasource/calendar.png"/>
+          <Image iconType="3" name="/resources/calendar.png"/>
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="Time Range Tool"/>
       </Properties>

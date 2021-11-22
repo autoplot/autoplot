@@ -185,7 +185,7 @@
             <Component class="javax.swing.JButton" name="nextIntervalButton">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/org/autoplot/datasource/nextNext.png"/>
+                  <Image iconType="3" name="/resources/nextNext.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Next Interval"/>
                 <Property name="toolTipText" type="java.lang.String" value="Scan to the next interval"/>
@@ -197,7 +197,7 @@
             <Component class="javax.swing.JButton" name="prevIntervalButton">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/org/autoplot/datasource/prevPrev.png"/>
+                  <Image iconType="3" name="/resources/prevPrev.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Previous Interval"/>
                 <Property name="toolTipText" type="java.lang.String" value="Scan to the previous interval"/>

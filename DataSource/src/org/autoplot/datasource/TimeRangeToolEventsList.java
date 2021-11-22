@@ -319,7 +319,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         jLabel1.setText("Rescale:");
         jLabel1.setToolTipText("Expand the interval range");
 
-        prevButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/prevPrev.png"))); // NOI18N
+        prevButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/prevPrev.png"))); // NOI18N
         prevButton.setToolTipText("Previous Interval");
         prevButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -327,7 +327,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             }
         });
 
-        nextButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/nextNext.png"))); // NOI18N
+        nextButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/nextNext.png"))); // NOI18N
         nextButton.setToolTipText("Next Interval");
         nextButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -405,7 +405,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(timeRangeButton)
                 .addContainerGap())
-            .addComponent(currentDataSetSelector, javax.swing.GroupLayout.DEFAULT_SIZE, 573, Short.MAX_VALUE)
+            .addComponent(currentDataSetSelector, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jScrollPane2)
         );
 

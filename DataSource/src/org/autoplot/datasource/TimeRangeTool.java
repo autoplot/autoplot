@@ -637,7 +637,7 @@ public final class TimeRangeTool extends javax.swing.JPanel {
             }
         });
 
-        nextIntervalButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/nextNext.png"))); // NOI18N
+        nextIntervalButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/nextNext.png"))); // NOI18N
         nextIntervalButton.setText("Next Interval");
         nextIntervalButton.setToolTipText("Scan to the next interval");
         nextIntervalButton.addActionListener(new java.awt.event.ActionListener() {
@@ -646,7 +646,7 @@ public final class TimeRangeTool extends javax.swing.JPanel {
             }
         });
 
-        prevIntervalButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/prevPrev.png"))); // NOI18N
+        prevIntervalButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/prevPrev.png"))); // NOI18N
         prevIntervalButton.setText("Previous Interval");
         prevIntervalButton.setToolTipText("Scan to the previous interval");
         prevIntervalButton.addActionListener(new java.awt.event.ActionListener() {

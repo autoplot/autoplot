@@ -532,7 +532,7 @@
     </Container>
     <Component class="javax.swing.JButton" name="editParamsButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Edit Params"/>
+        <Property name="text" type="java.lang.String" value="Edit Parameter Values"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>

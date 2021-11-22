@@ -1741,7 +1741,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         setMaximumSize(new java.awt.Dimension(1000, 27));
 
-        inspectButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/fileMag.png"))); // NOI18N
+        inspectButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/fileMag.png"))); // NOI18N
         inspectButton.setToolTipText("<html>Inspect this resource.<br>\nFor folder names, this enters the file system browser, or shows a list of remote folders.<br>\nFor files, this will enter an editor panel for the resource, or show a list of parameter options.<br>\n</html>\n\n");
         inspectButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
         inspectButton.setMaximumSize(new java.awt.Dimension(27, 27));
@@ -1754,7 +1754,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             }
         });
 
-        plotItButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/go.png"))); // NOI18N
+        plotItButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/go.png"))); // NOI18N
         plotItButton.setToolTipText("<html>Play button plots this data location, or URI<br>\nThis may also load a .vap file or run a script, depending on the text entered.<br>\nCtrl modifier: plot the dataset by adding a new plot<br>\nShift modifier: plot the dataset as an overplot<br>\nAlt modifier: inspect this resource.<br>");
         plotItButton.setMaximumSize(new java.awt.Dimension(27, 27));
         plotItButton.setMinimumSize(new java.awt.Dimension(27, 27));

@@ -372,7 +372,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
         setPreferredSize(new java.awt.Dimension(384, 39));
 
-        prevButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/prevPrev.png"))); // NOI18N
+        prevButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/prevPrev.png"))); // NOI18N
         prevButton.setToolTipText("Step to the previous interval");
         prevButton.setMaximumSize(new java.awt.Dimension(34, 20));
         prevButton.setMinimumSize(new java.awt.Dimension(34, 20));
@@ -383,7 +383,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             }
         });
 
-        nextButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/nextNext.png"))); // NOI18N
+        nextButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/nextNext.png"))); // NOI18N
         nextButton.setToolTipText("Step to the next interval");
         nextButton.setMaximumSize(new java.awt.Dimension(34, 24));
         nextButton.setMinimumSize(new java.awt.Dimension(34, 24));
@@ -394,7 +394,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             }
         });
 
-        browseButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/fileMag.png"))); // NOI18N
+        browseButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/fileMag.png"))); // NOI18N
         browseButton.setToolTipText("Inspect data source");
         browseButton.setEnabled(false);
         browseButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
@@ -410,7 +410,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         recentComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "2010-01-01", "2010-01-02" }));
         recentComboBox.setMinimumSize(new java.awt.Dimension(120, 27));
 
-        timeRangeToolButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/calendar.png"))); // NOI18N
+        timeRangeToolButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/calendar.png"))); // NOI18N
         timeRangeToolButton.setToolTipText("Time Range Tool");
         timeRangeToolButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -423,7 +423,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(recentComboBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE)
+                .add(recentComboBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(timeRangeToolButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)

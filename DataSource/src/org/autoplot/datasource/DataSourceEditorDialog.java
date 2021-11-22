@@ -105,7 +105,7 @@ public class DataSourceEditorDialog extends javax.swing.JDialog {
 
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        okayButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/datasource/go.png"))); // NOI18N
+        okayButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/go.png"))); // NOI18N
         okayButton.setText("Plot");
         okayButton.setToolTipText("Plot, replacing any previous plot.");
         okayButton.addActionListener(new java.awt.event.ActionListener() {
