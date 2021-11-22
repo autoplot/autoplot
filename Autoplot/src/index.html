@@ -27,7 +27,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-11-18 r26241):</p>
+        <p>Bugfixes (2021-11-22 r26265):</p>
+        <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">rfe758</a>: tickValues GUI had a bug with repeat every.  Thanks, Sadie!
+        </ul>
+        <p>Older Bugfixes (2021-11-18 r26241):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2409">2409</a>: Old bug where append( trim, trim ) wouldn't account for offsets post-trim is fixed.  Thanks, Sadie!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/143/">0143</a>: account for timetag cadence in metadata tab, so rapid MMS timetags can be distinguished.  Thanks, Ivar!
@@ -50,34 +54,11 @@
             <li>Canvas Size GUI on style tab cleaned up, so manual size can be entered in inches or centimeters.
             <li>Jython script trace run (where it executes line by line for debugging) handles multi-line strings.
         </ul>
-        <p>Older Bugfixes (2021-10-15 r26125):</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2402/">2402</a>: Correction to reducex, where xtags should have been made uniform.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2401/">2401</a>: eq with nominal units produces runtime error.  This is now supported.  Thanks, Ivar!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2400/">2400</a>: Don't paint opposite axis if there is a different axis there already.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2195/">2195</a>: LANL NN render mode didn't work when tags were monotonic decreasing.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2134/">2134</a>: support for negative step, useful in scripts to flip over arrays.
-            <li>annotations dialogs have link to documentation. 
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/1659/">1659</a>: in CDAWeb when dataset does not have master file, subTaskMonitor.finished was called twice.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2400/">2400</a>: white-line-on-white-plot still draws to support when a contrasting color is under the plot.  Thanks, Ali!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2400/">2400</a>: manual ticks ignored the minor ticks in "1,5/2,3,4,6,7,8,9".  Thanks, Ali!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2399/">2399</a>: invalid timerange got into history causing confusion.
-            <li>correct misspelling of indices in Ops Javadoc.  Thanks, Ivar!
-            <li><a href='https://sourceforge.net/p/autoplot/bugs/2398/'>2398</a>: monotonicSubset sets MONOTONIC to True, working around the problem Kristoff saw.
-            <li><a href='https://sourceforge.net/p/autoplot/bugs/2397/'>2397</a>: New Javadoc, still unpublished, supports extra characters like "Returns <i>e</i><sup>x</sup>&nbsp;-1."
-            <li><a href='https://sourceforge.net/p/autoplot/bugs/2394/'>2394</a>: IDL reader properly reads in array of strings and structure data following a string array.  Thanks, Lindsay!
-            <li>IDL reader support completions are corrected so automatic GUI is fixed.
-            <li><a href='https://sourceforge.net/p/autoplot/bugs/2391/'>2391</a>: Jython dataset setItem was overly cautious in its check for units, seriously degrading performance. Thanks, Bill!
-            <li>correction to where datum having units is assigned to dimensionless dataset in Jython.
-            <li>Jython scripts encoded in UTF-8 with non-breaking spaces are handled now by replacing with normal spaces.  Thanks, Cindy!
-            <li><a href='https://sourceforge.net/p/autoplot/bugs/1028/'>1028</a>: ds[x,y,z] where x y and z are rank 1 list of indices didn't allow negative indices.
-            <li><a href='https://sourceforge.net/p/autoplot/bugs/2390/'>2390</a>: correction to logic for copy plot elements down, which would break in some cases.  Thanks, Allison!
-            <li>layout tab list of plot elements wouldn't repaint when the legend label was changed.
-            <li>revert log/lin ticks logic, which is needing more time than available.
-            <li>"regex mode" for ASCII table parser would clear the units, limiting capabilities.
-            <li>Corrections to add plots and fix layout.  Now only plots attached to the marginColumn are used for the layout.
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>HTML table source supports commas in fields like "$1,234.00"
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>experiment allowing writes with GitHub-based FileSystems with a local clone.
             <li>qcturl property allows the Quality Control files to be written to another place, so that read-only pngwalks can be annotated.
@@ -96,28 +77,6 @@
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">758</a>: introduce editor for Granny Text Strings.
             <li>allow the connect timeout and read timeout to be reset from default of 5 and 60 seconds.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/757">757</a>: backgroundThick and fillStyle can be specified in the .vap
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/757">757</a>: plot.colorbarColumnPosition property added, so that the colorbar can be pushed over to make room for a second axis.
-            <li>Text strings can contain &lt;u&gt; for underlining text.
-            <li>NetCDF provides completions for x= and y= controls.
-            <li>Jython editor has beginnings of annotations for differences.
-            <li>GitCommand introduced to wrap calls to command line git, and native Java git is coming.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/754/">754</a>: aggregation can handle in-context timetags where just hours-since-midnight is in file.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/727/">727</a>: private GitLabs/GitHub projects can be used with ro_cache.txt mechanism.  Thanks, Sadie!
-            <li><a href="https://blog.jcoglan.com/2017/02/12/the-myers-diff-algorithm-part-1/">Meyers diff</a> introduced to support showing changes between two text files and eventually data sets, using com.github.difflib.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/456/">456</a>: external changes in script are automatically loaded without confirming this with the scientist.
-            <li>"AP> print 'hello'" works at the command line, to support copy-n-paste from references which contain "AP>" prompt.
-            <li>join(extent(),extent()) is properly formatted as two ranges.
-            <li>Introduce Units.us2020, for use when microsecond precision is needed around 2020.  Thanks, Kristoff!
-            <li>IDLSave reader uses %d format for integer data.
-            <li>IDLSave reader corrections to read array of strings, automatically detect ISO8601 data.  
-            <li>more accepting of HAPI servers under development, issuing warnings to help find problems.
-            <li>applyIndexAllLists extracted from Jython code and made available to Java codes as well.
-            <li>filter editor panel added for expandToFillGaps.  Thanks Bill!
-            <li><a href="https://github.com/das-developers/das2java/issues/18">18</a>: new logic for log ticks when ~1 cycle is showing.
-            <li>"About Autoplot" screen shows the release number, not the marginally useful v2021.  Thanks Bill!
         </ul>
         <p>Known issues:</p>
         <ul>
