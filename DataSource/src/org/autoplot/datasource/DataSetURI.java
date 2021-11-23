@@ -521,6 +521,13 @@ public class DataSetURI {
         // The user explicitly specified the source. E.g. vap+cdaweb:...
         String ext = DataSetURI.getExplicitExt( suri );
         if (ext != null && !suri.startsWith("vap+X:") ) {
+            if ( ext.equals(RECOGNIZE_FILE_EXTENSION_XML) || ext.equals(RECOGNIZE_FILE_EXTENSION_JSON) ) {
+                File f= getFile( uri.getRawSchemeSpecificPart(), mon );
+                String extr= DataSourceRecognizer.guessDataSourceType(f);
+                if ( extr!=null ) {
+                    ext= extr;
+                }
+            }
             return DataSourceRegistry.getInstance().getSource(ext);
         }
 
@@ -593,6 +600,16 @@ public class DataSetURI {
         }
         return factory;
     }
+    
+    /**
+     * carefully inspect the file to see if there is a particular handler for it.
+     */
+    public static final String RECOGNIZE_FILE_EXTENSION_JSON = "json";
+
+    /**
+     * carefully inspect the file to see if there is a particular handler for it.
+     */
+    public static final String RECOGNIZE_FILE_EXTENSION_XML = "xml";
     
     /**
      * get the InputStream from the path part of the URI.  The stream must be closed by the client.

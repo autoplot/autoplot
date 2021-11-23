@@ -101,6 +101,7 @@ import org.autoplot.datasource.ui.PromptComboBoxEditor;
 import org.autoplot.datasource.ui.PromptTextField;
 import org.das2.qds.ops.Ops;
 import org.das2.util.filesystem.Glob;
+import org.das2.util.monitor.AlertNullProgressMonitor;
 
 /**
  * Swing component for selecting dataset URIs.  This provides hooks for completions.
@@ -1837,11 +1838,35 @@ public class DataSetSelector extends javax.swing.JPanel {
                 return;
             }
         }
+        
+        boolean doBrowseSourceType= false;
+        if ( enableDataSource ) {
+            if ( !context.contains("/?") && context.contains("?") ) {
+                doBrowseSourceType= true;
+            } 
+            // see if the xml or json file is handled by a different source.
+            if ( ext.equals( DataSetURI.RECOGNIZE_FILE_EXTENSION_JSON ) || ext.equals( DataSetURI.RECOGNIZE_FILE_EXTENSION_XML) ) {
+                try {
+                    File f= DataSetURI.getFile(context,new AlertNullProgressMonitor("download on event thread"));
+                    String ext2= DataSourceRecognizer.guessDataSourceType(f);
+                    if ( ext2!=null ) {
+                        ext= ext2;
+                    }                    
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            if ( DataSourceRegistry.getInstance().hasSourceByExt(ext) ) {
+                doBrowseSourceType= true;
+            }
+        }
+        
 
         if ( enableDataSource && ( context.trim().length()==0 || context.trim().equals("vap+") ) ) {
             showCompletions();
 
-        } else if ( enableDataSource &&  ( (!context.contains("/?") && context.contains("?")) || DataSourceRegistry.getInstance().hasSourceByExt(ext) ) ) {
+        } else if ( doBrowseSourceType ) {
             browseSourceType();
 
         } else {

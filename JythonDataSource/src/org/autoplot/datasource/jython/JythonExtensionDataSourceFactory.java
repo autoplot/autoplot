@@ -10,9 +10,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.autoplot.datasource.AbstractDataSourceFactory;
 import org.autoplot.datasource.DataSetURI;
+import static org.autoplot.datasource.DataSetURI.getFile;
 import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.DataSourceRecognizer;
+import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.datasource.URISplit;
 import org.das2.datum.LoggerManager;
+import org.das2.util.monitor.AlertNullProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 
 /**
@@ -46,7 +50,23 @@ public class JythonExtensionDataSourceFactory extends AbstractDataSourceFactory 
             case "vap+wdc":
                 script= "https://raw.githubusercontent.com/autoplot/jyds/master/wdc_kp_ap.jyds";
                 break;
+            case "vap+tfcat":
+                script= "https://github.com/autoplot/scripts/blob/master/formats/tfcat/tfcat.jyds";
+                break;
             default:
+                try {
+                    File f;
+                    f = getFile( uri.getRawSchemeSpecificPart(), new AlertNullProgressMonitor() );
+                    String extr= DataSourceRecognizer.guessDataSourceType(f);
+                    if ( extr!=null ) {
+                        if ( extr.equals("vap+tfcat") ) {
+                            script= "https://github.com/autoplot/scripts/blob/master/formats/tfcat/tfcat.jyds";
+                            break;
+                        }
+                    }
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
                 throw new IllegalArgumentException("resource extension is not supported: "+split.ext);
         }
         

@@ -2,6 +2,8 @@
 package org.autoplot.datasource;
 
 import java.awt.Component;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.util.logging.Level;
@@ -11,6 +13,8 @@ import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.autoplot.aggregator.AggregatingDataSourceEditorPanel;
 import org.autoplot.aggregator.AggregatingDataSourceFactory;
+import static org.autoplot.datasource.DataSetSelector.logger;
+import org.das2.util.monitor.AlertNullProgressMonitor;
 
 /**
  * Utilities for URLs.
@@ -69,6 +73,18 @@ public class DataSourceEditorPanelUtil {
         String surl = suri;
         String ext = DataSetURI.getExt(surl);
 
+        if ( ext.equals(DataSetURI.RECOGNIZE_FILE_EXTENSION_JSON) || ext.equals( DataSetURI.RECOGNIZE_FILE_EXTENSION_XML ) ) {
+            try {
+                File f= DataSetURI.getFile(suri,new AlertNullProgressMonitor("download on event thread"));
+                String ext2= DataSourceRecognizer.guessDataSourceType(f);
+                if ( ext2!=null ) {
+                    ext= ext2;
+                }                    
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+        
         if (  DataSetURI.isAggregating(surl) ) {
             String eext = DataSetURI.getExplicitExt(surl);
             if (eext != null) {
