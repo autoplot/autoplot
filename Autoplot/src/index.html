@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Special GUI for autoRangeHints makes this unused feature more accessible.
+        <p><small>Special GUI for tickValues makes this unused feature more accessible.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,8 +27,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-11-22 r26265):</p>
+        <p>Bugfixes (2021-11-23 r26265):</p>
         <ul>
+            <li>LanlNNRebinner would improperly clip the last partial dataset column because of bug in renderer.  Thanks, Sadie!
+            <li>orbit renderer with ticks along the path didn't have the sloppy units logic.  Thanks, Sadie!
+            <li>Move images from org.autoplot.datasource to resources to reduce clutter.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">rfe758</a>: tickValues GUI had a bug with repeat every.  Thanks, Sadie!
         </ul>
         <p>Older Bugfixes (2021-11-18 r26241):</p>
@@ -56,6 +59,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/762">762</a>: Peek inside JSON and XML files to identify schema when identifying data source.
+            <li>junoPJ_2hr orbits added to TimeRangeTool.
             <li>HTML table source supports commas in fields like "$1,234.00"
         </ul>
         <p>Less recent features:</p>
