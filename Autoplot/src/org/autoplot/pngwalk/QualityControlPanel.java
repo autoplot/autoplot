@@ -142,7 +142,8 @@ public class QualityControlPanel extends javax.swing.JPanel {
             statustxt= " ";
         } else {
             int index= walkImageSequence.getIndex();
-            statustxt= String.format("#%d of %d OK | %d Prob | %d Ign | %d Unknown", (index+1), numOK, numProblem, numIgnore, numUnknown);
+            statustxt= String.format("#%d of %d OK | %d Prob | %d Ign | %d Unknown", 
+                    (index+1), numOK, numProblem, numIgnore, numUnknown);
         }
 
         statusLabel.setText(statustxt);
@@ -179,7 +180,8 @@ public class QualityControlPanel extends javax.swing.JPanel {
                     sequenceProperties.load(in);
                     in.close();
                 }
-                walkImageSequence.setQCFolder( DataSetURI.getResourceURI(sequenceProperties.getProperty(KEY_QUALITY_CONTROL_URI, path)) );
+                walkImageSequence.setQCFolder( 
+                        DataSetURI.getResourceURI(sequenceProperties.getProperty(KEY_QUALITY_CONTROL_URI, path)) );
                 
                 QualityControlSequence qseq= walkImageSequence.getQualityControlSequence();
                 int index= walkImageSequence.getIndex(); // DANGER: see repeat code
@@ -222,7 +224,6 @@ public class QualityControlPanel extends javax.swing.JPanel {
                         saveButton.setEnabled(true);
                         loginButton.setEnabled(false);        
                     } else {
-                        //JOptionPane.showMessageDialog( QualityControlPanel.this,"<html>Unable to write to File System<br>"+fs.getRootURI() );
                         loginButton.setEnabled(false);    
                         loginButton.setToolTipText("<html>Unable to write to File System<br>"+fs.getRootURI());
                         saveButton.setEnabled(false);
