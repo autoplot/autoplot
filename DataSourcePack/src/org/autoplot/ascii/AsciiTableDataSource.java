@@ -271,7 +271,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
                     throw new IllegalArgumentException("somehow the parser was misconfigured to have two different time units.");
                 }
                 if ( !u1.isConvertibleTo(u0.getOffsetUnits()) ) { // allow "s" to go with UTC
-                    throw new IllegalArgumentException("first two columns should have the same units, or second column should be offset (e.g. seconds) from first");
+                    throw new IllegalArgumentException("first two columns should have the same units, or "+
+                            "second column should be offset (e.g. seconds) from first");
                 }
             }
             dep0.putProperty( QDataSet.UNITS, parser.getUnits(0) );
@@ -314,8 +315,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
                             if ( column.length()>1 ) vds1.putProperty( QDataSet.NAME, column );
                             vds1.putProperty( QDataSet.LABEL, parser.getFieldNames()[icol] );
                         } else {
-                            //BUG2000: bundleDescriptor is supposed to be a AsciiHeadersParser.BundleDescriptor.  Message is poor when wrong column name is used.
-                            //https://sourceforge.net/p/autoplot/bugs/1999/
+                            //BUG2000: bundleDescriptor is supposed to be a AsciiHeadersParser.BundleDescriptor.  Message is poor 
+                            //when wrong column name is used.  https://sourceforge.net/p/autoplot/bugs/1999/
                             if ( bundleDescriptor instanceof AsciiHeadersParser.BundleDescriptor ) {
                                 QDataSet _vds= AsciiHeadersParser.getInlineDataSet( bundleDescriptor, column );
                                 if ( _vds==null ) {
@@ -382,7 +383,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 QDataSet cadence= DataSetUtil.guessCadenceNew( dep0, null );
                 if ( cadence!=null && !"log".equals( cadence.property(QDataSet.SCALE_TYPE) ) ) {
                     double add= cadence.value()/2; //DANGER--should really check units.
-                    logger.log( Level.FINE, "adding half-interval width to dep0 because of %s: %s", new Object[] { PARAM_INTERVAL_TAG, cadence } );
+                    logger.log( Level.FINE, "adding half-interval width to dep0 because of %s: %s", 
+                            new Object[] { PARAM_INTERVAL_TAG, cadence } );
                     for ( int i=0; i<dep0.length(); i++ ) {
                         dep0.putValue( i, dep0.value(i)+add );
                     }
@@ -587,7 +589,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
         } else {
             if (vds == null) {
                 if ( column==null ) {
-                    throw new IllegalArgumentException("column was not specified.  Use column, rank2, or bundle to specify data to plot.");
+                    throw new IllegalArgumentException("column was not specified.  "+
+                            "Use column, rank2, or bundle to specify data to plot.");
                 } else {
                     throw new IllegalArgumentException("didn't find column: " + column);
                 }
@@ -648,7 +651,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
     }
 
     /**
-     * returns the rank 2 dataset produced by the ascii table reader.
+     * returns the rank 2 dataset produced by the ASCII table reader.
      * @param mon note monitor is used twice, so the progress bar jumps back.
      * @return
      * @throws java.lang.NumberFormatException
@@ -1020,7 +1023,10 @@ public class AsciiTableDataSource extends AbstractDataSource {
         eventListColumn= params.get("eventListColumn");
         
         // rfe https://sourceforge.net/p/autoplot/bugs/1425/: create events list automatically.
-        if ( parser.getFieldLabels().length>=2 && parser.getFieldLabels().length <= 5 && UnitsUtil.isTimeLocation(parser.getUnits(0)) && UnitsUtil.isTimeLocation(parser.getUnits(1)) && !haveColumn ) {
+        if ( parser.getFieldLabels().length>=2 
+                && parser.getFieldLabels().length <= 5 
+                && UnitsUtil.isTimeLocation(parser.getUnits(0)) 
+                && UnitsUtil.isTimeLocation(parser.getUnits(1)) && !haveColumn ) {
             if ( parser.getFieldCount()>2 ) {
                 eventListColumn= "field"+(parser.getFieldLabels().length-1);
             } else {
@@ -1030,11 +1036,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
             }
         }
         
-        // rfe https://sourceforge.net/p/autoplot/feature-requests/256: add support for HDMC's simple event list format, where the first two columns are start and stop times.
+        // rfe https://sourceforge.net/p/autoplot/feature-requests/256: add support for HDMC's simple event list format, where 
+        // the first two columns are start and stop times.
         if ( eventListColumn!=null ) {
             parser.setUnits( 0, AsciiParser.UNIT_UTC );
             parser.setUnits( 1, AsciiParser.UNIT_UTC );
-            //if ( UnitsUtil.isTimeLocation( parser.getUnits(1) ) ) parser.setUnits(1,Units.us2000); // enough of a guess that this will find a good record.
             parser.setFieldParser(0, parser.UNITS_PARSER);
             parser.setFieldParser(1, parser.UNITS_PARSER);
             if ( !eventListColumn.equals("") ) { //"" means it is just two columns: st,en.
@@ -1046,13 +1052,13 @@ public class AsciiTableDataSource extends AbstractDataSource {
                     String[] fields = new String[parser.getRecordParser().fieldCount()];
                     String s= parser.readFirstParseableRecord(file.toString());
                     parser.getRecordParser().splitRecord(s,fields);
-                    if ( fields[2].startsWith("x") || fields[2].startsWith("0x" ) ) { // kludge for RGB color third column starts with x
+                    if ( fields[2].startsWith("x") || fields[2].startsWith("0x" ) ) { // RGB color third column starts with x or 0x
                         parser.setUnits(2,Units.dimensionless);
                         parser.setFieldParser( 2, new FieldParser() {
                             @Override
                             public double parseField(String field, int columnIndex) throws ParseException {
                                 if ( field.startsWith("x") ) {
-                                    return Integer.decode( "0"+field ); // kludge for Scott
+                                    return Integer.decode( "0"+field ); 
                                 } else {
                                     return Integer.decode( field );
                                 }
