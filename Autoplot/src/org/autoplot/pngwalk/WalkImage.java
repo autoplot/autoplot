@@ -54,7 +54,7 @@ public class WalkImage  {
     private static final int LOADED_THUMB_COUNT_LIMIT = 400;
 
     final String uriString;  // Used for sorting
-    private URI imgURI;
+    private final URI imgURI;
 
     /**
      * full-size image
@@ -87,10 +87,10 @@ public class WalkImage  {
     private Status status;
     private long initLoadBirthTime;
     
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private final boolean haveThumbs400;
 
-    private static BufferedImage missingImage = initMissingImage();
+    private static final BufferedImage missingImage = initMissingImage();
 
     private static final LinkedList<WalkImage> freshness= new LinkedList();
     //private static final LinkedList<WalkImage> thumbLoadingQueue= new LinkedList();
@@ -147,6 +147,7 @@ public class WalkImage  {
 
     private void setStatus(Status s) {
         logger.log(Level.FINER, "setStatus {0} {1}", new Object[]{s, caption});
+        if ( s==null ) throw new NullPointerException("status cannot be null");
         Status oldStatus = status;
         status = s;
         pcs.firePropertyChange(PROP_STATUS_CHANGE, oldStatus, status);
@@ -300,6 +301,7 @@ public class WalkImage  {
      * return a file, that is never type=0.  This was a bug on Windows.
      * @param f
      * @return
+     * @throws java.io.IOException
      */
     public BufferedImage readImage( File f ) throws IllegalArgumentException, IOException  {
         logger.entering( "WalkImage", "readImage" );
@@ -400,12 +402,15 @@ public class WalkImage  {
             //thumb = resizeOp.filter(rawThumb, null);
             thumb = WalkUtil.resizeImage( rawThumb, width, height );
             thumbDimension= new Dimension(width,height);
-            if (status == Status.THUMB_LOADING) {
-                setStatus(Status.THUMB_LOADED);
-            } else if (status == Status.SIZE_THUMB_LOADED) {
-                setStatus(Status.THUMB_LOADED);
-            } else {
-                //setStatus(Status.THUMB_LOADED);
+            switch (status) {
+                case THUMB_LOADING:
+                    setStatus(Status.THUMB_LOADED);
+                    break;
+                case SIZE_THUMB_LOADED:
+                    setStatus(Status.THUMB_LOADED);
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -494,10 +499,8 @@ public class WalkImage  {
         if (thumb != null) return thumb;
         if (!loadIfNeeded) return null;
 
-        Runnable r = new Runnable() {
-            public void run() {
-                getThumbnailImmediately();
-            }
+        Runnable r = () -> {
+            getThumbnailImmediately();
         };
         RequestProcessor.invokeLater(r);
 
@@ -563,8 +566,6 @@ public class WalkImage  {
 
             File localFile = fo.getFile();
 
-            Thread.yield();
-
             im = readImage(localFile);
 
             if ( im==null ) {
@@ -608,7 +609,7 @@ public class WalkImage  {
             setStatus(Status.IMAGE_LOADED);
         } catch (RuntimeException ex) {
             throw ex;
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             //System.err.println("Error loading image file from " + DataSetURI.fromUri(imgURI) );
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             setStatus(Status.MISSING);
@@ -622,10 +623,8 @@ public class WalkImage  {
         if (status == Status.IMAGE_LOADING || status == Status.IMAGE_LOADED) {
             return;
         }
-        Runnable r = new Runnable() {
-            public void run() {
-                loadImageImmediately();
-            }
+        Runnable r = () -> {
+            loadImageImmediately();
         };
         setStatus(Status.IMAGE_LOADING);
         initLoadBirthTime= System.currentTimeMillis();
