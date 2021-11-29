@@ -188,20 +188,14 @@ public class DataSourceUtil {
     }
 
     /**
-     * returns the last index of slash, splitting the FileSystem part from the template part.
-     * @param surl
-     * @return
-     */
-    private static int splitIndex(String surl) {
-        int i= firstIndexOf( surl,Arrays.asList( "%Y","$Y","%y","$y",".*") );
-        if ( i!=-1 ) {
-            i = surl.lastIndexOf('/', i);
-        } else {
-            i = surl.lastIndexOf('/');
-        }
-        return i;
-    }
-
+     * return the aggregations we can find.
+     * If remove is true, then the input list will have all items
+     * removed that are not part of an aggregation.
+     *
+     * @param files
+     * @param remove remove the files that are accounted for by the aggregation.
+     * @return list of aggregations found.
+     */    
     public static List<String> findAggregations( List<String> files, boolean remove ) {
         return findAggregations( files, remove, false );
     }
@@ -386,6 +380,31 @@ public class DataSourceUtil {
     }
 
     /**
+     * return the group containing the delimiter, the - in $Y-$m-$d.
+     * @param replaceWith1
+     * @return 
+     */
+    private static int delimGroup( String replaceWith1 ) {
+                                // identify delimiter 
+        int id2= replaceWith1.indexOf("$2"); 
+        if ( id2>-1 ) {
+            return 2;
+        } else {
+            int id3= replaceWith1.indexOf("$3");
+            if ( id3>-1 ) {
+                return 3;
+            } else {
+                int id4= replaceWith1.indexOf("$4");
+                if ( id4>-1 ) {
+                    return 4;
+                } else {
+                    return -1;
+                }
+            }
+        }
+    }
+    
+    /**
      * return the replacement or null.  remove the used items.  This will not match anything 
      * after the question mark, if there is one.
      * @param s the URI.
@@ -407,7 +426,8 @@ public class DataSourceUtil {
         String flast= null;
         String frepl= null;
         int best= -1;
-        int n= search.size();
+        int fdelimGroup= -1;
+        String bestDelim= "";
 
         int limit= s.indexOf('?');
         if ( limit==-1 ) limit=s.length();
@@ -415,15 +435,23 @@ public class DataSourceUtil {
         DatumRange dr= null;
         
         while (true ) {
+            
+            String delim= null;
+            int delimGroup= -1;
+            int n= search.size();
             for ( int i=0; i<n; i++ ) {
                 String search1= search.get(i);
+                String replaceWith1= replaceWith.get(i);
+                delimGroup= delimGroup(replaceWith1);
                 if ( search1==null ) continue; // search.get(i)==null means that search is no longer eligible.
                 Matcher m= Pattern.compile(search1).matcher(s);
                 int idx= -1;
                 int ien= -1;
+                
                 while ( m.find() ) {
                     idx= m.start();
                     ien= m.end();
+                    if ( delimGroup>-1 ) delim= m.group(delimGroup);
                 }
                 if ( idx>-1 && idx<limit ) {
                     found.put( search1, idx );
@@ -434,7 +462,7 @@ public class DataSourceUtil {
                             }
                         }
                         if ( timerange!=null ) {
-                            String trypattern= replaceWith.get(i);
+                            String trypattern= replaceWith1;
                             trypattern= trypattern.replaceAll("\\$\\d", ".");
                             trypattern= trypattern.replaceAll("\\\\","");
                             TimeParser tp= TimeParser.create(trypattern);
@@ -450,18 +478,18 @@ public class DataSourceUtil {
                         }
                         last= idx;
                         flast= search1;
-                        frepl= replaceWith.get(i);
+                        frepl= replaceWith1;
+                        fdelimGroup= delimGroup;
+                        bestDelim= delim;
                         best= i;
                     }
                 }
             }
             if ( best>-1 ) {
                 String date= s.substring(last);
-                String ch= date.substring(4,5); // get the $2 char.  Assumes all are $Y
                 assert frepl!=null;
                 String stp= frepl.replaceAll("\\\\",""); 
-                stp= stp.replaceAll("\\$2",ch);
-                stp= stp.replaceAll("\\$3",ch);
+                stp= stp.replaceAll("\\$"+fdelimGroup,bestDelim);
                 TimeParser tp= TimeParser.create( stp );
                 DatumRange dr1=null;
                 try {
@@ -596,8 +624,10 @@ public class DataSourceUtil {
                     break; // we found something
                 }
             }
-            logger.fine("unable to find any digits for aggregation.");
-            if ( timeRange==null ) return null;
+            if ( timeRange==null ) {
+                logger.fine("unable to find any digits for aggregation.");
+                return null;
+            }
         }
 
         int day= TimeUtil.DAY;
@@ -607,7 +637,7 @@ public class DataSourceUtil {
         int minute= TimeUtil.MINUTE;
 
         List<String> search= new ArrayList( Arrays.asList( yyyymmdd_HHMM, yyyymmdd_HH, yyyymmdd, yyyy_jjj, yyyyjjj, yyyymm, yyyy_mm_dd, yyyy_mm, yyyy ) );
-        List<String> replac= new ArrayList( Arrays.asList( "\\$Y\\$m\\$d$3\\$H\\$M", "\\$Y\\$m\\$d$3\\$H", "\\$Y\\$m\\$d", "\\$Y$2\\$j","\\$Y\\$j","\\$Y\\$m", "\\$Y$2\\$m$2\\$d", "\\$Y$2\\$m", "/\\$Y/" ) );
+        List<String> replac= new ArrayList( Arrays.asList( "\\$Y\\$m\\$d$4\\$H\\$M", "\\$Y\\$m\\$d$4\\$H", "\\$Y\\$m\\$d", "\\$Y$2\\$j","\\$Y\\$j","\\$Y\\$m", "\\$Y$2\\$m$2\\$d", "\\$Y$2\\$m", "/\\$Y/" ) );
         List<Integer> resol= new ArrayList( Arrays.asList( minute, hour, day, day, day, month, day, month, year ) );
         
         String s;
