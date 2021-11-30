@@ -172,14 +172,15 @@ public class FitsDataSource extends AbstractDataSource {
 
         };
         
-        if ( fc.getUnit().equals("s") ) {
+        String fcunit= fc.getUnit()!=null ? fc.getUnit() : "";
+        if ( "s".equals(fcunit) ) {
             try {
                 result.putProperty( QDataSet.UNITS, Units.lookupTimeUnits( "seconds since 2000-01-01T00:00Z") );
             } catch (ParseException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
         } else {
-            result.putProperty( QDataSet.UNITS, Units.lookupUnits( fc.getUnit() ) );
+            result.putProperty( QDataSet.UNITS, Units.lookupUnits( fcunit ) );
         }
         
         return result;
