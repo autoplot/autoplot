@@ -1,6 +1,8 @@
 
 package org.autoplot.servlet;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -106,7 +108,7 @@ public class ScriptGUIServlet extends HttpServlet {
      * @param out the OutputStream accepting the data, which is not closed.
      * @throws java.io.IOException
      */
-    public static void writeToPng( Application dom, OutputStream out) throws IOException {
+    private static void writeToPng( Application dom, BufferedImage orig, OutputStream out) throws IOException {
         waitUntilIdle();
 
         DasCanvas c = dom.getController().getApplicationModel().getCanvas();
@@ -115,6 +117,17 @@ public class ScriptGUIServlet extends HttpServlet {
 
         BufferedImage image = c.getImage(width,height);
 
+        if ( image.equals(orig) ) {
+            BufferedImage im= new BufferedImage( 320, 200, BufferedImage.TYPE_INT_ARGB );
+            Graphics g= im.getGraphics();
+            g.setColor( Color.WHITE );
+            g.fillRect( 0, 0, width, height );
+            g.setColor( Color.GRAY );
+            g.drawRect( 0, 0, width-1, height-1 );
+            g.drawString( "(canvas not used)", 10, 100 );
+            image= im;
+        }
+        
         DasPNGEncoder encoder = new DasPNGEncoder();
         encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
         encoder.addText(DasPNGConstants.KEYWORD_SOFTWARE, "Autoplot" );
@@ -398,6 +411,12 @@ public class ScriptGUIServlet extends HttpServlet {
         
         File consoleKeyFile= getKeyFile( key, ".txt.t" );
         
+        DasCanvas c = dom.getController().getApplicationModel().getCanvas();
+        int width= dom.getCanvases(0).getWidth();
+        int height= dom.getCanvases(0).getHeight();
+
+        BufferedImage baseImage = c.getImage(width,height);
+        
         try ( OutputStream baos= new FileOutputStream( consoleKeyFile, true ) ) {
             runScript( dom,
                 new ByteArrayInputStream(script.getBytes("UTF-8")),
@@ -410,10 +429,10 @@ public class ScriptGUIServlet extends HttpServlet {
                 ex.printStackTrace(write);
             }
         }
-        
+
         File imageKeyFile =  getKeyFile( key, ".png.t" );
         try ( FileOutputStream out= new FileOutputStream( imageKeyFile, true ) ) {
-            writeToPng( dom, out );
+            writeToPng(dom, baseImage, out );
         }
         if ( !imageKeyFile.renameTo( getKeyFile( key, ".png" ) ) ) {
             throw new IllegalArgumentException("unable to rename file (.png)");
