@@ -321,6 +321,12 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
                 if ( arg0.get(ii).completable.equals(arg0.get(ii).label) ) {
                     arg0.get(ii).label= null;
                 }
+                if ( arg0.get(ii).completable.equals("") ) {
+                    String s= arg0.get(ii).label;
+                    if ( s!=null && s.trim().length()>0 ) {
+                        optPanel.add( BorderLayout.NORTH, new JLabel(s) );
+                    }
+                }
                 if ( arg0.get(ii).label!=null ) {
                     arg0options.add( arg0.get(ii).completable + ": " +arg0.get(ii).label );
                 } else {
