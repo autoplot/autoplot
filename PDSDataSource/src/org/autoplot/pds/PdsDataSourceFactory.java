@@ -134,6 +134,7 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
         }
         
         for ( ArrayObject a: label.getObjects(ArrayObject.class) ) {
+            //result.put( a.getName(), a.getDescription() ); //TODO: update PDS4 library
             result.put( a.getName(), a.getName() );
         }
         
@@ -176,10 +177,11 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
             Map<String,String> result= getDataObjectNames(xmlfile.toURI().toURL(), mon);
             
             List<CompletionContext> ccresult= new ArrayList<>();
-            ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "", this, "arg_0", "", null, true ) );
+            ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "", this, "arg_0", "Select parameter to plot", "", false ) );
             for ( java.util.Map.Entry<String,String> e:result.entrySet() ) {
                 String key= e.getKey();
-                CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, key, this, "arg_0", e.getValue(), null, true );
+                String desc= e.getValue();
+                CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, key, this, "arg_0", desc, "", true );
                 ccresult.add(cc1);
             }
             ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "X=",
@@ -199,10 +201,13 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
                 Map<String,String> result= getDataObjectNames(cc.resourceURI.toURL(), mon);
             
                 List<CompletionContext> ccresult= new ArrayList<>();
-                ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "", this, "arg_0", "", null, true ) );
+                ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "", this, "arg_0", 
+                        "", null, true ) );
                 for ( java.util.Map.Entry<String,String> e:result.entrySet() ) {
                     String key= e.getKey();
-                    CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, key, this, "arg_0", e.getValue(), null, true );
+                    String desc= e.getValue();
+                    CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, key, this, "arg_0", 
+                            desc, null, true );
                     ccresult.add(cc1);
                 }
                 
