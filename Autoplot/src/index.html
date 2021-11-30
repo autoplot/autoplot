@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Special GUI for tickValues makes this unused feature more accessible.
+        <p><small>Length mouse module accepts keystroke "1" through "9" to divide by so many cycles.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,11 +27,15 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-11-23 r26265):</p>
+        <p>Bugfixes (2021-11-30 r26285):</p>
         <ul>
+            <li>make the "width is not finite" message more precise by including the code issuing the message.
+            <li>bugfix in FITS reader, where data without units would cause NullPointerException.
+            <li>bugfix in automatic aggregation of "$Y/$m/$d/$Y$m$dT$H_all.csv" 
             <li>LanlNNRebinner would improperly clip the last partial dataset column because of bug in renderer.  Thanks, Sadie!
             <li>orbit renderer with ticks along the path didn't have the sloppy units logic.  Thanks, Sadie!
             <li>Move images from org.autoplot.datasource to resources to reduce clutter.
+            <li>setDepend1Cadence filter editor had runtime error.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">rfe758</a>: tickValues GUI had a bug with repeat every.  Thanks, Sadie!
         </ul>
         <p>Older Bugfixes (2021-11-18 r26241):</p>
@@ -59,7 +63,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>
+            <li>rfe 764: completion-based GUIs using arg_0 can specify a label for arg_0 now.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/762">762</a>: Peek inside JSON and XML files to identify schema when identifying data source.
+            <li>Length digitizer allows 1-9 keys to specify a divisor, so that repeating signals can be measured more accurately.
             <li>junoPJ_2hr orbits added to TimeRangeTool.
             <li>HTML table source supports commas in fields like "$1,234.00"
         </ul>
