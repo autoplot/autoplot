@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.fits;
 
 import java.io.File;
@@ -22,7 +19,7 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 
 /**
- *
+ * NASA FITS file reader factory
  * @author jbf
  */
 public class FitsDataSourceFactory extends AbstractDataSourceFactory {
@@ -34,14 +31,14 @@ public class FitsDataSourceFactory extends AbstractDataSourceFactory {
 
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, org.das2.util.monitor.ProgressMonitor mon) throws FitsException {
-        List<CompletionContext> result = new ArrayList<CompletionContext>();
+        List<CompletionContext> result = new ArrayList<>();
 
         if (cc.context.equals(CompletionContext.CONTEXT_PARAMETER_NAME)) {
             try {
                 String surl = CompletionContext.get(CompletionContext.CONTEXT_FILE, cc);
                 Set<String> plottable = getPlottable( DataSetURI.toUri(surl), mon).keySet();
                 for (String s : plottable) {
-                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, s, this, "arg_0"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, s, this, "arg_0",null,null, true));
                 }
 
             } catch (IOException ex) {
@@ -56,7 +53,7 @@ public class FitsDataSourceFactory extends AbstractDataSourceFactory {
         File f = DataSetURI.getFile(uri, mon);
         FitsFile file = new FitsFile(f);
 
-        Map<String,Integer> result= new LinkedHashMap<String,Integer>();
+        Map<String,Integer> result= new LinkedHashMap<>();
         
         int nhdu= file.getNoHDUnits();
         for ( int i=0; i<nhdu; i++ ) {
