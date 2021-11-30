@@ -141,7 +141,8 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
         return result;
     }
     
-    protected static URL getFileResource( URL labelFile, ProgressMonitor mon ) throws IOException, URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException {
+    protected static URL getFileResource( URL labelFile, ProgressMonitor mon ) 
+            throws IOException, URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException {
         String suri= fromUri( labelFile.toURI() );
         File xmlfile = DataSetURI.getFile(suri,mon);
         DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
@@ -149,11 +150,13 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
         DocumentBuilder builder = domFactory.newDocumentBuilder();
         Document doc = builder.parse(xmlfile);
         
-        XPathExpression xp= XPathFactory.newInstance().newXPath().compile("//Product_Observational/File_Area_Observational/File/file_name/text()");
+        XPathExpression xp= XPathFactory.newInstance().newXPath().compile(
+                "//Product_Observational/File_Area_Observational/File/file_name/text()");
         String fname= (String)xp.evaluate( doc, XPathConstants.STRING );
         
         if ( fname.length()==0 ) {
-            throw new IllegalArgumentException("file name is empty or not found at //Product_Observational/File_Area_Observational/File/file_name/text()");
+            throw new IllegalArgumentException("file name is empty or not found at "+
+                    "//Product_Observational/File_Area_Observational/File/file_name/text()");
         }
         URL fnameUrl= new URL( labelFile, fname );
         return fnameUrl;
@@ -185,7 +188,8 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
             for ( java.util.Map.Entry<String,String> e:result.entrySet() ) {
                 String key= e.getKey();
                 String desc= e.getValue();
-                CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, key, this, "arg_0", desc, "", true );
+                CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, 
+                        key, this, "arg_0", desc, "", true );
                 ccresult.add(cc1);
             }
             ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "X=",
@@ -223,8 +227,5 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
         return Collections.emptyList();        
         
     }
-    
-    
-    
     
 }
