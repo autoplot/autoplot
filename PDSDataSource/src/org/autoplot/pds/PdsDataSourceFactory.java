@@ -177,7 +177,11 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
             Map<String,String> result= getDataObjectNames(xmlfile.toURI().toURL(), mon);
             
             List<CompletionContext> ccresult= new ArrayList<>();
-            ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "", this, "arg_0", "Select parameter to plot", "", false ) );
+            ccresult.add( new CompletionContext( 
+                    CompletionContext.CONTEXT_PARAMETER_NAME, 
+                    "", 
+                    this, "arg_0", 
+                    "Select parameter to plot", "", false ) );
             for ( java.util.Map.Entry<String,String> e:result.entrySet() ) {
                 String key= e.getKey();
                 String desc= e.getValue();
