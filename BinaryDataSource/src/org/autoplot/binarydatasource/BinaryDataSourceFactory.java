@@ -28,7 +28,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "byteOffset=", "byte offset of the first record" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "byteLength=", "total number of bytes to read (limit 2G)" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "fieldCount=", "specify record length based on field type" ) );
-            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "rank2=", "start and stop indeces for rank 2 data set" ) );
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "rank2=", "start and stop indices for rank 2 data set" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "recCount=", "limit the number of records to read in" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "recLength=", "byte length of each record" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "recOffset=", "byte offset into each record") );
