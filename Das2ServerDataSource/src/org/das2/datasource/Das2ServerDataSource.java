@@ -152,7 +152,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
     String interval;
     String dsParams;
     List<String> tcaDesc;
-    Map dsdfParams = null;
+    Map<String,String> dsdfParams = null;
 
     /**
      * attempt to unbundle the name, return null if the data set is not found.
@@ -321,10 +321,22 @@ public final class Das2ServerDataSource extends AbstractDataSource {
 
             int iplane = 0;
             String label = (String) dsdfParams.get("label");
-            while (label != null) {
-                tcaDesc.add(label);
-                iplane++;
-                label = (String) dsdfParams.get("plane_" + iplane + ".label");
+            if ( label==null ) { // do 2.2.2 stuff
+                if ( "1".equals( dsdfParams.get("requiresInterval") ) ) {
+                    label= dsdfParams.get("item_"+String.format("%02d",iplane) );
+                    while ( label!=null ) {
+                        tcaDesc.add(label);
+                        iplane++;
+                        label= dsdfParams.get("item_"+String.format("%02d",iplane) );
+                    }
+                    
+                }
+            } else {
+                while (label != null) {
+                    tcaDesc.add(label);
+                    iplane++;
+                    label = (String) dsdfParams.get("plane_" + iplane + ".label");
+                }
             }
 
             String groupAccess = (String) dsdfParams.get("groupAccess");
@@ -530,7 +542,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             }
 
             QDataSet result;
-            if ( tcaDesc!=null && tcaDesc.size()>0 ) {
+            if ( tcaDesc!=null && tcaDesc.size()>0 && item != null && !item.equals("") ) {
                 result= unbundleTCAItemQDS( ds, item, tcaDesc );
             } else {
                 result= ds;
