@@ -215,7 +215,11 @@ public class UndoRedoSupport {
         int oldDepth= stateStack.size();
 
         if ( level>(oldDepth-1) ) {
-            throw new IllegalArgumentException("cannot undo so many levels");
+            level= oldDepth-1;
+        }
+
+        if ( level==0 ) {
+            return;
         }
         
         if ( oldDepth>0 ) {
