@@ -570,6 +570,9 @@ public class CdfDataSource extends AbstractDataSource {
                 QDataSet result0=null;
                 for ( int i=0; i<svariables.length; i++ ) {
                     String s= svariables[i];
+                    if ( !cdf.existsVariable(s) ) {
+                        throw new IllegalArgumentException("variable does not exist: "+s );
+                    }
                     String c= constraints.isEmpty() ? null : constraints.get(i);
                     HashMap<String,Object> attrs1 = readAttributes(cdf, s, 0);
                     QDataSet result1= loadVariableAndDependents(cdf, s, c, false, doDep, attrs1, -1, mon.getSubtaskMonitor("reading "+s+" from CDF file") );
