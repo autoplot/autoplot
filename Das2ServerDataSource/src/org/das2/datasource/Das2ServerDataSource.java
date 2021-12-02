@@ -325,6 +325,8 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                 if ( "1".equals( dsdfParams.get("requiresInterval") ) ) {
                     label= dsdfParams.get("item_"+String.format("%02d",iplane) );
                     while ( label!=null ) {
+                        int i= label.indexOf("|");
+                        label = i==-1 ? label.trim() : label.substring(0,i).trim();
                         tcaDesc.add(label);
                         iplane++;
                         label= dsdfParams.get("item_"+String.format("%02d",iplane) );
@@ -544,6 +546,23 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             QDataSet result;
             if ( tcaDesc!=null && tcaDesc.size()>0 && item != null && !item.equals("") ) {
                 result= unbundleTCAItemQDS( ds, item, tcaDesc );
+            } else if ( tcaDesc!=null && tcaDesc.size()>0 && item==null ) {
+                QDataSet ll= Ops.labelsDataset( tcaDesc.toArray(new String[tcaDesc.size()] ) );
+                if ( ll.length()==ds.length(0) ) {
+                    QDataSet bds= (QDataSet)ds.property( QDataSet.BUNDLE_1 );
+                    if ( bds instanceof BundleDescriptor ) {
+                        BundleDescriptor bdds= (BundleDescriptor)bds;
+                        for ( int i=0; i<ll.length(); i++ ) {
+                            bdds.putProperty( QDataSet.NAME, i, ll.slice(i).svalue() );
+                        }
+                        result= ds;
+                    } else {
+                        result= Ops.putProperty( ds, QDataSet.DEPEND_1, ll );
+                    }
+                    
+                } else {
+                    result= ds;
+                }
             } else {
                 result= ds;
             }
