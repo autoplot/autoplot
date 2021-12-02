@@ -73,7 +73,7 @@ public class DataSourceEditorPanelUtil {
         String surl = suri;
         String ext = DataSetURI.getExt(surl);
 
-        if ( ext.equals(DataSetURI.RECOGNIZE_FILE_EXTENSION_JSON) || ext.equals( DataSetURI.RECOGNIZE_FILE_EXTENSION_XML ) ) {
+        if (  ext!=null && ( ext.equals(DataSetURI.RECOGNIZE_FILE_EXTENSION_JSON) || ext.equals( DataSetURI.RECOGNIZE_FILE_EXTENSION_XML ) ) ) {
             try {
                 File f= DataSetURI.getFile(suri,new AlertNullProgressMonitor("download on event thread"));
                 String ext2= DataSourceRecognizer.guessDataSourceType(f);

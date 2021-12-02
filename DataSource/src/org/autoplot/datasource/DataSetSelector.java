@@ -1845,7 +1845,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 doBrowseSourceType= true;
             } 
             // see if the xml or json file is handled by a different source.
-            if ( ext.equals( DataSetURI.RECOGNIZE_FILE_EXTENSION_JSON ) || ext.equals( DataSetURI.RECOGNIZE_FILE_EXTENSION_XML) ) {
+            if ( ext!=null && ( ext.equals( DataSetURI.RECOGNIZE_FILE_EXTENSION_JSON ) || ext.equals( DataSetURI.RECOGNIZE_FILE_EXTENSION_XML) ) ) {
                 try {
                     File f= DataSetURI.getFile(context,new AlertNullProgressMonitor("download on event thread"));
                     String ext2= DataSourceRecognizer.guessDataSourceType(f);
