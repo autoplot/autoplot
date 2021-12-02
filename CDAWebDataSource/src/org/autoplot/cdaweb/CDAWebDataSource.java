@@ -81,7 +81,7 @@ public class CDAWebDataSource extends AbstractDataSource {
         
         savail= getParam( PARAM_AVAIL,"F");
         
-        if ( id==null ) id= getParam("id","H_lo");
+        if ( id==null ) id= getParam("id",null);
 
         if ( id==null ) throw new IllegalArgumentException("param not specified");
 
