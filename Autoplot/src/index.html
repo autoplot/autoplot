@@ -27,8 +27,17 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-11-30 r26285):</p>
+        <p>Bugfixes (2021-12-03 r26294):</p>
         <ul>
+            <li>Single component of CDF variable could not be selected when timetags were Epoch16.  Thanks, Allison!
+            <li>GUI for inserting plot symbol into text didn't set size parameter correctly!  Thanks, Sadie!
+            <li>Desktop sampler had a new bug which made its result gray.  Thanks, Sadie!
+            <li>Corrections to psym painters in granny text renderer.  Thanks, Sadie!
+            <li>Manual tickValues are formatted more precisely now.  Thanks, Ali!
+            <li>rte_0404633081_20211201: ctrl-Z when nothing had been done cause runtime exception.
+            <li>rte280945130: NullPointerException when multiple variables were specified and one wasn't in the CDF file.  Thanks, Danielle M!
+            <li>H_lo was used as the default name when CDF arg_0 and id where missing, causing great confusion.  Thanks, Jeremy!
+            <li>Juno TCA didn't subset when requiresInterval and item_00 was found in DSDF.
             <li>make the "width is not finite" message more precise by including the code issuing the message.
             <li>bugfix in FITS reader, where data without units would cause NullPointerException.
             <li>bugfix in automatic aggregation of "$Y/$m/$d/$Y$m$dT$H_all.csv" 
@@ -63,7 +72,7 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>
+            <li>lblx extension for future PDS4 files is handled.
             <li>rfe 764: completion-based GUIs using arg_0 can specify a label for arg_0 now.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/762">762</a>: Peek inside JSON and XML files to identify schema when identifying data source.
             <li>Length digitizer allows 1-9 keys to specify a divisor, so that repeating signals can be measured more accurately.
