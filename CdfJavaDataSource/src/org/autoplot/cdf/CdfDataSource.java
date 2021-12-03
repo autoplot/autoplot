@@ -1172,8 +1172,12 @@ public class CdfDataSource extends AbstractDataSource {
 
         if ( cdf.getDimensions(svariable).length>0 && slice1>-1 ) {
             int n1= cdf.getDimensions(svariable)[0];
-            if ( slice1>=n1 ) {
-                throw new IllegalArgumentException("slice1="+slice1+" is too big for the dimension size ("+n1+")");
+            if ( cdf.getType(svariable)==CDFConstants.CDF_EPOCH16 ) {
+                logger.fine("CDF_EPOCH16, ew...");
+            } else {
+                if ( slice1>=n1 ) {
+                    throw new IllegalArgumentException("slice1="+slice1+" is too big for the dimension size ("+n1+")");
+                }
             }
         }
 
