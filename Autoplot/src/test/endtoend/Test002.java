@@ -1,11 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package test.endtoend;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import org.autoplot.RenderType;
 import org.autoplot.ScriptContext;
@@ -15,9 +11,10 @@ import org.das2.qds.ops.Ops;
 import org.autoplot.jythonsupport.Util;
 
 /**
- * Test Autoplot including:
- *   use case: load wave file and add spectrogram.
- *   and more abstract vap file products
+ * Test Autoplot including:<ul>
+ *   <li>use case: load wave file and add spectrogram.
+ *   <li>more abstract vap file products
+ * </ul>
  * @author jbf
  */
 public class Test002 {
