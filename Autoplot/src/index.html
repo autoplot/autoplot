@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Length mouse module accepts keystroke "1" through "9" to divide by so many cycles.
+        <p><small>Example plot from HAPI servers.  Here's the <a href="https://github.com/autoplot/dev/blob/master/demos/2021/20211206/20211129_hapi.vap">.vap</a>.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,8 +27,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2021-12-03 r26297):</p>
+        <p>Bugfixes (2021-12-06 r26299):</p>
         <ul>
+            <li>when a dataset without timetags has a dataset with timetags appended to it, it is no longer a runtime error.  Thanks, Sadie!
             <li>Corrections to psym painters in granny text renderer.  Thanks, Sadie!
             <li>Single component of CDF variable could not be selected when timetags were Epoch16.  Thanks, Allison!
             <li>GUI for inserting plot symbol into text didn't set size parameter correctly!  Thanks, Sadie!
@@ -72,6 +73,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>PDS4 checks for Special_Constants in label file which point out fill values and valid ranges.
             <li>lblx extension for future PDS4 files is handled.
             <li>rfe 764: completion-based GUIs using arg_0 can specify a label for arg_0 now.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/762">762</a>: Peek inside JSON and XML files to identify schema when identifying data source.
