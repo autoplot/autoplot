@@ -128,7 +128,26 @@ public class PdsDataSource extends AbstractDataSource {
         return rank1;
     }
     
-    
+    /**
+     * TODO: verify me!
+     * @param dd
+     * @return 
+     */
+    private double[] flatten3d( double[][][] dd ) {
+        double[] rank1= new double[dd.length*dd[0].length*dd[0][0].length];
+        int nj= dd[0].length;
+        int kk= 0;
+        int[] qube= new int[] { dd.length, dd[0].length, dd[0][0].length };
+        for ( int i0=0; i0<qube[0]; i0++ ) {
+            for ( int i1=0; i1<qube[1]; i1++ ) {
+                double[] d1= dd[i0][i1];
+                for ( int i2=0; i2<qube[2]; i2++ ) {
+                    rank1[kk++]= d1[i2];
+                }
+            }
+        }
+        return rank1;
+    }
      /**
      *
      * @param monitor the value of monitor
@@ -309,42 +328,79 @@ public class PdsDataSource extends AbstractDataSource {
             for ( ArrayObject a: label.getObjects(ArrayObject.class) ) {
                 Units units=null;
                 if ( a.getName().equals(name) ) {
-                    if ( a.getAxes()==2 ) {
-                        double[][] dd= a.getElements2D();
-                        double[] rank1= flatten(dd);
-                        int[] qube= new int[] { dd.length, dd[0].length };
-                        results[i]= DDataSet.wrap( rank1, qube );
-                    } else if ( a.getAxes()==1 ) {
-                        double[] dd= a.getElements1D();
-                        int[] qube= new int[] { dd.length };
-                        DDataSet ddresult= DDataSet.wrap( dd, qube );
-                        if ( name.equals("Epoch") ) {
-                            logger.info("Epoch kludge results in CDF_TT2000 units");
-                            units= Units.cdfTT2000;
-                            ddresult.putProperty( QDataSet.UNITS, units );
-                        }
-                        results[i]= ddresult;
+                    MutablePropertyDataSet result1;
+                    switch (a.getAxes()) {
+                        case 1:    {
+                                double[] dd= a.getElements1D();
+                                int[] qube= new int[] { dd.length };
+                                DDataSet ddresult= DDataSet.wrap( dd, qube );
+                                if ( name.equals("Epoch") ) {
+                                    logger.info("Epoch kludge results in CDF_TT2000 units");
+                                    units= Units.cdfTT2000;
+                                    ddresult.putProperty( QDataSet.UNITS, units );
+                                }       
+                                results[i]= ddresult;
+                                result1= ddresult;
+                                break;
+                            }
+                        case 2:    {
+                                double[][] dd= a.getElements2D();
+                                double[] rank1= flatten(dd);
+                                int[] qube= new int[] { dd.length, dd[0].length };
+                                DDataSet ddresult= DDataSet.wrap( rank1, qube );
+                                results[i]= ddresult;
+                                result1= ddresult;
+                                break;
+                            }
+                        case 3:    {
+                                double[][][] dd= a.getElements3D();
+                                double[] rank1= flatten3d(dd);
+                                int[] qube= new int[] { dd.length, dd[0].length, dd[0][0].length };
+                                DDataSet ddresult= DDataSet.wrap( rank1, qube );
+                                results[i]= ddresult;
+                                result1= ddresult;
+                                break;
+                            }
+                        default:
+                            logger.warning("Unsupported number of axes, only one, two, or three.");
+                            results[i]= null;
+                            continue;
                     }
-
-                    if ( doc!=null ) {
+                    
+                    if ( result1!=null && doc!=null ) {
                         XPathFactory factory= XPathFactory.newInstance();
                         XPath xpath= factory.newXPath();
 
                         String sunits= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Element_Array/unit/text()", doc );
                         sunits= sunits.trim();
                         if ( sunits.length()>0 && units==null ) {
-                            ((MutablePropertyDataSet)results[i]).putProperty( QDataSet.UNITS, Units.lookupUnits(sunits) );
+                            result1.putProperty( QDataSet.UNITS, Units.lookupUnits(sunits) );
                         }
                         if ( units==null || !UnitsUtil.isTimeLocation(units) ) {
-                            String labl=      (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/name/text()", doc );
+                            String labl= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/name/text()", doc );
                             if ( labl.length()==0 ) labl= name;
                             ((MutablePropertyDataSet)results[i]).putProperty( QDataSet.LABEL, labl );
                             String title= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/description/text()", doc );
                             if ( title.length()>0 ) {
-                                ((MutablePropertyDataSet)results[i]).putProperty( QDataSet.TITLE, title.trim() );
+                                result1.putProperty( QDataSet.TITLE, title.trim() );
                             }
                         }
                         
+                        String sfillValue= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Special_Constants/invalid_constant/text()", doc );
+                        String svalidMax= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Special_Constants/valid_maximum/text()", doc );
+                        String svalidMin= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Special_Constants/valid_minimum/text()", doc );
+                        if ( sfillValue.trim().length()>0 ) {
+                            double fillValue= Double.parseDouble(sfillValue);
+                            result1.putProperty( QDataSet.FILL_VALUE, fillValue );
+                        }
+                        if ( svalidMax.trim().length()>0 ) {
+                            double validMax= Double.parseDouble(svalidMax);
+                            result1.putProperty( QDataSet.VALID_MAX, validMax );
+                        }
+                        if ( svalidMin.trim().length()>0 ) {
+                            double validMin= Double.parseDouble(svalidMin);
+                            result1.putProperty( QDataSet.VALID_MIN, validMin );
+                        }
                     }
                 }
             }
