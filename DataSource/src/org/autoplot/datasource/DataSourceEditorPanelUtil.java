@@ -75,11 +75,20 @@ public class DataSourceEditorPanelUtil {
 
         if (  ext!=null && ( ext.equals(DataSetURI.RECOGNIZE_FILE_EXTENSION_JSON) || ext.equals( DataSetURI.RECOGNIZE_FILE_EXTENSION_XML ) ) ) {
             try {
-                File f= DataSetURI.getFile(suri,new AlertNullProgressMonitor("download on event thread"));
-                String ext2= DataSourceRecognizer.guessDataSourceType(f);
-                if ( ext2!=null ) {
-                    ext= ext2;
-                }                    
+                if ( DataSetURI.isAggregating(surl) ) {
+                    String delegateUri = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(surl, new NullProgressMonitor() );
+                    File f= DataSetURI.getFile(delegateUri,new AlertNullProgressMonitor("download on event thread"));
+                    String ext2= DataSourceRecognizer.guessDataSourceType(f);
+                    if ( ext2!=null ) {
+                        ext= ext2;
+                    }                    
+                } else {
+                    File f= DataSetURI.getFile(suri,new AlertNullProgressMonitor("download on event thread"));
+                    String ext2= DataSourceRecognizer.guessDataSourceType(f);
+                    if ( ext2!=null ) {
+                        ext= ext2;
+                    }                    
+                }
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
