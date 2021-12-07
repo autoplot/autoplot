@@ -28,6 +28,14 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class DataSourceRecognizer {
 
+    /**
+     * identify the reader to use based on the internal schema of the file.
+     * This might look at XML schemas for performance, or might look for
+     * particular tags.
+     * @param f the JSON or XML file.
+     * @return type, such as "vap+pds4" or null.
+     * @throws IOException 
+     */
     public static String guessDataSourceType( File f ) throws IOException {
         FileChannel channel= new FileInputStream(f).getChannel();
         ByteBuffer buf= channel.map( FileChannel.MapMode.READ_ONLY, 0, 1024 );
