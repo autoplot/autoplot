@@ -48,6 +48,40 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     public AggregatingDataSourceFactory() {
     }
 
+    /**
+     * return a file from the aggregation, so that it can be inspected externally.
+     * @param uri
+     * @param monitor
+     * @return null or a file.
+     * @throws IOException 
+     * @see setDelegateDataSourceFactory
+     */
+    public static String getRepresentativeFile( URI uri, ProgressMonitor monitor ) throws IOException {
+        String surl = DataSetURI.fromUri( uri );
+        FileStorageModel fsm = getFileStorageModel(surl);
+        
+        URISplit split = URISplit.parse(surl);
+        Map parms = URISplit.parseParams(split.params);
+        
+        DatumRange rangeConstraint=null;
+        String stimeRange= (String) parms.get("timerange");
+        if ( stimeRange!=null ) {
+            try {
+                rangeConstraint= DatumRangeUtil.parseTimeRange(stimeRange);
+            } catch ( ParseException ex ) {
+                logger.log(Level.INFO, "unable to used timerange, can''t parse: {0}", stimeRange);
+            }
+        }
+        String ff= fsm.getRepresentativeFile( monitor, null, rangeConstraint );
+        if ( ff==null ) {
+            return null;
+        } else {
+            int i= splitIndex(surl);
+            return surl.substring(0,i)+ff;
+        }
+
+    }
+    
     @Override
     public DataSource getDataSource(URI uri) throws Exception {
         String suri=  DataSetURI.fromUri(uri);
