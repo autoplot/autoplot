@@ -95,6 +95,7 @@ public class XmlFileDataSourceFactory extends AbstractDataSourceFactory implemen
             Object type= new XMLTypeCheck().calculateType(f);
 
             if ( type==null ) {
+                problems.add( "XML file is not supported by this reader, not one of HELM, SPASE, or VOTABLE");
                 return true;
             } else {
                 if ( type==XMLTypeCheck.TYPE_VOTABLE ) {
