@@ -67,7 +67,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -1350,10 +1349,11 @@ public class ScriptPanelSupport {
      * mark the changes git indicates.
      * @param support
      * @param fln
+     * @return the number of changes identified.
      * @throws IOException
      * @throws InterruptedException 
      */
-    public static void markChanges( EditorAnnotationsSupport support, File fln ) throws IOException, InterruptedException {
+    public static int markChanges( EditorAnnotationsSupport support, File fln ) throws IOException, InterruptedException {
 
         String diffOutput = new GitCommand(fln.getParentFile()).diff(fln);
                 
@@ -1361,7 +1361,9 @@ public class ScriptPanelSupport {
 
         support.clearAnnotations();
         
-        for ( AbstractDelta<String> d : deltas.getDeltas() ) {
+        List<AbstractDelta<String>> dd= deltas.getDeltas();
+                
+        for ( AbstractDelta<String> d : dd ) {
             Chunk<String> source = d.getSource();
             List<Integer> ll = source.getChangePosition();
             List<Integer> ss = d.getTarget().getChangePosition();
@@ -1391,6 +1393,9 @@ public class ScriptPanelSupport {
                 }
             }        
         }
+        
+        return dd.size();
+                
     }
 
     
