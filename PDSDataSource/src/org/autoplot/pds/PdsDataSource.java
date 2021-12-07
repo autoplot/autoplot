@@ -30,6 +30,7 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
+import org.das2.qds.ArrayDataSet;
 import org.das2.qds.DDataSet;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
@@ -314,10 +315,50 @@ public class PdsDataSource extends AbstractDataSource {
             }
             if ( tableColumnNames.size()>0 ) {
                 QDataSet bresults= getFromTable( t, tableColumnNames.toArray(new String[tableColumnNames.size()]) );
-                int iresults= 0;
-                for ( int i:datasetColumnIndexes ) {
-                    results[i]= Ops.unbundle( bresults, iresults );
-                    iresults++;                    
+                for ( int iii=0; iii<datasetColumnIndexes.size(); iii++ ) {
+                    int i= datasetColumnIndexes.get(iii);
+                    name= tableColumnNames.get(iii);
+                    ArrayDataSet result1= DDataSet.copy( Ops.unbundle( bresults, i ) );
+                    
+                    results[i]= result1;
+                    Units units= (Units) result1.property(QDataSet.UNITS);
+                    if ( doc!=null ) {
+                        XPathFactory factory= XPathFactory.newInstance();
+                        XPath xpath= factory.newXPath();
+
+                        String sunits= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Table_Character/Record_Character/Field_Character[name='"+name+"']/unit/text()", doc );
+                        sunits= sunits.trim();
+                        if ( sunits.length()>0 ) {
+                            result1.putProperty( QDataSet.UNITS, Units.lookupUnits(sunits) );
+                        }
+                        if ( units==null || !UnitsUtil.isTimeLocation(units) ) {
+                            String labl= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Table_Character/Record_Character/Field_Character[name='"+name+"']/name/text()", doc ); // TODO: Stupid, isn't this?
+                            if ( labl.length()==0 ) labl= name;
+                            ((MutablePropertyDataSet)results[i]).putProperty( QDataSet.LABEL, labl );
+                            String title= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Table_Character/Record_Character/Field_Character[name='"+name+"']/description/text()", doc );
+                            if ( title.length()>0 ) {
+                                result1.putProperty( QDataSet.TITLE, title.trim() );
+                            }
+                        
+                            String sfillValue= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Table_Character/Record_Character/Field_Character[name='"+name+"']/Special_Constants/invalid_constant/text()", doc );
+                            if ( sfillValue.length()==0 ) 
+                                sfillValue= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Table_Character/Record_Character/Field_Character[name='"+name+"']/Special_Constants/missing_constant/text()", doc );
+                            String svalidMax= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Table_Character/Record_Character/Field_Character[name='"+name+"']/Special_Constants/valid_maximum/text()", doc );
+                            String svalidMin= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Table_Character/Record_Character/Field_Character[name='"+name+"']/Special_Constants/valid_minimum/text()", doc );
+                            if ( sfillValue.trim().length()>0 ) {
+                                double fillValue= Double.parseDouble(sfillValue);
+                                result1.putProperty( QDataSet.FILL_VALUE, fillValue );
+                            }
+                            if ( svalidMax.trim().length()>0 ) {
+                                double validMax= Double.parseDouble(svalidMax);
+                                result1.putProperty( QDataSet.VALID_MAX, validMax );
+                            }
+                            if ( svalidMin.trim().length()>0 ) {
+                                double validMin= Double.parseDouble(svalidMin);
+                                result1.putProperty( QDataSet.VALID_MIN, validMin );
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -387,6 +428,8 @@ public class PdsDataSource extends AbstractDataSource {
                         }
                         
                         String sfillValue= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Special_Constants/invalid_constant/text()", doc );
+                        if ( sfillValue.length()==0 ) 
+                            sfillValue= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Special_Constants/missing_constant/text()", doc );
                         String svalidMax= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Special_Constants/valid_maximum/text()", doc );
                         String svalidMin= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Special_Constants/valid_minimum/text()", doc );
                         if ( sfillValue.trim().length()>0 ) {
