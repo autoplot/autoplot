@@ -509,7 +509,20 @@ public class DataSetURI {
         if ( isAggregating( suri ) ) {
             String eext = DataSetURI.getExplicitExt( suri );
             if (eext != null) {
-                DataSourceFactory delegateFactory = DataSourceRegistry.getInstance().getSource(eext);
+                DataSourceFactory delegateFactory;
+                if ( eext.equals(RECOGNIZE_FILE_EXTENSION_XML) || eext.equals(RECOGNIZE_FILE_EXTENSION_JSON) ) {
+                    String ff= AggregatingDataSourceFactory.getRepresentativeFile( uri, mon.getSubtaskMonitor("find representative file") );
+                    File f= getFile( ff, mon.getSubtaskMonitor("get representative file") );
+                    mon.finished();
+                    String extr= DataSourceRecognizer.guessDataSourceType(f);
+                    if ( extr!=null && extr.startsWith("vap+") ) {
+                        delegateFactory=  DataSourceRegistry.getInstance().getSource(extr);
+                    } else {
+                        delegateFactory = DataSourceRegistry.getInstance().getSource(eext); // just do what we would have done before.
+                    }
+                } else {
+                    delegateFactory = DataSourceRegistry.getInstance().getSource(eext);
+                }
                 AggregatingDataSourceFactory factory = new AggregatingDataSourceFactory();
                 factory.setDelegateDataSourceFactory(delegateFactory);
                 return factory;
