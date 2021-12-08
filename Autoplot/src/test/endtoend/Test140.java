@@ -95,24 +95,45 @@ public class Test140 {
             }
         }
     }    
+    
     /**
-     *
+     * 
      * @param uri the URI to load
      * @param iid the index of the test.
      * @param doTest if true, then expect a match, otherwise an ex prefix is used to indicate there should not be a match
+     * @param isPublic
+     * @return
+     * @throws Exception 
+     */
+    private static String do1( String uri, int iid, boolean doTest, boolean isPublic ) throws Exception {
+        return do1( uri, "", iid, doTest, isPublic );
+    }
+    
+    /**
+     *
+     * @param uri the URI to load
+     * @param shortId empty or the short unique name for the test
+     * @param iid the index of the test.
+     * @param doTest if true, then expect a match, otherwise an ex prefix is used to indicate there should not be a match
+     * @param isPublic if true, the URI can be printed in public logs and the image available on the web.
      * @return the ID of a product to test against a reference.
      * @throws Exception
      */
-    private static String do1( String uri, int iid, boolean doTest, boolean isPublic ) throws Exception {
+    private static String do1( String uri, String shortId, int iid, boolean doTest, boolean isPublic ) throws Exception {
 
-        System.err.printf( "== %03d %03d ==\n", testid, iid );
+        System.err.printf( "== %03d %03d %s ==\n", testid, iid, shortId );
         if ( isPublic ) {
             System.err.printf( "uri: %s\n", uri );
         } else {
             System.err.printf( "uri: (uri is not public)\n" );
         }
 
-        String label= String.format( "test%03d_%03d", testid, iid );
+        String label;
+        if ( shortId.length()>0 ) {
+            label= String.format( "test%03d_%s", testid, shortId );
+        } else {
+            label= String.format( "test%03d_%03d", testid, iid );
+        }
 
         double tsec,psec;
         long t0= System.currentTimeMillis();
@@ -217,22 +238,27 @@ public class Test140 {
         String result;
 
         String name;
-        if ( doTest ) {            
-            String id= URLEncoder.encode( uri, "US-ASCII" );
-            id= id.replaceAll("%3A", "" );
-            id= id.replaceAll("%2F%2F", "_" );
-            id= id.replaceAll("%[0-9A-F][0-9A-F]","_");
-            //id= id.replaceAll("%2F","_");
-            //id= id.replaceAll("%3F","_");
-            //id= id.replaceAll("%26","_");
-            //id= id.replaceAll("%7E","_"); // twiddle
-            //id= id.replaceAll("%2B","_"); // colon
-            //id= id.replaceAll("=","_");
-            if ( id.length()>150 ) { // ext4 filename length limits...
-                id= id.substring(0,150) + "..." + String.format( "%016d", id.hashCode() );
-            }
-            if ( !isPublic ) {
-                id= String.format("%08x",id.hashCode());
+        if ( doTest ) {
+            String id;
+            if ( shortId.length()==0 ) {
+                id= URLEncoder.encode( uri, "US-ASCII" );
+                id= id.replaceAll("%3A", "" );
+                id= id.replaceAll("%2F%2F", "_" );
+                id= id.replaceAll("%[0-9A-F][0-9A-F]","_");
+                //id= id.replaceAll("%2F","_");
+                //id= id.replaceAll("%3F","_");
+                //id= id.replaceAll("%26","_");
+                //id= id.replaceAll("%7E","_"); // twiddle
+                //id= id.replaceAll("%2B","_"); // colon
+                //id= id.replaceAll("=","_");
+                if ( id.length()>150 ) { // ext4 filename length limits...
+                    id= id.substring(0,150) + "..." + String.format( "%016d", id.hashCode() );
+                }
+                if ( !isPublic ) {
+                    id= String.format("%08x",id.hashCode());
+                }
+            } else {
+                id = shortId;
             }
             name= String.format( "test%03d_%s", testid, id );
             result= name;
@@ -247,9 +273,9 @@ public class Test140 {
             writeToPng( name1 );
         } else {
             writeToPng( "/home/jbf/ct/hudson/private/test/"+name1 );
-            int width= getApplicationModel().getDocumentModel().getController().getCanvas().getWidth();
-            int height= getApplicationModel().getDocumentModel().getController().getCanvas().getHeight();
-            BufferedImage image = getApplicationModel().getDocumentModel().getController().getCanvas().getController().getDasCanvas().getImage( width, height );
+            int width= getApplicationModel().getDom().getController().getCanvas().getWidth();
+            int height= getApplicationModel().getDom().getController().getCanvas().getHeight();
+            BufferedImage image = getApplicationModel().getDom().getController().getCanvas().getController().getDasCanvas().getImage( width, height );
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ImageIO.write(image, "png", outputStream);
             byte[] data = outputStream.toByteArray();
@@ -348,9 +374,14 @@ public class Test140 {
             return iid;        
         }
     }
-    
+
     /**
-     * list of URIs.  # comments.
+     * list of URIs, ignoring empty lines and everything following hash (#) comments.
+     * If two items are on the line and the first item is "x", the artifacts are 
+     * kept private.  If two items are on the line and the first item is not "x", 
+     * then this shortId is the string identifier for the artifact.  It three items which 
+     * are "shortId" "x" and "uri", then this is a private artifact.
+     * 
      * @param historyFileUri the URI for the history file.
      * @param f
      * @param iid
@@ -374,13 +405,23 @@ public class Test140 {
                     //    System.err.println("Here at doHistory #"+iid+": "+s);
                     //}
                     String[] ss= s.split("\t");
+                    if ( ss.length==1 ) ss= s.split("\\s");
                     String uri= ss[ss.length-1].trim();
+                    
+                    String shortId= "";
                     
                     // private URIs should be <id>TAB<URI> or <character>SPACE<URI>
                     boolean publc= true;
                     if ( ss.length>1 ) {
                         boolean isPrivate= ss[ss.length-2].trim().startsWith("x");
                         publc= !isPrivate;
+                        if ( isPrivate ) {
+                            if ( ss.length>2 ) {
+                                shortId= ss[0];
+                            }
+                        } else {
+                            shortId= ss[0];
+                        }
                     }
                     if ( uri.startsWith("x ") ) {
                         uri= uri.substring(2).trim();
@@ -389,8 +430,9 @@ public class Test140 {
                     if ( uri.startsWith("%{PWD}") ) {
                         uri= pwd + uri.substring(6);
                     }
+                    
                     try {
-                        do1(uri, iid, true, publc );
+                        do1(uri, shortId, iid, true, publc );
                     } catch ( Exception ex ) {
                         exceptions.put( uri, ex );
                         exceptionNumbers.put( uri, iid );
@@ -403,7 +445,7 @@ public class Test140 {
             return iid;
         }
     }
-
+    
     /**
      * Test the list of URIs in each the URL, making a trivial way to test
      * new lists of URIs.
