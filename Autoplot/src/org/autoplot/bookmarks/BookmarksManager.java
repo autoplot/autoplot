@@ -1314,7 +1314,8 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                     JOptionPane.showMessageDialog( rootPane, "Cannot add folder to remote bookmarks\n"+x, "Remote Bookmark Add Folder",JOptionPane.OK_OPTION );
                     return;
                 }
-                String s = JOptionPane.showInputDialog( BookmarksManager.this, "New Folder Name:");
+                String prompt= "<html>New Folder Name, which can be<br>a label for the folder or<br>this can be the address of a remote bookmarks file.";
+                String s = JOptionPane.showInputDialog( BookmarksManager.this, prompt );
                 if (s != null && !s.equals("")) {
                     if (s.startsWith("http:") || s.startsWith("https:") || s.startsWith("ftp:")) {
                         // kludge for testing remote bookmarks

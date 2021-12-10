@@ -1102,7 +1102,15 @@ public class DataSetURI {
             userInfo= null;
         }
 
-                
+        if ( !url.toString().contains("?") ) {
+            try {
+                File f= getFile(url, mon);
+                return f;
+            } catch ( IOException ex ) {
+                logger.fine("fail to load with FileSystem API, doing what we did before.");
+            }    
+        }
+        
         URISplit split = URISplit.parse( url.toString() ); // get the folder to put the file.
 
         if ( split.file.startsWith("file:/") ) {
