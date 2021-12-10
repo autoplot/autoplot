@@ -6488,8 +6488,8 @@ APSplash.checkTime("init 240");
                     BookmarksManager bm= new BookmarksManager(AutoplotUI.this,true,"editor");
                     bm.setPrefNode("editor");
                     bm.setVisible(true);
-                    
-                    System.err.println("----");
+                    scriptPanel.doRebuildMenu();
+                    addEditorCustomActions( scriptPanel );
                 }
             } );
         mi.setToolTipText( "add scripts for editor actions" );
