@@ -23,6 +23,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
@@ -68,8 +69,9 @@ public class EditorContextMenu {
     
     public EditorContextMenu( EditorTextPane edit  ) {
         this.editor = edit;
-        maybeCreateMenu();
-
+        
+        doRebuildMenu();
+    
         JythonCompletionProvider.getInstance().settings().addPropertyChangeListener((PropertyChangeEvent evt) -> {
             switch (evt.getPropertyName()) {
                 case CompletionSettings.PROP_EDITORFONT:
@@ -104,12 +106,6 @@ public class EditorContextMenu {
                 default:
                     break;
             }
-        });
-
-        editor.setComponentPopupMenu(menu); // override the default popup for the editor.
-        
-        menu.addPropertyChangeListener("visible", (PropertyChangeEvent evt) -> {
-            doRebuildJumpToMenu();
         });
 
     }
@@ -330,6 +326,7 @@ public class EditorContextMenu {
     private void maybeCreateMenu() {
         if ( menu==null ) {
             menu= new JPopupMenu();
+            menu.setName("t0:"+System.currentTimeMillis());
             Action a;
             JMenuItem item;
             JMenu insertCodeMenu= new JMenu("Insert Code");
@@ -813,7 +810,9 @@ public class EditorContextMenu {
             
             menu.add( settingsMenu );
             
-            menu.addSeparator();
+            JSeparator sep= new JSeparator();
+            sep.setName("customMenuItems");
+            menu.add(sep);
             
             mi = new JMenuItem(new AbstractAction("Static Code Analysis") {
                 @Override
@@ -899,6 +898,23 @@ public class EditorContextMenu {
      */
     public void addExampleAction( Action a ) {
         this.examplesMenu.add(a);
+    }
+
+    /**
+     * request that the menu be rebuilt.
+     */
+    public void doRebuildMenu() {
+        this.menu= null;
+        this.menuInsertCount= 0;
+        this.menuInsertIndex= 0;
+        
+        maybeCreateMenu();
+        editor.setComponentPopupMenu(menu); // override the default popup for the editor.
+        
+        menu.addPropertyChangeListener("visible", (PropertyChangeEvent evt) -> {
+            doRebuildJumpToMenu();
+        });
+
     }
 
 }

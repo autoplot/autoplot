@@ -765,6 +765,14 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
     }
     
     /**
+     * request that the popup menu be rebuilt.  Codes that added menu items will need to be called again.
+     */
+    public void doRebuildMenu() {
+        this.menu.doRebuildMenu();
+    }
+    
+    
+    /**
      * set the current script that is running.  This will prevent 
      * automatic loads from occurring.
      * @param f 
