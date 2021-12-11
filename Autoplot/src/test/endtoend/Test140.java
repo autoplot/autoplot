@@ -15,6 +15,7 @@ import java.io.PrintStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
@@ -376,6 +377,20 @@ public class Test140 {
     }
 
     /**
+     * return true if it is a URI or false if it isn't (and is presumably a test name).
+     * @param s
+     * @return 
+     */
+    private static boolean isURI( String s ) {
+        try {
+            DataSetURI.getURIValid(s);
+        } catch ( URISyntaxException ex ) {
+            return false;
+        } 
+        return true;
+    }
+    
+    /**
      * list of URIs, ignoring empty lines and everything following hash (#) comments.
      * If two items are on the line and the first item is "x", the artifacts are 
      * kept private.  If two items are on the line and the first item is not "x", 
@@ -405,7 +420,9 @@ public class Test140 {
                     //    System.err.println("Here at doHistory #"+iid+": "+s);
                     //}
                     String[] ss= s.split("\t");
-                    if ( ss.length==1 ) ss= s.split("\\s");
+                    if ( ss.length==1 && !isURI(s) ) {
+                        ss= s.split("\\s");
+                    }
                     String uri= ss[ss.length-1].trim();
                     
                     String shortId= "";
