@@ -1102,7 +1102,9 @@ public class DataSetURI {
             userInfo= null;
         }
 
-        if ( !url.toString().contains("?") ) {
+        URISplit split = URISplit.parse( url.toString() ); // get the folder to put the file.
+
+        if ( split.params==null && !split.file.endsWith("/") ) {
             try {
                 File f= getFile(url, mon);
                 return f;
@@ -1111,8 +1113,6 @@ public class DataSetURI {
             }    
         }
         
-        URISplit split = URISplit.parse( url.toString() ); // get the folder to put the file.
-
         if ( split.file.startsWith("file:/") ) {
             if ( split.params!=null && split.params.length()>0 ) {
                 throw new IllegalArgumentException("local file URLs cannot have arguments");
