@@ -1104,7 +1104,8 @@ public class DataSetURI {
 
         URISplit split = URISplit.parse( url.toString() ); // get the folder to put the file.
 
-        if ( split.params==null && !split.file.endsWith("/") ) {
+        if ( ( "https".equals(split.scheme) || "http".equals(split.scheme) ) 
+                && split.params==null && !split.file.endsWith("/") ) {
             try {
                 File f= getFile(url, mon);
                 return f;
