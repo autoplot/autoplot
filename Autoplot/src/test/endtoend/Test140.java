@@ -384,9 +384,9 @@ public class Test140 {
     private static boolean isURI( String s ) {
         try {
             DataSetURI.getURIValid(s);
-        } catch ( URISyntaxException ex ) {
+        } catch ( URISyntaxException | IllegalArgumentException ex ) {
             return false;
-        } 
+        }
         return true;
     }
     
