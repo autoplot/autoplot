@@ -384,6 +384,10 @@ public class Test140 {
     private static boolean isURI( String s ) {
         try {
             DataSetURI.getURIValid(s);
+            URISplit split= URISplit.parse(s);
+            if ( split.vapScheme==null && split.scheme==null ) {
+                return false;
+            }
         } catch ( URISyntaxException | IllegalArgumentException ex ) {
             return false;
         }
