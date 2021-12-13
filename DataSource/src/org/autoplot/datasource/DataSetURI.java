@@ -957,6 +957,10 @@ public class DataSetURI {
                 
         URISplit split = URISplit.parse( suri );
 
+        if ( split.resourceUri==null ) {
+            throw new IllegalArgumentException("suri is not a URI or URL: "+suri);
+        }
+        
         URL url= isUrl( split.resourceUri ) ? split.resourceUri.toURL() : null;
 
         try {
