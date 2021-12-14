@@ -1355,44 +1355,42 @@ public class ScriptPanelSupport {
      */
     public static int markChanges( EditorAnnotationsSupport support, File fln ) throws IOException, InterruptedException {
 
-        String diffOutput = new GitCommand(fln.getParentFile()).diff(fln);
+        GitCommand.GitResponse diffOutput = new GitCommand(fln.getParentFile()).diff(fln);
                 
-        Patch<String> deltas = UnifiedDiffUtils.parseUnifiedDiff( Arrays.asList( diffOutput.split("\n") ) );
+        Patch<String> deltas = UnifiedDiffUtils.parseUnifiedDiff( Arrays.asList( diffOutput.getResponse().split("\n") ) );
 
         support.clearAnnotations();
         
         List<AbstractDelta<String>> dd= deltas.getDeltas();
                 
-        for ( AbstractDelta<String> d : dd ) {
+        dd.forEach((d) -> {
             Chunk<String> source = d.getSource();
             List<Integer> ll = source.getChangePosition();
             List<Integer> ss = d.getTarget().getChangePosition();
             int[] lp0,lp1;
-            
             String sourceText = String.join( "\n", d.getSource().getLines() );
-            
             if ( d instanceof ChangeDelta ) {
                 for ( int i : ss ) {
-                    lp0 = support.getLinePosition(i);    
+                    lp0 = support.getLinePosition(i);
                     lp1 = support.getLinePosition(i); 
                     System.err.println( String.format("change characters %d through %d", lp0[0], lp1[1] ) );
                     support.annotateChars(lp0[0],lp1[1],EditorAnnotationsSupport.ANNO_CHANGE,sourceText,null);
                 }
             } else if ( d instanceof DeleteDelta ) {
                 for ( int i : ll ) {
-                    lp0 = support.getLinePosition(i);    
+                    lp0 = support.getLinePosition(i);
                     lp1 = support.getLinePosition(i); 
                     support.annotateChars(lp0[0],lp1[1],EditorAnnotationsSupport.ANNO_DELETE,sourceText,null);
                 }
             } else if ( d instanceof InsertDelta ) {
                 for ( int i : ss ) {
-                    lp0 = support.getLinePosition(i);    
+                    lp0 = support.getLinePosition(i);
                     lp1 = support.getLinePosition(i);    
                     System.err.println(String.format("insert characters %d through %d", lp0[0], lp1[1] ) );
                     support.annotateChars(lp0[0],lp1[1],EditorAnnotationsSupport.ANNO_INSERT,sourceText,null);
                 }
-            }        
-        }
+            }
+        });
         
         return dd.size();
                 

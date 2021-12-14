@@ -307,12 +307,12 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
                 LoggerManager.logGuiEvent(e);
                 
                 try {
-                    int status= new GitCommand(path).pull();
-                    if ( status==0 ) {
+                    GitCommand.GitResponse response= new GitCommand(path).pull();
+                    if ( response.getExitCode()==0 ) {
                         JOptionPane.showMessageDialog( app, "git pull was successful.");
                     } else {
-                        JOptionPane.showMessageDialog( app, "git pull was unsuccessful with exit code "+status + 
-                        ".  See console for messages" );
+                        JOptionPane.showMessageDialog( app, "git pull was unsuccessful with exit code "+response.getExitCode() + ":"
+                                + response.getErrorResponse() );
                         
                     }
                 } catch (IOException | InterruptedException ex) {
