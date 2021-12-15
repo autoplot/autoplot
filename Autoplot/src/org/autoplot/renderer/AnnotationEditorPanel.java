@@ -11,21 +11,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JRadioButton;
 import org.autoplot.AutoplotUtil;
 import org.autoplot.dom.Annotation;
 import org.autoplot.dom.Canvas;
 import org.autoplot.dom.Column;
-import org.autoplot.dom.PlotElementStyle;
 import org.autoplot.dom.Row;
 import org.autoplot.jythonsupport.ui.JLinkyLabel;
 import org.das2.components.DatumRangeEditor;
+import org.das2.components.GrannyTextEditor;
 import org.das2.components.propertyeditor.ColorEditor;
 import org.das2.components.propertyeditor.EnumerationEditor;
 import org.das2.datum.Datum;
@@ -34,6 +30,7 @@ import org.das2.datum.Units;
 import org.das2.graph.AnchorPosition;
 import org.das2.graph.AnchorType;
 import org.das2.graph.BorderType;
+import org.das2.graph.GraphUtil;
 import org.jdesktop.beansbinding.AutoBinding;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
@@ -230,7 +227,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         if ( useUrl ) {
             textUrlPanel.add( urlPanel );
         } else {
-            textUrlPanel.add( textField );
+            textUrlPanel.add( this.textFieldPanel );
         }
         textUrlPanel.validate();
         textUrlPanel.repaint();
@@ -271,13 +268,15 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         rowIdComboBox = new javax.swing.JComboBox<>();
         jLabel11 = new javax.swing.JLabel();
         columnIdComboBox = new javax.swing.JComboBox<>();
-        textField = new javax.swing.JTextField();
         urlPanel = new javax.swing.JPanel();
         urlTextField = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         scaleCB = new javax.swing.JComboBox<>();
         typeButtonGroup = new javax.swing.ButtonGroup();
         borderTypeEnumerationEditor = new org.das2.components.propertyeditor.EnumerationEditor();
+        textFieldPanel = new javax.swing.JPanel();
+        textField = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         anchorPositionPanel = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
@@ -407,8 +406,6 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
                 .addComponent(columnIdComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        textField.setText("jTextField1");
-
         urlTextField.setText("jTextField1");
 
         jLabel1.setText("Scale:");
@@ -434,6 +431,31 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
                 .addComponent(urlTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addComponent(jLabel1)
                 .addComponent(scaleCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        textField.setText("jTextField1");
+
+        jButton1.setText("...");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout textFieldPanelLayout = new javax.swing.GroupLayout(textFieldPanel);
+        textFieldPanel.setLayout(textFieldPanelLayout);
+        textFieldPanelLayout.setHorizontalGroup(
+            textFieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(textFieldPanelLayout.createSequentialGroup()
+                .addComponent(textField, javax.swing.GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        textFieldPanelLayout.setVerticalGroup(
+            textFieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(textFieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(jButton1)
+                .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         jLabel2.setText("Position:");
@@ -609,22 +631,12 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel16)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(borderTypePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel3)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(dataAnchorTypeButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addComponent(textUrlPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(annotationTextButton)
-                                .addGap(18, 18, 18)
-                                .addComponent(useUrl)
-                                .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addGroup(layout.createSequentialGroup()
@@ -647,7 +659,18 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
                                     .addGroup(layout.createSequentialGroup()
                                         .addGap(22, 22, 22)
                                         .addComponent(pointAtPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                            .addComponent(linkyLabelPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(linkyLabelPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel16)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(borderTypePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(annotationTextButton)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(useUrl)))
+                                .addGap(0, 0, Short.MAX_VALUE)))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
@@ -715,6 +738,15 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         resetTextUrlPanel( useUrl.isSelected() );
     }//GEN-LAST:event_useUrlActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        GrannyTextEditor textedit= GraphUtil.newGrannyTextEditor();
+        textedit.setValue( this.textField.getText() );
+        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, textedit, "Edit Text", JOptionPane.OK_CANCEL_OPTION ) ) {
+            this.textField.setText( textedit.getValue() );
+            ann.setText(textedit.getValue());
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     public static void main( String[] args ) {
         AnnotationEditorPanel p= new AnnotationEditorPanel();
         Annotation a= new Annotation();
@@ -739,6 +771,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     private javax.swing.JRadioButton dataAnchorTypeButton;
     private javax.swing.JPanel dataControlPanel;
     private javax.swing.JPanel foregroundColorPanel;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -767,6 +800,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> scaleCB;
     private javax.swing.JPanel textColorPanel;
     private javax.swing.JTextField textField;
+    private javax.swing.JPanel textFieldPanel;
     private javax.swing.JPanel textUrlPanel;
     private javax.swing.ButtonGroup typeButtonGroup;
     private javax.swing.JPanel urlPanel;
