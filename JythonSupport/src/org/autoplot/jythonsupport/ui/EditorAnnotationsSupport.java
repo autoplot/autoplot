@@ -21,6 +21,7 @@ import javax.swing.text.Element;
 import jsyntaxpane.components.Markers;
 import jsyntaxpane.components.Markers.SimpleMarker;
 import org.python.core.PyException;
+import org.python.core.PyIgnoreMethodTag;
 import org.python.core.PyInteger;
 import org.python.core.PyJavaInstance;
 import org.python.core.PyObject;
@@ -134,15 +135,11 @@ public class EditorAnnotationsSupport {
             }
         };
         editorPanel.getDocument().addDocumentListener(annoList);
-        this.editorPanel.addPropertyChangeListener( "document", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ( evt.getOldValue()!=null ) {
-                    ((Document)evt.getOldValue()).removeDocumentListener(annoList);
-                }
-                ((Document)evt.getNewValue()).addDocumentListener(annoList);
+        this.editorPanel.addPropertyChangeListener("document", (PropertyChangeEvent evt) -> {
+            if ( evt.getOldValue()!=null ) {
+                ((Document)evt.getOldValue()).removeDocumentListener(annoList);
             }
-
+            ((Document)evt.getNewValue()).addDocumentListener(annoList);
         });
         editorPanel.setToolTipText("this will contain annotations");
     }
@@ -156,14 +153,11 @@ public class EditorAnnotationsSupport {
             editorPanel.getHighlighter().removeAllHighlights();
             annotations= new TreeMap<>();
         } else {
-           SwingUtilities.invokeLater( new Runnable() {
-                @Override
-                public void run() {
-                    Markers.removeMarkers(editorPanel);
-                    editorPanel.getHighlighter().removeAllHighlights();
-                    annotations= new TreeMap<>();
-                }
-            } );
+           SwingUtilities.invokeLater(() -> {
+               Markers.removeMarkers(editorPanel);
+               editorPanel.getHighlighter().removeAllHighlights();
+               annotations= new TreeMap<>();
+           });
         }
     }
 
@@ -174,16 +168,13 @@ public class EditorAnnotationsSupport {
     public void clearAnnotations(int pos) {
         final Annotation ann = annotationAt(pos);
         if (ann != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    Markers.removeMarkers(editorPanel,ann.marker);
-                    annotations.remove(ann.offset);
-                    if ( ann.highlightInfo!=null ) {
-                        editorPanel.getHighlighter().removeHighlight(ann.highlightInfo);
-                    }
+            SwingUtilities.invokeLater(() -> {
+                Markers.removeMarkers(editorPanel,ann.marker);
+                annotations.remove(ann.offset);
+                if ( ann.highlightInfo!=null ) {
+                    editorPanel.getHighlighter().removeHighlight(ann.highlightInfo);
                 }
-            } );
+            });
         }
     }
 
@@ -274,38 +265,31 @@ public class EditorAnnotationsSupport {
             return;
         }
         
-        SwingUtilities.invokeLater( new Runnable() {
-            @Override
-            public void run() {
-                Document doc = editorPanel.getDocument();
-                Element root = editorPanel.getDocument().getDefaultRootElement();
-
-                if ( root.getElementCount()==1 ) { // transitional case where the document is cleared.
-                    return;
-                }
-                
-                if ( line>root.getElementCount()+1 ) {
-                    throw new IllegalArgumentException( "no such line: "+line );
-                }
-
-                int i0, i1;
-
-                if ( line<=root.getElementCount() ) {
-                    i0 = root.getElement(line - 1).getStartOffset();
-                    i1 = root.getElement(line - 1).getEndOffset();
-                } else {
-                    i0 = Math.max(0, doc.getLength()-2 );
-                    i1 = doc.getLength();
-                }
-                annotateChars(i0, i1, name, text, interp);
-                
-                try {
-                    scrollToOffset(i0);
-                } catch (BadLocationException ex) {
-                    logger.log(Level.SEVERE, null, ex);
-                }
+        SwingUtilities.invokeLater(() -> {
+            Document doc = editorPanel.getDocument();
+            Element root1 = editorPanel.getDocument().getDefaultRootElement();
+            if (root1.getElementCount() == 1) {
+                // transitional case where the document is cleared.
+                return;
             }
-        } );
+            if (line > root1.getElementCount() + 1) {
+                throw new IllegalArgumentException( "no such line: "+line );
+            }
+            int i0, i1;
+            if (line <= root1.getElementCount()) {
+                i0 = root1.getElement(line - 1).getStartOffset();
+                i1 = root1.getElement(line - 1).getEndOffset();
+            } else {
+                i0 = Math.max(0, doc.getLength()-2 );
+                i1 = doc.getLength();
+            }
+            annotateChars(i0, i1, name, text, interp);
+            try {
+                scrollToOffset(i0);
+            } catch (BadLocationException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        });
     }
 
     /**
@@ -349,30 +333,27 @@ public class EditorAnnotationsSupport {
      * @param interp null or the interpreter.
      */
     public void annotateChars( final int line, final int i0, final int i1, final String name, final String text, final PythonInterpreter interp ) {
-        SwingUtilities.invokeLater( new Runnable() {
-            @Override
-            public void run() {
-                Document doc = editorPanel.getDocument();
-                Element root = editorPanel.getDocument().getDefaultRootElement();
-
-                if ( root.getElementCount()==1 ) { // transitional case where the document is cleared.
-                    return;
-                }
-                
-                if ( line>root.getElementCount()+1 ) {
-                    throw new IllegalArgumentException( "no such line: "+line );
-                }
-
-                int lineStart;
-
-                if ( line<=root.getElementCount() ) {
-                    lineStart = root.getElement(line - 1).getStartOffset();
-                } else {
-                    lineStart = Math.max(0, doc.getLength()-2 );
-                }
-                annotateChars( lineStart+i0-1, lineStart+i1-1, name, text, interp );
+        SwingUtilities.invokeLater(() -> {
+            Document doc = editorPanel.getDocument();
+            Element root = editorPanel.getDocument().getDefaultRootElement();
+            
+            if ( root.getElementCount()==1 ) { // transitional case where the document is cleared.
+                return;
             }
-        } );
+            
+            if ( line>root.getElementCount()+1 ) {
+                throw new IllegalArgumentException( "no such line: "+line );
+            }
+            
+            int lineStart;
+            
+            if ( line<=root.getElementCount() ) {
+                lineStart = root.getElement(line - 1).getStartOffset();
+            } else {
+                lineStart = Math.max(0, doc.getLength()-2 );
+            }
+            annotateChars( lineStart+i0-1, lineStart+i1-1, name, text, interp );
+        });
     }
     
     /**
@@ -384,75 +365,71 @@ public class EditorAnnotationsSupport {
      * @param interp the interpreter or null, to allow for further queries by resetting the interpreter.
      */
     public void annotateChars( final int i0, final int i1, final String name, final String text, final PythonInterpreter interp ) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                
-                boolean lightBackground= ( ( 
-                        editorPanel.getBackground().getRed() +
-                        editorPanel.getBackground().getGreen() +
-                        editorPanel.getBackground().getBlue() ) / 3 ) > 100;
-                        
-                SimpleMarker mark;
-                Object highlightInfo=null;
-                switch (name) {
-                    case ANNO_WARNING:
-                        mark= new SimpleMarker( lightBackground ? Color.YELLOW : new Color(120,120,0) );
-                        break;
-                    case ANNO_CODE_HINT:
-                        mark= new SimpleMarker( lightBackground ? new Color(255,255,0,80) : new Color(255,255,0,80) );
-                        break;
-                    case ANNO_USAGE:
-                        mark= new SimpleMarker( lightBackground ? Color.GREEN.brighter() : new Color(0,100,0) );
-                        break;
-                    case ANNO_ERROR:
-                        mark= new SimpleMarker( lightBackground ? Color.PINK : new Color(120,80,80));
-                        break;
-                    case ANNO_PROGRAM_COUNTER:
-                        mark=  new SimpleMarker( lightBackground ? new Color( 0,255,0,80 ) :  new Color( 0,200,0,80 ) );
-                        break;
-                    case ANNO_INSERT:
-                        mark=  new SimpleMarker( lightBackground ? new Color( 100,255,100,80 ) :  new Color( 0,100,0,80 ) );
-                        break;
-                    case ANNO_DELETE:
-                        mark=  new SimpleMarker( lightBackground ? Color.PINK : new Color(120,80,80) );
-                        break;
-                    case ANNO_CHANGE:
-                        mark=  new SimpleMarker( lightBackground ? new Color( 100,100,255,80 ) :  new Color( 0,0,100,80 ) );
-                        break;
-                        
-                    default:
-                        mark=  new SimpleMarker(Color.GRAY );
-                        break;
-                }
-                
-                if (  name.equals(ANNO_ERROR) ) {
-                    SquigglePainter red= new SquigglePainter( Color.RED );
-                    try {
-                        highlightInfo= editorPanel.getHighlighter().addHighlight(i0, i1, red);
-                    } catch (BadLocationException ex) {
-                        Logger.getLogger(EditorAnnotationsSupport.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                } else if ( name.equals( ANNO_DELETE ) ) {
-                    DeletePainter red= new DeletePainter( Color.RED );
-                    try {
-                        highlightInfo= editorPanel.getHighlighter().addHighlight(i0, i1, red);
-                    } catch (BadLocationException ex) {
-                        Logger.getLogger(EditorAnnotationsSupport.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                } else {
-                    Markers.markText( editorPanel, i0, i1, mark );
-                }
-                
-                Annotation ann = new Annotation();
-                ann.len = i1 - i0;
-                ann.offset = i0;
-                ann.text = text;
-                ann.marker= mark;
-                ann.highlightInfo= highlightInfo;
-                annotations.put(ann.offset, ann);
+        SwingUtilities.invokeLater(() -> {
+            boolean lightBackground= ( (
+                    editorPanel.getBackground().getRed() +
+                    editorPanel.getBackground().getGreen() +
+                    editorPanel.getBackground().getBlue() ) / 3 ) > 100;
+            
+            SimpleMarker mark;
+            Object highlightInfo=null;
+            switch (name) {
+                case ANNO_WARNING:
+                    mark= new SimpleMarker( lightBackground ? Color.YELLOW : new Color(120,120,0) );
+                    break;
+                case ANNO_CODE_HINT:
+                    mark= new SimpleMarker( lightBackground ? new Color(255,255,0,80) : new Color(255,255,0,80) );
+                    break;
+                case ANNO_USAGE:
+                    mark= new SimpleMarker( lightBackground ? Color.GREEN.brighter() : new Color(0,100,0) );
+                    break;
+                case ANNO_ERROR:
+                    mark= new SimpleMarker( lightBackground ? Color.PINK : new Color(120,80,80));
+                    break;
+                case ANNO_PROGRAM_COUNTER:
+                    mark=  new SimpleMarker( lightBackground ? new Color( 0,255,0,80 ) :  new Color( 0,200,0,80 ) );
+                    break;
+                case ANNO_INSERT:
+                    mark=  new SimpleMarker( lightBackground ? new Color( 100,255,100,80 ) :  new Color( 0,100,0,80 ) );
+                    break;
+                case ANNO_DELETE:
+                    mark=  new SimpleMarker( lightBackground ? Color.PINK : new Color(120,80,80) );
+                    break;
+                case ANNO_CHANGE:
+                    mark=  new SimpleMarker( lightBackground ? new Color( 100,100,255,80 ) :  new Color( 0,0,100,80 ) );
+                    break;
+                    
+                default:
+                    mark=  new SimpleMarker(Color.GRAY );
+                    break;
             }
-        } );
+            
+            if (  name.equals(ANNO_ERROR) ) {
+                SquigglePainter red= new SquigglePainter( Color.RED );
+                try {
+                    highlightInfo= editorPanel.getHighlighter().addHighlight(i0, i1, red);
+                } catch (BadLocationException ex) {
+                    Logger.getLogger(EditorAnnotationsSupport.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else if ( name.equals( ANNO_DELETE ) ) {
+                DeletePainter red= new DeletePainter( Color.RED );
+                try {
+                    highlightInfo= editorPanel.getHighlighter().addHighlight(i0, i1, red);
+                } catch (BadLocationException ex) {
+                    Logger.getLogger(EditorAnnotationsSupport.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                Markers.markText( editorPanel, i0, i1, mark );
+            }
+            
+            Annotation ann = new Annotation();
+            ann.len = i1 - i0;
+            ann.offset = i0;
+            ann.text = text;
+            ann.marker= mark;
+            ann.highlightInfo= highlightInfo;
+            annotations.put(ann.offset, ann);
+        });
     }
 
     private String htmlify( String text ) {
@@ -487,26 +464,23 @@ public class EditorAnnotationsSupport {
     }
     
     public ExpressionLookup getForInterp( final PythonInterpreter interp ) {
-        return new ExpressionLookup() {
-            @Override
-            public PyObject lookup(String expr) {
-                if ( expr==null ) {
-                    return new PyString("<html>highlite an expression");
+        return (String expr) -> {
+            if ( expr==null ) {
+                return new PyString("<html>highlite an expression");
+            }
+            try {
+                PyObject po= interp.eval(expr);
+                return po;
+            } catch ( Exception e ) {
+                String msg= e.getMessage();
+                if ( msg==null ) {
+                    msg=e.toString();
+                    int i= msg.lastIndexOf("?\n");
+                    if ( i>-1 ) msg= msg.substring(i+2).trim();
                 }
-                try {
-                    PyObject po= interp.eval(expr);
-                    return po;
-                } catch ( Exception e ) {
-                    String msg= e.getMessage();
-                    if ( msg==null ) {
-                        msg=e.toString();
-                        int i= msg.lastIndexOf("?\n");
-                        if ( i>-1 ) msg= msg.substring(i+2).trim();
-                    }
-                    msg= msg.replaceAll("\n","<br>\n");
-                    //msg= "<b>"+expr+"</b><br>\n" + msg;
-                    return new PyString("<html>highlite an expression:<br>"+msg);
-                }
+                msg= msg.replaceAll("\n","<br>\n");
+                //msg= "<b>"+expr+"</b><br>\n" + msg;
+                return new PyString("<html>highlite an expression:<br>"+msg);
             }
         };
     }
@@ -531,7 +505,7 @@ public class EditorAnnotationsSupport {
                         if ( po instanceof PyJavaInstance ) {
                             try {
                                 return "<html>"+expr+"="+peek+"<br>"+((PyJavaInstance)po).instclass.safeRepr();
-                            } catch ( Exception ex ) {
+                            } catch ( PyIgnoreMethodTag ex ) {
                                 return "<html>"+expr+"="+peek+"<br>"+po.getType();
                             }
                         } else {
