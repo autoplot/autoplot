@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Example plot from HAPI servers.  Here's the <a href="https://github.com/autoplot/dev/blob/master/demos/2021/20211206/20211129_hapi.vap">.vap</a>.
+        <p><small>Git commands are coming to the editor, used to look at differences in the local version.  Here is <a href='https://jfaden.net/AutoplotServlet/ScriptGUIServlet?gameNumber=1&nstep=4&script=https%3A%2F%2Fgithub.com%2Fautoplot%2Fdev%2Fblob%2Fmaster%2Fdemos%2F2021%2F20211215%2FplayGame.jy'>the game</a>.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,6 +28,11 @@
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
         <p>Bugfixes (2021-12-11 r26317):</p>
+        <ul>
+            <li>annotation editor dialog now has GrannyTextEditor button.
+            <li>GitCommand assumed it could write to /tmp/, which isn't working on a Mac.
+        </ul>
+        <p>Older Bugfixes (2021-12-11 r26317):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2419">2419</a>: only use this logic for http and https, since jar:... may be used to load files from within the jar.  
             <li>new code to allow internal tests to have short names caused URIs with spaces to break.
@@ -51,32 +56,13 @@
             <li>orbit renderer with ticks along the path didn't have the sloppy units logic.  Thanks, Sadie!
             <li>Move images from org.autoplot.datasource to resources to reduce clutter.
             <li>setDepend1Cadence filter editor had runtime error.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">rfe758</a>: tickValues GUI had a bug with repeat every.  Thanks, Sadie!
-        </ul>
-        <p>Older Bugfixes (2021-11-18 r26241):</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2409">2409</a>: Old bug where append( trim, trim ) wouldn't account for offsets post-trim is fixed.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/143/">0143</a>: account for timetag cadence in metadata tab, so rapid MMS timetags can be distinguished.  Thanks, Ivar!
-            <li><a href="https://github.com/das-developers/das2java/issues/22">22</a>: Annotation "point at" mouse drag action didn't paint properly.  Thanks, Ali!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2413">2413</a>: RENDER_TYPE in inline URI isn't handled properly.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2409">2409</a>: append where two datasets have different fill values is handled properly.  Thanks, Sadie!
-            <li>GrannyTextRenderer custom painters were not given the correct font for calculating boundaries.
-            <li>Autoplot-based HAPI server properly formats string data into fixed-width field, trimming UTF-8 encoded Unicode characters.
-            <li>undo/redo support reworked to avoid synchronized blocks that could hang Autoplot.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2411">2411</a>: reducexWaveform allows reduction of entire packets and uses BIN_MIN and BIN_MAX.  Thanks, Bill!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2410">2410</a>: address bar inspect button becomes insensitive while editing a URI, so that people don't get confused when two editor windows pop up.  The
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2409">2409</a>: append where two datasets have timetags of cdf_epoch and tt2000 would cause runtime exception.  Thanks, Sadie!
-            <li>changes to support pure-Java Autoplot-based Das2Server.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">rfe758</a>: Granny Text Editor button added to "add annotation" dialog.
-            <li>flatten rank 3 join code wasn't pushed into Git for the devel release, whoops...
-            <li>data with CDF_EPOCH and CDF_TT2000 timetags could not be concatenated.  Thanks, Sadie!
-            <li>completions can cull the getters and setters in some cases.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2401/">2401</a>: never replace a saved .jy script with a .jyds. Thanks George and Sadie!
-            <li>simplifyScript wouldn't handle subscripts properly, causing runtime error when completions were triggered.
-            <li>Canvas Size GUI on style tab cleaned up, so manual size can be entered in inches or centimeters.
-            <li>Jython script trace run (where it executes line by line for debugging) handles multi-line strings.
-        </ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">rfe758</a>: tickValues GUI had a bug with repeat every.  Thanks, Sadie!        </ul>
         <p>Features:</p>
+        <ul>
+            <li>Introduce pull and push to GitCommand, looking forward to when pure-Java git library is introduced.
+            <li>Scroll to where the Jython error occurred, in addition to showing the red squiggly.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/762">762</a>: Aggregation works with JSON and XML files.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/729">729</a>: PDS4 checks for Special_Constants in label file which point out fill values and valid ranges.
@@ -86,26 +72,6 @@
             <li>Length digitizer allows 1-9 keys to specify a divisor, so that repeating signals can be measured more accurately.
             <li>junoPJ_2hr orbits added to TimeRangeTool.
             <li>HTML table source supports commas in fields like "$1,234.00"
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>experiment allowing writes with GitHub-based FileSystems with a local clone.
-            <li>qcturl property allows the Quality Control files to be written to another place, so that read-only pngwalks can be annotated.
-            <li>OdlParser matured to start supporting .sts files.
-            <li>Granny editor supports img control strings for inserting images.
-            <li>Granny editor supports psym control strings for creating legends.
-            <li>expandToFill gaps is more manual and under control.  Thanks, Bill!
-            <li>Granny strings allow experimental !(painter;psym) to support drawing the legend with annotations.  Thanks Sadie and others who have asked for this!
-            <li>Support for x_colorLookup extension in HAPI support, which looks up color for nominal data.
-            <li>AutoplotServlet has blacklist to block out areas like "file:/var/uploads."
-            <li>AutoplotServlet's ScriptGUIServlet calculates console output as well, progress bar is coming.
-            <li>GrannyTextEditor ctrl+unicode char button will insert the unicode character, not the unicode escape sequence.  Thanks, Bob!
-            <li>flatten supports rank 3 array of tables, to support Cassini RPWS data.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">758</a>: introduce editors to property editors, and special editor for autoRangeHints.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2405/">2405</a>: option to review and edit code before paste, with variable rename.  Thanks, Sadie for the suggestion!
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">758</a>: introduce editor for Granny Text Strings.
-            <li>allow the connect timeout and read timeout to be reset from default of 5 and 60 seconds.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/757">757</a>: backgroundThick and fillStyle can be specified in the .vap
         </ul>
         <p>Known issues:</p>
         <ul>
