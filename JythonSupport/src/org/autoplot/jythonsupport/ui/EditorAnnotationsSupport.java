@@ -298,6 +298,12 @@ public class EditorAnnotationsSupport {
                     i1 = doc.getLength();
                 }
                 annotateChars(i0, i1, name, text, interp);
+                
+                try {
+                    scrollToOffset(i0);
+                } catch (BadLocationException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
             }
         } );
     }
