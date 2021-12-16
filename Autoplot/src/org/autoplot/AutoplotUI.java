@@ -805,6 +805,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     params.remove("time.min");
                     params.remove("time.max");
                 }
+                //TODO-HAPI: time.min is being replaced in HAPI 3.0
                 split.vapScheme= "vap+hapi";
                 split.params= URISplit.formatParams(params);
                 final String newValue= URISplit.format(split);
@@ -831,6 +832,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     params.remove("time.min");
                     params.remove("time.max");
                 }
+                //TODO-HAPI: time.min is being replaced in HAPI 3.0
                 split.vapScheme= "vap+hapi";
                 split.params= URISplit.formatParams(params);
                 final String newValue= URISplit.format(split);
@@ -6509,6 +6511,8 @@ APSplash.checkTime("init 240");
                             String cmd= e.getActionCommand();
                             File f= DataSetURI.getFile( cmd, new NullProgressMonitor() );
                             Map<String,Object> env= new HashMap<>();
+                            URISplit split= URISplit.parse(cmd);
+                            env.put( "PWD", split.path );
                             JythonUtil.invokeScriptNow( env, f );
                         } catch (IOException ex) {
                             logger.log(Level.SEVERE, null, ex);
