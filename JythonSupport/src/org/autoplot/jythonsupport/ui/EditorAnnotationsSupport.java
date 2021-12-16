@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -404,22 +403,28 @@ public class EditorAnnotationsSupport {
                     break;
             }
             
-            if (  name.equals(ANNO_ERROR) ) {
-                SquigglePainter red= new SquigglePainter( Color.RED );
-                try {
-                    highlightInfo= editorPanel.getHighlighter().addHighlight(i0, i1, red);
-                } catch (BadLocationException ex) {
-                    Logger.getLogger(EditorAnnotationsSupport.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            } else if ( name.equals( ANNO_DELETE ) ) {
-                DeletePainter red= new DeletePainter( Color.RED );
-                try {
-                    highlightInfo= editorPanel.getHighlighter().addHighlight(i0, i1, red);
-                } catch (BadLocationException ex) {
-                    Logger.getLogger(EditorAnnotationsSupport.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            } else {
-                Markers.markText( editorPanel, i0, i1, mark );
+            switch (name) {
+                case ANNO_ERROR:
+                    {
+                        SquigglePainter red= new SquigglePainter( Color.RED );
+                        try {
+                            highlightInfo= editorPanel.getHighlighter().addHighlight(i0, i1, red);
+                        } catch (BadLocationException ex) {
+                            Logger.getLogger(EditorAnnotationsSupport.class.getName()).log(Level.SEVERE, null, ex);
+                        }       break;
+                    }
+                case ANNO_DELETE:
+                    {
+                        DeletePainter red= new DeletePainter( Color.RED );
+                        try {
+                            highlightInfo= editorPanel.getHighlighter().addHighlight(i0, i1, red);
+                        } catch (BadLocationException ex) {
+                            Logger.getLogger(EditorAnnotationsSupport.class.getName()).log(Level.SEVERE, null, ex);
+                        }       break;
+                    }
+                default:
+                    Markers.markText( editorPanel, i0, i1, mark );
+                    break;
             }
             
             Annotation ann = new Annotation();
