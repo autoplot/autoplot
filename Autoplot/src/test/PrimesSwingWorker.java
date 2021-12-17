@@ -28,7 +28,6 @@ public class PrimesSwingWorker {
 
     static class PrimeCalculator extends SwingWorker {
 
-        private final SecureRandom generator = new SecureRandom();
         private final JTextArea intermediateJTextArea; // displays found primes
         private final JButton getPrimesJButton;
         private final JButton cancelJButton;
@@ -57,7 +56,7 @@ public class PrimesSwingWorker {
                     setProgress(100 * (i + 1) / isPrime.length);
 
                     try {
-                       Thread.sleep(5);
+                       Thread.sleep(5); // slow it down a little
                     } catch (InterruptedException ex) {
                         statusJLabel.setText("Worker thread interrupted");
                         return count;
