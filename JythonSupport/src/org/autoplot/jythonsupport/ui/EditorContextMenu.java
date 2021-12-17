@@ -2,6 +2,7 @@
 package org.autoplot.jythonsupport.ui;
 
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
+import java.awt.Dimension;
 import java.awt.Font;
 import org.das2.components.propertyeditor.PropertyEditor;
 import java.awt.event.ActionEvent;
@@ -13,28 +14,33 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Element;
+import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.SyntaxStyle;
 import jsyntaxpane.SyntaxStyles;
 import jsyntaxpane.actions.ActionUtils;
 import jsyntaxpane.actions.IndentAction;
 import jsyntaxpane.actions.RedoAction;
 import jsyntaxpane.actions.UndoAction;
+import org.autoplot.datasource.AutoplotSettings;
 import org.das2.jythoncompletion.CompletionSettings;
 import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.util.LoggerManager;
@@ -42,6 +48,7 @@ import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.jythonsupport.ClipboardEditorPanel;
 import org.autoplot.jythonsupport.JavaJythonConverter;
+import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.MathematicaJythonConverter;
 import static org.das2.jythoncompletion.JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
@@ -612,6 +619,42 @@ public class EditorContextMenu {
             mi.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_F12, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ) ); 
             
             developerMenu.add(mi);
+            
+            mi= new JMenuItem( new AbstractAction("Show Simplified Script Used for Parameters") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);       
+                    String script= editor.getText();
+                    String scriptPrime= JythonUtil.simplifyScriptToGetParams( script, true );
+                    
+                    JEditorPane a;
+                    JDialog d;
+                    a= new JEditorPane();
+                    JEditorPane completionsEditorPane= a;
+                    DefaultSyntaxKit.initKit();
+                    Properties p= new Properties();
+                    String f= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA );
+                    String s;
+                    SyntaxStyle deft= SyntaxStyles.getInstance().getStyle(null);
+                    if ( a.getBackground().getRed()<128 ) {
+                        deft.setColorString("0xFFFFFF");
+                    } else {
+                        deft.setColorString("0x000000");
+                    }
+                
+                    a.setContentType("text/python");
+                    d= new JDialog();
+                    d.setTitle("Get Parameters Editor");
+                    a.setMinimumSize( new Dimension(600,800) );
+                    a.setPreferredSize( new Dimension(600,800) );
+                    d.getContentPane().add(new JScrollPane(a));
+                    d.pack();
+                    a.setText(scriptPrime);
+                    d.setVisible(true);
+                }
+            } );
+             
+            developerMenu.add(mi);            
                         
             mi= new JMenuItem( new AbstractAction("Plot") {
                 @Override
