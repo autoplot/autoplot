@@ -6504,20 +6504,20 @@ APSplash.checkTime("init 240");
             try {
                 List<Bookmark> bs= Bookmark.parseBookmarks(f.toURI().toURL());
                 JMenu j= new JMenu("Custom Actions");
-                DelayMenu.calculateMenu( j, bs, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
+                DelayMenu.calculateMenu(j, bs, (ActionEvent e) -> {
+                    final String cmd= e.getActionCommand();
+                    Runnable run= () -> {
                         try {
-                            String cmd= e.getActionCommand();
-                            File f= DataSetURI.getFile( cmd, new NullProgressMonitor() );
-                            Map<String,Object> env= new HashMap<>();
+                            File f1 = DataSetURI.getFile( cmd, new NullProgressMonitor() );
+                            final Map<String,Object> env= new HashMap<>();
                             URISplit split= URISplit.parse(cmd);
                             env.put( "PWD", split.path );
-                            JythonUtil.invokeScriptNow( env, f );
-                        } catch (IOException ex) {
+                            JythonUtil.invokeScriptNow(env, f1);
+                        }catch (IOException ex) {
                             logger.log(Level.SEVERE, null, ex);
                         }
-                    }
+                    };
+                    new Thread( run, "ScriptAction" ).start();
                 });
                 for ( Component c: j.getMenuComponents() ) {
                     if ( c instanceof JMenuItem ) {
