@@ -823,7 +823,7 @@ public class DataSourceUtil {
             final ByteBuffer buffer = ByteBuffer.allocateDirect(16 * 1024);
             while (src.read(buffer) != -1) {
                 // prepare the buffer to be drained
-                buffer.flip();
+                ((java.nio.Buffer)buffer).flip();
                 // write to the channel, may block
                 dest.write(buffer);
                 // If partial transfer, shift remainder down
@@ -831,7 +831,7 @@ public class DataSourceUtil {
                 buffer.compact();
             }
             // EOF will leave buffer in fill state
-            buffer.flip();
+            ((java.nio.Buffer)buffer).flip();
             // make sure the buffer is fully drained.
             while (buffer.hasRemaining()) {
                 dest.write(buffer);
