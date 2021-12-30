@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -84,9 +85,11 @@ public class WalkImage  {
     private int sizeThumbWidth=-1;
 
     private String caption;
-    private Status status;
     private long initLoadBirthTime;
-    
+
+    private Status status;
+    private ReentrantLock statusLock= new ReentrantLock();
+
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private final boolean haveThumbs400;
 
@@ -193,10 +196,11 @@ public class WalkImage  {
      * @return 
      */
     public BufferedImage getImage() {
-        if (status == Status.MISSING) {
+        Status lstatus= getStatus();
+        if (lstatus == Status.MISSING) {
             return missingImage;
         }
-        if ( im == null && status != Status.IMAGE_LOADING) {
+        if ( im == null && lstatus != Status.IMAGE_LOADING) {
             loadImage();
         }
 
@@ -397,7 +401,8 @@ public class WalkImage  {
         int height = (int) Math.round(Math.sqrt((THUMB_SIZE * THUMB_SIZE) / (aspect * aspect + 1)));
         int width = (int) Math.round(height * aspect);
 
-        synchronized ( this ) {
+        statusLock.lock();
+        try {
             //BufferedImageOp resizeOp = new ScalePerspectiveImageOp(rawThumb.getWidth(), rawThumb.getHeight(), 0, 0, width, height, 0, 1, 1, 0, false);
             //thumb = resizeOp.filter(rawThumb, null);
             thumb = WalkUtil.resizeImage( rawThumb, width, height );
@@ -412,6 +417,8 @@ public class WalkImage  {
                 default:
                     break;
             }
+        } finally {
+            statusLock.unlock();
         }
 
 
@@ -458,7 +465,8 @@ public class WalkImage  {
             thumbFreshness.addFirst(this);
         }
 
-        synchronized (this) {
+        statusLock.lock();
+        try {
             switch (status) {
                 case THUMB_LOADING:
                     // We're already working on it in another thread
@@ -492,6 +500,8 @@ public class WalkImage  {
                     //should never get here, but keeps Java from warning about missing return
                     throw new IllegalArgumentException("Encountered invalid status in walk image.");
             } //end switch
+        } finally {
+            statusLock.unlock();
         }
     }
 
@@ -620,7 +630,8 @@ public class WalkImage  {
 
     private void loadImage() {
         logger.log(Level.FINER, "loadImage {0}", this.caption);
-        if (status == Status.IMAGE_LOADING || status == Status.IMAGE_LOADED) {
+        Status lstatus= status;
+        if (lstatus == Status.IMAGE_LOADING || lstatus == Status.IMAGE_LOADED) {
             return;
         }
         Runnable r = () -> {
