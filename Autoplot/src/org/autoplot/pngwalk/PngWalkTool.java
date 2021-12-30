@@ -1663,17 +1663,21 @@ public final class PngWalkTool extends javax.swing.JPanel {
     }
 
     public void setMessage(String message) {
-        this.statusLabel.setIcon( IDLE_ICON );
-        this.statusLabel.setText(message);
+        setMessage( IDLE_ICON, message );
     }
 
     public void setMessage( Icon icon, String message ) {
         if ( message==null ) message= "<null>"; // TODO: fix this later
         String myMess= message;
         if ( myMess.length()>100 ) myMess= myMess.substring(0,100)+"...";
-        this.statusLabel.setIcon( icon );
-        this.statusLabel.setText(myMess);
-        this.statusLabel.setToolTipText(message);
+        String fMyMessag= myMess;
+        String fMessage= message;
+        Runnable run= () -> {
+            statusLabel.setIcon( icon );
+            statusLabel.setText(fMyMessag);
+            statusLabel.setToolTipText(fMessage);
+        };
+        SwingUtilities.invokeLater(run);
     }
 
     /**
