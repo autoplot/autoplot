@@ -88,7 +88,7 @@ public class WalkImage  {
     private long initLoadBirthTime;
 
     private Status status;
-    private ReentrantLock statusLock= new ReentrantLock();
+    private final ReentrantLock statusLock= new ReentrantLock();
 
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private final boolean haveThumbs400;
