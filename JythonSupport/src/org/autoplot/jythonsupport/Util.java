@@ -18,6 +18,7 @@ import java.nio.channels.WritableByteChannel;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -47,11 +48,14 @@ import org.das2.qds.WritableDataSet;
 import org.das2.qds.examples.Schemes;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
+import static org.autoplot.datasource.DataSetURI.fromUri;
+import static org.autoplot.datasource.DataSetURI.getFile;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
+import org.das2.util.monitor.AlertNullProgressMonitor;
 import org.das2.util.monitor.CancelledOperationException;
 import org.python.core.Py;
 import org.python.core.PyFunction;
@@ -753,6 +757,35 @@ public class Util {
         return new File(file).canRead();
     }
     
+    /**
+     * read the preferences into a map.  This has a number of TODOs, namely:
+     * 1. allow quoted values, and hashes within quotes.
+     * 2. allow defaults to be specified.
+     * 3. allow ini files to be used as well.
+     * 4. allow json files to be used as well.
+     * The input can be json, ini, or simple name-value
+     * @param suri the location of files which are name value pairs.
+     * @return a map of string to object.
+     * @throws IOException 
+     * @since Autoplot v2022a_1
+     */
+    public static Map<String,Object> readConfiguration( String suri ) throws IOException {
+        Map<String,Object> result= new LinkedHashMap<>();
+        File f= getFile(suri,false,new AlertNullProgressMonitor("loading configuration"));
+        try ( BufferedReader reader= new BufferedReader( new FileReader(f) ) ) {
+            String line;
+            while ( ( line = reader.readLine() ) !=null ) {
+                int i= line.indexOf('#');
+                if ( i>-1 ) line = line.substring(0,i);
+                line = line.trim();
+                if ( line.length()==0 ) continue;
+                i= line.indexOf('=');
+                result.put( line.substring(0,i).trim(), line.substring(i+1).trim() );
+            }
+        }
+        return result;
+    }
+
     /**
      * return a list of completions.  This is useful in the IDL context
      * as well as Jython scripts.  This will perform the completion for where the carot is
