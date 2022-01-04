@@ -1051,7 +1051,7 @@ public class DataSetURI {
         String suri= fromUri( uri );
         return getFile(suri,false,mon);
     }
-
+    
     /**
      * This loads the URL to a local temporary file.  If the temp file
      * is already downloaded and less than 10 seconds old, it will be used.  
@@ -1405,6 +1405,18 @@ public class DataSetURI {
         return getFile( uri, false, mon );
     }
 
+    /**
+     * retrieve the file specified in the URI, possibly using the VFS library to
+     * download the resource to a local cache.  The URI should be a downloadable
+     * file, and not the vap scheme URI.
+     * @param uri resource to download, such as "sftp://user@host/file.dat."
+     * @return the file
+     * @throws IOException
+     */
+    public static File getFile( String uri ) throws IOException {
+        return getFile( uri, false, new AlertNullProgressMonitor("downloading "+uri) );
+    }
+    
     /**
      * get the file, allowing it to have "&lt;html&gt;" in the front.  Normally this is not
      * allowed because of http://sourceforge.net/tracker/?func=detail&aid=3379717&group_id=199733&atid=970682
