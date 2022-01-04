@@ -759,12 +759,14 @@ public class Util {
     }
     
     /**
-     * read the preferences into a map.  This has a number of TODOs, namely:
-     * 1. allow quoted values, and hashes within quotes.
-     * 2. allow defaults to be specified.
-     * 3. allow ini files to be used as well.
-     * 4. allow json files to be used as well.
-     * %{PWD} is replaced with the directory of the config file
+     * read the preferences into a map.  These are name, value pairs.
+     * This has a number of TODOs, namely:<ul>
+     * <li> allow quoted values, and hashes within quotes.
+     * <li> allow defaults to be specified.
+     * <li> allow ini files to be used as well.
+     * <li> allow json files to be used as well.
+     * </ul>
+     * %{PWD} is replaced with the directory of the config file.
      * 
      * @param suri the location of files which are name value pairs.
      * @return a map of string to object.
