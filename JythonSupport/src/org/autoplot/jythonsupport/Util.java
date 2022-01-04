@@ -53,6 +53,7 @@ import static org.autoplot.datasource.DataSetURI.getFile;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.DataSourceUtil;
+import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
 import org.das2.util.monitor.AlertNullProgressMonitor;
@@ -763,7 +764,8 @@ public class Util {
      * 2. allow defaults to be specified.
      * 3. allow ini files to be used as well.
      * 4. allow json files to be used as well.
-     * The input can be json, ini, or simple name-value
+     * %{PWD} is replaced with the directory of the config file
+     * 
      * @param suri the location of files which are name value pairs.
      * @return a map of string to object.
      * @throws IOException 
@@ -771,6 +773,7 @@ public class Util {
      */
     public static Map<String,Object> readConfiguration( String suri ) throws IOException {
         Map<String,Object> result= new LinkedHashMap<>();
+        URISplit split= URISplit.parse(suri);
         File f= getFile(suri,false,new AlertNullProgressMonitor("loading configuration"));
         try ( BufferedReader reader= new BufferedReader( new FileReader(f) ) ) {
             String line;
@@ -780,7 +783,11 @@ public class Util {
                 line = line.trim();
                 if ( line.length()==0 ) continue;
                 i= line.indexOf('=');
-                result.put( line.substring(0,i).trim(), line.substring(i+1).trim() );
+                String value= line.substring(i+1).trim();
+                if ( value.contains("%{PWD}") ) {
+                    value= value.replace("%{PWD}", split.path );
+                }
+                result.put( line.substring(0,i).trim(), value );
             }
         }
         return result;
