@@ -60,7 +60,6 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
 import org.autoplot.jythonsupport.ui.EditorTextPane;
-import org.autoplot.jythonsupport.ui.Util;
 
 /**
  * GUI for editing and running Jython scripts.
@@ -71,6 +70,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
 
     ApplicationModel model;
+    AutoplotUI app; // the app, if available
     ApplicationController applicationController;
     DataSetSelector selector;
     ScriptPanelSupport support;
@@ -115,6 +115,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         setContext(CONTEXT_APPLICATION);
 
         this.model = app.getApplicationModel();
+        this.app= app;
+
         support = new ScriptPanelSupport(this, model, selector);
 
         this.applicationController= model.getDocumentModel().getController();
@@ -299,7 +301,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                     JOptionPane.showMessageDialog( JythonScriptPanel.this, ex );
                 }
             }
-            });
+        });
             
         menu.addMenuItem(  mi);
                         
@@ -552,6 +554,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
         }
         System.err.println("== Executing Script ==");
+        ScriptContext.setApplication( app );
         ScriptContext.setWindow(model);
         if ( support.file!=null ) this.setRunningScript(support.file);
         support.executeScript( evt.getModifiers() );
