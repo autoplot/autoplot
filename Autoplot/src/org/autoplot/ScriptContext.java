@@ -165,6 +165,7 @@ public class ScriptContext extends PyJavaInstance {
     public static synchronized void setApplication( AutoplotUI app ) {
         setApplicationModel(app.applicationModel);
         setView(app);        
+        appLookup.put( app.applicationModel, app );
     }
     
     /**
