@@ -142,9 +142,11 @@ public class StaticCodeAnalysis {
                     for ( aliasType a: ((ImportFrom) st).names ) {
                         if ( a.asname!=null ) {
                             this.addName( a.asname );
+                            logger.log(Level.FINE, "assignButNotReadWarning asname {0}", a.asname);
                             this.assignButNotReadWarning.put( a.asname, a );
                         } else {
                             this.addName( a.name );
+                            logger.log(Level.FINE, "assignButNotReadWarning name {0}", a.name);
                             this.assignButNotReadWarning.put( a.name, a );
                         }
                     }
@@ -190,8 +192,8 @@ public class StaticCodeAnalysis {
                 } else if ( st instanceof Assign ) {
                     Assign ast= ((Assign) st);
                     handleExprTypeRead(ast.value);
-                    logger.log(Level.FINE, "assignButNotRead={0}", this.assignButNotReadWarning);
-                    logger.log(Level.FINE, "reassignedBeforeRead={0}", this.reassignedBeforeReadWarning);
+                    logger.log(Level.FINER, "assignButNotRead={0}", this.assignButNotReadWarning);
+                    logger.log(Level.FINER, "reassignedBeforeRead={0}", this.reassignedBeforeReadWarning);
                     for ( exprType t: ast.targets ) {
                         handleExprTypeAssign(t);
                     }
@@ -244,6 +246,7 @@ public class StaticCodeAnalysis {
                 this.addName( n ); //  !!!! Why must I do this manually?!?!?
                 SimpleNode notRead= (SimpleNode)this.assignButNotReadWarning.get(n);
                 if ( notRead!=null ) {
+                    logger.log(Level.FINE, "reassignedBeforeReadWarning {0} line {1}", new Object[]{n, ((Name) t).beginLine});
                     this.reassignedBeforeReadWarning.add( notRead );
                 }
                 this.assignButNotReadWarning.put( n, t );
@@ -256,7 +259,7 @@ public class StaticCodeAnalysis {
         @Override
         public Object visitName(Name node) throws Exception {
             
-            logger.log(Level.FINE, "visitName line{0} {1} {2}", new Object[]{node.beginLine, node.id, Name.expr_contextTypeNames[node.ctx] });
+            logger.log(Level.FINER, "visitName line{0} {1} {2}", new Object[]{node.beginLine, node.id, Name.expr_contextTypeNames[node.ctx] });
             if ( name.equals(node.id)) {
                 names.add(node);
             }
@@ -268,6 +271,9 @@ public class StaticCodeAnalysis {
                 assignButNotReadWarning.put(node.id, node);
                 definedNames.put(node.id, node);
             } else if ( node.ctx==Name.Load ) {
+                if ( assignButNotReadWarning.containsKey(node.id) ) {
+                    logger.log(Level.FINE, "assignedBeforeReadWarning use {0} line {1}", new Object[]{node.id, ((Name) node).beginLine});
+                }
                 assignButNotReadWarning.remove(node.id);
                 if ( !definedNames.containsKey( node.id ) ) {
                     readButNotAssignedError.put(node.id,node);
@@ -369,10 +375,11 @@ public class StaticCodeAnalysis {
      * @return 
      */
     public static List<SimpleNode> showWriteWithoutRead(String script) {
+        logger.log(Level.FINE, "# showWriteWithoutRead (script length={0})", script.length());
         Module n = (Module) org.python.core.parser.parse(script, "exec");
         VisitNamesVisitorBase vb = new VisitNamesVisitorBase("");
         for (stmtType st : n.body) {
-            logger.log(Level.FINE, "line{0}", st.beginLine);
+            logger.log(Level.FINER, "line {0}", st.beginLine);
             vb.handleStmtType( st );
         }
         return vb.getAssignedButNotRead();
