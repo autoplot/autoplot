@@ -24,6 +24,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -55,7 +56,7 @@ class FTPDataTransferServer implements FTPDataTransferConnectionProvider,
 	/**
 	 * The thread executing the listening for incoming connection routine.
 	 */
-	private Thread thread;
+	private final Thread thread;
 
 	/**
 	 * Build the object.
@@ -95,23 +96,21 @@ class FTPDataTransferServer implements FTPDataTransferConnectionProvider,
 			}
 			if (!valid) {
 				// warning to the developer
-				logger.warning("WARNING: invalid value \"" + aux
-						+ "\" for the " + FTPKeys.ACTIVE_DT_PORT_RANGE
-						+ " system property. The value should "
-						+ "be in the start-stop form, with "
-						+ "start > 0, stop > 0 and start <= stop.");
+				logger.log(Level.WARNING,"WARNING: invalid value \"{0}\" for the "
+						+ FTPKeys.ACTIVE_DT_PORT_RANGE
+						+ " system property. The value should be in the start-stop form, with start > 0, stop > 0 and start <= stop.", aux);
 			}
 		}
 		if (useRange) {
-			ArrayList availables = new ArrayList();
+			ArrayList<Integer> availables = new ArrayList<>();
 			for (int i = start; i <= stop; i++) {
-				availables.add(new Integer(i));
+				availables.add(i);
 			}
 			int size;
 			boolean done = false;
 			while (!done && (size = availables.size()) > 0) {
 				int rand = (int) Math.floor(Math.random() * size);
-				int port = ((Integer) availables.remove(rand)).intValue();
+				int port = availables.remove(rand);
 				// Tries with the obtained value;
 				try {
 					serverSocket = new ServerSocket();
@@ -151,6 +150,7 @@ class FTPDataTransferServer implements FTPDataTransferConnectionProvider,
 	public int getPort() {
 		return serverSocket.getLocalPort();
 	}
+
 
 	public void run() {
 		int timeout = 30000;
