@@ -32,14 +32,17 @@ import org.python.parser.ast.Continue;
 import org.python.parser.ast.Expr;
 import org.python.parser.ast.For;
 import org.python.parser.ast.FunctionDef;
+import org.python.parser.ast.Global;
 import org.python.parser.ast.If;
 import org.python.parser.ast.ImportFrom;
 import org.python.parser.ast.Index;
 import org.python.parser.ast.Name;
 import org.python.parser.ast.Num;
 import org.python.parser.ast.Print;
+import org.python.parser.ast.Return;
 import org.python.parser.ast.Str;
 import org.python.parser.ast.VisitorBase;
+import org.python.parser.ast.While;
 import org.python.parser.ast.exprType;
 
 /**
@@ -101,7 +104,7 @@ public class JythonToJavaConverter {
 
         return result;
     }
-    
+
     /**
      * return a list of classes which are reasonable completions for the class
      * provided. For example, "JP" would result in "JPanel" and "JPasswordField"
@@ -463,6 +466,17 @@ public class JythonToJavaConverter {
                     return "int";
                 }
             }
+        } else if ( iter instanceof Str ) {
+            return "String";
+        } else if ( iter instanceof Name ) {
+            Name n= (Name)iter;
+            if ( n.id.equals("False") || n.id.equals("True")) {
+                return "boolean";
+            } else {
+                return "Object";
+            }
+        } else if ( iter instanceof Str ) {
+            return "String";
         }
         return "Object";
     }
@@ -521,30 +535,37 @@ public class JythonToJavaConverter {
                     this.builder.append(String.format("%04d: ", lineNumber));
                 }
             }
+            String thisIndent = "    "+ indent;
             //if ( lineNumber==4 ) {
             //    System.err.println("here line number breakpoint at line "+lineNumber );
             //}
             if (sn instanceof org.python.parser.ast.FunctionDef) {
                 FunctionDef fd = (FunctionDef) sn;
-                this.builder.append("private void ").append(fd.name).append("(");
+                this.builder.append("private Object ").append(fd.name).append("(");
                 for (int i = 0; i < fd.args.args.length; i++) {
                     if (i > 0) {
                         this.builder.append(",");
                     }
-                    this.builder.append("").append(fd.args.args[i].getImage().toString());
+                    traverse( "", fd.args.args[i], true );
                 }
                 this.builder.append(") {\n");
                 lineNumber++;
                 for (int i = 0; i < fd.body.length; i++) {
-                    traverse("\t", fd.body[i], false);
-                    if (!inline) {
-                        this.builder.append(";\n");
-                        lineNumber++;
-                    }
+                    traverse( thisIndent, fd.body[i], false);
                 }
                 this.builder.append("}\n");
                 lineNumber++;
+            } else if (sn instanceof Global) {
+                Global g= (Global)sn;
+                if ( !inline ) this.builder.append(indent);
+                this.builder.append("// global ");
+                for ( int i=0; i<g.names.length; i++ ){
+                    if ( i>0 ) this.builder.append(",");
+                    this.builder.append(g.names[i]);
+                }
+
             } else if (sn instanceof Expr) {
+                if ( !inline ) this.builder.append(indent);
                 Expr ex = (Expr) sn;
                 traverse("", ex.value, true);
                 if (!inline) {
@@ -553,7 +574,7 @@ public class JythonToJavaConverter {
                 }
             } else if (sn instanceof Print) {
                 Print pr = ((Print) sn);
-                this.builder.append(indent);
+                if ( !inline ) this.builder.append(indent);
                 this.builder.append("System.err.println(");
                 for (int i = 0; i < pr.values.length; i++) {
                     if (i > 0) {
@@ -562,6 +583,17 @@ public class JythonToJavaConverter {
                     traverse("", pr.values[i], false);
                 }
                 this.builder.append(");\n");
+                lineNumber++;
+            } else if (sn instanceof Return) {
+                Return rt = ((Return) sn);
+                if ( !inline ) this.builder.append(indent);
+                this.builder.append("return");
+                if ( rt.value!=null ) {
+                    this.builder.append(" ");
+                    traverse("", rt.value, false);
+                }
+                this.builder.append(";\n");
+                lineNumber++;
             } else if (sn instanceof ImportFrom) {
                 ImportFrom ff = ((ImportFrom) sn);
                 for (int i = 0; i < ff.names.length; i++) {
@@ -570,16 +602,18 @@ public class JythonToJavaConverter {
                 }
             } else if (sn instanceof Str) {
                 Str ss = (Str) sn;
+                if ( !inline ) this.builder.append(indent);
                 this.builder.append("\"");
                 String s= ss.s.replaceAll("\n", "\\\\n");
                 this.builder.append(s);
                 this.builder.append("\"");
             } else if (sn instanceof Num) {
+                if ( !inline ) this.builder.append(indent);
                 Num ex = (Num) sn;
                 this.builder.append(ex.n);
             } else if (sn instanceof BinOp) {
                 BinOp as = ((BinOp) sn);
-                this.builder.append(indent);
+                if ( !inline ) this.builder.append(indent);
                 if (as.left instanceof Str && as.op == 5) {
                     this.builder.append("String.format(");
                     traverse("", as.left, true);
@@ -595,7 +629,11 @@ public class JythonToJavaConverter {
                 }
             } else if (sn instanceof Assign) {
                 Assign as = ((Assign) sn);
-                this.builder.append(indent);
+                if ( !inline ) this.builder.append(indent);
+                String typeOf= getJavaExprType( as.value );
+                if ( as.targets.length==1 ) {
+                    this.builder.append(typeOf).append(" ");
+                } 
                 for (int i = 0; i < as.targets.length; i++) {
                     if (i > 0) {
                         this.builder.append(",");
@@ -604,9 +642,19 @@ public class JythonToJavaConverter {
                 }
                 this.builder.append(" = ");
                 traverse("", as.value, true);
+                this.builder.append(";");
                 
             } else if (sn instanceof Name) {
-                this.builder.append(((Name) sn).id);
+                String name= ((Name) sn).id;
+                if ( name.equals("False") ) {
+                    this.builder.append("false");
+                } else if ( name.equals("True") ) {
+                    this.builder.append("true");
+                } else if ( name.equals("None") ) {
+                    this.builder.append("null");
+                } else {
+                    this.builder.append(((Name) sn).id);
+                }
             } else if (sn instanceof Call) {
                 Call cc = (Call) sn;
                 if (cc.func instanceof Name) {
@@ -639,13 +687,26 @@ public class JythonToJavaConverter {
             } else if (sn instanceof For) {
                 For ff = (For) sn;
                 String typeOf= getJavaExprType( ff.iter );
-                this.builder.append(indent).append("for ( ").append(typeOf).append(" ");
+                if ( !inline ) this.builder.append(indent);
+                this.builder.append("for ( ").append(typeOf).append(" ");
                 traverse("", ff.target, true);
                 this.builder.append(" : ");
                 traverse("", ff.iter, true);
                 this.builder.append(" ) {\n");
                 lineNumber++;
-                String thisIndent = "    "+ indent;
+                for (int i = 0; i < ff.body.length; i++) {
+                    this.builder.append(indent).append(indent);
+                    traverse(thisIndent, ff.body[i], false);
+                }
+                this.builder.append(indent).append("}\n");
+                lineNumber++;
+            } else if (sn instanceof While) {
+                While ff = (While) sn;
+                if ( !inline ) this.builder.append(indent);
+                this.builder.append("while ( ");
+                traverse( ff.test );
+                this.builder.append(" ) {\n");
+                lineNumber++;
                 for (int i = 0; i < ff.body.length; i++) {
                     this.builder.append(indent).append(indent);
                     traverse(thisIndent, ff.body[i], false);
@@ -654,30 +715,55 @@ public class JythonToJavaConverter {
                 lineNumber++;
             } else if (sn instanceof If) {
                 If ff = (If) sn;
-                this.builder.append(indent).append("if ( ");
+                if ( !inline ) this.builder.append(indent);
+                this.builder.append("if ( ");
                 traverse("", ff.test, false);
                 this.builder.append(" ) {\n");
                 lineNumber++;
                 for (int i = 0; i < ff.body.length; i++) {
-                    this.builder.append(indent).append(indent);
-                    traverse(indent + indent, ff.body[i], false);
-                    this.builder.append(";");
+                    traverse( thisIndent, ff.body[i], false );
                 }
-                this.builder.append(indent).append("}\n");
-                if ( ff.orelse!=null ) {
-                    this.builder.append(indent).append("else {\n");
+                if ( ff.orelse==null ) {
+                    this.builder.append(indent).append("}\n");
+                    lineNumber++;
+                } else {
+                    this.builder.append(indent).append("} else {\n");
+                    lineNumber++;
                     for (int i = 0; i < ff.orelse.length; i++) {
-                        this.builder.append(indent);
-                        traverse(indent, ff.orelse[i], false);
-                        this.builder.append(";");
+                        traverse(thisIndent, ff.orelse[i], false);
                     } 
                     this.builder.append(indent).append("}\n");
+                    lineNumber++;
                 }
                 lineNumber++;
             } else if (sn instanceof Compare) {
                 Compare cp = (Compare) sn;
                 traverse("", cp.left, false);
-                this.builder.append("?in?");
+                for ( int i : cp.ops ) {
+                    switch (i) {
+                        case Compare.Gt:
+                            this.builder.append(">");
+                            break;
+                        case Compare.GtE:
+                            this.builder.append(">=");
+                            break;
+                        case Compare.Lt:
+                            this.builder.append("<");
+                            break;
+                        case Compare.LtE:
+                            this.builder.append("<=");
+                            break;
+                        case Compare.Eq:
+                            this.builder.append("==");
+                            break;
+                        case Compare.NotEq:
+                            this.builder.append("!=");
+                            break;
+                        default:
+                            this.builder.append("?in?");
+                            break;
+                    }   
+                }
                 for (exprType t : cp.comparators) {
                     traverse("", t, false);
                 }
@@ -726,6 +812,10 @@ public class JythonToJavaConverter {
 
     }
 
+    /**
+     * convert Jython script to Java
+     * @return Java attempt
+     */
     public static String convert(String script) throws Exception {
         org.python.parser.ast.Module n = (org.python.parser.ast.Module) org.python.core.parser.parse(script, "exec");
         StringBuilder b = new StringBuilder();
