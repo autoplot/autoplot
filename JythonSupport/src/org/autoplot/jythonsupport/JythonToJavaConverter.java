@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -45,6 +46,7 @@ import org.python.parser.ast.Raise;
 import org.python.parser.ast.Return;
 import org.python.parser.ast.Slice;
 import org.python.parser.ast.Str;
+import org.python.parser.ast.Tuple;
 import org.python.parser.ast.VisitorBase;
 import org.python.parser.ast.While;
 import org.python.parser.ast.exprType;
@@ -470,6 +472,13 @@ public class JythonToJavaConverter {
                     return "int";
                 } else if ( n.id.equals("xrange") ) {
                     return "int";
+                } else if ( n.id.equals("getDataSet") ) {
+                    return "QDataSet";
+                } else if ( n.id.equals("getParam") ) {
+                    if ( cc.args.length>1 ) {
+                        exprType arg1= cc.args[1];
+                        return getJavaExprType(arg1);
+                    }      
                 }
             }
         } else if ( iter instanceof Str ) {
@@ -481,6 +490,16 @@ public class JythonToJavaConverter {
             } else {
                 return "Object";
             }
+        } else if ( iter instanceof Num ) {
+            Num n= (Num)iter;
+            if ( n.n instanceof PyFloat ) {
+                return "float";
+            } else if ( n.n instanceof PyInteger ) {
+                return "int"; 
+            } else {
+                return "Number";
+            }
+
         } else if ( iter instanceof Str ) {
             return "String";
         }
@@ -531,6 +550,8 @@ public class JythonToJavaConverter {
         };
                 
         private static final String spaces4 = "    ";
+
+        private static Map<String,String> targetTypes= new LinkedHashMap<>();
 
         public void traverse(String indent, SimpleNode sn, boolean inline) throws Exception {
             if (includeLineNumbers && (this.builder.length() == 0 || builder.charAt(this.builder.length() - 1) == '\n')) {
@@ -678,7 +699,6 @@ public class JythonToJavaConverter {
                     if ( i>0 ) this.builder.append(",");
                     sliceType st= r.dims[i];
                     traverse("", st, true );
-                    this.builder.append(st);
                 }
             } else if (sn instanceof Slice) {
                 Slice s= (Slice)sn;
@@ -706,6 +726,12 @@ public class JythonToJavaConverter {
                 this.builder.append("[");
                 traverse( "", ss.slice, true );
                 this.builder.append("]");
+            } else if ( sn instanceof Tuple ) {
+                org.python.parser.ast.Tuple ss= (org.python.parser.ast.Tuple)sn;
+                for ( int i=0; i<ss.elts.length; i++ ) {
+                    if ( i>0 ) this.builder.append(',');
+                    traverse( "", ss.elts[i], true );
+                }
             } else {
                 this.builder.append(sn.toString()).append("\n");
                 lineNumber++;
@@ -762,8 +788,12 @@ public class JythonToJavaConverter {
 
         private void handleAssign(Assign as, String indent, boolean inline ) throws Exception {
             if ( as.targets.length==1 && ( as.targets[0] instanceof Name ) )  {
-                String typeOf= getJavaExprType( as.value );
-                this.builder.append(typeOf).append(" ");
+                String typeOf1= targetTypes.get( ((Name)as.targets[0]).id );
+                if ( typeOf1==null ) {
+                    String typeOf= getJavaExprType( as.value );
+                    this.builder.append(typeOf).append(" ");
+                    targetTypes.put( ((Name)as.targets[0]).id, typeOf );
+                }
             } 
             for (int i = 0; i < as.targets.length; i++) {
                 if (i > 0) {
