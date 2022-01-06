@@ -551,7 +551,7 @@ public class JythonToJavaConverter {
                 
         private static final String spaces4 = "    ";
 
-        private static Map<String,String> targetTypes= new LinkedHashMap<>();
+        private Map<String,String> targetTypes= new LinkedHashMap<>();
 
         public void traverse(String indent, SimpleNode sn, boolean inline) throws Exception {
             if (includeLineNumbers && (this.builder.length() == 0 || builder.charAt(this.builder.length() - 1) == '\n')) {
@@ -738,7 +738,8 @@ public class JythonToJavaConverter {
             }
             
             if ( !inline ) {
-                if ( this.builder.charAt(this.builder.length()-1)=='}' ) {
+                String ss= this.builder.toString().trim();
+                if ( ss.charAt(ss.length()-1)=='}' ) {
                     this.builder.append("\n");
                 } else {
                     this.builder.append(";\n");
