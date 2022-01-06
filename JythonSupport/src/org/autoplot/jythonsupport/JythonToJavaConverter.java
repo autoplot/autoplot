@@ -44,6 +44,7 @@ import org.python.parser.ast.Str;
 import org.python.parser.ast.VisitorBase;
 import org.python.parser.ast.While;
 import org.python.parser.ast.exprType;
+import org.python.parser.ast.stmtType;
 
 /**
  * experiment with code which converts the Jython AST (syntax tree) into Java
@@ -628,114 +629,27 @@ public class JythonToJavaConverter {
                     traverse("", as.right, true);
                 }
             } else if (sn instanceof Assign) {
-                Assign as = ((Assign) sn);
-                if ( !inline ) this.builder.append(indent);
-                String typeOf= getJavaExprType( as.value );
-                if ( as.targets.length==1 ) {
-                    this.builder.append(typeOf).append(" ");
-                } 
-                for (int i = 0; i < as.targets.length; i++) {
-                    if (i > 0) {
-                        this.builder.append(",");
-                    }
-                    traverse("", as.targets[i], false);
-                }
-                this.builder.append(" = ");
-                traverse("", as.value, true);
-                this.builder.append(";");
+                handleAssign( (Assign)sn, indent, inline );
                 
             } else if (sn instanceof Name) {
-                String name= ((Name) sn).id;
-                if ( name.equals("False") ) {
-                    this.builder.append("false");
-                } else if ( name.equals("True") ) {
-                    this.builder.append("true");
-                } else if ( name.equals("None") ) {
-                    this.builder.append("null");
-                } else {
-                    this.builder.append(((Name) sn).id);
-                }
+                handleName( (Name)sn, indent, inline );
+
             } else if (sn instanceof Call) {
-                Call cc = (Call) sn;
-                if (cc.func instanceof Name) {
-                    if (Character.isUpperCase(((Name) cc.func).id.charAt(0))) {
-                        String ss= this.builder.toString();
-                        int i= ss.lastIndexOf("\n");
-                        if (i==-1 ) i=0;
-                        String insertStr= ((Name) cc.func).id + " ";
-                        this.builder.insert( i + indent.length() + 1, insertStr ); 
-                        this.builder.append("new").append(" ");
-                    }
-                }
-                traverse("", cc.func, true);
-                this.builder.append("(");
-                for (int i = 0; i < cc.args.length; i++) {
-                    if (i > 0) {
-                        this.builder.append(",");
-                    }
-                    traverse("", cc.args[i], true);
-                }
-                this.builder.append(")");
-                if (!inline) {
-                    this.builder.append(";\n");
-                    lineNumber++;
-                }
+                handleCall( (Call)sn, indent, inline );
+
             } else if ( sn instanceof Index ) {
                 Index id= (Index)sn;
                 traverse("", id.value, true);
                 
             } else if (sn instanceof For) {
-                For ff = (For) sn;
-                String typeOf= getJavaExprType( ff.iter );
-                if ( !inline ) this.builder.append(indent);
-                this.builder.append("for ( ").append(typeOf).append(" ");
-                traverse("", ff.target, true);
-                this.builder.append(" : ");
-                traverse("", ff.iter, true);
-                this.builder.append(" ) {\n");
-                lineNumber++;
-                for (int i = 0; i < ff.body.length; i++) {
-                    this.builder.append(indent).append(indent);
-                    traverse(thisIndent, ff.body[i], false);
-                }
-                this.builder.append(indent).append("}\n");
-                lineNumber++;
+                handleFor( (For)sn, indent, inline );
+
             } else if (sn instanceof While) {
-                While ff = (While) sn;
-                if ( !inline ) this.builder.append(indent);
-                this.builder.append("while ( ");
-                traverse( ff.test );
-                this.builder.append(" ) {\n");
-                lineNumber++;
-                for (int i = 0; i < ff.body.length; i++) {
-                    this.builder.append(indent).append(indent);
-                    traverse(thisIndent, ff.body[i], false);
-                }
-                this.builder.append(indent).append("}\n");
-                lineNumber++;
+                handleWhile( (While)sn, indent, inline );
+
             } else if (sn instanceof If) {
-                If ff = (If) sn;
-                if ( !inline ) this.builder.append(indent);
-                this.builder.append("if ( ");
-                traverse("", ff.test, false);
-                this.builder.append(" ) {\n");
-                lineNumber++;
-                for (int i = 0; i < ff.body.length; i++) {
-                    traverse( thisIndent, ff.body[i], false );
-                }
-                if ( ff.orelse==null ) {
-                    this.builder.append(indent).append("}\n");
-                    lineNumber++;
-                } else {
-                    this.builder.append(indent).append("} else {\n");
-                    lineNumber++;
-                    for (int i = 0; i < ff.orelse.length; i++) {
-                        traverse(thisIndent, ff.orelse[i], false);
-                    } 
-                    this.builder.append(indent).append("}\n");
-                    lineNumber++;
-                }
-                lineNumber++;
+                handleIf( (If)sn, indent, inline );
+
             } else if (sn instanceof Compare) {
                 Compare cp = (Compare) sn;
                 traverse("", cp.left, false);
@@ -808,6 +722,114 @@ public class JythonToJavaConverter {
          */
         public boolean visitNameFail() {
             return visitNameFail;
+        }
+
+        private void handleAssign(Assign as, String indent, boolean inline ) throws Exception {
+            if ( !inline ) this.builder.append(indent);
+            String typeOf= getJavaExprType( as.value );
+            if ( as.targets.length==1 ) {
+                this.builder.append(typeOf).append(" ");
+            } 
+            for (int i = 0; i < as.targets.length; i++) {
+                if (i > 0) {
+                    this.builder.append(",");
+                }
+                traverse("", as.targets[i], false);
+            }
+            this.builder.append(" = ");
+            traverse("", as.value, true);
+            this.builder.append(";");
+
+        }
+
+        private void handleName(Name nn, String indent, boolean inline) {
+            String name= nn.id;
+            if ( name.equals("False") ) {
+                this.builder.append("false");
+            } else if ( name.equals("True") ) {
+                this.builder.append("true");
+            } else if ( name.equals("None") ) {
+                this.builder.append("null");
+            } else {
+                this.builder.append(nn.id);
+            }
+        }
+
+        private void handleCall(Call cc, String indent, boolean inline) throws Exception {
+            if (cc.func instanceof Name) {
+                if (Character.isUpperCase(((Name) cc.func).id.charAt(0))) {
+                    String ss= this.builder.toString();
+                    int i= ss.lastIndexOf("\n");
+                    if (i==-1 ) i=0;
+                    String insertStr= ((Name) cc.func).id + " ";
+                    this.builder.insert( i + indent.length() + 1, insertStr ); 
+                    this.builder.append("new").append(" ");
+                }
+            }
+            traverse("", cc.func, true);
+            this.builder.append("(");
+            for (int i = 0; i < cc.args.length; i++) {
+                if (i > 0) {
+                    this.builder.append(",");
+                }
+                traverse("", cc.args[i], true);
+            }
+            this.builder.append(")");
+            if (!inline) {
+                this.builder.append(";\n");
+                lineNumber++;
+            }
+        }
+
+        private void handleBody( stmtType[] body, String thisIndent ) throws Exception {
+            for (int i = 0; i < body.length; i++) {
+                traverse(thisIndent, body[i], false);
+            }
+        }
+
+        private void handleFor(For ff, String indent, boolean inline) throws Exception {
+            String typeOf= getJavaExprType( ff.iter );
+            if ( !inline ) this.builder.append(indent);
+            this.builder.append("for ( ").append(typeOf).append(" ");
+            traverse("", ff.target, true);
+            this.builder.append(" : ");
+            traverse("", ff.iter, true);
+            this.builder.append(" ) {\n");
+            lineNumber++;
+            handleBody( ff.body, "    "+ indent );
+            this.builder.append(indent).append("}\n");
+            lineNumber++;
+        }
+
+        private void handleWhile(While ff, String indent, boolean inline) throws Exception {
+            if ( !inline ) this.builder.append(indent);
+            this.builder.append("while ( ");
+            traverse( ff.test );
+            this.builder.append(" ) {\n");
+            lineNumber++;
+            handleBody( ff.body, "    "+ indent );
+            this.builder.append(indent).append("}\n");
+            lineNumber++;
+        }
+
+        private void handleIf(If ff, String indent, boolean inline) throws Exception {
+            if ( !inline ) this.builder.append(indent);
+            this.builder.append("if ( ");
+            traverse("", ff.test, false);
+            this.builder.append(" ) {\n");
+            lineNumber++;
+            handleBody( ff.body,"    "+ indent ); 
+            if ( ff.orelse==null ) {
+                this.builder.append(indent).append("}\n");
+                lineNumber++;
+            } else {
+                this.builder.append(indent).append("} else {\n");
+                lineNumber++;
+                handleBody( ff.orelse, "    "+ indent );
+                this.builder.append(indent).append("}\n");
+                lineNumber++;
+            }
+            lineNumber++;
         }
 
     }
