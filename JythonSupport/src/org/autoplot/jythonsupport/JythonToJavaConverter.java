@@ -419,7 +419,7 @@ public class JythonToJavaConverter {
         for ( String s : importedPaths ) {
             sb.append(s).append("\n");
         }
-        if ( importedPaths.size()>0 ) sb.append("\n");
+        if ( !importedPaths.isEmpty() ) sb.append("\n");
         sb.append(b);
         return sb.toString();
     }
@@ -684,7 +684,7 @@ public class JythonToJavaConverter {
                 
                 for ( int i=0; i<ll.elts.length; i++ ) {
                     if ( i>0 ) this.builder.append(",");
-                    traverse("", ll.elts[i], false);
+                    traverse("", ll.elts[i], true);
                 }
                 this.builder.append(" } ");
             } else if ( sn instanceof org.python.parser.ast.Subscript ) {
