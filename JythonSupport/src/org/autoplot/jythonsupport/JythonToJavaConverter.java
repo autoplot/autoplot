@@ -27,9 +27,11 @@ import org.python.parser.ast.Assign;
 import org.python.parser.ast.Attribute;
 import org.python.parser.ast.BinOp;
 import org.python.parser.ast.Call;
+import org.python.parser.ast.ClassDef;
 import org.python.parser.ast.Compare;
 import org.python.parser.ast.Continue;
 import org.python.parser.ast.Expr;
+import org.python.parser.ast.ExtSlice;
 import org.python.parser.ast.For;
 import org.python.parser.ast.FunctionDef;
 import org.python.parser.ast.Global;
@@ -39,11 +41,14 @@ import org.python.parser.ast.Index;
 import org.python.parser.ast.Name;
 import org.python.parser.ast.Num;
 import org.python.parser.ast.Print;
+import org.python.parser.ast.Raise;
 import org.python.parser.ast.Return;
+import org.python.parser.ast.Slice;
 import org.python.parser.ast.Str;
 import org.python.parser.ast.VisitorBase;
 import org.python.parser.ast.While;
 import org.python.parser.ast.exprType;
+import org.python.parser.ast.sliceType;
 import org.python.parser.ast.stmtType;
 
 /**
@@ -525,6 +530,8 @@ public class JythonToJavaConverter {
             ops.put( 12, "/floordiv/" );
         };
                 
+        private static final String spaces4 = "    ";
+
         public void traverse(String indent, SimpleNode sn, boolean inline) throws Exception {
             if (includeLineNumbers && (this.builder.length() == 0 || builder.charAt(this.builder.length() - 1) == '\n')) {
                 this.builder.append(String.format("%04d: ", lineNumber));
@@ -539,25 +546,15 @@ public class JythonToJavaConverter {
 
             if ( !inline ) this.builder.append(indent);
 
-            String thisIndent = "    "+ indent;
             //if ( lineNumber==4 ) {
             //    System.err.println("here line number breakpoint at line "+lineNumber );
             //}
-            if (sn instanceof org.python.parser.ast.FunctionDef) {
-                FunctionDef fd = (FunctionDef) sn;
-                this.builder.append("private Object ").append(fd.name).append("(");
-                for (int i = 0; i < fd.args.args.length; i++) {
-                    if (i > 0) {
-                        this.builder.append(",");
-                    }
-                    traverse( "", fd.args.args[i], true );
-                }
-                this.builder.append(") {\n");
-                lineNumber++;
-                for (int i = 0; i < fd.body.length; i++) {
-                    traverse( thisIndent, fd.body[i], false);
-                }
-                this.builder.append("}");
+            if (sn instanceof FunctionDef) {
+                handleFunctionDef( (FunctionDef)sn, indent, inline );
+
+            } else if (sn instanceof ClassDef ) {
+                handleClassDef( (ClassDef)sn, indent, inline );
+
             } else if (sn instanceof Global) {
                 Global g= (Global)sn;
                 this.builder.append("// global ");
@@ -589,8 +586,7 @@ public class JythonToJavaConverter {
             } else if (sn instanceof ImportFrom) {
                 ImportFrom ff = ((ImportFrom) sn);
                 for (int i = 0; i < ff.names.length; i++) {
-                    this.builder.append("import ").append(ff.module).append('.').append(ff.names[i].name).append(";\n");
-                    lineNumber++;
+                    this.builder.append("import ").append(ff.module).append('.').append(ff.names[i].name);
                 }
             } else if (sn instanceof Str) {
                 Str ss = (Str) sn;
@@ -671,6 +667,23 @@ public class JythonToJavaConverter {
                 }
             } else if (sn instanceof Continue) {
                 this.builder.append("continue");
+            } else if (sn instanceof Raise) {
+                Raise r= (Raise)sn;
+                this.builder.append("throw ");
+                traverse("", r.type, true );
+
+            } else if (sn instanceof ExtSlice ) {
+                ExtSlice r= (ExtSlice)sn;
+                for ( int i=0; i<r.dims.length; i++ ) {
+                    if ( i>0 ) this.builder.append(",");
+                    sliceType st= r.dims[i];
+                    traverse("", st, true );
+                    this.builder.append(st);
+                }
+            } else if (sn instanceof Slice) {
+                Slice s= (Slice)sn;
+                this.builder.append( String.valueOf(s.lower)+":"+ String.valueOf(s.upper)+":"+ String.valueOf(s.step) );
+
             } else if (sn instanceof Attribute) {
                 Attribute at = ((Attribute) sn);
                 traverse("", at.value, true);
@@ -689,9 +702,9 @@ public class JythonToJavaConverter {
                 this.builder.append(" } ");
             } else if ( sn instanceof org.python.parser.ast.Subscript ) {
                 org.python.parser.ast.Subscript ss= (org.python.parser.ast.Subscript)sn;
-                traverse( "", ss.value, false );
+                traverse( "", ss.value, true );
                 this.builder.append("[");
-                traverse( "", ss.slice, false );
+                traverse( "", ss.slice, true );
                 this.builder.append("]");
             } else {
                 this.builder.append(sn.toString()).append("\n");
@@ -719,6 +732,32 @@ public class JythonToJavaConverter {
          */
         public boolean visitNameFail() {
             return visitNameFail;
+        }
+
+        private void handleFunctionDef( FunctionDef fd, String indent, boolean inline ) throws Exception {
+            this.builder.append("private Object ").append(fd.name).append("(");
+            for (int i = 0; i < fd.args.args.length; i++) {
+                if (i > 0) {
+                    this.builder.append(",");
+                }
+                traverse( "", fd.args.args[i], true );
+            }
+            this.builder.append(") {\n");
+            lineNumber++;
+            handleBody( fd.body, indent+spaces4 );
+            this.builder.append("}");
+        }
+
+        private void handleClassDef( ClassDef classDef, String indent, boolean inline) throws Exception {
+            if ( classDef.bases.length>0 ) {
+                this.builder.append("private class ").append(classDef.name).append(" extends ");
+                traverse( indent, classDef.bases[0], true );
+                this.builder.append(" {");
+            } else {
+                this.builder.append("private class ").append(classDef.name).append(" {");
+            }
+            handleBody(classDef.body, indent+spaces4 );
+            this.builder.append("}");
         }
 
         private void handleAssign(Assign as, String indent, boolean inline ) throws Exception {
@@ -787,7 +826,7 @@ public class JythonToJavaConverter {
             traverse("", ff.iter, true);
             this.builder.append(" ) {\n");
             lineNumber++;
-            handleBody( ff.body, "    "+ indent );
+            handleBody(ff.body, spaces4+ indent );
             this.builder.append(indent).append("}\n");
             lineNumber++;
         }
@@ -797,7 +836,7 @@ public class JythonToJavaConverter {
             traverse( ff.test );
             this.builder.append(" ) {\n");
             lineNumber++;
-            handleBody( ff.body, "    "+ indent );
+            handleBody(ff.body, spaces4+ indent );
             this.builder.append(indent).append("}\n");
             lineNumber++;
         }
@@ -807,13 +846,13 @@ public class JythonToJavaConverter {
             traverse("", ff.test, true);
             this.builder.append(" ) {\n");
             lineNumber++;
-            handleBody( ff.body,"    "+ indent ); 
+            handleBody(ff.body,spaces4+ indent ); 
             if ( ff.orelse==null ) {
                 this.builder.append(indent).append("}");
             } else {
                 this.builder.append(indent).append("} else {\n");
                 lineNumber++;
-                handleBody( ff.orelse, "    "+ indent );
+                handleBody(ff.orelse, spaces4+ indent );
                 this.builder.append(indent).append("}");
             }
         }
