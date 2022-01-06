@@ -745,7 +745,7 @@ public class JythonToJavaConverter {
             this.builder.append(") {\n");
             lineNumber++;
             handleBody( fd.body, indent+spaces4 );
-            this.builder.append("}");
+            this.builder.append(indent).append("}");
         }
 
         private void handleClassDef( ClassDef classDef, String indent, boolean inline) throws Exception {
@@ -761,8 +761,8 @@ public class JythonToJavaConverter {
         }
 
         private void handleAssign(Assign as, String indent, boolean inline ) throws Exception {
-            String typeOf= getJavaExprType( as.value );
-            if ( as.targets.length==1 ) {
+            if ( as.targets.length==1 && ( as.targets[0] instanceof Name ) )  {
+                String typeOf= getJavaExprType( as.value );
                 this.builder.append(typeOf).append(" ");
             } 
             for (int i = 0; i < as.targets.length; i++) {
@@ -792,11 +792,6 @@ public class JythonToJavaConverter {
         private void handleCall(Call cc, String indent, boolean inline) throws Exception {
             if (cc.func instanceof Name) {
                 if (Character.isUpperCase(((Name) cc.func).id.charAt(0))) {
-                    String ss= this.builder.toString();
-                    int i= ss.lastIndexOf("\n");
-                    if (i==-1 ) i=0;
-                    String insertStr= ((Name) cc.func).id + " ";
-                    this.builder.insert( i + indent.length() + 1, insertStr ); 
                     this.builder.append("new").append(" ");
                 }
             }
