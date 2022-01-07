@@ -588,15 +588,7 @@ public class JythonToJavaConverter {
                 Expr ex = (Expr) sn;
                 traverse("", ex.value, true);
             } else if (sn instanceof Print) {
-                Print pr = ((Print) sn);
-                this.builder.append("System.err.println(");
-                for (int i = 0; i < pr.values.length; i++) {
-                    if (i > 0) {
-                        this.builder.append(",");
-                    }
-                    traverse("", pr.values[i], true);
-                }
-                this.builder.append(")");
+                handlePrint( (Print)sn, indent, inline );
             } else if (sn instanceof Return) {
                 Return rt = ((Return) sn);
                 this.builder.append("return");
@@ -775,6 +767,17 @@ public class JythonToJavaConverter {
             this.builder.append(indent).append("}");
         }
 
+        private void handlePrint( Print pr, String indent, boolean inline) throws Exception {
+            this.builder.append("System.err.println(");
+            for (int i = 0; i < pr.values.length; i++) {
+                if (i > 0) {
+                    this.builder.append(",");
+                }
+                traverse("", pr.values[i], true);
+            }
+            this.builder.append(")");
+        }
+        
         private void handleClassDef( ClassDef classDef, String indent, boolean inline) throws Exception {
             if ( classDef.bases.length>0 ) {
                 this.builder.append("private class ").append(classDef.name).append(" extends ");
