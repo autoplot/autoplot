@@ -16,6 +16,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.net.UnknownHostException;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -78,6 +79,13 @@ public class ScriptGUIServlet extends HttpServlet {
         timelogger.setLevel(Level.FINE);
         try {
             // %h is user.home
+            String home= System.getProperty("user.home"); //TODO: verify this new code which makes the log directory
+            File hf= Paths.get( home, "log", "tomcat" ).toFile();
+            if ( !hf.exists() ) {
+                if ( !hf.mkdirs() ) {
+                    throw new RuntimeException("Unable to make log directory: "+hf);
+                }
+            }
             final Handler h= new FileHandler( "%h/log/tomcat/scriptGuiTiming.%g.log" ) {
                 @Override
                 public synchronized void publish(LogRecord record) {
