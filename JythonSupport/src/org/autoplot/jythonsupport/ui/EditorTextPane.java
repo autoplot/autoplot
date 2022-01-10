@@ -283,6 +283,7 @@ public class EditorTextPane extends JEditorPane {
         String doThis= this.getSelectedText();
         if ( doThis==null || doThis.length()==0 ) {
             doThis= this.getText();
+            doThis= doThis.substring( 0,this.getCaretPosition() );
         }
         try {
             String scriptPrime= SimplifyScriptSupport.simplifyScriptToCompletions(doThis);
