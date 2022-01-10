@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
@@ -59,6 +60,7 @@ import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
 import org.das2.graph.GraphUtil;
+import org.python.core.PyArray;
 import org.python.core.PyFloat;
 import org.python.core.PyReflectedField;
 
@@ -309,17 +311,41 @@ public class JythonCompletionTask implements CompletionTask {
         PyObject lcontext=null;
         PyJavaClass lcontextClass=null;
         
+        boolean fromArray= false;
+        
         try {
             lcontext = interp.eval(cc.contextString);
         } catch (PyException ex) {
             try {
+                if ( cc.contextString.endsWith("]") ) {
+                    int k= cc.contextString.lastIndexOf("[");
+                    if ( k>-1 ) {
+                        PyObject occ= interp.eval(cc.contextString.substring(0,k));
+                        if ( occ instanceof PyArray ) {
+                            PyArray pa= (PyArray)occ;
+                            Object o= pa.getArray();
+                            Class oc= o.getClass();
+                            if ( oc.isArray() ) {
+                                lcontextClass= PyJavaClass.lookup( oc.getComponentType() );
+                                try {
+                                    lcontext = new PyJavaInstance( oc.getComponentType().getDeclaredConstructors()[0].newInstance() );
+                                } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex1) {
+                                    Logger.getLogger(JythonCompletionTask.class.getName()).log(Level.SEVERE, null, ex1);
+                                }
+                                fromArray= true;
+                            }
+                        }
+                    }
+                }
                 // check to see if we have identified the class of the symbol.
-                PyObject occ= interp.eval(cc.contextString+__CLASSTYPE);
-                if ( occ!=null && occ instanceof PyJavaClass ) {
-                    lcontextClass= (PyJavaClass)occ;
-                } else {
-                    rs.addItem(new MessageCompletionItem("EVAL error: " + cc.contextString, ex.toString()));
-                    return 0;
+                if ( lcontextClass==null ) {
+                    PyObject occ= interp.eval(cc.contextString+__CLASSTYPE);
+                    if ( occ!=null && occ instanceof PyJavaClass ) {
+                        lcontextClass= (PyJavaClass)occ;
+                    } else {
+                        rs.addItem(new MessageCompletionItem("EVAL error: " + cc.contextString, ex.toString()));
+                        return 0;
+                    }
                 }
             } catch ( PyException ex2 ) {
                 rs.addItem(new MessageCompletionItem("Eval error: " + cc.contextString, ex.toString()));
@@ -340,7 +366,7 @@ public class JythonCompletionTask implements CompletionTask {
             return 0;
         }
         
-        List<String> po3= reduceGetterSetters( lcontext, po2, lcontext!=lcontextClass );
+        List<String> po3= reduceGetterSetters( lcontext, po2, fromArray || ( lcontext!=lcontextClass ) );
                 
         int count=0;
         for (int i = 0; i < po3.size(); i++) {
