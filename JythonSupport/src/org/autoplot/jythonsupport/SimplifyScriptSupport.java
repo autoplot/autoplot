@@ -564,7 +564,10 @@ public class SimplifyScriptSupport {
 
     /**
      * return true if we can include this in the script without a huge performance penalty.
-     *
+     * This should be used for read access, not write access, so:<ul>
+     * <li>p= dom.plots[0]  is okay
+     * <li>dom.plots[1].rowId= dom.plots[0].rowId  is not okay.
+     * </ul>
      * @param o the statement, for example an import or an assignment
      * @param variableNames known symbol names
      * @return true if we can include this in the script without a huge performance penalty.
@@ -632,35 +635,37 @@ public class SimplifyScriptSupport {
                         logger.log(Level.FINEST, "assign to variable {0}", id);
                         //TODO: can we identify type?  Insert <id>__CLASSTYPE=... for completions.
                     } else if (et instanceof Attribute) {
-                        Attribute at = (Attribute) et;
-                        while (at.value instanceof Attribute || at.value instanceof Subscript) {
-                            if (at.value instanceof Attribute) {
-                                at = (Attribute) at.value;
-                            } else {
-                                Subscript s = (Subscript) at.value;
-                                if (s.value instanceof Attribute) {
-                                    at = (Attribute) s.value;
-                                } else {
-                                    return false; // oh just give up...
-                                }
-                            }
-                        }
-                        if (at.value instanceof Name) {
-                            Name n = (Name) at.value;
-                            if (!variableNames.contains(n.id)) {
-                                return false;
-                            }
-                        }
-                    } else if (et instanceof Subscript) {
-                        Subscript subscript = (Subscript) et;
-                        exprType et2 = subscript.value;
-                        if (et2 instanceof Name) {
-                            Name n = (Name) et2;
-                            if (variableNames.contains(n.id)) {
-                                return true;
-                            }
-                        }
                         return false;
+//                        Attribute at = (Attribute) et;
+//                        while (at.value instanceof Attribute || at.value instanceof Subscript) {
+//                            if (at.value instanceof Attribute) {
+//                                at = (Attribute) at.value;
+//                            } else {
+//                                Subscript s = (Subscript) at.value;
+//                                if (s.value instanceof Attribute) {
+//                                    at = (Attribute) s.value;
+//                                } else {
+//                                    return false; // oh just give up...
+//                                }
+//                            }
+//                        }
+//                        if (at.value instanceof Name) {
+//                            Name n = (Name) at.value;
+//                            if (!variableNames.contains(n.id)) {
+//                                return false;
+//                            }
+//                        }
+                    } else if (et instanceof Subscript) {
+                        return false;
+                        //Subscript subscript = (Subscript) et;
+                        //exprType et2 = subscript.value;
+                        //if (et2 instanceof Name) {
+                        //    Name n = (Name) et2;
+                        //    if (variableNames.contains(n.id)) {
+                        //        return true;
+                        //    }
+                        //}
+                        //return false;
                     } else {
                         return false;
                     }
