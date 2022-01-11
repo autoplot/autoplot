@@ -510,7 +510,11 @@ function normalizeTime(time,offset) {
     if (time[3+offset] > 24) {
         throw new IllegalArgumentException("time[3] is greater than 24 (hours)");
     }
-    if (time[1+offset] > 12) {
+    if (time[1+offset] > 12 && time[2+offset]===1 ) {
+        time[1+offset]= time[1+offset]-12;
+        time[0+offset]= time[0+offset]+1;
+    }
+    if ( time[1+offset]>12 ) {
         throw new IllegalArgumentException("time[1] is greater than 12 (months)");
     }
     if (time[1+offset] === 12 && time[2+offset] === 32) {
