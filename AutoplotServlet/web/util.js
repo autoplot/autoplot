@@ -1,120 +1,46 @@
-/**
- * returns the time found in an iso8601 string, or null.  This supports
- * periods (durations) as in: 2007-03-01T13:00:00Z/P1Y2M10DT2H30M
- * Other examples:
- *   2007-03-01T13:00:00Z/2008-05-11T15:30:00Z
- *   2007-03-01T13:00:00Z/P1Y2M10DT2H30M
- *   P1Y2M10DT2H30M/2008-05-11T15:30:00Z
- *   2007-03-01T00:00Z/P1D
- *   2012-100T02:00/03:45
- * https://en.wikipedia.org/wiki/ISO_8601#Time_intervals
- * @param stringIn
- * @param result if non-null should be an int[14] to provide storage to routine.
- * @return int[14] with [Y,M,D,H,M,S,NS,Y,M,D,H,M,S,NS]
- */
-function parseISO8601Range( stringIn, result ) {
 
-    parts= stringIn.split("/",2);
-    if ( parts.length!==2 ) return null;
+// require( ['TimeRangeParser.js' ] );
+// you must bring in TimeRangeParser.js before using this.
 
-    d1= parts[0].charAt(0)==='P'; // true if it is a duration
-    d2= parts[1].charAt(0)==='P';
 
-    lsd= -1;
-
-    if ( d1 ) {
-        digits0= parseISO8601Duration( parts[0] );
-    } else if ( parts[0]==='now' ) {
-        dd= new Date();
-        digits0= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ];
-    } else if ( parts[0].startsWith('now-') ) {
-        dd= new Date();
-        delta= parseISO8601Duration(parts[0].substring(4));
-        digits0= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ];          
-        for ( j=0; j<7; j++ ) digits0[j]-= delta[j]; 
-    } else if ( parts[0].startsWith('now+') ) {
-        dd= new Date();
-        delta= parseISO8601Duration(parts[0].substring(4));
-        digits0= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ];         
-        for ( j=0; j<7; j++ ) digits0[j]+= delta[j]; 
-    } else {
-        digits0= [0,0,0,0,0,0,0];
-        lsd= parseISO8601Datum( parts[0], digits0, lsd );
-        for ( j=lsd+1; j<3; j++ ) digits0[j]=1; // month 1 is first month, not 0. day 1 
-    }
-
-    if ( d2 ) {
-        digits1= parseISO8601Duration(parts[1]);
-    } else if ( parts[1]==='now' ) {
-        dd= new Date();
-        digits1= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ];
-    } else if ( parts[1].startsWith('now-') ) {
-        dd= new Date();
-        delta= parseISO8601Duration(parts[1].substring(4));
-        digits1= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ];            
-        for ( j=0; j<7; j++ ) digits1[j]-= delta[j]; 
-    } else if ( parts[1].startsWith('now+') ) {
-        dd= new Date();
-        delta= parseISO8601Duration(parts[1].substring(4));
-        digits1= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ];            
-        for ( j=0; j<7; j++ ) digits1[j]+= delta[j]; 
-    } else {
-        if ( d1 ) {
-            digits1= [0,0,0,0,0,0,0];
-        } else {
-            digits1= digits0.slice(0); // make a clone of the array
-        }
-        lsd= parseISO8601Datum( parts[1], digits1, lsd );
-        for ( j=lsd+1; j<3; j++ ) digits1[j]=1; // month 1 is first month, not 0. day 1 
-    }
-
-    if ( digits0===null || digits1===null ) return null;
-
-    if ( d1 ) {
-        for ( i=0; i<7; i++ ) digits0[i] = digits1[i] - digits0[i];
-    }
-
-    if ( d2 ) {
-        for ( i=0; i<7; i++ ) digits1[i] = digits0[i] + digits1[i];
-    }
-
-    if ( result===undefined ) {
-        result= [0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-    }
-    for ( i=0; i<7; i++ ) result[i]= digits0[i];
-    for ( i=0; i<7; i++ ) result[i+7]= digits1[i];
-
-    return result;
-
+function previousInterval( tf ) {
+    s= tf.value;
+    r= parseISO8601Range( s, undefined );
+    dt= [ r[7]-r[0], r[8]-r[1], r[9]-r[2], r[10]-r[3], r[11]-r[4], r[12]-r[5], r[13]-r[6] ];
+    r= subtract( r, dt );
+    tf.value= formatISO8601Range( r );
 }
 
-/**
- * efficiently format t1 and t2 as ISO8601 times range.
- * @param {type} t1
- * @param {type} t2
- * @returns {undefined}
- */
-function formatISO8601Range( t1, t2 ) {
-    if ( typeof t2 === "undefined" ) {
-        t2= [ t1[7], t1[8], t1[9], t1[10], t1[11], t1[12], t1[13] ];
-        t1= [ t1[0], t1[1], t1[2], t1[3], t1[4], t1[5], t1[6] ];
-    }
-    d=7;
-    // id the first non-zero trailing digit.
-    while ( t1[d]===0 && t2[d]===0 && d>3 ) {
-        d=d-1;
-    }
-    s1= new Date(t1).toJSON();
-    s2= new Date(t2).toJSON();
-    return s1+'/'+s2;
+function nextInterval( tf ) {
+    s= tf.value;
+    r= parseISO8601Range( s, undefined );
+    dt= [ r[7]-r[0], r[8]-r[1], r[9]-r[2], r[10]-r[3], r[11]-r[4], r[12]-r[5], r[13]-r[6] ];
+    r= add( r, dt );    
+    tf.value= formatISO8601Range( r );
 }
 
 function add( t, dt ) {
-    return [ t[0]+dt[0], t[1]+dt[1], t[2]+dt[2], t[3]+dt[3], t[4]+dt[4], t[5]+dt[5], t[6]+dt[6] ];
+    if ( t.length===14 ) {
+        result= [ t[0]+dt[0], t[1]+dt[1], t[2]+dt[2], t[3]+dt[3], t[4]+dt[4], t[5]+dt[5], t[6]+dt[6],
+            t[7]+dt[0], t[8]+dt[1], t[9]+dt[2], t[10]+dt[3], t[11]+dt[4], t[12]+dt[5], t[13]+dt[6] ];
+        result= normalizeTime(result,7);
+    } else {
+        result= [ t[0]+dt[0], t[1]+dt[1], t[2]+dt[2], t[3]+dt[3], t[4]+dt[4], t[5]+dt[5], t[6]+dt[6] ];
+    }
+    result= normalizeTime(result,0);
+    return result;
 }
     
 function subtract( t, dt ) {
-    return [ t[0]-dt[0], t[1]-dt[1], t[2]-dt[2], t[3]-dt[3], t[4]-dt[4], t[5]-dt[5], t[6]-dt[6] ];
+    if ( t.length===14 ) {
+        result = [ t[0]-dt[0], t[1]-dt[1], t[2]-dt[2], t[3]-dt[3], t[4]-dt[4], t[5]-dt[5], t[6]-dt[6],
+            t[7]-dt[0], t[8]-dt[1], t[9]-dt[2], t[10]-dt[3], t[11]-dt[4], t[12]-dt[5], t[13]-dt[6] ];
+        result= borrowTime(result,7);
+    } else {
+        result = [ t[0]-dt[0], t[1]-dt[1], t[2]-dt[2], t[3]-dt[3], t[4]-dt[4], t[5]-dt[5], t[6]-dt[6] ];
+    }
+    result= borrowTime(result,0);
+    return result;
 }    
 
 /**

@@ -249,8 +249,20 @@ function parseISO8601Datum(str, result, lsd) {
 function parseISO8601Range(stringIn, result) {
 
     parts = stringIn.split("/", 2);
-    if (parts.length !== 2)
-        return null;
+    if ( parts.length!==2 ) {
+        if ( parts[0].length<4 ) {
+            throw Exception('time must have 4, 7, 8, or 10 digits');
+        } else if ( parts[0].length===4 ) { // YYYY
+            stringIn= stringIn+'/P1Y';
+        } else if ( stringIn.length===7 ) { // YYYY-DD
+            stringIn= stringIn+'/P1M';
+        } else if ( stringIn.length===8 ) { // YYYY-MMM
+            stringIn= stringIn+'/P1D';
+        } else if ( stringIn.length===10 ) { // YYYY-MM-DD
+            stringIn= stringIn+'/P1D';
+        }
+        parts= stringIn.split("/",2);
+    }
 
     d1 = parts[0].charAt(0) === 'P'; // true if it is a duration
     d2 = parts[1].charAt(0) === 'P';
