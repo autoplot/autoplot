@@ -619,6 +619,40 @@ function formatISO8601Range(arr) {
 
 }
 
+/**
+ * return the width of the 14-element time range
+ * @param {type} r
+ * @returns {undefined}
+ */
+function width( r ) {
+    dt= [ r[7]-r[0], r[8]-r[1], r[9]-r[2], r[10]-r[3], r[11]-r[4], r[12]-r[5], r[13]-r[6] ];
+    while ( dt[6]<0 && dt[5]>0 ) {
+        dt[6]= dt[6]+1000000000;
+        dt[5]= dt[5]-1;
+    }
+    while ( dt[5]<0 && dt[4]>0 ) {
+        dt[5]= dt[5]+60;
+        dt[4]= dt[4]-1;
+    }
+    while ( dt[4]<0 && dt[3]>0 ) {
+        dt[4]= dt[4]+60;
+        dt[3]= dt[3]-1;
+    }
+    while ( dt[3]<0 && dt[2]>0 ) {
+        dt[4]= dt[4]+24;
+        dt[3]= dt[3]-1;
+    }
+    while ( dt[2]<0 && dt[1]>0 ) {
+        dt[2]= dt[2]+24;
+        dt[1]= dt[1]-1;
+    }
+    while ( dt[1]<0 && dt[0]>0 ) {
+        dt[1]= dt[1]+12;
+        dt[0]= dt[0]-1;
+    }
+    return dt;
+}
+
 //    public static void main( String[] args ) {
 //        int[] r= new int[14];
 //        

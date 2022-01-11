@@ -6,7 +6,7 @@
 function previousInterval( tf ) {
     s= tf.value;
     r= parseISO8601Range( s, undefined );
-    dt= [ r[7]-r[0], r[8]-r[1], r[9]-r[2], r[10]-r[3], r[11]-r[4], r[12]-r[5], r[13]-r[6] ];
+    dt= width( r );
     r= subtract( r, dt );
     tf.value= formatISO8601Range( r );
 }
@@ -14,7 +14,7 @@ function previousInterval( tf ) {
 function nextInterval( tf ) {
     s= tf.value;
     r= parseISO8601Range( s, undefined );
-    dt= [ r[7]-r[0], r[8]-r[1], r[9]-r[2], r[10]-r[3], r[11]-r[4], r[12]-r[5], r[13]-r[6] ];
+    dt= width( r );
     r= add( r, dt );    
     tf.value= formatISO8601Range( r );
 }
