@@ -635,7 +635,7 @@ public class ScriptGUIServlet extends HttpServlet {
             out.println( "</td>\n");
             out.println( "<td valign='top'>\n");
             out.println( "<div border=1></div>\n");
-            out.println("<img src='ScriptGUIServlet?img=1&key="+key+sparams+"' alt='image'>\n" );
+            out.println("<img src='ScriptGUIServlet?img=1&key="+key+sparams+"' alt='image' width='800' height='500'>\n" );
             out.println( "</td>\n");
             out.println( "</tr>\n");
             out.println( "</table>\n");
