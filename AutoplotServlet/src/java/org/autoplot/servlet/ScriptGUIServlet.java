@@ -386,7 +386,13 @@ public class ScriptGUIServlet extends HttpServlet {
             w.println(s);
         }
         
-        org.autoplot.Util.addFonts();
+        if ( !"true".equals(System.getProperty("java.awt.headless")) ) {
+            throw new IllegalArgumentException("java.awt.headless must be set to true");
+        }
+        
+        logger.fine("add fonts, which must be done with headless mode");
+        //System.getProperty("java.awt.headless");
+        org.autoplot.Util.addFonts(); // PROBLEMS
         
         ApplicationModel model = new ApplicationModel();
         model.setExceptionHandler( new DumpRteExceptionHandler() );
