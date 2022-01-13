@@ -526,7 +526,7 @@ function normalizeTime(time,offset) {
         time[0+offset] = time[0+offset] + 1;
         time[1+offset] = 1;
         time[2+offset] = 1;
-        return;
+        return time;
     }
     leap = isLeapYear(time[0+offset]) ? 1 : 0;
     if (time[2+offset] === 0) {

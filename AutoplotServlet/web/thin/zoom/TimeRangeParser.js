@@ -474,13 +474,6 @@ function borrowTime( t, offset ) {
         result[3]= result[3]+24;
         result[2]= result[2]-1;
     }
-    if ( result[2]<0 || result[1]<1) {
-        // we're going to abort here.  The problem is how to decrement the month?
-        // What does MONTH=-1, DAY=31 mean?  The "digits" are not independent as
-        // they are in HOURS,MINUTES,SECONDS...  I don't think we are going to
-        // run into this case anyway. jbf
-        throw new IllegalArgumentException("Borrow operation not defined for months<1 or days<0");
-    }
     if (result[2]===0) {
         if (result[1]>1) {
             daysLastMonth= daysInMonth(result[0],result[1]-1);
@@ -533,7 +526,7 @@ function normalizeTime(time,offset) {
         time[0+offset] = time[0+offset] + 1;
         time[1+offset] = 1;
         time[2+offset] = 1;
-        return;
+        return time;
     }
     leap = isLeapYear(time[0+offset]) ? 1 : 0;
     if (time[2+offset] === 0) {
@@ -596,7 +589,7 @@ function formatISO8601(arr, index) {
  */
 function formatISO8601Range(arr) {
     var s1, s2;
-    ds = [arr[7] - arr[0], arr[8] - arr[1], arr[9] - arr[2], arr[10] - arr[3], arr[11] - arr[4], arr[12] - arr[5], arr[13] - arr[6]];
+    ds = width( arr );
     uu = ["Y", "M", "D", "H", "M", "S"];
     dur = "P";
     havet = false;
@@ -611,7 +604,13 @@ function formatISO8601Range(arr) {
     }
     s1 = formatISO8601(arr, 0);
     if (dur.length > 1 && dur.length < 6) {
-        return s1 + "/" + dur;
+        if ( dur==='P1D' && s1.endsWith("T00:00") ) {
+            return s1.substring(0,10);
+        } else if ( dur==='P1M' && s1.endsWith("01T00:00") ) {
+            return s1.substring(0,7);
+        } else {
+            return s1 + "/" + dur;
+        }
     } else {
         s2 = formatISO8601(arr, 7);
         return s1 + "/" + s2;
@@ -643,7 +642,7 @@ function width( r ) {
         dt[3]= dt[3]-1;
     }
     while ( dt[2]<0 && dt[1]>0 ) {
-        dt[2]= dt[2]+24;
+        dt[2]= dt[2]+daysInMonth(r[0],r[1]-1);  // TODO: this needs to be tested
         dt[1]= dt[1]-1;
     }
     while ( dt[1]<0 && dt[0]>0 ) {
