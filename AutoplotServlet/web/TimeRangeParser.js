@@ -474,13 +474,6 @@ function borrowTime( t, offset ) {
         result[3]= result[3]+24;
         result[2]= result[2]-1;
     }
-    if ( result[2]<0 || result[1]<1) {
-        // we're going to abort here.  The problem is how to decrement the month?
-        // What does MONTH=-1, DAY=31 mean?  The "digits" are not independent as
-        // they are in HOURS,MINUTES,SECONDS...  I don't think we are going to
-        // run into this case anyway. jbf
-        throw new IllegalArgumentException("Borrow operation not defined for months<1 or days<0");
-    }
     if (result[2]===0) {
         if (result[1]>1) {
             daysLastMonth= daysInMonth(result[0],result[1]-1);
