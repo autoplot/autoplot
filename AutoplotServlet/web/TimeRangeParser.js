@@ -589,7 +589,7 @@ function formatISO8601(arr, index) {
  */
 function formatISO8601Range(arr) {
     var s1, s2;
-    ds = [arr[7] - arr[0], arr[8] - arr[1], arr[9] - arr[2], arr[10] - arr[3], arr[11] - arr[4], arr[12] - arr[5], arr[13] - arr[6]];
+    ds = width( arr );
     uu = ["Y", "M", "D", "H", "M", "S"];
     dur = "P";
     havet = false;
@@ -642,7 +642,7 @@ function width( r ) {
         dt[3]= dt[3]-1;
     }
     while ( dt[2]<0 && dt[1]>0 ) {
-        dt[2]= dt[2]+24;
+        dt[2]= dt[2]+daysInMonth(r[0],r[1]-1);  // TODO: this needs to be tested
         dt[1]= dt[1]-1;
     }
     while ( dt[1]<0 && dt[0]>0 ) {
