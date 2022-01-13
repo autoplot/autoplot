@@ -422,7 +422,22 @@ public class SimplifyScriptSupport {
                     result.append(m).append("\n");
                     currentLine = acceptLine;
                 }
-
+            } else if ( o instanceof Expr ) {
+                if (acceptLine > -1) { // always skip Expr.
+                    int thisLine = beginLine;
+                    for (int i = acceptLine; i <= thisLine; i++) {
+                        if (i < thisLine) {
+                            appendToResult(result, ss[i]).append("\n");
+                        } else {
+                            if (ss[i].length() > 0 && Character.isWhitespace(ss[i].charAt(0))) {
+                                appendToResult(result, ss[i]).append("\n");
+                            }
+                        }
+                    }
+                    appendToResult(result, "\n");
+                    currentLine = thisLine;
+                    acceptLine = -1;
+                }             
             } else { // Assign, etc
                 if (simplifyScriptToGetCompletionsOkay(o, variableNames)) {
                     if (acceptLine < 0) {
