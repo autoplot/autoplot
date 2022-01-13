@@ -393,7 +393,8 @@ public class SimplifyScriptSupport {
                     lastLine1 = lastLine;
                 }
                 if (includeBlock) {
-                    String ss1 = getIfBlock(ss, iff.body, variableNames,
+                    HashSet variableNames1= new HashSet(variableNames);
+                    String ss1 = getIfBlock(ss, iff.body, variableNames1,
                             Math.min(beginLine + 1, lastLine1), lastLine1, depth + 1);
                     appendToResult(result, ss1);
                     if (iff.orelse != null) {
@@ -407,8 +408,10 @@ public class SimplifyScriptSupport {
                         } else {
                             if (iff.orelse[0].beginLine > 0 && ss[iff.orelse[0].beginLine - 1].trim().startsWith("else:")) {
                                 result.append(ss[iff.orelse[0].beginLine - 1]).append("\n");
-                                ss1 = getIfBlock(ss, iff.orelse, variableNames, iff.orelse[0].beginLine, lastLine1, depth + 1);
+                                HashSet variableNames2= new HashSet(variableNames);
+                                ss1 = getIfBlock(ss, iff.orelse, variableNames2, iff.orelse[0].beginLine, lastLine1, depth + 1);
                                 appendToResult(result, ss1);
+                                //TODO: if variable is added to variableNames1 and variableNames2 then add it to variableNames.
                             } else {
                                 result.append(ss[iff.orelse[0].beginLine]).append("\n");
                             }
@@ -512,7 +515,7 @@ public class SimplifyScriptSupport {
                         return false; // oh just give up...
                     }
                 }
-            }
+            }   
             if ( !simplifyScriptToGetCompletionsCanResolve( at.value, variableNames ) ) {
                 return false;
             }
@@ -892,6 +895,10 @@ public class SimplifyScriptSupport {
                 case "fftPower":
                 case "magnitude":
                     return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet    # return type from " + funcName + " (spot line789)\n";
+                case "datumRange":
+                    return id + JythonCompletionTask.__CLASSTYPE + " = DatumRange    # return type from " + funcName + " (spot line896)\n";
+                case "datum":
+                    return id + JythonCompletionTask.__CLASSTYPE + " = Datum    # return type from " + funcName + " (spot line898)\n";
                 default:
                     break;
             }
