@@ -1013,6 +1013,8 @@ public class SimplifyScriptSupport {
                                 }
                             }
                         }
+                    } else if ( s.value instanceof Name ) {
+                        return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet  # (spot line1014)\n";
                     }
                 } else if ( a.value instanceof BinOp ) { // just go ahead and assume it's a QDataSet
                     return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet  # (spot line1014)\n";
