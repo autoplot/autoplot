@@ -331,7 +331,7 @@ public class SimplifyScriptSupport {
             if (beginLine > lastLine) {
                 continue;
             }
-            if (o instanceof Assign && !simplifyScriptToGetCompletionsOkay(o, variableNames)) {
+            if (o instanceof Assign && !simplifyScriptToGetCompletionsOkay(o, variableNames) ) {
                 // check for method calls where we know the type.
                 Assign a = (Assign) o;
                 String cl = maybeIdentifyType(a, importedNames);
@@ -908,7 +908,7 @@ public class SimplifyScriptSupport {
             }
             for ( Method m: Ops.class.getMethods() ) {
                 if ( m.getName().equals(funcName) ) {
-                    if ( m.getReturnType().isAssignableFrom( QDataSet.class ) ) {
+                    if ( QDataSet.class.isAssignableFrom( m.getReturnType() ) ) {
                         return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet    # ( spot line 898 )";
                     }
                 }
