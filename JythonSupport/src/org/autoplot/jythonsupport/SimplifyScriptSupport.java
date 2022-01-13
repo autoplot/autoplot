@@ -12,6 +12,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.jythoncompletion.JythonCompletionTask;
+import org.das2.qds.QDataSet;
+import org.das2.qds.ops.Ops;
 import org.python.core.PySyntaxError;
 import org.python.parser.ast.If;
 import org.python.parser.ast.Module;
@@ -892,6 +894,13 @@ public class SimplifyScriptSupport {
                     return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet    # return type from " + funcName + " (spot line789)\n";
                 default:
                     break;
+            }
+            for ( Method m: Ops.class.getMethods() ) {
+                if ( m.getName().equals(funcName) ) {
+                    if ( m.getReturnType().isAssignableFrom( QDataSet.class ) ) {
+                        return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet    # ( spot line 898 )";
+                    }
+                }
             }
             if (isConstructor(funcName, importedNames)) {
                 return id + JythonCompletionTask.__CLASSTYPE + " = " + funcName + "  # isConstructor (line794)\n";
