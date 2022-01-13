@@ -28,9 +28,13 @@ import org.python.parser.ast.Call;
 import org.python.parser.ast.Compare;
 import org.python.parser.ast.Expr;
 import org.python.parser.ast.Index;
+import org.python.parser.ast.List;
 import org.python.parser.ast.Name;
 import org.python.parser.ast.Num;
+import org.python.parser.ast.Str;
 import org.python.parser.ast.Subscript;
+import org.python.parser.ast.Tuple;
+import org.python.parser.ast.UnaryOp;
 import org.python.parser.ast.VisitorBase;
 import org.python.parser.ast.aliasType;
 import org.python.parser.ast.exprType;
@@ -1088,14 +1092,30 @@ public class SimplifyScriptSupport {
                 BinOp bo = (BinOp) sn;
                 traverse(bo.left);
                 traverse(bo.right);
+            } else if (sn instanceof UnaryOp) {
+                UnaryOp bo = (UnaryOp) sn;
+                traverse(bo.operand);
             } else if (sn instanceof Num) {
 
+            } else if ( sn instanceof Str ) {
+                
             } else if (sn instanceof Index) {
                 Index index = (Index) sn;
                 traverse(index.value);
-
+                
+            } else if (sn instanceof Tuple) {
+                Tuple tuple = (Tuple) sn;
+                for ( exprType e: tuple.elts ) {
+                    traverse(e);
+                }
+            } else if (sn instanceof List) {
+                List ll = (List) sn;
+                for ( exprType e: ll.elts ) {
+                    traverse(e);
+                }   
             } else {
                 logger.log(Level.FINE, "unchecked: {0}", sn);
+                looksOkay= false;
             }
         }
 
