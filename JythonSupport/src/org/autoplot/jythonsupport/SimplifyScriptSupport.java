@@ -873,6 +873,23 @@ public class SimplifyScriptSupport {
         }
     }
 
+    private static String maybeIndentifyValue( exprType t ) {
+        if ( t instanceof Num ) {
+            return ((Num)t).toString();
+        } else if ( t instanceof Str ) {
+            return "'"+ ((Str)t).toString() + "'";
+        } else if ( t instanceof Name ) {
+            String n=  ((Name)t).id;
+            if ( n.equals("True") || n.equals("False") ) {
+                return n;
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+    
     /**
      * return the line of code needed to use the result, or null.
      *
@@ -891,6 +908,14 @@ public class SimplifyScriptSupport {
                     return "from org.autoplot import ApplicationModel\n" + id + JythonCompletionTask.__CLASSTYPE + " = ApplicationModel\n";
                 case "getDataSource":
                     return "from org.autoplot.datasource import DataSource\n" + id + JythonCompletionTask.__CLASSTYPE + " = DataSource\n";
+                case "getParam": // weird--there's a special getParam loaded, but this doesn't work for  getParam( 'allowCache', True, 'allow storage of ephemeris to local file', [ True,False ] )
+                    exprType e1= c.args[1];
+                    String vv= maybeIndentifyValue(e1);
+                    if ( vv!=null ) {
+                        return id + " = " + vv;
+                    } else {
+                        return id  + JythonCompletionTask.__CLASSTYPE + " = " + e1.getImage();
+                    }
                 case "getDataSet":
                 case "xtags":
                 case "ytags":
