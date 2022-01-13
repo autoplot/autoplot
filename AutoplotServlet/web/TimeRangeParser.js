@@ -611,7 +611,13 @@ function formatISO8601Range(arr) {
     }
     s1 = formatISO8601(arr, 0);
     if (dur.length > 1 && dur.length < 6) {
-        return s1 + "/" + dur;
+        if ( dur==='P1D' && s1.endsWith("T00:00") ) {
+            return s1.substring(0,10);
+        } else if ( dur==='P1M' && s1.endsWith("01T00:00") ) {
+            return s1.substring(0,7);
+        } else {
+            return s1 + "/" + dur;
+        }
     } else {
         s2 = formatISO8601(arr, 7);
         return s1 + "/" + s2;
