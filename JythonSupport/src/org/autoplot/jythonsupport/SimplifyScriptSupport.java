@@ -337,7 +337,7 @@ public class SimplifyScriptSupport {
                             appendToResult(result, ss[i]).append("\n");
                         }
                     }
-                    appendToResult(result, getIndent(theLine) + cl);
+                    appendToResult(result, getIndent(theLine) + cl).append("\n") ;
                     acceptLine = -1;
                     continue;
                 }
@@ -1003,6 +1003,8 @@ public class SimplifyScriptSupport {
                             }
                         }
                     }
+                } else if ( a.value instanceof BinOp ) { // just go ahead and assume it's a QDataSet
+                    return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet  # (spot line1014)\n";
                 }
             }
         }
