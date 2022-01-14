@@ -940,6 +940,8 @@ public class SimplifyScriptSupport {
             }
             if (isConstructor(funcName, importedNames)) {
                 return id + JythonCompletionTask.__CLASSTYPE + " = " + funcName + "  # isConstructor (line794)\n";
+            } else {
+                return null;
             }
         } else if (c.func instanceof Attribute) {
             // p=PngWalkTool.start(...)
@@ -989,10 +991,14 @@ public class SimplifyScriptSupport {
                         return null; // shouldn't happen
                     }
                     return null;
+                } else {
+                    return null;
                 }
             }
+            return null;
+        } else {
+            return null;
         }
-        return null;
     }
 
     /**
