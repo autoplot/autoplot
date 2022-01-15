@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small><a href='https://github.com/autoplot/dev/blob/master/bugs/sf/2425/demoBug2425.jy'>Demo script</a> shows where 691200-point series with fill-to-zero mode was drawn incorrectly.
+        <p><small>Static code analysis shows where symbol "tp" was not used in script, the cause of a bug.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,8 +27,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-01-10 r26364):</p>
+        <p>Bugfixes (2022-01-15 r26394):</p>
         <ul>
+            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/363/'>rfe363</a>: various code fragments (else, subscript, etc) were handled improperly, causing completions to fail.
             <li><a href='https://sourceforge.net/p/autoplot/feature-requests/363/'>rfe363</a>: bug where line was included in simplify for completions, but shouldn't have been, which caused completions to fail.
             <li><a href='https://sourceforge.net/p/autoplot/bugs/2425'>2425</a>: fill-to-zero mode with 691200 points showed that reduced version wasn't used.
             <li>bugfix: color scatter mode didn't listen to the log property of the colorbar.  Thanks, Sadie!
@@ -65,6 +66,7 @@
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">rfe758</a>: tickValues GUI had a bug with repeat every.  Thanks, Sadie!        </ul>
         <p>Features:</p>
         <ul>
+            <li>AutoplotServlet's ScriptGUIServlet now has previous/next buttons on timerange GUI.
             <li><a href='https://sourceforge.net/p/autoplot/feature-requests/363/'>363</a>: support completions on object within array, like dom.plots[2].*
             <li>improvements to Jython to Java code converter.
             <li>introduce readConfiguration command, which reads configuration into map of name/value pairs to help with scripting and supports %{PWD}.
