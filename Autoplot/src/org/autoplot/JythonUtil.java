@@ -24,12 +24,14 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -283,6 +285,29 @@ public class JythonUtil {
         return contents.equals( okayedContents  );
     }
     
+    private static String stripTrailingWhitespace( String param ) {
+        int len= param.length();
+        for (; len > 0; len--) {
+            if (!Character.isWhitespace(param.charAt(len - 1)))
+                break;
+        }
+        return param.substring(0, len);
+    }
+    
+    /**
+     * The diff code has some problem on Windows, so clip off white space
+     * from the end of lines.
+     * @param src
+     * @return 
+     */
+    public static List<String> splitAndTrimLines( String src ) {
+        String[] ss= src.split("\n");
+        for ( int i=0; i<ss.length; i++ ) {
+            ss[i]= stripTrailingWhitespace(ss[i]);
+        }
+        return Arrays.asList(ss);
+    }
+    
     /**
      * return a Patch showing how the new version compares to the last run version.
      * @param filename
@@ -297,7 +322,8 @@ public class JythonUtil {
             if ( lastVersionFile.exists() ) {
                 try {
                     String lastVersionContents= FileUtil.readFileToString(lastVersionFile);
-                    return DiffUtils.diff( lastVersionContents, contents );
+                    return DiffUtils.diff( splitAndTrimLines( contents ), 
+                        splitAndTrimLines( lastVersionContents ) );
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
