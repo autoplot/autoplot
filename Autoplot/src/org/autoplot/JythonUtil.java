@@ -300,7 +300,7 @@ public class JythonUtil {
      * @param src
      * @return 
      */
-    public static List<String> splitAndTrimLines( String src ) {
+    private static List<String> splitAndTrimLines( String src ) {
         String[] ss= src.split("\n");
         for ( int i=0; i<ss.length; i++ ) {
             ss[i]= stripTrailingWhitespace(ss[i]);
