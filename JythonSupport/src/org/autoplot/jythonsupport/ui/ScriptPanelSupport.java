@@ -197,6 +197,8 @@ public class ScriptPanelSupport {
     public void annotatePatch( Patch<String> patch ) {
         annotationsSupport.clearAnnotations();
         
+        int scrollToOffset= -1;
+        
         for ( AbstractDelta<String> d : patch.getDeltas() ) {
             
             List<Integer> ll = d.getSource().getChangePosition();
@@ -223,6 +225,7 @@ public class ScriptPanelSupport {
                     lp0 = annotationsSupport.getLinePosition(i);    
                     lp1 = annotationsSupport.getLinePosition(i); 
                     annotationsSupport.annotateChars(lp0[0],lp1[1],EditorAnnotationsSupport.ANNO_CHANGE,sourceText,null);
+                    if ( scrollToOffset==-1 ) scrollToOffset= lp0[0];
                 }
             } else if ( d instanceof DeleteDelta ) {
                 sourceText= "<html><i>Text has been deleted:</i><br>"+sourceText;
@@ -230,15 +233,26 @@ public class ScriptPanelSupport {
                     lp0 = annotationsSupport.getLinePosition(i);    
                     lp1 = annotationsSupport.getLinePosition(i); 
                     annotationsSupport.annotateChars(lp0[0],lp1[1],EditorAnnotationsSupport.ANNO_DELETE,sourceText,null);
+                    if ( scrollToOffset==-1 ) scrollToOffset= lp0[0];
                 }
             } else if ( d instanceof InsertDelta ) {
                 for ( int i : ss ) {
                     lp0 = annotationsSupport.getLinePosition(i);    
                     lp1 = annotationsSupport.getLinePosition(i);    
                     annotationsSupport.annotateChars(lp0[0],lp1[1],EditorAnnotationsSupport.ANNO_INSERT,"<html><i>Text has been inserted.</i>",null);
+                    if ( scrollToOffset==-1 ) scrollToOffset= lp0[0];
                 }
             }        
         }
+        
+        if ( scrollToOffset>-1 ) {
+            try {
+                annotationsSupport.scrollToOffset( scrollToOffset );
+            } catch ( BadLocationException ex ) {
+                logger.log( Level.WARNING, ex.getMessage(), ex );
+            }
+        }
+        
     }
     
     /**
