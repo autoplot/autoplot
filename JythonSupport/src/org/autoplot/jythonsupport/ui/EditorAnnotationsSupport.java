@@ -182,9 +182,17 @@ public class EditorAnnotationsSupport {
      * @param offset
      * @throws BadLocationException 
      */
-    public void scrollToOffset( int  offset  ) throws BadLocationException {
+    public void scrollToOffset( int offset  ) throws BadLocationException {
         Rectangle r= editorPanel.modelToView( offset );
-        editorPanel.scrollRectToVisible(r);
+        int fontHeight=14;
+        if ( r.y > fontHeight*3 ) { 
+            r.y= r.y- fontHeight*3;
+            r.height= r.height +  fontHeight*3;
+        }
+        SwingUtilities.invokeLater(() -> {
+            editorPanel.scrollRectToVisible(r);
+        });
+        
     }
 
     private static class Annotation {
