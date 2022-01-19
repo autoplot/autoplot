@@ -615,6 +615,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                 ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(TimeRangeToolEventsList.this),"Loading Events File...");
                 try {
                     if ( isOrbitsFile(uri)) { // we'l read it twice but at least it's on the same thread.
+                        Orbits.resetOrbitsFor(uri);
                         logger.fine("range events will be treated as orbits range events");
                     }
                     TimeRangeToolEventsList.this.tsb= null;
