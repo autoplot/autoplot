@@ -27,8 +27,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-01-15 r26394):</p>
+        <p>Bugfixes (2022-01-19 r26404):</p>
         <ul>
+            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/651/'>rfe651</a>: orbit:/tmp/orbitsfile.txt:mms-1 is no longer interpreted as range.  This is only supported with numeric orbit numbers.
             <li><a href='https://sourceforge.net/p/autoplot/feature-requests/651/'>rfe651</a>: pressing the events list green play button will always re-read the events definitions from the file.  Thanks, Ivar!
             <li>Trim whitespace at end of Jython code when showing differences, because on Windows every line was marked as changed on Bill's computer.
             <li><a href='https://sourceforge.net/p/autoplot/feature-requests/363/'>rfe363</a>: various code fragments (else, subscript, etc) were handled improperly, causing completions to fail.
