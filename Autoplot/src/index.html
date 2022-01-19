@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Static code analysis shows where the value assigned to "tp" was not used in script because of the accidental paste at line 28, the cause of a bug.
+        <p><small>Windows properly shows changes since the last time the script was run.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -29,6 +29,7 @@
                 
         <p>Bugfixes (2022-01-15 r26394):</p>
         <ul>
+            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/651/'>rfe651</a>: pressing the green play button will always re-read the orbit definitions from the file.  Thanks, Ivar!
             <li>Trim whitespace at end of Jython code when showing differences, because on Windows every line was marked as changed on Bill's computer.
             <li><a href='https://sourceforge.net/p/autoplot/feature-requests/363/'>rfe363</a>: various code fragments (else, subscript, etc) were handled improperly, causing completions to fail.
             <li><a href='https://sourceforge.net/p/autoplot/feature-requests/363/'>rfe363</a>: bug where line was included in simplify for completions, but shouldn't have been, which caused completions to fail.
