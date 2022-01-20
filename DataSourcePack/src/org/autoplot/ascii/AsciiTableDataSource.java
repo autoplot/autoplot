@@ -936,7 +936,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         o = params.get( "arg_0" );
         if ( o!=null && o.length()>0 && !o.equals("rank2") ) {
             column = o;
-            if ( parser.getFieldIndex(column)>0 ) {
+            if ( parser.getFieldIndex(column)!=0 ) {
                 timeColumn= 0;
                 final Units u = AsciiParser.UNIT_UTC;
                 parser.setUnits(0, u);
