@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Windows properly shows changes since the last time the script was run.
+        <p><small>A <a href='https://github.com/autoplot/dev/blob/master/bugs/2022/20220125/shouldNotBreakTwo.jy'>script</a> demos where automatic detection of breaks has never been good with scatter data.  This will be studied more soon.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,8 +27,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-01-19 r26404):</p>
+        <p>Bugfixes (2022-01-26 r26408):</p>
         <ul>
+            <li><a href='https://github.com/das-developers/das2java/issues/26'>0026</a>: clip lines outside of the plot bounds, so that performance is preserved with lines to log(0) a.k.a. -Inf.
             <li><a href='https://sourceforge.net/p/autoplot/bugs/2429/'>2429</a>: don't do the automatic DEPEND_0 when the column read is column 0.  Thanks, Sadie!
             <li><a href='https://sourceforge.net/p/autoplot/feature-requests/651/'>rfe651</a>: orbit:/tmp/orbitsfile.txt:mms-1 is no longer interpreted as range.  This is only supported with numeric orbit numbers.
             <li><a href='https://sourceforge.net/p/autoplot/feature-requests/651/'>rfe651</a>: pressing the events list green play button will always re-read the events definitions from the file.  Thanks, Ivar!
