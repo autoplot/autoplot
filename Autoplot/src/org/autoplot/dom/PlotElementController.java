@@ -2539,8 +2539,12 @@ public class PlotElementController extends DomNodeController {
                     Units u= ydesc.range.getUnits();
                     for ( int i=fillDs.length(0)-2; i>=0; i-- ) {
                         AutoRangeUtil.AutoRangeDescriptor ydesc1= AutoRangeUtil.autoRange( DataSetOps.unbundle(fillDs,i ), props, ignoreDsProps );
-                        if ( ydesc1.range.getUnits().isConvertibleTo(u) ) {
-                            ydesc.range= DatumRangeUtil.union( ydesc.range, ydesc1.range );
+                        if ( ydesc1.range.getUnits().isConvertibleTo(u) ) { // Bx, By, Bz
+                            if ( i==0 && fillDs.length(0)==2 ) {
+                                // special case for T->X,Y where we are plotting X,Y, as in an orbit plot.
+                            } else {
+                                ydesc.range= DatumRangeUtil.union( ydesc.range, ydesc1.range );
+                            }
                         } else {
                             Units u1;
                             u1= ydesc1.range.getUnits();
