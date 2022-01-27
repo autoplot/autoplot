@@ -55,7 +55,8 @@ public enum RenderType {
                 if ( Schemes.isLegacyXYZScatter(ds) ) return true;
                 return false;
             case hugeScatter:
-                if ( ds.rank()==2 ) {
+            switch (ds.rank()) {
+                case 2:
                     if ( SemanticOps.isBundle(ds) ) {
                         for ( int i=0; i<ds.length(0); i++ ) {
                             QDataSet ds1= DataSetOps.unbundle(ds,i);
@@ -67,37 +68,34 @@ public enum RenderType {
                     } else {
                         return  SemanticOps.isRank2Waveform(ds);
                     }
-                } else if ( ds.rank()==1 ) {
+                case 1:
                     Units u= SemanticOps.getUnits(ds);
                     return UnitsUtil.isIntervalOrRatioMeasurement( u );
-                } else {
-                    return false;
-                }
+                default:
+                return false;
+            }
+
             case series:
             case scatter:
             case stairSteps:
             case fillToZero:
-                if ( ds.rank()==1 ) {
+            switch (ds.rank()) {
+                case 1:
                     Units u= SemanticOps.getUnits(ds);
-                    if ( UnitsUtil.isIntervalOrRatioMeasurement(u) ) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else if ( ds.rank()==2 ) {
+                    return UnitsUtil.isIntervalOrRatioMeasurement(u);
+
+                case 2:
                     if ( ds.length()==0 ) return true;
-                    if ( SemanticOps.isBundle(ds) ) {
-                        return true;
-                    } else {
-                        return true;
-                    }
-                } else if ( ds.rank()==3 ) {
+                    return SemanticOps.isBundle(ds);
+                case 3:
                     return true; // we can always slice repeatedly
-                } else {
-                    return false;
-                }
+                default:
+                return false;
+            }
+
             case colorScatter:
-                if ( ds.rank()==2 ) {
+            switch (ds.rank()) {
+                case 2:
                     if ( SemanticOps.isBundle(ds) ) {
                         for ( int i=0; i<ds.length(0); i++ ) {
                             QDataSet ds1= DataSetOps.unbundle(ds,i);
@@ -109,15 +107,12 @@ public enum RenderType {
                     } else {
                         return false;
                     }
-                } else if ( ds.rank()==1 ) {
-                    if ( ds.property(QDataSet.PLANE_0)!=null ) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
+                case 1:
+                    return ( ds.property(QDataSet.PLANE_0)!=null );
+                default:
+                return false;
+            }
+
             case digital:
                 if ( SemanticOps.isBundle(ds) ) {
                     for ( int i=0; i<ds.length(0); i++ ) {
