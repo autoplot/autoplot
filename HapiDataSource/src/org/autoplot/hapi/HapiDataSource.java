@@ -1131,7 +1131,7 @@ public final class HapiDataSource extends AbstractDataSource {
         ds = repackage(ds,pds,null);
         
         // look up colors for nominal data
-        if ( ds.rank()==1 && ( pds[1].units instanceof EnumerationUnits ) && cadence!=null ) {
+        if ( ds.rank()==1 && pds.length>1 && ( pds[1].units instanceof EnumerationUnits ) && cadence!=null ) {
             JSONObject paramInfo= pds[1].parameter;
             if ( paramInfo.has( HapiUtil.KEY_X_COLOR_LOOKUP ) ) {
                 JSONObject colorLookup= paramInfo.getJSONObject( HapiUtil.KEY_X_COLOR_LOOKUP );
