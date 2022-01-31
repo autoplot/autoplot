@@ -1606,7 +1606,7 @@ public class BatchMaster extends javax.swing.JPanel {
                             throw new IllegalArgumentException("param1Name not set");
                         }
                     }
-                    setParam( interp, parms.get(paramName), paramName, f1 );
+                    setParam( interp, parms.get(paramName), paramName, f1.trim() );
                     runResults.put(paramName,f1);
                     
                     if ( param2NameCB.getSelectedItem().toString().trim().length()==0 ) {
@@ -1617,7 +1617,7 @@ public class BatchMaster extends javax.swing.JPanel {
                             interp.setOut(outbaos);
                             interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile),scriptFile.getName()), scriptFile.getName() );
                             if ( writeCheckBox.isSelected() ) {
-                                runResults.put( "writeFile", doWrite( f1, "" ) );
+                                runResults.put( "writeFile", doWrite( f1.trim(), "" ) );
                             }
                             jobs1.get(i1).setIcon(okay);
                         } catch ( IOException | JSONException | RuntimeException ex ) {
@@ -1662,11 +1662,11 @@ public class BatchMaster extends javax.swing.JPanel {
                                 paramName= param2NameCB.getSelectedItem().toString();
                                 runResults.put(paramName,f2);
                                 jobs2.get(i2).setIcon( working );
-                                setParam( interp, parms.get(paramName), paramName, f2 );
+                                setParam( interp, parms.get(paramName), paramName, f2.trim() );
                                 interp.setOut(outbaos);
                                 interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile), scriptFile.getName()), scriptFile.getName() );
                                 if ( writeCheckBox.isSelected() ) {
-                                    runResults.put( "writeFile", doWrite( f1,f2 ) );
+                                    runResults.put( "writeFile", doWrite( f1.trim(),f2.trim() ) );
                                 }
                                 jobs2.get(i2).setIcon(okay);
                                 runResults.put("result","");
