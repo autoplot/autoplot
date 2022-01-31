@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="autoplot/EclipseBuild/autoplot.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/autoplot/EclipseBuild/autoplot.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=autoplot/AudioSystemDataSource\/src"/>
+        <javaElement handleIdentifier="=autoplot/CdfJavaDataSource\/src"/>
+        <folder path="/autoplot/APExtension"/>
+        <folder path="/autoplot/ImageDataSource"/>
+        <file path="/autoplot/.classpath"/>
+        <folder path="/autoplot/BinaryDataSource"/>
+        <folder path="/autoplot/VATesting"/>
+        <javaElement handleIdentifier="=autoplot/JythonSupport\/src"/>
+        <javaElement handleIdentifier="=autoplot/Autoplot\/src"/>
+        <folder path="/autoplot/Das2ServerDataSource"/>
+        <javaElement handleIdentifier="=autoplot/NetCdfDataSource\/src"/>
+        <folder path="/autoplot/DataSource"/>
+        <folder path="/autoplot/APLibs"/>
+        <folder path="/autoplot/CefDataSource"/>
+        <javaElement handleIdentifier="=autoplot/BinaryDataSource\/src"/>
+        <folder path="/autoplot/FlakyServer"/>
+        <folder path="/autoplot/JythonSupport"/>
+        <folder path="/autoplot/ExcelDataSource"/>
+        <folder path="/autoplot/PDSPPIDataSource"/>
+        <folder path="/autoplot/OpenDapDataSource"/>
+        <folder path="/autoplot/QStream"/>
+        <javaElement handleIdentifier="=das2java"/>
+        <javaElement handleIdentifier="=autoplot/Das2ServerDataSource\/src"/>
+        <folder path="/autoplot/QDataSet"/>
+        <folder path="/autoplot/CdfJavaDataSource"/>
+        <javaElement handleIdentifier="=autoplot/TsdsDataSource\/src"/>
+        <folder path="/autoplot/PDSDataSource"/>
+        <javaElement handleIdentifier="=autoplot/IdlMatlabSupport\/src"/>
+        <javaElement handleIdentifier="=autoplot/Autoplot\/javahelp"/>
+        <file path="/autoplot/README.txt"/>
+        <folder path="/autoplot/WavDataSource"/>
+        <file path="/autoplot/ECLIPSE_README.txt"/>
+        <javaElement handleIdentifier="=autoplot/CDAWebDataSource\/src"/>
+        <javaElement handleIdentifier="=autoplot/ImageDataSource\/src"/>
+        <folder path="/autoplot/HapiDataSource"/>
+        <folder path="/autoplot/IdlMatlabSupport"/>
+        <folder path="/autoplot/AudioSystemDataSource"/>
+        <folder path="/autoplot/JythonDataSource"/>
+        <javaElement handleIdentifier="=autoplot/JythonDataSource\/src"/>
+        <javaElement handleIdentifier="=autoplot/CefDataSource\/src"/>
+        <folder path="/autoplot/DataSourcePack"/>
+        <folder path="/autoplot/CDAWebDataSource"/>
+        <javaElement handleIdentifier="=autoplot/DataSourcePack\/src"/>
+        <javaElement handleIdentifier="=autoplot/WavDataSource\/src"/>
+        <file path="/autoplot/LICENSE.txt"/>
+        <folder path="/autoplot/FitsDataSource"/>
+        <file path="/autoplot/README.md"/>
+        <folder path="/autoplot/NetCdfDataSource"/>
+        <javaElement handleIdentifier="=autoplot/ExcelDataSource\/src"/>
+        <javaElement handleIdentifier="=autoplot/HapiDataSource\/src"/>
+        <folder path="/autoplot/FedCatDataSource"/>
+        <javaElement handleIdentifier="=autoplot/DataSource\/src"/>
+        <folder path="/autoplot/TsdsDataSource"/>
+        <folder path="/autoplot/Autoplot"/>
+        <folder path="/autoplot/AutoplotServlet"/>
+        <folder path="/autoplot/AutoplotHelp"/>
+        <folder path="/autoplot/DataSourceTests"/>
+        <javaElement handleIdentifier="=autoplot/OpenDapDataSource\/src"/>
+        <folder path="/autoplot/HapiServerDemo"/>
+        <javaElement handleIdentifier="=autoplot/AutoplotHelp\/src"/>
+        <javaElement handleIdentifier="=autoplot/FitsDataSource\/src"/>
+        <file path="/autoplot/.project"/>
+    </selectedElements>
+</jardesc>
