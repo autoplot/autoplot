@@ -27,8 +27,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-01-28 r26412):</p>
+        <p>Bugfixes (2022-02-01 r26424):</p>
         <ul>
+            <li>trace functionality revisited to use Jython AST for handling code.
+            <li>Run Batch Tool save action used open dialog, now uses save.
+            <li>dataSetWrapper needed to wrap slice and trim methods.
             <li>Recent change to support colors for nominal data in HAPI client broke timetag-only read.
             <li>DataSetBuilder's toString method used * for streaming dimension, when : is consistent with Jython.
             <li>Polar plot handles bundle(angles,radii).
@@ -75,6 +78,7 @@
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">rfe758</a>: tickValues GUI had a bug with repeat every.  Thanks, Sadie!        </ul>
         <p>Features:</p>
         <ul>
+            <li>Jython script trace mode follows program counter.
             <li>support for bounding boxes, automatically detecting scheme and using BoundsRenderer.
             <li>AutoplotServlet's ScriptGUIServlet now has previous/next buttons on timerange GUI.
             <li><a href='https://sourceforge.net/p/autoplot/feature-requests/363/'>363</a>: support completions on object within array, like dom.plots[2].*
