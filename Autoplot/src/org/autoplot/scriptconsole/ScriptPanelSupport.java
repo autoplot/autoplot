@@ -816,11 +816,16 @@ public class ScriptPanelSupport {
                         }
                         
                         String s= script.substring( i0, i1 );
-                        logger.finer( "line: "+ s);
+                        logger.log(Level.FINER, "line: {0}", s);
                            
                         try {
                             clearAnnotations();
                             annotationsSupport.annotateChars( i0, i1, "programCounter", "pc", interp );
+                            try {
+                                annotationsSupport.scrollToOffset( i0);
+                            } catch (BadLocationException ex) {
+                                logger.log(Level.SEVERE, null, ex);
+                            }
 
                             logger.finest("add Netbeans breakpoint here to debug jython code line-by-line without GDB");
 
