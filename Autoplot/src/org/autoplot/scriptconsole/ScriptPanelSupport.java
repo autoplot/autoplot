@@ -782,6 +782,8 @@ public class ScriptPanelSupport {
                     String[] sscript= script.split("\n");
                     
                     for ( int iline=0; iline<n.body.length; iline++ )  {
+                        long t0= System.currentTimeMillis();
+                        
                         stmtType stmt = n.body[iline];
                         int l0 = stmt.beginLine;
                         int l1= ( iline<n.body.length-1 ) ? n.body[iline+1].beginLine : sscript.length;
@@ -816,7 +818,6 @@ public class ScriptPanelSupport {
                         }
                         
                         String s= script.substring( i0, i1 );
-                        logger.log(Level.FINER, "line: {0}", s);
                            
                         try {
                             clearAnnotations();
@@ -834,7 +835,19 @@ public class ScriptPanelSupport {
                             throw ex;
                         }
                         offset += s.length();
-                        System.err.println(s);
+                        
+                        if ( logger.isLoggable(Level.FINE) ) {
+                            long elapsedTime= System.currentTimeMillis()-t0;
+                            int i= s.indexOf("\n");
+                            if ( s.length()>i ) {
+                                if ( i>-1 ) {
+                                    s= s.substring(0,i)+"...";
+                                }
+                            } else {
+                                s= s.substring(0,i);
+                            }
+                            logger.log( Level.FINE, String.format( "%4d %.3f %4d # %s", l0, elapsedTime/1000., l1-l0, s ) );
+                        }
                         
                     }
                     clearAnnotations();
