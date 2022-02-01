@@ -805,7 +805,7 @@ public class BatchMaster extends javax.swing.JPanel {
         if ( s!=null ) {
             chooser.setSelectedFile(new File(s));
         }
-        if ( JFileChooser.APPROVE_OPTION==chooser.showOpenDialog( this ) ) {
+        if ( JFileChooser.APPROVE_OPTION==chooser.showSaveDialog( this ) ) {
             File ff= chooser.getSelectedFile();
             if ( !ff.getName().endsWith(".batch") ) {
                 ff= new File( ff.getAbsolutePath()+".batch");
