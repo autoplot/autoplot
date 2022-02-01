@@ -103,6 +103,11 @@ import org.autoplot.datasource.jython.JythonDataSourceFactory;
 import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.das2.util.filesystem.GitCommand;
+import org.python.parser.Node;
+import org.python.parser.ast.Expr;
+import org.python.parser.ast.Str;
+import org.python.parser.ast.TryExcept;
+import org.python.parser.ast.stmtType;
 
 /**
  * Error annotations, saveAs, etc.
@@ -771,28 +776,48 @@ public class ScriptPanelSupport {
                 panel.setDirty(dirty0);
                 if ( ( ( mode & Event.CTRL_MASK ) == Event.CTRL_MASK ) ) { // trace
                     String script = panel.getEditorPanel().getText();
-                    int i0 = 0;
-                    while (i0 < script.length()) {
-                        int i1 = script.indexOf('\n', i0);
-                        while (i1 < script.length() - 1 && Character.isWhitespace(script.charAt(i1 + 1))) {
-                            i1 = script.indexOf('\n', i1 + 1);
-                        }
-                        if ( script.substring(i0,i1).contains("'''") ) {
-                            i1 = script.indexOf('\n', i0);
-                            int ii = script.indexOf("'''", i0)+3;
-                            while ( i1<script.length() - 1 && !script.substring(ii,i1).contains("'''") ) {
-                                ii = i1+1;
-                                i1 = script.indexOf('\n', ii);
+                    
+                    org.python.parser.ast.Module n = (org.python.parser.ast.Module) org.python.core.parser.parse(script, "exec");
+                    
+                    String[] sscript= script.split("\n");
+                    
+                    for ( int iline=0; iline<n.body.length; iline++ )  {
+                        stmtType stmt = n.body[iline];
+                        int l0 = stmt.beginLine;
+                        int l1= ( iline<n.body.length-1 ) ? n.body[iline+1].beginLine : sscript.length;
+
+                        if ( stmt instanceof TryExcept ) {  //  we need to kludge because try-except
+                            TryExcept te= (TryExcept)stmt;
+                            l0= te.body[0].beginLine -1;
+                        } else if ( stmt instanceof Expr ) {
+                            Expr exp= (Expr) stmt;
+                            if ( exp.value instanceof Str ) {
+                                Str s= (Str)exp.value;
+                                l0= s.beginLine;
                             }
                         }
-                        String s;
-                        if (i1 != -1) {
-                            i1 = i1 + 1;
-                            s = script.substring(i0, i1);
-                        } else {
-                            s = script.substring(i0);
-                            i1= script.length();
+                        if ( iline<n.body.length-1 ) { 
+                            if ( n.body[iline+1] instanceof TryExcept ) {// we need to kludge because try-except
+                                TryExcept te= (TryExcept)n.body[iline+1];
+                                l1= te.body[0].beginLine -1; 
+                            } else if ( n.body[iline+1] instanceof Expr ) { // multi-line strings cause problems
+                                Expr exp= (Expr) n.body[iline+1];
+                                if ( exp.value instanceof Str ) {
+                                    Str s= (Str)exp.value;
+                                    l1= s.beginLine;
+                                }
+                            }
                         }
+                        
+                        int i0= offset;
+                        int i1= i0;
+                        for ( int itn2= l0-1; itn2<l1-1; itn2++ ) {
+                            i1= i1 + sscript[itn2].length() + 1;
+                        }
+                        
+                        String s= script.substring( i0, i1 );
+                        logger.finer( "line: "+ s);
+                           
                         try {
                             clearAnnotations();
                             annotationsSupport.annotateChars( i0, i1, "programCounter", "pc", interp );
@@ -803,9 +828,9 @@ public class ScriptPanelSupport {
                         } catch (PyException ex) {
                             throw ex;
                         }
-                        i0 = i1;
-                        offset += 1;
+                        offset += s.length();
                         System.err.println(s);
+                        
                     }
                     clearAnnotations();
                 } else if ( ( ( mode & Event.SHIFT_MASK ) == Event.SHIFT_MASK ) || ( ( mode & Event.ALT_MASK ) == Event.ALT_MASK ) ) {
