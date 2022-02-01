@@ -34,6 +34,16 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
                 update();
             }
         });
+        
+        colorEditor2.setValue(Color.BLACK);
+        fillColorPanel.add( colorEditor2.getSmallEditor() );
+        colorEditor2.addPropertyChangeListener( new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                update();
+            }
+        });
+        
         validate();
     }
 
@@ -66,6 +76,7 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
         Map<String,String> controls= new LinkedHashMap();
         controls.put( Renderer.CONTROL_KEY_COLOR, Renderer.encodeColorControl( (Color)colorEditor1.getValue() ) );
         //controls.put( "fillLabel", fillLabelTF.getText() );
+        controls.put( Renderer.CONTROL_KEY_FILL_COLOR, Renderer.encodeColorControl( (Color)colorEditor2.getValue() ) );
         String c= Renderer.formatControl(controls);
         this.control= c;
         firePropertyChange( Renderer.PROP_CONTROL, oldValue, c );
@@ -73,6 +84,7 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
     private void updateGUI( Renderer renderer ) {
         this.control= renderer.getControl();
         colorEditor1.setValue( renderer.getColorControl( Renderer.CONTROL_KEY_COLOR, (Color)colorEditor1.getValue() ) );
+        colorEditor2.setValue( renderer.getColorControl( Renderer.CONTROL_KEY_FILL_COLOR, (Color)colorEditor2.getValue() ) );
     }
     
     @Override
@@ -116,8 +128,11 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
     private void initComponents() {
 
         colorEditor1 = new org.das2.components.propertyeditor.ColorEditor();
+        colorEditor2 = new org.das2.components.propertyeditor.ColorEditor();
         jLabel2 = new javax.swing.JLabel();
         colorPanel = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        fillColorPanel = new javax.swing.JPanel();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Bounds"));
 
@@ -125,18 +140,29 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
 
         colorPanel.setLayout(new java.awt.BorderLayout());
 
+        jLabel1.setText("Fill Color:");
+
+        fillColorPanel.setLayout(new java.awt.BorderLayout());
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(colorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addGap(134, 134, 134)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(colorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addGap(134, 134, 134)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(fillColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -146,14 +172,21 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
                         .addContainerGap()
                         .addComponent(jLabel2))
                     .addComponent(colorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(127, Short.MAX_VALUE))
+                .addGap(23, 23, 23)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel1)
+                    .addComponent(fillColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(77, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.das2.components.propertyeditor.ColorEditor colorEditor1;
+    private org.das2.components.propertyeditor.ColorEditor colorEditor2;
     private javax.swing.JPanel colorPanel;
+    private javax.swing.JPanel fillColorPanel;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
 }
