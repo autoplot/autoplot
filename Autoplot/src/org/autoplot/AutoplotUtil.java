@@ -1262,6 +1262,8 @@ public class AutoplotUtil {
             } else {
                 if ( dep1==null && fillds.rank()==2 && fillds.length()>3 && fillds.length(0)<4 ) { // Vector quantities without labels. [3x3] is a left a matrix.
                     spec = RenderType.series;
+                } else if ( fillds.rank()==2 && fillds.length()==2 && fillds.length(0)==2 ) {
+                    spec = RenderType.bounds;
                 } else {
                     spec = specPref;
                 }
