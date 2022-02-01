@@ -187,7 +187,11 @@ public class EditorAnnotationsSupport {
         int fontHeight=14;
         if ( r.y > fontHeight*3 ) { 
             r.y= r.y- fontHeight*3;
-            r.height= r.height +  fontHeight*3;
+            r.height= r.height +  fontHeight*5;
+        }
+        int h= editorPanel.getHeight();
+        if ( r.y + r.height > h ) {
+            r.y= h - r.height;
         }
         SwingUtilities.invokeLater(() -> {
             editorPanel.scrollRectToVisible(r);
