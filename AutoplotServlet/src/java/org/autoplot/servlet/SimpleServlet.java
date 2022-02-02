@@ -6,12 +6,10 @@ import org.autoplot.ApplicationModel;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.logging.Logger;
 import java.io.IOException;
 import java.io.InputStream;
@@ -178,7 +176,7 @@ public class SimpleServlet extends HttpServlet {
         String qs= request.getQueryString();
         String cacheControl= request.getHeader("Cache-Control");
 
-        synchronized ( this ) {
+        synchronized ( this ) { // if a cached response is available, then use it.
             if ( ServletInfo.isCaching() && qs!=null ) {
                 String format = ServletUtil.getStringParameter(request, "format", "image/png");
                 if ( format.equals("image/png") ) {
