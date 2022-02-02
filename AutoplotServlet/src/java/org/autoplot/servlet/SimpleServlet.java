@@ -226,7 +226,13 @@ public class SimpleServlet extends HttpServlet {
             throw new NullPointerException("logfile should be set");
         }
         
-        Handler h= new FileHandler(String.valueOf(logFile));
+        
+        Handler h;
+        try {
+            h= new FileHandler(String.valueOf(logFile));
+        } catch ( Exception ex ) {
+            throw new RuntimeException(ex);
+        }
         h.setFormatter( new TimingConsoleFormatter() );
         logger.addHandler(h);
         logger.setLevel( Level.ALL );
