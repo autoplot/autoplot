@@ -321,7 +321,7 @@ public class SimpleServlet extends HttpServlet {
             if ( id!=null ) logger.log(Level.FINE, "id={0}", id);
             
             // allow URI=vapfile
-            if ( vap==null && suri!=null ) {
+            if ( vap==null && suri!=null ) { 
                 if ( suri.contains(".vap") || suri.contains(".vap?") ) {
                     vap= suri;
                     suri= null;
