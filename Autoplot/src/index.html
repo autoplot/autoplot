@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small><a href="https://jfaden.net/jenkins/job/autoplot-test037/">Test037</a> shows all <a href="https://github.com/autoplot/documentation/wiki/QDataSet.Schemes">QDataSet schemes</a> and Autoplot's automatic display.
+        <p><small><a href="https://github.com/autoplot/dev/blob/master/demos/2022/20220202/rgbColorDemo.jy">Script</a> shows image renderer now supports rank 2 dataset with units RGBColor.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -27,7 +27,7 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-02-01 r26424):</p>
+        <p>Bugfixes (2022-02-02 r26431):</p>
         <ul>
             <li>trace functionality revisited to use Jython AST for handling code.
             <li>Run Batch Tool save action used open dialog, now uses save.
@@ -78,6 +78,7 @@
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">rfe758</a>: tickValues GUI had a bug with repeat every.  Thanks, Sadie!        </ul>
         <p>Features:</p>
         <ul>
+            <li>Image renderer now supports rank 2 dataset with rgbColor units.
             <li>Jython script trace mode follows program counter.
             <li>support for bounding boxes, automatically detecting scheme and using BoundsRenderer.
             <li>AutoplotServlet's ScriptGUIServlet now has previous/next buttons on timerange GUI.
