@@ -142,7 +142,7 @@ public class ServletInfo extends HttpServlet {
             
     public static File getCacheDirectory() {
         if ( cacheDirectory==null ) {
-            cacheDirectory= new File("/tmp/apsrv/cache/");
+            cacheDirectory= new File("/tmp/apsrv/cache/" + AutoplotUtil.getProcessId("000") );
             if ( !cacheDirectory.exists() ) {
                 if ( !cacheDirectory.mkdirs() ) {
                     throw new IllegalArgumentException("fail to make cache directory");

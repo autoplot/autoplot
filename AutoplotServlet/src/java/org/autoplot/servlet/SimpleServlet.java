@@ -184,6 +184,11 @@ public class SimpleServlet extends HttpServlet {
                 if ( format.equals("image/png") ) {
                     String hash= request.getQueryString();
                     File s= ServletInfo.getCacheDirectory();
+                    if ( !s.exists() ) {
+                        if ( !s.mkdirs() ) {
+                            throw new RuntimeException("Unable to make cache: "+s);
+                        }
+                    }
                     hash= String.format( "%04d", Math.abs( hash.hashCode() % 10000 ) );
                     cacheFile= new File( s, hash + ".png" );
                     metaCacheFile= new File( s, hash + ".txt" );
@@ -378,7 +383,7 @@ public class SimpleServlet extends HttpServlet {
                 if ( !whiteListed ) {
                     logger.log(Level.FINE, "vap is not whitelisted: {0}", vap);
                     ServletUtil.dumpWhitelistToLogger(Level.FINE);
-                    if ( ServletUtil.isBlacklisted(suri) ) {
+                    if ( ServletUtil.isBlacklisted(vap) ) {
                         throw new IllegalArgumentException("vap is blacklisted: {0}"+ vap);
                     }
                 }
