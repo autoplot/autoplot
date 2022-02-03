@@ -29,6 +29,8 @@
                 
         <p>Bugfixes (2022-02-02 r26431):</p>
         <ul>
+            <li>correction to rescale routine, which ignored the "max" parameter.
+            <li>if a data source crashed during GUI initialization, the data set selector could be locked up.
             <li>trace functionality revisited to use Jython AST for handling code.
             <li>Run Batch Tool save action used open dialog, now uses save.
             <li>dataSetWrapper needed to wrap slice and trim methods.
