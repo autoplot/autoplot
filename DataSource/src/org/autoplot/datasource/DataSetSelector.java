@@ -897,11 +897,11 @@ public class DataSetSelector extends javax.swing.JPanel {
                         return;
                     } catch (Exception ex) {
                         logger.log(Level.FINER, "exception in prepare: {0}", ex.getMessage());
-                        if ( !maybeHandleException(ex) ) {
-                            throw new RuntimeException(ex);
-                        }
                         clearBusyIcon();
                         setCursor( Cursor.getDefaultCursor() );
+                        if ( !maybeHandleException(ex) ) {
+                            throw new RuntimeException(ex);
+                        }                        
                         return;
                     }
 
