@@ -730,6 +730,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         }
         try {
+            serversComboBox.setSelectedItem(split.file);
             idsJSON= HapiServer.getCatalog(new URL(split.file));
         } catch ( IOException ex ) {
             messagesLabel.setText("Unable to connect to server");
