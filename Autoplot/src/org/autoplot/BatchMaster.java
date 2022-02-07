@@ -1484,7 +1484,7 @@ public class BatchMaster extends javax.swing.JPanel {
                                         }
                                     }
                                 } else {
-                                    System.err.println("one should never code on Saturday mornings");
+                                    logger.fine("Nothing to do.");
                                 }
                                 
                             } catch (JSONException ex) {
