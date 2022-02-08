@@ -57,11 +57,12 @@ public class BinaryDataFormatter implements DataFormatter {
                 if ( stype.equals("isotime") ) {
                     if ( !parameter.has("length") ) throw new RuntimeException("required tag length is missing");
                     final int len= parameter.getInt("length");
-                    final TransferType delegate= AsciiTimeTransferType.getForName( "time"+len, Collections.singletonMap(QDataSet.UNITS,(Object)u) );
+                    final TransferType delegate= AsciiTimeTransferType.getForName( "time"+(len), Collections.singletonMap(QDataSet.UNITS,(Object)u) );
                     tt= new TransferType() {
                         @Override
                         public void write(double d, ByteBuffer buffer) {
                             delegate.write(d, buffer);
+                            buffer.put( len-1, (byte)'Z' ); // delegate doesn't put in Z for time24.
                         }
                         @Override
                         public double read(ByteBuffer buffer) {
