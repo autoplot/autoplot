@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.das2.util.FileUtil;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Generate the HAPI server capabilities
@@ -76,6 +78,15 @@ public class AboutServlet extends HttpServlet {
                 throw new ServletException("Internal error, JSON file for capabilities does not parse.");
             }
             logger.log(Level.FINE, "using cached about file {0}", aboutFile);
+//            JSONObject jo;
+//            try {
+//                jo = new JSONObject(s);
+//                //TODO: security says this should not be shown in production use
+//                jo.put("x_HAPI_SERVER_HOME", getServletContext().getInitParameter("HAPI_SERVER_HOME") );
+//                s= jo.toString(4);
+//            } catch (JSONException ex) {
+//                throw new IllegalArgumentException(ex);
+//            }
             Util.transfer( new ByteArrayInputStream(s.getBytes("UTF-8")), response.getOutputStream() );
         } else {
             synchronized ( this ) {
