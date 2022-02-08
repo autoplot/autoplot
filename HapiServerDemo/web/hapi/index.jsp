@@ -94,7 +94,7 @@
                     title= title+ "<em> (available "+availableRange + ", example range "+exampleRange + " shown)</em>";
                 }
 
-                String exampleTimeRange= exampleRange==null ? null : String.format( "time.min=%s&time.max=%s", exampleRange.min().toString(), exampleRange.max().toString() ); 
+                String exampleTimeRange= exampleRange==null ? null : String.format( "start=%s&stop=%s", exampleRange.min().toString(), exampleRange.max().toString() ); 
                 out.println( String.format( "<p style=\"background-color: #e0e0e0;\">%s</p>", title ) );
                 if ( exampleRange!=null ) {
                     out.println( String.format("[<a href=\"info?id=%s\">Info</a>] [<a href=\"data?id=%s&%s\">Data</a>]", 
