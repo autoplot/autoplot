@@ -71,7 +71,7 @@
     </welcome-file-list>
     <context-param>
         <param-name>HAPI_SERVER_HOME</param-name>
-        <param-value>/mynet/spot8/home/jbf/hapi/</param-value>
+        <param-value>/home/jbf/hapi/</param-value>
     </context-param>
     <error-page>
         <exception-type>java.lang.RuntimeException</exception-type>
