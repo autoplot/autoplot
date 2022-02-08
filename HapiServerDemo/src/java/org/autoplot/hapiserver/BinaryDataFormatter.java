@@ -54,76 +54,83 @@ public class BinaryDataFormatter implements DataFormatter {
                 final String stype = parameter.getString("type");
                 double fl=-1;
                 Units u= SemanticOps.getUnits(record.slice(i));
-                if ( stype.equals("isotime") ) {
-                    if ( !parameter.has("length") ) throw new RuntimeException("required tag length is missing");
-                    final int len= parameter.getInt("length");
-                    final TransferType delegate= AsciiTimeTransferType.getForName( "time"+(len), Collections.singletonMap(QDataSet.UNITS,(Object)u) );
-                    tt= new TransferType() {
-                        @Override
-                        public void write(double d, ByteBuffer buffer) {
-                            delegate.write(d, buffer);
-                            buffer.put( len-1, (byte)'Z' ); // delegate doesn't put in Z for time24.
+                switch (stype) {
+                    case "isotime":
+                        {
+                            if ( !parameter.has("length") ) throw new RuntimeException("required tag length is missing");
+                            final int len= parameter.getInt("length");
+                            final TransferType delegate= AsciiTimeTransferType.getForName( "time"+(len), Collections.singletonMap(QDataSet.UNITS,(Object)u) );
+                            tt= new TransferType() {
+                                @Override
+                                public void write(double d, ByteBuffer buffer) {
+                                    delegate.write(d, buffer);
+                                    buffer.put( len-1, (byte)'Z' ); // delegate doesn't put in Z for time24.
+                                }
+                                @Override
+                                public double read(ByteBuffer buffer) {
+                                    throw new UnsupportedOperationException("Not supported.");
+                                }
+                                @Override
+                                public int sizeBytes() {
+                                    return len;
+                                }
+                                @Override
+                                public boolean isAscii() {
+                                    return false;
+                                }
+                                @Override
+                                public String name() {
+                                    return "string"+len;
+                                }
+                            };      break;
                         }
-                        @Override
-                        public double read(ByteBuffer buffer) {
-                            throw new UnsupportedOperationException("Not supported."); 
+                    case "string":
+                        {
+                            if ( !parameter.has("length") ) throw new RuntimeException("required tag length is missing"); 
+                            final int len= parameter.getInt("length");
+                            final Units units= u;
+                            final byte[] zeros= new byte[len];
+                            for ( int i2=0; i2<zeros.length; i2++ ) zeros[i2]= 0;
+                            tt= new TransferType() {
+                                @Override
+                                public void write(double d, ByteBuffer buffer) {
+                                    String s= units.createDatum(d).toString();
+                                    byte[] bytes= s.getBytes( Charset.forName("UTF-8") );
+                                    if ( bytes.length==len ) {
+                                        buffer.put( bytes );
+                                    } else if ( bytes.length<len ) {
+                                        buffer.put( bytes, 0, bytes.length );
+                                        buffer.put( zeros, bytes.length, len-bytes.length );
+                                    } else {
+                                        bytes= Util.trimUTF8( bytes, len );
+                                        buffer.put( bytes, 0, bytes.length );
+                                        buffer.put( zeros, bytes.length, len-bytes.length );
+                                    }
+                                }
+                                @Override
+                                public double read(ByteBuffer buffer) {
+                                    throw new UnsupportedOperationException("Not supported.");
+                                }
+                                @Override
+                                public int sizeBytes() {
+                                    return len;
+                                }
+                                @Override
+                                public boolean isAscii() {
+                                    return false;
+                                }
+                                @Override
+                                public String name() {
+                                    return "string"+len;
+                                }
+                            };      break;
                         }
-                        @Override
-                        public int sizeBytes() {
-                            return len;
-                        }
-                        @Override
-                        public boolean isAscii() {
-                            return false;
-                        }
-                        @Override
-                        public String name() {
-                            return "string"+len;
-                        }   
-                    };
-                } else if ( stype.equals("string") ) {
-                    if ( !parameter.has("length") ) throw new RuntimeException("required tag length is missing");
-                    final int len= parameter.getInt("length");
-                    final Units units= u;
-                    final byte[] zeros= new byte[len];
-                    for ( int i2=0; i2<zeros.length; i2++ ) zeros[i2]= 0;
-                    tt= new TransferType() {
-                        @Override
-                        public void write(double d, ByteBuffer buffer) {
-                            String s= units.createDatum(d).toString();
-                            byte[] bytes= s.getBytes( Charset.forName("UTF-8") );  
-                            if ( bytes.length==len ) {
-                                buffer.put( bytes ); 
-                            } else if ( bytes.length<len ) {
-                                buffer.put( bytes, 0, bytes.length ); 
-                                buffer.put( zeros, bytes.length, len-bytes.length );
-                            } else {
-                                bytes= Util.trimUTF8( bytes, len );
-                                buffer.put( bytes, 0, bytes.length );  
-                                buffer.put( zeros, bytes.length, len-bytes.length );
-                            }
-                        }
-                        @Override
-                        public double read(ByteBuffer buffer) {
-                            throw new UnsupportedOperationException("Not supported."); 
-                        }
-                        @Override
-                        public int sizeBytes() {
-                            return len;
-                        }
-                        @Override
-                        public boolean isAscii() {
-                            return false;
-                        }
-                        @Override
-                        public String name() {
-                            return "string"+len;
-                        }   
-                    };
-                } else if ( stype.equals("double") || stype.equals("integer")) {
-                    tt= TransferType.getForName(stype, Collections.singletonMap(QDataSet.UNITS,(Object)u) );
-                    fl= Double.parseDouble( parameter.getString("fill") );
-                } else {
+                    case "double":
+                    case "integer":
+                        tt= TransferType.getForName(stype, Collections.singletonMap(QDataSet.UNITS,(Object)u) );
+                        fl= Double.parseDouble( parameter.getString("fill") );
+                        break;
+                    default:
                     throw new IllegalArgumentException("server is misconfigured, using unsupported type: "+stype );
                 }
                 int nfields;
