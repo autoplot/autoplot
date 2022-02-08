@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.Collections;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Units;
@@ -32,6 +33,7 @@ public class BinaryDataFormatter implements DataFormatter {
     double[] fill;
     ByteBuffer b;
     int bufferSize;
+    int sentRecordCount;
     
     public BinaryDataFormatter( ) {
     }
@@ -55,13 +57,13 @@ public class BinaryDataFormatter implements DataFormatter {
                 if ( stype.equals("isotime") ) {
                     if ( !parameter.has("length") ) throw new RuntimeException("required tag length is missing");
                     final int len= parameter.getInt("length");
-                    final TransferType delegate= AsciiTimeTransferType.getForName( "time"+(len-1), Collections.singletonMap(QDataSet.UNITS,(Object)u) );
-                    final byte NULL= 0;
+                    final TransferType delegate= AsciiTimeTransferType.getForName( "time"+len, Collections.singletonMap(QDataSet.UNITS,(Object)u) );
+                    final byte NULL= 127;
                     tt= new TransferType() {
                         @Override
                         public void write(double d, ByteBuffer buffer) {
                             delegate.write(d, buffer);
-                            buffer.put(NULL);
+                            buffer.put(len-1,NULL);
                         }
                         @Override
                         public double read(ByteBuffer buffer) {
@@ -146,6 +148,8 @@ public class BinaryDataFormatter implements DataFormatter {
 
             b= TransferType.allocate( bufferSize, ByteOrder.LITTLE_ENDIAN );
             
+            sentRecordCount=0;
+            
         } catch (JSONException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
@@ -164,9 +168,25 @@ public class BinaryDataFormatter implements DataFormatter {
         }
         byte[] bytes= b.array();
         
+        if ( sentRecordCount==0 && logger.isLoggable(Level.FINER)  ) {
+            StringBuilder sbuf;
+            sbuf = new StringBuilder();
+            int nf= Math.min(80,bytes.length);
+            for ( int i=0; i<nf; i++ ) {
+                sbuf.append( String.format( "%2d ", i ) );
+            }
+            logger.fine( sbuf.toString() );
+            sbuf = new StringBuilder();
+            for ( int i=0; i<nf; i++ ) {
+                sbuf.append( String.format( "%02x ", bytes[i] ) );
+            }
+            logger.fine( sbuf.toString() );
+        }
         out.write( bytes );
         
         b.flip();
+        
+        sentRecordCount++;
                 
     }
     
