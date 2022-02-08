@@ -58,12 +58,10 @@ public class BinaryDataFormatter implements DataFormatter {
                     if ( !parameter.has("length") ) throw new RuntimeException("required tag length is missing");
                     final int len= parameter.getInt("length");
                     final TransferType delegate= AsciiTimeTransferType.getForName( "time"+len, Collections.singletonMap(QDataSet.UNITS,(Object)u) );
-                    final byte NULL= 127;
                     tt= new TransferType() {
                         @Override
                         public void write(double d, ByteBuffer buffer) {
                             delegate.write(d, buffer);
-                            buffer.put(len-1,NULL);
                         }
                         @Override
                         public double read(ByteBuffer buffer) {
@@ -168,19 +166,21 @@ public class BinaryDataFormatter implements DataFormatter {
         }
         byte[] bytes= b.array();
         
-        if ( sentRecordCount==0 && logger.isLoggable(Level.FINER)  ) {
-            StringBuilder sbuf;
-            sbuf = new StringBuilder();
-            int nf= Math.min(80,bytes.length);
-            for ( int i=0; i<nf; i++ ) {
-                sbuf.append( String.format( "%2d ", i ) );
+        if ( sentRecordCount==0 ) {
+            if ( logger.isLoggable(Level.FINE)  ) {
+                StringBuilder sbuf;
+                sbuf = new StringBuilder();
+                int nf= Math.min(80,bytes.length);
+                for ( int i=0; i<nf; i++ ) {
+                    sbuf.append( String.format( "%2d ", i ) );
+                }
+                logger.fine( sbuf.toString() );
+                sbuf = new StringBuilder();
+                for ( int i=0; i<nf; i++ ) {
+                    sbuf.append( String.format( "%02x ", bytes[i] ) );
+                }
+                logger.fine( sbuf.toString() );
             }
-            logger.fine( sbuf.toString() );
-            sbuf = new StringBuilder();
-            for ( int i=0; i<nf; i++ ) {
-                sbuf.append( String.format( "%02x ", bytes[i] ) );
-            }
-            logger.fine( sbuf.toString() );
         }
         out.write( bytes );
         
