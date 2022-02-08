@@ -240,6 +240,23 @@ public class HapiServer {
         return url;
     }
     
+    private static Map<String,String> versions= new HashMap<>();
+    private static Map<String,Long> versionFresh= new HashMap<>();
+    
+    public static String getHapiServerVersion( URL server ) throws JSONException, IOException {
+        String sserver= server.toString();
+        Long fresh= versionFresh.get(sserver);
+        if ( fresh==null || ( fresh < ( System.currentTimeMillis() - 600000 ) ) ) {
+            JSONObject capabilities= getCapabilities( server );
+            String version = capabilities.getString("HAPI");
+            versions.put( sserver, version );
+            versionFresh.put( sserver, System.currentTimeMillis() );
+            return version;
+        } else {
+            return versions.get( sserver );
+        }
+    }
+    
     /**
      * return the URL for data requests.
      * @param server
@@ -252,8 +269,19 @@ public class HapiServer {
         TimeParser tp= TimeParser.create("$Y-$m-$dT$H:$M:$SZ");
         HashMap<String,String> map= new LinkedHashMap();
         map.put(HapiSpec.URL_PARAM_ID, id );
-        map.put(HapiSpec.URL_PARAM_TIMEMIN, tp.format(tr.min()) );
-        map.put(HapiSpec.URL_PARAM_TIMEMAX, tp.format(tr.max()) );
+        String version;
+        try {
+            version= getHapiServerVersion(server);
+        } catch (JSONException | IOException ex) {
+            version= "2.0";
+        }
+        if ( version.startsWith("2.") ) {
+            map.put(HapiSpec.URL_PARAM_TIMEMIN, tp.format(tr.min()) );
+            map.put(HapiSpec.URL_PARAM_TIMEMAX, tp.format(tr.max()) );
+        } else {
+            map.put(HapiSpec.URL_PARAM_START, tp.format(tr.min()) );
+            map.put(HapiSpec.URL_PARAM_STOP, tp.format(tr.max()) );            
+        }
         if ( parameters.length()>0 ) {
             map.put(HapiSpec.URL_PARAM_PARAMETERS, parameters );
         }

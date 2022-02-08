@@ -43,6 +43,18 @@ public final class HapiSpec {
     protected static final String URL_PARAM_ID = "id";
 
     /**
+     * start time parameter of a URL, used in the data requests.
+     * @see https://github.com/hapi-server/data-specification#data
+     */
+    protected static final String URL_PARAM_START = "start";
+    
+    /**
+     * stop time parameter of a URL, used in the data requests.
+     * @see https://github.com/hapi-server/data-specification#data
+     */
+    protected static final String URL_PARAM_STOP = "stop";
+
+    /**
      * time.min parameter of a URL, used in the data requests.
      * @see https://github.com/hapi-server/data-specification#data
      */
