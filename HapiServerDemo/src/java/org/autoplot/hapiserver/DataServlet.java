@@ -123,8 +123,12 @@ public class DataServlet extends HttpServlet {
             
         Map<String,String[]> params= new HashMap<>( request.getParameterMap() );
         String id= getParam( params,"id",null,"The identifier for the resource.", null );
-        String timeMin= getParam( params, "time.min", null, "The earliest value of time to include in the response.", null );
-        String timeMax= getParam( params, "time.max", null, "The include values of time up to but not including this time in the response.", null );
+        String timeMin= getParam( params, "time.min", "", "The earliest value of time to include in the response.", null );
+        String timeMax= getParam( params, "time.max", "", "Include values of time up to but not including this time in the response.", null );
+        if ( timeMin.length()==0 ) { // support 3.0
+            timeMin= getParam( params, "start", null, "The earliest value of time to include in the response.", null );
+            timeMax= getParam( params, "stop", null, "Include values of time up to but not including this time in the response.", null );
+        }
         String parameters= getParam( params, "parameters", "", "The comma separated list of parameters to include in the response ", null );
         String include= getParam( params, "include", "", "include header at the top", Pattern.compile("(|header)") );
         String format= getParam( params, "format", "", "The desired format for the data stream.", Pattern.compile("(|csv|binary)") );
