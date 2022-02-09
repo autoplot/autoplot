@@ -178,7 +178,7 @@ public class DataServlet extends HttpServlet {
         
         long t0= System.currentTimeMillis();
         
-        if ( timer.equals("true") || request.getRemoteAddr().equals("127.0.0.1")  || request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")) {
+        if ( timer.equals("true") || Util.isTrustedClient(request) ) {
             out= new IdleClockOutputStream(out);
         }
                 
