@@ -114,7 +114,7 @@ public class Util {
      * @return the server implementation version. 
      */
     public static final String serverVersion() {
-        return "20220208.1647";
+        return "20220208.1801";
     }
     
     static boolean isKey(String key) {
