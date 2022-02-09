@@ -124,16 +124,20 @@ public class DataServlet extends HttpServlet {
         Map<String,String[]> params= new HashMap<>( request.getParameterMap() );
         String id= getParam( params,"id",null,"The identifier for the resource.", null );
         String timeMin= getParam( params, "time.min", "", "The earliest value of time to include in the response.", null );
-        String timeMax= getParam( params, "time.max", "", "Include values of time up to but not including this time in the response.", null );
+        String timeMax= 
+            getParam( params, "time.max", "", "Include values of time up to but not including this time in the response.", null );
         if ( timeMin.length()==0 ) { // support 3.0
             timeMin= getParam( params, "start", null, "The earliest value of time to include in the response.", null );
-            timeMax= getParam( params, "stop", null, "Include values of time up to but not including this time in the response.", null );
+            timeMax= 
+                getParam( params, "stop", null, "Include values of time up to but not including this time in the response.", null );
         }
-        String parameters= getParam( params, "parameters", "", "The comma separated list of parameters to include in the response ", null );
-        String include= getParam( params, "include", "", "include header at the top", Pattern.compile("(|header)") );
-        String format= getParam( params, "format", "", "The desired format for the data stream.", Pattern.compile("(|csv|binary)") );
-        String stream= getParam( params, "_stream", "true", "allow/disallow streaming.", Pattern.compile("(|true|false)") );
-        String timer= getParam( params, "_timer", "false", "service request with timing output stream", Pattern.compile("(|true|false)") );
+        String parameters= 
+            getParam( params, "parameters", "", "The comma separated list of parameters to include in the response ", null );
+        String include= getParam(params, "include", "", "include header at the top", PATTERN_INCLUDE);
+        String format= getParam(params, "format", "", "The desired format for the data stream.", PATTERN_FORMAT);
+        String stream= getParam(params, "_stream", "true", "allow/disallow streaming.", PATTERN_TRUE_FALSE);
+        String timer= getParam(params, "_timer", "false", "service request with timing output stream", PATTERN_TRUE_FALSE);
+        
         if ( !params.isEmpty() ) {
             throw new ServletException("unrecognized parameters: "+params);
         }
@@ -144,11 +148,13 @@ public class DataServlet extends HttpServlet {
         if ( format.equals("binary") ) {
             response.setContentType("application/binary");
             dataFormatter= new BinaryDataFormatter();
-            response.setHeader("Content-disposition", "attachment; filename="+ Ops.safeName(id) + "_"+timeMin+ "_"+timeMax + ".bin" );
+            response.setHeader("Content-disposition", "attachment; filename="
+                + Ops.safeName(id) + "_"+timeMin+ "_"+timeMax + ".bin" );
         } else {
             response.setContentType("text/csv;charset=UTF-8");  
             dataFormatter= new CsvDataFormatter();
-            response.setHeader("Content-disposition", "attachment; filename="+ Ops.safeName(id) + "_"+timeMin+ "_"+timeMax + ".csv" ); 
+            response.setHeader("Content-disposition", "attachment; filename=" 
+                + Ops.safeName(id) + "_"+timeMin+ "_"+timeMax + ".csv" ); 
         }
         
         
@@ -225,7 +231,8 @@ public class DataServlet extends HttpServlet {
                     } else {
                         if ( id.equals("0B000800408DD710.noStream") ) {
                             logger.log(Level.FINER, "noStream demo shows without streaming" );
-                            dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/0B000800408DD710.$Y$m$d.d2s", dr, false ); // allow Autoplot to select
+                            dsiter= new RecordIterator( // allow Autoplot to select
+                                "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/0B000800408DD710.$Y$m$d.d2s", dr, false ); 
                         } else {
                             throw new IllegalArgumentException("bad id: "+id+", data file does not exist: "+dataFile );
                         }
@@ -385,6 +392,9 @@ public class DataServlet extends HttpServlet {
             logger.log(Level.FINE, "request handled in {0} ms.", System.currentTimeMillis()-t0);
         }
     }
+    private static final Pattern PATTERN_TRUE_FALSE = Pattern.compile("(|true|false)");
+    private static final Pattern PATTERN_FORMAT = Pattern.compile("(|csv|binary)");
+    private static final Pattern PATTERN_INCLUDE = Pattern.compile("(|header)");
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -421,9 +431,10 @@ public class DataServlet extends HttpServlet {
         String id= getParam( params,"id",null,"The identifier for the resource.", null );
         String timeMin= getParam( params, "time.min", "", "The earliest value of time to include in the response.", null );
         String timeMax= getParam( params, "time.max", "", "The latest value of time to include in the response.", null );
-        String parameters= getParam( params, "parameters", "", "The comma separated list of parameters to include in the response ", null );
-        String include= getParam( params, "include", "", "include header at the top", Pattern.compile("(|header)") );
-        String format= getParam( params, "format", "", "The desired format for the data stream.", Pattern.compile("(|csv|binary)") );
+        String parameters= getParam( 
+            params, "parameters", "", "The comma separated list of parameters to include in the response ", null );
+        String include= getParam(params, "include", "", "include header at the top", PATTERN_INCLUDE);
+        String format= getParam(params, "format", "", "The desired format for the data stream.", PATTERN_FORMAT);
         
         String key= request.getParameter("key"); // key is authorization, not authentication
         if ( !Util.keyCanModify(id,key) ) {
@@ -448,7 +459,8 @@ public class DataServlet extends HttpServlet {
         ServletFileUpload upload = new ServletFileUpload(factory);
         try {
             request.getContentType();
-            // wget --post-data='data=2002-02-02T00:00Z,4.56' 'http://localhost:8084/HapiServerDemo/hapi/data?id=chickens&key=12345678'
+            // wget --post-data='data=2002-02-02T00:00Z,4.56' \
+            //    'http://localhost:8084/HapiServerDemo/hapi/data?id=chickens&key=12345678'
             if ( request.getContentType().equals( "application/x-www-form-urlencoded" ) ) {
                 String data= request.getParameter("data");
                 try ( BufferedReader r = new BufferedReader( new StringReader(data) );
@@ -502,7 +514,8 @@ public class DataServlet extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    private RecordIterator checkAutoplotSource(String id, DatumRange dr, boolean allowStream) throws IOException, JSONException, Exception {
+    private RecordIterator checkAutoplotSource(String id, DatumRange dr, boolean allowStream) 
+        throws IOException, JSONException, Exception {
         File configFile= new File( new File( Util.getHapiHome().toString(), "info" ), Util.fileSystemSafeName(id)+".json" );
         if ( !configFile.exists() ) {
             return null;
@@ -528,7 +541,8 @@ public class DataServlet extends HttpServlet {
      * @throws IOException 
      * 
      */
-    private void cachedDataCsv( JSONObject info, OutputStream out, File dataFile, DatumRange dr, String parameters, int[] indexMap) throws FileNotFoundException, IOException {
+    private void cachedDataCsv( JSONObject info, OutputStream out, File dataFile, DatumRange dr, String parameters, int[] indexMap) 
+        throws FileNotFoundException, IOException {
 
         long t0= System.currentTimeMillis();
         
@@ -568,12 +582,12 @@ public class DataServlet extends HttpServlet {
                                 if ( nf==-1 ) nf= ss.length;
                                 if ( quickVerify ) {
                                     try {
-                                        quickVerify= false;
                                         JSONArray pps= info.getJSONArray("parameters");
                                         JSONObject time= pps.getJSONObject(0);
                                         int len= time.getInt("length");
                                         if ( ss[0].length()!=len ) {
-                                            throw new IllegalArgumentException("cache field 0 length ("+ss[0].length()+") in file "+dataFile+" is incorrect, should be "+len);
+                                            throw new IllegalArgumentException("cache field 0 length ("+ss[0].length()+") in file "
+                                                +dataFile+" is incorrect, should be "+len);
                                         }
                                     } catch (JSONException ex) {
                                         throw new IllegalArgumentException(ex); // should have caught this already
