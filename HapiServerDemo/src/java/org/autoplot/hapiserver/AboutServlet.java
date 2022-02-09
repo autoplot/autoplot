@@ -78,15 +78,17 @@ public class AboutServlet extends HttpServlet {
                 throw new ServletException("Internal error, JSON file for capabilities does not parse.");
             }
             logger.log(Level.FINE, "using cached about file {0}", aboutFile);
-//            JSONObject jo;
-//            try {
-//                jo = new JSONObject(s);
-//                //TODO: security says this should not be shown in production use
-//                jo.put("x_HAPI_SERVER_HOME", getServletContext().getInitParameter("HAPI_SERVER_HOME") );
-//                s= jo.toString(4);
-//            } catch (JSONException ex) {
-//                throw new IllegalArgumentException(ex);
-//            }
+            if ( Util.isTrustedClient(request) ) {
+                // security says this should not be shown in production use, but include for localhost
+                JSONObject jo;
+                try {
+                    jo = new JSONObject(s);
+                    jo.put("x_HAPI_SERVER_HOME", getServletContext().getInitParameter("HAPI_SERVER_HOME") );
+                    s= jo.toString(4);
+                } catch (JSONException ex) {
+                    throw new IllegalArgumentException(ex);
+                }
+            }
             Util.transfer( new ByteArrayInputStream(s.getBytes("UTF-8")), response.getOutputStream() );
         } else {
             synchronized ( this ) {

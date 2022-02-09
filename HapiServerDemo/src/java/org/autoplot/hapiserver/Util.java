@@ -11,6 +11,7 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -20,6 +21,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.das2.qds.DataSetUtil;
 import org.json.JSONArray;
@@ -115,6 +117,25 @@ public class Util {
      */
     public static final String serverVersion() {
         return "20220208.1801";
+    }
+    
+    /**
+     * return true if the client is trusted and additional information about
+     * the server for debugging can be included in the response.
+     * @param request
+     * @return 
+     */
+    public static final boolean isTrustedClient( HttpServletRequest request ) {
+        String ip= request.getRemoteAddr();
+        if (ip.equals("127.0.0.1")) {
+                Enumeration<String> hh= request.getHeaders("X-Forwarded-For");
+                if ( hh.hasMoreElements() ) {
+                    ip = hh.nextElement();
+                }
+        }
+        String remoteAddr= ip;
+            
+        return remoteAddr.equals("127.0.0.1" ) || remoteAddr.equals("0:0:0:0:0:0:0:1");
     }
     
     static boolean isKey(String key) {

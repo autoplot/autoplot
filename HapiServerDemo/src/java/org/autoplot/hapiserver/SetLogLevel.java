@@ -44,17 +44,8 @@ public class SetLogLevel extends HttpServlet {
             String level= request.getParameter("level");
             String handler= request.getParameter("handler");
             String format= request.getParameter("format");
-            
-            String ip= request.getRemoteAddr();
-            if (ip.equals("127.0.0.1")) {
-                Enumeration<String> hh= request.getHeaders("X-Forwarded-For");
-                if ( hh.hasMoreElements() ) {
-                    ip = hh.nextElement();
-                }
-            }
-            String remoteAddr= ip;
-            
-            if ( !remoteAddr.equals("127.0.0.1" ) && !remoteAddr.equals("0:0:0:0:0:0:0:1") ) {
+                        
+            if ( !Util.isTrustedClient(request) ) {
                 out.println("<html>");
                 out.println("<head>");
                 out.println("<title>Servlet SetLogLevel</title>");  
