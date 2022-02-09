@@ -124,15 +124,13 @@ public class Util {
      * @return 
      */
     public static final boolean isTrustedClient( HttpServletRequest request ) {
-        String ip= request.getRemoteAddr();
-        if (ip.equals("127.0.0.1")) {
-                Enumeration<String> hh= request.getHeaders("X-Forwarded-For");
-                if ( hh.hasMoreElements() ) {
-                    ip = hh.nextElement();
-                }
-        }
-        String remoteAddr= ip;
-            
+        String remoteAddr= request.getRemoteAddr();
+        if ( remoteAddr.equals("127.0.0.1" ) || remoteAddr.equals("0:0:0:0:0:0:0:1") ) {
+            Enumeration<String> hh= request.getHeaders("X-Forwarded-For");
+            if ( hh.hasMoreElements() ) {
+                remoteAddr = hh.nextElement();
+            }
+        }            
         return remoteAddr.equals("127.0.0.1" ) || remoteAddr.equals("0:0:0:0:0:0:0:1");
     }
     
