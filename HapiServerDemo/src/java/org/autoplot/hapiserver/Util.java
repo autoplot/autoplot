@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -138,14 +136,15 @@ public class Util {
         return remoteAddr.equals("127.0.0.1" ) || remoteAddr.equals("0:0:0:0:0:0:0:1");
     }
     
+    private static final Pattern PATTERN_KEY= Pattern.compile("\\d{8}+");
+    
     static boolean isKey(String key) {
-        Pattern p= Pattern.compile("\\d{8}+");
-        return p.matcher(key).matches();
+        return PATTERN_KEY.matcher(key).matches();
     }
     
     /**
      * convert IDs and NAMEs into safe names which will work on all platforms.
-     * If the name is modified, it will start with an _. 
+     * If the name is modified, it will start with an underscore (_). 
      * <li>poolTemperature -> poolTemperature
      * <li>Iowa City Conditions -> _Iowa+City+Conditions
      * @param s
