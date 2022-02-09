@@ -422,11 +422,18 @@ public class HapiClient {
             String endTime ) throws IOException, JSONException {
         
         JSONObject info= getInfo( server, id );
-        
-        URL dataURL= new URL( server, 
+        URL dataURL;
+        if ( info.getString("HAPI").startsWith("3.") ) {
+            dataURL= new URL( server, 
+                "data?id="+id 
+                + "&start="+startTime 
+                + "&stop="+endTime );
+        } else {
+            dataURL= new URL( server, 
                 "data?id="+id 
                 + "&time.min="+startTime 
                 + "&time.max="+endTime );
+        }
         
         InputStream ins= dataURL.openStream();
         BufferedReader reader= new BufferedReader( new InputStreamReader(ins) );

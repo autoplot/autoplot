@@ -258,9 +258,10 @@ public final class HapiDataSource extends AbstractDataSource {
      * reformat the URL with the new timerange.
      * @param url the URL containing time.min and time.max parameters.
      * @param tr the new timerange
+     * @param vers the HAPI server version
      * @return the URL with time.min and time.max replaced.
      */
-    private static URL replaceTimeRangeURL(URL url, DatumRange tr) {
+    private static URL replaceTimeRangeURL(URL url, DatumRange tr, String vers ) {
         try {
             URISplit split= URISplit.parse(url.toURI());
             Map<String,String> params= URISplit.parseParams(split.params);
@@ -268,8 +269,13 @@ public final class HapiDataSource extends AbstractDataSource {
             String smax= tr.max().toString();
             if ( smin.endsWith("00:00:00.000Z") ) smin= smin.substring(0,smin.length()-14) + "T00:00Z";
             if ( smax.endsWith("00:00:00.000Z") ) smax= smax.substring(0,smax.length()-14) + "T00:00Z";
-            params.put("time.min",smin);
-            params.put("time.max",smax);
+            if ( vers.startsWith("1.") || vers.startsWith("2.")) {
+                params.put("time.min",smin);
+                params.put("time.max",smax);
+            } else {
+                params.put("start",smin);
+                params.put("stop",smax);
+            }
             split.params= URISplit.formatParams(params);
             String surl= URISplit.format(split);
             url= new URL(surl);
@@ -922,6 +928,8 @@ public final class HapiDataSource extends AbstractDataSource {
         JSONObject info= getInfo();
         info= HapiUtil.resolveRefs(info);
         
+        String vers= info.getString("HAPI");
+        
         monitor.setProgressMessage("got info");
         monitor.setTaskProgress(20);
         
@@ -1059,7 +1067,6 @@ public final class HapiDataSource extends AbstractDataSource {
             }
         }
         int totalFields= DataSetUtil.sum(nfields);
-
         QDataSet ds;
         switch (format) {
             case "binary":
@@ -1086,6 +1093,7 @@ public final class HapiDataSource extends AbstractDataSource {
                         monitor.started();
                     }
                     int iday=0;
+                    
                     while ( currentDay.min().le(tr.max()) ) {
                         logger.log(Level.FINER, "useCache, request {0}", currentDay);
                         ProgressMonitor mon1= nday==1 ? monitor : monitor.getSubtaskMonitor( 10*iday, 10*(iday+1), "read "+currentDay );
@@ -1093,7 +1101,7 @@ public final class HapiDataSource extends AbstractDataSource {
                         try {
                             DatumRange oneDaysRange= DatumRangeUtil.sloppyIntersection( currentDay, startStopDate );
                             if ( oneDaysRange.width().value()>0 ) {
-                                URL url1= replaceTimeRangeURL(url,oneDaysRange);
+                                URL url1= replaceTimeRangeURL(url,oneDaysRange,vers);
                                 ds1 = getDataSetViaCsv(totalFields, mon1, url1, pds, 
                                         oneDaysRange, nparam, nfields, getParam( "cache", "" ) );
                                 if ( ds1.length()>0 ) {
