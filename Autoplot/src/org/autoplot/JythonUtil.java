@@ -322,8 +322,7 @@ public class JythonUtil {
             if ( lastVersionFile.exists() ) {
                 try {
                     String lastVersionContents= FileUtil.readFileToString(lastVersionFile);
-                    return DiffUtils.diff( splitAndTrimLines( contents ), 
-                        splitAndTrimLines( lastVersionContents ) );
+                    return DiffUtils.diff( splitAndTrimLines( lastVersionContents ), splitAndTrimLines( contents ) );
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
