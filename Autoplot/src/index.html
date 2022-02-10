@@ -27,8 +27,16 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-02-02 r26431):</p>
+        <p>Bugfixes (2022-02-09 r26465):</p>
         <ul>
+            <li>corrections to decimalYear unit.
+            <li>SeriesRenderer handles rgbColor where alpha channel is non-zero.
+            <li>script diff since last invocation was drawn backwards, showing changes in the wrong direction.
+            <li>Use start and stop for HAPI 3.0 servers.
+            <li>Autoplot-based HAPI server properly formats times with Z suffix.  Thanks, Bob!
+            <li>HAPI data source editor is set properly when there is an error getting the catalog.  Before it would leave an old catalog showing.
+            <li>go-to line action from the Jython editor line number gutter now requires shift to activate.
+            <li>runtime error during data source editor creation could leave the data set selector in a locked state.
             <li>correction to rescale routine, which ignored the "max" parameter.
             <li>if a data source crashed during GUI initialization, the data set selector could be locked up.
             <li>trace functionality revisited to use Jython AST for handling code.
