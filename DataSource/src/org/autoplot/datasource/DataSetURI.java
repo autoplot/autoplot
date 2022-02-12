@@ -66,6 +66,7 @@ import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.datum.HttpUtil;
 import org.das2.qds.ops.Ops;
 import org.das2.util.Base64;
+import org.das2.util.FileUtil;
 import org.das2.util.filesystem.GitHubFileSystem;
 import org.das2.util.filesystem.KeyChain;
 import org.das2.util.monitor.AlertNullProgressMonitor;
@@ -1298,27 +1299,33 @@ public class DataSetURI {
 
         } else {
             boolean fail= true;
-            InputStream in=null;
-            try {
-                Logger loggerUrl= org.das2.util.LoggerManager.getLogger( "das2.url" );
-                mon.setProgressMessage("downloading "+url);
-                mon.started();
-                logger.log(Level.FINEST,"downloadResourceAsTempFile-> transfer");
-                logger.log(Level.FINE, "reading URL {0}", url);
-                loggerUrl.log(Level.FINE,"GET to get data {0}", url);
 
-                URLConnection urlc= url.openConnection();
-                urlc.setRequestProperty("Accept-Encoding", "gzip"); // RFE
-                urlc.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() ); // Reiner describes hang at LANL
-                urlc.setReadTimeout( FileSystem.settings().getReadTimeoutMs() );
-                urlc.setAllowUserInteraction(false);
-                if ( userInfo != null) {
-                    String encode = Base64.getEncoder().encodeToString( userInfo.getBytes());
-                    urlc.setRequestProperty("Authorization", "Basic " + encode);
+            Logger loggerUrl= org.das2.util.LoggerManager.getLogger( "das2.url" );
+            mon.setProgressMessage("downloading "+url);
+            mon.started();
+            logger.log(Level.FINEST,"downloadResourceAsTempFile-> transfer");
+            logger.log(Level.FINE, "reading URL {0}", url);
+            loggerUrl.log(Level.FINE,"GET to get data {0}", url);
+
+            URLConnection urlc= url.openConnection();
+            urlc.setRequestProperty("Accept-Encoding", "gzip"); // RFE
+            urlc.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() ); // Reiner describes hang at LANL
+            urlc.setReadTimeout( FileSystem.settings().getReadTimeoutMs() );
+            urlc.setAllowUserInteraction(false);
+            if ( userInfo != null) {
+                String encode = Base64.getEncoder().encodeToString( userInfo.getBytes());
+                urlc.setRequestProperty("Authorization", "Basic " + encode);
+            }
+            urlc= HttpUtil.checkRedirect(urlc);
+            if ( urlc instanceof HttpURLConnection ) {
+                HttpURLConnection huc= (HttpURLConnection)urlc;
+                if ( huc.getResponseCode()==400 ) {
+                    FileUtil.consumeStream( huc.getErrorStream() );
+                    throw new IOException(url.toString());
                 }
-                urlc= HttpUtil.checkRedirect(urlc);
+            }
                 
-                in= urlc.getInputStream();
+            try ( InputStream in= urlc.getInputStream() )  {
                 
                 Map<String, List<String>> headers = urlc.getHeaderFields();
                 List<String> contentEncodings=headers.get("Content-Encoding");
@@ -1336,16 +1343,19 @@ public class DataSetURI {
                 if ( contentLengths!=null && contentLengths.size()>0 ) {
                     contentLength= Long.parseLong( contentLengths.get(0) );
                 }
+                
+                InputStream fin= in;
+                
                 if ( hasGzipHeader ) {
                     logger.fine("temp file is compressed");
-                    in= new GZIPInputStream(in);
+                    fin= new GZIPInputStream(fin);
                 } else {
                     logger.fine("temp file is not compressed");
                 }
                 ProgressMonitor loadMonitor= mon.getSubtaskMonitor("loading");
                 if ( contentLength>-1 ) loadMonitor.setTaskSize(contentLength);
                 
-                in= new DasProgressMonitorInputStream( in, loadMonitor ); 
+                fin= new DasProgressMonitorInputStream( fin, loadMonitor ); 
                 if ( urlc instanceof HttpURLConnection ) {
                     final HttpURLConnection hurlc= (HttpURLConnection) urlc;
                     ((DasProgressMonitorInputStream)in).addRunWhenClosedRunnable( new Runnable() {
@@ -1359,7 +1369,7 @@ public class DataSetURI {
                     ((DasProgressMonitorInputStream)in).setStreamLength(contentLength);
                 }
                 OutputStream out= new FileOutputStream( tempfile );
-                DataSourceUtil.transfer( Channels.newChannel(in), Channels.newChannel(out) );
+                DataSourceUtil.transfer( Channels.newChannel(fin), Channels.newChannel(out) );
                 fail= false;
                 logger.log(Level.FINE,"downloadResourceAsTempFile-> transfer was successful");
             } catch ( IOException ex ) { 
@@ -1374,7 +1384,6 @@ public class DataSetURI {
                     }
                 }
                 mon.finished();
-                if ( in!=null ) in.close(); // This will throw the InterruptedIOException
             }
         }
 
