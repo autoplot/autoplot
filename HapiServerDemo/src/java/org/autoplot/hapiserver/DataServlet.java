@@ -342,22 +342,38 @@ public class DataServlet extends HttpServlet {
                 TimeUtil.getSecondsSinceMidnight(dr.max())==0 && 
                 dr.width().doubleValue(Units.seconds)==86400 || 
                 dr.width().doubleValue(Units.seconds)==86401 ) {
+            boolean proceed= true;
+            
             File dataFileHome= new File( Util.getHapiHome(), "cache" );
             dataFileHome= new File( dataFileHome, id );
             if ( !dataFileHome.exists() ) {
-                if ( !dataFileHome.mkdirs() ) logger.log(Level.FINE, "unable to mkdir {0}", dataFileHome);
+                if ( !dataFileHome.mkdirs() ) {
+                    logger.log(Level.FINE, "unable to mkdir {0}", dataFileHome);
+                    proceed=false;
+                }
             }
-            if ( dataFileHome.exists() ) {
+            if ( proceed && dataFileHome.exists() ) {
                 TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d.csv.gz");
                 String s= tp.format(dr);
                 File ff= new File( dataFileHome, s );
                 if ( !ff.getParentFile().exists() ) {
-                    if ( !ff.getParentFile().mkdirs() ) logger.log(Level.FINE, "unable to mkdir {0}", ff.getParentFile());
+                    if ( !ff.getParentFile().mkdirs() ) {
+                        logger.log(Level.FINE, "unable to mkdir {0}", ff.getParentFile());
+                        proceed= false;
+                    }
                 }
-                FileOutputStream fout= new FileOutputStream(ff);
-                GZIPOutputStream gzout= new GZIPOutputStream(fout);
-                org.apache.commons.io.output.TeeOutputStream tout= new TeeOutputStream( out, gzout );
-                out= tout;
+                if ( !ff.canWrite() ) {
+                    proceed= false;
+                }
+                if ( proceed ) {
+                    FileOutputStream fout= new FileOutputStream(ff);
+                    GZIPOutputStream gzout= new GZIPOutputStream(fout);
+                    org.apache.commons.io.output.TeeOutputStream tout= new TeeOutputStream( out, gzout );
+                    out= tout;
+                    logger.log( Level.FINE, "wrote cache file {0}", ff );
+                } else {
+                    logger.log( Level.FINE, "unable to write file {0}", ff );
+                }
             }
         }
         
