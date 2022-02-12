@@ -114,7 +114,7 @@ public class Util {
      * @return the server implementation version. 
      */
     public static final String serverVersion() {
-        return "20220212.0909";
+        return "20220212.1011";
     }
     
     /**
