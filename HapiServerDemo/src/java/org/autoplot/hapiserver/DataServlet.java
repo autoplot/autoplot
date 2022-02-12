@@ -362,7 +362,7 @@ public class DataServlet extends HttpServlet {
                         proceed= false;
                     }
                 }
-                if ( !ff.canWrite() ) {
+                if ( !ff.exists() && !ff.getParentFile().canWrite() ) {
                     proceed= false;
                 }
                 if ( proceed ) {
