@@ -15,6 +15,8 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.capability.Streaming;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.das2.datum.Datum;
+import org.das2.datum.TimeUtil;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
@@ -120,10 +122,14 @@ public class RecordIterator implements Iterator<QDataSet>  {
             throw new IllegalArgumentException("no data source factory found for URI: "+ uri );
         }
         
+        DatumRange timeRangeExt= new DatumRange( 
+            TimeUtil.prev( TimeUtil.MINUTE, timeRange.min() ),
+            TimeUtil.next( TimeUtil.MINUTE, timeRange.max() ) );
+        
         TimeSeriesBrowse tsb= factory.getCapability(TimeSeriesBrowse.class);   // see if we can allow for URIs without timeranges.
         if ( tsb!=null ) {
             tsb.setURI(suri);
-            tsb.setTimeRange( timeRange ); 
+            tsb.setTimeRange( timeRangeExt ); 
             uri= new URI( tsb.getURI() );
         }
         
@@ -138,7 +144,7 @@ public class RecordIterator implements Iterator<QDataSet>  {
             
             QDataSet ds;
             try {
-                ds= getDataSet( uri.toString(), timeRange, new NullProgressMonitor() );
+                ds= getDataSet( uri.toString(), timeRangeExt, new NullProgressMonitor() );
             } catch ( Exception ex ) {
                 throw ex; // breakpoint here
             }
@@ -228,14 +234,28 @@ public class RecordIterator implements Iterator<QDataSet>  {
         index= 0;
         lastIndex= src.length();
         QDataSet dep0= Ops.slice1( this.src, 0 );
-        if ( DataSetUtil.isMonotonic(dep0) ) {
-            QDataSet findeces= Ops.findex( dep0, dr );
-            this.index= (int)Math.ceil( findeces.value(0) );
-            this.lastIndex= (int)Math.ceil( findeces.value(1) );
-            this.index= Math.max(0,this.index);
-            this.lastIndex= Math.min(src.length(),this.lastIndex);
+        if ( dep0.length()==1 ) {
+            Datum d= Ops.datum(dep0.slice(0));
+            if ( d.ge(dr.min()) && d.lt(dr.max() ) ) {
+                this.index=0;
+                this.lastIndex=1;
+            } else if ( d.lt(dr.min() ) ) {
+                this.index=0;
+                this.lastIndex= 0;
+            } else if ( d.ge(dr.max() ) ) {
+                this.index= 1;
+                this.lastIndex= 1;
+            }
         } else {
-            throw new IllegalArgumentException("data dep0 is not monotonic");
+            if ( DataSetUtil.isMonotonic(dep0) ) {
+                QDataSet findeces= Ops.findex( dep0, dr );
+                this.index= (int)Math.ceil( findeces.value(0) );
+                this.lastIndex= (int)Math.ceil( findeces.value(1) );
+                this.index= Math.max(0,this.index);
+                this.lastIndex= Math.min(src.length(),this.lastIndex);
+            } else {
+                throw new IllegalArgumentException("data dep0 is not monotonic");
+            }
         }
     }
     
